@@ -23,12 +23,12 @@
  */
 
 use totara_competency\entities\competency;
-use criteria_linkedcourses\metadata_processor;
+use criteria_linkedcourses\items_processor;
 use pathway_criteria_group\criteria_group;
 use criteria_linkedcourses\linkedcourses;
 use totara_competency\linked_courses;
 
-class criteria_linkedcourses_metadata_processor_testcase extends advanced_testcase {
+class criteria_linkedcourses_items_processor_testcase extends advanced_testcase {
 
     private function set_up_pathway_with_linked_courses_criteria($competency) {
         $linked_course_criterion = new linkedcourses();
@@ -41,24 +41,22 @@ class criteria_linkedcourses_metadata_processor_testcase extends advanced_testca
         $pathway->save();
     }
 
-    public function test_update_item_links_no_data() {
+    public function test_update_items_no_data() {
         global $DB;
-
-        $this->resetAfterTest();
 
         /** @var totara_hierarchy_generator $hierarchy_generator */
         $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
         $compfw = $hierarchy_generator->create_comp_frame([]);
         $comp = $hierarchy_generator->create_comp(['frameworkid' => $compfw->id]);
 
-        metadata_processor::update_item_links($comp->id);
+        items_processor::update_items($comp->id);
 
         // Ensure no history or configuration change entries were logged
         $this->assertSame(0, $DB->count_records('totara_competency_configuration_change', ['comp_id' => $comp->id]));
         $this->assertSame(0, $DB->count_records('totara_competency_configuration_history', ['comp_id' => $comp->id]));
     }
 
-    public function test_update_item_links_criteria_with_no_courses() {
+    public function test_update_items_criteria_with_no_courses() {
         global $DB;
 
         /** @var totara_hierarchy_generator $hierarchy_generator */
@@ -78,15 +76,18 @@ class criteria_linkedcourses_metadata_processor_testcase extends advanced_testca
         $pathway->add_criterion($linked_course_criterion);
         $pathway->save();
 
-        metadata_processor::update_item_links($competency->id);
+        items_processor::update_items($competency->id);
 
         $this->assertCount(0, $DB->get_records('totara_criteria_item'));
         $this->assertSame(0, $DB->count_records('totara_competency_configuration_change', ['comp_id' => $comp->id]));
         $this->assertSame(0, $DB->count_records('totara_competency_configuration_history', ['comp_id' => $comp->id]));
     }
 
-    public function test_update_item_links_criteria_with_one_course() {
+    public function test_update_items_criteria_with_one_course() {
         global $DB;
+
+        // We sink the events to prevent observer interference
+        $sink = $this->redirectEvents();
 
         /** @var totara_hierarchy_generator $hierarchy_generator */
         $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
@@ -97,9 +98,9 @@ class criteria_linkedcourses_metadata_processor_testcase extends advanced_testca
         $this->set_up_pathway_with_linked_courses_criteria($competency);
 
         $course = $this->getDataGenerator()->create_course();
-        linked_courses::set_linked_courses($competency->id, [['id' => $course->id, 'linktype' => PLAN_LINKTYPE_MANDATORY]]);
+        linked_courses::set_linked_courses($competency->id, [['id' => $course->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY]]);
 
-        metadata_processor::update_item_links($competency->id);
+        items_processor::update_items($competency->id);
 
         $criterion_record = $DB->get_record('totara_criteria', ['plugin_type' => 'linkedcourses']);
 
@@ -112,10 +113,15 @@ class criteria_linkedcourses_metadata_processor_testcase extends advanced_testca
 
         $this->assertSame(1, $DB->count_records('totara_competency_configuration_change', ['comp_id' => $comp->id]));
         $this->assertSame(1, $DB->count_records('totara_competency_configuration_history', ['comp_id' => $comp->id]));
+
+        $sink->close();
     }
 
-    public function test_update_item_links_criteria_with_changes() {
+    public function test_update_items_criteria_with_changes() {
         global $DB;
+
+        // We sink the events to prevent observer interference
+        $sink = $this->redirectEvents();
 
         /** @var totara_hierarchy_generator $hierarchy_generator */
         $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
@@ -130,8 +136,13 @@ class criteria_linkedcourses_metadata_processor_testcase extends advanced_testca
         $remove = $this->getDataGenerator()->create_course();
         linked_courses::set_linked_courses(
             $competency->id,
-            [['id' => $keep->id, 'linktype' => PLAN_LINKTYPE_MANDATORY], ['id' => $remove->id, 'linktype' => PLAN_LINKTYPE_MANDATORY]]
+            [
+                ['id' => $keep->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+                ['id' => $remove->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY]
+            ]
         );
+
+        items_processor::update_items($competency->id);
 
         $items = $DB->get_records('totara_criteria_item');
         $this->assertCount(2, $items);
@@ -141,9 +152,12 @@ class criteria_linkedcourses_metadata_processor_testcase extends advanced_testca
         // At this point, we keep the $keep course, add $add. $remove gets removed.
         linked_courses::set_linked_courses(
             $competency->id,
-            [['id' => $keep->id, 'linktype' => PLAN_LINKTYPE_MANDATORY], ['id' => $add->id, 'linktype' => PLAN_LINKTYPE_MANDATORY]]
+            [
+                ['id' => $keep->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+                ['id' => $add->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY]]
         );
 
+        items_processor::update_items($competency->id);
         $items = $DB->get_records('totara_criteria_item');
         $this->assertCount(2, $items);
         $item_ids = array_column($items, 'item_id');
@@ -157,7 +171,11 @@ class criteria_linkedcourses_metadata_processor_testcase extends advanced_testca
             $competency->id,
             []
         );
+
+        items_processor::update_items($competency->id);
         $this->assertEquals(0, $DB->count_records('totara_criteria_item'));
+
+        $sink->close();
     }
 
 }

@@ -208,13 +208,10 @@ function link_courses_to_competencies($num_linked, $competencies, $courses) {
 function link_default_preset_to_competencies($competencies) {
     printf("\nLinking the default preset to competencies:\n");
 
-    foreach($competencies as $comp) {
+    foreach ($competencies as $comp) {
         printf("\t%s\n", $comp->fullname);
 
         $config = new achievement_configuration($comp);
         $config->link_default_preset();
     }
-
-    printf("\nCreating items for linked course criteria");
-    metadata_processor::update_item_links(null);
 }

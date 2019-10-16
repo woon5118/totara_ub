@@ -22,7 +22,6 @@
  * @package totara_criteria
  */
 
-use criteria_linkedcourses\task\update_linked_course_items_adhoc;
 use totara_competency\event\linked_courses_updated;
 use totara_competency\linked_courses;
 
@@ -73,15 +72,15 @@ class totara_competency_linked_courses_testcase extends advanced_testcase {
         linked_courses::set_linked_courses(
             $comp1->id,
             [
-                ['id' => $course1->id, 'linktype' => PLAN_LINKTYPE_MANDATORY],
-                ['id' => $course2->id, 'linktype' => PLAN_LINKTYPE_MANDATORY]
+                ['id' => $course1->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+                ['id' => $course2->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY]
             ]
         );
 
         linked_courses::set_linked_courses(
             $comp2->id,
             [
-                ['id' => $course3->id, 'linktype' => PLAN_LINKTYPE_OPTIONAL],
+                ['id' => $course3->id, 'linktype' => linked_courses::LINKTYPE_OPTIONAL],
             ]
         );
 
@@ -89,20 +88,20 @@ class totara_competency_linked_courses_testcase extends advanced_testcase {
         $this->assertCount(2, $linked_courses1);
         foreach ($linked_courses1 as $course) {
             $this->assertContains($course->id, [$course1->id, $course2->id]);
-            $this->assertEquals(PLAN_LINKTYPE_MANDATORY, $course->linktype);
+            $this->assertEquals(linked_courses::LINKTYPE_MANDATORY, $course->linktype);
         }
 
         $linked_courses2 = linked_courses::get_linked_courses($comp2->id);
         $this->assertCount(1, $linked_courses2);
         $course = array_pop($linked_courses2);
         $this->assertEquals($course->id, $course3->id);
-        $this->assertEquals(PLAN_LINKTYPE_OPTIONAL, $course->linktype);
+        $this->assertEquals(linked_courses::LINKTYPE_OPTIONAL, $course->linktype);
 
         linked_courses::set_linked_courses(
             $comp1->id,
             [
-                ['id' => $course1->id, 'linktype' => PLAN_LINKTYPE_MANDATORY],
-                ['id' => $course2->id, 'linktype' => PLAN_LINKTYPE_OPTIONAL]
+                ['id' => $course1->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+                ['id' => $course2->id, 'linktype' => linked_courses::LINKTYPE_OPTIONAL]
             ]
         );
 
@@ -111,10 +110,10 @@ class totara_competency_linked_courses_testcase extends advanced_testcase {
         foreach ($linked_courses1 as $course) {
             switch ($course->id) {
                 case $course1->id:
-                    $this->assertEquals(PLAN_LINKTYPE_MANDATORY, $course->linktype);
+                    $this->assertEquals(linked_courses::LINKTYPE_MANDATORY, $course->linktype);
                     break;
                 case $course2->id:
-                    $this->assertEquals(PLAN_LINKTYPE_OPTIONAL, $course->linktype);
+                    $this->assertEquals(linked_courses::LINKTYPE_OPTIONAL, $course->linktype);
                     break;
                 default:
                     $this->fail('Unexpected course included in linked courses');
@@ -125,7 +124,7 @@ class totara_competency_linked_courses_testcase extends advanced_testcase {
         $this->assertCount(1, $linked_courses2);
         $course = array_pop($linked_courses2);
         $this->assertEquals($course->id, $course3->id);
-        $this->assertEquals(PLAN_LINKTYPE_OPTIONAL, $course->linktype);
+        $this->assertEquals(linked_courses::LINKTYPE_OPTIONAL, $course->linktype);
 
         linked_courses::set_linked_courses($comp1->id, []);
 
@@ -136,7 +135,7 @@ class totara_competency_linked_courses_testcase extends advanced_testcase {
         $this->assertCount(1, $linked_courses2);
         $course = array_pop($linked_courses2);
         $this->assertEquals($course->id, $course3->id);
-        $this->assertEquals(PLAN_LINKTYPE_OPTIONAL, $course->linktype);
+        $this->assertEquals(linked_courses::LINKTYPE_OPTIONAL, $course->linktype);
     }
 
     public function test_get_and_set_linked_courses_event_is_fired() {
@@ -156,8 +155,8 @@ class totara_competency_linked_courses_testcase extends advanced_testcase {
         linked_courses::set_linked_courses(
             $comp1->id,
             [
-                ['id' => $course1->id, 'linktype' => PLAN_LINKTYPE_MANDATORY],
-                ['id' => $course2->id, 'linktype' => PLAN_LINKTYPE_MANDATORY]
+                ['id' => $course1->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+                ['id' => $course2->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY]
             ]
         );
 

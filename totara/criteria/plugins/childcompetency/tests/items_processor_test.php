@@ -21,26 +21,33 @@
  * @package totara_criteria
  */
 
+use core\orm\query\table;
 use criteria_childcompetency\childcompetency;
 use criteria_childcompetency\items_processor;
-use totara_competency\entities\competency;
-use totara_competency\pathway;
 use totara_criteria\criterion;
+use totara_competency\entities\competency as competency_entity;
+use totara_criteria\entities\criterion as criterion_entity;
+use totara_criteria\entities\criteria_item as item_entity;
+use totara_criteria\entities\criteria_item_record as item_record_entity;
+use totara_criteria\entities\criteria_metadata as metadata_entity;
 
 class criteria_childcompetency_items_processor_testcase extends advanced_testcase {
 
     private function setup_data() {
-        global $DB;
-
         $data = new class() {
             /** @var [\stdClass] competencies */
             public $competencies = [];
+            /** @var phpunit_event_sink $sink */
+            public $sink;
         };
 
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
         /** @var totara_criteria_generator $criteria_generator */
         $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        // Preventing events here to prevent the observers from making the calls to update_items
+        $data->sink = $this->redirectEvents();
 
         $to_create = [
             'Comp A' => ['with_criteria' => true],
@@ -62,22 +69,23 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
         // Create competencies with 2 levels of children
         foreach ($to_create as $compname => $compdata) {
             $comp_record = isset($compdata['parent']) ? ['parentid' => $data->competencies[$compdata['parent']]->id] : [];
-            $data->competencies[$compname] = $competency_generator->create_competency($compname, null, $comp_record);
+            $data->competencies[$compname] = $competency_generator->create_competency($compname, null, null, $comp_record);
 
             if (isset($compdata['with_criteria']) && $compdata['with_criteria']) {
-                $cc = $criteria_generator->create_childcompetency(['competency' => $data->competencies[$compname]->id]);
-
-                $cg = $competency_generator->create_criteria_group($data->competencies[$compname], $cc, null, 1);
+                $criteria_generator->create_childcompetency(['competency' => $data->competencies[$compname]->id]);
             }
         }
 
         // Verify generated data
-        $this->assertSame(count($to_create), $DB->count_records('comp'));
+        $this->assertSame(count($to_create), competency_entity::repository()->count());
 
         foreach ($to_create as $compname => $compdata) {
             if (isset($compdata['parent'])) {
-                $this->assertNotFalse($DB->get_record('comp',
-                    ['id' => $data->competencies[$compname]->id, 'parentid' => $data->competencies[$compdata['parent']]->id]));
+                $child_exists = competency_entity::repository()
+                    ->where('id', $data->competencies[$compname]->id)
+                    ->where('parentid', $data->competencies[$compdata['parent']]->id)
+                    ->exists();
+                $this->assertTrue($child_exists);
             }
 
             if (isset($compdata['with_criteria']) && $compdata['with_criteria']) {
@@ -89,12 +97,7 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
     }
 
 
-    /**
-     * Test constructor without attributes
-     */
     public function test_update_items() {
-        global $DB;
-
         $data = $this->setup_data();
 
         // Update items for non-existent competency
@@ -125,15 +128,11 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
         items_processor::update_items($data->competencies['Comp C']->id);
         $this->verify_items($data->competencies['Comp C']->id,
             [$data->competencies['Comp C-1']->id, $data->competencies['Comp C-2']->id]);
+
+        $data->sink->close();
     }
 
-    /**
-     * Test constructor without attributes
-     */
     public function test_update_items_with_changed_children() {
-        global $DB;
-
-        /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
         $data = $this->setup_data();
@@ -143,9 +142,9 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
         $this->verify_items($data->competencies['Comp E']->id, []);
 
         // Create 2 child competencies of Comp E
-        $newChild1 = $competency_generator->create_competency('New Child 1', null, ['parentid' => $data->competencies['Comp E']->id]);
-        $newChild2 = $competency_generator->create_competency('New Child 2', null, ['parentid' => $data->competencies['Comp E']->id]);
-        $newChild3 = $competency_generator->create_competency('New Child 3', null, ['parentid' => $data->competencies['Comp E']->id]);
+        $newChild1 = $competency_generator->create_competency('New Child 1', null, null, ['parentid' => $data->competencies['Comp E']->id]);
+        $newChild2 = $competency_generator->create_competency('New Child 2', null, null, ['parentid' => $data->competencies['Comp E']->id]);
+        $newChild3 = $competency_generator->create_competency('New Child 3', null, null, ['parentid' => $data->competencies['Comp E']->id]);
 
         // Now we should create 3 items for Comp E
         items_processor::update_items($data->competencies['Comp E']->id);
@@ -153,107 +152,132 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
             [$newChild1->id, $newChild2->id, $newChild3->id]);
 
         // Retrieve the current item record ids to be used later
-        [$items_sql, $items_params] = $this->build_items_sql($data->competencies['Comp E']->id);
-        $initial_items_id_map = $DB->get_records_sql_menu($items_sql, $items_params);
-        $initial_items_id_map = array_flip($initial_items_id_map);
+        $initial_items = $this->get_items($data->competencies['Comp E']->id);
+        $initial_item_id_map = array_combine($initial_items->pluck('item_id'), $initial_items->pluck('id'));
 
         // Change NewChild1 to point to another parent
         // Add Another Child to Comp E
-        $anotherChild = $competency_generator->create_competency('Anoterh Child', null, [
-            'parentid' => $data->competencies['Comp E']->id
-        ]);
+        $anotherChild = $competency_generator->create_competency('Another Child', null, null,
+            ['parentid' => $data->competencies['Comp E']->id]);
 
-        $entity1 = new competency($newChild1->id);
+        $entity1 = new competency_entity($newChild1->id);
         $entity1->parentid = 0;
         $entity1->path = '/' . $newChild1->id;
         $entity1->save();
 
         items_processor::update_items($data->competencies['Comp E']->id);
         $this->verify_items($data->competencies['Comp E']->id,
-            [$newChild2->id, $newChild3->id, $anotherChild->id], $initial_items_id_map);
+            [$newChild2->id, $newChild3->id, $anotherChild->id], $initial_item_id_map);
+
+        $data->sink->close();
+    }
+
+    public function test_update_items_with_records() {
+        $data = $this->setup_data();
+
+        // Run update_items to generate the initial items
+        // C initially has 2 children C-1 and C-2 (Tested in previous test)
+        items_processor::update_items($data->competencies['Comp C']->id);
+
+        // Now manually create some criteria_item_records for both items
+        $user = $this->getDataGenerator()->create_user();
+
+        $current_items = $this->get_items($data->competencies['Comp C']->id);
+        foreach ($current_items as $item) {
+            $item->item_records()->save(new item_record_entity(
+                [
+                    'user_id' => $user->id,
+                    'criterion_met' => 0,
+                    'timeevaluated' => time(),
+                ])
+            );
+        }
+
+        // Now for the test
+        // Move Comp C-1 to Comp A who has a childcompetency criterion
+        $data->competencies['Comp C-1']->parentid = $data->competencies['Comp A']->id;
+        $data->competencies['Comp C-1']->save();
+
+        // Run update items on both
+        items_processor::update_items($data->competencies['Comp C']->id);
+        items_processor::update_items($data->competencies['Comp A']->id);
+
+        // And verify both the items and item_records
+        $this->verify_items($data->competencies['Comp C']->id, [$data->competencies['Comp C-2']->id]);
+        $this->verify_items($data->competencies['Comp A']->id,
+            [$data->competencies['Comp A-1']->id, $data->competencies['Comp C-1']->id]);
+
+        // Comp C-1 should no longer have an item_record
+        $this->verify_item_records($data->competencies['Comp C-1']->id, []);
+
+        $data->sink->close();
     }
 
 
-    private function verify_criterion(int $comp_id, bool $expect_to_exist = true) {
-        global $DB;
+    private function verify_criterion(int $competency_id, bool $expect_to_exist = true) {
+        $criterion_count = criterion_entity::repository()
+            ->set_filter('competency', $competency_id)
+            ->where('plugin_type', 'childcompetency')
+            ->count();
 
-        $sql =
-            "SELECT tc.id
-               FROM {totara_competency_pathway} pw
-               JOIN {pathway_criteria_group} pcg
-                 ON pcg.id = pw.path_instance_id
-               JOIN {pathway_criteria_group_criterion} pcgc
-                 ON pcgc.criteria_group_id = pcg.id
-                AND pcgc.criterion_type = :criteriontype
-               JOIN {totara_criteria} tc
-                 ON tc.id = pcgc.criterion_id
-                AND tc.plugin_type = pcgc.criterion_type
-               JOIN {totara_criteria_metadata} tcm
-                 ON tcm.criterion_id = tc.id
-                AND tcm.metakey = :metakey
-                AND tcm.metavalue = :compid
-              WHERE pw.comp_id = :compid2
-                AND pw.path_type = :pathtype
-                AND status = :activestatus";
-        $params = [
-            'compid' => $comp_id,
-            'compid2' => $comp_id,
-            'pathtype' => 'criteria_group',
-            'activestatus' => pathway::PATHWAY_STATUS_ACTIVE,
-            'criteriontype' => 'childcompetency',
-            'metakey' => criterion::METADATA_COMPETENCY_KEY,
-        ];
-
-        $rows = $DB->get_records_sql($sql, $params);
-        $this->assertSame($expect_to_exist ? 1 : 0, count($rows));
+        $this->assertSame($expect_to_exist ? 1 : 0, $criterion_count);
     }
 
-    private function build_items_sql(int $comp_id): array {
-        global $DB;
+    /**
+     * Get the items linked to childcompetency criteria on the specified competency
+     * @param int $competency_id
+     * @return collection
+     */
+    private function get_items(int $competency_id): \core\orm\collection {
+        $item_type = (new childcompetency())->get_items_type();
 
-        $sql =
-            "SELECT tci.id,
-                    tci.item_id
-               FROM {totara_competency_pathway} pw
-               JOIN {pathway_criteria_group} pcg
-                 ON pcg.id = pw.path_instance_id
-               JOIN {pathway_criteria_group_criterion} pcgc
-                 ON pcgc.criteria_group_id = pcg.id
-                AND pcgc.criterion_type = :criteriontype
-               JOIN {totara_criteria} tc
-                 ON tc.id = pcgc.criterion_id
-                AND tc.plugin_type = pcgc.criterion_type
-               JOIN {totara_criteria_item} tci
-                 ON tci.criterion_id = tc.id
-                AND tci.item_type = :itemtype
-              WHERE pw.comp_id = :compid
-                AND pw.path_type = :pathtype
-                AND status = :activestatus";
-        $params = [
-            'compid' => $comp_id,
-            'pathtype' => 'criteria_group',
-            'activestatus' => pathway::PATHWAY_STATUS_ACTIVE,
-            'criteriontype' => 'childcompetency',
-            'itemtype' => 'competency',
-        ];
-
-        return [$sql, $params];
+        return item_entity::repository()
+            ->join((new table(metadata_entity::TABLE))->as('metadata'), 'criterion_id', '=', 'criterion_id')
+            ->where('item_type', $item_type)
+            ->where('metadata.metakey', criterion::METADATA_COMPETENCY_KEY)
+            ->where('metadata.metavalue', $competency_id)
+            ->get();
     }
 
-    private function verify_items(int $comp_id, array $expected_item_ids, ?array $previous_item_id_map = null) {
-        global $DB;
+    /**
+     * Verify the criteria_items are as expected.
+     *
+     * @param int $competency_id - Competency
+     * @param array $expected_item_ids - Exepected item ids
+     * @param array|null $previous_item_id_map - If specified, this is used to ensure that the item row were not replaced
+     *                                           (totara_criteria_item.id is still the same)
+     */
+    private function verify_items(int $competency_id, array $expected_item_ids, ?array $previous_item_id_map = null) {
+        $current_items = $this->get_items($competency_id);
 
-        [$sql, $params] = $this->build_items_sql($comp_id);
-        $rows = $DB->get_records_sql($sql, $params);
+        $this->assertSame(count($expected_item_ids), $current_items->count());
+        foreach ($current_items as $item) {
+            $this->assertTrue(in_array($item->item_id, $expected_item_ids));
 
-        $this->assertSame(count($expected_item_ids), count($rows));
-        foreach ($rows as $row) {
-            $this->assertTrue(in_array($row->item_id, $expected_item_ids));
-
-            if (!is_null($previous_item_id_map) && isset($previous_item_id_map[$row->item_id])) {
-                $this->assertEquals($previous_item_id_map[$row->item_id], $row->id);
+            if (!is_null($previous_item_id_map) && isset($previous_item_id_map[$item->item_id])) {
+                $this->assertEquals($previous_item_id_map[$item->item_id], $item->id);
             }
         }
     }
 
+    /**
+     * Verify the criteria_item_records are as expected.
+     *
+     * @param int $child_competency_id - Competency
+     * @param array $expected_user_id - User id for which a record is expected
+     */
+    private function verify_item_records(int $child_competency_id, array $expected_user_ids) {
+        $item_type = (new childcompetency())->get_items_type();
+
+        $item_records = item_record_entity::repository()
+            ->join((new table(item_entity::TABLE))->as('item'), 'criterion_item_id', '=', 'id')
+            ->where('item.item_type', $item_type)
+            ->where('item.item_id', $child_competency_id)
+            ->get();
+
+        $this->assertSame(count($expected_user_ids), $item_records->count());
+        foreach ($item_records as $record) {
+            $this->assertTrue(in_array($record->user_id, $expected_user_ids));
+        }
+    }
 }

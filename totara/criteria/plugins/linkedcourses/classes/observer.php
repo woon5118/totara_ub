@@ -30,7 +30,7 @@ class observer {
     public static function linked_courses_updated(linked_courses_updated $event) {
         $competency_id = $event->get_data()['objectid'];
 
-        metadata_processor::update_item_links($competency_id);
+        items_processor::update_items($competency_id);
     }
 
 }

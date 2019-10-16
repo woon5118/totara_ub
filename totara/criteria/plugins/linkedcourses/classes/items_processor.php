@@ -22,52 +22,45 @@
  * @package totara_criteria
  */
 
-namespace criteria_childcompetency;
+namespace criteria_linkedcourses;
 
 use core\orm\query\builder;
 use totara_competency\achievement_configuration;
+use totara_competency\entities\competency as competency_entitiy;
 use totara_competency\entities\configuration_change;
-use totara_competency\entities\competency as competency_entity;
 use totara_criteria\entities\criterion as criterion_entity;
 use totara_criteria\entities\criteria_item as item_entity;
+use totara_competency\linked_courses;
 
 class items_processor {
 
     /**
-     * Update the criterion items so that a criterion_item exist for each direct child competency of the applicable
-     * competency
-     * Not generating any events to be picked up by modules that use this type of criteria (e.g. criteria_group)
-     * as the change is not user specific and therefore may result in a lot of work to be completed by the observers.
-     *
-     * @param int $competency_id Update items of this
+     * Update the items linked to the criterion to reflect the courses currently linked to the competency
+     * @param int $competency_id Id of the competency whose linked course items must be updated
      */
     public static function update_items(int $competency_id) {
         global $DB;
 
-        $item_type = (new childcompetency())->get_items_type();
+        $item_type = (new linkedcourses())->get_items_type();
 
-        // Get all childcompetency criteria linked to the competency.
+        // Get all linkedcourses criteria linked to the competency .
         $criteria = criterion_entity::repository()
             ->set_filter('competency', $competency_id)
-            ->where('plugin_type', 'childcompetency')
+            ->where('plugin_type', 'linkedcourses')
             ->get();
 
         if (empty($criteria)) {
-            // Nothing to do
             return;
         }
 
         // We use the same action time for all updates to ensure that we only log changes once
-        // if the competency has more than one childcompetency criteria
+        // for competencies with more than one linkedcourses criteria
         $now = time();
 
-        // We get a configuration dump before we start making changes for the specific competency
+        // We get a configuration dump before we start making changes for a specific competency
         // so that we can dump history if anything did change
-        $competency_dump = achievement_configuration::get_current_configuration_dump($competency_id);
-        $child_competency_ids = competency_entity::repository()
-            ->where('parentid', $competency_id)
-            ->get()
-            ->pluck('id');
+        $configuration_dump = achievement_configuration::get_current_configuration_dump($competency_id);
+        $linked_course_ids = linked_courses::get_linked_course_ids($competency_id);
         $configuration_has_changed = false;
 
         $transaction = $DB->start_delegated_transaction();
@@ -78,8 +71,8 @@ class items_processor {
             $current_item_ids = $criterion->items
                 ->pluck('item_id');
 
-            $to_add = array_diff($child_competency_ids, $current_item_ids);
-            $to_delete = array_diff($current_item_ids, $child_competency_ids);
+            $to_add = array_diff($linked_course_ids, $current_item_ids);
+            $to_delete = array_diff($current_item_ids, $linked_course_ids);
 
             if (empty($to_add) && empty($to_delete)) {
                 break 1;
@@ -108,13 +101,14 @@ class items_processor {
             $criterion->save();
         }
 
-        // Now write competency history and change logs
         if ($configuration_has_changed) {
-            $config = new achievement_configuration(new competency_entity($competency_id));
-            $config->save_configuration_history($now, $competency_dump);
+            // Dump the configuration history and log the configuration change
+            $config = new achievement_configuration(new competency_entitiy($competency_id));
+            $config->save_configuration_history($now, $configuration_dump);
             configuration_change::add_competency_entry($competency_id, configuration_change::CHANGED_CRITERIA, $now);
         }
 
         $transaction->allow_commit();
     }
+
 }

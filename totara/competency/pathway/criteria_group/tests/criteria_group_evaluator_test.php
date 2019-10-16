@@ -425,7 +425,7 @@ class test_cge_criterion extends criterion {
     /** @var array $updated_user_ids User ids to mark as having updates */
     private $updated_user_ids = [];
 
-    protected function get_items_type() {
+    public function get_items_type() {
         return 'test_cge_criterion';
     }
 

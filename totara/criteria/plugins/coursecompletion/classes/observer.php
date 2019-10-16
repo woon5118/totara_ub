@@ -25,51 +25,33 @@
 namespace criteria_coursecompletion;
 
 use core\event\course_completed;
-use totara_criteria\course_item_evaluator;
-use totara_criteria\event\item_updated;
+use totara_criteria\entities\criteria_item;
+use totara_criteria\event\criteria_satisfied;
 
 class observer {
 
     public static function course_completed(course_completed $event) {
         global $DB;
 
-        // TODO: This is no longer valid - There may be more than one item for a specific course
-        //       To be fixed in TL-22569
-        return;
-//        $criterion_item_id = $DB->get_field(
-//            'totara_criteria_item',
-//            'id',
-//            [
-//                'item_type' => 'course',
-//                'item_id' => $event->courseid
-//            ]
-//        );
-//
-//        if (!$criterion_item_id) {
-//            // We're not tracking the course.
-//            return;
-//        }
-//
-//        $now = time();
-//
-//        $item_record = $DB->get_record(
-//            'totara_criteria_item_record',
-//            [
-//                'criterion_item_id' => $criterion_item_id,
-//                'user_id' => $event->relateduserid,
-//            ]
-//        );
-//
-//        if (!$item_record) {
-//            // We're not tracking this user for this item.
-//            return;
-//        }
-//
-//        // Update the criterion_met for this user
-//        $item_record->criterion_met = 1;
-//        $item_record->timeevaluated = time();
-//        $DB->update_record('totara_criteria_item_record', $item_record);
-//
-//        item_updated::create_with_item_record($criterion_item_id, $item_record)->trigger();
+        // Find all criteria items for completion of this course
+        // As the criterion has no knowledge whether this user's satisfaction of the criteria is to be tracked,
+        // it simply generates an criteria_satisfied event with the relevant criterion ids and this user's id.
+        // Modules that use these criteria are responsible for initiating the relevant processes to create/update
+        // the item_record(s) for this user
+
+        $criteria_ids = criteria_item::repository()
+            ->select('criterion_id')
+            ->where('item_type', 'course')
+            ->where('item_id', $event->courseid)
+            ->group_by('criterion_id')
+            ->get()
+            ->pluck('criterion_id');
+
+        if (empty($criteria_ids)) {
+            // We're not tracking the course - nothing more to do
+            return;
+        }
+
+        criteria_satisfied::create_with_ids($criteria_ids, $event->relateduserid)->trigger();
     }
 }

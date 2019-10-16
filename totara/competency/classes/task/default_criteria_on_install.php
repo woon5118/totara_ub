@@ -26,8 +26,12 @@ namespace totara_competency\task;
 use core\collection;
 use core\orm\query\builder;
 use core\task\adhoc_task;
-use criteria_childcompetency\items_processor;
-use criteria_linkedcourses\metadata_processor as linked_courses_metadata_processor;
+use criteria_childcompetency\childcompetency;
+use criteria_linkedcourses\linkedcourses;
+use criteria_linkedcourses\items_processor as linked_courses_items_processor;
+use pathway_criteria_group\criteria_group;
+use pathway_learning_plan\learning_plan;
+use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
 use totara_competency\entities\scale;
 use totara_competency\legacy_aggregation;
@@ -78,9 +82,7 @@ class default_criteria_on_install extends adhoc_task {
             $aggregation->create_default_pathways($scale, false);
         }
 
-        // Make sure all linked courses and child competencies are synced
-        linked_courses_metadata_processor::update_item_links(null);
-        items_processor::update_items(null);
+        // Linked courses are synced through observers - no need for additional steps here
     }
 
 

@@ -71,8 +71,8 @@ class criteria_coursecompletion_services_testcase extends advanced_testcase {
         for ($i = 0; $i < 5; $i += 2) {
             $expected_result['items'][] = [
                 'type' => 'course',
+                'id' => $data->courses[$i]->id,
                 'name' => $data->courses[$i]->fullname,
-                'id' => (int)$data->courses[$i]->id,
             ];
         }
 
@@ -87,10 +87,24 @@ class criteria_coursecompletion_services_testcase extends advanced_testcase {
         $this->assertEquals(false, $error);
         $this->assertTrue(is_array($result));
 
-        $this->assertArrayHasKey('items', $result);
-        $this->assertArrayHasKey('aggregation', $result);
-        $this->assertEqualsCanonicalizing($expected_result['items'], $result['items']);
-        $this->assertEquals($expected_result['aggregation'], $result['aggregation']);
+        $this->assertTrue(isset($result['aggregation']));
+        $this->assertEqualsCanonicalizing($expected_result['aggregation'], $result['aggregation']);
+
+        $this->assertTrue(isset($result['items']));
+        $this->assertSame(count($expected_result['items']), count($result['items']));
+
+        foreach ($result['items'] as $actual_item) {
+            foreach ($expected_result['items'] as $key => $expected_item) {
+                if ($actual_item['id'] == $expected_item['id'] &&
+                    $actual_item['type'] == $expected_item['type'] &&
+                    $actual_item['name'] == $expected_item['name']) {
+
+                    unset($expected_result['items'][$key]);
+                    break;
+                }
+            }
+        }
+        $this->assertSame(0, count($expected_result['items']));
     }
 
 }

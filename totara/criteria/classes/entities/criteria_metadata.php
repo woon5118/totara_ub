@@ -21,10 +21,26 @@
  * @package totara_criteria
  */
 
-$string['assign_competency'] = 'Assign competency';
-$string['competencies'] = 'Competencies';
-$string['no_competencies'] = 'There are no child competencies available to view';
-$string['pluginname'] = 'Aggregation of child competencies';
-$string['required_only'] = '{$a} required only';
-$string['self_assign_competency'] = 'Self assign competency';
-$string['view_competency'] = 'View competency';
+namespace totara_criteria\entities;
+
+use core\orm\entity\entity;
+use core\orm\entity\relations\belongs_to;
+
+/**
+ * One record for a criteria metadata
+ *
+ * @property int $criterion_id
+ * @property string metakey
+ * @property string metavalue
+ *
+ * @property-read criterion $criterion
+ */
+class criteria_metadata extends entity {
+
+    public const TABLE = 'totara_criteria_metadata';
+
+    public function criterion(): belongs_to {
+        return $this->belongs_to(criterion::class, 'criterion_id');
+    }
+
+}

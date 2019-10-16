@@ -22,57 +22,227 @@
  * @package pathway_criteria_group
  */
 
-use totara_criteria\item_evaluator;
-use pathway_criteria_group\criteria_group;
-use totara_criteria\criterion;
-use PHPUnit\Framework\MockObject\MockObject;
-use totara_competency\entities\scale_value;
-use totara_competency\pathway;
+use criteria_coursecompletion\coursecompletion;
 use pathway_criteria_group\aggregation_helper;
+use pathway_criteria_group\criteria_group;
+use tassign_competency\models\assignment_actions;
+use totara_competency\entities\scale_value;
 
 class pathway_criteria_group_aggregation_helper_testcase extends advanced_testcase {
 
-    public function test_with_no_groups() {
-
-        $pathways = aggregation_helper::get_pathways_containing_criterion_item(202, pathway::PATHWAY_STATUS_ACTIVE);
-        $this->assertCount(0, $pathways);
-
-        // Neither user nor criterion item exists.
-        // Simply no pathways to update will be found and execution will continue without
-        // throwing any exception.
-        aggregation_helper::aggregate_based_on_item(101, 202);
-    }
-
-    public function test_with_group_and_mock_item() {
+    private function setup_data() {
         global $DB;
 
-        $item_id = 101;
+        $data = new class {
+            public $competency_data = [];
+            public $courses = [];
+            public $users = [];
+
+        };
+
+        for ($i = 1; $i <= 3; $i++) {
+            $data->users[$i] = $this->getDataGenerator()->create_user();
+            $data->courses[$i] = $this->getDataGenerator()->create_course();
+        }
+
+        /** @var totara_hierarchy_generator $hierarchy_generator */
+        $hierarchygenerator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+
+        $scale = $hierarchygenerator->create_scale(
+            'comp',
+            ['name' => 'Test scale', 'description' => 'Test scale'],
+            [
+                1 => ['name' => 'No clue', 'proficient' => 0, 'sortorder' => 1, 'default' => 1],
+                2 => ['name' => 'Learning', 'proficient' => 0, 'sortorder' => 2, 'default' => 0],
+                3 => ['name' => 'Getting there', 'proficient' => 0, 'sortorder' => 3, 'default' => 0],
+                4 => ['name' => 'Almost there', 'proficient' => 1, 'sortorder' => 4, 'default' => 0],
+                5 => ['name' => 'Arrived', 'proficient' => 1, 'sortorder' => 4, 'default' => 0],
+            ]
+        );
+        $rows = $DB->get_records('comp_scale_values', ['scaleid' => $scale->id], 'sortorder');
+        foreach ($rows as $row) {
+            $scalevalues[$row->sortorder] = new scale_value($row->id);
+        }
+
+        $framework = $hierarchygenerator->create_comp_frame(['scale' => $scale->id]);
 
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
-        $competency = $competency_generator->create_competency();
+        /** @var tassign_competency_generator $assignment_generator */
+        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('tassign_competency');
 
-        /** @var scale_value $scale_value */
-        $scale_value = $competency->scale->sorted_values_high_to_low->first();
+        $to_create = [
+            'Comp A' => [
+                'user_keys' => [1, 2],
+                'course_keys' => [1],
+            ],
+            'Comp B' => [
+                'user_keys' => [1, 3],
+                'course_keys' => [1, 2],
+            ],
+            'Comp C' => [
+                'user_keys' => [3],
+                'course_keys' => [3],
+            ],
+            'Comp D' => [
+                'user_keys' => [1, 2, 3],
+                'course_keys' => [],
+            ],
+        ];
 
-        $group = new criteria_group();
+        foreach ($to_create as $competency_name => $competency_values) {
+            $competency = $competency_generator->create_competency($competency_name, $framework->id);
+            $criteria_ids = [];
 
-        /** @var criterion|MockObject $mock_criterion */
-        $mock_criterion = $this->getMockForAbstractClass(criterion::class, [], 'mock_criteria');
-        $mock_criterion->method('get_items_type')->willReturn('mock');
-        $mock_criterion->add_items([$item_id]);
-        $mock_criterion->save();
-        class_alias(get_class($mock_criterion), 'criteria_mock_criteria\mock_criteria');
-        totara_competency\plugintypes::enable_plugin('mock_criteria', 'criteria', 'totara_criteria');
+            // Each coursecompletion criterion is created in its own pathway
+            foreach ($competency_values['course_keys'] as $course_idx) {
+                $criterion = new coursecompletion();
+                $criterion->set_aggregation_method(coursecompletion::AGGREGATE_ALL);
+                $criterion->add_items([$data->courses[$course_idx]->id]);
 
-        $criterion_item_id = $DB->get_field('totara_criteria_item', 'id', ['item_id' => $item_id]);
+                $pathway = new criteria_group();
+                $pathway->set_competency($competency);
+                $pathway->set_scale_value($scalevalues[3]);
+                $pathway->add_criterion($criterion);
+                $pathway->save();
 
-        $group->add_criterion($mock_criterion);
-        $group->set_competency($competency);
-        $group->set_scale_value($scale_value);
-        $group->save();
+                $criteria_ids[$course_idx] = $criterion->get_id();
+            }
 
-        $pathways = aggregation_helper::get_pathways_containing_criterion_item($criterion_item_id, pathway::PATHWAY_STATUS_ACTIVE);
-        $this->assertCount(1, $pathways);
+            foreach ($competency_values['user_keys'] as $user_idx) {
+                $assignment = $assignment_generator->create_user_assignment($competency->id, $data->users[$user_idx]->id);
+                $model = new assignment_actions();
+                $model->activate([$assignment->id]);
+            }
+
+            $data->competency_data[$competency_name] = [
+                'competency_id' => $competency->id,
+                'criteria_ids' => $criteria_ids,
+            ];
+        }
+
+        $expand_task = new \tassign_competency\expand_task($DB);
+        $expand_task->expand_all();
+
+        return $data;
     }
+
+    /** Test no criteria_ids provided */
+    public function test_aggregate_based_on_criteria_empty_list() {
+        global $DB;
+
+        $data = $this->setup_data();
+        $this->verify_adhoc_task(0);
+
+        // No criteria_ids
+        aggregation_helper::aggregate_based_on_criteria($data->users[3]->id, []);
+        // No ad-hoc task should be scheduled
+        $this->verify_adhoc_task(0);
+    }
+
+    /**
+     * Test single competency, single criterion
+     */
+    public function test_aggregate_based_on_criteria_single_competency_single_criterion_assigned_user() {
+        global $DB;
+
+        $data = $this->setup_data();
+
+        $criteria_ids = $data->competency_data['Comp A']['criteria_ids'];
+        aggregation_helper::aggregate_based_on_criteria($data->users[1]->id, $criteria_ids);
+
+        // Expecting ad-hoc task with 1 competency id
+        $this->verify_adhoc_task(1,
+            [
+                'user_id' => $data->users[1]->id,
+                'competency_ids' => [$data->competency_data['Comp A']['competency_id']],
+            ]
+        );
+    }
+
+    /**
+     * Test single criterion, user not assigned
+     */
+    public function test_aggregate_based_on_criteria_single_criterion_not_assigned_user() {
+        global $DB;
+
+        $data = $this->setup_data();
+
+        $criteria_ids = $data->competency_data['Comp A']['criteria_ids'];
+        aggregation_helper::aggregate_based_on_criteria($data->users[3]->id, $criteria_ids);
+
+        // Expecting ad-hoc task with 1 competency id
+        $this->verify_adhoc_task(0);
+    }
+
+    /**
+     * Test single competency, multiple criteria, user assigned
+     */
+    public function test_aggregate_based_on_criteria_single_competencies_multiple_criteria_assigned_user() {
+        global $DB;
+
+        $data = $this->setup_data();
+
+        $criteria_ids = $data->competency_data['Comp B']['criteria_ids'];
+        aggregation_helper::aggregate_based_on_criteria($data->users[1]->id, $criteria_ids);
+
+        // Expecting ad-hoc task with 1 competency id
+        $this->verify_adhoc_task(1,
+            [
+                'user_id' => $data->users[1]->id,
+                'competency_ids' => [$data->competency_data['Comp B']['competency_id']],
+            ]
+        );
+    }
+
+    /**
+     * Test single competency, multiple criteria, user not assigned
+     */
+    public function test_aggregate_based_on_criteria_single_competencies_multiple_criteria_not_assigned_user() {
+        global $DB;
+
+        $data = $this->setup_data();
+
+        $criteria_ids = $data->competency_data['Comp B']['criteria_ids'];
+        aggregation_helper::aggregate_based_on_criteria($data->users[2]->id, $criteria_ids);
+
+        // Expecting ad-hoc task with 1 competency id
+        $this->verify_adhoc_task(0);
+    }
+
+    /**
+     * Test multiple competencies, multiple criteria, user assigned in some
+     */
+    public function test_aggregate_based_on_criteria_multipl_competencies_multiple_criteria() {
+        global $DB;
+
+        $data = $this->setup_data();
+
+        $criteria_ids = array_merge(
+            $data->competency_data['Comp A']['criteria_ids'],
+            $data->competency_data['Comp B']['criteria_ids'],
+            $data->competency_data['Comp C']['criteria_ids']);
+        aggregation_helper::aggregate_based_on_criteria($data->users[3]->id, $criteria_ids);
+
+        // Expecting ad-hoc task with 1 competency id
+        $this->verify_adhoc_task(1,
+            [
+                'user_id' => $data->users[3]->id,
+                'competency_ids' => [$data->competency_data['Comp B']['competency_id'], $data->competency_data['Comp C']['competency_id']],
+            ]
+        );
+    }
+
+    private function verify_adhoc_task(bool $expected, ?array $expected_custom_data = null) {
+        global $DB;
+
+        $rows = $DB->get_records('task_adhoc', ['classname' => '\totara_competency\task\competency_achievement_aggregation_adhoc']);
+        $this->assertSame((int) $expected, count($rows));
+
+        if (!is_null($expected_custom_data)) {
+            $task = reset($rows);
+            $this->assertEqualsCanonicalizing($expected_custom_data, json_decode($task->customdata, true));
+        }
+    }
+
 }

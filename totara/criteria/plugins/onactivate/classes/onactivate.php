@@ -35,7 +35,7 @@ class onactivate extends criterion {
      * Get the type of items stored in this criterion
      * V1 - Assuming that a criterion can only store items of a single type
      */
-    protected function get_items_type() {
+    public function get_items_type() {
         return 'onactivate';
     }
 

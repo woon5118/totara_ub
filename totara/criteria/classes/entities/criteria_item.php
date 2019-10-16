@@ -25,6 +25,7 @@ namespace totara_criteria\entities;
 
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
+use core\orm\entity\relations\has_many;
 
 /**
  * One users record for a criteria item
@@ -43,4 +44,7 @@ class criteria_item extends entity {
         return $this->belongs_to(criterion::class, 'criterion_id');
     }
 
+    public function item_records(): has_many {
+        return $this->has_many(criteria_item_record::class, 'criterion_item_id');
+    }
 }

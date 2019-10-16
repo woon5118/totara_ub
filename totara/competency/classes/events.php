@@ -25,7 +25,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $observers = [
     [
-        'eventname' => '\totara_criteria\event\item_updated',
-        'callback' => '\pathway_criteria_group\observer::criterion_item_updated',
+        'eventname' => '\totara_criteria\event\criteria_satisfied',
+        'callback' => '\pathway_criteria_group\observer::criteria_satisfied',
     ],
 ];

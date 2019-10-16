@@ -24,6 +24,7 @@
 
 namespace criteria_childcompetency;
 
+use core\orm\query\table;
 use criteria_childcompetency\items_processor;
 use hierarchy_competency\event\competency_created;
 use hierarchy_competency\event\competency_deleted;
@@ -31,6 +32,9 @@ use hierarchy_competency\event\competency_moved;
 use hierarchy_competency\event\competency_updated;
 use totara_competency\entities\competency;
 use totara_competency\pathway;
+use totara_criteria\criterion;
+use totara_criteria\entities\criteria_item as item_entity;
+use totara_criteria\entities\criteria_metadata as metadata_entity;
 
 class observer {
 
@@ -46,9 +50,11 @@ class observer {
         global $DB;
 
         // The event doesn't provide information on the previous parent.
-        // We therefore need to find it through existing
-        // childcompetency criteria with an item for this competency.
-        static::update_items_of_item_competency($event->objectid);
+        // We therefore need to find it through the existing items
+        $previous_parent_id = static::get_parent_competency_of_item($event->objectid);
+        if (!is_null($previous_parent_id)) {
+            items_processor::update_items($previous_parent_id);
+        }
 
         // If new parent is not top, update it's items as well
         $competency = new competency($event->objectid);
@@ -58,44 +64,31 @@ class observer {
     }
 
     public static function competency_deleted(competency_deleted $event) {
-        // The event doesn't provide information on the previous parent.
-        // We therefore need to find it through existing
-        // childcompetency criteria with an item for this competency.
-        static::update_items_of_item_competency($event->objectid);
+        // If the deleted competency has a parent, we need to update its parent
+        // competency's items
+        $previous_parent_id = static::get_parent_competency_of_item($event->objectid);
+        if (!is_null($previous_parent_id)) {
+            items_processor::update_items($previous_parent_id);
+        }
     }
 
     /**
-     * Update the items of the competency that currently have a criteria_item
-     * linked to this competency id
-     * @param  int $comp_id The competency id
+     * Retrieve the competency_id from metadata for the specific 'competency' item
+     * @param  int $child_competency_id Competency id to search for
+     * @return int|null Id of parent competency
      */
-    private static function update_items_of_item_competency(int $comp_id) {
-        global $DB;
+    private static function get_parent_competency_of_item(int $child_competency_id) {
+        $item_type = (new childcompetency())->get_items_type();
 
-        // Although there should only be 1 competency that has this competency as child,
-        // there may be more than 1 childcompetency criteria linked to this competency
-        $sql =
-            "SELECT DISTINCT cp.comp_id
-               FROM {totara_criteria_item} tci
-               JOIN {pathway_criteria_group_criterion} pcgc
-                 ON pcgc.criterion_type = :criteriontype
-                AND pcgc.criterion_id = tci.criterion_id
-               JOIN {totara_competency_pathway} cp
-                 ON cp.path_type = :pathtype
-                AND cp.path_instance_id = pcgc.criteria_group_id
-                AND cp.status = :activestatus
-              WHERE tci.item_type = :itemtype
-                AND tci.item_id = :compid";
-        $params = [
-            'criteriontype' => 'childcompetency',
-            'pathtype' => 'criteria_group',
-            'itemtype' => 'competency',
-            'compid' => $comp_id,
-            'activestatus' => pathway::PATHWAY_STATUS_ACTIVE,
-        ];
+        $parent_competency_id = metadata_entity::repository()
+            ->join((new table(item_entity::TABLE))->as('item'), 'criterion_id', 'criterion_id')
+            ->where('item.item_type', $item_type)
+            ->where('item.item_id', $child_competency_id)
+            ->where('metakey', criterion::METADATA_COMPETENCY_KEY)
+            ->get()
+            ->first();
 
-        if ($comp_id = $DB->get_field_sql($sql, $params)) {
-            items_processor::update_items($comp_id);
-        }
+        return !is_null($parent_competency_id) ? $parent_competency_id ->metavalue : null;
     }
+
 }

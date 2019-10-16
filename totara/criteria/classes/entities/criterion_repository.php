@@ -17,34 +17,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Brendan Cox <brendan.cox@totaralearning.com>
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  * @package totara_criteria
  */
 
-namespace totara_criteria\event;
+namespace totara_criteria\entities;
 
-use core\event\base;
+use core\orm\entity\repository;
+use totara_criteria\filter\criterion_competency;
 
-class item_updated extends base {
+class criterion_repository extends repository {
 
     /**
-     * Initialise required event data properties.
-     */
-    protected function init() {
-        $this->data['objecttable'] = 'totara_criteria_item_record';
-        $this->data['crud'] = 'u';
-        $this->data['edulevel'] = self::LEVEL_OTHER;
-    }
-
-    public static function create_with_item_record($criterion_id, $item_record) {
-        return item_updated::create(
-            [
-                'context' => \context_system::instance(),
-                'objectid' => $criterion_id,
-                'relateduserid' => $item_record->user_id,
-                'other' => ['criterion_type' => $item_record->criterion_item_id, 'criterion_met' => $item_record->criterion_met]
-            ]
-        );
+       * Define available default filters
+       *
+       * @return array
+       */
+    protected function get_default_filters(): array {
+        return [
+            'competency' => new criterion_competency(),
+        ];
     }
 }

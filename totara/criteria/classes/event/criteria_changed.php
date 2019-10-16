@@ -22,20 +22,27 @@
  * @package totara_criteria
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace totara_criteria\event;
 
-$tasks = [
-    // TODO: We will not need a task once we have the migration / system upgrade code
-    //       We only need to do this once on upgrade after data migration to perform criteria
-    //       From then on the event observers will handle this
-    //       Leaving the task for now until migration is sorted.
-    [
-        'classname' => 'criteria_childcompetency\task\update_child_competency_items',
-        'blocking' => 0,
-        'minute' => '0',
-        'hour' => '*',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*'
-    ]
-];
+use core\event\base;
+
+class criteria_changed extends base {
+
+    /**
+     * Initialise required event data properties.
+     */
+    protected function init() {
+        $this->data['crud'] = 'u';
+        $this->data['edulevel'] = self::LEVEL_OTHER;
+    }
+
+    public static function create_with_ids(array $criteria_ids, int $user_id) {
+        return criteria_satisfied::create(
+            [
+                'context' => \context_system::instance(),
+                'relateduserid' => $user_id,
+                'other' => ['criteria_ids' => $criteria_ids]
+            ]
+        );
+    }
+}

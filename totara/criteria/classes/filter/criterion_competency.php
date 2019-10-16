@@ -21,10 +21,26 @@
  * @package totara_criteria
  */
 
-$string['assign_competency'] = 'Assign competency';
-$string['competencies'] = 'Competencies';
-$string['no_competencies'] = 'There are no child competencies available to view';
-$string['pluginname'] = 'Aggregation of child competencies';
-$string['required_only'] = '{$a} required only';
-$string['self_assign_competency'] = 'Self assign competency';
-$string['view_competency'] = 'View competency';
+namespace totara_criteria\filter;
+
+
+use core\orm\entity\filter\filter;
+use core\orm\query\table;
+use totara_criteria\criterion;
+use totara_criteria\entities\criteria_metadata as metadata_entity;
+
+class criterion_competency extends filter {
+
+    public function apply() {
+        if (!empty($this->value)) {
+            if (!$metadata_join = $this->builder->get_join(metadata_entity::TABLE)) {
+                $this->builder->join((new table(metadata_entity::TABLE))->as('metadata'), 'id', '=', 'criterion_id');
+            }
+
+            $this->builder
+                ->where('metadata.metakey', criterion::METADATA_COMPETENCY_KEY)
+                ->where('metadata.metavalue', $this->value);
+        }
+    }
+
+}

@@ -205,7 +205,7 @@ abstract class criterion {
      * Get the type of items associated with this criterion
      * V1 - Assuming that a criterion can only store items of a single type
      */
-    abstract protected function get_items_type();
+    abstract public function get_items_type();
 
     /**
      * Get the ids of items associated with this criterion

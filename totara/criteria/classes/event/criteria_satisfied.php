@@ -17,32 +17,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * @author Brendan Cox <brendan.cox@totaralearning.com>
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  * @package totara_criteria
  */
 
-namespace criteria_childcompetency\task;
+namespace totara_criteria\event;
 
-defined('MOODLE_INTERNAL') || die();
+use core\event\base;
 
-use core\task\scheduled_task;
-use criteria_childcompetency\items_processor;
-use totara_competency\entities\competency;
-use totara_competency\pathway;
+class criteria_satisfied extends base {
 
-// TODO: We will not need a task once we have the migration / system upgrade code
-//       We only need to do this once on upgrade after data migration to perform criteria
-//       From then on the event observers will handle this
-//       Leaving the task for now until migration is sorted.
-
-class update_child_competency_items extends scheduled_task {
-    public function get_name() {
-        return get_string('updatechildcompetencyitems', 'criteria_childcompetency');
+    /**
+     * Initialise required event data properties.
+     */
+    protected function init() {
+        $this->data['crud'] = 'u';
+        $this->data['edulevel'] = self::LEVEL_OTHER;
     }
 
-    public function execute() {
-        global $DB;
-
-        items_processor::update_items(null);
+    public static function create_with_ids(array $criteria_ids, int $user_id) {
+        return criteria_satisfied::create(
+            [
+                'context' => \context_system::instance(),
+                'relateduserid' => $user_id,
+                'other' => ['criteria_ids' => $criteria_ids]
+            ]
+        );
     }
 }

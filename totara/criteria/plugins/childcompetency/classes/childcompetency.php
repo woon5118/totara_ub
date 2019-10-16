@@ -35,7 +35,7 @@ class childcompetency extends criterion {
     /**
      * Get the type of items stored in this criterion
      */
-    protected function get_items_type() {
+    public function get_items_type() {
         return 'competency';
     }
 

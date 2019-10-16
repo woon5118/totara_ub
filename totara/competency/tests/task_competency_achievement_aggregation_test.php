@@ -146,12 +146,17 @@ class task_competency_achievement_aggregation_testcase extends advanced_testcase
              * This function first translates the keys to the correct values and then use the correct generator function
              * to create the pathway
              *
-             * @param $competency_generator
+             * @param totara_competency_generator $competency_generator
              * @param $pw_type
              * @param $pw_data
              * @return |null
              */
             public function setup_pathway($competency_generator, $pw_key, $pw_type, $pw_data) {
+                if ($pw_type == 'test_pathway') {
+                    $this->pathways[$pw_key] = $competency_generator->create_test_pathway($this->comp);
+                    return $this->pathways[$pw_key];
+                }
+
                 $this->map_keys_to_values($pw_data);
 
                 if (!isset($pw_data['comp_id'])) {
@@ -334,7 +339,6 @@ class task_competency_achievement_aggregation_testcase extends advanced_testcase
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
-        $pw_instances = [];
         foreach ($pathways as $key => $pw) {
             $data->setup_pathway($competency_generator, $key, $pw['type'], $pw['data']);
         }
@@ -422,201 +426,6 @@ class task_competency_achievement_aggregation_testcase extends advanced_testcase
         $this->assertTrue($comp_record3->last_aggregated > $comp_record1->last_aggregated);
     }
 
-//    /**
-//     * Active assignment
-//     * Active pathway
-//     * Archived pathway achievement
-//     */
-//    public function test_new_active_assignment_archived_pathway_achievement() {
-//        global $DB;
-//
-//        $this->markTestIncomplete('Will be fixed in TL-22139');
-//
-//        $user = $this->getDataGenerator()->create_user();
-//        [$competency, $pathway] = $this->create_competency_with_pathway();
-//
-//        $this->generate_active_expanded_user_assignments($competency, [$user]);
-//        (new pathway_evaluator($pathway))->aggregate([$user->id]);
-//
-//        pathway_achievement::get_current($pathway, $user->id)->archive();
-//
-//        $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
-//        $this->assertEquals(0, $DB->count_records('totara_competency_achievement_via'));
-//
-//        $task = new competency_achievement_aggregation();
-//        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
-//        $this->assertCount(1, $user_ids);
-//    }
-//
-//    /**
-//     * Archived assignment
-//     * Active pathway
-//     * Active pathway achievement
-//     */
-//    public function test_new_archived_assignment_active_pathway_achievement() {
-//        global $DB;
-//
-//        $this->markTestIncomplete('Will be fixed in TL-22139');
-//
-//        $user = $this->getDataGenerator()->create_user();
-//        [$competency, $pathway] = $this->create_competency_with_pathway();
-//
-//        $assignment_ids = $this->generate_active_expanded_user_assignments($competency, [$user]);
-//        (new pathway_evaluator($pathway))->aggregate([$user->id]);
-//
-//        (new \tassign_competency\models\assignment_actions())->archive($assignment_ids);
-//        (new \tassign_competency\expand_task($DB))->expand_all();
-//
-//        $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
-//        $this->assertEquals(0, $DB->count_records('totara_competency_achievement_via'));
-//
-//        $task = new competency_achievement_aggregation();
-//
-//        $task->execute();
-//        // We only aggregate for active assignments.
-//        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
-//        $this->assertCount(0, $user_ids);
-//    }
-//
-//    /**
-//     * Begin with active assignment, pathway and achievement.
-//     * Then set the achievement to be archived.
-//     */
-//    public function test_updated_active_assignment_archived_pathway_achievement() {
-//        global $DB;
-//
-//        $this->markTestIncomplete('Will be fixed in TL-22139');
-//
-//        $user = $this->getDataGenerator()->create_user();
-//        [$competency, $pathway, $scale_value] = $this->create_competency_with_pathway();
-//
-//        $this->generate_active_expanded_user_assignments($competency, [$user]);
-//        (new pathway_evaluator($pathway))->aggregate([$user->id]);
-//
-//        $task = new competency_achievement_aggregation();
-//
-//        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
-//        $this->assertCount(1, $user_ids);
-//
-//        $task->execute();
-//
-//        // A comp_record should have been generated based on the user's pathway achievement.
-//        $comp_record = $DB->get_record('totara_competency_achievement', []);
-//
-//        $now = time();
-//
-//        pathway_achievement::get_current($pathway, $user->id)->archive();
-//
-//        // Work around the last_aggregated check so that this is updated if it needs to be.
-//        // Todo: Edge case here where if achievement is actually updated as record is being aggregated, it will be missed.
-//        $DB->set_field('totara_competency_achievement', 'last_aggregated', $now - 1, ['id' => $comp_record->id]);
-//
-//        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
-//        $this->assertCount(1, $user_ids);
-//    }
-//
-//    /**
-//     * Begin with active assignment, pathway and achievement.
-//     * Then set the assignment to be archived.
-//     * Then archive the achievement and we should not see any change.
-//     */
-//    public function test_updated_archived_assignment_active_pathway_achievement() {
-//        global $DB;
-//
-//        $this->markTestIncomplete('Will be fixed in TL-22139');
-//
-//        $user = $this->getDataGenerator()->create_user();
-//        [$competency, $pathway, $scale_value] = $this->create_competency_with_pathway();
-//
-//        $assignment_ids = $this->generate_active_expanded_user_assignments($competency, [$user]);
-//        (new pathway_evaluator($pathway))->aggregate([$user->id]);
-//
-//        $task = new competency_achievement_aggregation();
-//
-//        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
-//        $this->assertCount(1, $user_ids);
-//
-//        $task->execute();
-//
-//        // Now archive the assignment.
-//        (new \tassign_competency\models\assignment_actions())->archive($assignment_ids);
-//        (new \tassign_competency\expand_task($DB))->expand_all();
-//
-//        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
-//        $this->assertCount(0, $user_ids);
-//
-//        $task->execute();
-//
-//        // Nothing should have changed.
-//        $comp_record = $DB->get_record('totara_competency_achievement', []);
-//
-//        $now = time();
-//        // Now archive the achievement.
-//        pathway_achievement::get_current($pathway, $user->id)->archive($now);
-//
-//        // Work around the last_aggregated check so that this is updated if it needs to be.
-//        // Todo: Edge case here where if achievement is actually updated as record is being aggregated, it will be missed.
-//        $DB->set_field('totara_competency_achievement', 'last_aggregated', $now - 1, ['id' => $comp_record->id]);
-//
-//        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
-//        $this->assertCount(0, $user_ids);
-//    }
-//
-//    /**
-//     * First, an active achievement for active pathway and assignment leads to a comp_record value.
-//     * Then, archive the pathway itself.
-//     * That achievement should no longer contribute to the value.
-//     */
-//    public function test_archived_pathway_after_record_created() {
-//
-//        $this->markTestSkipped(); // Some more to implement before this will pass.
-//
-//        $user = $this->getDataGenerator()->create_user();
-//
-//        /**
-//         * @var competency $competency
-//         * @var pathway $pathway
-//         * @var scale_value $scale_value
-//         */
-//        [$competency, $pathway, $scale_value] = $this->create_competency_with_pathway();
-//
-//        $this->generate_active_expanded_user_assignments($competency, [$user]);
-//        (new pathway_evaluator($pathway))->aggregate([$user->id]);
-//
-//        $task = new competency_achievement_aggregation();
-//
-//        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
-//        $this->assertCount(1, $user_ids);
-//
-//        $task->execute();
-//
-//        // Now archive the pathway.
-//        // Todo: Maybe this isn't the right way. Maybe there needs to be a method like set_as_archived which does all the work.
-//        $pathway->set_status(pathway::PATHWAY_STATUS_ARCHIVED);
-//        $pathway->activate_changes(); // Todo: Or just account for archived in this one.
-//
-//        $user_ids = $task->get_assigned_users_with_updated_achievements($competency);
-//        $this->assertCount(0, $user_ids);
-//    }
-//
-//    /**
-//     * First, an active achievement for active pathway and assignment leads to a comp_record value.
-//     * Then, delete the pathway.
-//     * That achievement should no longer contribute to the value.
-//     */
-//    public function test_deleted_pathway_after_record_created() {
-//        $this->markTestIncomplete();
-//    }
-//
-//    /**
-//     * First, create two pathways that generate different scale values.
-//     * Aggregate so that the user has a comp_record based off one of them.
-//     * Update the aggregation method such that the user should now have the other value in their comp_record.
-//     * Run aggregation and check this occurs.
-//     */
-//    public function test_updated_aggregation_type_after_record_created() {
-//        $this->markTestIncomplete();
-//    }
 
     private function verify_achievement_records($expected, $data) {
         foreach ($expected as $expected_achievement_set) {

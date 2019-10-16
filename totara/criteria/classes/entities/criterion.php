@@ -24,7 +24,6 @@
 namespace totara_criteria\entities;
 
 
-use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\has_many;
 
@@ -45,6 +44,9 @@ class criterion extends entity {
 
     public function items(): has_many {
         return $this->has_many(criterion_item::class, 'criterion_id');
+    }
+    public function metadata(): has_many {
+        return $this->has_many(criteria_metadata::class, 'criterion_id');
     }
 
 }

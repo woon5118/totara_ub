@@ -21,6 +21,7 @@
  * @package pathway_learning_plan
  */
 
+use totara_competency\competency_aggregator_user_source_list;
 use totara_plan\event\competency_value_set;
 use totara_competency\entities\scale_value;
 use pathway_learning_plan\learning_plan;
@@ -36,8 +37,6 @@ class pathway_learning_plan_observer_testcase extends advanced_testcase {
 
     public function test_event_for_competency_with_lp_pathway() {
         global $DB;
-
-        $this->markTestSkipped('Will be fixed in TL-22317');
 
         $user = $this->getDataGenerator()->create_user();
 
@@ -89,7 +88,8 @@ class pathway_learning_plan_observer_testcase extends advanced_testcase {
         $pathway_achievement = pathway_achievement::get_current($lp_pathway, $user->id);
         $this->assertEquals($great->id, $pathway_achievement->scale_value_id);
 
-        (new competency_achievement_aggregator(new achievement_configuration($competency)))->aggregate([$user->id]);
+        $user_id_source = new competency_aggregator_user_source_list([$user->id], false);
+        (new competency_achievement_aggregator(new achievement_configuration($competency), $user_id_source))->aggregate();
 
         $achievements = competency_achievement::repository()
             ->where('user_id', '=', $user->id)
@@ -112,7 +112,7 @@ class pathway_learning_plan_observer_testcase extends advanced_testcase {
         $this->assertEquals($great->id, $pathway_achievement->scale_value_id);
 
         // Aggregate. There are no active pathways now. So we are left with no value.
-        (new competency_achievement_aggregator(new achievement_configuration($competency)))->aggregate([$user->id]);
+        (new competency_achievement_aggregator(new achievement_configuration($competency), $user_id_source))->aggregate();
         $achievements = competency_achievement::repository()
             ->where('user_id', '=', $user->id)
             ->where('comp_id', '=', $comp->id)
@@ -134,7 +134,7 @@ class pathway_learning_plan_observer_testcase extends advanced_testcase {
         $pathway_achievement = pathway_achievement::get_current($new_lp_pathway, $user->id);
         $this->assertEquals($good->id, $pathway_achievement->scale_value_id);
 
-        (new competency_achievement_aggregator(new achievement_configuration($competency)))->aggregate([$user->id]);
+        (new competency_achievement_aggregator(new achievement_configuration($competency), $user_id_source))->aggregate();
         $achievements = competency_achievement::repository()
             ->where('user_id', '=', $user->id)
             ->where('comp_id', '=', $comp->id)
@@ -146,8 +146,6 @@ class pathway_learning_plan_observer_testcase extends advanced_testcase {
 
     public function test_event_for_competency_without_lp_pathway() {
         global $DB;
-
-        $this->markTestSkipped();
 
         $user = $this->getDataGenerator()->create_user();
 
@@ -195,7 +193,8 @@ class pathway_learning_plan_observer_testcase extends advanced_testcase {
 
         competency_value_set::create_from_record($record)->trigger();
 
-        (new competency_achievement_aggregator(new achievement_configuration($competency)))->aggregate([$user->id]);
+        $user_id_source = new competency_aggregator_user_source_list([$user->id]);
+        (new competency_achievement_aggregator(new achievement_configuration($competency), $user_id_source))->aggregate();
 
         $achievements = competency_achievement::repository()
             ->where('user_id', '=', $user->id)

@@ -26,7 +26,7 @@ use pathway_criteria_group\criteria_group;
 use totara_competency\pathway;
 use criteria_coursecompletion\coursecompletion;
 use totara_competency\achievement_configuration;
-use totara_criteria\criterion;
+use totara_competency\task\competency_achievement_aggregation_adhoc;
 
 class pathway_criteria_group_course_completion_integration_testcase extends advanced_testcase {
 
@@ -101,7 +101,6 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
 
     public function test_course_completion_leads_to_comp_achievement_via_events() {
 
-        $this->markTestSkipped('Will be fixed in TL-22569');
         global $DB;
 
         /** @var totara_competency_generator $competency_generator */
@@ -154,6 +153,8 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
         $completion = new completion_completion(['course' => $course1->id, 'userid' => $user1->id]);
 
         $completion->mark_complete();
+        // Verify that an adhoc task was created and run it
+        $this->verify_and_run_adhoc_task();
 
         // Ordered these according to when they happen.
         $this->assertEquals(1, $DB->count_records('totara_criteria_item_record'));
@@ -167,4 +168,18 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
         $comp_record = $DB->get_record('totara_competency_achievement', []);
         $this->assertEquals($expected_value1->id, $comp_record->scale_value_id);
     }
+
+    private function verify_and_run_adhoc_task() {
+        global $DB;
+
+        $rows = $DB->get_records('task_adhoc', ['classname' => '\totara_competency\task\competency_achievement_aggregation_adhoc']);
+        $this->assertSame(1, count($rows));
+
+        // Run adhoc task
+        $row = reset($rows);
+        $task = new competency_achievement_aggregation_adhoc();
+        $task->set_custom_data(json_decode($row->customdata));
+        $task->execute();
+    }
+
 }

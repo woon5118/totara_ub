@@ -24,11 +24,11 @@
 
 namespace pathway_criteria_group;
 
-use totara_criteria\event\item_updated;
+use totara_criteria\event\criteria_satisfied;
 
 class observer {
 
-    public static function criterion_item_updated(item_updated $event) {
-        aggregation_helper::aggregate_based_on_item($event->relateduserid, $event->other['criterion_item_id']);
+    public static function criteria_satisfied(criteria_satisfied $event) {
+        aggregation_helper::aggregate_based_on_criteria($event->relateduserid, $event->other['criteria_ids']);
     }
 }
