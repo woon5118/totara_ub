@@ -295,8 +295,6 @@ function xmldb_totara_core_upgrade($oldversion) {
             uninstall_plugin('auth', $auth);
         }
 
-        uninstall_plugin('tool', 'innodb');
-
         // Core savepoint reached.
         upgrade_plugin_savepoint(true, 2018031501, 'totara', 'core');
     }
@@ -390,16 +388,6 @@ function xmldb_totara_core_upgrade($oldversion) {
         }
 
         upgrade_plugin_savepoint(true, 2018092101, 'totara', 'core');
-    }
-
-    if ($oldversion < 2018092600) {
-        // Removing cachestore plugin incompatible with PHP7.
-        if (!file_exists($CFG->dirroot . '/cache/stores/memcache/settings.php')) {
-            unset_all_config_for_plugin('cachestore_memcache');
-        }
-
-        // Core savepoint reached.
-        upgrade_plugin_savepoint(true, 2018092600, 'totara', 'core');
     }
 
     if ($oldversion < 2018100100) {
@@ -625,11 +613,6 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019070300, 'totara', 'core');
     }
 
-    if ($oldversion < 2019071801) {
-        totara_core_upgrade_delete_moodle_plugins();
-        upgrade_plugin_savepoint(true, 2019071801, 'totara', 'core');
-    }
-
     if ($oldversion < 2019072900) {
         // Delete any un-created drag-and-drop SCORM modules (where instance = 0).
         $mod_scorm = $DB->get_record('modules', array('name' => 'scorm'), 'id');
@@ -741,6 +724,11 @@ function xmldb_totara_core_upgrade($oldversion) {
 
         // Main savepoint reached.
         upgrade_plugin_savepoint(true, 2019100300, 'totara', 'core');
+    }
+
+    if ($oldversion < 2019101700) {
+        totara_core_upgrade_delete_moodle_plugins();
+        upgrade_plugin_savepoint(true, 2019101700, 'totara', 'core');
     }
 
     return true;

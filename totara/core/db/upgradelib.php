@@ -366,8 +366,9 @@ function totara_core_upgrade_delete_moodle_plugins() {
         'portfolio_picasa',
         // Moodle 3.4 merge skipped.
         'tool_analytics', 'tool_httpsreplace', 'report_insights', 'mlbackend_php', 'mlbackend_python',
-        // Extra cleanup.
-        'auth_none', 'tool_innodb', 'cache_memcache',
+
+        // Totara 12 removals.
+        'auth_none', 'tool_innodb', 'cachestore_memcache',
 
         // Moodle 3.3 removals.
         'repository_onedrive',
