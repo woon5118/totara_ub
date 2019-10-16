@@ -297,8 +297,11 @@ function dev_get_moodle_tag() {
     $versionfile = $CFG->dirroot . '/version.php';
     $release = null;
     include($versionfile);
-    if (!preg_match('/^\d\.\d+\.\d+/', $release, $matches)) {
+    if (!preg_match('/^\d\.\d+(\.\d+)?/', $release, $matches)) {
         throw new coding_exception('Invalid main moodle release detected');
+    }
+    if (substr_count($matches[0], '.') === 1) {
+        $matches[0] .= '.0';
     }
 
     return 'v' . $matches[0];
