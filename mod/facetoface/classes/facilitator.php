@@ -36,11 +36,6 @@ final class facilitator implements seminar_iterator_item {
     use traits\crud_mapper;
 
     /**
-     * @var string {event}.eventtype = 'facetofacefacilitator'
-     * NOTE: {event}.eventtype is varchar datatype and 20 chars lenght
-    const EVENTTYPE = 'facilitator';
-     */
-    /**
      * @var int {facetoface_facilitator}.id
      */
     private $id = 0;

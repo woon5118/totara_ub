@@ -69,12 +69,11 @@ class facetofacefacilitator  implements \totara_customfield\area {
     }
 
     /**
-     * Returns the c
+     * Returns the context_system::instance()
      * @return context_system
      */
     public static function get_context(): context_system {
         global $TEXTAREA_OPTIONS;
-        // context_system::instance()
         return $TEXTAREA_OPTIONS['context'];
     }
 

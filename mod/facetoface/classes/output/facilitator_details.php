@@ -50,16 +50,16 @@ class facilitator_details extends template {
         $data = [
             'namestr' => get_string('facilitatorname', 'mod_facetoface'),
             'namevalue' => $namevalue,
-            'customfields' => self::set_customfields($facilitator),
+            'customfields' => self::get_customfields($facilitator),
             'allowconflictstr' => get_string('allowfacilitatorconflicts', 'mod_facetoface'),
             'allowconflictvalue' => self::get_allowconflicts($facilitator),
             'isdescription' => empty($facilitator->get_description()),
             'descriptionstr' => get_string('descriptionlabel', 'mod_facetoface'),
-            'descriptionvalue' => self::set_description($facilitator),
+            'descriptionvalue' => self::get_description($facilitator),
             'createdstr' => get_string('created', 'mod_facetoface'),
-            'createdvalue' => self::set_created($facilitator),
+            'createdvalue' => self::get_created($facilitator),
             'modifiedstr' => get_string('modified'),
-            'modifiedvalue' => self::set_modified($facilitator),
+            'modifiedvalue' => self::get_modified($facilitator),
         ];
 
         return new static($data);
@@ -70,7 +70,7 @@ class facilitator_details extends template {
      * @param facilitator $facilitator
      * @return array
      */
-    private static function set_customfields(facilitator_user $facilitator): array {
+    private static function get_customfields(facilitator_user $facilitator): array {
         $filearea = facilitatorcustomfield::get_area_name();
         $tblprefix = facilitatorcustomfield::get_prefix();
         $options = array('prefix' => $filearea, 'extended' => true);
@@ -97,7 +97,7 @@ class facilitator_details extends template {
      * @param facilitator $facilitator
      * @return string
      */
-    private static function set_description(facilitator_user $facilitator): string {
+    private static function get_description(facilitator_user $facilitator): string {
         $context = facilitatorcustomfield::get_context();
         $component = facilitatorcustomfield::get_component();
         $filearea = facilitatorcustomfield::get_area_name();
@@ -118,11 +118,11 @@ class facilitator_details extends template {
     }
 
     /**
-     * Set created by user.
+     * Get created by user.
      * @param facilitator $facilitator
      * @return string
      */
-    private static function set_created(facilitator_user $facilitator): string {
+    private static function get_created(facilitator_user $facilitator): string {
         // Created.
         $created = new stdClass();
         $created->user = get_string('unknownuser');
@@ -139,11 +139,11 @@ class facilitator_details extends template {
     }
 
     /**
-     * Set modified by user.
+     * Get modified by user.
      * @param facilitator $facilitator
      * @return string
      */
-    private static function set_modified(facilitator_user $facilitator): string {
+    private static function get_modified(facilitator_user $facilitator): string {
         // Modified.
         $modified = new stdClass();
         $modified->user = get_string('unknownuser');

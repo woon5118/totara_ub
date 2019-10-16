@@ -27,6 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 
 use totara_reportbuilder\rb\display\base;
 use mod_facetoface\facilitator_user;
+use core\output\flex_icon;
+use moodle_url;
 
 /**
  * Display class intended for assets/rooms/facilitators actions
@@ -60,42 +62,48 @@ class facilitator_actions extends base {
             $useractive = facilitator_user::is_userid_active((int)$extrafields->userid);
         }
 
-        $output = array();
+        $output = [];
         $output[] = $OUTPUT->action_icon(
-            new \moodle_url('/mod/facetoface/reports/facilitators.php', array('facilitatorid' => $value)),
-            new \pix_icon('t/calendar', get_string('details', 'mod_facetoface'))
-        );
-
-        $output[] = $OUTPUT->action_icon(
-            new \moodle_url('/mod/facetoface/facilitator/edit.php', array('id' => $value)),
-            new \pix_icon('t/edit', get_string('edit'))
+            new moodle_url('/mod/facetoface/facilitator/edit.php', ['id' => $value]),
+            new flex_icon('edit', [
+                'alt' => get_string('editfacilitator', 'mod_facetoface'),
+                'title' => get_string('editfacilitator', 'mod_facetoface')
+            ])
         );
 
         if ($extrafields->hidden && $report->src->get_embeddedurl()) {
             if ($useractive) {
-                $params = array_merge($report->src->get_urlparams(), array('action' => 'show', 'id' => $value, 'sesskey' => sesskey()));
+                $params = array_merge($report->src->get_urlparams(), ['action' => 'show', 'id' => $value, 'sesskey' => sesskey()]);
                 $output[] = $OUTPUT->action_icon(
-                    new \moodle_url($report->src->get_embeddedurl(), $params),
-                    new \pix_icon('t/show', get_string('show'))
+                    new moodle_url($report->src->get_embeddedurl(), $params),
+                    new flex_icon('show', ['alt' => get_string('show'), 'title' => get_string('show')])
                 );
             } else {
-                $output[] = $OUTPUT->flex_icon('show', ['classes' => 'ft-size-100 ft-state-disabled', 'alt' => get_string('facilitatoruserdeleted', 'mod_facetoface')]);
+                $output[] = $OUTPUT->flex_icon('show', [
+                    'classes' => 'ft-state-disabled',
+                    'alt' => get_string('facilitatoruserdeleted', 'mod_facetoface'),
+                    'title' => get_string('facilitatoruserdeleted', 'mod_facetoface')
+                ]);
             }
         } else if ($report->src->get_embeddedurl()) {
-            $params = array_merge($report->src->get_urlparams(), array('action' => 'hide', 'id' => $value, 'sesskey' => sesskey()));
+            $params = array_merge($report->src->get_urlparams(), ['action' => 'hide', 'id' => $value, 'sesskey' => sesskey()]);
             $output[] = $OUTPUT->action_icon(
-                new \moodle_url($report->src->get_embeddedurl(), $params),
-                new \pix_icon('t/hide', get_string('hide'))
+                new moodle_url($report->src->get_embeddedurl(), $params),
+                new flex_icon('hide', ['alt' => get_string('hide'), 'title' => get_string('hide')])
             );
         }
-        if ($extrafields->cntdates) {
-            $output[] = $OUTPUT->pix_icon('t/delete_gray', get_string('currentlyassigned', 'mod_facetoface'), 'moodle', array('class' => 'disabled iconsmall'));
+        if ($extrafields->cntdates && $report->src->get_embeddedurl()) {
+            $output[] = $OUTPUT->flex_icon('delete', [
+                'classes' => 'ft-state-disabled',
+                'alt' => get_string('currentlyassigned', 'mod_facetoface'),
+                'title' => get_string('currentlyassigned', 'mod_facetoface')
+            ]);
         } else {
             if ($report->src->get_embeddedurl()) {
-                $params = array_merge($report->src->get_urlparams(), array('action' => 'delete', 'id' => $value, 'sesskey' => sesskey()));
+                $params = array_merge($report->src->get_urlparams(), ['action' => 'delete', 'id' => $value, 'sesskey' => sesskey()]);
                 $output[] = $OUTPUT->action_icon(
-                    new \moodle_url($report->src->get_embeddedurl(), $params),
-                    new \pix_icon('t/delete', get_string('delete'))
+                    new moodle_url($report->src->get_embeddedurl(), $params),
+                    new flex_icon('delete', ['alt' => get_string('delete'), 'title' => get_string('delete')])
                 );
             }
         }

@@ -1001,7 +1001,7 @@ function facetoface_extend_settings_navigation(settings_navigation $settings, na
     if (has_capability('mod/facetoface:managesitewidefacilitators', $context)) {
         $facetofacenode->add(
             get_string('facilitators', 'mod_facetoface'),
-            new moodle_url('/mod/facetoface/facilitator/manage.php', ['f' => $PAGE->cm->instance]),
+            new moodle_url('/mod/facetoface/facilitator/manage.php', ['published' => 0]),
             navigation_node::TYPE_SETTING
         );
     }

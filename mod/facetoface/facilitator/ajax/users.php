@@ -34,12 +34,6 @@ require_login(null, false, null, false, true);
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/mod/facetoface/facilitator/ajax/users.php');
 
-
-$canedit = true;
-if (!$canedit) {
-    // debug
-}
-
 // Get guest user for exclusion purposes
 $guest = guest_user();
 // Load potential managers for this user.

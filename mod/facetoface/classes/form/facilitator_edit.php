@@ -26,6 +26,7 @@ namespace mod_facetoface\form;
 use html_writer;
 use mod_facetoface\facilitator;
 use mod_facetoface\facilitator_user;
+use mod_facetoface\facilitator_type;
 use mod_facetoface\customfield_area\facetofacefacilitator as facilitatorcustomfield;
 use mod_facetoface\seminar_event;
 
@@ -36,7 +37,7 @@ class facilitator_edit extends \moodleform {
      * Definition of the facilitator form
      */
     public function definition() {
-        global $OUTPUT, $TEXTAREA_OPTIONS;
+        global $TEXTAREA_OPTIONS;
 
         $mform = $this->_form;
 
@@ -81,8 +82,8 @@ class facilitator_edit extends \moodleform {
             $username = [];
             $username[] =& $mform->createElement('hidden', 'userid');
             $typeoptions = [
-                '0' => get_string('facilitatorinternal', 'mod_facetoface'),
-                '1' => get_string('facilitatorexternal', 'mod_facetoface'),
+                facilitator_type::INTERNAL => get_string('facilitatorinternal', 'mod_facetoface'),
+                facilitator_type::EXTERNAL => get_string('facilitatorexternal', 'mod_facetoface'),
             ];
             $username[] =& $mform->createElement('select', 'facilitatortype', null, $typeoptions);
             $username[] =& $mform->createElement('button', 'facilitatorselector', get_string('selectuserwithdot', 'mod_facetoface'),
@@ -91,6 +92,7 @@ class facilitator_edit extends \moodleform {
             $mform->addGroup($username, 'labeltype', get_string('facilitatortype', 'mod_facetoface'), null, false);
             $mform->setType('userid', PARAM_INT);
             $mform->addHelpButton('labeltype', 'facilitatortype', 'mod_facetoface');
+            $mform->disabledIf('facilitatorselector', 'facilitatortype', 'eq', facilitator_type::EXTERNAL);
         } else {
             $mform->addElement('hidden', 'userid', 0);
             $mform->setType('userid', PARAM_INT);
@@ -204,27 +206,47 @@ class facilitator_edit extends \moodleform {
 
     public function save($data) {
         global $DB;
-        // New one, no problem.
-        if ((int)$data->id == 0 || (int)$data->userid == 0) {
-            return \mod_facetoface\facilitator_helper::save($data);
-        }
-        // Update one, lets load old record.
-        $oldfacilitator = new facilitator($data->id);
-        if ($oldfacilitator->get_userid() == (int)$data->userid) {
-            // Nothing change for user record, still same user.
-            // Lets check if user active or not.
-            if (facilitator_user::is_userid_active((int)$data->userid)) {
-                // All good, just lets save the record.
+        // New one.
+        if ((int)$data->id == 0) {
+            if ((int)$data->userid == 0) {
                 return \mod_facetoface\facilitator_helper::save($data);
+            } else {
+                if (facilitator_user::is_userid_active((int)$data->userid)) {
+                    return \mod_facetoface\facilitator_helper::save($data);
+                } else {
+                    \core\notification::warning(get_string('facilitatoruserdeleted', 'mod_facetoface'));
+                    return false;
+                }
             }
         }
+
+        // Update one.
+        $oldfacilitator = new facilitator($data->id);
+        if ($oldfacilitator->get_userid() == (int)$data->userid) {
+            // And also for $oldfacilitator->get_userid() == 0 && (int)$data->userid == 0
+            // Nothing change for user record, still same user.
+            // All good, just lets save the record.
+            return \mod_facetoface\facilitator_helper::save($data);
+        }
+        if ($oldfacilitator->get_userid() > 0 && (int)$data->userid == 0) {
+            return \mod_facetoface\facilitator_helper::save($data);
+        }
+        if ($oldfacilitator->get_userid() == 0 && (int)$data->userid > 0) {
+            if (facilitator_user::is_userid_active((int)$data->userid)) {
+                return \mod_facetoface\facilitator_helper::save($data);
+            } else {
+                \core\notification::warning(get_string('facilitatoruserdeleted', 'mod_facetoface'));
+                return false;
+            }
+        }
+
         // Right, new user, we must load all session records
         // It's probably doesn't matter if the user is in the trouble or not
         // We will update all upcoming sessions and skip the past ones for history records
         // Lets check a new user: for case he/she is active.
         if (!facilitator_user::is_userid_active((int)$data->userid)) {
             // This should not happened, but somehow did.
-            // \core\notification::warning(get_string('facilitatoruserwarning', 'mod_facetoface', $facilitator->get_fullname()));
+            \core\notification::warning(get_string('facilitatoruserdeleted', 'mod_facetoface'));
             return false;
         }
 
@@ -233,37 +255,6 @@ class facilitator_edit extends \moodleform {
         $data->id = 0;
         $newfacilitator = \mod_facetoface\facilitator_helper::save($data);
 
-        /**
-         * TODO:
-         * NOTE: keep this for case if we want to return to facilitator calendar
-        // Find and update calendar entries for upcoming events.
-        $sql = "SELECT fsd.timestart, fs.id, fs.facetoface
-                  FROM {facetoface_sessions} fs
-                  JOIN {facetoface_sessions_dates} fsd ON fsd.sessionid = fs.id
-                  JOIN {facetoface_facilitator_dates} ffd ON ffd.sessionsdateid = fsd.id
-                 WHERE ffd.facilitatorid = :oldfacilitatorid
-                   AND fsd.timestart > :timenow";
-        $params = ['facilitatorid' => $oldfacilitator->get_id(), 'timenow' => time()];
-        $records = $DB->get_records_sql($sql, $params);
-        $updatesql = "UPDATE {event}
-                       SET userid = :newfacilitatorid
-                     WHERE userid = :userid AND uuid = :uuid
-                       AND instance = :instance AND modulename = :modulename
-                       AND eventtype = :eventtype AND timestart = :timestart";
-        $eventtype = 'facetoface' . facilitator::EVENTTYPE;
-        foreach ($records as $rec) {
-            $params = [
-                'newfacilitatorid' => $newfacilitator->get_userid(),
-                'userid' => $oldfacilitator->get_userid(),
-                'uuid' => $rec->id,
-                'instance' => $rec->facetoface,
-                'modulename' => 'facetoface',
-                'eventtype' => $eventtype,
-                'timestart' => $rec->timestart
-            ];
-            $DB->execute($updatesql, $params);
-        }
-        */
         $sql = "SELECT DISTINCT ffd.*
                   FROM {facetoface_facilitator_dates} ffd
                   JOIN {facetoface_sessions_dates} fsd ON fsd.id = ffd.sessionsdateid

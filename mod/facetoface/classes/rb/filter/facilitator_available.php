@@ -21,6 +21,8 @@
 * @package mod_facetoface
 */
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Don't uncomment this namespace as report_builder will never find this filter.
  * Leaving this for reference.

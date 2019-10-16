@@ -34,18 +34,19 @@ use reportbuilder;
 use totara_reportbuilder_renderer;
 
 $id = optional_param('id', 0, PARAM_INT);
+$f = optional_param('f', 0, PARAM_INT);
 $action = optional_param('action', '', PARAM_ALPHA);
 $confirm = optional_param('confirm', 0, PARAM_BOOL);
 $debug = optional_param('debug', 0, PARAM_INT);
 $sid = optional_param('sid', '0', PARAM_INT);
+$published = optional_param('published', false, PARAM_INT);
 
 $baseurl = new moodle_url('/mod/facetoface/facilitator/manage.php');
 
 // Check permissions.
 admin_externalpage_setup('modfacetofacefacilitators', '', null, $baseurl);
 
-$config = new rb_config();
-$config->set_sid($sid);
+$config = (new rb_config())->set_sid($sid)->set_embeddata(['published' => $published]);
 $report = reportbuilder::create_embedded('facetoface_facilitators', $config);
 $baseurl->params($report->get_current_url_params());
 

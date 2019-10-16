@@ -35,6 +35,7 @@ final class facilitator_helper {
      * facilitator data
      * @param \stdClass $data to be saved includes:
      *      - int {facetoface_facilitator}.id
+     *      - int {facetoface_facilitator}.userid
      *      - string {facetoface_facilitator}.name
      *      - int {facetoface_facilitator}.allowconflicts
      *      - string {facetoface_facilitator}.description
@@ -122,7 +123,7 @@ final class facilitator_helper {
                 'facilitatorid'  => (int)$facilitator
             ], false);
         }
-        return !!$res;
+        return $res;
     }
 
     /**

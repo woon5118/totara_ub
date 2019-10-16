@@ -244,6 +244,10 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         'id' => 1, 'facetoface' => 1, 'userid' => 2, 'timedeclared' => 114051960, 'reason' => 'A good reason.'
     );
 
+    protected $f2f_facilitator_data = array('id' => 1, 'name' => 'Facilitator');
+
+    protected $f2f_facilitator_dates = array('id' => 1, 'facilitatorid' => 1, 'sessionsdateid' => 1);
+
     protected $scorm_data = array(
         'id' => 1, 'course' => 1, 'name' => 'Scorm', 'intro' => 'Hi there, this is a scorm.',
     );
@@ -644,6 +648,8 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         $this->f2f_asset_data = null;
         $this->f2f_asset_dates = null;
         $this->f2f_interest_data = null;
+        $this->f2f_facilitator_data = null;
+        $this->f2f_facilitator_dates = null;
         $this->scorm_data = null;
         $this->scorm_scoes_data = null;
         $this->scorm_scoes_track_data = null;
@@ -771,6 +777,8 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             'facetoface_asset' => array($this->f2f_asset_data),
             'facetoface_asset_dates' => array($this->f2f_asset_dates),
             'facetoface_interest' => array($this->f2f_interest_data),
+            'facetoface_facilitator' => array($this->f2f_facilitator_data),
+            'facetoface_facilitator_dates' => array($this->f2f_facilitator_dates),
             'scorm_scoes' => array($this->scorm_scoes_data),
             'scorm_scoes_track' => $this->scorm_scoes_track_data,
             'feedback' => array($this->feedback_data),

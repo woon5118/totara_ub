@@ -58,6 +58,12 @@ class rb_facetoface_summary_facilitator_embedded extends rb_base_embedded {
         parent::__construct();
     }
 
+    /**
+     * Check if the user is capable of accessing this report.
+     * @param int $reportfor userid of the user that this report is being generated for
+     * @param reportbuilder $report the report object - can use get_param_value to get params
+     * @return boolean true if the user can access this report
+     */
     public function is_capable($reportfor, $report) {
         return self::is_capable_static($reportfor);
     }

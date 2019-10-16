@@ -682,7 +682,6 @@
         <KEY NAME="usermodified_fk" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
         <INDEX NAME="custom" UNIQUE="false" FIELDS="custom"/>
       </INDEXES>
     </TABLE>

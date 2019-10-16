@@ -739,7 +739,6 @@ function xmldb_facetoface_upgrade($oldversion) {
         $table->add_key('usercreated_fk', XMLDB_KEY_FOREIGN, array('usercreated'), 'user', 'id');
         $table->add_key('usermodified_fk', XMLDB_KEY_FOREIGN, array('usermodified'), 'user', 'id');
         // Adding index to table facetoface_facilitator.
-        $table->add_index('userid', XMLDB_INDEX_NOTUNIQUE, array('userid'));
         $table->add_index('custom', XMLDB_INDEX_NOTUNIQUE, array('custom'));
         // Conditionally launch create table for facetoface_facilitator.
         if (!$dbman->table_exists($table)) {

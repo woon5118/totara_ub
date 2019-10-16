@@ -21,9 +21,9 @@
 * @package mod_facetoface
 */
 
-$string['sourcelabel'] = 'Seminar';
-$string['sourcesummary'] = 'Upcoming events using facilitators.';
-$string['sourcetitle'] = 'Seminar Facilitators Assignments';
-$string['type_date'] = 'Date';
-$string['type_session'] = 'Sessions';
+namespace mod_facetoface;
 
+abstract class facilitator_type {
+    const INTERNAL = 0;
+    const EXTERNAL = 1;
+}

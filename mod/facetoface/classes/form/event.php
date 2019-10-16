@@ -1026,20 +1026,6 @@ class event extends \moodleform {
         }
 
         \mod_facetoface\calendar::update_entries($seminarevent);
-        /**
-         * TODO:
-         * NOTE: keep this for case if we want to return to facilitator calendar
-        // Find and update facilitator calendar entries.
-        foreach ($sessiondates as $date) {
-            $facilitators = isset($date->facilitatorids) ? $date->facilitatorids : [];
-            foreach (array_unique($facilitators) as $facilitatorid) {
-                $facilitator = new facilitator($facilitatorid);
-                if ($facilitator->get_userid() > 0) {
-                    \mod_facetoface\calendar::add_seminar_event($seminarevent, 'user', $facilitator->get_userid(), facilitator::EVENTTYPE);
-                }
-            }
-        }
-         */
 
         if ($update) {
             // Send any necessary datetime change notifications but only if date/time is known.

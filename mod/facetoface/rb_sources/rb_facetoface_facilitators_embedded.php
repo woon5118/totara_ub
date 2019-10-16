@@ -31,7 +31,7 @@ class rb_facetoface_facilitators_embedded extends rb_base_embedded {
         $this->shortname = 'facetoface_facilitators';
         $this->fullname = get_string('embedded:seminarfacilitators', 'mod_facetoface');
         $this->columns = array(
-            array('type' => 'facilitator', 'value' => 'name', 'heading' => null),
+            array('type' => 'facilitator', 'value' => 'namelink', 'heading' => null),
             array('type' => 'facilitator', 'value' => 'allowconflicts', 'heading' => null),
             array('type' => 'facilitator', 'value' => 'published', 'heading' => null),
             array('type' => 'facilitator', 'value' => 'visible', 'heading' => null),
@@ -40,16 +40,27 @@ class rb_facetoface_facilitators_embedded extends rb_base_embedded {
 
         $this->filters = array(
             array('type' => 'facilitator', 'value' => 'name', 'advanced' => 0),
-            array('type' => 'facilitator', 'value' => 'facilitatoravailable', 'advanced' => 0)
+            array('type' => 'facilitator', 'value' => 'facilitatoravailable', 'advanced' => 0),
+            array('type' => 'facilitator', 'value' => 'published', 'advanced' => 0, 'defaultvalue' => ['value' => 0])
         );
+
+        if (isset($data['published']) && $data['published'] !== false) {
+            $this->embeddedparams['published'] = $data['published'];
+        }
 
         $this->contentmode = REPORT_BUILDER_CONTENT_MODE_NONE;
 
         parent::__construct();
     }
 
-    public function is_capable($reportfor, $report) {
+    /**
+     * Check if the user is capable of accessing this report.
+     * @param int $reportfor userid of the user that this report is being generated for
+     * @param reportbuilder $report the report object - can use get_param_value to get params
+     * @return boolean true if the user can access this report
+     */
+    public function is_capable($reportfor, $report): bool {
         $context = context_system::instance();
-        return has_capability('totara/core:modconfig', $context, $reportfor);
+        return has_any_capability(['mod/facetoface:managesitewidefacilitators', 'mod/facetoface:manageadhocfacilitators'], $context, $reportfor);
     }
 }

@@ -22,8 +22,5 @@
 */
 
 $string['sourcelabel'] = 'Seminar';
-$string['sourcesummary'] = 'Upcoming events using facilitators.';
-$string['sourcetitle'] = 'Seminar Facilitators Assignments';
-$string['type_date'] = 'Date';
-$string['type_session'] = 'Sessions';
-
+$string['sourcesummary'] = 'List of seminar facilitators.';
+$string['sourcetitle'] = 'Seminar Facilitators';

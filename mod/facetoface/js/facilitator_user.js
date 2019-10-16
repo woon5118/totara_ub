@@ -40,21 +40,40 @@ M.totara_seminar_facilitator = M.totara_seminar_facilitator || {
             throw new Error('M.totara_seminar_facilitator.init()-> jQuery dependency required for this module to function.');
         }
 
-        this.checkuseraddvisibility();
+        $('#id_submitbutton').on('click', function (e) {
+            e.preventDefault();
+            var option = $('select[name="facilitatortype"] option:selected');
+            if (option.val() == '0') {
+                var val = $('input[name="userid"]').val();
+                if (val == '0' || val == '') {
+                    $('div#fgroup_id_labeltype > fieldset > div.felement')
+                        .addClass('error')
+                        .prepend(M.totara_seminar_facilitator.config.errorblock);
+                    return false;
+                }
+            }
+            $('#mform_modal1').submit();
+        });
+
         $('select[name="facilitatortype"]').change(M.totara_seminar_facilitator.checkuseraddvisibility);
 
-        var show_warning =  function() {
-            if (M.totara_seminar_facilitator.config.userid != $('input[name="userid"]').val()) {
-                var notificationHolder = $('#user-notifications');
-                if (!notificationHolder) {
-                    return;
+        var show_warning = function () {
+            if (Number($('input[name="id"]').val()) > 0 && M.totara_seminar_facilitator.config.userid != '0') {
+                if (M.totara_seminar_facilitator.config.userid != $('input[name="userid"]').val()) {
+                    var notificationHolder = $('#user-notifications');
+                    if (!notificationHolder) {
+                        return;
+                    }
+                    notificationHolder.append(M.totara_seminar_facilitator.config.warningblock);
                 }
-                notificationHolder.append(M.totara_seminar_facilitator.config.warningblock);
             }
+            var div = $('div#fgroup_id_labeltype > fieldset > div.felement');
+            div.removeClass('error');
+            $(M.totara_seminar_facilitator.config.errorblock).detach();
         };
 
-        (function() {
-            var url = M.cfg.wwwroot+'/mod/facetoface/facilitator/ajax/users.php?userid=';
+        (function () {
+            var url = M.cfg.wwwroot + '/mod/facetoface/facilitator/ajax/users.php?userid=';
             totaraSingleSelectDialog(
                 'facilitator',
                 M.util.get_string('choosefacilitator', 'mod_facetoface') + M.totara_seminar_facilitator.config.dialog_display_facilitator,
@@ -62,18 +81,22 @@ M.totara_seminar_facilitator = M.totara_seminar_facilitator || {
                 'userid',
                 'facilitatortitle',
                 show_warning,
-                M.totara_seminar_facilitator.config.can_edit
+                true // this user allows to remove a facilitator from the list
             );
         })();
     },
 
-    checkuseraddvisibility: function() {
+    checkuseraddvisibility: function () {
+        var facilitatortype = M.totara_seminar_facilitator.config.facilitatortype;
         var option = $('select[name="facilitatortype"] option:selected');
-        if (option.val() == '0') {
-            $('#show-facilitator-dialog').attr("disabled", false);
-        } else {
-            $('#show-facilitator-dialog').attr("disabled", true);
-            $('a.dialog-singleselect-deletable').click();
+        if (option.val() != facilitatortype.internal) {
+            $('input[name="userid"]').val('0');
+            $('span#facilitatortitle').html('');
         }
-    },
+        var div = $('div#fgroup_id_labeltype > fieldset > div.felement');
+        div.removeClass('error');
+        $("#id_error_userid").detach();
+        $("#id_error_break_userid").detach();
+    }
 };
+

@@ -42,7 +42,6 @@ class facilitator_name_link extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        global $OUTPUT, $USER;
 
         if (empty($value)) {
             return '';
@@ -55,10 +54,7 @@ class facilitator_name_link extends base {
         $extrafields = self::get_extrafields_row($row, $column);
         if (!$isexport) {
             $url = new \moodle_url('/mod/facetoface/reports/facilitators.php', ['facilitatorid' => $extrafields->id]);
-            $popupurl = clone($url);
-            $popupurl->param('popup', 1);
-            $action = new popup_action('click', $popupurl, 'popup', ['width' => 800, 'height' => 600, '']);
-            $value = $OUTPUT->action_link($url, $value, $action, ['class' => 'facilitator_name_link']);
+            $value = html_writer::link($url, $value, ['class' => 'facilitator_name_link']);
         }
 
         if (isset($extrafields->userid) && (int)$extrafields->userid > 0) {

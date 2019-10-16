@@ -29,6 +29,7 @@ require_once($CFG->dirroot . '/totara/customfield/fieldlib.php');
 use \core\notification;
 use mod_facetoface\facilitator;
 use mod_facetoface\facilitator_user;
+use mod_facetoface\facilitator_type;
 use mod_facetoface\output\seminar_dialog_selected;
 
 $id = optional_param('id', 0, PARAM_INT);
@@ -52,16 +53,23 @@ $jsmodule = array(
     'name' => 'totara_seminar_facilitator',
     'fullpath' => '/mod/facetoface/js/facilitator_user.js',
     'requires' => ['json', 'totara_core']);
-$jscanedit = 'true';
-
 // Return markup for 'Currently selected' info in a dialog.
 $selected = $PAGE->get_renderer('mod_facetoface')->render(new seminar_dialog_selected([]));
 
 // Markup for notification warning user it will updating all upcoming events.
 $renderable = (new \core\output\notification(get_string('facilitatoruserchanged', 'mod_facetoface'), notification::WARNING))->set_show_closebutton(true);
 $warningblock = \html_writer::span($PAGE->get_renderer('core')->render($renderable), '', ['id' => uniqid()]);
+$errorblock = \html_writer::span(get_string('error:facilitatornotselected', 'mod_facetoface'), 'error', ['id' => 'id_error_userid']);
+$errorblock .= \html_writer::empty_tag('br', ['class' => 'error', 'id' => 'id_error_break_userid']);
 
-$args = ['can_edit' => $jscanedit, 'dialog_display_facilitator' => $selected, 'userid' => $facilitator->get_userid(), 'warningblock' => $warningblock];
+$facilitatortype = ['internal' => facilitator_type::INTERNAL, 'external' => facilitator_type::EXTERNAL];
+$args = [
+    'dialog_display_facilitator' => $selected,
+    'userid' => $facilitator->get_userid(),
+    'warningblock' => $warningblock,
+    'errorblock' => $errorblock,
+    'facilitatortype' => $facilitatortype,
+];
 $PAGE->requires->js_init_call('M.totara_seminar_facilitator.init', [$args], false, $jsmodule);
 
 $facilitator = new facilitator_user($facilitator);

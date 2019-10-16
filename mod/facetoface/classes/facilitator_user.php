@@ -111,8 +111,9 @@ class facilitator_user {
 
         $userid = $this->facilitator->get_userid();
         if (static::is_userid_active($userid)) {
-            if (user_can_view_profile($userid) && $link) {
-                $link = html_writer::link(new \moodle_url('/user/view.php', ['id' => $userid]), $this->fullname);
+            $url = user_get_profile_url($userid);
+            if ($url && $link) {
+                $link = html_writer::link($url, $this->fullname);
                 $html = " ({$link}) ";
             } else {
                 $html = " ({$this->fullname}) ";

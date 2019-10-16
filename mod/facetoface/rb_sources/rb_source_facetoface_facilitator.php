@@ -46,7 +46,9 @@ class rb_source_facetoface_facilitator extends rb_facetoface_base_source {
     public function __construct(rb_global_restriction_set $globalrestrictionset = null) {
 
         $this->base = '{facetoface_facilitator}';
-        $this->sourcetitle = get_string('facilitatorsourcetitle', 'mod_facetoface');
+        $this->sourcetitle = get_string('sourcetitle', 'rb_source_facetoface_facilitator');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_facetoface_facilitator');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_facetoface_facilitator');
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();
@@ -161,10 +163,14 @@ class rb_source_facetoface_facilitator extends rb_facetoface_base_source {
 
     protected function define_defaultfilters() {
         $defaultfilters = array(
-            array(
+            [
                 'type' => 'facilitator',
                 'value' => 'name'
-            )
+            ],
+            [
+                'type' => 'facilitator',
+                'value' => 'facilitatoravailable'
+            ],
         );
         return $defaultfilters;
     }
@@ -178,6 +184,16 @@ class rb_source_facetoface_facilitator extends rb_facetoface_base_source {
             $this->columnoptions,
             $this->filteroptions
         );
+    }
+
+    protected function define_paramoptions() {
+        $paramoptions = [
+            new rb_param_option(
+                'published',
+                'base.custom'
+            ),
+        ];
+        return $paramoptions;
     }
 
     /**

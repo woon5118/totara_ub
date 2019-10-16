@@ -37,13 +37,14 @@ $popup = optional_param('popup', 0, PARAM_INT);
 require_login(0, false);
 
 $systemcontext = context_system::instance();
-$PAGE->set_context($systemcontext);
-
 $params = ['facilitatorid' => $facilitatorid, 'sid' => $sid, 'debug' => $debug, 'popup' => $popup];
 $baseurl = new moodle_url('/mod/facetoface/reports/facilitators.php', $params);
-$PAGE->set_url($baseurl);
-if ($popup) {
+if (!$popup) {
+    admin_externalpage_setup('modfacetofacefacilitators', '', null, $baseurl);
+} else {
     $PAGE->set_pagelayout('popup');
+    $PAGE->set_url($baseurl);
+    $PAGE->set_context($systemcontext);
 }
 
 if (!$facilitatorid) {
@@ -65,12 +66,13 @@ if (rb_facetoface_summary_facilitator_embedded::is_capable_static($USER->id)) {
     if (!$report) {
         print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
     }
-    $PAGE->set_button($report->edit_button());
+    if (!$popup) {
+        $PAGE->set_button($report->edit_button());
+    }
 }
 
 $title = get_string('viewfacilitator', 'mod_facetoface');
 $PAGE->set_title($title);
-$PAGE->set_heading($title);
 
 echo $OUTPUT->header();
 
@@ -108,7 +110,7 @@ if ($report) {
     }
 
     if (!$popup && has_capability('mod/facetoface:addinstance', $systemcontext)) {
-        echo $renderer->single_button(new moodle_url('/mod/facetoface/facilitator/manage.php'), get_string('backtofacilitators', 'mod_facetoface'), 'get');
+        echo $renderer->single_button(new moodle_url('/mod/facetoface/facilitator/manage.php', ['published' => 0]), get_string('backtofacilitators', 'mod_facetoface'), 'get');
     }
 
     $report->include_js();

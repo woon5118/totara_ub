@@ -43,7 +43,9 @@ class rb_source_facetoface_facilitator_assignments extends rb_facetoface_base_so
         // Global report restrictions are applied in define_joinlist() method.
 
         $this->base = '{facetoface_facilitator_dates}';
-        $this->sourcetitle = get_string('facilitatorsourcetitleassignments', 'mod_facetoface');
+        $this->sourcetitle = get_string('sourcetitle', 'rb_source_facetoface_facilitator_assignments');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_facetoface_facilitator_assignments');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_facetoface_facilitator_assignments');
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();
@@ -52,6 +54,7 @@ class rb_source_facetoface_facilitator_assignments extends rb_facetoface_base_so
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->paramoptions = $this->define_paramoptions();
         $this->defaultfilters = $this->define_defaultfilters();
+        $this->usedcomponents[] = 'totara_cohort';
         $this->add_customfields();
 
         parent::__construct();

@@ -340,7 +340,7 @@ $settings = new admin_externalpage('modfacetofaceassets', new lang_string('asset
 $ADMIN->add('modfacetofacefolder', $settings);
 
 // Facilitators.
-$url = new moodle_url('/mod/facetoface/facilitator/manage.php');
+$url = new moodle_url('/mod/facetoface/facilitator/manage.php', ['published' => 0]);
 $settings = new admin_externalpage('modfacetofacefacilitators', new lang_string('facilitators','mod_facetoface'), $url, 'mod/facetoface:managesitewidefacilitators');
 $ADMIN->add('modfacetofacefolder', $settings);
 
