@@ -61,3 +61,16 @@ totara_core_migrate_old_block_titles();
 if (!get_config('scorm', 'protectpackagedownloads')) {
     unset_config('protectpackagedownloads', 'scorm');
 }
+
+// Remove all analytics tables.
+$tables = [
+    'analytics_models', 'analytics_models_log', 'analytics_predictions', 'analytics_train_samples',
+    'analytics_predict_samples', 'analytics_used_files', 'analytics_indicator_calc',
+    'analytics_prediction_actions', 'analytics_used_analysables'
+];
+foreach ($tables as $tablename) {
+    $table = new xmldb_table($tablename);
+    if ($dbman->table_exists($table)) {
+        $dbman->drop_table($table);
+    }
+}
