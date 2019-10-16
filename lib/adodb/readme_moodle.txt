@@ -1,4 +1,4 @@
-Description of ADODB V5.20.12 library import into Totara
+Description of ADODB library import into Totara
 
 This library is now used only in enrol and auth db plugins.
 The core DML drivers are not using ADODB any more.
