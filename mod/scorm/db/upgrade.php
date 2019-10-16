@@ -69,7 +69,10 @@ function xmldb_scorm_upgrade($oldversion) {
     // Automatically generated Moodle v3.3.0 release upgrade line.
     // Put any upgrade step following this.
 
-    if ($oldversion < 2017051501) {
+    // Automatically generated Moodle v3.4.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    if ($oldversion < 2017111301) {
 
         // Changing precision of field completionscorerequired on table scorm to (10).
         $table = new xmldb_table('scorm');
@@ -79,7 +82,7 @@ function xmldb_scorm_upgrade($oldversion) {
         $dbman->change_field_precision($table, $field);
 
         // Scorm savepoint reached.
-        upgrade_mod_savepoint(true, 2017051501, 'scorm');
+        upgrade_mod_savepoint(true, 2017111301, 'scorm');
     }
 
     return true;

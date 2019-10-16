@@ -83,7 +83,10 @@ function xmldb_forum_upgrade($oldversion) {
     // Automatically generated Moodle v3.2.0 release upgrade line.
     // Put any upgrade step following this.
 
-    if ($oldversion < 2016120501) {
+    // Automatically generated Moodle v3.3.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    if ($oldversion < 2017092200) {
 
         // Remove duplicate entries from forum_subscriptions.
         // Find records with multiple userid/forum combinations and find the highest ID.
@@ -110,13 +113,13 @@ function xmldb_forum_upgrade($oldversion) {
         $dbman->add_key($table, $key);
 
         // Forum savepoint reached.
-        upgrade_mod_savepoint(true, 2016120501, 'forum');
+        upgrade_mod_savepoint(true, 2017092200, 'forum');
     }
 
-    // Automatically generated Moodle v3.3.0 release upgrade line.
+    // Automatically generated Moodle v3.4.0 release upgrade line.
     // Put any upgrade step following this.
 
-    if ($oldversion < 2017051502) {
+    if ($oldversion < 2017111301) {
 
         // Define field deleted to be added to forum_posts.
         $table = new xmldb_table('forum_posts');
@@ -128,7 +131,7 @@ function xmldb_forum_upgrade($oldversion) {
         }
 
         // Forum savepoint reached.
-        upgrade_mod_savepoint(true, 2017051502, 'forum');
+        upgrade_mod_savepoint(true, 2017111301, 'forum');
     }
 
     return true;
