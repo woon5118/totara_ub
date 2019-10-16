@@ -86,3 +86,6 @@ $index = new xmldb_index('groupid-courseid-visible-userid', XMLDB_INDEX_NOTUNIQU
 if (!$dbman->index_exists($table, $index)) {
     $dbman->add_index($table, $index);
 }
+
+// Delete category subscritpions.
+$DB->delete_records_select('event_subscriptions', "categoryid <> 0");
