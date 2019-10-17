@@ -482,7 +482,8 @@ class totara_competency_install_testcase extends advanced_testcase {
     public function test_current_and_historic_comp_record_perform_disabled() {
         global $DB;
 
-        set_config('enableperform', advanced_feature::DISABLED);
+        advanced_feature::disable('perform');
+
         $this->assertTrue(advanced_feature::is_disabled('perform'));
 
         $comp_record = $this->add_comp_record(100, 200, 5, 300, 400);

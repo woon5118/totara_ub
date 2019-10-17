@@ -22,6 +22,7 @@
  * @category test
  */
 
+use tassign_competency\admin_setting_continuous_tracking;
 use tassign_competency\entities;
 use totara_job\job_assignment;
 
@@ -146,6 +147,8 @@ class tassign_competency_assignment_user_system_testcase extends tassign_compete
     }
 
     public function test_create_system_assignment_on_unassign() {
+        set_config('continuous_tracking', admin_setting_continuous_tracking::ENABLED, 'tassign_competency');
+
         ['competencies' => $competencies] = $this->generate_assignments();
 
         $user = $this->generator()->create_user();

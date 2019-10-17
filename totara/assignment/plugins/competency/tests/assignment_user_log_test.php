@@ -22,6 +22,7 @@
  * @category test
  */
 
+use tassign_competency\admin_setting_continuous_tracking;
 use tassign_competency\entities\assignment;
 use tassign_competency\entities\competency_assignment_user;
 use tassign_competency\entities\competency_assignment_user_log;
@@ -109,6 +110,8 @@ class tassign_competency_user_log_testcase extends tassign_competency_assignment
     }
 
     public function test_log_user_added_to_user_group() {
+        set_config('continuous_tracking', admin_setting_continuous_tracking::ENABLED, 'tassign_competency');
+
         ['competencies' => $competencies] = $this->generate_assignments();
 
         $hierarchy_generator = $this->generator()->hierarchy_generator();

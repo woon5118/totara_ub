@@ -71,8 +71,8 @@ class criteria_coursecompletion_services_testcase extends advanced_testcase {
         for ($i = 0; $i < 5; $i += 2) {
             $expected_result['items'][] = [
                 'type' => 'course',
-                'id' => $data->courses[$i]->id,
                 'name' => $data->courses[$i]->fullname,
+                'id' => (int)$data->courses[$i]->id,
             ];
         }
 
@@ -87,9 +87,10 @@ class criteria_coursecompletion_services_testcase extends advanced_testcase {
         $this->assertEquals(false, $error);
         $this->assertTrue(is_array($result));
 
-        $this->assertTrue(isset($result['items']));
-        $this->assertTrue(isset($result['aggregation']));
-        $this->assertEquals($expected_result, $result);
+        $this->assertArrayHasKey('items', $result);
+        $this->assertArrayHasKey('aggregation', $result);
+        $this->assertEqualsCanonicalizing($expected_result['items'], $result['items']);
+        $this->assertEquals($expected_result['aggregation'], $result['aggregation']);
     }
 
 }

@@ -556,7 +556,8 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
      * Similar to the above multiple competencies test. But doing so with perform disabled.
      */
     public function test_when_perform_disabled() {
-        set_config('enableperform', advanced_feature::DISABLED);
+        advanced_feature::disable('perform');
+
         $this->assertTrue(advanced_feature::is_disabled('perform'));
 
         /** @var totara_hierarchy_generator $totara_hierarchy_generator */
