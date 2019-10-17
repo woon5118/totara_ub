@@ -100,3 +100,30 @@ if (!empty($blockids)) {
         $DB->delete_records_list('user_preferences', 'name', ['block' . $bid . 'hidden', 'docked_block_instance_' . $bid]);
     }
 }
+
+// If the site was upgraded from Moodle 3.3.1+ the numsections format option does not exist as Moodle removed it.
+// This method finds all courses in 'weeks' and 'topics' format that don't have the 'numsections' course format option
+// and recreates it by using the actual number of sections.
+$sql = "SELECT c.id, count(cs.section) AS sectionsactual
+          FROM {course} c
+          JOIN {course_sections} cs ON cs.course = c.id
+     LEFT JOIN {course_format_options} n ON n.courseid = c.id AND
+               n.format = c.format AND
+               n.name = 'numsections' AND
+               n.sectionid = 0
+         WHERE c.format = :format AND cs.section > 0 AND n.id IS NULL
+      GROUP BY c.id";
+foreach (['weeks', 'topics'] as $format) {
+    $params = ['format' => $format];
+    $actuals = $DB->get_records_sql_menu($sql, $params);
+    foreach ($actuals as $courseid => $sectionsactual) {
+        $record = (object)[
+            'courseid' => $courseid,
+            'format' => $format,
+            'sectionid' => 0,
+            'name' => 'numsections',
+            'value' => $sectionsactual
+        ];
+        $DB->insert_record('course_format_options', $record);
+    }
+}
