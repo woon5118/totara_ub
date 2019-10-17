@@ -89,3 +89,14 @@ if (!$dbman->index_exists($table, $index)) {
 
 // Delete category subscritpions.
 $DB->delete_records_select('event_subscriptions', "categoryid <> 0");
+
+// Remove 'navigation' block instances from the system.
+$blockids = $DB->get_fieldset_select('block_instances', 'id', 'blockname = ?', ['navigation']);
+if (!empty($blockids)) {
+    foreach ($blockids as $bid) {
+        context_helper::delete_instance(CONTEXT_BLOCK, $bid);
+        $DB->delete_records('block_positions', ['blockinstanceid' => $bid]);
+        $DB->delete_records('block_instances', ['id' => $bid]);
+        $DB->delete_records_list('user_preferences', 'name', ['block' . $bid . 'hidden', 'docked_block_instance_' . $bid]);
+    }
+}
