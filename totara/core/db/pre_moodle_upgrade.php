@@ -127,3 +127,11 @@ foreach (['weeks', 'topics'] as $format) {
         $DB->insert_record('course_format_options', $record);
     }
 }
+
+// Define field instanceid to be added to enrol_paypal.
+// For some reason, some Moodle instances that are upgraded from old versions do not have this field.
+$table = new xmldb_table('enrol_paypal');
+$field = new xmldb_field('instanceid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'userid');
+if (!$dbman->field_exists($table, $field)) {
+    $dbman->add_field($table, $field);
+}
