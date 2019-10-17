@@ -32,7 +32,10 @@
     </div>
     <General :competency-id="competencyId" />
     <LinkedCourses :competency-id="competencyId" />
-    <AchievementConfiguration v-if="performEnabled" :competency-id="competencyId" />
+    <AchievementConfiguration
+      v-if="performEnabled"
+      :competency-id="competencyId"
+    />
   </div>
 </template>
 
@@ -67,8 +70,8 @@ export default {
     },
     performEnabled: {
       type: Boolean,
-      required: true
-    }
+      required: true,
+    },
   },
 
   computed: {

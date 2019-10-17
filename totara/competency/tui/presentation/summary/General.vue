@@ -116,6 +116,18 @@
           </div>
         </div>
       </div>
+      <div
+        v-if="hasAggregationMethod"
+        class="tui-competencySummaryGeneral__list_row"
+        role="row"
+      >
+        <div class="tui-competencySummaryGeneral__list_label" role="rowheader">
+          {{ $str('aggregationmethod', 'totara_hierarchy') }}
+        </div>
+        <div class="tui-competencySummaryGeneral__list_value" role="gridcell">
+          {{ aggregationMethodName }}
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -163,6 +175,20 @@ export default {
           'totara_hierarchy'
         ),
       };
+    },
+
+    hasAggregationMethod() {
+      return (
+        this.competency.aggregation_method &&
+        this.competency.aggregation_method !== null
+      );
+    },
+
+    aggregationMethodName() {
+      return this.$str(
+        'aggregationmethod' + this.competency.aggregation_method,
+        'totara_hierarchy'
+      );
     },
 
     editUrl() {
@@ -265,6 +291,10 @@ export default {
       "anyscalevalue"
     ],
     "totara_hierarchy": [
+      "aggregationmethod",
+      "aggregationmethod1",
+      "aggregationmethod2",
+      "aggregationmethod3",
       "competencyassignavailabilityselfsimple",
       "competencyassignavailabilityothersimple"
     ]

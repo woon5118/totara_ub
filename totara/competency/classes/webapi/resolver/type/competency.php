@@ -55,6 +55,10 @@ class competency implements type_resolver {
 
         $format = $args['format'] ?? null;
 
+        if ($field == 'aggregation_method') {
+            $field = 'aggregationmethod';
+        }
+
         if (!self::authorize($field, $format)) {
             return null;
         }
@@ -92,6 +96,11 @@ class competency implements type_resolver {
         if ($field == 'assign_availability') {
             // This field should show up on perform only
             return advanced_feature::is_enabled('perform');
+        }
+
+        if ($field == 'aggregationmethod') {
+            // This field should show up on NON-perform only
+            return advanced_feature::is_disabled('perform');
         }
 
         return true;

@@ -154,6 +154,7 @@ interface totara_competency_competency_interface {
   typeid: core_id
   type: totara_competency_competency_type
   assignments: [tassign_competency_assignment]
+  aggregation_method: Int
 }
 
 type totara_competency_competency implements totara_competency_competency_interface {
@@ -177,6 +178,7 @@ type totara_competency_competency implements totara_competency_competency_interf
   assignments: [tassign_competency_assignment]
   assign_availability: [Int]
   custom_fields: [totara_competency_competency_custom_field]
+  aggregation_method: Int
 }
 
 type totara_competency_competency_custom_field {
@@ -205,6 +207,7 @@ type totara_competency_self_assignable_competency implements totara_competency_c
   type: totara_competency_competency_type
   assignments: [tassign_competency_assignment]
   user_assignments: [tassign_competency_assignment]
+  aggregation_method: Int
 }
 
 """
