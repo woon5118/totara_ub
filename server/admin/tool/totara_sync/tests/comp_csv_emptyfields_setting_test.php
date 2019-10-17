@@ -21,6 +21,9 @@
  * @package tool_totara_sync
  */
 
+use tassign_competency\entities\competency_framework;
+use totara_competency\entities\scale;
+use totara_competency\entities\scale_assignment;
 use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
@@ -138,6 +141,9 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
             'comp_type' => array($this->type_data1),
             'comp_type_info_field' => array($this->customfield_textinput_data)
         )));
+
+        $this->assign_scale($this->comp_framework_data1);
+        $this->assign_scale($this->comp_framework_data2);
 
         $this->set_source_config([
             'csvuserencoding' => 'UTF-8',
@@ -268,7 +274,7 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
         $this->element->set_config('csvsaveemptyfields', false);
 
         // First add an competency we can update.
-        $this->create_competency();
+        $comp1 = $this->create_competency();
 
         //
         // Now lets update the competency.
@@ -486,8 +492,8 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
             'visible' => 1,
             'timevalidfrom' => 0,
             'timevalidto' => 0,
-            'timecreated' => 0,
-            'timemodified' => 0,
+            'timecreated' => time() - 3600,
+            'timemodified' => time() - 3600,
             'usermodified' => 2,
             'totarasync' => 1,
             'aggregationmethod' => 1,
@@ -704,6 +710,23 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
         ]);
 
         return $competency;
+    }
+
+    protected function assign_scale(array $comp_framework_data) {
+        $fw1 = competency_framework::repository()
+            ->where('idnumber', $comp_framework_data['idnumber'])
+            ->one();
+
+        $scale = scale::repository()
+            ->order_by('id')
+            ->first();
+
+        $scale_assignment = new scale_assignment();
+        $scale_assignment->scaleid = $scale->id;
+        $scale_assignment->frameworkid = $fw1->id;
+        $scale_assignment->timemodified = time();
+        $scale_assignment->usermodified = 0;
+        $scale_assignment->save();
     }
 
 }
