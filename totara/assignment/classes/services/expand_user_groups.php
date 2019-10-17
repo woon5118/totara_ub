@@ -77,7 +77,7 @@ class expand_user_groups extends \external_api {
      * @return array
      */
     public static function index(array $baskets, array $filters, int $page, string $order, string $direction) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         require_capability('moodle/cohort:view', \context_system::instance());
         require_capability('totara/hierarchy:viewposition', \context_system::instance());

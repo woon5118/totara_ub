@@ -23,6 +23,8 @@
  * @subpackage totara_hierarchy
  */
 
+use totara_core\advanced_feature;
+
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
@@ -776,7 +778,7 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
             get_string('competencytablinkedcourses', 'totara_hierarchy')
         );
 
-        if (\totara_core\advanced_feature::is_enabled('perform')) {
+        if (advanced_feature::is_enabled('competency_assignment')) {
             // Ability to edit achievement criteria is only available if perform is enabled.
             $tabs[] = new \tabobject(
                 'editachievementpaths',

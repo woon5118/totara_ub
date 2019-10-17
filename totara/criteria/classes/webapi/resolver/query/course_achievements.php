@@ -45,7 +45,7 @@ abstract class course_achievements implements query_resolver {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         global $CFG;
         require_once($CFG->dirroot . '/completion/completion_completion.php');

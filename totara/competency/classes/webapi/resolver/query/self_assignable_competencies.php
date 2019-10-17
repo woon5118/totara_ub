@@ -58,7 +58,7 @@ class self_assignable_competencies implements query_resolver {
     }
 
     protected static function authorize(array $args) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         require_login();
 

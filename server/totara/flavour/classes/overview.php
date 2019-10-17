@@ -108,6 +108,7 @@ class overview implements \renderable {
                 'enablepositions' => null,                  // Totara.
                 'enablemyteam' => null,                     // Totara.
                 'enablecompetencies' => null,               // Totara.
+                'enablecompetency_assignment' => null,      // Totara.
                 'enableappraisals' => null,                 // Totara.
                 'enablefeedback360' => null,                // Totara.
                 'enablelearningplans' => null,              // Totara.

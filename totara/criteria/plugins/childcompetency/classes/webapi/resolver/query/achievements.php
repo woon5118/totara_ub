@@ -48,7 +48,7 @@ class achievements implements query_resolver {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         $instance_id = $args['instance_id'];
         $user_id = $args['user_id'];

@@ -100,7 +100,7 @@ class competency_controller extends admin_controller {
             'competency-name' => $this->competency->display_name,
             'framework-id' => $this->framework->id,
             'framework-name' => format_string($this->framework->fullname),
-            'perform-enabled' => advanced_feature::is_enabled('perform'),
+            'perform-enabled' => advanced_feature::is_enabled('competency_assignment'),
         ]);
     }
 
@@ -216,7 +216,7 @@ class competency_controller extends admin_controller {
      * @return array
      */
     private function export_achievementpaths_edit() {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         $comp_agg_type = $this->competency->scale_aggregation_type ?: 'highest';
 

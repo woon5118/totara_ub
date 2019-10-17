@@ -31,7 +31,7 @@ use totara_core\advanced_feature;
 $actiontype = optional_param('type', '', PARAM_ALPHANUMEXT);
 $action = optional_param('action', '', PARAM_ALPHA);
 
-advanced_feature::require('perform');
+advanced_feature::require('competency_assignment');
 require_login();
 $systemcontext = context_system::instance();
 require_capability('moodle/site:config', $systemcontext);

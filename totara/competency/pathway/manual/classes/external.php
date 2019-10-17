@@ -43,7 +43,7 @@ class external extends \external_api {
     }
 
     public static function get_detail(int $id) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         $pathway = manual::fetch($id);
         return $pathway->export_edit_detail();
@@ -101,7 +101,7 @@ class external extends \external_api {
      * @return array
      */
     public static function get_roles(array $filters, int $page, string $order, string $direction) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         $roles = manual::get_all_valid_roles();
 
@@ -201,7 +201,7 @@ class external extends \external_api {
     }
 
     public static function create(int $comp_id, int $sortorder, array $roles, string $action_time) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         $competency = new competency($comp_id);
         $config = new achievement_configuration($competency);
@@ -246,7 +246,7 @@ class external extends \external_api {
     }
 
     public static function update(int $id, int $sortorder, array $roles, string $action_time) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         $pathway = manual::fetch($id);
         $config = new achievement_configuration($pathway->get_competency());

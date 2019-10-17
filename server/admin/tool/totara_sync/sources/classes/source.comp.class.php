@@ -64,7 +64,7 @@ abstract class totara_sync_source_comp extends totara_sync_source {
         ];
 
         // For non-perform we do show the old aggregation method for competencies
-        if (advanced_feature::is_enabled('perform')) {
+        if (advanced_feature::is_enabled('competency_assignment')) {
             $this->fields[] = 'assignavailability';
         } else {
             $this->fields[] = 'aggregationmethod';

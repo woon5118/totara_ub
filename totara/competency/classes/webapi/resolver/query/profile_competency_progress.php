@@ -31,7 +31,7 @@ use totara_core\advanced_feature;
 class profile_competency_progress implements query_resolver {
 
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         if (!isset($args['user_id'])) {
             throw new \coding_exception('User id is required');

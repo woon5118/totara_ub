@@ -40,7 +40,7 @@ $ADMIN->add(
         get_string('title:index', 'tassign_competency'),
         "{$CFG->wwwroot}/totara/assignment/plugins/competency/index.php",
         "tassign/competency:manage",
-        !advanced_feature::is_enabled('perform')
+        !advanced_feature::is_enabled('competency_assignment')
     )
 );
 $ADMIN->add(
@@ -50,7 +50,7 @@ $ADMIN->add(
         get_string('title:users', 'tassign_competency'),
         "{$CFG->wwwroot}/totara/assignment/plugins/competency/users.php",
         "tassign/competency:manage",
-        !advanced_feature::is_enabled('perform')
+        !advanced_feature::is_enabled('competency_assignment')
     )
 );
 $ADMIN->add(
@@ -60,11 +60,11 @@ $ADMIN->add(
         get_string('title:create', 'tassign_competency'),
         "{$CFG->wwwroot}/totara/assignment/plugins/competency/create.php",
         "tassign/competency:manage",
-        !advanced_feature::is_enabled('perform')
+        !advanced_feature::is_enabled('competency_assignment')
     )
 );
 
-if (advanced_feature::is_enabled('perform')) {
+if (advanced_feature::is_enabled('competency_assignment')) {
     $settings_page = \hierarchy_competency\admin_settings::load_or_create_settings_page($ADMIN);
     if (!is_array($settings_page->req_capability)) {
         $settings_page->req_capability = [$settings_page->req_capability];

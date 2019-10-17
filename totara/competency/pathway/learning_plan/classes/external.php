@@ -43,7 +43,7 @@ class external extends \external_api {
     }
 
     public static function create(int $comp_id, int $sortorder, string $action_time) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         $competency = new competency($comp_id);
         $config = new achievement_configuration($competency);
@@ -82,7 +82,7 @@ class external extends \external_api {
     }
 
     public static function update(int $id, int $sortorder, string $action_time) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         $pathway = learning_plan::fetch($id);
         $config = new achievement_configuration($pathway->get_competency());

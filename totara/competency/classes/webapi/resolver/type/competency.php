@@ -95,12 +95,12 @@ class competency implements type_resolver {
 
         if ($field == 'assign_availability') {
             // This field should show up on perform only
-            return advanced_feature::is_enabled('perform');
+            return advanced_feature::is_enabled('competency_assignment');
         }
 
         if ($field == 'aggregationmethod') {
             // This field should show up on NON-perform only
-            return advanced_feature::is_disabled('perform');
+            return advanced_feature::is_disabled('competency_assignment');
         }
 
         return true;

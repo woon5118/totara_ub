@@ -239,7 +239,7 @@ class tool_totara_sync_comp_partial_sync_testcase extends advanced_testcase {
      * Assignment availability for competencies is located in a seperate table, so make sure it is synced to correctly
      */
     public function test_sync_assign_availability() {
-        advanced_feature::enable('perform');
+        advanced_feature::enable('competency_assignment');
 
         // Reset the elements as activating the feaure affects the fields
         $this->element = new totara_sync_element_comp();

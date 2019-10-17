@@ -63,7 +63,7 @@ class legacy_aggregation {
      */
     public function apply() {
         // We only want this to be happening if we are not on perform
-        if (advanced_feature::is_enabled('perform')) {
+        if (advanced_feature::is_enabled('competency_assignment')) {
             return;
         }
 

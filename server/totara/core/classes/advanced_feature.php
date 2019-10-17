@@ -122,12 +122,12 @@ class advanced_feature {
             'appraisals',
             'certifications',
             'competencies',
+            'competency_assignment',
             'evidence',
             'feedback360',
             'goals',
             'learningplans',
             'myteam',
-            'perform', // TODO Replace this temporary feature
             'positions',
             'programs',
             'recordoflearning',

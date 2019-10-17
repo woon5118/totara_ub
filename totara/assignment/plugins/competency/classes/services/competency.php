@@ -86,7 +86,7 @@ class competency extends \external_api {
      * @return array
      */
     public static function index(array $filters = [], int $page = 0, string $order_by = '', string $order_dir = '') {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         require_capability('tassign/competency:view', \context_system::instance());
 
@@ -151,7 +151,7 @@ class competency extends \external_api {
      * @return array
      */
     public static function show(int $id, array $options) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
         
         require_capability('tassign/competency:view', \context_system::instance());
 

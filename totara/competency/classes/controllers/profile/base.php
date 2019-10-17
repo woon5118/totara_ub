@@ -63,7 +63,7 @@ abstract class base extends controller {
      * @return $this
      */
     protected function authorize() {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         // parent::authorize(); We don't need to call require login here, it's always required.
         $capability = $this->is_for_current_user() ? 'totara/competency:view_own_profile' : 'totara/competency:view_other_profile';

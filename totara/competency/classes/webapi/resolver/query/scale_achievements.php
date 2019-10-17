@@ -45,7 +45,7 @@ class scale_achievements implements query_resolver {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         require_login(null, false, null, false, true);
 

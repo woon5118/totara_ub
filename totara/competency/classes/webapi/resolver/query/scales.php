@@ -43,7 +43,7 @@ class scales implements query_resolver {
      * @return collection
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         if (!isset($args['id']) && !isset($args['competency_id']) || isset($args['id']) && isset($args['competency_id'])) {
             throw new \coding_exception('Please provide either scale id OR competency id');

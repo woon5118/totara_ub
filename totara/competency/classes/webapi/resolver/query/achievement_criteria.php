@@ -41,7 +41,7 @@ class achievement_criteria implements \core\webapi\query_resolver {
      * @return \stdClass
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         // TODO: More capability checks
         // TL-21305 will find a better, encapsulated solution for require_login calls.

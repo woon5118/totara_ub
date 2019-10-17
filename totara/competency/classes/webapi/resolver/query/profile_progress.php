@@ -38,7 +38,7 @@ class profile_progress implements query_resolver {
     }
 
     public static function authorize($user_id = null) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
         
         if (is_null($user_id)) {
             throw new \coding_exception('User id is required');

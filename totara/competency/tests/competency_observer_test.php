@@ -45,7 +45,7 @@ class totara_competency_competency_observer_testcase extends advanced_testcase {
     }
 
     public function test_event_when_perform_is_enabled() {
-        advanced_feature::enable('perform');
+        advanced_feature::enable('competency_assignment');
 
         $comp = $this->create_competency(\competency::AGGREGATION_METHOD_ANY);
 
@@ -60,7 +60,7 @@ class totara_competency_competency_observer_testcase extends advanced_testcase {
     }
 
     public function test_event_when_aggregation_method_did_not_change() {
-        advanced_feature::disable('perform');
+        advanced_feature::disable('competency_assignment');
 
         $comp = $this->create_competency(\competency::AGGREGATION_METHOD_ANY);
 
@@ -74,7 +74,7 @@ class totara_competency_competency_observer_testcase extends advanced_testcase {
     }
 
     public function test_event_when_aggregation_method_is_not_set() {
-        advanced_feature::disable('perform');
+        advanced_feature::disable('competency_assignment');
 
         $comp = $this->create_competency(\competency::AGGREGATION_METHOD_ANY);
 
@@ -89,7 +89,7 @@ class totara_competency_competency_observer_testcase extends advanced_testcase {
     }
 
     public function test_event_gets_processed_if_aggregation_method_changed() {
-        advanced_feature::disable('perform');
+        advanced_feature::disable('competency_assignment');
 
         $comp = $this->create_competency(\competency::AGGREGATION_METHOD_ANY);
 

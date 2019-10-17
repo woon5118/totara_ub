@@ -41,7 +41,7 @@ class external extends \external_api {
     }
 
     public static function get_detail(int $id) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         return childcompetency::fetch($id)
             -> export_edit_detail();

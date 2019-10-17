@@ -46,7 +46,7 @@ class totara_competency_legacy_aggregation_testcase extends advanced_testcase {
     }
 
     public function test_it_does_not_do_anything_with_perform_enabled() {
-        advanced_feature::enable('perform');
+        advanced_feature::enable('competency_assignment');
 
         $data = $this->create_data();
 
@@ -58,7 +58,7 @@ class totara_competency_legacy_aggregation_testcase extends advanced_testcase {
     }
 
     public function test_aggregation_set_from_off_to_all() {
-        advanced_feature::disable('perform');
+        advanced_feature::disable('competency_assignment');
 
         $data = $this->create_data();
 
@@ -78,7 +78,7 @@ class totara_competency_legacy_aggregation_testcase extends advanced_testcase {
     }
 
     public function test_aggregation_set_from_off_to_any_with_one_existing_criteria() {
-        advanced_feature::disable('perform');
+        advanced_feature::disable('competency_assignment');
 
         $data = $this->create_data();
         $min_proficient_value = $data->scale->min_proficient_value;
@@ -106,7 +106,7 @@ class totara_competency_legacy_aggregation_testcase extends advanced_testcase {
     }
 
     public function test_setting_aggregation_to_off_removes_default_criteria() {
-        advanced_feature::disable('perform');
+        advanced_feature::disable('competency_assignment');
 
         $data = $this->create_data();
         $min_proficient_value = $data->scale->min_proficient_value;
@@ -134,7 +134,7 @@ class totara_competency_legacy_aggregation_testcase extends advanced_testcase {
     }
 
     public function test_setting_aggregation_to_off_in_combination_with_multiple_criteria() {
-        advanced_feature::disable('perform');
+        advanced_feature::disable('competency_assignment');
 
         $data = $this->create_data();
         $min_proficient_value = $data->scale->min_proficient_value;
@@ -189,7 +189,7 @@ class totara_competency_legacy_aggregation_testcase extends advanced_testcase {
     }
 
     public function test_setting_aggregation_from_any_to_all() {
-        advanced_feature::disable('perform');
+        advanced_feature::disable('competency_assignment');
 
         $data = $this->create_data();
         $min_proficient_value = $data->scale->min_proficient_value;
@@ -220,7 +220,7 @@ class totara_competency_legacy_aggregation_testcase extends advanced_testcase {
     }
 
     public function test_setting_aggregation_from_all_to_any() {
-        advanced_feature::disable('perform');
+        advanced_feature::disable('competency_assignment');
 
         $data = $this->create_data();
         $min_proficient_value = $data->scale->min_proficient_value;

@@ -41,7 +41,7 @@ class assignment implements query_resolver {
      * @return assignment_model
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         require_login();
 

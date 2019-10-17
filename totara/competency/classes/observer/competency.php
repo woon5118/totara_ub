@@ -55,7 +55,7 @@ class competency {
      */
     private static function aggregation_method_changed(base $event, stdClass $snapshot): bool {
         // We want this happening only if perform is not activated
-        if (advanced_feature::is_enabled('perform')) {
+        if (advanced_feature::is_enabled('competency_assignment')) {
             return false;
         }
 

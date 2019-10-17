@@ -46,7 +46,7 @@ class external extends \external_api {
 
     public static function get_scale(int $comp_id): int {
         // TODO could be competency generic
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         $competency = new competency($comp_id);
         return $competency->scale->id;
@@ -70,7 +70,7 @@ class external extends \external_api {
 
     public static function get_scale_values(int $scale_id): array {
         // TODO could be competency generic
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         $results = [];
 
@@ -113,7 +113,7 @@ class external extends \external_api {
     }
 
     public static function get_pathways(int $comp_id) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         $config = new achievement_configuration(new competency($comp_id));
         $pathways = $config->get_active_pathways();
@@ -364,7 +364,7 @@ class external extends \external_api {
     }
 
     public static function link_default_preset(int $comp_id): string {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         $config = new achievement_configuration(new competency($comp_id));
         $config->link_default_preset();
@@ -387,7 +387,7 @@ class external extends \external_api {
     }
 
     public static function get_definition_template(string $type) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         return pathway_factory::create($type)
             -> export_pathway_edit_template();
@@ -419,7 +419,7 @@ class external extends \external_api {
     }
 
     public static function get_summary_template(string $type, int $id) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         return pathway_factory::fetch($type, $id)
             -> export_pathway_view_template();
@@ -448,7 +448,7 @@ class external extends \external_api {
     }
 
     public static function delete_pathways(string $comp_id, array $pathways, int $action_time) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         $config = new achievement_configuration(new competency($comp_id));
         return $config->delete_pathways($pathways, $action_time);
@@ -471,7 +471,7 @@ class external extends \external_api {
     }
 
     public static function has_singleuse_criteria(int $comp_id): string {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         $config = new achievement_configuration(new competency($comp_id));
         return $config->has_singleuse_criteria();
@@ -495,7 +495,7 @@ class external extends \external_api {
     }
 
     public static function set_overall_aggregation(int $comp_id, string $type, int $action_time): string {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         $config = new achievement_configuration(new competency($comp_id));
         $old_type = $config ->get_aggregation_type();

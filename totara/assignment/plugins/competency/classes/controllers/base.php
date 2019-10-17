@@ -38,7 +38,7 @@ class base extends admin_controller {
      * @return context
      */
     protected function setup_context(): context {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         return \context_system::instance();
     }

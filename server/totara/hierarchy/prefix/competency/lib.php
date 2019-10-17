@@ -865,7 +865,7 @@ class competency extends hierarchy {
                 AND a.scaleid = s.id
         ", array($frameworkid));
 
-        if (advanced_feature::is_disabled('perform')) {
+        if (advanced_feature::is_disabled('competency_assignment')) {
             $mform->addElement('select', 'aggregationmethod', get_string('aggregationmethod', 'totara_hierarchy'), $aggregations);
             $mform->addHelpButton('aggregationmethod', 'competencyaggregationmethod', 'totara_hierarchy');
             $mform->addRule('aggregationmethod', get_string('aggregationmethod', 'totara_hierarchy'), 'required', null);
@@ -879,7 +879,7 @@ class competency extends hierarchy {
         $mform->addElement('hidden', 'evidencecount', 0);
         $mform->setType('evidencecount', PARAM_INT);
 
-        if (advanced_feature::is_enabled('perform')) {
+        if (advanced_feature::is_enabled('competency_assignment')) {
             // Assignment Availability required in
             $checkboxGroup = array();
             $checkboxGroup[] =& $mform->createElement('advcheckbox',
@@ -920,7 +920,7 @@ class competency extends hierarchy {
 
         // Properly format assignment availability from individual form values into a single array
         $item->assignavailability = $item->assignavailability ?? [];
-        if (!advanced_feature::is_enabled('perform')) {
+        if (!advanced_feature::is_enabled('competency_assignment')) {
             $checkbox_mappings = [
                 'assignavailself' => self::ASSIGNMENT_CREATE_SELF,
                 'assignavailother' => self::ASSIGNMENT_CREATE_OTHER,
@@ -1183,7 +1183,7 @@ class competency extends hierarchy {
         $fields = parent::get_export_fields();
         // Show aggregation for non-perform,
         // Show assign availability for perform
-        if (!advanced_feature::is_enabled('perform')) {
+        if (!advanced_feature::is_enabled('competency_assignment')) {
             $fields = array_merge($fields, [
                 'aggregationmethod' => 'hierarchy.aggregationmethod',
             ]);
@@ -1214,7 +1214,7 @@ class competency extends hierarchy {
     protected function get_export_join_def() {
         $def = parent::get_export_join_def();
 
-        if (advanced_feature::is_enabled('perform')) {
+        if (advanced_feature::is_enabled('competency_assignment')) {
             $availabilities = [
                 self::ASSIGNMENT_CREATE_SELF => 'self',
                 self::ASSIGNMENT_CREATE_OTHER => 'other',
@@ -1313,7 +1313,7 @@ class competency extends hierarchy {
      * @param array $availabilities
      */
     protected function save_assignment_availabilities(int $comp_id, array $availabilities) {
-        if (advanced_feature::is_disabled('perform')) {
+        if (advanced_feature::is_disabled('competency_assignment')) {
             return;
         }
 

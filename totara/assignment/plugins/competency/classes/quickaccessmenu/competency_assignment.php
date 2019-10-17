@@ -30,7 +30,7 @@ use totara_core\quickaccessmenu\provider;
 
 class competency_assignment implements provider {
     public static function get_items(): array {
-        if (!advanced_feature::is_enabled('perform')) {
+        if (!advanced_feature::is_enabled('competency_assignment')) {
             return [];
         }
 

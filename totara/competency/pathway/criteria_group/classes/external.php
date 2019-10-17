@@ -106,7 +106,7 @@ class external extends \external_api {
 
     // TODO: Make this part of the graphQL configuration mutators
     public static function create(int $comp_id, int $sortorder, int $scalevalue, array $criteria, int $action_time) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         // If there are no criteria linked to this pathway, don't create
         if (empty($criteria)) {
@@ -208,7 +208,7 @@ class external extends \external_api {
     }
 
     public static function update(int $id, int $sortorder, array $criteria, int $action_time) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         $pathway = criteria_group::fetch($id);
 
@@ -282,7 +282,7 @@ class external extends \external_api {
     }
 
     public static function get_criteria_types() {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
 
         $results = [];
 

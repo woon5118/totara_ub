@@ -950,7 +950,7 @@ class totara_hierarchy_lib_testcase extends advanced_testcase {
     }
 
     public function test_export_data() {
-        advanced_feature::disable('perform');
+        advanced_feature::disable('competency_assignment');
 
         global $CFG;
 
@@ -964,7 +964,7 @@ class totara_hierarchy_lib_testcase extends advanced_testcase {
     }
 
     public function test_export_data_with_assignments() {
-        advanced_feature::enable('perform');
+        advanced_feature::enable('competency_assignment');
 
         global $CFG;
 

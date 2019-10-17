@@ -212,7 +212,7 @@ class rb_source_competency_status extends rb_base_source {
             ),
         );
 
-        if (advanced_feature::is_enabled('perform')) {
+        if (advanced_feature::is_enabled('competency_assignment')) {
             $columnoptions = array_merge($columnoptions, [
                 new rb_column_option(
                     'assignment',

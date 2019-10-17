@@ -33,7 +33,7 @@ if ($hassiteconfig) {
         new admin_category(
             'totara_criteria',
             get_string('pluginname', 'totara_criteria'),
-            !advanced_feature::is_enabled('perform')
+            !advanced_feature::is_enabled('competency_assignment')
         )
     );
 
@@ -44,7 +44,7 @@ if ($hassiteconfig) {
             get_string('managetypes', 'totara_criteria'),
             new moodle_url("/totara/criteria/managetypes.php"),
             ['moodle/site:config'],
-            !advanced_feature::is_enabled('perform')
+            !advanced_feature::is_enabled('competency_assignment')
         )
     );
 }

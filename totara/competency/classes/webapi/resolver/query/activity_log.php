@@ -10,7 +10,7 @@ use totara_core\advanced_feature;
 class activity_log implements query_resolver {
     
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('perform');
+        advanced_feature::require('competency_assignment');
         
         return data_providers\activity_log::create($args['user_id'], $args['competency_id'])
             ->set_filters($args['filters'] ?? [])
