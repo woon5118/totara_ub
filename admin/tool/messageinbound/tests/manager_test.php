@@ -27,12 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
-use core_privacy\tests\provider_testcase;
-use core_privacy\local\request\approved_contextlist;
-use core_privacy\local\request\transform;
-use core_privacy\local\request\writer;
-use tool_messageinbound\privacy\provider;
-
 /**
  * Manager testcase class.
  *
@@ -42,18 +36,7 @@ use tool_messageinbound\privacy\provider;
  * @author     Frédéric Massart <fred@branchup.tech>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class tool_messageinbound_manager_testcase extends provider_testcase {
-
-    public function setUp() {
-        global $CFG;
-        $this->resetAfterTest();
-
-        // Pretend the system is enabled.
-        $CFG->messageinbound_enabled = true;
-        $CFG->messageinbound_mailbox = 'mailbox';
-        $CFG->messageinbound_domain = 'example.com';
-    }
-
+class tool_messageinbound_manager_testcase extends advanced_testcase {
     public function test_tidy_old_verification_failures() {
         global $DB;
 
