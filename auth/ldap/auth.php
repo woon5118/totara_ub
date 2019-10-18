@@ -924,7 +924,7 @@ class auth_plugin_ldap extends auth_plugin_base {
                 $this->update_user_record($user->username, $updatekeys, false);
 
                 // Add roles if needed.
-                $this->sync_roles($euser);
+                $this->sync_roles($user);
 
             }
             $transaction->allow_commit();
