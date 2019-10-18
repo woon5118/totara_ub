@@ -1975,22 +1975,6 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2017100900.00);
     }
 
-    if ($oldversion < 2017101000.01) {
-        // Totara: not used, any existing value is ignored
-
-        // Define field override to be added to course_modules_completion.
-        $table = new xmldb_table('course_modules_completion');
-        $field = new xmldb_field('overrideby', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'viewed');
-
-        // Conditionally launch add field override.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Main savepoint reached.
-        upgrade_main_savepoint(true, 2017101000.01);
-    }
-
     if ($oldversion < 2017101200.00) {
         // Define table search_index_requests to be created.
         $table = new xmldb_table('search_index_requests');

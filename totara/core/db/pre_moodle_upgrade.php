@@ -127,3 +127,10 @@ foreach (['weeks', 'topics'] as $format) {
         $DB->insert_record('course_format_options', $record);
     }
 }
+
+// Delete unused completion column.
+$table = new xmldb_table('course_modules_completion');
+$field = new xmldb_field('overrideby', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'viewed');
+if ($dbman->field_exists($table, $field)) {
+    $dbman->drop_field($table, $field);
+}
