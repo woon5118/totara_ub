@@ -25,10 +25,13 @@ namespace totara_competency;
 
 use coding_exception;
 use core\orm\collection;
+use core\orm\query\builder;
 use criteria_childcompetency\childcompetency;
 use criteria_linkedcourses\linkedcourses;
+use criteria_linkedcourses\metadata_processor as linked_courses_metadata_processor;
 use pathway_criteria_group\criteria_group;
 use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
+use pathway_learning_plan\learning_plan;
 use totara_competency\entities\competency;
 use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\entities\scale;
@@ -183,24 +186,88 @@ class legacy_aggregation {
                 $criterion_entity->save();
             }
         } else {
-            $this->create_default_criteria($criterion, $min_proficient_value);
+            $this->create_default_criteria($criterion);
+            // Make sure all linked courses get synced
+            if ($criterion instanceof linkedcourses) {
+                linked_courses_metadata_processor::update_item_links($this->competency->id);
+            }
         }
+    }
+
+    /**
+     * Create the set of default pathways needed for each competency, which
+     * consists of one pathway with a linkedcourses criterion and another one with a
+     * childcompetency criterion. This mirrors the pre-perform aggregation behaviour.
+     *
+     * @param scale|null $scale needed to get the min_proficient_value, if omitted it's lazily loaded
+     * @param bool $update_items true to update items in criteria immediately
+     */
+    public function create_default_pathways(scale $scale = null, bool $update_items = true) {
+        $configuration = new achievement_configuration($this->competency);
+        if ($configuration->has_aggregation_type()) {
+            // If there's already an aggregation type chances are
+            // high that some criteria are already set.
+            // We only want to set the defaults on a criteria with no
+            // pathways set
+            return;
+        }
+
+        $configuration->set_aggregation_type('first');
+        $configuration->save_aggregation();
+
+        if ($this->should_add_learning_plans()) {
+            $lp_pathway = new learning_plan();
+            $lp_pathway->set_competency($this->competency);
+            $lp_pathway->save();
+        }
+
+        if ($scale) {
+            $min_proficient_value = $scale->min_proficient_value;
+        } else {
+            $min_proficient_value = $this->get_minimum_proficient_value();
+        }
+
+        $this->create_default_criteria(new linkedcourses(), $min_proficient_value)
+            ->create_default_criteria(new childcompetency(), $min_proficient_value);
+
+        // Make sure all linked courses are synced
+        if ($update_items) {
+            linked_courses_metadata_processor::update_item_links($this->competency->id);
+        }
+    }
+
+    private function should_add_learning_plans(): bool {
+        if (advanced_feature::is_disabled('competency_assignment')) {
+            // If perform isn't enabled, we'll need to add the learning plan pathway here since users will not be able
+            // to access an interface to add them themselves if they need them.
+            return true;
+        }
+
+        if (totara_feature_disabled('learningplans')) {
+            return false;
+        }
+
+        return builder::table('dp_plan_competency_assign')->exists();
     }
 
     /**
      * Creates a new criteria group with a child competency criteria
      *
      * @param criterion $criterion
-     * @param scale_value $min_proficient_scale_value
+     * @param scale_value $min_proficient_scale_value if omitted it gets the current valud from the competency
      *
      * @return $this
      * @throws coding_exception
      */
-    public function create_default_criteria(criterion $criterion, scale_value $min_proficient_scale_value) {
+    public function create_default_criteria(criterion $criterion, scale_value $min_proficient_scale_value = null) {
         $aggregation_method = $this->get_mapped_aggregation_method();
         if (is_null($aggregation_method)) {
             // In case of OFF do nothing
             return $this;
+        }
+
+        if (empty($min_proficient_scale_value)) {
+            $min_proficient_scale_value = $this->get_minimum_proficient_value();
         }
 
         $criterion->set_aggregation_method($aggregation_method);

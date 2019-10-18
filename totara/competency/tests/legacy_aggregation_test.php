@@ -27,6 +27,7 @@ use criteria_coursecompletion\coursecompletion;
 use criteria_linkedcourses\linkedcourses;
 use pathway_criteria_group\criteria_group;
 use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
+use totara_competency\achievement_configuration;
 use totara_competency\entities\competency as competency_entity;
 use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\entities\scale as scale_entity;
@@ -249,6 +250,62 @@ class totara_competency_legacy_aggregation_testcase extends advanced_testcase {
         $this->assert_has_criteria($data->competency->id, criterion::AGGREGATE_ANY_N);
     }
 
+    public function test_create_default_pathways_with_existing_criteria() {
+        advanced_feature::disable('competency_assignment');
+
+        $data = $this->create_data();
+
+        $previous_criteria1 = $this->get_criteria($data->competency->id);
+        $previous_criteria2 = $this->get_criteria($data->control_competency->id);
+
+        $aggregation = new legacy_aggregation($data->control_competency);
+        $aggregation->create_default_pathways();
+
+        // This should not have changed anything as we already have the defaults
+        $criteria1 = $this->get_criteria($data->competency->id);
+        $this->assertEquals($previous_criteria1, $criteria1);
+        $criteria2 = $this->get_criteria($data->control_competency->id);
+        $this->assertEquals($previous_criteria2, $criteria2);
+    }
+
+    public function test_create_default_pathways_with_no_criteria() {
+        advanced_feature::disable('competency_assignment');
+
+        $data = $this->create_data();
+
+        $previous_criteria = $this->get_criteria($data->control_competency->id);
+
+        $aggregation = new legacy_aggregation($data->control_competency);
+        $aggregation->create_default_pathways();
+
+        // This should not have changed anything as we already have the defaults
+        $criteria = $this->get_criteria($data->control_competency->id);
+        $this->assertEquals($previous_criteria, $criteria);
+        // This one should not be touched
+        $this->assert_not_has_criteria($data->competency->id);
+    }
+
+    public function test_create_default_pathways() {
+        advanced_feature::disable('competency_assignment');
+
+        $data = $this->create_data();
+
+        $previous_criteria = $this->get_criteria($data->control_competency->id);
+
+        // Make sure we start with no criteria
+        $this->assert_not_has_criteria($data->competency->id);
+
+        $aggregation = new legacy_aggregation($data->competency);
+        $aggregation->create_default_pathways();
+
+        // This should not have changed anything as we already have the defaults
+        $criteria = $this->get_criteria($data->control_competency->id);
+        $this->assertEquals($previous_criteria, $criteria);
+
+        // Assert that we have the new default criteria created
+        $this->asset_has_default_pathways($data->competency);
+    }
+
     protected function create_data() {
         $data = new class {
             /** @var scale_entity */
@@ -277,6 +334,9 @@ class totara_competency_legacy_aggregation_testcase extends advanced_testcase {
         $data->scale = scale_entity::repository()->find($scale->id);
         $min_proficient_value = $data->scale->min_proficient_value;
 
+        // We don't want the create event fired here
+        $sink = $this->redirectEvents();
+
         $fw = $hierarchy_generator->create_comp_frame(['fullname' => 'Framework one', 'idnumber' => 'f1', 'scale' => $scale->id]);
         $comp = $hierarchy_generator->create_comp([
             'frameworkid' => $fw->id,
@@ -297,8 +357,10 @@ class totara_competency_legacy_aggregation_testcase extends advanced_testcase {
 
         // Make sure there are criteria for the control competency
         $aggregation = new legacy_aggregation($data->control_competency);
-        $aggregation->create_default_criteria(new linkedcourses(), $min_proficient_value)
-            ->create_default_criteria(new childcompetency(), $min_proficient_value);
+        $aggregation->create_default_pathways();
+
+        // Stop redirecting events from now
+        $sink->close();
 
         return $data;
     }
@@ -334,6 +396,21 @@ class totara_competency_legacy_aggregation_testcase extends advanced_testcase {
             ->where('pw.comp_id', $competency_id)
             ->where('pw.status', pathway::PATHWAY_STATUS_ACTIVE)
             ->get();
+    }
+
+    protected function asset_has_default_pathways(competency_entity $competency) {
+        // Should have linked courses and child competencies
+        $this->assertCount(2, $this->get_criteria($competency->id));
+
+        $has_learning_plan = pathway_entity::repository()
+            ->where('comp_id', $competency->id)
+            ->where('path_type', 'learning_plan')
+            ->where('sortorder', 1)
+            ->exists();
+        $this->assertTrue($has_learning_plan, 'Learning plan pathway not found');
+
+        $achievement_configuration = new achievement_configuration($competency);
+        $this->assertTrue($achievement_configuration->has_aggregation_type('first'));
     }
 
 }

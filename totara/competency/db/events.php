@@ -28,4 +28,8 @@ $observers = [
         'eventname' => \hierarchy_competency\event\competency_updated::class,
         'callback' => \totara_competency\observer\competency::class.'::updated',
     ],
+    [
+        'eventname' => \hierarchy_competency\event\competency_created::class,
+        'callback' => \totara_competency\observer\competency::class.'::created',
+    ],
 ];

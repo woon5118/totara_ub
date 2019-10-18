@@ -33,7 +33,7 @@ use totara_competency\entities\configuration_history;
  */
 class achievement_configuration {
 
-    private const DEFAULT_AGGREGATION = 'highest';
+    public const DEFAULT_AGGREGATION = 'highest';
 
     /** @var string aggregation_type */
     private $aggregation_type = null;
@@ -50,6 +50,22 @@ class achievement_configuration {
 
     public function get_competency(): competency {
         return $this->competency;
+    }
+
+    /**
+     * Returns true if the aggregation type is set for this competency
+     *
+     * @param string|null $aggregation_type specify if a specific type should be checked
+     * @return bool
+     */
+    public function has_aggregation_type(string $aggregation_type = null): bool {
+        global $DB;
+
+        $params = ['comp_id' => $this->get_competency()->id];
+        if ($aggregation_type) {
+            $params['type'] = $aggregation_type;
+        }
+        return $DB->record_exists('totara_competency_scale_aggregation', $params);
     }
 
     /**

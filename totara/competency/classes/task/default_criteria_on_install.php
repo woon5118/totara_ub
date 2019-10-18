@@ -27,6 +27,7 @@ use core\collection;
 use core\orm\query\builder;
 use core\task\adhoc_task;
 use criteria_childcompetency\childcompetency;
+use criteria_childcompetency\items_processor;
 use criteria_linkedcourses\linkedcourses;
 use criteria_linkedcourses\metadata_processor as linked_courses_metadata_processor;
 use pathway_criteria_group\criteria_group;
@@ -77,39 +78,17 @@ class default_criteria_on_install extends adhoc_task {
         $scales = scale::repository()->get();
 
         foreach ($competencies as $competency) {
-            $configuration = new achievement_configuration($competency);
-            $configuration->set_aggregation_type('first');
-            $configuration->save_aggregation();
-
-            if ($this->should_add_learning_plans()) {
-                $lp_pathway = new learning_plan();
-                $lp_pathway->set_competency($competency);
-                $lp_pathway->save();
-            }
-
             $scale_id = $framework_to_scale->item($competency->frameworkid)->scaleid;
-            $min_proficient_value = $scales->item($scale_id)->min_proficient_value;
+            $scale = $scales->item($scale_id);
 
             $aggregation = new legacy_aggregation($competency);
-            $aggregation->create_default_criteria(new linkedcourses(), $min_proficient_value)
-                ->create_default_criteria(new childcompetency(), $min_proficient_value);
+            $aggregation->create_default_pathways($scale, false);
         }
 
-        // Make sure all linked courses are synced
+        // Make sure all linked courses and child competencies are synced
         linked_courses_metadata_processor::update_item_links(null);
+        items_processor::update_items(null);
     }
 
-    private function should_add_learning_plans(): bool {
-        if (advanced_feature::is_disabled('competency_assignment')) {
-            // If perform isn't enabled, we'll need to add the learning plan pathway here since users will not be able
-            // to access an interface to add them themselves if they need them.
-            return true;
-        }
 
-        if (totara_feature_disabled('learningplans')) {
-            return false;
-        }
-
-        return builder::table('dp_plan_competency_assign')->exists();
-    }
 }

@@ -24,6 +24,7 @@
 use core\orm\collection;
 use criteria_childcompetency\childcompetency;
 use criteria_linkedcourses\linkedcourses;
+use hierarchy_competency\event\competency_created;
 use hierarchy_competency\event\competency_updated;
 use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
 use totara_competency\entities\pathway as pathway_entity;
@@ -44,7 +45,7 @@ class totara_competency_competency_observer_testcase extends advanced_testcase {
         require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
     }
 
-    public function test_event_when_perform_is_enabled() {
+    public function test_updated_event_when_perform_is_enabled() {
         advanced_feature::enable('competency_assignment');
 
         $comp = $this->create_competency(\competency::AGGREGATION_METHOD_ANY);
@@ -59,7 +60,7 @@ class totara_competency_competency_observer_testcase extends advanced_testcase {
         $this->assert_not_has_criteria($comp_changed->id);
     }
 
-    public function test_event_when_aggregation_method_did_not_change() {
+    public function test_updated_event_when_aggregation_method_did_not_change() {
         advanced_feature::disable('competency_assignment');
 
         $comp = $this->create_competency(\competency::AGGREGATION_METHOD_ANY);
@@ -73,7 +74,7 @@ class totara_competency_competency_observer_testcase extends advanced_testcase {
         $this->assert_not_has_criteria($comp_changed->id);
     }
 
-    public function test_event_when_aggregation_method_is_not_set() {
+    public function test_updated_event_when_aggregation_method_is_not_set() {
         advanced_feature::disable('competency_assignment');
 
         $comp = $this->create_competency(\competency::AGGREGATION_METHOD_ANY);
@@ -88,7 +89,7 @@ class totara_competency_competency_observer_testcase extends advanced_testcase {
         $this->assert_not_has_criteria($comp_changed->id);
     }
 
-    public function test_event_gets_processed_if_aggregation_method_changed() {
+    public function test_updated_event_gets_processed_if_aggregation_method_changed() {
         advanced_feature::disable('competency_assignment');
 
         $comp = $this->create_competency(\competency::AGGREGATION_METHOD_ANY);
@@ -101,6 +102,30 @@ class totara_competency_competency_observer_testcase extends advanced_testcase {
         competency_updated::create_from_old_and_new($comp_changed, $comp)->trigger();
 
         $this->assert_has_criteria($comp_changed->id, criterion::AGGREGATE_ALL);
+    }
+
+    public function test_created_event_only_applies_defaults_with_assignment_enabled() {
+        advanced_feature::enable('competency_assignment');
+
+        $comp = $this->create_competency(\competency::AGGREGATION_METHOD_ANY);
+
+        $this->assert_not_has_criteria($comp->id);
+
+        competency_created::create_from_instance($comp)->trigger();
+
+        $this->assert_not_has_criteria($comp->id);
+    }
+
+    public function test_created_event_creates_defaults() {
+        advanced_feature::disable('competency_assignment');
+
+        $comp = $this->create_competency(\competency::AGGREGATION_METHOD_ANY);
+
+        $this->assert_not_has_criteria($comp->id);
+
+        competency_created::create_from_instance($comp)->trigger();
+
+        $this->assert_has_criteria($comp->id, criterion::AGGREGATE_ANY_N);
     }
 
     protected function create_competency(int $aggregation_method) {
@@ -119,6 +144,9 @@ class totara_competency_competency_observer_testcase extends advanced_testcase {
             ]
         );
 
+        // We don't want the create event fired here
+        $sink = $this->redirectEvents();
+
         $fw = $hierarchy_generator->create_comp_frame(['fullname' => 'Framework one', 'idnumber' => 'f1', 'scale' => $scale->id]);
         $comp = $hierarchy_generator->create_comp([
             'frameworkid' => $fw->id,
@@ -126,6 +154,9 @@ class totara_competency_competency_observer_testcase extends advanced_testcase {
             'parentid' => 0,
             'aggregationmethod' => $aggregation_method
         ]);
+
+        // Stop redirecting events from now
+        $sink->close();
 
         return $comp;
     }

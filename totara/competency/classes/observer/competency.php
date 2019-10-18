@@ -24,6 +24,9 @@
 namespace totara_competency\observer;
 
 use core\event\base;
+use criteria_childcompetency\childcompetency;
+use criteria_linkedcourses\linkedcourses;
+use hierarchy_competency\event\competency_created;
 use hierarchy_competency\event\competency_updated;
 use stdClass;
 use totara_competency\achievement_configuration;
@@ -66,6 +69,21 @@ class competency {
 
         return isset($snapshot->aggregationmethod)
             && ($old_instance['aggregationmethod'] != $snapshot->aggregationmethod);
+    }
+
+    /**
+     * React on a new competency being created
+     *
+     * @param competency_created $event
+     */
+    public static function created(competency_created $event) {
+        $competency_id = $event->get_data()['objectid'];
+
+        // Create default criteria based on the current aggregation method
+        if (advanced_feature::is_disabled('competency_assignment')) {
+            $aggregation = new legacy_aggregation(new competency_entity($competency_id));
+            $aggregation->create_default_pathways();
+        }
     }
 
 }
