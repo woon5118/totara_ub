@@ -2748,7 +2748,7 @@ class mod_assign_locallib_testcase extends advanced_testcase {
 
         $cm = get_coursemodule_from_instance('assign', $assign->get_instance()->id);
         $context = context_module::instance($cm->id);
-        $assign = new testable_assign($context, $cm, $course);
+        $assign = new mod_assign_testable_assign($context, $cm, $course);
 
         // Check that other teachers can't view this submission.
         $this->setUser($otherteacher);
@@ -3598,7 +3598,8 @@ Anchor link 2:<a title=\"bananas\" href=\"../logo-240x60.gif\">Link text</a>
         $result = $assign->testable_process_save_quick_grades($data);
         $this->assertContains(get_string('quickgradingchangessaved', 'assign'), $result);
         $grade = $assign->get_user_grade($student->id, false);
-        $this->assertEquals('60.0', $grade->grade);
+        // TOTARA: required as string comparison of numeric values no longer coerces type.
+        $this->assertSame('60.00000', $grade->grade);
 
         // Attempt to grade with a past attempts grade info.
         $assign->testable_process_add_attempt($student->id);
@@ -3622,7 +3623,8 @@ Anchor link 2:<a title=\"bananas\" href=\"../logo-240x60.gif\">Link text</a>
         $result = $assign->testable_process_save_quick_grades($data);
         $this->assertContains(get_string('quickgradingchangessaved', 'assign'), $result);
         $grade = $assign->get_user_grade($student->id, false);
-        $this->assertEquals('40.0', $grade->grade);
+        // TOTARA: required as string comparison of numeric values no longer coerces type.
+        $this->assertSame('40.00000', $grade->grade);
 
         // Catch grade update conflicts.
         // Save old data for later.
@@ -3636,13 +3638,15 @@ Anchor link 2:<a title=\"bananas\" href=\"../logo-240x60.gif\">Link text</a>
         $result = $assign->testable_process_save_quick_grades($data);
         $this->assertContains(get_string('quickgradingchangessaved', 'assign'), $result);
         $grade = $assign->get_user_grade($student->id, false);
-        $this->assertEquals('30.0', $grade->grade);
+        // TOTARA: required as string comparison of numeric values no longer coerces type.
+        $this->assertEquals('30.00000', $grade->grade);
 
         // Now update using 'old' data. Should fail.
         $result = $assign->testable_process_save_quick_grades($pastdata);
         $this->assertContains(get_string('errorrecordmodified', 'assign'), $result);
         $grade = $assign->get_user_grade($student->id, false);
-        $this->assertEquals('30.0', $grade->grade);
+        // TOTARA: required as string comparison of numeric values no longer coerces type.
+        $this->assertEquals('30.00000', $grade->grade);
     }
 
     /**
@@ -3669,7 +3673,6 @@ Anchor link 2:<a title=\"bananas\" href=\"../logo-240x60.gif\">Link text</a>
         // Totara: we have instant completion.
 /*
         // Check that completion is not met yet.
-        $completion = new completion_info($course);
         $completiondata = $completion->get_data($cm, false, $student->id);
         $this->assertEquals(0, $completiondata->completionstate);
 
@@ -3679,6 +3682,8 @@ Anchor link 2:<a title=\"bananas\" href=\"../logo-240x60.gif\">Link text</a>
                 $student->id, COMPLETION_COMPLETE, $completion);
 
 */
+        $completion = new completion_info($course);
+
         // Completion should now be met.
         $completiondata = $completion->get_data($cm, false, $student->id);
         $this->assertEquals(1, $completiondata->completionstate);
