@@ -61,7 +61,7 @@
             {{ role.latest_rating.date }}
           </div>
           <div
-            v-if="!raterPurged(role)"
+            v-else-if="!raterPurged(role)"
             class="tui-pathwayManual-achievementDisplay__rating_date"
           >
             {{

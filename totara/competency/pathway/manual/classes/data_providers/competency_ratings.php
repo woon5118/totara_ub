@@ -27,8 +27,6 @@ use core\orm\query\builder;
 use pathway_manual\manual;
 use pathway_manual\models\role_rating;
 use tassign_competency\entities\assignment;
-use tassign_competency\entities\competency_assignment_user;
-use tassign_competency\entities\competency_assignment_user_log;
 use totara_competency\entities\pathway;
 
 defined('MOODLE_INTERNAL') || die();
@@ -50,24 +48,15 @@ class competency_ratings {
         $this->user_id = $user_id;
     }
 
+    /**
+     * Get the competency from the competency assignment.
+     *
+     * @param int $assignment_id
+     * @param int $user_id
+     * @return competency_ratings
+     */
     public static function for_assignment(int $assignment_id, int $user_id): self {
-        /** @var competency_assignment_user $competency_assignment */
-        $competency_assignment = competency_assignment_user::repository()
-            ->where('user_id', $user_id)
-            ->where('assignment_id', $assignment_id)
-            ->one();
-
-        if (is_null($competency_assignment)) {
-            // Competency assignment isn't active, so look for it in the logs
-            $competency_assignment = assignment::repository()
-                ->join([competency_assignment_user_log::TABLE, 'log'], 'id', 'assignment_id')
-                ->where('log.user_id', $user_id)
-                ->where('log.assignment_id', $assignment_id)
-                ->order_by('id')
-                ->first();
-        }
-
-        return new static($competency_assignment->competency_id, $user_id);
+        return new static((new assignment($assignment_id))->competency_id, $user_id);
     }
 
     /**

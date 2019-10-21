@@ -24,3 +24,9 @@
 $string['pluginname'] = 'Learning plan';
 
 $string['aggregatetask'] = 'Update learning plan pathway achievements';
+$string['learning_plans'] = 'Learning plans';
+$string['no_available_learning_plans'] = 'No available learning plans';
+$string['no_description_available'] = 'No description available';
+$string['no_permission_view_plan'] = 'You do not have permission to view this plan';
+$string['no_rating_set'] = 'No rating set';
+$string['view_plan'] = 'View plan';
