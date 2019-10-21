@@ -126,6 +126,9 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
         $this->resetAfterTest(true);
         $this->setAdminUser();
 
+        // We set the default to not enable assignment
+        advanced_feature::disable('competency_assignment');
+
         $this->source = new $this->sourcename();
         $this->element = new totara_sync_element_comp();
         $this->element->source = $this->source;

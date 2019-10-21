@@ -21,6 +21,8 @@
  * @package tool_totara_sync
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -45,6 +47,8 @@ class tool_totara_sync_comp_database_testcase extends totara_sync_database_testc
         $this->setAdminUser();
 
         $this->create_external_db_table();
+
+        advanced_feature::disable('competency_assignment');
     }
 
     public function tearDown(): void {
