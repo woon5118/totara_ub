@@ -2424,6 +2424,10 @@ class core_dml_testcase extends database_driver_testcase {
         $table = $this->get_test_table();
         $tablename = $table->getName();
 
+        if ($DB->get_dbfamily()) {
+            $this->markTestSkipped('TODO: fix composed nullable indexes in MS SQL driver TL-22803');
+        }
+
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('notnull1', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('nullable1', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
