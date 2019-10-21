@@ -26,6 +26,7 @@ Feature: Import course's content's twice
       | quiz       | Test quiz | C1     | quiz1    |
     And I log in as "teacher1"
 
+  @javascript
   Scenario: Import course's contents to another course
     Given I am on "Course 2" course homepage with editing mode on
     And I should not see "Online users"
