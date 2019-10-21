@@ -279,13 +279,13 @@ Feature: Return to previous page after actions in seminar
 
     # Event page -> Allocate spaces for team -> Add -> Event page
     When I follow "Allocate spaces for team"
-    And I click on "Sam1 Student1" "option"
+    And I set the field "Available team members" to "Sam1 Student1"
     And I press "Add"
     Then ".mod_facetoface__navigation" "css_element" should exist
 
     # Event page -> Allocate spaces for team -> Remove -> Event page
     When I follow "Allocate spaces for team"
-    And I click on "Sam1 Student1" "option"
+    And I set the field "Allocated team members" to "Sam1 Student1"
     And I press "Remove"
     Then ".mod_facetoface__navigation" "css_element" should exist
 

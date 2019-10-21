@@ -394,7 +394,7 @@ Feature: Seminar event cancellation notifications
     Then I should see "Allocate spaces for team (0/1)"
 
     When I follow "Allocate spaces for team"
-    And I set the field "Potential allocations" to "Learner Four"
+    And I set the field "Available team members" to "Learner Four"
     And I press "Add"
     Then I should see "Allocate spaces for team (1/1)"
 

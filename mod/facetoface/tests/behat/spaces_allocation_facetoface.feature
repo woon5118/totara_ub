@@ -93,13 +93,13 @@ Feature: Allocate spaces for team in seminar
   Scenario: Manager can deallocate users that he has allocated in the current session
     Given I log in as "sitemanager1"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
-    And I click on the link "Allocate spaces for team" in row 1
-    And I set the field "Potential allocations" to "Sam1 Student1"
+    And I click on the link "Go to event" in row 1
+    And I follow "Allocate spaces for team"
+    And I set the field "Available team members" to "Sam1 Student1"
     And I press "Add"
-    When I click on the link "Allocate spaces for team" in row 1
-    Then the "Current allocations" select box should contain "Sam1 Student1"
-    And I set the field "Current allocations" to "Sam1 Student1"
+    When I follow "Allocate spaces for team"
+    Then the "Allocated team members" select box should contain "Sam1 Student1"
+    And I set the field "Allocated team members" to "Sam1 Student1"
     And I press "Remove"
     And I follow "Allocate spaces for team"
     Then the "Available team members" select box should contain "Sam1 Student1"
@@ -108,9 +108,9 @@ Feature: Allocate spaces for team in seminar
   Scenario: Capacity should be unaffected if removing allocation and create reservations when removing allocations is set to Yes
     Given I log in as "sitemanager1"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
-    And I click on the link "Allocate spaces for team" in row 1
-    And I set the field "Potential allocations" to "Sam1 Student1"
+    And I click on the link "Go to event" in row 1
+    And I follow "Allocate spaces for team"
+    And I set the field "Available team members" to "Sam1 Student1"
     When I press "Add"
     And I press "View all events"
     Then I should see "1 / 3" in the "1 January 2020" "table_row"
@@ -119,7 +119,7 @@ Feature: Allocate spaces for team in seminar
     Then the "Allocated team members" select box should contain "Sam1 Student1"
     When I set the following fields to these values:
       | replaceallocations         | Yes  |
-    And I set the field "Current allocations" to "Sam1 Student1"
+    And I set the field "Allocated team members" to "Sam1 Student1"
     And I press "Remove"
     And I press "View all events"
     Then I should see "1 / 3" in the "1 January 2020" "table_row"
@@ -132,9 +132,9 @@ Feature: Allocate spaces for team in seminar
   Scenario: Capacity should be affected if removing allocation and create reservations when removing allocations is set to No
     Given I log in as "sitemanager1"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
-    And I click on the link "Allocate spaces for team" in row 1
-    And I set the field "Potential allocations" to "Sam1 Student1"
+    And I click on the link "Go to event" in row 1
+    And I follow "Allocate spaces for team"
+    And I set the field "Available team members" to "Sam1 Student1"
     When I press "Add"
     And I press "View all events"
     Then I should see "1 / 3" in the "1 January 2020" "table_row"
@@ -143,7 +143,7 @@ Feature: Allocate spaces for team in seminar
     Then the "Allocated team members" select box should contain "Sam1 Student1"
     When I set the following fields to these values:
       | replaceallocations         | No  |
-    And I set the field "Current allocations" to "Sam1 Student1"
+    And I set the field "Allocated team members" to "Sam1 Student1"
     And I press "Remove"
     And I press "View all events"
     Then I should see "0 / 3" in the "1 January 2020" "table_row"
@@ -155,9 +155,9 @@ Feature: Allocate spaces for team in seminar
   Scenario: Manager cannot see users allocated from another managers
     Given I log in as "sitemanager1"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
-    And I click on the link "Allocate spaces for team" in row 1
-    And I set the field "Potential allocations" to "Sam1 Student1"
+    And I click on the link "Go to event" in row 1
+    And I follow "Allocate spaces for team"
+    And I set the field "Available team members" to "Sam1 Student1"
     And I press "Add"
     When I follow "Allocate spaces for team"
     Then the "Allocated team members" select box should contain "Sam1 Student1"
@@ -180,10 +180,10 @@ Feature: Allocate spaces for team in seminar
 
     When I log in as "sitemanager1"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
-    And I click on the link "Allocate spaces for team" in row 1
-    Then the "Current allocations" select box should contain "Sam1 Student1 (Self booked)"
-    And I set the field "Current allocations" to "Sam1 Student1"
+    And I click on the link "Go to event" in row 1
+    And I follow "Allocate spaces for team"
+    Then the "Allocated team members" select box should contain "Sam1 Student1 (Self booked)"
+    And I set the field "Allocated team members" to "Sam1 Student1"
     And I press "Remove"
     And I follow "Allocate spaces for team"
     Then the "Allocated team members" select box should contain "Sam1 Student1 (Self booked)"
@@ -192,9 +192,9 @@ Feature: Allocate spaces for team in seminar
   Scenario: Manager cannot deallocate users in another activity even if he is their manager and he allocated the user
     Given I log in as "sitemanager1"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
-    And I click on the link "Allocate spaces for team" in row 1
-    And I set the field "Potential allocations" to "Sam1 Student1"
+    And I click on the link "Go to event" in row 1
+    And I follow "Allocate spaces for team"
+    And I set the field "Available team members" to "Sam1 Student1"
     And I press "Add"
     When I follow "Allocate spaces for team"
     Then the "Allocated team members" select box should contain "Sam1 Student1"
@@ -203,7 +203,7 @@ Feature: Allocate spaces for team in seminar
     And I click on the link "Go to event" in row 2
     And I follow "Allocate spaces for team"
     Then I should see "Sam1 Student1" in the "Other event(s) in this activity" "optgroup"
-    And I set the field "Current allocations" to "Sam1 Student1"
+    And I set the field "Allocated team members" to "Sam1 Student1"
     And I press "Remove"
     And I follow "Allocate spaces for team"
     But I should see "Sam1 Student1" in the "Other event(s) in this activity" "optgroup"
@@ -212,17 +212,17 @@ Feature: Allocate spaces for team in seminar
   Scenario: Allocate spaces for students in different sessions should be allowed if multiple sessions per signup is On
     Given I log in as "sitemanager1"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
-    And I click on the link "Allocate spaces for team" in row 1
-    When I set the field "Potential allocations" to "Sam1 Student1"
+    And I click on the link "Go to event" in row 1
+    And I follow "Allocate spaces for team"
+    When I set the field "Available team members" to "Sam1 Student1"
     And I press "Add"
     And I follow "Allocate spaces for team"
     Then the "Allocated team members" select box should contain "Sam1 Student1"
 
     When I click on "Course 1" "link"
-    And I follow "View all events"
-    And I click on the link "Allocate spaces for team" in row 2
-    And I set the field "Potential allocations" to "Sam1 Student1"
+    And I click on the link "Go to event" in row 2
+    And I follow "Allocate spaces for team"
+    And I set the field "Available team members" to "Sam1 Student1"
     And I press "Add"
     And I follow "Allocate spaces for team"
     Then the "Allocated team members" select box should contain "Sam1 Student1"
@@ -243,18 +243,18 @@ Feature: Allocate spaces for team in seminar
     Then the "Allocated team members" select box should contain "Sam1 Student1 (Self booked)"
 
     When I click on "Course 1" "link"
-    And I follow "View all events"
-    And I click on the link "Allocate spaces for team" in row 2
-    And I set the field "Potential allocations" to "Sam1 Student1"
+    And I click on the link "Go to event" in row 2
+    And I follow "Allocate spaces for team"
+    And I set the field "Available team members" to "Sam1 Student1"
     And I press "Add"
     And I follow "Allocate spaces for team"
     Then I should see "Sam1 Student1" in the "This event" "optgroup"
     And I should see "Sam1 Student1 (Self booked)" in the "Other event(s) in this activity" "optgroup"
 
     When I click on "Course 1" "link"
-    And I follow "View all events"
-    And I click on the link "Allocate spaces for team" in row 2
-    And I set the field "Current allocations" to "Sam1 Student1"
+    And I click on the link "Go to event" in row 2
+    And I follow "Allocate spaces for team"
+    And I set the field "Allocated team members" to "Sam1 Student1"
     And I press "Remove"
     And I follow "Allocate spaces for team"
     Then I should not see "Sam1 Student1" in the "This event" "optgroup"

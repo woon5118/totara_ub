@@ -57,9 +57,9 @@ Feature: Allocate spaces in full events
   Scenario: Allocate user to a full event without waitlist should not happen
     Given I log in as "manager1"
     And I am on "Course 1" course homepage
-    And I follow "View all events"
-    And I click on the link "Allocate spaces for team" in row 1
-    And I set the field "Potential allocations" to "Sam2 Student2"
+    And I click on the link "Go to event" in row 1
+    And I follow "Allocate spaces for team"
+    And I set the field "Available team members" to "Sam2 Student2"
     When I press "Add"
     Then I should see "This event is now full. You will need to pick another time or talk to the instructor."
     And I should see "Booking full"
@@ -84,8 +84,9 @@ Feature: Allocate spaces in full events
 
     And I log in as "manager1"
     And I am on "Course 1" course homepage
-    And I click on the link "Allocate spaces for team" in row 1
-    And I set the field "Potential allocations" to "Sam2 Student2"
+    And I click on the link "Go to event" in row 1
+    And I follow "Allocate spaces for team"
+    And I set the field "Available team members" to "Sam2 Student2"
     When I press "Add"
     Then I should not see "This event is now full. You will need to pick another time or talk to the instructor."
     And I should see "Booking full"
