@@ -20,6 +20,7 @@
  * @author Sam Hemelryk <sam.hemelryk@totaralearning.com>
  */
 
+use totara_core\advanced_feature;
 use totara_core\quickaccessmenu\factory;
 use totara_core\quickaccessmenu\group;
 use totara_core\quickaccessmenu\item;
@@ -1084,6 +1085,9 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
 
     public function test_helper_remove_group() {
         global $DB;
+
+        // Testing with competency assignment explicitly switched off
+        advanced_feature::disable('competency_assignment');
 
         $this->resetAfterTest();
 
