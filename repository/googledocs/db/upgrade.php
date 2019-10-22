@@ -39,15 +39,23 @@ function xmldb_repository_googledocs_upgrade($oldversion) {
     // Automatically generated Moodle v3.4.0 release upgrade line.
     // Put any upgrade step following this.
 
-    if ($oldversion < 2017011100) {
+    if ($oldversion < 2017111300) {
         // Set default import formats from Google.
-        set_config('documentformat', 'rtf', 'googledocs');
-        set_config('drawingformat', 'pdf', 'googledocs');
-        set_config('presentationformat', 'pptx', 'googledocs');
-        set_config('spreadsheetformat', 'xlsx', 'googledocs');
+        if (get_config('googledocs', 'documentformat') === false) {
+            set_config('documentformat', 'rtf', 'googledocs');
+        }
+        if (get_config('googledocs', 'drawingformat') === false) {
+            set_config('drawingformat', 'pdf', 'googledocs');
+        }
+        if (get_config('googledocs', 'presentationformat') === false) {
+            set_config('presentationformat', 'pptx', 'googledocs');
+        }
+        if (get_config('googledocs', 'spreadsheetformat') === false) {
+            set_config('spreadsheetformat', 'xlsx', 'googledocs');
+        }
 
         // Plugin savepoint reached.
-        upgrade_plugin_savepoint(true, 2017011100, 'repository', 'googledocs');
+        upgrade_plugin_savepoint(true, 2017111300, 'repository', 'googledocs');
     }
 
     return true;
