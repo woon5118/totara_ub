@@ -375,6 +375,7 @@ $string['exportfilesystempath_help'] = 'Absolute file system path to a writeable
 $string['exportods'] = 'Export in ODS format';
 $string['exportoptiondisabled'] = 'Disabled: {$a}';
 $string['exportoptions'] = 'Export formats';
+$string['exportoptionsoverride'] = 'Export format override?';
 $string['exportperformancesettings_heading'] = 'Export Performance Settings';
 $string['exportpdf_landscape'] = 'Export in PDF (Landscape) format';
 $string['exportpdf_mramlimitexceeded'] = 'Notice: Ram memory limit exceeded! Probably the report being exported is too big, as it took almost {$a} MB of ram memory to create it, please consider reducing the size of the report, applying filters or splitting the report in several files.';

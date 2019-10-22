@@ -122,6 +122,8 @@ trait report_trait {
      * Add report columns.
      */
     protected function add_report_columns() {
+        global $DB;
+
         /** @var report_trait|\rb_base_source $this */
         $join = $this->reportjoin;
 
@@ -296,6 +298,41 @@ trait report_trait {
                 'joins' => [$join],
             ]
         );
+        $this->columnoptions[] = new \rb_column_option(
+            'report',
+            'overrideexportoptions',
+            get_string('exportoptionsoverride', 'totara_reportbuilder'),
+            "{$join}.overrideexportoptions",
+            array(
+                'joins' => [$join],
+                'dbdatatype' => 'char',
+                'outputformat' => 'text',
+                'displayfunc' => 'yes_or_no'
+            )
+        );
+
+        $generalexportoptions = str_replace(',','|', get_config('reportbuilder', 'exportoptions'));
+        $optionsconactsql = $DB->sql_group_concat($DB->sql_cast_2char('name'), '|');
+
+        $this->columnoptions[] = new \rb_column_option(
+            'report',
+            'exportoptions',
+            get_string('exportoptions', 'totara_reportbuilder'),
+            "CASE WHEN {$join}.overrideexportoptions = '1'
+                       THEN (SELECT {$optionsconactsql}
+                               FROM {report_builder_settings}
+                              WHERE reportid = {$join}.id
+                                AND type = 'exportoption'
+                                AND value = '1')
+                       ELSE '{$generalexportoptions}'
+                   END",
+            array(
+                'dbdatatype' => 'char',
+                'outputformat' => 'text',
+                'displayfunc' => 'report_export_options',
+                'joins' => [$join],
+            )
+        );
     }
 
     /**
@@ -363,6 +400,26 @@ trait report_trait {
             'savedcount',
             get_string('numsaved', 'totara_reportbuilder'),
             'number'
+        );
+        $this->filteroptions[] = new \rb_filter_option(
+            'report',
+            'overrideexportoptions',
+            get_string('exportoptionsoverride', 'totara_reportbuilder'),
+            'select',
+            [
+                'selectchoices' => [1 => get_string('yes'), 0 => get_string('no')],
+                'simplemode' => true,
+            ]
+        );
+        $this->filteroptions[] = new \rb_filter_option(
+            'report',
+            'exportoptions',
+            get_string('exportoptions', 'totara_reportbuilder'),
+            'multicheck',
+            array(
+                'selectchoices' => \reportbuilder::get_all_general_export_options(true),
+                'concat' => true,
+            )
         );
     }
 
