@@ -111,6 +111,10 @@ if ($ADMIN->fulltree) {
     // If button colour has been customised, use that as the default.
     if ($button_setting->get_setting() != css_processor::$DEFAULT_BUTTONCOLOR) {
         $default = $button_setting->get_setting();
+        if ($default === null) {
+            // We do need a default for upgrades!
+            $default = css_processor::$DEFAULT_PRIMARYBUTTONCOLOR;
+        }
     } else {
         $default = css_processor::$DEFAULT_PRIMARYBUTTONCOLOR;
     }
