@@ -76,4 +76,11 @@
         <version>14.4.2</version>
         <licenseversion></licenseversion>
     </library>
+    <library>
+        <location>tui/build</location>
+        <name>resize-observer-polyfill</name>
+        <license>MIT</license>
+        <version>1.5.1</version>
+        <licenseversion></licenseversion>
+    </library>
 </libraries>

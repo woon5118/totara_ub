@@ -28,6 +28,7 @@
         "apollo-link-http": "^1.5.16",
         "graphql": "^14.4.2",
         "graphql-tag": "^2.10.1",
+        "resize-observer-polyfill": "^1.5.1",
         "vue": "^2.6.10",
         "vue-apollo": "^3.0.2"
     },
