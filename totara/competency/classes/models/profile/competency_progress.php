@@ -26,26 +26,23 @@ namespace totara_competency\models\profile;
 use core\orm\collection;
 use stdClass;
 use tassign_competency\models\assignment as assignment_model;
-use tassign_competency\quickaccessmenu\competency_assignment;
 use totara_assignment\entities\user;
 use totara_competency\data_providers\assignments;
 use totara_competency\entities\assignment;
-use totara_competency\entities\scale;
+use totara_competency\entities\competency;
+use totara_competency\entities\competency_achievement;
 use totara_competency\entities\scale_value;
-use totara_competency\models\basic_model;
 
 /**
  * Class profile_progress
  *
  * This is a profile progress item model scaffolding, it has the following properties available:
  *
- *  - Key -> md5 of some attributes it's grouped by
  *  - Assignments -> [Assignment] - a collection of related assignment models
  *  - Overall progress -> int - Overall progress value per this group
  *
- *
- * @property-read string $key A key uniquely identifying this progress item
  * @property-read collection $assignments Collection of assignments for this user group
+ * @property-read collection $items Collection of assignments for this user group
  * @property-read collection $filters Collection of filters
  * @property-read string $latest_achievement Latest achieved competency name (if any)
  * @package totara_competency\models
@@ -53,32 +50,64 @@ use totara_competency\models\basic_model;
 class competency_progress {
 
     /**
-     * @var array
+     * @var collection
      */
-    protected $attributes;
+    protected $assignments;
 
     /**
-     * Key
-     *
-     * @var string
+     * @var competency
      */
-    protected $key;
+    protected $competency;
 
+    /**
+     * @var competency_achievement
+     */
+    protected $achievement;
+
+    /**
+     * @var scale_value|null
+     */
+    protected $my_value;
+
+    /**
+     * Attributes available publicly on the model
+     *
+     * @var array
+     */
+    protected $public_attributes = [
+        'assignments',
+        'competency',
+        'achievement',
+        'my_value',
+    ];
+
+    /**
+     * competency_progress constructor.
+     *
+     * @param assignment $assignment Assignment entity
+     */
     public function __construct(assignment $assignment) {
-        $this->attributes = [
-            'competency' => $assignment->competency,
-            'achievement' => $assignment->current_achievement,
-            'my_value' => $assignment->current_achievement->value ?? null,
-            'assignments' => new collection([
-                assignment_model::load_by_entity($assignment),
-            ]),
-        ];
+        $this->competency = $assignment->competency;
+        $this->achievement = $assignment->current_achievement;
+        $this->my_value = $assignment->current_achievement->value ?? null;
+        $this->assignments = new collection([assignment_model::load_by_entity($assignment)]);
     }
 
+    /**
+     * Return assignments for a given competency
+     *
+     * @return collection
+     */
     public function get_assignments(): collection {
         return $this->assignments;
     }
 
+    /**
+     * Build a collection of competency progress models using assignments
+     *
+     * @param collection $assignments
+     * @return collection
+     */
     public static function build_from_assignments(collection $assignments) {
         $progress = new collection();
 
@@ -118,7 +147,8 @@ class competency_progress {
             $name = 'assignments';
         }
 
-        return $this->attributes[$name] ?? null;
+        // Calling ?? will automatically trigger isset allowing only public attributes
+        return $this->{$name} ?? null;
     }
 
     /**
@@ -128,16 +158,15 @@ class competency_progress {
      * @return bool
      */
     public function __isset($name) {
-
         if ($name === 'items') {
             $name = 'assignments';
         }
 
-        return array_key_exists($name, $this->attributes);
+        return in_array($name, $this->public_attributes);
     }
 
     /**
-     * Append assignment
+     * Append assignment to the current progress item model
      *
      * @param assignment $assignment
      * @return $this

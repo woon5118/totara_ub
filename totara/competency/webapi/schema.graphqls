@@ -67,7 +67,7 @@ Competency profile scale_value progress type that includes extra details (the pe
 """
 type totara_competency_profile_scale_value_progress {
   id: core_id
-  scaleid: core_id
+  scale_id: core_id
   name: String!
   percentage: Int
   proficient: Boolean

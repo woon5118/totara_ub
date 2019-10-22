@@ -34,12 +34,62 @@ use totara_competency\models\basic_model;
  *
  * This model represents a relative proficiency value
  */
-class proficiency_value extends basic_model {
+class proficiency_value {
 
     /**
      * @var assignment
      */
     protected $assignment;
+
+    /**
+     * Current achievement scale value id
+     *
+     * @var int
+     */
+    protected $id;
+
+    /**
+     * Current achievement scale value name
+     *
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * A flag whether the current value is proficient
+     *
+     * @var bool
+     */
+    protected $proficient;
+
+    /**
+     * Relative percentage for the current proficient value
+     * Where 0% is no value (value not achieved)
+     * and a 100% is the highest value on the scale
+     *
+     * @var float
+     */
+    protected $percentage;
+
+    /**
+     * Related scale id for a given proficient value
+     *
+     * @var int
+     */
+    protected $scale_id;
+
+    /**
+     * Array of attributes publicly available on the model
+     *
+     * @var array
+     */
+    protected $public_attributes = [
+        'id',
+        'name',
+        'proficient',
+        'percentage',
+        'scale_id'
+    ];
 
     /**
      * proficiency_value constructor.
@@ -65,19 +115,24 @@ class proficiency_value extends basic_model {
             throw new coding_exception('You must preload "current_achievement" relation with a user filter included, otherwise it does not make sense...');
         }
 
+        $value->scale_id = $assignment->competency->scale->id;
+
         if ($assignment->current_achievement) {
-            return $value->set_attribute('id', $assignment->current_achievement->value->id)
-                ->set_attribute('name', $assignment->current_achievement->value->name)
-                ->set_attribute('proficient', boolval($assignment->current_achievement->value->proficient))
-                ->set_attribute('percentage', static::calculate_scale_value_percentage($assignment->current_achievement->value, $assignment->competency->scale))
-                ->set_attribute('scaleid', $assignment->competency->scale->id);
+            $value->id = $assignment->current_achievement->value->id;
+            $value->name = $assignment->current_achievement->value->name;
+            $value->proficient = boolval($assignment->current_achievement->value->proficient);
+            $value->percentage = static::calculate_scale_value_percentage(
+                $assignment->current_achievement->value,
+                $assignment->competency->scale
+            );
         } else {
-            return $value->set_attribute('id', 0)
-                ->set_attribute('name', get_string('no_value_achieved', 'totara_competency'))
-                ->set_attribute('proficient', false)
-                ->set_attribute('percentage', 0)
-                ->set_attribute('scaleid', $assignment->competency->scale->id);
+            $value->id = 0; // It's a pseudo value, with no actual record in the db
+            $value->name = get_string('no_value_achieved', 'totara_competency');
+            $value->proficient = false; // No value is always not proficient
+            $value->percentage = 0; // No value is always 0 percent.
         }
+
+        return $value;
     }
 
     /**
@@ -89,11 +144,16 @@ class proficiency_value extends basic_model {
     public static function min_value(assignment $assignment) {
         $value = new static($assignment);
 
-        return $value->set_attribute('id', $assignment->competency->scale->min_proficient_value->id)
-            ->set_attribute('name', $assignment->competency->scale->min_proficient_value->name)
-            ->set_attribute('proficient', true)
-            ->set_attribute('percentage', static::calculate_scale_value_percentage($assignment->competency->scale->min_proficient_value, $assignment->competency->scale))
-            ->set_attribute('scaleid', $assignment->competency->scale->id);
+        $value->id = $assignment->competency->scale->min_proficient_value->id;
+        $value->name = $assignment->competency->scale->min_proficient_value->name;
+        $value->scale_id = $assignment->competency->scale->id;
+        $value->proficient = true; // This is a min proficient value, so always proficient :)
+        $value->percentage = static::calculate_scale_value_percentage(
+            $assignment->competency->scale->min_proficient_value,
+            $assignment->competency->scale
+        );
+
+        return $value;
     }
 
     /**
@@ -104,8 +164,6 @@ class proficiency_value extends basic_model {
      * @return float
      */
     protected static function calculate_scale_value_percentage(scale_value $value, scale $scale): float {
-        $count = count($scale->values);
-
         $pos = $scale->values->reduce(function($pos, $scale_value) use ($value) {
             if ($value->sortorder <= $scale_value->sortorder) {
                 $pos += 1;
@@ -113,6 +171,27 @@ class proficiency_value extends basic_model {
             return $pos;
         }, 0);
 
-        return round($pos / $count * 100);
+        return round($pos / count($scale->values) * 100);
+    }
+
+    /**
+     * Return whether publicly available attribute is set on the model
+     *
+     * @param $name
+     * @return bool
+     */
+    public function __isset($name): bool {
+        return in_array($name, $this->public_attributes);
+    }
+
+    /**
+     * Get publicly available attribute
+     *
+     * @param $name
+     * @return mixed|null
+     */
+    public function __get($name) {
+        // Having ?? automatically triggers isset check and returns only publicly available attributes
+        return $this->{$name} ?? null;
     }
 }

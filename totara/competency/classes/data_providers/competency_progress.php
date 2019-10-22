@@ -72,10 +72,14 @@ class competency_progress extends user_data_provider {
         return $this->filter()->order();
     }
 
+    /**
+     * Sort competencies in a specified order
+     *
+     * @return $this
+     */
     protected function order() {
-
         switch ($this->order) {
-            case 'recently-assigned': // TODO const?
+            case 'recently-assigned':
                 $this->items->sort(function ($a, $b) {
                     return $this->get_latest_assignment_by_field($b->assignments, 'assigned_at') <=>
                         $this->get_latest_assignment_by_field($a->assignments, 'assigned_at');
@@ -105,6 +109,16 @@ class competency_progress extends user_data_provider {
         return $this;
     }
 
+    /**
+     * Select latest given field from a collection of assignment models
+     *
+     * This is required to get for example last assigned or last archived value
+     * which is later used to sort assignments
+     *
+     * @param collection $assignments Collection of assignment models
+     * @param string $field Field to select
+     * @return mixed
+     */
     protected function get_latest_assignment_by_field(collection $assignments, string $field) {
         return $assignments->reduce(function(int $maxDate, assignment $assignment) use ($field) {
             if ($assignment->get_field($field) > $maxDate) {
@@ -115,7 +129,14 @@ class competency_progress extends user_data_provider {
         }, 0);
     }
 
+    /**
+     * Apply filters set with set_filters method
+     *
+     * @return $this
+     */
     protected function filter() {
+        // We filter only filters applicable to the progress, as the rest of the filters
+        // are proxied to the assignments data provider
         $filters = array_filter($this->filters, function($key) {
             return in_array($key, ['proficient']);
         }, ARRAY_FILTER_USE_KEY);
@@ -133,20 +154,27 @@ class competency_progress extends user_data_provider {
         return $this;
     }
 
+    /**
+     * Filter items by competencies with proficient \ not proficient values
+     *
+     * @param bool $value Proficient flag
+     */
     protected function filter_by_proficient($value) {
         $this->items = $this->items->filter(function($item) use ($value) {
-
-            $proficient = false;
-
-            if (!is_null($item->my_value)) {
-                $proficient = !! $item->my_value->proficient;
-            }
+            // Let's iterate over assignment records for a given competency
+            // We need to find at least one with achievement that has a proficient value.
+            $proficient = $item->assignments->reduce(function(bool $proficient, assignment $assignment) {
+                // We need at least one proficient value for an achievement.
+                return $proficient || ($assignment->current_achievement->value->proficient ?? false);
+            }, false);
 
             return $value ? $proficient : !$proficient;
         });
     }
 
     /**
+     * Set filters
+     *
      * @param array $filters
      * @return $this
      */

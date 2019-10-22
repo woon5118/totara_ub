@@ -21,12 +21,17 @@
  * @package totara_competency
  */
 
+use core\orm\query\builder;
 use core\collection as core_collection;
 use core\orm\collection;
 use tassign_competency\expand_task;
+use tassign_competency\models\assignment as assignment_model;
 use totara_assignment\entities\user;
 use totara_assignment\user_groups;
 use totara_competency\entities\assignment;
+use totara_competency\entities\competency_achievement;
+use totara_competency\entities\scale;
+use totara_competency\entities\scale_value;
 use totara_job\job_assignment;
 
 abstract class totara_competency_testcase extends advanced_testcase {
@@ -36,13 +41,21 @@ abstract class totara_competency_testcase extends advanced_testcase {
      */
     protected $time;
 
+    /**
+     * Setup before the test
+     */
     protected function setUp() {
         parent::setUp();
 
         $this->warpTime();
     }
 
+    /**
+     * Clean up after each test
+     */
     protected function tearDown() {
+        unset($this->time);
+
         parent::tearDown();
     }
 
@@ -76,6 +89,232 @@ abstract class totara_competency_testcase extends advanced_testcase {
         $this->time = $time;
 
         return $this;
+    }
+
+    /**
+     * Creates data for testing filtering and sorting, it's all crammed to a single method as it's really
+     * more an integration test and creating data comes with an overhead for creating records with timestamps
+     * in a particular order
+     *
+     * Returns an array of collections with the created data:
+     *
+     * [
+     *  'users' => Collection of created users
+     *  'competencies' => Collection of created users
+     *  'assignments' => Collection of created assignments
+     *  'achievements' => Collection of created achievements
+     * ]
+     *
+     * It also creates related user groups (audience, position, organisation) however these aren't returned.
+     *
+     * @return array
+     */
+    protected function create_sorting_testing_data() {
+        $expander = new expand_task(builder::get_db());
+
+        // Create 2 users
+        $users = $this->create_n_users(3);
+
+        // Create competencies
+        $competencies = $this->create_some_competencies();
+
+        // We need to get scale values for achievements. Our competencies I believe will all come with the default scale
+        $scale = scale::repository()
+            ->with(['min_proficient_value', 'values'])
+            ->one();
+
+        // The competent value will be min-proficient value and non-proficient value will be the first value
+        // from values array.
+        $competent = $scale->min_proficient_value;
+        $not_competent = $scale->values->first();
+
+        // Define assignments collection
+        $assignments = new collection();
+
+        // Define achievements collection
+        $achievements = new collection();
+
+        $users_to_add = [$users->item(0), $users->item(1), $users->item(2)];
+        $other_users_to_add = [$users->item(1), $users->item(2)];
+
+        // Create position
+        $position = $this->generator()->create_position_and_add_members($users_to_add);
+        $another_pos = $this->generator()->create_position_and_add_members($other_users_to_add);
+
+        // Create organisation
+        $organisation = $this->generator()->create_organisation_and_add_members($users_to_add);
+        $another_org = $this->generator()->create_organisation_and_add_members($other_users_to_add);
+
+        // Create audience
+        $audience = $this->generator()->create_cohort_and_add_members($users_to_add);
+        $another_aud = $this->generator()->create_cohort_and_add_members($other_users_to_add);
+
+        // First assignments set
+
+        // Create position competency assignment
+        $assignments->set(
+            $aa = $this->generator()->create_position_assignment($competencies->first()->id, $position->id),
+            "p_{$position->id}_{$competencies->first()->id}"
+        );
+
+        // Let's add a not proficient scale value
+        $achievements->append($this->create_achievement_record(new assignment($aa), $users->item(0), $not_competent));
+
+        // Create another position assignment that we'll archive
+        $assignments->set(
+            $ass = $this->generator()->create_position_assignment($competencies->first()->id, $another_pos->id),
+            "p_{$another_pos->id}_{$competencies->first()->id}"
+        );
+
+        // Let's add a not proficient scale value
+        $achievements->append($this->create_achievement_record(new assignment($ass), $users->item(2), $not_competent));
+
+        $expander->expand_all();
+
+        // Before we sleep, we'd need to archive and re-expand
+        (assignment_model::load_by_entity(new assignment($ass)))->archive(false);
+
+        $expander->expand_all();
+
+        sleep(1);
+
+        // ------------------
+        // Second assignments set
+
+        // Create organisation competency assignment
+        $assignments->set(
+            $aa = $this->generator()->create_organisation_assignment($competencies->item(1)->id, $organisation->id),
+            "o_{$organisation->id}_{$competencies->item(1)->id}"
+        );
+
+        // Let's add a not proficient scale value
+        $achievements->append($this->create_achievement_record(new assignment($aa), $users->item(0), $not_competent));
+
+        // Create another position assignment that we'll archive
+        $assignments->set(
+            $ass = $this->generator()->create_organisation_assignment($competencies->item(1)->id, $another_org->id),
+            "o_{$another_org->id}_{$competencies->first()->id}"
+        );
+
+        // Let's add a not proficient scale value
+        $achievements->append($this->create_achievement_record(new assignment($ass), $users->item(0), $not_competent));
+
+        $expander->expand_all();
+
+        // Before we sleep, we'd need to archive and re-expand
+        (assignment_model::load_by_entity(new assignment($ass)))->archive(false);
+
+        $expander->expand_all();
+
+        sleep(1);
+
+        // ------------------
+        // Third assignments set
+
+        // Create audience competency assignment
+        $assignments->set(
+            $this->generator()->create_cohort_assignment($competencies->item(2)->id, $audience->id),
+            "a_{$audience->id}_{$competencies->item(2)->id}"
+        );
+
+        // Create another position assignment that we'll archive
+        $assignments->set(
+            $ass = $this->generator()->create_cohort_assignment($competencies->item(2)->id, $another_aud->id),
+            "o_{$another_aud->id}_{$competencies->first()->id}"
+        );
+
+        $expander->expand_all();
+
+        // Before we sleep, we'd need to archive and re-expand
+        (assignment_model::load_by_entity(new assignment($ass)))->archive(false);
+
+        $expander->expand_all();
+
+        sleep(1);
+
+        // ------------------
+
+        // Then we are going to create an individual assignment for the first competency again.
+        $assignments->set(
+            $aa = $this->generator()->create_user_assignment($competencies->first()->id, $users->first()->id),
+            "i_{$users->first()->id}_{$competencies->first()->id}"
+        );
+
+        // Let's add a not proficient scale value
+        $achievements->append($this->create_achievement_record(new assignment($aa), $users->item(0), $competent));
+
+        // And the one to archive, this time from a mid competency
+        $assignments->set(
+            $ass = $this->generator()->create_user_assignment($competencies->item(1)->id, $users->item(1)->id),
+            "i_{$users->item(1)->id}_{$competencies->item(1)->id}"
+        );
+
+        // Let's add a not proficient scale value
+        $achievements->append($this->create_achievement_record(new assignment($ass), $users->item(1), $competent));
+
+        $expander->expand_all();
+
+        // Before we return, we'd need to archive and re-expand
+        (assignment_model::load_by_entity(new assignment($ass)))->archive(false);
+
+        $expander->expand_all();
+
+        // To avoid sleeps in our tests we need clearly sequential timestamps for assignment users.
+        // Since this part is not exposed we'd warp the time after the assignments have been created.
+        // This function is intended to be used standalone (with no other data created prior to this function execution).
+        // We should be ok to just take all assignment user records,
+        // order by id and then replace timestamps with incremental values.
+        // TODO, TBD users will work, but what to do with archived ones :(
+
+        // We've created achievements record, including competent and not competent at the same time for the first competency
+        // This is in particular to test proficient filter which should match a competency that has at least one proficient
+        // value regardless of which assignment it came from.
+
+        return [
+            'users' => $users,
+            'competencies' => $competencies,
+            'assignments' => $assignments,
+            'achievements' => $achievements,
+        ];
+    }
+
+    /**
+     * Create competency achievement record
+     *
+     * TODO this is a 'bad' function that doesn't use proper API for several reasons:
+     * TODO 1. The API isn't there yet
+     * TODO 2. The overhead is quite significant while we actually just need to have this record
+     * TODO    and we aren't concerned how this record appeared in the achievements table
+     * TODO Maybe we should reconsider, maybe not. Please remove the TODO once decided.
+     *
+     * @param assignment $assignment Assignment entity
+     * @param user $user User entity
+     * @param scale_value $value Scale value entity
+     * @param array $attributes Allows to override:
+     *                          status, time_created, time_status, time_proficient, time_scale_value and time_aggregated
+     *                          whatever those things are...
+     * @return competency_achievement
+     */
+    protected function create_achievement_record(assignment $assignment, user $user, scale_value $value, array $attributes = []) {
+        if (!$assignment->exists() || !$user->exists() || !$value->exists()) {
+            throw new Exception("Assignment, user and value must all exist.");
+        }
+
+        $achievement = new competency_achievement([
+            'comp_id' => $assignment->competency_id,
+            'user_id' => $user->id,
+            'assignment_id' => $assignment->id,
+            'scale_value_id' => $value->id,
+            'proficient' => $value->proficient,
+            'status' => $attributes['status'] ?? 0,
+            'time_created' => $attributes['time_created'] ?? time(),
+            'time_status' => $attributes['time_status'] ?? time(),
+            'time_proficient' => $attributes['time_proficient'] ?? time(),
+            'time_scale_value' => $attributes['time_scale_value'] ?? time(),
+            'last_aggregated' => $attributes['last_aggregated'] ?? time(),
+        ]);
+
+        return $achievement->save();
     }
 
     /**
@@ -307,6 +546,15 @@ abstract class totara_competency_testcase extends advanced_testcase {
      */
     public function hierarchy_generator() {
         return $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+    }
+
+    /**
+     * Get user without globals
+     *
+     * @return user
+     */
+    protected function get_user() {
+        return new user($GLOBALS['USER']->id);
     }
 
 }

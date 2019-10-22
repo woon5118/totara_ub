@@ -27,7 +27,6 @@ use core\orm\collection;
 use tassign_competency\models\assignment as assignment_model;
 use totara_competency\data_providers\assignments;
 use totara_competency\entities\assignment;
-use totara_competency\models\basic_model;
 
 /**
  * Class profile_progress
@@ -45,7 +44,7 @@ use totara_competency\models\basic_model;
  * @property-read string $latest_achievement Latest achieved competency name (if any)
  * @package totara_competency\models
  */
-class item extends basic_model {
+class item {
 
     /**
      * @var collection
@@ -201,11 +200,7 @@ class item extends basic_model {
     public function calculate_overall_progress() {
         // Let's iterate over progress items and calculate individual progress percentage
         $competent_count = $this->get_assignments()->reduce(function($count, $assignment) {
-            if (!$assignment->current_achievement) {
-                return $count;
-            } else {
-                return $count + intval($assignment->current_achievement->proficient);
-            }
+            return $count + intval($assignment->current_achievement->proficient ?? 0);
         }, 0);
 
         $this->overall_progress = round($competent_count / count($this->get_assignments()) * 100);

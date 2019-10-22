@@ -28,6 +28,21 @@ use core\orm\entity\repository;
 use totara_competency\entities\competency;
 use totara_competency\entities\scale as scale_entity;
 
+/**
+ * Class scale
+ * This is a model that represent a scale
+ *
+ * @property-read int $id
+ * @property-read string $name
+ * @property-read string $description
+ * @property-read int $timemodified
+ * @property-read int $usermodified
+ * @property-read int $defaultid
+ * @property-read int $minproficiencyid
+ * @property-read collection $values
+ *
+ * @package totara_competency\models
+ */
 class scale extends entity_model {
 
     /**

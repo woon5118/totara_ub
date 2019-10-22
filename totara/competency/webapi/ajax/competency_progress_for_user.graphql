@@ -20,7 +20,7 @@ query totara_competency_competency_progress_for_user(
       }
       my_value {
         id
-        scaleid
+        scale_id
         name
         percentage
         proficient

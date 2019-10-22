@@ -40,7 +40,6 @@ use totara_competency\entities\competency_achievement;
  *  - Filters -> [Filter] - a collection of filter items
  *  - Latest achievement -> Competency achievement entity - Latest competency achieved by user (if any)
  *
- *
  * @property-read user $user User the progress is for
  * @property-read collection $items Collection of progress items
  * @property-read collection $filters Collection of filters

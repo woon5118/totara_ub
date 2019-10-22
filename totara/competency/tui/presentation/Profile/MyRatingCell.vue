@@ -53,7 +53,7 @@ export default {
 
   computed: {
     scale() {
-      return this.scales.find(({ id }) => id === this.value.scaleid);
+      return this.scales.find(({ id }) => id === this.value.scale_id);
     },
 
     minProficientValue() {
