@@ -89,7 +89,7 @@ class course_tile extends learning_item_tile {
             $status = null;
         }
         if (isset($this->data->progressbar) && $this->data->progressbar == '1') {
-            $progressbar = totara_display_course_progress_bar($USER->id, $this->data->courseid, $status);
+            $progressbar = totara_display_course_progress_bar($USER->id, $this->data->courseid, $status, true);
         } else {
             $progressbar = false;
         }

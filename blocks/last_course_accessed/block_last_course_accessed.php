@@ -148,7 +148,8 @@ class block_last_course_accessed extends block_base {
         $renderer = $this->page->get_renderer('totara_core');
 
         // If there's no status, there's no completion data, so no progress bar.
-        $templateobject->progress = $renderer->export_course_progress_for_template($USER->id, $courseid, $course->status);
+        // If there's no active enrolment, no progress bar also.
+        $templateobject->progress = $renderer->export_course_progress_for_template($USER->id, $courseid, $course->status, true);
 
         // Get the block content from the template.
         $this->content->text = $renderer->render_from_template('block_last_course_accessed/block', $templateobject);

@@ -705,6 +705,45 @@ function enrol_get_my_courses($fields = NULL, $sort = 'visible DESC,sortorder AS
 }
 
 /**
+ * Returns the user's course enrolment status.
+ *
+ * @param mixed $course course object or course id
+ * @param integer $userid userid or 0 as the current user
+ * @return int|false ENROL_USER_ACTIVE, ENROL_USER_SUSPENDED or false if not enrolled.
+ *                   **Always use `===` operator to compare it!**
+ */
+function enrol_get_users_course_status($course, int $userid = 0) {
+    global $USER, $DB;
+    /** @var \moodle_database $DB */
+    if (empty($userid)) {
+        $userid = $USER->id;
+    }
+    if (is_object($course)) {
+        $courseid = $course->id;
+    } else {
+        $courseid = (int)$course;
+    }
+    // If two or more enrolments are found, the 'active' state will be prioritised.
+    $states = $DB->get_fieldset_sql(
+        'SELECT ue.status
+           FROM {user_enrolments} ue
+     INNER JOIN {enrol} e ON e.id = ue.enrolid AND e.courseid = :courseid
+          WHERE ue.userid = :userid
+       ORDER BY ue.status ASC',
+        [
+            'courseid' => $courseid,
+            'userid' => $userid
+        ]
+    );
+    $result = false;
+    if (!empty($states)) {
+        // Convert string to integer.
+        $result = (int)$states[0];
+    }
+    return $result;
+}
+
+/**
  * Returns course enrolment information icons.
  *
  * @param object $course

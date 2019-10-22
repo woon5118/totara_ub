@@ -970,14 +970,15 @@ function totara_upgrade_installed_languages() {
  * @param int $userid User id
  * @param int $courseid Course id
  * @param int $status COMPLETION_STATUS_ constant
+ * @param bool $hideifnotactive true to hide progress bar if unenrolled or suspended
  * @return string
  */
-function totara_display_course_progress_bar($userid, $courseid, $status) {
+function totara_display_course_progress_bar($userid, $courseid, $status, $hideifnotactive = false) {
     global $PAGE;
 
     /** @var totara_core_renderer $renderer */
     $renderer = $PAGE->get_renderer('totara_core');
-    $content = $renderer->course_progress_bar($userid, $courseid, $status);
+    $content = $renderer->course_progress_bar($userid, $courseid, $status, $hideifnotactive);
     return $content;
 }
 
@@ -987,14 +988,15 @@ function totara_display_course_progress_bar($userid, $courseid, $status) {
  * @param int $userid User id
  * @param int $courseid Course id
  * @param int $status COMPLETION_STATUS_ constant
+ * @param bool $hideifnotactive true to hide progress bar if unenrolled or suspended
  * @return string
  */
-function totara_export_course_progress($userid, $courseid, $status) {
+function totara_export_course_progress($userid, $courseid, $status, $hideifnotactive = false) {
     global $PAGE;
 
     /** @var totara_core_renderer $renderer */
     $renderer = $PAGE->get_renderer('totara_core');
-    $content = $renderer->export_course_progress_for_template($userid, $courseid, $status);
+    $content = $renderer->export_course_progress_for_template($userid, $courseid, $status, $hideifnotactive);
     if (isset($content->percent)) {
         return $content->percent;
     }

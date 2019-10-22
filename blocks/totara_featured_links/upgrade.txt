@@ -3,6 +3,8 @@ Information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* course_tile class has been changed to hide the progress bar if no active enrolment
+
 === 12.0 ===
 
 * Icon helpers are no longer used in the following templates, icon data is passed via context data:

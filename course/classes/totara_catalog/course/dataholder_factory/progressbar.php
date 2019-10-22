@@ -48,12 +48,22 @@ class progressbar extends dataholder_factory {
                 ],
                 [
                     'progressbar_cc' =>
-                        'LEFT JOIN {course_completions} progressbar_cc
+                        'LEFT JOIN (
+                            SELECT cc.*
+                              FROM {course_completions} cc
+                        INNER JOIN {user_enrolments} ue
+                                ON cc.userid = ue.userid
+                               AND ue.status = :progressbar_ue_active
+                        INNER JOIN {enrol} e
+                                ON e.id = ue.enrolid
+                               AND e.courseid = cc.course
+                         ) progressbar_cc
                            ON progressbar_cc.course = base.id
                           AND progressbar_cc.userid = :progressbar_userid',
                 ],
                 [
                     'progressbar_userid' => $USER->id,
+                    'progressbar_ue_active' => ENROL_USER_ACTIVE,
                 ]
             )
         ];

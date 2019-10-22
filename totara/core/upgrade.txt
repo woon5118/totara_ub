@@ -52,6 +52,10 @@ information provided here is intended especially for developers.
   Please use: \totara_core\advanced_feature::is_enabled() and \totara_core\advanced_feature::is_disabled() instead.
   totara_feature_hidden() is now deprecated as we do not support hidden anymore, just enabled and disabled.
 * Updated totara_core/grid template, adding role attributes
+* totara_core_renderer::course_progress_bar() added fourth argument $hideifnotactive
+* totara_core_renderer::export_course_progress_for_template() added fourth argument $hideifnotactive
+* totara_display_course_progress_bar() added fourth argument $hideifnotactive
+* totara_export_course_progress() added fourth argument $hideifnotactive
 
 === 12.0 ===
 

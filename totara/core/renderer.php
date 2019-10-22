@@ -85,16 +85,17 @@ class totara_core_renderer extends plugin_renderer_base {
     * Optionally with a link to the user's profile if they have the correct permissions
     *
     * @access  public
-    * @param   $userid     int
-    * @param   $courseid   int
-    * @param   $status     int     COMPLETION_STATUS_ constant
+    * @param   int $userid
+    * @param   int $courseid
+    * @param   int $status COMPLETION_STATUS_ constant
+    * @param   bool $hideifnotactive true to hide progress bar if unenrolled or suspended
     * @return  string html to display
     */
-    public function course_progress_bar($userid, $courseid, $status) {
+    public function course_progress_bar($userid, $courseid, $status, $hideifnotactive = false) {
         global $COMPLETION_STATUS;
 
         // Display the course progress bar.
-        $data = $this->export_course_progress_for_template($userid, $courseid, $status);
+        $data = $this->export_course_progress_for_template($userid, $courseid, $status, $hideifnotactive);
         return $this->output->render_from_template('totara_core/course_progress_bar', $data);
     }
 
@@ -105,9 +106,10 @@ class totara_core_renderer extends plugin_renderer_base {
     * @param   int $userid
     * @param   int $courseid
     * @param   int $status COMPLETION_STATUS_ constant
+    * @param   bool $hideifnotactive true to hide progress bar if unenrolled or suspended
     * @return  stdClass with exported template data
     */
-    public function export_course_progress_for_template($userid, $courseid, $status) {
+    public function export_course_progress_for_template($userid, $courseid, $status, $hideifnotactive = false) {
         global $COMPLETION_STATUS, $OUTPUT;
 
         $data = new stdClass();
@@ -115,6 +117,15 @@ class totara_core_renderer extends plugin_renderer_base {
         if (!isset($status) || !array_key_exists($status, $COMPLETION_STATUS)){
             $data->statustext = get_string('statusnottracked', 'completion');
             return $data;
+        }
+
+        if ($hideifnotactive) {
+            $enrol_status = enrol_get_users_course_status($courseid, $userid);
+            if ($enrol_status === false || $enrol_status === ENROL_USER_SUSPENDED) {
+                // If there is no active enrolment, no progress bar, no status
+                $data->statustext = '';
+                return $data;
+            }
         }
 
         $completion = new completion_completion(['userid' => $userid, 'course' => $courseid]);
