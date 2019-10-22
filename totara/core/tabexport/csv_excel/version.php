@@ -23,8 +23,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2019083000; // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2017051509; // Requires this Moodle version.
+$plugin->version  = 2019102300; // The current module version (Date: YYYYMMDDXX).
+$plugin->requires = 2017111309; // Requires this Moodle version.
 $plugin->component = 'tabexport_csv_excel'; // To check on upgrade, that module sits in correct place
 $plugin->dependencies = [
     'tabexport_csv' => 2018120700 // This plugin extends the CSV plugin.

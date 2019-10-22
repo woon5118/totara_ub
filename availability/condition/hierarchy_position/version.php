@@ -23,6 +23,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2019101700;
-$plugin->requires = 2017051509;
+$plugin->version = 2019102300;
+$plugin->requires = 2017111309;
 $plugin->component = 'availability_hierarchy_position';
