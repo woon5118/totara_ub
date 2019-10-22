@@ -5286,7 +5286,7 @@ function forum_user_can_see_post($forum, $discussion, $post, $user = null, $cm =
         $user = $USER;
     }
 
-    $canviewdiscussion = (isset($cm->cache) && !empty($cm->cache->caps['mod/forum:viewdiscussion']) || has_capability('mod/forum:viewdiscussion', $modcontext, $user->id);
+    $canviewdiscussion = (isset($cm->cache) && !empty($cm->cache->caps['mod/forum:viewdiscussion']) || has_capability('mod/forum:viewdiscussion', $modcontext, $user->id));
     if (!$canviewdiscussion && !has_all_capabilities(array('moodle/user:viewalldetails', 'moodle/user:readuserposts'), context_user::instance($post->userid))) {
         return false;
     }
