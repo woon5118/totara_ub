@@ -251,3 +251,24 @@ Feature: Verify course completion data can be successfully uploaded.
     And I should see "Unknown column 'badcolumn'"
     And I should see "Missing required column 'courseidnumber'"
     And I should see "No records were imported"
+
+  Scenario: Verify a successful course completion with User participation in course is suspended
+    Given I log in as "admin"
+    And I am on "Course 1" course homepage
+    And I enrol "Bob1 Learner1" user as "Learner"
+    And I navigate to "Enrolled users" node in "Course administration > Users"
+    And I click on "Edit enrolment" "link"
+    And I set the field "Status" to "Suspended"
+    And I press "Save changes"
+
+    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_completion_1b.csv" file to "Choose course file to upload" filemanager
+    And I click on "Upload" "button" in the "#mform1" "css_element"
+    Then I should see "CSV import completed"
+    And I should see "1 Records successfully imported as courses"
+    And I should see "1 Records in total"
+
+    When I navigate to "Manage users" node in "Site administration > Users"
+    And I follow "Bob1 Learner1"
+    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    Then I should see "100%" in the "Course 1" "table_row"

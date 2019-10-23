@@ -39,7 +39,7 @@ define('COURSE_IMPORT_CSV_ROWS', 100);
  *
  * @group totara_completionimport
  */
-class clean_course_data_task_testcase extends advanced_testcase {
+class totara_completionimport_clean_course_data_task_testcase extends advanced_testcase {
 
     public function test_task() {
         global $CFG, $DB;

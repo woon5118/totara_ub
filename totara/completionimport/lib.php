@@ -931,7 +931,7 @@ function import_course($importname, $importtime) {
             $timeenrolled = $course->timeenrolled;
             $timestarted = $course->timestarted;
 
-            if (empty($course->userenrolid) || ($course->userenrolstatus == ENROL_USER_SUSPENDED)) {
+            if (empty($course->userenrolid)) {
                 // User isn't already enrolled or has been suspended, so add them to the enrol list.
                 $user = new stdClass();
                 $user->userid = $course->userid;
