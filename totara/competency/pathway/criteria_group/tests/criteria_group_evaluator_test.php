@@ -497,7 +497,7 @@ class test_cge_criterion_evaluator extends item_evaluator {
         $temp_table_name = $temp_table->get_table_name();
         $temp_user_id_column = $temp_table->get_user_id_column();
         [$temp_set_sql, $temp_set_params] = $temp_table->get_set_has_changed_sql_with_params(1);
-        [$temp_wh, $temp_wh_params] = $temp_table->get_filter_sql_with_params('', true);
+        [$temp_wh, $temp_wh_params] = $temp_table->get_filter_sql_with_params('', true, null);
         if (!empty($temp_wh)) {
             $temp_wh .= ' AND ';
         }

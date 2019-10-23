@@ -51,7 +51,8 @@ class manual_evaluator_user_source_table extends pathway_evaluator_user_source_t
         $temp_table_name = $this->temp_user_table->get_table_name();
         $temp_user_id_column = $this->temp_user_table->get_user_id_column();
         [$temp_set_sql, $temp_set_params] = $this->temp_user_table->get_set_has_changed_sql_with_params(1);
-        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('', true);
+        $competency_id = $pathway->get_competency()->id;
+        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('', true, null, $competency_id);
         if (!empty($temp_wh)) {
             $temp_wh = "{$temp_wh} AND ";
         }
@@ -79,7 +80,7 @@ class manual_evaluator_user_source_table extends pathway_evaluator_user_source_t
             [
                 'pathwayid' => $pathway->get_id(),
                 'activestatus' => pathway_achievement::STATUS_CURRENT,
-                'competencyid' => $pathway->get_competency()->id,
+                'competencyid' => $competency_id,
             ],
             $temp_set_params,
             $temp_wh_params);
@@ -105,7 +106,7 @@ class manual_evaluator_user_source_table extends pathway_evaluator_user_source_t
             [
                 'pathwayid' => $pathway->get_id(),
                 'activestatus' => pathway_achievement::STATUS_CURRENT,
-                'competencyid' => $pathway->get_competency()->id,
+                'competencyid' => $competency_id,
             ],
             $temp_set_params,
             $temp_wh_params);

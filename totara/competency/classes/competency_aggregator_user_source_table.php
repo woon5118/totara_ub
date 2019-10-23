@@ -57,7 +57,7 @@ class competency_aggregator_user_source_table implements competency_aggregator_u
 
         $temp_table_name = $this->temp_user_table->get_table_name();
         $temp_user_id_column = $this->temp_user_table->get_user_id_column();
-        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('', false);
+        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('', false, null, $competency_id);
         if (!empty($temp_wh)) {
             $temp_wh = ' WHERE ' . $temp_wh;
         }
@@ -123,8 +123,10 @@ class competency_aggregator_user_source_table implements competency_aggregator_u
 
     /**
      * Get users to consider for reaggregation
+     *
      * @param int $competency_id
      * @param int $aggregation_time
+     * @return \moodle_recordset
      */
     public function get_users_to_reaggregate(int $competency_id, int $aggregation_time): \moodle_recordset {
         global $DB;
@@ -133,6 +135,7 @@ class competency_aggregator_user_source_table implements competency_aggregator_u
         $temp_alias = 'tmp';
         $temp_tablename = $this->temp_user_table->get_table_name();
         $temp_user_id_column = $this->temp_user_table->get_user_id_column();
+        $temp_competency_id_column = $this->temp_user_table->get_competency_id_column();
         [$user_id_wh, $params] = $this->temp_user_table->get_filter_sql_with_params($temp_alias, false, 1);
         $params['newstatus'] = competency_achievement::ACTIVE_ASSIGNMENT;
         $params['competencyid'] = $competency_id;
@@ -144,7 +147,7 @@ class competency_aggregator_user_source_table implements competency_aggregator_u
                     COALESCE(ca.scale_value_id, NULL) AS scale_value_id
                  FROM {totara_assignment_competency_users} tacu
                  JOIN {" . $temp_tablename . "} {$temp_alias} 
-                   ON tacu.user_id = {$temp_alias}.{$temp_user_id_column}
+                   ON tacu.user_id = {$temp_alias}.{$temp_user_id_column} AND tacu.competency_id = {$temp_alias}.{$temp_competency_id_column}
             LEFT JOIN {totara_competency_achievement} ca
                    ON tacu.user_id = ca.user_id
                   AND tacu.assignment_id = ca.assignment_id

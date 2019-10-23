@@ -29,6 +29,7 @@ use totara_competency\entities\pathway_achievement;
 use totara_competency\pathway;
 use totara_competency\pathway_evaluator;
 use totara_competency\pathway_evaluator_user_source;
+use totara_criteria\item_evaluator;
 use totara_criteria\item_evaluator_user_source;
 
 class criteria_group_evaluator extends pathway_evaluator {
@@ -56,7 +57,7 @@ class criteria_group_evaluator extends pathway_evaluator {
     protected function evaluate_user_achievements(int $aggregation_time) {
         // First update all criteria item_records for assigned users.
         foreach ($this->pathway->get_criteria() as $criterion) {
-            /** @var item_evaluator $evaluator */
+            /** @var item_evaluator $item_evaluator */
             $item_evaluator_class = $criterion::item_evaluator();
             if (!empty($item_evaluator_class)) {
                 $item_evaluator = new $item_evaluator_class($this->item_evaluator_user_source);

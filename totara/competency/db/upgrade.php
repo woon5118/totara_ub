@@ -156,6 +156,46 @@ function xmldb_totara_competency_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019101500, 'totara', 'competency');
     }
 
+    if ($oldversion < 2019102300) {
+
+        // Define table totara_competency_temp_users to be renamed to NEWNAMEGOESHERE.
+        $table = new xmldb_table('totara_competency_temp_users');
+
+        // Launch rename table for totara_competency_temp_users.
+        $dbman->rename_table($table, 'totara_competency_aggregation_queue');
+
+        // Define field competency_id to be added to totara_competency_temp_users.
+        $table = new xmldb_table('totara_competency_aggregation_queue');
+        $field = new xmldb_field('competency_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'user_id');
+
+        // Conditionally launch add field user_id.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $index = new xmldb_index('user_competency_id', XMLDB_INDEX_NOTUNIQUE, ['user_id', 'competency_id']);
+        // Conditionally launch add index .
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        $index = new xmldb_index('competency_id', XMLDB_INDEX_NOTUNIQUE, ['competency_id']);
+        // Conditionally launch add index .
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        $index = new xmldb_index('process_key', XMLDB_INDEX_NOTUNIQUE, ['process_key']);
+        // Conditionally launch add index .
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+
+        // Competency savepoint reached.
+        upgrade_plugin_savepoint(true, 2019102300, 'totara', 'competency');
+    }
+
     if ($oldversion < 2019110800) {
         $table = new xmldb_table('totara_assignment_competencies');
         if ($dbman->table_exists($table)) {

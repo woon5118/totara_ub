@@ -81,7 +81,7 @@ class pathway_evaluator_user_source_table implements pathway_evaluator_user_sour
 
         $temp_table_name = $this->temp_user_table->get_table_name();
         $temp_user_id_column = $this->temp_user_table->get_user_id_column();
-        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('', false);
+        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('', false, null, $pathway->get_competency()->id);
         $temp_wh = !empty($temp_wh) ? " WHERE {$temp_wh}" : '';
 
         $sql =
@@ -121,8 +121,9 @@ class pathway_evaluator_user_source_table implements pathway_evaluator_user_sour
 
         $temp_table_name = $this->temp_user_table->get_table_name();
         $user_id_column = $this->temp_user_table->get_user_id_column();
+        $competency_id = $pathway->get_competency()->id;
         [$set_haschanged_sql, $set_haschanged_params] = $this->temp_user_table->get_set_has_changed_sql_with_params(1);
-        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('', false);
+        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('', false, null, $competency_id);
         if (!empty($temp_wh)) {
             $temp_wh = " AND {$temp_wh}";
         }
@@ -131,9 +132,11 @@ class pathway_evaluator_user_source_table implements pathway_evaluator_user_sour
             [
                 'pathwayid' => $pathway->get_id(),
                 'currentstatus' => pathway_achievement::STATUS_CURRENT,
+                'competency_id' => $pathway->get_competency()->id
             ],
             $set_haschanged_params,
-            $temp_wh_params);
+            $temp_wh_params
+        );
 
         $sql =
             "UPDATE {" . $temp_table_name . "}
@@ -167,8 +170,10 @@ class pathway_evaluator_user_source_table implements pathway_evaluator_user_sour
 
     /**
      * Reaggregate all users with changed completion values
+     *
      * @param pathway $pathway
      * @param int $aggregation_time
+     * @return \moodle_recordset
      */
     public function get_users_to_reaggregate(pathway $pathway, int $aggregation_time): \moodle_recordset {
         global $DB;
@@ -176,7 +181,8 @@ class pathway_evaluator_user_source_table implements pathway_evaluator_user_sour
         $temp_alias = 'tmp';
         $temp_table_name = $this->temp_user_table->get_table_name();
         $userid_column = $this->temp_user_table->get_user_id_column();
-        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params($temp_alias, true, 1);
+        $competency_id = $pathway->get_competency()->id;
+        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params($temp_alias, true, 1, $competency_id);
 
         $sql =
             "SELECT {$temp_alias}.{$userid_column} as user_id, 

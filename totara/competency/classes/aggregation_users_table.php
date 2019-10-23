@@ -28,6 +28,7 @@ namespace totara_competency;
 use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
 use totara_competency\entities\scale_value;
+use xmldb_table;
 
 /**
  * Class containing information on the table and columns to use to obtain the users to perform achievement aggregation for
@@ -36,19 +37,22 @@ use totara_competency\entities\scale_value;
 class aggregation_users_table {
 
     /** @var string $table_name Name of the table containing information on the users to consider for aggregation */
-    private $table_name = '';
+    private $table_name = 'totara_competency_aggregation_queue';
 
     /** @var string $user_id_column Name of the column containing the ids of users to consider for aggregation */
-    private $user_id_column = '';
+    private $user_id_column = 'user_id';
+
+    /** @var string $competency_id_column Name of the column containing the ids of competencies to consider for aggregation */
+    private $competency_id_column = 'competency_id';
 
     /** @var string $has_changed_column Name of the column to set for users that have changes. */
-    private $has_changed_column = '';
+    private $has_changed_column = 'has_changed';
 
     // The process key column and value can be used to allow the same table to be re-used in different processes / instances of
     // the aggregation process.
     // If either the process_key_column or process_key_value is not set, all user ids found in the table are used
     /** @var ?string $process_key_column Name of the column containing the process key. */
-    private $process_key_column = '';
+    private $process_key_column = 'process_key';
 
     /** @@var mixed $process_key Key to used for filtering applicable rows */
     protected $process_key_value = '';
@@ -56,25 +60,94 @@ class aggregation_users_table {
     // The update operation column and value can be used to set the name of the operation responsible for the last change
     // Filtering on the update_operation is always secondary to the process_key
     /** @var ?string $update_operation_column Name of the column containing the update operation value. */
-    private $update_operation_column = '';
+    private $update_operation_column = 'update_operation_name';
 
     /** @@var mixed $update_operation_value Value to used for filtering applicable rows */
     protected $update_operation_value = '';
 
     /**
-     * Constructor.
+     * @param string $table_name
+     * @param bool $is_temporary
+     * @param string $user_id_column
+     * @param string|null $competency_id_column
+     * @param string|null $has_changed_column
+     * @param string|null $process_key_column
+     * @param string|null $update_operation_column
      */
-    final public function __construct(string $table_name, string $user_id_column, ?string $has_changed_column = '',
-                                      ?string $process_key_column = '', ?string $update_operation_column = '') {
-        if (empty($table_name) || empty($user_id_column)) {
-            throw new \coding_exception('The table name and user id column name must be specified');
+    final public function __construct(
+        string $table_name = '',
+        bool $is_temporary = false,
+        string $user_id_column = '',
+        string $competency_id_column = '',
+        ?string $has_changed_column = '',
+        ?string $process_key_column = '',
+        ?string $update_operation_column = ''
+    ) {
+        // Set defaults for this table
+        if (!empty($table_name)) {
+            $this->table_name = $table_name;
+        }
+        if (!empty($user_id_column)) {
+            $this->user_id_column = $user_id_column;
+        }
+        if (!empty($competency_id_column)) {
+            $this->competency_id_column = $competency_id_column;
+        }
+        if (!empty($has_changed_column) || is_null($has_changed_column)) {
+            $this->has_changed_column = $has_changed_column;
+        }
+        if (!empty($process_key_column) || is_null($process_key_column)) {
+            $this->process_key_column = $process_key_column;
+        }
+        if (!empty($update_operation_column) || is_null($update_operation_column)) {
+            $this->update_operation_column = $update_operation_column;
         }
 
-        $this->table_name = $table_name;
-        $this->user_id_column = $user_id_column;
-        $this->has_changed_column = $has_changed_column;
-        $this->process_key_column = $process_key_column;
-        $this->update_operation_column = $update_operation_column;
+        if ($is_temporary) {
+            $this->create_temp_table();
+        }
+    }
+
+    /**
+     * Generate a temporary table or if it already exists truncate it
+     */
+    private function create_temp_table() {
+        global $CFG, $DB;
+
+        require_once($CFG->dirroot . '/lib/ddllib.php');
+
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table($this->table_name);
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table->add_field($this->competency_id_column, XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field($this->user_id_column, XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        if ($this->has_changed_column) {
+            $table->add_field($this->has_changed_column, XMLDB_TYPE_INTEGER, '1');
+        }
+        if ($this->process_key_column) {
+            $table->add_field($this->process_key_column, XMLDB_TYPE_CHAR, '255');
+        }
+        if ($this->update_operation_column) {
+            $table->add_field($this->update_operation_column, XMLDB_TYPE_CHAR, '255');
+        }
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        $table->add_index('competency_id', XMLDB_INDEX_NOTUNIQUE, ['competency_id']);
+        $table->add_index('user_id', XMLDB_INDEX_NOTUNIQUE, [$this->user_id_column]);
+        if ($this->process_key_column) {
+            $table->add_index('process_key_column', XMLDB_INDEX_NOTUNIQUE, [$this->process_key_column]);
+        }
+        if ($this->update_operation_column) {
+            $table->add_index('update_operation_column', XMLDB_INDEX_NOTUNIQUE, [$this->update_operation_column]);
+        }
+
+        if ($dbman->table_exists($table)) {
+            $this->truncate();
+        } else {
+            $dbman->create_temp_table($table);
+        }
     }
 
     /**
@@ -89,6 +162,13 @@ class aggregation_users_table {
      */
     public function get_user_id_column(): string {
         return $this->user_id_column;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_competency_id_column(): string {
+        return $this->competency_id_column;
     }
 
     /**
@@ -160,7 +240,7 @@ class aggregation_users_table {
     public function truncate(): aggregation_users_table {
         global $DB;
 
-        $DB->delete_records($this->table_name, $this->get_filter());
+        $DB->execute("TRUNCATE TABLE {{$this->table_name}}");
         return $this;
     }
 
@@ -219,11 +299,15 @@ class aggregation_users_table {
      * If an update operation column and value is set, these are also included
      *
      * @param int $user_id_value Value to insert in the user_id column
+     * @param int $competency_id_value Value to insert in the competency_id column
      * @param mixed|null $has_changed_value Value to insert in the has_changed column
      * @return array
      */
-    public function get_insert_record(int $user_id_value, $has_changed_value = null): array {
-        $record = [$this->get_user_id_column() => $user_id_value];
+    public function get_insert_record(int $user_id_value, int $competency_id_value, $has_changed_value = null): array {
+        $record = [
+            $this->get_user_id_column() => $user_id_value,
+            $this->get_competency_id_column() => $competency_id_value
+        ];
 
         if (!is_null($has_changed_value) && empty($this->has_changed_column)) {
             $record[$this->get_has_changed_column()] = $has_changed_value;
@@ -241,58 +325,38 @@ class aggregation_users_table {
     }
 
     /**
-     * Return the column list to use in an insert sql statement
-     *
-     * @param array $exclude List of columns to exclude in the list
-     * @return string
-     */
-    public function get_insert_column_list(array $exclude_columns=[]): string {
-        $column_list = [];
-        if (!isset($exclude_columns['user_id'])) {
-            $column_list[] = $this->user_id_column;
-        };
-
-        if (!empty($this->has_changed_column) && !isset($exclude_columns['has_changed'])) {
-            $column_list[] = $this->has_changed_column;
-        }
-
-        if (!empty($this->process_key_column) && !empty($this->process_key_value)) {
-            $column_list[] = $this->process_key_column;
-        }
-
-        return implode(', ', $column_list);
-    }
-
-    /**
      * Return the SQL snippet and parameters for inserting
      *
-     * @param int|null $user_id_value Value to insert in the user_id column
-     * @param mixed|null $has_changed_value Value to insert in the has_changed column
+     * @param int|null $user_id_value
+     * @param int|null $comp_id_value
+     * @param null $has_changed_value
      * @return array [string, array]
      */
-    public function get_insert_values_sql_with_params(?int $user_id_value = null, $has_changed_value = null): array {
-        $sql = '';
+    public function get_insert_values_sql_with_params(?int $user_id_value = null, ?int $comp_id_value = null, $has_changed_value = null): array {
+        $sql = [];
         $params = [];
 
-        $connect = '';
         if (!is_null($user_id_value)) {
-            $sql .= "{$this->user_id_column} = :autbl_userid";
-            $params['autbl_userid'] = $user_id_value;
-            $connect = ', ';
+            $sql[] = ":user_id";
+            $params['user_id'] = $user_id_value;
+        }
+
+        if (!is_null($comp_id_value)) {
+            $sql[] = ":competency_id";
+            $params['competency_id'] = $comp_id_value;
         }
 
         if (!is_null($has_changed_value) && !empty($this->has_changed_column)) {
-            $sql .= "{$connect}{$this->has_changed_column} = :autbl_haschanged";
-            $params['autbl_haschanged'] = $has_changed_value;
-            $connect = ', ';
+            $sql[] = ":has_changed";
+            $params['has_changed'] = $has_changed_value;
         }
 
         if (!empty($this->process_key_column) && !empty($this->process_key_value)) {
-            $sql .= "{$connect}{$this->process_key_column} = :autbl_processkey";
-            $params['autbl_processkey'] = $this->process_key_value;
+            $sql[] =  ":process_key";
+            $params['process_key'] = $this->process_key_value;
         }
 
-        return [$sql, $params];
+        return [implode(", ", $sql), $params];
     }
 
     /**
@@ -321,10 +385,17 @@ class aggregation_users_table {
      * @param string $table_alias
      * @param bool $include_update_operation Include filtering on the update_operation?
      * @param mixed|null $has_change_value Include filtering with this has_changed_value
+     * @param int|null $competency_id_value
      * @param string $param_prefix Prefix to use for the parameters
      * @return array [string, array]
      */
-    public function get_filter_sql_with_params(string $table_alias = '', bool $include_update_operation = true, $has_change_value = null, string $param_prefix = 'autbl') {
+    public function get_filter_sql_with_params(
+        string $table_alias = '',
+        bool $include_update_operation = true,
+        $has_change_value = null,
+        ?int $competency_id_value = null,
+        string $param_prefix = 'autbl'
+    ) {
         $sql = '';
         $params = [];
 
@@ -346,6 +417,12 @@ class aggregation_users_table {
         if (!is_null($has_change_value) && !empty($this->has_changed_column)) {
             $sql .= "{$connect}{$table_alias}{$this->has_changed_column} = :{$param_prefix}_haschanged";
             $params[$param_prefix . '_haschanged'] = $has_change_value;
+            $connect = ' AND ';
+        }
+
+        if (!is_null($competency_id_value)) {
+            $sql .= "{$connect}{$table_alias}{$this->competency_id_column} = :{$param_prefix}_competency_id";
+            $params[$param_prefix . '_competency_id'] = $competency_id_value;
             $connect = ' AND ';
         }
 

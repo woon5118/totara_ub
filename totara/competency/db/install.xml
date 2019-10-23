@@ -141,10 +141,11 @@
         <KEY NAME="fk_assignment_id" TYPE="foreign" FIELDS="assignment_id" REFTABLE="totara_competency_assignments" REFFIELDS="id" ONDELETE="cascade"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="totara_competency_temp_users" COMMENT="Temporary table used during evaluation and aggregation of user achievements">
+    <TABLE NAME="totara_competency_aggregation_queue" COMMENT="Queuing table to hold aggregations to process">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="user_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of the user to evaluate / aggregate"/>
+        <FIELD NAME="competency_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of the competency this queue record belongs to"/>
         <FIELD NAME="has_changed" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Was the user's value updated"/>
         <FIELD NAME="process_key" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Key to use when multiple processes uses the same table"/>
         <FIELD NAME="update_operation_name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Name of the operation responsible for making the last update"/>
@@ -152,6 +153,11 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="user_competency_id" UNIQUE="false" FIELDS="user_id, competency_id"/>
+        <INDEX NAME="competency_id" UNIQUE="false" FIELDS="competency_id"/>
+        <INDEX NAME="process_key" UNIQUE="false" FIELDS="process_key"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="totara_competency_assignment_users" COMMENT="Totara Competency Users">
       <FIELDS>
