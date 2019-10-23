@@ -53,10 +53,7 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
         $record = ['courseids' => [$data->course->id]];
         $data->coursecompletion = $generator->create_coursecompletion($record);
 
-        $data->temp_table_def = new aggregation_users_table('totara_competency_temp_users',
-            'user_id',
-            'has_changed'
-        );
+        $data->temp_table_def = new aggregation_users_table();
 
         return $data;
     }

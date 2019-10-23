@@ -64,12 +64,7 @@ class totara_criteria_item_evaluator_user_source_table_testcase extends advanced
         $record = ['courseids' => [$data->course->id]];
         $data->criterion = $generator->create_coursecompletion($record);
 
-        $temp_table_def = new aggregation_users_table('totara_competency_temp_users',
-            'user_id',
-            'has_changed',
-            'process_key',
-            'update_operation_name'
-        );
+        $temp_table_def = new aggregation_users_table();
 
         // Testing with process_key and update_operation_name to exercise those where clauses
         $temp_table_def->set_process_key_value($this->process_key);

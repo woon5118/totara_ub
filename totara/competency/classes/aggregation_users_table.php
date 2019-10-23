@@ -174,14 +174,14 @@ class aggregation_users_table {
     /**
      * @return string
      */
-    public function get_has_changed_column(): string {
+    public function get_has_changed_column(): ?string {
         return $this->has_changed_column;
     }
 
     /**
      * @return string
      */
-    public function get_process_key_column(): string {
+    public function get_process_key_column(): ?string {
         return $this->process_key_column;
     }
 
@@ -205,7 +205,7 @@ class aggregation_users_table {
     /**
      * @return string
      */
-    public function get_update_operation_column(): string {
+    public function get_update_operation_column(): ?string {
         return $this->update_operation_column;
     }
 
@@ -427,6 +427,48 @@ class aggregation_users_table {
         }
 
         return [$sql, $params];
+    }
+
+    /**
+     * Queue aggregation to be processed in the background, only if no record is already queued
+     *
+     * @param int $user_id
+     * @param int $competency_id
+     */
+    public function queue_for_aggregation(int $user_id, int $competency_id) {
+        global $DB;
+
+        $exists = $DB->record_exists(
+            $this->table_name,
+            [
+                $this->user_id_column => $user_id,
+                $this->competency_id_column => $competency_id,
+                $this->process_key_column => null
+            ]
+        );
+
+        if (!$exists) {
+            $record = $this->get_insert_record($user_id, $competency_id);
+            $DB->insert_record($this->table_name, $record);
+        }
+    }
+
+    /**
+     * delete all rows belonging to the current process
+     */
+    public function delete() {
+        global $DB;
+
+        $params = [];
+        if ($this->process_key_value) {
+            $params[$this->process_key_column] = $this->process_key_value;
+        }
+
+        if ($this->update_operation_value) {
+            $params[$this->update_operation_column] = $this->update_operation_value;
+        }
+
+        $DB->delete_records($this->table_name, $params);
     }
 
 }

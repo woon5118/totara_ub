@@ -89,12 +89,7 @@ class pathway_manual_evaluator_testcase extends advanced_testcase {
         $data->manual->set_roles([manual::ROLE_MANAGER, manual::ROLE_APPRAISER, manual::ROLE_SELF]);
         $data->manual->save();
 
-        $data->user_id_table = new aggregation_users_table('totara_competency_temp_users',
-            'user_id',
-            'has_changed',
-            'process_key',
-            'update_operation_name'
-        );
+        $data->user_id_table = new aggregation_users_table();
 
         $data->user_id_source = new manual_evaluator_user_source_table($data->user_id_table, true);
 
@@ -118,7 +113,7 @@ class pathway_manual_evaluator_testcase extends advanced_testcase {
             ],
         ]);
 
-        $this->create_userid_table_records($data->user_id_table, [$data->users['user']->id]);
+        $this->create_userid_table_records($data->user_id_table, $data->competency->id, [$data->users['user']->id]);
         $evaluator = new \pathway_manual\manual_evaluator($data->manual, $data->user_id_source);
 
         // Now aggregate first time
@@ -246,10 +241,10 @@ class pathway_manual_evaluator_testcase extends advanced_testcase {
      * Helper function to create rows in the user_id table
      *
      * @param aggregation_users_table $user_id_table
-     * @param array $assiged_users
+     * @param int $competency_id
+     * @param array $assigned_users
      */
-    private function create_userid_table_records(aggregation_users_table $user_id_table, array $assigned_users)
-    {
+    private function create_userid_table_records(aggregation_users_table $user_id_table, int $competency_id, array $assigned_users) {
         global $DB;
 
         $user_id_table->truncate();
@@ -260,7 +255,7 @@ class pathway_manual_evaluator_testcase extends advanced_testcase {
         $tablename = $user_id_table->get_table_name();
         $temp_user_records = [];
         foreach ($assigned_users as $user_id) {
-            $temp_user_records[] = $user_id_table->get_insert_record($user_id);
+            $temp_user_records[] = $user_id_table->get_insert_record($user_id, $competency_id);
         }
         $DB->insert_records($tablename, $temp_user_records);
     }
@@ -275,8 +270,8 @@ class pathway_manual_evaluator_testcase extends advanced_testcase {
             foreach ($expected_rows as $key => $expected_row) {
                 if ((int)$actual_row->pathway_id == $expected_row['pathway_id'] &&
                     (int)$actual_row->status == $expected_row['status'] &&
-                    (int)$actual_row->scale_value_id == $expected_row['scale_value_id']) {
-
+                    (int)$actual_row->scale_value_id == $expected_row['scale_value_id']
+                ) {
                     unset($expected_rows[$key]);
                     break;
                 }

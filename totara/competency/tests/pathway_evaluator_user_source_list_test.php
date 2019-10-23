@@ -53,12 +53,7 @@ class totara_competency_pathway_evaluator_user_source_list_testcase extends adva
             $data->criteria[$i] = $criteria_generator->create_test_criterion('coursecompletion');
         }
 
-        $data->user_id_table = new aggregation_users_table('totara_competency_temp_users',
-            'user_id',
-            'has_changed',
-            'process_key',
-            'update_operation_name'
-        );
+        $data->user_id_table = new aggregation_users_table();
 
         return $data;
     }

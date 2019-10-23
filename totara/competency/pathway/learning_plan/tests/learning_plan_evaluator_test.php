@@ -82,12 +82,7 @@ class pathway_learning_plan_evaluator_testcase extends advanced_testcase {
         $data->lp_pathway->save();
 
         // The user_source
-        $data->user_id_table = new aggregation_users_table('totara_competency_temp_users',
-            'user_id',
-            'has_changed',
-            'process_key',
-            'update_operation_name'
-        );
+        $data->user_id_table = new aggregation_users_table();
 
         $data->user_id_source = new manual_evaluator_user_source_table($data->user_id_table, true);
 
@@ -104,7 +99,7 @@ class pathway_learning_plan_evaluator_testcase extends advanced_testcase {
         // found in learning_plan_test.php
         $this->create_rating_record($data->competency->id, $data->users[1]->id, $data->scalevalues[4]->id, $now++);
 
-        $this->create_userid_table_records($data->user_id_table, [$data->users[1]->id]);
+        $this->create_userid_table_records($data->user_id_table, $data->competency->id, [$data->users[1]->id]);
         $evaluator = new learning_plan_evaluator($data->lp_pathway, $data->user_id_source);
 
         // Now aggregate first time for user1
@@ -154,7 +149,7 @@ class pathway_learning_plan_evaluator_testcase extends advanced_testcase {
         $this->verify_pathway_achievements($data->users[2]->id, $expected[2]);
 
         // Now 'assign' user 2
-        $this->create_userid_table_records($data->user_id_table, [$data->users[1]->id, $data->users[2]->id]);
+        $this->create_userid_table_records($data->user_id_table, $data->competency->id, [$data->users[1]->id, $data->users[2]->id]);
 
         // Aggregate
         $evaluator->aggregate($now++);
@@ -223,10 +218,10 @@ class pathway_learning_plan_evaluator_testcase extends advanced_testcase {
      * Helper function to create rows in the user_id table
      *
      * @param aggregation_users_table $user_id_table
-     * @param array $assiged_users
+     * @param int $competency_id
+     * @param array $assigned_users
      */
-    private function create_userid_table_records(aggregation_users_table $user_id_table, array $assigned_users)
-    {
+    private function create_userid_table_records(aggregation_users_table $user_id_table, int $competency_id, array $assigned_users) {
         global $DB;
 
         $user_id_table->truncate();
@@ -237,7 +232,7 @@ class pathway_learning_plan_evaluator_testcase extends advanced_testcase {
         $tablename = $user_id_table->get_table_name();
         $temp_user_records = [];
         foreach ($assigned_users as $user_id) {
-            $temp_user_records[] = $user_id_table->get_insert_record($user_id);
+            $temp_user_records[] = $user_id_table->get_insert_record($user_id, $competency_id);
         }
         $DB->insert_records($tablename, $temp_user_records);
     }

@@ -52,12 +52,7 @@ class totara_competency_pathway_evaluator_user_source_table_testcase extends adv
             $data->criteria[$i] = $criteria_generator->create_test_criterion('coursecompletion');
         }
 
-        $data->user_id_table = new aggregation_users_table('totara_competency_temp_users',
-            'user_id',
-            'has_changed',
-            'process_key',
-            'update_operation_name'
-        );
+        $data->user_id_table = new aggregation_users_table();
 
         return $data;
     }
@@ -158,7 +153,7 @@ class totara_competency_pathway_evaluator_user_source_table_testcase extends adv
         $data->user_id_table->set_update_operation_value($operation_value);
 
         $this->create_achievement_records($cg->get_id(), $achievements);
-        $this->create_userid_table_records($data->user_id_table, $assigned_users);
+        $this->create_userid_table_records($data->user_id_table, $data->competency->id, $assigned_users);
 
         $user_source = new \totara_competency\pathway_evaluator_user_source_table($data->user_id_table, true);
         $user_source->archive_non_assigned_achievements($cg, time());
@@ -234,7 +229,7 @@ class totara_competency_pathway_evaluator_user_source_table_testcase extends adv
         $cg = $competency_generator->create_criteria_group($params);
 
         $this->create_achievement_records($cg->get_id(), $achievements);
-        $this->create_userid_table_records($data->user_id_table, $assigned_users);
+        $this->create_userid_table_records($data->user_id_table, $data->competency->id, $assigned_users);
 
         // Testing here without process_key and update_operation
         $user_source = new \totara_competency\pathway_evaluator_user_source_table($data->user_id_table, true);
@@ -286,9 +281,10 @@ class totara_competency_pathway_evaluator_user_source_table_testcase extends adv
      * Helper function to create rows in the user_id table
      *
      * @param aggregation_users_table $user_id_table
-     * @param array $assiged_users
+     * @param int $competency_id
+     * @param array $assigned_users
      */
-    private function create_userid_table_records(aggregation_users_table $user_id_table, array $assigned_users) {
+    private function create_userid_table_records(aggregation_users_table $user_id_table, int $competency_id, array $assigned_users) {
         global $DB;
 
         if (empty($assigned_users)) {
@@ -298,7 +294,7 @@ class totara_competency_pathway_evaluator_user_source_table_testcase extends adv
         $tablename = $user_id_table->get_table_name();
         $temp_user_records = [];
         foreach ($assigned_users as $user_id) {
-            $temp_user_records[] = $user_id_table->get_insert_record($user_id);
+            $temp_user_records[] = $user_id_table->get_insert_record($user_id, $competency_id);
         }
         $DB->insert_records($tablename, $temp_user_records);
     }

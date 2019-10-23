@@ -36,23 +36,19 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
             public $records;
         };
 
-        $data->tbl = new aggregation_users_table('totara_competency_temp_users',
-            'user_id',
-            'has_changed',
-            'process_key',
-            'update_operation_name');
+        $data->tbl = new aggregation_users_table();
 
         $data->records = [
-            ['user_id' => 1, 'has_changed' => 0, 'process_key' => '', 'update_operation_name' => 'op1'],
-            ['user_id' => 2, 'has_changed' => 1, 'process_key' => '', 'update_operation_name' => ''],
-            ['user_id' => 3, 'has_changed' => 0, 'process_key' => 'proc2', 'update_operation_name' => ''],
-            ['user_id' => 4, 'has_changed' => 1, 'process_key' => 'proc2', 'update_operation_name' => ''],
-            ['user_id' => 5, 'has_changed' => 0, 'process_key' => 'proc3', 'update_operation_name' => 'op1'],
-            ['user_id' => 6, 'has_changed' => 1, 'process_key' => 'proc3', 'update_operation_name' => 'op1'],
-            ['user_id' => 7, 'has_changed' => 0, 'process_key' => 'proc3', 'update_operation_name' => 'op2'],
-            ['user_id' => 8, 'has_changed' => 1, 'process_key' => 'proc3', 'update_operation_name' => 'op3'],
-            ['user_id' => 9, 'has_changed' => 0, 'process_key' => '', 'update_operation_name' => 'op3'],
-            ['user_id' => 10, 'has_changed' => 1, 'process_key' => '', 'update_operation_name' => 'op3'],
+            ['user_id' => 1, 'competency_id' => 10, 'has_changed' => 0, 'process_key' => '', 'update_operation_name' => 'op1'],
+            ['user_id' => 2, 'competency_id' => 9, 'has_changed' => 1, 'process_key' => '', 'update_operation_name' => ''],
+            ['user_id' => 3, 'competency_id' => 8, 'has_changed' => 0, 'process_key' => 'proc2', 'update_operation_name' => ''],
+            ['user_id' => 4, 'competency_id' => 7, 'has_changed' => 1, 'process_key' => 'proc2', 'update_operation_name' => ''],
+            ['user_id' => 5, 'competency_id' => 6, 'has_changed' => 0, 'process_key' => 'proc3', 'update_operation_name' => 'op1'],
+            ['user_id' => 6, 'competency_id' => 5, 'has_changed' => 1, 'process_key' => 'proc3', 'update_operation_name' => 'op1'],
+            ['user_id' => 7, 'competency_id' => 4, 'has_changed' => 0, 'process_key' => 'proc3', 'update_operation_name' => 'op2'],
+            ['user_id' => 8, 'competency_id' => 3, 'has_changed' => 1, 'process_key' => 'proc3', 'update_operation_name' => 'op3'],
+            ['user_id' => 9, 'competency_id' => 2, 'has_changed' => 0, 'process_key' => '', 'update_operation_name' => 'op3'],
+            ['user_id' => 10, 'competency_id' => 1, 'has_changed' => 1, 'process_key' => '', 'update_operation_name' => 'op3'],
         ];
 
         $DB->insert_records($data->tbl->get_table_name(), $data->records);
@@ -60,95 +56,92 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
         return $data;
     }
 
-
-    /**
-     * Test invalid constructor - no table name
-     */
-    public function test_constructor_no_tablename() {
-        $this->expectException(coding_exception::class);
-        $this->expectExceptionMessage('The table name and user id column name must be specified');
-
-        $tbl = new aggregation_users_table('', 'columnname');
-    }
-
-    /**
-     * Test invalid constructor - no table name
-     */
-    public function test_constructor_no_user_id_column() {
-        $this->expectException(coding_exception::class);
-        $this->expectExceptionMessage('The table name and user id column name must be specified');
-
-        $tbl = new aggregation_users_table('tablename', '');
-    }
-
-    /**
-     * Data provider for test_constructor_getters_setters.
-     */
-    public function data_provider_test_constructor_getters_setters() {
-        return [
-            [
-                'table_name' => 'a_table_name',
-                'user_id_column' => 'a_user_id_column',
-            ],
-            [
-                'table_name' => 'a_table_name',
-                'user_id_column' => 'a_user_id_column',
-                'has_changed_column' => 'the_has_changed_column',
-                'process_key_column' => 'the_process_key_column',
-                'process_key_value' => 'process123',
-                'update_operation_column' => 'the_update_operation_column',
-                'update_operation_value' => 'operation 987',
-            ],
-        ];
-    }
-
     /**
      * Test constructor, getters and setters
-     *
-     * @dataProvider data_provider_test_constructor_getters_setters
      */
-    public function test_constructor_getters_setters($table_name, $user_id_column, $has_changed_column = '',
-                                                     $process_key_column = '', $process_key_value = '',
-                                                     $update_operation_column = '', $update_operation_value = '') {
-        $tbl = new \totara_competency\aggregation_users_table($table_name, $user_id_column, $has_changed_column, $process_key_column, $update_operation_column);
+    public function test_constructor_getters_setters() {
+        // First use defaults
+        $tbl = new aggregation_users_table();
 
-        $this->assertSame($table_name, $tbl->get_table_name());
-        $this->assertSame($user_id_column, $tbl->get_user_id_column());
-        $this->assertSame($has_changed_column, $tbl->get_has_changed_column());
-        $this->assertSame($process_key_column, $tbl->get_process_key_column());
+        $this->assertSame('totara_competency_aggregation_queue', $tbl->get_table_name());
+        $this->assertSame('user_id', $tbl->get_user_id_column());
+        $this->assertSame('competency_id', $tbl->get_competency_id_column());
+        $this->assertSame('has_changed', $tbl->get_has_changed_column());
+        $this->assertSame('process_key', $tbl->get_process_key_column());
         $this->assertEmpty($tbl->get_process_key_value());
-        $this->assertSame($update_operation_column, $tbl->get_update_operation_column());
+        $this->assertSame('update_operation_name', $tbl->get_update_operation_column());
         $this->assertEmpty($tbl->get_update_operation_value());
 
-        if (!empty($process_key_value)) {
-            $tbl->set_process_key_value($process_key_value);
-            $this->assertSame($process_key_value, $tbl->get_process_key_value());
-        }
+        $tbl->set_process_key_value('my_value');
+        $this->assertSame('my_value', $tbl->get_process_key_value());
 
-        if (!empty($update_operation_value)) {
-            $tbl->set_update_operation_value($update_operation_value);
-            $this->assertSame($update_operation_value, $tbl->get_update_operation_value());
-        }
+        $tbl->set_update_operation_value('my_value2');
+        $this->assertSame('my_value2', $tbl->get_update_operation_value());
+
+        $tbl = new aggregation_users_table('my_table', false, 'ui', 'ci', 'hc', 'pc', 'uon');
+
+        $this->assertSame('my_table', $tbl->get_table_name());
+        $this->assertSame('ui', $tbl->get_user_id_column());
+        $this->assertSame('ci', $tbl->get_competency_id_column());
+        $this->assertSame('hc', $tbl->get_has_changed_column());
+        $this->assertSame('pc', $tbl->get_process_key_column());
+        $this->assertEmpty($tbl->get_process_key_value());
+        $this->assertSame('uon', $tbl->get_update_operation_column());
+        $this->assertEmpty($tbl->get_update_operation_value());
+
+        $tbl = new aggregation_users_table('my_table', false, 'ui', 'ci', null, 'pc', 'uon');
+
+        $this->assertSame(null, $tbl->get_has_changed_column());
+        $this->assertSame('pc', $tbl->get_process_key_column());
+        $this->assertSame('uon', $tbl->get_update_operation_column());
+
+        $tbl = new aggregation_users_table('my_table', false, 'ui', 'ci', 'hc', null, 'uon');
+
+        $this->assertSame('hc', $tbl->get_has_changed_column());
+        $this->assertSame(null, $tbl->get_process_key_column());
+        $this->assertSame('uon', $tbl->get_update_operation_column());
+
+        $tbl = new aggregation_users_table('my_table', false, 'ui', 'ci', 'hc', 'pc', null);
+
+        $this->assertSame('hc', $tbl->get_has_changed_column());
+        $this->assertSame('pc', $tbl->get_process_key_column());
+        $this->assertSame(null, $tbl->get_update_operation_column());
+    }
+
+    public function test_creating_temp_table() {
+        global $CFG, $DB;
+
+        require_once($CFG->dirroot . '/lib/ddllib.php');
+
+        $table_name = 'my_temporary_for_aggregation';
+
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table($table_name);
+        $this->assertFalse($dbman->table_exists($table));
+
+        $tbl = new aggregation_users_table($table_name, true);
+        $this->assertTrue($dbman->table_exists($table));
     }
 
     /**
-     * Test truncate without process key
+     * Test truncate deletes everything
      */
-    public function test_truncate_no_process_key() {
+    public function test_truncate() {
         global $DB;
 
         $data = $this->setup_data();
+
         $this->assertSame(count($data->records), $DB->count_records($data->tbl->get_table_name()));
 
-        // We haven't set a process key - so all rows will be deleted
         $data->tbl->truncate();
+
         $this->assertSame(0, $DB->count_records($data->tbl->get_table_name()));
     }
 
     /**
-     * Test truncate with process key only
+     * Test truncate deletes everything
      */
-    public function test_truncate_with_process_key() {
+    public function test_delete_records() {
         global $DB;
 
         $data = $this->setup_data();
@@ -161,7 +154,9 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
         });
 
         $expected_record_keys = array_diff(array_keys($data->records), array_keys($to_delete));
-        $data->tbl->truncate();
+
+        $data->tbl->delete();
+
         $this->assertSame(count($expected_record_keys), $DB->count_records($data->tbl->get_table_name()));
     }
 
@@ -181,7 +176,7 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
         });
 
         $expected_record_keys = array_diff(array_keys($data->records), array_keys($to_delete));
-        $data->tbl->truncate();
+        $data->tbl->delete();
         $this->assertSame(count($expected_record_keys), $DB->count_records($data->tbl->get_table_name()));
     }
 
@@ -203,8 +198,28 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
         });
 
         $expected_record_keys = array_diff(array_keys($data->records), array_keys($to_delete));
-        $data->tbl->truncate();
+        $data->tbl->delete();
         $this->assertSame(count($expected_record_keys), $DB->count_records($data->tbl->get_table_name()));
+    }
+
+    public function test_queue_for_aggregation() {
+        global $DB;
+
+        $data = $this->setup_data();
+        $original_count = count($data->records);
+        $this->assertSame($original_count, $DB->count_records($data->tbl->get_table_name()));
+
+        $data->tbl->queue_for_aggregation(123, 321);
+
+        $this->assertSame($original_count + 1, $DB->count_records($data->tbl->get_table_name()));
+
+        // With process value should still add
+        $data->tbl->queue_for_aggregation(3, 8);
+        $this->assertSame($original_count + 2, $DB->count_records($data->tbl->get_table_name()));
+
+        // Without process value it should not be added
+        $data->tbl->queue_for_aggregation(3, 8);
+        $this->assertSame($original_count + 2, $DB->count_records($data->tbl->get_table_name()));
     }
 
     /**
@@ -213,8 +228,8 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
     public function data_provider_test_filter() {
         return [
             [],
-            ['process_key' => 'proc1', 'update_operation' => ''],
-            ['process_key' => '', 'update_operation' => 'op1'],
+            ['process_key' => 'proc1', 'update_operation' => null],
+            ['process_key' => null, 'update_operation' => 'op1'],
             ['process_key' => 'proc3', 'update_operation' => 'op2'],
             ['process_key' => 'proc3', 'update_operation' => 'op2', 'include_update_operation' => false],
         ];
@@ -225,9 +240,9 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
      *
      * @dataProvider data_provider_test_filter
      */
-    public function test_get_filter(string $process_key = '', string $update_operation = '', bool $include_update_operation = true) {
+    public function test_get_filter(?string $process_key = null, ?string $update_operation = null, bool $include_update_operation = true) {
         $data = $this->setup_data();
-        $nocolumn_tbl = new aggregation_users_table('tablename', 'useridcolumn');
+        $nocolumn_tbl = new aggregation_users_table('tablename', false, 'useridcolumn', 'competencyidcolumn', 'haschangedcolumn', null, null);
 
         $expected = [];
         if (!empty($process_key)) {
@@ -259,10 +274,10 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
      *
      * @dataProvider data_provider_test_filter
      */
-    public function test_get_filter_sql_with_params(string $process_key = '', string $update_operation = '', bool $include_update_operation = true) {
+    public function test_get_filter_sql_with_params(?string $process_key = '', ?string $update_operation = '', bool $include_update_operation = true) {
 
         $data = $this->setup_data();
-        $nocolumn_tbl = new aggregation_users_table('tablename', 'useridcolumn');
+        $nocolumn_tbl = new aggregation_users_table('tablename', false, 'useridcolumn', 'competencyidcolumn', 'haschangedcolumn', null, null);
 
         $table_alias = 'tmp';
         $expected_sql = '';
@@ -321,10 +336,9 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
      *
      * @dataProvider data_provider_test_get_set_has_changed_sql_with_params
      */
-    public function test_get_set_has_changed_sql_with_params(string $update_operation = '')
-    {
+    public function test_get_set_has_changed_sql_with_params(string $update_operation = '') {
         $data = $this->setup_data();
-        $nocolumn_tbl = new aggregation_users_table('tablename', 'useridcolumn');
+        $nocolumn_tbl = new aggregation_users_table('tablename', false, 'useridcolumn', 'competencyidcolumn', null, null, null);
 
         $table_alias = 'tmp';
         $expected_sql = $data->tbl->get_has_changed_column() . ' = :agtbl_haschanged';
