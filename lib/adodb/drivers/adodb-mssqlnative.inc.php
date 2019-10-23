@@ -487,6 +487,10 @@ class ADODB_mssqlnative extends ADOConnection {
 
         if ($this->debug) ADOConnection::outp("<hr>connecting... hostname: $argHostname params: ".var_export($connectionInfo,true));
 		//if ($this->debug) ADOConnection::outp("<hr>_connectionID before: ".serialize($this->_connectionID));
+
+        // Totara: always use UTF-8 for sql server, both auth_db and enrol_database expect it.
+        $connectionInfo['CharacterSet'] = 'UTF-8';
+
 		if(!($this->_connectionID = sqlsrv_connect($argHostname,$connectionInfo))) {
 			if ($this->debug) ADOConnection::outp( "<hr><b>errors</b>: ".print_r( sqlsrv_errors(), true));
 			return false;

@@ -864,6 +864,27 @@ class enrol_database_plugin extends enrol_plugin {
     }
 
     /**
+     * Makes sure config is loaded and cached.
+     * @return void
+     */
+    protected function load_config() {
+        if (!isset($this->config)) {
+            parent::load_config();
+
+            if (isset($this->config->dbtype)) {
+                // Totara: fix nonexistent driver references.
+                if ($this->config->dbtype === 'mssql' or $this->config->dbtype === 'mssql_n') {
+                    $this->config->dbtype = 'mssqlnative';
+                }
+                // Totara: MS SQL server driver is compatible with utf-8 only!
+                if ($this->config->dbtype === 'mssqlnative') {
+                    $this->config->dbencoding = 'utf-8';
+                }
+            }
+        }
+    }
+
+    /**
      * Tries to make connection to the external database.
      *
      * @return null|ADONewConnection
