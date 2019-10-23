@@ -416,9 +416,9 @@ class totara_program_messages_testcase extends reportcache_advanced_testcase {
         // Update the message record to be triggered 100 days before due.
         $duemessage = $DB->get_record('prog_message', array('programid' => $this->program1->id, 'messagetype' => MESSAGETYPE_PROGRAM_DUE));
         // Some quick edits to the enrolment message content.
-        $duemessage->messagesubject = 'Learner ProgDue Message';
+        $duemessage->messagesubject = 'Learner ProgDue Message (copy sent to %managername%)';
         $duemessage->mainmessage = 'Hey dude, do your program';
-        $duemessage->managersubject = 'Manager ProgDue Message';
+        $duemessage->managersubject = 'Manager ProgDue Message for %programfullname%';
         $duemessage->managermessage = 'Go tell your staff member to finish their program';
         $duemessage->notifymanager = 1;
         $DB->update_record('prog_message', $duemessage);
@@ -516,12 +516,12 @@ class totara_program_messages_testcase extends reportcache_advanced_testcase {
         foreach ($emails as $email) {
             if (in_array($email->useridto, $usersprogram)) {
                 $learnercount++;
-                $this->assertEquals($email->subject, 'Learner ProgDue Message', 'unexpected default learner enrolment subject');
+                $this->assertEquals($email->subject, 'Learner ProgDue Message (copy sent to ' . fullname($this->manager) . ')', 'unexpected default learner enrolment subject');
                 $this->assertEquals($email->fullmessage, 'Hey dude, do your program', 'unexpected default learner enrolment message');
             } else {
                 $managercount++;
                 $this->assertEquals($email->useridto, $this->manager->id, 'unexpected user recieving message');
-                $this->assertEquals($email->subject, 'Manager ProgDue Message', 'unexpected default manager enrolment subject');
+                $this->assertEquals($email->subject, 'Manager ProgDue Message for Program Fullname', 'unexpected default manager enrolment subject');
                 $this->assertEquals($email->fullmessage, 'Go tell your staff member to finish their program', 'unexpected custom manager enrolment message');
             }
 

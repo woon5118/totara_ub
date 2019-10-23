@@ -225,6 +225,12 @@ abstract class prog_message {
 
         // Get text to scan for placeholders.
         $messagedata = $this->studentmessagedata->subject . $this->studentmessagedata->fullmessage;
+        if (!empty($this->managersubject)) {
+            $messagedata .= $this->managersubject;
+        }
+        if (!empty($this->managermessage)) {
+            $messagedata .= $this->managermessage;
+        }
         if (!empty($this->managermessagedata->subject)) {
             $messagedata .= $this->managermessagedata->subject;
         }
