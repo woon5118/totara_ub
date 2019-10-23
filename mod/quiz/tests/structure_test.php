@@ -695,6 +695,33 @@ class mod_quiz_structure_testcase extends advanced_testcase {
             ), $structure);
     }
 
+    public function test_quiz_remove_slots() {
+        global $DB;
+        $quizobj = $this->create_test_quiz(array(
+                array('TF1', 1, 'truefalse'),
+                array('TF2', 1, 'truefalse'),
+                array('TF3', 1, 'truefalse'),
+                'Heading 2',
+                array('TF4', 2, 'truefalse'),
+                array('TF5', 2, 'truefalse'),
+            ));
+        $structure = \mod_quiz\structure::create_for_quiz($quizobj);
+
+        // Get ids of the slots in the quiz.
+        list($insql, $inparams) = $DB->get_in_or_equal([2, 5], SQL_PARAMS_NAMED);
+        $params = array_merge(['quizid' => $quizobj->get_quizid()], $inparams);
+        $slots = $DB->get_records_select('quiz_slots', "quizid = :quizid AND slot {$insql}", $params);
+        $structure->remove_slots(array_column($slots, 'id'));
+
+        $structure = \mod_quiz\structure::create_for_quiz($quizobj);
+        $this->assert_quiz_layout(array(
+                array('TF1', 1, 'truefalse'),
+                array('TF3', 1, 'truefalse'),
+                'Heading 2',
+                array('TF4', 2, 'truefalse'),
+            ), $structure);
+    }
+
     public function test_quiz_removing_a_random_question_deletes_the_question() {
         global $DB;
 
@@ -756,6 +783,27 @@ class mod_quiz_structure_testcase extends advanced_testcase {
                 'Heading 1',
                 array('TF2', 1, 'truefalse'),
         ), $structure);
+    }
+
+    public function test_quiz_remove_all_questions_in_a_quiz() {
+        global $DB;
+        $quizobj = $this->create_test_quiz(array(
+                array('TF1', 1, 'truefalse'),
+                array('TF2', 1, 'truefalse'),
+                array('TF3', 1, 'truefalse'),
+                'Heading 2',
+                array('TF4', 2, 'truefalse'),
+                array('TF5', 2, 'truefalse'),
+            ));
+        $structure = \mod_quiz\structure::create_for_quiz($quizobj);
+
+        // Get ids of the slots in the quiz.
+        list($insql, $inparams) = $DB->get_in_or_equal([1, 2, 3, 4, 5], SQL_PARAMS_NAMED);
+        $params = array_merge(['quizid' => $quizobj->get_quizid()], $inparams);
+        $slots = $DB->get_records_select('quiz_slots', "quizid = :quizid AND slot {$insql}", $params);
+        $structure->remove_slots(array_column($slots, 'id'));
+
+        $this->assertFalse($structure->has_questions());
     }
 
     public function test_add_question_updates_headings() {

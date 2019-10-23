@@ -108,7 +108,7 @@ function quiz_report_get_significant_questions($quiz) {
              WHERE slot.quizid = ?
                AND q.length > 0
 
-          ORDER BY slot.slot", array($quiz->id));
+          ORDER BY slot.slot, slot.id", array($quiz->id));
 
     $number = 1;
     foreach ($qsbyslot as $question) {

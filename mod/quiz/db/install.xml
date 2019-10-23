@@ -71,7 +71,7 @@
         <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="question" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="quizid-slot" UNIQUE="true" FIELDS="quizid, slot"/>
+        <INDEX NAME="quizid-slot" UNIQUE="false" FIELDS="quizid, slot" COMMENT="Totara: made index non-unique to avoid update issues"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="quiz_sections" COMMENT="Stores sections of a quiz with section name (heading), from slot-number N and whether the question order should be shuffled.">

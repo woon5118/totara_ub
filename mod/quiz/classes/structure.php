@@ -587,7 +587,7 @@ class structure {
                   LEFT JOIN {question} q ON q.id = slot.questionid
                   LEFT JOIN {question_categories} qc ON qc.id = q.category
                  WHERE slot.quizid = ?
-              ORDER BY slot.slot", array($quiz->id));
+              ORDER BY slot.slot, slot.id", array($quiz->id));
 
         $slots = $this->populate_missing_questions($slots);
 
@@ -733,13 +733,16 @@ class structure {
         }
 
         // Work out how things are being moved.
-        $slotreorder = array();
+        $slotreorder = false;
         if ($moveafterslotnumber > $movingslotnumber) {
             // Moving down.
-            $slotreorder[$movingslotnumber] = $moveafterslotnumber;
-            for ($i = $movingslotnumber; $i < $moveafterslotnumber; $i++) {
-                $slotreorder[$i + 1] = $i;
-            }
+            $slotreorder = true;
+
+            // Totara: Increment all slots in the quiz that are ordered after the $moveafterslotnumber.
+            // This makes a space for the slot we're moving.
+            $DB->execute('UPDATE {quiz_slots} SET slot = slot + 1 WHERE quizid = :quizid AND slot > :slot',
+                ['quizid' => $this->get_quizid(), 'slot' => $moveafterslotnumber]);
+            $DB->set_field('quiz_slots', 'slot', $moveafterslotnumber + 1, ['id' => $movingslot->id]);
 
             $headingmoveafter = $movingslotnumber;
             if ($this->is_last_slot_in_quiz($moveafterslotnumber) ||
@@ -754,10 +757,14 @@ class structure {
 
         } else if ($moveafterslotnumber < $movingslotnumber - 1) {
             // Moving up.
-            $slotreorder[$movingslotnumber] = $moveafterslotnumber + 1;
-            for ($i = $moveafterslotnumber + 1; $i < $movingslotnumber; $i++) {
-                $slotreorder[$i] = $i + 1;
-            }
+            $slotreorder = true;
+
+            // Totara: The same logic as when moving down.
+            // Increment all slots in the quiz that are ordered after the $moveafterslotnumber.
+            // This makes a space for the slot we're moving.
+            $DB->execute('UPDATE {quiz_slots} SET slot = slot + 1 WHERE quizid = :quizid AND slot > :slot',
+                ['quizid' => $this->get_quizid(), 'slot' => $moveafterslotnumber]);
+            $DB->set_field('quiz_slots', 'slot', $moveafterslotnumber + 1, ['id' => $movingslot->id]);
 
             if ($page == $this->get_page_number_for_slot($moveafterslotnumber + 1)) {
                 // Moving to the start of a section, don't move that section.
@@ -789,10 +796,9 @@ class structure {
 
         $trans = $DB->start_delegated_transaction();
 
-        // Slot has moved record new order.
+        // Totara: fix the sortorder of the slots in this quiz.
         if ($slotreorder) {
-            update_field_with_unique_index('quiz_slots', 'slot', $slotreorder,
-                    array('quizid' => $this->get_quizid()));
+            $this->fix_slots_sortorder();
         }
 
         // Page has changed. Record it.
@@ -836,7 +842,7 @@ class structure {
         global $DB;
         // Get slots ordered by page then slot.
         if (!count($slots)) {
-            $slots = $DB->get_records('quiz_slots', array('quizid' => $this->get_quizid()), 'slot, page');
+            $slots = $DB->get_records('quiz_slots', array('quizid' => $this->get_quizid()), 'page, slot, id');
         }
 
         // Loop slots. Start Page number at 1 and increment as required.
@@ -894,14 +900,12 @@ class structure {
         if (!$slot) {
             return;
         }
-        $maxslot = $DB->get_field_sql('SELECT MAX(slot) FROM {quiz_slots} WHERE quizid = ?', array($this->get_quizid()));
 
         $trans = $DB->start_delegated_transaction();
         $DB->delete_records('quiz_slots', array('id' => $slot->id));
-        for ($i = $slot->slot + 1; $i <= $maxslot; $i++) {
-            $DB->set_field('quiz_slots', 'slot', $i - 1,
-                    array('quizid' => $this->get_quizid(), 'slot' => $i));
-        }
+        // Totara: we are decreasing slot by 1 given quizid for all slots that are after the deleted one.
+        $DB->execute('UPDATE {quiz_slots} SET slot = slot - 1 WHERE quizid = :quizid AND slot > :slot',
+            ['quizid' => $this->get_quizid(), 'slot' => $slotnumber]);
 
         $qtype = $DB->get_field('question', 'qtype', array('id' => $slot->questionid));
         if ($qtype === 'random') {
@@ -915,6 +919,74 @@ class structure {
         $this->refresh_page_numbers_and_update_db();
 
         $trans->allow_commit();
+    }
+
+    /**
+     * Bulk removal of question slots.
+     *
+     * Better suited for multiple question removal compared to {@see remove_slot}.
+     *
+     * @since Totara 12.14, 13.0
+     *
+     * @param array $slotids
+     */
+    public function remove_slots(array $slotids) {
+        global $DB;
+
+        $this->check_can_be_edited();
+
+        list($insql, $inparams) = $DB->get_in_or_equal($slotids, SQL_PARAMS_NAMED);
+        $params = array_merge(['quizid' => $this->get_quizid()], $inparams);
+        $slots = $DB->get_records_select('quiz_slots', "quizid = :quizid AND id {$insql}", $params);
+        if (!$slots) {
+            return;
+        }
+
+        $trans = $DB->start_delegated_transaction();
+        $DB->delete_records_select('quiz_slots', "quizid = :quizid AND id {$insql}", $params);
+
+        // Update slots (sortorder).
+        $this->fix_slots_sortorder();
+
+        // Remove unused random questions.
+        $questionids = array_column($slots, 'questionid');
+        list($inquestionsql, $inquestionparams) = $DB->get_in_or_equal($questionids, SQL_PARAMS_NAMED);
+        $qparams = array_merge(['qtype' => 'random'], $inquestionparams);
+        $randomquestions = $DB->get_records_select('question', "qtype = :qtype AND id {$inquestionsql}", $qparams);
+        foreach ($randomquestions as $question) {
+            // This function automatically checks if the question is in use, and won't delete if it is.
+            question_delete_question($question->id);
+        }
+
+        // Unset questions from $this.
+        foreach ($slots as $slot) {
+            quiz_update_section_firstslots($this->get_quizid(), -1, $slot->slot);
+            unset($this->questions[$slot->questionid]);
+        }
+
+        $this->refresh_page_numbers_and_update_db();
+
+        $trans->allow_commit();
+    }
+
+    /**
+     * Fixes sort order (slots) of questions that might get out of order in a quiz
+     * as a result of moving, editing, or deleting.
+     *
+     * @since Totara 12.14, 13.0
+     */
+    public function fix_slots_sortorder() {
+        global $DB;
+
+        // Only try to fix slots if they are out of order.
+        $slots = $DB->get_records('quiz_slots', ['quizid' => $this->get_quizid()], 'slot ASC, id DESC', 'id, slot');
+        $i = 1;
+        foreach ($slots as $slot) {
+            if ($slot->slot != $i) {
+                $DB->set_field('quiz_slots', 'slot', $i, ['id' => $slot->id]);
+            }
+            $i++;
+        }
     }
 
     /**
@@ -971,7 +1043,7 @@ class structure {
 
         $this->check_can_be_edited();
 
-        $quizslots = $DB->get_records('quiz_slots', array('quizid' => $this->get_quizid()), 'slot');
+        $quizslots = $DB->get_records('quiz_slots', array('quizid' => $this->get_quizid()), 'slot, id');
         $repaginate = new \mod_quiz\repaginate($this->get_quizid(), $quizslots);
         $repaginate->repaginate_slots($quizslots[$slotid]->slot, $type);
         $slots = $this->refresh_page_numbers_and_update_db();
@@ -993,7 +1065,7 @@ class structure {
             $section->heading = get_string('newsectionheading', 'quiz');
         }
         $section->quizid = $this->get_quizid();
-        $slotsonpage = $DB->get_records('quiz_slots', array('quizid' => $this->get_quizid(), 'page' => $pagenumber), 'slot DESC');
+        $slotsonpage = $DB->get_records('quiz_slots', array('quizid' => $this->get_quizid(), 'page' => $pagenumber), 'slot DESC, id ASC');
         $section->firstslot = end($slotsonpage)->slot;
         $section->shufflequestions = 0;
         return $DB->insert_record('quiz_sections', $section);
