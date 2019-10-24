@@ -19,15 +19,13 @@
  *
  * @author Brendan Cox <brendan.cox@totaralearning.com>
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package totara_competency
  */
 
 namespace totara_competency;
 
 
-use totara_competency\achievement_configuration;
-use totara_competency\entities\competency;
-use totara_competency\entities\scale_value;
 use xmldb_table;
 
 /**
@@ -187,9 +185,11 @@ class aggregation_users_table {
 
     /**
      * Set the process_key value to filter rows on
+     *
      * @param mixed $process_key_value
+     * @return self
      */
-    public function set_process_key_value($process_key_value): aggregation_users_table {
+    public function set_process_key_value($process_key_value): self {
         $this->process_key_value = (string)$process_key_value;
         return $this;
     }
@@ -211,9 +211,11 @@ class aggregation_users_table {
 
     /**
      * Set the update_operation value to filter rows on
+     *
      * @param mixed $update_operation_value
+     * @return self
      */
-    public function set_update_operation_value($update_operation_value): aggregation_users_table {
+    public function set_update_operation_value($update_operation_value): self {
         $this->update_operation_value = $update_operation_value;
         return $this;
     }
@@ -226,20 +228,13 @@ class aggregation_users_table {
         return $this->update_operation_value;
     }
 
-
-    /************************************************************************************
-     * SQL snippets
-     ************************************************************************************/
-
     /**
      * Remove all rows from the users table associated with the key
      *
-     * @return aggregation_users_table
-     * @throws \dml_exception
+     * @return self
      */
-    public function truncate(): aggregation_users_table {
+    public function truncate(): self {
         global $DB;
-
         $DB->execute("TRUNCATE TABLE {{$this->table_name}}");
         return $this;
     }
@@ -430,12 +425,30 @@ class aggregation_users_table {
     }
 
     /**
+     * Claim all rows with current process key which are not claimed yet
+     *
+     * @return $this
+     */
+    public function claim_process() {
+        global $DB;
+
+        $DB->set_field(
+            $this->table_name,
+            $this->process_key_column,
+            $this->process_key_value,
+            [ $this->process_key_column => null ]
+        );
+
+        return $this;
+    }
+
+    /**
      * Queue aggregation to be processed in the background, only if no record is already queued
      *
      * @param int $user_id
      * @param int $competency_id
      */
-    public function queue_for_aggregation(int $user_id, int $competency_id) {
+    public function queue_for_aggregation(int $user_id, int $competency_id): void {
         global $DB;
 
         $exists = $DB->record_exists(
@@ -456,7 +469,7 @@ class aggregation_users_table {
     /**
      * delete all rows belonging to the current process
      */
-    public function delete() {
+    public function delete(): void {
         global $DB;
 
         $params = [];

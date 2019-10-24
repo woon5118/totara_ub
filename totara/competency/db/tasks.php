@@ -22,20 +22,22 @@
  * @package totara_competency
  */
 
-use totara_competency\task\competency_achievement_aggregation;
+use totara_competency\task\competency_aggregation_all;
 use totara_competency\task\expand_assignments_task;
 
 defined('MOODLE_INTERNAL') || die();
 
 $tasks = [
     [
-        'classname' => competency_achievement_aggregation::class,
+        // This task should only be executed on demand or not very regularly
+        // as depending on the amount of competencies and users it can run for a while
+        'classname' => competency_aggregation_all::class,
         'blocking' => 0,
         'minute' => '0',
-        'hour' => '*',
+        'hour' => '0',
         'day' => '*',
         'dayofweek' => '*',
-        'month' => '*'
+        'disabled' => 1
     ],
     [
         'classname' => expand_assignments_task::class,
@@ -46,4 +48,13 @@ $tasks = [
         'dayofweek' => '*',
         'month' => '*'
     ],
+    [
+        'classname' => \totara_competency\task\competency_aggregation_queue::class,
+        'blocking' => 0,
+        'minute' => '*/10',
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ]
 ];

@@ -30,25 +30,25 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
         global $DB;
 
         $data = new class() {
-            /** @var aggregation_users_table $tbl */
+            /** @var aggregation_users_table */
             public $tbl;
-            /** @var array $records */
+            /** @var array */
             public $records;
         };
 
         $data->tbl = new aggregation_users_table();
 
         $data->records = [
-            ['user_id' => 1, 'competency_id' => 10, 'has_changed' => 0, 'process_key' => '', 'update_operation_name' => 'op1'],
-            ['user_id' => 2, 'competency_id' => 9, 'has_changed' => 1, 'process_key' => '', 'update_operation_name' => ''],
+            ['user_id' => 1, 'competency_id' => 10, 'has_changed' => 0, 'process_key' => null, 'update_operation_name' => 'op1'],
+            ['user_id' => 2, 'competency_id' => 9, 'has_changed' => 1, 'process_key' => null, 'update_operation_name' => ''],
             ['user_id' => 3, 'competency_id' => 8, 'has_changed' => 0, 'process_key' => 'proc2', 'update_operation_name' => ''],
             ['user_id' => 4, 'competency_id' => 7, 'has_changed' => 1, 'process_key' => 'proc2', 'update_operation_name' => ''],
             ['user_id' => 5, 'competency_id' => 6, 'has_changed' => 0, 'process_key' => 'proc3', 'update_operation_name' => 'op1'],
             ['user_id' => 6, 'competency_id' => 5, 'has_changed' => 1, 'process_key' => 'proc3', 'update_operation_name' => 'op1'],
             ['user_id' => 7, 'competency_id' => 4, 'has_changed' => 0, 'process_key' => 'proc3', 'update_operation_name' => 'op2'],
             ['user_id' => 8, 'competency_id' => 3, 'has_changed' => 1, 'process_key' => 'proc3', 'update_operation_name' => 'op3'],
-            ['user_id' => 9, 'competency_id' => 2, 'has_changed' => 0, 'process_key' => '', 'update_operation_name' => 'op3'],
-            ['user_id' => 10, 'competency_id' => 1, 'has_changed' => 1, 'process_key' => '', 'update_operation_name' => 'op3'],
+            ['user_id' => 9, 'competency_id' => 2, 'has_changed' => 0, 'process_key' => null, 'update_operation_name' => 'op3'],
+            ['user_id' => 10, 'competency_id' => 1, 'has_changed' => 1, 'process_key' => null, 'update_operation_name' => 'op3'],
         ];
 
         $DB->insert_records($data->tbl->get_table_name(), $data->records);
@@ -220,6 +220,24 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
         // Without process value it should not be added
         $data->tbl->queue_for_aggregation(3, 8);
         $this->assertSame($original_count + 2, $DB->count_records($data->tbl->get_table_name()));
+    }
+
+    public function test_claim_process() {
+        global $DB;
+
+        $data = $this->setup_data();
+
+        $data->tbl->set_process_key_value('thisismyprocess');
+        $data->tbl->claim_process();
+
+        $result = $DB->get_records($data->tbl->get_table_name(), [$data->tbl->get_process_key_column() => 'thisismyprocess']);
+        $this->assertCount(4, $result);
+
+        $user_ids = array_column($result, 'user_id');
+        $competency_ids = array_column($result, 'competency_id');
+
+        $this->assertEqualsCanonicalizing([1, 2, 9, 10], $user_ids);
+        $this->assertEqualsCanonicalizing([10, 9, 2, 1], $competency_ids);
     }
 
     /**

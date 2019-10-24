@@ -1,0 +1,81 @@
+<?php
+/*
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2018 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Brendan Cox <brendan.cox@totaralearning.com>
+ * @package totara_competency
+ */
+
+namespace totara_competency\task;
+
+use core\task\scheduled_task;
+use totara_competency\aggregation_task;
+use totara_competency\aggregation_users_table;
+
+/**
+ * Aggregates competency achievements for all users actively assigned to any competency in the system.
+ *
+ * Depending on the amount of data this task could run for a while. As all actions leading to
+ * changes in achievement of a competency are picked up on the go via the competency_aggregation_queue_task
+ * this task does not need to run regularly or only on demand.
+ */
+class competency_aggregation_all extends scheduled_task {
+
+    /**
+     * @var int
+     */
+    private $aggregation_time = null;
+
+    /**
+     * @param int $timestamp
+     */
+    public function set_aggregation_time(int $timestamp) {
+        $this->aggregation_time = $timestamp;
+    }
+
+    public function get_name() {
+        return get_string('aggregate_all_competencies_task', 'totara_competency');
+    }
+
+    public function execute() {
+        $table = new aggregation_users_table('totara_competency_aggregation_temp', true);
+
+        $this->fill_temp_table($table);
+
+        $task = new aggregation_task($table, true);
+        $task->execute($this->aggregation_time);
+    }
+
+    private function fill_temp_table(aggregation_users_table $table) {
+        global $DB;
+
+        [$insert_values_sql, $params] = $table->get_insert_values_sql_with_params(null, null, 0);
+
+        $insert_columns = "user_id, competency_id, ".implode(", ", array_keys($params));
+
+        $sql =
+            "INSERT INTO {" . $table->get_table_name() . "}
+            (" . $insert_columns . ")
+             SELECT user_id, competency_id, {$insert_values_sql}
+              FROM {totara_assignment_competency_users} tacu
+              GROUP BY user_id, competency_id";
+
+        $DB->execute($sql, $params);
+    }
+
+}

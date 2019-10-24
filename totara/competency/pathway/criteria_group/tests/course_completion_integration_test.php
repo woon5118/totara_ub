@@ -85,7 +85,7 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
         $this->assertEquals(0, $DB->count_records('totara_competency_pathway_achievement'));
         $this->assertEquals(0, $DB->count_records('totara_criteria_item_record'));
 
-        (new totara_competency\task\competency_achievement_aggregation())->execute();
+        (new totara_competency\task\competency_aggregation_all())->execute();
 
         $this->assertEquals(1, $DB->count_records('totara_competency_achievement'));
         $this->assertEquals(1, $DB->count_records('totara_competency_achievement_via'));

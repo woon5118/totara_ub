@@ -22,9 +22,11 @@
  */
 
 use pathway_criteria_group\criteria_group;
+use totara_competency\aggregation_task;
+use totara_competency\aggregation_users_table;
 use totara_competency\entities\competency;
 use totara_competency\entities\competency_achievement;
-use totara_competency\task\competency_achievement_aggregation;
+use totara_competency\task\competency_aggregation_all;
 use totara_competency\entities\pathway_achievement;
 use totara_criteria\criterion;
 
@@ -39,7 +41,7 @@ use totara_criteria\criterion;
  * Including the behaviour of the aggregator in the tests does however ensure correct behaviour of the cron task
  * in certain scenarios, such as when it uses the last_aggregated field.
  */
-class task_competency_achievement_aggregation_testcase extends advanced_testcase {
+class totara_competency_aggregation_all_task_testcase extends advanced_testcase {
 
     // TODO: These are integration tests - Need to write proper unit tests
     private function setup_data() {
@@ -232,11 +234,10 @@ class task_competency_achievement_aggregation_testcase extends advanced_testcase
         return $data;
     }
 
-
     public function test_execute_with_no_data() {
         global $DB;
 
-        $task = new competency_achievement_aggregation();
+        $task = new competency_aggregation_all();
         $task->execute();
 
         $rows = $DB->get_records('totara_competency_achievement');
@@ -355,7 +356,7 @@ class task_competency_achievement_aggregation_testcase extends advanced_testcase
         $this->assertEquals(0, $DB->count_records('totara_competency_achievement_via'));
 
         // Now run the task
-        $task = new competency_achievement_aggregation();
+        $task = new competency_aggregation_all();
         $task->execute();
 
         // Verify item_record
@@ -384,7 +385,10 @@ class task_competency_achievement_aggregation_testcase extends advanced_testcase
         $assignment_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
         $data->setup_active_expanded_user_assignments($assignment_generator, [1]);
 
-        $task = new competency_achievement_aggregation();
+        $start_time = $time = time();
+
+        $task = new competency_aggregation_all();
+        $task->set_aggregation_time($time);
 
         // Up until this point, this test will have been similar to test_aggregation_of_single_competency_and_user().
         // We now run the task again without any changes
@@ -399,8 +403,8 @@ class task_competency_achievement_aggregation_testcase extends advanced_testcase
         // We've recorded the time we aggregated and we sent an event because there was a new value.
         $this->assertTimeCurrent($comp_record1->last_aggregated);
 
-        // Now we wait for a moment and then re-aggregate again
-        $this->waitForSecond();
+        $time = $time + 1;
+        $task->set_aggregation_time($time);
         $task->execute();
 
         // Nothing changed - so not expecting an update
@@ -410,11 +414,9 @@ class task_competency_achievement_aggregation_testcase extends advanced_testcase
 
         $this->assertEquals($comp_record1->last_aggregated, $comp_record2->last_aggregated);
 
-        // Now manually simulate a change on the lowest level - item_recor
-        $this->waitForSecond();
-
-        $DB->execute('UPDATE {totara_criteria_item_record} SET timeevaluated = :timeevaluated',
-            ['timeevaluated' => time()]);
+        $time = $time + 1;
+        $task->set_aggregation_time($time);
+        $DB->set_field('totara_criteria_item_record', 'timeevaluated', $time);
 
         $task->execute();
 

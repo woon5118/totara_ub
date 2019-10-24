@@ -17,55 +17,61 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Brendan Cox <brendan.cox@totaralearning.com>
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package totara_competency
  */
 
-namespace totara_competency\task;
+namespace totara_competency;
 
-use core\task\scheduled_task;
-use totara_competency\achievement_configuration;
-use totara_competency\aggregation_users_table;
-use totara_competency\competency_achievement_aggregator;
-use totara_competency\competency_aggregator_user_source_table;
-use totara_competency\pathway;
 use totara_competency\entities\competency;
-use totara_competency\pathway_evaluator_factory;
-use totara_competency\pathway_evaluator_user_source_table;
-use totara_competency\pathway_factory;
-use totara_competency\plugintypes;
-use xmldb_table;
 
 /**
- * Class competency_achievement_aggregation
+ * Class to run the aggregation on a list of users and competencies.
  *
- * Aggregates values for users competency achievements based on their pathway achievement values.
+ * Which users and competencies to run on is determined by the table passed in.
+ *
+ * The task uses all records in the table provided and run aggregation on them.
  */
-class competency_achievement_aggregation extends scheduled_task {
+class aggregation_task {
 
-    /** @var aggregation_users_table $temp_table */
-    private $temp_table;
+    /**
+     * @var aggregation_users_table
+     */
+    private $table;
 
-    /** @var pathway_evaluator_user_source_table $pw_user_id_source */
+    /**
+     * @var bool
+     */
+    private $full_user_set;
+
+    /**
+     * @var pathway_evaluator_user_source_table
+     */
     private $pw_user_id_source;
 
-    /** @var competency__aggregator_user_source_table $comp_user_id_source */
+    /**
+     * @var competency_aggregator_user_source_table
+     */
     private $comp_user_id_source;
 
-    public function get_name() {
-        return get_string('updatecompachievements', 'totara_competency');
+    /**
+     * @param aggregation_users_table $table
+     * @param bool $full_user_set set it to true if all users and competencies are in the table,
+     *                            false if only a subset of rows is in the table
+     */
+    public function __construct(aggregation_users_table $table, bool $full_user_set) {
+        $this->table = $table;
+        $this->full_user_set = $full_user_set;
     }
 
-    public function execute() {
-        $this->temp_table = new aggregation_users_table('totara_competency_aggregation_temp', true);
+    /**
+     * @param int|null $aggregation_time if needed you can specify the time, defaults to current unix timestamp
+     */
+    public function execute(?int $aggregation_time = null) {
+        $this->pw_user_id_source = new pathway_evaluator_user_source_table($this->table, $this->full_user_set);
+        $this->comp_user_id_source = new competency_aggregator_user_source_table($this->table, $this->full_user_set);
 
-        // With using a temp table this is probably not necessary
-        $this->pw_user_id_source = new pathway_evaluator_user_source_table($this->temp_table, true);
-        $this->comp_user_id_source = new competency_aggregator_user_source_table($this->temp_table, true);
-
-        $this->fill_temp_table();
-
-        $aggregation_time = time();
+        $aggregation_time = $aggregation_time ?? time();
 
         // Get competencies with active enabled pathways and assigned users
         //      For each pathway
@@ -94,23 +100,6 @@ class competency_achievement_aggregation extends scheduled_task {
         }
     }
 
-    private function fill_temp_table() {
-        global $DB;
-
-        [$insert_values_sql, $params] = $this->temp_table->get_insert_values_sql_with_params(null, null, 0);
-
-        $insert_columns = "user_id, competency_id, ".implode(", ", array_keys($params));
-
-        $sql =
-            "INSERT INTO {" . $this->temp_table->get_table_name() . "}
-            (" . $insert_columns . ")
-             SELECT user_id, competency_id, {$insert_values_sql}
-              FROM {totara_competency_assignment_users} tacu
-              GROUP BY user_id, competency_id";
-
-        $DB->execute($sql, $params);
-    }
-
     private function get_active_pathways_for_assigned_users(): \moodle_recordset {
         global $DB;
 
@@ -127,12 +116,10 @@ class competency_achievement_aggregation extends scheduled_task {
                 AND tcp.status = :activestatus
                 AND tcp.comp_id IN (
                     SELECT DISTINCT competency_id
-                    FROM {{$this->temp_table->get_table_name()}}
+                    FROM {{$this->table->get_table_name()}}
                 )
             ORDER BY tcp.comp_id";
         $params['activestatus'] = pathway::PATHWAY_STATUS_ACTIVE;
-
-        $aggregation_time = time();
 
         return $DB->get_recordset_sql($sql, $params);
     }
@@ -149,6 +136,5 @@ class competency_achievement_aggregation extends scheduled_task {
         $competency_aggregator = new competency_achievement_aggregator($configuration, $this->comp_user_id_source);
         $competency_aggregator->aggregate($aggregation_time);
     }
-
 
 }
