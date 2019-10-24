@@ -2142,27 +2142,19 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 $output .= html_writer::tag('dd', $approver);
             }
 
-            if ($signup->has_manager()) {
-                $manager = core_user::get_user($signup->get_managerid());
-                if (isset($manager->firstname) && isset($manager->lastname)) {
-                    $manager_url = new moodle_url('/user/view.php', ['id' => $manager->id]);
-                    $output .= html_writer::tag('dt', get_string('managername', 'mod_facetoface') . ':');
-                    $output .= html_writer::tag('dd', html_writer::link($manager_url, fullname($manager)));
+            $managernames = [];
+            $managers = signup_helper::find_managers_from_signup($signup);
+            foreach ($managers as $manager) {
+                $manager_url = user_get_profile_url($manager);
+                if ($manager_url) {
+                    $managernames[] = html_writer::link($manager_url, $manager->fullname);
+                } else {
+                    $managernames[] = $manager->fullname;
                 }
-            } else {
-                $managerids   = \totara_job\job_assignment::get_all_manager_userids($USER->id);
-                if (!empty($managerids)) {
-                    $managers = [];
-                    foreach ($managerids as $managerid) {
-                        $manager = core_user::get_user($managerid);
-                        $manager_url = new moodle_url('/user/view.php', ['id' => $manager->id]);
-                        $managers[] = html_writer::link($manager_url, fullname($manager));
-                    }
-                    if (!empty($managers)) {
-                        $output .= html_writer::tag('dt', get_string('managername', 'mod_facetoface') . ':');
-                        $output .= html_writer::tag('dd', implode(', ', $managers));
-                    }
-                }
+            }
+            if (!empty($managernames)) {
+                $output .= html_writer::tag('dt', get_string('managername', 'mod_facetoface') . ':');
+                $output .= html_writer::tag('dd', implode(', ', $managernames));
             }
         }
 
