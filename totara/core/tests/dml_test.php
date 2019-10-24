@@ -969,8 +969,8 @@ ORDER BY tt1.groupid";
         }
 
         /** @var sqlsrv_native_moodle_database $DB */
-        $done = $DB->fts_wait_for_indexing($tablename, 10);
-        $this->assertTrue($done);
+        $done = $DB->fts_wait_for_indexing($tablename, 30);
+        $this->assertTrue($done, 'Timeout while waiting for SQL Server FTS reindexing');
     }
 
     public function test_override_dboption() {
