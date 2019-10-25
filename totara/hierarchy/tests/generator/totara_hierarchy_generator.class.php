@@ -782,6 +782,7 @@ class totara_hierarchy_generator extends component_generator_base {
         $data = new \stdClass();
         $data->id = 0;
         $data->shortname = $datatype . $typeid;
+        $data->fullname  = ucfirst($customfield['hierarchy']).' type '.$datatype;
         $data->typeid = $typeid;
         $data->datatype = $datatype;
         $data->description_editor = array('text' => '', 'format' => '1', 'itemid' => time());
@@ -811,7 +812,13 @@ class totara_hierarchy_generator extends component_generator_base {
         if ($datatype == 'multiselect' && isset($customfield['param1'])) {
             $data->multiselectitem = $customfield['param1'];
         }
-        $data->fullname  = ucfirst($customfield['hierarchy']).' type '.$datatype;
+
+        if (isset($customfield['shortname'])) {
+            $data->shortname = $customfield['shortname'];
+        }
+        if (isset($customfield['fullname'])) {
+            $data->fullname = $customfield['fullname'];
+        }
 
         require_once($CFG->dirroot.'/totara/customfield/field/'.$datatype.'/define.class.php');
         $customfieldclass = 'customfield_define_'.$datatype;

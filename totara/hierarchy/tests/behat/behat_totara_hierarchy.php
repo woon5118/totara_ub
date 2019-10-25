@@ -38,6 +38,9 @@ class behat_totara_hierarchy extends behat_base {
 
     protected static $generator = null;
 
+    /**
+     * @return totara_hierarchy_generator
+     */
     protected function get_data_generator() {
         global $CFG;
         if (self::$generator === null) {
@@ -171,6 +174,133 @@ class behat_totara_hierarchy extends behat_base {
             unset($record['type']);
 
             $this->get_data_generator()->create_hierarchy($frameworkid, $prefix, $record);
+        }
+    }
+
+    /**
+     * Create the requested hierarchy element
+     *
+     * @Given /^the following hierarchy types exist:$/
+     * @param TableNode $table
+     * @throws Exception
+     */
+    public function the_following_hierarchy_types_exist(TableNode $table) {
+        \behat_hooks::set_step_readonly(true); // Backend action.
+
+        $required = array(
+            'hierarchy',
+        );
+        $optional = array(
+            'idnumber',
+            'fullname',
+        );
+
+        $data = $table->getHash();
+        $firstrow = reset($data);
+
+        file_put_contents('/tmp/hash.txt', var_export($data, true));
+
+        // Check required fields are present.
+        foreach ($required as $reqname) {
+            if (!isset($firstrow[$reqname])) {
+                throw new Exception('Hierarchy elements require the field '.$reqname.' to be set');
+            }
+        }
+
+        $generator = $this->get_data_generator();
+
+        foreach ($data as $row) {
+            // Copy values, ready to pass on to the generator.
+            $record = array();
+            foreach ($row as $fieldname => $value) {
+                if (in_array($fieldname, $required)) {
+                    $record[$fieldname] = $value;
+                } else if (in_array($fieldname, $optional)) {
+                    $record[$fieldname] = $value;
+                } else {
+                    throw new Exception('Unknown field '.$fieldname.' in hierarchy definition');
+                }
+            }
+
+            $hierarchytype = $record['hierarchy'];
+            unset($record['hierarchy']);
+
+            $generator->create_hierarchy_type($hierarchytype, $record);
+        }
+    }
+
+    /**
+     * Create the requested hierarchy type custom fields
+     *
+     * @Given /^the following hierarchy type custom fields exist:$/
+     * @param TableNode $table
+     * @throws Exception
+     */
+    public function the_following_hierarchy_type_custom_fields_exist(TableNode $table) {
+        \behat_hooks::set_step_readonly(true); // Backend action.
+
+        $required = array(
+            'hierarchy',
+            'typeidnumber',
+            'type',
+            'value',
+        );
+        $optional = array(
+            'fullname',
+            'shortname',
+        );
+
+        $data = $table->getHash();
+        $firstrow = reset($data);
+
+        // Check required fields are present.
+        foreach ($required as $reqname) {
+            if (!isset($firstrow[$reqname])) {
+                throw new Exception('Hierarchy elements require the field '.$reqname.' to be set');
+            }
+        }
+
+        $generator = $this->get_data_generator();
+
+        foreach ($data as $row) {
+            // Copy values, ready to pass on to the generator.
+            $record = array();
+            foreach ($row as $fieldname => $value) {
+                if (in_array($fieldname, $required)) {
+                    $record[$fieldname] = $value;
+                } else if (in_array($fieldname, $optional)) {
+                    $record[$fieldname] = $value;
+                } else {
+                    throw new Exception('Unknown field '.$fieldname.' in hierarchy definition');
+                }
+            }
+
+            $type = $record['type'];
+            unset($record['type']);
+
+            switch($type) {
+                case 'checkbox':
+                    $generator->create_hierarchy_type_checkbox($record);
+                    break;
+                case 'assign':
+                    $generator->create_hierarchy_type_assign($record);
+                    break;
+                case 'datetime':
+                    $generator->create_hierarchy_type_datetime($record);
+                    break;
+                case 'location':
+                    $generator->create_hierarchy_type_location($record);
+                    break;
+                case 'text':
+                    $generator->create_hierarchy_type_text($record);
+                    break;
+                case 'textarea':
+                    $generator->create_hierarchy_type_textarea($record);
+                    break;
+                default:
+                    throw new Exception('Invalid custom field type '.$record['type']);
+
+            }
         }
     }
 
