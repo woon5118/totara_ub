@@ -391,37 +391,32 @@ class aggregation_users_table {
         ?int $competency_id_value = null,
         string $param_prefix = 'autbl'
     ) {
-        $sql = '';
+        $sql_parts = [];
         $params = [];
 
         $table_alias = !empty($table_alias) ? $table_alias . '.' : $table_alias;
-        $connect = '';
+
+        if (!is_null($competency_id_value)) {
+            $sql_parts[] = "{$table_alias}{$this->competency_id_column} = :{$param_prefix}_competency_id";
+            $params[$param_prefix . '_competency_id'] = $competency_id_value;
+        }
 
         if (!empty($this->process_key_value) && !empty($this->process_key_column)) {
-            $sql = "{$table_alias}{$this->process_key_column} = :{$param_prefix}_processkey";
+            $sql_parts[] = "{$table_alias}{$this->process_key_column} = :{$param_prefix}_processkey";
             $params[$param_prefix . '_processkey'] = $this->process_key_value;
-            $connect = ' AND ';
         }
 
         if ($include_update_operation && !empty($this->update_operation_column) && !empty($this->update_operation_value)) {
-            $sql .= "{$connect}{$table_alias}{$this->update_operation_column} = :{$param_prefix}_updateoperation";
+            $sql_parts[] = "{$table_alias}{$this->update_operation_column} = :{$param_prefix}_updateoperation";
             $params[$param_prefix . '_updateoperation'] = $this->update_operation_value;
-            $connect = ' AND ';
         }
 
         if (!is_null($has_change_value) && !empty($this->has_changed_column)) {
-            $sql .= "{$connect}{$table_alias}{$this->has_changed_column} = :{$param_prefix}_haschanged";
+            $sql_parts[] = "{$table_alias}{$this->has_changed_column} = :{$param_prefix}_haschanged";
             $params[$param_prefix . '_haschanged'] = $has_change_value;
-            $connect = ' AND ';
         }
 
-        if (!is_null($competency_id_value)) {
-            $sql .= "{$connect}{$table_alias}{$this->competency_id_column} = :{$param_prefix}_competency_id";
-            $params[$param_prefix . '_competency_id'] = $competency_id_value;
-            $connect = ' AND ';
-        }
-
-        return [$sql, $params];
+        return [implode(' AND ', $sql_parts), $params];
     }
 
     /**
@@ -463,6 +458,41 @@ class aggregation_users_table {
         if (!$exists) {
             $record = $this->get_insert_record($user_id, $competency_id);
             $DB->insert_record($this->table_name, $record);
+        }
+    }
+
+    /**
+     * Queue aggregation to be processed in the background for all assigned users
+     *
+     * @param int $competency_id
+     */
+    public function queue_all_assigned_users_for_aggregation(int $competency_id): void {
+        global $DB;
+
+        if (!empty($this->process_key_column)) {
+            $process_key_wh = " AND agg_queue.{$this->process_key_column} IS NULL";
+        }
+        $sql =
+            "SELECT tacu.user_id
+               FROM {totara_assignment_competency_users} tacu
+          LEFT JOIN {{$this->get_table_name()}} agg_queue
+                 ON agg_queue.{$this->competency_id_column} = tacu.competency_id
+                AND agg_queue.{$this->user_id_column} = tacu.user_id
+                    {$process_key_wh}
+              WHERE tacu.competency_id = :compid
+                AND agg_queue.id IS NULL";
+
+        $to_add = $DB->get_fieldset_sql($sql, ['compid' => $competency_id]);
+        $to_add = array_map(
+            function($user_id) use ($competency_id) {
+                return ['competency_id' => $competency_id, 'user_id' => $user_id, 'process_key' => null];
+            },
+            $to_add
+        );
+
+        $batches = array_chunk($to_add, BATCH_INSERT_MAX_ROW_COUNT);
+        foreach ($batches as $rows) {
+            $DB->insert_records($this->table_name, $rows);
         }
     }
 

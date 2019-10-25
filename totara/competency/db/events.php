@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+ * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  * @package totara_competency
  */
 
@@ -90,5 +91,17 @@ $observers = [
     [
         'eventname' => \hierarchy_organisation\event\organisation_deleted::class,
         'callback'  => \totara_competency\observers\organisation_deleted::class.'::observe'
+    ],
+    [
+        'eventname' => '\tassign_competency\event\assignment_user_assigned',
+        'callback' => 'totara_competency\observer::user_assigned',
+    ],
+    [
+        'eventname' => '\tassign_competency\event\assignment_user_unassigned',
+        'callback' => 'totara_competency\observer::user_unassigned',
+    ],
+    [
+        'eventname' => '\tassign_competency\event\assignment_user_archived',
+        'callback' => 'totara_competency\observer::user_archived',
     ],
 ];

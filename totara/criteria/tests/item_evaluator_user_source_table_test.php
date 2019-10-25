@@ -79,13 +79,18 @@ class totara_criteria_item_evaluator_user_source_table_testcase extends advanced
     private function insert_temp_users(array $user_ids, int $has_changed = 0) {
         global $DB;
 
-        $DB->delete_records('totara_competency_temp_users');
+        $DB->delete_records('totara_competency_aggregation_queue');
         $temp_records = [];
         foreach ($user_ids as $id) {
-            $temp_records[] = ['user_id' => $id, 'has_changed' => $has_changed, 'process_key' => $this->process_key, 'update_operation_name' => $this->update_operation_value];
+            $temp_records[] = [
+                'competency_id' => 1,
+                'user_id' => $id,
+                'has_changed' => $has_changed,
+                'process_key' => $this->process_key,
+                'update_operation_name' => $this->update_operation_value];
         }
 
-        $DB->insert_records('totara_competency_temp_users', $temp_records);
+        $DB->insert_records('totara_competency_aggregation_queue', $temp_records);
     }
 
     private function verify_item_records($expected) {
@@ -206,7 +211,7 @@ class totara_criteria_item_evaluator_user_source_table_testcase extends advanced
 
         // Now for the test
         // Initially all temp user rows has a 0 has_changed value
-        $temp_user_rows = $DB->get_records('totara_competency_temp_users');
+        $temp_user_rows = $DB->get_records('totara_competency_aggregation_queue');
         $this->assertEquals(5, count($temp_user_rows));
         foreach ($temp_user_rows as $row) {
             $this->assertEquals(0, $row->has_changed);
@@ -215,7 +220,7 @@ class totara_criteria_item_evaluator_user_source_table_testcase extends advanced
         $data->full_source->mark_updated_assigned_users($data->criterion->get_id(), $previous_time);
 
         // Now users 1, 3 and 5 must be marked as having changes
-        $temp_user_rows = $DB->get_records('totara_competency_temp_users');
+        $temp_user_rows = $DB->get_records('totara_competency_aggregation_queue');
         $this->assertEquals(5, count($temp_user_rows));
         foreach ($temp_user_rows as $row) {
             $this->assertEquals(in_array($row->user_id, [1, 3, 5]) ? 1 : 0, $row->has_changed);

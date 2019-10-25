@@ -40,6 +40,9 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
 
         };
 
+        // Redirect the events during setup
+        $sink = $this->redirectEvents();
+
         for ($i = 1; $i <= 3; $i++) {
             $data->users[$i] = $this->getDataGenerator()->create_user();
             $data->courses[$i] = $this->getDataGenerator()->create_course();
@@ -123,97 +126,94 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
 
         $expand_task = new \tassign_competency\expand_task($DB);
         $expand_task->expand_all();
+        $sink->close();
 
         return $data;
     }
 
     /** Test no criteria_ids provided */
-    public function test_aggregate_based_on_criteria_empty_list() {
+    public function test_mark_for_reaggregate_from_criteria_empty_list() {
         global $DB;
 
         $data = $this->setup_data();
-        $this->verify_adhoc_task(0);
+        $this->assertSame(0, $DB->count_records('totara_competency_aggregation_queue', []));
 
         // No criteria_ids
-        aggregation_helper::aggregate_based_on_criteria($data->users[3]->id, []);
-        // No ad-hoc task should be scheduled
-        $this->verify_adhoc_task(0);
+        aggregation_helper::mark_for_reaggregate_from_criteria([], $data->users[3]->id);
+        $this->verify_queue([]);
     }
 
     /**
      * Test single competency, single criterion
      */
-    public function test_aggregate_based_on_criteria_single_competency_single_criterion_assigned_user() {
+    public function test_mark_for_reaggregate_from_criteria_single_competency_single_criterion_assigned_user() {
         global $DB;
 
         $data = $this->setup_data();
 
         $criteria_ids = $data->competency_data['Comp A']['criteria_ids'];
-        aggregation_helper::aggregate_based_on_criteria($data->users[1]->id, $criteria_ids);
+        aggregation_helper::mark_for_reaggregate_from_criteria($criteria_ids, $data->users[1]->id);
 
-        // Expecting ad-hoc task with 1 competency id
-        $this->verify_adhoc_task(1,
+        $this->verify_queue([
             [
                 'user_id' => $data->users[1]->id,
-                'competency_ids' => [$data->competency_data['Comp A']['competency_id']],
+                'competency_id' => $data->competency_data['Comp A']['competency_id'],
             ]
-        );
+        ]);
     }
 
     /**
      * Test single criterion, user not assigned
      */
-    public function test_aggregate_based_on_criteria_single_criterion_not_assigned_user() {
+    public function test_mark_for_reaggregate_from_criteria_single_criterion_not_assigned_user() {
         global $DB;
 
         $data = $this->setup_data();
 
         $criteria_ids = $data->competency_data['Comp A']['criteria_ids'];
-        aggregation_helper::aggregate_based_on_criteria($data->users[3]->id, $criteria_ids);
+        aggregation_helper::mark_for_reaggregate_from_criteria($criteria_ids, $data->users[3]->id);
 
-        // Expecting ad-hoc task with 1 competency id
-        $this->verify_adhoc_task(0);
+        $this->verify_queue([]);
     }
 
     /**
      * Test single competency, multiple criteria, user assigned
      */
-    public function test_aggregate_based_on_criteria_single_competencies_multiple_criteria_assigned_user() {
+    public function test_mark_for_reaggregate_from_criteria_single_competencies_multiple_criteria_assigned_user() {
         global $DB;
 
         $data = $this->setup_data();
 
         $criteria_ids = $data->competency_data['Comp B']['criteria_ids'];
-        aggregation_helper::aggregate_based_on_criteria($data->users[1]->id, $criteria_ids);
+        aggregation_helper::mark_for_reaggregate_from_criteria($criteria_ids, $data->users[1]->id);
 
         // Expecting ad-hoc task with 1 competency id
-        $this->verify_adhoc_task(1,
+        $this->verify_queue([
             [
                 'user_id' => $data->users[1]->id,
-                'competency_ids' => [$data->competency_data['Comp B']['competency_id']],
+                'competency_id' => $data->competency_data['Comp B']['competency_id'],
             ]
-        );
+        ]);
     }
 
     /**
      * Test single competency, multiple criteria, user not assigned
      */
-    public function test_aggregate_based_on_criteria_single_competencies_multiple_criteria_not_assigned_user() {
+    public function test_mark_for_reaggregate_from_criteria_single_competencies_multiple_criteria_not_assigned_user() {
         global $DB;
 
         $data = $this->setup_data();
 
         $criteria_ids = $data->competency_data['Comp B']['criteria_ids'];
-        aggregation_helper::aggregate_based_on_criteria($data->users[2]->id, $criteria_ids);
+        aggregation_helper::mark_for_reaggregate_from_criteria($criteria_ids, $data->users[2]->id);
 
-        // Expecting ad-hoc task with 1 competency id
-        $this->verify_adhoc_task(0);
+        $this->verify_queue([]);
     }
 
     /**
      * Test multiple competencies, multiple criteria, user assigned in some
      */
-    public function test_aggregate_based_on_criteria_multipl_competencies_multiple_criteria() {
+    public function test_mark_for_reaggregate_from_criteria_multiple_competencies_multiple_criteria() {
         global $DB;
 
         $data = $this->setup_data();
@@ -222,27 +222,76 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
             $data->competency_data['Comp A']['criteria_ids'],
             $data->competency_data['Comp B']['criteria_ids'],
             $data->competency_data['Comp C']['criteria_ids']);
-        aggregation_helper::aggregate_based_on_criteria($data->users[3]->id, $criteria_ids);
+        aggregation_helper::mark_for_reaggregate_from_criteria($criteria_ids, $data->users[3]->id);
 
-        // Expecting ad-hoc task with 1 competency id
-        $this->verify_adhoc_task(1,
+        $this->verify_queue([
             [
                 'user_id' => $data->users[3]->id,
-                'competency_ids' => [$data->competency_data['Comp B']['competency_id'], $data->competency_data['Comp C']['competency_id']],
-            ]
-        );
+                'competency_id' => $data->competency_data['Comp B']['competency_id'],
+            ],
+            [
+                'user_id' => $data->users[3]->id,
+                'competency_id' => $data->competency_data['Comp C']['competency_id'],
+            ],
+        ]);
     }
 
-    private function verify_adhoc_task(bool $expected, ?array $expected_custom_data = null) {
+    /**
+     * Test multiple competencies, multiple criteria, all assigned users
+     */
+    public function test_mark_for_reaggregate_from_criteria_multiple_competencies_multiple_criteria_all_users() {
         global $DB;
 
-        $rows = $DB->get_records('task_adhoc', ['classname' => '\totara_competency\task\competency_achievement_aggregation_adhoc']);
-        $this->assertSame((int) $expected, count($rows));
+        $data = $this->setup_data();
 
-        if (!is_null($expected_custom_data)) {
-            $task = reset($rows);
-            $this->assertEqualsCanonicalizing($expected_custom_data, json_decode($task->customdata, true));
+        $criteria_ids = array_merge(
+            $data->competency_data['Comp A']['criteria_ids'],
+            $data->competency_data['Comp B']['criteria_ids'],
+            $data->competency_data['Comp C']['criteria_ids']);
+        aggregation_helper::mark_for_reaggregate_from_criteria($criteria_ids);
+
+        $this->verify_queue([
+            [
+                'user_id' => $data->users[1]->id,
+                'competency_id' => $data->competency_data['Comp A']['competency_id'],
+            ],
+            [
+                'user_id' => $data->users[1]->id,
+                'competency_id' => $data->competency_data['Comp B']['competency_id'],
+            ],
+            [
+                'user_id' => $data->users[2]->id,
+                'competency_id' => $data->competency_data['Comp A']['competency_id'],
+            ],
+            [
+                'user_id' => $data->users[3]->id,
+                'competency_id' => $data->competency_data['Comp B']['competency_id'],
+            ],
+            [
+                'user_id' => $data->users[3]->id,
+                'competency_id' => $data->competency_data['Comp C']['competency_id'],
+            ],
+        ]);
+    }
+
+
+    private function verify_queue(array $expected_rows) {
+        global $DB;
+
+        $rows = $DB->get_records('totara_competency_aggregation_queue');
+        $this->assertSame(count($expected_rows), count($rows));
+
+        // Just checking user_id and comp_id
+        foreach ($rows as $row) {
+            foreach ($expected_rows as $key => $expected) {
+                if ($row->competency_id == $expected['competency_id'] && $row->user_id == $expected['user_id']) {
+                    unset ($expected_rows[$key]);
+                    break 1;
+                }
+            }
         }
+
+        $this->assertSame(0, count($expected_rows));
     }
 
 }

@@ -23,6 +23,8 @@
  */
 
 use pathway_criteria_group\criteria_group;
+use totara_competency\aggregation_task;
+use totara_competency\aggregation_users_table;
 use totara_competency\pathway;
 use criteria_coursecompletion\coursecompletion;
 use totara_competency\achievement_configuration;
@@ -100,7 +102,6 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
     }
 
     public function test_course_completion_leads_to_comp_achievement_via_events() {
-
         global $DB;
 
         /** @var totara_competency_generator $competency_generator */
@@ -153,8 +154,13 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
         $completion = new completion_completion(['course' => $course1->id, 'userid' => $user1->id]);
 
         $completion->mark_complete();
-        // Verify that an adhoc task was created and run it
-        $this->verify_and_run_adhoc_task();
+        // Verify that a row was inserted in the aggregation queue
+        $this->assertTrue($DB->record_exists('totara_competency_aggregation_queue',
+            ['user_id' => $user1->id, 'competency_id' => $competency1->id, 'process_key' => null])
+        );
+
+        // Run the task
+        $this->run_aggregation_task();
 
         // Ordered these according to when they happen.
         $this->assertEquals(1, $DB->count_records('totara_criteria_item_record'));
@@ -169,16 +175,12 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
         $this->assertEquals($expected_value1->id, $comp_record->scale_value_id);
     }
 
-    private function verify_and_run_adhoc_task() {
-        global $DB;
-
-        $rows = $DB->get_records('task_adhoc', ['classname' => '\totara_competency\task\competency_achievement_aggregation_adhoc']);
-        $this->assertSame(1, count($rows));
-
-        // Run adhoc task
-        $row = reset($rows);
-        $task = new competency_achievement_aggregation_adhoc();
-        $task->set_custom_data(json_decode($row->customdata));
+    private function run_aggregation_task() {
+        $process_key = md5(uniqid(rand(), true));
+        $table = new aggregation_users_table();
+        $table->set_process_key_value($process_key);
+        $table->claim_process();
+        $task = new aggregation_task($table, false);
         $task->execute();
     }
 

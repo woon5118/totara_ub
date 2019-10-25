@@ -22,9 +22,10 @@
  * @package totara_criteria
  */
 
+use totara_competency\aggregation_users_table;
 use totara_competency\entities\competency_achievement;
 use totara_criteria\competency_item_evaluator;
-use totara_criteria\item_evaluator_user_source_list;
+use totara_criteria\item_evaluator_user_source_table;
 
 class totara_criteria_competency_item_evaluator_testcase extends advanced_testcase {
 
@@ -32,13 +33,18 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
         global $DB;
 
         $data = new class() {
+            /** @var criterion $criterion */
             public $criterion;
+            /** @var aggregation_users_table $source_table */
+            public $source_table;
         };
 
         $this->setAdminUser();
         $GLOBALS['USER']->ignoresesskey = true;
 
         // Simulating a competency (id = 1) with 1 child (id 11)
+
+        /** @var totara_criteria_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
         $data->criterion = $generator->create_childcompetency(['competency' => 1]);
 
@@ -46,6 +52,7 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
         $record = ['criterion_id' => $data->criterion->get_id(), 'item_type' => 'competency', 'item_id' => 11];
         $DB->insert_record('totara_criteria_item', $record);
 
+        $data->source_table = new aggregation_users_table();
         return $data;
     }
 
@@ -122,7 +129,7 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
 
         $data = $this->setup_data();
 
-        $user_source = new item_evaluator_user_source_list([], true);
+        $user_source = new item_evaluator_user_source_table($data->source_table, false);
         $evaluator = new competency_item_evaluator($user_source);
         $evaluator->update_completion($data->criterion);
         $this->assertSame(0, $DB->count_records('totara_criteria_item_record'));
@@ -156,7 +163,8 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
             ['criterion_id' => $data->criterion->get_id(), 'item_type' => 'competency', 'item_id' => $child_id]);
         $record_id = $this->create_item_record($item_id, $user_id, $is_met);
 
-        $user_source = new item_evaluator_user_source_list([$user_id], true);
+        $data->source_table->queue_for_aggregation($user_id, 1);
+        $user_source = new item_evaluator_user_source_table($data->source_table);
         $evaluator = new competency_item_evaluator($user_source);
         $evaluator->update_completion($data->criterion);
 
@@ -298,7 +306,8 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
                 $achievement['status'] ?? null);
         }
 
-        $user_source = new item_evaluator_user_source_list([$user_id], true);
+        $data->source_table->queue_for_aggregation($user_id, 1);
+        $user_source = new item_evaluator_user_source_table($data->source_table);
         $evaluator = new competency_item_evaluator($user_source);
         $evaluator->update_completion($data->criterion);
 
@@ -370,7 +379,8 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
                 $achievement['status'] ?? null);
         }
 
-        $user_source = new item_evaluator_user_source_list([$user_id], true);
+        $data->source_table->queue_for_aggregation($user_id, 1);
+        $user_source = new item_evaluator_user_source_table($data->source_table);
         $evaluator = new competency_item_evaluator($user_source);
         $evaluator->update_completion($data->criterion);
 

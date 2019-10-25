@@ -22,6 +22,8 @@
  */
 
 
+use tassign_competency\expand_task;
+use tassign_competency\models\assignment_actions;
 use totara_competency\aggregation_users_table;
 
 class totara_competency_aggregation_users_table_testcase extends \advanced_testcase {
@@ -385,5 +387,76 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
         [$sql, $params] = $nocolumn_tbl->get_set_has_changed_sql_with_params(1);
         $this->assertEquals('', $sql);
         $this->assertEquals([], $params);
+    }
+
+    /**
+     * Test queue_all_assigned_users_for_aggregation
+     */
+    public function test_queue_all_assigned_users_for_aggregation() {
+        global $DB;
+
+        $sink = $this->redirectEvents();
+        // The assignment table's foreign keys require us to create some actual competencies and users
+
+        /** @var totara_competency_generator $competency_generator */
+        $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+        /** @var tassign_competency_generator $assignment_generator */
+        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+
+        $competencies = [];
+        $competencies[1] = $competency_generator->create_competency();
+        $competencies[2] = $competency_generator->create_competency();
+
+        $users = [];
+        $user_ids_all = [];
+        $user_ids_some = [];
+        $assignment_ids = [];
+        for ($i = 1; $i < 10; $i++) {
+            $users[$i] = $this->getDataGenerator()->create_user();
+            $user_ids_all[] = $users[$i]->id;
+            $assignment = $assignment_generator->create_user_assignment($competencies[1]->id, $users[$i]->id);
+            $assignment_ids[] = $assignment->id;
+
+            if ($i % 2) {
+                $user_ids_some[] = $users[$i]->id;
+                $assignment = $assignment_generator->create_user_assignment($competencies[2]->id, $users[$i]->id);
+                $assignment_ids[] = $assignment->id;
+            }
+        }
+
+        (new assignment_actions())->activate($assignment_ids);
+        (new expand_task($DB))->expand_all();
+
+        $user_table = new aggregation_users_table();
+
+        // Now for the tests
+
+        // Start with an empty queue - add all users assigned to competency2
+        $user_table->queue_all_assigned_users_for_aggregation($competencies[2]->id);
+
+        $sql =
+            "SELECT id, {$user_table->get_user_id_column()}
+               FROM {{$user_table->get_table_name()}}
+              WHERE {$user_table->get_competency_id_column()} = :compid
+                AND {$user_table->get_process_key_column()} IS NULL";
+
+        $actual_user_ids = $DB->get_records_sql_menu($sql, ['compid' => $competencies[2]->id]);
+        $this->assertEqualsCanonicalizing($user_ids_some, $actual_user_ids);
+
+        $actual_user_ids = $DB->get_records_sql_menu($sql, ['compid' => $competencies[1]->id]);
+        $this->assertEmpty($actual_user_ids);
+
+        // First manually add some rows for competency1
+        for ($i = 1; $i <= 3; $i++) {
+            $user_table->queue_for_aggregation($users[$i]->id, $competencies[1]->id);
+        }
+
+        // Now test that each user appear only once
+        $user_table->queue_all_assigned_users_for_aggregation($competencies[1]->id);
+        $actual_user_ids = $DB->get_records_sql_menu($sql, ['compid' => $competencies[1]->id]);
+        $this->assertSame(count($user_ids_all), count($actual_user_ids));
+        $this->assertEqualsCanonicalizing($user_ids_all, $actual_user_ids);
+
+        $sink->close();
     }
 }

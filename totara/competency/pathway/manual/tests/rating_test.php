@@ -24,6 +24,8 @@
 
 use pathway_manual\manual;
 use pathway_manual\manual_evaluator;
+use totara_competency\aggregation_task;
+use totara_competency\aggregation_users_table;
 use totara_competency\entities\competency;
 use totara_competency\pathway_evaluator;
 use totara_competency\pathway_evaluator_user_source_list;
@@ -69,6 +71,7 @@ class pathway_manual_rating_testcase extends advanced_testcase {
         // When using list sources, we need an actual user
         $user = $this->getDataGenerator()->create_user();
         $manual->set_manual_value($user->id, $user->id, manual::ROLE_SELF, null, 'Go me');
+        $this->validate_and_run_aggregation_task();
 
         $this->assertNull(pathway_achievement::get_current($manual, $user->id)->scale_value_id);
 
@@ -99,6 +102,7 @@ class pathway_manual_rating_testcase extends advanced_testcase {
         $this->setCurrentTimeStart();
         $scale_value = $competency->scale->sorted_values_high_to_low->first();
         $manual->set_manual_value($user->id, $user->id, manual::ROLE_SELF, $scale_value->id, 'Great jerb');
+        $this->validate_and_run_aggregation_task();
 
         $this->assertEquals(
             $scale_value->id,
@@ -134,6 +138,7 @@ class pathway_manual_rating_testcase extends advanced_testcase {
         $this->setCurrentTimeStart();
         $scale_value = $competency->scale->sorted_values_high_to_low->first();
         $manual->set_manual_value($user->id, $manager->id, manual::ROLE_MANAGER, $scale_value->id);
+        $this->validate_and_run_aggregation_task();
 
         $this->assertEquals(
             $scale_value->id,
@@ -192,6 +197,7 @@ class pathway_manual_rating_testcase extends advanced_testcase {
 
         $scale_value = $competency->scale->sorted_values_high_to_low->first();
         $manual->set_manual_value($user->id, $manager->id, manual::ROLE_APPRAISER, $scale_value->id, '');
+        $this->validate_and_run_aggregation_task();
 
         $this->assertEquals(
             $scale_value->id,
@@ -302,6 +308,7 @@ class pathway_manual_rating_testcase extends advanced_testcase {
 
         $manual1->set_manual_value($user->id, $manager->id, manual::ROLE_MANAGER, $scale_value1->id, '');
         $manual2->set_manual_value($user->id, $user->id, manual::ROLE_SELF, $scale_value2->id, '');
+        $this->validate_and_run_aggregation_task();
 
         $pathway_achievement1 = pathway_achievement::get_current($manual1, $user->id);
         $pathway_achievement2 = pathway_achievement::get_current($manual2, $user->id);
@@ -309,17 +316,24 @@ class pathway_manual_rating_testcase extends advanced_testcase {
         $this->assertEquals($pathway_achievement1->scale_value_id, $scale_value1->id);
         $this->assertEquals($pathway_achievement2->scale_value_id, $scale_value2->id);
 
-        // This happens internally when setting a manual value. We do this now independent of a manual
-        // value being set to ensure that one still does not pick up the other's value.
-
-        $user_source = new pathway_evaluator_user_source_list([$user->id]);
-        (new manual_evaluator($manual1, $user_source))->aggregate();
-        (new manual_evaluator($manual2, $user_source))->aggregate();
-
         $pathway_achievement1 = pathway_achievement::get_current($manual1, $user->id);
         $pathway_achievement2 = pathway_achievement::get_current($manual2, $user->id);
 
         $this->assertEquals($pathway_achievement1->scale_value_id, $scale_value1->id);
         $this->assertEquals($pathway_achievement2->scale_value_id, $scale_value2->id);
+    }
+
+    private function validate_and_run_aggregation_task() {
+        global $DB;
+
+        $table = new aggregation_users_table();
+
+        $this->assertTrue($DB->record_exists($table->get_table_name(), [$table->get_process_key_column() => null]));
+
+        $process_key = md5(uniqid(rand(), true));
+        $table->set_process_key_value($process_key);
+        $table->claim_process();
+        $task = new aggregation_task($table, false);
+        $task->execute();
     }
 }

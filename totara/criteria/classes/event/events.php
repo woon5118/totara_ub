@@ -36,4 +36,21 @@ $observers = [
         'eventname' => '\hierarchy_competency\event\competency_deleted',
         'callback' => '\criteria_childcompetency\observer::competency_deleted',
     ],
+    [
+        'eventname' => 'totara_competency\event\competency_achievement_updated',
+        'callback' => '\criteria_childcompetency\observer::competency_achievement_updated',
+    ],
+    [
+        'eventname' => '\tassign_competency\event\assignment_user_assigned',
+        'callback' => '\criteria_childcompetency\observer::user_assigned',
+    ],
+    [
+        'eventname' => '\tassign_competency\event\assignment_user_unassigned',
+        'callback' => '\criteria_childcompetency\observer::user_unassigned',
+    ],
+    [
+        'eventname' => '\tassign_competency\event\assignment_user_archived',
+        'callback' => '\criteria_childcompetency\observer::user_assignment_archived',
+    ],
+
 ];

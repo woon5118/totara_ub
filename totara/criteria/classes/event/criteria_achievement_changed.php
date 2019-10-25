@@ -26,7 +26,7 @@ namespace totara_criteria\event;
 
 use core\event\base;
 
-class criteria_satisfied extends base {
+class criteria_achievement_changed extends base {
 
     /**
      * Initialise required event data properties.
@@ -36,8 +36,8 @@ class criteria_satisfied extends base {
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }
 
-    public static function create_with_ids(array $criteria_ids, int $user_id) {
-        return criteria_satisfied::create(
+    public static function create_with_ids(int $user_id, array $criteria_ids) {
+        return criteria_achievement_changed::create(
             [
                 'context' => \context_system::instance(),
                 'relateduserid' => $user_id,

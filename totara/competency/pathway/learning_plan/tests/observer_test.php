@@ -21,7 +21,7 @@
  * @package pathway_learning_plan
  */
 
-use totara_competency\competency_aggregator_user_source_list;
+use totara_competency\aggregation_users_table;
 use totara_plan\event\competency_value_set;
 use totara_competency\entities\scale_value;
 use pathway_learning_plan\learning_plan;
@@ -85,18 +85,17 @@ class pathway_learning_plan_observer_testcase extends advanced_testcase {
 
         competency_value_set::create_from_record($lp_value_record)->trigger();
 
-        $pathway_achievement = pathway_achievement::get_current($lp_pathway, $user->id);
-        $this->assertEquals($great->id, $pathway_achievement->scale_value_id);
+        // Verify that a row was inserted in the aggregation queue
+        $source_table = new aggregation_users_table();
+        $this->assertTrue($DB->record_exists($source_table->get_table_name(),
+            [
+                $source_table->get_user_id_column() => $user->id,
+                $source_table->get_competency_id_column() => $comp->id,
+                $source_table->get_process_key_column() => null
+            ])
+        );
 
-        $user_id_source = new competency_aggregator_user_source_list([$user->id], false);
-        (new competency_achievement_aggregator(new achievement_configuration($competency), $user_id_source))->aggregate();
-
-        $achievements = competency_achievement::repository()
-            ->where('user_id', '=', $user->id)
-            ->where('comp_id', '=', $comp->id)
-            ->get();
-        $this->assertCount(1, $achievements);
-        $this->assertEquals($great->id, $achievements->first()->scale_value_id);
+        $source_table->truncate();
 
         // Part 2 of this test (as we have data set up already): account for pathways being archived.
 
@@ -107,41 +106,8 @@ class pathway_learning_plan_observer_testcase extends advanced_testcase {
 
         competency_value_set::create_from_record($lp_value_record)->trigger();
 
-        // The latest pathway achievement should still equal great. Because the pathway was archived.
-        $pathway_achievement = pathway_achievement::get_current($lp_pathway, $user->id);
-        $this->assertEquals($great->id, $pathway_achievement->scale_value_id);
-
-        // Aggregate. There are no active pathways now. So we are left with no value.
-        (new competency_achievement_aggregator(new achievement_configuration($competency), $user_id_source))->aggregate();
-        $achievements = competency_achievement::repository()
-            ->where('user_id', '=', $user->id)
-            ->where('comp_id', '=', $comp->id)
-            ->where('status', '=', competency_achievement::ACTIVE_ASSIGNMENT)
-            ->get();
-        $this->assertCount(1, $achievements);
-        $this->assertNull($achievements->first()->scale_value_id);
-
-        // Part 3: Now do the above again, but there will be a new active pathway instead.
-
-        $new_lp_pathway = new learning_plan();
-        $new_lp_pathway->set_competency($competency);
-        $new_lp_pathway->save();
-
-        // Trigger the event for the observer to catch.
-        competency_value_set::create_from_record($lp_value_record)->trigger();
-
-        // The latest pathway achievement should now equal good.
-        $pathway_achievement = pathway_achievement::get_current($new_lp_pathway, $user->id);
-        $this->assertEquals($good->id, $pathway_achievement->scale_value_id);
-
-        (new competency_achievement_aggregator(new achievement_configuration($competency), $user_id_source))->aggregate();
-        $achievements = competency_achievement::repository()
-            ->where('user_id', '=', $user->id)
-            ->where('comp_id', '=', $comp->id)
-            ->where('status', '=', competency_achievement::ACTIVE_ASSIGNMENT)
-            ->get();
-        $this->assertCount(1, $achievements);
-        $this->assertEquals($good->id, $achievements->first()->scale_value_id);
+        // As the user is still assigned to the competency
+        $this->assertFalse($DB->record_exists($source_table->get_table_name(), []));
     }
 
     public function test_event_for_competency_without_lp_pathway() {
@@ -193,16 +159,15 @@ class pathway_learning_plan_observer_testcase extends advanced_testcase {
 
         competency_value_set::create_from_record($record)->trigger();
 
-        $user_id_source = new competency_aggregator_user_source_list([$user->id]);
-        (new competency_achievement_aggregator(new achievement_configuration($competency), $user_id_source))->aggregate();
-
-        $achievements = competency_achievement::repository()
-            ->where('user_id', '=', $user->id)
-            ->where('comp_id', '=', $comp->id)
-            ->get();
-        $this->assertCount(1, $achievements);
-
-        // Has not achieved any scale value despite receiving a rating via a learning plan.
-        $this->assertEquals(null, $achievements->first()->scale_value_id);
+        // Verify that a row was inserted in the aggregation queue
+        $source_table = new aggregation_users_table();
+        $this->assertTrue($DB->record_exists($source_table->get_table_name(),
+            [
+                $source_table->get_user_id_column() => $user->id,
+                $source_table->get_competency_id_column() => $comp->id,
+                $source_table->get_process_key_column() => null
+            ])
+        );
     }
+
 }

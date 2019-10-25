@@ -29,9 +29,14 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
     private function setup_data() {
         $data = new class() {
+            /** @var array $users */
             public $users;
+            /** @var \stdClass $course */
             public $course;
+            /** @var coursecompletion $coursecompletion */
             public $coursecompletion;
+            /** @var aggregation_users_table $source_table */
+            public $source_table;
         };
 
         $this->setAdminUser();
@@ -53,7 +58,7 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
         $record = ['courseids' => [$data->course->id]];
         $data->coursecompletion = $generator->create_coursecompletion($record);
 
-        $data->temp_table_def = new aggregation_users_table();
+        $data->source_table = new aggregation_users_table();
 
         return $data;
     }
@@ -63,10 +68,10 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
         $temp_records = [];
         foreach ($user_ids as $id) {
-            $temp_records[] = ['user_id' => $id, 'has_changed' => $has_changed];
+            $temp_records[] = ['competency_id' => 1, 'user_id' => $id, 'has_changed' => $has_changed];
         }
 
-        $DB->insert_records('totara_competency_temp_users', $temp_records);
+        $DB->insert_records('totara_competency_aggregation_queue', $temp_records);
     }
 
     public function test_update_completion_no_users() {
@@ -75,7 +80,7 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
         $data = $this->setup_data();
         $this->assertSame(0, $DB->count_records('totara_criteria_item_record'));
 
-        $user_source = new item_evaluator_user_source_table($data->temp_table_def, true);
+        $user_source = new item_evaluator_user_source_table($data->source_table);
         $item_evaluator = new course_item_evaluator($user_source);
         $item_evaluator->update_completion($data->coursecompletion);
         $this->assertSame(0, $DB->count_records('totara_criteria_item_record'));
@@ -83,6 +88,9 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
     public function test_update_completion_new_course_completion() {
         global $DB;
+
+        // Redirecting events to prevent observers from interfering with tests
+        $sink = $this->redirectEvents();
 
         $data = $this->setup_data();
         $test_users = [$data->users[1]->id, $data->users[2]->id];
@@ -92,13 +100,13 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
         $this->insert_temp_users($test_users);
 
         // Create the initial item_records and wait for a second to ensure we have unique timestamps
-        $user_source = new item_evaluator_user_source_table($data->temp_table_def, true);
+        $user_source = new item_evaluator_user_source_table($data->source_table);
         $item_evaluator = new course_item_evaluator($user_source);
         $item_evaluator->update_completion($data->coursecompletion);
         $this->waitForSecond();
 
         // Reset the has_changed flag for all assignments which was set when the item_records were created
-        $DB->execute('UPDATE {totara_competency_temp_users} SET has_changed = 0');
+        $DB->execute('UPDATE {totara_competency_aggregation_queue} SET has_changed = 0');
 
         // Mark user1 to have completed the course
         /** @var completion_completion $completion */
@@ -124,7 +132,7 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
         }
 
         // Similarly - user1's has_changes in the temp table should be set, but not user2's
-        $temp_records = $DB->get_records('totara_competency_temp_users');
+        $temp_records = $DB->get_records('totara_competency_aggregation_queue');
         $this->assertSame(count($test_users), count($temp_records));
         foreach ($temp_records as $record) {
             if ($record->user_id == $data->users[1]->id) {
@@ -133,6 +141,8 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
                 $this->assertEquals(0, $record->has_changed);
             }
         }
+
+        $sink->close();
     }
 
     public function test_update_completion_course_completion_no_longer_exist() {
@@ -147,11 +157,11 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
         $this->insert_temp_users($test_users);
 
         // Create the initial item_records - tested in another function
-        $user_source = new item_evaluator_user_source_table($data->temp_table_def, true);
+        $user_source = new item_evaluator_user_source_table($data->source_table);
         $item_evaluator = new course_item_evaluator($user_source);
         $item_evaluator->update_completion($data->coursecompletion);
         // Reset the has_changed flag
-        $DB->execute('UPDATE {totara_competency_temp_users} SET has_changed = 0');
+        $DB->execute('UPDATE {totara_competency_aggregation_queue} SET has_changed = 0');
 
         // Now for the real test ...
         // Testing that the sql statements to catch item_records with invalid criterion_met values are updated correctly
@@ -172,7 +182,7 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
         }
 
         // Similarly - user1's has_changes in the temp table should be set, but not user2's
-        $temp_records = $DB->get_records('totara_competency_temp_users');
+        $temp_records = $DB->get_records('totara_competency_aggregation_queue');
         $this->assertSame(count($test_users), count($temp_records));
         foreach ($temp_records as $record) {
             if ($record->user_id == $data->users[1]->id) {
@@ -186,6 +196,9 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
     public function test_update_completion_course_completion_missed_by_observer() {
         global $DB;
 
+        // Redirecting events to prevent observers from interfering with tests
+        $sink = $this->redirectEvents();
+
         $data = $this->setup_data();
 
         $test_users = [$data->users[1]->id, $data->users[2]->id];
@@ -195,13 +208,13 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
         $this->insert_temp_users($test_users);
 
         // Create the initial item_records and wait for a second to ensure we have unique timestamps
-        $user_source = new item_evaluator_user_source_table($data->temp_table_def, true);
+        $user_source = new item_evaluator_user_source_table($data->source_table);
         $item_evaluator = new course_item_evaluator($user_source);
         $item_evaluator->update_completion($data->coursecompletion);
         $this->waitForSecond();
 
         // Reset the has_changed flag for all assignments which was set when the item_records were created
-        $DB->execute('UPDATE {totara_competency_temp_users} SET has_changed = 0');
+        $DB->execute('UPDATE {totara_competency_aggregation_queue} SET has_changed = 0');
 
         // Mark user1 to have completed the course
         /** @var completion_completion $completion */
@@ -233,7 +246,7 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
         }
 
         // Similarly - user1's has_changes in the temp table should be set, but not user2's
-        $temp_records = $DB->get_records('totara_competency_temp_users');
+        $temp_records = $DB->get_records('totara_competency_aggregation_queue');
         $this->assertSame(count($test_users), count($temp_records));
         foreach ($temp_records as $record) {
             if ($record->user_id == $data->users[1]->id) {
@@ -242,6 +255,8 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
                 $this->assertEquals(0, $record->has_changed);
             }
         }
+
+        $sink->close();
     }
 
 }

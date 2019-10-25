@@ -24,9 +24,8 @@
 namespace pathway_learning_plan;
 
 use totara_competency\entities\competency_assignment_user;
+use totara_competency\aggregation_users_table;
 use totara_competency\pathway;
-use totara_competency\pathway_factory;
-use totara_competency\pathway_evaluator;
 use totara_plan\event\competency_value_set;
 
 class observer {
@@ -37,26 +36,24 @@ class observer {
         $competency_id = $event->other['competency_id'];
         $user_id = $event->relateduserid;
 
-        $pathway_record = $DB->get_record(
-            'totara_competency_pathway',
-            ['comp_id' => $competency_id, 'path_type' => 'learning_plan', 'status' => pathway::PATHWAY_STATUS_ACTIVE]
-        );
+        // Check that we have an active learning_plan
+        $sql = "SELECT 1
+                  FROM {totara_assignment_competency_users} tacu
+                  JOIN {totara_competency_pathway} tcp
+                    ON tcp.comp_id = tacu.competency_id
+                 WHERE tacu.competency_id = :compid
+                   AND tacu.user_id = :userid
+                   AND tcp.path_type = :pathtype
+                   AND tcp.status = :activestatus";
+        $params = [
+            'compid' => $competency_id,
+            'userid' => $user_id,
+            'pathtype' => 'learning_plan',
+            'activestatus' => pathway::PATHWAY_STATUS_ACTIVE
+        ];
 
-        if (!$pathway_record) {
-            return;
-        }
-
-        // Check if the user is assigned to this competency.
-        $assigned = competency_assignment_user::repository()
-            ->where('competency_id', $competency_id)
-            ->where('user_id', $user_id);
-
-        if (!$assigned->exists()) {
-            return;
-        }
-
-        $pathway = pathway_factory::fetch('learning_plan', $pathway_record->id);
-        $user_source = new learning_plan_evaluator_user_source_list([$user_id], false);
-        (new learning_plan_evaluator($pathway, $user_source))->aggregate();
+        if ($DB->record_exists_sql($sql, $params)) {
+            (new aggregation_users_table())->queue_for_aggregation($user_id, $competency_id);
+        };
     }
 }

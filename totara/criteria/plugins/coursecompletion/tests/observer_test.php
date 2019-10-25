@@ -25,7 +25,7 @@
 use core\event\course_completed;
 use criteria_coursecompletion\observer;
 use totara_criteria\entities\criteria_item;
-use totara_criteria\event\criteria_satisfied;
+use totara_criteria\event\criteria_achievement_changed;
 
 class criteria_coursecompletion_observer_testcase extends \advanced_testcase {
 
@@ -114,7 +114,7 @@ class criteria_coursecompletion_observer_testcase extends \advanced_testcase {
         $events = $sink->get_events();
         $this->assertEquals(1, count($events));
         $event = reset($events);
-        $this->assertEquals(criteria_satisfied::class, get_class($event));
+        $this->assertEquals(criteria_achievement_changed::class, get_class($event));
 
         $this->assertEqualsCanonicalizing([$criterion->get_id()], $event->other['criteria_ids']);
         $sink->close();
@@ -144,7 +144,7 @@ class criteria_coursecompletion_observer_testcase extends \advanced_testcase {
         $events = $sink->get_events();
         $this->assertEquals(1, count($events));
         $event = reset($events);
-        $this->assertEquals(criteria_satisfied::class, get_class($event));
+        $this->assertEquals(criteria_achievement_changed::class, get_class($event));
 
         $this->assertEqualsCanonicalizing([$criterion1->get_id(), $criterion2->get_id()], $event->other['criteria_ids']);
         $sink->close();

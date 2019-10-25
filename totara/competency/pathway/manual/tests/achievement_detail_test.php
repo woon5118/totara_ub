@@ -24,6 +24,8 @@
 use pathway_manual\achievement_detail;
 use pathway_manual\manual;
 use pathway_manual\userdata\manual_rating_other;
+use totara_competency\aggregation_task;
+use totara_competency\aggregation_users_table;
 use totara_competency\entities\pathway_achievement;
 use totara_job\job_assignment;
 use totara_userdata\userdata\target_user;
@@ -80,6 +82,7 @@ class pathway_manual_achievement_detail_testcase extends advanced_testcase {
      */
     public function test_get_achieved_via_string_self() {
         $this->manual->set_manual_value($this->user1->id, $this->user1->id, manual::ROLE_SELF, $this->scalevalue1->id, '');
+        $this->validate_and_run_aggregation_task();
 
         $this->assert_achieved_via_string($this->user1->id, 'rating by ' . fullname($this->user1) . ' (Self)');
     }
@@ -95,6 +98,7 @@ class pathway_manual_achievement_detail_testcase extends advanced_testcase {
             'managerjaid' => $managerja->id
         ]);
         $this->manual->set_manual_value($this->user1->id, $this->user2->id, manual::ROLE_MANAGER, $this->scalevalue2->id, '');
+        $this->validate_and_run_aggregation_task();
 
         $this->assert_achieved_via_string($this->user1->id, 'rating by ' . fullname($this->user2) . ' (Manager)');
     }
@@ -109,6 +113,7 @@ class pathway_manual_achievement_detail_testcase extends advanced_testcase {
             'appraiserid' => $this->user2->id,
         ]);
         $this->manual->set_manual_value($this->user1->id, $this->user2->id, manual::ROLE_APPRAISER, $this->scalevalue2->id, '');
+        $this->validate_and_run_aggregation_task();
 
         $this->assert_achieved_via_string($this->user1->id, 'rating by ' . fullname($this->user2) . ' (Appraiser)');
     }
@@ -126,6 +131,7 @@ class pathway_manual_achievement_detail_testcase extends advanced_testcase {
         manual_rating_other::execute_purge(new target_user($this->user2), context_system::instance());
 
         $expected_string = get_string('rating_by_removed', 'pathway_manual', 'an appraiser');
+        $this->validate_and_run_aggregation_task();
         $this->assert_achieved_via_string($this->user1->id, $expected_string);
     }
 
@@ -141,6 +147,7 @@ class pathway_manual_achievement_detail_testcase extends advanced_testcase {
         ]);
         $this->manual->set_manual_value($this->user1->id, $this->user2->id, manual::ROLE_MANAGER, $this->scalevalue2->id, '');
         delete_user($this->user2);
+        $this->validate_and_run_aggregation_task();
 
         $expected_string = get_string('rating_by_removed', 'pathway_manual', 'a manager');
         $this->assert_achieved_via_string($this->user1->id, $expected_string);
@@ -151,5 +158,19 @@ class pathway_manual_achievement_detail_testcase extends advanced_testcase {
         $detail = new achievement_detail();
         $detail->set_related_info(json_decode($achievement->related_info, true));
         $this->assertSame([$expected_string], $detail->get_achieved_via_strings());
+    }
+
+    private function validate_and_run_aggregation_task() {
+        global $DB;
+
+        $table = new aggregation_users_table();
+
+        $this->assertTrue($DB->record_exists($table->get_table_name(), [$table->get_process_key_column() => null]));
+
+        $process_key = md5(uniqid(rand(), true));
+        $table->set_process_key_value($process_key);
+        $table->claim_process();
+        $task = new aggregation_task($table, false);
+        $task->execute();
     }
 }

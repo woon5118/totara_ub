@@ -82,15 +82,13 @@ class aggregation_task {
         //      For each competency
         //          Aggregate achievement
 
-        $pathways = $this->get_active_pathways_for_assigned_users();
+        $pathway_rows = $this->get_active_pathways_for_assigned_users();
 
         $reaggregate_competencies = [];
-        foreach ($pathways as $pathway) {
-            $reaggregate_competencies[$pathway->comp_id] = true;
+        foreach ($pathway_rows as $row) {
+            $reaggregate_competencies[$row->comp_id] = true;
 
-            // TODO this will trigger additional queries, think of how to optimise,
-            //      maybe use the record instead because we mostly need the id or the comp_id
-            $pathway = pathway_factory::fetch($pathway->path_type, $pathway->id);
+            $pathway = pathway_factory::from_record($row);
             $pw_evaluator = pathway_evaluator_factory::create($pathway, $this->pw_user_id_source);
             $pw_evaluator->aggregate($aggregation_time);
         }
@@ -110,7 +108,7 @@ class aggregation_task {
         // Although order by may have a slight impact on the query performance, with the possible number of rows
         // that may be returned, it is better to do ordering on the database
         $sql = "
-            SELECT tcp.comp_id, tcp.id, tcp.path_type
+            SELECT *
             FROM {totara_competency_pathway} tcp
             WHERE tcp.path_type {$pathtype_sql}
                 AND tcp.status = :activestatus

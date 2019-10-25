@@ -30,6 +30,7 @@ use totara_criteria\entities\criterion as criterion_entity;
 use totara_criteria\entities\criteria_item as item_entity;
 use totara_criteria\entities\criteria_item_record as item_record_entity;
 use totara_criteria\entities\criteria_metadata as metadata_entity;
+use totara_criteria\event\criteria_items_updated;
 
 class criteria_childcompetency_items_processor_testcase extends advanced_testcase {
 
@@ -37,8 +38,8 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
         $data = new class() {
             /** @var [\stdClass] competencies */
             public $competencies = [];
-            /** @var phpunit_event_sink $sink */
-            public $sink;
+            /** var [childcompetency] $criteria */
+            public $criteria = [];
         };
 
         /** @var totara_competency_generator $competency_generator */
@@ -47,7 +48,7 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
         $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
         // Preventing events here to prevent the observers from making the calls to update_items
-        $data->sink = $this->redirectEvents();
+        $sink = $this->redirectEvents();
 
         $to_create = [
             'Comp A' => ['with_criteria' => true],
@@ -72,7 +73,7 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
             $data->competencies[$compname] = $competency_generator->create_competency($compname, null, null, $comp_record);
 
             if (isset($compdata['with_criteria']) && $compdata['with_criteria']) {
-                $criteria_generator->create_childcompetency(['competency' => $data->competencies[$compname]->id]);
+                $data->criteria[$compname] = $criteria_generator->create_childcompetency(['competency' => $data->competencies[$compname]->id]);
             }
         }
 
@@ -93,12 +94,15 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
             }
         }
 
+        $sink->clear();
+
         return $data;
     }
 
 
     public function test_update_items() {
         $data = $this->setup_data();
+        $sink = $this->redirectEvents();
 
         // Update items for non-existent competency
         $this->verify_criterion(1, false);
@@ -107,49 +111,65 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
         $this->verify_criterion(1, false);
         $this->verify_items(1, []);
 
+        // Ensure that the no event was triggered
+        $this->assertSame(0, $sink->count());
+
         // Update items for competency without any children
         items_processor::update_items($data->competencies['Comp E']->id);
         $this->verify_items($data->competencies['Comp E']->id, []);
+        $this->assertSame(0, $sink->count());
 
         items_processor::update_items($data->competencies['Comp F']->id);
         $this->verify_items($data->competencies['Comp F']->id, []);
+        $this->assertSame(0, $sink->count());
 
         // Update items for competencies with children but without criteria
         foreach (['Comp B', 'Comp D'] as $compname) {
             items_processor::update_items($data->competencies[$compname]->id);
             $this->verify_items($data->competencies[$compname]->id, []);
+            $this->assertSame(0, $sink->count());
         }
 
         // Update items for competency with criteria and multi level children
         items_processor::update_items($data->competencies['Comp A']->id);
         $this->verify_items($data->competencies['Comp A']->id, [$data->competencies['Comp A-1']->id]);
+        $this->verify_event($sink, [$data->criteria['Comp A']->get_id()]);
+        $sink->clear();
 
         // Update items for competency with criteria and multiple direct children
         items_processor::update_items($data->competencies['Comp C']->id);
         $this->verify_items($data->competencies['Comp C']->id,
             [$data->competencies['Comp C-1']->id, $data->competencies['Comp C-2']->id]);
+        $this->verify_event($sink, [$data->criteria['Comp C']->get_id()]);
 
-        $data->sink->close();
+        $sink->close();
     }
 
     public function test_update_items_with_changed_children() {
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
         $data = $this->setup_data();
+        $sink = $this->redirectEvents();
 
         // Comp E starts with criterion, but no children
         items_processor::update_items($data->competencies['Comp E']->id);
         $this->verify_items($data->competencies['Comp E']->id, []);
+        $this->assertSame(0, $sink->count());
 
         // Create 2 child competencies of Comp E
         $newChild1 = $competency_generator->create_competency('New Child 1', null, null, ['parentid' => $data->competencies['Comp E']->id]);
         $newChild2 = $competency_generator->create_competency('New Child 2', null, null, ['parentid' => $data->competencies['Comp E']->id]);
         $newChild3 = $competency_generator->create_competency('New Child 3', null, null, ['parentid' => $data->competencies['Comp E']->id]);
 
-        // Now we should create 3 items for Comp E
+        // Ignore the hierarchy events that were triggered (will be picked up by observer - tested elsewhere)
+        $sink->clear();
+
+        // Now we should create 3 items for Comp E and 1 event generated
         items_processor::update_items($data->competencies['Comp E']->id);
         $this->verify_items($data->competencies['Comp E']->id,
             [$newChild1->id, $newChild2->id, $newChild3->id]);
+        $this->verify_event($sink, [$data->criteria['Comp E']->get_id()]);
+        $sink->clear();
 
         // Retrieve the current item record ids to be used later
         $initial_items = $this->get_items($data->competencies['Comp E']->id);
@@ -165,15 +185,19 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
         $entity1->path = '/' . $newChild1->id;
         $entity1->save();
 
+        $sink->clear();
+
         items_processor::update_items($data->competencies['Comp E']->id);
         $this->verify_items($data->competencies['Comp E']->id,
             [$newChild2->id, $newChild3->id, $anotherChild->id], $initial_item_id_map);
+        $this->verify_event($sink, [$data->criteria['Comp E']->get_id()]);
 
-        $data->sink->close();
+        $sink->close();
     }
 
     public function test_update_items_with_records() {
         $data = $this->setup_data();
+        $sink = $this->redirectEvents();
 
         // Run update_items to generate the initial items
         // C initially has 2 children C-1 and C-2 (Tested in previous test)
@@ -193,6 +217,8 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
             );
         }
 
+        $sink->clear();
+
         // Now for the test
         // Move Comp C-1 to Comp A who has a childcompetency criterion
         $data->competencies['Comp C-1']->parentid = $data->competencies['Comp A']->id;
@@ -200,7 +226,11 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
 
         // Run update items on both
         items_processor::update_items($data->competencies['Comp C']->id);
+        $this->verify_event($sink, [$data->criteria['Comp C']->get_id()]);
+        $sink->clear();
+
         items_processor::update_items($data->competencies['Comp A']->id);
+        $this->verify_event($sink, [$data->criteria['Comp A']->get_id()]);
 
         // And verify both the items and item_records
         $this->verify_items($data->competencies['Comp C']->id, [$data->competencies['Comp C-2']->id]);
@@ -210,7 +240,7 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
         // Comp C-1 should no longer have an item_record
         $this->verify_item_records($data->competencies['Comp C-1']->id, []);
 
-        $data->sink->close();
+        $sink->close();
     }
 
 
@@ -280,4 +310,19 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
             $this->assertTrue(in_array($record->user_id, $expected_user_ids));
         }
     }
+
+    /**
+     * Verify the triggered event
+     *
+     * @param \phpunit_event_sink $sink
+     * @param array $expected_criteria_ids
+     */
+    private function verify_event(\phpunit_event_sink $sink, array $expected_criteria_ids = []) {
+        $this->assertSame(1, $sink->count());
+        $events = $sink->get_events();
+        $event = reset($events);
+        $this->assertTrue($event instanceof criteria_items_updated);
+        $this->assertEqualsCanonicalizing($expected_criteria_ids, $event->other['criteria_ids']);
+    }
+
 }

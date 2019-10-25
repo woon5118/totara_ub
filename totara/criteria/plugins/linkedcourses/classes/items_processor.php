@@ -31,6 +31,7 @@ use totara_competency\entities\configuration_change;
 use totara_criteria\entities\criterion as criterion_entity;
 use totara_criteria\entities\criteria_item as item_entity;
 use totara_competency\linked_courses;
+use totara_criteria\event\criteria_items_updated;
 
 class items_processor {
 
@@ -62,6 +63,7 @@ class items_processor {
         $configuration_dump = achievement_configuration::get_current_configuration_dump($competency_id);
         $linked_course_ids = linked_courses::get_linked_course_ids($competency_id);
         $configuration_has_changed = false;
+        $updated_criteria_ids = [];
 
         $transaction = $DB->start_delegated_transaction();
 
@@ -79,6 +81,7 @@ class items_processor {
             }
 
             $configuration_has_changed = true;
+            $updated_criteria_ids[] = $criterion->id;
 
             foreach ($to_add as $to_add_id) {
                 $item = new item_entity();
@@ -106,6 +109,8 @@ class items_processor {
             $config = new achievement_configuration(new competency_entitiy($competency_id));
             $config->save_configuration_history($now, $configuration_dump);
             configuration_change::add_competency_entry($competency_id, configuration_change::CHANGED_CRITERIA, $now);
+
+            criteria_items_updated::create_with_ids($updated_criteria_ids)->trigger();
         }
 
         $transaction->allow_commit();

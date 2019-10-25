@@ -22,7 +22,8 @@
  */
 
 use totara_competency\entities\competency_assignment_user_log;
-use totara_competency\competency_aggregator_user_source_list;
+use totara_competency\aggregation_users_table;
+use totara_competency\competency_aggregator_user_source_table;
 use totara_competency\data_providers;
 use totara_competency\models\assignment_actions;
 use totara_competency\expand_task;
@@ -36,7 +37,7 @@ use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
 use totara_competency\competency_achievement_aggregator;
 use totara_competency\base_achievement_detail;
-use totara_competency\pathway_evaluator_user_source_list;
+use totara_competency\pathway_evaluator_user_source_table;
 
 class totara_competency_data_provider_activity_log_testcase extends advanced_testcase {
 
@@ -225,13 +226,15 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
 
         $now = time();
 
-        $pw_user_source = new pathway_evaluator_user_source_list([$user->id], true);
+        $source_table = new aggregation_users_table();
+        $source_table->queue_for_aggregation($user->id, $competency->id);
+        $pw_user_source = new pathway_evaluator_user_source_table($source_table, true);
         $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway, $pw_user_source]);
         $pathway_evaluator->aggregate($now++);
 
         $achievement_configuration = new achievement_configuration($competency);
 
-        $comp_user_source = new competency_aggregator_user_source_list([$user->id], true);
+        $comp_user_source = new competency_aggregator_user_source_table($source_table, true);
         $competency_aggregator = new competency_achievement_aggregator($achievement_configuration, $comp_user_source);
         $competency_aggregator->aggregate($now++);
 
@@ -322,11 +325,13 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
             class_alias(get_class($test_achievement_detail), 'pathway_test_pathway\achievement_detail');
         }
 
-        $pw_user_source = new pathway_evaluator_user_source_list([$user->id], true);
+        $source_table = new aggregation_users_table();
+        $source_table->queue_for_aggregation($user->id, $competency->id);
+        $pw_user_source = new pathway_evaluator_user_source_table($source_table, true);
         $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway, $pw_user_source]);
         $pathway_evaluator->aggregate();
 
-        $comp_user_source = new competency_aggregator_user_source_list([$user->id], true);
+        $comp_user_source = new competency_aggregator_user_source_table($source_table, true);
         (new competency_achievement_aggregator(new achievement_configuration($competency), $comp_user_source))->aggregate();
 
         // Now we create an achievement for the other competency, to ensure that this doesn't show up.

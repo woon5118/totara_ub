@@ -3,6 +3,7 @@
 namespace totara_competency\entities;
 
 use core\orm\entity\entity;
+use totara_competency\aggregation_users_table;
 
 /**
  * @property-read int $id ID
@@ -57,6 +58,10 @@ class configuration_change extends entity {
                 return $logged;
             }
         }
+
+        // TODO: It doesn't feel right to do this from an entity!!
+        // Adding each assigned user to the aggregation queuu
+        (new aggregation_users_table())->queue_all_assigned_users_for_aggregation($competency_id);
 
         $entry = new configuration_change();
         $entry->comp_id = $competency_id;

@@ -81,11 +81,21 @@ abstract class pathway {
      * @param  int $id
      * @return static
      */
-    final public static function fetch($id): pathway {
+    final public static function fetch(int $id): pathway {
         global $DB;
 
         $record = $DB->get_record('totara_competency_pathway', ['id' => $id], '*', MUST_EXIST);
 
+        return static::from_record($record);
+    }
+
+    /**
+     * Set the instance attributes from the record
+     *
+     * @param \stdClass $record
+     * @return static
+     */
+    final public static function from_record($record): pathway {
         $classname = "\\pathway_{$record->path_type}\\{$record->path_type}";
         if (!class_exists($classname) || !is_subclass_of($classname, 'totara_competency\pathway')) {
             throw new \coding_exception("Pathway type '{$record->path_type}' does not exist or is not enabled.");

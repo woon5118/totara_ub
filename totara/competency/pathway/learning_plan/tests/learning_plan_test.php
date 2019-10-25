@@ -24,8 +24,10 @@
 use totara_competency\expand_task;
 use totara_competency\models\assignment_actions;
 use totara_competency\achievement_configuration;
+use totara_competency\aggregation_task;
+use totara_competency\aggregation_users_table;
 use totara_competency\competency_achievement_aggregator;
-use totara_competency\competency_aggregator_user_source_list;
+use totara_competency\competency_aggregator_user_source_table;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\scale_value;
@@ -130,6 +132,13 @@ class pathway_learning_plan_learning_plan_testcase extends advanced_testcase {
         // We won't set a value for other assigned user, we want to make sure they are excluded.
         $competency_component->set_value($competency->id, $not_assigned_user->id, $great->id, new stdClass());
 
+        // Verify that a row was inserted in the aggregation queue
+        $this->assertTrue($DB->record_exists('totara_competency_aggregation_queue',
+            ['user_id' => $user->id, 'competency_id' => $comp->id, 'process_key' => null])
+        );
+        // Run the task
+        $this->run_aggregation_task();
+
         $pathway_achievement = pathway_achievement::get_current($lp_pathway, $user->id);
         $this->assertEquals($great->id, $pathway_achievement->scale_value_id);
 
@@ -139,7 +148,9 @@ class pathway_learning_plan_learning_plan_testcase extends advanced_testcase {
         $pathway_achievement = pathway_achievement::get_current($lp_pathway, $not_assigned_user->id);
         $this->assertNull($pathway_achievement->scale_value_id);
 
-        $comp_user_source = new competency_aggregator_user_source_list([$user->id], true);
+        $source_table = new aggregation_users_table();
+        $source_table->queue_for_aggregation($user->id, 1);
+        $comp_user_source = new competency_aggregator_user_source_table($source_table, true);
         (new competency_achievement_aggregator(new achievement_configuration($competency), $comp_user_source))->aggregate();
 
         $achievements = competency_achievement::repository()
@@ -149,4 +160,14 @@ class pathway_learning_plan_learning_plan_testcase extends advanced_testcase {
         $this->assertCount(1, $achievements);
         $this->assertEquals($great->id, $achievements->first()->scale_value_id);
     }
+
+    private function run_aggregation_task() {
+        $process_key = md5(uniqid(rand(), true));
+        $table = new aggregation_users_table();
+        $table->set_process_key_value($process_key);
+        $table->claim_process();
+        $task = new aggregation_task($table, false);
+        $task->execute();
+    }
+
 }

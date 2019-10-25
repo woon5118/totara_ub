@@ -24,98 +24,65 @@
 
 namespace pathway_criteria_group;
 
+use core\orm\collection;
 use core\task\manager;
+use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
+use pathway_criteria_group\entities\criteria_group as criteria_group_entity;
+use totara_competency\aggregation_users_table;
+use totara_competency\entities\competency as competency_entity;
 use totara_competency\pathway;
 use totara_competency\pathway_evaluator_factory;
-use totara_competency\pathway_evaluator_user_source_list;
 use totara_competency\task\competency_achievement_aggregation_adhoc;
 
 class aggregation_helper {
 
     /**
-     * Retrieve the pathways containing the specified criterion ids. Only return pathways linked to competencies
-     * to which the user is assigned.
-     * @param int $user_id
-     * @param array $criteria_ids
-     * @return array of pathways
+     * Add entries to totara_competency_aggregation_queue for each competency with a pathway with
+     * any of the provided criteria
+     *
+     * @param $criteria_ids
+     * @param $user_id
+     * @throws \coding_exception
      */
-    private static function get_pathways_containing_criteria(int $user_id, array $criteria_ids): array {
+    public static function mark_for_reaggregate_from_criteria(array $criteria_ids, ?int $user_id = null) {
         global $DB;
 
         if (empty($criteria_ids)) {
-            return [];
+            return;
         }
 
-        // Get the ids of the competencies to which these criteria are linked AND the user is assigned ot
+        $aggregation_table = new aggregation_users_table();
+
+        // TODO: For now inserting one by one. Find better way if user_id is null
+
         [$criteria_id_sql, $params] = $DB->get_in_or_equal($criteria_ids, SQL_PARAMS_NAMED);
 
-        $sql = "SELECT DISTINCT tcp.id
-                  FROM {totara_competency_pathway} tcp
+        $sql = "SELECT DISTINCT tacu.id,
+                       tcp.comp_id, 
+                       tacu.user_id
+                  FROM {totara_assignment_competency_users} tacu
+                  JOIN {totara_competency_pathway} tcp
+                    ON tcp.comp_id = tacu.competency_id
                   JOIN {pathway_criteria_group} pcg
                     ON pcg.id = tcp.path_instance_id
                   JOIN {pathway_criteria_group_criterion} pcgc
                     ON pcgc.criteria_group_id = pcg.id
                  WHERE tcp.path_type = :pathtype
                    AND tcp.status = :activestatus
-                   AND tcp.comp_id IN (
-                       SELECT DISTINCT tacu.competency_id
-                         FROM {totara_assignment_competency_users} tacu
-                        WHERE user_id = :userid
-                       )
                    AND pcgc.criterion_id {$criteria_id_sql}";
+        if (!empty($user_id)) {
+            $sql .= ' AND tacu.user_id = :userid';
+            $params['userid'] = $user_id;
+        }
+
         $params['pathtype'] = 'criteria_group';
         $params['activestatus'] = pathway::PATHWAY_STATUS_ACTIVE;
         $params['userid'] = $user_id;
 
-        $pathway_ids = $DB->get_fieldset_sql($sql, $params);
+        $rows = $DB->get_records_sql($sql, $params);
 
-        $pathways = [];
-        foreach ($pathway_ids as $pathway_id) {
-            $pathways[] = criteria_group::fetch($pathway_id);
-        }
-
-        return $pathways;
-    }
-
-    /**
-     * Determine which pathways contain the specified criteria
-     * Evaluate the user's pathway_achievement on each pathway
-     * Then trigger an ad-hoc task to aggregate the competency achievement(s) to which these pathways belong
-     *
-     * @param $user_id
-     * @param $criteria_ids
-     * @throws \coding_exception
-     */
-    public static function aggregate_based_on_criteria($user_id, $criteria_ids) {
-        global $DB;
-
-        if (empty($criteria_ids)) {
-            return;
-        }
-
-        $pathways = static::get_pathways_containing_criteria($user_id, $criteria_ids);
-        if (empty($pathways)) {
-            return;
-        }
-
-        $user_id_source = new pathway_evaluator_user_source_list([$user_id], false);
-        $competency_ids = [];
-        $aggregation_time = time();
-
-        foreach ($pathways as $pathway) {
-            $pw_evaluator = pathway_evaluator_factory::create($pathway, $user_id_source);
-            $pw_evaluator->aggregate($aggregation_time);
-            $competency_ids[$pathway->get_competency()->id] = $pathway->get_competency()->id;
-        }
-
-        if (!empty($competency_ids)) {
-            $data = (object)[
-                'user_id' => $user_id,
-                'competency_ids' => array_values($competency_ids)
-            ];
-            $task = new competency_achievement_aggregation_adhoc();
-            $task->set_custom_data($data);
-            manager::queue_adhoc_task($task);
+        foreach ($rows as $row) {
+            $aggregation_table->queue_for_aggregation($row->user_id, $row->comp_id);
         }
     }
 

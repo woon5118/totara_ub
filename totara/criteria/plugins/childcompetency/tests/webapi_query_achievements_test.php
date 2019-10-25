@@ -145,6 +145,9 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends \advan
     }
 
     public function test_it_returns_whether_child_competency_has_been_assigned() {
+        // Redirecting events to ensure observers don't interfere with the test
+        $sink = $this->redirectEvents();
+
         $data = $this->create_data();
 
         // Logging in...
@@ -238,8 +241,7 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends \advan
         $this->assertFalse( $items->item($archived_competency->id)['self_assignable']);
         $this->assertTrue( $items->item($archived_competency->id)['assigned']);
 
-
-        // Let's assert whether these competencies have been assigned
+        $sink->close();
     }
 
 
@@ -311,7 +313,7 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends \advan
         ], $this->get_execution_context());
     }
 
-    public function create_data() {
+    private function create_data() {
         $competencies = [];
         $assignments = [];
 

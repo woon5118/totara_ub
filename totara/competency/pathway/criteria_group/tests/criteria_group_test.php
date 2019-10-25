@@ -172,7 +172,7 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $critgrp_row = $DB->get_record('pathway_criteria_group', ['id' => $instance_id]);
 
         // Sleeping 1 second to ensure timestamps are different
-        sleep(1);
+        $this->waitForSecond();
 
         // Save without changes
         $instance->save();

@@ -46,7 +46,7 @@ class pathway_factory {
     }
 
     /**
-     * Instantiate an instance of the specified pathway type
+     * Instantiate an instance of the specified pathway type and fetch its detail from the database
      *
      * @param string $type Pathway type to instantiate
      * @param int $id Optional pathway instance id
@@ -58,6 +58,20 @@ class pathway_factory {
         $classname = static::get_classname($type);
 
         return $classname::fetch($id);
+    }
+
+    /**
+     * Instantiate an instance of the specified pathway type with the provided detail
+     *
+     * @param \stdClass $record
+     * @return pathway of the requested type
+     */
+    public static function from_record($record) {
+        static::require_enabled($record->path_type);
+
+        $classname = static::get_classname($record->path_type);
+
+        return $classname::from_record($record);
     }
 
     /**

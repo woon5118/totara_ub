@@ -158,7 +158,7 @@ function xmldb_totara_competency_upgrade($oldversion) {
 
     if ($oldversion < 2019102300) {
 
-        // Define table totara_competency_temp_users to be renamed to NEWNAMEGOESHERE.
+        // Define table totara_competency_temp_users to be renamed to totara_competency_aggregation_queue.
         $table = new xmldb_table('totara_competency_temp_users');
 
         // Launch rename table for totara_competency_temp_users.

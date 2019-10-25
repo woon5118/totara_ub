@@ -26,16 +26,14 @@ namespace criteria_coursecompletion;
 
 use core\event\course_completed;
 use totara_criteria\entities\criteria_item;
-use totara_criteria\event\criteria_satisfied;
+use totara_criteria\event\criteria_achievement_changed;
 
 class observer {
 
     public static function course_completed(course_completed $event) {
-        global $DB;
-
         // Find all criteria items for completion of this course
         // As the criterion has no knowledge whether this user's satisfaction of the criteria is to be tracked,
-        // it simply generates an criteria_satisfied event with the relevant criterion ids and this user's id.
+        // it simply generates an criteria_achievement_changed event with the relevant criterion ids and this user's id.
         // Modules that use these criteria are responsible for initiating the relevant processes to create/update
         // the item_record(s) for this user
 
@@ -47,11 +45,8 @@ class observer {
             ->get()
             ->pluck('criterion_id');
 
-        if (empty($criteria_ids)) {
-            // We're not tracking the course - nothing more to do
-            return;
+        if (!empty($criteria_ids)) {
+            criteria_achievement_changed::create_with_ids($event->relateduserid, $criteria_ids)->trigger();
         }
-
-        criteria_satisfied::create_with_ids($criteria_ids, $event->relateduserid)->trigger();
     }
 }
