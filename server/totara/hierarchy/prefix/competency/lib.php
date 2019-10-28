@@ -920,7 +920,7 @@ class competency extends hierarchy {
 
         // Properly format assignment availability from individual form values into a single array
         $item->assignavailability = $item->assignavailability ?? [];
-        if (!advanced_feature::is_enabled('competency_assignment')) {
+        if (advanced_feature::is_enabled('competency_assignment')) {
             $checkbox_mappings = [
                 'assignavailself' => self::ASSIGNMENT_CREATE_SELF,
                 'assignavailother' => self::ASSIGNMENT_CREATE_OTHER,
