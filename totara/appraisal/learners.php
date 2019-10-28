@@ -152,9 +152,7 @@ if (!appraisal::is_closed($appraisalid)) {
 
     // If the appraisal is active notify the user that changes are not live.
     if ($appraisal->status == appraisal::STATUS_ACTIVE) {
-        $userassignments = $assign->get_current_users();
-        $groupassignments = $assign->get_current_users(null, null, null, true);
-        $differences = $appraisal->compare_assignments($userassignments, $groupassignments);
+        $differences = !$assign->is_synced();
         echo html_writer::start_tag('div', array('id' => 'notlivenotice'));
         if (!empty($CFG->dynamicappraisals) && $differences) {
             echo $notlivenotice;
