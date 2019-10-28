@@ -26,7 +26,7 @@ global $CFG;
 require_once("{$CFG->dirroot}/mod/facetoface/lib.php");
 
 use mod_facetoface\{seminar, seminar_event, signup, seminar_session, signup_list};
-use mod_facetoface\signup\state\{booked, requestedadmin, requested};
+use mod_facetoface\signup\state\{booked, declined, requestedadmin, requested};
 use totara_job\job_assignment;
 
 /**
@@ -110,14 +110,16 @@ class mod_facetoface_signup_approval_admin_testcase extends advanced_testcase {
      * @param int $numberofsignups
      * @param seminar $seminar
      * @param string $state
-     * @return void
+     * @return array of [ signups, users ]
      */
-    private function create_signups(int $numberofsignups, seminar $seminar, string $state): void {
+    private function create_signups(int $numberofsignups, seminar $seminar, string $state): array {
         $users = $this->create_users($numberofsignups);
         $generator = $this->getDataGenerator();
         /** @var seminar_event $seminarevent */
         $seminarevent = $seminar->get_events()->current();
 
+        $signups = [];
+        $allusers = [];
         /** @var stdClass $user */
         foreach ($users as $user) {
             $generator->enrol_user($user->id, $seminar->get_course());
@@ -125,7 +127,11 @@ class mod_facetoface_signup_approval_admin_testcase extends advanced_testcase {
             $signup->set_sessionid($seminarevent->get_id())->set_userid($user->id);
             $signup->save();
             $signup->switch_state($state);
+            $signups[] = $signup;
+            $allusers[] = $user->id;
+            $allusers[] = $user->jobassignment->managerid;
         }
+        return [$signups, $allusers];
     }
 
     /**
@@ -204,6 +210,46 @@ class mod_facetoface_signup_approval_admin_testcase extends advanced_testcase {
         $signups->rewind();
         foreach ($signups as $signup) {
             $this->assertInstanceOf(booked::class, $signup->get_state());
+        }
+    }
+
+    /**
+     * @return array of non-manager approval types
+     */
+    public function data_approval_types() {
+        return [[seminar::APPROVAL_NONE], [seminar::APPROVAL_SELF]];
+    }
+
+    /**
+     * Make sure the requested/requestedadmin state is able to be switched to declined after manager approval is turned off.
+     * @dataProvider data_approval_types
+     */
+    public function test_requested_state_can_be_switched_to_declined($approvaltype) {
+        $this->setAdminUser();
+        $seminar = $this->get_facetoface();
+        [$signups, $users] = $this->create_signups(2, $seminar, requested::class);
+        /** @var signup $signup */
+        foreach ($signups as $signup) {
+            $this->assertTrue($signup->can_switch(declined::class));
+        }
+        // We need two steps to move to requestedadmin state.
+        /** @var signup $signup */
+        foreach ($signups as $signup) {
+            $signup->switch_state(requestedadmin::class);
+        }
+        $seminar->set_approvaltype($approvaltype)->save();
+        /** @var seminar_event $seminarevent */
+        $seminarevent = $seminar->get_events()->current();
+        $seminarevent->set_registrationtimestart(0)->set_registrationtimefinish(time() - YEARSECS)->save();
+        /** @var signup $signup */
+        foreach ($signups as $signup) {
+            // See if all admin, manager, learner and another learner can decline this sign-up.
+            $this->setAdminUser();
+            $this->assertTrue($signup->can_switch(declined::class));
+            foreach ($users as $userid) {
+                $this->setUser($userid);
+                $this->assertTrue($signup->can_switch(declined::class));
+            }
         }
     }
 }

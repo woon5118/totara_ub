@@ -33,6 +33,7 @@ use mod_facetoface\signup\condition\{
     event_is_cancelled,
     event_is_not_cancelled,
     event_has_role_approver,
+    signup_awaits_approval,
     waitlist_common
 };
 use mod_facetoface\signup\restriction\{
@@ -92,7 +93,7 @@ class requested extends state implements interface_event {
                 actor_is_manager_or_admin::class
             ),
             transition::to(new declined($this->signup))->with_conditions(
-                approval_manager_required::Class,
+                approval_manager_required::class,
                 event_is_not_cancelled::class
             )->with_restrictions(
                 actor_is_manager_or_admin::class
@@ -139,6 +140,12 @@ class requested extends state implements interface_event {
             ),
             // The user has cancelled.
             transition::to(new user_cancelled($this->signup)),
+
+            // Rescue 'request approval' sign-up status to be able to move to declined.
+            transition::to(new declined($this->signup))->with_conditions(
+                approval_not_required::class,
+                signup_awaits_approval::class
+            ),
         ];
     }
 

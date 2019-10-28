@@ -24,7 +24,7 @@
 namespace mod_facetoface\signup\state;
 
 use mod_facetoface\signup\condition\{approval_admin_required, approval_manager_required, approval_not_required, booking_common,
-    event_is_cancelled, event_is_not_cancelled, waitlist_common, waitlist_everyone_disabled};
+    event_is_cancelled, event_is_not_cancelled, signup_awaits_approval, waitlist_common, waitlist_everyone_disabled};
 use mod_facetoface\signup\transition;
 use mod_facetoface\signup\restriction\actor_is_admin;
 
@@ -91,7 +91,13 @@ class requestedadmin extends state {
             // The seminar event is cancelled.
             transition::to(new event_cancelled($this->signup))->with_conditions(
                 event_is_cancelled::class
-            )
+            ),
+
+            // Rescue 'request approval' sign-up status to be able to move to declined.
+            transition::to(new declined($this->signup))->with_conditions(
+                approval_not_required::class,
+                signup_awaits_approval::class
+            ),
         ];
     }
 

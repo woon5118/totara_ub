@@ -33,11 +33,13 @@ use mod_facetoface\signup\condition\{
     booking_common,
     event_is_cancelled,
     event_is_not_cancelled,
+    signup_awaits_approval,
     waitlist_common
 };
 use mod_facetoface\signup;
 use mod_facetoface\signup\restriction\{
     actor_has_role,
+    actor_is_admin,
     actor_is_manager_or_admin
 };
 use mod_facetoface\signup\transition;
@@ -97,6 +99,12 @@ class requestedrole extends state implements interface_event {
             ),
             // The user has cancelled.
             transition::to(new user_cancelled($this->signup)),
+
+            // Rescue 'request approval' sign-up status to be able to move to declined.
+            transition::to(new declined($this->signup))->with_conditions(
+                approval_not_required::class,
+                signup_awaits_approval::class
+            ),
         ];
     }
 

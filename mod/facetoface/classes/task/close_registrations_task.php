@@ -104,10 +104,11 @@ class close_registrations_task extends \core\task\scheduled_task {
                INNER JOIN {facetoface_signups_status} fss
                        ON fss.signupid = fs.id AND fss.superceded = 0
                     WHERE fs.sessionid = :sess
-                      AND (statuscode = :req OR statuscode = :adreq)";
+                      AND (statuscode = :req OR statuscode = :roreq OR statuscode = :adreq)";
 
         $params = [
             'req' => requested::get_code(),
+            'roreq' => requestedrole::get_code(),
             'adreq' => requestedadmin::get_code(),
             'sess' => $seminarevent->get_id(),
         ];
@@ -124,13 +125,12 @@ class close_registrations_task extends \core\task\scheduled_task {
 
             if ($signup->can_switch(declined::class)) {
                 $signup->switch_state(declined::class);
+                // Send a registration expiration message to the user (and their manager).
+                notice_sender::registration_closure($seminarevent, $record->recipient);
             } else {
                 $failures = $signup->get_failures(declined::class);
                 debugging(implode("\n", $failures), DEBUG_DEVELOPER);
             }
-
-            // Send a registration expiration message to the user (and their manager).
-            notice_sender::registration_closure($seminarevent, $record->recipient);
         }
     }
 }
