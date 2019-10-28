@@ -17,24 +17,49 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @package totara_core
+  @package totara_samples
 -->
 
 <template>
-  <div>
-    <p>Vue component displayed</p>
-    <div id="testSeparator">
-      <Separator />
-    </div>
+  <div class="tui-loader">
+    A visual 'and' separator
+
+    <SamplesExample>
+      <AndBox />
+    </SamplesExample>
+
+    <SamplesCode>
+      <template v-slot:template>{{ codeTemplate }}</template>
+      <template v-slot:script>{{ codeScript }}</template>
+    </SamplesCode>
   </div>
 </template>
 
 <script>
-import Separator from 'totara_core/components/decor/Separator';
+import AndBox from 'totara_core/components/decor/AndBox';
+import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
 
 export default {
   components: {
-    Separator,
+    AndBox,
+    SamplesCode,
+    SamplesExample,
+  },
+
+  data() {
+    return {
+      fullpage: false,
+      loading: true,
+      codeTemplate: `<AndBox/>`,
+      codeScript: `import AndBox from 'totara_core/components/decor/AndBox';
+
+export default {
+  components: {
+    AndBox,
+  }
+}`,
+    };
   },
 };
 </script>

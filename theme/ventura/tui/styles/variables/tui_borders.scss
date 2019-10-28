@@ -18,16 +18,18 @@
 //
 // @copyright 2019 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-// @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
+// @author    Dave Wallace <dave.wallace@totaralearning.com>
 // @package   theme_ventura
 
-// Import all common theme variables
-@import 'theme_ventura/variables/tui_sizes';
-@import 'theme_ventura/variables/tui_spacing';
-@import 'theme_ventura/variables/tui_borders';
-@import 'theme_ventura/variables/tui_colors';
-@import 'theme_ventura/variables/tui_bootstrap_colors';
-@import 'theme_ventura/variables/tui_shadows';
-@import 'theme_ventura/variables/tui_breakpoints';
-@import 'theme_ventura/variables/tui_mixins';
-@import 'theme_ventura/variables/tui_typography';
+:root {
+  //
+  // Theme border widths
+  //
+
+  // Content aggregation borders
+  // Often used for sections of content such as Forms, Blocks, various Panels,
+  // and horizontal rules
+  --tui-border-width-thin: 1px;
+  --tui-border-width-normal: 2px;
+  --tui-border-width-thick: 3px;
+}

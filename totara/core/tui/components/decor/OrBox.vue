@@ -21,20 +21,17 @@
 -->
 
 <template>
-  <div>
-    <p>Vue component displayed</p>
-    <div id="testSeparator">
-      <Separator />
-    </div>
+  <div class="tui-orBox">
+    <h6 class="tui-orBox__text">
+      {{ $str('or_separator', 'totara_core') }}
+    </h6>
   </div>
 </template>
 
-<script>
-import Separator from 'totara_core/components/decor/Separator';
-
-export default {
-  components: {
-    Separator,
-  },
-};
-</script>
+<lang-strings>
+  {
+    "totara_core" : [
+      "or_separator"
+    ]
+  }
+</lang-strings>

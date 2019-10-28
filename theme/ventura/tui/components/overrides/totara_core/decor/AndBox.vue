@@ -17,24 +17,15 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @package totara_core
+  @package theme_ventura
 -->
 
-<template>
-  <div>
-    <p>Vue component displayed</p>
-    <div id="testSeparator">
-      <Separator />
-    </div>
-  </div>
-</template>
+<style lang="scss">
+.tui-andBox {
+  @extend .tui-orBox;
 
-<script>
-import Separator from 'totara_core/components/decor/Separator';
-
-export default {
-  components: {
-    Separator,
-  },
-};
-</script>
+  &__text {
+    @extend .tui-orBox__text;
+  }
+}
+</style>

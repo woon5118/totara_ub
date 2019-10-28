@@ -16,22 +16,35 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @package totara_core
+  @author Dave Wallace <dave.wallace@totaralearning.com>
+  @package totara_samples
 -->
 
 <template>
-  <div>
-    <p>Vue component displayed</p>
-    <div id="testSeparator">
-      <Separator />
-    </div>
+  <div id="testSeparator">
+    <Separator />
+    <br />
+    <Separator :thick="true" />
+    <br />
+    <Separator :spread="true" />
+    <br />
+    <Separator :thick="true" :spread="true" />
+    <br />
+    <Separator :thick="true" :spread="true">
+      hello world
+    </Separator>
+    <Separator :thick="true" :spread="true">
+      <img
+        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mM03f3sPwAF2gLXke5VKgAAAABJRU5ErkJggg=="
+        width="32"
+        height="32"
+      />
+    </Separator>
   </div>
 </template>
 
 <script>
 import Separator from 'totara_core/components/decor/Separator';
-
 export default {
   components: {
     Separator,

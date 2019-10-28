@@ -17,24 +17,49 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @package totara_core
+  @package totara_samples
 -->
 
 <template>
-  <div>
-    <p>Vue component displayed</p>
-    <div id="testSeparator">
-      <Separator />
-    </div>
+  <div class="tui-loader">
+    A visual 'or' separator
+
+    <SamplesExample>
+      <OrBox />
+    </SamplesExample>
+
+    <SamplesCode>
+      <template v-slot:template>{{ codeTemplate }}</template>
+      <template v-slot:script>{{ codeScript }}</template>
+    </SamplesCode>
   </div>
 </template>
 
 <script>
-import Separator from 'totara_core/components/decor/Separator';
+import OrBox from 'totara_core/components/decor/OrBox';
+import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
 
 export default {
   components: {
-    Separator,
+    OrBox,
+    SamplesCode,
+    SamplesExample,
+  },
+
+  data() {
+    return {
+      fullpage: false,
+      loading: true,
+      codeTemplate: `<OrBox/>`,
+      codeScript: `import OrBox from 'totara_core/components/decor/OrBox';
+
+export default {
+  components: {
+    OrBox,
+  }
+}`,
+    };
   },
 };
 </script>

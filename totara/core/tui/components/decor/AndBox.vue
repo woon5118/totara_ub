@@ -21,20 +21,17 @@
 -->
 
 <template>
-  <div>
-    <p>Vue component displayed</p>
-    <div id="testSeparator">
-      <Separator />
-    </div>
+  <div class="tui-andBox">
+    <h6 class="tui-andBox__text">
+      {{ $str('and_separator', 'totara_core') }}
+    </h6>
   </div>
 </template>
 
-<script>
-import Separator from 'totara_core/components/decor/Separator';
-
-export default {
-  components: {
-    Separator,
-  },
-};
-</script>
+<lang-strings>
+  {
+    "totara_core" : [
+      "and_separator"
+    ]
+  }
+</lang-strings>
