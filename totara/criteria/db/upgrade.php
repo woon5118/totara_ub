@@ -71,34 +71,41 @@ function xmldb_totara_criteria_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019082800, 'totara', 'criteria');
     }
 
-    if ($oldversion < 2019101500) {
+    if ($oldversion < 2019102902) {
 
         // Define key totara_criterion_fk (foreign) to be added to totara_criteria_item.
         $table = new xmldb_table('totara_criteria_item');
         $key = new xmldb_key('totara_criterion_fk', XMLDB_KEY_FOREIGN, array('criterion_id'), 'totara_criteria', array('id'), 'cascade');
-
-        // Launch add key totara_criterion_fk.
-        $dbman->add_key($table, $key);
+        if (!$dbman->key_exists($table, $key)) {
+            // Launch add key totara_criterion_fk.
+            $dbman->add_key($table, $key);
+        }
 
         // Define key totara_criterion_item_fk (foreign) to be added to totara_criteria_item_record.
         $table = new xmldb_table('totara_criteria_item_record');
         $key = new xmldb_key('crititmrec_fk_itm', XMLDB_KEY_FOREIGN, array('criterion_item_id'), 'totara_criteria_item', array('id'));
-        // Launch add key totara_criterion_item_fk.
-        $dbman->drop_key($table, $key);
+        if ($dbman->key_exists($table, $key)) {
+            // Launch add key totara_criterion_item_fk.
+            $dbman->drop_key($table, $key);
+        }
 
         $key = new xmldb_key('crititmrec_fk_itm', XMLDB_KEY_FOREIGN, array('criterion_item_id'), 'totara_criteria_item', array('id'), 'cascade');
-        // Launch add key totara_criterion_item_fk.
-        $dbman->add_key($table, $key);
+        $dbman->drop_key($table, $key);
+        if (!$dbman->key_exists($table, $key)) {
+            // Launch add key totara_criterion_item_fk.
+            $dbman->add_key($table, $key);
+        }
 
         // Define key fk_criterion__meta_id (foreign) to be added to totara_criteria_item_record.
         $table = new xmldb_table('totara_criteria_metadata');
         $key = new xmldb_key('fk_criterion__meta_id', XMLDB_KEY_FOREIGN, array('criterion_id'), 'totara_criteria', array('id'), 'cascade');
-
-        // Launch add key fk_criterion__meta_id.
-        $dbman->add_key($table, $key);
+        if (!$dbman->key_exists($table, $key)) {
+            // Launch add key fk_criterion__meta_id.
+            $dbman->add_key($table, $key);
+        }
 
         // Criteria savepoint reached.
-        upgrade_plugin_savepoint(true, 2019101500, 'totara', 'criteria');
+        upgrade_plugin_savepoint(true, 2019102902, 'totara', 'criteria');
     }
 
     return true;
