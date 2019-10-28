@@ -30,6 +30,7 @@ use criteria_onactivate\onactivate;
 use totara_competency\plugintypes;
 use totara_criteria\criterion;
 use totara_criteria\criterion_factory;
+use totara_criteria\entities\criterion as criterion_entity;
 
 /**
  * Coursecompletion criterion generator.
@@ -167,6 +168,28 @@ class totara_criteria_generator extends component_generator_base {
         $criterion = criterion_factory::create($plugin);
         $criterion->update_items();
         return $criterion;
+    }
+
+    /**
+     * Creates a criteria item for a course
+     *
+     * @param stdClass $course
+     * @return int the id of the item just generated
+     */
+    public function create_course_criterion_item(stdClass $course) {
+        global $DB;
+
+        $criterion = new criterion_entity();
+        $criterion->plugin_type = 'test';
+        $criterion->aggregation_method = criterion::AGGREGATE_ALL;
+        $criterion->criterion_modified = time();
+        $criterion->save();
+
+        $record = new stdClass();
+        $record->criterion_id = $criterion->id;
+        $record->item_type = 'course';
+        $record->item_id = $course->id;
+        return $DB->insert_record('totara_criteria_item', $record);
     }
 }
 

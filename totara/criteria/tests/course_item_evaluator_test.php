@@ -38,7 +38,10 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
 
-        $this->create_course_criterion_item($course);
+        /** @var totara_criteria_generator $criteria_generator */
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        $criteria_generator->create_course_criterion_item($course);
 
         course_item_evaluator::update_item_records();
 
@@ -51,7 +54,10 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
 
-        $item_id = $this->create_course_criterion_item($course);
+        /** @var totara_criteria_generator $criteria_generator */
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        $item_id = $criteria_generator->create_course_criterion_item($course);
 
         $user = $this->getDataGenerator()->create_user();
 
@@ -80,7 +86,10 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
 
-        $item_id = $this->create_course_criterion_item($course);
+        /** @var totara_criteria_generator $criteria_generator */
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        $item_id = $criteria_generator->create_course_criterion_item($course);
 
         $user = $this->getDataGenerator()->create_user();
 
@@ -113,7 +122,10 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
 
-        $item_id = $this->create_course_criterion_item($course);
+        /** @var totara_criteria_generator $criteria_generator */
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        $item_id = $criteria_generator->create_course_criterion_item($course);
 
         $user = $this->getDataGenerator()->create_user();
 
@@ -134,7 +146,10 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
 
-        $item_id = $this->create_course_criterion_item($course);
+        /** @var totara_criteria_generator $criteria_generator */
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        $item_id = $criteria_generator->create_course_criterion_item($course);
 
         $user = $this->getDataGenerator()->create_user();
 
@@ -184,7 +199,10 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
 
-        $item_id = $this->create_course_criterion_item($course);
+        /** @var totara_criteria_generator $criteria_generator */
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        $item_id = $criteria_generator->create_course_criterion_item($course);
 
         $user = $this->getDataGenerator()->create_user();
 
@@ -213,7 +231,10 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
 
-        $item_id = $this->create_course_criterion_item($course);
+        /** @var totara_criteria_generator $criteria_generator */
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        $item_id = $criteria_generator->create_course_criterion_item($course);
 
         $user = $this->getDataGenerator()->create_user();
 
@@ -242,7 +263,10 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
 
-        $item_id = $this->create_course_criterion_item($course);
+        /** @var totara_criteria_generator $criteria_generator */
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        $item_id = $criteria_generator->create_course_criterion_item($course);
 
         $user = $this->getDataGenerator()->create_user();
 
@@ -286,23 +310,4 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
         $this->assertEquals('0', $item_record->criterion_met);
     }
 
-    /**
-     * @param stdClass $course
-     * @return bool|int
-     */
-    private function create_course_criterion_item(stdClass $course) {
-        global $DB;
-
-        $criterion = new criterion_entity();
-        $criterion->plugin_type = 'test';
-        $criterion->aggregation_method = criterion::AGGREGATE_ALL;
-        $criterion->criterion_modified = time();
-        $criterion->save();
-
-        $record = new stdClass();
-        $record->criterion_id = $criterion->id;
-        $record->item_type = 'course';
-        $record->item_id = $course->id;
-        return $DB->insert_record('totara_criteria_item', $record);
-    }
 }

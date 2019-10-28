@@ -31,19 +31,17 @@ use totara_competency\models\scale as scale_model;
 use totara_core\advanced_feature;
 
 /**
- * Query to return a single competency.
+ * Query to return a scales for one or multiple competencies or scale ids
  */
 class scales implements query_resolver {
 
     /**
-     * Returns a competency, given its ID.
-     *
      * @param array $args
      * @param execution_context $ec
      * @return collection
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('competency_assignment');
+        advanced_feature::require('competencies');
 
         if (!isset($args['id']) && !isset($args['competency_id']) || isset($args['id']) && isset($args['competency_id'])) {
             throw new \coding_exception('Please provide either scale id OR competency id');

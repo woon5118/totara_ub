@@ -176,7 +176,6 @@ class legacy_aggregation {
      */
     private function update_or_create_default_criteria(criterion $criterion) {
         $aggregation_method = $this->get_mapped_aggregation_method();
-        $min_proficient_value = $this->get_minimum_proficient_value();
 
         $criteria = $this->get_existing_criteria($criterion);
         if ($criteria->count()) {
@@ -251,7 +250,7 @@ class legacy_aggregation {
     }
 
     /**
-     * Creates a new criteria group with a child competency criteria
+     * Creates a new criteria group with a given criterion, i.e. child competency or linked cours
      *
      * @param criterion $criterion
      * @param scale_value $min_proficient_scale_value if omitted it gets the current valud from the competency

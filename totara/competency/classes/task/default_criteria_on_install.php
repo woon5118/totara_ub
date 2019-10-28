@@ -26,18 +26,11 @@ namespace totara_competency\task;
 use core\collection;
 use core\orm\query\builder;
 use core\task\adhoc_task;
-use criteria_childcompetency\childcompetency;
 use criteria_childcompetency\items_processor;
-use criteria_linkedcourses\linkedcourses;
 use criteria_linkedcourses\metadata_processor as linked_courses_metadata_processor;
-use pathway_criteria_group\criteria_group;
-use pathway_learning_plan\learning_plan;
-use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
 use totara_competency\entities\scale;
 use totara_competency\legacy_aggregation;
-use totara_core\advanced_feature;
-use totara_criteria\criterion;
 
 class default_criteria_on_install extends adhoc_task {
 

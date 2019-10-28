@@ -584,7 +584,7 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
     }
 
     /**
-     * Test dump_pathway_configuration
+     * Test archiving empty pathways
      */
     public function test_archive_empty_pathways() {
         /** @var totara_hierarchy_generator $totara_hierarchy_generator */
