@@ -728,7 +728,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      */
     public function event_status_attendance_taking_html(\stdClass $session, ?int $eventattendance): string {
         $seminarevent = (new seminar_event())->from_record_with_dates($session, false);
-        $status = $seminarevent->get_attendance_taking_status($eventattendance);
+        $status = $seminarevent->get_attendance_taking_status($eventattendance, 0, true, true);
         // Put the event attendance link only when it is open.
         if ($status != attendance_taking_status::OPEN && $status != attendance_taking_status::ALLSAVED) {
             return '';
