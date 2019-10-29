@@ -218,7 +218,8 @@ final class url_helper {
      */
     public static function user_sitepolicy_version_view($userid, $policyversionid, $versionnumber, $language, $currentcount = null, $totalcount = null): \moodle_url {
         global $CFG, $USER;
-        $iscurrentuser = ($USER->id == $userid);
+        $thisuserid = empty($USER->id) ? $CFG->siteguest : $USER->id;
+        $iscurrentuser = ($thisuserid == $userid);
         if ($iscurrentuser) {
             $url = new \moodle_url("/{$CFG->admin}/tool/sitepolicy/userpolicy.php");
         } else {

@@ -10,6 +10,10 @@ Feature: Manage sitepolicy version translations
       | Enable site policies | 1 |
     And I fake the French language pack is installed for site policies
     And I fake the Dutch language pack is installed for site policies
+    And I navigate to "Plugins > Authentication > Manage authentication" in site administration
+    And I click on "Enable" "link" in the "Self-registration with approval" "table_row"
+    And I set the following administration settings values:
+      | registerauth | Self-registration with approval |
     And I log out
 
   Scenario: Add a new translation to a sitepolicy version
@@ -179,3 +183,21 @@ Feature: Manage sitepolicy version translations
     And I should not see "Incomplete translations" in the "Draft" "table_row"
     And "Publish" "link" should exist in the "Draft" "table_row"
 
+  Scenario: Multilingual sitepolicy is available for create new account
+    Given the following "multiversionpolicies" exist in "tool_sitepolicy" plugin:
+      | hasdraft | numpublished | allarchived | title    | languages | langprefix | statement          | numoptions | consentstatement       | providetext | withholdtext | mandatory |
+      | 1        | 0            | 0           | Policy 2 | en,nl,fr  | ,nl ,fr    | Policy 2 statement | 1          | P2 - Consent statement | Yes         | No           | first     |
+    And I log in as "admin"
+    And I navigate to "Manage policies" node in "Site administration > Security > Site policies"
+    And I follow "Policy 2"
+    When I follow "Publish"
+    Then I should see "Are you sure you want to publish \"Policy 2\""
+    When I press "Publish"
+    Then I should see "Version 1 of \"Policy 2\" has been published successfully"
+    And I log out
+    When I press "Create new account"
+    Then I should see "Policy 2"
+    When I set the field "language" to "nl"
+    Then I should see "nl Policy 2"
+    When I set the field "language" to "fr"
+    Then I should see "fr Policy 2"

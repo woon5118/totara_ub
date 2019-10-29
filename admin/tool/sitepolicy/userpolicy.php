@@ -215,7 +215,7 @@ $PAGE->set_title($currentpolicy->get_title(false));
 
 // Navigation Bar
 // Start the navigation off at the users branch.
-if ($node = $PAGE->navigation->find('user' . $USER->id, navigation_node::TYPE_USER)) {
+if ($node = $PAGE->navigation->find('user' . $userid, navigation_node::TYPE_USER)) {
     $node->make_active();
 }
 
