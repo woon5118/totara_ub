@@ -46,7 +46,6 @@ class mod_quiz_backup_restore_quiz_testcase extends advanced_testcase {
         parent::setUp();
 
         self::setAdminUser();
-        self::resetAfterTest();
 
         $this->generator = self::getDataGenerator();
         $this->quiz_generator = $this->generator->get_plugin_generator('mod_quiz');
@@ -98,6 +97,18 @@ class mod_quiz_backup_restore_quiz_testcase extends advanced_testcase {
         self::assertEquals(2, $DB->count_records('quiz', ['course' => $this->course->id]));
         // Count of random questions: 2 in q1 + 2 in q2 = 4.
         self::assertEquals(4, $DB->count_records('question', ['qtype' => 'random']));
+
+        // Duplicate the quiz inside this course again.
+        self::duplicate($this->course, $quiz->cmid);
+        self::assertEquals(3, $DB->count_records('quiz', ['course' => $this->course->id]));
+        // Count of random questions: 2 in q1 + 2 in q2 + 2 in q3 = 6.
+        self::assertEquals(6, $DB->count_records('question', ['qtype' => 'random']));
+
+        // Duplicate the quiz inside this course yet again, just in case.
+        self::duplicate($this->course, $quiz->cmid);
+        self::assertEquals(4, $DB->count_records('quiz', ['course' => $this->course->id]));
+        // Count of random questions: 2 in q1 + 2 in q2 + 2 in q3 + 2 in q4 = 8.
+        self::assertEquals(8, $DB->count_records('question', ['qtype' => 'random']));
     }
 
     /**
@@ -147,6 +158,11 @@ class mod_quiz_backup_restore_quiz_testcase extends advanced_testcase {
 
         // Add one more random question to the new quiz.
         quiz_add_random_questions($newquiz, 0, $this->category_course->id, 1, false);
+        self::assertEquals(5, $DB->count_records('question', ['qtype' => 'random']));
+
+        // Check that we got all questions in quizzes.
+        self::assertEquals(2, $DB->count_records('quiz_slots', ['quizid' => $quiz->id]));
+        self::assertEquals(3, $DB->count_records('quiz_slots', ['quizid' => $newquiz->id]));
 
         // Backup and restore an entire course.
         $newcourseid = self::backup_and_restore($this->course);
@@ -154,6 +170,16 @@ class mod_quiz_backup_restore_quiz_testcase extends advanced_testcase {
         self::assertEquals(4, $DB->count_records('quiz'));
         self::assertEquals(2, $DB->count_records('quiz', ['course' => $this->course->id]));
         self::assertEquals(2, $DB->count_records('quiz', ['course' => $newcourseid]));
+
+        // Check that we still got all questions in quizzes.
+        self::assertEquals(2, $DB->count_records('quiz_slots', ['quizid' => $quiz->id]));
+        self::assertEquals(3, $DB->count_records('quiz_slots', ['quizid' => $newquiz->id]));
+        self::assertEquals(5, $DB->count_records_sql(
+            'SELECT COUNT(qs.id) FROM {quiz_slots} qs
+                WHERE EXISTS (SELECT 1 FROM {quiz} q WHERE q.course = :course AND qs.quizid = q.id)',
+            ['course' => $newcourseid])
+        );
+
         // Count of random questions: 2 in c1q1 + 3 in c1q2 + 2 in c2q1 + 3 in c2q2 = 10.
         self::assertEquals(10, $DB->count_records('question', ['qtype' => 'random']));
     }
@@ -169,6 +195,8 @@ class mod_quiz_backup_restore_quiz_testcase extends advanced_testcase {
      */
     protected static function backup_and_restore($course) {
         global $USER, $CFG;
+        require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
+        require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
 
         // Turn off file logging, otherwise it can't delete the file (Windows).
         $CFG->backup_file_logger_level = backup::LOG_NONE;
@@ -196,14 +224,16 @@ class mod_quiz_backup_restore_quiz_testcase extends advanced_testcase {
     /**
      * Duplicates a single activity within a course.
      *
-     * This is based on the code from course/modduplicate.php, but reduced for simplicity.
+     * This is based on the code from @see core_backup_moodle2_testcase.
      *
      * @param stdClass $course Course object
      * @param int $cmid Activity to duplicate
      * @return int ID of new activity
      */
     protected static function duplicate($course, $cmid) {
-        global $USER;
+        global $USER, $CFG;
+        require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
+        require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
 
         // Do backup.
         $bc = new backup_controller(backup::TYPE_1ACTIVITY, $cmid, backup::FORMAT_MOODLE,

@@ -4570,6 +4570,10 @@ class restore_create_categories_and_questions extends restore_structure_step {
 
         // With newitemid = 0, let's create the question
         if (!$questionmapping->newitemid) {
+            if ($data->qtype === 'random') {
+                // Ensure that this newly created question is considered by cleaning up in final restore task.
+                $data->hidden = 0;
+            }
             $data->stamp = make_unique_id_code();
             $data->version = make_unique_id_code();
             $newitemid = $DB->insert_record('question', $data);
@@ -4861,6 +4865,34 @@ class restore_create_question_files extends restore_execution_step {
                 restore_dbops::send_files_to_pool($this->get_basepath(), $this->get_restoreid(), $component, $filearea,
                         $oldctxid, $this->task->get_userid(), $mapping, null, $newctxid, true, $progress);
             }
+        }
+    }
+}
+
+/**
+ * Execution step that will remove all unused random questions created during restore.
+ */
+class restore_cleanup_unused_random_questions extends restore_execution_step {
+
+    protected function define_execution() {
+        global $DB, $CFG;
+        require_once($CFG->libdir . '/questionlib.php');
+
+        $unusedrandomids = $DB->get_records_sql("
+                SELECT q.id, 1
+                  FROM {question} q
+                LEFT JOIN {quiz_slots} qslots ON q.id = qslots.questionid
+                  WHERE qslots.questionid IS NULL AND q.qtype = ? AND hidden = ?", ['random', 0]);
+        $count = 0;
+        foreach ($unusedrandomids as $unusedrandomid => $notused) {
+            question_delete_question($unusedrandomid);
+            // In case the question was not actually deleted (because it was in use somehow),
+            // mark it as hidden, so the query above will not return it again.
+            $DB->set_field('question', 'hidden', 1, ['id' => $unusedrandomid]);
+            $count++;
+        }
+        if ($count > 0) {
+            $this->log('Cleaned up ' . $count . ' unused random questions created during restore', backup::LOG_INFO);
         }
     }
 }
