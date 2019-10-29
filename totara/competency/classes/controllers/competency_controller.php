@@ -71,7 +71,7 @@ class competency_controller extends admin_controller {
 
         $this->competency = competency::repository()
             ->where('id', required_param('id', PARAM_INT))
-            ->with(['scale_aggregation', 'framework'])
+            ->with('framework')
             ->one();
 
         $this->framework = $this->competency->framework;

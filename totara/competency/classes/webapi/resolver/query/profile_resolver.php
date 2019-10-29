@@ -26,8 +26,9 @@ namespace totara_competency\webapi\resolver\query;
 use context_user;
 use core\webapi\query_resolver;
 use totara_assignment\entities\user;
+use totara_core\advanced_feature;
 
-abstract class profile_resolver implements query_resolver {
+abstract class profile_resolver  {
 
     /**
      * Authorize given user, returns user id, or throws an exception if the user is not authorized
@@ -45,6 +46,9 @@ abstract class profile_resolver implements query_resolver {
         if (!$authorized_user = user::logged_in()) {
             require_login();
         }
+
+
+        advanced_feature::require('competency_assignment');
 
         $capability = $authorized_user->id === $user_id
             ? 'totara/competency:view_own_profile'

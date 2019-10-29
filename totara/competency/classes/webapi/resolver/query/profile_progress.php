@@ -25,12 +25,9 @@ namespace totara_competency\webapi\resolver\query;
 
 use core\webapi\execution_context;
 use totara_competency\models\profile\progress as progress_model;
-use totara_core\advanced_feature;
 
 class profile_progress extends profile_resolver {
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('competency_assignment');
-
         return progress_model::for(static::authorize($args['user_id'] ?? null), $args['filters'] ?? []);
     }
 }

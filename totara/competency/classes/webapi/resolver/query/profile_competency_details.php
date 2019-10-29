@@ -25,12 +25,9 @@ namespace totara_competency\webapi\resolver\query;
 
 use core\webapi\execution_context;
 use totara_competency\models\profile\competency_progress;
-use totara_core\advanced_feature;
 
 class profile_competency_details extends profile_resolver {
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('competency_assignment');
-
         if (!isset($args['user_id'])) {
             throw new \coding_exception('User id is required');
         }
