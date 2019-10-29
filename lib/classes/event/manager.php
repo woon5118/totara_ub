@@ -214,11 +214,15 @@ class manager {
                             // Observers are notified before installation and upgrade, this may throw errors.
                             if (empty($CFG->upgraderunning)) {
                                 // Ignore errors during upgrade, otherwise warn developers.
-                                debugging("Exception encountered in event observer '$observer->callable': ".$e->getMessage(), DEBUG_DEVELOPER, $e->getTrace());
+                                // Totara: get the human callable name
+                                $callable = get_callable_name($observer->callable);
+                                debugging("Exception encountered in event observer '{$callable}': ".$e->getMessage(), DEBUG_DEVELOPER, $e->getTrace());
                             }
                         }
                     } else {
-                        debugging("Can not execute event observer '$observer->callable'");
+                        // Totara: get the human callable name.
+                        $callable = get_callable_name($observer->callable);
+                        debugging("Can not execute event observer '{$callable}'");
                     }
                 }
             }
