@@ -24,8 +24,6 @@
 
 namespace block_html\search;
 
-use core_search\moodle_recordset;
-
 defined('MOODLE_INTERNAL') || die();
 
 /**
