@@ -108,7 +108,9 @@ class criteria_linkedcourses_items_processor_testcase extends advanced_testcase 
         $this->set_up_pathway_with_linked_courses_criteria($competency);
 
         $course = $this->getDataGenerator()->create_course();
-        linked_courses::set_linked_courses($competency->id, [['id' => $course->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY]]);
+        linked_courses::set_linked_courses($competency->id,
+            [['id' => $course->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY]]
+        );
 
         $sink->clear();
 
@@ -173,7 +175,8 @@ class criteria_linkedcourses_items_processor_testcase extends advanced_testcase 
             $competency->id,
             [
                 ['id' => $keep->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
-                ['id' => $add->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY]]
+                ['id' => $add->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY]
+            ]
         );
         $sink->clear();
 

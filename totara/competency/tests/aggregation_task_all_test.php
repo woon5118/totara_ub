@@ -83,7 +83,10 @@ class totara_competency_aggregation_all_task_testcase extends advanced_testcase 
                 $this->comp = new competency($comp);
             }
 
-            public function setup_active_expanded_user_assignments(tassign_competency_generator $assignment_generator, array $user_idxs = []) {
+            public function setup_active_expanded_user_assignments(
+                tassign_competency_generator $assignment_generator,
+                array $user_idxs = []
+            ) {
                 global $DB;
 
                 $assignment_ids = [];
@@ -124,13 +127,13 @@ class totara_competency_aggregation_all_task_testcase extends advanced_testcase 
 
                 // Create coursecompletion criteria
                 $this->criteria['course_1'] = $criteria_generator->create_coursecompletion([
-                    'aggregation'=> criterion::AGGREGATE_ALL,
-                    'courseids' =>[$this->courses[1]->id],
+                    'aggregation' => criterion::AGGREGATE_ALL,
+                    'courseids' => [$this->courses[1]->id],
                 ]);
 
                 $this->criteria['course_2_and_3'] = $criteria_generator->create_coursecompletion([
-                    'aggregation'=> criterion::AGGREGATE_ALL,
-                    'courseids' =>[$this->courses[2]->id, $this->courses[3]->id],
+                    'aggregation' => criterion::AGGREGATE_ALL,
+                    'courseids' => [$this->courses[2]->id, $this->courses[3]->id],
                 ]);
 
                 $this->criteria['course_3_or_4_or_5'] = $criteria_generator->create_coursecompletion([
@@ -372,10 +375,10 @@ class totara_competency_aggregation_all_task_testcase extends advanced_testcase 
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
         $params = [
-           'comp_id' => $data->comp->id,
-           'sortorder' => 1,
-           'scale_value_id' => $data->scalevalues[2],
-           'criteria' => [$data->criteria['course_1']],
+            'comp_id' => $data->comp->id,
+            'sortorder' => 1,
+            'scale_value_id' => $data->scalevalues[2],
+            'criteria' => [$data->criteria['course_1']],
         ];
 
         $pw = $competency_generator->create_criteria_group($params);
@@ -494,8 +497,8 @@ class totara_competency_aggregation_all_task_testcase extends advanced_testcase 
                 if ((int)$actual_row->pathway_id == $expected_row['pathway_id'] &&
                     (int)$actual_row->status == $expected_row['status'] &&
                     (int)$actual_row->scale_value_id == $expected_row['scale_value_id'] &&
-                    (!isset($expected_row['related_info']) || $actual_row->related_info == json_encode($expected_row['related_info']))) {
-
+                    (!isset($expected_row['related_info']) ||
+                        $actual_row->related_info == json_encode($expected_row['related_info']))) {
                     unset($expected_rows[$key]);
                     break;
                 }
@@ -517,7 +520,6 @@ class totara_competency_aggregation_all_task_testcase extends advanced_testcase 
                     (int)$actual_row->status == $expected_row['status'] &&
                     (int)$actual_row->scale_value_id == $expected_row['scale_value_id'] &&
                     (int)$actual_row->proficient == $expected_row['proficient']) {
-
                     unset($expected_rows[$key]);
                     break;
                 }

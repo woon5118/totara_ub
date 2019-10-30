@@ -87,7 +87,8 @@ class totara_criteria_item_evaluator_user_source_table_testcase extends advanced
                 'user_id' => $id,
                 'has_changed' => $has_changed,
                 'process_key' => $this->process_key,
-                'update_operation_name' => $this->update_operation_value];
+                'update_operation_name' => $this->update_operation_value
+            ];
         }
 
         $DB->insert_records('totara_competency_aggregation_queue', $temp_records);

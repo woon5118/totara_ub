@@ -174,7 +174,7 @@ class criteria_childcompetency_testcase extends \advanced_testcase {
             $actual = childcompetency::dump_criterion_configuration($id);
             $this->assertEqualsCanonicalizing($expected, $actual);
         }
-   }
+    }
 
 
     // TODO: test aggregate

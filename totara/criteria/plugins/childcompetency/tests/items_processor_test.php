@@ -73,7 +73,9 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
             $data->competencies[$compname] = $competency_generator->create_competency($compname, null, null, $comp_record);
 
             if (isset($compdata['with_criteria']) && $compdata['with_criteria']) {
-                $data->criteria[$compname] = $criteria_generator->create_childcompetency(['competency' => $data->competencies[$compname]->id]);
+                $data->criteria[$compname] = $criteria_generator->create_childcompetency(
+                    ['competency' => $data->competencies[$compname]->id]
+                );
             }
         }
 
@@ -139,7 +141,8 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
         // Update items for competency with criteria and multiple direct children
         items_processor::update_items($data->competencies['Comp C']->id);
         $this->verify_items($data->competencies['Comp C']->id,
-            [$data->competencies['Comp C-1']->id, $data->competencies['Comp C-2']->id]);
+            [$data->competencies['Comp C-1']->id, $data->competencies['Comp C-2']->id]
+        );
         $this->verify_event($sink, [$data->criteria['Comp C']->get_id()]);
 
         $sink->close();
@@ -157,9 +160,21 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
         $this->assertSame(0, $sink->count());
 
         // Create 2 child competencies of Comp E
-        $newChild1 = $competency_generator->create_competency('New Child 1', null, null, ['parentid' => $data->competencies['Comp E']->id]);
-        $newChild2 = $competency_generator->create_competency('New Child 2', null, null, ['parentid' => $data->competencies['Comp E']->id]);
-        $newChild3 = $competency_generator->create_competency('New Child 3', null, null, ['parentid' => $data->competencies['Comp E']->id]);
+        $new_child_1 = $competency_generator->create_competency('New Child 1',
+            null,
+            null,
+            ['parentid' => $data->competencies['Comp E']->id]
+        );
+        $new_child_2 = $competency_generator->create_competency('New Child 2',
+            null,
+            null,
+            ['parentid' => $data->competencies['Comp E']->id]
+        );
+        $new_child_3 = $competency_generator->create_competency('New Child 3',
+            null,
+            null,
+            ['parentid' => $data->competencies['Comp E']->id]
+        );
 
         // Ignore the hierarchy events that were triggered (will be picked up by observer - tested elsewhere)
         $sink->clear();
@@ -167,7 +182,8 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
         // Now we should create 3 items for Comp E and 1 event generated
         items_processor::update_items($data->competencies['Comp E']->id);
         $this->verify_items($data->competencies['Comp E']->id,
-            [$newChild1->id, $newChild2->id, $newChild3->id]);
+            [$new_child_1->id, $new_child_2->id, $new_child_3->id]
+        );
         $this->verify_event($sink, [$data->criteria['Comp E']->get_id()]);
         $sink->clear();
 
@@ -177,19 +193,24 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
 
         // Change NewChild1 to point to another parent
         // Add Another Child to Comp E
-        $anotherChild = $competency_generator->create_competency('Another Child', null, null,
-            ['parentid' => $data->competencies['Comp E']->id]);
+        $another_child = $competency_generator->create_competency('Another Child',
+            null,
+            null,
+            ['parentid' => $data->competencies['Comp E']->id]
+        );
 
-        $entity1 = new competency_entity($newChild1->id);
+        $entity1 = new competency_entity($new_child_1->id);
         $entity1->parentid = 0;
-        $entity1->path = '/' . $newChild1->id;
+        $entity1->path = '/' . $new_child_1->id;
         $entity1->save();
 
         $sink->clear();
 
         items_processor::update_items($data->competencies['Comp E']->id);
         $this->verify_items($data->competencies['Comp E']->id,
-            [$newChild2->id, $newChild3->id, $anotherChild->id], $initial_item_id_map);
+            [$new_child_2->id, $new_child_3->id, $another_child->id],
+            $initial_item_id_map
+        );
         $this->verify_event($sink, [$data->criteria['Comp E']->get_id()]);
 
         $sink->close();
@@ -208,12 +229,14 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
 
         $current_items = $this->get_items($data->competencies['Comp C']->id);
         foreach ($current_items as $item) {
-            $item->item_records()->save(new item_record_entity(
-                [
-                    'user_id' => $user->id,
-                    'criterion_met' => 0,
-                    'timeevaluated' => time(),
-                ])
+            $item->item_records()->save(
+                new item_record_entity(
+                    [
+                        'user_id' => $user->id,
+                        'criterion_met' => 0,
+                        'timeevaluated' => time(),
+                    ]
+                )
             );
         }
 
@@ -235,7 +258,8 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
         // And verify both the items and item_records
         $this->verify_items($data->competencies['Comp C']->id, [$data->competencies['Comp C-2']->id]);
         $this->verify_items($data->competencies['Comp A']->id,
-            [$data->competencies['Comp A-1']->id, $data->competencies['Comp C-1']->id]);
+            [$data->competencies['Comp A-1']->id, $data->competencies['Comp C-1']->id]
+        );
 
         // Comp C-1 should no longer have an item_record
         $this->verify_item_records($data->competencies['Comp C-1']->id, []);

@@ -114,7 +114,8 @@ function create_scale($num_scalevalues) {
             'name' => "Level $i",
             'proficient' => ($i >= $num_scalevalues - 1),
             'sortorder' => $num_scalevalues - $i + 1,
-            'default' => ($i == 1)];
+            'default' => ($i == 1)
+        ];
     }
 
     $name = 'Test scale';

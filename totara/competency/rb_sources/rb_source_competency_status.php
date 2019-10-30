@@ -284,7 +284,7 @@ class rb_source_competency_status extends rb_base_source {
                 'time_proficient',        // value
                 get_string('proficientdate', 'rb_source_competency_status'),       // label
                 'date',                 // filtertype
-                array()                 // options
+                []                 // options
             ),
             new rb_filter_option(
                 'competency',
@@ -333,35 +333,35 @@ class rb_source_competency_status extends rb_base_source {
 
     protected function define_defaultcolumns() {
         $defaultcolumns = array(
-            array(
+            [
                 'type'  => 'user',
                 'value' => 'namelink'
-            ),
-            array(
+            ],
+            [
                 'type'  => 'competency_status',
                 'value' => 'scale_value_name',
-            ),
+            ],
         );
         return $defaultcolumns;
     }
 
     protected function define_defaultfilters() {
         $defaultfilters = array(
-            array(
+            [
                 'type' => 'user',
                 'value' => 'fullname',
                 'advanced' => 0,
-            ),
-            array(
+            ],
+            [
                 'type' => 'job_assignment',
                 'value' => 'allorganisations',
                 'advanced' => 1,
-            ),
-            array(
+            ],
+            [
                 'type' => 'competency',
                 'value' => 'fullname',
                 'advanced' => 1,
-            ),
+            ],
         );
         return $defaultfilters;
     }
@@ -379,12 +379,12 @@ class rb_source_competency_status extends rb_base_source {
     //
     //
 
-    function rb_filter_proficiency_list() {
+    public function rb_filter_proficiency_list() {
         global $DB;
 
         $values = $DB->get_records_menu('comp_scale_values', null, 'scaleid, sortorder', 'id, name');
 
-        $scales = array();
+        $scales = [];
         foreach ($values as $index => $value) {
             $scales[$index] = format_string($value);
         }

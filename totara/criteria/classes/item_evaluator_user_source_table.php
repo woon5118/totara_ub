@@ -73,7 +73,7 @@ class item_evaluator_user_source_table implements item_evaluator_user_source {
      * @param int $criterion_met Criterion met value to use when creating new item records
      * @param ?int $timeevaluated
      */
-   public function create_item_records(int $criterion_id, int $criterion_met = 0, ?int $timeevaluated = null) {
+    public function create_item_records(int $criterion_id, int $criterion_met = 0, ?int $timeevaluated = null) {
         global $DB;
 
         if (is_null($timeevaluated)) {
@@ -113,7 +113,7 @@ class item_evaluator_user_source_table implements item_evaluator_user_source {
      * Delete item records for all users not in the users_source if the source contains the full list
      * @param int $criterion_id
      */
-   public function delete_item_records(int $criterion_id) {
+    public function delete_item_records(int $criterion_id) {
         global $DB;
 
         if (!$this->full_user_set) {
@@ -149,7 +149,7 @@ class item_evaluator_user_source_table implements item_evaluator_user_source {
      * @param int $criterion_id
      * @param int $checkfrom Time to use as start when checking updates of item records
      */
-   public function mark_updated_assigned_users(int $criterion_id, int $checkfrom) {
+    public function mark_updated_assigned_users(int $criterion_id, int $checkfrom) {
         global $DB;
 
         $temp_has_changed_column = $this->temp_user_table->get_has_changed_column();
@@ -186,7 +186,8 @@ class item_evaluator_user_source_table implements item_evaluator_user_source {
                 'checkfrom' => $checkfrom,
             ],
             $temp_set_params,
-            $temp_wh_params);
+            $temp_wh_params
+        );
 
         $DB->execute($sql, $params);
     }

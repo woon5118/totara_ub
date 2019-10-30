@@ -99,7 +99,7 @@ class pathway_criteria_group_evaluator_testcase extends \advanced_testcase {
     public function data_provider_test_aggregate() {
         // TODO: More combinations
         return [
-            // 1 criterion. 1 user. Criterion_met didn't change. No change in achievement
+            // 1 criterion. 1 user. Criterion_met didn't change. No/Totara/totaraperf/totara/competency/pathway/criteria_group/lang/en/pathway_criteria_group.php change in achievement
             [
                 'pathway_scale_value' => 3,
                 'criteria' => [
@@ -118,10 +118,12 @@ class pathway_criteria_group_evaluator_testcase extends \advanced_testcase {
                     ],
                 ],
                 'expected' => [
-                    1 => [[
-                        'status' => pathway_achievement::STATUS_CURRENT,
-                        'scale_value' => 4,
-                    ]],
+                    1 => [
+                        [
+                            'status' => pathway_achievement::STATUS_CURRENT,
+                            'scale_value' => 4,
+                        ]
+                    ],
                 ],
             ],
 
@@ -266,8 +268,11 @@ class pathway_criteria_group_evaluator_testcase extends \advanced_testcase {
                 }
 
                 if (isset($user['existing_achievement'])) {
-                    $this->create_achievement_record($cg->get_id(), $user['user_id'], $user['existing_achievement']['status'],
-                        $data->scalevalues[$user['existing_achievement']['scale_value']]->id);
+                    $this->create_achievement_record($cg->get_id(),
+                        $user['user_id'],
+                        $user['existing_achievement']['status'],
+                        $data->scalevalues[$user['existing_achievement']['scale_value']]->id
+                    );
                 }
 
                 if (!empty($user['criteria_met'])) {
@@ -382,7 +387,10 @@ class pathway_criteria_group_evaluator_testcase extends \advanced_testcase {
      * @param int $competency_id
      * @param array $assigned_users
      */
-    private function create_userid_table_records(aggregation_users_table $user_id_table, int $competency_id, array $assigned_users) {
+    private function create_userid_table_records(
+        aggregation_users_table $user_id_table,
+        int $competency_id, array $assigned_users
+    ) {
         global $DB;
 
         if (empty($assigned_users)) {

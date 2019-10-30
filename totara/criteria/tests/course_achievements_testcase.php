@@ -209,7 +209,13 @@ abstract class totara_criteria_course_achievements_testcase extends advanced_tes
 
         // User needs to be able to access the profile
         $user_role = $DB->get_record('role', ['shortname' => 'user'], '*', MUST_EXIST);
-        assign_capability('totara/competency:view_own_profile', CAP_ALLOW, $user_role->id, context_user::instance($user->id)->id, true);
+        assign_capability(
+            'totara/competency:view_own_profile',
+            CAP_ALLOW,
+            $user_role->id,
+            context_user::instance($user->id)->id,
+            true
+        );
 
         // Now query as a normal user for whom the course 2 should not be visible
         $this->setUser($user);
@@ -248,7 +254,12 @@ abstract class totara_criteria_course_achievements_testcase extends advanced_tes
         }
 
         // User needs to be able to access the profile
-        assign_capability('totara/competency:view_own_profile', CAP_ALLOW, $user_role->id, context_user::instance($data->user->id)->id, true);
+        assign_capability('totara/competency:view_own_profile',
+            CAP_ALLOW,
+            $user_role->id,
+            context_user::instance($data->user->id)->id,
+            true
+        );
 
         $args = ['instance_id' => $criteria->get_id(), 'user_id' => $data->user->id];
 
@@ -312,7 +323,9 @@ abstract class totara_criteria_course_achievements_testcase extends advanced_tes
         $data = new class() {
             public $fw1;
             public $comp1;
-            public $course1, $course2, $course3;
+            public $course1;
+            public $course2;
+            public $course3;
             public $user;
         };
 

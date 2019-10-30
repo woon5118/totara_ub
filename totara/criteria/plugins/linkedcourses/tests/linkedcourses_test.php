@@ -74,14 +74,16 @@ class criteria_linkedcourses_testcase extends \advanced_testcase {
                             'criterion_id' => $criterion_id,
                             'metakey' => $metakey,
                             'metavalue' => $metavalue,
-                        ]);
+                        ]
+                    );
                 }
 
                 $this->verify_saved_metadata($criterion_id, $tst['metadata']);
             }
 
             $data->metadatarows[$criterion_id] = $DB->get_records('totara_criteria_metadata',
-                ['criterion_id' => $criterion_id]);
+                ['criterion_id' => $criterion_id]
+            );
 
             $data->metadatakeys[$criterion_id] = $DB->get_records_menu('totara_criteria_metadata',
                 ['criterion_id' => $criterion_id],
@@ -101,7 +103,12 @@ class criteria_linkedcourses_testcase extends \advanced_testcase {
     private function verify_saved_metadata(int $criterion_id, array $expected_pairs) {
         global $DB;
 
-        $actual_pairs = $DB->get_records_menu('totara_criteria_metadata', ['criterion_id' => $criterion_id], '', 'metakey, metavalue');
+        $actual_pairs = $DB->get_records_menu(
+            'totara_criteria_metadata',
+            ['criterion_id' => $criterion_id],
+            '',
+            'metakey, metavalue'
+        );
         $this->assertEqualsCanonicalizing($expected_pairs, $actual_pairs);
     }
 
@@ -223,7 +230,10 @@ class criteria_linkedcourses_testcase extends \advanced_testcase {
         $this->assertSame(3, count($rows));
 
         // Add some and remove others and then save
-        $cc->add_metadata([['metakey' => 'many1', 'metavalue' => 'first of many'], ['metakey' => 'many2', 'metavalue' => 'second of many']]);
+        $cc->add_metadata([
+            ['metakey' => 'many1', 'metavalue' => 'first of many'],
+            ['metakey' => 'many2', 'metavalue' => 'second of many']
+        ]);
         $cc->remove_metadata(['newkey']);
 
         $expected->metadata['many1'] = 'first of many';
@@ -278,7 +288,7 @@ class criteria_linkedcourses_testcase extends \advanced_testcase {
             $actual = linkedcourses::dump_criterion_configuration($id);
             $this->assertEqualsCanonicalizing($expected, $actual);
         }
-   }
+    }
 
 
     // TODO: test aggregate

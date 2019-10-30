@@ -244,7 +244,11 @@ class pathway_manual_evaluator_testcase extends advanced_testcase {
      * @param int $competency_id
      * @param array $assigned_users
      */
-    private function create_userid_table_records(aggregation_users_table $user_id_table, int $competency_id, array $assigned_users) {
+    private function create_userid_table_records(
+        aggregation_users_table $user_id_table,
+        int $competency_id,
+        array $assigned_users
+    ) {
         global $DB;
 
         $user_id_table->truncate();

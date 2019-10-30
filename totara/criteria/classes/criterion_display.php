@@ -74,7 +74,8 @@ abstract class criterion_display {
             $agg_params = $this->criterion->get_aggregation_params();
             return get_string('aggregate_any',
                 'totara_criteria',
-                (object)['x' => $agg_params['req_items'] ?? 1]);
+                (object)['x' => $agg_params['req_items'] ?? 1]
+            );
         }
     }
 

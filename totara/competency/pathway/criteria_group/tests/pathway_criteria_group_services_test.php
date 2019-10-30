@@ -130,9 +130,6 @@ class pathway_criteria_group_services_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
         $error = $res['error'] ?? null;
-if ($error) {
-    var_dump($res);
-}
 
         $this->assertEquals(false, $error);
         $this->assertTrue(is_numeric($result));

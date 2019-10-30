@@ -72,7 +72,6 @@ class manual extends pathway {
                 ['path_manual_id' => $this->get_path_instance_id()]
             )
         );
-
     }
 
     /****************************************************************************
@@ -104,7 +103,8 @@ class manual extends pathway {
         $previous_role_records = $DB->get_records('pathway_manual_role',
             ['path_manual_id' => $this->get_path_instance_id()],
             '',
-            'role, id, path_manual_id');
+            'role, id, path_manual_id'
+        );
 
         // Create this object once and reuse it for inserting new records.
         $new_record = new \stdClass();
@@ -150,7 +150,8 @@ class manual extends pathway {
         $previous_role_records = $DB->get_records('pathway_manual_role',
             ['path_manual_id' => $this->get_path_instance_id()],
             '',
-            'role, id, path_manual_id');
+            'role, id, path_manual_id'
+        );
 
         $has_changes = count($previous_role_records) != count($this->roles);
         if (!$has_changes) {
@@ -242,7 +243,12 @@ class manual extends pathway {
     public function get_summarized_criteria_set(): array {
         $result = new \stdClass();
         $result->item_type = $this->get_title();
-        $result->items = array_map(function ($role) { return ucfirst($role); }, $this->get_roles());
+        $result->items = array_map(
+            function ($role) {
+                return ucfirst($role);
+            },
+            $this->get_roles()
+        );
 
         return [$result];
     }

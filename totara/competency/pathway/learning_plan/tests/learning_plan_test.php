@@ -134,8 +134,8 @@ class pathway_learning_plan_learning_plan_testcase extends advanced_testcase {
 
         // Verify that a row was inserted in the aggregation queue
         $this->assertTrue($DB->record_exists('totara_competency_aggregation_queue',
-            ['user_id' => $user->id, 'competency_id' => $comp->id, 'process_key' => null])
-        );
+            ['user_id' => $user->id, 'competency_id' => $comp->id, 'process_key' => null]
+        ));
         // Run the task
         $this->run_aggregation_task();
 

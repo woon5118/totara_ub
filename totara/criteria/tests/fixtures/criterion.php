@@ -57,8 +57,8 @@ if ($displaydebugging) {
 $type = required_param('type', PARAM_ALPHAEXT);
 $id = required_param('id', PARAM_INT);
 $criterion = criterion_factory::fetch($type, $id);
-$criterionData = $criterion->export_criterion_view_template();
+$criterion_data = $criterion->export_criterion_view_template();
 
-echo $OUTPUT->render_from_template('totara_criteria/criterion_test', $criterionData);
+echo $OUTPUT->render_from_template('totara_criteria/criterion_test', $criterion_data);
 
 echo $OUTPUT->footer();

@@ -72,8 +72,8 @@ class totara_competency_generator_testcase extends \advanced_testcase {
         //      - Course 1 OR Course 3 OR Course 5
         $crit_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
         $data->cc[1] = $crit_generator->create_coursecompletion([
-            'aggregation'=> criterion::AGGREGATE_ALL,
-            'courseids' =>[$data->courses[1]->id, $data->courses[2]->id],
+            'aggregation' => criterion::AGGREGATE_ALL,
+            'courseids' => [$data->courses[1]->id, $data->courses[2]->id],
         ]);
 
         $data->cc[2] = $crit_generator->create_coursecompletion([

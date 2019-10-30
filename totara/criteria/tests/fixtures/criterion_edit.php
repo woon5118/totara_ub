@@ -61,8 +61,8 @@ if ($id !== 0) {
 } else {
     $criterion = criterion_factory::create($type);
 }
-$criterionData = $criterion->export_criterion_edit_template();
+$criterion_data = $criterion->export_criterion_edit_template();
 
-echo $OUTPUT->render_from_template('totara_criteria/criterion_test', $criterionData);
+echo $OUTPUT->render_from_template('totara_criteria/criterion_test', $criterion_data);
 
 echo $OUTPUT->footer();

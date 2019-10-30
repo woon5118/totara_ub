@@ -88,7 +88,6 @@ function xmldb_pathway_manual_upgrade($oldversion) {
     }
 
     if ($oldversion < 2019070301) {
-
         // Define table pathway_manual_rating to be dropped.
         $table = new xmldb_table('pathway_manual_value');
 
@@ -102,7 +101,6 @@ function xmldb_pathway_manual_upgrade($oldversion) {
     }
 
     if ($oldversion < 2019070302) {
-
         // Define table pathway_manual_rating to be created.
         $table = new xmldb_table('pathway_manual_rating');
 

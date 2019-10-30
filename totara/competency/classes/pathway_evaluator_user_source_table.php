@@ -81,7 +81,11 @@ class pathway_evaluator_user_source_table implements pathway_evaluator_user_sour
 
         $temp_table_name = $this->temp_user_table->get_table_name();
         $temp_user_id_column = $this->temp_user_table->get_user_id_column();
-        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('', false, null, $pathway->get_competency()->id);
+        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('',
+            false,
+            null,
+            $pathway->get_competency()->id
+        );
         $temp_wh = !empty($temp_wh) ? " WHERE {$temp_wh}" : '';
 
         $sql =
@@ -102,7 +106,8 @@ class pathway_evaluator_user_source_table implements pathway_evaluator_user_sour
                 'pathwayid' => $pathway->get_id(),
                 'currentstatus' => pathway_achievement::STATUS_CURRENT,
             ],
-            $temp_wh_params);
+            $temp_wh_params
+        );
 
         $DB->execute($sql, $params);
     }

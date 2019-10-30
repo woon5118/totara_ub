@@ -70,7 +70,6 @@ function xmldb_totara_competency_upgrade($oldversion) {
     }
 
     if ($oldversion < 2019073000) {
-
         // Define field related_info to be added to totara_competency_configuration_change.
         $table = new xmldb_table('totara_competency_configuration_change');
         $field = new xmldb_field('related_info', XMLDB_TYPE_CHAR, '1333', null, XMLDB_NOTNULL, null, null, 'change_type');
@@ -85,7 +84,6 @@ function xmldb_totara_competency_upgrade($oldversion) {
     }
 
     if ($oldversion < 2019082700) {
-
         // Define table totara_competency_temp_users to be created.
         $table = new xmldb_table('totara_competency_temp_users');
 
@@ -107,7 +105,6 @@ function xmldb_totara_competency_upgrade($oldversion) {
     }
 
     if ($oldversion < 2019082701) {
-
         // Define field process_key to be added to totara_competency_temp_users
         $table = new xmldb_table('totara_competency_temp_users');
         $field = new xmldb_field('process_key', XMLDB_TYPE_CHAR, '255', null, null, null, null);
@@ -122,7 +119,6 @@ function xmldb_totara_competency_upgrade($oldversion) {
     }
 
     if ($oldversion < 2019090600) {
-
         // Define field process_key to be added to totara_competency_temp_users
         $table = new xmldb_table('totara_competency_temp_users');
         $field = new xmldb_field('update_operation_name', XMLDB_TYPE_CHAR, '255', null, null, null, null);
@@ -157,7 +153,6 @@ function xmldb_totara_competency_upgrade($oldversion) {
     }
 
     if ($oldversion < 2019102300) {
-
         // Define table totara_competency_temp_users to be renamed to totara_competency_aggregation_queue.
         $table = new xmldb_table('totara_competency_temp_users');
 

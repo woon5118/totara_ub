@@ -54,7 +54,10 @@ final class competency_achievement_aggregator {
      * @param achievement_configuration $achievement_configuration
      * @param competency_aggregator_user_source_list $user_id_source
      */
-    public function __construct(achievement_configuration $achievement_configuration, competency_aggregator_user_source $user_id_source) {
+    public function __construct(
+        achievement_configuration $achievement_configuration,
+        competency_aggregator_user_source $user_id_source
+    ) {
         $this->achievement_configuration = $achievement_configuration;
         $this->user_id_source = $user_id_source;
     }
@@ -139,7 +142,9 @@ final class competency_achievement_aggregator {
                 }
 
                 $achieved_via_ids = array_map(
-                    function (pathway_achievement $achievement) {return $achievement->id;},
+                    function (pathway_achievement $achievement) {
+                        return $achievement->id;
+                    },
                     $user_achievement['achieved_via']
                 );
 

@@ -78,10 +78,12 @@ abstract class overall_aggregation {
         }
 
         // TODO: can possibly make use of a separate class, but seems like an overkill at this point
-        return empty($this->user_achievement[$user_id]) ? ['scale_value_id' => null, 'achieved_via' => []] : $this->user_achievement[$user_id];
+        return empty($this->user_achievement[$user_id])
+            ? ['scale_value_id' => null, 'achieved_via' => []]
+            : $this->user_achievement[$user_id];
     }
 
-    protected abstract function do_aggregation(int $user_id);
+    abstract protected function do_aggregation(int $user_id);
 
     protected function set_user_achievement($user_id, ?int $scale_value_id = null, array $achieved_via) {
         // For now taking the last value set

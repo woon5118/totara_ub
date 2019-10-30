@@ -260,9 +260,20 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
      *
      * @dataProvider data_provider_test_filter
      */
-    public function test_get_filter(?string $process_key = null, ?string $update_operation = null, bool $include_update_operation = true) {
+    public function test_get_filter(
+        ?string $process_key = null,
+        ?string $update_operation = null,
+        bool $include_update_operation = true
+    ) {
         $data = $this->setup_data();
-        $nocolumn_tbl = new aggregation_users_table('tablename', false, 'useridcolumn', 'competencyidcolumn', 'haschangedcolumn', null, null);
+        $nocolumn_tbl = new aggregation_users_table('tablename',
+            false,
+            'useridcolumn',
+            'competencyidcolumn',
+            'haschangedcolumn',
+            null,
+            null
+        );
 
         $expected = [];
         if (!empty($process_key)) {
@@ -294,25 +305,34 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
      *
      * @dataProvider data_provider_test_filter
      */
-    public function test_get_filter_sql_with_params(?string $process_key = '', ?string $update_operation = '', bool $include_update_operation = true) {
+    public function test_get_filter_sql_with_params(
+        ?string $process_key = '',
+        ?string $update_operation = '',
+        bool $include_update_operation = true
+    ) {
 
         $data = $this->setup_data();
-        $nocolumn_tbl = new aggregation_users_table('tablename', false, 'useridcolumn', 'competencyidcolumn', 'haschangedcolumn', null, null);
+        $nocolumn_tbl = new aggregation_users_table('tablename',
+            false,
+            'useridcolumn',
+            'competencyidcolumn',
+            'haschangedcolumn',
+            null,
+            null
+        );
 
         $table_alias = 'tmp';
-        $expected_sql = '';
-        $expected_sql_with_alias = '';
+        $expected_sql_parts = [];
+        $expected_sql_with_alias = [];
         $expected_params = [];
-        $connect = '';
 
         if (!empty($process_key)) {
             $data->tbl->set_process_key_value($process_key);
             $nocolumn_tbl->set_process_key_value($process_key);
 
-            $expected_sql = $data->tbl->get_process_key_column() . ' = :autbl_processkey';
-            $expected_sql_with_alias = $table_alias . '.' . $data->tbl->get_process_key_column() . ' = :autbl_processkey';
+            $expected_sql_parts[] = $data->tbl->get_process_key_column() . ' = :autbl_processkey';
+            $expected_sql_with_alias[] = $table_alias . '.' . $data->tbl->get_process_key_column() . ' = :autbl_processkey';
             $expected_params['autbl_processkey'] = $process_key;
-            $connect = ' AND ';
         }
 
         if (!empty($update_operation)) {
@@ -320,17 +340,19 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
             $nocolumn_tbl->set_update_operation_value($update_operation);
 
             if ($include_update_operation) {
-                $expected_sql .= $connect . $data->tbl->get_update_operation_column() . ' = :autbl_updateoperation';
-                $expected_sql_with_alias .= $connect . $table_alias . '.' . $data->tbl->get_update_operation_column() . ' = :autbl_updateoperation';
+                $expected_sql_parts[] = $data->tbl->get_update_operation_column() . ' = :autbl_updateoperation';
+                $expected_sql_with_alias[] = $table_alias . '.' . $data->tbl->get_update_operation_column() . ' = :autbl_updateoperation';
                 $expected_params['autbl_updateoperation'] = $update_operation;
             }
         }
 
+        $expected_sql = implode(' AND ' , $expected_sql_parts);
         [$sql, $params] = $data->tbl->get_filter_sql_with_params('', $include_update_operation);
         $this->assertEquals($expected_sql, $sql);
         $this->assertEqualsCanonicalizing($expected_params, $params);
 
         // With a table alias
+        $expected_sql_with_alias = implode(' AND ', $expected_sql_with_alias);
         [$sql, $params] = $data->tbl->get_filter_sql_with_params($table_alias, $include_update_operation);
         $this->assertEquals($expected_sql_with_alias, $sql);
         $this->assertEquals($expected_params, $params);

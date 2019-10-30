@@ -70,11 +70,11 @@ class criteria_childcompetency_observer_testcase extends advanced_testcase {
         // Create a second child competency and verify again
         $child_competency2 = $competency_generator->create_competency('Comp A-2', null, null, ['parentid' => $competency->id]);
 
-        // This should have resulted in the competency_created observer being called and a criteria_item created for the second child
+        // Should have resulted in the competency_created observer being called and a criteria_item created for the second child
         $this->verify_items($competency->id, [$child_competency->id, $child_competency2->id]);
         $this->assertSame(0, item_record_entity::repository()->count());
 
-        // Now add a criteria_item_record for one of the items, create another child and ensure that the existing item_records are not changed
+        // Add a criteria_item_record for one of the items, create another child and ensure that the existing item_records are not changed
         $user = $this->getDataGenerator()->create_user();
         $this->create_item_record($user->id, $child_competency->id);
         $this->verify_item_records($child_competency->id, [$user->id]);
@@ -124,14 +124,24 @@ class criteria_childcompetency_observer_testcase extends advanced_testcase {
 
         // Create 2 competencies, each with 1 child
         $competencies = [];
-        foreach(['Comp A', 'Comp B'] as $name) {
+        foreach (['Comp A', 'Comp B'] as $name) {
             $competencies[$name] = $competency_generator->create_competency($name);
             $criteria_generator->create_childcompetency(['competency' => $competencies[$name]->id]);
 
             $childname = $name . '-1';
-            $competencies[$childname] = $competency_generator->create_competency($childname, null, null, ['parentid' => $competencies[$name]->id]);
+            $competencies[$childname] = $competency_generator->create_competency(
+                $childname,
+                null,
+                null,
+                ['parentid' => $competencies[$name]->id]
+            );
             $childname = $name . '-2';
-            $competencies[$childname] = $competency_generator->create_competency($childname, null, null, ['parentid' => $competencies[$name]->id]);
+            $competencies[$childname] = $competency_generator->create_competency(
+                $childname,
+                null,
+                null,
+                ['parentid' => $competencies[$name]->id]
+            );
         }
 
         // Verify generated data
@@ -139,7 +149,7 @@ class criteria_childcompetency_observer_testcase extends advanced_testcase {
         $this->assertSame(2, criterion_entity::repository()->count());
 
         // The competency_created observer should have created the necessary items
-        foreach(['Comp A', 'Comp B'] as $name) {
+        foreach (['Comp A', 'Comp B'] as $name) {
             $this->verify_items($competencies[$name]->id, [$competencies["{$name}-1"]->id, $competencies["{$name}-2"]->id]);
         }
         $this->assertSame(0, item_record_entity::repository()->count());
@@ -149,12 +159,15 @@ class criteria_childcompetency_observer_testcase extends advanced_testcase {
 
         // This should have resulted in the competency_moved observer which should have updated both parent competencies' items
         $this->verify_items($competencies['Comp A']->id, [$competencies['Comp A-2']->id]);
-        $this->verify_items($competencies['Comp B']->id, [$competencies['Comp A-1']->id, $competencies['Comp B-1']->id, $competencies['Comp B-2']->id]);
+        $this->verify_items(
+            $competencies['Comp B']->id,
+            [$competencies['Comp A-1']->id, $competencies['Comp B-1']->id, $competencies['Comp B-2']->id]
+        );
         $this->assertSame(0, item_record_entity::repository()->count());
 
         // Now add a criteria_item_record for the items. Move an item and ensure that it's item_record is also removed
         $user = $this->getDataGenerator()->create_user();
-        foreach(['Comp A', 'Comp B'] as $name) {
+        foreach (['Comp A', 'Comp B'] as $name) {
             $this->create_item_record($user->id, $competencies["{$name}-1"]->id);
             $this->create_item_record($user->id, $competencies["{$name}-2"]->id);
         }
@@ -203,9 +216,19 @@ class criteria_childcompetency_observer_testcase extends advanced_testcase {
             $competencies[$name] = $competency_generator->create_competency($name);
 
             $childname = $name . '-1';
-            $competencies[$childname] = $competency_generator->create_competency($childname, null, null, ['parentid' => $competencies[$name]->id]);
+            $competencies[$childname] = $competency_generator->create_competency(
+                $childname,
+                null,
+                null,
+                ['parentid' => $competencies[$name]->id]
+            );
             $childname = $name . '-2';
-            $competencies[$childname] = $competency_generator->create_competency($childname, null, null, ['parentid' => $competencies[$name]->id]);
+            $competencies[$childname] = $competency_generator->create_competency(
+                $childname,
+                null,
+                null,
+                ['parentid' => $competencies[$name]->id]
+            );
         }
 
         // Verify generated data
@@ -245,11 +268,16 @@ class criteria_childcompetency_observer_testcase extends advanced_testcase {
 
         // Create 2 competencies, each with 1 child. First one has childcompetency criteria
         $competencies = [];
-        foreach(['Comp A', 'Comp B'] as $name) {
+        foreach (['Comp A', 'Comp B'] as $name) {
             $competencies[$name] = $competency_generator->create_competency($name);
 
             $childname = $name . '-1';
-            $competencies[$childname] = $competency_generator->create_competency($childname, null, null, ['parentid' => $competencies[$name]->id]);
+            $competencies[$childname] = $competency_generator->create_competency(
+                $childname,
+                null,
+                null,
+                ['parentid' => $competencies[$name]->id]
+            );
         }
         $criterion = $criteria_generator->create_childcompetency(['competency' => $competencies['Comp A']->id]);
 

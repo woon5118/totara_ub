@@ -156,8 +156,8 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
         $completion->mark_complete();
         // Verify that a row was inserted in the aggregation queue
         $this->assertTrue($DB->record_exists('totara_competency_aggregation_queue',
-            ['user_id' => $user1->id, 'competency_id' => $competency1->id, 'process_key' => null])
-        );
+            ['user_id' => $user1->id, 'competency_id' => $competency1->id, 'process_key' => null]
+        ));
 
         // Run the task
         $this->run_aggregation_task();

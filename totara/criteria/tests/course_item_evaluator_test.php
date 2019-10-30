@@ -167,7 +167,8 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
         // Testing that the sql statements to catch item_records with invalid criterion_met values are updated correctly
 
         $DB->execute('UPDATE {totara_criteria_item_record} SET criterion_met = 1 WHERE user_id = :user2',
-            ['user2' => $data->users[2]->id]);
+            ['user2' => $data->users[2]->id]
+        );
 
         $this->waitForSecond();
         $item_evaluator->update_completion($data->coursecompletion);

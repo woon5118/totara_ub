@@ -76,7 +76,8 @@ class linked_courses {
         $linked_course_ids = $DB->get_fieldset_select('comp_criteria',
             'iteminstance',
             'competencyid = :competencyid AND itemtype = :itemtype',
-            ['competencyid' => $competency_id, 'itemtype' => 'coursecompletion']);
+            ['competencyid' => $competency_id, 'itemtype' => 'coursecompletion']
+        );
 
         return $linked_course_ids;
     }
@@ -120,7 +121,6 @@ class linked_courses {
                 }
 
                 $course['linktype'] = $course['mandatory'] ? static::LINKTYPE_MANDATORY : static::LINKTYPE_OPTIONAL;
-
             } else if (!isset($valid_linktypes[$course['linktype']])) {
                 throw new \coding_exception('Invalid linktype');
             }

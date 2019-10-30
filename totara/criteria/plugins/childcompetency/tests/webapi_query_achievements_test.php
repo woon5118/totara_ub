@@ -34,7 +34,7 @@ use totara_criteria\criterion;
 use totara_criteria\criterion_not_found_exception;
 use totara_competency\entities\competency;
 
-class criteria_childcompetency_webapi_query_achievements_testcase extends \advanced_testcase {
+class criteria_childcompetency_webapi_query_achievements_testcase extends advanced_testcase {
 
      /**
       * Test configuration display - aggregate all
@@ -77,7 +77,12 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends \advan
         $this->assertNull($items->item($data['competencies'][3]->id)['value']);
 
         // Now let's take away the capability and check that there is an error
-        assign_capability('totara/competency:view_own_profile', CAP_PROHIBIT, $data['role']->id, context_user::instance($data['user']->id), true);
+        assign_capability('totara/competency:view_own_profile',
+            CAP_PROHIBIT,
+            $data['role']->id,
+            context_user::instance($data['user']->id),
+            true
+        );
 
         $this->expectException(required_capability_exception::class);
         $this->expectExceptionMessage('Sorry, but you do not currently have permissions to do that (View own competency profile)');
@@ -97,7 +102,12 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends \advan
         $logged_user = $this->getDataGenerator()->create_user();
 
         $this->getDataGenerator()->role_assign($data['role']->id, $logged_user->id);
-        assign_capability('totara/competency:view_other_profile', CAP_ALLOW, $data['role']->id, context_user::instance($data['user']->id));
+        assign_capability(
+            'totara/competency:view_other_profile',
+            CAP_ALLOW,
+            $data['role']->id,
+            context_user::instance($data['user']->id)
+        );
 
         $this->setUser($logged_user);
 
@@ -133,7 +143,12 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends \advan
         $this->assertNull($items->item($data['competencies'][3]->id)['value']);
 
         // Now let's take away the capability and check that there is an error
-        assign_capability('totara/competency:view_other_profile', CAP_PROHIBIT, $data['role']->id, context_user::instance($data['user']->id), true);
+        assign_capability('totara/competency:view_other_profile',
+            CAP_PROHIBIT,
+            $data['role']->id,
+            context_user::instance($data['user']->id),
+            true
+        );
 
         $this->expectException(required_capability_exception::class);
         $this->expectExceptionMessage('Sorry, but you do not currently have permissions to do that (View profile of other users)');
@@ -210,7 +225,13 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends \advan
         $items = $result['items'] ?? null;
 
         $this->assertEqualsCanonicalizing(
-            [$data['competencies'][1]->id, $data['competencies'][2]->id, $data['competencies'][3]->id, $na_competency->id, $archived_competency->id],
+            [
+                $data['competencies'][1]->id,
+                $data['competencies'][2]->id,
+                $data['competencies'][3]->id,
+                $na_competency->id,
+                $archived_competency->id
+            ],
             $items->pluck('id')
         );
 
@@ -218,28 +239,28 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends \advan
 
         // Competency 1
         $this->assertEquals($data['proficient_value']->id, $items->item($data['competencies'][1]->id)['value']->id);
-        $this->assertFalse( $items->item($data['competencies'][1]->id)['self_assignable']);
-        $this->assertTrue( $items->item($data['competencies'][1]->id)['assigned']);
+        $this->assertFalse($items->item($data['competencies'][1]->id)['self_assignable']);
+        $this->assertTrue($items->item($data['competencies'][1]->id)['assigned']);
 
         // Competency 2
         $this->assertNull($items->item($data['competencies'][2]->id)['value']);
-        $this->assertTrue( $items->item($data['competencies'][2]->id)['self_assignable']);
-        $this->assertTrue( $items->item($data['competencies'][2]->id)['assigned']);
+        $this->assertTrue($items->item($data['competencies'][2]->id)['self_assignable']);
+        $this->assertTrue($items->item($data['competencies'][2]->id)['assigned']);
 
         // Competency 3
         $this->assertNull($items->item($data['competencies'][3]->id)['value']);
-        $this->assertFalse( $items->item($data['competencies'][3]->id)['self_assignable']);
-        $this->assertTrue( $items->item($data['competencies'][3]->id)['assigned']);
+        $this->assertFalse($items->item($data['competencies'][3]->id)['self_assignable']);
+        $this->assertTrue($items->item($data['competencies'][3]->id)['assigned']);
 
         // Competency 4
         $this->assertNull($items->item($na_competency->id)['value']);
-        $this->assertTrue( $items->item($na_competency->id)['self_assignable']);
-        $this->assertFalse( $items->item($na_competency->id)['assigned']);
+        $this->assertTrue($items->item($na_competency->id)['self_assignable']);
+        $this->assertFalse($items->item($na_competency->id)['assigned']);
 
         // Competency 5
         $this->assertNull($items->item($archived_competency->id)['value']);
-        $this->assertFalse( $items->item($archived_competency->id)['self_assignable']);
-        $this->assertTrue( $items->item($archived_competency->id)['assigned']);
+        $this->assertFalse($items->item($archived_competency->id)['self_assignable']);
+        $this->assertTrue($items->item($archived_competency->id)['assigned']);
 
         $sink->close();
     }
@@ -325,11 +346,27 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends \advan
         $competencies[] = $this->competency_generator()->create_competency();
 
         // These 3 we're looking for
-        $competencies[] = $this->competency_generator()->create_competency(null, $competencies[0]->frameworkid, ['parentid' => $competencies[0]->id]); // Achieved
-        $competencies[] = $this->competency_generator()->create_competency(null, $competencies[0]->frameworkid, ['parentid' => $competencies[0]->id]); // Not achieved
-        $competencies[] = $this->competency_generator()->create_competency(null, $competencies[0]->frameworkid, ['parentid' => $competencies[0]->id]); // No value
+        $competencies[] = $this->competency_generator()->create_competency(
+            null,
+            $competencies[0]->frameworkid,
+            ['parentid' => $competencies[0]->id]
+        ); // Achieved
+        $competencies[] = $this->competency_generator()->create_competency(
+            null,
+            $competencies[0]->frameworkid,
+            ['parentid' => $competencies[0]->id]
+        ); // Not achieved
+        $competencies[] = $this->competency_generator()->create_competency(
+            null,
+            $competencies[0]->frameworkid,
+            ['parentid' => $competencies[0]->id]
+        ); // No value
 
-        $competencies[] = $this->competency_generator()->create_competency(null, $competencies[0]->frameworkid, ['parentid' => $competencies[1]->id]);
+        $competencies[] = $this->competency_generator()->create_competency(
+            null,
+            $competencies[0]->frameworkid,
+            ['parentid' => $competencies[1]->id]
+        );
         $competencies[] = $this->competency_generator()->create_competency();
 
         // Create child competency criterion

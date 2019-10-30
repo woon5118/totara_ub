@@ -72,8 +72,8 @@ class totara_competency_pathway_factory_testcase extends \advanced_testcase {
         // Coursecompletions
         $crit_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
         $cc1 = $crit_generator->create_coursecompletion([
-            'aggregation'=> criterion::AGGREGATE_ALL,
-            'courseids' =>[$courses[1]->id, $courses[2]->id],
+            'aggregation' => criterion::AGGREGATE_ALL,
+            'courseids' => [$courses[1]->id, $courses[2]->id],
         ]);
 
         $cc2 = $crit_generator->create_coursecompletion([

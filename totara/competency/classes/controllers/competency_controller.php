@@ -108,7 +108,7 @@ class competency_controller extends admin_controller {
 
     public function action_edit() {
         global $CFG;
-        require_once ($CFG->dirroot . '/totara/hierarchy/renderer.php');
+        require_once($CFG->dirroot . '/totara/hierarchy/renderer.php');
 
         $this->setup();
 
@@ -183,7 +183,7 @@ class competency_controller extends admin_controller {
                 'frameworkid' => $this->competency->frameworkid,
                 'id' => $this->competency->id,
             ]
-         );
+        );
         redirect($url);
 
         // global $TEXTAREA_OPTIONS;
@@ -272,7 +272,9 @@ class competency_controller extends admin_controller {
         // Framework
         $url = null;
         if ($canviewframeworks) {
-            $url = new \moodle_url('/totara/hierarchy/index.php', ['prefix' => $this->prefix, 'frameworkid' => $this->competency->frameworkid]);
+            $url = new \moodle_url('/totara/hierarchy/index.php',
+                ['prefix' => $this->prefix, 'frameworkid' => $this->competency->frameworkid]
+            );
         }
         $this->page->navbar->add(format_string($this->competency->framework->fullname), $url);
 

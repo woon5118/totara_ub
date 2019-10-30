@@ -98,7 +98,6 @@ class criteria_coursecompletion_services_testcase extends advanced_testcase {
                 if ($actual_item['id'] == $expected_item['id'] &&
                     $actual_item['type'] == $expected_item['type'] &&
                     $actual_item['name'] == $expected_item['name']) {
-
                     unset($expected_result['items'][$key]);
                     break;
                 }

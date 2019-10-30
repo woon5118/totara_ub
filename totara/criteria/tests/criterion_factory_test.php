@@ -55,7 +55,7 @@ class totara_criteria_criterion_factory_testcase extends \advanced_testcase {
     public function test_create() {
 
         $enabled_types = plugintypes::get_enabled_plugins('criteria', 'totara_criteria');
-        foreach($enabled_types as $plugin_type) {
+        foreach ($enabled_types as $plugin_type) {
             $instance = criterion_factory::create($plugin_type);
             $this->assertSame($plugin_type, $instance->get_plugin_type());
             $this->assertTrue(is_null($instance->get_id()));
@@ -100,7 +100,7 @@ class totara_criteria_criterion_factory_testcase extends \advanced_testcase {
         $record = [
             'aggregation' => criterion::AGGREGATE_ANY_N,
             'req_items' => 2,
-            'courseids' =>[$courses[2]->id, $courses[3]->id, $courses[4]->id, $courses[5]->id],
+            'courseids' => [$courses[2]->id, $courses[3]->id, $courses[4]->id, $courses[5]->id],
         ];
 
         $cc = $generator->create_coursecompletion($record);
@@ -155,7 +155,7 @@ class totara_criteria_criterion_factory_testcase extends \advanced_testcase {
         $record = [
             'aggregation' => criterion::AGGREGATE_ANY_N,
             'req_items' => 2,
-            'courseids' =>[$courses[2]->id, $courses[3]->id, $courses[4]->id, $courses[5]->id],
+            'courseids' => [$courses[2]->id, $courses[3]->id, $courses[4]->id, $courses[5]->id],
         ];
 
         $cc = $generator->create_coursecompletion($record);

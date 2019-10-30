@@ -38,7 +38,7 @@ class competency_item_evaluator extends item_evaluator {
          ******************************************************************************************/
         $criterion_id = $criterion->get_id();
 
-        // Not linking with the users_source here as we've already ensured that there is a record for each applicable users in the parent
+        // Not linking with the users_source here as we've already ensured that there is a record in the parent function
 
         // Due to MySQL not allowing the table being updated and MSSQL not allowing '(column1, column2) IN' in a where clause,
         // first selecting items to update and then updating them

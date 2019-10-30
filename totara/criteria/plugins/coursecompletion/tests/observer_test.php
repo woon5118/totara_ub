@@ -91,7 +91,7 @@ class criteria_coursecompletion_observer_testcase extends \advanced_testcase {
         $sink->close();
     }
 
-   public function test_course_completed_single_item() {
+    public function test_course_completed_single_item() {
         $data = $this->setup_data();
         $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
         $criterion = $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id]]);
@@ -120,7 +120,7 @@ class criteria_coursecompletion_observer_testcase extends \advanced_testcase {
         $sink->close();
     }
 
-   public function test_course_completed_multiple_items() {
+    public function test_course_completed_multiple_items() {
         $data = $this->setup_data();
         $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
         $criterion1 = $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id]]);

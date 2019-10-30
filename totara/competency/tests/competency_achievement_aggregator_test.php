@@ -383,8 +383,10 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         // These are not filtered out by the competency_achievement_aggregator just because they are null.
         // Todo: consider what behaviour meets our needs here:
         // 1. Aggregation methods should return all pathways with a null value
-        // 2. Aggregation methods shouldn't return all pathways with a null value. This is how it currently works. There are logical issues with 1 such as when null achievements are a placeholder
-        // And if the aggregation method does return a null value for it's 'via' record, should the competency_achievement_aggregator save it or not.
+        // 2. Aggregation methods shouldn't return all pathways with a null value.
+        //    This is how it currently works. There are logical issues with 1 such as when null achievements are a placeholder
+        // And if the aggregation method does return a null value for it's 'via' record,
+        // should the competency_achievement_aggregator save it or not.
         $this->assertEquals(4, $DB->count_records('totara_competency_achievement_via'));
 
         // The value changed, so an event was sent.
@@ -750,7 +752,9 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $this->assertEquals($first_comp_record->scale_value_id, $reloaded_first_comp_record->scale_value_id);
         $this->assertEquals(competency_achievement::SUPERSEDED, $reloaded_first_comp_record->status);
 
-        $second_comp_record = $DB->get_record('totara_competency_achievement', ['status' => competency_achievement::ACTIVE_ASSIGNMENT]);
+        $second_comp_record = $DB->get_record('totara_competency_achievement',
+            ['status' => competency_achievement::ACTIVE_ASSIGNMENT]
+        );
         $this->assertEquals($scale_value2->id, $second_comp_record->scale_value_id);
 
 
@@ -776,7 +780,9 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $this->assertEquals($first_comp_record->scale_value_id, $reloaded_first_comp_record->scale_value_id);
         $this->assertEquals(competency_achievement::SUPERSEDED, $reloaded_first_comp_record->status);
 
-        $third_comp_record = $DB->get_record('totara_competency_achievement', ['status' => competency_achievement::ACTIVE_ASSIGNMENT]);
+        $third_comp_record = $DB->get_record('totara_competency_achievement',
+            ['status' => competency_achievement::ACTIVE_ASSIGNMENT]
+        );
         $this->assertEquals($scale_value3->id, $third_comp_record->scale_value_id);
     }
 }

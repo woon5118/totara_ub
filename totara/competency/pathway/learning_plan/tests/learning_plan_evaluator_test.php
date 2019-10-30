@@ -95,7 +95,7 @@ class pathway_learning_plan_evaluator_testcase extends advanced_testcase {
         $now = time();
 
         // Manually insert into dp plan_competency_value to exercise the table sql explicitly
-        // The full process (making use of the list source) is exercised in pathway_learning_plan_learning_plan_testcase::test_integration
+        // The full process is exercised in pathway_learning_plan_learning_plan_testcase::test_integration
         // found in learning_plan_test.php
         $this->create_rating_record($data->competency->id, $data->users[1]->id, $data->scalevalues[4]->id, $now++);
 
@@ -171,10 +171,10 @@ class pathway_learning_plan_evaluator_testcase extends advanced_testcase {
             ],
             2 => [
                 [
-                'pathway_id' => $data->lp_pathway->get_id(),
-                'scale_value_id' => $data->scalevalues[2]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
-                'related_info' => [],
+                    'pathway_id' => $data->lp_pathway->get_id(),
+                    'scale_value_id' => $data->scalevalues[2]->id,
+                    'status' => pathway_achievement::STATUS_CURRENT,
+                    'related_info' => [],
                 ],
             ],
         ];
@@ -221,7 +221,11 @@ class pathway_learning_plan_evaluator_testcase extends advanced_testcase {
      * @param int $competency_id
      * @param array $assigned_users
      */
-    private function create_userid_table_records(aggregation_users_table $user_id_table, int $competency_id, array $assigned_users) {
+    private function create_userid_table_records(
+        aggregation_users_table $user_id_table,
+        int $competency_id,
+        array $assigned_users
+    ) {
         global $DB;
 
         $user_id_table->truncate();
@@ -248,7 +252,6 @@ class pathway_learning_plan_evaluator_testcase extends advanced_testcase {
                 if ((int)$actual_row->pathway_id == $expected_row['pathway_id'] &&
                     (int)$actual_row->status == $expected_row['status'] &&
                     (int)$actual_row->scale_value_id == $expected_row['scale_value_id']) {
-
                     unset($expected_rows[$key]);
                     break;
                 }

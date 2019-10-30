@@ -118,7 +118,6 @@ class competency_aggregator_user_source_table implements competency_aggregator_u
         );
 
         $DB->execute($sql, $params);
-
     }
 
     /**
@@ -140,14 +139,15 @@ class competency_aggregator_user_source_table implements competency_aggregator_u
         $params['newstatus'] = competency_achievement::ACTIVE_ASSIGNMENT;
         $params['competencyid'] = $competency_id;
 
-        $sql ="SELECT tacu.id,
+        $sql = "SELECT tacu.id,
                     tacu.user_id,
                     tacu.assignment_id,
                     COALESCE(ca.id, NULL) AS comp_achievement_id,
                     COALESCE(ca.scale_value_id, NULL) AS scale_value_id
                  FROM {totara_assignment_competency_users} tacu
                  JOIN {" . $temp_tablename . "} {$temp_alias} 
-                   ON tacu.user_id = {$temp_alias}.{$temp_user_id_column} AND tacu.competency_id = {$temp_alias}.{$temp_competency_id_column}
+                   ON tacu.user_id = {$temp_alias}.{$temp_user_id_column} 
+                  AND tacu.competency_id = {$temp_alias}.{$temp_competency_id_column}
             LEFT JOIN {totara_competency_achievement} ca
                    ON tacu.user_id = ca.user_id
                   AND tacu.assignment_id = ca.assignment_id

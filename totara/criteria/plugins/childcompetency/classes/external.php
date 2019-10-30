@@ -55,7 +55,8 @@ class external extends \external_api {
                         [
                             'metakey' => new \external_value(PARAM_TEXT, 'Metadata key'),
                             'metavalue' => new \external_value(PARAM_TEXT, 'Metadata value'),
-                        ]),
+                        ]
+                    ),
                     'Child competency metadata'
                 ),
                 'aggregation' => new \external_single_structure(

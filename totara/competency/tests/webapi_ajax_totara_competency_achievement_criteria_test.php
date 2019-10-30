@@ -81,7 +81,9 @@ class totara_competency_webapi_ajax_totara_competency_achievement_criteria_testc
         $data = $this->setup_data();
 
         $operationname = 'totara_competency_achievement_criteria';
-        $result = graphql::execute_operation(execution_context::create('ajax', $operationname), ['competency_id' => $data->comp->id]);
+        $result = graphql::execute_operation(execution_context::create('ajax', $operationname),
+            ['competency_id' => $data->comp->id]
+        );
 
         $this->assertEmpty($result->errors);
         $this->assertTrue(is_array($result->data));
@@ -94,7 +96,7 @@ class totara_competency_webapi_ajax_totara_competency_achievement_criteria_testc
                     'aggregation_type' => $expected_aggregation->get_agg_type(),
                     'title' => $expected_aggregation->get_title(),
                     'description' => $expected_aggregation->get_description(),
-                    ],
+                ],
                 'paths' => [],
             ]
         ];
@@ -111,8 +113,8 @@ class totara_competency_webapi_ajax_totara_competency_achievement_criteria_testc
         /** @var totara_criteria_generator $criteria_generator */
         $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
         $cc = $criteria_generator->create_coursecompletion([
-            'aggregation'=> criterion::AGGREGATE_ALL,
-            'courseids' =>[$data->courses[1]->id, $data->courses[2]->id],
+            'aggregation' => criterion::AGGREGATE_ALL,
+            'courseids' => [$data->courses[1]->id, $data->courses[2]->id],
         ]);
 
         // Create pathways:
@@ -133,7 +135,9 @@ class totara_competency_webapi_ajax_totara_competency_achievement_criteria_testc
         $operationname = 'totara_competency_achievement_criteria';
 
         // Without summary_criteria
-        $result = graphql::execute_operation(execution_context::create('ajax', $operationname), ['competency_id' => $data->comp->id]);
+        $result = graphql::execute_operation(execution_context::create('ajax', $operationname),
+            ['competency_id' => $data->comp->id]
+        );
 
         $this->assertEmpty($result->errors);
         $this->assertTrue(is_array($result->data));

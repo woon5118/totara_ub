@@ -100,7 +100,8 @@ class criteria_coursecompletion_display_testcase extends \advanced_testcase {
         if ($aggregation['method'] == criterion::AGGREGATE_ANY_N) {
             $expected->item_aggregation = get_string('aggregate_any',
                 'totara_criteria',
-                (object)['x' => $aggregation['req_items'] ?? 1]);
+                (object)['x' => $aggregation['req_items'] ?? 1]
+            );
         }
 
         foreach ($courses as $course_idx) {

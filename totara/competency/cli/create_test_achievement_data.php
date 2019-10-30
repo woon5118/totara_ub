@@ -161,7 +161,8 @@ function create_item_records($user_ids, $competency_ids) {
             'pathtype' => 'criteria_group',
             'pathstatus' => pathway::PATHWAY_STATUS_ACTIVE,
         ],
-        $comp_id_params);
+        $comp_id_params
+    );
 
     $exist_sql =
         "SELECT tcir.id
@@ -227,14 +228,15 @@ function create_manual_ratings($user_ids, $competency_ids) {
                    AND tcp.status = :pathstatus
                 {$comp_id_sql})";
     $params = array_merge(
-    [
-        'dateassigned' => $now,
-        'assignedby' => 1,
-        'assignedbyrole' => 'manager',
-        'pathtype' => 'manual',
-        'pathstatus' => pathway::PATHWAY_STATUS_ACTIVE,
-    ],
-    $comp_id_params);
+        [
+            'dateassigned' => $now,
+            'assignedby' => 1,
+            'assignedbyrole' => 'manager',
+            'pathtype' => 'manual',
+            'pathstatus' => pathway::PATHWAY_STATUS_ACTIVE,
+        ],
+        $comp_id_params
+    );
 
     foreach ($user_ids as $user_id) {
         printf("\tUser: %d\n", $user_id);
@@ -287,7 +289,8 @@ function create_pathway_achievements($user_ids, $competency_ids) {
             'pathstatus' => pathway::PATHWAY_STATUS_ACTIVE,
             'currentstatus2' => pathway_achievement::STATUS_CURRENT,
         ],
-        $comp_id_params);
+        $comp_id_params
+    );
 
     $cg_sql =
         "INSERT INTO {totara_competency_pathway_achievement}
@@ -309,8 +312,14 @@ function create_pathway_achievements($user_ids, $competency_ids) {
 
     foreach ($user_ids as $user_id) {
         printf("\tUser: %d\n", $user_id);
-        $DB->execute($manual_sql, array_merge($params, ['pathtype' => 'manual', 'userid' => (int)$user_id, 'achievementuser' => (int)$user_id]));
-        $DB->execute($cg_sql, array_merge($params, ['pathtype' => 'criteria_group', 'userid' => (int)$user_id, 'achievementuser' => (int)$user_id]));
+        $DB->execute($manual_sql,
+            array_merge($params, ['pathtype' => 'manual', 'userid' => (int)$user_id, 'achievementuser' => (int)$user_id])
+        );
+        $DB->execute($cg_sql,
+            array_merge($params,
+                ['pathtype' => 'criteria_group', 'userid' => (int)$user_id, 'achievementuser' => (int)$user_id]
+            )
+        );
     }
 }
 
@@ -360,7 +369,8 @@ function create_competency_achievements($user_ids, $competency_ids) {
             'tca_status' => competency_achievement::ACTIVE_ASSIGNMENT,
             'tcpa_status' => pathway_achievement::STATUS_CURRENT,
         ],
-        $comp_id_params);
+        $comp_id_params
+    );
 
     foreach ($user_ids as $user_id) {
         printf("\tUser: %d\n", $user_id);
@@ -368,6 +378,5 @@ function create_competency_achievements($user_ids, $competency_ids) {
     }
 
     // TODO: update statement to set proficient
-
 }
 

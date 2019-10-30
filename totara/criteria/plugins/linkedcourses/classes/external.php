@@ -46,7 +46,6 @@ class external extends \external_api {
 
         return linkedcourses::fetch($id)
             -> export_edit_detail();
-
     }
 
     public static function get_detail_returns() {
@@ -57,7 +56,8 @@ class external extends \external_api {
                         [
                             'metakey' => new \external_value(PARAM_TEXT, 'Metadata key'),
                             'metavalue' => new \external_value(PARAM_TEXT, 'Metadata value'),
-                        ]),
+                        ]
+                    ),
                     'Linked courses metadata'
                 ),
                 'aggregation' => new \external_single_structure(

@@ -759,7 +759,6 @@ abstract class criterion {
         $item_results = $this->get_item_results($user_id);
 
         foreach ($item_results as $item_result) {
-
             // Aggregate this item completion result and previously evaluated results
             switch ($this->aggregation_method) {
                 case self::AGGREGATE_ALL:

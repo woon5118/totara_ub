@@ -327,7 +327,11 @@ class aggregation_users_table {
      * @param null $has_changed_value
      * @return array [string, array]
      */
-    public function get_insert_values_sql_with_params(?int $user_id_value = null, ?int $comp_id_value = null, $has_changed_value = null): array {
+    public function get_insert_values_sql_with_params(
+        ?int $user_id_value = null,
+        ?int $comp_id_value = null,
+        $has_changed_value = null
+    ): array {
         $sql = [];
         $params = [];
 
@@ -484,7 +488,7 @@ class aggregation_users_table {
 
         $to_add = $DB->get_fieldset_sql($sql, ['compid' => $competency_id]);
         $to_add = array_map(
-            function($user_id) use ($competency_id) {
+            function ($user_id) use ($competency_id) {
                 return ['competency_id' => $competency_id, 'user_id' => $user_id, 'process_key' => null];
             },
             $to_add

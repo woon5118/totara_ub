@@ -54,6 +54,31 @@ class scale extends entity_model {
         parent::__construct($entity);
     }
 
+    public static function find_by_id(array $id, $with_values = true): self {
+        $model = new static(static::scale_repository()->find_or_fail($id));
+
+        if ($with_values) {
+            $model->load_values();
+        }
+
+        return $model;
+    }
+
+    public static function find_by_ids(array $ids, $with_values = true): collection {
+
+        $ids = static::sanitize_ids($ids);
+
+        $scales = static::scale_repository()->where('id', $ids)->get();
+
+        $values = $with_values ? static::preload_values($scales) : new collection();
+
+        $models = $scales->map(function (scale_entity $scale) use ($with_values, $values) {
+            $model = new static($scale);
+
+            if ($with_values) {
+                static::assign_preloaded_values($model, $values);
+            }
+
     /**
      * Load scale by ID
      *

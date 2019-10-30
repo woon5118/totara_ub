@@ -58,7 +58,6 @@ class achievements implements query_resolver {
                     'type' => $criterion->criterion_type
                 ];
             }
-
         }
 
         return $result;

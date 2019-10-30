@@ -82,8 +82,8 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         //      3 - Course 4 AND Course 5
         $crit_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
         $data->cc[1] = $crit_generator->create_coursecompletion([
-            'aggregation'=> criterion::AGGREGATE_ALL,
-            'courseids' =>[$data->courses[1]->id, $data->courses[2]->id],
+            'aggregation' => criterion::AGGREGATE_ALL,
+            'courseids' => [$data->courses[1]->id, $data->courses[2]->id],
         ]);
 
         $data->cc[2] = $crit_generator->create_coursecompletion([
@@ -93,8 +93,8 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         ]);
 
         $data->cc[3] = $crit_generator->create_coursecompletion([
-            'aggregation'=> criterion::AGGREGATE_ALL,
-            'courseids' =>[$data->courses[4]->id, $data->courses[5]->id],
+            'aggregation' => criterion::AGGREGATE_ALL,
+            'courseids' => [$data->courses[4]->id, $data->courses[5]->id],
         ]);
 
         // Validate existence of criteria
@@ -422,7 +422,9 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $instance->save();
 
         $expected = $DB->get_record('pathway_criteria_group', ['id' => $instance->get_path_instance_id()]);
-        $expected->criteria = $DB->get_records('pathway_criteria_group_criterion', ['criteria_group_id' => $instance->get_path_instance_id()]);
+        $expected->criteria = $DB->get_records('pathway_criteria_group_criterion',
+            ['criteria_group_id' => $instance->get_path_instance_id()]
+        );
         foreach ($expected->criteria as $criterion) {
             $criterion->detail = coursecompletion::dump_criterion_configuration($criterion->criterion_id);
         }

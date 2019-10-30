@@ -162,6 +162,8 @@ abstract class base extends controller {
     }
 
     public function get_self_assignment_url() {
-        return new moodle_url('/totara/competency/profile/self-assign', $this->is_for_current_user() ? [] : ['user_id' => $this->user->id]);
+        return new moodle_url('/totara/competency/profile/self-assign',
+            $this->is_for_current_user() ? [] : ['user_id' => $this->user->id]
+        );
     }
 }

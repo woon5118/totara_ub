@@ -119,7 +119,9 @@ class criteria_group extends pathway {
             return true;
         }
 
-        $criteria_rows = $DB->get_records('pathway_criteria_group_criterion', ['criteria_group_id' => $this->get_path_instance_id()]);
+        $criteria_rows = $DB->get_records('pathway_criteria_group_criterion',
+            ['criteria_group_id' => $this->get_path_instance_id()]
+        );
         if (count($this->get_criteria()) != count($criteria_rows)) {
             return true;
         }
@@ -523,7 +525,9 @@ class criteria_group extends pathway {
         if (!is_null($id) && $result = $DB->get_record('pathway_criteria_group', ['id' => $id])) {
             $result->criteria = $DB->get_records('pathway_criteria_group_criterion', ['criteria_group_id' => $id]);
             foreach ($result->criteria as $id => $criterion) {
-                $criterion->detail = criterion_factory::dump_criterion_configuration($criterion->criterion_type, $criterion->criterion_id);
+                $criterion->detail = criterion_factory::dump_criterion_configuration($criterion->criterion_type,
+                    $criterion->criterion_id
+                );
             }
 
             return $result;

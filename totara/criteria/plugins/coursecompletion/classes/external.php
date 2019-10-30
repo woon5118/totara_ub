@@ -46,7 +46,6 @@ class external extends \external_api {
 
         return coursecompletion::fetch($id)
             -> export_edit_detail();
-
     }
 
     public static function get_detail_returns() {

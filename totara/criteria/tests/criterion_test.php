@@ -143,7 +143,10 @@ class totara_criteria_criterion_testcase extends \advanced_testcase {
         $this->assertEquals(['the key' => 'the value'], $mock_criterion->get_metadata());
 
         // One new, One updated
-        $mock_criterion->add_metadata([['metakey' => 'the key', 'metavalue' => 'new value'], ['metakey' => 'key2', 'metavalue' => 'value2']]);
+        $mock_criterion->add_metadata([
+            ['metakey' => 'the key', 'metavalue' => 'new value'],
+            ['metakey' => 'key2', 'metavalue' => 'value2']
+        ]);
         $this->assertEquals(['the key' => 'new value', 'key2' => 'value2'], $mock_criterion->get_metadata());
 
         // Nothing new
@@ -154,21 +157,25 @@ class totara_criteria_criterion_testcase extends \advanced_testcase {
         $mock_criterion->set_metadata([['metakey' => 'the key', 'metavalue' => 'set value']]);
         $this->assertEquals(['the key' => 'set value'], $mock_criterion->get_metadata());
         // Last value is used
-        $mock_criterion->set_metadata([['metakey' => 'the key', 'metavalue' => 'set value'], ['metakey' => 'key2', 'metavalue' => 'value2'], ['metakey' => 'key2', 'metavalue' => 'value3']]);
-        $this->assertEquals(['the key' => 'set value', 'key2'=> 'value3'], $mock_criterion->get_metadata());
+        $mock_criterion->set_metadata([
+            ['metakey' => 'the key', 'metavalue' => 'set value'],
+            ['metakey' => 'key2', 'metavalue' => 'value2'],
+            ['metakey' => 'key2', 'metavalue' => 'value3']
+        ]);
+        $this->assertEquals(['the key' => 'set value', 'key2' => 'value3'], $mock_criterion->get_metadata());
 
         // Remove :-
         // Empty
         $mock_criterion->remove_metadata([]);
-        $this->assertEquals(['the key' => 'set value', 'key2'=> 'value3'], $mock_criterion->get_metadata());
+        $this->assertEquals(['the key' => 'set value', 'key2' => 'value3'], $mock_criterion->get_metadata());
 
         // Non-existing
         $mock_criterion->remove_metadata(['some key']);
-        $this->assertEquals(['the key' => 'set value', 'key2'=> 'value3'], $mock_criterion->get_metadata());
+        $this->assertEquals(['the key' => 'set value', 'key2' => 'value3'], $mock_criterion->get_metadata());
 
         // Existing
         $mock_criterion->remove_metadata(['the key']);
-        $this->assertEquals(['key2'=> 'value3'], $mock_criterion->get_metadata());
+        $this->assertEquals(['key2' => 'value3'], $mock_criterion->get_metadata());
 
         // Last
         $mock_criterion->remove_metadata(['key2']);
@@ -199,7 +206,7 @@ class totara_criteria_criterion_testcase extends \advanced_testcase {
      */
     public function test_save_and_fetch() {
         global $DB;
-        
+
         $mock_criterion = $this->getMockForAbstractClass(criterion::class);
 
         // Ensure the mock criterion is stored

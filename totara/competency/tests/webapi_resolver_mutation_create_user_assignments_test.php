@@ -230,8 +230,10 @@ class totara_competency_webapi_resolver_mutation_create_user_assignments_testcas
 
         $data = new class() {
             public $fw1;
-            public $user1, $user2;
-            public $comp1, $comp2;
+            public $user1;
+            public $user2;
+            public $comp1;
+            public $comp2;
         };
         $data->fw1 = $this->generator()->hierarchy_generator()->create_comp_frame([]);
 

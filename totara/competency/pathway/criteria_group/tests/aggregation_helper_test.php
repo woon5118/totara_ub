@@ -218,10 +218,10 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
 
         $data = $this->setup_data();
 
-        $criteria_ids = array_merge(
-            $data->competency_data['Comp A']['criteria_ids'],
+        $criteria_ids = array_merge($data->competency_data['Comp A']['criteria_ids'],
             $data->competency_data['Comp B']['criteria_ids'],
-            $data->competency_data['Comp C']['criteria_ids']);
+            $data->competency_data['Comp C']['criteria_ids']
+        );
         aggregation_helper::mark_for_reaggregate_from_criteria($criteria_ids, $data->users[3]->id);
 
         $this->verify_queue([
@@ -247,7 +247,8 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
         $criteria_ids = array_merge(
             $data->competency_data['Comp A']['criteria_ids'],
             $data->competency_data['Comp B']['criteria_ids'],
-            $data->competency_data['Comp C']['criteria_ids']);
+            $data->competency_data['Comp C']['criteria_ids']
+        );
         aggregation_helper::mark_for_reaggregate_from_criteria($criteria_ids);
 
         $this->verify_queue([
@@ -285,7 +286,7 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
         foreach ($rows as $row) {
             foreach ($expected_rows as $key => $expected) {
                 if ($row->competency_id == $expected['competency_id'] && $row->user_id == $expected['user_id']) {
-                    unset ($expected_rows[$key]);
+                    unset($expected_rows[$key]);
                     break 1;
                 }
             }

@@ -85,11 +85,11 @@ class achievements implements query_resolver {
         // Let's load achievement values if any, as well as assignment availability
         $assignment->competency->children->load(
             [
-                'achievement' => function(repository $repository) use ($user_id, $assignment_id) {
+                'achievement' => function (repository $repository) use ($user_id, $assignment_id) {
                     $repository->where('user_id', $user_id)
                         ->where('proficient', 1)
                         ->with('value');
-                    },
+                },
                 'availability'
             ]
         );
@@ -100,11 +100,13 @@ class achievements implements query_resolver {
             'current_user' => static::is_for_current_user($user_id),
             'items' => $assignment->competency->children->map(function (competency $competency) use ($can_assign, $ass_user) {
                 // We need to figure out whether these competencies are assigned to the current user or not.
-                // The cheapest way to do so is to check achievement if a competency has an achievement, well it must be assigned to the user...
+                // The cheapest way to do so is to check achievement if a competency has an achievement,
+                // well it must be assigned to the user...
                 if ($competency->achievement->value ?? false) {
                     $assigned = true;
                 } else {
-                    $assigned = $ass_user->has_active_assignments($competency->id) || $ass_user->has_archived_assignments($competency->id);
+                    $assigned = $ass_user->has_active_assignments($competency->id) ||
+                        $ass_user->has_archived_assignments($competency->id);
                 }
 
                 return [

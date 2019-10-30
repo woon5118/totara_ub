@@ -44,7 +44,8 @@ class manual_evaluator_user_source_table extends pathway_evaluator_user_source_t
         }
 
         // Re-aggregate when
-        //     the user has neither a rating, nor an achievement record (will result in the user getting an achievement record during aggregation),
+        //     the user has neither a rating, nor an achievement record
+        //     (will result in the user getting an achievement record during aggregation),
         //  OR the user has a rating, but not yet an achievement record
         //  OR the user has a new rating
 
@@ -60,7 +61,8 @@ class manual_evaluator_user_source_table extends pathway_evaluator_user_source_t
         // TODO: These are good queries to use for creation of indexes / other performance enhancement options
 
         // Using 2 queries for clarify. Might consider joining them in future if it is more performant
-        // First query - Mark all users with one or more rating since the last achievement aggregation or who has a rating without an achievement record yet>
+        // First query - Mark all users with one or more rating since the last achievement aggregation
+        // or who has a rating without an achievement record yet>
         $sql =
             "UPDATE {" . $temp_table_name . "}
                 SET {$temp_set_sql} 
@@ -83,7 +85,8 @@ class manual_evaluator_user_source_table extends pathway_evaluator_user_source_t
                 'competencyid' => $competency_id,
             ],
             $temp_set_params,
-            $temp_wh_params);
+            $temp_wh_params
+        );
 
         $DB->execute($sql, $params);
 
@@ -109,7 +112,8 @@ class manual_evaluator_user_source_table extends pathway_evaluator_user_source_t
                 'competencyid' => $competency_id,
             ],
             $temp_set_params,
-            $temp_wh_params);
+            $temp_wh_params
+        );
 
         $DB->execute($sql, $params);
     }

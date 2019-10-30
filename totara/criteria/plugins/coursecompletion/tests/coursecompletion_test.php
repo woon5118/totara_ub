@@ -66,7 +66,7 @@ class criteria_coursecompletion_testcase extends \advanced_testcase {
             // First the criterion
             $tst['criterion_modified'] = time();
 
-            $criterion_id = $DB->insert_record("totara_criteria", $tst, true, false);;
+            $criterion_id = $DB->insert_record("totara_criteria", $tst, true, false);
 
             if (!empty($tst['item_ids'])) {
                 // Add non-existins criterion_items
@@ -317,7 +317,7 @@ class criteria_coursecompletion_testcase extends \advanced_testcase {
         // Single course to be completed
         $record = [
             'aggregation' => ['method' => criterion::AGGREGATE_ALL],
-            'courseids' =>[$course_2->id],
+            'courseids' => [$course_2->id],
         ];
 
         $cc = $cc_generator->create_coursecompletion($record);
@@ -331,7 +331,7 @@ class criteria_coursecompletion_testcase extends \advanced_testcase {
         // Multiple courses to be completed
         $record = [
             'aggregation' => ['method' => criterion::AGGREGATE_ALL],
-            'courseids' =>[$course_2->id, $course_3->id],
+            'courseids' => [$course_2->id, $course_3->id],
         ];
 
         $cc = $cc_generator->create_coursecompletion($record);
@@ -347,7 +347,7 @@ class criteria_coursecompletion_testcase extends \advanced_testcase {
         // Any of 2 courses to be completed
         $record = [
             'aggregation' => ['method' => criterion::AGGREGATE_ANY_N, 'req_items' => 1],
-            'courseids' =>[$course_2->id, $course_3->id],
+            'courseids' => [$course_2->id, $course_3->id],
         ];
 
         $cc = $cc_generator->create_coursecompletion($record);
@@ -377,7 +377,7 @@ class criteria_coursecompletion_testcase extends \advanced_testcase {
             $actual = coursecompletion::dump_criterion_configuration($id);
             $this->assertEqualsCanonicalizing($expected, $actual);
         }
-   }
+    }
 
 
     /**

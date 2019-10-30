@@ -92,8 +92,8 @@ class pathway_learning_plan_observer_testcase extends advanced_testcase {
                 $source_table->get_user_id_column() => $user->id,
                 $source_table->get_competency_id_column() => $comp->id,
                 $source_table->get_process_key_column() => null
-            ])
-        );
+            ]
+        ));
 
         $source_table->truncate();
 
@@ -166,8 +166,8 @@ class pathway_learning_plan_observer_testcase extends advanced_testcase {
                 $source_table->get_user_id_column() => $user->id,
                 $source_table->get_competency_id_column() => $comp->id,
                 $source_table->get_process_key_column() => null
-            ])
-        );
+            ]
+        ));
     }
 
 }

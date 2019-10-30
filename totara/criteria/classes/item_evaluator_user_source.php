@@ -43,24 +43,24 @@ interface item_evaluator_user_source {
      */
     public function is_full_user_set(): bool;
 
-   /**
+    /**
      * Create item records for all users in the users_source who doesn't have a item_record
      * @param int $criterion                                                                                                                                                              _id
      * @param int $criterion_met Criterion met value to use when creating new item records
      * @param ?int $timeevaluated
      */
-   public function create_item_records(int $criterion_id, int $criterion_met = 0, ?int $timeevaluated = null);
+    public function create_item_records(int $criterion_id, int $criterion_met = 0, ?int $timeevaluated = null);
 
     /**
      * Delete item records for all users not in the users_source if the source contains the full list
      * @param int $criterion_id
      */
-   public function delete_item_records(int $criterion_id);
+    public function delete_item_records(int $criterion_id);
 
     /**
      * Mark users in the users_source whose item_record was updated since the specified time
      * @param int $criterion_id
      * @param int $checkfrom Time to use as start when checking updates of item records
      */
-   public function mark_updated_assigned_users(int $criterion_id, int $checkfrom);
+    public function mark_updated_assigned_users(int $criterion_id, int $checkfrom);
 }

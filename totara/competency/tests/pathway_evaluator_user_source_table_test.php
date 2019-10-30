@@ -284,7 +284,11 @@ class totara_competency_pathway_evaluator_user_source_table_testcase extends adv
      * @param int $competency_id
      * @param array $assigned_users
      */
-    private function create_userid_table_records(aggregation_users_table $user_id_table, int $competency_id, array $assigned_users) {
+    private function create_userid_table_records(
+        aggregation_users_table $user_id_table,
+        int $competency_id,
+        array $assigned_users
+    ) {
         global $DB;
 
         if (empty($assigned_users)) {

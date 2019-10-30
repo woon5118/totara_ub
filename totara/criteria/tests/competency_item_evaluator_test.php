@@ -106,7 +106,13 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
      * @param int $status
      * @return int Id of inserted row
      */
-    private function create_achievement(int $comp_id, int $user_id, int $assignment_id, int $proficient = 0, ?int $status = null): int {
+    private function create_achievement(
+        int $comp_id,
+        int $user_id,
+        ?int $assignment_id = null,
+        int $proficient = 0,
+        ?int $status = null
+    ): int {
         $achievement = new competency_achievement([
             'user_id' => $user_id,
             'comp_id' => $comp_id,
@@ -159,8 +165,10 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
 
         $data = $this->setup_data();
 
-        $item_id = $DB->get_field('totara_criteria_item', 'id',
-            ['criterion_id' => $data->criterion->get_id(), 'item_type' => 'competency', 'item_id' => $child_id]);
+        $item_id = $DB->get_field('totara_criteria_item',
+            'id',
+            ['criterion_id' => $data->criterion->get_id(), 'item_type' => 'competency', 'item_id' => $child_id]
+        );
         $record_id = $this->create_item_record($item_id, $user_id, $is_met);
 
         $data->source_table->queue_for_aggregation($user_id, 1);
@@ -294,8 +302,10 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
 
         $data = $this->setup_data();
 
-        $item_id = $DB->get_field('totara_criteria_item', 'id',
-            ['criterion_id' => $data->criterion->get_id(), 'item_type' => 'competency', 'item_id' => $child_id]);
+        $item_id = $DB->get_field('totara_criteria_item',
+            'id',
+            ['criterion_id' => $data->criterion->get_id(), 'item_type' => 'competency', 'item_id' => $child_id]
+        );
 
         foreach ($achievements as $achievement) {
             $this->create_achievement(
@@ -303,7 +313,8 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
                 $user_id,
                 $assignment_id,
                 $achievement['proficient'] ?? 0,
-                $achievement['status'] ?? null);
+                $achievement['status'] ?? null
+            );
         }
 
         $data->source_table->queue_for_aggregation($user_id, 1);
@@ -320,39 +331,52 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
      */
     public function achievement_and_item_record_data_provider() {
         return [
-            ['child_id' => 11, 'user_id' => 100,
+            [
+                'child_id' => 11,
+                'user_id' => 100,
                 'achievements' => [
-                    ['proficient' => 0, 'status' => competency_achievement::ACTIVE_ASSIGNMENT]],
+                    ['proficient' => 0, 'status' => competency_achievement::ACTIVE_ASSIGNMENT]
+                ],
                 'criterion_met' => 0,
-                'expected_met' => 0
+                'expected_met' => 0,
             ],
-            ['child_id' => 11, 'user_id' => 101,
+            [
+                'child_id' => 11,
+                'user_id' => 101,
                 'achievements' => [
-                    ['proficient' => 1, 'status' => competency_achievement::ACTIVE_ASSIGNMENT]],
+                    ['proficient' => 1, 'status' => competency_achievement::ACTIVE_ASSIGNMENT]
+                ],
                 'criterion_met' => 0,
-                'expected_met' => 1
+                'expected_met' => 1,
             ],
-            ['child_id' => 11, 'user_id' => 102,
+            [
+                'child_id' => 11,
+                'user_id' => 102,
                 'achievements' => [
-                    ['proficient' => 0, 'status' => competency_achievement::ACTIVE_ASSIGNMENT]],
+                    ['proficient' => 0, 'status' => competency_achievement::ACTIVE_ASSIGNMENT]
+                ],
                 'criterion_met' => 1,
-                'expected_met' => 0
+                'expected_met' => 0,
             ],
-            ['child_id' => 11, 'user_id' => 103,
+            [
+                'child_id' => 11,
+                'user_id' => 103,
                 'achievements' => [
                     ['proficient' => 1, 'status' => competency_achievement::SUPERSEDED],
                     ['proficient' => 0, 'status' => competency_achievement::ACTIVE_ASSIGNMENT],
                 ],
                 'criterion_met' => 1,
-                'expected_met' => 0
+                'expected_met' => 0,
             ],
-            ['child_id' => 11, 'user_id' => 104,
+            [
+                'child_id' => 11,
+                'user_id' => 104,
                 'achievements' => [
                     ['proficient' => 1, 'status' => competency_achievement::ACTIVE_ASSIGNMENT],
                     ['proficient' => 0, 'status' => competency_achievement::ACTIVE_ASSIGNMENT],
                 ],
                 'criterion_met' => 1,
-                'expected_met' => 1
+                'expected_met' => 1,
             ],
         ];
     }
@@ -361,14 +385,22 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
      * Test update_item_records with totara_competency_achievement row as well as totara_criteria_item_record
      * @dataProvider achievement_and_item_record_data_provider
      */
-    public function test_update_item_records_achievement_and_item_record($child_id, $user_id, $achievements, $criterion_met, $expected_is_met) {
+    public function test_update_item_records_achievement_and_item_record(
+        $child_id,
+        $user_id,
+        $achievements,
+        $criterion_met,
+        $expected_is_met
+    ) {
         global $DB;
 
         $data = $this->setup_data();
 
         // No need for an actual competency in this test
-        $item_id = $DB->get_field('totara_criteria_item', 'id',
-            ['criterion_id' => $data->criterion->get_id(), 'item_type' => 'competency', 'item_id' => $child_id]);
+        $item_id = $DB->get_field('totara_criteria_item',
+            'id',
+            ['criterion_id' => $data->criterion->get_id(), 'item_type' => 'competency', 'item_id' => $child_id]
+        );
         $record_id = $this->create_item_record($item_id, $user_id, $criterion_met);
 
         foreach ($achievements as $achievement) {
@@ -376,7 +408,8 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
                 $user_id,
                 $achievement['assignment'] ?? null,
                 $achievement['proficient'] ?? 0,
-                $achievement['status'] ?? null);
+                $achievement['status'] ?? null
+            );
         }
 
         $data->source_table->queue_for_aggregation($user_id, 1);

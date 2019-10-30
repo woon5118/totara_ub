@@ -33,7 +33,7 @@ class course_item_evaluator extends item_evaluator {
      * @param criterion $criterion
      * @param int $now
      */
-   protected function update_criterion_completion(criterion $criterion, int $now) {
+    protected function update_criterion_completion(criterion $criterion, int $now) {
         global $DB;
 
         $criterion_id = $criterion->get_id();

@@ -75,7 +75,7 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
 
         $record = [
             'aggregation' => ['method' => criterion::AGGREGATE_ALL],
-            'courseids' =>[$data->courses[1]->id, $data->courses[2]->id, $data->courses[3]->id],
+            'courseids' => [$data->courses[1]->id, $data->courses[2]->id, $data->courses[3]->id],
         ];
 
         $cc = $generator->create_coursecompletion($record);
@@ -97,7 +97,7 @@ class totara_criteria_generator_testcase extends \advanced_testcase {
                 'method' => criterion::AGGREGATE_ANY_N,
                 'req_items' => 2,
             ],
-            'courseids' =>[$data->courses[2]->id, $data->courses[3]->id, $data->courses[4]->id, $data->courses[5]->id],
+            'courseids' => [$data->courses[2]->id, $data->courses[3]->id, $data->courses[4]->id, $data->courses[5]->id],
         ];
 
         $cc = $generator->create_coursecompletion($record);

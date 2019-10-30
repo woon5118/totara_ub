@@ -169,6 +169,6 @@ class criteria_onactivate_testcase extends \advanced_testcase {
             $actual = onactivate::dump_criterion_configuration($id);
             $this->assertEqualsCanonicalizing($expected, $actual);
         }
-   }
+    }
 
 }
