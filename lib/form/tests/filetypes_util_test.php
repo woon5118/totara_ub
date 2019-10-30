@@ -344,11 +344,9 @@ class filetypes_util_testcase extends advanced_testcase {
                 $this->assertTrue($group->expanded);
             }
             foreach ($group->types as $ext) {
-                foreach ($group->types as $ext) {
-                    if ($ext->key === '.png') {
-                        $this->assertTrue($ext->selected);
-                        $this->assertTrue($group->expanded);
-                    }
+                if ($ext->key === '.png') {
+                    $this->assertTrue($ext->selected);
+                    $this->assertTrue($group->expanded);
                 }
             }
         }
