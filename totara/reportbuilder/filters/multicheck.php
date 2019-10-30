@@ -377,7 +377,7 @@ class rb_filter_multicheck extends rb_filter_type {
         // either end we can match any item with a single LIKE, instead
         // of having to handle end matches separately.
         if ($this->options['concat']) {
-            $query = $DB->sql_concat("'|'", $query, "'|'");
+            $query = $DB->sql_concat("'|'", "COALESCE(" . $query . ", '')", "'|'");
         }
 
         $res = array();
