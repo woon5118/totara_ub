@@ -117,7 +117,7 @@ class rb_source_pos extends rb_base_source {
 
             // A count of all members of this position.
             new rb_join(
-                'member',
+                'members', // 'member' is a reserved keyword in MySQL 8
                 'LEFT',
                 "(SELECT positionid, COUNT(DISTINCT ja.userid) membercount
                     FROM {job_assignment} ja
@@ -125,7 +125,7 @@ class rb_source_pos extends rb_base_source {
                          {$global_restriction_join_ja}
                    WHERE u.deleted = 0
                 GROUP BY ja.positionid)",
-                'base.id = member.positionid',
+                'base.id = members.positionid',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
 
@@ -305,8 +305,8 @@ class rb_source_pos extends rb_base_source {
                 'pos',
                 'membercount',
                 get_string('membercount', 'rb_source_pos'),
-                'COALESCE(member.membercount, 0)',
-                array('joins' => 'member',
+                'COALESCE(members.membercount, 0)',
+                array('joins' => 'members',
                       'displayfunc' => 'integer')
             ),
             // A count of all members of this position and its child positions.
