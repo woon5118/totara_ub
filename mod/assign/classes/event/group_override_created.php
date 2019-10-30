@@ -58,7 +58,7 @@ class group_override_created extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventoverridecreated', 'mod_assign');
+        return get_string('eventoverridecreatedgroup', 'mod_assign');
     }
 
     /**
