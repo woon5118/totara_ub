@@ -134,6 +134,8 @@ class question_engine_test extends advanced_testcase {
 
     public function test_render_question_number() {
         global $PAGE;
+        require_once(__DIR__.'/helpers.php');
+
         $renderer = new testable_core_question_renderer($PAGE, 'core_question');
 
         // Test with number is i character.
