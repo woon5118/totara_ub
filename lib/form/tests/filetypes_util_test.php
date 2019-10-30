@@ -23,13 +23,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace core_form;
-
-use advanced_testcase;
-
 defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
 
 /**
  * Test cases for the {@link core_form\filetypes_util} class.
@@ -37,7 +31,7 @@ global $CFG;
  * @copyright 2017 David Mudrak <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class filetypes_util_testcase extends advanced_testcase {
+class core_form_filetypes_util_testcase extends advanced_testcase {
 
     /**
      * Test normalizing list of extensions.
@@ -45,7 +39,7 @@ class filetypes_util_testcase extends advanced_testcase {
     public function test_normalize_file_types() {
 
         $this->resetAfterTest(true);
-        $util = new filetypes_util();
+        $util = new core_form\filetypes_util();
 
         $this->assertSame(['.odt'], $util->normalize_file_types('.odt'));
         $this->assertSame(['.odt'], $util->normalize_file_types('odt'));
@@ -77,7 +71,7 @@ class filetypes_util_testcase extends advanced_testcase {
     public function test_looks_like_mimetype() {
 
         $this->resetAfterTest(true);
-        $util = new filetypes_util();
+        $util = new core_form\filetypes_util();
 
         $this->assertTrue($util->looks_like_mimetype('type/subtype'));
         $this->assertTrue($util->looks_like_mimetype('type/x-subtype'));
@@ -96,7 +90,7 @@ class filetypes_util_testcase extends advanced_testcase {
     public function test_is_filetype_group() {
 
         $this->resetAfterTest(true);
-        $util = new filetypes_util();
+        $util = new core_form\filetypes_util();
 
         $audio = $util->is_filetype_group('audio');
         $this->assertNotFalse($audio);
@@ -114,7 +108,7 @@ class filetypes_util_testcase extends advanced_testcase {
     public function test_describe_file_types() {
 
         $this->resetAfterTest(true);
-        $util = new filetypes_util();
+        $util = new core_form\filetypes_util();
 
         force_current_language('en');
 
@@ -172,7 +166,7 @@ class filetypes_util_testcase extends advanced_testcase {
     public function test_expand() {
 
         $this->resetAfterTest(true);
-        $util = new filetypes_util();
+        $util = new core_form\filetypes_util();
 
         $this->assertSame([], $util->expand(''));
 
@@ -210,7 +204,7 @@ class filetypes_util_testcase extends advanced_testcase {
     public function test_is_whitelisted() {
 
         $this->resetAfterTest(true);
-        $util = new filetypes_util();
+        $util = new core_form\filetypes_util();
 
         // These should be intuitively true.
         $this->assertTrue($util->is_whitelisted('txt', 'text/plain'));
@@ -253,7 +247,7 @@ class filetypes_util_testcase extends advanced_testcase {
     public function test_get_not_whitelisted() {
 
         $this->resetAfterTest(true);
-        $util = new filetypes_util();
+        $util = new core_form\filetypes_util();
 
         $this->assertEmpty($util->get_not_whitelisted('txt', 'text/plain'));
         $this->assertEmpty($util->get_not_whitelisted('txt', '.doc .txt .rtf'));
@@ -276,7 +270,7 @@ class filetypes_util_testcase extends advanced_testcase {
     public function test_data_for_browser() {
 
         $this->resetAfterTest(true);
-        $util = new filetypes_util();
+        $util = new core_form\filetypes_util();
 
         $data = $util->data_for_browser();
         $this->assertContainsOnly('object', $data);
@@ -410,7 +404,7 @@ class filetypes_util_testcase extends advanced_testcase {
      * @param boolean $expected The expected result. True if the file is allowed, false if not.
      */
     public function test_is_allowed_file_type($filename, $whitelist, $expected) {
-        $util = new filetypes_util();
+        $util = new core_form\filetypes_util();
         $this->assertSame($expected, $util->is_allowed_file_type($filename, $whitelist));
     }
 
@@ -479,7 +473,7 @@ class filetypes_util_testcase extends advanced_testcase {
      * @param array $expected The expected result. The list of non existant file types.
      */
     public function test_get_unknown_file_types($filetypes, $expected) {
-        $util = new filetypes_util();
+        $util = new core_form\filetypes_util();
         $this->assertSame($expected, $util->get_unknown_file_types($filetypes));
     }
 }
