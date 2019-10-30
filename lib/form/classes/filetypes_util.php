@@ -292,7 +292,8 @@ class filetypes_util {
                     continue;
                 }
 
-                $desc = get_mimetype_description(['filename' => 'fakefile'.$extension]);
+                // Totara: not used
+                //$desc = get_mimetype_description(['filename' => 'fakefile'.$extension]);
 
                 if ($selected = in_array($extension, $current)) {
                     $group->expanded = true;
