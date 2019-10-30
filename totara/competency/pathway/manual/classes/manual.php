@@ -374,8 +374,10 @@ class manual extends pathway {
      *     e.g. self::ROLE_MANAGER.
      * @param int|null $scale_value_id
      * @param string|null $comment An optional comment can be provided by the user with this rating.
+     *
+     * @return rating
      */
-    public function set_manual_value($subject_id, $rater_id, $as_role, ?int $scale_value_id, string $comment = null) {
+    public function set_manual_value($subject_id, $rater_id, $as_role, ?int $scale_value_id, string $comment = null): rating {
         $rating = new rating();
         $rating->comp_id = $this->get_competency()->id;
         $rating->user_id = $subject_id;
@@ -393,6 +395,8 @@ class manual extends pathway {
         $rating->save();
 
         (new pathway_aggregator($this))->aggregate([$subject_id]);
+
+        return $rating;
     }
 
     /**

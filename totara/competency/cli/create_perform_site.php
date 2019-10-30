@@ -1232,7 +1232,7 @@ Feel free to browse, list of users is below, their password is 12345.
     ];
 
     foreach ($course_completion as $completion) {
-        $competency_generator->create_course_completion(...$completion);
+        $competency_generator->create_course_enrollment_and_completion(...$completion);
     }
 
     // Then we need to link the courses to the competencies
@@ -2692,7 +2692,7 @@ Feel free to browse, list of users is below, their password is 12345.
         get_competency('bs', 'drive', $data)->id,
     ];
     foreach ($learning_plan_pathways as $competency) {
-        $competency_generator->create_learning_plan_pathway($competency);
+        $competency_generator->create_learning_plan($competency);
     }
 
     // Then let's create some manual ratings
@@ -3932,6 +3932,9 @@ function create_course_links($records, $data) {
  * @param totara_competency_generator $generator
  */
 function create_criteria_pathways($competencies, $data, $generator) {
+    /** @var totara_criteria_generator $criteria_generator */
+    $criteria_generator = phpunit_util::get_data_generator()->get_plugin_generator('totara_criteria');
+
     foreach ($competencies as $competency => $pathways) {
         $competency = new competency_entity(get_competency($competency, null, $data), false);
 
@@ -3943,7 +3946,7 @@ function create_criteria_pathways($competencies, $data, $generator) {
                     $criteria_group = [$criteria_group];
                 }
 
-                $criteria = create_criteria($criteria_group, $competency, $generator);
+                $criteria = create_criteria($criteria_group, $competency, $criteria_generator);
                 $generator->create_criteria_group($competency, $criteria, $scale_map[$scale_key]);
             }
         }
@@ -3954,30 +3957,44 @@ function create_criteria_pathways($competencies, $data, $generator) {
  * Create an individual criterion for a criteria group.
  *
  * @param array $criteria_group
- * @param stdClass $competency
- * @param totara_competency_generator $generator
+ * @param stdClass|\totara_competency\entities\competency $competency
+ * @param totara_criteria_generator $generator
  * @return criterion[]
  */
 function create_criteria($criteria_group, $competency, $generator) {
     $criteria = [];
     foreach ($criteria_group as $criterion) {
-        $items = [];
-        if ($criterion['criterion'] == onactivate::class) {
-            $criteria[] = $generator->create_criterion(onactivate::class, $competency);
-            continue;
-        } else if ($criterion['criterion'] == coursecompletion::class) {
-            $items = array_map(function (stdClass $course) {
-                return $course->id;
-            }, $criterion['courses']);
-        }
+        $criterion_method = 'create_' . (new ReflectionClass($criterion['criterion']))->getShortName();
+        $criteria_data = ['competency' => $competency->id];
 
-        $criteria[] = $generator->create_criterion(
-            $criterion['criterion'],
-            $competency,
-            $criterion['aggregation'],
-            $items,
-            $criterion['aggregation_required_count'] ?? 1
-        );
+        switch ($criterion['criterion']) {
+            case coursecompletion::class:
+                $course_ids = array_map(function (stdClass $course) {
+                    return $course->id;
+                }, $criterion['courses']);
+                $criteria[] = $generator->$criterion_method(array_merge($criteria_data, [
+                    'aggregation' => [
+                        'method' => $criterion['aggregation'],
+                        'req_count' => $criterion['aggregation_required_count'] ?? 1,
+                    ],
+                    'courseids' => $course_ids,
+                ]));
+                break;
+
+            case linked_courses::class:
+            case childcompetency::class:
+                $criteria[] = $generator->$criterion_method(array_merge($criteria_data, [
+                    'aggregation' => [
+                        'method' => $criterion['aggregation'],
+                        'req_count' => $criterion['aggregation_required_count'] ?? 1,
+                    ],
+                ]));
+                break;
+
+            default:
+                $criteria[] = $generator->$criterion_method($criteria_data);
+                break;
+        }
     }
     return $criteria;
 }
@@ -4055,7 +4072,7 @@ function create_learning_plans($user, $plans, $data, $generator) {
             $competencies[$competency->id] = $scale_value->id;
         }
 
-        $created[$key] = $generator->create_learning_plan($user, $competencies);
+        $created[$key] = $generator->create_learning_plan_with_competencies($user, $competencies);
     }
 
     return $created;
