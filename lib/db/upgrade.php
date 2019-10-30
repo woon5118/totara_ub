@@ -1867,16 +1867,14 @@ function xmldb_main_upgrade($oldversion) {
         // Define field userid to be added to task_adhoc.
         $table = new xmldb_table('task_adhoc');
         $field = new xmldb_field('userid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'customdata');
+        $key = new xmldb_key('useriduser', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
 
         // Conditionally launch add field userid.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
+            // Launch add key userid_user.
+            $dbman->add_key($table, $key);
         }
-
-        $key = new xmldb_key('useriduser', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
-
-        // Launch add key userid_user.
-        $dbman->add_key($table, $key);
 
         // Main savepoint reached.
         upgrade_main_savepoint(true, 2017090600.00);
