@@ -43,6 +43,12 @@ class totara_sync_log_type extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+        $isexport = ($format !== 'html');
+
+        if ($isexport) {
+            return get_string($value, 'tool_totara_sync');
+        }
+
         switch ($value) {
             case 'error':
                 $class = 'notifyproblem';
