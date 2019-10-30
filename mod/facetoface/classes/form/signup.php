@@ -235,7 +235,7 @@ class signup extends \moodleform {
 
         $jobassignments = \totara_job\job_assignment::get_all($USER->id, $seminar->is_manager_required());
 
-        if (count($jobassignments) > 1) {
+        if (count($jobassignments) >= 1) {
             $posselectelement = $mform->addElement('select', $controlname, get_string('selectjobassignment', 'mod_facetoface'));
             $mform->addHelpButton($controlname, 'selectedjobassignment', 'mod_facetoface');
             $mform->setType($controlname, PARAM_INT);

@@ -223,3 +223,50 @@ Feature: Take seminar attendance with job assignment on signup
     And I should see "job1" in the "Sam1 Student1" "table_row"
     And "//tr[td[contains(.,'Sam1 Student1')]]//a[contains(@class,'attendee-edit-job-assignment')]" "xpath_element" should exist
     And "//tr[td[contains(.,'Bob2 Student2')]]//a[contains(@class,'attendee-edit-job-assignment')]" "xpath_element" should exist
+
+  Scenario: Show job assignments dropdown when Select job assignment on signup is set
+    Given I log in as "admin"
+    And the following job assignments exist:
+      | user     | fullname | idnumber |
+      | student2 | job3     | ja3      |
+    And I set the following administration settings values:
+      | facetoface_selectjobassignmentonsignupglobal | 1 |
+    And I am on "Course 1" course homepage
+    And I follow "Test seminar name"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | Select job assignment on signup | 1 |
+    And I press "Save and display"
+    And I log out
+
+    When I log in as "student2"
+    And I am on "Course 1" course homepage
+    And I follow "Test seminar name"
+    And I follow "Sign-up"
+    Then I should see "Select a job assignment"
+    And the "Select a job assignment" select box should contain "job3"
+
+    When I press "Sign-up"
+    Then I should see "Event info"
+
+    When I follow "Event info"
+    Then I should see "Job assignment"
+    And I should see "job3"
+    And I log out
+
+    When I log in as "student1"
+    And I am on "Course 1" course homepage
+    And I follow "Test seminar name"
+    And I follow "Sign-up"
+    Then I should see "Select a job assignment"
+    And the "Select a job assignment" select box should contain "job1"
+    And the "Select a job assignment" select box should contain "job2"
+
+    When I select "job2" from the "Select a job assignment" singleselect
+    And I press "Sign-up"
+    Then I should see "Event info"
+
+    When I follow "Event info"
+    Then I should see "Job assignment"
+    And I should see "job2"
+    And I log out
