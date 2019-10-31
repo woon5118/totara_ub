@@ -76,6 +76,7 @@ abstract class base {
      * Output file headers to initialise the download of the file.
      */
     public function send_http_headers() {
+        global $CFG;
         if (defined('BEHAT_SITE_RUNNING')) {
             // For text based formats - we cannot test the output with behat if we force a file download.
             return;
@@ -92,7 +93,9 @@ abstract class base {
         header('Expires: '. gmdate('D, d M Y H:i:s', 0) .' GMT');
         header("Content-Type: $this->mimetype\n");
         $filename = $this->filename . $this->get_extension();
-        header("Content-Disposition: attachment; filename=\"$filename\"");
+        // Totara: Send the content-disposition header with both filename and filename*.
+        require($CFG->libdir.'/filelib.php');
+        header(make_content_disposition('attachment', $filename));
     }
 
     /**
