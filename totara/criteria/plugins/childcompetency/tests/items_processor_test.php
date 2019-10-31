@@ -70,7 +70,7 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
         // Create competencies with 2 levels of children
         foreach ($to_create as $compname => $compdata) {
             $comp_record = isset($compdata['parent']) ? ['parentid' => $data->competencies[$compdata['parent']]->id] : [];
-            $data->competencies[$compname] = $competency_generator->create_competency($compname, null, null, $comp_record);
+            $data->competencies[$compname] = $competency_generator->create_competency($compname, null, $comp_record);
 
             if (isset($compdata['with_criteria']) && $compdata['with_criteria']) {
                 $data->criteria[$compname] = $criteria_generator->create_childcompetency(
@@ -162,16 +162,13 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
         // Create 2 child competencies of Comp E
         $new_child_1 = $competency_generator->create_competency('New Child 1',
             null,
-            null,
             ['parentid' => $data->competencies['Comp E']->id]
         );
         $new_child_2 = $competency_generator->create_competency('New Child 2',
             null,
-            null,
             ['parentid' => $data->competencies['Comp E']->id]
         );
         $new_child_3 = $competency_generator->create_competency('New Child 3',
-            null,
             null,
             ['parentid' => $data->competencies['Comp E']->id]
         );
@@ -194,7 +191,6 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
         // Change NewChild1 to point to another parent
         // Add Another Child to Comp E
         $another_child = $competency_generator->create_competency('Another Child',
-            null,
             null,
             ['parentid' => $data->competencies['Comp E']->id]
         );

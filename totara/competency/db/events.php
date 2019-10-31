@@ -94,14 +94,14 @@ $observers = [
     ],
     [
         'eventname' => '\tassign_competency\event\assignment_user_assigned',
-        'callback' => 'totara_competency\observer::user_assigned',
+        'callback' => \totara_competency\observer\assignment::class.'::user_assigned',
     ],
     [
         'eventname' => '\tassign_competency\event\assignment_user_unassigned',
-        'callback' => 'totara_competency\observer::user_unassigned',
+        'callback' => \totara_competency\observer\assignment::class.'::user_unassigned',
     ],
     [
         'eventname' => '\tassign_competency\event\assignment_user_archived',
-        'callback' => 'totara_competency\observer::user_archived',
+        'callback' => \totara_competency\observer\assignment::class.'::user_archived',
     ],
 ];

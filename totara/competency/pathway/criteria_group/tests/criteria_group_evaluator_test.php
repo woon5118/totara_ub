@@ -99,7 +99,7 @@ class pathway_criteria_group_evaluator_testcase extends \advanced_testcase {
     public function data_provider_test_aggregate() {
         // TODO: More combinations
         return [
-            // 1 criterion. 1 user. Criterion_met didn't change. No/Totara/totaraperf/totara/competency/pathway/criteria_group/lang/en/pathway_criteria_group.php change in achievement
+            // 1 criterion. 1 user. Criterion_met didn't change. No change in achievement
             [
                 'pathway_scale_value' => 3,
                 'criteria' => [
@@ -237,19 +237,17 @@ class pathway_criteria_group_evaluator_testcase extends \advanced_testcase {
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
-        $params = [
-            'comp_id' => $data->competency->id,
-            'sortorder' => 1,
-            'scale_value' => $data->scalevalues[$pathway_scale_value_key]->id,
-            'criteria' => [],
-        ];
-
+        $cg_criteria = [];
         foreach (array_keys($criteria) as $key) {
-            $params['criteria'][] = $data->criteria[$key];
+            $cg_criteria[] = $data->criteria[$key];
         }
 
         /** @var criteria_group $cg */
-        $cg = $competency_generator->create_criteria_group($params);
+        $cg = $competency_generator->create_criteria_group($data->competency,
+            $cg_criteria,
+            $data->scalevalues[$pathway_scale_value_key]->id,
+            1
+        );
         // Pathways make use of an operation key in the user_id_table,
         // Setting the same value in tests
         $operation_value = $cg->get_path_type() . '__' . $cg->get_id();

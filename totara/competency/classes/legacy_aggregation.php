@@ -186,10 +186,6 @@ class legacy_aggregation {
             }
         } else {
             $this->create_default_criteria($criterion);
-            // Make sure all linked courses get synced
-            if ($criterion instanceof linkedcourses) {
-                linked_courses_metadata_processor::update_item_links($this->competency->id);
-            }
         }
     }
 
@@ -228,11 +224,6 @@ class legacy_aggregation {
 
         $this->create_default_criteria(new linkedcourses(), $min_proficient_value)
             ->create_default_criteria(new childcompetency(), $min_proficient_value);
-
-        // Make sure all linked courses are synced
-        if ($update_items) {
-            linked_courses_metadata_processor::update_item_links($this->competency->id);
-        }
     }
 
     private function should_add_learning_plans(): bool {

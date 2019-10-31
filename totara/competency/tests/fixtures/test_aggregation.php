@@ -23,14 +23,14 @@
 
 namespace aggregation_test_aggregation;
 
-use totara_competency\pathway_aggregation;
+use totara_competency\overall_aggregation;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * To use this in tests, call totara_competency_generator::create_test_aggregation() instead of instantiating it directly.
  */
-class test_aggregation extends pathway_aggregation {
+class test_aggregation extends overall_aggregation {
 
     private $test_achieved_value_ids = [];
     private $test_achieved_vias = [];
@@ -49,13 +49,11 @@ class test_aggregation extends pathway_aggregation {
     /**
      * Test aggregation.
      */
-    protected function do_aggregation() {
-        foreach ($this->test_achieved_value_ids as $userid => $achieved_value_id) {
-            $this->set_achieved_value_id($userid, $achieved_value_id);
-        }
-        foreach ($this->test_achieved_vias as $userid => $achieved_via) {
-            $this->set_achieved_via($userid, $achieved_via);
-        }
+    protected function do_aggregation(int $user_id) {
+        $this->set_user_achievement($user_id,
+            $this->test_achieved_value_ids[$user_id] ?? null,
+            $this->test_achieved_vias[$user_id] ?? []
+        );
     }
 
 }

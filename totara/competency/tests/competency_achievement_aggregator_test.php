@@ -33,6 +33,9 @@ use totara_competency\overall_aggregation;
 use totara_competency\entities\scale_value;
 use totara_competency\entities\competency_achievement;
 use totara_competency\pathway_evaluator_user_source_table;
+use pathway_test_pathway\test_pathway_evaluator;
+use aggregation_test_aggregation\test_aggregation;
+
 
 /**
  * Class totara_competency_achievement_aggregator_testcase
@@ -49,7 +52,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
-        $test_aggregation = $competency_generator->create_test_aggregation();
+        $test_aggregation = new test_aggregation();
         $achieved_value_ids = [];
         $achieved_vias = [];
         foreach ($pathway_achievements as $pathway_achievement) {
@@ -332,8 +335,6 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $achievement1 = pathway_achievement::get_current($pathway1, $user->id);
         $achievement2 = pathway_achievement::get_current($pathway2, $user->id);
 
-        $source_table = new aggregation_users_table();
-        $source_table->queue_for_aggregation($user->id, $competency->id);
         $comp_user_source = new competency_aggregator_user_source_table($source_table, true);
         $aggregator = new competency_achievement_aggregator($achievement_configuration, $comp_user_source);
 

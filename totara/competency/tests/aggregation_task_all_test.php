@@ -21,9 +21,7 @@
  * @package totara_competency
  */
 
-use pathway_criteria_group\criteria_group;
-use totara_competency\aggregation_task;
-use totara_competency\aggregation_users_table;
+use pathway_manual\manual;
 use totara_competency\entities\competency;
 use totara_competency\entities\competency_achievement;
 use totara_competency\task\competency_aggregation_all;
@@ -157,19 +155,33 @@ class totara_competency_aggregation_all_task_testcase extends advanced_testcase 
              * @return |null
              */
             public function setup_pathway($competency_generator, $pw_key, $pw_type, $pw_data) {
-                if ($pw_type == 'test_pathway') {
-                    $this->pathways[$pw_key] = $competency_generator->create_test_pathway($this->comp);
-                    return $this->pathways[$pw_key];
-                }
-
                 $this->map_keys_to_values($pw_data);
 
-                if (!isset($pw_data['comp_id'])) {
-                    $pw_data['comp_id'] = $this->comp->id;
+                switch ($pw_type) {
+                    case 'test_pathway':
+                        $this->pathways[$pw_key] = $competency_generator->create_test_pathway($this->comp);
+                        break;
+
+                    case 'manual':
+                        $this->pathways[$pw_key] = $competency_generator->create_manual($pw_data['comp_id'] ?? $this->comp,
+                            $pw_data['roles'] ?? [],
+                            $pw_data['sortorder'] ?? null);
+                        break;
+
+                    case 'criteria_group':
+                        $this->pathways[$pw_key] = $competency_generator->create_criteria_group($pw_data['comp_id'] ?? $this->comp,
+                            $pw_data['criteria'] ?? [],
+                            $pw_data['scale_value'] ?? null,
+                            $pw_data['sortorder'] ?? null
+                        );
+                        break;
+
+                    case 'learning_plan':
+                        $this->pathways[$pw_key] = $competency_generator->create_learning_plan_pathway($pw_data['comp_id'] ?? $this->comp,
+                            $pw_data['sortorder'] ?? null)
+                        ;
                 }
 
-                $methodname = "create_{$pw_type}";
-                $this->pathways[$pw_key] = $competency_generator->$methodname($pw_data);
                 return $this->pathways[$pw_key];
             }
 
@@ -299,7 +311,7 @@ class totara_competency_aggregation_all_task_testcase extends advanced_testcase 
                         'type' => 'manual',
                         'data' => [
                             'sortorder' => 1,
-                            'roles' => ['manager'],
+                            'roles' => [manual::ROLE_MANAGER],
                         ]
                     ],
                 ],
@@ -374,14 +386,7 @@ class totara_competency_aggregation_all_task_testcase extends advanced_testcase 
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
-        $params = [
-            'comp_id' => $data->comp->id,
-            'sortorder' => 1,
-            'scale_value_id' => $data->scalevalues[2],
-            'criteria' => [$data->criteria['course_1']],
-        ];
-
-        $pw = $competency_generator->create_criteria_group($params);
+        $pw = $competency_generator->create_criteria_group($data->comp, [$data->criteria['course_1']], $data->scalevalues[2], 1);
 
         // Assign user1 to the competency
         /** @var tassign_competency_generator $assignment_generator */

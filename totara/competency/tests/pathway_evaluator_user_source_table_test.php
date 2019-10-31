@@ -133,19 +133,14 @@ class totara_competency_pathway_evaluator_user_source_table_testcase extends adv
         $data = $this->setup_data();
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
-        $params = [
-            'comp_id' => $data->competency->id,
-            'sortorder' => 1,
-            'criteria' => [],
-        ];
-
+        $pw_criteria = [];
         foreach ($criteria_keys as $key) {
-            $params['criteria'][] = $data->criteria[$key];
+            $pw_criteria[] = $data->criteria[$key];
         }
 
         // The type of pathway is irrelevant for this test.
         /** @var criteria_group $cg */
-        $cg = $competency_generator->create_criteria_group($params);
+        $cg = $competency_generator->create_criteria_group($data->competency, $pw_criteria, null, 1);
         // Testing here with both process_key and update_operation_value
         $process_key = 'test_' . time();
         $data->user_id_table->set_process_key_value($process_key);
@@ -226,7 +221,7 @@ class totara_competency_pathway_evaluator_user_source_table_testcase extends adv
         ];
 
         /** @var criteria_group $cg */
-        $cg = $competency_generator->create_criteria_group($params);
+        $cg = $competency_generator->create_criteria_group($data->competency, [$data->criteria[1]], null, 1);
 
         $this->create_achievement_records($cg->get_id(), $achievements);
         $this->create_userid_table_records($data->user_id_table, $data->competency->id, $assigned_users);

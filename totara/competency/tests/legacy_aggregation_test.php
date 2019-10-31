@@ -311,8 +311,10 @@ class totara_competency_legacy_aggregation_testcase extends advanced_testcase {
             /** @var scale_entity */
             public $scale;
             public $fw;
-            /** @var competency_entity */
-            public $competency, $control_competency;
+            /** @var competency_entity $competency */
+            public $competency;
+            /** @var competency_entity $contril_competency */
+            public $control_competency;
         };
 
         /** @var totara_hierarchy_generator $hierarchy_generator */

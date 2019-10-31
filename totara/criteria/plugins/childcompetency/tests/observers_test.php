@@ -23,7 +23,7 @@
 
 use core\orm\query\table;
 use criteria_childcompetency\childcompetency;
-use criteria_childcompetency\observer;
+use criteria_childcompetency\observer\achievement as achievement_observer;
 use totara_competency\event\competency_achievement_updated;
 use totara_criteria\criterion;
 use totara_competency\entities\competency as competency_entity;
@@ -39,8 +39,10 @@ use totara_criteria\event\criteria_achievement_changed;
  * The tests are very similar to the ones defined in items_process_test.php, but here we don't sink the events.
  * We basically test that by relying on the observers we get the same results as we got when calling the item_processor
  * manually
+ *
+ * We also include tests for all observers here to avoid duplicating of validation functions
  */
-class criteria_childcompetency_observer_testcase extends advanced_testcase {
+class criteria_childcompetency_observers_testcase extends advanced_testcase {
 
     /**
      * Test observer when a child competency is created for a comptetency with childcompetency criteria
@@ -51,7 +53,8 @@ class criteria_childcompetency_observer_testcase extends advanced_testcase {
         /** @var totara_criteria_generator $criteria_generator */
         $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
-        $competency = $competency_generator->create_competency('Comp A');
+        $framework = $competency_generator->create_framework();
+        $competency = $competency_generator->create_competency('Comp A', $framework);
         $criteria_generator->create_childcompetency(['competency' => $competency->id]);
 
         // Verify generated data
@@ -61,14 +64,14 @@ class criteria_childcompetency_observer_testcase extends advanced_testcase {
         $this->assertSame(0, item_record_entity::repository()->count());
 
         // Create a child competency
-        $child_competency = $competency_generator->create_competency('Comp A-1', null, null, ['parentid' => $competency->id]);
+        $child_competency = $competency_generator->create_competency('Comp A-1', $framework, ['parentid' => $competency->id]);
 
         // This should have resulted in the competency_created observer being called and an criteria_item created
         $this->verify_items($competency->id, [$child_competency->id]);
         $this->assertSame(0, item_record_entity::repository()->count());
 
         // Create a second child competency and verify again
-        $child_competency2 = $competency_generator->create_competency('Comp A-2', null, null, ['parentid' => $competency->id]);
+        $child_competency2 = $competency_generator->create_competency('Comp A-2', $framework, ['parentid' => $competency->id]);
 
         // Should have resulted in the competency_created observer being called and a criteria_item created for the second child
         $this->verify_items($competency->id, [$child_competency->id, $child_competency2->id]);
@@ -79,7 +82,7 @@ class criteria_childcompetency_observer_testcase extends advanced_testcase {
         $this->create_item_record($user->id, $child_competency->id);
         $this->verify_item_records($child_competency->id, [$user->id]);
 
-        $child_competency3 = $competency_generator->create_competency('Comp A-2', null, null, ['parentid' => $competency->id]);
+        $child_competency3 = $competency_generator->create_competency('Comp A-2', $framework, ['parentid' => $competency->id]);
         $this->verify_items($competency->id, [$child_competency->id, $child_competency2->id, $child_competency3->id]);
         $this->verify_item_records($child_competency->id, [$user->id]);
         $this->verify_item_records($child_competency2->id, []);
@@ -92,7 +95,8 @@ class criteria_childcompetency_observer_testcase extends advanced_testcase {
     public function test_competency_created_without_criteria() {
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
-        $competency = $competency_generator->create_competency('Comp A');
+        $framework = $competency_generator->create_framework();
+        $competency = $competency_generator->create_competency('Comp A', $framework);
 
         // Verify generated data
         $this->assertSame(1, competency_entity::repository()->count());
@@ -101,12 +105,12 @@ class criteria_childcompetency_observer_testcase extends advanced_testcase {
         $this->assertSame(0, item_record_entity::repository()->count());
 
         // Create a child competency
-        $child_competency = $competency_generator->create_competency('Comp A-1', null, null, ['parentid' => $competency->id]);
+        $child_competency = $competency_generator->create_competency('Comp A-1', $framework, ['parentid' => $competency->id]);
         $this->assertSame(0, item_entity::repository()->count());
         $this->assertSame(0, item_record_entity::repository()->count());
 
         // Create a second child competency and verify again
-        $child_competency2 = $competency_generator->create_competency('Comp A-2', null, null, ['parentid' => $competency->id]);
+        $child_competency2 = $competency_generator->create_competency('Comp A-2', $framework, ['parentid' => $competency->id]);
         $this->assertSame(0, item_entity::repository()->count());
         $this->assertSame(0, item_record_entity::repository()->count());
     }
@@ -122,24 +126,24 @@ class criteria_childcompetency_observer_testcase extends advanced_testcase {
         /** @var totara_criteria_generator $criteria_generator */
         $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
+        $framework = $competency_generator->create_framework();
+
         // Create 2 competencies, each with 1 child
         $competencies = [];
         foreach (['Comp A', 'Comp B'] as $name) {
-            $competencies[$name] = $competency_generator->create_competency($name);
+            $competencies[$name] = $competency_generator->create_competency($name, $framework);
             $criteria_generator->create_childcompetency(['competency' => $competencies[$name]->id]);
 
             $childname = $name . '-1';
             $competencies[$childname] = $competency_generator->create_competency(
                 $childname,
-                null,
-                null,
+                $framework,
                 ['parentid' => $competencies[$name]->id]
             );
             $childname = $name . '-2';
             $competencies[$childname] = $competency_generator->create_competency(
                 $childname,
-                null,
-                null,
+                $framework,
                 ['parentid' => $competencies[$name]->id]
             );
         }
@@ -210,23 +214,23 @@ class criteria_childcompetency_observer_testcase extends advanced_testcase {
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
+        $framework = $competency_generator->create_framework();
+
         // Create 2 competencies, each with 1 child
         $competencies = [];
         foreach (['Comp A', 'Comp B'] as $name) {
-            $competencies[$name] = $competency_generator->create_competency($name);
+            $competencies[$name] = $competency_generator->create_competency($name, $framework);
 
             $childname = $name . '-1';
             $competencies[$childname] = $competency_generator->create_competency(
                 $childname,
-                null,
-                null,
+                $framework,
                 ['parentid' => $competencies[$name]->id]
             );
             $childname = $name . '-2';
             $competencies[$childname] = $competency_generator->create_competency(
                 $childname,
-                null,
-                null,
+                $framework,
                 ['parentid' => $competencies[$name]->id]
             );
         }
@@ -266,16 +270,17 @@ class criteria_childcompetency_observer_testcase extends advanced_testcase {
         /** @var totara_criteria_generator $criteria_generator */
         $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
+        $framework = $competency_generator->create_framework();
+
         // Create 2 competencies, each with 1 child. First one has childcompetency criteria
         $competencies = [];
         foreach (['Comp A', 'Comp B'] as $name) {
-            $competencies[$name] = $competency_generator->create_competency($name);
+            $competencies[$name] = $competency_generator->create_competency($name, $framework);
 
             $childname = $name . '-1';
             $competencies[$childname] = $competency_generator->create_competency(
                 $childname,
-                null,
-                null,
+                $framework,
                 ['parentid' => $competencies[$name]->id]
             );
         }
@@ -296,23 +301,23 @@ class criteria_childcompetency_observer_testcase extends advanced_testcase {
 
         // First for child competency of parent without criteria
         $test_event = $this->create_achievement_event($competencies['Comp B-1']->id, $user->id);
-        observer::competency_achievement_updated($test_event);
+        achievement_observer::competency_achievement_updated($test_event);
         $this->assertSame(0, $sink->count());
 
         // Parent without criteria
         $test_event = $this->create_achievement_event($competencies['Comp B']->id, $user->id);
-        observer::competency_achievement_updated($test_event);
+        achievement_observer::competency_achievement_updated($test_event);
         $this->assertSame(0, $sink->count());
 
         // Child competency of parent with criteria
         $test_event = $this->create_achievement_event($competencies['Comp A-1']->id, $user->id);
-        observer::competency_achievement_updated($test_event);
+        achievement_observer::competency_achievement_updated($test_event);
         $this->verify_event($sink, [$criterion->get_id()]);
         $sink->clear();
 
         // Parent with criteria
         $test_event = $this->create_achievement_event($competencies['Comp A']->id, $user->id);
-        observer::competency_achievement_updated($test_event);
+        achievement_observer::competency_achievement_updated($test_event);
         $this->assertSame(0, $sink->count());
 
         $sink->close();
