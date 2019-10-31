@@ -23,25 +23,26 @@
 
 namespace totara_competency\entities;
 
-use core\orm\entity\relations\has_one;
-use totara_competency\achievement_configuration;
 use totara_assignment\entities\hierarchy_item;
 
 // Currently only required to re-use the constants
-require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
+global $CFG;
+require_once($CFG->dirroot . '/totara/hierarchy/prefix/competency/lib.php');
 
 /**
- *
  * Class competency scale aggregation
  *
  * @property-read int $id ID
  * @property int $comp_id
  * @property string $type
  * @property int $timemodified
- *
  */
 class scale_aggregation extends hierarchy_item {
 
     public const TABLE = 'totara_competency_scale_aggregation';
-    
+
+    public const UPDATED_TIMESTAMP = 'timemodified';
+
+    public const SET_UPDATED_WHEN_CREATED = true;
+
 }

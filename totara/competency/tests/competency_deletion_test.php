@@ -1,0 +1,260 @@
+<?php
+/*
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
+ * @package totara_competency
+ */
+
+use core\orm\entity\entity;
+use totara_competency\entities\achievement_via;
+use totara_competency\entities\assignment_availability;
+use totara_competency\entities\competency_achievement;
+use totara_competency\entities\configuration_change;
+use totara_competency\entities\configuration_history;
+use totara_competency\entities\pathway;
+use totara_competency\entities\pathway_achievement;
+use totara_competency\entities\scale_aggregation;
+
+global $CFG;
+require_once($CFG->dirroot . '/totara/hierarchy/prefix/competency/lib.php');
+
+/**
+ * Tests that deleting a competency from the hierarchy deletes all child data.
+ */
+class totara_competency_competency_deletion_testcase extends advanced_testcase {
+
+    /** @var totara_competency_generator|component_generator_base */
+    private $generator;
+
+    /** @var \totara_competency\entities\competency */
+    private $comp_1;
+
+    /** @var \totara_competency\entities\competency */
+    private $comp_2;
+
+    protected function setUp() {
+        $this->generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+        $this->comp_1 = $this->generator->create_competency('A');
+        $this->comp_2 = $this->generator->create_competency('B');
+    }
+
+    protected function tearDown() {
+        $this->generator = null;
+        $this->comp_1 = null;
+        $this->comp_2 = null;
+    }
+
+    /**
+     * Test self assignment availability options for a competency are deleted too.
+     */
+    public function test_assign_availability_deleted() {
+        $availability_1 = (new assignment_availability(['comp_id' => $this->comp_1->id, 'availability' => 0]))->save();
+        $availability_2 = (new assignment_availability(['comp_id' => $this->comp_2->id, 'availability' => 0]))->save();
+
+        $this->assert_exists($availability_1);
+        $this->assert_exists($availability_2);
+
+        $this->delete($this->comp_1);
+
+        $this->assert_not_exists($availability_1);
+        $this->assert_exists($availability_2);
+
+        $this->delete($this->comp_2);
+
+        $this->assert_not_exists($availability_1);
+        $this->assert_not_exists($availability_2);
+    }
+
+    /**
+     * Test scale aggregation options for a competency are deleted too.
+     */
+    public function test_scale_aggregation_deleted() {
+        $scale_agg_1 = (new scale_aggregation(['comp_id' => $this->comp_1->id, 'type' => 'A']))->save();
+        $scale_agg_2 = (new scale_aggregation(['comp_id' => $this->comp_2->id, 'type' => 'B']))->save();
+
+        $this->assert_exists($scale_agg_1);
+        $this->assert_exists($scale_agg_2);
+
+        $this->delete($this->comp_1);
+
+        $this->assert_not_exists($scale_agg_1);
+        $this->assert_exists($scale_agg_2);
+
+        $this->delete($this->comp_2);
+
+        $this->assert_not_exists($scale_agg_1);
+        $this->assert_not_exists($scale_agg_2);
+    }
+
+    /**
+     * Test configuration log and history for a competency are deleted too.
+     */
+    public function test_configuration_logs_deleted() {
+        $config_change_attributes = [
+            'assignment_id' => 0,
+            'time_changed' => 0,
+            'change_type' => 0,
+        ];
+        $config_change_1 = (new configuration_change(array_merge($config_change_attributes, ['comp_id' => $this->comp_1->id])))
+            ->save();
+        $config_change_2 = (new configuration_change(array_merge($config_change_attributes, ['comp_id' => $this->comp_2->id])))
+            ->save();
+
+        $config_history_attributes = [
+            'assignment_id' => 0,
+            'active_from' => 0,
+            'active_to' => 0,
+            'configuration' => 0,
+        ];
+        $config_history_1 = (new configuration_history(array_merge($config_history_attributes, ['comp_id' => $this->comp_1->id])))
+            ->save();
+        $config_history_2 = (new configuration_history(array_merge($config_history_attributes, ['comp_id' => $this->comp_2->id])))
+            ->save();
+
+        $this->assert_exists($config_change_1);
+        $this->assert_exists($config_change_2);
+        $this->assert_exists($config_history_1);
+        $this->assert_exists($config_history_2);
+
+        $this->delete($this->comp_1);
+
+        $this->assert_not_exists($config_change_1);
+        $this->assert_not_exists($config_history_1);
+        $this->assert_exists($config_change_2);
+        $this->assert_exists($config_history_2);
+
+        $this->delete($this->comp_2);
+
+        $this->assert_not_exists($config_change_1);
+        $this->assert_not_exists($config_change_2);
+        $this->assert_not_exists($config_history_1);
+        $this->assert_not_exists($config_history_2);
+    }
+
+    /**
+     * Test pathways, achievement and pathway achievement records for a competency are deleted too.
+     */
+    public function test_pathways_and_achievements_deleted() {
+        $path_attributes = [
+            'sortorder' => 0,
+            'path_type' => 'learning_plan',
+            'status' => 0,
+            'pathway_modified' => 0,
+        ];
+        $path_1 = (new pathway(array_merge($path_attributes, ['comp_id' => $this->comp_1->id])))->save();
+        $path_2 = (new pathway(array_merge($path_attributes, ['comp_id' => $this->comp_2->id])))->save();
+
+        $path_achievement_attributes = [
+            'user_id' => 0,
+            'scale_value_id' => 0,
+            'date_achieved' => 0,
+            'last_aggregated' => 0,
+        ];
+        $path_achievement_1 = (new pathway_achievement(array_merge($path_achievement_attributes, ['pathway_id' => $path_1->id])))
+            ->save();
+        $path_achievement_2 = (new pathway_achievement(array_merge($path_achievement_attributes, ['pathway_id' => $path_2->id])))
+            ->save();
+
+        $achievement_attributes = [
+            'user_id' => 0,
+            'assignment_id' => 0,
+            'scale_value_id' => 0,
+            'proficient' => 0,
+            'status' => 0,
+            'time_created' => 0,
+            'time_status' => 0,
+            'time_proficient' => 0,
+            'time_scale_value' => 0,
+            'last_aggregated' => 0,
+        ];
+        $achievement_1 = (new competency_achievement(array_merge($achievement_attributes, ['comp_id' => $this->comp_1->id])))
+            ->save();
+        $achievement_2 = (new competency_achievement(array_merge($achievement_attributes, ['comp_id' => $this->comp_2->id])))
+            ->save();
+
+        $achievement_via_1 = (new achievement_via([
+            'comp_achievement_id' => $achievement_1->id,
+            'pathway_achievement_id' => $path_achievement_1->id
+        ]))->save();
+        $achievement_via_2 = (new achievement_via([
+            'comp_achievement_id' => $achievement_2->id,
+            'pathway_achievement_id' => $path_achievement_2->id
+        ]))->save();
+
+        $this->assert_exists($path_1);
+        $this->assert_exists($path_achievement_1);
+        $this->assert_exists($achievement_1);
+        $this->assert_exists($achievement_via_1);
+        $this->assert_exists($path_2);
+        $this->assert_exists($path_achievement_2);
+        $this->assert_exists($achievement_2);
+        $this->assert_exists($achievement_via_2);
+
+        $this->delete($this->comp_1);
+
+        $this->assert_not_exists($path_1);
+        $this->assert_not_exists($path_achievement_1);
+        $this->assert_not_exists($achievement_1);
+        $this->assert_not_exists($achievement_via_1);
+        $this->assert_exists($path_2);
+        $this->assert_exists($path_achievement_2);
+        $this->assert_exists($achievement_2);
+        $this->assert_exists($achievement_via_2);
+
+        $this->delete($this->comp_2);
+
+        $this->assert_not_exists($path_1);
+        $this->assert_not_exists($path_achievement_1);
+        $this->assert_not_exists($achievement_1);
+        $this->assert_not_exists($achievement_via_1);
+        $this->assert_not_exists($path_2);
+        $this->assert_not_exists($path_achievement_2);
+        $this->assert_not_exists($achievement_2);
+        $this->assert_not_exists($achievement_via_2);
+    }
+
+    /**
+     * Check that the specified entity still exists.
+     *
+     * @param entity $entity
+     */
+    private function assert_exists(entity $entity) {
+        $this->assertTrue($entity::repository()->where('id', $entity->id)->exists());
+    }
+
+    /**
+     * Check that the specified entity no longer exists.
+     *
+     * @param entity $entity
+     */
+    private function assert_not_exists(entity $entity) {
+        $this->assertFalse($entity::repository()->where('id', $entity->id)->exists());
+    }
+
+    /**
+     * Delete the competency.
+     *
+     * @param \totara_competency\entities\competency $competency
+     */
+    private function delete(\totara_competency\entities\competency $competency) {
+        $hierarchy_comp = new \competency();
+        $hierarchy_comp->delete_hierarchy_item($competency->id);
+    }
+
+}

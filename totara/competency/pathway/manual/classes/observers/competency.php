@@ -17,13 +17,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Brendan Cox <brendan.cox@totaralearning.com>
- * @author Riana Rossouw <riana.rossouw@totaralearning.com>
- * @package totara_pathway
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
+ * @package pathway_manual
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace pathway_manual\observers;
 
-$plugin->version  = 2019103100;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'pathway_manual'; // To check on upgrade, that module sits in correct place
+use hierarchy_competency\event\competency_deleted;
+use pathway_manual\entities\rating;
+
+class competency {
+
+    /**
+     * React on a competency being deleted
+     *
+     * @param competency_deleted $event
+     */
+    public static function deleted(competency_deleted $event) {
+        $competency_id = $event->get_data()['objectid'];
+
+        rating::repository()
+            ->where('comp_id', $competency_id)
+            ->delete();
+    }
+
+}

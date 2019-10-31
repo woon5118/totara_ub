@@ -31,6 +31,7 @@
 
 use core\orm\query\builder;
 use hierarchy_competency\event\competency_updated;
+use totara_competency\pathway;
 use totara_core\advanced_feature;
 
 require_once("{$CFG->dirroot}/totara/hierarchy/lib.php");
@@ -157,7 +158,12 @@ class competency extends hierarchy {
     protected function _delete_hierarchy_items($items) {
         global $DB;
 
-        // First call the deleter for the parent class
+        // First delete all competency achievement pathways for the competency
+        foreach ($items as $competency_id) {
+            pathway::delete_all_for_competency($competency_id);
+        }
+
+        // Then call the deleter for the parent class
         if (!parent::_delete_hierarchy_items($items)) {
             return false;
         }

@@ -24,14 +24,18 @@
 namespace totara_competency\observer;
 
 use core\event\base;
-use criteria_childcompetency\childcompetency;
-use criteria_linkedcourses\linkedcourses;
 use hierarchy_competency\event\competency_created;
+use hierarchy_competency\event\competency_deleted;
 use hierarchy_competency\event\competency_updated;
 use stdClass;
 use totara_competency\achievement_configuration;
 use totara_competency\entities\competency as competency_entity;
+use totara_competency\entities\competency_achievement;
+use totara_competency\entities\configuration_change;
+use totara_competency\entities\configuration_history;
+use totara_competency\entities\scale_aggregation;
 use totara_competency\legacy_aggregation;
+use totara_competency\pathway;
 use totara_core\advanced_feature;
 
 class competency {
@@ -84,6 +88,35 @@ class competency {
             $aggregation = new legacy_aggregation(new competency_entity($competency_id));
             $aggregation->create_default_pathways();
         }
+    }
+
+    /**
+     * React on a competency being deleted
+     *
+     * @param competency_deleted $event
+     */
+    public static function deleted(competency_deleted $event) {
+        global $DB;
+
+        $competency_id = $event->get_data()['objectid'];
+
+        $DB->transaction(function () use ($competency_id) {
+            configuration_change::repository()
+                ->where('comp_id', $competency_id)
+                ->delete();
+
+            configuration_history::repository()
+                ->where('comp_id', $competency_id)
+                ->delete();
+
+            scale_aggregation::repository()
+                ->where('comp_id', $competency_id)
+                ->delete();
+
+            competency_achievement::repository()
+                ->where('comp_id', $competency_id)
+                ->delete();
+        });
     }
 
 }

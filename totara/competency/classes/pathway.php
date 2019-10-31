@@ -26,6 +26,8 @@ namespace totara_competency;
 
 
 use totara_competency\entities\competency;
+use totara_competency\entities\pathway as pathway_entity;
+use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\scale_value;
 
 /**
@@ -237,6 +239,29 @@ abstract class pathway {
      * Delete the pathway specific detail
      */
     abstract protected function delete_configuration();
+
+    /**
+     * Delete all pathway data relating to a specific competency.
+     *
+     * @param competency|int $competency Competency entity or ID
+     */
+    final public static function delete_all_for_competency($competency) {
+        global $DB;
+        $DB->transaction(function () use ($competency) {
+            $pathways = pathway_entity::repository()
+                ->where('comp_id', $competency->id ?? $competency);
+
+            foreach ($pathways->get() as $pathway) {
+                static::fetch($pathway->id)->delete_configuration();
+
+                pathway_achievement::repository()
+                    ->where('pathway_id', $pathway->id)
+                    ->delete();
+            }
+
+            $pathways->delete();
+        });
+    }
 
 
     /****************************************************************************

@@ -24,6 +24,7 @@
 namespace pathway_test_pathway;
 
 use totara_competency\base_achievement_detail;
+use totara_competency\entities\competency;
 use totara_competency\entities\scale_value;
 use totara_competency\pathway;
 
