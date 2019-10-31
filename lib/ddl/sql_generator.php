@@ -892,6 +892,14 @@ abstract class sql_generator {
             return null;
         }
 
+        // HACK: MySQL 5.7 does not support value constraints - to be removed after we drop support for 5.7.
+        if ($this->mdb->get_dbvendor() === 'mysql') {
+            $version = $this->mdb->get_server_info()['version'];
+            if (version_compare($version, '8.0', '<')) {
+                return null;
+            }
+        }
+
         $tablename = $this->getTableName($xmldb_table, true);
         $constraintname = $this->getAllowedValuesContraintName($xmldb_table, $xmldb_field);
         $fieldname = $xmldb_field->getName();

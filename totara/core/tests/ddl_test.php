@@ -1840,8 +1840,13 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $this->assertTrue($dbman->table_exists('test_table'));
 
         $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $table->getField('name')));
-        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $table->getField('status')));
-        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $table->getField('deleted')));
+        if (!$this->is_mysql57()) {
+            $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $table->getField('status')));
+            $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $table->getField('deleted')));
+        } else {
+            $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $table->getField('status')));
+            $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $table->getField('deleted')));
+        }
 
         $record = new stdClass();
         $record->name = 'abc';
@@ -1869,6 +1874,10 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $record->id = $DB->insert_record('test_table', $record);
         $newrecord = $DB->get_record('test_table', ['id' => $record->id]);
         $this->assertEquals($record, $newrecord);
+
+        if ($this->is_mysql57()) {
+            return;
+        }
 
         try {
             $update = clone($record);
@@ -1951,6 +1960,10 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $newrecord = $DB->get_record('test_table', ['id' => $record->id]);
         $this->assertEquals($record, $newrecord);
 
+        if ($this->is_mysql57()) {
+            return;
+        }
+
         try {
             $record = new stdClass();
             $record->name = 'xyz';
@@ -1991,11 +2004,19 @@ class totara_core_ddl_testcase extends database_driver_testcase {
 
         $field = new xmldb_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null, null, ['active', 'suspended']);
         $dbman->add_field($table, $field);
-        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $field));
+        if (!$this->is_mysql57()) {
+            $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $field));
+        } else {
+            $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $field));
+        }
 
         $field = new xmldb_field('deleted', XMLDB_TYPE_INTEGER, '1', null, null, null, null, null, ['0', '1']);
         $dbman->add_field($table, $field);
-        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $field));
+        if (!$this->is_mysql57()) {
+            $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $field));
+        } else {
+            $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $field));
+        }
 
         $record = new stdClass();
         $record->name = 'abc';
@@ -2023,6 +2044,10 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $record->id = $DB->insert_record('test_table', $record);
         $newrecord = $DB->get_record('test_table', ['id' => $record->id]);
         $this->assertEquals($record, $newrecord);
+
+        if ($this->is_mysql57()) {
+            return;
+        }
 
         try {
             $record = new stdClass();
@@ -2064,8 +2089,13 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $this->assertTrue($dbman->table_exists('test_table'));
 
         $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $table->getField('name')));
-        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $table->getField('status')));
-        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $table->getField('deleted')));
+        if (!$this->is_mysql57()) {
+            $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $table->getField('status')));
+            $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $table->getField('deleted')));
+        } else {
+            $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $table->getField('status')));
+            $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $table->getField('deleted')));
+        }
 
         $field = new xmldb_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null, null);
         $dbman->change_field_allowed_values($table, $field);
@@ -2104,11 +2134,19 @@ class totara_core_ddl_testcase extends database_driver_testcase {
 
         $field = new xmldb_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null, null, ['active', 'suspended']);
         $dbman->change_field_allowed_values($table, $field);
-        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $field));
+        if (!$this->is_mysql57()) {
+            $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $field));
+        } else {
+            $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $field));
+        }
 
         $field = new xmldb_field('deleted', XMLDB_TYPE_INTEGER, '1', null, null, null, null, null, ['0', '1']);
         $dbman->change_field_allowed_values($table, $field);
-        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $field));
+        if (!$this->is_mysql57()) {
+            $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $field));
+        } else {
+            $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $field));
+        }
 
         $record = new stdClass();
         $record->name = 'abc';
@@ -2136,6 +2174,10 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $record->id = $DB->insert_record('test_table', $record);
         $newrecord = $DB->get_record('test_table', ['id' => $record->id]);
         $this->assertEquals($record, $newrecord);
+
+        if ($this->is_mysql57()) {
+            return;
+        }
 
         try {
             $record = new stdClass();
@@ -2177,16 +2219,29 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $this->assertTrue($dbman->table_exists('test_table'));
 
         $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $table->getField('name')));
-        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $table->getField('status')));
-        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $table->getField('deleted')));
+        if (!$this->is_mysql57()) {
+            $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $table->getField('status')));
+            $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $table->getField('deleted')));
+        } else {
+            $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $table->getField('status')));
+            $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $table->getField('deleted')));
+        }
 
         $field = new xmldb_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null, null, ['active', 'passive']);
         $dbman->change_field_allowed_values($table, $field);
-        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $field));
+        if (!$this->is_mysql57()) {
+            $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $field));
+        } else {
+            $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $field));
+        }
 
         $field = new xmldb_field('deleted', XMLDB_TYPE_INTEGER, '1', null, null, null, null, null, [2, 3]);
         $dbman->change_field_allowed_values($table, $field);
-        $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $field));
+        if (!$this->is_mysql57()) {
+            $this->assertTrue($dbman->field_allowed_values_constraint_exists($table, $field));
+        } else {
+            $this->assertFalse($dbman->field_allowed_values_constraint_exists($table, $field));
+        }
 
         $record = new stdClass();
         $record->name = 'abc';
@@ -2196,6 +2251,10 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $record->id = $DB->insert_record('test_table', $record);
         $newrecord = $DB->get_record('test_table', ['id' => $record->id]);
         $this->assertEquals($record, $newrecord);
+
+        if ($this->is_mysql57()) {
+            return;
+        }
 
         try {
             $record = new stdClass();
@@ -2261,5 +2320,14 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         /** @var sqlsrv_native_moodle_database $DB */
         $done = $DB->fts_wait_for_indexing($tablename, 10);
         $this->assertTrue($done);
+    }
+
+    public function is_mysql57() {
+        if ($this->tdb->get_dbvendor() === 'mysql') {
+            $version = $this->tdb->get_server_info()['version'];
+            if (version_compare($version, '8.0', '<')) {
+                $this->markTestSkipped('Not supported in MySQL 5.7.x');
+            }
+        }
     }
 }
