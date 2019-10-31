@@ -101,6 +101,13 @@ final class signup implements seminar_iterator_item {
     private $settings = [];
 
     /**
+     * @var array Default options for switch_state_with_grade.
+     */
+    private $default_options = [
+        'gradeonly' => false
+    ];
+
+    /**
      * Seminar signup constructor.
      *
      * @param int $id {facetoface_signups}.id If 0 - new signup will be created
@@ -276,6 +283,11 @@ final class signup implements seminar_iterator_item {
     public function delete(): signup {
         global $DB;
 
+        if (!$this->exists()) {
+            $this->map_object((object)get_object_vars(new self()));
+            return $this;
+        }
+
         $this->delete_customfields();
 
         // Delete all signup session statuses.
@@ -285,10 +297,16 @@ final class signup implements seminar_iterator_item {
         $signupstatuses = new signup_status_list(['signupid' => $this->get_id()]);
         $signupstatuses->delete();
 
+        // Save the instance before it's washed out.
+        $presignup = clone $this;
+        $cm = $this->get_seminar_event()->get_seminar()->get_coursemodule();
+        $context = \context_module::instance($cm->id);
+
         $DB->delete_records(self::DBTABLE, ['id' => $this->id]);
         // Re-load instance with default values.
         $this->map_object((object)get_object_vars(new self()));
 
+        \mod_facetoface\event\signup_deleted::create_from_signup($presignup, $context)->trigger();
         return $this;
     }
 
@@ -308,51 +326,48 @@ final class signup implements seminar_iterator_item {
      * @return signup
      */
     public function switch_state(string ...$newstates): signup {
-        global $DB;
-        $trans = $DB->start_delegated_transaction();
-        $oldstate = $this->get_state();
-        $newstate = $oldstate->switch_to(...$newstates);
-        $this->update_status($newstate);
-
-        /**
-         * @var state $newstate
-         */
-        if ($newstate instanceof interface_event) {
-            $newstate->get_event()->trigger();
-        }
-        $newstate->on_enter();
-
-        $trans->allow_commit();
-
-        return $this;
+        return $this->switch_state_with_grade(null, null, ...$newstates);
     }
 
     /**
      * Switch signup state and set grade.
      * This function must be used for any state changes
      * @param float|null $grade grade
-     * @param null $reserved must be null
+     * @param array|null $options optional associative array optionally containing:
+     *                  - 'gradeonly' => true to set grade without state changes.
+     *                    In the case, $newstates must be the same as the current state.
+     *                    Otherwise the signup_exception will be thrown.
      * @param string ...$newstates class names
-     * @return \signup
+     * @return signup
+     * @throws signup_exception
      */
-    public function switch_state_with_grade(?float $grade, $reserved, string ...$newstates): signup {
+    public function switch_state_with_grade(?float $grade, $options, string ...$newstates): signup {
         global $DB;
-        if ($reserved !== null) {
-            throw new \coding_exception('the argument `$reserved` must be null at this moment.');
-        }
+        // Load options
+        $options = ($options ?? []) + $this->default_options;
 
         $trans = $DB->start_delegated_transaction();
         $oldstate = $this->get_state();
-        $newstate = $oldstate->switch_to(...$newstates);
-        $this->update_status($newstate, 0, 0, $grade, $reserved);
+        if ($options['gradeonly']) {
+            if (count($newstates) !== 1 || get_class($oldstate) !== $newstates[0]) {
+                throw new signup_exception('The gradeonly option is not available for the desired state(s): '.implode(', ', $newstates));
+            }
+            $newstate = $oldstate;
+        } else {
+            $newstate = $oldstate->switch_to(...$newstates);
+        }
+        $this->update_status($newstate, 0, 0, $grade, $options);
 
         /**
          * @var state $newstate
          */
-        if ($newstate instanceof interface_event) {
-            $newstate->get_event()->trigger();
+        if ($newstate->get_code() != $oldstate->get_code()) {
+            // Fire event only if switching to a different state.
+            if ($newstate instanceof interface_event) {
+                $newstate->get_event()->trigger();
+            }
+            $newstate->on_enter();
         }
-        $newstate->on_enter();
 
         $trans->allow_commit();
 
@@ -456,28 +471,38 @@ final class signup implements seminar_iterator_item {
     /**
      * Add new current signup status with a new state.
      * To change state of signup use signup::switch_state()
-     * @param state         $state
-     * @param int           $timecreated
-     * @param int           $userbyid
+     * @param state         $state the new state
+     * @param int           $timecreated timestamp or 0 to use current time
+     * @param int           $userbyid who's updating the status? 0 for the current user
      * @param float|null    $grade
-     * @param null          $reserved        must be null
+     * @param array|null    $options see signup::switch_state_with_grade()
      * @return signup_status
+     * @throws signup_exception when switching to $state is not permitted
      */
-    protected function update_status(state $state, int $timecreated = 0, int $userbyid = 0, ?float $grade = null, $reserved = null): signup_status {
-        global $USER, $CFG;
-
-        if ($reserved !== null) {
-            throw new \coding_exception('The $reserved argument must be null');
-        }
-
-        // We need the completionlib for \completion_info and the COMPLETION_UNKNOWN constant.
-        require_once($CFG->libdir . '/completionlib.php');
+    protected function update_status(state $state, int $timecreated = 0, int $userbyid = 0, ?float $grade = null, $options = null): signup_status {
+        global $USER;
+        // Load options
+        $options = ($options ?? []) + $this->default_options;
 
         if ($state instanceof not_set) {
             throw new signup_exception("New booking status cannot be 'not set'");
         }
 
-        $status = signup_status::create($this, $state, $timecreated, $grade, $reserved);
+        // Special interception for the 'gradeonly' option:
+        // - the current state and the desired $state must be the same. otherwise throw signup_exception.
+        // - if the current grade is identical to the desired grade, do nothing;
+        //   just returns the current state without adding a new record nor firing an event.
+        if ($options['gradeonly']) {
+            $currentstatus = $this->get_signup_status();
+            if ($state->get_code() != $currentstatus->get_statuscode()) {
+                throw new signup_exception('The gradeonly option is not available for the desired state(s): '.get_class($state));
+            }
+            if ($grade === $currentstatus->get_grade()) {
+                return $currentstatus;
+            }
+        }
+
+        $status = signup_status::create($this, $state, $timecreated, $grade, null);
 
         if (empty($userbyid)) {
             $userbyid = (int)$USER->id;
@@ -485,22 +510,11 @@ final class signup implements seminar_iterator_item {
         $status->set_createdby($userbyid);
         $status->save();
 
-        $seminarevent = $this->get_seminar_event();
-        $seminar = $seminarevent->get_seminar();
-        $cm = $seminar->get_coursemodule();
+        $cm = $this->get_seminar_event()->get_seminar()->get_coursemodule();
         $context = \context_module::instance($cm->id);
 
-        // Check for completions.
-        // Note: This code block was taken from facetoface_set_completion();
-        $course = new \stdClass();
-        $course->id = $seminar->get_course();
-        $completion = new \completion_info($course);
-        if ($completion->is_enabled() && !empty($cm) && $completion->is_enabled($cm)) {
-            $completion->update_state($cm, COMPLETION_UNKNOWN, $this->get_userid());
-            $completion->invalidatecache($seminar->get_course(), $this->get_userid(), true);
-        }
-
         // The signup status has been updated, throw the generic event.
+        // This will also trigger the update to the event grade and the seminar activity completion.
         \mod_facetoface\event\signup_status_updated::create_from_items($status, $context, $this)->trigger();
 
         return $status;
@@ -518,8 +532,9 @@ final class signup implements seminar_iterator_item {
      * @return state
      */
     public function get_state(): state {
-        if (signup_status::has_current($this)) {
-            $stateclass = signup_status::from_current($this)->get_state_class();
+        $signupstatus = $this->get_signup_status();
+        if ($signupstatus !== null) {
+            $stateclass = $signupstatus->get_state_class();
             return new $stateclass($this);
         }
 
@@ -586,10 +601,10 @@ final class signup implements seminar_iterator_item {
         }
 
         if (!empty($this->discountcode) && !$hidediscountconfig) {
-            $cost = format_string($this->seminarevent->get_discountcost());
+            $cost = format_string($this->get_seminar_event()->get_discountcost());
         } else {
             if (!$hidecostconfig) {
-                $cost = format_string($this->seminarevent->get_normalcost());
+                $cost = format_string($this->get_seminar_event()->get_normalcost());
             }
         }
         return $cost;
@@ -791,11 +806,7 @@ final class signup implements seminar_iterator_item {
      * @return signup_status|null
      */
     public function get_signup_status(): ?signup_status {
-        if (signup_status::has_current($this)) {
-            return signup_status::from_current($this);
-        }
-
-        return null;
+        return signup_status::find_current($this);
     }
 
     /**

@@ -274,7 +274,7 @@ Feature: Seminar Signup Manager Approval
     And I log in as "admin"
     And I am on "Classroom Connect Course" course homepage
     And I click on the seminar event action "Delete event" in row "#1"
-    And I press "Continue"
+    And I press "Delete"
     And I run all adhoc tasks
     And I log out
     And I log in as "manager"

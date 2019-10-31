@@ -53,11 +53,7 @@ if ($backtoallsessions) {
     $returnurl = new moodle_url('/course/view.php', ['id' => $seminar->get_course()]);
 }
 
-if ($seminarevent->is_first_started()) {
-    // How did they get here? There should not be any link in UI to this page.
-    redirect($returnurl);
-}
-if ($seminarevent->get_cancelledstatus() != 0) {
+if (!$seminarevent->is_cancellable()) {
     // How did they get here? There should not be any link in UI to this page.
     redirect($returnurl, get_string('error:cannoteditcancelledevent', 'mod_facetoface'), null, notification::NOTIFY_ERROR);
 }

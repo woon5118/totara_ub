@@ -82,6 +82,14 @@ $observers = [
         'callback' => '\mod_facetoface\event_handler::send_notification_requested'
     ],
     [
+        'eventname' => \mod_facetoface\event\signup_deleted::class,
+        'callback' => '\mod_facetoface\event_handler::signup_deleted'
+    ],
+    [
+        'eventname' => \mod_facetoface\event\signup_status_updated::class,
+        'callback' => '\mod_facetoface\event_handler::signup_status_updated'
+    ],
+    [
         'eventname' => \totara_job\event\job_assignment_deleted::class,
         'callback'  => '\mod_facetoface\event_handler::job_assignment_deleted',
     ],

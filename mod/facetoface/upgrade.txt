@@ -140,6 +140,14 @@ Note that more recent update comes to the top.
 * form\event::new_user_roles_added() has been deprecated and will be removed in Totara 14
 
 --- Update in backend code ---
+* seminar_event::is_cancellable() has been added; please use this method to see whether the event can be cancelled or not
+* signup_helper::process_attendance() has been changed to trigger the signup_status_updated event whenever signup status is changed
+* signup::switch_state() has been changed to trigger the signup_status_updated event whenever signup status is changed
+* signup::switch_state() and signup::switch_state_with_grade() has been changed to trigger the signup_status_updated event whenever signup status is changed
+* signup_helper::process_attendance() no longer directly updates event grade and completion status; it instead hands over to the event observer
+* signup::switch_state_with_grade() changed the $reserved argument to $options
+* signup::update_status() changed the $reserved argument to $options
+* signup_deleted event has been added; the event is triggered when a signup is deleted from a database
 * mod_facetoface\rb_sources\rb_facetoface_base_source::add_assets_fields_to_columns() moved to mod_facetoface\rb\traits\assets::add_assets_fields_to_columns()
 * mod_facetoface\rb_sources\rb_facetoface_base_source::add_assets_fields_to_filters() moved to mod_facetoface\rb\traits\assets::add_assets_fields_to_filters()
 * all deprecated seminar report builder methods are moved to mod_facetoface\rb\traits\deprecated_*.php files

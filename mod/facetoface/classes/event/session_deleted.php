@@ -66,6 +66,8 @@ class session_deleted extends \core\event\base {
         $event = self::create($data);
         $event->add_record_snapshot('facetoface_sessions', $session);
         self::$preventcreatecall = true;
+        $event->session = $session;
+
         return $event;
     }
 

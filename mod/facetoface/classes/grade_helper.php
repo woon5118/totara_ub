@@ -65,9 +65,18 @@ final class grade_helper {
      * @param seminar_event $seminarevent
      * @param signup        $signup
      * @return true
+     * @throws \coding_exception
      */
     public static function grade_signup(seminar_event $seminarevent, signup $signup): bool {
         global $CFG;
+
+        if ($seminarevent->get_id() !== $signup->get_sessionid()) {
+            throw new \coding_exception('The signup #'.$signup->get_id().' does not belong to the seminar event #'.$seminarevent->get_id());
+        }
+        // Bail out before userid #0 confuses facetoface_update_grades().
+        if (empty($signup->get_userid())) {
+            return true;
+        }
 
         // Necessary for facetoface_update_grades()
         require_once($CFG->dirroot . '/mod/facetoface/lib.php');
@@ -214,12 +223,13 @@ final class grade_helper {
                    FROM {facetoface_signups} su
              INNER JOIN {facetoface_sessions} s ON s.id = su.sessionid
               LEFT JOIN {facetoface_signups_status} sus ON sus.signupid = su.id
-                  WHERE (s.facetoface = ?)
+                  WHERE (s.facetoface = :f2f)
                     AND (s.cancelledstatus = 0)
                     AND (sus.superceded = 0)
                     AND (sus.grade IS NOT NULL)
-                    AND (su.archived = 0 OR su.archived IS NULL)',
-                [$f2fid]
+                    AND (su.archived = 0 OR su.archived IS NULL)
+                    AND (su.userid != 0)',
+                ['f2f' => $f2fid]
             );
         }
 

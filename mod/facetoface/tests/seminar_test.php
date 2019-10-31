@@ -233,7 +233,7 @@ class mod_facetoface_seminar_testcase extends \advanced_testcase {
         // Test for new-empty instance.
         $this->assertEquals(0, $signup->get_id());
 
-        $signup->set_sessionid($seminarsession->get_id())
+        $signup->set_sessionid($seminarevent->get_id())
             ->set_userid($USER->id)
             ->set_discountcode(1)
             ->set_archived(1)

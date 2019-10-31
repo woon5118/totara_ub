@@ -77,7 +77,7 @@ Feature: Sign up status
     And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on the seminar event action "Cancel event" in row "1 January"
-    And I should see "Are you sure you want to cancel this event?"
+    And I should see "Cancelling this event will remove all of its booking, attendance and grade records. All attendees will be notified."
     And I press "Yes"
     And I should see "Event cancelled" in the ".alert-success" "css_element"
     And I log out
@@ -162,7 +162,7 @@ Feature: Sign up status
     And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on the seminar event action "Cancel event" in row "Wait-listed"
-    And I should see "Are you sure you want to cancel this event?"
+    And I should see "Cancelling this event will remove all of its booking, attendance and grade records. All attendees will be notified."
     And I press "Yes"
     And I should see "Event cancelled" in the ".alert-success" "css_element"
     And I log out

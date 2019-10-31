@@ -141,8 +141,11 @@ final class signup_status implements seminar_iterator_item {
     }
 
     /**
+     * Load the current signup_status instance from signup.
+     *
      * @param signup $signup
      * @return signup_status
+     * @throws dml_exception
      */
     public static function from_current(signup $signup) : signup_status {
         global $DB;
@@ -154,21 +157,16 @@ final class signup_status implements seminar_iterator_item {
      * Load the current signup_status instance from signup.
      *
      * @param int|signup $signup    signup instance or signup id
-     * @return signup_status        class instance or null if nothing found
+     * @return signup_status|null   class instance or null if nothing found
      */
-    public static function find_current($signup) : signup_status {
+    public static function find_current($signup) : ?signup_status {
         global $DB;
-        if (is_int($signup)) {
-            $rec = $DB->get_record('facetoface_signups_status', ['signupid' => $signup, 'superceded' => 0], '*', IGNORE_MISSING);
-            if (!empty($rec)) {
-                $self = new signup_status();
-                return $self->from_record($rec);
-            }
-        } else {
-            $id = (int)$DB->get_field('facetoface_signups_status', 'id', ['signupid' => $signup->get_id(), 'superceded' => 0], IGNORE_MISSING);
-            if ($id !== 0) {
-                return new signup_status($id);
-            }
+        if (!is_int($signup)) {
+            $signup = $signup->get_id();
+        }
+        $rec = $DB->get_record('facetoface_signups_status', ['signupid' => $signup, 'superceded' => 0], '*', IGNORE_MISSING);
+        if (!empty($rec)) {
+            return (new signup_status())->from_record($rec);
         }
         return null;
     }
@@ -207,7 +205,7 @@ final class signup_status implements seminar_iterator_item {
      * Create new signup status from state
      * @param signup        $signup
      * @param state         $state
-     * @param int           $timecreated
+     * @param int           $timecreated timestamp or 0 to use current time
      * @param float|null    $grade
      * @param null          $reserved       must be null
      * @return signup_status

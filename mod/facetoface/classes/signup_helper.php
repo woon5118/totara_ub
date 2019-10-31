@@ -188,6 +188,24 @@ final class signup_helper {
     /**
      * Process the attendance records for a seminar event. This is for event taking attendance.
      *
+     * Here is the internal workflow just for illustration purposes.
+     * Please do not rely on this as it is not contractual.
+     *
+     * + signup_helper::process_attendance():
+     *   + signup_helper::switch_state_and_grade():
+     *     + signup::switch_state_with_grade():
+     *       + signup::update_status():                     - work out state transition
+     *       | + signup_status::save()                      - supersede signup_status
+     *       | + signup_status_updated::trigger():          - trigger event
+     *       |   + event_handler::signup_status_updated():  - event observer
+     *       |     + grade_helper::grade_signup():
+     *       |       + facetoface_update_grades():          - module callback function to update grade
+     *       |       | + facetoface_grade_item_update()
+     *       |       |   + grade_update()                   - update grade
+     *       |       + seminar::set_completion():
+     *       |         + completion_info::update_state()    - update activity completion status
+     *       + interface_event::trigger()
+     *
      * @param seminar_event $seminarevent
      * @param array         $attendance     an array containing [ signup::id => state::get_code() ]
      * @param array         $grades         an array containing [ signup::id => grade or null ]
@@ -199,7 +217,7 @@ final class signup_helper {
         if ($grades === null) {
             $grades = [];
         }
-        $eventgradingmanual = $seminarevent->get_seminar()->get_eventgradingmanual() != 0;
+        $eventgradingmanual = (bool)$seminarevent->get_seminar()->get_eventgradingmanual();
 
         // Validation: The $attendance array must contain all the keys of the $grades array.
         $attendance_keys = array_keys($attendance);
@@ -222,7 +240,7 @@ final class signup_helper {
             $signup = (new signup($signupid))->set_attendance_processed(true);
             $desiredstate = state::from_code($statuscode);
 
-            if (!self::switch_state_and_grade($seminarevent, $signup, $desiredstate, $eventgradingmanual, $grade)) {
+            if (!self::switch_state_and_grade($signup, $desiredstate, $eventgradingmanual, $grade)) {
                 return false;
             }
         }
@@ -232,19 +250,17 @@ final class signup_helper {
     /**
      * Switch state and grade.
      *
-     * @param seminar_event $seminarevent
      * @param signup        $signup
-     * @param string        $desiredstate       the class name of a new state
-     * @param bool          $eventgradingmanual true to use $grade value, false to use default value instead of $grade value
-     * @param float|null    $grade              new grade or null to use default by $desiredstate::get_grade()
+     * @param string        $desiredstate       the fully-qualified class name of a new state
+     * @param bool          $eventgradingmanual true to use $grade value, false to use the default grade of $desiredstate
+     * @param float|null    $grade
      * @return bool
      */
-    private static function switch_state_and_grade(seminar_event $seminarevent, signup $signup, string $desiredstate, bool $eventgradingmanual, float $grade = null) : bool {
-        global $USER;
-
-        $currentstate = $signup->get_state();
+    private static function switch_state_and_grade(signup $signup, string $desiredstate, bool $eventgradingmanual, float $grade = null) : bool {
+        $currentstate = null; // Delay-load signup_status.
 
         if ($desiredstate == not_set::class) {
+            $currentstate = $currentstate ?? $signup->get_state();
             // If current state is attendance, try fallback to booked, otherwise leave it as is
             if ($currentstate instanceof attendance_state) {
                 $desiredstate = booked::class;
@@ -260,19 +276,10 @@ final class signup_helper {
         if ($signup->can_switch($desiredstate)) {
             $signup->switch_state_with_grade($grade, null, $desiredstate);
         } else {
-            $same_state = get_class($currentstate) === $desiredstate;
-            if ($same_state) {
-                $signupstatus = signup_status::from_current($signup);
-                // same states but different grade
-                if ($signupstatus->get_grade() !== $grade) {
-                    $signupstatus = signup_status::create($signup, $currentstate, 0, $grade, null);
-                    $signupstatus->set_createdby((int)$USER->id);
-                    $signupstatus->save();
-                }
-            }
-
-            // do not error_log() when attempting to switch to the same state
-            if (!$same_state) {
+            $currentstate = $currentstate ?? $signup->get_state();
+            if (get_class($currentstate) === $desiredstate) {
+                $signup->switch_state_with_grade($grade, ['gradeonly' => true], $desiredstate);
+            } else {
                 $error = sprintf("Seminar: could not switch signup #%d from '%s' to '%s'", $signup->get_id(), get_class($currentstate), $desiredstate);
                 error_log($error);
                 // Also dump the error message under PHPUnit.
@@ -283,7 +290,7 @@ final class signup_helper {
             }
         }
 
-        return grade_helper::grade_signup($seminarevent, $signup);
+        return true;
     }
 
     /**

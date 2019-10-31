@@ -125,12 +125,7 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
         $this->assertEquals(item::RESULT_STATUS_SUCCESS, $status);
 
         // Check that signup cancelling was called correctly (triggers event signup_status_updated).
-        $this->assertCount(2, $events);
-        $this->assertInstanceOf('\mod_facetoface\event\signup_status_updated', $events[0]);
-        $this->assertInstanceOf('\mod_facetoface\event\booking_cancelled', $events[1]);
-        $event = $events[0];
-        $event_data = $event->get_data();
-        $this->assertEquals($student1->id, $event_data['other']['userid']);
+        $this->assert_signup_status_updated_event($targetuser, $events, 2);
 
         // Verify expected data. Everything should be purged for student1 while nothing should be purged for student2.
         $this->assertEquals(0, $DB->count_records('facetoface_signups', ['userid' => $student1->id]));
@@ -256,7 +251,7 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
 
         $this->assertEquals(item::RESULT_STATUS_SUCCESS, $status);
 
-        $this->assert_signup_status_updated_event($targetuser, $events);
+        $this->assert_signup_status_updated_event($targetuser, $events, 1);
 
         // Verify expected data. Only student1/session2 data should be purged.
         $this->assertEquals(1, $DB->count_records('facetoface_signups', ['userid' => $student1->id]));
@@ -379,7 +374,7 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
 
         $this->assertEquals(item::RESULT_STATUS_SUCCESS, $status);
 
-        $this->assert_signup_status_updated_event($targetuser, $events);
+        $this->assert_signup_status_updated_event($targetuser, $events, 2);
 
         // For deleted/suspended the active signups get cancelled, so we expect additional records in signups_status table.
         // Also, we expect the additional default cancellation customfield.
@@ -518,7 +513,7 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
 
         $this->assertEquals(item::RESULT_STATUS_SUCCESS, $status);
 
-        $this->assert_signup_status_updated_event($targetuser, $events);
+        $this->assert_signup_status_updated_event($targetuser, $events, 2);
 
         // For deleted/suspended the active signups get cancelled, so we expect additional records in signups_status table.
         // Also, we expect the additional default cancellation customfield.
@@ -598,19 +593,27 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
      *
      * @param target_user $targetuser
      * @param array $events
+     * @param int $numsignups
      */
-    private function assert_signup_status_updated_event(target_user $targetuser, array $events) {
+    private function assert_signup_status_updated_event(target_user $targetuser, array $events, int $numsignups) {
         // Check that signup cancelling was called correctly (triggers event signup_status_updated).
         // For deleted and suspended users this doesn't trigger an event because it already happened at deletion/suspension time.
         if (!$targetuser->deleted && !$targetuser->suspended) {
-            $this->assertCount(2, $events);
+            $this->assertCount(2 + $numsignups, $events);
             $this->assertInstanceOf('\mod_facetoface\event\signup_status_updated', $events[0]);
             $this->assertInstanceOf('\mod_facetoface\event\booking_cancelled', $events[1]);
             $event = $events[0];
             $event_data = $event->get_data();
             $this->assertEquals($targetuser->id, $event_data['other']['userid']);
+            array_splice($events, 0, 2);
         } else {
-            $this->assertEmpty($events);
+            $this->assertCount($numsignups, $events);
+        }
+        while ($numsignups--) {
+            $event = array_pop($events);
+            $this->assertInstanceOf('\mod_facetoface\event\signup_deleted', $event);
+            $event_data = $event->get_data();
+            $this->assertEquals($targetuser->id, $event_data['other']['userid']);
         }
     }
 

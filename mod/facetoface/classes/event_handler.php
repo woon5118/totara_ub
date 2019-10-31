@@ -253,6 +253,33 @@ class event_handler {
     }
 
     /**
+     * Update the event grade and the activity completion status when a signup is deleted.
+     *
+     * @param \mod_facetoface\event\signup_deleted $event
+     * @return bool true on success
+     */
+    public static function signup_deleted(\mod_facetoface\event\signup_deleted $event) {
+        $signup = $event->get_signup();
+        // NOTE: grade_helper::grade_signup() can cope with non-existent signup
+        // because it's only interested in sessionid and userid.
+        $seminarevent = $signup->get_seminar_event();
+        return \mod_facetoface\grade_helper::grade_signup($seminarevent, $signup);
+    }
+
+    /**
+     * Update the event grade and the activity completion status when a signup status is updated.
+     *
+     * @param \mod_facetoface\event\signup_status_updated $event
+     * @return bool true on success
+     */
+    public static function signup_status_updated(\mod_facetoface\event\signup_status_updated $event) {
+        $signupstatus = $event->get_signupstatus();
+        $signup = new \mod_facetoface\signup($signupstatus->get_signupid());
+        $seminarevent = $signup->get_seminar_event();
+        return \mod_facetoface\grade_helper::grade_signup($seminarevent, $signup);
+    }
+
+    /**
      * Triggered via job_assignment_deleted event.
      * - Removes facetoface signup jobassignmentid data
      *

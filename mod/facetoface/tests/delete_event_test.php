@@ -23,8 +23,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use mod_facetoface\{seminar_event, signup, seminar_session, role, seminar_event_helper, room, asset, asset_helper, room_helper};
-use mod_facetoface\signup\state\booked;
+use mod_facetoface\{seminar_event, signup, seminar_session, role, seminar_event_helper, room, asset, asset_helper, room_helper, seminar, signup_status};
+use mod_facetoface\signup\state\{booked, fully_attended, partially_attended};
 
 class mod_facetoface_delete_event_testcase extends advanced_testcase {
     /**
@@ -253,5 +253,139 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
         seminar_event_helper::delete_seminarevent($seminarevent2);
         $this->assertFalse($DB->record_exists('facetoface_asset', ['id' => $asset2id]));
         $this->assertFalse($DB->record_exists('facetoface_asset', ['id' => $asset1id]));
+    }
+
+    /**
+     * Create a future seminar event and sign up a user.
+     * @param int $f2fid
+     * @return signup
+     */
+    private function make_signup_for_seminar(int $f2fid, int $userid): signup {
+        // Just boring boilerplate code as usual.
+        $gen = $this->getDataGenerator();
+        /** @var mod_facetoface_generator $f2fgen */
+        $f2fgen = $gen->get_plugin_generator('mod_facetoface');
+        $f2fevtid = $f2fgen->add_session(['facetoface' => $f2fid]);
+        $seminarevent = new seminar_event($f2fevtid);
+        $signup = signup::create($userid, $seminarevent)->save();
+        signup_status::create($signup, new booked($signup))->save();
+        $this->assertInstanceOf(booked::class, $signup->get_state());
+        return $signup;
+    }
+
+    /**
+     * Create a user, a course, a seminar, a future seminar event, sign up a user and set the event past.
+     * @return array of [courseID, seminarID, userID, signup]
+     */
+    private function make_signup(): array {
+        // Just boring boilerplate code as usual.
+        $gen = $this->getDataGenerator();
+        $user = $gen->create_user();
+        $course = $gen->create_course();
+        /** @var mod_facetoface_generator $f2fgen */
+        $f2fgen = $gen->get_plugin_generator('mod_facetoface');
+        $f2fid = $f2fgen->create_instance(['course' => $course->id])->id;
+        $signup = $this->make_signup_for_seminar($f2fid, $user->id);
+        return [$course->id, $f2fid, $user->id, $signup];
+    }
+
+    /**
+     * @return array of [ offsetToTimeStart ]
+     */
+    public function data_timestart_delta(): array {
+        return [
+            [ -YEARSECS ], // past
+            [ -HOURSECS ], // present
+            [ +WEEKSECS ], // future
+        ];
+    }
+
+    /**
+     * Delete one of seminar events in various time period via seminar_event_helper::delete_seminarevent() and see the event grade updated.
+     * @dataProvider data_timestart_delta
+     */
+    public function test_deleting_an_event_updates_grade(int $timediff) {
+        [$courseid, $f2fid, $userid, $signup1] = $this->make_signup();
+        $signup2 = $this->make_signup_for_seminar($f2fid, $userid);
+        /** @var signup $signup1 */
+        /** @var signup $signup2 */
+
+        (new seminar($f2fid))->set_eventgradingmethod(seminar::GRADING_METHOD_GRADEHIGHEST)->save();
+        $seminarevent1 = $signup1->get_seminar_event();
+        $seminarevent2 = $signup2->get_seminar_event();
+
+        // Temporarily go back in time to take attendance.
+        /** @var seminar_session $session */
+        $session1 = $seminarevent1->get_sessions()->current();
+        $session1->set_timestart(time() - WEEKSECS * 4)->set_timefinish(time() - WEEKSECS * 3)->save();
+        $session2 = $seminarevent2->get_sessions()->current();
+        $session2->set_timestart(time() - WEEKSECS * 2)->set_timefinish(time() - WEEKSECS)->save();
+
+        $signup1->switch_state_with_grade(77., null, fully_attended::class);
+        $signup2->switch_state_with_grade(42., null, partially_attended::class);
+        $grade_grades = grade_get_grades($courseid, 'mod', 'facetoface', $f2fid, [$userid]);
+        $this->assertSame(77., grade_floatval($grade_grades->items[0]->grades[$userid]->grade));
+
+        // Back to the desired time.
+        $session2->set_timestart(time() + $timediff)->set_timefinish(time() + $timediff + DAYSECS)->save();
+
+        // The grade must become 42 because the event where the user is given 77 grade no longer exists.
+        $this->assertTrue(seminar_event_helper::delete_seminarevent($seminarevent1));
+        $grade_grades = grade_get_grades($courseid, 'mod', 'facetoface', $f2fid, [$userid]);
+        $this->assertSame(42., grade_floatval($grade_grades->items[0]->grades[$userid]->grade));
+    }
+
+    /**
+     * Delete a seminar event in various time period via seminar_event_helper::delete_seminarevent() and see the event grade updated.
+     * @dataProvider data_timestart_delta
+     */
+    public function test_deleting_last_event_updates_grade(int $timediff) {
+        [$courseid, $f2fid, $userid, $signup] = $this->make_signup();
+        /** @var signup $signup */
+        $seminarevent = $signup->get_seminar_event();
+
+        // Temporarily go back in time to take attendance.
+        /** @var seminar_session $session */
+        $session = $seminarevent->get_sessions()->current();
+        $session->set_timestart(time() - WEEKSECS * 2)->set_timefinish(time() - WEEKSECS)->save();
+
+        $signup->switch_state_with_grade(77., null, fully_attended::class);
+        $grade_grades = grade_get_grades($courseid, 'mod', 'facetoface', $f2fid, [$userid]);
+        $this->assertSame(77., grade_floatval($grade_grades->items[0]->grades[$userid]->grade));
+
+        // Back to the desired time.
+        $session->set_timestart(time() + $timediff)->set_timefinish(time() + $timediff + DAYSECS)->save();
+
+        // The grade must become null because the user no longer signs up any event.
+        $this->assertTrue(seminar_event_helper::delete_seminarevent($seminarevent));
+        $grade_grades = grade_get_grades($courseid, 'mod', 'facetoface', $f2fid, [$userid]);
+        $this->assertSame(null, grade_floatval($grade_grades->items[0]->grades[$userid]->grade));
+    }
+
+    /**
+     * Delete a seminar event in various time period via seminar_event::delete() and see the event grade updated.
+     * @dataProvider data_timestart_delta
+     */
+    public function test_deleting_event_directly_updates_grade(int $timediff) {
+        [$courseid, $f2fid, $userid, $signup] = $this->make_signup();
+        /** @var signup $signup */
+        $seminarevent = $signup->get_seminar_event();
+
+        // Temporarily go back in time to take attendance.
+        /** @var seminar_session $session */
+        $session = $seminarevent->get_sessions()->current();
+        $session->set_timestart(time() - WEEKSECS * 2)->set_timefinish(time() - WEEKSECS)->save();
+
+        $signup->switch_state_with_grade(77., null, fully_attended::class);
+        $grade_grades = grade_get_grades($courseid, 'mod', 'facetoface', $f2fid, [$userid]);
+        $this->assertSame(77., grade_floatval($grade_grades->items[0]->grades[$userid]->grade));
+
+        // Back to the desired time.
+        $session->set_timestart(time() + $timediff)->set_timefinish(time() + $timediff + DAYSECS)->save();
+
+        // The grade must become null because the user no longer signs up any event.
+        $seminarevent->delete();
+        $grade_grades = grade_get_grades($courseid, 'mod', 'facetoface', $f2fid, [$userid]);
+        $this->assertSame(null, grade_floatval($grade_grades->items[0]->grades[$userid]->grade));
     }
 }

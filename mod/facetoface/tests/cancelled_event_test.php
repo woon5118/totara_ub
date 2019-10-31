@@ -23,8 +23,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use mod_facetoface\{seminar_event, room, seminar_session, signup, room_helper};
-use mod_facetoface\signup\state\booked;
+use mod_facetoface\{seminar_event, room, seminar_session, signup, room_helper, signup_status};
+use mod_facetoface\signup\state\{booked, fully_attended};
 
 class mod_facetoface_cancelled_event_testcase extends advanced_testcase {
     /**
@@ -89,5 +89,61 @@ class mod_facetoface_cancelled_event_testcase extends advanced_testcase {
         foreach ($messages as $msg) {
             $this->assertContains('This is custom room', $msg->fullmessage);
         }
+    }
+
+    /**
+     * Create a user, a course, a seminar, a future seminar event, sign up a user and set the event past.
+     * @return array of [courseID, seminarID, userID, signup]
+     */
+    private function make_signup(): array {
+        // Just boring boilerplate code as usual.
+        $gen = $this->getDataGenerator();
+        /** @var mod_facetoface_generator $f2fgen */
+        $f2fgen = $gen->get_plugin_generator('mod_facetoface');
+        $user = $gen->create_user();
+        $course = $gen->create_course();
+        $seminarevent = $f2fgen->create_session_for_course($course);
+        $signup = signup::create($user->id, $seminarevent)->save();
+        signup_status::create($signup, new booked($signup))->save();
+        $this->assertInstanceOf(booked::class, $signup->get_state());
+        return [$course->id, $seminarevent->get_facetoface(), $user->id, $signup];
+    }
+
+    /**
+     * @return array of [ offsetToTimeStart, isCancelled, eventGrade ]
+     */
+    public function data_cancelling_event_updates_grade(): array {
+        return [
+            [ -YEARSECS, false, 77. ], // past
+            [ -HOURSECS, false, 77. ], // present
+            [ WEEKSECS, true, null ], // future
+        ];
+    }
+
+    /**
+     * Cancel a seminar event in various time period and see the event grade updated or not.
+     * @dataProvider data_cancelling_event_updates_grade
+     */
+    public function test_cancelling_event_updates_grade(int $timediff, bool $cancelled, ?float $newgrade) {
+        [$courseid, $f2fid, $userid, $signup] = $this->make_signup();
+        /** @var signup $signup */
+        $seminarevent = $signup->get_seminar_event();
+
+        // Temporarily go back in time to take attendance.
+        /** @var seminar_session $session */
+        $session = $seminarevent->get_sessions()->current();
+        $session->set_timestart(time() - WEEKSECS * 2)->set_timefinish(time() - WEEKSECS)->save();
+
+        $signup->switch_state_with_grade(77., null, fully_attended::class);
+        $grade_grades = grade_get_grades($courseid, 'mod', 'facetoface', $f2fid, [$userid]);
+        $this->assertSame(77., grade_floatval($grade_grades->items[0]->grades[$userid]->grade));
+
+        // Back to the future, or the past.
+        $session->set_timestart(time() + $timediff)->set_timefinish(time() + $timediff + DAYSECS)->save();
+
+        // Cancelling a past seminar event is not possible.
+        $this->assertSame($cancelled, $seminarevent->cancel());
+        $grade_grades = grade_get_grades($courseid, 'mod', 'facetoface', $f2fid, [$userid]);
+        $this->assertSame($newgrade, grade_floatval($grade_grades->items[0]->grades[$userid]->grade));
     }
 }

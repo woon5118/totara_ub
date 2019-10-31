@@ -176,6 +176,31 @@ final class seminar_event implements seminar_iterator_item {
     }
 
     /**
+     * Return whether the seminar event can be cancelled or not.
+     *
+     * @param int $time
+     * @return bool
+     */
+    public function is_cancellable(int $time = 0): bool {
+        if (!$this->exists()) {
+            // Event does not exist.
+            return false;
+        }
+
+        if ($this->is_first_started($time)) {
+            // Events can not be cancelled after they have started.
+            return false;
+        }
+
+        if ($this->get_cancelledstatus() != 0) {
+            // Event is already cancelled, can not cancel twice.
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Cancel the seminar event.
      *
      * @return bool
@@ -183,13 +208,7 @@ final class seminar_event implements seminar_iterator_item {
     public function cancel(): bool {
         global $DB;
 
-        if ($this->is_first_started()) {
-            // Events can not be cancelled after they have started.
-            return false;
-        }
-
-        if ($this->get_cancelledstatus() != 0) {
-            // Event is already cancelled, can not cancel twice.
+        if (!$this->is_cancellable()) {
             return false;
         }
 

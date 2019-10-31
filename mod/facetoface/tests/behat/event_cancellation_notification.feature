@@ -327,7 +327,7 @@ Feature: Seminar event cancellation notifications
     And I am on "Course 1" course homepage
     And I follow "View all events"
     And I click on the seminar event action "Delete event" in row "10 February"
-    And I press "Continue"
+    And I press "Delete"
 
     When I log out
     And I log in as "learner1"

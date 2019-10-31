@@ -60,7 +60,11 @@ $seminarrenderer = $PAGE->get_renderer('mod_facetoface');
 echo $seminarrenderer->render_seminar_event($seminarevent, $viewattendees);
 
 $optionsyes = array('sesskey' => sesskey(), 's' => $seminarevent->get_id(), 'backtoallsessions' => $backtoallsessions);
-echo $OUTPUT->confirm(get_string('deletesessionconfirm', 'facetoface', format_string($seminar->get_name())),
-    new moodle_url('confirm.php', $optionsyes),
-    new moodle_url($returnurl));
+$yesbutton = new single_button(new moodle_url('confirm.php', $optionsyes), get_string('deletesessionconfirmdelete', 'mod_facetoface'), 'post', true);
+if ($seminarevent->is_cancellable()) {
+    $message = get_string('deletecancelsessionconfirm', 'facetoface', format_string($seminar->get_name()));
+} else {
+    $message = get_string('deletesessionconfirm', 'facetoface', format_string($seminar->get_name()));
+}
+echo $OUTPUT->confirm($message, $yesbutton, new moodle_url($returnurl));
 echo $OUTPUT->footer();

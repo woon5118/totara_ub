@@ -1,5 +1,4 @@
 <?php
-
 /*
  * This file is part of Totara LMS
  *
@@ -23,21 +22,22 @@
  */
 
 use mod_facetoface\{seminar, seminar_event, seminar_session, signup, signup_status};
+use mod_facetoface\event\{booking_booked, signup_status_updated};
+use mod_facetoface\exception\signup_exception;
 use mod_facetoface\signup\condition\{ condition, event_taking_attendance };
 use mod_facetoface\signup\restriction\restriction;
-use mod_facetoface\signup\state\{not_set, state, booked, event_cancelled};
+use mod_facetoface\signup\state\{not_set, state, booked, event_cancelled, fully_attended, partially_attended, unable_to_attend};
 use mod_facetoface\signup\transition;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * A unit test to make sure that all states and relevant objects are the right classes.
+ * A unit test for the signup class and state transitions.
  *
  * Class mod_facetoface_signup_states_testcase
  */
 class mod_facetoface_signup_states_testcase extends advanced_testcase {
     protected function setUp() {
-        $this->resetAfterTest(true);
         $this->setAdminUser();
     }
 
@@ -290,5 +290,178 @@ class mod_facetoface_signup_states_testcase extends advanced_testcase {
         $reflection = new ReflectionMethod($signup, 'update_status');
         $reflection->setAccessible(true);
         $reflection->invoke($signup, new not_set($signup));
+    }
+
+    public function test_signup_status_find_current_returns_null_when_signup_is_missing() {
+        $this->assertNull(signup_status::find_current(42));
+        $signup = new signup();
+        $rp = new ReflectionProperty($signup, 'id');
+        $rp->setAccessible(true);
+        $rp->setValue($signup, 42);
+        $this->assertNull(signup_status::find_current($signup));
+    }
+
+    /**
+     * Create a user, a course, a seminar, a future seminar event, sign up a user and set the event past.
+     * @return signup
+     */
+    private function make_signup(): signup {
+        // Just boring boilerplate code as usual.
+        $gen = $this->getDataGenerator();
+        /** @var mod_facetoface_generator $f2fgen */
+        $f2fgen = $gen->get_plugin_generator('mod_facetoface');
+        $user = $gen->create_user();
+        $course = $gen->create_course();
+        $seminarevent = $f2fgen->create_session_for_course($course);
+        $signup = signup::create($user->id, $seminarevent)->save();
+        signup_status::create($signup, new booked($signup))->save();
+        $this->assertInstanceOf(booked::class, $signup->get_state());
+        /** @var seminar_session $session */
+        $session = $seminarevent->get_sessions()->current();
+        $session->set_timestart(time() - WEEKSECS - DAYSECS)->set_timefinish(time() - WEEKSECS)->save();
+        return $signup;
+    }
+
+    /**
+     * @return array of cases that end up with signup_exception
+     */
+    public function data_signup_switch_state_with_grade_exception(): array {
+        return [
+            [null, null, [not_set::class], "booking status cannot be 'not set'"],
+            [null, null, [booked::class], 'Cannot move from '.booked::class.' to any of requested states'],
+            [42, null, [booked::class], 'Cannot move from '.booked::class.' to any of requested states'],
+            // switch_state_with_grade() will throw exception if it gets multiple desired states or the desired state differs to the current state.
+            [42, ['gradeonly' => true], [unable_to_attend::class], 'gradeonly option is not available for the desired state'],
+            [42, ['gradeonly' => true], [booked::class, booked::class], 'gradeonly option is not available for the desired state'],
+        ];
+    }
+
+    /**
+     * Ensure signup::switch_state_with_grade() throws signup_exception.
+     * @dataProvider data_signup_switch_state_with_grade_exception
+     */
+    public function test_signup_switch_state_with_grade_exception(?float $grade, ?array $options, array $newstates, string $message) {
+        $signup = $this->make_signup();
+        try {
+            $signup->switch_state_with_grade($grade, $options, ...$newstates);
+            $this->fail('signup_exception expected');
+        } catch (signup_exception $ex) {
+            $this->assertContains($message, $ex->getMessage());
+        }
+    }
+
+    /**
+     * Ensure signup::switch_state_with_grade() succeeds with expected outcomes.
+     */
+    public function test_signup_switch_state_with_grade_success() {
+        $signup = $this->make_signup();
+
+        $hit_and_run = function ($callback) use ($signup) {
+            $sink = $this->redirectEvents();
+            $callback($signup);
+            $events = $sink->get_events();
+            $sink->close();
+            return $events;
+        };
+
+        // Attendance taken, sort of.
+        $events = $hit_and_run(function (signup $signup) {
+            $signup->switch_state_with_grade(null, null, fully_attended::class);
+        });
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(signup_status_updated::class, $events[0]);
+        $this->assertInstanceOf(fully_attended::class, $signup->get_state());
+        $this->assertSame(null, signup_status::from_current($signup)->get_grade());
+
+        // Attendance updated, sort of.
+        $events = $hit_and_run(function (signup $signup) {
+            $signup->switch_state_with_grade(42, null, booked::class);
+        });
+        // Make sure two events are fired - signup_status_updated from switch_state_with_grade, booking_booked from booked state.
+        $this->assertCount(2, $events);
+        $this->assertInstanceOf(signup_status_updated::class, $events[0]);
+        $this->assertInstanceOf(booking_booked::class, $events[1]);
+        $this->assertInstanceOf(booked::class, $signup->get_state());
+        $this->assertSame(42., signup_status::from_current($signup)->get_grade());
+
+        // Update only grade with the 'gradeonly' option.
+        $events = $hit_and_run(function (signup $signup) {
+            $signup->switch_state_with_grade(85, ['gradeonly' => true], booked::class);
+        });
+        // Make sure booking_booked event is not fired because the state is not changed.
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(signup_status_updated::class, $events[0]);
+        $this->assertInstanceOf(booked::class, $signup->get_state());
+        $this->assertSame(85., signup_status::from_current($signup)->get_grade());
+    }
+
+    /**
+     * @return array of cases that end up with signup_exception
+     */
+    public function data_signup_update_status_exception(): array {
+        return [
+            [not_set::class, null, null, "New booking status cannot be 'not set'"],
+            [fully_attended::class, null, ['gradeonly' => true], 'gradeonly option is not available for the desired state'],
+        ];
+    }
+
+    /**
+     * @dataProvider data_signup_update_status_exception
+     */
+    public function test_signup_update_status_exception(string $stateclass, ?float $grade, ?array $options, string $message) {
+        $signup = $this->make_signup();
+        $state = new $stateclass($signup);
+        $rm = new ReflectionMethod($signup, 'update_status');
+        $rm->setAccessible(true);
+        try {
+            $rm->invoke($signup, $state, 0, 0, $grade, $options);
+            $this->fail('signup_exception expected');
+        } catch (signup_exception $ex) {
+            $this->assertContains($message, $ex->getMessage());
+        }
+    }
+
+    /**
+     * Ensure signup::update_status() succeeds with expected outcomes but not very obviously.
+     */
+    public function test_signup_update_status_edge_case() {
+        $signup = $this->make_signup();
+        $method = new ReflectionMethod($signup, 'update_status');
+        $method->setAccessible(true);
+
+        $set_and_fire = function ($callback) use ($signup, $method) {
+            $sink = $this->redirectEvents();
+            $result = $callback($signup, $method);
+            $events = $sink->get_events();
+            $sink->close();
+            return [$events, $result];
+        };
+
+        // Update only grade with the 'gradeonly' option.
+        $oldstatus = $signup->get_signup_status();
+        [$events, $newstatus] = $set_and_fire(function ($signup, $method) {
+            return $method->invoke($signup, new booked($signup), 0, 0, 42, ['gradeonly' => true]);
+        });
+        // Make sure only signup_status_updated event is fired.
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(signup_status_updated::class, $events[0]);
+        $this->assertInstanceOf(booked::class, $signup->get_state());
+        $this->assertSame(42., signup_status::from_current($signup)->get_grade());
+        // Make sure a new record is added.
+        $this->assertNotEquals($oldstatus->get_id(), $newstatus->get_id());
+        $this->assertEquals($newstatus->get_id(), signup_status::from_current($signup)->get_id());
+
+        // Update nothing with the 'gradeonly' option.
+        $oldstatus = $signup->get_signup_status();
+        [$events, $newstatus] = $set_and_fire(function ($signup, $method) {
+            return $method->invoke($signup, new booked($signup), 0, 0, 42, ['gradeonly' => true]);
+        });
+        // Make sure no events are fired.
+        $this->assertCount(0, $events);
+        $this->assertInstanceOf(booked::class, $signup->get_state());
+        $this->assertSame(42., signup_status::from_current($signup)->get_grade());
+        // Make sure a new record is NOT added.
+        $this->assertEquals($oldstatus->get_id(), $newstatus->get_id());
+        $this->assertEquals($oldstatus->get_id(), signup_status::from_current($signup)->get_id());
     }
 }

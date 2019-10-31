@@ -493,7 +493,7 @@ Feature: Seminar event cancellation basic
 
     When I click on the seminar event action "Cancel event" in row "0 / 30"
     And I should see "Cancelling event in"
-    And I should see "Are you sure you want to cancel this event?"
+    And I should see "Cancelling this event will remove all of its booking, attendance and grade records. All attendees will be notified."
     And I press "Yes"
     Then I should see "Event cancelled" in the ".alert-success" "css_element"
     And I should see "Cancelled" in the "0 / 30" "table_row"
@@ -502,7 +502,7 @@ Feature: Seminar event cancellation basic
 
     When I click on the seminar event action "Delete event" in row "0 / 30"
     And I should see "Deleting event in"
-    And I press "Continue"
+    And I press "Delete"
     Then I should not see "0 / 30"
     And I should see "0 / 20"
 
@@ -544,7 +544,7 @@ Feature: Seminar event cancellation basic
 
     When I click on the seminar event action "Cancel event" in row "0 / 30"
     And I should see "Cancelling event in"
-    And I should see "Are you sure you want to cancel this event?"
+    And I should see "Cancelling this event will remove all of its booking, attendance and grade records. All attendees will be notified."
     And I press "Yes"
     Then I should see "Event cancelled" in the ".alert-success" "css_element"
     And I should see "Cancelled" in the "0 / 30" "table_row"

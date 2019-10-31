@@ -38,9 +38,9 @@ Feature: Test deletion of a Seminar event
 
     When I click on the seminar event action "Delete event" in row "#1"
     Then I should see "Deleting event in Test seminar name"
-    And I should see "Are you completely sure you want to delete this event and all sign-ups and attendance for this event?"
+    And I should see "Deleting this event will remove all of its booking, attendance and grade records. All attendees will be notified."
 
-    When I press "Continue"
+    When I press "Delete"
     Then I should see "Test seminar name" in the ".mod_facetoface__event-dashboard" "css_element"
     And I should see "No results" in the ".mod_facetoface__event-dashboard" "css_element"
     And a seminar custom asset called "Projector" should not exist
@@ -75,9 +75,9 @@ Feature: Test deletion of a Seminar event
     When I click on the seminar event action "Delete event" in row "#1"
     Then I should see "Deleting event in Test seminar name"
     And I should see "Room 1"
-    And I should see "Are you completely sure you want to delete this event and all sign-ups and attendance for this event?"
+    And I should see "Deleting this event will remove all of its booking, attendance and grade records. All attendees will be notified."
 
-    When I press "Continue"
+    When I press "Delete"
     Then I should see "Test seminar name" in the ".mod_facetoface__event-dashboard" "css_element"
     And I should see "No results" in the ".mod_facetoface__event-dashboard" "css_element"
     And a seminar custom room called "Room 1" should not exist

@@ -46,12 +46,14 @@ class session_signup extends \core\event\base {
     /** @var bool Flag for prevention of direct create() call. */
     protected static $preventcreatecall = true;
 
+    /** @var \stdClass */
+    protected $usersignup;
+
     /**
      * Create instance of event.
      *
-     * @param \stdClass $usersignup
+     * @param signup $signup
      * @param \context_module $context
-     * @param int $userid
      * @return session_signup
      */
     public static function create_from_signup(signup $signup, \context_module $context) {
@@ -70,19 +72,15 @@ class session_signup extends \core\event\base {
         /** @var session_signup $event */
         $event = self::create($data);
         self::$preventcreatecall = true;
-        $event->usersignup = $signup;
+        $event->usersignup = $signup->to_record();
         return $event;
     }
-
-    /** @var \stdClass */
-    protected $usersignup;
 
     /**
      * Create instance of event.
      *
      * @param \stdClass $usersignup
      * @param \context_module $context
-     * @param int $userid
      * @return session_signup
      * @deprecated since Totara 12.0 use session_signup::create_from_signup() instead.
      */

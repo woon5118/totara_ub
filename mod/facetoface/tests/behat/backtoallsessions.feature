@@ -123,7 +123,7 @@ Feature: Return to previous page after actions in seminar
 
     Given I am on "Course 1" course homepage
     When I click on the seminar event action "Delete event" in row "Booking open"
-    And I click on "Continue" "button"
+    And I click on "Delete" "button"
     Then I should see "View all events"
     And ".mod_facetoface__event-dashboard" "css_element" should not exist
     And I should not see "Booking open"
@@ -139,7 +139,7 @@ Feature: Return to previous page after actions in seminar
     Given I am on "Course 1" course homepage
     And I follow "View all events"
     When I click on the seminar event action "Delete event" in row "Booking open"
-    And I click on "Continue" "button"
+    And I click on "Delete" "button"
     Then ".mod_facetoface__event-dashboard" "css_element" should exist
     And I should not see "View all events"
     And I should not see "Booking open"

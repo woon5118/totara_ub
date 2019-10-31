@@ -288,6 +288,7 @@ class mod_facetoface_signup_helper_testcase extends advanced_testcase {
         $gen = $this->getDataGenerator();
         $course = $gen->create_course();
 
+        /** @var mod_facetoface_generator $f2fgen */
         $f2fgen = $gen->get_plugin_generator('mod_facetoface');
         $f2f = $f2fgen->create_instance(['course' => $course->id]);
 
@@ -362,14 +363,20 @@ class mod_facetoface_signup_helper_testcase extends advanced_testcase {
         $grade = signup_status::from_current($signup11)->get_grade();
         $this->assertSame(42., grade_floatval($grade));
 
+        // Same attendance state but event grade
+        $result = signup_helper::process_attendance($event1, [ $signup11->get_id() => no_show::get_code() ], [ $signup11->get_id() => 64]);
+        $this->assertTrue($result);
+        $grade = signup_status::from_current($signup11)->get_grade();
+        $this->assertSame(64., grade_floatval($grade));
+
         // Attendance & wrong event grade: throws coding_exception
         try {
-            signup_helper::process_attendance($event2, [ $signup12->get_id() => no_show::get_code() ], [ $signup11->get_id() => 42]);
+            signup_helper::process_attendance($event2, [ $signup12->get_id() => no_show::get_code() ], [ $signup11->get_id() => 85]);
             $this->fail('coding_exception expected');
         } catch (\coding_exception $ex) {
         }
         $grade = signup_status::from_current($signup11)->get_grade();
-        $this->assertSame(42., grade_floatval($grade));
+        $this->assertSame(64., grade_floatval($grade));
     }
 
     /**
