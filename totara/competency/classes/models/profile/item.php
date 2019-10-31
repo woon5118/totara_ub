@@ -29,8 +29,6 @@ use totara_competency\data_providers\assignments;
 use totara_competency\entities\assignment;
 
 /**
- * Class profile_progress
- *
  * This is a profile progress item model scaffolding, it has the following properties available:
  *
  *  - Key -> md5 of some attributes it's grouped by

@@ -28,14 +28,9 @@ use totara_competency\models\profile\competency_progress;
 
 class profile_competency_details extends profile_resolver {
     public static function resolve(array $args, execution_context $ec) {
-        if (!isset($args['user_id'])) {
-            throw new \coding_exception('User id is required');
-        }
-        if (!isset($args['competency_id'])) {
-            throw new \coding_exception('Competency id is required');
-        }
+        $user_id = static::authorize($args['user_id'] ?? null);
 
-        return competency_progress::build_for_competency(static::authorize($args['user_id'] ?? null), $args['competency_id']);
+        return competency_progress::build_for_competency($user_id, $args['competency_id']);
     }
 
 }

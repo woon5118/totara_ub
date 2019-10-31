@@ -176,7 +176,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
 
         $expander->expand_all();
 
-        sleep(1);
+        $this->waitForSecond();
 
         // ------------------
         // Second assignments set
@@ -206,7 +206,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
 
         $expander->expand_all();
 
-        sleep(1);
+        $this->waitForSecond();
 
         // ------------------
         // Third assignments set
@@ -230,7 +230,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
 
         $expander->expand_all();
 
-        sleep(1);
+        $this->waitForSecond();
 
         // ------------------
 

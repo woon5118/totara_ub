@@ -80,28 +80,6 @@ class achievement_criteria {
             ->set_roles([manual::ROLE_SELF]);
         $pathways[] = $pw;
 
-        // First get first proficient and default scalevalue
-        // TODO: Create model for this???
-
-        // Assuming scalevalues are returned in order highest to lowest
-        // TODO: update when TL-20274 is merged
-        $scalevalues = $scale->scale_values;
-
-        $first_proficient = null;
-        $first_sortorder = -1;
-
-        foreach ($scalevalues as $id => $scalevalue) {
-            if ($scalevalue->get_attribute('proficient') && $scalevalue->get_attribute('sortorder') > $first_sortorder) {
-                $first_proficient = $id;
-                $first_sortorder = $scalevalue->get_attribute('sortorder');
-            }
-        }
-
-        if (is_null($first_proficient)) {
-            // Just in case ... Assign top as first proficient
-            $first_proficient = $scalevalues->first()->get_attribute('id');
-        }
-
         $crit = new linkedcourses();
         $crit->set_aggregation_method(criterion::AGGREGATE_ALL);
         if (!is_null($comp_id)) {
@@ -110,7 +88,7 @@ class achievement_criteria {
 
         $pw = new criteria_group();
         $pw->set_sortorder(3)
-            ->set_scale_value(new scale_value($first_proficient))
+            ->set_scale_value($scale->min_proficient_value)
             ->add_criterion($crit);
         $pathways[] = $pw;
 

@@ -48,9 +48,12 @@ class pathway_manual_achievement_detail_testcase extends advanced_testcase {
         $competency = new \totara_competency\entities\competency($comp);
 
         $scale = $competency->scale;
-        $this->scalevalue1 = $scale->scale_values->first();
-        $scale->scale_values->next();
-        $this->scalevalue2 = $scale->scale_values->current();
+        $values = $scale->values()
+            ->order_by('sortorder', 'asc')
+            ->get();
+        $this->scalevalue1 = $values->first();
+        $values->next();
+        $this->scalevalue2 = $values->current();
 
         $this->manual = new manual();
         $this->manual->set_competency($competency);

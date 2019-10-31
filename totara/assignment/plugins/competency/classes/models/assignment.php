@@ -455,20 +455,6 @@ class assignment {
         }
     }
 
-    public function get_human_status() {
-        switch ($this->entity->status) {
-            case assignment_entity::STATUS_ACTIVE:
-                return get_string('status:active-alt', 'tassign_competency');
-            case assignment_entity::STATUS_ARCHIVED:
-                return get_string('status:archived-alt', 'tassign_competency');
-            case assignment_entity::STATUS_DRAFT:
-                return get_string('status:draft', 'tassign_competency');
-            default:
-                debugging('Unknown assignment status: ' . $this->entity->status, DEBUG_DEVELOPER);
-                return 'Unknown';
-        }
-    }
-
     /**
      * Gets human readable reason for assignment, we show
      * - the fullname of the assigner and role
@@ -528,9 +514,6 @@ class assignment {
             case 'progress_name':
                 return $this->get_progress_name();
 
-            case 'human_status':
-                return $this->get_human_status();
-
             case 'reason_assigned':
                 return $this->get_reason_assigned();
 
@@ -546,8 +529,8 @@ class assignment {
             case 'min_value':
                 return $this->get_min_value();
 
-            /** @noinspection PhpMissingBreakStatementInspection */
             case 'assigned_at':
+                // We fall back to the default if it's not there intentionally
                 if ($this->entity->relation_loaded('assignment_user')) {
                     // The relation might be loaded, but the related model does not always exist,
                     // for example there is no assignment user for archived assignments...
@@ -581,7 +564,6 @@ class assignment {
             'user_group',
             'competency',
             'status_name',
-            'human_status',
             'type_name',
             'progress_name',
             'reason_assigned',

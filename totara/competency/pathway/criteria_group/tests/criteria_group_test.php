@@ -476,7 +476,9 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $totara_hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
         $scale = $totara_hierarchy_generator->create_scale('comp');
         $scale = new scale($scale);
-        $value1 = $scale->scale_values->first();
+        $value1 = $scale->values()
+            ->order_by('sortorder', 'asc')
+            ->first();
 
         $criteria_group = new criteria_group();
         $criteria_group->set_scale_value($value1);
@@ -497,7 +499,9 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $totara_hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
         $scale = $totara_hierarchy_generator->create_scale('comp');
         $scale = new scale($scale);
-        $value1 = $scale->scale_values->first();
+        $value1 = $scale->values()
+            ->order_by('sortorder', 'asc')
+            ->first();
 
         $criteria_group = new criteria_group();
         $criteria_group->set_scale_value($value1);
@@ -525,7 +529,9 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $totara_hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
         $scale = $totara_hierarchy_generator->create_scale('comp');
         $scale = new scale($scale);
-        $value1 = $scale->scale_values->first();
+        $value1 = $scale->values()
+            ->order_by('sortorder', 'asc')
+            ->first();
 
         $criteria_group = new criteria_group();
         $criteria_group->set_scale_value($value1);
@@ -559,7 +565,9 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $totara_hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
         $scale = $totara_hierarchy_generator->create_scale('comp');
         $scale = new scale($scale);
-        $value1 = $scale->scale_values->first();
+        $value1 = $scale->values()
+            ->order_by('sortorder', 'asc')
+            ->first();
 
         $criteria_group = new criteria_group();
         $criteria_group->set_scale_value($value1);
@@ -591,7 +599,9 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $totara_hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
         $scale = $totara_hierarchy_generator->create_scale('comp');
         $scale = new scale($scale);
-        $value1 = $scale->scale_values->first();
+        $value1 = $scale->values()
+            ->order_by('sortorder', 'asc')
+            ->first();
 
         $framework = $totara_hierarchy_generator->create_comp_frame(['scale' => $scale->id]);
         $comp = $totara_hierarchy_generator->create_comp(['frameworkid' => $framework->id]);

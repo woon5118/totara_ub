@@ -120,7 +120,7 @@ class competency_progress extends user_data_provider {
      * @return mixed
      */
     protected function get_latest_assignment_by_field(collection $assignments, string $field) {
-        return $assignments->reduce(function(int $maxDate, assignment $assignment) use ($field) {
+        return $assignments->reduce(function (int $maxDate, assignment $assignment) use ($field) {
             if ($assignment->get_field($field) > $maxDate) {
                 $maxDate = $assignment->get_field($field);
             }
@@ -137,7 +137,7 @@ class competency_progress extends user_data_provider {
     protected function filter() {
         // We filter only filters applicable to the progress, as the rest of the filters
         // are proxied to the assignments data provider
-        $filters = array_filter($this->filters, function($key) {
+        $filters = array_filter($this->filters, function ($key) {
             return in_array($key, ['proficient']);
         }, ARRAY_FILTER_USE_KEY);
 
@@ -160,10 +160,10 @@ class competency_progress extends user_data_provider {
      * @param bool $value Proficient flag
      */
     protected function filter_by_proficient($value) {
-        $this->items = $this->items->filter(function($item) use ($value) {
+        $this->items = $this->items->filter(function ($item) use ($value) {
             // Let's iterate over assignment records for a given competency
             // We need to find at least one with achievement that has a proficient value.
-            $proficient = $item->assignments->reduce(function(bool $proficient, assignment $assignment) {
+            $proficient = $item->assignments->reduce(function (bool $proficient, assignment $assignment) {
                 // We need at least one proficient value for an achievement.
                 return $proficient || ($assignment->current_achievement->value->proficient ?? false);
             }, false);
@@ -182,7 +182,7 @@ class competency_progress extends user_data_provider {
         parent::set_filters($filters);
 
         // This filters are proxied to the assignments data provider
-        $ass_progress = array_filter($filters, function($key) {
+        $ass_progress = array_filter($filters, function ($key) {
             return in_array($key, ['status', 'type', 'user_group_type', 'user_group_id', 'search', 'competency_id']);
         }, ARRAY_FILTER_USE_KEY);
 

@@ -25,8 +25,8 @@ namespace totara_competency\models\profile;
 
 use core\collection;
 use totara_competency\data_providers\assignments;
-use totara_competency\entities\assignment;
 use tassign_competency\models\assignment as assignment_model;
+use totara_competency\entities\assignment as assignment_entity;
 
 /**
  * Class filter
@@ -55,16 +55,16 @@ class filter {
     /**
      * Create filter from assignment and key
      *
-     * @param assignment $assignment Assignment entity
+     * @param assignment_entity $assignment Assignment entity
      * @param string $key Key
      */
-    public function __construct(assignment $assignment, string $key) {
+    public function __construct(assignment_entity $assignment, string $key) {
 
         $model = assignment_model::load_by_entity($assignment);
 
         $this->attributes = [
             'name' => $model->get_progress_name(),
-            'status_name' => $model->get_human_status(),
+            'status_name' => $this->get_human_status($model),
             'status' => $assignment->status,
             'user_group_type' => $assignment->user_group_type,
             'user_group_id' => $assignment->user_group_id,
@@ -86,7 +86,7 @@ class filter {
     public static function build_from_assignments(collection $assignments) {
         $filters = [];
 
-        $assignments->map(function (assignment $assignment) use (&$filters) {
+        $assignments->map(function (assignment_entity $assignment) use (&$filters) {
             $key = static::build_key($assignment);
             if (!isset($filters[$key])) {
                 $filters[$key] = new static($assignment, $key);
@@ -122,14 +122,34 @@ class filter {
      * @param assignment $assignment
      * @return string
      */
-    protected static function build_key(assignment $assignment) {
+    protected static function build_key(assignment_entity $assignment) {
         $type = $assignment->type;
 
         // We are grouping individual admin and manager assignments together...
-        if ($type === assignment::TYPE_OTHER) {
-            $type = assignment::TYPE_ADMIN;
+        if ($type === assignment_entity::TYPE_OTHER) {
+            $type = assignment_entity::TYPE_ADMIN;
         }
 
         return md5("$assignment->status/$type/$assignment->user_group_type/$assignment->user_group_id");
+    }
+
+    /**
+     * Get human readable name for the status filter
+     *
+     * @param assignment_model $assignment
+     * @return string
+     */
+    protected function get_human_status(assignment_model $assignment) {
+        switch ($assignment->get_status()) {
+            case assignment_entity::STATUS_ACTIVE:
+                return get_string('status:active-alt', 'tassign_competency');
+            case assignment_entity::STATUS_ARCHIVED:
+                return get_string('status:archived-alt', 'tassign_competency');
+            case assignment_entity::STATUS_DRAFT:
+                return get_string('status:draft', 'tassign_competency');
+            default:
+                debugging('Unknown assignment status: ' . $assignment->get_status(), DEBUG_DEVELOPER);
+                return 'Unknown';
+        }
     }
 }

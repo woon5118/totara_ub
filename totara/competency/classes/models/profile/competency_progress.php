@@ -34,8 +34,6 @@ use totara_competency\entities\competency_achievement;
 use totara_competency\entities\scale_value;
 
 /**
- * Class profile_progress
- *
  * This is a profile progress item model scaffolding, it has the following properties available:
  *
  *  - Assignments -> [Assignment] - a collection of related assignment models

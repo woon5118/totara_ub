@@ -30,8 +30,6 @@ use totara_competency\data_providers\assignments;
 use totara_competency\entities\competency_achievement;
 
 /**
- * Class profile_progress
- *
  * This is a generic profile progress model scaffolding, it has the following properties available:
  *
  *  - User -> user entity

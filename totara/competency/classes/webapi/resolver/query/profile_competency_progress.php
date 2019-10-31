@@ -28,7 +28,9 @@ use totara_competency\data_providers\competency_progress;
 
 class profile_competency_progress extends profile_resolver {
     public static function resolve(array $args, execution_context $ec) {
-        return competency_progress::for(static::authorize($args['user_id'] ?? null))
+        $user_id = static::authorize($args['user_id'] ?? null);
+
+        return competency_progress::for($user_id)
             ->set_filters($args['filters'] ?? [])
             ->set_order($args['order'] ?? null)
             ->fetch()

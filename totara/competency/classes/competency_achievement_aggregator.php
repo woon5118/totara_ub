@@ -26,6 +26,7 @@ namespace totara_competency;
 
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\pathway_achievement;
+use totara_competency\entities\scale_value;
 use totara_competency\event\competency_achievement_updated;
 
 /**
@@ -214,23 +215,10 @@ final class competency_achievement_aggregator {
      */
     private function is_proficient($value_id): bool {
         if (is_null($this->proficient_scale_value_ids)) {
-            $scale = $this->get_achievement_configuration()->get_competency()->scale;
-            $values = $scale->scale_values;
-
-            $proficient = false;
-            $this->proficient_scale_value_ids = [];
-            foreach ($values as $value) {
-                if (!$proficient && $value->proficient) {
-                    $proficient = true;
-                }
-                // Todo: use this rather than above once minprofid is added via TL-20274
-                //if (!$proficient && $value->id == $scale->minprofid) {
-                //    $proficient = true;
-                //}
-
-                if ($proficient) {
-                    $this->proficient_scale_value_ids[$value->id] = $value->id;
-                }
+            $value = new scale_value($value_id);
+            if ($value->proficient) {
+                $this->proficient_scale_value_ids[$value->id] = $value->id;
+                return true;
             }
         }
 

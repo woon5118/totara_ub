@@ -32,6 +32,7 @@ use totara_competency\entities\assignment;
 use tassign_competency\expand_task;
 use tassign_competency\models\assignment_actions;
 use totara_assignment\entities\user;
+use totara_competency\entities\competency as competency_entity;
 use totara_competency\entities\scale_value;
 use totara_competency\linked_courses;
 use totara_criteria\criterion;
@@ -3932,13 +3933,9 @@ function create_course_links($records, $data) {
  */
 function create_criteria_pathways($competencies, $data, $generator) {
     foreach ($competencies as $competency => $pathways) {
-        $competency = new \totara_competency\entities\competency(get_competency($competency, null, $data), false);
+        $competency = new competency_entity(get_competency($competency, null, $data), false);
 
-        $scale_map = [];
-        $scale_values = array_reverse($competency->scale->scale_values->all());
-        foreach ($scale_values as $scale_value) {
-            $scale_map[$scale_value->sortorder] = $scale_value;
-        }
+        $scale_map = $competency->scale->values->key_by('sortorder')->all(true);
 
         foreach ($pathways as $scale_key => $criteria_groups) {
             foreach ($criteria_groups as $criteria_group) {

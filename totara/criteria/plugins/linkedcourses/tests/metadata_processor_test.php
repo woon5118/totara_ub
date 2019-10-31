@@ -36,7 +36,7 @@ class criteria_linkedcourses_metadata_processor_testcase extends advanced_testca
 
         $pathway = new criteria_group();
         $pathway->set_competency($competency);
-        $pathway->set_scale_value($competency->scale->scale_values->first());
+        $pathway->set_scale_value($competency->scale->values()->order_by('sortorder', 'asc')->first());
         $pathway->add_criterion($linked_course_criterion);
         $pathway->save();
     }
@@ -72,7 +72,11 @@ class criteria_linkedcourses_metadata_processor_testcase extends advanced_testca
 
         $pathway = new criteria_group();
         $pathway->set_competency($competency);
-        $pathway->set_scale_value($competency->scale->scale_values->first());
+        $pathway->set_scale_value(
+            $competency->scale->values()
+                ->order_by('sortorder', 'asc')
+                ->first()
+        );
         $pathway->add_criterion($linked_course_criterion);
         $pathway->save();
 

@@ -75,7 +75,9 @@ class external extends \external_api {
         $results = [];
 
         $scale = new scale($scale_id);
-        $scalevalues = $scale->scale_values;
+        $scalevalues = $scale->values()
+            ->order_by('sortorder', 'asc')
+            ->get();
 
         foreach ($scalevalues as $scalevalue) {
             $results[] = [

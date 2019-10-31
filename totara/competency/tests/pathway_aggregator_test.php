@@ -50,7 +50,9 @@ class totara_competency_pathway_aggregator_testcase extends advanced_testcase {
 
         $pathway = $competency_generator->create_test_pathway($competency, pathway::PATHWAY_STATUS_ACTIVE);
         /** @var scale_value $scale_value */
-        $scale_value = $competency->scale->scale_values->first();
+        $scale_value = $competency->scale->values()
+            ->order_by('sortorder', 'asc')
+            ->first();
         $pathway->set_test_aggregate_current_value($scale_value);
 
         $aggregator = new pathway_aggregator($pathway);
@@ -100,7 +102,10 @@ class totara_competency_pathway_aggregator_testcase extends advanced_testcase {
 
 
         /** @var scale_value[] $scale_values */
-        $scale_values = $competency->scale->scale_values->all();
+        $scale_values = $competency->scale->values()
+            ->order_by('sortorder', 'asc')
+            ->get()
+            ->all();
         $scale_value1 = array_pop($scale_values);
         $pathway->set_test_aggregate_current_value($scale_value1);
 
@@ -149,7 +154,9 @@ class totara_competency_pathway_aggregator_testcase extends advanced_testcase {
 
         $pathway = $competency_generator->create_test_pathway($competency, pathway::PATHWAY_STATUS_ACTIVE);
         /** @var scale_value $scale_value */
-        $scale_value = $competency->scale->scale_values->first();
+        $scale_value = $competency->scale->values()
+            ->order_by('sortorder', 'asc')
+            ->first();
         $pathway->set_test_aggregate_current_value($scale_value);
 
         $aggregator = new pathway_aggregator($pathway);
@@ -192,7 +199,10 @@ class totara_competency_pathway_aggregator_testcase extends advanced_testcase {
 
         $pathway1 = $competency_generator->create_test_pathway($competency);
         /** @var scale_value[] $scale_values */
-        $scale_values = $competency->scale->scale_values->all();
+        $scale_values = $competency->scale->values()
+            ->order_by('sortorder', 'asc')
+            ->get()
+            ->all();
         $scale_value1 = array_pop($scale_values);
         $scale_value2 = array_pop($scale_values);
 
@@ -257,7 +267,10 @@ class totara_competency_pathway_aggregator_testcase extends advanced_testcase {
         $pathway = $competency_generator->create_test_pathway($competency, pathway::PATHWAY_STATUS_ACTIVE);
 
         /** @var scale_value[] $scale_values */
-        $scale_values = $competency->scale->scale_values->all();
+        $scale_values = $competency->scale->values()
+            ->order_by('sortorder', 'asc')
+            ->get()
+            ->all();
         $scale_value1 = array_pop($scale_values);
         $pathway->set_test_aggregate_current_value($scale_value1);
 

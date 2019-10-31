@@ -63,9 +63,14 @@ class totara_competency_webapi_resolver_query_competency_plans_testcase extends 
         $this->competency = new competency($comp);
 
         $scale = $this->competency->scale;
-        $this->scalevalue1 = $scale->scale_values->first();
-        $scale->scale_values->next();
-        $this->scalevalue2 = $scale->scale_values->current();
+        $values = $scale->values()
+            ->order_by('sortorder', 'asc')
+            ->get();
+
+        $this->scalevalue1 = $values->first();
+
+        $values->next();
+        $this->scalevalue2 = $values->current();
 
         $this->user1 = $this->getDataGenerator()->create_user();
         $this->user2 = $this->getDataGenerator()->create_user();

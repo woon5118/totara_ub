@@ -111,7 +111,9 @@ class totara_competency_competency_achievement_aggregator_testcase extends advan
         $competency = $competency_generator->create_competency();
 
         /** @var scale_value $scale_value */
-        $scale_value = $competency->scale->scale_values->first();
+        $scale_value = $competency->scale->values()
+            ->order_by('sortorder', 'asc')
+            ->first();
 
         $pathway = $competency_generator->create_test_pathway($competency);
         $pathway->set_test_aggregate_current_value($scale_value);
@@ -159,7 +161,9 @@ class totara_competency_competency_achievement_aggregator_testcase extends advan
         $competency = $competency_generator->create_competency();
 
         /** @var scale_value $scale_value */
-        $scale_value = $competency->scale->scale_values->first();
+        $scale_value = $competency->scale->values()
+            ->order_by('sortorder', 'asc')
+            ->first();
 
         // Two pathways that will return the same scale_value.
         $pathway1 = $competency_generator->create_test_pathway($competency);
@@ -219,7 +223,9 @@ class totara_competency_competency_achievement_aggregator_testcase extends advan
         $competency = $competency_generator->create_competency();
 
         /** @var scale_value $scale_value */
-        $scale_value = $competency->scale->scale_values->first();
+        $scale_value = $competency->scale->values()
+            ->order_by('sortorder', 'asc')
+            ->first();
 
         // Two pathways that will return the same scale_value.
         $pathway1 = $competency_generator->create_test_pathway($competency);
@@ -286,7 +292,9 @@ class totara_competency_competency_achievement_aggregator_testcase extends advan
         $competency = $competency_generator->create_competency();
 
         /** @var scale_value $scale_value */
-        $scale_value = $competency->scale->scale_values->first();
+        $scale_value = $competency->scale->values()
+            ->order_by('sortorder', 'asc')
+            ->first();
 
         // Two pathways that will return the same scale_value.
         $pathway1 = $competency_generator->create_test_pathway($competency);
@@ -372,11 +380,15 @@ class totara_competency_competency_achievement_aggregator_testcase extends advan
         $competency = $competency_generator->create_competency();
 
         /** @var scale_value $scale_value1 */
-        $scale_value1 = $competency->scale->scale_values->first();
-        $competency->scale->scale_values->next();
+        $scale = $competency->scale;
+        $values = $scale->values()
+            ->order_by('sortorder', 'asc')
+            ->get();
+
+        $scale_value1 = $values->first();
+        $values->next();
         /** @var scale_value $scale_value2 */
-        $scale_value2 = $competency->scale->scale_values->current();
-        $competency->scale->scale_values->rewind();
+        $scale_value2 = $values->current();
 
         $pathway1 = $competency_generator->create_test_pathway($competency);
         $pathway1->set_test_aggregate_current_value($scale_value1);
@@ -454,7 +466,9 @@ class totara_competency_competency_achievement_aggregator_testcase extends advan
         $competency = $competency_generator->create_competency();
 
         /** @var scale_value $scale_value */
-        $scale_value = $competency->scale->scale_values->first();
+        $scale_value = $competency->scale->values()
+            ->order_by('sortorder', 'asc')
+            ->first();
 
         $pathway = $competency_generator->create_test_pathway($competency);
         $pathway->set_test_aggregate_current_value($scale_value);
@@ -549,12 +563,14 @@ class totara_competency_competency_achievement_aggregator_testcase extends advan
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
         $competency = $competency_generator->create_competency();
 
-        /** @var scale_value $scale_value */
-        $scale_value1 = $competency->scale->scale_values->first();
-        $competency->scale->scale_values->next();
+        $scale = $competency->scale;
+        $values = $scale->values()
+            ->order_by('sortorder', 'asc')
+            ->get();
+        $scale_value1 = $values->first();
+        $values->next();
         /** @var scale_value $scale_value2 */
-        $scale_value2 = $competency->scale->scale_values->current();
-        $competency->scale->scale_values->rewind();
+        $scale_value2 = $values->current();
 
         $pathway = $competency_generator->create_test_pathway($competency);
         $pathway->set_test_aggregate_current_value($scale_value1);
@@ -633,15 +649,19 @@ class totara_competency_competency_achievement_aggregator_testcase extends advan
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
         $competency = $competency_generator->create_competency();
 
-        /** @var scale_value $scale_value */
-        $scale_value1 = $competency->scale->scale_values->first();
-        $competency->scale->scale_values->next();
+        $scale = $competency->scale;
+        $values = $scale->values()
+            ->order_by('sortorder', 'asc')
+            ->get();
+
+        /** @var scale_value $scale_value1 */
+        $scale_value1 = $values->first();
+        $values->next();
         /** @var scale_value $scale_value2 */
-        $scale_value2 = $competency->scale->scale_values->current();
-        $competency->scale->scale_values->next();
-        /** @var scale_value $scale_value2 */
-        $scale_value3 = $competency->scale->scale_values->current();
-        $competency->scale->scale_values->rewind();
+        $scale_value2 = $values->current();
+        $values->next();
+        /** @var scale_value $scale_value3 */
+        $scale_value3 = $values->current();
 
         $pathway = $competency_generator->create_test_pathway($competency);
         $pathway->set_test_aggregate_current_value($scale_value1);

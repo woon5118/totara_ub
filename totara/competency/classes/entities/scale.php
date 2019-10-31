@@ -49,8 +49,6 @@ class scale extends entity {
 
     public const TABLE = 'comp_scale';
 
-    private $scale_value_cache;
-
     /**
      * Values for this scale
      *
@@ -59,21 +57,6 @@ class scale extends entity {
     public function values(): has_many {
         return $this->has_many(scale_value::class, 'scaleid')
             ->order_by('sortorder', 'desc');
-    }
-
-    /**
-     * @return collection
-     * @throws coding_exception
-     */
-    protected function get_scale_values_attribute() {
-        if (!isset($this->scale_value_cache)) {
-            $this->scale_value_cache = scale_value::repository()
-                    ->where('scaleid', $this->id)
-                    ->order_by('sortorder', 'asc')
-                    ->get();
-        }
-
-        return $this->scale_value_cache;
     }
 
     /**

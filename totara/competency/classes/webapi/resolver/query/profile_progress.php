@@ -28,6 +28,8 @@ use totara_competency\models\profile\progress as progress_model;
 
 class profile_progress extends profile_resolver {
     public static function resolve(array $args, execution_context $ec) {
-        return progress_model::for(static::authorize($args['user_id'] ?? null), $args['filters'] ?? []);
+        $user_id = static::authorize($args['user_id'] ?? null);
+
+        return progress_model::for($user_id, $args['filters'] ?? []);
     }
 }

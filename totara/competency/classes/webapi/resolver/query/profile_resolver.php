@@ -36,17 +36,14 @@ abstract class profile_resolver  {
      * @param null $user_id
      * @return int|null
      */
-    public static function authorize($user_id = null) {
+    public static function authorize(int $user_id = null) {
         if (is_null($user_id)) {
             throw new \coding_exception('User id is required');
         }
 
-        $user_id = intval($user_id);
+        require_login();
 
-        if (!$authorized_user = user::logged_in()) {
-            require_login();
-        }
-
+        $authorized_user = user::logged_in();
 
         advanced_feature::require('competency_assignment');
 

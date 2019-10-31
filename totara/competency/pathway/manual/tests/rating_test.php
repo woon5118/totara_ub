@@ -92,7 +92,9 @@ class pathway_manual_rating_testcase extends advanced_testcase {
         $user_id = 201;
 
         $this->setCurrentTimeStart();
-        $scale_value = $competency->scale->scale_values->first();
+        $scale_value = $competency->scale->values()
+            ->order_by('sortorder', 'asc')
+            ->first();
         $manual->set_manual_value($user_id, $user_id, manual::ROLE_SELF, $scale_value->id, 'Great jerb');
 
         $this->assertEquals(
@@ -127,7 +129,9 @@ class pathway_manual_rating_testcase extends advanced_testcase {
         job_assignment::create_default($user->id, ['managerjaid' => $managerja->id]);
 
         $this->setCurrentTimeStart();
-        $scale_value = $competency->scale->scale_values->first();
+        $scale_value = $competency->scale->values()
+            ->order_by('sortorder', 'asc')
+            ->first();
         $manual->set_manual_value($user->id, $manager->id, manual::ROLE_MANAGER, $scale_value->id);
 
         $this->assertEquals(
@@ -162,7 +166,9 @@ class pathway_manual_rating_testcase extends advanced_testcase {
         // We are not setting the user to have any manager here.
         job_assignment::create_default($user->id);
 
-        $scale_value = $competency->scale->scale_values->first();
+        $scale_value = $competency->scale->values()
+            ->order_by('sortorder', 'asc')
+            ->first();
 
         $this->expectException(coding_exception::class);
 
@@ -185,7 +191,9 @@ class pathway_manual_rating_testcase extends advanced_testcase {
             ['managerjaid' => $managerja->id, 'appraiserid' => $manager->id]
         );
 
-        $scale_value = $competency->scale->scale_values->first();
+        $scale_value = $competency->scale->values()
+            ->order_by('sortorder', 'asc')
+            ->first();
         $manual->set_manual_value($user->id, $manager->id, manual::ROLE_APPRAISER, $scale_value->id, '');
 
         $this->assertEquals(
@@ -279,7 +287,10 @@ class pathway_manual_rating_testcase extends advanced_testcase {
         $manual2->set_roles([manual::ROLE_SELF]);
         $manual2->save();
 
-        $scale_values = $competency->scale->scale_values->all();
+        $scale_values = $competency->scale->values()
+            ->order_by('sortorder', 'asc')
+            ->get()
+            ->all();
         $scale_value1 = array_pop($scale_values);
         $scale_value2 = array_pop($scale_values);
 
