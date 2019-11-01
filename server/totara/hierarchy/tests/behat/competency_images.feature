@@ -152,7 +152,8 @@ Feature: Test use of images in competencies and competency custom fields
     Then I should see "Complete"
     And I log out
     And I log in as "admin"
-    And I run the "\totara_hierarchy\task\update_competencies_task" task
+    # TODO this needs to be updated to use the new task, see TL-22637
+    #And I run the "\totara_hierarchy\task\update_competencies_task" task
 
     When I navigate to "Manage user reports" node in "Site administration > Reports"
     And I follow "Test Competency Status"

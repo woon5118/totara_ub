@@ -69,7 +69,8 @@ Feature: Test competencies achieved is updated
     And I should see "Complete"
     And I log out
     And I log in as "admin"
-    And I run the "\totara_hierarchy\task\update_competencies_task" task
+    # TODO this needs to be updated to use the new task, see TL-22637
+    #And I run the "\totara_hierarchy\task\update_competencies_task" task
     And I log out
     And I log in as "gandalf"
     And I am on "Team" page

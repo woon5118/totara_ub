@@ -135,7 +135,8 @@ Scale 1
     And the following courses are completed:
       | user     | course | timecompleted  |
       | learner1 | C1     | today          |
-    And I run the "\totara_hierarchy\task\update_competencies_task" task
+    # TODO this needs to be updated to use the new task, see TL-22826
+    #And I run the "\totara_hierarchy\task\update_competencies_task" task
     And I log out
 
     # Check course completion but competency status not updated
@@ -159,13 +160,15 @@ Scale 1
     And the following courses are completed:
       | user     | course | timecompleted  |
       | learner1 | C1     | today          |
-    Then I run the "\totara_hierarchy\task\update_competencies_task" task
+    # TODO this needs to be updated to use the new task, see TL-22826
+    #Then I run the "\totara_hierarchy\task\update_competencies_task" task
 
     # Upload course completion for other courses with today's date
     When the following courses are completed:
       | user     | course | timecompleted  |
       | learner1 | C2     | today          |
-    And I run the "\totara_hierarchy\task\update_competencies_task" task
+    # TODO this needs to be updated to use the new task, see TL-22826
+    #And I run the "\totara_hierarchy\task\update_competencies_task" task
     Then I log out
 
     # Check course completion and competency status updated
@@ -189,13 +192,15 @@ Scale 1
     And the following courses are completed:
       | user     | course | timecompleted  |
       | learner1 | C1     | today          |
-    Then I run the "\totara_hierarchy\task\update_competencies_task" task
+    # TODO this needs to be updated to use the new task, see TL-22826
+    #Then I run the "\totara_hierarchy\task\update_competencies_task" task
 
     # Upload course completion for other courses with last month's date
     When the following courses are completed:
       | user     | course | timecompleted  |
       | learner1 | C2     | last month     |
-    Then I run the "\totara_hierarchy\task\update_competencies_task" task
+    # TODO this needs to be updated to use the new task, see TL-22826
+    #Then I run the "\totara_hierarchy\task\update_competencies_task" task
     And I log out
 
     # Check course completion and competency status updated
@@ -219,7 +224,8 @@ Scale 1
     And the following courses are completed:
       | user     | course | timecompleted  |
       | learner1 | C1     | today          |
-    Then I run the "\totara_hierarchy\task\update_competencies_task" task
+    # TODO this needs to be updated to use the new task, see TL-22826
+    #Then I run the "\totara_hierarchy\task\update_competencies_task" task
     And I log out
 
     # Check course completion and competency status is not updated
@@ -243,7 +249,8 @@ Scale 1
     And I click on "Edit" "link" in the "Competency 1" "table_row"
     And I set the field "Aggregation method" to "Any"
     And I press "Save changes"
-    Then I run the "\totara_hierarchy\task\update_competencies_task" task
+    # TODO this needs to be updated to use the new task, see TL-22826
+    #Then I run the "\totara_hierarchy\task\update_competencies_task" task
     And I log out
 
     # Check competency status is updated

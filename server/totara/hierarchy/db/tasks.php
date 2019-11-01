@@ -35,13 +35,4 @@ $tasks = array(
         'dayofweek' => '*',
         'month' => '*'
     ),
-    array(
-        'classname' => 'totara_hierarchy\task\update_competencies_task',
-        'blocking' => 0,
-        'minute' => '0',
-        'hour' => '*',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*'
-    ),
 );
