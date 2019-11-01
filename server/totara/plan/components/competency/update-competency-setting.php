@@ -72,6 +72,8 @@ if ($jobassignment) {
 $details->assessorname = fullname($USER);
 $details->assessorid = $USER->id;
 
+// TODO This script here is used for triggering ajax requests from the 'rb_source_dp_competency' report source,
+//      We need to decide if we still support that. If yes, this call here needs to be changed (see TL-19974)
 $result = hierarchy_add_competency_evidence($competencyid, $userid, $prof, $component, $details);
 
 if ($result) {
