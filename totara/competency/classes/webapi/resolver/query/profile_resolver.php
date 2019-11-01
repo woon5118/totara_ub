@@ -28,12 +28,12 @@ use core\webapi\query_resolver;
 use totara_assignment\entities\user;
 use totara_core\advanced_feature;
 
-abstract class profile_resolver  {
+abstract class profile_resolver implements query_resolver {
 
     /**
      * Authorize given user, returns user id, or throws an exception if the user is not authorized
      *
-     * @param null $user_id
+     * @param int|null $user_id
      * @return int|null
      */
     public static function authorize(int $user_id = null) {

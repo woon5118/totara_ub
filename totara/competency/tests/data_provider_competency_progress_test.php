@@ -134,14 +134,14 @@ class totara_competency_data_provider_competency_progress_testcase extends totar
         // individual items and assert that they have everything loaded properly.
 
         // Let's assert that returned data have everything we need.
-        $cp->map(function(cp $cp) use (&$at_least_one_achievement_found) {
+        $cp->map(function (cp $cp) use (&$at_least_one_achievement_found) {
             $this->assertInstanceOf(collection::class, $cp->get_assignments());
 
             // Let's check that we alias assignments to items
             $this->assertSame($cp->assignments, $cp->items);
 
             // Let's check all the assignments
-            $cp->get_assignments()->map(function(assignment_model $assignment) use (&$at_least_one_achievement_found) {
+            $cp->get_assignments()->map(function (assignment_model $assignment) use (&$at_least_one_achievement_found) {
                 $this->assertTrue($assignment->get_entity()->relation_loaded('current_achievement'));
 
                 $achievement = competency_achievement::repository()->where('user_id', $this->get_user()->id)

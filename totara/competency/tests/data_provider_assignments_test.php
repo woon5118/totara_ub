@@ -73,7 +73,7 @@ class totara_competency_data_provider_assignments_testcase extends totara_compet
         $has_archived_assignments = false;
 
         // Let's assert that we have all the required data fetched, it should include exactly 12 assignments
-        $assignments->map(function(assignment $assignment) use ($target_user, &$has_active_assignments, &$has_archived_assignments) {
+        $assignments->map(function (assignment $assignment) use ($target_user, &$has_active_assignments, &$has_archived_assignments) {
             // Due to the fact that assignments do not have direct reference to the user, we'd need to compare
             // with data fetched from a related table
             if ($assignment->assignment_user) {
@@ -107,7 +107,7 @@ class totara_competency_data_provider_assignments_testcase extends totara_compet
 
         $this->assertNotEmpty($filtered);
 
-        $filtered->map(function(assignment $assignment) {
+        $filtered->map(function (assignment $assignment) {
             $this->assertEquals(assignment::STATUS_ARCHIVED, $assignment->status);
         });
 
@@ -122,7 +122,7 @@ class totara_competency_data_provider_assignments_testcase extends totara_compet
 
         $this->assertNotEmpty($filtered);
 
-        $filtered->map(function(assignment $assignment) use ($target_user) {
+        $filtered->map(function (assignment $assignment) use ($target_user) {
             $this->assertEquals(assignment::TYPE_SELF, $assignment->type);
             $this->assertEquals(user_groups::USER, $assignment->user_group_type);
             $this->assertEquals($target_user->id, $assignment->user_group_id);
@@ -137,7 +137,7 @@ class totara_competency_data_provider_assignments_testcase extends totara_compet
 
         $this->assertNotEmpty($filtered);
 
-        $filtered->map(function(assignment $assignment) use ($target_user) {
+        $filtered->map(function (assignment $assignment) use ($target_user) {
             $this->assertEquals(assignment::TYPE_ADMIN, $assignment->type);
             $this->assertEquals(user_groups::POSITION, $assignment->user_group_type);
         });
@@ -152,7 +152,7 @@ class totara_competency_data_provider_assignments_testcase extends totara_compet
 
         $this->assertNotEmpty($filtered);
 
-        $filtered->map(function(assignment $assignment) use ($target_user, $pos) {
+        $filtered->map(function (assignment $assignment) use ($target_user, $pos) {
             $this->assertEquals(assignment::TYPE_ADMIN, $assignment->type);
             $this->assertEquals(user_groups::POSITION, $assignment->user_group_type);
             $this->assertEquals($pos->id, $assignment->user_group_id);
@@ -169,7 +169,7 @@ class totara_competency_data_provider_assignments_testcase extends totara_compet
 
         $this->assertNotEmpty($filtered);
 
-        $filtered->map(function(assignment $assignment) use ($competencies) {
+        $filtered->map(function (assignment $assignment) use ($competencies) {
             $this->assertEquals($competencies->item(1)->id, $assignment->competency_id);
         });
 

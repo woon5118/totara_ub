@@ -38,7 +38,7 @@ use totara_core\advanced_feature;
 class scale_achievements implements query_resolver {
 
     /**
-     * Returns the achivement configuration for a specific competency.
+     * Returns the achievement configuration for a specific competency.
      *
      * @param array $args
      * @param execution_context $ec

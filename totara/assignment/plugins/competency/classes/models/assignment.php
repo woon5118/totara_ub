@@ -529,8 +529,8 @@ class assignment {
             case 'min_value':
                 return $this->get_min_value();
 
+            // We fall back to the default if it's not there intentionally
             case 'assigned_at':
-                // We fall back to the default if it's not there intentionally
                 if ($this->entity->relation_loaded('assignment_user')) {
                     // The relation might be loaded, but the related model does not always exist,
                     // for example there is no assignment user for archived assignments...

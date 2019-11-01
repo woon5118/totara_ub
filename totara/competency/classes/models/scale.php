@@ -75,7 +75,7 @@ class scale extends entity_model {
     public static function find_by_ids(array $ids, bool $with_values = true): collection {
         return scale_entity::repository()
             ->where('id', 'in', static::sanitize_ids($ids))
-            ->when($with_values, function(repository $repository) {
+            ->when($with_values, function (repository $repository) {
                 $repository->with('values');
             })
             ->get()

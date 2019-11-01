@@ -127,7 +127,7 @@ class competency_repository extends hierarchy_item_repository {
      * @return $this
      */
     public function with_assignments_count(): competency_repository {
-        $this->add_select((new subquery(function(builder $builder) {
+        $this->add_select((new subquery(function (builder $builder) {
             $builder->from('totara_assignment_competencies')
                 ->as('count_tac')
                 ->select('count(id)')

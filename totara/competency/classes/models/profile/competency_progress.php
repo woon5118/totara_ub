@@ -109,7 +109,7 @@ class competency_progress {
     public static function build_from_assignments(collection $assignments) {
         $progress = new collection();
 
-        $assignments->map(function(assignment $assignment) use ($progress) {
+        $assignments->map(function (assignment $assignment) use ($progress) {
             if (!$progress->item($assignment->competency_id)) {
                 $progress->set(new static($assignment), $assignment->competency_id);
             } else {
@@ -131,7 +131,8 @@ class competency_progress {
         return static::build_from_assignments(
             assignments::for($user)->set_filters([
                 'competency_id' => $competency_id,
-            ])->fetch()->get())->first();
+            ])->fetch()->get()
+        )->first();
     }
 
     /**

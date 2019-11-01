@@ -164,7 +164,7 @@ class proficiency_value {
      * @return float
      */
     protected static function calculate_scale_value_percentage(scale_value $value, scale $scale): float {
-        $pos = $scale->values->reduce(function($pos, $scale_value) use ($value) {
+        $pos = $scale->values->reduce(function ($pos, $scale_value) use ($value) {
             if ($value->sortorder <= $scale_value->sortorder) {
                 $pos += 1;
             }

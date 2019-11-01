@@ -107,9 +107,10 @@ abstract class totara_competency_testcase extends advanced_testcase {
      *
      * It also creates related user groups (audience, position, organisation) however these aren't returned.
      *
+     * @param bool $ignore_order Do not sleep during data creation
      * @return array
      */
-    protected function create_sorting_testing_data() {
+    protected function create_sorting_testing_data(bool $ignore_order = false) {
         $expander = new expand_task(builder::get_db());
 
         // Create 2 users
@@ -176,7 +177,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
 
         $expander->expand_all();
 
-        $this->waitForSecond();
+        !$ignore_order && $this->waitForSecond();
 
         // ------------------
         // Second assignments set
@@ -206,7 +207,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
 
         $expander->expand_all();
 
-        $this->waitForSecond();
+        !$ignore_order && $this->waitForSecond();
 
         // ------------------
         // Third assignments set
@@ -230,7 +231,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
 
         $expander->expand_all();
 
-        $this->waitForSecond();
+        !$ignore_order && $this->waitForSecond();
 
         // ------------------
 
@@ -338,79 +339,77 @@ abstract class totara_competency_testcase extends advanced_testcase {
 
         // Create user group(s)
 
-        {
-            $pos_users = array_merge(
-                [$users->item(19)],
-                array_slice($users->all(),0, 5)
+        $pos_users = array_merge(
+            [$users->item(19)],
+            array_slice($users->all(),0, 5)
+        );
+
+        $org_users = array_merge(
+            [$users->item(19)],
+            array_slice($users->all(),5, 5)
+        );
+
+        $audience_users = array_merge(
+            [$users->item(19)],
+            array_slice($users->all(),10, 5)
+        );
+
+        // Create position
+        $position = $this->generator()->create_position_and_add_members($pos_users);
+
+        // Create organisation
+        $organisation = $this->generator()->create_organisation_and_add_members($org_users);
+
+        // Create audience
+        $audience = $this->generator()->create_cohort_and_add_members($audience_users);
+
+        // Create assignments for a position and organisation
+        for ($i = 1; $i <= 3; $i++) {
+            $assignments->item('pos')->append(
+                $this->generator()->create_position_assignment(
+                    $competencies->item($i)->id,
+                    $position->id,
+                    $this->attributes_with_ts()
+                )
             );
 
-            $org_users = array_merge(
-                [$users->item(19)],
-                array_slice($users->all(),5, 5)
+            $assignments->item('org')->append(
+                $this->generator()->create_organisation_assignment(
+                    $competencies->item($i)->id,
+                    $organisation->id,
+                    $this->attributes_with_ts()
+                )
             );
 
-            $audience_users = array_merge(
-                [$users->item(19)],
-                array_slice($users->all(),10, 5)
+            $assignments->item('audience')->append(
+                $this->generator()->create_cohort_assignment(
+                    $competencies->item($i)->id,
+                    $audience->id,
+                    $this->attributes_with_ts()
+                )
             );
 
-            // Create position
-            $position = $this->generator()->create_position_and_add_members($pos_users);
-
-            // Create organisation
-            $organisation = $this->generator()->create_organisation_and_add_members($org_users);
-
-            // Create audience
-            $audience = $this->generator()->create_cohort_and_add_members($audience_users);
-
-            // Create assignments for a position and organisation
-            for($i = 1; $i <= 3; $i++) {
-                $assignments->item('pos')->append(
-                    $this->generator()->create_position_assignment(
-                        $competencies->item($i)->id,
-                        $position->id,
-                        $this->attributes_with_ts()
-                    )
-                );
-
-                $assignments->item('org')->append(
-                    $this->generator()->create_organisation_assignment(
-                        $competencies->item($i)->id,
-                        $organisation->id,
-                        $this->attributes_with_ts()
-                    )
-                );
-
-                $assignments->item('audience')->append(
-                    $this->generator()->create_cohort_assignment(
-                        $competencies->item($i)->id,
-                        $audience->id,
-                        $this->attributes_with_ts()
-                    )
-                );
-
-                $assignments->item('user')->append(
-                    $this->generator()->create_user_assignment(
-                        $competencies->item($i)->id,
-                        $users->item(18)->id,
-                        $this->attributes_with_ts()
-                    )
-                );
-
-                $assignments->item('user')->append(
-                    $this->generator()->create_user_assignment(
-                        $competencies->item($i)->id,
-                        $users->item(19)->id,
-                        $this->attributes_with_ts()
-                    )
-                );
-            }
-
-            // Let's create self assignments as well
             $assignments->item('user')->append(
-                $this->generator()->create_self_assignment($competencies->item(4)->id, $users->item(19)->id)
+                $this->generator()->create_user_assignment(
+                    $competencies->item($i)->id,
+                    $users->item(18)->id,
+                    $this->attributes_with_ts()
+                )
+            );
+
+            $assignments->item('user')->append(
+                $this->generator()->create_user_assignment(
+                    $competencies->item($i)->id,
+                    $users->item(19)->id,
+                    $this->attributes_with_ts()
+                )
             );
         }
+
+        // Let's create self assignments as well
+        $assignments->item('user')->append(
+            $this->generator()->create_self_assignment($competencies->item(4)->id, $users->item(19)->id)
+        );
 
         $task = new expand_task($GLOBALS['DB']);
         $task->expand_all();
@@ -436,7 +435,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
         $task->expand_all();;
 
         // Now let's archive a few assignments and re-evaluate :)
-        $assignments->item('user')->filter(function($assignment) use ($users) {
+        $assignments->item('user')->filter(function ($assignment) use ($users) {
             $assignment = new assignment($assignment);
 
             if ($assignment->user_group_type === user_groups::USER &&
@@ -480,8 +479,8 @@ abstract class totara_competency_testcase extends advanced_testcase {
                 ->create_competency(
                     ['description' => 'The description. This is a predefined key phrase for searching a competency'], $competencies->first()->frameworkid
                 )
-        )
-        ;
+        );
+
         $competencies->append($comp = $this->generator()->create_competency());
         $competencies->append($this->generator()->create_competency([], $comp->frameworkid));
 

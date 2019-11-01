@@ -132,7 +132,7 @@ class item {
     public static function build_from_assignments(collection $assignments) {
         $progress = new collection();
 
-        $assignments->map(function(assignment $assignment) use ($progress) {
+        $assignments->map(function (assignment $assignment) use ($progress) {
             $model = assignment_model::load_by_entity($assignment);
             if (!$progress->item($key = static::build_key(
                 $assignment->type,
@@ -197,7 +197,7 @@ class item {
      */
     public function calculate_overall_progress() {
         // Let's iterate over progress items and calculate individual progress percentage
-        $competent_count = $this->get_assignments()->reduce(function($count, $assignment) {
+        $competent_count = $this->get_assignments()->reduce(function ($count, $assignment) {
             return $count + intval($assignment->current_achievement->proficient ?? 0);
         }, 0);
 

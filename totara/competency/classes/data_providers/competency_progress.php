@@ -94,7 +94,7 @@ class competency_progress extends user_data_provider {
                 break;
 
             case 'alphabetical':
-                $this->items->sort(function($a, $b) {
+                $this->items->sort(function ($a, $b) {
                     return $a->competency->fullname <=> $b->competency->fullname;
                 });
                 break;
@@ -120,12 +120,12 @@ class competency_progress extends user_data_provider {
      * @return mixed
      */
     protected function get_latest_assignment_by_field(collection $assignments, string $field) {
-        return $assignments->reduce(function (int $maxDate, assignment $assignment) use ($field) {
-            if ($assignment->get_field($field) > $maxDate) {
-                $maxDate = $assignment->get_field($field);
+        return $assignments->reduce(function (int $max_date, assignment $assignment) use ($field) {
+            if ($assignment->get_field($field) > $max_date) {
+                $max_date = $assignment->get_field($field);
             }
 
-            return $maxDate;
+            return $max_date;
         }, 0);
     }
 

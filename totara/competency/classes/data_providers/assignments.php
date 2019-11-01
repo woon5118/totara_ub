@@ -64,10 +64,12 @@ class assignments extends user_data_provider {
         // Let's outline the relations we want to fetch the assignments with
         $repo = $this->assignments_repository_for_user()->with([
             'competency' => function (repository $repository) {
-                $repository->with(['scale' => function (repository $repository) {
-                    $repository->with('values')
-                        ->with('min_proficient_value');
-                }]);
+                $repository->with([
+                    'scale' => function (repository $repository) {
+                        $repository->with('values')
+                            ->with('min_proficient_value');
+                    }
+                ]);
             },
             'current_achievement' => function (repository $repository) {
                 $repository->where('user_id', $this->get_user()->id)
@@ -268,7 +270,7 @@ class assignments extends user_data_provider {
             $repository->join('comp', 'competency_id', 'id');
         }
 
-        $repository->where(function(builder $builder) use ($value) {
+        $repository->where(function (builder $builder) use ($value) {
             $builder->where('comp.fullname', 'ilike', $value)
                 ->or_where('comp.description', 'ilike', $value);
         });

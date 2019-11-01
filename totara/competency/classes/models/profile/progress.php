@@ -126,11 +126,8 @@ class progress {
      * @return mixed|null
      */
     public function __get($name) {
-        if (in_array($name, $this->public_attributes)) {
-            return $this->{$name};
-        }
-
-        return null;
+        // ?? will trigger isset and check for public attributes only
+        return $this->{$name} ?? null;
     }
 
     /**

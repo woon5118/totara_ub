@@ -53,7 +53,8 @@ class totara_competency_model_scale_testcase extends advanced_testcase {
         // Let's also check that it loaded values correctly
         $this->assert_scale_is_good(
             scale::find_by_ids([$expected->item(0)->id, $expected->item(2)->id], true),
-            true);
+            true
+        );
 
         $this->assertEqualsCanonicalizing(
             (new scale_entity($expected->item(1)->id))->to_array(),
@@ -114,7 +115,7 @@ class totara_competency_model_scale_testcase extends advanced_testcase {
      * @param bool $with_values Check whether it should have values loaded or not
      */
     protected function assert_scale_is_good(collection $scales, bool $with_values = false) {
-        $scales->map(function(scale $scale) use ($with_values) {
+        $scales->map(function (scale $scale) use ($with_values) {
             $this->assertInstanceOf(scale::class, $scale);
 
             $exp = (new scale_entity($scale->get_id()))->to_array();
@@ -131,13 +132,11 @@ class totara_competency_model_scale_testcase extends advanced_testcase {
 
                 $this->assertEqualsCanonicalizing($expected->pluck('name'), $scale->values->pluck('name'));
 
-                $scale->values->map(function(scale_value $scale_value) use ($expected) {
+                $scale->values->map(function (scale_value $scale_value) use ($expected) {
                     $this->assertEqualsCanonicalizing($expected->item($scale_value->id)->to_array(), $scale_value->to_array());
                 });
 
                 unset($scale_array['values']);
-
-
             } else {
                 $this->assertFalse(isset($scale_array['values']));
             }
