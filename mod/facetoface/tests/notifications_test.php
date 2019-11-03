@@ -41,6 +41,7 @@ require_once($CFG->dirroot . '/totara/customfield/field/datetime/field.class.php
 use mod_facetoface\{signup_helper, seminar_event, trainer_helper};
 
 class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_testcase {
+
     /**
      * PhpUnit fixture method that runs before the test method executes.
      */
@@ -66,8 +67,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
      * @param null|array|\stdClass $options
      * @return \stdClass
      */
-    private function createCourse($record = null, $options = null)
-    {
+    private function createCourse($record = null, $options = null) {
         return $this->getDataGenerator()->create_course($record, $options);
     }
 
@@ -906,7 +906,8 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $expectedmsg .= "That is all.";
         $this->assertEquals($expectedmsg, $replacedmsg);
     }
- public function test_facetoface_notification_loop_session_placeholders_no_session() {
+
+    public function test_facetoface_notification_loop_session_placeholders_no_session() {
         $msg = "Testing with non-saved session. A[#sessions]Start time is [session:starttime]. Finish time is [session:finishtime].\n[/sessions]A";
         $msg .= " I repeat: [#sessions]Start date is [session:startdate]. Finish date is [session:finishdate].\n[/sessions]";
         $msg .= " That is all.";
@@ -1109,6 +1110,367 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $expectedmsg .= "Room Two has custom text of .\n";
         $expectedmsg .= "Room Two has a custom location of .\n";
         $expectedmsg .= "Those are all the details.";
+
+        $this->assertEquals($expectedmsg, $replacedmsg);
+    }
+
+    /*
+     * Creates a seminar event with two sessions. 
+     * One has a single room, asset, and facilitator; the other has two of each.
+     * @return array [$session, $roomlist, $roomcf, $attachmenturls] for use with following session loop tests
+     */
+    private function setup_for_multiple_attachment_session_placeholders() {
+        global $DB;
+
+        // Store and return attachment urls.
+        $attachmenturls = ['room', 'asset', 'facilitator'];
+
+        // We'll use the server timezone otherwise this test will fail in some parts of the world and not others.
+        $timezone = core_date::get_server_timezone();
+
+        $times = $this->create_array_of_times();
+
+        $course = $this->getDataGenerator()->create_course();
+
+        /** @var mod_facetoface_generator $facetofacegenerator */
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+
+        $facetofacedata = array(
+            'name' => 'facetoface',
+            'course' => $course->id
+        );
+        $facetoface = $facetofacegenerator->create_instance($facetofacedata);
+
+        /** @var totara_customfield_generator $customfieldgenerator */
+        $customfieldgenerator = $this->getDataGenerator()->get_plugin_generator('totara_customfield');
+
+        // Use existing room custom fields.
+        $roomcustomfields = customfield_get_fields_definition('facetoface_room');
+        foreach ($roomcustomfields as $cfdef) {
+            $roomcustomfields[$cfdef->shortname] = $cfdef->id;
+        }
+        
+        // Create asset and facilitator custom fields
+        $cfsettings = array('color'); // Will have the shortname of color
+        $assetcustomfields = $customfieldgenerator->create_text('facetoface_asset', $cfsettings);
+        $cfsettings = array('t-shirt'); // Will have the shortname of tshirt
+        $facilitatorcustomfields = $customfieldgenerator->create_text('facetoface_facilitator', $cfsettings);
+
+        // Create a room with building and location.
+        $room1 = new stdClass();
+        $room1->name = 'Room One';
+        $room1->capacity = 20;
+        $room1->timemodified = time();
+        $room1->timecreated = $room1->timemodified;
+        $room1->id = $DB->insert_record('facetoface_room', $room1);
+        $customfieldgenerator->set_text($room1, $roomcustomfields['building'], 'Catalyst House', 'facetofaceroom', 'facetoface_room');
+        $customfieldgenerator->set_location_address($room1, $roomcustomfields['location'], '150 Willis Street', 'facetofaceroom', 'facetoface_room');
+        $attachmenturls['room'][1] = new moodle_url('/mod/facetoface/reports/rooms.php', ['roomid' => $room1->id]);
+
+        // Create another room with building only.
+        $room2 = new stdClass();
+        $room2->name = 'Room Two';
+        $room2->capacity = 40;
+        $room2->timemodified = time();
+        $room2->timecreated = $room2->timemodified;
+        $room2->id = $DB->insert_record('facetoface_room', $room2);
+        $customfieldgenerator->set_text($room2, $roomcustomfields['building'], 'South Campus', 'facetofaceroom', 'facetoface_room');
+        $attachmenturls['room'][2] = new moodle_url('/mod/facetoface/reports/rooms.php', ['roomid' => $room2->id]);
+
+        // Create a third room with location only.
+        $room3 = new stdClass();
+        $room3->name = 'Room Three';
+        $room3->capacity = 40;
+        $room3->timemodified = time();
+        $room3->timecreated = $room3->timemodified;
+        $room3->id = $DB->insert_record('facetoface_room', $room3);
+        $customfieldgenerator->set_location_address($room3, $roomcustomfields['location'], '186 Willis Street', 'facetofaceroom', 'facetoface_room');
+        $attachmenturls['room'][3] = new moodle_url('/mod/facetoface/reports/rooms.php', ['roomid' => $room3->id]);
+
+        // Create an asset with color.
+        $asset1 = new stdClass();
+        $asset1->name = 'Asset One';
+        $asset1->timemodified = time();
+        $asset1->timecreated = $asset1->timemodified;
+        $asset1->id = $DB->insert_record('facetoface_asset', $asset1);
+        $customfieldgenerator->set_text($asset1, $assetcustomfields['color'], 'Gold', 'facetofaceasset', 'facetoface_asset');
+        $attachmenturls['asset'][1] = new moodle_url('/mod/facetoface/reports/assets.php', ['assetid' => $asset1->id]);
+
+        // Create another asset with color.
+        $asset2 = new stdClass();
+        $asset2->name = 'Asset Two';
+        $asset2->timemodified = time();
+        $asset2->timecreated = $asset2->timemodified;
+        $asset2->id = $DB->insert_record('facetoface_asset', $asset2);
+        $customfieldgenerator->set_text($asset2, $assetcustomfields['color'], 'Silver', 'facetofaceasset', 'facetoface_asset');
+        $attachmenturls['asset'][2] = new moodle_url('/mod/facetoface/reports/assets.php', ['assetid' => $asset2->id]);
+
+        // Create a third asset with no color
+        $asset3 = new stdClass();
+        $asset3->name = 'Asset Three';
+        $asset3->timemodified = time();
+        $asset3->timecreated = $asset3->timemodified;
+        $asset3->id = $DB->insert_record('facetoface_asset', $asset3);
+        $attachmenturls['asset'][3] = new moodle_url('/mod/facetoface/reports/assets.php', ['assetid' => $asset3->id]);
+
+        // Create a facilitator with tshirt.
+        $facilitator1 = new stdClass();
+        $facilitator1->name = 'Facilitator One';
+        $facilitator1->timemodified = time();
+        $facilitator1->timecreated = $facilitator1->timemodified;
+        $facilitator1->id = $DB->insert_record('facetoface_facilitator', $facilitator1);
+        $customfieldgenerator->set_text($facilitator1, $facilitatorcustomfields['t-shirt'], 'Medium', 'facetofacefacilitator', 'facetoface_facilitator');
+        $attachmenturls['facilitator'][1] = new moodle_url('/mod/facetoface/reports/facilitators.php', ['facilitatorid' => $facilitator1->id]);
+
+        // Create another facilitator with tshirt.
+        $facilitator2 = new stdClass();
+        $facilitator2->name = 'Facilitator Two';
+        $facilitator2->timemodified = time();
+        $facilitator2->timecreated = $facilitator2->timemodified;
+        $facilitator2->id = $DB->insert_record('facetoface_facilitator', $facilitator2);
+        $customfieldgenerator->set_text($facilitator2, $facilitatorcustomfields['t-shirt'], 'Large', 'facetofacefacilitator', 'facetoface_facilitator');
+        $attachmenturls['facilitator'][2] = new moodle_url('/mod/facetoface/reports/facilitators.php', ['facilitatorid' => $facilitator2->id]);
+
+        // Create a third facilitator with no tshirt
+        $facilitator3 = new stdClass();
+        $facilitator3->name = 'Facilitator Three';
+        $facilitator3->timemodified = time();
+        $facilitator3->timecreated = $facilitator3->timemodified;
+        $facilitator3->id = $DB->insert_record('facetoface_facilitator', $facilitator3);
+        $attachmenturls['facilitator'][3] = new moodle_url('/mod/facetoface/reports/facilitators.php', ['facilitatorid' => $facilitator3->id]);
+
+        // Set up the face-to-face session.
+        $sessiondate1 = new stdClass();
+        $sessiondate1->sessiontimezone = $timezone;
+        $sessiondate1->timestart = $times['start1'];
+        $sessiondate1->timefinish = $times['end1'];
+        $sessiondate1->roomids = [$room1->id];
+        $sessiondate1->assetids = [$asset1->id];
+        $sessiondate1->facilitatorids = [$facilitator1->id];
+
+        $sessiondate2 = new stdClass();
+        $sessiondate2->sessiontimezone = $timezone;
+        $sessiondate2->timestart = $times['start2'];
+        $sessiondate2->timefinish = $times['end2'];
+        $sessiondate2->roomids = [$room2->id, $room3->id];
+        $sessiondate2->assetids = [$asset2->id, $asset3->id];
+        $sessiondate2->facilitatorids = [$facilitator2->id, $facilitator3->id];
+
+        $sessiondata = array(
+            'facetoface' => $facetoface->id,
+            'capacity' => 3,
+            'allowoverbook' => 1,
+            'sessiondates' => array($sessiondate1, $sessiondate2),
+            'mincapacity' => '1',
+            'cutoff' => DAYSECS - 60
+        );
+
+        $sessionid = $facetofacegenerator->add_session($sessiondata);
+        $seminarevent = new seminar_event($sessionid);
+
+        // Now get all the data we've created.
+        $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
+        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
+        // Get data for room custom fields.
+        $roomcf = [];
+        $roomlist = \mod_facetoface\room_list::get_event_rooms($session->id);
+        foreach ($roomlist as $room) {
+            $roomcf[$room->get_id()] = customfield_get_data($room->to_record(), "facetoface_room", "facetofaceroom", false);
+        }
+
+        return [$session, $roomlist, $roomcf, $attachmenturls];
+    }
+
+    /**
+     * Test [session:room:name] and friends with multiple rooms
+     */
+    public function test_facetoface_notification_loop_session_placeholders_multiple_rooms() {
+        list($session, $roomlist, $roomcf, $attachmenturls) = $this->setup_for_multiple_attachment_session_placeholders();
+
+        $roomurls = $attachmenturls['room'];
+
+        $msg = "The details for each session:\n";
+        $msg .= "[#sessions]\n";
+        $msg .= "Room: [session:room:name]\n";
+        $msg .= "Building: [session:room:cf_building]\n";
+        $msg .= "Location: [session:room:cf_location]\n";
+        $msg .= "[session:room:link]\n";
+        $msg .= "[/sessions]\n";
+        $msg .= "Those are all the details.";
+
+        $replacedmsg = strip_tags(facetoface_notification_loop_session_placeholders($msg, $session, $roomlist, $roomcf));
+
+        $expectedmsg = "The details for each session:\n";
+        $expectedmsg .= "\nRoom: Room One\n";
+        $expectedmsg .= "Building: Catalyst House\n";
+        $expectedmsg .= "Location: 150 Willis Street\n";
+        $expectedmsg .= "{$roomurls[1]}\n";
+        $expectedmsg .= "\nRoom: \n";
+        $expectedmsg .= " Room Three\n";
+        $expectedmsg .= " Room Two\n";
+        $expectedmsg .= "Building: \n";
+        $expectedmsg .= " \n";
+        $expectedmsg .= " South Campus\n";
+        $expectedmsg .= "Location: \n";
+        $expectedmsg .= " 186 Willis Street\n";
+        $expectedmsg .= " \n";
+        $expectedmsg .= "\n";
+        $expectedmsg .= " {$roomurls[3]}\n";
+        $expectedmsg .= " {$roomurls[2]}\n";
+        $expectedmsg .= "\nThose are all the details.";
+
+        $this->assertEquals($expectedmsg, $replacedmsg);
+    }
+
+    /**
+     * Test [session:rooms] placeholder.
+     */
+    public function test_facetoface_notification_loop_session_roomdetails() {
+        list($session, $roomlist, $roomcf, $attachmenturls) = $this->setup_for_multiple_attachment_session_placeholders();
+
+        $roomurls = $attachmenturls['room'];
+
+        $msg = "The details for each session:\n";
+        $msg .= "[#sessions]\n";
+        $msg .= "[session:rooms]\n";
+        $msg .= "[/sessions]\n";
+        $msg .= "Those are all the details.";
+
+        $replacedmsg = strip_tags(facetoface_notification_loop_session_placeholders($msg, $session, $roomlist, $roomcf));
+
+        $expectedmsg = "The details for each session:\n";
+        $expectedmsg .= "\nRoom: ";
+        $expectedmsg .= "Room One\n Catalyst House\n 150 Willis Street\n {$roomurls[1]}\n";
+        $expectedmsg .= "\nRooms:\n";
+        $expectedmsg .= "Room Three\n 186 Willis Street\n {$roomurls[3]}\n";
+        $expectedmsg .= "Room Two\n South Campus\n {$roomurls[2]}\n";
+        $expectedmsg .= "\nThose are all the details.";
+
+        $this->assertEquals($expectedmsg, $replacedmsg);
+    }
+
+    /**
+     * Test [session:asset:nnn] placeholders
+     */
+    public function test_facetoface_notification_loop_session_asset_placeholders() {
+        list($session, $roomlist, $roomcf, $attachmenturls) = $this->setup_for_multiple_attachment_session_placeholders();
+
+        $asseturls = $attachmenturls['asset'];
+
+        $msg = "The details for each session:\n";
+        $msg .= "[#sessions]\n";
+        $msg .= "Asset: [session:asset:name]\n";
+        $msg .= "Colour: [session:asset:cf_color]\n";
+        $msg .= "[session:asset:link]\n";
+        $msg .= "[/sessions]\n";
+        $msg .= "Those are all the details.";
+
+        $replacedmsg = strip_tags(facetoface_notification_loop_session_placeholders($msg, $session, $roomlist, $roomcf));
+
+        $expectedmsg = "The details for each session:\n";
+        $expectedmsg .= "\nAsset: Asset One\n";
+        $expectedmsg .= "Colour: Gold\n";
+        $expectedmsg .= "{$asseturls[1]}\n";
+        $expectedmsg .= "\nAsset: \n";
+        $expectedmsg .= " Asset Three\n";
+        $expectedmsg .= " Asset Two\n";
+        $expectedmsg .= "Colour: \n";
+        $expectedmsg .= " \n";
+        $expectedmsg .= " Silver\n";
+        $expectedmsg .= "\n";
+        $expectedmsg .= " {$asseturls[3]}\n";
+        $expectedmsg .= " {$asseturls[2]}\n";
+        $expectedmsg .= "\nThose are all the details.";
+
+        $this->assertEquals($expectedmsg, $replacedmsg);
+    }
+
+    /**
+     * Test [session:assets] placeholder.
+     */
+    public function test_facetoface_notification_loop_session_assetdetails() {
+        list($session, $roomlist, $roomcf, $attachmenturls) = $this->setup_for_multiple_attachment_session_placeholders();
+
+        $asseturls = $attachmenturls['asset'];
+
+        $msg = "The details for each session:\n";
+        $msg .= "[#sessions]\n";
+        $msg .= "[session:assets]\n";
+        $msg .= "[/sessions]\n";
+        $msg .= "Those are all the details.";
+
+        $replacedmsg = strip_tags(facetoface_notification_loop_session_placeholders($msg, $session, $roomlist, $roomcf));
+
+        $expectedmsg = "The details for each session:\n";
+        $expectedmsg .= "\nAsset: ";
+        $expectedmsg .= "Asset One\n {$asseturls[1]}\n";
+        $expectedmsg .= "\nAssets:\n";
+        $expectedmsg .= "Asset Three\n {$asseturls[3]}\n";
+        $expectedmsg .= "Asset Two\n {$asseturls[2]}\n";
+        $expectedmsg .= "\nThose are all the details.";
+
+        $this->assertEquals($expectedmsg, $replacedmsg);
+    }
+
+    /**
+     * Test [session:facilitator:nnn] placeholders
+     */
+    public function test_facetoface_notification_loop_session_facilitator_placeholders() {
+        list($session, $roomlist, $roomcf, $attachmenturls) = $this->setup_for_multiple_attachment_session_placeholders();
+
+        $facilitatorurls = $attachmenturls['facilitator'];
+
+        $msg = "The details for each session:\n";
+        $msg .= "[#sessions]\n";
+        $msg .= "Facilitator: [session:facilitator:name]\n";
+        $msg .= "T-Shirt: [session:facilitator:cf_t-shirt]\n";
+        $msg .= "[session:facilitator:link]\n";
+        $msg .= "[/sessions]\n";
+        $msg .= "Those are all the details.";
+
+        $replacedmsg = strip_tags(facetoface_notification_loop_session_placeholders($msg, $session, $roomlist, $roomcf));
+
+        $expectedmsg = "The details for each session:\n";
+        $expectedmsg .= "\nFacilitator: Facilitator One\n";
+        $expectedmsg .= "T-Shirt: Medium\n";
+        $expectedmsg .= "{$facilitatorurls[1]}\n";
+        $expectedmsg .= "\nFacilitator: \n";
+        $expectedmsg .= " Facilitator Three\n";
+        $expectedmsg .= " Facilitator Two\n";
+        $expectedmsg .= "T-Shirt: \n";
+        $expectedmsg .= " \n";
+        $expectedmsg .= " Large\n";
+        $expectedmsg .= "\n";
+        $expectedmsg .= " {$facilitatorurls[3]}\n";
+        $expectedmsg .= " {$facilitatorurls[2]}\n";
+        $expectedmsg .= "\nThose are all the details.";
+
+        $this->assertEquals($expectedmsg, $replacedmsg);
+    }
+
+    /**
+     * Test [session:facilitators] placeholder.
+     */
+    public function test_facetoface_notification_loop_session_facilitatordetails() {
+        list($session, $roomlist, $roomcf, $attachmenturls) = $this->setup_for_multiple_attachment_session_placeholders();
+
+        $facilitatorurls = $attachmenturls['facilitator'];
+
+        $msg = "The details for each session:\n";
+        $msg .= "[#sessions]\n";
+        $msg .= "[session:facilitators]\n";
+        $msg .= "[/sessions]\n";
+        $msg .= "Those are all the details.";
+
+        $replacedmsg = strip_tags(facetoface_notification_loop_session_placeholders($msg, $session, $roomlist, $roomcf));
+
+        $expectedmsg = "The details for each session:\n";
+        $expectedmsg .= "\nFacilitator: ";
+        $expectedmsg .= "Facilitator One\n {$facilitatorurls[1]}\n";
+        $expectedmsg .= "\nFacilitators:\n";
+        $expectedmsg .= "Facilitator Three\n {$facilitatorurls[3]}\n";
+        $expectedmsg .= "Facilitator Two\n {$facilitatorurls[2]}\n";
+        $expectedmsg .= "\nThose are all the details.";
 
         $this->assertEquals($expectedmsg, $replacedmsg);
     }

@@ -1638,6 +1638,7 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     // Legacy.
     $msg = str_replace(get_string('placeholder:registrationcutoff', 'facetoface'), $registrationcutoff, $msg);
 
+    // Session placeholders loop processing.
     $msg = facetoface_notification_loop_session_placeholders($msg, $data, null, [], $user);
 
     $details = '';
@@ -1719,6 +1720,9 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
 function facetoface_notification_loop_session_placeholders($msg, $session, $rooms = null, $roomcustomfields = array(), $user = null) {
     global $DB;
 
+    // Types of session attachment, as an array of $attachment_collection => $attachment_type pairs.
+    $attachment_types = ['rooms' => 'room', 'assets' => 'asset', 'facilitators' => 'facilitator'];
+
     $prevendposition = 0;
     $startposition = 0;
     while($startposition !== false) {
@@ -1754,28 +1758,44 @@ function facetoface_notification_loop_session_placeholders($msg, $session, $room
             'session:finishtime' => '[session:finishtime]',
             'session:timezone' => '[session:timezone]',
             'session:duration' => '[session:duration]',
-            'room:name' => '[session:room:name]',
-            'room:link' => '[session:room:link]');
+        );
+        foreach ($attachment_types as $attachment_type) {
+            $fixed_placeholders["{$attachment_type}:name"] = "[session:{$attachment_type}:name]";
+            $fixed_placeholders["{$attachment_type}:link"] = "[session:{$attachment_type}:link]";
+        }
 
         foreach ($fixed_placeholders as $key => $placeholderstring) {
             // Check if the placeholder is present in this segment.
-            if (strpos($templatesegment, $placeholderstring) !== false) {
-                $fixed_placeholders[$key] = $placeholderstring;
-            } else {
+            if (strpos($templatesegment, $placeholderstring) === false) {
                 // Remove if not present in template segment, which saves the processing involved
                 // in determining the value when it's not necessary.
                 unset($fixed_placeholders[$key]);
             }
         }
 
-        // Now add the room custom field placeholders.
-        $room_cf_placeholders = array();
-        $room_cf_names = $DB->get_records('facetoface_room_info_field', array('hidden' => 0), '', 'shortname');
-        foreach ($room_cf_names as $room_cf_name) {
-            $placeholderstring = "[session:room:cf_{$room_cf_name->shortname}]";
-            // Check if the placeholder is present in this segment.
-            if (strpos($templatesegment, $placeholderstring) !== false) {
-                $room_cf_placeholders[$room_cf_name->shortname] = $placeholderstring;
+        // Now add the room/asset/facilitator custom field placeholders.
+        $cf_placeholders = array();
+        foreach ($attachment_types as $attachment_type) {
+            $cf_placeholders[$attachment_type] = array();
+            $cf_table = "facetoface_{$attachment_type}_info_field";
+            $cf_names = $DB->get_records($cf_table, array('hidden' => 0), '', 'shortname');
+            foreach ($cf_names as $cf_name) {
+                $placeholderstring = "[session:{$attachment_type}:cf_{$cf_name->shortname}]";
+                // Check if the placeholder is present in this segment.
+                if (strpos($templatesegment, $placeholderstring) !== false) {
+                    $cf_placeholders[$attachment_type][$cf_name->shortname] = $placeholderstring;
+                }
+            }
+        }
+
+        // Now check for meta placeholders, and remove if not present.
+        $meta_placeholders = array();
+        foreach ($attachment_types as $attachment_collection => $attachment_type) {
+            $meta_placeholders["session:{$attachment_collection}"] = "[session:{$attachment_collection}]";
+        }
+        foreach ($meta_placeholders as $key => $placeholderstring) {
+            if (strpos($templatesegment, $placeholderstring) === false) {
+                unset($meta_placeholders[$key]);
             }
         }
 
@@ -1790,15 +1810,23 @@ function facetoface_notification_loop_session_placeholders($msg, $session, $room
             if (isset($user->timezone)) {
                 $sessiontimezone = ($sessiondate->sessiontimezone == 99 ? $user->timezone : $sessiondate->sessiontimezone);
             }
-            $roomcustomfields = [];
-            /** @var \mod_facetoface\room_list $rooms */
-            $rooms = \mod_facetoface\room_list::from_session($sessiondate->id);
-            foreach ($rooms as $room) {
-                $roomcustomfields[$room->get_id()] = customfield_get_data($room->to_record(), 'facetoface_room', 'facetofaceroom', false);
+            $attachments = array();
+            foreach ($attachment_types as $attachment_collection => $attachment_type) {
+                $list_class = '\mod_facetoface\\'.$attachment_type.'_list';
+                $attachments[$attachment_collection] = $list_class::from_session($sessiondate->id);
+                $attachments["{$attachment_type}customfields"] = [];
+                foreach ($attachments[$attachment_collection] as $attachment) {
+                    $attachments["{$attachment_type}customfields"][$attachment->get_id()] = customfield_get_data(
+                        $attachment->to_record(),
+                        "facetoface_{$attachment_type}",
+                        "facetoface{$attachment_type}",
+                        false
+                    );
+                }
             }
-            foreach ($fixed_placeholders as $type => $fixed_placeholder) {
+            foreach ($fixed_placeholders as $placeholder_type => $fixed_placeholder) {
                 $value = '';
-                switch ($type) {
+                switch ($placeholder_type) {
                     case 'session:startdate':
                         $value = userdate($sessiondate->timestart, $strftimedate, $sessiontimezone);
                         break;
@@ -1819,24 +1847,38 @@ function facetoface_notification_loop_session_placeholders($msg, $session, $room
                         $value = format_time((int)$sessiondate->timestart - (int)$sessiondate->timefinish);
                         break;
                     case 'room:name':
-                        if (!$rooms->is_empty()) {
-                            $place = [];
-                            /** @var \mod_facetoface\room $room */
-                            foreach ($rooms as $room) {
-                                $place[] = $room->get_name();
+                    case 'asset:name':
+                    case 'facilitator:name':
+                        list($attachment_type,$pholder) = explode(':', $placeholder_type);
+                        $attachment_collection = array_search($attachment_type, $attachment_types);
+                        if (!$attachments[$attachment_collection]->is_empty()) {
+                            $values = [];
+                            foreach ($attachments[$attachment_collection] as $attachment) {
+                                $values[] = $attachment->get_name();
                             }
-                            $value = implode(', ', $place);
+                            if (count($values) > 1) {
+                                $value = "\n<ol><li> " . implode("\n<li> ", $values) . '</ol>';
+                            } else {
+                                $value = $values[0];
+                            }
                         }
                         break;
                     case 'room:link':
-                        if (!$rooms->is_empty()) {
-                            $placeurl = [];
-                            /** @var \mod_facetoface\room $room */
-                            foreach ($rooms as $room) {
-                                $url = new moodle_url('/mod/facetoface/reports/rooms.php', ['roomid' => $room->get_id()]);
-                                $palceurl[] = html_writer::link($url, $url, ['title' => get_string('roomdetails', 'mod_facetoface')]);
+                    case 'asset:link':
+                    case 'facilitator:link':
+                        list($attachment_type,$pholder) = explode(':', $placeholder_type);
+                        $attachment_collection = array_search($attachment_type, $attachment_types);
+                        if (!$attachments[$attachment_collection]->is_empty()) {
+                            $values = [];
+                            foreach ($attachments[$attachment_collection] as $attachment) {
+                                $url = new moodle_url("/mod/facetoface/reports/{$attachment_collection}.php", ["{$attachment_type}id" => $attachment->get_id()]);
+                                $values[] = html_writer::link($url, $url, ['title' => get_string("{$attachment_type}details", 'mod_facetoface')]);
                             }
-                            $value = implode("\n<br>", $placeurl);
+                            if (count($values) > 1) {
+                                $value = "\n<ol><li> " . implode("\n<li> ", $values) . '</ol>';
+                            } else {
+                                $value = $values[0];
+                            }
                         }
                         break;
                     default:
@@ -1848,24 +1890,72 @@ function facetoface_notification_loop_session_placeholders($msg, $session, $room
                 }
                 $returnedsegments[$key] = str_replace($fixed_placeholder, $value, $returnedsegments[$key]);
             }
-            foreach ($room_cf_placeholders as $type => $room_cf_placeholder) {
-                $value = '';
-                if (!$rooms->is_empty()) {
-                    /** @var \mod_facetoface\room $room */
-                    $place = [];
-                    foreach ($rooms as $room) {
-                        if (!empty($roomcustomfields[$room->get_id()][$type])) {
-                            $place[] = $roomcustomfields[$room->get_id()][$type];
+            foreach ($attachment_types as $attachment_collection => $attachment_type) {
+                foreach ($cf_placeholders[$attachment_type] as $placeholder_type => $cf_placeholder) {
+                    $value = '';
+                    if (!$attachments[$attachment_collection]->is_empty()) {
+                        $values = [];
+                        $hasvalue = false;
+                        foreach ($attachments[$attachment_collection] as $attachment) {
+                            $customfields = $attachments["{$attachment_type}customfields"][$attachment->get_id()];
+                            if (isset($customfields[$placeholder_type]) && $customfields[$placeholder_type] !== '') {
+                                $values[] = $customfields[$placeholder_type];
+                                $hasvalue = true;
+                            } else {
+                                $values[] = '';
+                            }
+                        }
+                        if ($hasvalue) {
+                            if (count($values) > 1) {
+                                $value = "\n<ol><li> " . implode("\n<li> ", $values) . '</ol>';
+                            } else {
+                                $value = $values[0];
+                            }
                         }
                     }
-                    $value = implode("\n<br>", $place);
+                    // If the value for this field for this session is false or null, we'll use an empty string.
+                    if (is_null($value) or ($value === false)) {
+                        $value = '';
+                    }
+                    $returnedsegments[$key] = str_replace($cf_placeholder, $value, $returnedsegments[$key]);
                 }
-                // If the value for this field for this session is false or null, we'll use an empty string.
+            }
+            foreach ($meta_placeholders as $placeholder_type => $meta_placeholder) {
+                $value = '';
+                list($looper, $attachment_collection) = explode(':', $placeholder_type);
+                $attachment_type = $attachment_types[$attachment_collection];
+                if (!$attachments[$attachment_collection]->is_empty()) {
+                    $values = [];
+                    foreach ($attachments[$attachment_collection] as $attachment) {
+                        $url = new moodle_url("/mod/facetoface/reports/{$attachment_collection}.php", ["{$attachment_type}id" => $attachment->get_id()]);
+                        $partial = $attachment->get_name();
+                        if ($attachment_type == 'room') {
+                            $cfs_for_partial = array();
+                            foreach (['building', 'location'] as $cfkey) {
+                                if ($attachments['roomcustomfields'][$attachment->get_id()][$cfkey] ?? false) {
+                                    $cfs_for_partial[] = $attachments['roomcustomfields'][$attachment->get_id()][$cfkey];
+                                }
+                            }
+                            if (!empty($cfs_for_partial)) {
+                                $partial .= "\n<br> " . implode("\n<br> ", $cfs_for_partial);
+                            }
+                        }
+                        $partial .= "\n<br> " . html_writer::link($url, $url, ['title' => get_string("{$attachment_type}details", 'mod_facetoface')]);
+                        $values[] = $partial;
+                    }
+                    if (count($values) > 1) {
+                        $value = get_string("{$attachment_collection}", 'mod_facetoface') . ":\n" . '<ol><li>' . implode("\n<li>", $values) . '</ol>';
+                    } else {
+                        $value = get_string($attachment_type, 'mod_facetoface') . ': ' . '<span style="display: inline-block; vertical-align: top;">' . $values[0] . '</span>';
+                    }
+                }
                 if (is_null($value) or ($value === false)) {
                     $value = '';
                 }
-                $returnedsegments[$key] = str_replace($room_cf_placeholder, $value, $returnedsegments[$key]);
+                $returnedsegments[$key] = str_replace($meta_placeholder, $value, $returnedsegments[$key]);
             }
+            // Remove extra newline caused by </ol><br> condition from multiple rooms.
+            $returnedsegments[$key] = str_replace("</ol><br>", "</ol>", $returnedsegments[$key]);
         }
 
         $prestartloop = substr($msg, 0, $startposition);

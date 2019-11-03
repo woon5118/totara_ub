@@ -214,7 +214,8 @@ final class facilitator_list  implements \Iterator {
              LEFT JOIN {user} u ON u.id = ff.userid
             INNER JOIN {facetoface_facilitator_dates} ffd ON ffd.facilitatorid = ff.id
             INNER JOIN {facetoface_sessions_dates} fsd ON fsd.id = ffd.sessionsdateid
-                 WHERE ff.hidden = 0 AND fsd.id = :sessionid";
+                 WHERE ff.hidden = 0 AND fsd.id = :sessionid
+              ORDER BY ff.name ASC, ff.id ASC";
         $records = $DB->get_records_sql($sql, ['sessionid' => $sessionid]);
         $list = new static();
         foreach ($records as $record) {

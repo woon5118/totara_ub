@@ -198,7 +198,8 @@ final class asset_list implements \Iterator {
                   FROM {facetoface_asset} a
             INNER JOIN {facetoface_asset_dates} fad ON fad.assetid = a.id
             INNER JOIN {facetoface_sessions_dates} fsd ON fsd.id = fad.sessionsdateid
-                 WHERE fsd.id = :sessionid";
+                 WHERE fsd.id = :sessionid
+              ORDER BY a.name ASC, a.id ASC";
         $records = $DB->get_records_sql($sql, ['sessionid' => $sessionid]);
 
         $list = new static();

@@ -121,11 +121,13 @@ $string['approverrolename'] = 'Approver role';
 $string['approveuserevent'] = 'Approve {$a} for this event';
 $string['areyousureconfirmwaitlist'] = 'This will be over the event maximum bookings allowance. Are you sure you want to continue?';
 $string['assessmentyour'] = 'Your assessment';
+$string['asset'] = 'Asset';
 $string['assetalreadybooked'] = ' (asset unavailable on selected dates)';
 $string['assetcreatesuccess'] = 'Successfully created asset';
 $string['assetcustomfieldtab'] =' Asset';
 $string['assetdeleted'] = 'Asset deleted';
 $string['assetdescription'] = 'Asset description';
+$string['assetdetails'] = 'Asset details';
 $string['assetdoesnotexist'] = 'Asset does not exist';
 $string['assethide'] = 'Hide from users when choosing an asset on the Add/Edit event page';
 $string['assethidden'] = 'Asset hidden successfully';
@@ -166,8 +168,9 @@ There are several types of place holders, the patterns for each are as follows:
 * Event custom fields: [session:placeholder]
 * Event cancellation custom fields: [sessioncancel:placeholder]
 * Multiple session event details: [#sessions][session:placeholder][/sessions]
-* Room details for each session: [#sessions][session:room:placeholder][/sessions]
-* Room custom fields for each session: [#sessions][session:room:placeholder][/sessions]
+* Room/Asset/Facilitator details for each session: [#sessions][session:rooms][/sessions]
+* Room/Asset/Facilitator individual fields for each session: [#sessions][session:room:placeholder][/sessions]
+* Room/Asset/Facilitator custom fields for each session: [#sessions][session:room:cf_placeholder][/sessions]
 * User details: [placeholder]
 * User custom fields: [user:placeholder]
 
@@ -233,16 +236,33 @@ You can then add the following placeholders between these tags:
 
 The details of any rooms used for the session can also be added to the notification by using the desired placeholders from the following list.
 
-* [session:room:name] - name of room assigned to this session.
-* [session:room:link] - link to details page for this room.
+* [session:rooms] - room or list of rooms assigned to this session, each with building, location, and link to details.
+* [session:room:name] - name of each room assigned to this session.
+* [session:room:link] - link to details page for each room.
 
-### 4.2. Room custom fields for each session
-
-In addition to the above, room custom field information for each session can be added to the notification by using the following placeholder, replacing \'placeholder\' with the shortname for the custom field.
+Room custom field information for each session can be added to the notification by using the following placeholder, replacing \'placeholder\' with the shortname for the custom field.
 
     [session:room:cf_placeholder]
 
-For example if you have a room custom field with the shortname \'building\', to use the value recorded in the custom field in the notification body you would use the placeholder [session:room:building].
+For example if you have a room custom field with the shortname \'building\', to use the value recorded in the custom field in the notification body you would use the placeholder [session:room:cf_building].
+
+### 4.2. Asset details for each session
+
+The details of any assets used for the session can also be added to the notification by using the desired placeholders from the following list.
+
+* [session:assets] - asset or list of assets assigned to this session, with link(s) to details.
+* [session:asset:name] - name of each asset assigned to this session.
+* [session:asset:link] - link to details page for each asset.
+* [session:asset:cf_placeholder] - asset custom field information for each session, replacing \'placeholder\' with the shortname for the custom field.
+
+### 4.3. Facilitator details for each session
+
+The details of any facilitators used for the session can also be added to the notification by using the desired placeholders from the following list.
+
+* [session:facilitators] - facilitator or list of facilitators assigned to this session, with link(s) to details.
+* [session:facilitator:name] - name of each facilitator assigned to this session.
+* [session:facilitator:link] - link to details page for each facilitator.
+* [session:facilitator:cf_placeholder] - facilitator custom field information for each session, replacing \'placeholder\' with the shortname for the custom field.
 
 ### 5. User details
 
@@ -801,12 +821,14 @@ $string['facetoface:viewinterestreport'] = 'View seminar declared interest repor
 $string['facetofacebooking'] = 'Seminar booking';
 $string['facetofacename'] = 'Seminar name';
 $string['facetofacesession'] = 'Seminar event';
+$string['facilitator'] = 'Facilitator';
 $string['facilitatoralreadybooked'] = ' (facilitator unavailable on selected dates)';
 $string['facilitatoravailable'] = 'Facilitator availability';
 $string['facilitatorcreatesuccess'] = 'Successfully created facilitator';
 $string['facilitatorcustomfieldtab'] = 'Facilitator';
 $string['facilitatordeleted'] = 'Facilitator deleted';
 $string['facilitatordisplayname'] = '{$a->name} ({$a->fullname})';
+$string['facilitatordetails'] = 'Facilitator details';
 $string['facilitatorexternal'] = 'External';
 $string['facilitatorid'] = 'Facilitator ID';
 $string['facilitatorinternal'] = 'Internal';
@@ -1449,10 +1471,8 @@ Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
-Room: [session:room:name]
-Building: [session:room:cf_building]
-Location: [session:room:cf_location]
-[session:room:link]
+[session:rooms]
+[session:facilitators]
 [/sessions]
 ';
 $string['setting:defaultcancellationsubject'] = 'Default subject line for cancellation emails.';
@@ -1485,10 +1505,8 @@ Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
-Room: [session:room:name]
-Building: [session:room:cf_building]
-Location: [session:room:cf_location]
-[session:room:link]
+[session:rooms]
+[session:facilitators]
 [/sessions]
 ';
 $string['setting:defaultcancelreservationsubjectdefault'] = 'Reservation cancellation';
@@ -1516,10 +1534,8 @@ Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
-Room: [session:room:name]
-Building: [session:room:cf_building]
-Location: [session:room:cf_location]
-[session:room:link]
+[session:rooms]
+[session:facilitators]
 [/sessions]
 ';
 $string['setting:defaultdeclineinstrmngr'] = 'Default decline message sent to managers.';
@@ -1567,10 +1583,8 @@ Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
-Room: [session:room:name]
-Building: [session:room:cf_building]
-Location: [session:room:cf_location]
-[session:room:link]
+[session:rooms]
+[session:facilitators]
 [/sessions]
 ';
 $string['setting:defaultdeclinesubject'] = 'Default subject line for decline emails.';
@@ -1631,10 +1645,8 @@ Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
-Room: [session:room:name]
-Building: [session:room:cf_building]
-Location: [session:room:cf_location]
-[session:room:link]
+[session:rooms]
+[session:facilitators]
 [/sessions]
 
 ***Please arrive ten minutes before the course starts***
@@ -1672,10 +1684,8 @@ Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
-Room: [session:room:name]
-Building: [session:room:cf_building]
-Location: [session:room:cf_location]
-[session:room:link]
+[session:rooms]
+[session:facilitators]
 [/sessions]
 ';
 $string['setting:defaultdatetimechangesubject'] = 'Default subject line for date/time change emails.';
@@ -1707,10 +1717,8 @@ Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
-Room: [session:room:name]
-Building: [session:room:cf_building]
-Location: [session:room:cf_location]
-[session:room:link]
+[session:rooms]
+[session:facilitators]
 [/sessions]
 ';
 $string['setting:defaultpendingreqclosuresubject'] = 'Default subject line for registration closure emails.';
@@ -1745,10 +1753,8 @@ Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
-Room: [session:room:name]
-Building: [session:room:cf_building]
-Location: [session:room:cf_location]
-[session:room:link]
+[session:rooms]
+[session:facilitators]
 [/sessions]
 ';
 $string['setting:defaultregistrationexpiredmessagedefault_v9'] = 'The registration period for the following session has been closed:
@@ -1761,10 +1767,8 @@ Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
-Room: [session:room:name]
-Building: [session:room:cf_building]
-Location: [session:room:cf_location]
-[session:room:link]
+[session:rooms]
+[session:facilitators]
 [/sessions]
 ';
 $string['setting:defaultdatetimechangesubjectdefault'] = 'Face-to-face booking date/time changed: [seminarname], [starttime]-[finishtime], [sessiondate]';
@@ -1825,10 +1829,8 @@ Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
-Room: [session:room:name]
-Building: [session:room:cf_building]
-Location: [session:room:cf_location]
-[session:room:link]
+[session:rooms]
+[session:facilitators]
 [/sessions]
 
 ***Please arrive ten minutes before the course starts***
@@ -1903,10 +1905,8 @@ Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
-Room: [session:room:name]
-Building: [session:room:cf_building]
-Location: [session:room:cf_location]
-[session:room:link]
+[session:rooms]
+[session:facilitators]
 [/sessions]
 
 This request will expire on [registrationcutoff]
@@ -1957,10 +1957,8 @@ Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
-Room: [session:room:name]
-Building: [session:room:cf_building]
-Location: [session:room:cf_location]
-[session:room:link]
+[session:rooms]
+[session:facilitators]
 [/sessions]
 
 This request will expire on [registrationcutoff]
@@ -2010,10 +2008,8 @@ Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
-Room: [session:room:name]
-Building: [session:room:cf_building]
-Location: [session:room:cf_location]
-[session:room:link]
+[session:rooms]
+[session:facilitators]
 [/sessions]
 
 This request will expire on [registrationcutoff]
@@ -2049,10 +2045,8 @@ Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
-Room: [session:room:name]
-Building: [session:room:cf_building]
-Location: [session:room:cf_location]
-[session:room:link]
+[session:rooms]
+[session:facilitators]
 [/sessions]
 
 ***Please arrive ten minutes before the course starts***
@@ -2094,10 +2088,8 @@ Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
-Room: [session:room:name]
-Building: [session:room:cf_building]
-Location: [session:room:cf_location]
-[session:room:link]
+[session:rooms]
+[session:facilitators]
 [/sessions]
 ';
 $string['setting:defaulttrainersessioncancellationsubject'] = 'Default subject line for trainer event cancellation emails.';
@@ -2135,10 +2127,8 @@ Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
-Room: [session:room:name]
-Building: [session:room:cf_building]
-Location: [session:room:cf_location]
-[session:room:link]
+[session:rooms]
+[session:facilitators]
 [/sessions]
 ';
 $string['setting:defaulttrainersessionunassignedsubject'] = 'Default subject line for trainer event unassigned emails.';
@@ -2159,10 +2149,8 @@ Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
-Room: [session:room:name]
-Building: [session:room:cf_building]
-Location: [session:room:cf_location]
-[session:room:link]
+[session:rooms]
+[session:facilitators]
 [/sessions]';
 $string['setting:defaultvalue'] = 'Default value';
 $string['setting:defaultwaitlistautocleansubjectdefault'] = 'Waitlisted signup expired';
@@ -2176,10 +2164,8 @@ Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
-Room: [session:room:name]
-Building: [session:room:cf_building]
-Location: [session:room:cf_location]
-[session:room:link]
+[session:rooms]
+[session:facilitators]
 [/sessions]';
 $string['setting:defaultwaitlistedmessage'] = 'Default wait-listed message sent to users.';
 $string['setting:defaultwaitlistedmessage_caption'] = 'Wait-listed message';
@@ -2217,10 +2203,8 @@ Participant:   [firstname] [lastname]
 
 Location(s):
 [#sessions]
-Room: [session:room:name]
-Building: [session:room:cf_building]
-Location: [session:room:cf_location]
-[session:room:link]
+[session:rooms]
+[session:facilitators]
 [/sessions]
 
 ***Please note this is not a course booking confirmation***
@@ -2258,10 +2242,8 @@ Date(s) and location(s):
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
-Room: [session:room:name]
-Building: [session:room:cf_building]
-Location: [session:room:cf_location]
-[session:room:link]
+[session:rooms]
+[session:facilitators]
 [/sessions]
 ';
 $string['setting:defaultsessioncancellationsubject'] = 'Default subject line for session cancellation emails.';
