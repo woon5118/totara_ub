@@ -470,7 +470,7 @@ final class signup extends \moodleform {
                     $mform->addElement('static', 'reqmgr', '', get_string('managereitherselectionorfreeformrequired', 'auth_approved'));
                 }
                 else {
-                    $mform->addRule('managerjaid', get_string('errormissingmgr', 'auth_approved'), 'required', null, 'client');
+                    $mform->addRule('managerjaid', get_string('errormissingmgr', 'auth_approved'), 'required');
                 }
             }
 
@@ -488,7 +488,7 @@ final class signup extends \moodleform {
                     $mform->addElement('static', 'reqdmgrf', '', get_string('managereitherselectionorfreeformrequired', 'auth_approved'));
                 }
                 else {
-                    $mform->addRule('managerfreetext', get_string('errormissingmgr', 'auth_approved'), 'required', null, 'client');
+                    $mform->addRule('managerfreetext', get_string('errormissingmgr', 'auth_approved'), 'required');
                 }
             }
         }

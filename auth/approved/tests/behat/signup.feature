@@ -267,8 +267,6 @@ Feature: auth_approved: signup workflow
       | Select an organisation | Deliveries                  |
       | Select a position      | Sales Engr                  |
     And I set the field "Select a manager" to "Manager Sales"
-    And I click on ".form-autocomplete-downarrow" "css_element"
-    And I click on ".form-autocomplete-suggestions" "css_element"
     And I press "Request account"
     Then I should see "An email should have been sent to your address at bond@example.gov"
 

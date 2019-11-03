@@ -290,8 +290,6 @@ Feature: auth_approved: signup page fields
       | Country       | United Kingdom   |
     And I should see "No manager selected"
     When I set the field "Select a manager" to "Manager Sales"
-    And I click on ".form-autocomplete-downarrow" "css_element"
-    And I click on ".form-autocomplete-suggestions" "css_element"
     Then I should see "Manager Sales - salesmgr ja"
 
     When I press "Cancel"
@@ -308,8 +306,6 @@ Feature: auth_approved: signup page fields
       | Country       | United Kingdom   |
     And I should see "No manager selected"
     When I set the field "Select a manager" to "Engr Sales"
-    And I click on ".form-autocomplete-downarrow" "css_element"
-    And I click on ".form-autocomplete-suggestions" "css_element"
     Then I should see "Engr Sales - salesengr ja"
     And I should not see "Manager Sales - salesmgr ja"
 
@@ -327,8 +323,6 @@ Feature: auth_approved: signup page fields
       | Country       | United Kingdom   |
     And I should see "No manager selected"
     When I set the field "Select a manager" to "Vice President"
-    And I click on ".form-autocomplete-downarrow" "css_element"
-    And I click on ".form-autocomplete-suggestions" "css_element"
     Then I should see "Vice President - vp ja"
     And I should not see "Manager Sales - salesmgr ja"
     And I should not see "Engr Sales - salesengr ja"
