@@ -100,7 +100,7 @@ class organisation extends \external_api {
                     'id' => $item->id,
                     'fullname' => $name,
                     'display_name' => $name,
-                    'idnumber' => format_string($item->idnumber),
+                    'idnumber' => $item->idnumber,
                     'crumbtrail' => $item->crumbtrail
                 ];
             })->to_array();
@@ -155,7 +155,7 @@ class organisation extends \external_api {
         $organisation = [
             'id' => $item->id,
             'fullname' => $string_formatter->format($item->fullname),
-            'idnumber' => $string_formatter->format($item->idnumber),
+            'idnumber' => $item->idnumber,
             'description' => $text_formatter->format($item->description),
             'shortname' => $string_formatter->format($item->shortname),
             'visible' => $item->visible,

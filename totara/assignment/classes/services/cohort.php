@@ -96,7 +96,7 @@ class cohort extends \external_api {
                 return [
                     'id' => $item->id,
                     'display_name' => format_string($item->name),
-                    'idnumber' => format_string($item->idnumber),
+                    'idnumber' => $item->idnumber,
                 ];
             })->to_array();
     }
