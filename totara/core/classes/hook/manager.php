@@ -100,7 +100,7 @@ abstract class manager {
                 // Watchers are executed before installation and upgrade, this may throw errors.
                 if (empty($CFG->upgraderunning)) {
                     // Ignore errors during upgrade, otherwise warn developers.
-                    $callback = var_export($watcher->callback, true);
+                    $callback = get_callable_name($watcher->callback);
                     debugging("Exception encountered in hook watcher '$callback': " .
                         $e->getMessage(), DEBUG_DEVELOPER, $e->getTrace());
                 }
@@ -108,7 +108,7 @@ abstract class manager {
                 // Watchers are executed before installation and upgrade, this may throw errors.
                 if (empty($CFG->upgraderunning)) {
                     // Ignore errors during upgrade, otherwise warn developers.
-                    $callback = var_export($watcher->callback, true);
+                    $callback = get_callable_name($watcher->callback);
                     debugging("Error encountered in hook watcher '$callback': " .
                         $e->getMessage(), DEBUG_DEVELOPER, $e->getTrace());
                 }

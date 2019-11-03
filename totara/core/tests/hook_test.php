@@ -169,7 +169,7 @@ class totara_core_hook_testcase extends advanced_testcase {
         $result = $hook->execute();
         $this->assertSame($result, $hook);
         $this->assertSame(array(3, 2, 1), $hook->info);
-        $this->assertDebuggingCalled("Exception encountered in hook watcher 'array (\n  0 => 'totara_core_test_hook_watcher',\n  1 => 'listen3',\n)': some problem");
+        $this->assertDebuggingCalled("Exception encountered in hook watcher 'totara_core_test_hook_watcher::listen3': some problem");
     }
 
     /**
