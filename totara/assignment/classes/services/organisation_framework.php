@@ -74,13 +74,13 @@ class organisation_framework extends \external_api {
             ->order_by($order, $direction)
             ->paginate($page)
             ->transform(function (\totara_assignment\entities\organisation_framework $item) {
-            $fullname = format_string($item->fullname);
-            return [
-                'id' => $item->id,
-                'display_name' => $fullname,
-                'fullname' => $fullname
-            ];
-        })->to_array();
+                $fullname = format_string($item->fullname);
+                return [
+                    'id' => $item->id,
+                    'display_name' => $fullname,
+                    'fullname' => $fullname
+                ];
+            })->to_array();
     }
     /**
      * @return null

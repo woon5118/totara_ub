@@ -23,6 +23,7 @@
 
 namespace tassign_competency\services;
 
+use core\format;
 use core\orm\collection;
 use core\output\notification;
 use external_function_parameters;
@@ -35,6 +36,7 @@ use totara_competency\entities;
 use tassign_competency\models;
 use totara_core\advanced_feature;
 use totara_core\basket\session_basket;
+use totara_core\formatter\field\string_field_formatter;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -457,11 +459,13 @@ class assignment extends \external_api {
             'user_group_id' => $assignment->get_field('user_group_id'),
         ];
 
+        $formatter = new string_field_formatter(format::FORMAT_HTML, \context_system::instance());
+
         // TODO Previously we showed the competency name only in certain conditions, this will likely be replaced by GrpahQL
-        $response['competency_name'] = $assignment->get_competency()->display_name;
+        $response['competency_name'] = $formatter->format($assignment->get_competency()->display_name);
 
         // TODO Previously we showed the user group name only in certain conditions, this will likely be replaced by GrpahQL
-        $response['user_group_name'] = $assignment->get_user_group_name();
+        $response['user_group_name'] = $formatter->format($assignment->get_user_group_name());
 
         return $response;
     }

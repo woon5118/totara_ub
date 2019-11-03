@@ -97,8 +97,10 @@ class expanded_users {
         }
 
         // Closure::fromCallable allows to keep map_users hidden within the class
-        return $user_builder->results_as_arrays()->paginate($page)->transform(Closure::fromCallable(([$this, 'map_users'])));
-
+        return $user_builder
+            ->results_as_arrays()
+            ->paginate($page)
+            ->transform(Closure::fromCallable(([$this, 'map_users'])));
     }
 
     /**

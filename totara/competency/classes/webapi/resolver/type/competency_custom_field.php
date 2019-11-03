@@ -36,6 +36,7 @@ class competency_custom_field implements type_resolver {
                 return (new string_field_formatter($args['format'] ?? format::FORMAT_HTML, \context_system::instance()))
                     ->format($competency_field->title);
             case 'value':
+                // Formatting of the value is done by the 'display_item_data' function of each custom field type
                 return $competency_field->value;
             case 'type':
                 return $competency_field->type;

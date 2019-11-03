@@ -29,7 +29,7 @@ use core\webapi\execution_context;
 use core\webapi\type_resolver;
 use totara_competency\entities\competency as competency_entity;
 use totara_competency\entities\competency_framework as competency_framework_entity;
-use totara_competency\formatter\competency_framework_formatter;
+use totara_competency\formatter;
 
 /**
  * Organisation hierarchy type.
@@ -58,7 +58,7 @@ class competency_framework implements type_resolver {
             return null;
         }
 
-        $formatter = new competency_framework_formatter($competency_framework, context_system::instance());
+        $formatter = new formatter\competency_framework($competency_framework, context_system::instance());
         return $formatter->format($field, $format);
     }
 

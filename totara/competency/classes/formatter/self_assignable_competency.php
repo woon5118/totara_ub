@@ -23,16 +23,16 @@
 
 namespace totara_competency\formatter;
 
-use totara_competency\models\self_assignable_competency;
 use totara_core\formatter\field\date_field_formatter;
 use totara_core\formatter\field\string_field_formatter;
 use totara_core\formatter\field\text_field_formatter;
 use totara_core\formatter\formatter;
 
+
 /**
- * @property self_assignable_competency $object
+ * @property \totara_competency\models\self_assignable_competency $object
  */
-class self_assignable_competency_formatter extends formatter {
+class self_assignable_competency extends formatter {
 
     protected function get_map(): array {
         return [

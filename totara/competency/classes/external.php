@@ -24,10 +24,12 @@
 
 namespace totara_competency;
 
+use core\format;
 use totara_competency\entities\competency;
 use totara_competency\entities\course;
 use totara_competency\entities\scale;
 use totara_core\advanced_feature;
+use totara_core\formatter\field\string_field_formatter;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -79,10 +81,12 @@ class external extends \external_api {
             ->order_by('sortorder', 'asc')
             ->get();
 
+        $formatter = new string_field_formatter(format::FORMAT_HTML, \context_system::instance());
+
         foreach ($scalevalues as $scalevalue) {
             $results[] = [
                 'id' => $scalevalue->get_attribute('id'),
-                'name' => $scalevalue->get_attribute('name'),
+                'name' => $formatter->format($scalevalue->get_attribute('name')),
                 'proficient' => $scalevalue->get_attribute('proficient'),
             ];
         }
@@ -217,8 +221,7 @@ class external extends \external_api {
 
         $data = course::repository()
             ->select(['id', 'shortname', 'fullname', 'visible', 'audiencevisible'])
-            ->as('course') // Todo: We can remove this when default aliasing is fixed in perform.
-            ->join(['context', 'ctx'], 'ctx.instanceid', '=', 'course.id')
+            ->join(['context', 'ctx'], 'id', 'ctx.instanceid')
             ->filter_by_category($filters['category'] ?? null)
             ->filter_by_name($filters['name'] ?? null)
             ->filter_by_ids($filters['ids'] ?? null)
@@ -229,12 +232,14 @@ class external extends \external_api {
             ->paginate($page)
             ->to_array();
 
+        $formatter = new string_field_formatter(format::FORMAT_HTML, \context_system::instance());
+
         $items = [];
         foreach ($data['items'] as $item) {
             $items[] = [
                 'id' => $item['id'],
-                'shortname' => format_string($item['shortname']),
-                'fullname' => format_string($item['fullname'])
+                'shortname' => $formatter->format($item['shortname']),
+                'fullname' => $formatter->format($item['fullname'])
             ];
         }
         $data['items'] = $items;
@@ -294,16 +299,17 @@ class external extends \external_api {
 
         $linked_courses_records = linked_courses::get_linked_courses($competency_id);
 
+        $formatter = new string_field_formatter(format::FORMAT_HTML, \context_system::instance());
+
         $linked_courses = [];
         foreach ($linked_courses_records as $linked_courses_record) {
-
             // Todo: permission checks. Can see courses.
             // If in admin context, may still return, but with hidden.
 
             $linked_courses[] = [
                 'id' => $linked_courses_record->id,
                 'mandatory' => ($linked_courses_record->linktype == linked_courses::LINKTYPE_MANDATORY),
-                'fullname' => format_string($linked_courses_record->fullname)
+                'fullname' => $formatter->format($linked_courses_record->fullname)
             ];
         }
 

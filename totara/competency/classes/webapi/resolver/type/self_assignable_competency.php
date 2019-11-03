@@ -27,7 +27,7 @@ use context_system;
 use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use totara_competency\formatter\self_assignable_competency_formatter;
+use totara_competency\formatter;
 use totara_competency\models\self_assignable_competency as competency_model;
 
 /**
@@ -57,7 +57,7 @@ class self_assignable_competency implements type_resolver {
             return null;
         }
 
-        $formatter = new self_assignable_competency_formatter($competency, context_system::instance());
+        $formatter = new formatter\self_assignable_competency($competency, context_system::instance());
         return $formatter->format($field, $format);
     }
 

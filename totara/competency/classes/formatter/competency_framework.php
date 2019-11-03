@@ -23,16 +23,15 @@
 
 namespace totara_competency\formatter;
 
-use totara_competency\entities\competency;
+use core\orm\formatter\entity_formatter;
 use totara_core\formatter\field\date_field_formatter;
 use totara_core\formatter\field\string_field_formatter;
 use totara_core\formatter\field\text_field_formatter;
-use core\orm\formatter\entity_formatter;
 
 /**
- * @property competency $object
+ * @property \totara_competency\entities\competency_framework $object
  */
-class competency_formatter extends entity_formatter {
+class competency_framework extends entity_formatter {
 
     protected function get_map(): array {
         return [
@@ -46,7 +45,7 @@ class competency_formatter extends entity_formatter {
                 require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
 
                 $component = 'totara_hierarchy';
-                $filearea = \hierarchy::get_short_prefix('competency');
+                $filearea = \hierarchy::get_short_prefix('competency') . '_framework';
                 $itemid = $this->object->id;
 
                 return $formatter
@@ -55,18 +54,11 @@ class competency_formatter extends entity_formatter {
             },
             'timecreated' => date_field_formatter::class,
             'timemodified' => date_field_formatter::class,
-            'frameworkid' => null,
-            'framework' => null,
-            'path' => null,
-            'parent' => null,
-            'parentid' => null,
+            'usermodified' => null,
+            'sortorder' => null,
             'visible' => null,
-            'children' => null,
-            'typeid' => null,
-            'type' => null,
-            'assign_availability' => null,
-            'aggregationmethod' => null,
-            'custom_fields' => null,
+            'hidecustomfields' => null,
+            'competencies' => null
         ];
     }
 

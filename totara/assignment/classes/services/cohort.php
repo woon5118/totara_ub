@@ -93,13 +93,12 @@ class cohort extends \external_api {
             ->order_by($order, $direction)
             ->paginate($page)
             ->transform(function (\totara_assignment\entities\cohort $item) {
-            return [
-                'id' => $item->id,
-                'display_name' => format_string($item->name),
-                'idnumber' => $item->idnumber,
-            ];
-        })->to_array();
-
+                return [
+                    'id' => $item->id,
+                    'display_name' => format_string($item->name),
+                    'idnumber' => format_string($item->idnumber),
+                ];
+            })->to_array();
     }
 
     /**

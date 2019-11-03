@@ -23,11 +23,15 @@
 
 namespace totara_assignment\services;
 
+use context_system;
+use core\format;
 use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use totara_core\advanced_feature;
+use totara_core\formatter\field\string_field_formatter;
+use totara_core\formatter\field\text_field_formatter;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -94,15 +98,15 @@ class position extends \external_api {
             ->order_by($order, $direction)
             ->paginate($page)
             ->transform(function (\totara_assignment\entities\position $item) {
-            $name = format_string($item->fullname);
-            return [
-                'id' => $item->id,
-                'fullname' => $name,
-                'display_name' => $name,
-                'idnumber' => $item->idnumber,
-                'crumbtrail' => $item->crumbtrail
-            ];
-        })->to_array();
+                $name = format_string($item->fullname);
+                return [
+                    'id' => $item->id,
+                    'fullname' => $name,
+                    'display_name' => $name,
+                    'idnumber' => format_string($item->idnumber),
+                    'crumbtrail' => $item->crumbtrail
+                ];
+            })->to_array();
     }
     /**
      * @return null
@@ -137,7 +141,8 @@ class position extends \external_api {
      */
     public static function show(int $id, array $options) {
         advanced_feature::require('positions');
-        require_capability('totara/hierarchy:viewposition', \context_system::instance());
+        $context = context_system::instance();
+        require_capability('totara/hierarchy:viewposition', $context);
 
         /** @var \totara_assignment\entities\position $item */
         $item = \totara_assignment\entities\position::repository()->find($id);
@@ -145,12 +150,16 @@ class position extends \external_api {
             return [];
         }
 
+        $string_formatter = new string_field_formatter(format::FORMAT_HTML, $context);
+        $text_formatter = (new text_field_formatter(format::FORMAT_HTML, $context))
+            ->set_pluginfile_url_options($context, 'totara_hierarchy', 'pos', $id);
+
         $position = [
             'id' => $item->id,
-            'fullname' => format_string($item->fullname),
-            'idnumber' => $item->idnumber,
-            'description' => format_text($item->description, FORMAT_HTML),
-            'shortname' => $item->shortname,
+            'fullname' => $string_formatter->format($item->fullname),
+            'idnumber' => $string_formatter->format($item->idnumber),
+            'description' => $text_formatter->format($item->description),
+            'shortname' => $string_formatter->format($item->shortname),
             'visible' => $item->visible,
             'frameworkid' => $item->frameworkid
         ];

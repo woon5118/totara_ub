@@ -123,7 +123,6 @@ class expand_user_groups extends \external_api {
                     )
                 ];
             })->to_array();
-
     }
 
     /**

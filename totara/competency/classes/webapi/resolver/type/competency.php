@@ -28,7 +28,7 @@ use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
 use totara_competency\entities\competency as competency_entity;
-use totara_competency\formatter\competency_formatter;
+use totara_competency\formatter;
 use totara_core\advanced_feature;
 
 /**
@@ -62,7 +62,7 @@ class competency implements type_resolver {
             return null;
         }
 
-        $formatter = new competency_formatter($competency, context_system::instance());
+        $formatter = new formatter\competency($competency, context_system::instance());
         return $formatter->format($field, $format);
     }
 

@@ -33,13 +33,12 @@ class linked_course implements type_resolver {
     public static function resolve(string $field, $linked_course, array $args, execution_context $ec) {
         // TODO: capability checks
 
-        $format = $args['format'] ?? format::FORMAT_HTML;
-        $formatter = new string_field_formatter($format, \context_system::instance());
-
         switch ($field) {
             case 'course_id':
                 return $linked_course->id;
             case 'fullname':
+                $format = $args['format'] ?? format::FORMAT_HTML;
+                $formatter = new string_field_formatter($format, \context_system::instance());
                 return $formatter->format($linked_course->fullname);
             case 'is_mandatory':
                 return (bool) $linked_course->linktype;

@@ -25,7 +25,7 @@ namespace tassign_competency\webapi\resolver\type;
 
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use tassign_competency\formatter\assignment_formatter;
+use tassign_competency\formatter;
 use tassign_competency\models\assignment as assignment_model;
 
 /**
@@ -45,7 +45,7 @@ class assignment implements type_resolver {
             throw new \coding_exception('Accepting only assignment models.');
         }
 
-        $formatter = new assignment_formatter($assignment, \context_system::instance());
+        $formatter = new formatter\assignment($assignment, \context_system::instance());
         return $formatter->format($field, $args['format'] ?? null);
     }
 

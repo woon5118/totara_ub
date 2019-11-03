@@ -100,7 +100,7 @@ class user extends \external_api {
                     'id' => $item->id,
                     'display_name' => format_string(fullname($user))
                 ];
-        })->to_array();
+            })->to_array();
     }
 
     /**

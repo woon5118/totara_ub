@@ -28,7 +28,7 @@ use core\webapi\execution_context;
 use core\webapi\type_resolver;
 use totara_competency\entities\competency as competency_entity;
 use totara_competency\entities\competency_type as competency_type_entity;
-use totara_competency\formatter\competency_type_formatter;
+use totara_competency\formatter;
 
 /**
  * Organisation hierarchy type.
@@ -51,7 +51,7 @@ class competency_type implements type_resolver {
             throw new \coding_exception('Accepting only entities.');
         }
 
-        $formatter = new competency_type_formatter($competency_type, context_system::instance());
+        $formatter = new formatter\competency_type($competency_type, context_system::instance());
         return $formatter->format($field, $args['format'] ?? null);
     }
 

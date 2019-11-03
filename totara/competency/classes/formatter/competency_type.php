@@ -23,16 +23,15 @@
 
 namespace totara_competency\formatter;
 
-use totara_competency\entities\competency_type;
+use core\orm\formatter\entity_formatter;
 use totara_core\formatter\field\date_field_formatter;
 use totara_core\formatter\field\string_field_formatter;
 use totara_core\formatter\field\text_field_formatter;
-use core\orm\formatter\entity_formatter;
 
 /**
- * @property competency_type $object
+ * @property \totara_competency\entities\competency_type $object
  */
-class competency_type_formatter extends entity_formatter {
+class competency_type extends entity_formatter {
 
     protected function get_map(): array {
         return [

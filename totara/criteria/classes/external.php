@@ -41,7 +41,7 @@ class external extends \external_api {
         advanced_feature::require('competency_assignment');
 
         return criterion_factory::create($type)
-            -> export_criterion_edit_template();
+            ->export_criterion_edit_template();
     }
 
     public static function get_definition_template_returns() {

@@ -24,8 +24,10 @@
 namespace totara_competency\entities\helpers;
 
 
+use core\format;
 use totara_assignment\entities\hierarchy_item;
 use core\orm\query\builder;
+use totara_core\formatter\field\string_field_formatter;
 
 class hierarchy_crumbtrail_helper {
 
@@ -125,9 +127,12 @@ class hierarchy_crumbtrail_helper {
      */
     private function create_crumbtrail_item(int $id, string $name, string $type,
         int $parent_id = null, bool $active = false, bool $first = false, bool $last = false): array {
+
+        $string_formatter = new string_field_formatter(format::FORMAT_HTML, \context_system::instance());
+
         return [
             'id' => $id,
-            'name' => $name,
+            'name' => $string_formatter->format($name),
             'parent_id' => $parent_id,
             'type' => $type,
             'active' => $active,

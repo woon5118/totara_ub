@@ -31,7 +31,7 @@ use totara_core\formatter\formatter;
 /**
  * @property assignment_model $object
  */
-class assignment_formatter extends formatter {
+class assignment extends formatter {
 
     protected function get_map(): array {
         return [

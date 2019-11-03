@@ -24,12 +24,16 @@
 namespace tassign_competency\services;
 
 
+use context_system;
+use core\format;
 use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use totara_competency\entities;
 use totara_core\advanced_feature;
+use totara_core\formatter\field\string_field_formatter;
+use totara_core\formatter\field\text_field_formatter;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -88,7 +92,7 @@ class competency extends \external_api {
     public static function index(array $filters = [], int $page = 0, string $order_by = '', string $order_dir = '') {
         advanced_feature::require('competency_assignment');
 
-        require_capability('tassign/competency:view', \context_system::instance());
+        require_capability('tassign/competency:view', context_system::instance());
 
         if (!array_key_exists('visible', $filters)) {
             $filters['visible'] = true;
@@ -153,7 +157,7 @@ class competency extends \external_api {
     public static function show(int $id, array $options) {
         advanced_feature::require('competency_assignment');
 
-        require_capability('tassign/competency:view', \context_system::instance());
+        require_capability('tassign/competency:view', context_system::instance());
 
         /** @var entities\competency $competency */
         $competency = entities\competency::repository()->find($id);
@@ -192,21 +196,27 @@ class competency extends \external_api {
                                                             ?bool $with_user_groups = false,
                                                             ?bool $with_assignments = false): array {
         global $PAGE;
+
+        $context = context_system::instance();
         // As we use format_string make sure we have the page context set
-        $PAGE->set_context(\context_system::instance());
+        $PAGE->set_context($context);
+
+        $string_formatter = new string_field_formatter(format::FORMAT_HTML, $context);
+        $text_formatter = (new text_field_formatter(format::FORMAT_HTML, $context))
+            ->set_pluginfile_url_options($context, 'totara_hierarchy', 'comp', $competency->id);
 
         $response = [
             'id' => $competency->id,
-            'fullname' => format_string($competency->fullname),
-            'description' => format_text($competency->description, FORMAT_HTML),
-            'display_name' => format_string($competency->display_name),
+            'fullname' => $string_formatter->format($competency->fullname),
+            'description' => $text_formatter->format($competency->description),
+            'display_name' => $string_formatter->format($competency->display_name),
             'parentid' => $competency->parentid,
             'frameworkid' => $competency->frameworkid
         ];
 
         if ($with_user_groups) {
-            $assigned_user_groups = array_map(function ($item) {
-                return ['user_group_name' => format_string($item)];
+            $assigned_user_groups = array_map(function ($item) use ($string_formatter) {
+                return ['user_group_name' => $string_formatter->format($item)];
             }, $competency->assigned_user_groups);
 
             $response['assigned_user_groups'] = array_values($assigned_user_groups);
