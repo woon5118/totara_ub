@@ -24,9 +24,9 @@
 namespace pathway_test_pathway;
 
 use totara_competency\pathway;
-use totara_competency\pathway_evaluator_user_source_table;
+use totara_competency\pathway_evaluator_user_source;
 
-class test_pathway_evaluator_user_source_table extends pathway_evaluator_user_source_table {
+class test_pathway_evaluator_user_source extends pathway_evaluator_user_source {
 
     /**
      * Mark users who needs to be reaggregated

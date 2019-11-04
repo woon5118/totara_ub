@@ -26,6 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 $observers = [
     [
         'eventname' => '\core\event\course_completed',
-        'callback' => '\criteria_coursecompletion\observer::course_completed',
+        'callback' => criteria_coursecompletion\observer\course::class.'::course_completed',
     ],
 ];

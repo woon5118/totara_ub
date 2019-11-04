@@ -24,7 +24,6 @@
 
 namespace totara_competency;
 
-use core\task\manager as task_manager;
 use criteria_linkedcourses\task\update_linked_course_items_adhoc;
 use totara_competency\event\linked_courses_updated;
 

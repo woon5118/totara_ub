@@ -23,19 +23,8 @@
 
 namespace totara_competency\task;
 
-use core\task\scheduled_task;
-use totara_competency\achievement_configuration;
 use totara_competency\aggregation_task;
 use totara_competency\aggregation_users_table;
-use totara_competency\competency_achievement_aggregator;
-use totara_competency\competency_aggregator_user_source_table;
-use totara_competency\pathway;
-use totara_competency\entities\competency;
-use totara_competency\pathway_evaluator_factory;
-use totara_competency\pathway_evaluator_user_source_table;
-use totara_competency\pathway_factory;
-use totara_competency\plugintypes;
-use xmldb_table;
 
 /**
  * Aggregates competency achievements for all users and competencies

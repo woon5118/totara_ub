@@ -20,8 +20,6 @@
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  */
 
-use pathway_manual\external;
-use pathway_manual\manual;
 
 global $CFG;
 require_once($CFG->dirroot . '/lib/externallib.php');

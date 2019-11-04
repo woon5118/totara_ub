@@ -165,7 +165,8 @@ class totara_competency_aggregation_all_task_testcase extends advanced_testcase 
                     case 'manual':
                         $this->pathways[$pw_key] = $competency_generator->create_manual($pw_data['comp_id'] ?? $this->comp,
                             $pw_data['roles'] ?? [],
-                            $pw_data['sortorder'] ?? null);
+                            $pw_data['sortorder'] ?? null
+                        );
                         break;
 
                     case 'criteria_group':
@@ -178,8 +179,8 @@ class totara_competency_aggregation_all_task_testcase extends advanced_testcase 
 
                     case 'learning_plan':
                         $this->pathways[$pw_key] = $competency_generator->create_learning_plan_pathway($pw_data['comp_id'] ?? $this->comp,
-                            $pw_data['sortorder'] ?? null)
-                        ;
+                            $pw_data['sortorder'] ?? null
+                        );
                 }
 
                 return $this->pathways[$pw_key];

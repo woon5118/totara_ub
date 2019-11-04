@@ -24,15 +24,8 @@
 
 namespace pathway_criteria_group;
 
-use core\orm\collection;
-use core\task\manager;
-use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
-use pathway_criteria_group\entities\criteria_group as criteria_group_entity;
 use totara_competency\aggregation_users_table;
-use totara_competency\entities\competency as competency_entity;
 use totara_competency\pathway;
-use totara_competency\pathway_evaluator_factory;
-use totara_competency\task\competency_achievement_aggregation_adhoc;
 
 class aggregation_helper {
 

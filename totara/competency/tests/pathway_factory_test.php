@@ -22,7 +22,6 @@
  */
 
 use totara_competency\pathway_factory;
-use totara_competency\pathway;
 use totara_competency\plugintypes;
 use totara_criteria\criterion;
 

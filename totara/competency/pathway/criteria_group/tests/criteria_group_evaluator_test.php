@@ -27,11 +27,11 @@ use totara_competency\aggregation_users_table;
 use totara_competency\entities\competency;
 use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\scale_value;
-use totara_competency\pathway_evaluator_user_source_table;
+use totara_competency\pathway_evaluator_user_source;
 use totara_criteria\criterion;
 use totara_criteria\item_combined;
 use totara_criteria\item_evaluator;
-use totara_criteria\item_evaluator_user_source_table;
+use totara_criteria\item_evaluator_user_source;
 
 class pathway_criteria_group_evaluator_testcase extends \advanced_testcase {
 
@@ -295,7 +295,7 @@ class pathway_criteria_group_evaluator_testcase extends \advanced_testcase {
 
         // End of setting up the data
 
-        $user_source = new pathway_evaluator_user_source_table($data->user_id_table, true);
+        $user_source = new pathway_evaluator_user_source($data->user_id_table, true);
         $evaluator = new criteria_group_evaluator($cg, $user_source);
         $this->waitForSecond();
         $evaluator->aggregate(time());
@@ -488,7 +488,7 @@ class test_cge_criterion_evaluator extends item_evaluator {
 
         $updated_user_ids = self::$criteria_updated_user_ids[$criterion->get_id()];
 
-        if (empty($updated_user_ids) || !$this->user_source instanceof item_evaluator_user_source_table) {
+        if (empty($updated_user_ids) || !$this->user_source instanceof item_evaluator_user_source) {
             // Nothing to do
             return;
         }

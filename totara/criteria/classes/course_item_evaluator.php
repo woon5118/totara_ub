@@ -23,9 +23,6 @@
 
 namespace totara_criteria;
 
-use totara_criteria\criterion;
-use totara_criteria\item_evaluator;
-
 class course_item_evaluator extends item_evaluator {
 
     /**

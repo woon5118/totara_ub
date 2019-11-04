@@ -37,6 +37,7 @@ use core\orm\entity\relations\has_many;
  * @property int $last_evaluated
  *
  * @property-read collection|criterion_item[] $items
+ * @property-read collection|criteria_metadata[] $metadata
  */
 class criterion extends entity {
 

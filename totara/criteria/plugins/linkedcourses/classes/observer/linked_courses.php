@@ -21,11 +21,12 @@
  * @package criteria_linkedcourses
  */
 
-namespace criteria_linkedcourses;
+namespace criteria_linkedcourses\observer;
 
+use criteria_linkedcourses\items_processor;
 use totara_competency\event\linked_courses_updated;
 
-class observer {
+class linked_courses {
 
     public static function linked_courses_updated(linked_courses_updated $event) {
         $competency_id = $event->get_data()['objectid'];

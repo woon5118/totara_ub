@@ -1,9 +1,7 @@
 <?php
 
-use totara_competency\achievement_configuration;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\pathway_achievement;
-use totara_competency\linked_courses;
 use totara_competency\pathway;
 
 /**

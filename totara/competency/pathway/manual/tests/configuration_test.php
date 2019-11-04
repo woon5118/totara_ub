@@ -23,7 +23,6 @@
  */
 
 use pathway_manual\manual;
-use totara_competency\entities\competency;
 use totara_competency\pathway;
 
 class pathway_manual_configuration_testcase extends advanced_testcase {

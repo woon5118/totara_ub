@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2018 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,13 +21,11 @@
  * @package totara_criteria
  */
 
-
 use core\event\course_completed;
-use criteria_coursecompletion\observer;
-use totara_criteria\entities\criteria_item;
+use criteria_coursecompletion\observer\course as course_observer;
 use totara_criteria\event\criteria_achievement_changed;
 
-class criteria_coursecompletion_observer_testcase extends \advanced_testcase {
+class criteria_coursecompletion_course_observer_testcase extends \advanced_testcase {
 
     private function setup_data() {
         $data = new class() {
@@ -64,7 +62,7 @@ class criteria_coursecompletion_observer_testcase extends \advanced_testcase {
         $this->assertEquals(course_completed::class, get_class($cc_event));
         $sink->clear();
 
-        observer::course_completed($cc_event);
+        course_observer::course_completed($cc_event);
         $events = $sink->get_events();
         $this->assertEmpty($events);
         $sink->close();
@@ -85,7 +83,7 @@ class criteria_coursecompletion_observer_testcase extends \advanced_testcase {
         $sink->clear();
 
         $sink = $this->redirectEvents();
-        observer::course_completed($cc_event);
+        course_observer::course_completed($cc_event);
         $events = $sink->get_events();
         $this->assertEmpty($events);
         $sink->close();
@@ -110,7 +108,7 @@ class criteria_coursecompletion_observer_testcase extends \advanced_testcase {
         $this->assertEquals(course_completed::class, get_class($cc_event));
         $sink->clear();
 
-        observer::course_completed($cc_event);
+        course_observer::course_completed($cc_event);
         $events = $sink->get_events();
         $this->assertEquals(1, count($events));
         $event = reset($events);
@@ -140,7 +138,7 @@ class criteria_coursecompletion_observer_testcase extends \advanced_testcase {
         $this->assertEquals(course_completed::class, get_class($cc_event));
         $sink->clear();
 
-        observer::course_completed($cc_event);
+        course_observer::course_completed($cc_event);
         $events = $sink->get_events();
         $this->assertEquals(1, count($events));
         $event = reset($events);

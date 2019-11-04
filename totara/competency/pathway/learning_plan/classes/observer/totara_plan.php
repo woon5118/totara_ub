@@ -21,14 +21,14 @@
  * @package pathway_learning_plan
  */
 
-namespace pathway_learning_plan;
+namespace pathway_learning_plan\observer;
 
 use totara_competency\entities\competency_assignment_user;
 use totara_competency\aggregation_users_table;
 use totara_competency\pathway;
 use totara_plan\event\competency_value_set;
 
-class observer {
+class totara_plan {
 
     public static function competency_value_set(competency_value_set $event) {
         global $DB;

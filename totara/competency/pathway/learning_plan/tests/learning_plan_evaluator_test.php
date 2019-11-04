@@ -24,7 +24,7 @@
 
 use pathway_learning_plan\learning_plan;
 use pathway_learning_plan\learning_plan_evaluator;
-use pathway_manual\manual_evaluator_user_source_table;
+use pathway_manual\manual_evaluator_user_source;
 use totara_competency\aggregation_users_table;
 use totara_competency\entities\competency;
 use totara_competency\entities\pathway_achievement;
@@ -48,7 +48,7 @@ class pathway_learning_plan_evaluator_testcase extends advanced_testcase {
 
             /** @var aggregation_users_table $user_id_table */
             public $user_id_table;
-            /** @var manual_evaluator_user_source_table $user_id_source*/
+            /** @var manual_evaluator_user_source $user_id_source*/
             public $user_id_source;
         };
 
@@ -84,7 +84,7 @@ class pathway_learning_plan_evaluator_testcase extends advanced_testcase {
         // The user_source
         $data->user_id_table = new aggregation_users_table();
 
-        $data->user_id_source = new manual_evaluator_user_source_table($data->user_id_table, true);
+        $data->user_id_source = new manual_evaluator_user_source($data->user_id_table, true);
 
         return $data;
     }

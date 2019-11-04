@@ -24,8 +24,6 @@
 namespace pathway_criteria_group;
 
 
-use totara_competency\base_achievement_detail;
-use totara_competency\entities\pathway_achievement;
 use totara_competency\pathway;
 use totara_competency\pathway_evaluator;
 use totara_competency\pathway_evaluator_user_source;
@@ -72,7 +70,6 @@ class criteria_group_evaluator extends pathway_evaluator {
      * @return item_evaluator_user_source
      */
     private function get_item_evaluator_user_source(pathway_evaluator_user_source $user_id_source): item_evaluator_user_source {
-        $classname = 'totara_criteria\item_evaluator_user_source_' . $user_id_source->get_source_type();
-        return new $classname($user_id_source->get_source(), $user_id_source->is_full_user_set());
+        return new item_evaluator_user_source($user_id_source->get_source(), $user_id_source->is_full_user_set());
     }
 }

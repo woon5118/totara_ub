@@ -21,7 +21,6 @@
  * @package totara_criteria
  */
 
-use criteria_linkedcourses\linkedcourses;
 use criteria_linkedcourses\linkedcourses_display;
 use totara_criteria\criterion;
 

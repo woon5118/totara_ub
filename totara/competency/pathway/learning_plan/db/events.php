@@ -26,6 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 $observers = [
     [
         'eventname' => '\totara_plan\event\competency_value_set',
-        'callback' => '\pathway_learning_plan\observer::competency_value_set',
+        'callback' => pathway_learning_plan\observer\totara_plan::class.'::competency_value_set',
     ],
 ];

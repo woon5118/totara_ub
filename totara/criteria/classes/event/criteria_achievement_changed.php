@@ -26,6 +26,10 @@ namespace totara_criteria\event;
 
 use core\event\base;
 
+/**
+ * Event to be triggered when a user's achievement of a specific criterion changed
+ * The change can be either that the user now satisfies the criteria, or no longer satisfy the criteria
+ */
 class criteria_achievement_changed extends base {
 
     /**

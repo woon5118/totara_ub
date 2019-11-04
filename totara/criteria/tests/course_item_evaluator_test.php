@@ -23,7 +23,7 @@
 
 use totara_competency\aggregation_users_table;
 use totara_criteria\course_item_evaluator;
-use totara_criteria\item_evaluator_user_source_table;
+use totara_criteria\item_evaluator_user_source;
 
 class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
@@ -80,7 +80,7 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
         $data = $this->setup_data();
         $this->assertSame(0, $DB->count_records('totara_criteria_item_record'));
 
-        $user_source = new item_evaluator_user_source_table($data->source_table);
+        $user_source = new item_evaluator_user_source($data->source_table);
         $item_evaluator = new course_item_evaluator($user_source);
         $item_evaluator->update_completion($data->coursecompletion);
         $this->assertSame(0, $DB->count_records('totara_criteria_item_record'));
@@ -100,7 +100,7 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
         $this->insert_temp_users($test_users);
 
         // Create the initial item_records and wait for a second to ensure we have unique timestamps
-        $user_source = new item_evaluator_user_source_table($data->source_table);
+        $user_source = new item_evaluator_user_source($data->source_table);
         $item_evaluator = new course_item_evaluator($user_source);
         $item_evaluator->update_completion($data->coursecompletion);
         $this->waitForSecond();
@@ -157,7 +157,7 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
         $this->insert_temp_users($test_users);
 
         // Create the initial item_records - tested in another function
-        $user_source = new item_evaluator_user_source_table($data->source_table);
+        $user_source = new item_evaluator_user_source($data->source_table);
         $item_evaluator = new course_item_evaluator($user_source);
         $item_evaluator->update_completion($data->coursecompletion);
         // Reset the has_changed flag
@@ -209,7 +209,7 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
         $this->insert_temp_users($test_users);
 
         // Create the initial item_records and wait for a second to ensure we have unique timestamps
-        $user_source = new item_evaluator_user_source_table($data->source_table);
+        $user_source = new item_evaluator_user_source($data->source_table);
         $item_evaluator = new course_item_evaluator($user_source);
         $item_evaluator->update_completion($data->coursecompletion);
         $this->waitForSecond();

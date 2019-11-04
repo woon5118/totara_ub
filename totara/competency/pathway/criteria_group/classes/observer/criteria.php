@@ -17,23 +17,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Brendan Cox <brendan.cox@totaralearning.com>
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  * @package pathway_criteria_group
  */
 
-namespace pathway_criteria_group;
+namespace pathway_criteria_group\observer;
 
-use totara_criteria\event\criteria_items_updated;
+use pathway_criteria_group\aggregation_helper;
 use totara_criteria\event\criteria_achievement_changed;
 
-class observer {
+class criteria {
 
     public static function criteria_achievement_changed(criteria_achievement_changed $event) {
         aggregation_helper::mark_for_reaggregate_from_criteria($event->other['criteria_ids'], $event->relateduserid);
-    }
-
-    public static function criteria_items_updated(criteria_items_updated $event) {
-        aggregation_helper::mark_for_reaggregate_from_criteria($event->other['criteria_ids']);
     }
 }

@@ -22,9 +22,9 @@
  */
 
 use totara_competency\aggregation_users_table;
-use totara_criteria\item_evaluator_user_source_table;
+use totara_criteria\item_evaluator_user_source;
 
-class totara_criteria_item_evaluator_user_source_table_testcase extends advanced_testcase {
+class totara_criteria_item_evaluator_user_source_testcase extends advanced_testcase {
 
     private $process_key = 'the_process_key';
     private $update_operation_value = 'the_update_operation_value';
@@ -38,9 +38,9 @@ class totara_criteria_item_evaluator_user_source_table_testcase extends advanced
             public $course;
             /** @var criterion $criterion */
             public $criterion;
-            /** @var item_evaluator_user_source_table $full_source */
+            /** @var item_evaluator_user_source $full_source */
             public $full_source;
-            /** @var item_evaluator_user_source_table $partial_source */
+            /** @var item_evaluator_user_source $partial_source */
             public $partial_source;
         };
 
@@ -70,8 +70,8 @@ class totara_criteria_item_evaluator_user_source_table_testcase extends advanced
         $temp_table_def->set_process_key_value($this->process_key);
         $temp_table_def->set_update_operation_value($this->update_operation_value);
 
-        $data->full_source = new item_evaluator_user_source_table($temp_table_def, true);
-        $data->partial_source = new item_evaluator_user_source_table($temp_table_def, false);
+        $data->full_source = new item_evaluator_user_source($temp_table_def, true);
+        $data->partial_source = new item_evaluator_user_source($temp_table_def, false);
 
         return $data;
     }

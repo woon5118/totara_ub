@@ -25,10 +25,10 @@ namespace pathway_learning_plan;
 
 use totara_competency\entities\pathway_achievement;
 use totara_competency\pathway;
-use totara_competency\pathway_evaluator_user_source_table;
+use totara_competency\pathway_evaluator_user_source;
 
 
-class learning_plan_evaluator_user_source_table extends pathway_evaluator_user_source_table {
+class learning_plan_evaluator_user_source extends pathway_evaluator_user_source {
 
     /**
      * Mark users who needs to be reaggregated

@@ -22,13 +22,13 @@
  * @package criteria_coursecompletion
  */
 
-namespace criteria_coursecompletion;
+namespace criteria_coursecompletion\observer;
 
 use core\event\course_completed;
 use totara_criteria\entities\criteria_item;
 use totara_criteria\event\criteria_achievement_changed;
 
-class observer {
+class course {
 
     public static function course_completed(course_completed $event) {
         // Find all criteria items for completion of this course

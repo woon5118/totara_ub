@@ -27,7 +27,6 @@ use criteria_linkedcourses\items_processor;
 use pathway_criteria_group\criteria_group;
 use criteria_linkedcourses\linkedcourses;
 use totara_competency\linked_courses;
-use totara_criteria\event\criteria_items_updated;
 
 class criteria_linkedcourses_items_processor_testcase extends advanced_testcase {
 
@@ -128,7 +127,6 @@ class criteria_linkedcourses_items_processor_testcase extends advanced_testcase 
         $this->assertSame(1, $DB->count_records('totara_competency_configuration_change', ['comp_id' => $comp->id]));
         $this->assertSame(1, $DB->count_records('totara_competency_configuration_history', ['comp_id' => $comp->id]));
 
-        $this->verify_event($sink, [$criterion_record->id]);
         $sink->close();
     }
 
@@ -168,8 +166,6 @@ class criteria_linkedcourses_items_processor_testcase extends advanced_testcase 
         $item_ids = array_column($items, 'item_id');
         $this->assertEqualsCanonicalizing([$keep->id, $remove->id], $item_ids);
 
-        $this->verify_event($sink, [$criterion_record->id]);
-
         // At this point, we keep the $keep course, add $add. $remove gets removed.
         linked_courses::set_linked_courses(
             $competency->id,
@@ -186,8 +182,6 @@ class criteria_linkedcourses_items_processor_testcase extends advanced_testcase 
         $item_ids = array_column($items, 'item_id');
         $this->assertEqualsCanonicalizing([$keep->id, $add->id], $item_ids);
 
-        $this->verify_event($sink, [$criterion_record->id]);
-
         // Final step. Remove all courses from linked.
         // The idea of this test is to check it does remove when there are zero courses linked rather
         // than ignore thinking there's nothing to do.
@@ -201,23 +195,7 @@ class criteria_linkedcourses_items_processor_testcase extends advanced_testcase 
         items_processor::update_items($competency->id);
         $this->assertEquals(0, $DB->count_records('totara_criteria_item'));
 
-        $this->verify_event($sink, [$criterion_record->id]);
-
         $sink->close();
-    }
-
-    /**
-     * Verify the triggered event
-     *
-     * @param \phpunit_event_sink $sink
-     * @param array $expected_criteria_ids
-     */
-    private function verify_event(\phpunit_event_sink $sink, array $expected_criteria_ids = []) {
-        $this->assertSame(1, $sink->count());
-        $events = $sink->get_events();
-        $event = reset($events);
-        $this->assertTrue($event instanceof criteria_items_updated);
-        $this->assertEqualsCanonicalizing($expected_criteria_ids, $event->other['criteria_ids']);
     }
 
 }

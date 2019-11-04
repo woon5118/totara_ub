@@ -24,14 +24,12 @@
 
 namespace pathway_criteria_group;
 
-use core\orm\entity\repository;
 use core\orm\query\builder;
 use pathway_criteria_group\entities\criteria_group as criteria_group_entity;
 use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
 use totara_competency\base_achievement_detail;
 use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\pathway;
-use totara_competency\plugintypes;
 use totara_competency\entities\scale_value;
 use totara_competency\pathway_factory;
 use totara_criteria\criterion;

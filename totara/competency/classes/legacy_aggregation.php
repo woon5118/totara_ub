@@ -28,7 +28,6 @@ use core\orm\collection;
 use core\orm\query\builder;
 use criteria_childcompetency\childcompetency;
 use criteria_linkedcourses\linkedcourses;
-use criteria_linkedcourses\metadata_processor as linked_courses_metadata_processor;
 use pathway_criteria_group\criteria_group;
 use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
 use pathway_learning_plan\learning_plan;

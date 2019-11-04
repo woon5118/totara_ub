@@ -37,7 +37,7 @@ use totara_criteria\entities\criteria_metadata as metadata_entity;
  * We basically test that by relying on the observers we get the same results as we got when calling the item_processor
  * manually
  */
-class criteria_linkedcourse_observer_testcase extends advanced_testcase {
+class criteria_linkedcourses_linked_courses_observer_testcase extends advanced_testcase {
 
     private function setup_data(bool $add_criterion = false) {
         $data = new class() {

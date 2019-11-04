@@ -23,7 +23,6 @@
 
 namespace criteria_childcompetency;
 
-use totara_competency\entities\competency;
 use totara_criteria\competency_item_evaluator;
 use totara_criteria\criterion;
 

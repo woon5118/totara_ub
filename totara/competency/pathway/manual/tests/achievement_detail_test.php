@@ -164,13 +164,8 @@ class pathway_manual_achievement_detail_testcase extends advanced_testcase {
         global $DB;
 
         $table = new aggregation_users_table();
-
         $this->assertTrue($DB->record_exists($table->get_table_name(), [$table->get_process_key_column() => null]));
 
-        $process_key = md5(uniqid(rand(), true));
-        $table->set_process_key_value($process_key);
-        $table->claim_process();
-        $task = new aggregation_task($table, false);
-        $task->execute();
+        (new aggregation_task($table, false))->execute();
     }
 }

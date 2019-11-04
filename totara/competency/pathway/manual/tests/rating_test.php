@@ -23,11 +23,9 @@
  */
 
 use pathway_manual\manual;
-use pathway_manual\manual_evaluator;
 use totara_competency\aggregation_task;
 use totara_competency\aggregation_users_table;
 use totara_competency\entities\competency;
-use totara_competency\pathway_evaluator;
 use totara_competency\pathway_evaluator_user_source_list;
 use totara_job\job_assignment;
 use totara_competency\entities\pathway_achievement;
@@ -327,13 +325,8 @@ class pathway_manual_rating_testcase extends advanced_testcase {
         global $DB;
 
         $table = new aggregation_users_table();
-
         $this->assertTrue($DB->record_exists($table->get_table_name(), [$table->get_process_key_column() => null]));
 
-        $process_key = md5(uniqid(rand(), true));
-        $table->set_process_key_value($process_key);
-        $table->claim_process();
-        $task = new aggregation_task($table, false);
-        $task->execute();
+        (new aggregation_task($table, false))->execute();
     }
 }

@@ -45,12 +45,12 @@ class aggregation_task {
     private $full_user_set;
 
     /**
-     * @var pathway_evaluator_user_source_table
+     * @var pathway_evaluator_user_source
      */
     private $pw_user_id_source;
 
     /**
-     * @var competency_aggregator_user_source_table
+     * @var competency_aggregator_user_source
      */
     private $comp_user_id_source;
 
@@ -68,8 +68,8 @@ class aggregation_task {
      * @param int|null $aggregation_time if needed you can specify the time, defaults to current unix timestamp
      */
     public function execute(?int $aggregation_time = null) {
-        $this->pw_user_id_source = new pathway_evaluator_user_source_table($this->table, $this->full_user_set);
-        $this->comp_user_id_source = new competency_aggregator_user_source_table($this->table, $this->full_user_set);
+        $this->pw_user_id_source = new pathway_evaluator_user_source($this->table, $this->full_user_set);
+        $this->comp_user_id_source = new competency_aggregator_user_source($this->table, $this->full_user_set);
 
         $aggregation_time = $aggregation_time ?? time();
 

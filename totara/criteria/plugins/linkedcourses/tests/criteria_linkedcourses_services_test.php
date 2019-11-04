@@ -22,7 +22,6 @@
  */
 
 use totara_criteria\criterion;
-use criteria_linkedcourses\linkedcourses;
 
 global $CFG;
 require_once($CFG->dirroot . '/lib/externallib.php');

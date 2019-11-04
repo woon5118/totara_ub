@@ -412,6 +412,60 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
     }
 
     /**
+     * Test queue_multiple_for_aggregation
+     */
+    public function test_queue_multiple_for_aggregation() {
+        global $DB;
+
+        $table = new aggregation_users_table();
+
+        $records = [
+            ['user_id' => 1, 'competency_id' => 1, 'has_changed' => 0, 'process_key' => null],
+            ['user_id' => 2, 'competency_id' => 1, 'has_changed' => 0, 'process_key' => 'proc1'],
+            ['user_id' => 3, 'competency_id' => 1, 'has_changed' => 0, 'process_key' => 'proc1'],
+            ['user_id' => 1, 'competency_id' => 2, 'has_changed' => 0, 'process_key' => null],
+            ['user_id' => 2, 'competency_id' => 2, 'has_changed' => 0, 'process_key' => 'proc2'],
+            ['user_id' => 3, 'competency_id' => 2, 'has_changed' => 0, 'process_key' => null],
+            ['user_id' => 1, 'competency_id' => 3, 'has_changed' => 0, 'process_key' => null],
+            ['user_id' => 2, 'competency_id' => 3, 'has_changed' => 0, 'process_key' => null],
+            ['user_id' => 3, 'competency_id' => 3, 'has_changed' => 0, 'process_key' => null],
+        ];
+
+        $DB->insert_records($table->get_table_name(), $records);
+
+        $to_queue = [];
+        for ($user_id = 1; $user_id <= 3; $user_id++) {
+            for ($competency_id = 1; $competency_id <= 3; $competency_id++) {
+                $to_queue[] = [$table->get_user_id_column() => $user_id, $table->get_competency_id_column() => $competency_id];
+            }
+        }
+
+        $table->queue_multiple_for_aggregation($to_queue);
+
+        $expected_rows = array_merge($records,
+            [
+                ['user_id' => 2, 'competency_id' => 1, 'has_changed' => 0, 'process_key' => null],
+                ['user_id' => 3, 'competency_id' => 1, 'has_changed' => 0, 'process_key' => null],
+                ['user_id' => 2, 'competency_id' => 2, 'has_changed' => 0, 'process_key' => null],
+            ]
+        );
+
+        $rows = $DB->get_records($table->get_table_name());
+        foreach ($rows as $row) {
+            foreach ($expected_rows as $idx => $expected_row) {
+                if ($expected_row['user_id'] == $row->{$table->get_user_id_column()}
+                    && $expected_row['competency_id'] == $row->{$table->get_competency_id_column()}
+                    && $expected_row['process_key'] == $row->{$table->get_process_key_column()}) {
+                    unset($expected_rows[$idx]);
+                    break;
+                }
+            }
+        }
+
+        $this->assertEmpty($expected_rows);
+    }
+
+    /**
      * Test queue_all_assigned_users_for_aggregation
      */
     public function test_queue_all_assigned_users_for_aggregation() {

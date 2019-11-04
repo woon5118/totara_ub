@@ -45,9 +45,8 @@ class manual_evaluator extends pathway_evaluator {
      * @param pathway_evaluator_user_source $user_id_source
      * @return manual_user_source
      */
-    private function get_manual_user_source(pathway_evaluator_user_source $user_id_source): pathway_evaluator_user_source {
-        $classname = 'pathway_manual\manual_evaluator_user_source_' . $user_id_source->get_source_type();
-        return new $classname($user_id_source->get_source(), $user_id_source->is_full_user_set());
+    private function get_manual_user_source(pathway_evaluator_user_source $user_id_source): manual_evaluator_user_source {
+        return new manual_evaluator_user_source($user_id_source->get_source(), $user_id_source->is_full_user_set());
     }
 
 }

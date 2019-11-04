@@ -26,7 +26,7 @@ use totara_competency\aggregation_users_table;
 use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\competency;
 
-class totara_competency_pathway_evaluator_user_source_table_testcase extends advanced_testcase {
+class totara_competency_pathway_evaluator_user_source_testcase extends advanced_testcase {
 
     private function setup_data() {
         global $DB;
@@ -150,7 +150,7 @@ class totara_competency_pathway_evaluator_user_source_table_testcase extends adv
         $this->create_achievement_records($cg->get_id(), $achievements);
         $this->create_userid_table_records($data->user_id_table, $data->competency->id, $assigned_users);
 
-        $user_source = new \totara_competency\pathway_evaluator_user_source_table($data->user_id_table, true);
+        $user_source = new \totara_competency\pathway_evaluator_user_source($data->user_id_table, true);
         $user_source->archive_non_assigned_achievements($cg, time());
         $this->validate_achievement_records($expected);
     }
@@ -227,7 +227,7 @@ class totara_competency_pathway_evaluator_user_source_table_testcase extends adv
         $this->create_userid_table_records($data->user_id_table, $data->competency->id, $assigned_users);
 
         // Testing here without process_key and update_operation
-        $user_source = new \totara_competency\pathway_evaluator_user_source_table($data->user_id_table, true);
+        $user_source = new \totara_competency\pathway_evaluator_user_source($data->user_id_table, true);
         $user_source->mark_newly_assigned_users($cg);
         $this->validate_userid_table_records($data->user_id_table, $expected);
     }

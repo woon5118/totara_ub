@@ -22,7 +22,6 @@
  */
 
 use criteria_onactivate\onactivate_display;
-use totara_criteria\criterion;
 
 class criteria_onactivate_display_testcase extends \advanced_testcase {
 

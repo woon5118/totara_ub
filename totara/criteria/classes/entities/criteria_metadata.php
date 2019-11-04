@@ -30,8 +30,8 @@ use core\orm\entity\relations\belongs_to;
  * One record for a criteria metadata
  *
  * @property int $criterion_id
- * @property string metakey
- * @property string metavalue
+ * @property string $metakey
+ * @property string $metavalue
  *
  * @property-read criterion $criterion
  */

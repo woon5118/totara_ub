@@ -30,6 +30,6 @@ defined('MOODLE_INTERNAL') || die();
 $observers = [
     [
         'eventname' => \totara_competency\event\linked_courses_updated::class,
-        'callback'  => \criteria_linkedcourses\observer::class.'::linked_courses_updated'
+        'callback'  => \criteria_linkedcourses\observer\linked_courses::class.'::linked_courses_updated'
     ],
 ];

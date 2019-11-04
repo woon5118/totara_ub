@@ -27,7 +27,7 @@ use totara_competency\pathway_evaluator;
 use totara_competency\entities\pathway_achievement;
 use aggregation_highest\highest;
 use totara_competency\base_achievement_detail;
-use totara_competency\pathway_evaluator_user_source_table;
+use totara_competency\pathway_evaluator_user_source;
 
 class aggregation_highest_aggregation_testcase extends advanced_testcase {
 
@@ -60,7 +60,7 @@ class aggregation_highest_aggregation_testcase extends advanced_testcase {
 
         $source_table = new aggregation_users_table();
         $source_table->queue_for_aggregation($user->id, 1);
-        $pw_user_source = new pathway_evaluator_user_source_table($source_table, true);
+        $pw_user_source = new pathway_evaluator_user_source($source_table, true);
         $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway1, $pw_user_source]);
         $pathway_evaluator->aggregate();
 
@@ -97,7 +97,7 @@ class aggregation_highest_aggregation_testcase extends advanced_testcase {
 
         $source_table = new aggregation_users_table();
         $source_table->queue_for_aggregation($user->id, 1);
-        $pw_user_source = new pathway_evaluator_user_source_table($source_table, true);
+        $pw_user_source = new pathway_evaluator_user_source($source_table, true);
         $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway1, $pw_user_source]);
         $pathway_evaluator->aggregate();
 
@@ -134,7 +134,7 @@ class aggregation_highest_aggregation_testcase extends advanced_testcase {
 
         $source_table = new aggregation_users_table();
         $source_table->queue_for_aggregation($user->id, 1);
-        $pw_user_source = new pathway_evaluator_user_source_table($source_table, true);
+        $pw_user_source = new pathway_evaluator_user_source($source_table, true);
         $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway1, $pw_user_source]);
         $pathway_evaluator->aggregate();
 

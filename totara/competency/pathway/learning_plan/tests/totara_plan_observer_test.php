@@ -33,7 +33,7 @@ use totara_competency\achievement_configuration;
 use totara_competency\models\assignment_actions;
 use totara_competency\expand_task;
 
-class pathway_learning_plan_observer_testcase extends advanced_testcase {
+class pathway_learning_plan_totara_plan_observer_testcase extends advanced_testcase {
 
     public function test_event_for_competency_with_lp_pathway() {
         global $DB;

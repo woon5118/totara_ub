@@ -25,7 +25,7 @@
 use totara_competency\aggregation_users_table;
 use totara_competency\entities\competency_achievement;
 use totara_criteria\competency_item_evaluator;
-use totara_criteria\item_evaluator_user_source_table;
+use totara_criteria\item_evaluator_user_source;
 
 class totara_criteria_competency_item_evaluator_testcase extends advanced_testcase {
 
@@ -135,7 +135,7 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
 
         $data = $this->setup_data();
 
-        $user_source = new item_evaluator_user_source_table($data->source_table, false);
+        $user_source = new item_evaluator_user_source($data->source_table, false);
         $evaluator = new competency_item_evaluator($user_source);
         $evaluator->update_completion($data->criterion);
         $this->assertSame(0, $DB->count_records('totara_criteria_item_record'));
@@ -172,7 +172,7 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
         $record_id = $this->create_item_record($item_id, $user_id, $is_met);
 
         $data->source_table->queue_for_aggregation($user_id, 1);
-        $user_source = new item_evaluator_user_source_table($data->source_table);
+        $user_source = new item_evaluator_user_source($data->source_table);
         $evaluator = new competency_item_evaluator($user_source);
         $evaluator->update_completion($data->criterion);
 
@@ -318,7 +318,7 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
         }
 
         $data->source_table->queue_for_aggregation($user_id, 1);
-        $user_source = new item_evaluator_user_source_table($data->source_table);
+        $user_source = new item_evaluator_user_source($data->source_table);
         $evaluator = new competency_item_evaluator($user_source);
         $evaluator->update_completion($data->criterion);
 
@@ -413,7 +413,7 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
         }
 
         $data->source_table->queue_for_aggregation($user_id, 1);
-        $user_source = new item_evaluator_user_source_table($data->source_table);
+        $user_source = new item_evaluator_user_source($data->source_table);
         $evaluator = new competency_item_evaluator($user_source);
         $evaluator->update_completion($data->criterion);
 

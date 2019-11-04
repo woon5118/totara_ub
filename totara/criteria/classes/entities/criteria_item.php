@@ -35,6 +35,7 @@ use core\orm\entity\relations\has_many;
  * @property int $item_id
  *
  * @property-read criterion $criterion
+ * @property-read collection|criteria_item_record[] $item_records
  */
 class criteria_item extends entity {
 

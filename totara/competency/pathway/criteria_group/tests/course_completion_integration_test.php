@@ -25,10 +25,8 @@
 use pathway_criteria_group\criteria_group;
 use totara_competency\aggregation_task;
 use totara_competency\aggregation_users_table;
-use totara_competency\pathway;
 use criteria_coursecompletion\coursecompletion;
 use totara_competency\achievement_configuration;
-use totara_competency\task\competency_achievement_aggregation_adhoc;
 
 class pathway_criteria_group_course_completion_integration_testcase extends advanced_testcase {
 
@@ -176,12 +174,7 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
     }
 
     private function run_aggregation_task() {
-        $process_key = md5(uniqid(rand(), true));
-        $table = new aggregation_users_table();
-        $table->set_process_key_value($process_key);
-        $table->claim_process();
-        $task = new aggregation_task($table, false);
-        $task->execute();
+        (new aggregation_task(new aggregation_users_table(), false))->execute();
     }
 
 }

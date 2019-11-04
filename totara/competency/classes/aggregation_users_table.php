@@ -298,7 +298,11 @@ class aggregation_users_table {
      * @param mixed|null $has_changed_value Value to insert in the has_changed column
      * @return array
      */
-    public function get_insert_record(int $user_id_value, int $competency_id_value, $has_changed_value = null): array {
+    public function get_insert_record(
+        int $user_id_value,
+        int $competency_id_value,
+        $has_changed_value = null
+    ): array {
         $record = [
             $this->get_user_id_column() => $user_id_value,
             $this->get_competency_id_column() => $competency_id_value
@@ -468,14 +472,85 @@ class aggregation_users_table {
     /**
      * Queue aggregation to be processed in the background for all assigned users
      *
+     * @param array $data List of ['user_id' => , 'competency_id' => ] pairs to queue
+     */
+    public function queue_multiple_for_aggregation(array $data): void {
+        global $DB;
+
+        if (empty($data)) {
+            return;
+        }
+
+        // Ensure the data array contains 'user_id' and 'competency_id'
+        if (empty(array_column($data, 'user_id')) || empty(array_column($data, 'competency_id'))) {
+            throw new \coding_exception('Data passed to queue_multiple_for_aggregation must contain a user_id and competency_id');
+        }
+
+        // Convert data to objects for consistency
+        $data = json_decode(json_encode($data));
+
+        $process_key_wh = '';
+
+        if (!empty($this->process_key_column)) {
+            $process_key_set = ', NULL as ' . $this->process_key_column;
+            $process_key_wh = " {$this->process_key_column} IS NULL";
+        }
+
+        $wh_parts = [];
+        $params = [];
+        foreach ($data as $idx => $item) {
+            $wh_parts[] = "{$this->user_id_column} = :userid_{$idx} AND {$this->competency_id_column} = :compid_{$idx}";
+            $params["userid_{$idx}"] = $item->user_id;
+            $params["compid_{$idx}"] = $item->competency_id;
+        }
+
+        $id_concat = $DB->sql_concat($this->get_user_id_column(), "'_'", $this->get_competency_id_column());
+        $sql =
+            "SELECT {$id_concat} as idstr, {$this->get_user_id_column()} as user_id, {$this->get_competency_id_column()} as competency_id
+               FROM {{$this->get_table_name()}}
+              WHERE {$process_key_wh}
+                AND ((" . implode(') OR (', $wh_parts) . '))';
+
+        // Expecting calling function to
+        $existing_rows = $DB->get_records_sql($sql, $params);
+        $to_add = array_udiff($data, $existing_rows, function ($new, $existing) {
+            if ($new->user_id == $existing->user_id) {
+                return $new->competency_id <=> $existing->competency_id;
+            } else {
+                return $new->user_id <=> $existing->user_id;
+            }
+        });
+
+        $to_add = array_map(
+            function ($el) {
+                $add_el = (object)$this->get_insert_record($el->user_id, $el->competency_id);
+                if (!empty($this->process_key_column)) {
+                    // We are queuing - ensure process_key is null
+                    $add_el->{$this->process_key_column} = null;
+                }
+                return $add_el;
+            },
+            $to_add
+        );
+
+        $DB->insert_records_via_batch($this->table_name, $to_add);
+    }
+
+    /**
+     * Queue aggregation to be processed in the background for all assigned users
+     *
      * @param int $competency_id
      */
     public function queue_all_assigned_users_for_aggregation(int $competency_id): void {
         global $DB;
 
+        $process_key_set = '';
+        $process_key_wh = '';
+
         if (!empty($this->process_key_column)) {
             $process_key_wh = " AND agg_queue.{$this->process_key_column} IS NULL";
         }
+
         $sql =
             "SELECT tacu.user_id
                FROM {totara_assignment_competency_users} tacu
@@ -486,18 +561,21 @@ class aggregation_users_table {
               WHERE tacu.competency_id = :compid
                 AND agg_queue.id IS NULL";
 
-        $to_add = $DB->get_fieldset_sql($sql, ['compid' => $competency_id]);
+        $to_add = $DB->get_records_sql($sql, ['compid' => $competency_id]);
+
         $to_add = array_map(
-            function ($user_id) use ($competency_id) {
-                return ['competency_id' => $competency_id, 'user_id' => $user_id, 'process_key' => null];
+            function ($el) use ($competency_id) {
+                $add_el = (object)$this->get_insert_record($el->user_id, $competency_id);
+                if (!empty($this->process_key_column)) {
+                    // We are queuing - ensure process_key is null
+                    $add_el->{$this->process_key_column} = null;
+                }
+                return $add_el;
             },
             $to_add
         );
 
-        $batches = array_chunk($to_add, BATCH_INSERT_MAX_ROW_COUNT);
-        foreach ($batches as $rows) {
-            $DB->insert_records($this->table_name, $rows);
-        }
+        $DB->insert_records_via_batch($this->table_name, $to_add);
     }
 
     /**

@@ -27,6 +27,9 @@ use totara_competency\pathway;
 use totara_competency\pathway_evaluator;
 use totara_competency\pathway_evaluator_user_source;
 
+global $CFG;
+require_once($CFG->dirroot . '/totara/competency/tests/fixtures/test_pathway_evaluator_source.php');
+
 class test_pathway_evaluator extends pathway_evaluator {
     /**
      * Constructor.
@@ -45,8 +48,7 @@ class test_pathway_evaluator extends pathway_evaluator {
      * @return manual_user_source
      */
     private function get_test_user_source(pathway_evaluator_user_source $user_id_source): pathway_evaluator_user_source {
-        $classname = 'pathway_test_pathway\test_pathway_evaluator_user_source_' . $user_id_source->get_source_type();
-        return new $classname($user_id_source->get_source(), $user_id_source->is_full_user_set());
+        return new \pathway_test_pathway\test_pathway_evaluator_user_source($user_id_source->get_source(), $user_id_source->is_full_user_set());
     }
 
 }

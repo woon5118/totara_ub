@@ -23,7 +23,6 @@
  */
 
 use criteria_linkedcourses\linkedcourses;
-use totara_criteria\criterion;
 
 class criteria_linkedcourses_testcase extends \advanced_testcase {
 
