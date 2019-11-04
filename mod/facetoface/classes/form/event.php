@@ -230,6 +230,7 @@ class event extends \moodleform {
                         $mform->setType('trainerrole['.$role->id.']['.$cid.']', PARAM_INT);
                     }
                 } else {
+                    $choices = array(0 => get_string('none', 'facetoface')) + $choices;
                     $mform->addElement('select', 'trainerrole['.$role->id.']', $rolename, $choices, array('multiple' => 'multiple'));
                     $mform->setType('trainerrole['.$role->id.']', PARAM_SEQUENCE);
                 }
