@@ -136,18 +136,6 @@ class totara_flavour_overview_setting_testcase extends advanced_testcase {
         $this->assertTrue($setting->is_on());
         $this->assertFalse($setting->is_set_in_configphp());
 
-        set_config('enablegoals', advanced_feature::HIDDEN);
-        $overview = new overview();
-        $setting = $overview->settings['moodle|enablegoals'];
-        $this->assertInstanceOf('totara_flavour\\overview_setting', $setting);
-        $this->assertSame('enablegoals', $setting->name);
-        $this->assertSame('moodle', $setting->component);
-        $this->assertEquals(advanced_feature::HIDDEN, $setting->currentvalue);
-        $this->assertTrue($setting->is_prohibited('flavour_test'));
-        $this->assertFalse($setting->is_prohibited('flavour_enterprise'));
-        $this->assertTrue($setting->is_on());
-        $this->assertFalse($setting->is_set_in_configphp());
-
         set_config('enablegoals', advanced_feature::DISABLED);
         $CFG->enablegoals = (string)advanced_feature::ENABLED;
         $CFG->config_php_settings['enablegoals'] = $CFG->enablegoals;

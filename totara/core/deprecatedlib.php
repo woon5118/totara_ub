@@ -299,7 +299,7 @@ function totara_feature_check_state($feature, $stateconstant) {
             return advanced_feature::is_enabled($feature);
         case advanced_feature::DISABLED:
             return advanced_feature::is_disabled($feature);
-        case advanced_feature::HIDDEN:
+        case TOTARA_HIDEFEATURE:
             return totara_feature_hidden($feature);
         default:
             throw new coding_exception('Unknown state constant for feature check');
