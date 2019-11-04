@@ -25,7 +25,7 @@ namespace totara_competency\controllers\profile;
 
 use totara_competency\entities\competency_framework;
 use totara_competency\entities\competency_type;
-use totara_mvc\view;
+use totara_mvc\tui_view;
 
 class self_assignment extends base {
 
