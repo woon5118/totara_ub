@@ -104,12 +104,12 @@ class totara_core_admin_setting_feature extends admin_setting_configselect {
             return true;
         }
 
-        if (isset($CFG->{$this->name}) and $CFG->{$this->name} == advanced_feature::HIDDEN) {
-            // The \totara_core\advanced_feature::HIDDEN does note really work, keep it for existing sites only,
-            // this should be removed completely in the trust release after we add upgrade code.
+        if (isset($CFG->{$this->name}) and $CFG->{$this->name} == TOTARA_HIDEFEATURE) {
+            debugging("Found hidden feature '{$this->name}': hiding features is not supported anymore, features can only be enabled or disabled..", DEBUG_DEVELOPER);
+
             $this->choices = array(
                 advanced_feature::ENABLED => new lang_string('showfeature', 'totara_core'),
-                advanced_feature::HIDDEN => new lang_string('hidefeature', 'totara_core'),
+                TOTARA_HIDEFEATURE => new lang_string('hidefeature', 'totara_core'),
                 advanced_feature::DISABLED => new lang_string('disablefeature', 'totara_core')
             );
         } else {
