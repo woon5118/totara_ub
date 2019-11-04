@@ -46,15 +46,8 @@ if ($backtoallsessions) {
 }
 
 try {
-    $session = new stdClass();
-    $session = $seminarevent->to_record();
-    $session->mintimestart = $seminarevent->get_mintimestart();
-    $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
-
     // Start deleting now.
     \mod_facetoface\seminar_event_helper::delete_seminarevent($seminarevent);
-
-    \mod_facetoface\event\session_deleted::create_from_session($session, $context)->trigger();
     redirect($returnurl);
 } catch (Exception $e) {
     print_error('error:couldnotdeletesession', 'facetoface', $returnurl);

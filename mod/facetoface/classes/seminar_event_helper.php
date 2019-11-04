@@ -26,6 +26,7 @@ namespace mod_facetoface;
 
 defined('MOODLE_INTERNAL') || die();
 
+use context_module;
 use mod_facetoface\signup\state\{
     attendance_state,
     booked,
@@ -146,6 +147,13 @@ final class seminar_event_helper {
         }
 
         $id = $seminarevent->get_id();
+        $cm = $seminarevent->get_seminar()->get_coursemodule();
+        $context = context_module::instance($cm->id);
+
+        // Capture the snapshot of the seminar event before cancelling or deleting it.
+        $session = $seminarevent->to_record();
+        $session->mintimestart = $seminarevent->get_mintimestart();
+        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
 
         // Either before or not able to cancelling the event, it still needs to cache the list of custom rooms and
         // assets, because at the very end of this functionality, these custom rooms/assets should be deleted
@@ -190,6 +198,7 @@ final class seminar_event_helper {
             }
         }
 
+        \mod_facetoface\event\session_deleted::create_from_session($session, $context)->trigger();
         return true;
     }
 

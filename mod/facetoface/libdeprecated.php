@@ -4900,6 +4900,7 @@ function facetoface_delete_session($session) {
 
     $transaction->allow_commit();
 
+    \mod_facetoface\event\session_deleted::create_from_session($session, $context)->trigger();
     return true;
 }
 
