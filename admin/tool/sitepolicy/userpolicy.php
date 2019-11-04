@@ -41,7 +41,9 @@ $consentdata = optional_param('consentdata', '', PARAM_TEXT);
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url(new moodle_url("/{$CFG->admin}/tool/sitepolicy/userpolicy.php"));
 $PAGE->set_popup_notification_allowed(false);
-
+if (!isloggedin() || isguestuser()) {
+    $PAGE->set_pagelayout('login');
+}
 if (isset($SESSION->wantsurl)) {
     $wantsurl = $SESSION->wantsurl;
 } else {

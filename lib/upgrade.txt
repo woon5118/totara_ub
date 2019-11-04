@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* core_renderer::login_info and core_renderer::user_menu are updated to remove the main menu items from the site policy page.
 * All support for counted record sets was deprecated, use two separate queries instead.
 * Added new moodleform element 'filetypes' and new admin setting widget 'admin_setting_filetypes'. These new widgets
   allow users to define a list of file types; either by typing them manually or selecting them from a list. The widgets

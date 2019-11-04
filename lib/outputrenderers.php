@@ -630,9 +630,14 @@ class core_renderer extends renderer_base {
                 }
             }
         } else {
-            $loggedinas = get_string('loggedinnot', 'moodle');
-            if (!$loginpage && $withlinks) {
-                $loggedinas .= " <a href=\"$loginurl\" class=\"btn btn-primary btn-xs\">".get_string('login').'</a>';
+            // Totara: do not display login button.
+            if (!$loginpage) {
+                $loggedinas = get_string('loggedinnot', 'moodle');
+                if ($withlinks) {
+                    $loggedinas .= html_writer::link($loginurl, get_string('login'), ['class' => 'btn btn-primary btn-xs']);
+                }
+            } else {
+                return '';
             }
         }
 
@@ -672,11 +677,13 @@ class core_renderer extends renderer_base {
         // This is a real bit of a hack, but its a rarety that we need to do something like this.
         // In fact the login pages should be only these two pages and as exposing this as an option for all pages
         // could lead to abuse (or at least unneedingly complex code) the hack is the way to go.
+        // TOTARA: We are not showing "Login" button for site policy page.
         return in_array(
             $this->page->url->out_as_local_url(false, array()),
             array(
                 '/login/index.php',
                 '/login/forgot_password.php',
+                '/admin/tool/sitepolicy/userpolicy.php',
             )
         );
     }
@@ -2974,18 +2981,19 @@ EOD;
         $loginurl = get_login_url();
         // If not logged in, show the typical not-logged-in string.
         if (!isloggedin()) {
-            $returnstr = get_string('loggedinnot', 'moodle');
+            // Totara: do not display login button.
             if (!$loginpage) {
-                $returnstr .= " <a href=\"$loginurl\" class=\"btn btn-primary btn-xs\">" . get_string('login') . '</a>';
+                $returnstr = get_string('loggedinnot', 'moodle') . html_writer::link($loginurl, get_string('login'), ['class' => 'btn btn-primary btn-xs']);
+                return html_writer::div(
+                    html_writer::span(
+                        $returnstr,
+                        'login'
+                    ),
+                    $usermenuclasses
+                );
+            } else {
+                return '';
             }
-            return html_writer::div(
-                html_writer::span(
-                    $returnstr,
-                    'login'
-                ),
-                $usermenuclasses
-            );
-
         }
 
         // If logged in as a guest user, show a string to that effect.

@@ -201,3 +201,35 @@ Feature: Manage sitepolicy version translations
     Then I should see "nl Policy 2"
     When I set the field "language" to "fr"
     Then I should see "fr Policy 2"
+
+  Scenario: Multilingual sitepolicy is match to Main menu language when select
+    Given the following "multiversionpolicies" exist in "tool_sitepolicy" plugin:
+      | hasdraft | numpublished | allarchived | title    | languages | langprefix | statement          | numoptions | consentstatement       | providetext | withholdtext | mandatory |
+      | 1        | 0            | 0           | Policy 2 | en,nl,fr  | ,nl ,fr    | Policy 2 statement | 1          | P2 - Consent statement | Yes         | No           | first     |
+    And I log in as "admin"
+    And I navigate to "Manage policies" node in "Site administration > Security > Site policies"
+    And I follow "Policy 2"
+    When I follow "Publish"
+    Then I should see "Are you sure you want to publish \"Policy 2\""
+    When I press "Publish"
+    Then I should see "Version 1 of \"Policy 2\" has been published successfully"
+    And I log out
+    When I press "Create new account"
+    Then I should see "Policy 2"
+    And "Home" "link" should not exist
+    And "Find learning" "link" should not exist
+    When I set the field "lang" to "nl"
+    Then the field "language" matches value "nl"
+    And the field "language" does not match value "en"
+    And the field "language" does not match value "fr"
+    And I should see "nl Policy 2"
+    When I set the field "lang" to "fr"
+    Then the field "language" matches value "fr"
+    And the field "language" does not match value "en"
+    And the field "language" does not match value "nl"
+    And I should see "fr Policy 2"
+    When I set the field "lang" to "en"
+    Then the field "language" matches value "en"
+    And the field "language" does not match value "nl"
+    And the field "language" does not match value "fr"
+    And I should see "Policy 2"

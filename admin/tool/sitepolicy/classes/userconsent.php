@@ -325,7 +325,7 @@ class userconsent {
                AND tslp.isprimary = :isprimary
         ";
 
-        if ($userid != 0) {
+        if ($userid > 1) {
             $userchoosen = $DB->get_record_sql($userchoosensql,
                 ['userid' => $userid, 'policyversionid' => $policyversionid]);
             if (!empty($userchoosen)) {
@@ -359,7 +359,7 @@ class userconsent {
             }
         }
 
-        return $mustexist ? $primary->language : 'en';
+        return $mustexist ? $primary->language : current_language();
 
     }
 
