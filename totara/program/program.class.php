@@ -26,6 +26,7 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
+use totara_core\advanced_feature;
 use \totara_program\exception\manager as exception_manager;
 
 require_once($CFG->dirroot . '/totara/program/program_content.class.php');
@@ -2398,11 +2399,11 @@ class program {
     public function save_image($imagedata) {
         // Only upload if the module is enabled.
         if ($this->is_certif()) {
-            if (totara_feature_disabled('certifications')) {
+            if (advanced_feature::is_disabled('certifications')) {
                 return;
             }
         } else {
-            if (totara_feature_disabled('programs')) {
+            if (advanced_feature::is_disabled('programs')) {
                 return;
             }
         }

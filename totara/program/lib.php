@@ -22,6 +22,8 @@
  * @subpackage program
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/coursecatlib.php');
@@ -476,7 +478,7 @@ function prog_add_required_learning_base_navlinks($userid) {
     // the user is viewing someone else's learning
     $user = $DB->get_record('user', array('id' => $userid));
     if ($user) {
-        if (totara_feature_visible('myteam')) {
+        if (advanced_feature::is_enabled('myteam')) {
             $PAGE->navbar->add(get_string('team', 'totara_core'), new moodle_url('/my/teammembers.php'));
         }
         $PAGE->navbar->add(get_string('xsrequiredlearning', 'totara_program', fullname($user)), new moodle_url('/totara/program/required.php', array('userid' => $userid)));
@@ -2180,7 +2182,7 @@ function prog_update_available_enrolments(enrol_totara_program_plugin $program_p
  *
  */
 function check_program_enabled() {
-    if (totara_feature_disabled('programs')) {
+    if (advanced_feature::is_disabled('programs')) {
         print_error('programsdisabled', 'totara_program');
     }
 }
@@ -2190,7 +2192,7 @@ function check_program_enabled() {
  *
  */
 function check_certification_enabled() {
-    if (totara_feature_disabled('certifications')) {
+    if (advanced_feature::is_disabled('certifications')) {
         print_error('certificationsdisabled', 'totara_certification');
     }
 }

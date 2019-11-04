@@ -21,6 +21,8 @@
  * @package totara_program
 */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -59,18 +61,18 @@ class totara_program_completions_task_testcase extends advanced_testcase {
     public function test_task_having_disabled_programs() {
         global $CFG;
 
-        $this->assertFalse(totara_feature_disabled('programs'));
+        $this->assertFalse(advanced_feature::is_disabled('programs'));
 
         $original = $CFG->enableprograms;
-        $CFG->enableprograms = TOTARA_DISABLEFEATURE;
+        $CFG->enableprograms = advanced_feature::DISABLED;
 
-        $this->assertTrue(totara_feature_disabled('programs'));
+        $this->assertTrue(advanced_feature::is_disabled('programs'));
 
         $task = new \totara_program\task\completions_task();
         $this->assertTrue($task->execute());
 
         $CFG->enableprograms = $original;
-        $this->assertFalse(totara_feature_disabled('programs'));
+        $this->assertFalse(advanced_feature::is_disabled('programs'));
         $this->assertTrue($task->execute());
     }
 
@@ -80,18 +82,18 @@ class totara_program_completions_task_testcase extends advanced_testcase {
     public function test_task_having_disabled_certifications() {
         global $CFG;
 
-        $this->assertFalse(totara_feature_disabled('certifications'));
+        $this->assertFalse(advanced_feature::is_disabled('certifications'));
 
         $original = $CFG->enablecertifications;
-        $CFG->enablecertifications = TOTARA_DISABLEFEATURE;
+        $CFG->enablecertifications = advanced_feature::DISABLED;
 
-        $this->assertTrue(totara_feature_disabled('certifications'));
+        $this->assertTrue(advanced_feature::is_disabled('certifications'));
 
         $task = new \totara_program\task\completions_task();
         $this->assertTrue($task->execute());
 
         $CFG->enablecertifications = $original;
-        $this->assertFalse(totara_feature_disabled('certifications'));
+        $this->assertFalse(advanced_feature::is_disabled('certifications'));
         $this->assertTrue($task->execute());
     }
 
@@ -101,24 +103,24 @@ class totara_program_completions_task_testcase extends advanced_testcase {
     public function test_task_having_disabled_programs_and_certifications() {
         global $CFG;
 
-        $this->assertFalse(totara_feature_disabled('programs'));
-        $this->assertFalse(totara_feature_disabled('certifications'));
+        $this->assertFalse(advanced_feature::is_disabled('programs'));
+        $this->assertFalse(advanced_feature::is_disabled('certifications'));
 
         $original_programs = $CFG->enableprograms;
         $original_certifications = $CFG->enablecertifications;
-        $CFG->enableprograms = TOTARA_DISABLEFEATURE;
-        $CFG->enablecertifications = TOTARA_DISABLEFEATURE;
+        $CFG->enableprograms = advanced_feature::DISABLED;
+        $CFG->enablecertifications = advanced_feature::DISABLED;
 
-        $this->assertTrue(totara_feature_disabled('programs'));
-        $this->assertTrue(totara_feature_disabled('certifications'));
+        $this->assertTrue(advanced_feature::is_disabled('programs'));
+        $this->assertTrue(advanced_feature::is_disabled('certifications'));
 
         $task = new \totara_program\task\completions_task();
         $this->assertFalse($task->execute());
 
         $CFG->enableprograms = $original_programs;
         $CFG->enablecertifications = $original_certifications;
-        $this->assertFalse(totara_feature_disabled('programs'));
-        $this->assertFalse(totara_feature_disabled('certifications'));
+        $this->assertFalse(advanced_feature::is_disabled('programs'));
+        $this->assertFalse(advanced_feature::is_disabled('certifications'));
         $this->assertTrue($task->execute());
     }
 

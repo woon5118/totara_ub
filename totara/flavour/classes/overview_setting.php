@@ -23,6 +23,8 @@
 
 namespace totara_flavour;
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -152,10 +154,10 @@ class overview_setting implements \renderable {
      * @return bool
      */
     public function is_on() {
-        $totarafeatures = totara_advanced_features_list();
+        $totarafeatures = advanced_feature::get_available();
         foreach ($totarafeatures as $name) {
             if ($this->name === 'enable' . $name) {
-                return ((int)$this->currentvalue !== TOTARA_DISABLEFEATURE);
+                return ((int)$this->currentvalue !== advanced_feature::DISABLED);
             }
         }
         return !empty($this->currentvalue);

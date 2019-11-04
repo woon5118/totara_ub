@@ -21,6 +21,8 @@
  * @package totara_job
  */
 
+use totara_core\advanced_feature;
+
 require_once($CFG->dirroot . '/lib/formslib.php');
 
 class job_assignment_form extends moodleform {
@@ -152,7 +154,7 @@ class job_assignment_form extends moodleform {
         $mform->addHelpButton('enddate', 'jobassignmentenddate', 'totara_job');
         $mform->setDefault('enddate', 0);
 
-        if (!totara_feature_disabled('positions')) {
+        if (!advanced_feature::is_disabled('positions')) {
             $pos_class = strlen($positiontitle) ? 'nonempty' : '';
             $mform->addElement('static', 'positionselector', get_string('position', 'totara_job'),
                 html_writer::tag('span', format_string($positiontitle), array('class' => $pos_class, 'id' => 'positiontitle')).
@@ -175,7 +177,7 @@ class job_assignment_form extends moodleform {
         $mform->setDefault('organisationid', 0);
         $mform->addHelpButton('organisationselector', 'chooseorganisation', 'totara_job');
 
-        if (!totara_feature_disabled('appraisals')) {
+        if (!advanced_feature::is_disabled('appraisals')) {
             // Show appraiser.
             // If we can edit, show button. Else show link to appraiser's profile.
             if ($canedit) {

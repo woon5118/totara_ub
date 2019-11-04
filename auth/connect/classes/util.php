@@ -23,6 +23,7 @@
 
 namespace auth_connect;
 
+use totara_core\advanced_feature;
 use \totara_core\jsend;
 
 /**
@@ -1348,7 +1349,7 @@ class util {
             return true;
         }
 
-        if (totara_feature_disabled('positions')) {
+        if (advanced_feature::is_disabled('positions')) {
             return true;
         }
 

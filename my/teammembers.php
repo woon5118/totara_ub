@@ -25,6 +25,8 @@
 
 /* Displays information for the current user's team */
 
+use totara_core\advanced_feature;
+
 require_once(dirname(dirname(__FILE__)).'/config.php');
 require_once($CFG->libdir.'/blocklib.php');
 require_once($CFG->libdir.'/tablelib.php');
@@ -38,7 +40,7 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_pagetype('my-teammembers');
 $PAGE->set_url(new moodle_url('/my/teammembers.php'));
 
-if (totara_feature_disabled('myteam')) {
+if (advanced_feature::is_disabled('myteam')) {
     redirect(new moodle_url('/'));
 }
 

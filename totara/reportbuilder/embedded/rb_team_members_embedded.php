@@ -22,6 +22,7 @@
  * @subpackage reportbuilder
  */
 
+use totara_core\advanced_feature;
 use totara_reportbuilder\rb\content\user;
 
 class rb_team_members_embedded extends rb_base_embedded {
@@ -104,7 +105,7 @@ class rb_team_members_embedded extends rb_base_embedded {
      * @return bool
      */
     public static function is_report_ignored() {
-        return !totara_feature_visible('myteam');
+        return !advanced_feature::is_enabled('myteam');
     }
 
     /**

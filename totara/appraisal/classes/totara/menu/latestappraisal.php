@@ -26,6 +26,8 @@
 
 namespace totara_appraisal\totara\menu;
 
+use totara_core\advanced_feature;
+
 class latestappraisal extends \totara_core\totara\menu\item {
 
     protected function get_default_title() {
@@ -72,7 +74,7 @@ class latestappraisal extends \totara_core\totara\menu\item {
      * @return bool
      */
     public function is_disabled() {
-        return totara_feature_disabled('appraisals');
+        return advanced_feature::is_disabled('appraisals');
     }
 
     public function get_incompatible_preset_rules(): array {

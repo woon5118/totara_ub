@@ -22,6 +22,8 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
@@ -1433,7 +1435,7 @@ class core_course_management_renderer extends plugin_renderer_base {
             $output .= $this->single_button($url, $title, 'get');
         }
 
-        if (totara_feature_visible('programs')) {
+        if (advanced_feature::is_enabled('programs')) {
             // Print button for switching to program management.
             $url = new moodle_url('/totara/program/manage.php', array('categoryid' => $categoryid));
             $programcaps = array('totara/program:createprogram', 'totara/program:deleteprogram', 'totara/program:configuredetails');
@@ -1442,7 +1444,7 @@ class core_course_management_renderer extends plugin_renderer_base {
                 $output .= $this->single_button($url, $title, 'get');
             }
         }
-        if (totara_feature_visible('certifications')) {
+        if (advanced_feature::is_enabled('certifications')) {
             // Print button for switching to certification management.
             $url = new moodle_url('/totara/program/manage.php', array('categoryid' => $categoryid, 'viewtype' => 'certification'));
             $programcaps = array('totara/certification:createcertification',

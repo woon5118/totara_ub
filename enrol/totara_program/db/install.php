@@ -22,12 +22,14 @@
  * @subpackage totara_program
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 function xmldb_enrol_totara_program_install() {
     global $CFG, $DB;
 
-    if (!totara_feature_visible('programs') && !totara_feature_visible('certifications')) {
+    if (!advanced_feature::is_enabled('programs') && !advanced_feature::is_enabled('certifications')) {
         return;
     }
 

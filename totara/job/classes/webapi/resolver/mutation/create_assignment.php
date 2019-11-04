@@ -24,6 +24,7 @@
 namespace totara_job\webapi\resolver\mutation;
 
 use \core\webapi\execution_context;
+use totara_core\advanced_feature;
 use \totara_job\job_assignment;
 
 /**
@@ -60,7 +61,7 @@ class create_assignment implements \core\webapi\mutation_resolver {
         $jobassignment->fullname = $args['fullname'] ?? null;
         $jobassignment->shortname = $args['shortname'] ?? null;
         $jobassignment->description = $args['description'] ?? null;
-        if (!totara_feature_disabled('positions')) {
+        if (!advanced_feature::is_disabled('positions')) {
             $jobassignment->positionid = $args['positionid'] ?? null;
         }
         $jobassignment->organisationid = $args['organisationid'] ?? null;

@@ -24,6 +24,8 @@
 
 namespace totara_certification\task;
 
+use totara_core\advanced_feature;
+
 /**
  * Update learner assignments for active appraisals.
  */
@@ -51,7 +53,7 @@ class update_certification_task extends \core\task\scheduled_task {
         // Suppress output during tests.
         $quiet = PHPUNIT_TEST || defined('BEHAT_SITE_RUNNING');
 
-        if (totara_feature_disabled('certifications')) {
+        if (advanced_feature::is_disabled('certifications')) {
             return;
         }
 

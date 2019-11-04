@@ -27,6 +27,8 @@
  * Main Class definition and library functions for report builder
  */
 
+use totara_core\advanced_feature;
+
 require_once($CFG->dirroot . '/calendar/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/filters/lib.php');
 require_once($CFG->dirroot . '/totara/core/lib/scheduler.php');
@@ -4608,7 +4610,7 @@ class reportbuilder {
         }
 
         $graph = null;
-        if (!totara_feature_disabled('reportgraphs')) {
+        if (!advanced_feature::is_disabled('reportgraphs')) {
             $graph = \totara_reportbuilder\local\graph\base::create_graph($this, false);
 
             if (!$graph->is_valid()) {

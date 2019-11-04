@@ -28,6 +28,9 @@
  *
  * Library to construct competency hierarchies
  */
+
+use totara_core\advanced_feature;
+
 require_once("{$CFG->dirroot}/totara/hierarchy/lib.php");
 require_once("{$CFG->dirroot}/totara/hierarchy/prefix/competency/evidenceitem/type/abstract.php");
 require_once("{$CFG->dirroot}/totara/core/utils.php");
@@ -1111,7 +1114,7 @@ class competency extends hierarchy {
      * @return Nothing but print an error if competencies are not enabled
      */
     public static function check_feature_enabled() {
-        if (totara_feature_disabled('competencies')) {
+        if (advanced_feature::is_disabled('competencies')) {
             print_error('competenciesdisabled', 'totara_hierarchy');
         }
     }

@@ -25,6 +25,7 @@ namespace totara_completioneditor\output;
 
 use \core_completion\helper;
 use \totara_completioneditor\course_editor;
+use totara_core\advanced_feature;
 
 /**
 * Standard HTML output renderer for totara_core module
@@ -546,8 +547,8 @@ class course_renderer extends \plugin_renderer_base {
             return $out;
         }
 
-        $progsenabled = $CFG->enableprogramcompletioneditor && !totara_feature_disabled('programs');
-        $certsenabled = $CFG->enableprogramcompletioneditor && !totara_feature_disabled('certifications');
+        $progsenabled = $CFG->enableprogramcompletioneditor && !advanced_feature::is_disabled('programs');
+        $certsenabled = $CFG->enableprogramcompletioneditor && !advanced_feature::is_disabled('certifications');
         $haseditcolumn = !empty($progs) && $progsenabled || !empty($certs) && $certsenabled;
 
         ob_start();

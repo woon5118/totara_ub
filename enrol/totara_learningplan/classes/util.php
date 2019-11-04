@@ -21,6 +21,8 @@
  * @package enrol_totara_learningplan
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -41,7 +43,7 @@ class enrol_totara_learningplan_util {
         $resetcaches = false;
         $enabled = explode(',', $CFG->enrol_plugins_enabled);
 
-        if (totara_feature_visible('learningplans')) {
+        if (advanced_feature::is_enabled('learningplans')) {
             // NOTE: do not enable learning plans automatically, new installs in 2.7 require manual enabling too.
             /*
             if (!in_array('totara_learningplan', $enabled)) {

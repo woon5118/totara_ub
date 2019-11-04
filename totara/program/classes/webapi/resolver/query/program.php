@@ -25,6 +25,7 @@
 namespace totara_program\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use totara_core\advanced_feature;
 
 /**
  * Query to return a program
@@ -43,7 +44,7 @@ class program implements \core\webapi\query_resolver {
         // TL-21305 will find a better, encapsulated solution for require_login calls.
         require_login(null, false, null, false, true);
 
-        if (totara_feature_disabled('programs')) {
+        if (advanced_feature::is_disabled('programs')) {
             throw new \coding_exception('Programs have been disabled.');
         }
 

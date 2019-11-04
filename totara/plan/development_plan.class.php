@@ -22,6 +22,8 @@
  * @subpackage plan
  */
 
+use totara_core\advanced_feature;
+
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
@@ -243,10 +245,10 @@ class development_plan {
             ORDER BY sortorder";
         $params = array_merge($inparams, array($this->templateid));
         $active_components = $DB->get_records_sql($sql, $params);
-        if (totara_feature_disabled('programs')) {
+        if (advanced_feature::is_disabled('programs')) {
             $active_components = totara_search_for_value($active_components, 'component', TOTARA_SEARCH_OP_NOT_EQUAL, 'program');
         }
-        if (totara_feature_disabled('competencies')) {
+        if (advanced_feature::is_disabled('competencies')) {
             $active_components = totara_search_for_value($active_components, 'component', TOTARA_SEARCH_OP_NOT_EQUAL, 'competency');
         }
 
@@ -449,11 +451,11 @@ class development_plan {
         $content = '';
         $count = 1;
 
-        if (!totara_feature_visible('programs')) {
+        if (!advanced_feature::is_enabled('programs')) {
             $components = totara_search_for_value($components, 'component', TOTARA_SEARCH_OP_NOT_EQUAL, 'program');
         }
 
-        if (!totara_feature_visible('competencies')) {
+        if (!advanced_feature::is_enabled('competencies')) {
             $components = totara_search_for_value($components, 'component', TOTARA_SEARCH_OP_NOT_EQUAL, 'competency');
         }
 
@@ -1900,11 +1902,11 @@ class development_plan {
         // get active components in correct order
         $components = $this->get_components();
 
-        if (!totara_feature_visible('programs')) {
+        if (!advanced_feature::is_enabled('programs')) {
             $components = totara_search_for_value($components, 'component', TOTARA_SEARCH_OP_NOT_EQUAL, 'program');
         }
 
-        if (!totara_feature_visible('competencies')) {
+        if (!advanced_feature::is_enabled('competencies')) {
             $components = totara_search_for_value($components, 'component', TOTARA_SEARCH_OP_NOT_EQUAL, 'competency');
         }
 

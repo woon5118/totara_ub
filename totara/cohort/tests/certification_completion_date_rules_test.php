@@ -21,6 +21,8 @@
  * @package totara_cohort
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -77,7 +79,7 @@ class totara_cohort_certification_date_rules_testcase extends totara_cohort_cert
         }
 
         // Turn off programs. This is to test that it doesn't interfere with certification status in anyway.
-        set_config('enableprograms', TOTARA_DISABLEFEATURE);
+        set_config('enableprograms', advanced_feature::DISABLED);
 
         // Create certifications.
         for ($i = 1; $i <= self::TEST_CERTIFICATIONS_COUNT; $i++) {

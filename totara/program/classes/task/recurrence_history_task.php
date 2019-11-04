@@ -24,6 +24,8 @@
 
 namespace totara_program\task;
 
+use totara_core\advanced_feature;
+
 /**
  * Check if any courses in recurring programs that were not completed when
  * the recurring course was switched to a newer version of the course
@@ -53,8 +55,8 @@ class recurrence_history_task extends \core\task\scheduled_task {
         require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 
         // Don't run programs cron if programs and certifications are disabled.
-        if (totara_feature_disabled('programs') &&
-            totara_feature_disabled('certifications')) {
+        if (advanced_feature::is_disabled('programs') &&
+            advanced_feature::is_disabled('certifications')) {
             return false;
         }
 

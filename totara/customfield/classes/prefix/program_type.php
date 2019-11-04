@@ -22,6 +22,8 @@
  */
 
 namespace totara_customfield\prefix;
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 class program_type extends type_base {
@@ -31,7 +33,7 @@ class program_type extends type_base {
     }
 
     public function is_feature_type_disabled() {
-        return (totara_feature_disabled('programs') && totara_feature_disabled('certifications'));
+        return (advanced_feature::is_disabled('programs') && advanced_feature::is_disabled('certifications'));
     }
 
     public function get_capability_managefield() {

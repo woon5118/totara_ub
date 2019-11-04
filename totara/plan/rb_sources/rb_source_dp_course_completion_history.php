@@ -21,6 +21,8 @@
  * @package totara_reportbuilder
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -49,6 +51,6 @@ class rb_source_dp_course_completion_history extends rb_source_course_completion
      * @return boolean If the report should be ignored of not.
      */
     public static function is_source_ignored() {
-        return !totara_feature_visible('recordoflearning');
+        return !advanced_feature::is_enabled('recordoflearning');
     }
 }

@@ -24,6 +24,8 @@
  * @subpackage plan
  */
 
+use totara_core\advanced_feature;
+
 require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot.'/totara/plan/lib.php');
 require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
@@ -63,7 +65,7 @@ $currenturl = new moodle_url('/totara/plan/components/course/view.php', array('i
 
 $evidence = new dp_evidence_relation($id, $componentname, $caid);
 
-$competenciesenabled = totara_feature_visible('competencies') && $plan->get_component('competency')->get_setting('enabled');
+$competenciesenabled = advanced_feature::is_enabled('competencies') && $plan->get_component('competency')->get_setting('enabled');
 $competencyname = get_string('competencyplural', 'totara_plan');
 $objectivesenabled = $plan->get_component('objective')->get_setting('enabled');
 $objectivename = get_string('objectiveplural', 'totara_plan');

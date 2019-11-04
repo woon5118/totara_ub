@@ -24,6 +24,8 @@
 
 namespace totara_coursecatalog\totara\menu;
 
+use totara_core\advanced_feature;
+
 class certifications extends \totara_core\totara\menu\item {
 
     protected function get_default_title() {
@@ -54,7 +56,7 @@ class certifications extends \totara_core\totara\menu\item {
      * @return bool
      */
     public function is_disabled() {
-        return totara_feature_disabled('certifications');
+        return advanced_feature::is_disabled('certifications');
     }
 
     public function get_incompatible_preset_rules(): array {

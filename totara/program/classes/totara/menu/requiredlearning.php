@@ -24,6 +24,8 @@
 
 namespace totara_program\totara\menu;
 
+use totara_core\advanced_feature;
+
 /**
  * Class to store, render and manage the Required Learning Node
  *
@@ -81,7 +83,7 @@ class requiredlearning extends \totara_core\totara\menu\item {
      * @return bool
      */
     public function is_disabled() {
-        return (totara_feature_disabled('programs') && totara_feature_disabled('certifications'));
+        return (advanced_feature::is_disabled('programs') && advanced_feature::is_disabled('certifications'));
     }
 
     protected function get_default_parent() {

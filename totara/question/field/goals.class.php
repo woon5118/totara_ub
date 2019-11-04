@@ -23,6 +23,9 @@
  * @subpackage totara_question
  */
 global $CFG;
+
+use totara_core\advanced_feature;
+
 require_once('reviewrating.class.php');
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 
@@ -638,7 +641,7 @@ class question_goals extends reviewrating {
      * @return boolean If goals is enabled or not.
      */
     public static function check_enabled() {
-        return !totara_feature_disabled('goals');
+        return !advanced_feature::is_disabled('goals');
     }
 
 }

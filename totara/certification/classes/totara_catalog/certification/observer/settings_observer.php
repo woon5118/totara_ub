@@ -26,6 +26,7 @@ namespace totara_certification\totara_catalog\certification\observer;
 
 defined('MOODLE_INTERNAL') || die();
 
+use totara_core\advanced_feature;
 use totara_program\totara_catalog\program\observer\settings_observer as program_settings_observer;
 
 class settings_observer extends program_settings_observer {
@@ -40,7 +41,7 @@ class settings_observer extends program_settings_observer {
         global $CFG;
 
         $enablecertifications = (int)$CFG->enablecertifications;
-        if ($enablecertifications != TOTARA_DISABLEFEATURE) {
+        if ($enablecertifications != advanced_feature::DISABLED) {
             return true;
         }
 

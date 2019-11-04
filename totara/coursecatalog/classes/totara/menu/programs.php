@@ -23,6 +23,8 @@
 
 namespace totara_coursecatalog\totara\menu;
 
+use totara_core\advanced_feature;
+
 class programs extends \totara_core\totara\menu\item {
 
     protected function get_default_title() {
@@ -49,7 +51,7 @@ class programs extends \totara_core\totara\menu\item {
      * @return bool
      */
     public function is_disabled() {
-        return totara_feature_disabled('programs');
+        return advanced_feature::is_disabled('programs');
     }
 
     protected function get_default_parent() {

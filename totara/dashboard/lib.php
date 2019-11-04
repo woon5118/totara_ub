@@ -21,6 +21,8 @@
  * @package totara_dashboard
  */
 
+use totara_core\advanced_feature;
+
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');
 }
@@ -118,7 +120,7 @@ class totara_dashboard {
 
         // If dashboards are disabled then return an empty array
         // so redirects are done where necessary.
-        if (totara_feature_disabled('totaradashboard')) {
+        if (advanced_feature::is_disabled('totaradashboard')) {
             return array();
         }
 
@@ -736,7 +738,7 @@ class totara_dashboard {
     * Prints an error if Totara Dashboard is not enabled.
     */
     public static function check_feature_enabled() {
-        if (totara_feature_disabled('totaradashboard')) {
+        if (advanced_feature::is_disabled('totaradashboard')) {
             print_error('totaradashboarddisabled', 'totara_dashboard');
         }
     }

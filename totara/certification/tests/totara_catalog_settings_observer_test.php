@@ -21,6 +21,8 @@
  * @package
  */
 
+use totara_core\advanced_feature;
+
 /**
  * @group totara_catalog
  */
@@ -45,7 +47,7 @@ class totara_certification_totara_catalog_settings_observer_testcase extends adv
         $this->assertSame(1, $DB->count_records('catalog', ['objecttype' => 'certification']));
 
         // turn off certification
-        set_config('enablecertifications', TOTARA_DISABLEFEATURE);
+        set_config('enablecertifications', advanced_feature::DISABLED);
         $event = core\event\admin_settings_changed::create(
             [
                 'context' => \context_system::instance(),
@@ -66,7 +68,7 @@ class totara_certification_totara_catalog_settings_observer_testcase extends adv
         global $DB;
 
         // create one course , one program and one certification
-        set_config('enablecertifications', TOTARA_DISABLEFEATURE);
+        set_config('enablecertifications', advanced_feature::DISABLED);
         $this->create_catalog_objects();
 
         $this->assertSame(0, $DB->count_records('catalog', ['objecttype' => 'certification']));
@@ -79,7 +81,7 @@ class totara_certification_totara_catalog_settings_observer_testcase extends adv
                 'context' => \context_system::instance(),
                 'other'   =>
                     [
-                        'olddata' => ['s__enablecertifications' => TOTARA_DISABLEFEATURE],
+                        'olddata' => ['s__enablecertifications' => advanced_feature::DISABLED],
                     ],
             ]
         );

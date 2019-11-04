@@ -26,6 +26,7 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
+use totara_core\advanced_feature;
 use \totara_program\exception\manager as exception_manager;
 
 require_once($CFG->dirroot . '/course/renderer.php');
@@ -255,7 +256,7 @@ class totara_program_renderer extends plugin_renderer_base {
         // Display the categories!
         $js = '';
         foreach ($categories as $category) {
-            if (get_class($category) === 'positions_category' && totara_feature_disabled('positions')) {
+            if (get_class($category) === 'positions_category' && advanced_feature::is_disabled('positions')) {
                 $canadd = false;
             } else if ($program->has_expired()) {
                 $canadd = false;

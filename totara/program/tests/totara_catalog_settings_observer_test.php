@@ -22,6 +22,8 @@
  * @category totara_catalog
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -49,7 +51,7 @@ class totara_program_totara_catalog_settings_observer_testcase extends advanced_
         $this->assertSame(3, $DB->count_records('catalog'));
 
         // turn off programs
-        set_config('enableprograms', TOTARA_DISABLEFEATURE);
+        set_config('enableprograms', advanced_feature::DISABLED);
         $event = core\event\admin_settings_changed::create(
             [
                 'context' => \context_system::instance(),
@@ -70,7 +72,7 @@ class totara_program_totara_catalog_settings_observer_testcase extends advanced_
         global $DB;
 
         // create one course , one program and one certification
-        set_config('enableprograms', TOTARA_DISABLEFEATURE);
+        set_config('enableprograms', advanced_feature::DISABLED);
         $this->create_catalog_objects();
 
         $this->assertSame(0, $DB->count_records('catalog', ['objecttype' => 'program']));
@@ -83,7 +85,7 @@ class totara_program_totara_catalog_settings_observer_testcase extends advanced_
                 'context' => \context_system::instance(),
                 'other'   =>
                     [
-                        'olddata' => ['s__enableprograms' => TOTARA_DISABLEFEATURE],
+                        'olddata' => ['s__enableprograms' => advanced_feature::DISABLED],
                     ],
             ]
         );

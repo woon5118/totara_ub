@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -1143,7 +1145,7 @@ class global_navigation extends navigation_node {
             return;
         }
 
-        if (totara_feature_visible('totaradashboard') && get_home_page() == HOMEPAGE_TOTARA_DASHBOARD) {
+        if (advanced_feature::is_enabled('totaradashboard') && get_home_page() == HOMEPAGE_TOTARA_DASHBOARD) {
             // We are using totara dashboard for the root element.
             $properties = array(
                 'key' => 'mydashboard',
@@ -1219,7 +1221,7 @@ class global_navigation extends navigation_node {
         } else if (get_home_page() == HOMEPAGE_SITE) {
             // The home element should be dashboard because the root node is site.
             // But only show if the user has dashboards.
-            if (totara_feature_visible('totaradashboard') && (count(totara_dashboard::get_user_dashboards($USER->id)))) {
+            if (advanced_feature::is_enabled('totaradashboard') && (count(totara_dashboard::get_user_dashboards($USER->id)))) {
                 $this->rootnodes['home'] = $this->add(get_string('dashboard'), new moodle_url('/totara/dashboard/index.php'));
             }
         } else {
@@ -4117,7 +4119,7 @@ class settings_navigation extends navigation_node {
         }
 
         if ($adminoptions->update) {
-            if (totara_feature_visible('competencies')) {
+            if (advanced_feature::is_enabled('competencies')) {
                 // Add the course competencies link.
                 $url = new moodle_url('/course/competency.php', array('id' => $course->id));
                 $coursenode->add(get_string('competencies', 'totara_hierarchy'), $url, self::TYPE_SETTING, null, null, new pix_icon('i/settings', ''));

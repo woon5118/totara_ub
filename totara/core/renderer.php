@@ -22,6 +22,8 @@
  * @subpackage totara_core
  */
 
+use totara_core\advanced_feature;
+
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
@@ -164,7 +166,7 @@ class totara_core_renderer extends plugin_renderer_base {
             return '';
         }
 
-        if (!totara_feature_visible('myteam')) {
+        if (!advanced_feature::is_enabled('myteam')) {
             return '';
         }
 
@@ -228,7 +230,7 @@ class totara_core_renderer extends plugin_renderer_base {
                 continue;
             }
 
-            if (totara_feature_visible('reportgraphs') && !empty($report->graph) && isset($graphimages[$report->graph])) {
+            if (advanced_feature::is_enabled('reportgraphs') && !empty($report->graph) && isset($graphimages[$report->graph])) {
                 $graphicon = new pix_icon(
                     $graphimages[$report->graph],
                     null,
@@ -672,7 +674,7 @@ class totara_core_renderer extends plugin_renderer_base {
         }
 
         // Learning plans.
-        if (totara_feature_visible('learningplans') && dp_can_view_users_plans($userid)) {
+        if (advanced_feature::is_enabled('learningplans') && dp_can_view_users_plans($userid)) {
             $strplans = get_string('learningplans', 'totara_plan');
             $urlplans = new moodle_url('/totara/plan/index.php', array('userid' => $userid));
             echo html_writer::tag('dt', $strplans);

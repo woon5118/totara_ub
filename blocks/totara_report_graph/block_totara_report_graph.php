@@ -21,6 +21,8 @@
  * @package block_totara_report_graph
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 class block_totara_report_graph extends block_base {
@@ -94,7 +96,7 @@ class block_totara_report_graph extends block_base {
     public function get_content() {
         global $USER, $CFG, $SESSION;
 
-        if (totara_feature_disabled('reportgraphs')) {
+        if (advanced_feature::is_disabled('reportgraphs')) {
             return '';
         }
 

@@ -21,6 +21,8 @@
  * @package totara_program
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -890,7 +892,7 @@ class totara_program_lib_testcase extends reportcache_advanced_testcase {
         $this->resetAfterTest(true);
 
         // Turn off programs. This is to test that it doesn't interfere with certification completion.
-        set_config('enableprograms', TOTARA_DISABLEFEATURE);
+        set_config('enableprograms', advanced_feature::DISABLED);
 
         // Create users.
         for ($i = 1; $i <= $this->numfixusers; $i++) {

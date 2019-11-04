@@ -26,6 +26,7 @@ namespace totara_certification\totara_catalog;
 defined('MOODLE_INTERNAL') || die();
 
 use totara_catalog\provider;
+use totara_core\advanced_feature;
 use totara_customfield\totara_catalog\dataholder_factory as customfield_dataholder_factory;
 
 global $CFG;
@@ -40,7 +41,7 @@ class certification extends provider {
     private $config_cache = null;
 
     public static function is_plugin_enabled(): bool {
-        return !totara_feature_disabled('certifications');
+        return !advanced_feature::is_disabled('certifications');
     }
 
     public static function get_name(): string {

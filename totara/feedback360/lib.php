@@ -24,6 +24,8 @@
  * @subpackage feedback360
  */
 
+use totara_core\advanced_feature;
+
 require_once($CFG->dirroot . '/totara/core/lib.php');
 require_once($CFG->dirroot . '/totara/question/lib.php');
 require_once($CFG->dirroot . '/totara/feedback360/lib/assign/lib.php');
@@ -944,7 +946,7 @@ class feedback360 {
      *
      */
     public static function check_feature_enabled() {
-        if (totara_feature_disabled('feedback360')) {
+        if (advanced_feature::is_disabled('feedback360')) {
             print_error('feedback360disabled', 'totara_feedback360');
         }
     }

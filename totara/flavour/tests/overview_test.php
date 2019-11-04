@@ -21,6 +21,7 @@
  * @package totara_flavour
  */
 
+use totara_core\advanced_feature;
 use \totara_flavour\overview;
 use \totara_flavour\helper;
 
@@ -65,7 +66,7 @@ class totara_flavour_overview_testcase extends advanced_testcase {
         $this->assertObjectNotHasAttribute('forceflavour', $CFG);
         $this->assertObjectNotHasAttribute('showflavours', $CFG);
         $this->assertObjectNotHasAttribute('currentflavour', $CFG);
-        $this->assertEquals(TOTARA_SHOWFEATURE, get_config('moodle', 'enableappraisals'));
+        $this->assertEquals(advanced_feature::ENABLED, get_config('moodle', 'enableappraisals'));
 
         // We need some flavours for testing.
         $this->assertFileExists("$CFG->dirroot/totara/flavour/flavours/enterprise/classes/definition.php");
@@ -167,7 +168,7 @@ class totara_flavour_overview_testcase extends advanced_testcase {
         $result = $overview->get_flavour_to_enforce();
         $this->assertSame('flavour_test', $result);
 
-        set_config('enablegoals', TOTARA_SHOWFEATURE);
+        set_config('enablegoals', advanced_feature::ENABLED);
         $overview = new overview();
         $result = $overview->get_flavour_to_enforce();
         $this->assertSame('flavour_test', $result);

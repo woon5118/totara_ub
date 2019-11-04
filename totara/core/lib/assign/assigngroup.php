@@ -27,6 +27,8 @@
  * and action (add, remove, edit) and then calls the correct class functions to provide/collect content from the dialog
  */
 
+use totara_core\advanced_feature;
+
 require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/core/lib/assign/lib.php');
@@ -47,9 +49,9 @@ $sitecontext = context_system::instance();
 // Totara plugins need to implement this capability otherwise they have to do heir own assign stuff, see goals for example.
 require_capability("totara/{$module}:assign{$module}togroup", $sitecontext);
 
-$features = totara_advanced_features_list();
+$features = advanced_feature::get_available();
 if (in_array($module, $features)) {
-    if (totara_feature_disabled($module)) {
+    if (advanced_feature::is_disabled($module)) {
         die;
     }
 }

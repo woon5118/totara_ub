@@ -24,6 +24,8 @@
 
 namespace totara_plan\totara\menu;
 
+use totara_core\advanced_feature;
+
 class learningplans extends \totara_core\totara\menu\item {
 
     protected function get_default_title() {
@@ -66,7 +68,7 @@ class learningplans extends \totara_core\totara\menu\item {
      * @return bool
      */
     public function is_disabled() {
-        return totara_feature_disabled('learningplans');
+        return advanced_feature::is_disabled('learningplans');
     }
 
     protected function get_default_parent() {

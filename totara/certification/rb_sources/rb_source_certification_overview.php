@@ -22,6 +22,8 @@
  * @subpackage reportbuilder
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -78,7 +80,7 @@ class rb_source_certification_overview extends rb_base_source {
      * @return bool
      */
     public static function is_source_ignored() {
-        return !totara_feature_visible('certifications');
+        return !advanced_feature::is_enabled('certifications');
     }
 
     /**

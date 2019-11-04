@@ -21,6 +21,8 @@
  * @package auth_connect
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 require_once("{$CFG->libdir}/authlib.php");
 
@@ -61,7 +63,7 @@ $settingspage->add(new admin_setting_configselect('auth_connect/removeuser',
 $settingspage->add(new admin_setting_configcheckbox('auth_connect/syncjobs',
     new lang_string('syncjobs', 'auth_connect'), new lang_string('syncjobs_desc', 'auth_connect'), 0));
 
-if (!totara_feature_disabled('positions')) {
+if (!advanced_feature::is_disabled('positions')) {
     $settingspage->add(new admin_setting_configcheckbox('auth_connect/syncpositions',
         new lang_string('syncpositions', 'auth_connect'), new lang_string('syncpositions_desc', 'auth_connect'), 0));
 }

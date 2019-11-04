@@ -22,6 +22,8 @@
  * @author     Russell England <russell.england@catalyst-eu.net>
  */
 
+use totara_core\advanced_feature;
+
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/totara/completionimport/reset_form.php');
 require_once($CFG->dirroot . '/totara/completionimport/lib.php');
@@ -55,7 +57,7 @@ if ($pageparams['confirm']) {
         if ($pageparams['course']) {
             reset_import('course');
         }
-        if ($pageparams['certification'] && totara_feature_visible('certifications')) {
+        if ($pageparams['certification'] && advanced_feature::is_enabled('certifications')) {
             reset_import('certification');
         }
     }

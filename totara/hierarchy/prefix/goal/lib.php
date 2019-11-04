@@ -28,6 +28,9 @@
  *
  * Library to construct goal hierarchies
  */
+
+use totara_core\advanced_feature;
+
 require_once("{$CFG->dirroot}/totara/hierarchy/lib.php");
 require_once("{$CFG->dirroot}/totara/core/utils.php");
 require_once("{$CFG->dirroot}/totara/core/js/lib/setup.php");
@@ -230,7 +233,7 @@ class goal extends hierarchy {
             'cohort' => get_string('addcohorts', 'totara_hierarchy'),
         );
         // Only allow hierarchy positions to be added if it's enabled.
-        if (totara_feature_disabled('positions')) {
+        if (advanced_feature::is_disabled('positions')) {
             unset($options['pos']);
         }
 
@@ -1524,7 +1527,7 @@ class goal extends hierarchy {
      * @return Nothing but print an error if goals are not enabled
      */
     public static function check_feature_enabled() {
-        if (totara_feature_disabled('goals')) {
+        if (advanced_feature::is_disabled('goals')) {
             print_error('goalsdisabled', 'totara_hierarchy');
         }
     }

@@ -1,5 +1,7 @@
 <?php
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $USER;
@@ -38,15 +40,15 @@ $ADMIN->add('root', new admin_category('users', new lang_string('users','admin')
 $ADMIN->add('root', new admin_category('audiences', new lang_string('cohorts', 'totara_cohort')));
 $ADMIN->add('root', new admin_category('roles', new lang_string('permissions', 'role')));
 $ADMIN->add('root', new admin_category('userdata', new lang_string('pluginname', 'totara_userdata')));
-$ADMIN->add('root', new admin_category('positions', get_string('positions', 'totara_hierarchy'), totara_feature_disabled('positions')));
+$ADMIN->add('root', new admin_category('positions', get_string('positions', 'totara_hierarchy'), advanced_feature::is_disabled('positions')));
 $ADMIN->add('root', new admin_category('organisations', get_string('organisations', 'totara_hierarchy')));
-$ADMIN->add('root', new admin_category('competencies', get_string('competencies', 'totara_hierarchy'), totara_feature_disabled('competencies')));
-$ADMIN->add('root', new admin_category('goals', get_string('goals', 'totara_hierarchy'), totara_feature_disabled('goals')));
+$ADMIN->add('root', new admin_category('competencies', get_string('competencies', 'totara_hierarchy'), advanced_feature::is_disabled('competencies')));
+$ADMIN->add('root', new admin_category('goals', get_string('goals', 'totara_hierarchy'), advanced_feature::is_disabled('goals')));
 $ADMIN->add('root', new admin_category('totara_plan', new lang_string('learningplans', 'totara_plan'),
-    totara_feature_disabled('learningplans')
+    advanced_feature::is_disabled('learningplans')
 ));
 $ADMIN->add('root', new admin_category('appraisals', new lang_string('appraisals', 'totara_appraisal'),
-    (totara_feature_disabled('appraisals') && totara_feature_disabled('feedback360'))
+    (advanced_feature::is_disabled('appraisals') && advanced_feature::is_disabled('feedback360'))
 ));
 $ADMIN->add('root', new admin_category('courses', new lang_string('courses','admin')));
 $ADMIN->add('root', new admin_category('programs', new lang_string('programs','totara_program')));

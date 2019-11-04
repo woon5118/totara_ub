@@ -24,6 +24,8 @@
 
 namespace totara_plan\totara\menu;
 
+use totara_core\advanced_feature;
+
 class recordoflearning extends \totara_core\totara\menu\item {
 
     protected function get_default_title() {
@@ -51,6 +53,6 @@ class recordoflearning extends \totara_core\totara\menu\item {
      * @return bool
      */
     public function is_disabled() {
-        return totara_feature_disabled('recordoflearning');
+        return advanced_feature::is_disabled('recordoflearning');
     }
 }

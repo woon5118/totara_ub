@@ -21,6 +21,8 @@
  * @package tool_totara_sync
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -91,7 +93,7 @@ abstract class totara_sync_source_jobassignment extends totara_sync_source {
             $this->set_config('import_managerjobassignmentidnumber', '0');
         }
 
-        if (totara_feature_disabled('positions')) {
+        if (advanced_feature::is_disabled('positions')) {
             $this->set_config('import_posidnumber', '0');
             $this->disabled_fields[] = 'posidnumber';
         }

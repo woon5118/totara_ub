@@ -22,6 +22,8 @@
  * @subpackage program
  */
 
+use totara_core\advanced_feature;
+
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
@@ -1172,7 +1174,7 @@ class prog_content {
                     CONTENTTYPE_MULTICOURSE => get_string('setofcourses', 'totara_program'),
                 );
                 if (!$iscertif) {
-                    if (totara_feature_visible('competencies')) {
+                    if (advanced_feature::is_enabled('competencies')) {
                         $contentoptions[CONTENTTYPE_COMPETENCY] = get_string('competency', 'totara_program');
                     }
                     if ($numcoursesets == 0) { // don't allow recurring course to be added if the program already has other content

@@ -21,6 +21,7 @@
  * @package totara_dashboard
  */
 
+use totara_core\advanced_feature;
 use totara_dashboard\userdata\totara_dashboard as totara_dashboard_item;
 use totara_userdata\userdata\target_user;
 
@@ -270,7 +271,7 @@ class totara_dashboard_item_testcase extends advanced_testcase {
         $countbefore = totara_dashboard_item::execute_count($data->user1, $data->systemcontext);
 
         // Disable dashboards.
-        $CFG->enabletotaradashboard = TOTARA_DISABLEFEATURE;
+        $CFG->enabletotaradashboard = advanced_feature::DISABLED;
 
         $currentcount = totara_dashboard_item::execute_count($data->user1, $data->systemcontext);
         $this->assertEquals($countbefore, $currentcount);

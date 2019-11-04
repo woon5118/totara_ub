@@ -21,6 +21,7 @@
  * @package totara_flavour
  */
 
+use totara_core\advanced_feature;
 use \totara_flavour\overview;
 use \totara_flavour\helper;
 
@@ -65,7 +66,7 @@ class totara_flavour_overview_setting_testcase extends advanced_testcase {
         $this->assertObjectNotHasAttribute('forceflavour', $CFG);
         $this->assertObjectNotHasAttribute('showflavours', $CFG);
         $this->assertObjectNotHasAttribute('currentflavour', $CFG);
-        $this->assertEquals(TOTARA_SHOWFEATURE, get_config('moodle', 'enableappraisals'));
+        $this->assertEquals(advanced_feature::ENABLED, get_config('moodle', 'enableappraisals'));
 
         // We need some flavours for testing.
         $this->assertFileExists("$CFG->dirroot/totara/flavour/flavours/enterprise/classes/definition.php");
@@ -117,45 +118,45 @@ class totara_flavour_overview_setting_testcase extends advanced_testcase {
         $this->assertInstanceOf('totara_flavour\\overview_setting', $setting);
         $this->assertSame('enablegoals', $setting->name);
         $this->assertSame('moodle', $setting->component);
-        $this->assertEquals(TOTARA_DISABLEFEATURE, $setting->currentvalue);
+        $this->assertEquals(advanced_feature::DISABLED, $setting->currentvalue);
         $this->assertTrue($setting->is_prohibited('flavour_test'));
         $this->assertFalse($setting->is_prohibited('flavour_enterprise'));
         $this->assertFalse($setting->is_on());
         $this->assertFalse($setting->is_set_in_configphp());
 
-        set_config('enablegoals', TOTARA_SHOWFEATURE);
+        set_config('enablegoals', advanced_feature::ENABLED);
         $overview = new overview();
         $setting = $overview->settings['moodle|enablegoals'];
         $this->assertInstanceOf('totara_flavour\\overview_setting', $setting);
         $this->assertSame('enablegoals', $setting->name);
         $this->assertSame('moodle', $setting->component);
-        $this->assertEquals(TOTARA_SHOWFEATURE, $setting->currentvalue);
+        $this->assertEquals(advanced_feature::ENABLED, $setting->currentvalue);
         $this->assertTrue($setting->is_prohibited('flavour_test'));
         $this->assertFalse($setting->is_prohibited('flavour_enterprise'));
         $this->assertTrue($setting->is_on());
         $this->assertFalse($setting->is_set_in_configphp());
 
-        set_config('enablegoals', TOTARA_HIDEFEATURE);
+        set_config('enablegoals', advanced_feature::HIDDEN);
         $overview = new overview();
         $setting = $overview->settings['moodle|enablegoals'];
         $this->assertInstanceOf('totara_flavour\\overview_setting', $setting);
         $this->assertSame('enablegoals', $setting->name);
         $this->assertSame('moodle', $setting->component);
-        $this->assertEquals(TOTARA_HIDEFEATURE, $setting->currentvalue);
+        $this->assertEquals(advanced_feature::HIDDEN, $setting->currentvalue);
         $this->assertTrue($setting->is_prohibited('flavour_test'));
         $this->assertFalse($setting->is_prohibited('flavour_enterprise'));
         $this->assertTrue($setting->is_on());
         $this->assertFalse($setting->is_set_in_configphp());
 
-        set_config('enablegoals', TOTARA_DISABLEFEATURE);
-        $CFG->enablegoals = (string)TOTARA_SHOWFEATURE;
+        set_config('enablegoals', advanced_feature::DISABLED);
+        $CFG->enablegoals = (string)advanced_feature::ENABLED;
         $CFG->config_php_settings['enablegoals'] = $CFG->enablegoals;
         $overview = new overview();
         $setting = $overview->settings['moodle|enablegoals'];
         $this->assertInstanceOf('totara_flavour\\overview_setting', $setting);
         $this->assertSame('enablegoals', $setting->name);
         $this->assertSame('moodle', $setting->component);
-        $this->assertEquals(TOTARA_SHOWFEATURE, $setting->currentvalue);
+        $this->assertEquals(advanced_feature::ENABLED, $setting->currentvalue);
         $this->assertTrue($setting->is_prohibited('flavour_test'));
         $this->assertFalse($setting->is_prohibited('flavour_enterprise'));
         $this->assertTrue($setting->is_on());

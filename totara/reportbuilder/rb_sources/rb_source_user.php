@@ -23,6 +23,8 @@
  * @subpackage reportbuilder
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once("{$CFG->dirroot}/completion/completion_completion.php");
@@ -577,7 +579,7 @@ class rb_source_user extends rb_base_source {
         $disp = html_writer::start_tag('span', array('style' => 'white-space:nowrap;'));
 
         // Learning Records icon
-        if (totara_feature_visible('recordoflearning')) {
+        if (advanced_feature::is_enabled('recordoflearning')) {
             $disp .= html_writer::start_tag('a', array('href' => $CFG->wwwroot . '/totara/plan/record/index.php?userid='.$itemid));
             $disp .= $OUTPUT->flex_icon('recordoflearning', ['classes' => 'ft-size-300']);
             $disp .= html_writer::end_tag('a');
@@ -591,7 +593,7 @@ class rb_source_user extends rb_base_source {
         }
 
         // Individual Development Plans icon
-        if (totara_feature_visible('learningplans')) {
+        if (advanced_feature::is_enabled('learningplans')) {
             if (has_capability('totara/plan:accessplan', $systemcontext)) {
                 $disp .= html_writer::start_tag('a', array('href' => $CFG->wwwroot . '/totara/plan/index.php?userid=' . $itemid));
                 $disp .= $OUTPUT->flex_icon('learningplan', ['classes' => 'ft-size-300']);
@@ -698,7 +700,7 @@ class rb_source_user extends rb_base_source {
         $feedback_link = html_writer::link("{$CFG->wwwroot}/totara/feedback360/index.php?userid={$userid}", $feedback360str);
         $goal_link = html_writer::link("{$CFG->wwwroot}/totara/hierarchy/prefix/goal/mygoals.php?userid={$userid}", $goalstr);
 
-        $show_plan_link = totara_feature_visible('learningplans') && dp_can_view_users_plans($userid);
+        $show_plan_link = advanced_feature::is_enabled('learningplans') && dp_can_view_users_plans($userid);
 
         $links = html_writer::start_tag('ul');
         $links .= $show_plan_link ? html_writer::tag('li', $plan_link) : '';
@@ -708,22 +710,22 @@ class rb_source_user extends rb_base_source {
 
         // Show link to managers, but not to temporary managers.
         $ismanager = \totara_job\job_assignment::is_managing($USER->id, $userid, null, false);
-        if ($ismanager && totara_feature_visible('appraisals')) {
+        if ($ismanager && advanced_feature::is_enabled('appraisals')) {
             $links .= html_writer::tag('li', $appraisal_link);
         }
 
-        if (totara_feature_visible('feedback360') && feedback360::can_view_other_feedback360s($userid)) {
+        if (advanced_feature::is_enabled('feedback360') && feedback360::can_view_other_feedback360s($userid)) {
             $links .= html_writer::tag('li', $feedback_link);
         }
 
-        if (totara_feature_visible('goals')) {
+        if (advanced_feature::is_enabled('goals')) {
             if (has_capability('totara/hierarchy:viewstaffcompanygoal', $usercontext, $USER->id) ||
                 has_capability('totara/hierarchy:viewstaffpersonalgoal', $usercontext, $USER->id)) {
                 $links .= html_writer::tag('li', $goal_link);
             }
         }
 
-        if ((totara_feature_visible('programs') || totara_feature_visible('certifications')) && prog_can_view_users_required_learning($userid)) {
+        if ((advanced_feature::is_enabled('programs') || advanced_feature::is_enabled('certifications')) && prog_can_view_users_required_learning($userid)) {
             $links .= html_writer::tag('li', $required_link);
         }
 

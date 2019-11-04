@@ -22,6 +22,8 @@
  * @subpackage feedback360
  */
 
+use totara_core\advanced_feature;
+
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir  . '/adminlib.php');
 require_once($CFG->dirroot . '/totara/feedback360/lib.php');
@@ -75,7 +77,7 @@ if ($canassign) {
         echo $output->heading(get_string('assigncurrentgroups', 'totara_feedback360'));
         $groups = $assign->get_assignable_grouptype_names();
         // If hierarchy positions are disabled then don't included them in the options.
-        if (totara_feature_disabled('positions')) {
+        if (advanced_feature::is_disabled('positions')) {
             unset($groups['pos']);
         }
 

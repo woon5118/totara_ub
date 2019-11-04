@@ -28,6 +28,8 @@
  * Included in each settings page
  */
 
+use totara_core\advanced_feature;
+
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
@@ -45,7 +47,7 @@ $inactive = array();
 $row[] = new tabobject('general', $CFG->wwwroot . '/totara/reportbuilder/general.php?id=' . $id, get_string('general'));
 $row[] = new tabobject('columns', $CFG->wwwroot . '/totara/reportbuilder/columns.php?id=' . $id, get_string('columns', 'totara_reportbuilder'));
 
-if (!totara_feature_disabled('reportgraphs')) {
+if (!advanced_feature::is_disabled('reportgraphs')) {
     $row[] = new tabobject('graph', $CFG->wwwroot . '/totara/reportbuilder/graph.php?reportid=' . $id, get_string('graph', 'totara_reportbuilder'));
 }
 

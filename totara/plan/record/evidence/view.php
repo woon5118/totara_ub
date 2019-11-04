@@ -25,6 +25,8 @@
  * @subpackage plan
  */
 
+use totara_core\advanced_feature;
+
 require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot . '/totara/plan/lib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
@@ -33,7 +35,7 @@ require_once('lib.php');
 
 require_login();
 
-if (totara_feature_disabled('recordoflearning')) {
+if (advanced_feature::is_disabled('recordoflearning')) {
     print_error('error:recordoflearningdisabled', 'totara_plan');
 }
 
@@ -67,7 +69,7 @@ if ($USER->id != $userid) {
 
 // Get subheading name for display.
 if ($usertype == 'manager') {
-    if (totara_feature_visible('myteam')) {
+    if (advanced_feature::is_enabled('myteam')) {
         $menuitem = 'myteam';
         $url = new moodle_url('/my/teammembers.php');
         $PAGE->navbar->add(get_string('team', 'totara_core'), $url);

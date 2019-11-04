@@ -24,6 +24,8 @@
  * @author     Yuliya Bozhko <yuliya.bozhko@totaralms.com>
  */
 
+use totara_core\advanced_feature;
+
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/coursecatlib.php');
 require_once($CFG->dirroot . '/totara/program/lib.php');
@@ -459,7 +461,7 @@ if ($canmanage) {
     echo $OUTPUT->single_button($url, $title, 'get');
     if ($viewtype == 'program') {
         // Print button for switching to certification management.
-        if (totara_feature_visible('certifications')) {
+        if (advanced_feature::is_enabled('certifications')) {
             $url = new moodle_url('/totara/program/manage.php', array('categoryid' => $id, 'viewtype' => 'certification'));
             $programcaps = array('totara/certification:createcertification',
                                  'totara/certification:deletecertification',
@@ -471,7 +473,7 @@ if ($canmanage) {
         }
     } else {
         // Print button for switching to program management.
-        if (totara_feature_visible('programs')) {
+        if (advanced_feature::is_enabled('programs')) {
             $url = new moodle_url('/totara/program/manage.php', array('categoryid' => $id));
             $programcaps = array('totara/program:createprogram',
                                  'totara/program:deleteprogram',
@@ -723,8 +725,8 @@ if ($canmanage && $numprograms > 1 && empty($searchcriteria)) {
     echo $OUTPUT->single_button($url, get_string('resortprogramsbyname', 'totara_program'), 'get');
 }
 
-$cancreateprog = has_capability('totara/program:createprogram', $context) && !totara_feature_disabled('programs');
-$cancreatecert = has_capability('totara/certification:createcertification', $context) && !totara_feature_disabled('certifications');
+$cancreateprog = has_capability('totara/program:createprogram', $context) && !advanced_feature::is_disabled('programs');
+$cancreatecert = has_capability('totara/certification:createcertification', $context) && !advanced_feature::is_disabled('certifications');
 if (empty($searchcriteria)) {
     if ($viewtype == 'program' && $cancreateprog) {
         // Print button to create a new program.

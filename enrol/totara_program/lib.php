@@ -22,6 +22,8 @@
  * @subpackage totara_program
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 class enrol_totara_program_plugin extends enrol_plugin {
@@ -34,7 +36,7 @@ class enrol_totara_program_plugin extends enrol_plugin {
     public function get_newinstance_link($courseid) {
         global $DB;
 
-        if (!totara_feature_visible('programs') && !totara_feature_visible('certifications')) {
+        if (!advanced_feature::is_enabled('programs') && !advanced_feature::is_enabled('certifications')) {
             return null;
         }
 
@@ -58,7 +60,7 @@ class enrol_totara_program_plugin extends enrol_plugin {
      * @return bool
      */
     public function can_delete_instance($instance) {
-        if (!totara_feature_visible('programs') && !totara_feature_visible('certifications')) {
+        if (!advanced_feature::is_enabled('programs') && !advanced_feature::is_enabled('certifications')) {
             // Allow deleting only when programs disabled so that they can get rid of preexisting
             // enrolemnts before the programs were disabled.
             $context = context_course::instance($instance->courseid);
@@ -74,7 +76,7 @@ class enrol_totara_program_plugin extends enrol_plugin {
      * @return int id of new instance, null if can not be created
      */
     public function add_default_instance($course) {
-        if (!totara_feature_visible('programs') && !totara_feature_visible('certifications')) {
+        if (!advanced_feature::is_enabled('programs') && !advanced_feature::is_enabled('certifications')) {
             return null;
         }
 
@@ -231,7 +233,7 @@ class enrol_totara_program_plugin extends enrol_plugin {
     public function try_autoenrol(stdClass $instance) {
         global $CFG, $USER, $DB;
 
-        if (!totara_feature_visible('programs') && !totara_feature_visible('certifications')) {
+        if (!advanced_feature::is_enabled('programs') && !advanced_feature::is_enabled('certifications')) {
             return false;
         }
 

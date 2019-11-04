@@ -24,6 +24,9 @@
 /**
  * This file contains library functions relating to dynamic cohort rules
  */
+
+use totara_core\advanced_feature;
+
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
@@ -115,7 +118,7 @@ function cohort_rules_get_menu_options() {
             // If we're looking at hierarchy positions, then we need to check if they're enabled.
             // The check is done here because any existing rulesets using positions remain valid,
             // but the user isn't allowed to add any more.
-            if ($groupname === 'pos' && totara_feature_disabled('positions')) {
+            if ($groupname === 'pos' && advanced_feature::is_disabled('positions')) {
                 continue;
             }
 

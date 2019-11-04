@@ -25,6 +25,9 @@
 /**
  * Add learning plans administration menu settings
  */
+
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die;
 
     $ADMIN->add('totara_plan',
@@ -32,7 +35,7 @@ defined('MOODLE_INTERNAL') || die;
             new lang_string('managetemplates', 'totara_plan'),
             "$CFG->wwwroot/totara/plan/template/index.php",
             array('totara/plan:configureplans'),
-            totara_feature_disabled('learningplans')
+            advanced_feature::is_disabled('learningplans')
         )
     );
 
@@ -41,7 +44,7 @@ defined('MOODLE_INTERNAL') || die;
             new lang_string('priorityscales', 'totara_plan'),
             "$CFG->wwwroot/totara/plan/priorityscales/index.php",
             array('totara/plan:configureplans'),
-            totara_feature_disabled('learningplans')
+            advanced_feature::is_disabled('learningplans')
         )
     );
 
@@ -50,7 +53,7 @@ defined('MOODLE_INTERNAL') || die;
             new lang_string('objectivescales', 'totara_plan'),
             "$CFG->wwwroot/totara/plan/objectivescales/index.php",
             array('totara/plan:configureplans'),
-            totara_feature_disabled('learningplans')
+            advanced_feature::is_disabled('learningplans')
         )
     );
 
@@ -59,7 +62,7 @@ defined('MOODLE_INTERNAL') || die;
             new lang_string('evidencetypes', 'totara_plan'),
             "$CFG->wwwroot/totara/plan/evidencetypes/index.php",
             array('totara/plan:configureplans'),
-            totara_feature_disabled('learningplans')
+            advanced_feature::is_disabled('learningplans')
         )
     );
 
@@ -68,7 +71,7 @@ defined('MOODLE_INTERNAL') || die;
             new lang_string('evidencecustomfields', 'totara_plan'),
             "$CFG->wwwroot/totara/customfield/index.php?prefix=evidence",
             array('totara/plan:evidencemanagecustomfield'),
-            totara_feature_disabled('learningplans')
+            advanced_feature::is_disabled('learningplans')
         )
     );
 

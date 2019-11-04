@@ -21,11 +21,13 @@
  * @package totara_program
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 /** @var admin_root $ADMIN */
 /** @var context_system $systemcontext */
 
-$programsenabled = totara_feature_disabled('programs');
+$programsenabled = advanced_feature::is_disabled('programs');
 
 if (has_any_capability(['totara/program:createprogram', 'totara/program:configuredetails'], $systemcontext)) {
     $ADMIN->add('programs', new admin_externalpage('programmgmt',

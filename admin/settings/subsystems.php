@@ -1,5 +1,7 @@
 <?php
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 /** @var admin_root $ADMIN */
 
@@ -143,71 +145,71 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
         new lang_string('enablelegacyprogramassignments_help', 'totara_program'), 0));
 
     // If adding or removing the settings below, be sure to update the array in
-    // totara_advanced_features_list() in totara/core/totara.php.
+    // \totara_core\advanced_feature::get_available() in \totara_core\advanced_feature.
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablegoals',
         new lang_string('enablegoals', 'totara_hierarchy'),
         new lang_string('configenablegoals', 'totara_hierarchy'),
-        TOTARA_SHOWFEATURE));
+        advanced_feature::ENABLED));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablecompetencies',
         new lang_string('enablecompetencies', 'totara_hierarchy'),
         new lang_string('enablecompetencies_desc', 'totara_hierarchy'),
-        TOTARA_SHOWFEATURE));
+        advanced_feature::ENABLED));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enableappraisals',
         new lang_string('enableappraisals', 'totara_appraisal'),
         new lang_string('configenableappraisals', 'totara_appraisal'),
-        TOTARA_SHOWFEATURE));
+        advanced_feature::ENABLED));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablefeedback360',
         new lang_string('enablefeedback360', 'totara_feedback360'),
         new lang_string('configenablefeedback360', 'totara_feedback360'),
-        TOTARA_SHOWFEATURE));
+        advanced_feature::ENABLED));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablelearningplans',
         new lang_string('enablelearningplans', 'totara_plan'),
         new lang_string('configenablelearningplans', 'totara_plan'),
-        TOTARA_SHOWFEATURE,
+        advanced_feature::ENABLED,
         array('totara_menu_reset_all_caches', 'totara_rb_purge_ignored_reports',
             array('enrol_totara_learningplan_util', 'feature_setting_updated_callback'))));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enableprograms',
         new lang_string('enableprograms', 'totara_program'),
         new lang_string('configenableprograms', 'totara_program'),
-        TOTARA_SHOWFEATURE,
+        advanced_feature::ENABLED,
         array('totara_menu_reset_all_caches', 'totara_rb_purge_ignored_reports',
             array('enrol_totara_program_util', 'feature_setting_updated_callback'))));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablecertifications',
         new lang_string('enablecertifications', 'totara_program'),
         new lang_string('configenablecertifications', 'totara_program'),
-        TOTARA_SHOWFEATURE));
+        advanced_feature::ENABLED));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enabletotaradashboard',
         new lang_string('enabletotaradashboard', 'totara_dashboard'),
         new lang_string('configenabletotaradashboard', 'totara_dashboard'),
-        TOTARA_SHOWFEATURE));
+        advanced_feature::ENABLED));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablereportgraphs',
         new lang_string('enablereportgraphs', 'totara_reportbuilder'),
         new lang_string('enablereportgraphsinfo', 'totara_reportbuilder'),
-        TOTARA_SHOWFEATURE));
+        advanced_feature::ENABLED));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablerecordoflearning',
         new lang_string('enablerecordoflearning', 'totara_plan'),
         new lang_string('enablerecordoflearninginfo', 'totara_plan'),
-        TOTARA_SHOWFEATURE));
+        advanced_feature::ENABLED));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablepositions',
         new lang_string('enablepositions', 'totara_hierarchy'),
         new lang_string('enablepositions_desc', 'totara_hierarchy'),
-        TOTARA_SHOWFEATURE));
+        advanced_feature::ENABLED));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablemyteam',
         new lang_string('enableteam', 'totara_core'),
         new lang_string('enableteam_desc', 'totara_core'),
-        TOTARA_SHOWFEATURE));
+        advanced_feature::ENABLED));
 
     $defaultenhanced = 0;
     $setting = new admin_setting_configcheckbox('enableprogramcompletioneditor',

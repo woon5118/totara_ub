@@ -22,6 +22,8 @@
  */
 namespace totara_appraisal\task;
 
+use totara_core\advanced_feature;
+
 /**
  * Update learner assignments for active appraisals.
  */
@@ -47,7 +49,7 @@ class update_learner_assignments_task extends \core\task\scheduled_task {
         $timenow = time();
 
         // Execute the cron if Appraisals are not disabled or static.
-        if (totara_feature_disabled('appraisals')) {
+        if (advanced_feature::is_disabled('appraisals')) {
             return;
         }
 

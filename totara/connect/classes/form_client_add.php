@@ -24,6 +24,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 use \totara_connect\util;
+use totara_core\advanced_feature;
 
 global $CFG;
 require_once($CFG->dirroot . '/lib/formslib.php');
@@ -65,7 +66,7 @@ class totara_connect_form_client_add extends moodleform {
         $mform->addElement('advcheckbox', 'syncjobs', get_string('syncjobs', 'totara_connect'));
         $mform->addHelpButton('syncjobs', 'syncjobs', 'totara_connect');
 
-        if (!totara_feature_disabled('positions')) {
+        if (!advanced_feature::is_disabled('positions')) {
             $options = array();
             $frameworks = $DB->get_records('pos_framework', array(), 'sortorder ASC');
             foreach ($frameworks as $framework) {

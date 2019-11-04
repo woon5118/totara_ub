@@ -21,6 +21,8 @@
  * @package block_totara_certifications
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -82,7 +84,7 @@ class block_totara_certifications_testcase extends advanced_testcase {
         $this->assertContains('Test Certification 1', $content);
 
         // Now disable Certifications. The block should not show.
-        set_config('enablecertifications', TOTARA_DISABLEFEATURE);
+        set_config('enablecertifications', advanced_feature::DISABLED);
 
         $blockinstance = $this->create_totara_certifications_block_instance();
         $content = $blockinstance->get_content();

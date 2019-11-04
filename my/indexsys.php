@@ -35,6 +35,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use totara_core\advanced_feature;
+
 require_once(__DIR__ . '/../config.php');
 require_once($CFG->dirroot . '/my/lib.php');
 require_once($CFG->libdir.'/adminlib.php');
@@ -47,7 +49,7 @@ require_once($CFG->libdir.'/adminlib.php');
 
 require_login();
 
-$redirecturl = totara_feature_disabled('totaradashboard') ? new moodle_url('/') :
+$redirecturl = advanced_feature::is_disabled('totaradashboard') ? new moodle_url('/') :
     new moodle_url('/totara/dashboard/manage.php');
 
 debugging('The My Learning page has been removed. Existing My Learning content has been moved to a hidden dashboard called "Legacy My Learning".');

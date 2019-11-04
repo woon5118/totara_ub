@@ -25,6 +25,7 @@ namespace totara_completioneditor;
 
 use core_completion\helper;
 use totara_completioneditor\form\course_completion;
+use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -142,8 +143,8 @@ final class course_editor {
     public static function get_all_progs_and_certs($courseid, $userid) {
         global $CFG, $DB;
 
-        $progseditenabled = $CFG->enableprogramcompletioneditor && !totara_feature_disabled('programs');
-        $certseditenabled = $CFG->enableprogramcompletioneditor && !totara_feature_disabled('certifications');
+        $progseditenabled = $CFG->enableprogramcompletioneditor && !advanced_feature::is_disabled('programs');
+        $certseditenabled = $CFG->enableprogramcompletioneditor && !advanced_feature::is_disabled('certifications');
 
         // Programs first.
         $progs = array();

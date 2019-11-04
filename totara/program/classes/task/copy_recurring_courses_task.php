@@ -24,6 +24,8 @@
 
 namespace totara_program\task;
 
+use totara_core\advanced_feature;
+
 /**
  * Makes copies of any recurring courses as necessary
  */
@@ -52,7 +54,7 @@ class copy_recurring_courses_task extends \core\task\scheduled_task {
         require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 
         // Don't run programs cron if programs are disabled.
-        if (totara_feature_disabled('programs')) {
+        if (advanced_feature::is_disabled('programs')) {
             return false;
         }
 

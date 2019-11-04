@@ -22,6 +22,8 @@
  * @subpackage totara_program_completion
  */
 
+use totara_core\advanced_feature;
+
 require_once($CFG->dirroot.'/totara/program/program.class.php');
 require_once($CFG->dirroot.'/blocks/totara_program_completion/locallib.php');
 /**
@@ -50,7 +52,7 @@ class block_totara_program_completion extends block_base {
             return $this->content;
         }
 
-        if (totara_feature_disabled('programs')) {
+        if (advanced_feature::is_disabled('programs')) {
             return '';
         }
         $this->content = new stdClass();

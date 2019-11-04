@@ -27,6 +27,8 @@
  *
  */
 
+use totara_core\advanced_feature;
+
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 
 $id = required_param('id', PARAM_INT); // course id
@@ -38,7 +40,7 @@ require_login($course);
 require_capability('moodle/course:enrolconfig', $context);
 require_sesskey();
 
-if (!totara_feature_visible('programs') && !totara_feature_visible('certifications')) {
+if (!advanced_feature::is_enabled('programs') && !advanced_feature::is_enabled('certifications')) {
     redirect(new moodle_url('/enrol/instances.php', array('id' => $course->id)));
 }
 

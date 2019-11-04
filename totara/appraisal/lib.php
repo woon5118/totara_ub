@@ -29,6 +29,7 @@ require_once($CFG->dirroot.'/totara/appraisal/lib/assign/lib.php');
 require_once($CFG->dirroot.'/user/lib.php');
 require_once($CFG->dirroot.'/totara/message/messagelib.php');
 
+use totara_core\advanced_feature;
 use totara_job\job_assignment;
 
 
@@ -2162,7 +2163,7 @@ class appraisal {
      *
      */
     public static function check_feature_enabled() {
-        if (totara_feature_disabled('appraisals')) {
+        if (advanced_feature::is_disabled('appraisals')) {
             print_error('appraisalsdisabled', 'totara_appraisal');
         }
     }
@@ -2182,7 +2183,7 @@ class appraisal {
         }
 
         // Execute the cron if Appraisals are not disabled or static.
-        if (totara_feature_disabled('appraisals')) {
+        if (advanced_feature::is_disabled('appraisals')) {
             return;
         }
 

@@ -23,6 +23,8 @@
 
 namespace totara_connect;
 
+use totara_core\advanced_feature;
+
 /**
  * Class sep_services provides the implementation for all web service calls
  * from Totara Connect clients.
@@ -322,7 +324,7 @@ class sep_services {
             );
         }
 
-        if (totara_feature_disabled('positions')) {
+        if (advanced_feature::is_disabled('positions')) {
             return array(
                 'status' => 'success',
                 'data' => array(

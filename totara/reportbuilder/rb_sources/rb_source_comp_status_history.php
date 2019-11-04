@@ -22,6 +22,8 @@
  * @subpackage reportbuilder
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 class rb_source_comp_status_history extends rb_base_source {
@@ -61,7 +63,7 @@ class rb_source_comp_status_history extends rb_base_source {
     }
 
     public static function is_source_ignored() {
-        return !totara_feature_visible('competencies');
+        return !advanced_feature::is_enabled('competencies');
     }
 
     protected function define_joinlist() {

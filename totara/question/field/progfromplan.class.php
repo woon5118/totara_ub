@@ -23,6 +23,8 @@
  * @subpackage totara_question
  */
 
+use totara_core\advanced_feature;
+
 class question_progfromplan extends review {
 
     protected $component = 'program';
@@ -45,7 +47,7 @@ class question_progfromplan extends review {
      */
     public static function check_enabled() {
 
-        return !totara_feature_disabled('learningplans') && !totara_feature_disabled('programs');
+        return !advanced_feature::is_disabled('learningplans') && !advanced_feature::is_disabled('programs');
     }
 
     /**

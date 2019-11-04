@@ -26,6 +26,8 @@
  * This file displays the embedded report to show the "enrolled learning" items for a single cohort
  */
 
+use totara_core\advanced_feature;
+
 require_once('../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/cohort/lib.php');
@@ -169,13 +171,13 @@ if ($canedit && has_capability('moodle/course:update', $context)) {
 }
 
 // Add programs and certifications.
-if ($canedit && totara_feature_visible('programs') && has_capability('totara/program:configureassignments', $context)) {
+if ($canedit && advanced_feature::is_enabled('programs') && has_capability('totara/program:configureassignments', $context)) {
     echo html_writer::start_tag('div', array('class' => 'singlebutton'));
     echo html_writer::empty_tag('input', array('type' => 'submit', 'id' => 'add-program-learningitem-dialog',
         'value' => get_string('addprograms', 'totara_cohort')));
     echo html_writer::end_tag('div');
 }
-if ($canedit && totara_feature_visible('certifications') && has_capability('totara/program:configureassignments', $context)) {
+if ($canedit && advanced_feature::is_enabled('certifications') && has_capability('totara/program:configureassignments', $context)) {
     echo html_writer::start_tag('div', array('class' => 'singlebutton'));
     echo html_writer::empty_tag('input', array('type' => 'submit', 'id' => 'add-certification-learningitem-dialog',
         'value' => get_string('addcertifications', 'totara_cohort')));

@@ -23,6 +23,8 @@
 
 namespace totara_reportbuilder\rb\display;
 
+use totara_core\advanced_feature;
+
 /**
  * Display class intended for showing a users name, icon and links to their learning components
  * To pass the correct data, first:
@@ -106,7 +108,7 @@ class user_with_components_links extends base {
         $feedback_link = \html_writer::link("{$CFG->wwwroot}/totara/feedback360/index.php?userid={$userid}", $feedback360str);
         $goal_link = \html_writer::link("{$CFG->wwwroot}/totara/hierarchy/prefix/goal/mygoals.php?userid={$userid}", $goalstr);
 
-        $show_plan_link = totara_feature_visible('learningplans') && dp_can_view_users_plans($userid);
+        $show_plan_link = advanced_feature::is_enabled('learningplans') && dp_can_view_users_plans($userid);
 
         $links = \html_writer::start_tag('ul');
         $links .= $show_plan_link ? \html_writer::tag('li', $plan_link) : '';
@@ -116,22 +118,22 @@ class user_with_components_links extends base {
 
         // Show link to managers, but not to temporary managers.
         $ismanager = \totara_job\job_assignment::is_managing($USER->id, $userid, null, false);
-        if ($ismanager && totara_feature_visible('appraisals')) {
+        if ($ismanager && advanced_feature::is_enabled('appraisals')) {
             $links .= \html_writer::tag('li', $appraisal_link);
         }
 
-        if (totara_feature_visible('feedback360') && \feedback360::can_view_other_feedback360s($userid)) {
+        if (advanced_feature::is_enabled('feedback360') && \feedback360::can_view_other_feedback360s($userid)) {
             $links .= \html_writer::tag('li', $feedback_link);
         }
 
-        if (totara_feature_visible('goals')) {
+        if (advanced_feature::is_enabled('goals')) {
             if (has_capability('totara/hierarchy:viewstaffcompanygoal', $usercontext, $USER->id) ||
                 has_capability('totara/hierarchy:viewstaffpersonalgoal', $usercontext, $USER->id)) {
                 $links .= \html_writer::tag('li', $goal_link);
             }
         }
 
-        if ((totara_feature_visible('programs') || totara_feature_visible('certifications')) && prog_can_view_users_required_learning($userid)) {
+        if ((advanced_feature::is_enabled('programs') || advanced_feature::is_enabled('certifications')) && prog_can_view_users_required_learning($userid)) {
             $links .= \html_writer::tag('li', $required_link);
         }
 

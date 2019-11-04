@@ -23,6 +23,8 @@
  * @subpackage reportbuilder
  */
 
+use totara_core\advanced_feature;
+
 require_once($CFG->dirroot . '/totara/program/lib.php');
 
 class rb_plan_programs_recurring_embedded extends rb_base_embedded {
@@ -100,6 +102,6 @@ class rb_plan_programs_recurring_embedded extends rb_base_embedded {
      * @return boolean If the report should be ignored of not.
      */
     public static function is_report_ignored() {
-        return !totara_feature_visible('recordoflearning');
+        return !advanced_feature::is_enabled('recordoflearning');
     }
 }

@@ -22,6 +22,8 @@
  * @subpackage hierarchy
  */
 
+use totara_core\advanced_feature;
+
 require_once(__DIR__ . '/../../../../../config.php');
 require_once($CFG->dirroot.'/totara/core/utils.php');
 require_once($CFG->dirroot.'/totara/reportbuilder/filters/lib.php');
@@ -40,7 +42,7 @@ if (isguestuser()) {
 }
 
 // Check if Competencies are enabled.
-if (totara_feature_disabled('positions')) {
+if (advanced_feature::is_disabled('positions')) {
     echo html_writer::tag('div', get_string('positionsdisabled', 'totara_hierarchy'), array('class' => 'notifyproblem'));
     die();
 }

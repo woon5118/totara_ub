@@ -22,6 +22,8 @@
  * @subpackage hierarchy
  */
 
+use totara_core\advanced_feature;
+
 require_once(__DIR__ . '/../../../../../config.php');
 require_once($CFG->dirroot.'/totara/core/utils.php');
 
@@ -39,7 +41,7 @@ if (isguestuser()) {
 }
 
 // Check if Competencies are enabled.
-if (totara_feature_disabled('goals')) {
+if (advanced_feature::is_disabled('goals')) {
     echo html_writer::tag('div', get_string('goalsdisabled', 'totara_hierarchy'), array('class' => 'notifyproblem'));
     die();
 }

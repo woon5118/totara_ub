@@ -24,6 +24,9 @@
 /**
  * This page displays the embedded report for the "visible learning" items for a single cohort
  */
+
+use totara_core\advanced_feature;
+
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->dirroot . '/cohort/lib.php');
@@ -144,14 +147,14 @@ if ($canedit) {
 
     if (has_capability('totara/program:configuredetails', context_system::instance())) {
         // Add programs.
-        if (totara_feature_visible('programs')) {
+        if (advanced_feature::is_enabled('programs')) {
             echo html_writer::start_tag('div', array('class' => 'singlebutton'));
             echo html_writer::empty_tag('input', array('type' => 'submit', 'id' => 'add-program-learningitem-dialog',
                 'value' => get_string('addprograms', 'totara_cohort')));
             echo html_writer::end_tag('div');
         }
         // Add certifications.
-        if (totara_feature_visible('certifications')) {
+        if (advanced_feature::is_enabled('certifications')) {
             echo html_writer::start_tag('div', array('class' => 'singlebutton'));
             echo html_writer::empty_tag('input', array('type' => 'submit', 'id' => 'add-certification-learningitem-dialog',
                 'value' => get_string('addcertifications', 'totara_cohort')));

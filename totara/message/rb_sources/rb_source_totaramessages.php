@@ -24,6 +24,9 @@
  */
 
 global $CFG;
+
+use totara_core\advanced_feature;
+
 require_once($CFG->dirroot.'/totara/message/lib.php');
 
 defined('MOODLE_INTERNAL') || die();
@@ -499,13 +502,13 @@ class rb_source_totaramessages extends rb_base_source {
         $out = array();
 
         $componentskeys = array_flip(array('competency', 'course', 'evidence', 'facetoface', 'learningplan', 'objective', 'resource', 'program'));
-        if (totara_feature_disabled('competencies')) {
+        if (advanced_feature::is_disabled('competencies')) {
             unset($componentskeys['competency']);
         }
-        if (totara_feature_disabled('learningplans')) {
+        if (advanced_feature::is_disabled('learningplans')) {
             unset($componentskeys['learningplan']);
         }
-        if (totara_feature_disabled('programs') && totara_feature_disabled('certifications')) {
+        if (advanced_feature::is_disabled('programs') && advanced_feature::is_disabled('certifications')) {
             unset($componentskeys['program']);
         }
         $components = array_flip($componentskeys);

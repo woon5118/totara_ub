@@ -22,6 +22,8 @@
  * @author     Russell England <russell.england@catalyst-eu.net>
  */
 
+use totara_core\advanced_feature;
+
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/totara/completionimport/upload_form.php');
 require_once($CFG->dirroot . '/totara/completionimport/lib.php');
@@ -170,7 +172,7 @@ if ($evidence_customfields) {
 $courseform->display();
 
 // Display upload certification heading + fields to import.
-if (totara_feature_visible('certifications')) {
+if (advanced_feature::is_enabled('certifications')) {
     echo $OUTPUT->heading(get_string('uploadcertification', 'totara_completionimport'), 3);
     $columnnames = implode(',', get_columnnames('certification'));
     echo format_text(get_string('uploadcertificationintro', 'totara_completionimport', $columnnames));

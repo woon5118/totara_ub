@@ -22,12 +22,14 @@
  */
 
 namespace totara_customfield\prefix;
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 class goal_type extends hierarchy_type {
 
     public function is_feature_type_disabled() {
-        return totara_feature_disabled('goals');
+        return advanced_feature::is_disabled('goals');
     }
 
     public function get_capability_managefield() {

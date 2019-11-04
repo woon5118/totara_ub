@@ -22,6 +22,8 @@
  * @subpackage reportbuilder
  */
 
+use totara_core\advanced_feature;
+
 define('REPORTBUIDLER_MANAGE_REPORTS_PAGE', true);
 define('REPORT_BUILDER_IGNORE_PAGE_PARAMETERS', true); // We are setting up report here, do not accept source params.
 
@@ -31,7 +33,7 @@ require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
-if (totara_feature_disabled('reportgraphs')) {
+if (advanced_feature::is_disabled('reportgraphs')) {
     print_error('error:reportgraphsdisabled', 'totara_reportbuilder');
 }
 

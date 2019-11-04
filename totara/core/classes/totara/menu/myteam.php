@@ -23,6 +23,7 @@
  */
 namespace totara_core\totara\menu;
 
+use totara_core\advanced_feature;
 use totara_job\job_assignment;
 
 class myteam extends item {
@@ -66,7 +67,7 @@ class myteam extends item {
      * @return bool
      */
     public function is_disabled() {
-        return totara_feature_disabled('myteam');
+        return advanced_feature::is_disabled('myteam');
     }
 
     public function get_incompatible_preset_rules(): array {

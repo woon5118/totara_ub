@@ -27,6 +27,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use totara_core\advanced_feature;
+
 /**
  * Holds the core settings that affect how Moodle works. Some of its fields
  * are set in config.php, and the rest are loaded from the config table.
@@ -1149,7 +1151,7 @@ if (defined('BEHAT_SITE_RUNNING') && !defined('BEHAT_TEST')) {
 // might be converted to utf-8 in admin/index.php during installation
 
 // Totara: hack settings a bit so that we do not have to look for disabled subsystems everywhere.
-if (totara_feature_disabled('totaradashboard')) {
+if (advanced_feature::is_disabled('totaradashboard')) {
     $CFG->defaulthomepage = (string)HOMEPAGE_SITE;
     $CFG->allowdefaultpageselection = '0';
 }

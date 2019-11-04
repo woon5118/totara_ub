@@ -23,6 +23,8 @@
  * @subpackage totara_question
  */
 
+use totara_core\advanced_feature;
+
 class question_objfromplan extends review{
 
     protected $component = 'objective';
@@ -45,7 +47,7 @@ class question_objfromplan extends review{
      */
     public static function check_enabled() {
 
-        return !totara_feature_disabled('learningplans');
+        return !advanced_feature::is_disabled('learningplans');
     }
 
     /**

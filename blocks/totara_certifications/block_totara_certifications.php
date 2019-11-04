@@ -22,6 +22,8 @@
  * @subpackage block_totara_certifications
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -38,7 +40,7 @@ class block_totara_certifications extends block_base {
     public function get_content() {
         global $USER, $DB;
 
-        if (!totara_feature_visible('certifications')) {
+        if (!advanced_feature::is_enabled('certifications')) {
             return '';
         }
 

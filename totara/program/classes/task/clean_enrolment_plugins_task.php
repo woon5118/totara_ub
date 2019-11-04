@@ -24,6 +24,8 @@
 
 namespace totara_program\task;
 
+use totara_core\advanced_feature;
+
 /**
  * Tidy up enrolment plugins on courses.
  */
@@ -49,7 +51,7 @@ class clean_enrolment_plugins_task extends \core\task\scheduled_task {
         require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 
         // Don't run programs cron if programs and certifications are disabled.
-        if (totara_feature_disabled('programs') && totara_feature_disabled('certifications')) {
+        if (advanced_feature::is_disabled('programs') && advanced_feature::is_disabled('certifications')) {
             // Note that managers may deleted the program enrol instances manually if necessary.
             return false;
         }

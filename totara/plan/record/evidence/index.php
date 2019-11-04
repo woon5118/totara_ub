@@ -23,13 +23,15 @@
  * @subpackage plan
  */
 
+use totara_core\advanced_feature;
+
 require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot.'/totara/plan/lib.php'); // Is this needed?
 
 require_login();
 
-if (totara_feature_disabled('recordoflearning')) {
+if (advanced_feature::is_disabled('recordoflearning')) {
     print_error('error:recordoflearningdisabled', 'totara_plan');
 }
 
@@ -56,7 +58,7 @@ if ($USER->id == $userid) {
 } else {
     $strheading = get_string('recordoflearningforname', 'totara_core', fullname($user, true));
     $usertype = 'manager';
-    if (totara_feature_visible('myteam')) {
+    if (advanced_feature::is_enabled('myteam')) {
         $menuitem = '\totara_core\totara\menu\myteam';
         $menunavitem = 'team';
         $url = new moodle_url('/my/teammembers.php');

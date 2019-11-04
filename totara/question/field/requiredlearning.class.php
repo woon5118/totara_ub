@@ -22,6 +22,8 @@
  * @subpackage totara_question
  */
 
+use totara_core\advanced_feature;
+
 class question_requiredlearning extends review {
 
     public static function get_info() {
@@ -42,7 +44,7 @@ class question_requiredlearning extends review {
      */
     public static function check_enabled() {
 
-        return !totara_feature_disabled('programs') && !totara_feature_disabled('certifications');
+        return !advanced_feature::is_disabled('programs') && !advanced_feature::is_disabled('certifications');
     }
 
     /**

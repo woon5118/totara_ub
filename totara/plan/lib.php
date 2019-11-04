@@ -26,6 +26,8 @@
  * @subpackage plan
  */
 
+use totara_core\advanced_feature;
+
 require_once($CFG->dirroot . '/totara/plan/development_plan.class.php');
 require_once($CFG->dirroot . '/totara/plan/role.class.php');
 require_once($CFG->dirroot . '/totara/plan/component.class.php');
@@ -513,7 +515,7 @@ function dp_get_rol_tabs_visible($userid) {
     }
 
     $assigned_comps = $DB->count_records('comp_record', array('userid' => $userid));
-    if (totara_feature_visible('competencies') && ($assigned_comps > 0 || $show_competency_tab)) {
+    if (advanced_feature::is_enabled('competencies') && ($assigned_comps > 0 || $show_competency_tab)) {
         $visible[] = 'competencies';
     }
 
@@ -535,7 +537,7 @@ function dp_get_rol_tabs_visible($userid) {
             AND pc.coursesetid = 0",
         array('userid' => $userid, 'incomplete' => STATUS_PROGRAM_INCOMPLETE)
         );
-    if (($programscount > 0 || $show_program_tab || $progcompletionexists) && totara_feature_visible('programs')) {
+    if (($programscount > 0 || $show_program_tab || $progcompletionexists) && advanced_feature::is_enabled('programs')) {
         $visible[] = 'programs';
     }
 
@@ -545,7 +547,7 @@ function dp_get_rol_tabs_visible($userid) {
     $unassignedcertifications = $DB->record_exists('certif_completion_history', array('userid' => $userid, 'unassigned' => 1));
     $certcompletionexists = $DB->record_exists_select('certif_completion', "userid = :userid AND status > :assigned",
         array('userid' => $userid, 'assigned' => CERTIFSTATUS_ASSIGNED));
-    if (($certification_progs > 0 || $unassignedcertifications || $certcompletionexists) && totara_feature_visible('certifications')) {
+    if (($certification_progs > 0 || $unassignedcertifications || $certcompletionexists) && advanced_feature::is_enabled('certifications')) {
         $visible[] = 'certifications';
     }
 
@@ -890,18 +892,18 @@ function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage
     global $OUTPUT, $DB, $PAGE;
     $list = array();
     $attr = array();
-    $enableplans = totara_feature_visible('learningplans');
+    $enableplans = advanced_feature::is_enabled('learningplans');
 
     $out = $OUTPUT->container_start(null, 'dp-plans-menu');
     $class = $userid == 0 ? 'dp-menu-selected' : '';
     if ($role == 'manager') {
-        if (totara_feature_visible('myteam')) {
+        if (advanced_feature::is_enabled('myteam')) {
             // Print out the All team members link
             $out .= $OUTPUT->heading(get_string('teammembers', 'totara_plan'), 3, 'main');
             $out .= html_writer::alist(array($OUTPUT->action_link(new moodle_url('/my/teammembers.php'), get_string('allteammembers', 'totara_plan'))), array('class' => $class));
         }
         if ($userid) {
-            if ($enableplans && !totara_feature_disabled('learningplans')) {
+            if ($enableplans && !advanced_feature::is_disabled('learningplans')) {
                 // TODO: make this more efficient
                 $user = $DB->get_record('user', array('id' => $userid));
                 $class = $selectedid == 0 ? 'dp-menu-selected' : '';
@@ -912,7 +914,7 @@ function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage
             }
         }
     } else {
-        if ($enableplans && !totara_feature_disabled('learningplans')) {
+        if ($enableplans && !advanced_feature::is_disabled('learningplans')) {
             $out .= $OUTPUT->heading(get_string('learningplans', 'totara_plan'), 3, 'main');
             $out .= html_writer::alist(array($OUTPUT->action_link(new moodle_url('/totara/plan/index.php'), get_string('manageplans', 'totara_plan'))), array('class' => $class));
         }
@@ -985,8 +987,8 @@ function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage
         $programs = prog_get_required_programs($userid, ' ORDER BY fullname ASC ', '', '', false, true);
         $certifications = prog_get_certification_programs($userid, ' ORDER BY fullname ASC ', '', '', false, true, true);
         if ($programs || $certifications) {
-            $canviewprograms = totara_feature_visible('programs');
-            $canviewcertifications = totara_feature_visible('certifications');
+            $canviewprograms = advanced_feature::is_enabled('programs');
+            $canviewcertifications = advanced_feature::is_enabled('certifications');
             $extraparams = array();
             $headingclass = 'main';
             if ($role == 'manager') {
@@ -1251,7 +1253,7 @@ function dp_get_plan_base_navlinks($userid) {
     // the user is viewing someone else's plan
     $user = $DB->get_record('user', array('id' => $userid));
     if ($user) {
-        if (totara_feature_visible('myteam')) {
+        if (advanced_feature::is_enabled('myteam')) {
             $PAGE->navbar->add(get_string('team', 'totara_core'), new moodle_url('/my/teammembers.php'));
         }
         $PAGE->navbar->add(get_string('xslearningplans', 'totara_plan', fullname($user)), new moodle_url('/totara/plan/index.php', array('userid' => $userid)));
@@ -1797,7 +1799,7 @@ function display_rol_tab_for_component($component) {
  *
  */
 function check_learningplan_enabled() {
-    if (totara_feature_disabled('learningplans')) {
+    if (advanced_feature::is_disabled('learningplans')) {
         print_error('learningplansdisabled', 'totara_plan');
     }
 }
@@ -1821,7 +1823,7 @@ function totara_plan_myprofile_navigation(\core_user\output\myprofile\tree $tree
     $tree->add_category($category);
 
     // Record of learning.
-    if (totara_feature_visible('recordoflearning')) {
+    if (advanced_feature::is_enabled('recordoflearning')) {
         if ($currentuser || \totara_job\job_assignment::is_managing($USER->id, $user->id) || has_capability('totara/core:viewrecordoflearning', $usercontext)) {
             $title = get_string('recordoflearning', 'totara_core');
             $url = new moodle_url('/totara/plan/record/index.php', array('userid' => $user->id));
@@ -1833,7 +1835,7 @@ function totara_plan_myprofile_navigation(\core_user\output\myprofile\tree $tree
     }
 
     // Learning plans.
-    if (totara_feature_visible('learningplans') && dp_can_view_users_plans($user->id)) {
+    if (advanced_feature::is_enabled('learningplans') && dp_can_view_users_plans($user->id)) {
         $title = get_string('learningplans', 'totara_plan');
         $url = new moodle_url('/totara/plan/index.php', array('userid' => $user->id));
         $content =  html_writer::link($url, $title);

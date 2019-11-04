@@ -25,6 +25,7 @@ namespace totara_hierarchy\webapi\resolver\type;
 
 use core\format;
 use core\webapi\execution_context;
+use totara_core\advanced_feature;
 use totara_core\formatter\field\string_field_formatter;
 use totara_core\formatter\field\text_field_formatter;
 
@@ -54,7 +55,7 @@ class position_type implements \core\webapi\type_resolver {
             throw new \coding_exception('Only position framework records from the database are accepted ' . gettype($positiontype));
         }
 
-        if (totara_feature_disabled('positions')) {
+        if (advanced_feature::is_disabled('positions')) {
             // You should have checked before resolving to this type.
             throw new \coding_exception('Positions have been disabled.');
         }

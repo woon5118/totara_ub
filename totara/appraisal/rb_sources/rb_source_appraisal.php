@@ -22,6 +22,8 @@
  * @subpackage reportbuilder
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 class rb_source_appraisal extends rb_base_source {
@@ -62,7 +64,7 @@ class rb_source_appraisal extends rb_base_source {
      * @return bool
      */
     public static function is_source_ignored() {
-        return !totara_feature_visible('appraisals');
+        return !advanced_feature::is_enabled('appraisals');
     }
 
     /**

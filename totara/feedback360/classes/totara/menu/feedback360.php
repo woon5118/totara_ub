@@ -24,6 +24,8 @@
 
 namespace totara_feedback360\totara\menu;
 
+use totara_core\advanced_feature;
+
 class feedback360 extends \totara_core\totara\menu\item {
 
     protected function get_default_title() {
@@ -66,7 +68,7 @@ class feedback360 extends \totara_core\totara\menu\item {
      * @return bool
      */
     public function is_disabled() {
-        return totara_feature_disabled('feedback360');
+        return advanced_feature::is_disabled('feedback360');
     }
 
     protected function get_default_parent() {

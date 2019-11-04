@@ -23,6 +23,8 @@
  * @subpackage totara_feedback360
  */
 
+use totara_core\advanced_feature;
+
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/totara/feedback360/lib.php');
 
@@ -67,7 +69,7 @@ if ($USER->id == $userid) {
     $canmanage = has_capability('totara/feedback360:managestafffeedback', $usercontext);
 
     $userxfeedback = get_string('userxfeedback360', 'totara_feedback360', fullname($user));
-    if (totara_feature_visible('myteam')) {
+    if (advanced_feature::is_enabled('myteam')) {
         $PAGE->set_totara_menu_selected('\totara_core\totara\menu\myteam');
         $PAGE->navbar->add(get_string('team', 'totara_core'), new moodle_url('/my/teammembers.php'));
     }

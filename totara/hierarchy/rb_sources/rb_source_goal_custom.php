@@ -22,6 +22,8 @@
  * @subpackage reportbuilder
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 class rb_source_goal_custom extends rb_base_source {
@@ -78,7 +80,7 @@ class rb_source_goal_custom extends rb_base_source {
     }
 
     public static function is_source_ignored() {
-        return !totara_feature_visible('goals');
+        return !advanced_feature::is_enabled('goals');
     }
 
     protected function define_joinlist() {

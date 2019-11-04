@@ -28,6 +28,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 // CONSTANTS (Encased in phpdoc proper comments).
@@ -10417,7 +10419,7 @@ function get_home_page() {
         return HOMEPAGE_SITE;
     }
 
-    if (totara_feature_disabled('totaradashboard')) {
+    if (advanced_feature::is_disabled('totaradashboard')) {
         return HOMEPAGE_SITE;
     }
 

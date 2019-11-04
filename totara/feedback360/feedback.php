@@ -24,6 +24,9 @@
 /**
  * View answer on feedback360
  */
+
+use totara_core\advanced_feature;
+
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/totara/feedback360/lib.php');
 require_once($CFG->dirroot . '/totara/feedback360/feedback360_forms.php');
@@ -171,7 +174,7 @@ if ($isexternaluser) {
 
     $PAGE->set_title($userxfeedback);
     $PAGE->set_heading($userxfeedback);
-    if (totara_feature_visible('myteam')) {
+    if (advanced_feature::is_enabled('myteam')) {
         $PAGE->set_totara_menu_selected('\totara_core\totara\menu\myteam');
         $PAGE->navbar->add(get_string('team', 'totara_core'), new moodle_url('/my/teammembers.php'));
     }

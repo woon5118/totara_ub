@@ -22,6 +22,8 @@
  * @subpackage totara_hierarchy
  */
 
+use totara_core\advanced_feature;
+
 require_once(__DIR__ . '/../../../../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_hierarchy.class.php');
@@ -52,7 +54,7 @@ $frameworkid = optional_param('frameworkid', 0, PARAM_INT);
 $treeonly = optional_param('treeonly', false, PARAM_BOOL);
 
 // Check if Competencies are enabled.
-if (totara_feature_disabled('competencies')) {
+if (advanced_feature::is_disabled('competencies')) {
     echo html_writer::tag('div', get_string('competenciesdisabled', 'totara_hierarchy'), array('class' => 'notifyproblem'));
     die();
 }

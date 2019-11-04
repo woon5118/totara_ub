@@ -28,6 +28,9 @@
  *
  * Library to construct organisation hierarchies
  */
+
+use totara_core\advanced_feature;
+
 require_once("{$CFG->dirroot}/totara/hierarchy/lib.php");
 require_once("{$CFG->dirroot}/totara/core/utils.php");
 
@@ -144,7 +147,7 @@ class organisation extends hierarchy {
         $comptype = optional_param('comptype', 'competencies', PARAM_TEXT);
         $renderer = $PAGE->get_renderer('totara_hierarchy');
 
-        if (totara_feature_visible('competencies')) {
+        if (advanced_feature::is_enabled('competencies')) {
             // Spacing.
             echo html_writer::empty_tag('br');
 
@@ -174,7 +177,7 @@ class organisation extends hierarchy {
         echo html_writer::empty_tag('br');
 
         // Display all goals assigned to this item.
-        if (totara_feature_visible('goals') && !is_ajax_request($_SERVER)) {
+        if (advanced_feature::is_enabled('goals') && !is_ajax_request($_SERVER)) {
             $addgoalparam = array('assignto' => $item->id, 'assigntype' => GOAL_ASSIGNMENT_ORGANISATION, 'sesskey' => sesskey());
             $addgoalurl = new moodle_url('/totara/hierarchy/prefix/goal/assign/find.php', $addgoalparam);
             echo html_writer::start_tag('div', array('class' => 'list-assigned-goals'));

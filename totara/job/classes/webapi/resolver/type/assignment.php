@@ -26,6 +26,7 @@ namespace totara_job\webapi\resolver\type;
 use \core\date_format;
 use \core\format;
 use \core\webapi\execution_context;
+use totara_core\advanced_feature;
 use \totara_core\formatter\field\date_field_formatter;
 use \totara_core\formatter\field\string_field_formatter;
 use \totara_core\formatter\field\text_field_formatter;
@@ -163,7 +164,7 @@ class assignment implements \core\webapi\type_resolver {
      * @return bool
      */
     private static function can_view_position(job_assignment $job): bool {
-        if (totara_feature_disabled('positions')) {
+        if (advanced_feature::is_disabled('positions')) {
             return false;
         }
         return has_capability('totara/hierarchy:viewposition', \context_user::instance($job->userid));

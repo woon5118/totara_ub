@@ -23,6 +23,8 @@
 
 namespace totara_program\task;
 
+use totara_core\advanced_feature;
+
 /**
  * Process any user assignment changes that have been deferred until cron.
  */
@@ -46,8 +48,8 @@ class assignments_deferred_task extends \core\task\scheduled_task {
         require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 
         // Don't run programs cron if programs and certifications are disabled.
-        if (totara_feature_disabled('programs') &&
-            totara_feature_disabled('certifications')) {
+        if (advanced_feature::is_disabled('programs') &&
+            advanced_feature::is_disabled('certifications')) {
             return false;
         }
 

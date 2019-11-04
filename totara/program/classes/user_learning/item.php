@@ -26,6 +26,7 @@ namespace totara_program\user_learning;
 
 defined('MOODLE_INTERNAL') || die();
 
+use totara_core\advanced_feature;
 use \totara_core\user_learning\item_base;
 use \totara_core\user_learning\item_has_progress;
 use \totara_core\user_learning\item_has_dueinfo;
@@ -64,7 +65,7 @@ class item extends item_base implements item_has_progress, item_has_dueinfo {
         require_once($CFG->dirroot . '/totara/program/lib.php');
 
         // Check programs are enabled.
-        if (totara_feature_disabled('programs')) {
+        if (advanced_feature::is_disabled('programs')) {
             return [];
         }
         $items = [];
@@ -88,7 +89,7 @@ class item extends item_base implements item_has_progress, item_has_dueinfo {
      */
     public static function one($userorid, $itemorid) {
         // Check programs are enabled.
-        if (totara_feature_disabled('programs')) {
+        if (advanced_feature::is_disabled('programs')) {
             return false;
         }
 

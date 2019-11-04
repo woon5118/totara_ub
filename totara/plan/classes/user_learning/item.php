@@ -25,6 +25,7 @@
 
 namespace totara_plan\user_learning;
 
+use totara_core\advanced_feature;
 use \totara_core\user_learning\item_base;
 use \totara_core\user_learning\item_has_progress;
 use \totara_core\user_learning\designation_primary;
@@ -63,7 +64,7 @@ class item extends item_base implements item_has_progress {
      */
     public static function all($userorid) {
         // Check learningplans are enabled.
-        if (totara_feature_disabled('learningplans')) {
+        if (advanced_feature::is_disabled('learningplans')) {
             return [];
         }
         $items = [];
@@ -91,7 +92,7 @@ class item extends item_base implements item_has_progress {
      */
     public static function one($userorid, $itemid) {
         // Check programs are enabled.
-        if (totara_feature_disabled('learningplans')) {
+        if (advanced_feature::is_disabled('learningplans')) {
             return false;
         }
         $user = self::resolve_user($userorid);

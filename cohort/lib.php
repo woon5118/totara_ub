@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 define('COHORT_ALL', 0);
@@ -744,12 +746,12 @@ function cohort_print_tabs($currenttab, $cohortid, $cohorttype, $cohort) {
             get_string('visiblelearning', 'totara_cohort'));
     }
 
-    if (totara_feature_visible('learningplans') && $canmanage && $cancreateplancohort) {
+    if (advanced_feature::is_enabled('learningplans') && $canmanage && $cancreateplancohort) {
         $toprow[] = new tabobject('plans', new moodle_url('/totara/cohort/learningplan.php', array('id' => $cohortid)),
             get_string('learningplan', 'totara_cohort'));
     }
 
-    if (totara_feature_visible('goals') && $canview) {
+    if (advanced_feature::is_enabled('goals') && $canview) {
         $toprow[] = new tabobject('goals', new moodle_url('/totara/cohort/goals.php', array('id' => $cohortid)),
             get_string('goals', 'totara_hierarchy'));
     }

@@ -26,6 +26,8 @@
  */
 namespace totara_completionimport\task;
 
+use totara_core\advanced_feature;
+
 class clean_certification_completion_upload_logs_task extends \core\task\scheduled_task {
 
     /**
@@ -43,7 +45,7 @@ class clean_certification_completion_upload_logs_task extends \core\task\schedul
     public function execute() {
         global $DB;
 
-        if (totara_feature_visible('certifications')) {
+        if (advanced_feature::is_enabled('certifications')) {
             $loglifetime = get_config('complrecords', 'certificationloglifetime');
             if ((int)$loglifetime > 0) {
                 $time = time();

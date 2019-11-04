@@ -68,6 +68,7 @@ use totara_cohort\rules\ui\course_enrolment_allanynotallnone as  cohort_rule_ui_
 use totara_cohort\rules\ui\program_enrolment_allanynotallnone as cohort_rule_ui_program_enrolment_allanynotallnone;
 use totara_cohort\rules\ui\has_indirect_reports as cohort_rule_ui_has_indirect_reports;
 use totara_cohort\rules\ui\has_appraisees as cohort_rule_ui_has_appraisees;
+use totara_core\advanced_feature;
 
 /* Constants to identify if the rule comes from a menu or a text input */
 define('COHORT_RULES_TYPE_MENU', 1);
@@ -717,7 +718,7 @@ function cohort_rules_list($reset = false){
             new cohort_rule_sqlhandler_course_completion_history_date()
         );
 
-        if (totara_feature_visible('programs')) {
+        if (advanced_feature::is_enabled('programs')) {
             // Assignemnt to all/any/not all/none programs in a list
             $rules[] = new cohort_rule_option(
                 'learning',
@@ -771,7 +772,7 @@ function cohort_rules_list($reset = false){
         }
 
         // Certification rules.
-        if (totara_feature_visible('certifications')) {
+        if (advanced_feature::is_enabled('certifications')) {
             // Certification status.
             $rules[] = new cohort_rule_option(
                 'learning',

@@ -23,6 +23,8 @@
 
 namespace totara_dashboard\totara\menu;
 
+use totara_core\advanced_feature;
+
 class dashboard extends \totara_core\totara\menu\item {
 
     protected function get_default_title() {
@@ -65,6 +67,6 @@ class dashboard extends \totara_core\totara\menu\item {
      * @return bool
      */
     public function is_disabled() {
-        return totara_feature_disabled('totaradashboard');
+        return advanced_feature::is_disabled('totaradashboard');
     }
 }

@@ -22,6 +22,8 @@
  * @subpackage completionimport
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die;
 
 $ADMIN->add('courses',
@@ -86,7 +88,7 @@ $ADMIN->add('totara_completionimport',
                 get_string('report_certification', 'totara_completionimport'),
                 new moodle_url('/totara/completionimport/viewreport.php', array('importname' => 'certification', 'clearfilters' => 1)),
                 array('totara/completionimport:import'),
-                totara_feature_disabled('certifications')
+                advanced_feature::is_disabled('certifications')
         ));
 
 $ADMIN->add('totara_completionimport',

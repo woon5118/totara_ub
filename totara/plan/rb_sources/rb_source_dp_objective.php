@@ -22,6 +22,8 @@
  * @subpackage reportbuilder
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -584,6 +586,6 @@ class rb_source_dp_objective extends rb_base_source {
      * @return boolean If the report should be ignored of not.
      */
     public static function is_source_ignored() {
-        return !totara_feature_visible('recordoflearning');
+        return !advanced_feature::is_enabled('recordoflearning');
     }
 }

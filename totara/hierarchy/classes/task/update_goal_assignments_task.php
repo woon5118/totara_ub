@@ -24,6 +24,8 @@
 
 namespace totara_hierarchy\task;
 
+use totara_core\advanced_feature;
+
 /**
  * Update goal assignment task
  */
@@ -46,7 +48,7 @@ class update_goal_assignments_task extends \core\task\scheduled_task {
         global $DB, $CFG;
         require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 
-        if (totara_feature_disabled('goals')) {
+        if (advanced_feature::is_disabled('goals')) {
             return;
         }
         $goallib = new \goal();

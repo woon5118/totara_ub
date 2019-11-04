@@ -21,6 +21,8 @@
  * @package totara_dashboard
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/totara/dashboard/lib.php');
 /**
@@ -37,7 +39,7 @@ class block_totara_dashboard extends block_base {
     public function get_content() {
         global $USER;
 
-        if (!totara_feature_visible('totaradashboard')) {
+        if (!advanced_feature::is_enabled('totaradashboard')) {
             return '';
         }
 

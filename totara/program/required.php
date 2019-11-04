@@ -23,6 +23,8 @@
  * @subpackage plan
  */
 
+use totara_core\advanced_feature;
+
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/totara/program/lib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
@@ -41,8 +43,8 @@ if ($filter == 'program') {
     check_program_enabled();
 } else if ($filter == 'certification') {
     check_certification_enabled();
-} else if (totara_feature_disabled('programs') &&
-    totara_feature_disabled('certifications')) {
+} else if (advanced_feature::is_disabled('programs') &&
+    advanced_feature::is_disabled('certifications')) {
     print_error('programsandcertificationsdisabled', 'totara_program');
 }
 
@@ -265,7 +267,7 @@ if (isset($program) && $program->user_is_assigned($userid)) {
     echo html_writer::start_tag('div', array('style' => 'clear: both;')) . html_writer::end_tag('div');
     echo $OUTPUT->container_end();
 
-    if (($filter == 'all' || $filter == 'program') && totara_feature_visible('programs')) {
+    if (($filter == 'all' || $filter == 'program') && advanced_feature::is_enabled('programs')) {
         echo $OUTPUT->container_start('', 'required-learning-list');
         echo $OUTPUT->heading(get_string('programs', 'totara_program'), 3);
 
@@ -280,7 +282,7 @@ if (isset($program) && $program->user_is_assigned($userid)) {
         echo $OUTPUT->container_end();
     }
 
-    if (($filter == 'all' || $filter == 'certification') && totara_feature_visible('certifications')) {
+    if (($filter == 'all' || $filter == 'certification') && advanced_feature::is_enabled('certifications')) {
         echo $OUTPUT->container_start('', 'certification-learning-list');
         echo $OUTPUT->heading(get_string('certifications', 'totara_program'), 3);
 

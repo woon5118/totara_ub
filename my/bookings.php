@@ -22,6 +22,8 @@
  * @subpackage my
  */
 
+use totara_core\advanced_feature;
+
 require_once(dirname(dirname(__FILE__)).'/config.php');
 require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 
@@ -48,7 +50,7 @@ $renderer = $PAGE->get_renderer('totara_reportbuilder');
 
 if ($USER->id != $userid) {
     $strheading = get_string('bookingsfor', 'totara_core').fullname($user, true);
-    if (totara_feature_visible('myteam')) {
+    if (advanced_feature::is_enabled('myteam')) {
         $menuitem = 'myteam';
         $url = new moodle_url('/my/teammembers.php');
         $PAGE->navbar->add(get_string('team', 'totara_core'), $url);

@@ -24,6 +24,7 @@
 
 namespace totara_certification\user_learning;
 
+use totara_core\advanced_feature;
 use \totara_core\user_learning\designation_primary;
 use \totara_core\user_learning\item_base;
 use \totara_core\user_learning\item_has_progress;
@@ -80,7 +81,7 @@ class item extends item_base implements item_has_progress, item_has_dueinfo {
      */
     public static function all($userorid) {
         // Check programs are enabled.
-        if (totara_feature_disabled('certifications')) {
+        if (advanced_feature::is_disabled('certifications')) {
             return [];
         }
         $items = [];
@@ -103,7 +104,7 @@ class item extends item_base implements item_has_progress, item_has_dueinfo {
      */
     public static function one($userorid, $itemorid) {
         // Check certifications are enabled.
-        if (totara_feature_disabled('certifications')) {
+        if (advanced_feature::is_disabled('certifications')) {
             return false;
         }
 

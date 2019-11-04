@@ -22,6 +22,8 @@
  * @subpackage reportbuilder
  */
 
+use totara_core\advanced_feature;
+
 require_once($CFG->dirroot . '/totara/reportbuilder/embedded/rb_findprograms_embedded.php');
 
 /**
@@ -71,7 +73,7 @@ class rb_catalogprograms_embedded extends rb_base_embedded {
      */
     public static function is_report_ignored() {
         global $CFG;
-        return ($CFG->catalogtype !== 'enhanced' || !totara_feature_visible('programs'));
+        return ($CFG->catalogtype !== 'enhanced' || !advanced_feature::is_enabled('programs'));
     }
 
     /**

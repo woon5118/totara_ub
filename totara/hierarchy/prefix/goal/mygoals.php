@@ -22,6 +22,8 @@
  * @subpackage totara_hierarchy
  */
 
+use totara_core\advanced_feature;
+
 require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
@@ -96,7 +98,7 @@ if ($PAGE->user_allowed_editing()) {
 if (\totara_job\job_assignment::is_managing($USER->id, $userid)) {
     $username = fullname($DB->get_record('user', array('id' => $userid)));
     $strmygoals = get_string('mygoalsteam', 'totara_hierarchy', $username);
-    if (totara_feature_visible('myteam')) {
+    if (advanced_feature::is_enabled('myteam')) {
         $myteamurl = new moodle_url('/my/teammembers.php', array());
         $PAGE->set_totara_menu_selected('\totara_core\totara\menu\myteam');
         $PAGE->navbar->add(get_string('team', 'totara_core'), $myteamurl);

@@ -30,6 +30,8 @@
  * @author    Petr Skoda <petr.skoda@totaralms.com>
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -71,8 +73,8 @@ class totara_core_admin_setting_feature extends admin_setting_configselect {
                 debugging('Feature setting names must start with "enable"', DEBUG_DEVELOPER);
             } else {
                 $shortname = preg_replace('/^enable/', '', $name);
-                if (!in_array($shortname, totara_advanced_features_list())) {
-                    debugging('Feature setting name must be included in totara_advanced_features_list()', DEBUG_DEVELOPER);
+                if (!in_array($shortname, advanced_feature::get_available())) {
+                    debugging('Feature setting name must be included in \totara_core\advanced_feature::get_available()', DEBUG_DEVELOPER);
                 }
             }
         }
@@ -102,18 +104,18 @@ class totara_core_admin_setting_feature extends admin_setting_configselect {
             return true;
         }
 
-        if (isset($CFG->{$this->name}) and $CFG->{$this->name} == TOTARA_HIDEFEATURE) {
-            // The TOTARA_HIDEFEATURE does note really work, keep it for existing sites only,
+        if (isset($CFG->{$this->name}) and $CFG->{$this->name} == advanced_feature::HIDDEN) {
+            // The \totara_core\advanced_feature::HIDDEN does note really work, keep it for existing sites only,
             // this should be removed completely in the trust release after we add upgrade code.
             $this->choices = array(
-                TOTARA_SHOWFEATURE => new lang_string('showfeature', 'totara_core'),
-                TOTARA_HIDEFEATURE => new lang_string('hidefeature', 'totara_core'),
-                TOTARA_DISABLEFEATURE => new lang_string('disablefeature', 'totara_core')
+                advanced_feature::ENABLED => new lang_string('showfeature', 'totara_core'),
+                advanced_feature::HIDDEN => new lang_string('hidefeature', 'totara_core'),
+                advanced_feature::DISABLED => new lang_string('disablefeature', 'totara_core')
             );
         } else {
             $this->choices = array(
-                TOTARA_SHOWFEATURE => new lang_string('showfeature', 'totara_core'),
-                TOTARA_DISABLEFEATURE => new lang_string('disablefeature', 'totara_core')
+                advanced_feature::ENABLED => new lang_string('showfeature', 'totara_core'),
+                advanced_feature::DISABLED => new lang_string('disablefeature', 'totara_core')
             );
         }
         return true;

@@ -22,6 +22,8 @@
  * @subpackage certification
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -47,7 +49,7 @@ class totara_certification_reassignment_testcase extends advanced_testcase {
         parent::setup();
 
         // Turn off programs. This is to test that it doesn't interfere with certification completion.
-        set_config('enableprograms', TOTARA_DISABLEFEATURE);
+        set_config('enableprograms', advanced_feature::DISABLED);
     }
 
     private function get_certification_data() {

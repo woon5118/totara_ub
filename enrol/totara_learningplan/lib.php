@@ -22,6 +22,8 @@
  * @subpackage enrol_totara_learningplan
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 class enrol_totara_learningplan_plugin extends enrol_plugin {
@@ -34,7 +36,7 @@ class enrol_totara_learningplan_plugin extends enrol_plugin {
     public function get_newinstance_link($courseid) {
         global $DB;
 
-        if (!totara_feature_visible('learningplans')) {
+        if (!advanced_feature::is_enabled('learningplans')) {
             return null;
         }
 
@@ -58,7 +60,7 @@ class enrol_totara_learningplan_plugin extends enrol_plugin {
      * @return bool
      */
     public function can_delete_instance($instance) {
-        if (!totara_feature_visible('learningplans')) {
+        if (!advanced_feature::is_enabled('learningplans')) {
             // Allow deleting only when learning plans disabled so that they can get rid of preexisting
             // enrolments before the learning plans were disabled.
             $context = context_course::instance($instance->courseid);
@@ -74,7 +76,7 @@ class enrol_totara_learningplan_plugin extends enrol_plugin {
      * @return int id of new instance, null if can not be created
      */
     public function add_default_instance($course) {
-        if (!totara_feature_visible('learningplans')) {
+        if (!advanced_feature::is_enabled('learningplans')) {
             return null;
         }
 
@@ -136,7 +138,7 @@ class enrol_totara_learningplan_plugin extends enrol_plugin {
     public function try_autoenrol(stdClass $instance) {
         global $USER, $DB;
 
-        if (!totara_feature_visible('learningplans')) {
+        if (!advanced_feature::is_enabled('learningplans')) {
             return false;
         }
 

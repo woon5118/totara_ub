@@ -22,6 +22,8 @@
  * @subpackage completionimport
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->libdir . '/formslib.php');
@@ -33,7 +35,7 @@ class reset_form extends moodleform {
         $mform->addElement('checkbox', 'course', get_string('resetcourse', 'totara_completionimport'));
         $mform->setType('course', PARAM_BOOL);
 
-        if (!totara_feature_disabled('certifications')) {
+        if (!advanced_feature::is_disabled('certifications')) {
             $mform->addElement('checkbox', 'certification', get_string('resetcertification', 'totara_completionimport'));
             $mform->setType('certification', PARAM_BOOL);
         }

@@ -21,6 +21,7 @@
  * @package totara_flavour
  */
 
+use totara_core\advanced_feature;
 use \totara_flavour\helper;
 
 defined('MOODLE_INTERNAL') || die();
@@ -64,7 +65,7 @@ class totara_flavour_helper_testcase extends advanced_testcase {
         $this->assertObjectNotHasAttribute('forceflavour', $CFG);
         $this->assertObjectNotHasAttribute('showflavours', $CFG);
         $this->assertObjectNotHasAttribute('currentflavour', $CFG);
-        $this->assertEquals(TOTARA_SHOWFEATURE, get_config('moodle', 'enableappraisals'));
+        $this->assertEquals(advanced_feature::ENABLED, get_config('moodle', 'enableappraisals'));
 
         // We need some flavours for testing.
         $this->assertFileExists("$CFG->dirroot/totara/flavour/flavours/enterprise/classes/definition.php");
@@ -239,7 +240,7 @@ class totara_flavour_helper_testcase extends advanced_testcase {
         $this->assertArrayHasKey('moodle', $result);
         $this->assertArrayNotHasKey('', $result);
         // Test a few settings to verify the format.
-        $this->assertSame(TOTARA_DISABLEFEATURE, $result['moodle']['enableappraisals']);
+        $this->assertSame(advanced_feature::DISABLED, $result['moodle']['enableappraisals']);
         $this->assertSame('', $result['theme_basis']['customcss']);
     }
 
@@ -285,7 +286,7 @@ class totara_flavour_helper_testcase extends advanced_testcase {
         helper::execute_post_install_steps();
 
         $this->assertSame('flavour_test', get_config('totara_flavour', 'currentflavour'));
-        $this->assertEquals(TOTARA_DISABLEFEATURE, get_config('moodle', 'enableappraisals'));
+        $this->assertEquals(advanced_feature::DISABLED, get_config('moodle', 'enableappraisals'));
     }
 
     public function test_execute_post_upgrade_steps() {
@@ -303,7 +304,7 @@ class totara_flavour_helper_testcase extends advanced_testcase {
         helper::execute_post_upgrade_steps();
 
         $this->assertSame('flavour_test', get_config('totara_flavour', 'currentflavour'));
-        $this->assertEquals(TOTARA_DISABLEFEATURE, get_config('moodle', 'enableappraisals'));
+        $this->assertEquals(advanced_feature::DISABLED, get_config('moodle', 'enableappraisals'));
     }
 
     public function test_execute_post_upgradesettings_steps() {
@@ -321,7 +322,7 @@ class totara_flavour_helper_testcase extends advanced_testcase {
         helper::execute_post_upgradesettings_steps();
 
         $this->assertSame('flavour_test', get_config('totara_flavour', 'currentflavour'));
-        $this->assertEquals(TOTARA_DISABLEFEATURE, get_config('moodle', 'enableappraisals'));
+        $this->assertEquals(advanced_feature::DISABLED, get_config('moodle', 'enableappraisals'));
     }
 
     public function test_set_active_flavour() {
@@ -338,12 +339,12 @@ class totara_flavour_helper_testcase extends advanced_testcase {
         helper::set_active_flavour('flavour_test');
 
         $this->assertSame('flavour_test', get_config('totara_flavour', 'currentflavour'));
-        $this->assertEquals(TOTARA_DISABLEFEATURE, get_config('moodle', 'enableappraisals'));
+        $this->assertEquals(advanced_feature::DISABLED, get_config('moodle', 'enableappraisals'));
 
         helper::set_active_flavour('flavour_enterprise');
 
         $this->assertSame('flavour_enterprise', get_config('totara_flavour', 'currentflavour'));
-        $this->assertEquals(TOTARA_DISABLEFEATURE, get_config('moodle', 'enableappraisals'));
+        $this->assertEquals(advanced_feature::DISABLED, get_config('moodle', 'enableappraisals'));
 
         // Invalid value.
         try {

@@ -22,6 +22,8 @@
  * @subpackage totara_core
  */
 
+use totara_core\advanced_feature;
+
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
@@ -268,7 +270,7 @@ class totara_customfield_renderer extends plugin_renderer_base {
 
         $row[] = new tabobject('course', new moodle_url('/totara/customfield/index.php', array('prefix' => 'course')),
             get_string('courses'));
-        if ((totara_feature_visible('programs') || totara_feature_visible('certifications')) && has_capability('totara/core:programmanagecustomfield', $systemcontext)) {
+        if ((advanced_feature::is_enabled('programs') || advanced_feature::is_enabled('certifications')) && has_capability('totara/core:programmanagecustomfield', $systemcontext)) {
             $row[] = new tabobject('program', new moodle_url('/totara/customfield/index.php', array('prefix' => 'program')),
                 get_string('programscerts', 'totara_program'));
         }

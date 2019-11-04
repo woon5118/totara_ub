@@ -23,6 +23,9 @@
  * @subpackage totara_question
  */
 global $CFG;
+
+use totara_core\advanced_feature;
+
 require_once('reviewrating.class.php');
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/evidence/lib.php');
 require_once($CFG->dirroot.'/totara/plan/development_plan.class.php');
@@ -50,7 +53,7 @@ class question_compfromplan extends reviewrating {
      */
     public static function check_enabled() {
 
-        return !totara_feature_disabled('learningplans') && !totara_feature_disabled('competencies');
+        return !advanced_feature::is_disabled('learningplans') && !advanced_feature::is_disabled('competencies');
     }
 
     /**

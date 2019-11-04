@@ -23,6 +23,8 @@
  * @subpackage plan
  */
 
+use totara_core\advanced_feature;
+
 require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot.'/totara/plan/components/competency/dialog_content_linked_competencies.class.php');
 require_once($CFG->dirroot.'/totara/plan/lib.php');
@@ -34,7 +36,7 @@ require_login();
 check_learningplan_enabled();
 
 // Check if Competencies are enabled.
-if (totara_feature_disabled('competencies')) {
+if (advanced_feature::is_disabled('competencies')) {
     echo html_writer::tag('div', get_string('competenciesdisabled', 'totara_hierarchy'), array('class' => 'notifyproblem'));
     die();
 }

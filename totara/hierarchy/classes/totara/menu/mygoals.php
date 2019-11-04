@@ -26,6 +26,8 @@
 
 namespace totara_hierarchy\totara\menu;
 
+use totara_core\advanced_feature;
+
 class mygoals extends \totara_core\totara\menu\item {
 
     protected function get_default_title() {
@@ -72,7 +74,7 @@ class mygoals extends \totara_core\totara\menu\item {
      * @return bool
      */
     public function is_disabled() {
-        return totara_feature_disabled('goals');
+        return advanced_feature::is_disabled('goals');
     }
 
     protected function get_default_parent() {

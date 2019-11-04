@@ -22,12 +22,14 @@
  * @subpackage plan
  */
 
+use totara_core\advanced_feature;
+
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/totara/plan/lib.php');
 
 require_login();
 
-if (totara_feature_disabled('recordoflearning')) {
+if (advanced_feature::is_disabled('recordoflearning')) {
     print_error('error:recordoflearningdisabled', 'totara_plan');
 }
 

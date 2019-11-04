@@ -22,6 +22,7 @@
  */
 
 namespace tool_totara_sync\task;
+use totara_core\advanced_feature;
 use totara_sync_element_comp;
 
 class comp extends \core\task\scheduled_task {
@@ -42,7 +43,7 @@ class comp extends \core\task\scheduled_task {
         global $CFG;
         require_once($CFG->dirroot . '/admin/tool/totara_sync/elements/comp.php');
 
-        if (totara_feature_disabled('competencies')) {
+        if (advanced_feature::is_disabled('competencies')) {
             return;
         }
 

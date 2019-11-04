@@ -22,6 +22,8 @@
  * @subpackage totara_sync
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die;
 
 define('TOTARA_SYNC_DBROWS', 10000);
@@ -236,10 +238,10 @@ function totara_sync_get_elements($onlyenabled=false) {
     foreach ($efiles as $filepath) {
         $element = basename($filepath, '.php');
 
-        if ($element == 'pos' && totara_feature_disabled('positions')) {
+        if ($element == 'pos' && advanced_feature::is_disabled('positions')) {
             continue;
         }
-        if ($element == 'comp' && totara_feature_disabled('competencies')) {
+        if ($element == 'comp' && advanced_feature::is_disabled('competencies')) {
             continue;
         }
 

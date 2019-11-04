@@ -22,6 +22,8 @@
  * @subpackage appraisal
  */
 
+use totara_core\advanced_feature;
+
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot . '/totara/appraisal/lib.php');
@@ -131,7 +133,7 @@ if ($canassign) {
         echo get_string('appraisalactivenochangesallowed', 'totara_appraisal');
     } else {
         // If the hierarchy positions feature is disabled then remove it from the Assign User Group menu.
-        if (totara_feature_disabled('positions') && array_key_exists('pos', $grouptypes)) {
+        if (advanced_feature::is_disabled('positions') && array_key_exists('pos', $grouptypes)) {
             unset($grouptypes['pos']);
         }
 

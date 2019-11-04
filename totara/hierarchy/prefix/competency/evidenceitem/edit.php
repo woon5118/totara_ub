@@ -22,6 +22,8 @@
  * @subpackage totara_hierarchy
  */
 
+use totara_core\advanced_feature;
+
 require_once(__DIR__ . '/../../../../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->libdir . '/coursecatlib.php');
@@ -38,7 +40,7 @@ $id = required_param('id', PARAM_INT);
 $category = optional_param('category', 0, PARAM_INT);
 
 // Check if Competencies are enabled.
-if (totara_feature_disabled('competencies')) {
+if (advanced_feature::is_disabled('competencies')) {
     echo html_writer::tag('div', get_string('competenciesdisabled', 'totara_hierarchy'), array('class' => 'notifyproblem'));
     die();
 }

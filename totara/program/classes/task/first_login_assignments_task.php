@@ -24,6 +24,8 @@
 
 namespace totara_program\task;
 
+use totara_core\advanced_feature;
+
 class first_login_assignments_task extends \core\task\scheduled_task {
     /**
      * Get a descriptive name for this task (shown to admins).
@@ -47,8 +49,8 @@ class first_login_assignments_task extends \core\task\scheduled_task {
         require_once($CFG->dirroot . '/totara/program/lib.php');
 
         // Don't run programs cron if programs and certifications are disabled.
-        if (totara_feature_disabled('programs') &&
-            totara_feature_disabled('certifications')) {
+        if (advanced_feature::is_disabled('programs') &&
+            advanced_feature::is_disabled('certifications')) {
             return;
         }
 

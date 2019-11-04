@@ -21,11 +21,13 @@
  * @package totara_certification
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 /** @var admin_root $ADMIN */
 /** @var context_system $systemcontext */
 
-$certificationsenabled = totara_feature_disabled('certifications');
+$certificationsenabled = advanced_feature::is_disabled('certifications');
 
 if (has_any_capability(['totara/certification:createcertification', 'totara/certification:configurecertification'], $systemcontext)) {
     $ADMIN->add('certifications', new admin_externalpage('managecertifications',

@@ -28,6 +28,7 @@ use core\event\admin_settings_changed;
 use totara_catalog\local\catalog_storage;
 use totara_catalog\task\provider_active_task;
 use core\task\manager as task_manager;
+use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -67,7 +68,7 @@ class settings_observer {
         global $CFG;
 
         $enableprograms = (int)$CFG->enableprograms;
-        if ($enableprograms != TOTARA_DISABLEFEATURE) {
+        if ($enableprograms != advanced_feature::DISABLED) {
             return true;
         }
 

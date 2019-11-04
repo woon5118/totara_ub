@@ -25,6 +25,8 @@
 
 namespace totara_plan\customfield_area;
 
+use totara_core\advanced_feature;
+
 /**
  * Evidence custom field management class.
  *
@@ -123,7 +125,7 @@ class evidence implements \totara_customfield\area {
 
         // Access control matches that in totara/plan/record/evidence/view.php and edit.php
 
-        if (totara_feature_disabled('recordoflearning')) {
+        if (advanced_feature::is_disabled('recordoflearning')) {
             // Return and let the calling function call send_file_not_found().
             send_file_not_found();
         }

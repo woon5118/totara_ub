@@ -23,6 +23,8 @@
 
 namespace totara_reportbuilder\rb\display;
 
+use totara_core\advanced_feature;
+
 /**
  * Display class intended for users learning items
  *
@@ -52,7 +54,7 @@ class user_learning_icons extends base {
         $disp = \html_writer::start_tag('span', array('style' => 'white-space:nowrap;'));
 
         // Learning Records icon.
-        if (totara_feature_visible('recordoflearning')) {
+        if (advanced_feature::is_enabled('recordoflearning')) {
             $disp .= \html_writer::start_tag('a', array('href' => $CFG->wwwroot . '/totara/plan/record/index.php?userid=' . $value));
             $disp .= $OUTPUT->flex_icon('recordoflearning', ['classes' => 'ft-size-300']);
             $disp .= \html_writer::end_tag('a');
@@ -66,7 +68,7 @@ class user_learning_icons extends base {
         }
 
         // Individual Development Plans icon.
-        if (totara_feature_visible('learningplans')) {
+        if (advanced_feature::is_enabled('learningplans')) {
             if (has_capability('totara/plan:accessplan', $systemcontext)) {
                 $disp .= \html_writer::start_tag('a', array('href' => $CFG->wwwroot . '/totara/plan/index.php?userid=' . $value));
                 $disp .= $OUTPUT->flex_icon('learningplan', ['classes' => 'ft-size-300']);

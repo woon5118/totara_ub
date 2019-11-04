@@ -1,5 +1,7 @@
 <?php
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 /** @var admin_root $ADMIN */
 
@@ -148,7 +150,7 @@ preferences,moodle|/user/preferences.php|preferences',
 
     // Navigation settings
     $temp = new admin_settingpage('navigation', new lang_string('menuitem:navigationsettings', 'totara_core'), array('totara/core:appearance'));
-    if (!totara_feature_disabled('totaradashboard')) {
+    if (!advanced_feature::is_disabled('totaradashboard')) {
         $choices = array(
             HOMEPAGE_SITE => new lang_string('site'),
             HOMEPAGE_TOTARA_DASHBOARD => new lang_string('totaradashboard', 'admin')
@@ -199,7 +201,7 @@ preferences,moodle|/user/preferences.php|preferences',
 
     // Dashboard settings.
     $temp = new admin_externalpage('totaradashboard', new lang_string('dashboards', 'totara_dashboard'),
-        $CFG->wwwroot . '/totara/dashboard/manage.php', array('totara/dashboard:manage'), totara_feature_disabled('totaradashboard'));
+        $CFG->wwwroot . '/totara/dashboard/manage.php', array('totara/dashboard:manage'), advanced_feature::is_disabled('totaradashboard'));
     $ADMIN->add('navigationcat', $temp, 'navigation');
 
     // coursecontact is the person responsible for course - usually manages enrolments, receives notification, etc.

@@ -22,6 +22,8 @@
  * @subpackage reportbuilder
  */
 
+use totara_core\advanced_feature;
+
 class rb_plan_programs_completion_history_embedded extends rb_base_embedded {
 
     public $url, $source, $fullname, $filters, $columns;
@@ -128,6 +130,6 @@ class rb_plan_programs_completion_history_embedded extends rb_base_embedded {
      * @return boolean If the report should be ignored of not.
      */
     public static function is_report_ignored() {
-        return !totara_feature_visible('recordoflearning');
+        return !advanced_feature::is_enabled('recordoflearning');
     }
 }

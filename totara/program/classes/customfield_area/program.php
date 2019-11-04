@@ -25,6 +25,8 @@
 
 namespace totara_program\customfield_area;
 
+use totara_core\advanced_feature;
+
 /**
  * Program and Certification custom field management class.
  *
@@ -97,11 +99,11 @@ class program implements \totara_customfield\area {
         $program = new \program($programorid);
 
         if (empty($program->certifid)) {
-            if (totara_feature_disabled('programs')) {
+            if (advanced_feature::is_disabled('programs')) {
                 return false;
             }
         } else {
-            if (totara_feature_disabled('certifications')) {
+            if (advanced_feature::is_disabled('certifications')) {
                 return false;
             }
         }
@@ -124,7 +126,7 @@ class program implements \totara_customfield\area {
     public static function pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, $options = array()) {
         global $CFG, $DB;
 
-        if (totara_feature_disabled('programs') && totara_feature_disabled('certifications')) {
+        if (advanced_feature::is_disabled('programs') && advanced_feature::is_disabled('certifications')) {
             // Return and let the calling function call send_file_not_found().
             send_file_not_found();
         }

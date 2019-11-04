@@ -23,6 +23,8 @@
  * @subpackage totara_question
  */
 
+use totara_core\advanced_feature;
+
 require_once('review.class.php');
 
 class question_coursefromplan extends review {
@@ -47,7 +49,7 @@ class question_coursefromplan extends review {
      */
     public static function check_enabled() {
 
-        return !totara_feature_disabled('learningplans');
+        return !advanced_feature::is_disabled('learningplans');
     }
 
     /**
