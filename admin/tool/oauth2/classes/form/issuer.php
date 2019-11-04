@@ -83,7 +83,7 @@ class issuer extends persistent {
         $mform = $this->_form;
         $issuer = $this->get_persistent();
 
-        $docslink = optional_param('docslink', '', PARAM_ALPHAEXT);
+        $docslink = get_docs_url('OAuth2'); // Totara: Update to point to our docs
         if ($docslink) {
             $name = s($issuer->get('name'));
             $mform->addElement('html', $OUTPUT->doc_link($docslink, get_string('issuersetuptype', 'tool_oauth2', $name)));
