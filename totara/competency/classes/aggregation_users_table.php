@@ -34,6 +34,11 @@ use xmldb_table;
  */
 class aggregation_users_table {
 
+    /**
+     * @var bool
+     */
+    protected $is_temporary;
+
     /** @var string $table_name Name of the table containing information on the users to consider for aggregation */
     private $table_name = 'totara_competency_aggregation_queue';
 
@@ -101,9 +106,28 @@ class aggregation_users_table {
             $this->update_operation_column = $update_operation_column;
         }
 
-        if ($is_temporary) {
+        $this->is_temporary = $is_temporary;
+        if ($this->is_temporary) {
             $this->create_temp_table();
         }
+    }
+
+    /**
+     * Make sure any temporary table is dropped when this object gets destroyed
+     */
+    public function __destruct() {
+        if ($this->is_temporary) {
+            $this->drop_temp_table();
+        }
+    }
+
+    private function drop_temp_table() {
+        global $CFG, $DB;
+
+        require_once($CFG->dirroot . '/lib/ddllib.php');
+
+        $dbman = $DB->get_manager();
+        $dbman->drop_table(new xmldb_table($this->table_name));
     }
 
     /**
@@ -540,7 +564,6 @@ class aggregation_users_table {
     public function queue_all_assigned_users_for_aggregation(int $competency_id): void {
         global $DB;
 
-        $process_key_set = '';
         $process_key_wh = '';
 
         if (!empty($this->process_key_column)) {
@@ -548,7 +571,8 @@ class aggregation_users_table {
         }
 
         $sql =
-            "SELECT tacu.user_id
+            "SELECT tacu.id,
+                    tacu.user_id
                FROM {totara_assignment_competency_users} tacu
           LEFT JOIN {{$this->get_table_name()}} agg_queue
                  ON agg_queue.{$this->competency_id_column} = tacu.competency_id
@@ -583,10 +607,6 @@ class aggregation_users_table {
         $params = [];
         if ($this->process_key_value) {
             $params[$this->process_key_column] = $this->process_key_value;
-        }
-
-        if ($this->update_operation_value) {
-            $params[$this->update_operation_column] = $this->update_operation_value;
         }
 
         $DB->delete_records($this->table_name, $params);

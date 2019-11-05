@@ -123,6 +123,14 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
 
         $tbl = new aggregation_users_table($table_name, true);
         $this->assertTrue($dbman->table_exists($table));
+
+        $this->assertTrue($dbman->table_exists($table_name));
+
+        // Triggering destruct
+        unset($tbl);
+
+        // Test if the table got dropped
+        $this->assertFalse($dbman->table_exists($table_name));
     }
 
     /**

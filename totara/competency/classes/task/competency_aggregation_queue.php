@@ -51,6 +51,8 @@ class competency_aggregation_queue extends scheduled_task {
 
         $task = new aggregation_task($table, false);
         $task->execute();
+
+        $table->delete();
     }
 
 }
