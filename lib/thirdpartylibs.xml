@@ -266,6 +266,12 @@
     <version>2.8.0</version>
   </library>
   <library>
+    <location>amd/src/chartjs-plugin-doughnutlabel.js</location>
+    <name>Chart.js Doughnut plugin</name>
+    <license>MIT</license>
+    <version>2.0.3</version>
+  </library>
+  <library>
     <location>maxmind/GeoIp2</location>
     <name>GeoIP2 PHP API</name>
     <license>Apache 2.0</license>
