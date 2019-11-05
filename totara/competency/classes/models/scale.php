@@ -54,31 +54,6 @@ class scale extends entity_model {
         parent::__construct($entity);
     }
 
-    public static function find_by_id(array $id, $with_values = true): self {
-        $model = new static(static::scale_repository()->find_or_fail($id));
-
-        if ($with_values) {
-            $model->load_values();
-        }
-
-        return $model;
-    }
-
-    public static function find_by_ids(array $ids, $with_values = true): collection {
-
-        $ids = static::sanitize_ids($ids);
-
-        $scales = static::scale_repository()->where('id', $ids)->get();
-
-        $values = $with_values ? static::preload_values($scales) : new collection();
-
-        $models = $scales->map(function (scale_entity $scale) use ($with_values, $values) {
-            $model = new static($scale);
-
-            if ($with_values) {
-                static::assign_preloaded_values($model, $values);
-            }
-
     /**
      * Load scale by ID
      *
@@ -112,14 +87,17 @@ class scale extends entity_model {
      *
      * @param int[] $ids Competency IDs
      * @param bool $with_values A flag to load scale values
-     * @return collection
+     * @return collection|array
      */
     public static function find_by_competency_ids(array $ids, bool $with_values = false): collection {
-       return static::find_by_ids((new collection(competency::repository()
+        $scales = competency::repository()
             ->where('id', 'in', static::sanitize_ids($ids))
             ->with('scale')
             ->get()
-            ->pluck('scale')))->pluck('id'), $with_values);
+            ->pluck('scale');
+
+        $scales = new collection($scales);
+        return static::find_by_ids($scales->pluck('id'), $with_values);
     }
 
     /**

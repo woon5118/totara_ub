@@ -76,7 +76,8 @@ class totara_competency_model_scale_testcase extends advanced_testcase {
         $expected = $data['scales'];
         $comps = $data['competencies'];
 
-        $scales = scale::find_by_competency_ids([
+        $scales = scale::find_by_competency_ids(
+            [
                 'I am negative :(',
                 '-2',
                 -2,

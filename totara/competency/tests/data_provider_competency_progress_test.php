@@ -144,8 +144,8 @@ class totara_competency_data_provider_competency_progress_testcase extends totar
             $cp->get_assignments()->map(function (assignment_model $assignment) use (&$at_least_one_achievement_found) {
                 $this->assertTrue($assignment->get_entity()->relation_loaded('current_achievement'));
 
-                $achievement = competency_achievement::repository()->where('user_id', $this->get_user()->id)
-                    ->where('status', 0)
+                $achievement = competency_achievement::repository()
+                    ->where('user_id', $this->get_user()->id)
                     ->where('assignment_id', $assignment->get_id())
                     ->with('value') // Our achievement comes with a preloaded scale value
                     ->one();
