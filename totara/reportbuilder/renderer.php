@@ -706,7 +706,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
             $string = get_string('x' . $resultstr, 'totara_reportbuilder', $filteredcount);
         }
 
-        return html_writer::span($string, 'rb-record-count');
+        return html_writer::span($string, 'rb-record-count', ['role' => 'status']);
     }
 
     /**

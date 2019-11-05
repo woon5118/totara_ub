@@ -29,6 +29,7 @@ information provided here is intended especially for developers.
 * Removed no longer used ajax/graph.php file
 * Updated default colours for report graphs
 * Deprecated reportbuilder_get_export_options(), please use reportbuilder::get_all_general_export_options()
+* totara_reportbuilder_renderer::result_count_info has been updated adding status role for screen readers
 
 === 12.0 ===
 
