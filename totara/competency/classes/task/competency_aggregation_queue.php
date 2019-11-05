@@ -23,6 +23,7 @@
 
 namespace totara_competency\task;
 
+use core\task\scheduled_task;
 use totara_competency\aggregation_task;
 use totara_competency\aggregation_users_table;
 
