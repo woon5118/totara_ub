@@ -203,7 +203,7 @@ class database_manager {
      * @return bool
      */
     public function field_allowed_values_constraint_exists(xmldb_table $table, xmldb_field $field) {
-        $sql = $this->generator->getAllowedValuesContraintExistsSQL($table, $field);
+        $sql = $this->generator->getAllowedValuesConstraintExistsSQL($table, $field);
         return $this->mdb->record_exists_sql($sql);
     }
 

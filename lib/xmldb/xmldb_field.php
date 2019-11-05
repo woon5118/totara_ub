@@ -445,7 +445,7 @@ class xmldb_field extends xmldb_object {
         if (isset($xmlarr['@']['ALLOWED_VALUES'])) {
             $values = trim($xmlarr['@']['ALLOWED_VALUES']);
             if ($values === '') {
-                $this->errormsg = 'Allowed values atttribute cannot be empty';
+                $this->errormsg = 'Allowed values attribute cannot be empty';
                 $this->debug($this->errormsg);
                 $result = false;
             } else {

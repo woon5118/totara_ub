@@ -77,7 +77,7 @@ $warningfound = false;
 
 $schema = $dbmanager->get_install_xml_schema();
 
-cli_heading("Enum value contraint check ($vendor: $version)");
+cli_heading("Enum value constraint check ($vendor: $version)");
 
 foreach ($schema->getTables() as $table) {
     foreach ($table->getFields() as $field) {

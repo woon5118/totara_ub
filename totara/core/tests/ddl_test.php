@@ -2322,7 +2322,7 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $this->assertTrue($done);
     }
 
-    public function is_mysql57() {
+    protected function is_mysql57() {
         if ($this->tdb->get_dbvendor() === 'mysql') {
             $version = $this->tdb->get_server_info()['version'];
             if (version_compare($version, '8.0', '<')) {

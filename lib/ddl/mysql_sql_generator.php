@@ -563,10 +563,10 @@ class mysql_sql_generator extends sql_generator {
      * @param xmldb_field $xmldb_field
      * @return core\dml\sql
      */
-    public function getAllowedValuesContraintExistsSQL(xmldb_table $xmldb_table, xmldb_field $xmldb_field) {
-        $constraintname = $this->getAllowedValuesContraintName($xmldb_table, $xmldb_field);
+    public function getAllowedValuesConstraintExistsSQL(xmldb_table $xmldb_table, xmldb_field $xmldb_field) {
+        $constraintname = $this->getAllowedValuesConstraintName($xmldb_table, $xmldb_field);
 
-        $sql = "SELECT * 
+        $sql = "SELECT 1
                   FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
                  WHERE CONSTRAINT_NAME = :constraintname";
         $params = ['constraintname' => $constraintname];
@@ -585,9 +585,9 @@ class mysql_sql_generator extends sql_generator {
      */
     public function getDropAllowedValuesConstraintSQL(xmldb_table $xmldb_table, xmldb_field $xmldb_field): string {
         $tablename = $this->getTableName($xmldb_table, true);
-        $constraintname = $this->getAllowedValuesContraintName($xmldb_table, $xmldb_field);
+        $constraintname = $this->getAllowedValuesConstraintName($xmldb_table, $xmldb_field);
 
-        if ($this->mdb->get_dbvendor()=== 'mariadb') {
+        if ($this->mdb->get_dbvendor() === 'mariadb') {
             return "ALTER TABLE $tablename DROP CONSTRAINT \"$constraintname\"";
         } else {
             return "ALTER TABLE $tablename DROP CHECK \"$constraintname\"";

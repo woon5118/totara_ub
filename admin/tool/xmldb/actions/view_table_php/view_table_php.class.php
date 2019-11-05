@@ -642,7 +642,7 @@ class view_table_php extends XMLDBAction {
      * @param string $field field name to change
      * @return string
      */
-    function change_field_allowedvalues_php($structure, $table, $field) {
+    public function change_field_allowedvalues_php($structure, $table, $field) {
 
         $result = '';
         // Validate if we can do it

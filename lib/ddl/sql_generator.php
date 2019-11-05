@@ -848,7 +848,7 @@ abstract class sql_generator {
      * @param xmldb_field $xmldb_field
      * @return string
      */
-    protected function getAllowedValuesContraintName(xmldb_table $xmldb_table, xmldb_field $xmldb_field): string {
+    protected function getAllowedValuesConstraintName(xmldb_table $xmldb_table, xmldb_field $xmldb_field): string {
         return $this->getTableName($xmldb_table, false) . $xmldb_field->getName() . '_enum';
     }
 
@@ -861,9 +861,9 @@ abstract class sql_generator {
      * @param xmldb_field $xmldb_field
      * @return core\dml\sql
      */
-    public function getAllowedValuesContraintExistsSQL(xmldb_table $xmldb_table, xmldb_field $xmldb_field) {
+    public function getAllowedValuesConstraintExistsSQL(xmldb_table $xmldb_table, xmldb_field $xmldb_field) {
         $tablename = $this->getTableName($xmldb_table, false);
-        $constraintname = $this->getAllowedValuesContraintName($xmldb_table, $xmldb_field);
+        $constraintname = $this->getAllowedValuesConstraintName($xmldb_table, $xmldb_field);
 
         $sql = "SELECT 1
                   FROM information_schema.constraint_column_usage 
@@ -901,7 +901,7 @@ abstract class sql_generator {
         }
 
         $tablename = $this->getTableName($xmldb_table, true);
-        $constraintname = $this->getAllowedValuesContraintName($xmldb_table, $xmldb_field);
+        $constraintname = $this->getAllowedValuesConstraintName($xmldb_table, $xmldb_field);
         $fieldname = $xmldb_field->getName();
 
         if ($type == XMLDB_TYPE_INTEGER) {
@@ -928,7 +928,7 @@ abstract class sql_generator {
      */
     public function getDropAllowedValuesConstraintSQL(xmldb_table $xmldb_table, xmldb_field $xmldb_field): string {
         $tablename = $this->getTableName($xmldb_table, true);
-        $constraintname = $this->getAllowedValuesContraintName($xmldb_table, $xmldb_field);
+        $constraintname = $this->getAllowedValuesConstraintName($xmldb_table, $xmldb_field);
 
         return "ALTER TABLE $tablename DROP CONSTRAINT IF EXISTS \"$constraintname\"";
     }
