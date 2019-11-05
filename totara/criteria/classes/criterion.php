@@ -818,7 +818,7 @@ abstract class criterion {
         $params['userid'] = $user_id;
 
         $existing_records = $DB->get_records_sql_menu(
-            'SELECT criterion_item_id, criterion_met
+            'SELECT id, criterion_item_id, criterion_met
                    FROM {totara_criteria_item_record}
                   WHERE user_id = :userid
                     AND criterion_item_id ' . $insql,
