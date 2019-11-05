@@ -177,6 +177,7 @@ $string['deleteusercheckfull'] = 'Are you absolutely sure you want to completely
 <li>messages will be marked as read</li>
 </ul>
 If you wish to retain any data you may wish to consider suspending the user instead.';
+$string['enablefeature'] = 'Enable';
 $string['disablefeature'] = 'Disable';
 $string['downloaderrorlog'] = 'Download error log';
 $string['downloadregistrationdata'] = 'Download encrypted registration data';
@@ -189,10 +190,10 @@ $string['elementlibrary'] = 'Element Library';
 $string['emptyassignments'] = 'No assignments';
 $string['enabledisabletotarasync'] = 'Select Enable or Disable and then click continue to update HR Import for {$a}';
 $string['enableteam'] = 'Enable Team';
-$string['enableteam_desc'] = 'This option will let you: Enable(show)/Disable Team feature from users on this site.
+$string['enableteam_desc'] = 'This option will let you: Enable/Disable Team feature from users on this site.
 
-* If Show is chosen, all links, menus, tabs and option related to Team will be accessible.
-* If Disable is chosen, Team will disappear from any menu on the site and will not be accessible.';
+* If Enable is selected, all links, menus, tabs and option related to Team will be accessible.
+* If Disable is selected, Team will disappear from any menu on the site and will not be accessible.';
 $string['enableprogramextensionrequests'] = 'Enable program extension requests';
 $string['enableprogramextensionrequests_help'] = 'When enabled extension requests can be turned on for individual programs. This allows the program assignee to request an extension to the due date for a program. This extension can then be accepted or denied by the assignees manager.';
 $string['enrolled'] = 'Enrolled';

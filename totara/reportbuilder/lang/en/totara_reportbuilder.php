@@ -291,9 +291,9 @@ $string['enablereportcaching'] = 'Enable report caching';
 $string['enableglobalrestrictions'] = 'Enable report restrictions';
 $string['enableglobalrestrictions_desc'] = 'Global user report restrictions are designed to restrict the content visible in report builder reports. Turning this feature on allows for fine grained control over what records are visible to users viewing a report builder report but can have a significant impact on performance.';
 $string['enablereportgraphs'] = 'Enable report builder graphs';
-$string['enablereportgraphsinfo'] = 'This option will let you: enable (show) or disable report builder graphs on this site.
+$string['enablereportgraphsinfo'] = 'This option will let you: enable or disable report builder graphs on this site.
 
-* If Show is selected, all features related to report builder graphs will be visible and accessible.
+* If Enable is selected, all features related to report builder graphs will be visible and accessible.
 * If Disable is selected, no report builder graphs features will be visible or accessible.';
 $string['enrol'] = 'Enrol';
 $string['enrolledcoursecohortids'] = 'Enrolled course audience IDs';

@@ -229,15 +229,15 @@ $string['completiontransactions'] = 'Transactions';
 $string['completiontype'] = 'Completion type';
 $string['completiontype_help'] = 'The operator options (**Learner must complete**) within the set are: * **one course**: Meaning **or**.* **all courses**: Meaning **and**.The idea is to keep the flow humanly readable. Depending on the option chosen, the text in front of the courses changes automatically.';
 $string['completionupdatecancelled'] = 'Completion update cancelled';
-$string['configenablecertifications'] = 'This option will let you: Enable(show)/Disable Certifications features from users on this site.
+$string['configenablecertifications'] = 'This option will let you: Enable/Disable Certifications features from users on this site.
 
-* If Show is chosen, all links, menus, tabs and option related to certifications will be accessible.
-* If Disable is chosen, certifications will disappear from any menu on the site and will not be accessible.
+* If Enable is selected, all links, menus, tabs and option related to certifications will be accessible.
+* If Disable is selected, certifications will disappear from any menu on the site and will not be accessible.
 ';
-$string['configenableprograms'] = 'This option will let you: Enable(show)/Disable Programs features from users on this site.
+$string['configenableprograms'] = 'This option will let you: Enable/Disable Programs features from users on this site.
 
-* If Show is chosen, all links, menus, tabs and option related to programs will be accessible.
-* If Disable is chosen, programs will disappear from any menu on the site and will not be accessible.
+* If Enable is selected, all links, menus, tabs and option related to programs will be accessible.
+* If Disable is selected, programs will disappear from any menu on the site and will not be accessible.
 ';
 $string['confirmassignmentchanges'] = 'Confirm assignment changes';
 $string['confirmcontentchanges'] = 'Confirm content changes';

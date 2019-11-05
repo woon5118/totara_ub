@@ -108,13 +108,13 @@ class totara_core_admin_setting_feature extends admin_setting_configselect {
             debugging("Found hidden feature '{$this->name}': hiding features is not supported anymore, features can only be enabled or disabled..", DEBUG_DEVELOPER);
 
             $this->choices = array(
-                advanced_feature::ENABLED => new lang_string('showfeature', 'totara_core'),
+                advanced_feature::ENABLED => new lang_string('enablefeature', 'totara_core'),
                 TOTARA_HIDEFEATURE => new lang_string('hidefeature', 'totara_core'),
                 advanced_feature::DISABLED => new lang_string('disablefeature', 'totara_core')
             );
         } else {
             $this->choices = array(
-                advanced_feature::ENABLED => new lang_string('showfeature', 'totara_core'),
+                advanced_feature::ENABLED => new lang_string('enablefeature', 'totara_core'),
                 advanced_feature::DISABLED => new lang_string('disablefeature', 'totara_core')
             );
         }

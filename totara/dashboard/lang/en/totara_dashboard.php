@@ -39,10 +39,10 @@ $string['clonedashboard'] = 'Clone dashboard';
 $string['clonedashboardconfirm'] = 'Do you really want to clone dashboard {$a}?
 
 Cloning will create a copy of this dashboard including the blocks that have been added to it and any audience assignments.';
-$string['configenabletotaradashboard'] = 'This option will let you: Enable(show)/Disable Totara Dashboard feature on this site.
+$string['configenabletotaradashboard'] = 'This option will let you: Enable/Disable Totara Dashboard feature on this site.
 
-* If Show is chosen, all links, menus, tabs and option related to Totara Dashboard will be accessible.
-* If Disable is chosen, Totara Dashboard will disappear from any menu on the site and will not be accessible.
+* If Enable is selected, all links, menus, tabs and option related to Totara Dashboard will be accessible.
+* If Disable is selected, Totara Dashboard will disappear from any menu on the site and will not be accessible.
 ';
 $string['createdashboard'] = 'Create dashboard';
 $string['customiseon'] = 'Customise this page';
