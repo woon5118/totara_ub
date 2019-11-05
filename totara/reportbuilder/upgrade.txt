@@ -36,6 +36,10 @@ information provided here is intended especially for developers.
 * Updated default colours for report graphs
 * Deprecated reportbuilder_get_export_options(), please use reportbuilder::get_all_general_export_options()
 * totara_reportbuilder_renderer::result_count_info has been updated adding status role for screen readers
+* The following reportbuilder/lib.php global variables have been deprecated and should no longer be used:
+  * REPORT_BUILDER_PDF_FONT_SIZE_DATA
+  * REPORT_BUILDER_PDF_FONT_SIZE_RECORD
+  * REPORT_BUILDER_PDF_FONT_SIZE_TITLE
 
 === 12.0 ===
 

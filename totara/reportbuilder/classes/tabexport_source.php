@@ -80,6 +80,15 @@ class tabexport_source extends \totara_core\tabexport_source {
     }
 
     /**
+     * Returns brief summary of the report suitable for caption.
+     *
+     * @return string
+     */
+    public function get_summary() {
+        return format_string($this->report->summary);
+    }
+
+    /**
      * BLock of extra frontpage information.
      * @return array
      */

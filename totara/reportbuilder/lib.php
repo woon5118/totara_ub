@@ -105,8 +105,11 @@ define('REPORT_CACHING_TIMEOUT', 3600);
  *  Pdf export constants.
  *
  */
+/** @deprecated since Totara 13 */
 define('REPORT_BUILDER_PDF_FONT_SIZE_DATA', 10);
+/** @deprecated since Totara 13 */
 define('REPORT_BUILDER_PDF_FONT_SIZE_RECORD', 14);
+/** @deprecated since Totara 13 */
 define('REPORT_BUILDER_PDF_FONT_SIZE_TITLE', 20);
 define('REPORT_BUILDER_PDF_MARGIN_FOOTER', 10);
 define('REPORT_BUILDER_PDF_MARGIN_BOTTOM', 20);

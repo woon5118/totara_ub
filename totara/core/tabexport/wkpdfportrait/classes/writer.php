@@ -72,11 +72,14 @@ class writer extends tabexport_writer {
 
         // Create table.
         $tablehtml = '';
-        $tablehtml .= '<table border="1" cellpadding="2" cellspacing="0" width="100%">
-                        <thead>
+        $tablehtml .= '<table border="1" cellpadding="2" cellspacing="0" width="100%">';
+        if ($this->source->get_summary()) {
+            $tablehtml .= '<caption>' . s($this->source->get_summary()) . '</caption>';
+        }
+        $tablehtml .= ' <thead>
                             <tr style="background-color: #CCC;">';
         foreach ($this->source->get_headings() as $heading) {
-            $tablehtml .= '<th>' . s($heading) . '</th>';
+            $tablehtml .= '<th scope="col">' . s($heading) . '</th>';
         }
         $tablehtml .= '</tr></thead><tbody>';
         $count = 0;
@@ -141,6 +144,7 @@ class writer extends tabexport_writer {
         @chmod($htmlfile, (fileperms(dirname($htmlfile)) & 0666));
 
         // Release memory.
+        unset($tablehtml);
         unset($html);
         unset($svgdata);
 
