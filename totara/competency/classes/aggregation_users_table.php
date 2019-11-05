@@ -499,11 +499,14 @@ class aggregation_users_table {
         }
         $user_competency_condition = "((" . implode(') OR (', $wh_parts) . "))";
 
+        if (!empty($this->process_key_column)) {
+            $process_key_wh = " AND {$this->process_key_column} IS NULL";
+        }
+
         $sql = "
             SELECT id, {$this->get_user_id_column()}, {$this->get_competency_id_column()}
             FROM {{$this->get_table_name()}}
-            WHERE {$this->process_key_column} IS NULL
-                AND {$user_competency_condition}
+            WHERE {$user_competency_condition} {$process_key_wh}
         ";
 
         $existing_rows = $DB->get_records_sql($sql, $params);
