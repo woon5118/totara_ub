@@ -132,14 +132,14 @@ Feature: Sign up status
       | registrationtimestart[enabled]   | <periodopen>  |
       | registrationtimestart[month]     | July          |
       | registrationtimestart[day]       | 30            |
-      | registrationtimestart[year]      | <startyear>   |
+      | registrationtimestart[year]      | ## <startyear> ## Y ## |
       | registrationtimestart[hour]      | 01            |
       | registrationtimestart[minute]    | 00            |
       | registrationtimestart[timezone]  | <startzone>   |
       | registrationtimefinish[enabled]  | <periodclose> |
       | registrationtimefinish[month]    | July          |
       | registrationtimefinish[day]      | 30            |
-      | registrationtimefinish[year]     | <endyear>     |
+      | registrationtimefinish[year]     | ## <endyear> ## Y ## |
       | registrationtimefinish[hour]     | 01            |
       | registrationtimefinish[minute]   | 00            |
       | registrationtimefinish[timezone] | <endzone>     |
@@ -152,7 +152,8 @@ Feature: Sign up status
 
     When I follow "View all events"
     Then I should see "<bookingstatus>"
-    And I should see "<signupperiod>"
+    And I should see date "30 July, <startyear>" formatted "<signupperiodstartformat>"
+    And I should see date "30 July, <endyear>" formatted "<signupperiodendformat>"
     And I should see "<signupperiodzone>"
     And I should see "Wait-listed"
     And I should not see "Cancelled"
@@ -161,7 +162,7 @@ Feature: Sign up status
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Cancel event" "link" in the "<signupperiod>" "table_row"
+    And I click on "Cancel event" "link" in the "Wait-listed" "table_row"
     And I should see "Are you sure you want to cancel this event?"
     And I press "Yes"
     And I should see "Event cancelled" in the ".alert-success" "css_element"
@@ -175,11 +176,11 @@ Feature: Sign up status
     And I log out
 
     Examples:
-      | periodopen | startyear | startzone        | periodclose | endyear | endzone         | signupavailable     | bookingstatus       | signupperiod                                  | signupperiodzone |
-      | 1          | 2014      | Australia/Perth  | 1           | 2015    | Australia/Perth | Wait-listed         | Booking closed      | 30 July 2014, 1:00 AM - 30 July 2015, 1:00 AM | Australia/Perth  |
-      | 1          | 2014      | Australia/Perth  | 1           | 2030    | Australia/Perth | Join waitlist       | Booking open        | 30 July 2014, 1:00 AM - 30 July 2030, 1:00 AM | Australia/Perth  |
-      | 1          | 2029      | Australia/Perth  | 1           | 2030    | Australia/Perth | Wait-listed         | Booking not open    | 30 July 2029, 1:00 AM - 30 July 2030, 1:00 AM | Australia/Perth  |
-      | 1          | 2029      | Pacific/Honolulu | 1           | 2030    | Pacific/Fiji    | Wait-listed         | Booking not open    | 30 July 2029, 7:00 PM - 29 July 2030, 9:00 PM | Australia/Perth  |
-      | 0          | 2029      | Australia/Perth  | 0           | 2030    | Australia/Perth | Join waitlist       | Booking open        | Booking open                                  |                  |
-      | 1          | 2029      | Australia/Perth  | 0           | 2030    | Australia/Perth | Wait-listed         | Booking not open    | After 30 July 2029, 1:00 AM                   | Australia/Perth  |
-      | 0          | 2029      | Australia/Perth  | 1           | 2030    | Australia/Perth | Join waitlist       | Booking open        | Before 30 July 2030, 1:00 AM                  | Australia/Perth  |
+      | periodopen | startyear | startzone        | periodclose | endyear | endzone         | signupavailable | bookingstatus    | signupperiodstartformat    | signupperiodendformat      | signupperiodzone |
+      | 1          | -2 year   | Australia/Perth  | 1           | -1 year | Australia/Perth | Wait-listed     | Booking closed   | 30 July %Y, 1:00 AM        | 30 July %Y, 1:00 AM        | Australia/Perth  |
+      | 1          | -2 year   | Australia/Perth  | 1           | +2 year | Australia/Perth | Join waitlist   | Booking open     | 30 July %Y, 1:00 AM        | 30 July %Y, 1:00 AM        | Australia/Perth  |
+      | 1          | +1 year   | Australia/Perth  | 1           | +2 year | Australia/Perth | Wait-listed     | Booking not open | 30 July %Y, 1:00 AM        | 30 July %Y, 1:00 AM        | Australia/Perth  |
+      | 1          | +1 year   | Pacific/Honolulu | 1           | +2 year | Pacific/Fiji    | Wait-listed     | Booking not open | 30 July %Y, 7:00 PM        | 29 July %Y, 9:00 PM        | Australia/Perth  |
+      | 0          | +1 year   | Australia/Perth  | 0           | +2 year | Australia/Perth | Join waitlist   | Booking open     | -                          | -                          | -                |
+      | 1          | +1 year   | Australia/Perth  | 0           | +2 year | Australia/Perth | Wait-listed     | Booking not open | After 30 July %Y, 1:00 AM  | -                          | Australia/Perth  |
+      | 0          | +1 year   | Australia/Perth  | 1           | +2 year | Australia/Perth | Join waitlist   | Booking open     | -                          | Before 30 July %Y, 1:00 AM | Australia/Perth  |

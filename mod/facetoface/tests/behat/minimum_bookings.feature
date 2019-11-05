@@ -50,18 +50,18 @@ Feature: Minimum Seminar bookings
     And I set the following fields to these values:
       | timestart[day]     | 29       |
       | timestart[month]   | December |
-      | timestart[year]    | 2030     |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 12       |
       | timestart[minute]  | 00       |
       | timefinish[day]    | 29       |
       | timefinish[month]  | December |
-      | timefinish[year]   | 2030     |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 13       |
       | timefinish[minute] | 00       |
     And I click on "OK" "button"
     And I wait "1" seconds
     And I click on "Save changes" "button"
-    And I click on "Edit" "link" in the "29 December 2030" "table_row"
+    And I click on "Edit" "link" in the "29 December" "table_row"
     Then the field "Minimum bookings" matches value "2"
 
   Scenario Outline: Confirm notifications are sent out once cutoff has been reached

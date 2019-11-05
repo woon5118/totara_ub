@@ -42,7 +42,7 @@ Feature: In Dashboard, teacher can see the number of student attempts to lessons
       | id_deadline_enabled | 1 |
       | deadline[day] | 1 |
       | deadline[month] | January |
-      | deadline[year] | 2030 |
+      | deadline[year] | ## +5 years ## Y ## |
       | deadline[hour] | 08 |
       | deadline[minute] | 00 |
       | Re-takes allowed | Yes |

@@ -108,7 +108,7 @@ Feature: Check asset details with all possible custom fields
       | customfield_datetime[enabled] | 1    |
       | customfield_datetime[day]     | 2    |
       | customfield_datetime[month]   | 3    |
-      | customfield_datetime[year]    | 2020 |
+      | customfield_datetime[year]    | ## next year ## Y ## |
       | customfield_datetime[hour]    | 10   |
       | customfield_datetime[minute]  | 30   |
       | customfield_datetime[enabled] | 1    |
@@ -150,7 +150,7 @@ Feature: Check asset details with all possible custom fields
     And I should see "150 Willis street"
     # "Yes" for checkbox
     And I should see "Yes"
-    And I should see "Monday, 2 March 2020, 10:30 AM"
+    And I should see date "2 March next year 10:30 AM" formatted "%A, %d %B %Y, %I:%M %p"
     And I should see "test.jpg"
     And I should see "Orange"
     And I should see "Tuatara"

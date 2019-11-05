@@ -55,13 +55,13 @@ Feature: Reserve spaces for team in seminar
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | 2025 |
+      | timestart[month]   | 2    |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 0    |
       | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | 2025 |
+      | timefinish[month]  | 2    |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 0    |
     And I press "OK"

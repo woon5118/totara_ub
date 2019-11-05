@@ -34,12 +34,12 @@ Feature: Only Alerts Report table block on dashboard
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## +2 years ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
       | timefinish[day]    | 1    |
       | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## +2 years ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"

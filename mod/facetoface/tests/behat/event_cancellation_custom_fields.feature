@@ -157,9 +157,9 @@ Feature: Seminar event cancellation custom fields
     And I set the following fields to these values:
       | customfield_cancelcheckbox          | 1                  |
       | customfield_canceldatetime[enabled] | 1                  |
-      | customfield_canceldatetime[day]     | 1                  |
-      | customfield_canceldatetime[month]   | December           |
-      | customfield_canceldatetime[year]    | 2030               |
+      | customfield_canceldatetime[day]     | ## 1 Dec next year ## j ## |
+      | customfield_canceldatetime[month]   | ## 1 Dec next year ## n ## |
+      | customfield_canceldatetime[year]    | ## 1 Dec next year ## Y ## |
       | customfield_cancellocationaddress   | Kensington         |
       | customfield_cancelmenu              | Nein               |
       | customfield_cancelmulti[0]          | 1                  |
@@ -187,7 +187,7 @@ Feature: Seminar event cancellation custom fields
     When I click on "Attendees" "link"
     And I click on "Event details" "link"
     Then I should see "Yes" in the "//dt[contains(., 'cancelcheckbox')]//following-sibling::dd" "xpath_element"
-    And I should see "1 December 2030" in the "//dt[contains(., 'canceldatetime')]//following-sibling::dd" "xpath_element"
+    And I should see date "1 Dec next year" formatted "%d %B %Y" in the "//dt[contains(., 'canceldatetime')]//following-sibling::dd" "xpath_element"
     And I should see "test.jpg" in the "//dt[contains(., 'cancelfile')]//following-sibling::dd" "xpath_element"
     And I should see "Kensington" in the "//dt[contains(., 'cancellocation')]//following-sibling::dd" "xpath_element"
     And I should see "Nein" in the "//dt[contains(., 'cancelmenu')]//following-sibling::dd" "xpath_element"
@@ -231,7 +231,7 @@ Feature: Seminar event cancellation custom fields
 
     When I follow "View This Report"
     Then I should see "Test Seminar" in the "Course 1" "table_row"
-    And I should see "1 Dec 2030" in the "Test Seminar" "table_row"
+    And I should see date "1 Dec next year" formatted "%d %b %Y" in the "Test Seminar" "table_row"
     And I should see "test.jpg" in the "Test Seminar" "table_row"
     And I should see "Kensington" in the "Test Seminar" "table_row"
     And I should see "Nein" in the "Test Seminar" "table_row"
@@ -252,5 +252,5 @@ Feature: Seminar event cancellation custom fields
     And I follow "Show more..."
     And I set the field "Message Content value" to "CANCELLED"
     And I click on "input[value=Search]" "css_element"
-    Then I should see "Yes::1 December 2030::Kensington::Nein::Aye, Nay::hi::http://example.org"
+    Then I should see date "1 Dec next year" formatted "Yes::%d %B %Y::Kensington::Nein::Aye, Nay::hi::http://example.org"
 

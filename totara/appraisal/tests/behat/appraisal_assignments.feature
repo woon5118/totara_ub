@@ -53,7 +53,7 @@ Feature: Test reported learners in appraisal assignments
       | Appraisal1  |
     And the following "stages" exist in "totara_appraisal" plugin:
       | appraisal   | name       | timedue                 |
-      | Appraisal1  | App1_Stage | 1 January 2020 23:59:59 |
+      | Appraisal1  | App1_Stage | 1 Jan +2 years 23:59:59 |
     And the following "pages" exist in "totara_appraisal" plugin:
       | appraisal   | stage      | name      |
       | Appraisal1  | App1_Stage | App1_Page |

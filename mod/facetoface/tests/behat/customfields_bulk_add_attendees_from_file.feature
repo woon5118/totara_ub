@@ -87,7 +87,7 @@ Feature: Add seminar attendees from csv file with custom fields
     When I press "Confirm"
     Then I should see "Uploaded via csv file" in the "John1 Smith1" "table_row"
     And I should see "Yes" in the "John1 Smith1" "table_row"
-    And I should see "2 Mar 2020" in the "John1 Smith1" "table_row"
+    And I should see "2 Mar 2035" in the "John1 Smith1" "table_row"
     And I should see "Apple" in the "John1 Smith1" "table_row"
     And I should see "Tui, Moa" in the "John1 Smith1" "table_row"
     And I should see "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." in the "John1 Smith1" "table_row"
@@ -96,7 +96,7 @@ Feature: Add seminar attendees from csv file with custom fields
 
     And I should see "Also uploaded via csv file" in the "John2 Smith2" "table_row"
     And I should see "Yes" in the "John2 Smith2" "table_row"
-    And I should see "3 Apr 2021" in the "John2 Smith2" "table_row"
+    And I should see "3 Apr 2036" in the "John2 Smith2" "table_row"
     And I should see "Orange" in the "John2 Smith2" "table_row"
     And I should see "Moa, Tuatara" in the "John2 Smith2" "table_row"
     And I should see "Consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." in the "John2 Smith2" "table_row"
@@ -105,7 +105,7 @@ Feature: Add seminar attendees from csv file with custom fields
 
     And I should see "More uploaded via csv file" in the "John3 Smith3" "table_row"
     And I should see "No" in the "John3 Smith3" "table_row"
-    And I should see "4 May 2022" in the "John3 Smith3" "table_row"
+    And I should see "4 May 2037" in the "John3 Smith3" "table_row"
     And I should see "Banana" in the "John3 Smith3" "table_row"
     And I should see "Tuatara" in the "John3 Smith3" "table_row"
     And I should see "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." in the "John3 Smith3" "table_row"

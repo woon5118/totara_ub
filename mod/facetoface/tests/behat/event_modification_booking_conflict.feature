@@ -29,12 +29,12 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
       | timefinish[day]    | 1    |
       | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
@@ -86,12 +86,12 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
       | timefinish[day]    | 1    |
       | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
@@ -117,12 +117,12 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
     And I set the following fields to these values:
       | timestart[day]     | 10   |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
       | timefinish[day]    | 1    |
       | timefinish[month]  | 10   |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
@@ -147,12 +147,12 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
       | timefinish[day]    | 1    |
       | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
@@ -178,19 +178,19 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
       | timefinish[day]    | 1    |
       | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
     And I set the following fields to these values:
       | capacity                  | 5   |
     And I press "Save changes"
-    Then I should see "1 January 2020"
+    Then I should see date "1 Jan next year" formatted "%d %B %Y"
     And I should not see "scheduling conflict"
 
   # Modify an event to have the same dates than seminar1 and check it's saved because there are not booking conflicts.
@@ -212,16 +212,16 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
       | timefinish[day]    | 1    |
       | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
-    Then I should see "1 January 2020"
+    Then I should see date "1 Jan next year" formatted "%d %B %Y"
     And I should not see "scheduling conflict"
 

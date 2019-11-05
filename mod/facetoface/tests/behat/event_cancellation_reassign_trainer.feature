@@ -33,13 +33,13 @@ Feature: Seminar event cancellation trainer can be reassigned
       | sessiontimezone     | Pacific/Auckland |
       | timestart[day]      | 10               |
       | timestart[month]    | 2                |
-      | timestart[year]     | 2025             |
+      | timestart[year]     | ## next year ## Y ## |
       | timestart[hour]     | 9                |
       | timestart[minute]   | 0                |
       | timestart[timezone] | Pacific/Auckland |
       | timefinish[day]     | 10               |
       | timefinish[month]   | 2                |
-      | timefinish[year]    | 2025             |
+      | timefinish[year]    | ## next year ## Y ## |
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
@@ -62,13 +62,13 @@ Feature: Seminar event cancellation trainer can be reassigned
       | sessiontimezone     | Pacific/Auckland |
       | timestart[day]      | 10               |
       | timestart[month]    | 2                |
-      | timestart[year]     | 2025             |
+      | timestart[year]     | ## next year ## Y ## |
       | timestart[hour]     | 9                |
       | timestart[minute]   | 0                |
       | timestart[timezone] | Pacific/Auckland |
       | timefinish[day]     | 10               |
       | timefinish[month]   | 2                |
-      | timefinish[year]    | 2025             |
+      | timefinish[year]    | ## next year ## Y ## |
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
@@ -93,13 +93,13 @@ Feature: Seminar event cancellation trainer can be reassigned
       | sessiontimezone     | Pacific/Auckland |
       | timestart[day]      | 10               |
       | timestart[month]    | 2                |
-      | timestart[year]     | 2025             |
+      | timestart[year]     | ## next year ## Y ## |
       | timestart[hour]     | 9                |
       | timestart[minute]   | 0                |
       | timestart[timezone] | Pacific/Auckland |
       | timefinish[day]     | 10               |
       | timefinish[month]   | 2                |
-      | timefinish[year]    | 2025             |
+      | timefinish[year]    | ## next year ## Y ## |
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |

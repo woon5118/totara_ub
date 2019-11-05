@@ -36,19 +36,20 @@ Feature: Take seminar attendance with job assignment on signup
       | sessiontimezone     | Pacific/Auckland |
       | timestart[day]      | 10               |
       | timestart[month]    | 2                |
-      | timestart[year]     | 2025             |
+      | timestart[year]     | ## next year ## Y ## |
       | timestart[hour]     | 9                |
       | timestart[minute]   | 0                |
       | timestart[timezone] | Pacific/Auckland |
       | timefinish[day]     | 10               |
       | timefinish[month]   | 2                |
-      | timefinish[year]    | 2025             |
+      | timefinish[year]    | ## next year ## Y ## |
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
     And I press "OK"
     When I press "Save changes"
-    Then I should see "Timezone: Pacific/Auckland" in the "10 February 2025, 9:00 AM - 3:00 PM" "table_row"
+    Then I should see date "10 February next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "Pacific/Auckland" in the "9:00 AM - 3:00 PM" "table_row"
     And I log out
 
 
@@ -84,7 +85,7 @@ Feature: Take seminar attendance with job assignment on signup
     When I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Edit event" "link" in the "10 February 2025" "table_row"
+    And I click on "Edit event" "link" in the "10 February" "table_row"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[year]    | 2016 |
@@ -141,7 +142,7 @@ Feature: Take seminar attendance with job assignment on signup
     When I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Edit event" "link" in the "10 February 2025" "table_row"
+    And I click on "Edit event" "link" in the "10 February" "table_row"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[year]    | 2016 |
@@ -207,7 +208,7 @@ Feature: Take seminar attendance with job assignment on signup
     When I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Edit event" "link" in the "10 February 2025" "table_row"
+    And I click on "Edit event" "link" in the "10 February" "table_row"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[year]    | 2016 |

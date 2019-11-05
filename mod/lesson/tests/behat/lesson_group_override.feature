@@ -58,16 +58,16 @@ Feature: Lesson group override
       | id_deadline_enabled | 1 |
       | deadline[day]       | 1 |
       | deadline[month]     | January |
-      | deadline[year]      | 2020 |
+      | deadline[year]      | ## +2 years ## Y ## |
       | deadline[hour]      | 08 |
       | deadline[minute]    | 00 |
     And I press "Save"
-    And I should see "Wednesday, 1 January 2020, 8:00"
+    And I should see date "1 Jan +2 years" formatted "%A, %d %B %Y, 8:00"
     Then I click on "Edit" "link" in the "region-main" "region"
     And I set the following fields to these values:
-      | deadline[year] | 2030 |
+      | deadline[year] | ## +5 years ## Y ## |
     And I press "Save"
-    And I should see "Tuesday, 1 January 2030, 8:00"
+    And I should see date "1 Jan +5 years" formatted "%A, %d %B %Y, 8:00"
     And I click on "Delete" "link"
     And I press "Continue"
     And I should not see "Group 1"
@@ -81,17 +81,17 @@ Feature: Lesson group override
       | id_deadline_enabled | 1 |
       | deadline[day]       | 1 |
       | deadline[month]     | January |
-      | deadline[year]      | 2020 |
+      | deadline[year]      | ## +2 years ## Y ## |
       | deadline[hour]      | 08 |
       | deadline[minute]    | 00 |
     And I press "Save"
-    And I should see "Wednesday, 1 January 2020, 8:00"
+    And I should see date "1 Jan +2 years" formatted "%A, %d %B %Y, 8:00"
     Then I click on "copy" "link"
     And I set the following fields to these values:
       | Override group | Group 2  |
-      | deadline[year] | 2030 |
+      | deadline[year] | ## +5 years ## Y ## |
     And I press "Save"
-    And I should see "Tuesday, 1 January 2030, 8:00"
+    And I should see date "1 Jan +5 years" formatted "%A, %d %B %Y, 8:00"
     And I should see "Group 2"
 
   Scenario: Allow a single group to have re-take the lesson
@@ -185,7 +185,7 @@ Feature: Lesson group override
       | id_deadline_enabled | 1 |
       | deadline[day]       | 1 |
       | deadline[month]     | January |
-      | deadline[year]      | 2000 |
+      | deadline[year]      | ## -3 years ## Y ## |
       | deadline[hour]      | 08 |
       | deadline[minute]    | 00 |
     And I press "Save and display"
@@ -196,7 +196,7 @@ Feature: Lesson group override
       | id_deadline_enabled | 1 |
       | deadline[day]       | 1 |
       | deadline[month]     | January |
-      | deadline[year]      | 2020 |
+      | deadline[year]      | ## +2 years ## Y ## |
       | deadline[hour]      | 08 |
       | deadline[minute]    | 00 |
     And I press "Save"
@@ -205,7 +205,7 @@ Feature: Lesson group override
     And I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "Test lesson"
-    Then I should see "This lesson closed on Saturday, 1 January 2000, 8:00"
+    Then I should see date "-3 years 1 Jan" formatted "This lesson closed on %A, %d %B %Y, 8:00"
     And I should not see "Cat is an amphibian"
     And I log out
     And I log in as "student1"
@@ -220,7 +220,7 @@ Feature: Lesson group override
       | id_available_enabled | 1 |
       | available[day]       | 1 |
       | available[month]     | January |
-      | available[year]      | 2020 |
+      | available[year]      | ## +2 years ## Y ## |
       | available[hour]      | 08 |
       | available[minute]    | 00 |
     And I press "Save and display"
@@ -231,7 +231,7 @@ Feature: Lesson group override
       | id_available_enabled | 1 |
       | available[day]       | 1 |
       | available[month]     | January |
-      | available[year]      | 2015 |
+      | available[year]      | ## last year ## Y ## |
       | available[hour]      | 08 |
       | available[minute]    | 00 |
     And I press "Save"
@@ -240,7 +240,7 @@ Feature: Lesson group override
     And I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "Test lesson"
-    Then  I should see "This lesson will be open on Wednesday, 1 January 2020, 8:00"
+    Then  I should see date "1 Jan +2 years" formatted "This lesson will be open on %A, %d %B %Y, 8:00"
     And I should not see "Cat is an amphibian"
     And I log out
     And I log in as "student1"
@@ -295,7 +295,7 @@ Feature: Lesson group override
       | id_available_enabled | 1 |
       | available[day]       | 1 |
       | available[month]     | January |
-      | available[year]      | 2030 |
+      | available[year]      | ## +5 years ## Y ## |
       | available[hour]      | 08 |
       | available[minute]    | 00 |
     And I press "Save and display"
@@ -307,11 +307,11 @@ Feature: Lesson group override
       | id_available_enabled | 1 |
       | available[day]       | 1 |
       | available[month]     | January |
-      | available[year]      | 2020 |
+      | available[year]      | ## +2 years ## Y ## |
       | available[hour]      | 08 |
       | available[minute]    | 00 |
     And I press "Save"
-    And I should see "Wednesday, 1 January 2020, 8:00"
+    And I should see date "1 Jan +2 years" formatted "%A, %d %B %Y, 8:00"
     And I follow "Test lesson name"
     And I navigate to "User overrides" in current page administration
     And I press "Add user override"
@@ -320,23 +320,23 @@ Feature: Lesson group override
       | id_available_enabled | 1 |
       | available[day]       | 1 |
       | available[month]     | January |
-      | available[year]      | 2021 |
+      | available[year]      | ## +3 years ## Y ## |
       | available[hour]      | 08 |
       | available[minute]    | 00 |
     And I press "Save"
-    And I should see "Friday, 1 January 2021, 8:00"
+    And I should see date "1 Jan +3 years" formatted "%A, %d %B %Y, 8:00"
     And I log out
     Then I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test lesson"
-    And I should see "This lesson will be open on Friday, 1 January 2021, 8:00"
+    And I should see date "1 Jan +3 years" formatted "This lesson will be open on %A, %d %B %Y, 8:00"
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "Test lesson"
-    And I should see "This lesson will be open on Tuesday, 1 January 2030, 8:00"
+    And I should see date "1 Jan +5 years" formatted "This lesson will be open on %A, %d %B %Y, 8:00"
     And I log out
     And I log in as "student3"
     And I am on "Course 1" course homepage
     And I follow "Test lesson"
-    And I should see "This lesson will be open on Wednesday, 1 January 2020, 8:00"
+    And I should see date "1 Jan +2 years" formatted "This lesson will be open on %A, %d %B %Y, 8:00"

@@ -27,8 +27,8 @@ Feature: Delete a course with a seminar
       | facetoface         | details |
       | Test seminar name  | event 1 |
     And the following "seminar sessions" exist in "mod_facetoface" plugin:
-      | eventdetails | start               | finish              |
-      | event 1      | 2025-01-01 11:00:00 | 2025-01-01 12:00:00 |
+      | eventdetails | start                    | finish                   |
+      | event 1      | 1 Jan next year 11:00:00 | 1 jan next year 12:00:00 |
     And the following "seminar signups" exist in "mod_facetoface" plugin:
       | user     | eventdetails |
       | student1 | event 1      |

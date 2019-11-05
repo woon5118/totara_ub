@@ -34,12 +34,12 @@ Feature: Sign up to a seminar
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 0    |
       | timefinish[day]    | 1    |
       | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 0    |
     And I press "OK"
@@ -378,7 +378,7 @@ Feature: Sign up to a seminar
       | customfield_signupdatetime[enabled] | 1                  |
       | customfield_signupdatetime[day]     | 1                  |
       | customfield_signupdatetime[month]   | December           |
-      | customfield_signupdatetime[year]    | 2030               |
+      | customfield_signupdatetime[year]    | ## 2 years ## Y ## |
       | customfield_signupmenu              | Nein               |
       | customfield_signupmulti[0]          | 1                  |
       | customfield_signupmulti[1]          | 1                  |
@@ -410,7 +410,7 @@ Feature: Sign up to a seminar
     And "Sam1 Student1" row "Signup checkbox" column of "facetoface_sessions" table should contain "Yes"
     And "Sam1 Student1" row "Signup file" column of "facetoface_sessions" table should contain "test.jpg"
     And "Sam1 Student1" row "Signup menu" column of "facetoface_sessions" table should contain "Nein"
-    And "Sam1 Student1" row "Signup datetime" column of "facetoface_sessions" table should contain "1 Dec 2030"
+    And "Sam1 Student1" row "Signup datetime" column of "facetoface_sessions" table should contain "1 Dec"
     And "Sam1 Student1" row "Signup multi (text)" column of "facetoface_sessions" table should contain "Aye, Nay"
     And "Sam1 Student1" row "Signup input" column of "facetoface_sessions" table should contain "hi"
     And I should see the "Green leaves on customfield text area" image in the "//table[@id='facetoface_sessions']/tbody/tr" "xpath_element"
@@ -426,7 +426,7 @@ Feature: Sign up to a seminar
       | customfield_usercancellationdatetime[enabled] | 1                    |
       | customfield_usercancellationdatetime[day]     | 15                   |
       | customfield_usercancellationdatetime[month]   | October              |
-      | customfield_usercancellationdatetime[year]    | 2020                 |
+      | customfield_usercancellationdatetime[year]    | ## next year ## Y ## |
       | User cancellation menu                        | Ja                   |
       | customfield_usercancellationmulti[1]          | 1                    |
       | User cancellation input                       | Monkey               |
@@ -453,7 +453,7 @@ Feature: Sign up to a seminar
     And I follow "Attendees"
     And I follow "Cancellations"
     And I follow "Show cancellation reason"
-    Then I should see "15 October 2020" in the "//div[@aria-hidden='false' and @class='moodle-dialogue-base']" "xpath_element"
+    Then I should see date "15 October next year" formatted "%d %B %Y" in the "//div[@aria-hidden='false' and @class='moodle-dialogue-base']" "xpath_element"
     And I should see "test.jpg" in the "//div[@aria-hidden='false' and @class='moodle-dialogue-base']" "xpath_element"
     And I should see "Ja" in the "//div[@aria-hidden='false' and @class='moodle-dialogue-base']" "xpath_element"
     And I should see "Nay" in the "//div[@aria-hidden='false' and @class='moodle-dialogue-base']" "xpath_element"

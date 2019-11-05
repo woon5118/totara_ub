@@ -57,12 +57,12 @@ Feature: Display the rooms in select room dialog when room is booked and hidden
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
       | timefinish[day]    | 1    |
       | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
@@ -81,12 +81,12 @@ Feature: Display the rooms in select room dialog when room is booked and hidden
     And I set the following fields to these values:
       | timestart[day]     | 2    |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
       | timefinish[day]    | 2    |
       | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"

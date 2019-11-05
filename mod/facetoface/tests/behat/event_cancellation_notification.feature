@@ -72,13 +72,13 @@ Feature: Seminar event cancellation notifications
       | sessiontimezone     | Pacific/Auckland |
       | timestart[day]      | 10               |
       | timestart[month]    | 2                |
-      | timestart[year]     | 2025             |
+      | timestart[year]     | ## next year ## Y ## |
       | timestart[hour]     | 9                |
       | timestart[minute]   | 0                |
       | timestart[timezone] | Pacific/Auckland |
       | timefinish[day]     | 10               |
       | timefinish[month]   | 2                |
-      | timefinish[year]    | 2025             |
+      | timefinish[year]    | ## next year ## Y ## |
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
@@ -107,19 +107,21 @@ Feature: Seminar event cancellation notifications
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Timezone: Pacific/Auckland" in the "10 February 2025, 9:00 AM - 3:00 PM" "table_row"
-    And I should see "2 / 2" in the "10 February 2025" "table_row"
+    Then I should see "Timezone: Pacific/Auckland" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see date "10 Feb next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "2 / 2" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "Booking full" in the "2 / 2" "table_row"
     And "Cancel event" "link" should exist in the "2 / 2" "table_row"
 
     When I click on "Cancel event" "link" in the "2 / 2" "table_row"
     Then I should see "Cancelling event in Test Seminar"
-    And I should see "10 February 2025, 9:00 AM - 3:00 PM Pacific/Auckland"
+    And I should see date "10 Feb next year" formatted "%d %B %Y, 9:00 AM - 3:00 PM Pacific/Auckland"
     And I press "Yes"
-    Then I should see "Timezone: Pacific/Auckland" in the "10 February 2025, 9:00 AM - 3:00 PM" "table_row"
-    And I should see "3 / 2 (Overbooked)" in the "10 February 2025" "table_row"
-    And I should see "Cancelled" in the "3 / 2" "table_row"
-    And "Cancel event" "link" should not exist in the "3 / 2" "table_row"
+    Then I should see "Timezone: Pacific/Auckland" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see date "10 Feb next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "3 / 2 (Overbooked)" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "Cancelled" in the "9:00 AM - 3:00 PM" "table_row"
+    And "Cancel event" "link" should not exist in the "9:00 AM - 3:00 PM" "table_row"
     And I run all adhoc tasks
 
     When I log out
@@ -135,7 +137,7 @@ Feature: Seminar event cancellation notifications
 
     And I should see "Course:   Course 1"
     And I should see "Seminar:   Test Seminar"
-    And I should see "10 February 2025, 9:00 AM - 10 February 2025, 3:00 PM Pacific/Auckland"
+    And I should see date "10 Feb next year" formatted "%d %B %Y, 9:00 AM - %d %B %Y, 3:00 PM Pacific/Auckland"
 
     When I log out
     And I log in as "learner2"
@@ -150,7 +152,7 @@ Feature: Seminar event cancellation notifications
 
     And I should see "Course:   Course 1"
     And I should see "Seminar:   Test Seminar"
-    And I should see "10 February 2025, 9:00 AM - 10 February 2025, 3:00 PM Pacific/Auckland"
+    And I should see date "10 Feb next year" formatted "%d %B %Y, 9:00 AM - %d %B %Y, 3:00 PM Pacific/Auckland"
 
     When I log out
     And I log in as "learner3"
@@ -165,7 +167,7 @@ Feature: Seminar event cancellation notifications
 
     And I should see "Course:   Course 1"
     And I should see "Seminar:   Test Seminar"
-    And I should see "10 February 2025, 9:00 AM - 10 February 2025, 3:00 PM Pacific/Auckland"
+    And I should see date "10 Feb next year" formatted "%d %B %Y, 9:00 AM - %d %B %Y, 3:00 PM Pacific/Auckland"
 
     When I log out
     And I log in as "teacher1"
@@ -180,7 +182,7 @@ Feature: Seminar event cancellation notifications
 
     And I should see "Course:   Course 1"
     And I should see "Seminar:   Test Seminar"
-    And I should see "10 February 2025, 9:00 AM - 10 February 2025, 3:00 PM Pacific/Auckland"
+    And I should see date "10 Feb next year" formatted "%d %B %Y, 9:00 AM - %d %B %Y, 3:00 PM Pacific/Auckland"
 
 
   # ----------------------------------------------------------------------------
@@ -188,20 +190,20 @@ Feature: Seminar event cancellation notifications
     Given I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I click on "Edit event" "link" in the "10 February 2025" "table_row"
+    And I click on "Edit event" "link" in the "10 February" "table_row"
     And I press "Add a new session"
     And I follow "show-selectdate1-dialog"
     And I set the following fields to these values:
       | sessiontimezone     | Pacific/Auckland |
       | timestart[day]      | 11               |
       | timestart[month]    | 3                |
-      | timestart[year]     | 2026             |
+      | timestart[year]     | ## 2 years ## Y ## |
       | timestart[hour]     | 10               |
       | timestart[minute]   | 0                |
       | timestart[timezone] | Pacific/Auckland |
       | timefinish[day]     | 11               |
       | timefinish[month]   | 3                |
-      | timefinish[year]    | 2026             |
+      | timefinish[year]    | ## 2 years ## Y ## |
       | timefinish[hour]    | 16               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
@@ -212,18 +214,22 @@ Feature: Seminar event cancellation notifications
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Timezone: Pacific/Auckland" in the "10 February 2025, 9:00 AM - 3:00 PM" "table_row"
-    And I should see "Timezone: Pacific/Auckland" in the "11 March 2026, 10:00 AM - 4:00 PM" "table_row"
-    And I should see "Booking full" in the "10 February 2025" "table_row"
-    And "Cancel event" "link" should exist in the "Booking full" "table_row"
+    Then I should see "Timezone: Pacific/Auckland" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see date "10 Feb next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "Timezone: Pacific/Auckland" in the "10:00 AM - 4:00 PM" "table_row"
+    And I should see date "11 Mar +2 years" formatted "%d %B %Y" in the "10:00 AM - 4:00 PM" "table_row"
+    And I should see "Booking full" in the "9:00 AM - 3:00 PM" "table_row"
+    And "Cancel event" "link" should exist in the "9:00 AM - 3:00 PM" "table_row"
 
     When I click on "Cancel event" "link" in the "Booking full" "table_row"
     And I press "Yes"
-    Then I should see "Timezone: Pacific/Auckland" in the "10 February 2025, 9:00 AM - 3:00 PM" "table_row"
-    And I should see "Timezone: Pacific/Auckland" in the "11 March 2026, 10:00 AM - 4:00 PM" "table_row"
-    And I should see "3 / 2 (Overbooked)" in the "11 March 2026" "table_row"
-    And I should see "Cancelled" in the "3 / 2" "table_row"
-    And "Cancel event" "link" should not exist in the "3 / 2" "table_row"
+    Then I should see "Timezone: Pacific/Auckland" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see date "10 Feb next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "Timezone: Pacific/Auckland" in the "10:00 AM - 4:00 PM" "table_row"
+    And I should see date "11 Mar +2 years" formatted "%d %B %Y" in the "10:00 AM - 4:00 PM" "table_row"
+    And I should see "3 / 2 (Overbooked)" in the "10:00 AM - 4:00 PM" "table_row"
+    And I should see "Cancelled" in the "10:00 AM - 4:00 PM" "table_row"
+    And "Cancel event" "link" should not exist in the "10:00 AM - 4:00 PM" "table_row"
     And I run all adhoc tasks
 
     When I log out
@@ -239,8 +245,8 @@ Feature: Seminar event cancellation notifications
 
     And I should see "Course:   Course 1"
     And I should see "Seminar:   Test Seminar"
-    And I should see "10 February 2025, 9:00 AM - 10 February 2025, 3:00 PM Pacific/Auckland"
-    And I should see "11 March 2026, 10:00 AM - 11 March 2026, 4:00 PM Pacific/Auckland"
+    And I should see date "10 Feb next year" formatted "%d %B %Y, 9:00 AM - %d %B %Y, 3:00 PM Pacific/Auckland"
+    And I should see date "11 Mar +2 years" formatted "%d %B %Y, 10:00 AM - %d %B %Y, 4:00 PM Pacific/Auckland"
 
     When I log out
     And I log in as "learner2"
@@ -255,8 +261,8 @@ Feature: Seminar event cancellation notifications
 
     And I should see "Course:   Course 1"
     And I should see "Seminar:   Test Seminar"
-    And I should see "10 February 2025, 9:00 AM - 10 February 2025, 3:00 PM Pacific/Auckland"
-    And I should see "11 March 2026, 10:00 AM - 11 March 2026, 4:00 PM Pacific/Auckland"
+    And I should see date "10 Feb next year" formatted "%d %B %Y, 9:00 AM - %d %B %Y, 3:00 PM Pacific/Auckland"
+    And I should see date "11 Mar +2 years" formatted "%d %B %Y, 10:00 AM - %d %B %Y, 4:00 PM Pacific/Auckland"
 
     When I log out
     And I log in as "learner3"
@@ -271,8 +277,8 @@ Feature: Seminar event cancellation notifications
 
     And I should see "Course:   Course 1"
     And I should see "Seminar:   Test Seminar"
-    And I should see "10 February 2025, 9:00 AM - 10 February 2025, 3:00 PM Pacific/Auckland"
-    And I should see "11 March 2026, 10:00 AM - 11 March 2026, 4:00 PM Pacific/Auckland"
+    And I should see date "10 Feb next year" formatted "%d %B %Y, 9:00 AM - %d %B %Y, 3:00 PM Pacific/Auckland"
+    And I should see date "11 Mar +2 years" formatted "%d %B %Y, 10:00 AM - %d %B %Y, 4:00 PM Pacific/Auckland"
 
     When I log out
     And I log in as "teacher1"
@@ -287,8 +293,8 @@ Feature: Seminar event cancellation notifications
 
     And I should see "Course:   Course 1"
     And I should see "Seminar:   Test Seminar"
-    And I should see "10 February 2025, 9:00 AM - 10 February 2025, 3:00 PM Pacific/Auckland"
-    And I should see "11 March 2026, 10:00 AM - 11 March 2026, 4:00 PM Pacific/Auckland"
+    And I should see date "10 Feb next year" formatted "%d %B %Y, 9:00 AM - %d %B %Y, 3:00 PM Pacific/Auckland"
+    And I should see date "11 Mar +2 years" formatted "%d %B %Y, 10:00 AM - %d %B %Y, 4:00 PM Pacific/Auckland"
 
 
   # ----------------------------------------------------------------------------
@@ -297,13 +303,14 @@ Feature: Seminar event cancellation notifications
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Timezone: Pacific/Auckland" in the "10 February 2025, 9:00 AM - 3:00 PM" "table_row"
-    And I should see "2 / 2" in the "10 February 2025" "table_row"
-    And I should see "Booking full" in the "10 February 2025" "table_row"
-    And "Cancel event" "link" should exist in the "10 February 2025" "table_row"
-    And I click on "Cancel event" "link" in the "10 February 2025" "table_row"
+    Then I should see "Timezone: Pacific/Auckland" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see date "10 Feb next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "2 / 2" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "Booking full" in the "9:00 AM - 3:00 PM" "table_row"
+    And "Cancel event" "link" should exist in the "9:00 AM - 3:00 PM" "table_row"
+    And I click on "Cancel event" "link" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "Cancelling event in Test Seminar"
-    And I should see "10 February 2025, 9:00 AM - 3:00 PM Pacific/Auckland"
+    And I should see date "10 Feb next year" formatted "%d %B %Y, 9:00 AM - 3:00 PM Pacific/Auckland"
     And I press "Yes"
     And I run all adhoc tasks
 
@@ -321,7 +328,7 @@ Feature: Seminar event cancellation notifications
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Delete event" "link" in the "10 February 2025" "table_row"
+    And I click on "Delete event" "link" in the "10 February" "table_row"
     And I press "Continue"
 
     When I log out
@@ -336,9 +343,10 @@ Feature: Seminar event cancellation notifications
     And I log in as "manager4"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Timezone: Pacific/Auckland" in the "10 February 2025, 9:00 AM - 3:00 PM" "table_row"
-    And I should see "Booking full" in the "10 February 2025" "table_row"
-    And I should see "Reserve spaces for team (0/1)" in the "10 February 2025" "table_row"
+    Then I should see "Timezone: Pacific/Auckland" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see date "10 Feb next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "Booking full" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "Reserve spaces for team (0/1)" in the "9:00 AM - 3:00 PM" "table_row"
 
     When I follow "Reserve spaces for team"
     And I set the field "reserve" to "1*"
@@ -349,7 +357,7 @@ Feature: Seminar event cancellation notifications
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Cancel event" "link" in the "10 February 2025" "table_row"
+    And I click on "Cancel event" "link" in the "10 February" "table_row"
     And I press "Yes"
     And I run all adhoc tasks
 
@@ -357,9 +365,10 @@ Feature: Seminar event cancellation notifications
     And I log in as "manager4"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Timezone: Pacific/Auckland" in the "10 February 2025, 9:00 AM - 3:00 PM" "table_row"
-    And I should see "Cancelled" in the "10 February 2025" "table_row"
-    And I should not see "Sign-up" in the "10 February 2025" "table_row"
+    Then I should see "Timezone: Pacific/Auckland" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see date "10 Feb next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "Cancelled" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should not see "Sign-up" in the "9:00 AM - 3:00 PM" "table_row"
 
     When I click on "Dashboard" in the totara menu
     Then I should see "Seminar event cancellation"
@@ -372,7 +381,7 @@ Feature: Seminar event cancellation notifications
 
     And I should see "Course:   Course 1"
     And I should see "Seminar:   Test Seminar"
-    And I should see "10 February 2025, 9:00 AM - 10 February 2025, 3:00 PM Pacific/Auckland"
+    And I should see date "10 Feb next year" formatted "%d %B %Y, 9:00 AM - %d %B %Y, 3:00 PM Pacific/Auckland"
 
 
   # ----------------------------------------------------------------------------
@@ -381,9 +390,10 @@ Feature: Seminar event cancellation notifications
     And I log in as "manager4"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Timezone: Pacific/Auckland" in the "10 February 2025, 9:00 AM - 3:00 PM" "table_row"
-    And I should see "Booking full" in the "10 February 2025" "table_row"
-    And I should see "Allocate spaces for team (0/1)" in the "10 February 2025" "table_row"
+    Then I should see "Timezone: Pacific/Auckland" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see date "10 Feb next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "Booking full" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "Allocate spaces for team (0/1)" in the "9:00 AM - 3:00 PM" "table_row"
 
     When I follow "Allocate spaces for team"
     And I set the field "Potential allocations" to "Learner Four"
@@ -394,7 +404,7 @@ Feature: Seminar event cancellation notifications
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Cancel event" "link" in the "10 February 2025" "table_row"
+    And I click on "Cancel event" "link" in the "10 February" "table_row"
     And I press "Yes"
     And I run all adhoc tasks
 
@@ -411,15 +421,16 @@ Feature: Seminar event cancellation notifications
 
     And I should see "Course:   Course 1"
     And I should see "Seminar:   Test Seminar"
-    And I should see "10 February 2025, 9:00 AM - 10 February 2025, 3:00 PM Pacific/Auckland"
+    And I should see date "10 Feb next year" formatted "%d %B %Y, 9:00 AM - %d %B %Y, 3:00 PM Pacific/Auckland"
 
     When I log out
     And I log in as "manager4"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Timezone: Pacific/Auckland" in the "10 February 2025, 9:00 AM - 3:00 PM" "table_row"
-    And I should see "Cancelled" in the "10 February 2025" "table_row"
-    And I should not see "Sign-up" in the "10 February 2025" "table_row"
+    Then I should see "Timezone: Pacific/Auckland" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see date "10 Feb next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "Cancelled" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should not see "Sign-up" in the "9:00 AM - 3:00 PM" "table_row"
 
     When I click on "Dashboard" in the totara menu
     Then I should see "Seminar event cancellation"
@@ -432,4 +443,4 @@ Feature: Seminar event cancellation notifications
 
     And I should see "Course:   Course 1"
     And I should see "Seminar:   Test Seminar"
-    And I should see "10 February 2025, 9:00 AM - 10 February 2025, 3:00 PM Pacific/Auckland"
+    And I should see date "10 Feb next year" formatted "%d %B %Y, 9:00 AM - %d %B %Y, 3:00 PM Pacific/Auckland"

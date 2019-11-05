@@ -27,13 +27,13 @@ Feature: I can add and edit seminar session dates
     And I set the following fields to these values:
       | timestart[day]       | 1                |
       | timestart[month]     | 1                |
-      | timestart[year]      | 2020             |
+      | timestart[year]      | 2037             |
       | timestart[hour]      | 10               |
       | timestart[minute]    | 00               |
       | timestart[timezone]  | Pacific/Auckland |
       | timefinish[day]      | 1                |
       | timefinish[month]    | 1                |
-      | timefinish[year]     | 2020             |
+      | timefinish[year]     | 2037             |
       | timefinish[hour]     | 11               |
       | timefinish[minute]   | 00               |
       | timefinish[timezone] | Pacific/Auckland |
@@ -44,10 +44,10 @@ Feature: I can add and edit seminar session dates
     When I press "Save changes"
     Then I should not see "The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect."
     And I should see "Upcoming events"
-    And I should see "1 January 2020"
+    And I should see "1 January 2037"
 
-    When I use magic to adjust the seminar event "start" from "01/01/2020 10:00" "Pacific/Auckland" to "26/10/2016 10:00"
-    And I use magic to adjust the seminar event "end" from "01/01/2020 11:00" "Pacific/Auckland" to "26/10/2016 11:00"
+    When I use magic to adjust the seminar event "start" from "01/01/2037 10:00" "Pacific/Auckland" to "26/10/2016 10:00"
+    And I use magic to adjust the seminar event "end" from "01/01/2037 11:00" "Pacific/Auckland" to "26/10/2016 11:00"
     And I follow "Test seminar name"
     Then I should see "Upcoming events"
     And I should see "26 October 2016"
@@ -84,15 +84,15 @@ Feature: I can add and edit seminar session dates
     And I follow "Add event"
     And I click to edit the seminar event date at position 1
     And I set the following fields to these values:
-      | timestart[day]       | 1                |
+      | timestart[day]       | 9                |
       | timestart[month]     | 1                |
-      | timestart[year]      | 2020             |
+      | timestart[year]      | ## next year ## Y ## |
       | timestart[hour]      | 10               |
       | timestart[minute]    | 00               |
       | timestart[timezone]  | Pacific/Auckland |
-      | timefinish[day]      | 1                |
+      | timefinish[day]      | 9                |
       | timefinish[month]    | 1                |
-      | timefinish[year]     | 2020             |
+      | timefinish[year]     | ## next year ## Y ## |
       | timefinish[hour]     | 11               |
       | timefinish[minute]   | 00               |
       | timefinish[timezone] | Pacific/Auckland |
@@ -102,7 +102,7 @@ Feature: I can add and edit seminar session dates
     When I press "Save changes"
     Then I should not see "The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect."
     And I should see "Upcoming events"
-    And I should see "1 January 2020"
+    And I should see date "9 Jan next year" formatted "%d %B %Y"
 
     When I click to edit the seminar session in row 1
     Then I should see "Editing event in Test seminar name"
@@ -120,13 +120,13 @@ Feature: I can add and edit seminar session dates
     And I set the following fields to these values:
       | timestart[day]       | 3                |
       | timestart[month]     | 2                |
-      | timestart[year]      | 2020             |
+      | timestart[year]      | ## next year ## Y ## |
       | timestart[hour]      | 10               |
       | timestart[minute]    | 00               |
       | timestart[timezone]  | Pacific/Auckland |
       | timefinish[day]      | 3                |
       | timefinish[month]    | 2                |
-      | timefinish[year]     | 2020             |
+      | timefinish[year]     | ## next year ## Y ## |
       | timefinish[hour]     | 11               |
       | timefinish[minute]   | 00               |
       | timefinish[timezone] | Pacific/Auckland |
@@ -148,13 +148,13 @@ Feature: I can add and edit seminar session dates
     And I set the following fields to these values:
       | timestart[day]       | 1                |
       | timestart[month]     | 1                |
-      | timestart[year]      | 2020             |
+      | timestart[year]      | 2037             |
       | timestart[hour]      | 10               |
       | timestart[minute]    | 00               |
       | timestart[timezone]  | Pacific/Auckland |
       | timefinish[day]      | 1                |
       | timefinish[month]    | 1                |
-      | timefinish[year]     | 2020             |
+      | timefinish[year]     | 2037             |
       | timefinish[hour]     | 11               |
       | timefinish[minute]   | 00               |
       | timefinish[timezone] | Pacific/Auckland |
@@ -168,9 +168,9 @@ Feature: I can add and edit seminar session dates
     And I press "Save changes"
     And I should not see "The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect."
     And I should see "Upcoming events"
-    And I should see "1 January 2020"
-    And I use magic to adjust the seminar event "start" from "01/01/2020 10:00" "Pacific/Auckland" to "26/10/2016 10:00"
-    And I use magic to adjust the seminar event "end" from "01/01/2020 11:00" "Pacific/Auckland" to "26/10/2016 11:00"
+    And I should see "1 January 2037"
+    And I use magic to adjust the seminar event "start" from "01/01/2037 10:00" "Pacific/Auckland" to "26/10/2016 10:00"
+    And I use magic to adjust the seminar event "end" from "01/01/2037 11:00" "Pacific/Auckland" to "26/10/2016 11:00"
 
     When I follow "Test seminar name"
     Then I should see "Upcoming events"
@@ -218,15 +218,15 @@ Feature: I can add and edit seminar session dates
     And I follow "Add event"
     And I click to edit the seminar event date at position 1
     And I set the following fields to these values:
-      | timestart[day]       | 1                |
+      | timestart[day]       | 9                |
       | timestart[month]     | 1                |
-      | timestart[year]      | 2020             |
+      | timestart[year]      | ## next year ## Y ## |
       | timestart[hour]      | 10               |
       | timestart[minute]    | 00               |
       | timestart[timezone]  | Pacific/Auckland |
-      | timefinish[day]      | 1                |
+      | timefinish[day]      | 9                |
       | timefinish[month]    | 1                |
-      | timefinish[year]     | 2020             |
+      | timefinish[year]     | ## next year ## Y ## |
       | timefinish[hour]     | 11               |
       | timefinish[minute]   | 00               |
       | timefinish[timezone] | Pacific/Auckland |
@@ -240,7 +240,7 @@ Feature: I can add and edit seminar session dates
     When I press "Save changes"
     Then I should not see "The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect."
     And I should see "Upcoming events"
-    And I should see "1 January 2020"
+    And I should see date "9 Jan next year" formatted "%d %B %Y"
 
     When I click to edit the seminar session in row 1
     Then I should see "Editing event in Test seminar name"
@@ -258,13 +258,13 @@ Feature: I can add and edit seminar session dates
     And I set the following fields to these values:
       | timestart[day]       | 3                |
       | timestart[month]     | 2                |
-      | timestart[year]      | 2020             |
+      | timestart[year]      | ## next year ## Y ## |
       | timestart[hour]      | 10               |
       | timestart[minute]    | 00               |
       | timestart[timezone]  | Pacific/Auckland |
       | timefinish[day]      | 3                |
       | timefinish[month]    | 2                |
-      | timefinish[year]     | 2020             |
+      | timefinish[year]     | ## next year ## Y ## |
       | timefinish[hour]     | 11               |
       | timefinish[minute]   | 00               |
       | timefinish[timezone] | Pacific/Auckland |

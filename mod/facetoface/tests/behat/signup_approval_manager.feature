@@ -44,19 +44,6 @@ Feature: Seminar Signup Manager Approval
       | Description         | Classroom Connect Tests |
     And I follow "View all events"
     And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 1    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
-      | timestart[hour]    | 10   |
-      | timestart[minute]  | 0    |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 0    |
-    And I press "OK"
     And I set the following fields to these values:
       | capacity              | 10   |
     And I press "Save changes"
@@ -165,7 +152,7 @@ Feature: Seminar Signup Manager Approval
     Then I should see "Seminar booking request"
     And I click on "View all tasks" "link"
     And I should see "This is to advise that Jimmy Jim has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
-    And I click on "Attendees" "link" in the "1 January 2020" "table_row"
+    And I click on "Attendees" "link" in the "Follow the link" "table_row"
     Then I should see "Jimmy Jim" in the ".lastrow" "css_element"
 
     When I click on "requests[8]" "radio" in the ".lastrow .lastcol" "css_element"
@@ -180,7 +167,7 @@ Feature: Seminar Signup Manager Approval
 
     When I am on "Classroom Connect Course" course homepage
     And I follow "View all events"
-    Then I should see "Booked" in the "1 January 2020" "table_row"
+    Then I should see "Booked" in the "Upcoming" "table_row"
 
     When I click on "Event info" "link"
     Then I should see "Manager's name"
@@ -211,7 +198,7 @@ Feature: Seminar Signup Manager Approval
     Then I should see "Seminar booking request"
     And I click on "View all tasks" "link"
     And I should see "This is to advise that Jimmy Jim has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
-    And I click on "Attendees" "link" in the "1 January 2020" "table_row"
+    And I click on "Attendees" "link" in the "Follow the link" "table_row"
     Then I should see "Jimmy Jim" in the ".lastrow" "css_element"
 
     When I click on "requests[8]" "radio" in the ".lastrow .lastcol" "css_element"
@@ -226,7 +213,7 @@ Feature: Seminar Signup Manager Approval
 
     When I am on "Classroom Connect Course" course homepage
     And I follow "View all events"
-    Then I should see "Booked" in the "1 January 2020" "table_row"
+    Then I should see "Booked" in the "Upcoming" "table_row"
 
   Scenario: Trainer is given permission to approve any bookings
     And I log out

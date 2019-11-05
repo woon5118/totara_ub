@@ -94,12 +94,12 @@ Feature: Check previous and upcomings sections are right populated
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | 2037 |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
       | timefinish[day]    | 1    |
       | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | 2037 |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
@@ -111,16 +111,16 @@ Feature: Check previous and upcomings sections are right populated
     And I am on "Course 1" course homepage
     And I follow "View all events"
     Then I should see "In progress" in the ".upcomingsessionlist" "css_element"
-    And I should see "1 January 2020" in the ".upcomingsessionlist" "css_element"
+    And I should see "1 January 2037" in the ".upcomingsessionlist" "css_element"
     And I should see "1 January 1999" in the ".previoussessionlist" "css_element"
 
     When I follow "C1"
     Then I should see "In progress"
-    And I should see "1 January 2020"
+    And I should see "1 January 2037"
     And I should not see "1 January 1999"
 
     # Sign up for a session and make sure it is displayed in the course page.
-    And I click on "Sign-up" "link" in the "1 January 2020" "table_row"
+    And I click on "Sign-up" "link" in the "1 January 2037" "table_row"
     And I press "Sign-up"
     When I follow "C1"
     Then I should see "Booked"
@@ -144,7 +144,7 @@ Feature: Check previous and upcomings sections are right populated
 
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    Then I should see "1 January 2020"
+    Then I should see "1 January 2037"
     And I should not see "1 January 1999"
     And I should not see "In progress"
     And I log out

@@ -28,7 +28,7 @@ Feature: A teacher can set available from and deadline dates to access a lesson
       | Description | Test lesson description |
       | available[day] | 1 |
       | available[month] | January |
-      | available[year] | 2020 |
+      | available[year] | ## +2 years ## Y ## |
       | available[hour] | 08 |
       | available[minute] | 00 |
     And I press "Save and display"
@@ -43,7 +43,7 @@ Feature: A teacher can set available from and deadline dates to access a lesson
     And I log in as "student1"
     And I am on "Course 1" course homepage
     When I follow "Test lesson"
-    Then I should see "This lesson will be open on Wednesday, 1 January 2020, 8:00"
+    Then I should see date "1 Jan +2 years" formatted "This lesson will be open on %A, %d %B %Y, 8:00"
     And I should not see "First page contents"
 
   Scenario: Forbidding lesson accesses until a specified date
@@ -54,7 +54,7 @@ Feature: A teacher can set available from and deadline dates to access a lesson
       | Description | Test lesson description |
       | deadline[day] | 1 |
       | deadline[month] | January |
-      | deadline[year] | 2000 |
+      | deadline[year] | ## -3 years ## Y ## |
       | deadline[hour] | 08 |
       | deadline[minute] | 00 |
     And I press "Save and display"
@@ -69,5 +69,5 @@ Feature: A teacher can set available from and deadline dates to access a lesson
     And I log in as "student1"
     And I am on "Course 1" course homepage
     When I follow "Test lesson"
-    Then I should see "This lesson closed on Saturday, 1 January 2000, 8:00"
+    Then I should see date "-3 years 1 Jan" formatted "This lesson closed on %A, %d %B %Y, 8:00"
     And I should not see "First page contents"

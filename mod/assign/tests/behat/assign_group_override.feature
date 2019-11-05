@@ -48,16 +48,16 @@ Feature: Assign group override
       | id_duedate_enabled | 1 |
       | duedate[day]       | 1 |
       | duedate[month]     | January |
-      | duedate[year]      | 2020 |
+      | duedate[year]      | ## +2 years ## Y ## |
       | duedate[hour]      | 08 |
       | duedate[minute]    | 00 |
     And I press "Save"
-    And I should see "Wednesday, 1 January 2020, 8:00"
+    And I should see date "1 Jan +2 years" formatted "%A, %d %B %Y, 8:00"
     Then I click on "Edit" "link" in the "Group 1" "table_row"
     And I set the following fields to these values:
-      | duedate[year] | 2030 |
+      | duedate[year] | ## +5 years ## Y ## |
     And I press "Save"
-    And I should see "Tuesday, 1 January 2030, 8:00"
+    And I should see date "1 Jan +5 years" formatted "%A, %d %B %Y, 8:00"
     And I click on "Delete" "link"
     And I press "Continue"
     And I should not see "Group 1"
@@ -71,17 +71,17 @@ Feature: Assign group override
       | id_duedate_enabled | 1 |
       | duedate[day]       | 1 |
       | duedate[month]     | January |
-      | duedate[year]      | 2020 |
+      | duedate[year]      | ## +2 years ## Y ## |
       | duedate[hour]      | 08 |
       | duedate[minute]    | 00 |
     And I press "Save"
-    And I should see "Wednesday, 1 January 2020, 8:00"
+    And I should see date "1 Jan +2 years" formatted "%A, %d %B %Y, 8:00"
     Then I click on "copy" "link"
     And I set the following fields to these values:
       | Override group | Group 2  |
-      | duedate[year]  | 2030 |
+      | duedate[year]  | ## +5 years ## Y ## |
     And I press "Save"
-    And I should see "Tuesday, 1 January 2030, 8:00"
+    And I should see date "1 Jan +5 years" formatted "%A, %d %B %Y, 8:00"
     And I should see "Group 2"
 
   Scenario: Allow a group to have a different due date
@@ -93,7 +93,7 @@ Feature: Assign group override
       | id_cutoffdate_enabled | 0 |
       | duedate[day]       | 1 |
       | duedate[month]     | January |
-      | duedate[year]      | 2000 |
+      | duedate[year]      | ## -3 years ## Y ## |
       | duedate[hour]      | 08 |
       | duedate[minute]    | 00 |
     And I press "Save and display"
@@ -104,21 +104,21 @@ Feature: Assign group override
       | id_duedate_enabled | 1 |
       | duedate[day]       | 1 |
       | duedate[month]     | January |
-      | duedate[year]      | 2020 |
+      | duedate[year]      | ## +2 years ## Y ## |
       | duedate[hour]      | 08 |
       | duedate[minute]    | 00 |
     And I press "Save"
-    And I should see "Wednesday, 1 January 2020, 8:00"
+    And I should see date "1 Jan +2 years" formatted "%A, %d %B %Y, 8:00"
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    Then I should see "Saturday, 1 January 2000, 8:00"
+    Then I should see date "-3 years 1 Jan" formatted "%A, %d %B %Y, 8:00"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I should see "Wednesday, 1 January 2020, 8:00"
+    And I should see date "1 Jan +2 years" formatted "%A, %d %B %Y, 8:00"
 
   Scenario: Allow a group to have a different cut off date
     When I follow "Test assignment name"
@@ -129,7 +129,7 @@ Feature: Assign group override
       | id_cutoffdate_enabled | 1 |
       | cutoffdate[day]       | 1 |
       | cutoffdate[month]     | January |
-      | cutoffdate[year]      | 2000 |
+      | cutoffdate[year]      | ## -3 years ## Y ## |
       | cutoffdate[hour]      | 08 |
       | cutoffdate[minute]    | 00 |
     And I press "Save and display"
@@ -140,11 +140,11 @@ Feature: Assign group override
       | id_cutoffdate_enabled | 1 |
       | cutoffdate[day]       | 1 |
       | cutoffdate[month]     | January |
-      | cutoffdate[year]      | 2020 |
+      | cutoffdate[year]      | ## +2 years ## Y ## |
       | cutoffdate[hour]      | 08 |
       | cutoffdate[minute]    | 00 |
     And I press "Save"
-    And I should see "Wednesday, 1 January 2020, 8:00"
+    And I should see date "1 Jan +2 years" formatted "%A, %d %B %Y, 8:00"
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
@@ -165,7 +165,7 @@ Feature: Assign group override
       | id_cutoffdate_enabled | 0 |
       | allowsubmissionsfromdate[day]       | 1 |
       | allowsubmissionsfromdate[month]     | January |
-      | allowsubmissionsfromdate[year]      | 2020 |
+      | allowsubmissionsfromdate[year]      | ## +2 years ## Y ## |
       | allowsubmissionsfromdate[hour]      | 08 |
       | allowsubmissionsfromdate[minute]    | 00 |
     And I press "Save and display"
@@ -176,22 +176,22 @@ Feature: Assign group override
       | id_allowsubmissionsfromdate_enabled | 1 |
       | allowsubmissionsfromdate[day]       | 1 |
       | allowsubmissionsfromdate[month]     | January |
-      | allowsubmissionsfromdate[year]      | 2015 |
+      | allowsubmissionsfromdate[year]      | ## last year ## Y ## |
       | allowsubmissionsfromdate[hour]      | 08 |
       | allowsubmissionsfromdate[minute]    | 00 |
     And I press "Save"
-    And I should see "Thursday, 1 January 2015, 8:00"
+    And I should see date "1 Jan last year" formatted "%A, %d %B %Y, 8:00"
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    Then I should see "This assignment will accept submissions from Wednesday, 1 January 2020, 8:00"
+    Then I should see date "1 Jan +2 years" formatted "This assignment will accept submissions from %A, %d %B %Y, 8:00"
     And I should not see "Add submission"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I should not see "This assignment will accept submissions from Wednesday, 1 January 2020, 8:00"
+    And I should not see "This assignment will accept submissions from"
 
   @javascript
   Scenario: Add both a user and group override and verify that both are applied correctly
@@ -203,7 +203,7 @@ Feature: Assign group override
       | id_cutoffdate_enabled | 0 |
       | allowsubmissionsfromdate[day]       | 1 |
       | allowsubmissionsfromdate[month]     | January |
-      | allowsubmissionsfromdate[year]      | 2030 |
+      | allowsubmissionsfromdate[year]      | ## +5 years ## Y ## |
       | allowsubmissionsfromdate[hour]      | 08 |
       | allowsubmissionsfromdate[minute]    | 00 |
     And I press "Save and display"
@@ -214,11 +214,11 @@ Feature: Assign group override
       | id_allowsubmissionsfromdate_enabled | 1 |
       | allowsubmissionsfromdate[day]       | 1 |
       | allowsubmissionsfromdate[month]     | January |
-      | allowsubmissionsfromdate[year]      | 2020 |
+      | allowsubmissionsfromdate[year]      | ## +2 years ## Y ## |
       | allowsubmissionsfromdate[hour]      | 08 |
       | allowsubmissionsfromdate[minute]    | 00 |
     And I press "Save"
-    And I should see "Wednesday, 1 January 2020, 8:00"
+    And I should see date "1 Jan +2 years" formatted "%A, %d %B %Y, 8:00"
     And I follow "Test assignment name"
     And I navigate to "User overrides" in current page administration
     And I press "Add user override"
@@ -227,26 +227,26 @@ Feature: Assign group override
       | id_allowsubmissionsfromdate_enabled | 1 |
       | allowsubmissionsfromdate[day]       | 1 |
       | allowsubmissionsfromdate[month]     | January |
-      | allowsubmissionsfromdate[year]      | 2021 |
+      | allowsubmissionsfromdate[year]      | ## +3 years ## Y ## |
       | allowsubmissionsfromdate[hour]      | 08 |
       | allowsubmissionsfromdate[minute]    | 00 |
     And I press "Save"
-    And I should see "Friday, 1 January 2021, 8:00"
+    And I should see date "1 Jan +3 years" formatted "%A, %d %B %Y, 8:00"
     And I log out
     Then I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I should see "This assignment will accept submissions from Friday, 1 January 2021, 8:00"
+    And I should see date "1 Jan +3 years" formatted "This assignment will accept submissions from %A, %d %B %Y, 8:00"
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I should see "This assignment will accept submissions from Tuesday, 1 January 2030, 8:00"
+    And I should see date "1 Jan +5 years" formatted "This assignment will accept submissions from %A, %d %B %Y, 8:00"
     And I log out
     And I log in as "student3"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I should see "This assignment will accept submissions from Wednesday, 1 January 2020, 8:00"
+    And I should see date "1 Jan +2 years" formatted "This assignment will accept submissions from %A, %d %B %Y, 8:00"
 
   Scenario: Check correct ordering is made when overriding group with same due date
     When I follow "Test assignment name"
@@ -257,7 +257,7 @@ Feature: Assign group override
       | id_cutoffdate_enabled | 0 |
       | duedate[day]       | 1 |
       | duedate[month]     | January |
-      | duedate[year]      | 2000 |
+      | duedate[year]      | ## -3 years ## Y ## |
       | duedate[hour]      | 08 |
       | duedate[minute]    | 00 |
     And I press "Save and display"
@@ -268,11 +268,11 @@ Feature: Assign group override
       | id_duedate_enabled | 1       |
       | duedate[day]       | 1       |
       | duedate[month]     | January |
-      | duedate[year]      | 2020    |
+      | duedate[year]      | ## +2 years ## Y ## |
       | duedate[hour]      | 08      |
       | duedate[minute]    | 00      |
     And I press "Save"
-    And I should see "Wednesday, 1 January 2020, 8:00"
+    And I should see date "1 Jan +2 years" formatted "%A, %d %B %Y, 8:00"
     And I navigate to "Group overrides" in current page administration
     And I press "Add group override"
     And I set the following fields to these values:
@@ -280,7 +280,7 @@ Feature: Assign group override
       | id_duedate_enabled | 1       |
       | duedate[day]       | 1       |
       | duedate[month]     | January |
-      | duedate[year]      | 2020    |
+      | duedate[year]      | ## +2 years ## Y ## |
       | duedate[hour]      | 08      |
       | duedate[minute]    | 00      |
     And I press "Save"
@@ -294,7 +294,7 @@ Feature: Assign group override
       | id_duedate_enabled | 1       |
       | duedate[day]       | 1       |
       | duedate[month]     | January |
-      | duedate[year]      | 2020    |
+      | duedate[year]      | ## +2 years ## Y ## |
       | duedate[hour]      | 08      |
       | duedate[minute]    | 00      |
     And I press "Save"

@@ -34,13 +34,13 @@ Feature: Seminar timezones in reports
       | sessiontimezone      | Europe/Prague   |
       | timestart[day]       | 2               |
       | timestart[month]     | 1               |
-      | timestart[year]      | 2020            |
+      | timestart[year]      | ## next year ## Y ## |
       | timestart[hour]      | 1               |
       | timestart[minute]    | 15              |
       | timestart[timezone]  | Australia/Perth |
       | timefinish[day]      | 2               |
       | timefinish[month]    | 1               |
-      | timefinish[year]     | 2020            |
+      | timefinish[year]     | ## next year ## Y ## |
       | timefinish[hour]     | 3               |
       | timefinish[minute]   | 45              |
       | timefinish[timezone] | Australia/Perth |
@@ -69,13 +69,13 @@ Feature: Seminar timezones in reports
       | sessiontimezone      | User timezone   |
       | timestart[day]       | 4               |
       | timestart[month]     | 2               |
-      | timestart[year]      | 2021            |
+      | timestart[year]      | ## 2 years ## Y ## |
       | timestart[hour]      | 1               |
       | timestart[minute]    | 0               |
       | timestart[timezone]  | Australia/Perth |
       | timefinish[day]      | 4               |
       | timefinish[month]    | 2               |
-      | timefinish[year]     | 2021            |
+      | timefinish[year]     | ## 2 years ## Y ## |
       | timefinish[hour]     | 2               |
       | timefinish[minute]   | 30              |
       | timefinish[timezone] | Australia/Perth |
@@ -100,10 +100,10 @@ Feature: Seminar timezones in reports
     And I press "Save changes"
     And I should see "6:15 PM - 8:45 PM" in the "Room 1" "table_row"
     And I should see "Timezone: Europe/Prague" in the "Room 1" "table_row"
-    And I should see "1 January 2020" in the "Room 1" "table_row"
+    And I should see date "1 Jan next year Australia/Perth" formatted "%d %B %Y" in the "Room 1" "table_row"
     And I should see "1:00 AM - 2:30 AM" in the "Room 2" "table_row"
     And I should see "Timezone: Australia/Perth" in the "Room 2" "table_row"
-    And I should see "4 February 2021" in the "Room 2" "table_row"
+    And I should see date "4 Feb +2 years Australia/Perth" formatted "%d %B %Y" in the "Room 2" "table_row"
     And I click on "Attendees" "link" in the "Room 1" "table_row"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "First User, user1@example.com"
@@ -127,17 +127,17 @@ Feature: Seminar timezones in reports
     And I add the "Session Start Date/Time (linked to activity)" column to the report
 
     When I navigate to my "F2F sessions" report
-    Then I should see "1 January 2020" in the "First User" "table_row"
+    And I should see date "1 Jan next year Australia/Perth" formatted "%d %B %Y" in the "First User" "table_row"
     And I should see "6:15 PM" in the "First User" "table_row"
     And I should see "Timezone: Europe/Prague" in the "6:15 PM" "table_row"
     And I should see "8:45 PM" in the "First User" "table_row"
     And I should see "Timezone: Europe/Prague" in the "8:45 PM" "table_row"
-    And I should see "4 February 2021" in the "Second User" "table_row"
+    And I should see date "4 Feb +2 years Australia/Perth" formatted "%d %B %Y" in the "Second User" "table_row"
     And I should see "1:00 AM" in the "Second User" "table_row"
     And I should see "Timezone: Australia/Perth" in the "1:00 AM" "table_row"
     And I should see "2:30 AM" in the "Second User" "table_row"
     And I should see "Timezone: Australia/Perth" in the "2:30 AM" "table_row"
-    And I should not see "2 January 2020"
+    And I should not see "2 January"
 
     When I am on homepage
     And I set the following administration settings values:
@@ -145,16 +145,16 @@ Feature: Seminar timezones in reports
     And I navigate to my "F2F sessions" report
     # That's a bit strange that w/o timezone date shown in different format, might need to look at that later.
     Then I should see "2 Jan" in the "First User" "table_row"
-    Then I should see "2020" in the "First User" "table_row"
+    Then I should see date "2 Jan next year 1:15 AM Australia/Perth" formatted "%Y" in the "First User" "table_row"
     And I should see "1:15" in the "First User" "table_row"
     And I should see "3:45" in the "First User" "table_row"
     And I should see "4 Feb" in the "Second User" "table_row"
-    And I should see "2021" in the "Second User" "table_row"
+    And I should see date "4 Feb +2 years 1:00 AM Australia/Perth" formatted "%Y" in the "Second User" "table_row"
     And I should see "1:00" in the "Second User" "table_row"
     And I should see "2:30" in the "Second User" "table_row"
     And I should not see "Prague"
     And I should not see "Perth"
-    And I should not see "1 January 2020"
+    And I should not see "1 January"
 
   @javascript
   Scenario: Test timezones in seminar summary report
@@ -178,13 +178,13 @@ Feature: Seminar timezones in reports
       | sessiontimezone      | Europe/Prague   |
       | timestart[day]       | 2               |
       | timestart[month]     | 1               |
-      | timestart[year]      | 2020            |
+      | timestart[year]      | ## next year ## Y ## |
       | timestart[hour]      | 1               |
       | timestart[minute]    | 15              |
       | timestart[timezone]  | Australia/Perth |
       | timefinish[day]      | 2               |
       | timefinish[month]    | 1               |
-      | timefinish[year]     | 2020            |
+      | timefinish[year]     | ## next year ## Y ## |
       | timefinish[hour]     | 3               |
       | timefinish[minute]   | 45              |
       | timefinish[timezone] | Australia/Perth |
@@ -201,13 +201,13 @@ Feature: Seminar timezones in reports
       | sessiontimezone      | User timezone   |
       | timestart[day]       | 4               |
       | timestart[month]     | 2               |
-      | timestart[year]      | 2021            |
+      | timestart[year]      | ## 2 years ## Y ## |
       | timestart[hour]      | 1               |
       | timestart[minute]    | 0               |
       | timestart[timezone]  | Australia/Perth |
       | timefinish[day]      | 4               |
       | timefinish[month]    | 2               |
-      | timefinish[year]     | 2021            |
+      | timefinish[year]     | ## 2 years ## Y ## |
       | timefinish[hour]     | 2               |
       | timefinish[minute]   | 30              |
       | timefinish[timezone] | Australia/Perth |
@@ -221,20 +221,20 @@ Feature: Seminar timezones in reports
     And I add the "Session Start Date/Time" column to the report
 
     When I navigate to my "F2F summary" report
-    Then I should see "1 January 2020" in the "Test seminar 1 name" "table_row"
-    And I should see "4 February 2021" in the "Test seminar 2 name" "table_row"
+    Then I should see date "1 Jan next year Europe/Prague" formatted "%d %B %Y" in the "Test seminar 1 name" "table_row"
+    And I should see date "4 Feb +2 years Australia/Perth" formatted "%d %B %Y" in the "Test seminar 2 name" "table_row"
     And I should see "Europe/Prague" in the "Test seminar 1 name" "table_row"
     And I should see "Australia/Perth" in the "Test seminar 2 name" "table_row"
-    And I should not see "2 January 2020"
+    And I should not see "2 January"
 
     When I am on homepage
     And I set the following administration settings values:
       | facetoface_displaysessiontimezones | 0 |
     And I navigate to my "F2F summary" report
     Then I should see "2 Jan" in the "Test seminar 1 name" "table_row"
-    Then I should see "2020" in the "Test seminar 1 name" "table_row"
+    Then I should see date "2 Jan next year" formatted "%Y" in the "Test seminar 1 name" "table_row"
     And I should see "4 Feb" in the "Test seminar 2 name" "table_row"
-    And I should see "2021" in the "Test seminar 2 name" "table_row"
+    And I should see date "4 Feb +2 years" formatted "%Y" in the "Test seminar 2 name" "table_row"
     And I should not see "Prague"
     And I should not see "Perth"
-    And I should not see "1 January 2020"
+    And I should not see "1 January"

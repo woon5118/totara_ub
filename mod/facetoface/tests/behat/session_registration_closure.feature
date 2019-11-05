@@ -47,12 +47,12 @@ Feature: Seminar Event Registration Closure
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
       | timefinish[day]    | 31   |
       | timefinish[month]  | 12   |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
@@ -61,13 +61,13 @@ Feature: Seminar Event Registration Closure
       | registrationtimestart[enabled]  | 1    |
       | registrationtimestart[day]      | 1    |
       | registrationtimestart[month]    | 1    |
-      | registrationtimestart[year]     | 2010 |
+      | registrationtimestart[year]     | ## last year ## Y ## |
       | registrationtimestart[hour]     | 05   |
       | registrationtimestart[minute]   | 00   |
       | registrationtimefinish[enabled] | 1    |
       | registrationtimefinish[day]     | 1    |
       | registrationtimefinish[month]   | 1    |
-      | registrationtimefinish[year]    | 2020 |
+      | registrationtimefinish[year]    | ## next year ## Y ## |
       | registrationtimefinish[hour]    | 09   |
       | registrationtimefinish[minute]  | 00   |
     And I press "Save changes"
@@ -107,11 +107,11 @@ Feature: Seminar Event Registration Closure
 
     When I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    And I click on "Edit event" "link" in the "1 January 2020" "table_row"
+    And I click on "Edit event" "link" in the "1 January" "table_row"
     And I set the following fields to these values:
       | registrationtimefinish[day]     | 1    |
       | registrationtimefinish[month]   | 1    |
-      | registrationtimefinish[year]    | 2010 |
+      | registrationtimefinish[year]    | ## last year ## Y ## |
       | registrationtimefinish[hour]    | 17   |
       | registrationtimefinish[minute]  | 00   |
     And I press "Save changes"

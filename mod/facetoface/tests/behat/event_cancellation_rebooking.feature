@@ -39,13 +39,13 @@ Feature: Seminar event cancellation rebooking
       | sessiontimezone     | Pacific/Auckland |
       | timestart[day]      | 10               |
       | timestart[month]    | 2                |
-      | timestart[year]     | 2025             |
+      | timestart[year]     | ## next year ## Y ## |
       | timestart[hour]     | 9                |
       | timestart[minute]   | 0                |
       | timestart[timezone] | Pacific/Auckland |
       | timefinish[day]     | 10               |
       | timefinish[month]   | 2                |
-      | timefinish[year]    | 2025             |
+      | timefinish[year]    | ## next year ## Y ## |
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
@@ -76,15 +76,15 @@ Feature: Seminar event cancellation rebooking
     And I follow "show-selectdate0-dialog"
     And I set the following fields to these values:
       | sessiontimezone     | Pacific/Auckland |
-      | timestart[day]      | 10               |
-      | timestart[month]    | 2                |
-      | timestart[year]     | 2030             |
+      | timestart[day]      | 11               |
+      | timestart[month]    | 3                |
+      | timestart[year]     | ## 2 years ## Y ## |
       | timestart[hour]     | 9                |
       | timestart[minute]   | 0                |
       | timestart[timezone] | Pacific/Auckland |
-      | timefinish[day]     | 10               |
-      | timefinish[month]   | 2                |
-      | timefinish[year]    | 2030             |
+      | timefinish[day]     | 11               |
+      | timefinish[month]   | 3                |
+      | timefinish[year]    | ## 2 years ## Y ## |
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
@@ -96,7 +96,7 @@ Feature: Seminar event cancellation rebooking
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_600: Mass rebooking after a cancelled event
-    Given I click on "Attendees" "link" in the "10 February 2030" "table_row"
+    Given I click on "Attendees" "link" in the "11 March" "table_row"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
     And I press "Add"
@@ -111,24 +111,24 @@ Feature: Seminar event cancellation rebooking
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Cancel event" "link" in the "10 February 2025" "table_row"
+    And I click on "Cancel event" "link" in the "10 February" "table_row"
     And I press "Yes"
 
     Given I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Booking open" in the "10 February 2030" "table_row"
-    And I should see "Cancelled" in the "10 February 2025" "table_row"
+    Then I should see "Booking open" in the "11 March" "table_row"
+    And I should see "Cancelled" in the "10 February" "table_row"
 
-    When I click on "Attendees" "link" in the "10 February 2030" "table_row"
+    When I click on "Attendees" "link" in the "11 March" "table_row"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
     And I press "Add"
     And I press "Continue"
     And I press "Confirm"
     And I follow "View all events"
-    Then I should see "2 / 19" in the "10 February 2030" "table_row"
+    Then I should see "2 / 19" in the "11 March" "table_row"
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_601: Individual learner rebooking after a cancelled event
@@ -136,44 +136,44 @@ Feature: Seminar event cancellation rebooking
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Cancel event" "link" in the "10 February 2025" "table_row"
+    And I click on "Cancel event" "link" in the "10 February" "table_row"
     And I press "Yes"
 
     Given I log out
     And I log in as "learner1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Booking open" in the "10 February 2030" "table_row"
-    Then I should see "19" in the "10 February 2030" "table_row"
-    And I should see "Cancelled" in the "10 February 2025" "table_row"
+    Then I should see "Booking open" in the "11 March" "table_row"
+    Then I should see "19" in the "11 March" "table_row"
+    And I should see "Cancelled" in the "10 February" "table_row"
 
-    When I click on "Sign-up" "link" in the "10 February 2030" "table_row"
+    When I click on "Sign-up" "link" in the "11 March" "table_row"
     And I press "Sign-up"
-    Then I should see "Booked" in the "10 February 2030" "table_row"
-    Then I should see "18" in the "10 February 2030" "table_row"
+    Then I should see "Booked" in the "11 March" "table_row"
+    Then I should see "18" in the "11 March" "table_row"
 
     Given I log out
     And I log in as "learner2"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Booking open" in the "10 February 2030" "table_row"
-    Then I should see "18" in the "10 February 2030" "table_row"
-    And I should see "Cancelled" in the "10 February 2025" "table_row"
+    Then I should see "Booking open" in the "11 March" "table_row"
+    Then I should see "18" in the "11 March" "table_row"
+    And I should see "Cancelled" in the "10 February" "table_row"
 
-    When I click on "Sign-up" "link" in the "10 February 2030" "table_row"
+    When I click on "Sign-up" "link" in the "11 March" "table_row"
     And I press "Sign-up"
-    Then I should see "Booked" in the "10 February 2030" "table_row"
-    Then I should see "17" in the "10 February 2030" "table_row"
+    Then I should see "Booked" in the "11 March" "table_row"
+    Then I should see "17" in the "11 March" "table_row"
 
     Given I log out
     And I log in as "learner3"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Booking open" in the "10 February 2030" "table_row"
-    Then I should see "17" in the "10 February 2030" "table_row"
-    And I should see "Cancelled" in the "10 February 2025" "table_row"
+    Then I should see "Booking open" in the "11 March" "table_row"
+    Then I should see "17" in the "11 March" "table_row"
+    And I should see "Cancelled" in the "10 February" "table_row"
 
-    When I click on "Sign-up" "link" in the "10 February 2030" "table_row"
+    When I click on "Sign-up" "link" in the "11 March" "table_row"
     And I press "Sign-up"
-    Then I should see "Booked" in the "10 February 2030" "table_row"
-    Then I should see "16" in the "10 February 2030" "table_row"
+    Then I should see "Booked" in the "11 March" "table_row"
+    Then I should see "16" in the "11 March" "table_row"

@@ -30,10 +30,10 @@ Feature: Admin can change default Seminar direct enrolment plugin settings
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timefinish[day]    | 1    |
       | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I follow "Add event"
@@ -41,10 +41,10 @@ Feature: Admin can change default Seminar direct enrolment plugin settings
     And I set the following fields to these values:
       | timestart[day]     | 2    |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timefinish[day]    | 2    |
       | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I follow "Add event"
@@ -52,10 +52,10 @@ Feature: Admin can change default Seminar direct enrolment plugin settings
     And I set the following fields to these values:
       | timestart[day]     | 3    |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timefinish[day]    | 3    |
       | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I log out
@@ -63,9 +63,9 @@ Feature: Admin can change default Seminar direct enrolment plugin settings
   Scenario: Change Enrolment displayed on course page setting from default setting to a new one
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    Then I should see "Booking open" in the "1 January 2020" "table_row"
-    And I should see "Booking open" in the "2 January 2020" "table_row"
-    And I should see "Booking open" in the "3 January 2020" "table_row"
+    Then I should see "Booking open" in the "1 January" "table_row"
+    And I should see "Booking open" in the "2 January" "table_row"
+    And I should see "Booking open" in the "3 January" "table_row"
     And I log out
 
     And I log in as "admin"
@@ -79,6 +79,6 @@ Feature: Admin can change default Seminar direct enrolment plugin settings
 
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    Then I should see "Booking open" in the "1 January 2020" "table_row"
-    And I should see "Booking open" in the "2 January 2020" "table_row"
-    And I should not see "3 January 2020" in the "Booking open" "table_row"
+    Then I should see "Booking open" in the "1 January" "table_row"
+    And I should see "Booking open" in the "2 January" "table_row"
+    And I should not see "3 January" in the "Booking open" "table_row"

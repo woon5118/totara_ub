@@ -102,18 +102,18 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
       | timefinish[day]    | 1    |
       | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
     And I set the field "Terry Teacher1" to "1"
     And I press "Save changes"
-    And I click on "Attendees" "link" in the "1 January 2020" "table_row"
+    And I click on "Attendees" "link" in the "1 January" "table_row"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com,Sam3 Student3, student3@example.com"
     And I press "Add"
@@ -126,18 +126,18 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 2    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
       | timefinish[day]    | 1    |
       | timefinish[month]  | 2    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
     And I set the field "Alex Teacher2" to "1"
     And I press "Save changes"
-    And I click on "Attendees" "link" in the "1 February 2020" "table_row"
+    And I click on "Attendees" "link" in the "1 February" "table_row"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam4 Student4, student4@example.com,Sam5 Student5, student5@example.com,Sam6 Student6, student6@example.com"
     And I press "Add"
@@ -204,18 +204,18 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
       | timefinish[day]    | 1    |
       | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
     And I set the field "Terry Teacher1" to "1"
     And I press "Save changes"
-    And I click on "Attendees" "link" in the "1 January 2020" "table_row"
+    And I click on "Attendees" "link" in the "1 January" "table_row"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com,Sam3 Student3, student3@example.com"
     And I press "Add"
@@ -228,18 +228,18 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 2    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
       | timefinish[day]    | 1    |
       | timefinish[month]  | 2    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
     And I set the field "Alex Teacher2" to "1"
     And I press "Save changes"
-    And I click on "Attendees" "link" in the "1 February 2020" "table_row"
+    And I click on "Attendees" "link" in the "1 February" "table_row"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam4 Student4, student4@example.com,Sam5 Student5, student5@example.com,Sam6 Student6, student6@example.com"
     And I press "Add"
@@ -254,18 +254,18 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I set the following fields to these values:
       | timestart[day]     | 2    |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
       | timefinish[day]    | 2    |
       | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
     And I set the field "Terry Teacher1" to "1"
     And I press "Save changes"
-    And I click on "Attendees" "link" in the "2 January 2020" "table_row"
+    And I click on "Attendees" "link" in the "2 January" "table_row"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com,Sam3 Student3, student3@example.com"
     And I press "Add"
@@ -278,18 +278,18 @@ Feature: Use facetoface session roles content restriction in facetoface session 
     And I set the following fields to these values:
       | timestart[day]     | 2    |
       | timestart[month]   | 2    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
       | timefinish[day]    | 2    |
       | timefinish[month]  | 2    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
     And I set the field "Alex Teacher2" to "1"
     And I press "Save changes"
-    And I click on "Attendees" "link" in the "2 February 2020" "table_row"
+    And I click on "Attendees" "link" in the "2 February" "table_row"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam4 Student4, student4@example.com,Sam5 Student5, student5@example.com,Sam6 Student6, student6@example.com"
     And I press "Add"

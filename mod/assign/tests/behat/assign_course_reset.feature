@@ -70,7 +70,7 @@ Feature: Assign reset
         | id_duedate_enabled | 1 |
         | duedate[day]       | 1 |
         | duedate[month]     | January |
-        | duedate[year]      | 2020 |
+        | duedate[year]      | ## +2 years ## Y ## |
         | duedate[hour]      | 08 |
         | duedate[minute]    | 00 |
     And I press "Save"
@@ -94,7 +94,7 @@ Feature: Assign reset
         | id_duedate_enabled | 1 |
         | duedate[day]       | 1 |
         | duedate[month]     | January |
-        | duedate[year]      | 2020 |
+        | duedate[year]      | ## +2 years ## Y ## |
         | duedate[hour]      | 08 |
         | duedate[minute]    | 00 |
     And I press "Save"

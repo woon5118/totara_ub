@@ -40,13 +40,13 @@ Feature: Seminar event cancellation basic
       | sessiontimezone     | Pacific/Auckland |
       | timestart[day]      | 10               |
       | timestart[month]    | 2                |
-      | timestart[year]     | 2025             |
+      | timestart[year]     | ## next year ## Y ## |
       | timestart[hour]     | 9                |
       | timestart[minute]   | 0                |
       | timestart[timezone] | Pacific/Auckland |
       | timefinish[day]     | 10               |
       | timefinish[month]   | 2                |
-      | timefinish[year]    | 2025             |
+      | timefinish[year]    | ## next year ## Y ## |
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
@@ -65,30 +65,32 @@ Feature: Seminar event cancellation basic
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Timezone: Pacific/Auckland" in the "10 February 2025, 9:00 AM - 3:00 PM" "table_row"
-    And I should see "2 / 39" in the "10 February 2025" "table_row"
-    And I should see "Booking open" in the "10 February 2025" "table_row"
-    And "Cancel event" "link" should exist in the "10 February 2025" "table_row"
+    Then I should see date "10 February next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "Timezone: Pacific/Auckland" in the "10 February" "table_row"
+    And I should see "2 / 39" in the "10 February" "table_row"
+    And I should see "Booking open" in the "10 February" "table_row"
 
-    When I click on "Cancel event" "link" in the "10 February 2025" "table_row"
+    When I click on "Cancel event" "link" in the "10 February" "table_row"
     Then I should see "Cancelling event in Test Seminar"
-    And I should see "10 February 2025, 9:00 AM - 3:00 PM Pacific/Auckland"
+    And I should see date "10 February next year" formatted "%d %B %Y, 9:00 AM - 3:00 PM Pacific/Auckland"
 
     When I press "No"
-    Then I should see "Timezone: Pacific/Auckland" in the "10 February 2025, 9:00 AM - 3:00 PM" "table_row"
-    And I should see "2 / 39" in the "10 February 2025" "table_row"
-    And I should see "Booking open" in the "10 February 2025" "table_row"
+    Then I should see date "10 February next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "Timezone: Pacific/Auckland" in the "10 February" "table_row"
+    And I should see "2 / 39" in the "10 February" "table_row"
+    And I should see "Booking open" in the "10 February" "table_row"
 
-    When I click on "Cancel event" "link" in the "10 February 2025" "table_row"
+    When I click on "Cancel event" "link" in the "10 February" "table_row"
     And I press "Yes"
-    Then I should see "Timezone: Pacific/Auckland" in the "10 February 2025, 9:00 AM - 3:00 PM" "table_row"
-    And I should see "2 / 39" in the "10 February 2025" "table_row"
-    And I should see "Cancelled" in the "10 February 2025" "table_row"
-    And I should not see "Sign-up" in the "10 February 2025" "table_row"
-    And "Cancel event" "link" should not exist in the "10 February 2025" "table_row"
-    And "Copy event" "link" should exist in the "10 February 2025" "table_row"
-    And "Delete event" "link" should exist in the "10 February 2025" "table_row"
-    And "Edit event" "link" should not exist in the "10 February 2025" "table_row"
+    Then I should see date "10 February next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "Timezone: Pacific/Auckland" in the "10 February" "table_row"
+    And I should see "2 / 39" in the "10 February" "table_row"
+    And I should see "Cancelled" in the "10 February" "table_row"
+    And I should not see "Sign-up" in the "10 February" "table_row"
+    And "Cancel event" "link" should not exist in the "10 February" "table_row"
+    And "Copy event" "link" should exist in the "10 February" "table_row"
+    And "Delete event" "link" should exist in the "10 February" "table_row"
+    And "Edit event" "link" should not exist in the "10 February" "table_row"
 
     And I navigate to "Events report" node in "Site administration > Seminars"
     And I should see "N/A" in the ".session_bookingstatus div span" "css_element"
@@ -98,14 +100,14 @@ Feature: Seminar event cancellation basic
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Timezone: Pacific/Auckland" in the "10 February 2025, 9:00 AM - 3:00 PM" "table_row"
-    And I should see "2 / 39" in the "10 February 2025" "table_row"
-    And I should not see "Sign-up" in the "10 February 2025" "table_row"
-    And I should see "Cancelled" in the "10 February 2025" "table_row"
-    And "Cancel event" "link" should not exist in the "10 February 2025" "table_row"
-    And "Copy event" "link" should exist in the "10 February 2025" "table_row"
-    And "Delete event" "link" should exist in the "10 February 2025" "table_row"
-    And "Edit event" "link" should not exist in the "10 February 2025" "table_row"
+    Then I should see date "10 February next year" formatted "%d %B %Y, 9:00 AM - 3:00 PM" in the "Timezone: Pacific/Auckland" "table_row"
+    And I should see date "10 February next year" formatted "%d %B %Y" in the "2 / 39" "table_row"
+    And I should see date "10 February next year" formatted "%d %B %Y" in the "Cancelled" "table_row"
+    And I should not see "Sign-up" in the "10 February" "table_row"
+    And "Cancel event" "link" should not exist in the "10 February" "table_row"
+    And "Copy event" "link" should exist in the "10 February" "table_row"
+    And "Delete event" "link" should exist in the "10 February" "table_row"
+    And "Edit event" "link" should not exist in the "10 February" "table_row"
 
 
   # ----------------------------------------------------------------------------
@@ -118,13 +120,13 @@ Feature: Seminar event cancellation basic
       | sessiontimezone     | Pacific/Auckland |
       | timestart[day]      | 10               |
       | timestart[month]    | 2                |
-      | timestart[year]     | 2025             |
+      | timestart[year]     | ## next year ## Y ## |
       | timestart[hour]     | 9                |
       | timestart[minute]   | 0                |
       | timestart[timezone] | Pacific/Auckland |
       | timefinish[day]     | 10               |
       | timefinish[month]   | 2                |
-      | timefinish[year]    | 2025             |
+      | timefinish[year]    | ## next year ## Y ## |
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
@@ -136,13 +138,13 @@ Feature: Seminar event cancellation basic
       | sessiontimezone     | Pacific/Auckland |
       | timestart[day]      | 11               |
       | timestart[month]    | 3                |
-      | timestart[year]     | 2026             |
+      | timestart[year]     | ## 2 years ## Y ## |
       | timestart[hour]     | 10               |
       | timestart[minute]   | 0                |
       | timestart[timezone] | Pacific/Auckland |
       | timefinish[day]     | 11               |
       | timefinish[month]   | 3                |
-      | timefinish[year]    | 2026             |
+      | timefinish[year]    | ## 2 years ## Y ## |
       | timefinish[hour]    | 16               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
@@ -157,23 +159,26 @@ Feature: Seminar event cancellation basic
     And I press "Confirm"
 
     When I follow "View all events"
-    Then I should see "Timezone: Pacific/Auckland" in the "10 February 2025, 9:00 AM - 3:00 PM" "table_row"
-    And I should see "Timezone: Pacific/Auckland" in the "11 March 2026, 10:00 AM - 4:00 PM" "table_row"
-    And I should see "2 / 39" in the "10 February 2025" "table_row"
-    And I should see "Booking open" in the "2 / 39" "table_row"
-    And "Cancel event" "link" should exist in the "2 / 39" "table_row"
+    Then I should see date "10 February next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "Timezone: Pacific/Auckland" in the "10 February" "table_row"
+    And I should see date "11 March +2 years" formatted "%d %B %Y" in the "10:00 AM - 4:00 PM" "table_row"
+    And I should see "Timezone: Pacific/Auckland" in the "11 March" "table_row"
+    And I should see "2 / 39" in the "10 February" "table_row"
+    And I should see "Booking open" in the "10 February" "table_row"
 
-    When I click on "Cancel event" "link" in the "2 / 39" "table_row"
+    When I click on "Cancel event" "link" in the "10 February" "table_row"
     And I press "Yes"
-    Then I should see "Timezone: Pacific/Auckland" in the "10 February 2025, 9:00 AM - 3:00 PM" "table_row"
-    And I should see "Timezone: Pacific/Auckland" in the "11 March 2026, 10:00 AM - 4:00 PM" "table_row"
-    And I should see "2 / 39" in the "11 March 2026" "table_row"
-    And I should see "Cancelled" in the "2 / 39" "table_row"
-    And I should not see "Sign-up" in the "2 / 39" "table_row"
-    And "Cancel event" "link" should not exist in the "2 / 39" "table_row"
-    And "Copy event" "link" should exist in the "2 / 39" "table_row"
-    And "Delete event" "link" should exist in the "2 / 39" "table_row"
-    And "Edit event" "link" should not exist in the "2 / 39" "table_row"
+    Then I should see date "10 February next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "Timezone: Pacific/Auckland" in the "10 February" "table_row"
+    And I should see date "11 March +2 years" formatted "%d %B %Y" in the "10:00 AM - 4:00 PM" "table_row"
+    And I should see "Timezone: Pacific/Auckland" in the "11 March" "table_row"
+    And I should see "2 / 39" in the "11 March" "table_row"
+    And I should see "Cancelled" in the "11 March" "table_row"
+    And I should not see "Sign-up" in the "11 March" "table_row"
+    And "Cancel event" "link" should not exist in the "11 March" "table_row"
+    And "Copy event" "link" should exist in the "11 March" "table_row"
+    And "Delete event" "link" should exist in the "11 March" "table_row"
+    And "Edit event" "link" should not exist in the "11 March" "table_row"
 
 
   # ----------------------------------------------------------------------------
@@ -186,13 +191,13 @@ Feature: Seminar event cancellation basic
       | sessiontimezone     | Pacific/Auckland |
       | timestart[day]      | 10               |
       | timestart[month]    | 2                |
-      | timestart[year]     | 2025             |
+      | timestart[year]     | ## next year ## Y ## |
       | timestart[hour]     | 9                |
       | timestart[minute]   | 0                |
       | timestart[timezone] | Pacific/Auckland |
       | timefinish[day]     | 10               |
       | timefinish[month]   | 2                |
-      | timefinish[year]    | 2025             |
+      | timefinish[year]    | ## next year ## Y ## |
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
@@ -232,29 +237,31 @@ Feature: Seminar event cancellation basic
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Timezone: Pacific/Auckland" in the "10 February 2025, 9:00 AM - 3:00 PM" "table_row"
+    Then I should see date "10 February next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "Timezone: Pacific/Auckland" in the "10 February" "table_row"
     And I should see date "-10 day Pacific/Auckland" formatted "%d %B %Y"
     And I should see "Timezone: Pacific/Auckland" in the "10:00 AM - 4:00 PM" "table_row"
     And I should see "2 / 39" in the "10:00 AM - 4:00 PM" "table_row"
-    And I should see "In progress" in the "2 / 39" "table_row"
-    And "Cancel event" "link" should not exist in the "2 / 39" "table_row"
-    And "Edit event" "link" should exist in the "2 / 39" "table_row"
-    And "Copy event" "link" should exist in the "2 / 39" "table_row"
-    And "Delete event" "link" should exist in the "2 / 39" "table_row"
+    And I should see "In progress" in the "10:00 AM - 4:00 PM" "table_row"
+    And "Cancel event" "link" should not exist in the "10:00 AM - 4:00 PM" "table_row"
+    And "Edit event" "link" should exist in the "10:00 AM - 4:00 PM" "table_row"
+    And "Copy event" "link" should exist in the "10:00 AM - 4:00 PM" "table_row"
+    And "Delete event" "link" should exist in the "10:00 AM - 4:00 PM" "table_row"
 
     When I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Timezone: Pacific/Auckland" in the "10 February 2025, 9:00 AM - 3:00 PM" "table_row"
+    Then I should see date "10 February next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "Timezone: Pacific/Auckland" in the "10 February" "table_row"
     And I should see date "-10 day Pacific/Auckland" formatted "%d %B %Y"
     And I should see "Timezone: Pacific/Auckland" in the "10:00 AM - 4:00 PM" "table_row"
     And I should see "2 / 39" in the "10:00 AM - 4:00 PM" "table_row"
-    And I should see "In progress" in the "2 / 39" "table_row"
-    And "Cancel event" "link" should not exist in the "2 / 39" "table_row"
-    And "Edit event" "link" should exist in the "2 / 39" "table_row"
-    And "Copy event" "link" should exist in the "2 / 39" "table_row"
-    And "Delete event" "link" should exist in the "2 / 39" "table_row"
+    And I should see "In progress" in the "10:00 AM - 4:00 PM" "table_row"
+    And "Cancel event" "link" should not exist in the "10:00 AM - 4:00 PM" "table_row"
+    And "Edit event" "link" should exist in the "10:00 AM - 4:00 PM" "table_row"
+    And "Copy event" "link" should exist in the "10:00 AM - 4:00 PM" "table_row"
+    And "Delete event" "link" should exist in the "10:00 AM - 4:00 PM" "table_row"
 
 
   # ----------------------------------------------------------------------------
@@ -267,13 +274,13 @@ Feature: Seminar event cancellation basic
       | sessiontimezone     | Pacific/Auckland |
       | timestart[day]      | 10               |
       | timestart[month]    | 2                |
-      | timestart[year]     | 2025             |
+      | timestart[year]     | ## next year ## Y ## |
       | timestart[hour]     | 9                |
       | timestart[minute]   | 0                |
       | timestart[timezone] | Pacific/Auckland |
       | timefinish[day]     | 10               |
       | timefinish[month]   | 2                |
-      | timefinish[year]    | 2025             |
+      | timefinish[year]    | ## next year ## Y ## |
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
@@ -309,29 +316,31 @@ Feature: Seminar event cancellation basic
     And I press "Confirm"
 
     When I follow "View all events"
-    Then I should see "Timezone: Pacific/Auckland" in the "10 February 2025, 9:00 AM - 3:00 PM" "table_row"
+    Then I should see date "10 February next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "Timezone: Pacific/Auckland" in the "10 February" "table_row"
     And I should see date "0 day Pacific/Auckland" formatted "%d %B %Y"
     And I should see "Timezone: Pacific/Auckland" in the "12:05 AM - 11:55 PM" "table_row"
     And I should see "2 / 39" in the "12:05 AM - 11:55 PM" "table_row"
-    And I should see "In progress" in the "2 / 39" "table_row"
-    And "Cancel event" "link" should not exist in the "2 / 39" "table_row"
-    And "Edit event" "link" should exist in the "2 / 39" "table_row"
-    And "Copy event" "link" should exist in the "2 / 39" "table_row"
-    And "Delete event" "link" should exist in the "2 / 39" "table_row"
+    And I should see "In progress" in the "12:05 AM - 11:55 PM" "table_row"
+    And "Cancel event" "link" should not exist in the "12:05 AM - 11:55 PM" "table_row"
+    And "Edit event" "link" should exist in the "12:05 AM - 11:55 PM" "table_row"
+    And "Copy event" "link" should exist in the "12:05 AM - 11:55 PM" "table_row"
+    And "Delete event" "link" should exist in the "12:05 AM - 11:55 PM" "table_row"
 
     When I log out
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Timezone: Pacific/Auckland" in the "10 February 2025, 9:00 AM - 3:00 PM" "table_row"
+    Then I should see date "10 February next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see "Timezone: Pacific/Auckland" in the "10 February" "table_row"
     And I should see date "0 day Pacific/Auckland" formatted "%d %B %Y"
     And I should see "Timezone: Pacific/Auckland" in the "12:05 AM - 11:55 PM" "table_row"
     And I should see "2 / 39" in the "12:05 AM - 11:55 PM" "table_row"
-    And I should see "In progress" in the "2 / 39" "table_row"
-    And "Cancel event" "link" should not exist in the "2 / 39" "table_row"
-    And "Edit event" "link" should exist in the "2 / 39" "table_row"
-    And "Copy event" "link" should exist in the "2 / 39" "table_row"
-    And "Delete event" "link" should exist in the "2 / 39" "table_row"
+    And I should see "In progress" in the "12:05 AM - 11:55 PM" "table_row"
+    And "Cancel event" "link" should not exist in the "12:05 AM - 11:55 PM" "table_row"
+    And "Edit event" "link" should exist in the "12:05 AM - 11:55 PM" "table_row"
+    And "Copy event" "link" should exist in the "12:05 AM - 11:55 PM" "table_row"
+    And "Delete event" "link" should exist in the "12:05 AM - 11:55 PM" "table_row"
 
 
   # ----------------------------------------------------------------------------

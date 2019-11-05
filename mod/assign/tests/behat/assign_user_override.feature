@@ -37,16 +37,16 @@ Feature: Assign user override
       | id_duedate_enabled | 1 |
       | duedate[day]       | 1 |
       | duedate[month]     | January |
-      | duedate[year]      | 2020 |
+      | duedate[year]      | ## +2 years ## Y ## |
       | duedate[hour]      | 08 |
       | duedate[minute]    | 00 |
     And I press "Save"
-    And I should see "Wednesday, 1 January 2020, 8:00"
+    And I should see date "1 Jan +2 years" formatted "%A, %d %B %Y, 8:00"
     Then I click on "Edit" "link" in the "Sam1 Student1" "table_row"
     And I set the following fields to these values:
-      | duedate[year] | 2030 |
+      | duedate[year] | ## +5 years ## Y ## |
     And I press "Save"
-    And I should see "Tuesday, 1 January 2030, 8:00"
+    And I should see date "1 Jan +5 years" formatted "%A, %d %B %Y, 8:00"
     And I click on "Delete" "link"
     And I press "Continue"
     And I should not see "Sam1 Student1"
@@ -60,17 +60,17 @@ Feature: Assign user override
       | id_duedate_enabled | 1 |
       | duedate[day]       | 1 |
       | duedate[month]     | January |
-      | duedate[year]      | 2020 |
+      | duedate[year]      | ## +2 years ## Y ## |
       | duedate[hour]      | 08 |
       | duedate[minute]    | 00 |
     And I press "Save"
-    And I should see "Wednesday, 1 January 2020, 8:00"
+    And I should see date "1 Jan +2 years" formatted "%A, %d %B %Y, 8:00"
     Then I click on "copy" "link"
     And I set the following fields to these values:
       | Override user  | Student2  |
-      | duedate[year] | 2030 |
+      | duedate[year] | ## +5 years ## Y ## |
     And I press "Save"
-    And I should see "Tuesday, 1 January 2030, 8:00"
+    And I should see date "1 Jan +5 years" formatted "%A, %d %B %Y, 8:00"
     And I should see "Sam2 Student2"
 
   Scenario: Allow a user to have a different due date
@@ -82,7 +82,7 @@ Feature: Assign user override
       | id_cutoffdate_enabled | 0 |
       | duedate[day]       | 1 |
       | duedate[month]     | January |
-      | duedate[year]      | 2000 |
+      | duedate[year]      | ## -3 years ## Y ## |
       | duedate[hour]      | 08 |
       | duedate[minute]    | 00 |
     And I press "Save and display"
@@ -93,21 +93,21 @@ Feature: Assign user override
       | id_duedate_enabled | 1 |
       | duedate[day]       | 1 |
       | duedate[month]     | January |
-      | duedate[year]      | 2020 |
+      | duedate[year]      | ## +2 years ## Y ## |
       | duedate[hour]      | 08 |
       | duedate[minute]    | 00 |
     And I press "Save"
-    And I should see "Wednesday, 1 January 2020, 8:00"
+    And I should see date "1 Jan +2 years" formatted "%A, %d %B %Y, 8:00"
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    Then I should see "Saturday, 1 January 2000, 8:00"
+    Then I should see date "-3 years 1 Jan" formatted "%A, %d %B %Y, 8:00"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I should see "Wednesday, 1 January 2020, 8:00"
+    And I should see date "1 Jan +2 years" formatted "%A, %d %B %Y, 8:00"
 
   Scenario: Allow a user to have a different cut off date
     When I follow "Test assignment name"
@@ -118,7 +118,7 @@ Feature: Assign user override
       | id_cutoffdate_enabled | 1 |
       | cutoffdate[day]       | 1 |
       | cutoffdate[month]     | January |
-      | cutoffdate[year]      | 2000 |
+      | cutoffdate[year]      | ## -3 years ## Y ## |
       | cutoffdate[hour]      | 08 |
       | cutoffdate[minute]    | 00 |
     And I press "Save and display"
@@ -129,11 +129,11 @@ Feature: Assign user override
       | id_cutoffdate_enabled | 1 |
       | cutoffdate[day]       | 1 |
       | cutoffdate[month]     | January |
-      | cutoffdate[year]      | 2020 |
+      | cutoffdate[year]      | ## +2 years ## Y ## |
       | cutoffdate[hour]      | 08 |
       | cutoffdate[minute]    | 00 |
     And I press "Save"
-    And I should see "Wednesday, 1 January 2020, 8:00"
+    And I should see date "1 Jan +2 years" formatted "%A, %d %B %Y, 8:00"
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
@@ -154,7 +154,7 @@ Feature: Assign user override
       | id_cutoffdate_enabled | 0 |
       | allowsubmissionsfromdate[day]       | 1 |
       | allowsubmissionsfromdate[month]     | January |
-      | allowsubmissionsfromdate[year]      | 2020 |
+      | allowsubmissionsfromdate[year]      | ## +2 years ## Y ## |
       | allowsubmissionsfromdate[hour]      | 08 |
       | allowsubmissionsfromdate[minute]    | 00 |
     And I press "Save and display"
@@ -165,18 +165,18 @@ Feature: Assign user override
       | id_allowsubmissionsfromdate_enabled | 1 |
       | allowsubmissionsfromdate[day]       | 1 |
       | allowsubmissionsfromdate[month]     | January |
-      | allowsubmissionsfromdate[year]      | 2015 |
+      | allowsubmissionsfromdate[year]      | ## last year ## Y ## |
       | allowsubmissionsfromdate[hour]      | 08 |
       | allowsubmissionsfromdate[minute]    | 00 |
     And I press "Save"
-    And I should see "Thursday, 1 January 2015, 8:00"
+    And I should see date "1 Jan last year" formatted "%A, %d %B %Y, 8:00"
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    Then I should see "This assignment will accept submissions from Wednesday, 1 January 2020, 8:00"
+    Then I should see date "1 Jan +2 years" formatted "This assignment will accept submissions from %A, %d %B %Y, 8:00"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I should not see "This assignment will accept submissions from Wednesday, 1 January 2020, 8:00"
+    And I should not see "This assignment will accept submissions from"

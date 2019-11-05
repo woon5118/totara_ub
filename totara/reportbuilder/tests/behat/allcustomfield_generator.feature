@@ -97,12 +97,12 @@ Feature: All customfields column generator
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2030 |
+      | timestart[year]    | ## +2 years ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
       | timefinish[day]    | 1    |
       | timefinish[month]  | 1    |
-      | timefinish[year]   | 2030 |
+      | timefinish[year]   | ## +2 years ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
@@ -121,7 +121,7 @@ Feature: All customfields column generator
       | customfield_cfdatetime[enabled]| 1                                       |
       | customfield_cfdatetime[day]    | 5                                       |
       | customfield_cfdatetime[month]  | 6                                       |
-      | customfield_cfdatetime[year]   | 2031                                    |
+      | customfield_cfdatetime[year]   | ## +3 years ## Y ##                     |
       | CF Menu of choices             | Choice 2                                |
       | CF Text area                   | My area                                 |
       | customfield_cfurl[url]         | http://example.com/                     |
@@ -135,7 +135,7 @@ Feature: All customfields column generator
     Then I should see "Booked" in the "Sam1 Student1" "table_row"
     And I should see "My note" in the "Sam1 Student1" "table_row"
     And I should see "Yes" in the "Sam1 Student1" "table_row"
-    And I should see "5 Jun 2031" in the "Sam1 Student1" "table_row"
+    And I should see date "5 Jun +3 years" formatted "%d %b %Y" in the "Sam1 Student1" "table_row"
     And I should see "test.txt" in the "Sam1 Student1" "table_row"
     And I should see "Choice 2" in the "Sam1 Student1" "table_row"
     And I should see "My area" in the "Sam1 Student1" "table_row"

@@ -79,19 +79,6 @@ Feature: Manage pre-defined rooms
     And I turn editing mode off
     And I follow "View all events"
     And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 1    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
-    And I press "OK"
     And I set the following fields to these values:
       | capacity           | 7   |
     When I click on "Select room" "link"
@@ -136,12 +123,12 @@ Feature: Manage pre-defined rooms
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 0    |
       | timefinish[day]    | 1    |
       | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
@@ -159,12 +146,12 @@ Feature: Manage pre-defined rooms
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 0    |
       | timefinish[day]    | 1    |
       | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
     And I press "OK"
@@ -177,12 +164,12 @@ Feature: Manage pre-defined rooms
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 14   |
       | timestart[minute]  | 0    |
       | timefinish[day]    | 1    |
       | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 15   |
       | timefinish[minute] | 0    |
     And I press "OK"
@@ -194,19 +181,19 @@ Feature: Manage pre-defined rooms
     And I set the following fields to these values:
       | timestart[day]     | 1    |
       | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 0    |
       | timefinish[day]    | 1    |
       | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 0    |
     And I press "OK"
     And I should see "The new dates you have selected are unavailable due to a scheduling conflict"
     And I click on "Cancel" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
-    Then I should see "Room 1" in the "1 January 2020" "table_row"
+    Then I should see date "1 January next year" formatted "%d %B %Y" in the "Room 1" "table_row"
 
   Scenario: Clash a room with different timezones
     Given I am on "Course 1" course homepage with editing mode on
@@ -219,13 +206,13 @@ Feature: Manage pre-defined rooms
     And I set the following fields to these values:
       | timestart[day]       | 1                |
       | timestart[month]     | 1                |
-      | timestart[year]      | 2020             |
+      | timestart[year]      | ## next year ## Y ## |
       | timestart[hour]      | 19               |
       | timestart[minute]    | 0                |
       | timestart[timezone]  | Pacific/Auckland |
       | timefinish[day]      | 1                |
       | timefinish[month]    | 1                |
-      | timefinish[year]     | 2020             |
+      | timefinish[year]     | ## next year ## Y ## |
       | timefinish[hour]     | 20               |
       | timefinish[minute]   | 0                |
       | timefinish[timezone] | Pacific/Auckland |
@@ -244,13 +231,13 @@ Feature: Manage pre-defined rooms
     And I set the following fields to these values:
       | timestart[day]       | 1             |
       | timestart[month]     | 1             |
-      | timestart[year]      | 2020          |
+      | timestart[year]      | ## next year ## Y ## |
       | timestart[hour]      | 6             |
       | timestart[minute]    | 0             |
       | timestart[timezone]  | Europe/London |
       | timefinish[day]      | 1             |
       | timefinish[month]    | 1             |
-      | timefinish[year]     | 2020          |
+      | timefinish[year]     | ## next year ## Y ## |
       | timefinish[hour]     | 7             |
       | timefinish[minute]   | 0             |
       | timefinish[timezone] | Europe/London |
@@ -265,13 +252,13 @@ Feature: Manage pre-defined rooms
     And I set the following fields to these values:
       | timestart[day]       | 2             |
       | timestart[month]     | 1             |
-      | timestart[year]      | 2020          |
+      | timestart[year]      | ## next year ## Y ## |
       | timestart[hour]      | 14            |
       | timestart[minute]    | 0             |
       | timestart[timezone]  | Europe/London |
       | timefinish[day]      | 2             |
       | timefinish[month]    | 1             |
-      | timefinish[year]     | 2020          |
+      | timefinish[year]     | ## next year ## Y ## |
       | timefinish[hour]     | 15            |
       | timefinish[minute]   | 0             |
       | timefinish[timezone] | Europe/London |
@@ -285,13 +272,13 @@ Feature: Manage pre-defined rooms
     And I set the following fields to these values:
       | timestart[day]       | 1             |
       | timestart[month]     | 1             |
-      | timestart[year]      | 2020          |
+      | timestart[year]      | ## next year ## Y ## |
       | timestart[hour]      | 6             |
       | timestart[minute]    | 0             |
       | timestart[timezone]  | Europe/London |
       | timefinish[day]      | 1             |
       | timefinish[month]    | 1             |
-      | timefinish[year]     | 2020          |
+      | timefinish[year]     | ## next year ## Y ## |
       | timefinish[hour]     | 7             |
       | timefinish[minute]   | 0             |
       | timefinish[timezone] | Europe/London |
@@ -300,4 +287,4 @@ Feature: Manage pre-defined rooms
     And I click on "Cancel" "button" in the "Select date" "totaradialogue"
     And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
     And I press "Save changes"
-    Then I should see "Room 1" in the "1 January 2020" "table_row"
+    Then I should see date "1 January next year" formatted "%d %B %Y" in the "Room 1" "table_row"

@@ -58,13 +58,13 @@ Feature: Allocate spaces for team in seminar
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[month]   | 2    |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 0    |
       | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
+      | timefinish[month]  | 2    |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 0    |
     And I press "OK"
@@ -75,13 +75,13 @@ Feature: Allocate spaces for team in seminar
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 2    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | 2020 |
+      | timestart[month]   | 2    |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 0    |
       | timefinish[day]    | 2    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | 2020 |
+      | timefinish[month]  | 2    |
+      | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 0    |
     And I press "OK"
@@ -283,9 +283,9 @@ Feature: Allocate spaces for team in seminar
     And I should not see "Allocate spaces for team" in the "0 / 33" "table_row"
     And I should not see "Reserve spaces for team" in the "0 / 33" "table_row"
     And I should not see "Manage reservations" in the "0 / 33" "table_row"
-    And I should see "Allocate spaces for team" in the "1 January 2020" "table_row"
-    And I should see "Reserve spaces for team" in the "1 January 2020" "table_row"
-    And I should see "Manage reservations" in the "1 January 2020" "table_row"
-    And I should see "Allocate spaces for team" in the "2 January 2020" "table_row"
-    And I should see "Reserve spaces for team" in the "2 January 2020" "table_row"
-    And I should see "Manage reservations" in the "2 January 2020" "table_row"
+    And I should see "Allocate spaces for team" in the "1 February" "table_row"
+    And I should see "Reserve spaces for team" in the "1 February" "table_row"
+    And I should see "Manage reservations" in the "1 February" "table_row"
+    And I should see "Allocate spaces for team" in the "2 February" "table_row"
+    And I should see "Reserve spaces for team" in the "2 February" "table_row"
+    And I should see "Manage reservations" in the "2 February" "table_row"

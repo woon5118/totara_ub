@@ -38,17 +38,17 @@ Feature: Add a seminar with select position
     And I set the following fields to these values:
       | timestart[day]       | 1    |
       | timestart[month]     | 1    |
-      | timestart[year]      | 2020 |
+      | timestart[year]      | ## next year ## Y ## |
       | timestart[hour]      | 11   |
       | timestart[minute]    | 0    |
       | timefinish[day]      | 1    |
       | timefinish[month]    | 1    |
-      | timefinish[year]     | 2020 |
+      | timefinish[year]     | ## next year ## Y ## |
       | timefinish[hour]     | 12   |
       | timefinish[minute]   | 0    |
     And I press "OK"
     And I press "Save changes"
-    And I should see "1 January 2020"
+    And I should see date "1 January next year" formatted "%d %B %Y"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
@@ -82,17 +82,17 @@ Feature: Add a seminar with select position
     And I set the following fields to these values:
       | timestart[day]       | 1    |
       | timestart[month]     | 1    |
-      | timestart[year]      | 2020 |
+      | timestart[year]      | ## next year ## Y ## |
       | timestart[hour]      | 11   |
       | timestart[minute]    | 0    |
       | timefinish[day]      | 1    |
       | timefinish[month]    | 1    |
-      | timefinish[year]     | 2020 |
+      | timefinish[year]     | ## next year ## Y ## |
       | timefinish[hour]     | 12   |
       | timefinish[minute]   | 0    |
     And I press "OK"
     And I press "Save changes"
-    And I should see "1 January 2020"
+    And I should see date "1 January next year" formatted "%d %B %Y"
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
@@ -137,17 +137,17 @@ Feature: Add a seminar with select position
     And I set the following fields to these values:
       | timestart[day]       | 1    |
       | timestart[month]     | 1    |
-      | timestart[year]      | 2020 |
+      | timestart[year]      | ## next year ## Y ## |
       | timestart[hour]      | 11   |
       | timestart[minute]    | 0    |
       | timefinish[day]      | 1    |
       | timefinish[month]    | 1    |
-      | timefinish[year]     | 2020 |
+      | timefinish[year]     | ## next year ## Y ## |
       | timefinish[hour]     | 12   |
       | timefinish[minute]   | 0    |
     And I press "OK"
     And I press "Save changes"
-    And I should see "1 January 2020"
+    And I should see date "1 January next year" formatted "%d %B %Y"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
@@ -180,17 +180,17 @@ Feature: Add a seminar with select position
     And I set the following fields to these values:
       | timestart[day]       | 1    |
       | timestart[month]     | 1    |
-      | timestart[year]      | 2020 |
+      | timestart[year]      | ## next year ## Y ## |
       | timestart[hour]      | 11   |
       | timestart[minute]    | 0    |
       | timefinish[day]      | 1    |
       | timefinish[month]    | 1    |
-      | timefinish[year]     | 2020 |
+      | timefinish[year]     | ## next year ## Y ## |
       | timefinish[hour]     | 12   |
       | timefinish[minute]   | 0    |
     And I press "OK"
     And I press "Save changes"
-    And I should see "1 January 2020"
+    And I should see date "1 January next year" formatted "%d %B %Y"
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
