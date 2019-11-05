@@ -440,7 +440,8 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
             }
         }
 
-        $table->queue_multiple_for_aggregation($to_queue);
+        $result = $table->queue_multiple_for_aggregation($to_queue);
+        $this->assertCount(3, $result);
 
         $expected_rows = array_merge($records,
             [
@@ -463,6 +464,31 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
         }
 
         $this->assertEmpty($expected_rows);
+    }
+
+    /**
+     * Test queue_multiple_for_aggregation
+     */
+    public function test_queue_multiple_for_aggregation_with_invalid_data() {
+        $table = new aggregation_users_table();
+
+        // Try empty data
+        $result = $table->queue_multiple_for_aggregation([]);
+        $this->assertEmpty($result);
+
+        // Try invalid data
+        $to_queue = [
+            ['user_id' => 1, 'competency_id' => 1],
+            ['user_id' => 2, 'thisshouldfail' => 1],
+            ['user_id' => 1, 'competency_id' => 3],
+            ['user_id' => 2, 'competency_id' => 3],
+            ['user_id' => 3, 'competency_id' => 3],
+        ];
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Data passed to queue_multiple_for_aggregation must contain a user_id and competency_id');
+
+        $table->queue_multiple_for_aggregation($to_queue);
     }
 
     /**

@@ -473,67 +473,60 @@ class aggregation_users_table {
      * Queue aggregation to be processed in the background for all assigned users
      *
      * @param array $data List of ['user_id' => , 'competency_id' => ] pairs to queue
+     * @return array all combinations added to the table (userid, competency_id)
      */
-    public function queue_multiple_for_aggregation(array $data): void {
+    public function queue_multiple_for_aggregation(array $data): array {
         global $DB;
 
         if (empty($data)) {
-            return;
-        }
-
-        // Ensure the data array contains 'user_id' and 'competency_id'
-        if (empty(array_column($data, 'user_id')) || empty(array_column($data, 'competency_id'))) {
-            throw new \coding_exception('Data passed to queue_multiple_for_aggregation must contain a user_id and competency_id');
-        }
-
-        // Convert data to objects for consistency
-        $data = json_decode(json_encode($data));
-
-        $process_key_wh = '';
-
-        if (!empty($this->process_key_column)) {
-            $process_key_set = ', NULL as ' . $this->process_key_column;
-            $process_key_wh = " {$this->process_key_column} IS NULL";
+            return [];
         }
 
         $wh_parts = [];
         $params = [];
         foreach ($data as $idx => $item) {
+            // Validate that it has the right properties
+            if (!(isset($item['user_id']) && isset($item['competency_id']))) {
+                throw new \coding_exception('Data passed to queue_multiple_for_aggregation must contain a user_id and competency_id');
+            }
+            // To ensure consistency convert it to an object
+            $item = (object) $item;
+            $data[$idx] = $item;
+
             $wh_parts[] = "{$this->user_id_column} = :userid_{$idx} AND {$this->competency_id_column} = :compid_{$idx}";
             $params["userid_{$idx}"] = $item->user_id;
             $params["compid_{$idx}"] = $item->competency_id;
         }
+        $user_competency_condition = "((" . implode(') OR (', $wh_parts) . "))";
 
-        $id_concat = $DB->sql_concat($this->get_user_id_column(), "'_'", $this->get_competency_id_column());
-        $sql =
-            "SELECT {$id_concat} as idstr, {$this->get_user_id_column()} as user_id, {$this->get_competency_id_column()} as competency_id
-               FROM {{$this->get_table_name()}}
-              WHERE {$process_key_wh}
-                AND ((" . implode(') OR (', $wh_parts) . '))';
+        $sql = "
+            SELECT id, {$this->get_user_id_column()}, {$this->get_competency_id_column()}
+            FROM {{$this->get_table_name()}}
+            WHERE {$this->process_key_column} IS NULL
+                AND {$user_competency_condition}
+        ";
 
-        // Expecting calling function to
         $existing_rows = $DB->get_records_sql($sql, $params);
+        // Get all rows which are not there already
         $to_add = array_udiff($data, $existing_rows, function ($new, $existing) {
-            if ($new->user_id == $existing->user_id) {
-                return $new->competency_id <=> $existing->competency_id;
+            if ($new->user_id == $existing->{$this->get_user_id_column()}) {
+                return $new->competency_id <=> $existing->{$this->get_competency_id_column()};
             } else {
-                return $new->user_id <=> $existing->user_id;
+                return $new->user_id <=> $existing->{$this->get_user_id_column()};
             }
         });
 
-        $to_add = array_map(
-            function ($el) {
-                $add_el = (object)$this->get_insert_record($el->user_id, $el->competency_id);
-                if (!empty($this->process_key_column)) {
-                    // We are queuing - ensure process_key is null
-                    $add_el->{$this->process_key_column} = null;
-                }
-                return $add_el;
-            },
-            $to_add
-        );
+        // Prepare insert array, ensuring that only user and competency id is there
+        $to_add = array_map(function ($item) {
+            $add_el = (object)$this->get_insert_record($item->user_id, $item->competency_id);
+            // We are queuing - process key is not needed
+            unset($add_el->{$this->process_key_column});
+            return $add_el;
+        }, $to_add);
 
         $DB->insert_records_via_batch($this->table_name, $to_add);
+
+        return $to_add;
     }
 
     /**
