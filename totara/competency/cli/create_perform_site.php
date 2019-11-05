@@ -2692,7 +2692,7 @@ Feel free to browse, list of users is below, their password is 12345.
         get_competency('bs', 'drive', $data)->id,
     ];
     foreach ($learning_plan_pathways as $competency) {
-        $competency_generator->create_learning_plan($competency);
+        $competency_generator->create_learning_plan_pathway($competency);
     }
 
     // Then let's create some manual ratings
@@ -4191,9 +4191,7 @@ function evidence_generator() {
 
 function run_tasks() {
     (new expand_task(db()))->expand_all();
-    (new totara_competency\task\competency_achievement_aggregation())->execute();
-    (new totara_criteria\task\evaluate_items())->execute();
-    (new pathway_criteria_group\task\aggregate())->execute();
+    (new totara_competency\task\competency_aggregation_all())->execute();
 }
 
 function mark_competencies_self_assignable($frameworks, $data) {

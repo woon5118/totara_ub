@@ -29,10 +29,6 @@ use totara_competency\entities\pathway_achievement;
 use totara_criteria\criterion;
 
 /**
- * Class task_competency_achievement_aggregation_testcase
- *
- * Tests the the behaviour of the totara_competency\task\competency_achievement_aggregation class.
- *
  * While many of the tests do test for the work done by the totara_competency\aggregator class, detailed testing
  * of the aggregator itself should be done in a testcase dedicated to that.
  *
