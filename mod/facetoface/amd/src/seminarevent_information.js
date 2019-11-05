@@ -21,7 +21,7 @@
  */
 
 
-define([], function() {
+define(['core/yui', 'core/form_duplicate_prevent'], function(Y, dupe) {
     const CLASS_TOGGLE = '.mod_facetoface__eventinfo__sidebars__toggle';
 
     return {
@@ -50,8 +50,23 @@ define([], function() {
                     }
                 });
                 Array.prototype.forEach.call(root.querySelectorAll(CLASS_TOGGLE), update);
-                require(['core/form_duplicate_prevent'], function(dupe) {
-                    dupe.init(root).then(resolve);
+
+                dupe.init(root).then(function() {
+                    // Listen to the global YUI event.
+                    Y.use('moodle-core-event', function() {
+                        Y.Global.on(M.core.globalEvents.FORM_ERROR, function(event) {
+                            M.util.js_pending('mod_facetoface__eventinfo_form_error');
+                            setTimeout(function() {
+                                // Only interested in a form element inside the root element.
+                                var form = root.querySelector('#' + event.formid);
+                                if (form !== null && form.querySelector('#' + event.elementid) !== null) {
+                                    dupe.reset();
+                                }
+                                M.util.js_complete('mod_facetoface__eventinfo_form_error');
+                            }, 10);
+                        });
+                        resolve();
+                    });
                 });
             });
         }
