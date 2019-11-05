@@ -146,7 +146,7 @@ export default {
     },
 
     getAddRatingUrl(role) {
-      // TODO: Return url for making manual ratings in TL-21734
+      // TODO: Return url for making manual ratings in TL-22969
       return '#' + role.role;
     },
 

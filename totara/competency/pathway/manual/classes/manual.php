@@ -26,7 +26,9 @@ namespace pathway_manual;
 
 use pathway_manual\entities\rating;
 use totara_competency\aggregation_users_table;
+use pathway_manual\entities\role;
 use totara_competency\base_achievement_detail;
+use totara_competency\entities\competency;
 use totara_competency\pathway;
 use totara_job\job_assignment;
 
@@ -203,6 +205,45 @@ class manual extends pathway {
     }
 
     /**
+     * Get the order in which we should display the roles.
+     *
+     * @return string[]
+     */
+    public static function get_role_display_order(): array {
+        return [
+            self::ROLE_SELF,
+            self::ROLE_MANAGER,
+            self::ROLE_APPRAISER,
+        ];
+    }
+
+    /**
+     * Check if the specified role(s) are valid.
+     *
+     * @param string|string[] $role Role or multiple roles
+     * @param bool $validate Optionally throws exception if there are invalid roles
+     * @return bool
+     */
+    public static function check_is_valid_role($role, bool $validate = false): bool {
+        if (!is_array($role)) {
+            $role = [$role];
+        }
+
+        $valid_roles = array_values(self::get_all_valid_roles());
+        $invalid_roles = array_diff($role, $valid_roles);
+
+        if (empty($invalid_roles)) {
+            return true;
+        }
+
+        if ($validate) {
+            throw new \coding_exception("Invalid role(s) specified: '" . implode("', '", $invalid_roles) . "'");
+        }
+
+        return false;
+    }
+
+    /**
      * Set roles
      *
      * @param string[] $roles - Array of role names (value should be the role name, key will be ignored).
@@ -210,13 +251,10 @@ class manual extends pathway {
      * @throws \coding_exception
      */
     public function set_roles(array $roles): pathway {
-        $this->roles = [];
+        self::check_is_valid_role($roles, true);
 
-        $valid_roles = array_flip(static::get_all_valid_roles());
+        $this->roles = [];
         foreach ($roles as $role) {
-            if (!isset($valid_roles[$role])) {
-                throw new \coding_exception('Invalid role');
-            }
             $this->roles[$role] = $role;
         }
         $this->validated = false;
@@ -233,6 +271,25 @@ class manual extends pathway {
         return $this->roles;
     }
 
+    /**
+     * Get all unique roles that can add ratings for a competency.
+     *
+     * @param competency $competency
+     * @return string[]
+     */
+    public static function get_roles_for_competency(competency $competency): array {
+        $role_order = array_flip(self::get_role_display_order());
+
+        return role::repository()
+            ->select_raw('DISTINCT role')
+            ->join([\totara_competency\entities\pathway::TABLE, 'pathway'], 'path_manual_id', 'pathway.path_instance_id')
+            ->where('pathway.comp_id', $competency->id)
+            ->get()
+            ->sort(function (role $a, role $b) use ($role_order) {
+                return $role_order[$a->role] <=> $role_order[$b->role];
+            })
+            ->pluck('role');
+    }
 
     /**
      * Return a summary of the criteria associated with this pathway.
@@ -445,39 +502,69 @@ class manual extends pathway {
         return $achievement_detail;
     }
 
-    public function get_roles_that_apply_to_user($subject_id, $rater_id) {
+    /**
+     * Can one user be rated by another user with a specific role?
+     *
+     * @param int $subject_user Subject user ID
+     * @param int $rater_user Rater user ID
+     * @param string $role Role - e.g. manual::ROLE_SELF, manual::ROLE_MANAGER etc.
+     * @return bool
+     */
+    public static function user_has_role(int $subject_user, int $rater_user, string $role): bool {
+        switch ($role) {
+            case manual::ROLE_SELF:
+                return $subject_user == $rater_user;
+            case manual::ROLE_MANAGER:
+                return job_assignment::is_managing($rater_user, $subject_user);
+            case manual::ROLE_APPRAISER:
+                $job_assignments = job_assignment::get_all($subject_user);
+                foreach ($job_assignments as $job_assignment) {
+                    if ($job_assignment->appraiserid == $rater_user) {
+                        return true;
+                    }
+                }
+                return false;
+            default:
+                throw new \coding_exception('Invalid role');
+        }
+    }
 
+    /**
+     * Get array of the roles that the rater user has in relation to the subject user.
+     *
+     * @param int $subject_user Subject user ID.
+     * @param int $rater_user Rater user ID.
+     * @return array Array of roles => roles, e.g. [manual::SELF => manual::SELF, manual::MANAGER => manual::MANGER, etc...]
+     */
+    public function get_roles_that_apply_to_user(int $subject_user, int $rater_user) {
         $roles_that_apply = [];
 
         foreach ($this->roles as $role) {
-            switch ($role) {
-                case self::ROLE_MANAGER:
-                    if (job_assignment::is_managing($rater_id, $subject_id)) {
-                        $roles_that_apply[self::ROLE_MANAGER] = self::ROLE_MANAGER;
-                    }
-                    break;
-                case self::ROLE_APPRAISER:
-                    $job_assignments = job_assignment::get_all($subject_id);
-                    foreach ($job_assignments as $job_assignment) {
-                        if ($job_assignment->appraiserid == $rater_id) {
-                            $roles_that_apply[self::ROLE_APPRAISER] = self::ROLE_APPRAISER;
-                        }
-                    }
-                    break;
-                case self::ROLE_SELF:
-                    if ($rater_id == $subject_id) {
-                        $roles_that_apply[self::ROLE_SELF] = self::ROLE_SELF;
-                    }
-                    break;
-                default:
-                    throw new \coding_exception('Unrecognised role');
+            if (self::user_has_role($subject_user, $rater_user, $role)) {
+                $roles_that_apply[$role] = $role;
             }
         }
 
         return $roles_that_apply;
     }
 
-    public function can_set_manual_value($subject_id, $rater_id) {
-        return !empty($this->get_roles_that_apply_to_user($subject_id, $rater_id));
+    /**
+     * Get all the roles the current user has in relation to the subject user.
+     *
+     * @param int $subject_user Subject user ID.
+     * @return string[] e.g. [manual::MANAGER, manual::APPRAISER]
+     */
+    public static function get_current_user_roles(int $subject_user): array {
+        global $USER;
+        $has_roles = [];
+
+        foreach (self::get_all_valid_roles() as $index => $role) {
+            if (self::user_has_role($subject_user, $USER->id, $role)) {
+                $has_roles[] = $role;
+            };
+        }
+
+        return $has_roles;
     }
+
 }

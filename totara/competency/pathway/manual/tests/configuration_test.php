@@ -41,6 +41,28 @@ class pathway_manual_configuration_testcase extends advanced_testcase {
         return $data;
     }
 
+    public function test_check_valid_roles() {
+        // Without validation
+        $this->assertTrue(manual::check_is_valid_role(manual::ROLE_SELF));
+        $this->assertTrue(manual::check_is_valid_role(manual::ROLE_MANAGER));
+        $this->assertTrue(manual::check_is_valid_role(manual::ROLE_APPRAISER));
+        $this->assertTrue(manual::check_is_valid_role([manual::ROLE_SELF, manual::ROLE_MANAGER, manual::ROLE_APPRAISER]));
+
+        // With validation
+        $this->assertTrue(manual::check_is_valid_role(manual::ROLE_SELF, true));
+        $this->assertTrue(manual::check_is_valid_role(manual::ROLE_MANAGER, true));
+        $this->assertTrue(manual::check_is_valid_role(manual::ROLE_APPRAISER, true));
+        $this->assertTrue(manual::check_is_valid_role([manual::ROLE_SELF, manual::ROLE_MANAGER, manual::ROLE_APPRAISER], true));
+
+        // Test invalid roles without validation
+        $this->assertFalse(manual::check_is_valid_role('blah blah blah'));
+        $this->assertFalse(manual::check_is_valid_role(['blah', 'blah blah blah']));
+
+        // Test invalid roles with validation
+        $this->expectExceptionMessage("Invalid role(s) specified: 'blah blah blah'");
+        manual::check_is_valid_role('blah blah blah', true);
+    }
+
     public function test_setting_valid_roles() {
         $data = $this->setup_data();
 

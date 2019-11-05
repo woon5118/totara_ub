@@ -26,9 +26,14 @@ namespace pathway_manual\entities;
 use core\orm\entity\entity;
 
 /**
+ * Class role
+ * Defines a role that is enabled within a manual rating pathway.
+ *
  * @property-read int $id ID
  * @property int $path_manual_id
  * @property string $role
+ *
+ * @package pathway_manual\entities
  */
 class role extends entity {
 

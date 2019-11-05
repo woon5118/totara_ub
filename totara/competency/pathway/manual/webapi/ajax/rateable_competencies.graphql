@@ -1,0 +1,30 @@
+query pathway_manual_rateable_competencies($user_id: core_id!, $role: String!) {
+  pathway_manual_rateable_competencies(user_id: $user_id, role: $role) {
+    user {
+      fullname
+      profileimageurl
+    }
+    scales {
+      values {
+        id
+        name
+        proficient
+        description
+      }
+      competencies {
+        competency {
+          id
+          display_name
+        }
+        last_rating {
+          date: timestamp(format: DATE)
+          comment
+          scale_value {
+            id
+          }
+        }
+      }
+    }
+    count
+  }
+}

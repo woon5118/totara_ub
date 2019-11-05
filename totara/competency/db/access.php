@@ -74,4 +74,22 @@ $capabilities = [
             'manager' => CAP_ALLOW
         ]
     ],
+
+    // Manual ratings
+    'totara/competency:rate_own_competencies' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_USER,
+        'archetypes' => [
+            'user' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ]
+    ],
+    'totara/competency:rate_other_competencies' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_USER,
+        'archetypes' => [
+            'staffmanager' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ]
+    ],
 ];

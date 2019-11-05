@@ -23,6 +23,7 @@
 
 namespace totara_competency\controllers\profile;
 
+use pathway_manual\models\user_competencies;
 use totara_mvc\tui_view;
 use user_picture;
 
@@ -41,7 +42,8 @@ class index extends base {
             'user-name' => $this->user->fullname,
             'is-mine' => $this->is_for_current_user(),
             'base-url' => (string) $this->get_base_url(),
-            'can-assign' => $this->can_assign()
+            'can-assign' => $this->can_assign(),
+            'can-rate-competencies' => user_competencies::can_rate_competencies($this->user, $this->context),
         ];
 
         return tui_view::create('totara_competency/pages/CompetencyProfile', $props)

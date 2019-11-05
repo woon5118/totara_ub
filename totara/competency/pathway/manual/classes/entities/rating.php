@@ -24,9 +24,9 @@
 
 namespace pathway_manual\entities;
 
+use core\entities\user;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
-use core\entities\user;
 use totara_competency\entities\competency;
 use totara_competency\entities\scale_value;
 
@@ -52,7 +52,7 @@ class rating extends entity {
     public const TABLE = 'pathway_manual_rating';
 
     /**
-     * User who made the rating
+     * User who made the rating.
      *
      * @return belongs_to
      */
@@ -61,10 +61,20 @@ class rating extends entity {
             ->where('deleted', 0);
     }
 
+    /**
+     * The competency this rating is of.
+     *
+     * @return belongs_to
+     */
     public function competency(): belongs_to {
         return $this->belongs_to(competency::class, 'comp_id');
     }
 
+    /**
+     * The value of the rating.
+     *
+     * @return belongs_to
+     */
     public function scale_value(): belongs_to {
         return $this->belongs_to(scale_value::class, 'scale_value_id');
     }

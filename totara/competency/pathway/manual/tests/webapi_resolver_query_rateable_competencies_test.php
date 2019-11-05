@@ -1,0 +1,197 @@
+<?php
+/*
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Mark Metcalfe <mark.metcalfe>@totaralearning.com>
+ * @package pathway_manual
+ */
+
+use core\orm\query\builder;
+use core\webapi\execution_context;
+use pathway_manual\manual;
+use pathway_manual\models\rateable_competency;
+use pathway_manual\models\scale_group;
+use pathway_manual\webapi\resolver\query\rateable_competencies;
+use pathway_manual\webapi\resolver\type\rateable_competency as rateable_competency_type;
+use pathway_manual\webapi\resolver\type\scale_group as scale_group_type;
+use pathway_manual\webapi\resolver\type\user_competencies as user_competencies_type;
+use totara_competency\expand_task;
+use totara_job\job_assignment;
+
+require_once(__DIR__ . '/pathway_manual_base_test.php');
+
+class pathway_manual_webapi_resolver_query_rateable_competencies_testcase extends pathway_manual_base_testcase {
+
+    /**
+     * Assign user to competency.
+     */
+    protected function setUp() {
+        parent::setUp();
+
+        $this->generator->create_manual($this->competency1, [manual::ROLE_SELF]);
+
+        $this->generator->assignment_generator()->create_assignment([
+            'user_group_type' => 'user',
+            'user_group_id' => $this->user1->id,
+            'competency_id' => $this->competency1->id,
+        ]);
+        $this->generator->assignment_generator()->create_assignment([
+            'user_group_type' => 'user',
+            'user_group_id' => $this->user2->id,
+            'competency_id' => $this->competency1->id,
+        ]);
+        (new expand_task(builder::get_db()))->expand_all();
+    }
+
+    /**
+     * @return execution_context
+     */
+    private function execution_context(): execution_context {
+        return execution_context::create('dev', null);
+    }
+
+    /**
+     * Make sure the user must be logged in to resolve the query.
+     */
+    public function test_capability_logged_in() {
+        $this->setUser($this->user1->id);
+
+        rateable_competencies::resolve(
+            ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
+            $this->execution_context()
+        );
+
+        $this->setUser(null);
+        $this->expectException(require_login_exception::class);
+
+        rateable_competencies::resolve(
+            ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
+            $this->execution_context()
+        );
+    }
+
+    /**
+     * Make sure correct capabilities are enforced when querying for themselves.
+     */
+    public function test_capability_self() {
+        $this->setUser($this->user1->id);
+        rateable_competencies::resolve(
+            ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
+            $this->execution_context()
+        );
+
+        $role = builder::table('role')->where('shortname', 'user')->one()->id;
+        unassign_capability('totara/competency:rate_own_competencies', $role);
+
+        $this->expectException(required_capability_exception::class);
+        rateable_competencies::resolve(
+            ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
+            $this->execution_context()
+        );
+    }
+
+    /**
+     * Make sure correct capabilities are enforced when querying for another user as a manager.
+     */
+    public function test_capability_manager() {
+        $manager_ja = job_assignment::create_default($this->user2->id);
+        job_assignment::create(['userid' => $this->user1->id, 'managerjaid' => $manager_ja->id, 'idnumber' => 1]);
+
+        $this->setUser($this->user2->id);
+
+        rateable_competencies::resolve(
+            ['user_id' => $this->user1->id, 'role' => manual::ROLE_MANAGER],
+            $this->execution_context()
+        );
+
+        $role = builder::table('role')->where('shortname', 'staffmanager')->one()->id;
+        unassign_capability('totara/competency:rate_other_competencies', $role);
+
+        $this->expectException(required_capability_exception::class);
+        rateable_competencies::resolve(
+            ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
+            $this->execution_context()
+        );
+    }
+
+    // TODO: Test that Appraisers can execute the query with correct permissions handling in TL-23002
+
+    /**
+     * Sanity check to make sure the count can be resolved.
+     */
+    public function test_resolve_count_field() {
+        $this->setUser($this->user1->id);
+
+        $query = rateable_competencies::resolve(
+            ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
+            $this->execution_context()
+        );
+        $this->assertEquals(1, user_competencies_type::resolve('count', $query, [], $this->execution_context()));
+    }
+
+    /**
+     * Sanity check to make sure the user can be resolved.
+     */
+    public function test_resolve_user_field() {
+        $this->setUser($this->user1->id);
+
+        $query = rateable_competencies::resolve(
+            ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
+            $this->execution_context()
+        );
+        $this->assertEquals($this->user1->id, user_competencies_type::resolve('user', $query, [], $this->execution_context())->id);
+    }
+
+    /**
+     * Sanity check to make sure the scale group and its children can be resolved.
+     */
+    public function test_resolve_scale_field() {
+        $this->setUser($this->user1->id);
+
+        $query = rateable_competencies::resolve(
+            ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
+            $this->execution_context()
+        );
+
+        $expected_rateable_competencies = [new rateable_competency($this->competency1, $this->user1)];
+        $expected_scale_group = scale_group::build_from_competencies($expected_rateable_competencies)[0];
+
+        /** @var scale_group[] $returned_scale_groups */
+        $returned_scale_groups = user_competencies_type::resolve('scales', $query, [], $this->execution_context());
+        $this->assertCount(1, $returned_scale_groups);
+        $returned_scale_group = $returned_scale_groups[0];
+
+        $this->assertCount(1, $returned_scale_group->get_rateable_competencies());
+        $this->assertEquals(
+            $expected_rateable_competencies[0]->get_entity()->id,
+            $returned_scale_group->get_rateable_competencies()[0]->get_entity()->id
+        );
+
+        $returned_scale_values = scale_group_type::resolve('values', $returned_scale_group, [], $this->execution_context());
+        $this->assertEquals($expected_scale_group->get_scale_values(), $returned_scale_values);
+
+        /** @var rateable_competency[] $returned_competencies */
+        $returned_competencies = scale_group_type::resolve('competencies', $returned_scale_group, [], $this->execution_context());
+        $this->assertCount(1, $returned_competencies);
+        $returned_competency = $returned_competencies[0];
+
+        rateable_competency_type::resolve('competency', $returned_competency, [], $this->execution_context());
+        rateable_competency_type::resolve('last_rating', $returned_competency, [], $this->execution_context());
+    }
+
+}

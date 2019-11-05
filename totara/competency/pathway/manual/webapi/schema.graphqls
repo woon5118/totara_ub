@@ -1,3 +1,6 @@
+"""
+An individual rating for a competency made by a user for a user
+"""
 type pathway_manual_rating {
   rater: core_user # user fullname, picture url, etc.
   scale_value: totara_competency_scale_value # rating value id given
@@ -5,6 +8,9 @@ type pathway_manual_rating {
   comment(format: core_format = HTML): String # comment added on rating
 }
 
+"""
+A role that can rate a competency
+"""
 type pathway_manual_role_rating {
   role: String! # manager, self, etc.
   role_display_name: String! # "Manager", "Your rating" etc
@@ -13,9 +19,45 @@ type pathway_manual_role_rating {
   default_profile_picture: String # Picture url to use if there is no rating
 }
 
+"""
+A competency that can be rated
+"""
+type pathway_manual_rateable_competency {
+  competency: totara_competency_competency! # The actual competency
+  last_rating: pathway_manual_rating # Last rating made
+}
+
+"""
+A competency scale with scale values and rateable competencies
+"""
+type pathway_manual_scale_group {
+  values: [totara_competency_scale_value!]! # The actual scale
+  competencies: [pathway_manual_rateable_competency] # Rateable competencies
+}
+
+"""
+All rateable competencies for a specific user, grouped by scale
+"""
+type pathway_manual_user_competencies {
+  user: core_user! # The user we are rating competencies of
+  scales: [pathway_manual_scale_group!]! # Scale groups
+  count: Int! # Total number of competencies that we can rate
+}
+
 extend type Query {
+  """
+  Get most recent ratings for a competency assignment by role
+  """
   pathway_manual_role_ratings(
     user_id: core_id!
     assignment_id: core_id!
   ): [pathway_manual_role_rating]
+
+  """
+  Get all rateable competencies for a user by role
+  """
+  pathway_manual_rateable_competencies(
+    user_id: core_id!
+    role: String!
+  ): pathway_manual_user_competencies!
 }

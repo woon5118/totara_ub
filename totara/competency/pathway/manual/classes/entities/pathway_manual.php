@@ -32,6 +32,9 @@ use totara_competency\entities\pathway;
  * @property-read int $id ID
  * @property int $aggregation_method
  * @property int $aggregation_params
+ *
+ * @property-read pathway $pathway
+ * @property-read role[] $roles
  */
 class pathway_manual extends entity {
 

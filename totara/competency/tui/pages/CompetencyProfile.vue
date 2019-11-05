@@ -15,6 +15,7 @@
         :data="currentProgressData"
         :profile-picture="profilePicture"
         :latest-achievement="data.latest_achievement"
+        :rate-competencies-url="rateCompetenciesUrl"
       />
       <div>
         <hr />
@@ -107,6 +108,10 @@ export default {
       required: true,
       type: Boolean,
     },
+    canRateCompetencies: {
+      required: true,
+      type: Boolean,
+    },
   },
 
   data: function() {
@@ -150,6 +155,16 @@ export default {
 
     noAssignments() {
       return !this.$apollo.loading && !this.filters.length;
+    },
+
+    rateCompetenciesUrl() {
+      if (!this.canRateCompetencies) {
+        return null;
+      }
+
+      return this.$url('/totara/competency/profile/rate-competencies/', {
+        user_id: this.userId,
+      });
     },
   },
 

@@ -21,37 +21,36 @@
  * @package pathway_manual
  */
 
-namespace pathway_manual\webapi\resolver\query;
+namespace pathway_manual\webapi\resolver\type;
 
-use context_user;
-use core\entities\user;
 use core\webapi\execution_context;
-use core\webapi\query_resolver;
-use pathway_manual\models\rateable_competency;
-use totara_competency\entities\assignment;
-use totara_core\advanced_feature;
+use core\webapi\type_resolver;
+use pathway_manual\models\user_competencies as competencies;
 
-class role_ratings implements query_resolver {
+class user_competencies implements type_resolver {
 
     /**
+     * Resolves fields for a user's competencies.
+     *
+     * @param string $field
+     * @param competencies $competencies
      * @param array $args
      * @param execution_context $ec
-     * @return array
+     * @return mixed
      */
-    public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('competency_assignment');
-
-        global $USER;
-
+    public static function resolve(string $field, $competencies, array $args, execution_context $ec) {
         require_login(null, false, null, false, true);
 
-        $assignment_id = $args['assignment_id'];
-        $user_id = $args['user_id'];
-        $capability = $USER->id == $user_id ? 'totara/competency:view_own_profile' : 'totara/competency:view_other_profile';
-        require_capability($capability, context_user::instance($user_id));
-
-        return rateable_competency::for_assignment(new assignment($assignment_id), new user($user_id))
-            ->get_all_role_ratings();
+        switch ($field) {
+            case 'user':
+                return (object) $competencies->get_user_for()->to_array();
+            case 'scales':
+                return $competencies->get_scale_groups();
+            case 'count':
+                return $competencies->get_count();
+            default:
+                throw new \coding_exception('Unknown field', $field);
+        }
     }
 
 }

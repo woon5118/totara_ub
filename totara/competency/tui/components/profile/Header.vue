@@ -14,6 +14,12 @@
         class="tui-CompetencyProfileHeader__avatar"
       />
       <ActionLink
+        v-if="rateCompetenciesUrl"
+        :href="rateCompetenciesUrl"
+        class="btn totara_style-btn"
+        v-text="$str('rate_competencies', 'pathway_manual')"
+      />
+      <ActionLink
         :href="selfAssignmentUrl"
         :text="$str('assign_competencies', 'totara_competency')"
         :styleclass="{ primary: true }"
@@ -68,6 +74,10 @@ export default {
     },
     selfAssignmentUrl: {
       required: true,
+      type: String,
+    },
+    rateCompetenciesUrl: {
+      required: false,
       type: String,
     },
   },
@@ -131,6 +141,12 @@ export default {
 </style>
 <lang-strings>
   {
-    "totara_competency": ["assign_competencies", "latest_achievement"]
+    "pathway_manual": [
+      "rate_competencies"
+    ],
+    "totara_competency": [
+      "assign_competencies",
+      "latest_achievement"
+    ]
   }
 </lang-strings>

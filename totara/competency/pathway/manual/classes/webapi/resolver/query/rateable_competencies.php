@@ -24,34 +24,50 @@
 namespace pathway_manual\webapi\resolver\query;
 
 use context_user;
-use core\entities\user;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
-use pathway_manual\models\rateable_competency;
-use totara_competency\entities\assignment;
-use totara_core\advanced_feature;
+use pathway_manual\data_providers\rateable_competencies as rateable_competencies_provider;
+use pathway_manual\manual;
+use pathway_manual\models\user_competencies;
 
-class role_ratings implements query_resolver {
+class rateable_competencies implements query_resolver {
 
     /**
      * @param array $args
      * @param execution_context $ec
-     * @return array
+     * @return user_competencies
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('competency_assignment');
+        $user_id = $args['user_id'];
+        $role = $args['role'];
 
+        self::authorize($user_id, $role);
+
+        return rateable_competencies_provider::for_user_and_role($user_id, $role)->get();
+    }
+
+    /**
+     * Authorize a user to make sure they have the correct capability and have the specified role.
+     *
+     * @param int $user_id
+     * @param string $role
+     */
+    public static function authorize(int $user_id, string $role) {
         global $USER;
 
         require_login(null, false, null, false, true);
 
-        $assignment_id = $args['assignment_id'];
-        $user_id = $args['user_id'];
-        $capability = $USER->id == $user_id ? 'totara/competency:view_own_profile' : 'totara/competency:view_other_profile';
-        require_capability($capability, context_user::instance($user_id));
+        if ($USER->id == $user_id) {
+            require_capability('totara/competency:rate_own_competencies', context_user::instance($user_id));
+        } else {
+            require_capability('totara/competency:rate_other_competencies', context_user::instance($user_id));
+        }
 
-        return rateable_competency::for_assignment(new assignment($assignment_id), new user($user_id))
-            ->get_all_role_ratings();
+        manual::check_is_valid_role($role, true);
+
+        if (!manual::user_has_role($user_id, $USER->id, $role)) {
+            throw new \coding_exception("You do not have the role {$role} for user {$user_id}");
+        };
     }
 
 }

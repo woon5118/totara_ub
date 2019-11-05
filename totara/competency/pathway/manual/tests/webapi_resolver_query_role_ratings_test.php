@@ -27,9 +27,9 @@ use core\webapi\execution_context;
 use pathway_manual\manual;
 use pathway_manual\models\role_rating;
 use pathway_manual\webapi\resolver\query\role_ratings;
+use totara_competency\entities\competency;
 use totara_competency\expand_task;
 use totara_competency\models\assignment;
-use totara_competency\entities\competency;
 use totara_job\job_assignment;
 
 defined('MOODLE_INTERNAL') || die();
@@ -37,7 +37,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Tests the query to fetch all roles and their latest ratings for a given user and competency
  */
-class totara_competency_webapi_resolver_query_role_ratings_testcase extends advanced_testcase {
+class pathway_manual_webapi_resolver_query_role_ratings_testcase extends advanced_testcase {
 
     private $scalevalue1;
 

@@ -23,11 +23,12 @@
 
 namespace pathway_manual\models;
 
+use core\entities\user;
 use core\orm\entity\entity;
 use moodle_url;
 use pathway_manual\entities\rating;
 use pathway_manual\manual;
-use totara_job\job_assignment;
+use totara_competency\entities\competency;
 use user_picture;
 
 defined('MOODLE_INTERNAL') || die();
@@ -40,24 +41,26 @@ defined('MOODLE_INTERNAL') || die();
 class role_rating {
 
     /**
-     * @var int
+     * @var competency
      */
-    protected $competency_id;
+    protected $competency;
 
     /**
-     * @var int
+     * @var user
      */
-    protected $user_id;
+    protected $user;
 
     /**
      * @var string
      */
     protected $role;
 
-    public function __construct(int $competency_id, int $user_id, string $role) {
-        $this->competency_id = $competency_id;
-        $this->user_id = $user_id;
+    public function __construct(competency $competency, user $user, string $role) {
+        manual::check_is_valid_role($role, true);
+
+        $this->user = $user;
         $this->role = $role;
+        $this->competency = $competency;
     }
 
     /**
@@ -68,44 +71,28 @@ class role_rating {
     }
 
     /**
-     * @return string
-     */
-    public function get_role_display_name(): string {
-        global $DB, $USER;
-        if ($this->role == manual::ROLE_SELF) {
-            if ($this->user_id == $USER->id) {
-                return get_string('your_rating', 'pathway_manual');
-            } else {
-                return fullname($DB->get_record('user', ['id' => $this->user_id]));
-            }
-        }
-
-        return get_string('role_' . $this->role, 'pathway_manual');
-    }
-
-    /**
      * Does the logged in user have this role?
      *
      * @return bool
      */
     public function current_user_has_role(): bool {
         global $USER;
-        switch ($this->role) {
-            case manual::ROLE_SELF:
-                return $this->user_id == $USER->id;
-            case manual::ROLE_MANAGER:
-                return job_assignment::is_managing($USER->id, $this->user_id);
-            case manual::ROLE_APPRAISER:
-                $job_assignments = job_assignment::get_all($this->user_id);
-                foreach ($job_assignments as $job_assignment) {
-                    if ($job_assignment->appraiserid == $USER->id) {
-                        return true;
-                    }
-                }
-                return false;
-            default:
-                throw new \coding_exception('Invalid role');
+        return manual::user_has_role($this->user->id, $USER->id, $this->role);
+    }
+
+    /**
+     * @return string
+     */
+    public function get_role_display_name(): string {
+        if ($this->role == manual::ROLE_SELF) {
+            if ($this->user->is_logged_in()) {
+                return get_string('your_rating', 'pathway_manual');
+            } else {
+                return $this->user->fullname;
+            }
         }
+
+        return get_string('role_' . $this->role, 'pathway_manual');
     }
 
     /**
@@ -115,10 +102,9 @@ class role_rating {
      * @return moodle_url
      */
     public function get_default_picture(): moodle_url {
-        global $DB, $PAGE, $OUTPUT;
+        global $PAGE, $OUTPUT;
         if ($this->role == manual::ROLE_SELF) {
-            $user = $DB->get_record('user', ['id' => $this->user_id]);
-            $user_picture = new user_picture($user);
+            $user_picture = new user_picture((object) $this->user->to_array());
             $user_picture->size = 1; // Size f1.
             return $user_picture->get_url($PAGE);
         }
@@ -133,8 +119,8 @@ class role_rating {
      */
     public function get_latest_rating(): ?rating {
         return rating::repository()
-            ->where('comp_id', $this->competency_id)
-            ->where('user_id', $this->user_id)
+            ->where('comp_id', $this->competency->id)
+            ->where('user_id', $this->user->id)
             ->where('assigned_by_role', $this->role)
             ->order_by('date_assigned', 'desc')
             ->first();
