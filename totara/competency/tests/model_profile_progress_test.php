@@ -82,6 +82,6 @@ class totara_competency_model_profile_progress_testcase extends totara_competenc
 
         // Latest achievement
         $this->assertEquals($data['competencies']->first()->fullname, $progress->latest_achievement);
-
     }
+
 }

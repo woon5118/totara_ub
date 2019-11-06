@@ -201,7 +201,7 @@ class assignments extends user_data_provider {
             if (method_exists($this, $method = 'filter_by_' . $key)) {
                 $this->{$method}($repository, $value);
             } else {
-                throw new \moodle_exception('Filtering by "' . $key . '" is currently not supported' );
+                throw new \moodle_exception('Filtering by "' . $key . '" is currently not supported');
             }
         }
 

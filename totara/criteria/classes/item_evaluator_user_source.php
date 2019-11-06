@@ -67,7 +67,7 @@ class item_evaluator_user_source {
         $this->full_user_set = $full_user_set;
     }
 
-   /**
+    /**
      * Create item records for all users in the users_source who doesn't have a item_record
      * @param int $criterion_id
      * @param int $criterion_met Criterion met value to use when creating new item records
@@ -82,11 +82,14 @@ class item_evaluator_user_source {
 
         $temp_table_name = $this->temp_user_table->get_table_name();
         $temp_user_id_column = $this->temp_user_table->get_user_id_column();
-        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('tmp', true);
+        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('tmp', false);
 
+        // The user table may contain more than one record for a specific user (e.g. a record for each competency that
+        // the user is assigned to. Therefore using DISTINCT
+        // DML generated an error if the integer values were passed via params. Thus using it directly in the SELECT
         $sql = "INSERT INTO {totara_criteria_item_record}
                     (user_id, criterion_item_id, criterion_met, timeevaluated)
-                    SELECT tmp." . $temp_user_id_column . ", tci.id, :criterionmet, :timeevaluated
+                    SELECT DISTINCT tmp." . $temp_user_id_column . ", tci.id, {$criterion_met}, {$timeevaluated}
                          FROM {" . $temp_table_name . "} tmp
                          JOIN {totara_criteria_item} tci
                            ON tci.criterion_id = :criterionid
@@ -97,8 +100,6 @@ class item_evaluator_user_source {
 
         $params = [
             'criterionid' => $criterion_id,
-            'criterionmet' => $criterion_met,
-            'timeevaluated' => $timeevaluated
         ];
 
         if (!empty($temp_wh)) {

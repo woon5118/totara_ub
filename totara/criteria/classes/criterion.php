@@ -69,7 +69,7 @@ abstract class criterion {
      * Fetch specific criterion from the database
      *
      * @param int $id Id of the criterion to fetch
-     * @return $this
+     * @return criterion $this
      * @throws \coding_exception
      */
     final public static function fetch(int $id): criterion {
@@ -817,8 +817,10 @@ abstract class criterion {
         [$insql, $params] = $DB->get_in_or_equal($criterion_item_ids, SQL_PARAMS_NAMED);
         $params['userid'] = $user_id;
 
+        // There should be no more than 1 row for each item/user combination.
+        // Not selecting the id to pick up if we ever create more than one
         $existing_records = $DB->get_records_sql_menu(
-            'SELECT id, criterion_item_id, criterion_met
+            'SELECT criterion_item_id, criterion_met
                    FROM {totara_criteria_item_record}
                   WHERE user_id = :userid
                     AND criterion_item_id ' . $insql,
