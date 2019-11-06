@@ -43,6 +43,8 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/competency/tests/fixtures/test_achievement_detail.php');
 require_once($CFG->dirroot . '/totara/competency/tests/fixtures/test_aggregation.php');
 require_once($CFG->dirroot . '/totara/competency/tests/fixtures/test_pathway.php');
+require_once($CFG->dirroot . '/totara/competency/tests/fixtures/test_pathway_evaluator.php');
+require_once($CFG->dirroot . '/totara/competency/tests/fixtures/test_pathway_evaluator_source.php');
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -166,7 +168,7 @@ class totara_competency_generator extends component_generator_base {
 
         if (is_null($scale_value)) {
             $scale_value = $competency->scale->sorted_values_high_to_low->first();
-        } else if (!$scale_value instanceof $scale_value) {
+        } else if (is_number($scale_value) || !$scale_value instanceof scale_value) {
             $scale_value = new scale_value($scale_value, true, true);
         }
         $instance->set_scale_value($scale_value);
@@ -253,7 +255,7 @@ class totara_competency_generator extends component_generator_base {
      *
      * @return learning_plan
      */
-    public function create_learning_plan($competency, int $sort_order = null): learning_plan {
+    public function create_learning_plan_pathway($competency, int $sort_order = null): learning_plan {
         /** @var learning_plan $instance */
         $instance = $this->create_pathway(learning_plan::class, $competency, $sort_order);
         return $instance->save();
@@ -292,8 +294,34 @@ class totara_competency_generator extends component_generator_base {
      **************************************************************************/
 
     /**
+     * Create an individual criterion for use in a pathway
+     *
+     * @param string $criterion_class Criterion subclass, e.g. onactivate::class, linkedcourses::class, coursecompletion::class etc.
+     * @param competency|stdClass|int $competency Competency entity, record or ID.
+     * @param int|null $aggregation_method Aggregation method, either criterion::AGGREGATE_ALL or criterion::AGGREGATE_ANY_N
+     * @param int[]|null $items Array of IDs for this criterion - e.g. for coursecompletion, it would be an array of course IDs
+     * @param int|null $required_items The number of items that need to be completed for this criteria to be met (ANY_N aggregation)
+     *
+     * @return criterion
+     */
+    public function create_criterion(string $criterion_class, $competency, int $aggregation_method = criterion::AGGREGATE_ALL,
+        array $items = [], int $required_items = 1): criterion {
+        /** @var criterion $criterion */
+        $criterion = new $criterion_class();
+
+        $criterion->set_competency_id($competency->id ?? $competency);
+        $criterion->set_aggregation_method($aggregation_method);
+        $criterion->set_aggregation_params(['req_items' => $required_items]);
+
+        $criterion->add_items($items);
+
+        $criterion->save();
+
+        return $criterion;
+    }
+
+    /**
      * Set completion course completion status for a user in a course.
-     * Enrols the user into the course if they aren't already.
      *
      * @param stdClass|int $course Course ID or record
      * @param stdClass|int $user User ID or record
