@@ -1,0 +1,123 @@
+<?php
+/*
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Mark Metcalfe <mark.metcalfe>@totaralearning.com>
+ * @package totara_competency
+ */
+
+use core\format;
+use core\webapi\execution_context;
+use totara_competency\entities\scale_value;
+use totara_competency\webapi\resolver\type\scale_value as scale_value_type;
+
+class totara_competency_webapi_resolver_type_scale_value_testcase extends advanced_testcase {
+
+    /** @var scale_value $scale_value */
+    protected $scale_value;
+
+    protected function setUp() {
+        parent::setUp();
+
+        $this->scale_value = new scale_value([
+            'proficient' => 0,
+            'numericscore' => 0,
+            'idnumber' => 0,
+            'scaleid' => 0,
+            'sortorder' => 0,
+            'timemodified' => 0,
+            'usermodified' => 0,
+        ]);
+    }
+
+    protected function tearDown() {
+        parent::tearDown();
+
+        $this->scale_value = null;
+    }
+
+    /**
+     * Resolve the type.
+     *
+     * @param string $field
+     * @param array $format
+     * @return string
+     */
+    private function resolve_field(string $field, array $format): string {
+        return scale_value_type::resolve(
+            $field,
+            $this->scale_value,
+            $format,
+            execution_context::create('dev', null)
+        );
+    }
+
+    /**
+     * Test that the scale value mutlilang names and descriptions are resolved.
+     */
+    public function test_resolve_scale_value_field_multilang() {
+        // Enable multi-language filter
+        filter_manager::reset_caches();
+        filter_set_global_state('multilang', TEXTFILTER_ON);
+        filter_set_applies_to_strings('multilang', true);
+
+        $multilang_string = '<span lang="en" class="multilang">English</span><span lang="es" class="multilang">Spanish</span>';
+
+        $this->scale_value->name = $multilang_string;
+        $this->scale_value->description = $multilang_string;
+        $this->scale_value->save();
+
+        $this->assertEquals('English', $this->resolve_field('name', ['format' => format::FORMAT_HTML]));
+        $this->assertEquals('English', $this->resolve_field('name', ['format' => format::FORMAT_PLAIN]));
+        $this->assertEquals('English', $this->resolve_field('description', ['format' => format::FORMAT_HTML]));
+        $this->assertEquals('English', $this->resolve_field('description', ['format' => format::FORMAT_PLAIN]));
+    }
+
+    /**
+     * Test that the scale value descriptions that have images in them are resolved.
+     */
+    public function test_resolve_scale_value_description_image() {
+        $this->scale_value->name = 'Value';
+        $this->scale_value->save();
+
+        $xss_string = '<script>alert("Bad")</script>';
+
+        get_file_storage()->create_file_from_string([
+            'contextid' => context_system::instance()->id,
+            'component' => 'totara_hierarchy',
+            'filearea' => scale_value::TABLE,
+            'filepath' => '/',
+            'filename' => 'value.png',
+            'itemid' => $this->scale_value->id,
+        ], 'File');
+        $this->scale_value->description = '<img src="@@PLUGINFILE@@/value.png"/>' . $xss_string;
+        $this->scale_value->save();
+
+        $raw_description = $this->resolve_field('description', ['format' => format::FORMAT_PLAIN]);
+        $this->assertStringNotContainsString('<img src=', $raw_description);
+        $this->assertStringNotContainsString($xss_string, $raw_description);
+
+        $resolved_description = $this->resolve_field('description', ['format' => format::FORMAT_HTML]);
+        $this->assertStringContainsString('pluginfile.php', $resolved_description);
+        $this->assertStringContainsString('totara_hierarchy', $resolved_description);
+        $this->assertStringContainsString(scale_value::TABLE, $resolved_description);
+        $this->assertStringContainsString('value.png', $resolved_description);
+        $this->assertStringNotContainsString($xss_string, $resolved_description);
+    }
+
+}

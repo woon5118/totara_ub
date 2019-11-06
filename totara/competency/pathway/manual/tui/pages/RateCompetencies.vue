@@ -66,9 +66,6 @@ export default {
 
 <lang-strings>
   {
-    "pathway_manual": [
-      "rate_competencies"
-    ],
     "totara_competency": [
       "back_to_competency_profile"
     ]

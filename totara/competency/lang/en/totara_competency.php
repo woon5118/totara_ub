@@ -160,6 +160,7 @@ $string['proficient'] = 'Proficient';
 $string['proficient_on'] = 'Proficient {$a}';
 $string['proficient_value'] = 'Proficient value';
 $string['progress_name_by_user'] = '{$a->progress_name} by {$a->user_fullname_role}';
+$string['rating_scale'] = 'Rating scale';
 $string['removelinkedcourse'] = 'Remove linked course';
 $string['removedlinkedcourse'] = 'Removed linked course';
 $string['revertallchanges:body'] = 'Are you sure you want to revert all changes? All changes not yet activated will be permanently deleted.';

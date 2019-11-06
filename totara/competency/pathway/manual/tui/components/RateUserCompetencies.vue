@@ -164,6 +164,7 @@ export default {
       "no_rateable_competencies",
       "number_of_competencies",
       "rate_user",
+      "rate_competencies",
       "rating_as_appraiser",
       "rating_as_manager"
     ]

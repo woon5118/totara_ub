@@ -33,8 +33,22 @@
       <HeaderCell size="1">
         <strong>{{ $str('last_rating_given', 'pathway_manual') }}</strong>
       </HeaderCell>
-      <HeaderCell size="2">
-        <strong>{{ $str('rate_competency', 'pathway_manual') }}</strong>
+      <HeaderCell size="2" class="tui-pathwayManual-scaleTable__block">
+        <div class="tui-pathwayManual-scaleTable__block">
+          <strong>{{ $str('rate_competency', 'pathway_manual') }}</strong>
+          <div
+            class="tui-pathwayManual-scaleTable__help"
+            @mouseover="showScaleTooltip = true"
+            @mouseleave="showScaleTooltip = false"
+          >
+            <FlexIcon icon="info" size="200" />
+            <ScaleTooltip
+              :scale="scale"
+              :display="showScaleTooltip"
+              :show-descriptions="true"
+            />
+          </div>
+        </div>
       </HeaderCell>
     </template>
     <template v-slot:row="{ row }">
@@ -49,17 +63,25 @@
 
 <script>
 import Cell from 'totara_core/presentation/datatable/Cell';
+import FlexIcon from 'totara_core/containers/icons/FlexIcon';
 import HeaderCell from 'totara_core/presentation/datatable/HeaderCell';
+import ScaleTooltip from 'totara_competency/presentation/ScaleTooltip';
 import Table from 'totara_core/presentation/datatable/Table';
 
 export default {
-  components: { Cell, HeaderCell, Table },
+  components: { Cell, FlexIcon, HeaderCell, ScaleTooltip, Table },
 
   props: {
     scale: {
       required: true,
       type: Object,
     },
+  },
+
+  data() {
+    return {
+      showScaleTooltip: false,
+    };
   },
 };
 </script>
@@ -68,6 +90,9 @@ export default {
 .tui-pathwayManual-scaleTable {
   &:not(:last-child) {
     margin-bottom: var(--tui-gap-7);
+  }
+  &__block {
+    display: block;
   }
   &__help {
     display: inline;

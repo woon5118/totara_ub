@@ -26,6 +26,7 @@ namespace totara_competency\formatter;
 use core\orm\formatter\entity_formatter;
 use totara_core\formatter\field\date_field_formatter;
 use totara_core\formatter\field\string_field_formatter;
+use totara_core\formatter\field\text_field_formatter;
 
 /**
  * @property scale $object
@@ -37,7 +38,15 @@ class scale_value extends entity_formatter {
             'id' => null,
             'name' => string_field_formatter::class,
             'idnumber' => null,
-            'description' => string_field_formatter::class,
+            'description' => function ($value, text_field_formatter $formatter) {
+                $component = 'totara_hierarchy';
+                $filearea = \totara_competency\entities\scale_value::TABLE;
+                $itemid = $this->object->id;
+
+                return $formatter
+                    ->set_pluginfile_url_options($this->context, $component, $filearea, $itemid)
+                    ->format($value);
+            },
             'scaleid' => null,
             'numericscore' => null,
             'sortorder' => null,

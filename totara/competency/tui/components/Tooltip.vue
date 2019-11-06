@@ -25,7 +25,6 @@ export default {
 <style lang="scss">
 .tui-Tooltip__ {
   &wrapper {
-    position: relative;
     width: 0;
     height: 0;
     overflow: visible;
@@ -45,6 +44,7 @@ export default {
       content: '';
     }
     position: absolute;
+    z-index: 1000;
     width: max-content;
     margin-top: var(--tui-font-size-8);
     padding: var(--tui-font-size-8) var(--tui-font-size-12);

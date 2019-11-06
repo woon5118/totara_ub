@@ -42,13 +42,13 @@ class scale_value implements type_resolver {
      * Resolves fields for an organisation
      *
      * @param string $field
-     * @param scale_model $scale
+     * @param scale_value_entity $value
      * @param array $args
      * @param execution_context $ec
      * @return mixed
      */
-    public static function resolve(string $field, $scale, array $args, execution_context $ec) {
-        if (!$scale instanceof scale_value_entity) {
+    public static function resolve(string $field, $value, array $args, execution_context $ec) {
+        if (!$value instanceof scale_value_entity) {
             throw new \coding_exception('Please pass a scale value entity');
         }
 
@@ -58,7 +58,7 @@ class scale_value implements type_resolver {
             return null;
         }
 
-        $formatter = new formatter\scale_value($scale, context_system::instance());
+        $formatter = new formatter\scale_value($value, context_system::instance());
         return $formatter->format($field, $format);
     }
 
