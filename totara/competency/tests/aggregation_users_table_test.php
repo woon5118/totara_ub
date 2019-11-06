@@ -171,45 +171,40 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
     }
 
     /**
-     * Test truncate with update_operation
-     */
-    public function test_truncate_with_update_operation() {
-        global $DB;
-
-        $data = $this->setup_data();
-        $this->assertSame(count($data->records), $DB->count_records($data->tbl->get_table_name()));
-
-        // Set the update_operation
-        $data->tbl->set_update_operation_value('op3');
-        $to_delete = array_filter($data->records, function ($record) {
-            return $record['update_operation_name'] == 'op3';
-        });
-
-        $expected_record_keys = array_diff(array_keys($data->records), array_keys($to_delete));
-        $data->tbl->delete();
-        $this->assertSame(count($expected_record_keys), $DB->count_records($data->tbl->get_table_name()));
-    }
-
-    /**
      * Test truncate with process_key and update_operation
      */
-    public function test_truncate_with_process_key_and_update_operation() {
+    public function test_truncate_with_process_key() {
         global $DB;
 
         $data = $this->setup_data();
-        $this->assertSame(count($data->records), $DB->count_records($data->tbl->get_table_name()));
+        $this->assertEquals(count($data->records), $DB->count_records($data->tbl->get_table_name()));
 
         // Set the process key abd update_operation
         $data->tbl->set_process_key_value('proc3');
         $data->tbl->set_update_operation_value('op3');
 
         $to_delete = array_filter($data->records, function ($record) {
-            return $record['process_key'] == 'proc3' && $record['update_operation_name'] == 'op3';
+            return $record['process_key'] == 'proc3';
         });
 
         $expected_record_keys = array_diff(array_keys($data->records), array_keys($to_delete));
         $data->tbl->delete();
-        $this->assertSame(count($expected_record_keys), $DB->count_records($data->tbl->get_table_name()));
+        $this->assertEquals(count($expected_record_keys), $DB->count_records($data->tbl->get_table_name()));
+    }
+
+    /**
+     * Test truncate with process_key and update_operation
+     */
+    public function test_truncate_without_process_key() {
+        global $DB;
+
+        $data = $this->setup_data();
+        $this->assertEquals(count($data->records), $DB->count_records($data->tbl->get_table_name()));
+
+        $data->tbl->delete();
+
+        // Everything should be gone now
+        $this->assertEquals(0, $DB->count_records($data->tbl->get_table_name()));
     }
 
     public function test_queue_for_aggregation() {
