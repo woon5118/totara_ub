@@ -29,6 +29,7 @@ use core\task\adhoc_task;
 use totara_competency\entities\competency;
 use totara_competency\entities\scale;
 use totara_competency\legacy_aggregation;
+use totara_core\advanced_feature;
 
 class default_criteria_on_install extends adhoc_task {
 
@@ -39,6 +40,11 @@ class default_criteria_on_install extends adhoc_task {
      * Throw exceptions on errors (the job will be retried).
      */
     public function execute() {
+        // This task should only run for non-perform
+        if (advanced_feature::is_enabled('competency_assignment')) {
+            return;
+        }
+
         /**
          * Load any competencies that don't already have an associated overall aggregation type record.
          *
@@ -77,6 +83,9 @@ class default_criteria_on_install extends adhoc_task {
         }
 
         // Linked courses are synced through observers - no need for additional steps here
+
+        // Run aggregation task right away
+        (new competency_aggregation_queue())->execute();
     }
 
 

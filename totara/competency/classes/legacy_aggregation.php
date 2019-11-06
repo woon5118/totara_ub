@@ -112,6 +112,7 @@ class legacy_aggregation {
             case \competency::AGGREGATION_METHOD_ALL:
                 return criterion::AGGREGATE_ALL;
             case \competency::AGGREGATION_METHOD_OFF:
+            case null:
                 return null;
         }
 
