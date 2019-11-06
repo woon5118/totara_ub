@@ -747,9 +747,9 @@ class auth_approved_request_testcase extends advanced_testcase {
         $events = $eventsink->get_events();
         // First job assignment updated.
         $event = reset($events);
-        $this->assertInstanceOf('\totara_job\event\job_assignment_updated', $event);
+        $this->assertInstanceOf('\totara_job\event\job_assignment_created', $event);
         $this->assertSame('totara_job', $event->component);
-        $this->assertSame('updated', $event->action);
+        $this->assertSame('created', $event->action);
         $this->assertSame(CONTEXT_SYSTEM, $event->contextlevel);
         $this->assertNotContains('monkey', json_encode($event)); // Confirm the event does not contain the password!
 

@@ -23,38 +23,18 @@
 
 namespace totara_job\event;
 
-use totara_job\job_assignment;
-
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Event triggered when user job assignment is deleted.
+ * Event triggered when user job assignment is created.
  */
-class job_assignment_deleted extends \core\event\base {
-
-    /**
-     * Create instance of event.
-     *
-     * @param job_assignment $jobassignment Job assignment object.
-     * @param \context $context
-     */
-    public static function create_from_instance(job_assignment $jobassignment, \context $context) {
-
-        $data = [
-            'objectid'      => $jobassignment->id,
-            'context'       => $context,
-            'relateduserid' => $jobassignment->userid,
-        ];
-
-        return self::create($data);
-    }
-
+class job_assignment_created extends \core\event\base {
     /**
      * Init method.
      */
     protected function init() {
         $this->data['objecttable'] = 'job_assignment';
-        $this->data['crud'] = 'd';
+        $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }
 
@@ -62,7 +42,7 @@ class job_assignment_deleted extends \core\event\base {
      * Returns localised event name.
      */
     public static function get_name() {
-        return get_string('eventjobassignmentdeleted', 'totara_job');
+        return get_string('eventjobassignmentcreated', 'totara_job');
     }
 
     /**
@@ -70,9 +50,9 @@ class job_assignment_deleted extends \core\event\base {
      */
     public function get_description() {
         if ((int)$this->userid == (int)$this->relateduserid) {
-            return "The user with id '{$this->userid}' deleted the job assignment with id '$this->objectid'.";
+            return "The user with id '{$this->userid}' created the job assignment with id '$this->objectid'.";
         } else {
-            return "The user with id '{$this->userid}' deleted the job assignment with id '$this->objectid' for the user with id '{$this->relateduserid}'.";
+            return "The user with id '{$this->userid}' created the job assignment with id '$this->objectid' for the user with id '{$this->relateduserid}'.";
         }
     }
 
@@ -81,6 +61,6 @@ class job_assignment_deleted extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/totara/job/jobassignment.php', ['userid' => $this->relateduserid, 'jobassignmentid' => $this->objectid]);
+        return new \moodle_url('/totara/job/jobassignment.php', array('jobassignmentid' => $this->objectid));
     }
 }

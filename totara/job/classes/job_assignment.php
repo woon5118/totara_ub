@@ -23,6 +23,7 @@
 
 namespace totara_job;
 
+use totara_job\event\job_assignment_created;
 use totara_job\event\job_assignment_viewed;
 use totara_job\event\job_assignment_updated;
 use totara_job\event\job_assignment_deleted;
@@ -459,7 +460,7 @@ class job_assignment {
             $transaction->rollback($e);
         }
 
-        $event = job_assignment_updated::create(
+        $event = job_assignment_created::create(
             array(
                 'objectid' => $jobassignment->id,
                 'context' => \context_system::instance(),

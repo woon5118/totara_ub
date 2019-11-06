@@ -54,7 +54,7 @@ class totara_core_event_user_position_testcase extends advanced_testcase {
 
         $this->assertEquals(count($events), 2);
         $eventdata1 = $events[0]->get_data();
-        if ($eventdata1['eventname'] == '\totara_job\event\job_assignment_updated') {
+        if ($eventdata1['eventname'] == '\totara_job\event\job_assignment_created') {
             $eventdata2 = $events[1]->get_data();
         } else {
             $eventdata2 = $eventdata1;
@@ -62,8 +62,8 @@ class totara_core_event_user_position_testcase extends advanced_testcase {
         }
 
         $this->assertEquals('totara_job', $eventdata1['component']);
-        $this->assertEquals('\totara_job\event\job_assignment_updated', $eventdata1['eventname']);
-        $this->assertEquals('updated', $eventdata1['action']);
+        $this->assertEquals('\totara_job\event\job_assignment_created', $eventdata1['eventname']);
+        $this->assertEquals('created', $eventdata1['action']);
         $this->assertEquals($jobassignment->id, $eventdata1['objectid']);
 
         $this->assertEquals('core', $eventdata2['component']);

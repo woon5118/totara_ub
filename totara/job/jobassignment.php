@@ -43,7 +43,17 @@ if (empty($jobassignmentid)) {
     $currenturl = new moodle_url('/totara/job/jobassignment.php', array('userid' => $userid));
 } else {
     // Load the job assignment.
-    $jobassignment = \totara_job\job_assignment::get_with_id($jobassignmentid);
+    $jobassignment = \totara_job\job_assignment::get_with_id($jobassignmentid, false);
+    if (!$jobassignment) {
+        $userid = optional_param('userid', 0, PARAM_INT);
+        $returnurl = $userid > 1 ? new moodle_url('/user/view.php', ['id' => $userid]) : new moodle_url('/admin/user.php');
+        redirect(
+            $returnurl,
+            get_string('error:missingjobassignment', 'totara_job'),
+            null,
+            \core\notification::ERROR
+        );
+    }
     $userid = $jobassignment->userid;
     $currenturl = new moodle_url('/totara/job/jobassignment.php', array('jobassignmentid' => $jobassignmentid));
 }
