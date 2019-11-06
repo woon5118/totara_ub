@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  * @category test
  */
 
@@ -27,12 +27,12 @@ use totara_competency\entities\assignment;
 defined('MOODLE_INTERNAL') || die();
 
 
-class tassign_competency_assignment_entity_testcase extends advanced_testcase {
+class totara_competency_assignment_entity_testcase extends advanced_testcase {
 
     public function test_filters() {
 
-        /** @var tassign_competency_generator $gen */
-        $gen = $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        /** @var totara_competency_assignment_generator $gen */
+        $gen = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
 
         $ass1 = $gen->create_user_assignment(null, null, ['status' => assignment::STATUS_DRAFT]);
         $ass2 = $gen->create_user_assignment(null, null, ['status' => assignment::STATUS_ACTIVE]);
@@ -92,28 +92,28 @@ class tassign_competency_assignment_entity_testcase extends advanced_testcase {
     }
 
     public function test_filter_by_user_group() {
-        /** @var tassign_competency_generator $generator */
-        $generator = $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        /** @var totara_competency_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
         $fw = $generator->hierarchy_generator()->create_comp_frame([]);
         $type = $generator->hierarchy_generator()->create_comp_type(['idnumber' => 'type1']);
 
-        $comp1 = $generator->create_competency([
+        $comp1 = $generator->create_competency(null, $fw->id, [
             'shortname' => 'acc',
             'fullname' => 'Accounting',
             'description' => 'Counting profits',
             'idnumber' => 'accc',
             'typeid' => $type,
-        ], $fw->id);
+        ]);
 
-        $comp2 = $generator->create_competency([
+        $comp2 = $generator->create_competency(null, $fw->id, [
             'shortname' => 'acc2',
             'fullname' => 'Accounting 2',
             'description' => 'Counting profits 2',
             'idnumber' => 'accc2',
             'typeid' => $type,
-        ], $fw->id);
-
+        ]);
+        // TODODO: Use assignment generator
         $assignment1 = new assignment();
         $assignment1->competency_id = $comp1->id;
         $assignment1->type = assignment::TYPE_ADMIN;

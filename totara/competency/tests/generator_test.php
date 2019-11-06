@@ -93,10 +93,8 @@ class totara_competency_generator_testcase extends \advanced_testcase {
      */
     public function test_generator_criteria_group_single_criteria() {
         $data = $this->setup_data();
-        /** @var totara_competency_generator $generator */
-        $generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
-        $cg = $generator->create_criteria_group($data->comp, $data->cc[1], $data->scalevalues[1]);
+        $cg = $this->generator()->create_criteria_group($data->comp, $data->cc[1], $data->scalevalues[1]);
 
         $this->validate_criteria_group($cg, [
             'comp_id' => $data->comp->id,
@@ -110,10 +108,8 @@ class totara_competency_generator_testcase extends \advanced_testcase {
      */
     public function test_generator_criteria_group_active_multi_criteria() {
         $data = $this->setup_data();
-        /** @var totara_competency_generator $generator */
-        $generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
-        $cg = $generator->create_criteria_group($data->comp, [$data->cc[1], $data->cc[2]], $data->scalevalues[2]);
+        $cg = $this->generator()->create_criteria_group($data->comp, [$data->cc[1], $data->cc[2]], $data->scalevalues[2]);
 
         $this->validate_criteria_group($cg, [
             'comp_id' => $data->comp->id,
@@ -162,5 +158,18 @@ class totara_competency_generator_testcase extends \advanced_testcase {
             $this->assertEquals('coursecompletion', $row->criterion_type);
             $this->assertTrue(in_array($row->criterion_id, $critids));
         }
+    }
+
+    public function test_it_returns_assignment_generator() {
+        $ag = $this->generator()->assignment_generator();
+        $this->assertInstanceOf(totara_competency_assignment_generator::class, $ag);
+        $this->assertSame($ag, $this->generator()->assignment_generator());
+    }
+
+    /**
+     * @return totara_competency_generator
+     */
+    protected function generator() {
+        return $this->getDataGenerator()->get_plugin_generator('totara_competency');
     }
 }

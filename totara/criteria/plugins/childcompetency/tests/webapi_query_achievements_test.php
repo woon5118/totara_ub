@@ -151,11 +151,13 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends \advan
         $this->setUser($data['user']);
 
         // Let's create a competency with no assignment...
-        $na_competency = $this->assignment_generator()->create_competency(['parentid' => $data['competencies'][0]->id], $data['competencies'][0]->frameworkid); // No value
+        $na_competency = $this->competency_generator()->create_competency(null, $data['competencies'][0]->frameworkid,
+            ['parentid' => $data['competencies'][0]->id]); // No value
 
         // Archived competency
-        $archived_competency = $this->assignment_generator()->create_competency(['parentid' => $data['competencies'][0]->id], $data['competencies'][0]->frameworkid);
-        $archived_assignment = $this->assignment_generator()
+        $archived_competency = $this->competency_generator()->create_competency(null, $data['competencies'][0]->frameworkid, ['parentid' => $data['competencies'][0]->id]);
+        $archived_assignment = $this->competency_generator()
+            ->assignment_generator()
             ->create_assignment([
                 'user_group_type' => user_groups::USER,
                 'user_group_id' => $data['user']->id,
@@ -311,15 +313,15 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends \advan
         // Create child competency
         // Create another child competency
 
-        $competencies[] = $this->assignment_generator()->create_competency();
+        $competencies[] = $this->competency_generator()->create_competency();
 
         // These 3 we're looking for
-        $competencies[] = $this->assignment_generator()->create_competency(['parentid' => $competencies[0]->id], $competencies[0]->frameworkid); // Achieved
-        $competencies[] = $this->assignment_generator()->create_competency(['parentid' => $competencies[0]->id], $competencies[0]->frameworkid); // Not achieved
-        $competencies[] = $this->assignment_generator()->create_competency(['parentid' => $competencies[0]->id], $competencies[0]->frameworkid); // No value
+        $competencies[] = $this->competency_generator()->create_competency(null, $competencies[0]->frameworkid, ['parentid' => $competencies[0]->id]); // Achieved
+        $competencies[] = $this->competency_generator()->create_competency(null, $competencies[0]->frameworkid, ['parentid' => $competencies[0]->id]); // Not achieved
+        $competencies[] = $this->competency_generator()->create_competency(null, $competencies[0]->frameworkid, ['parentid' => $competencies[0]->id]); // No value
 
-        $competencies[] = $this->assignment_generator()->create_competency(['parentid' => $competencies[1]->id], $competencies[0]->frameworkid);
-        $competencies[] = $this->assignment_generator()->create_competency();
+        $competencies[] = $this->competency_generator()->create_competency(null, $competencies[0]->frameworkid, ['parentid' => $competencies[1]->id]);
+        $competencies[] = $this->competency_generator()->create_competency();
 
         // Create child competency criterion
         $criterion = $this->generator()->create_childcompetency([
@@ -342,25 +344,25 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends \advan
         assign_capability('totara/competency:view_own_profile', CAP_ALLOW, $role->id, context_user::instance($user->id));
 
         // This is the main user assignment for a parent competency
-        $assignment = $this->assignment_generator()->create_assignment([
+        $assignment = $this->competency_generator()->assignment_generator()->create_assignment([
             'user_group_type' => user_groups::USER,
             'user_group_id' => $user->id,
             'competency_id' => $competencies[0]->id,
         ]);
 
-        $assignments[] = $this->assignment_generator()->create_assignment([
+        $assignments[] = $this->competency_generator()->assignment_generator()->create_assignment([
             'user_group_type' => user_groups::USER,
             'user_group_id' => $user->id,
             'competency_id' => $competencies[1]->id,
         ]);
 
-        $assignments[] = $this->assignment_generator()->create_assignment([
+        $assignments[] = $this->competency_generator()->assignment_generator()->create_assignment([
             'user_group_type' => user_groups::USER,
             'user_group_id' => $user->id,
             'competency_id' => $competencies[2]->id,
         ]);
 
-        $assignments[] = $this->assignment_generator()->create_assignment([
+        $assignments[] = $this->competency_generator()->assignment_generator()->create_assignment([
             'user_group_type' => user_groups::USER,
             'user_group_id' => $user->id,
             'competency_id' => $competencies[3]->id,
@@ -426,10 +428,10 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends \advan
     /**
      * Get criteria data generator
      *
-     * @return tassign_competency_generator
+     * @return totara_competency_generator
      */
-    protected function assignment_generator() {
-        return $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+    protected function competency_generator() {
+        return $this->getDataGenerator()->get_plugin_generator('totara_competency');
     }
 
     private function get_execution_context(string $type = 'dev', ?string $operation = null) {

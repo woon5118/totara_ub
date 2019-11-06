@@ -32,7 +32,7 @@ use totara_core\basket\session_basket;
 
 defined('MOODLE_INTERNAL') || die();
 
-class tassign_competency_assignment_service_create_from_baskets_testcase extends advanced_testcase {
+class totara_competency_assignment_service_create_from_baskets_testcase extends advanced_testcase {
 
     use \totara_core\phpunit\webservice_utils;
 

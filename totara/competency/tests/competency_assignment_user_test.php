@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  * @category test
  */
 
@@ -29,7 +29,7 @@ use tassign_competency\models\assignment_user;
 
 defined('MOODLE_INTERNAL') || die();
 
-class tassign_competency_competency_assignment_user_testcase extends advanced_testcase {
+class totara_competency_assignment_user_testcase extends advanced_testcase {
 
     protected function setUp() {
         parent::setUp();
@@ -92,8 +92,8 @@ class tassign_competency_competency_assignment_user_testcase extends advanced_te
         $this->assertTrue($assignment_user->has_active_assignments($assignment1->competency_id));
 
         $gen = $this->generator();
-        $cohort = $gen->create_cohort();
-        $assignment2 = $gen->create_cohort_assignment($assignment1->competency_id, $cohort->id, ['status' => entities\assignment::STATUS_ACTIVE]);
+        $cohort = $gen->assignment_generator()->create_cohort();
+        $assignment2 = $gen->assignment_generator()->create_cohort_assignment($assignment1->competency_id, $cohort->id, ['status' => entities\assignment::STATUS_ACTIVE]);
         cohort_add_member($cohort->id, $user_id);
 
         $expand_task = new expand_task($GLOBALS['DB']);
@@ -107,7 +107,9 @@ class tassign_competency_competency_assignment_user_testcase extends advanced_te
         $user = $this->getDataGenerator()->create_user();
 
         $competency = $this->generator()->create_competency();
-        $assignment = $this->generator()->create_user_assignment($competency->id, $user->id, ['status' => entities\assignment::STATUS_ARCHIVED]);
+        $assignment = $this->generator()
+            ->assignment_generator()
+            ->create_user_assignment($competency->id, $user->id, ['status' => entities\assignment::STATUS_ARCHIVED]);
 
         $this->expand();
 
@@ -148,33 +150,33 @@ class tassign_competency_competency_assignment_user_testcase extends advanced_te
         $data['types'][] = $type1 = $this->generator()->hierarchy_generator()->create_comp_type(['idnumber' => 'type1']);
         $data['types'][] = $type2 = $this->generator()->hierarchy_generator()->create_comp_type(['idnumber' => 'type2']);
 
-        $data['competencies'][] = $one = $this->generator()->create_competency([
+        $data['competencies'][] = $one = $this->generator()->create_competency(null, $fw->id, [
             'shortname' => 'acc',
             'fullname' => 'Accounting',
             'description' => 'Counting profits',
             'idnumber' => 'accc',
             'typeid' => $type1,
-        ], $fw->id);
+        ]);
 
-        $data['competencies'][] = $two = $this->generator()->create_competency([
+        $data['competencies'][] = $two = $this->generator()->create_competency(null, $fw2->id, [
             'shortname' => 'c-chef',
             'fullname' => 'Chef proficiency',
             'description' => 'Bossing around',
             'idnumber' => 'cook-chef-c',
             'typeid' => $type1,
-        ], $fw2->id);
+        ]);
 
-        $data['competencies'][] = $three = $this->generator()->create_competency([
+        $data['competencies'][] = $three = $this->generator()->create_competency(null, $fw->id, [
             'shortname' => 'des',
             'fullname' => 'Designing interiors',
             'description' => 'Decorating things',
             'idnumber' => 'des',
             'parentid' => $one->id,
             'typeid' => $type2,
-        ], $fw->id);
+        ]);
 
         // Create assignments for competencies
-        $gen = $this->generator();
+        $gen = $this->generator()->assignment_generator();
         $data['assignments'][] = $gen->create_user_assignment($one->id);
         $data['assignments'][] = $gen->create_user_assignment($two->id);
         $data['assignments'][] = $gen->create_user_assignment($three->id);
@@ -190,10 +192,10 @@ class tassign_competency_competency_assignment_user_testcase extends advanced_te
     /**
      * Get hierarchy specific generator
      *
-     * @return tassign_competency_generator|component_generator_base
+     * @return totara_competency_generator|component_generator_base
      */
     protected function generator() {
-        return $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        return $this->getDataGenerator()->get_plugin_generator('totara_competency');
     }
 
 }

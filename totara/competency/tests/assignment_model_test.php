@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  * @category test
  */
 
@@ -34,7 +34,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__.'/assignment_model_base_testcase.php');
 
-class tassign_competency_assignment_model_testcase extends assignment_model_base_testcase {
+class totara_competency_assignment_model_testcase extends assignment_model_base_testcase {
 
     public function test_load_assignment() {
         $data = $this->create_data();

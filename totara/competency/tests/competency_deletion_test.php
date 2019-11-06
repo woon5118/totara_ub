@@ -23,6 +23,7 @@
 
 use core\orm\entity\entity;
 use totara_competency\entities\achievement_via;
+use totara_competency\entities\assignment;
 use totara_competency\entities\assignment_availability;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\configuration_change;
@@ -30,6 +31,7 @@ use totara_competency\entities\configuration_history;
 use totara_competency\entities\pathway;
 use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\scale_aggregation;
+use totara_competency\entities\competency as competency_entity;
 
 global $CFG;
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/competency/lib.php');
@@ -37,7 +39,7 @@ require_once($CFG->dirroot . '/totara/hierarchy/prefix/competency/lib.php');
 /**
  * Tests that deleting a competency from the hierarchy deletes all child data.
  */
-class totara_competency_competency_deletion_testcase extends advanced_testcase {
+class totara_competency_deletion_testcase extends advanced_testcase {
 
     /** @var totara_competency_generator|component_generator_base */
     private $generator;
@@ -229,6 +231,71 @@ class totara_competency_competency_deletion_testcase extends advanced_testcase {
         $this->assert_not_exists($achievement_via_2);
     }
 
+    public function test_it_removes_assignments_when_competency_deleted() {
+        $comps = $this->generate_competencies();
+
+        $ids = competency_entity::repository()->where('path', 'like_starts_with', '/' . $comps[0]->id)
+            ->get()->pluck('id');
+
+        $hierarchy = new competency();
+        $hierarchy->delete_hierarchy_item($comps[0]->id);
+
+        $this->assertTrue(assignment::repository()->where('competency_id', $ids)->does_not_exist());
+
+        $this->assertTrue(assignment::repository()->where('competency_id', $comps[3]->id)->exists());
+    }
+
+    /**
+     * Create a few competencies with knows names to test search
+     */
+    protected function generate_competencies() {
+        $comps = [];
+
+        $fw = $this->generator()->hierarchy_generator()->create_comp_frame([]);
+        $type = $this->generator()->hierarchy_generator()->create_comp_type(['idnumber' => 'type1']);
+
+        $comps[] = $comp_one = $this->generator()->create_competency(null, $fw->id, [
+            'shortname' => 'acc',
+            'fullname' => 'Accounting',
+            'description' => 'Counting profits',
+            'idnumber' => 'accc',
+            'typeid' => $type,
+        ]);
+
+        $comps[] = $comp_two = $this->generator()->create_competency(null, $fw->id, [
+            'shortname' => 'c-chef',
+            'fullname' => 'Chef proficiency',
+            'description' => 'Bossing around',
+            'idnumber' => 'cook-chef-c',
+            'typeid' => $type,
+            'parentid' => $comp_one->id,
+        ]);
+
+        $comps[] = $comp_three = $this->generator()->create_competency(null, $fw->id, [
+            'shortname' => 'des',
+            'fullname' => 'Designing interiors',
+            'description' => 'Decorating things',
+            'idnumber' => 'des',
+            'parentid' => $comp_two->id,
+            'typeid' => $type,
+        ]);
+
+        $comps[] = $comp_four =  $this->generator()->create_competency(null, $fw->id, [
+            'shortname' => 'c-baker',
+            'fullname' => 'Baking skill-set',
+            'description' => 'Baking amazing things',
+            'idnumber' => 'cook-baker',
+            'typeid' => $type,
+        ]);
+
+        // Create an assignment for a competency
+        foreach ($comps as $competency) {
+            $this->generator()->assignment_generator()->create_user_assignment($competency->id, null, ['type' => assignment::TYPE_ADMIN]);
+        }
+
+        return $comps;
+    }
+
     /**
      * Check that the specified entity still exists.
      *
@@ -257,4 +324,12 @@ class totara_competency_competency_deletion_testcase extends advanced_testcase {
         $hierarchy_comp->delete_hierarchy_item($competency->id);
     }
 
+    /**
+     * Get hierarchy specific generator
+     *
+     * @return totara_competency_generator
+     */
+    protected function generator() {
+        return $this->getDataGenerator()->get_plugin_generator('totara_competency');
+    }
 }

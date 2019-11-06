@@ -30,7 +30,7 @@ use totara_core\basket\session_basket;
 
 defined('MOODLE_INTERNAL') || die();
 
-class tassign_competency_competency_service_testcase extends advanced_testcase {
+class totara_competency_service_testcase extends advanced_testcase {
 
     use \totara_core\phpunit\webservice_utils;
 
@@ -789,49 +789,49 @@ class tassign_competency_competency_service_testcase extends advanced_testcase {
         $data['types'][] = $type1 = $this->generator()->hierarchy_generator()->create_comp_type(['idnumber' => 'type1']);
         $data['types'][] = $type2 = $this->generator()->hierarchy_generator()->create_comp_type(['idnumber' => 'type2']);
 
-        $data['comps'][] = $comp_one = $this->generator()->create_competency([
+        $data['comps'][] = $comp_one = $this->generator()->create_competency(null, $fw->id, [
             'shortname' => 'acc',
             'fullname' => 'Accounting',
             'description' => 'Counting profits',
             'idnumber' => 'accc',
             'typeid' => $type1,
-        ], $fw->id);
+        ]);
 
-        $data['comps'][] = $comp_two = $this->generator()->create_competency([
+        $data['comps'][] = $comp_two = $this->generator()->create_competency(null, $fw2->id, [
             'shortname' => 'c-chef',
             'fullname' => 'Chef proficiency',
             'description' => 'Bossing around',
             'idnumber' => 'cook-chef-c',
             'typeid' => $type1,
-        ], $fw2->id);
+        ]);
 
-        $data['comps'][] = $comp_three = $this->generator()->create_competency([
+        $data['comps'][] = $comp_three = $this->generator()->create_competency(null, $fw->id, [
             'shortname' => 'des',
             'fullname' => 'Designing interiors',
             'description' => 'Decorating things',
             'idnumber' => 'des',
             'parentid' => $comp_one->id,
             'typeid' => $type2,
-        ], $fw->id);
+        ]);
 
-        $data['comps'][] = $comp_four =  $this->generator()->create_competency([
+        $data['comps'][] = $comp_four =  $this->generator()->create_competency(null, $fw2->id, [
             'shortname' => 'c-baker',
             'fullname' => 'Baking skill-set',
             'description' => 'Baking amazing things',
             'idnumber' => 'cook-baker',
             'typeid' => $type2,
-        ], $fw2->id);
+        ]);
 
-        $data['comps'][] = $comp_five = $this->generator()->create_competency([
+        $data['comps'][] = $comp_five = $this->generator()->create_competency(null, $fw->id, [
             'shortname' => 'c-cook',
             'fullname' => 'Cooking',
             'description' => 'More cooking',
             'idnumber' => 'cook',
             'parentid' => $comp_three->id,
             'typeid' => $type2,
-        ], $fw->id);
+        ]);
 
-        $data['comps'][] = $comp_six = $this->generator()->create_competency([
+        $data['comps'][] = $comp_six = $this->generator()->create_competency(null, $fw2->id, [
             'shortname' => 'c-inv',
             'fullname' => 'Invisible',
             'description' => 'More hidden cooking',
@@ -839,63 +839,63 @@ class tassign_competency_competency_service_testcase extends advanced_testcase {
             'visible' => false,
             'parentid' => $comp_one->id,
             'typeid' => $type2,
-        ], $fw2->id);
+        ]);
 
-        $data['comps'][] = $comp_seven = $this->generator()->create_competency([
+        $data['comps'][] = $comp_seven = $this->generator()->create_competency(null, $fw2->id, [
             'shortname' => 'c-code',
             'fullname' => 'Coding',
             'description' => 'Coding skill',
             'idnumber' => 'coding',
             'parentid' => $comp_one->id,
             'typeid' => $type2,
-        ], $fw2->id);
+        ]);
 
-        $data['comps'][] = $comp_eight = $this->generator()->create_competency([
+        $data['comps'][] = $comp_eight = $this->generator()->create_competency(null, $fw2->id, [
             'shortname' => 'c-hacking',
             'fullname' => 'Hacking',
             'description' => 'Hacking skills',
             'idnumber' => 'hacking',
             'parentid' => $comp_one->id,
             'typeid' => $type2,
-        ], $fw2->id);
+        ]);
 
-        $data['comps'][] = $comp_nine = $this->generator()->create_competency([
+        $data['comps'][] = $comp_nine = $this->generator()->create_competency(null, $fw2->id, [
             'shortname' => 'c-talking',
             'fullname' => 'Talking',
             'description' => 'Talking skills',
             'idnumber' => 'talking',
             'parentid' => $comp_one->id,
             'typeid' => $type2,
-        ], $fw2->id);
+        ]);
 
         // the following three competencies do not have assignments
 
-        $data['comps'][] = $comp_ten = $this->generator()->create_competency([
+        $data['comps'][] = $comp_ten = $this->generator()->create_competency(null, $fw2->id, [
             'shortname' => 'c-planning',
             'fullname' => 'Planning',
             'description' => 'Planning skills',
             'idnumber' => 'planning',
             'parentid' => $comp_one->id,
             'typeid' => $type2,
-        ], $fw2->id);
+        ]);
 
-        $data['comps'][] = $comp_eleven = $this->generator()->create_competency([
+        $data['comps'][] = $comp_eleven = $this->generator()->create_competency(null, $fw2->id, [
             'shortname' => 'c-leading',
             'fullname' => 'Leading',
             'description' => 'Leading skills',
             'idnumber' => 'leading',
             'parentid' => $comp_one->id,
             'typeid' => $type2,
-        ], $fw2->id);
+        ]);
 
-        $data['comps'][] = $comp_twelve = $this->generator()->create_competency([
+        $data['comps'][] = $comp_twelve = $this->generator()->create_competency(null, $fw->id, [
             'shortname' => 'c-typing',
             'fullname' => 'Typing',
             'description' => 'Typing skills',
             'idnumber' => 'typing',
             'parentid' => $comp_one->id,
             'typeid' => $type1,
-        ], $fw->id);
+        ]);
 
         $hierarchy_generator = $this->generator()->hierarchy_generator();
         $fw = $hierarchy_generator->create_pos_frame(['fullname' => 'Framework 2']);
@@ -904,17 +904,19 @@ class tassign_competency_competency_service_testcase extends advanced_testcase {
         $fw = $hierarchy_generator->create_org_frame(['fullname' => 'Framework 3']);
         $org = $hierarchy_generator->create_org(['frameworkid' => $fw->id, 'fullname' => 'Organisation 1']);
 
-        $cohort = $this->generator()->create_cohort();
+        $assignment_generator = $this->generator()->assignment_generator();
+
+        $cohort = $assignment_generator->create_cohort();
 
         // Create an assignment for a competency
-        $data['ass'][] = $this->generator()->create_user_assignment($comp_one->id, null, ['type' => assignment::TYPE_ADMIN]);
-        $data['ass'][] = $this->generator()->create_user_assignment($comp_three->id, null, ['type' => assignment::TYPE_ADMIN]);
-        $data['ass'][] = $this->generator()->create_user_assignment($comp_two->id, null, ['type' => assignment::TYPE_SELF]);
-        $data['ass'][] = $this->generator()->create_user_assignment($comp_four->id, null, ['type' => assignment::TYPE_OTHER]);
-        $data['ass'][] = $this->generator()->create_user_assignment($comp_five->id, null, ['type' => assignment::TYPE_SYSTEM]);
-        $data['ass'][] = $this->generator()->create_position_assignment($comp_nine->id, $pos->id);
-        $data['ass'][] = $this->generator()->create_organisation_assignment($comp_seven->id, $org->id);
-        $data['ass'][] = $this->generator()->create_cohort_assignment($comp_eight->id, $cohort->id);
+        $data['ass'][] = $assignment_generator->create_user_assignment($comp_one->id, null, ['type' => assignment::TYPE_ADMIN]);
+        $data['ass'][] = $assignment_generator->create_user_assignment($comp_three->id, null, ['type' => assignment::TYPE_ADMIN]);
+        $data['ass'][] = $assignment_generator->create_user_assignment($comp_two->id, null, ['type' => assignment::TYPE_SELF]);
+        $data['ass'][] = $assignment_generator->create_user_assignment($comp_four->id, null, ['type' => assignment::TYPE_OTHER]);
+        $data['ass'][] = $assignment_generator->create_user_assignment($comp_five->id, null, ['type' => assignment::TYPE_SYSTEM]);
+        $data['ass'][] = $assignment_generator->create_position_assignment($comp_nine->id, $pos->id);
+        $data['ass'][] = $assignment_generator->create_organisation_assignment($comp_seven->id, $org->id);
+        $data['ass'][] = $assignment_generator->create_cohort_assignment($comp_eight->id, $cohort->id);
 
         return $data;
     }
@@ -933,7 +935,7 @@ class tassign_competency_competency_service_testcase extends advanced_testcase {
         $items = [];
 
         do {
-            $items[] = $this->generator()->create_competency([], $fw->id);
+            $items[] = $this->generator()->create_competency(null, $fw->id);
 
             $i++;
         } while ($i <= $n);
@@ -943,9 +945,9 @@ class tassign_competency_competency_service_testcase extends advanced_testcase {
     /**
      * Get hierarchy specific generator
      *
-     * @return tassign_competency_generator
+     * @return totara_competency_generator
      */
     protected function generator() {
-        return $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        return $this->getDataGenerator()->get_plugin_generator('totara_competency');
     }
 }

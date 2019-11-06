@@ -46,9 +46,7 @@ class totara_competency_entity_testcase extends \advanced_testcase {
     public function test_competency_entity() {
         $data = $this->create_data();
 
-        $competency = new competency($data['competencies'][0]);
-
-        $this->assertEqualsCanonicalizing($competency->to_array(), competency::repository()->find($data['competencies'][0]->id)->to_array());
+        $this->assertEqualsCanonicalizing($data['competencies'][0]->to_array(), competency::repository()->find($data['competencies'][0]->id)->to_array());
     }
 
     public function test_it_has_related_scale() {
@@ -77,7 +75,7 @@ class totara_competency_entity_testcase extends \advanced_testcase {
         $another_framework = $this->hierarchy_generator()->create_comp_frame(['scale' => $another_scale->id]);
 
         // Let's create another competency
-        $another_competency = new competency($this->generator()->create_competency([], $another_framework->id)->id);
+        $another_competency = new competency($this->generator()->create_competency(null, $another_framework->id)->id);
 
         // Let's check that we have a framework created
         $this->assertEquals($framework_id, $framework->id);
@@ -107,11 +105,11 @@ class totara_competency_entity_testcase extends \advanced_testcase {
     /**
      * Get competency data generator
      *
-     * @return tassign_competency_generator
+     * @return totara_competency_generator
      * @throws coding_exception
      */
     public function generator() {
-        return $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        return $this->getDataGenerator()->get_plugin_generator('totara_competency');
     }
 
     /**

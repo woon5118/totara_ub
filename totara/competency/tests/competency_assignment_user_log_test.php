@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  * @category test
  */
 
@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use totara_competency\entities\competency_assignment_user_log;
 
-class tassign_competency_competency_assignment_user_log_testcase extends advanced_testcase {
+class totara_competency_assignment_user_log_testcase extends advanced_testcase {
 
     public function test_action_name() {
         $log = new competency_assignment_user_log();

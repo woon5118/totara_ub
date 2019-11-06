@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  * @category test
  */
 
@@ -26,7 +26,7 @@ use totara_assignment\user_groups;
 
 defined('MOODLE_INTERNAL') || die();
 
-class tassign_competency_generator_testcase extends advanced_testcase {
+class totara_competency_assignment_generator_testcase extends advanced_testcase {
 
     /**
      * Moodle database shortcut
@@ -38,10 +38,17 @@ class tassign_competency_generator_testcase extends advanced_testcase {
     }
 
     /**
-     * @return tassign_competency_generator
+     * @return totara_competency_assignment_generator
      */
     protected function generator() {
-        return $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        return $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
+    }
+
+    /**
+     * @return totara_competency_generator
+     */
+    protected function competency_generator() {
+        return $this->getDataGenerator()->get_plugin_generator('totara_competency');
     }
 
     protected function setUp() {
@@ -52,7 +59,7 @@ class tassign_competency_generator_testcase extends advanced_testcase {
         $this->assertEquals(0, $this->db()->count_records('totara_assignment_competencies'));
 
         $ass = $this->generator()->create_assignment([
-            'competency_id' => $this->generator()->create_competency()->id,
+            'competency_id' => $this->competency_generator()->create_competency()->id,
             'user_group_type' => user_groups::USER,
             'user_group_id' => $this->generator()->create_user()->id,
         ]);
@@ -65,7 +72,7 @@ class tassign_competency_generator_testcase extends advanced_testcase {
         $this->assertEquals(0, $this->db()->count_records('totara_assignment_competencies'));
 
         $attributes = [
-            'competency_id' => $this->generator()->create_competency()->id,
+            'competency_id' => $this->competency_generator()->create_competency()->id,
             'user_group_type' => user_groups::USER,
             'user_group_id' => $this->generator()->create_user()->id,
             'status' => 1,
@@ -139,10 +146,6 @@ class tassign_competency_generator_testcase extends advanced_testcase {
         $this->assertEquals(2, $this->db()->count_records('totara_assignment_competencies'));
 
         $this->assertEquals(user_groups::COHORT, $record->user_group_type);
-    }
-
-    public function test_it_returns_hierarchy_generator() {
-        $this->assertInstanceOf(totara_hierarchy_generator::class, $this->generator()->hierarchy_generator());
     }
 
 }

@@ -32,7 +32,7 @@ use totara_core\basket\session_basket;
 
 defined('MOODLE_INTERNAL') || die();
 
-class tassign_competency_assignment_service_create_testcase extends advanced_testcase {
+class totara_competency_assignment_service_create_testcase extends advanced_testcase {
 
     use \totara_core\phpunit\webservice_utils;
 
@@ -209,7 +209,7 @@ class tassign_competency_assignment_service_create_testcase extends advanced_tes
         $basket = new session_basket('comp_basket');
         $basket->add([$data['competency']->id]);
 
-        $user = $this->generator()->create_user();
+        $user = $this->getDataGenerator()->create_user();
         $data['user_groups'][user_groups::USER][] = $user->id;
 
         $res = $this->call_webservice_api('tassign_competency_assignment_create', [
@@ -285,8 +285,8 @@ class tassign_competency_assignment_service_create_testcase extends advanced_tes
      * @return array
      */
     protected function generate_data() {
-        $user = $this->generator()->create_user();
-        $cohort = $this->generator()->create_cohort();
+        $user = $this->getDataGenerator()->create_user();
+        $cohort = $this->getDataGenerator()->create_cohort();
 
         $fw = new competency_framework([
             'sortorder' => 1,

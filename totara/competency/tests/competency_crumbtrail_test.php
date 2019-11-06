@@ -18,13 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  * @category test
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-class tassign_competency_competency_crumbtrail_testcase extends advanced_testcase {
+class totara_competency_crumbtrail_testcase extends advanced_testcase {
 
     /**
      * @var moodle_database

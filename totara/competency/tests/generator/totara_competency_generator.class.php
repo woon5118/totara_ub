@@ -46,6 +46,8 @@ require_once($CFG->dirroot . '/totara/competency/tests/fixtures/test_pathway.php
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once(__DIR__ . '/totara_competency_assignment_generator.php');
+
 /**
  * Pathway generator.
  *
@@ -53,6 +55,11 @@ defined('MOODLE_INTERNAL') || die();
  *    $generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
  */
 class totara_competency_generator extends component_generator_base {
+
+    /**
+     * @var totara_competency_assignment_generator
+     */
+    protected $assignment_generator;
 
     /**************************************************************************
      * Basic competency creation
@@ -106,6 +113,7 @@ class totara_competency_generator extends component_generator_base {
         if (isset($scale)) {
             $framework_data['scale'] = $scale->id;
         } else {
+            // This is a controversial idea
             $framework_data['scale'] = $this->create_scale()->id;
         }
 
@@ -392,6 +400,19 @@ class totara_competency_generator extends component_generator_base {
         return new test_aggregation();
     }
 
+    /**
+     * Get an instance of assignment specific generator
+     *
+     * @return totara_competency_assignment_generator
+     */
+    public function assignment_generator() {
+        if (is_null($this->assignment_generator)) {
+            $this->assignment_generator = new totara_competency_assignment_generator($this);
+        }
+
+        return $this->assignment_generator;
+    }
+
 
     /**************************************************************************
      * Internal Helpers
@@ -402,7 +423,7 @@ class totara_competency_generator extends component_generator_base {
      *
      * @return totara_hierarchy_generator|component_generator_base
      */
-    private function hierarchy_generator(): totara_hierarchy_generator {
+    public function hierarchy_generator(): totara_hierarchy_generator {
         return $this->datagenerator->get_plugin_generator('totara_hierarchy');
     }
 

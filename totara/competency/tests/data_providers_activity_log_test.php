@@ -54,8 +54,8 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
         $compfw = $totara_hierarchy_generator->create_comp_frame([]);
         $comp = $totara_hierarchy_generator->create_comp(['frameworkid' => $compfw->id]);
 
-        /** @var tassign_competency_generator $assignment_generator */
-        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        /** @var totara_competency_assignment_generator $assignment_generator */
+        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
         $assignment = $assignment_generator->create_user_assignment($comp->id, $user->id);
 
         $model = new assignment_actions();
@@ -198,8 +198,8 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
         /** @var scale_value $great */
         $great = scale_value::repository()->where('name', '=', 'Great')->one();
 
-        /** @var tassign_competency_generator $assignment_generator */
-        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        /** @var totara_competency_assignment_generator $assignment_generator */
+        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
         $assignment = $assignment_generator->create_user_assignment($comp->id, $user->id);
 
         $model = new assignment_actions();
@@ -294,8 +294,8 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
         /** @var scale_value $good */
         $good = scale_value::repository()->where('name', '=', 'Good')->one();
 
-        /** @var tassign_competency_generator $assignment_generator */
-        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        /** @var totara_competency_assignment_generator $assignment_generator */
+        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
         $assignment = $assignment_generator->create_cohort_assignment($comp->id, $cohort->id);
         $other_competency_assignment = $assignment_generator->create_user_assignment($other_comp->id, $user->id);
 
@@ -447,8 +447,8 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
         (new expand_task($DB))->expand_all();
         $this->assertEmpty(data_providers\activity_log::create($user->id, $competency->id)->fetch());
 
-        /** @var tassign_competency_generator $assignment_generator */
-        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        /** @var totara_competency_assignment_generator $assignment_generator */
+        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
         $user_assignment = $assignment_generator->create_user_assignment($competency->id, $user->id);
         (new assignment_actions())->activate([$user_assignment->id, $competency->id]);
         (new expand_task($DB))->expand_all();
@@ -499,13 +499,12 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
      * but only if there is a previous non-null rating that has been achieved.
      */
     public function test_scale_value_none() {
-
-        /** @var tassign_competency_generator $assignment_generator */
-        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        /** @var totara_competency_generator $hierarchy_generator */
+        $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
         $user = $this->getDataGenerator()->create_user();
-        $competency = $assignment_generator->create_competency();
-        $assignment = $assignment_generator->create_assignment([
+        $competency = $competency_generator->create_competency();
+        $assignment = $competency_generator->assignment_generator()->create_assignment([
             'user_group_type' => 'user',
             'user_group_id' => $user->id,
             'competency_id' => $competency->id,

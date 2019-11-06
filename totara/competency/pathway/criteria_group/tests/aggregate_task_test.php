@@ -30,7 +30,7 @@ class pathway_criteria_group_aggregate_task_testcase extends advanced_testcase {
         global $DB;
 
         /** @var tassign_competency_generator $assignment_generator */
-        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
 
         $assignment_ids = [];
         foreach ($users as $user) {

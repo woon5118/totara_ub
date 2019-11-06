@@ -4174,10 +4174,10 @@ function hierarchy_generator() {
 /**
  * Get Assignment specific generator
  *
- * @return tassign_competency_generator|component_generator_base
+ * @return totara_competency_assignment_generator|component_generator_base
  */
 function assignment_generator() {
-    return generator()->get_plugin_generator('tassign_competency');
+    return generator()->get_plugin_generator('totara_competency')->assignment_generator();
 }
 
 /**

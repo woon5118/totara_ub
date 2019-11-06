@@ -66,24 +66,22 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
 
     public function test_only_competencies_with_self_assign_setting_are_returned() {
         $generator = $this->getDataGenerator();
-        /** @var tassign_competency_generator $assign_generator */
-        $assign_generator = $generator->get_plugin_generator('tassign_competency');
 
-        $fw = $assign_generator->hierarchy_generator()->create_comp_frame([]);
+        $fw = $this->generator()->hierarchy_generator()->create_comp_frame([]);
 
-        $comp1 = $assign_generator->create_competency([
+        $comp1 = $this->generator()->create_competency(null, $fw->id, [
             'shortname' => 'c-chef',
             'fullname' => 'Chef proficiency',
             'description' => 'Bossing around',
             'idnumber' => 'cook-chef-c',
-        ], $fw->id);
+        ]);
 
-        $comp2 = $assign_generator->create_competency([
+        $comp2 = $this->generator()->create_competency(null, $fw->id, [
             'shortname' => 'c-chef',
             'fullname' => 'Chef proficiency',
             'description' => 'Bossing around',
             'idnumber' => 'cook-chef-c',
-        ], $fw->id);
+        ]);
 
         $user1 = $generator->create_user();
 
@@ -149,24 +147,22 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
 
     public function test_only_competencies_with_other_assign_setting_are_returned() {
         $generator = $this->getDataGenerator();
-        /** @var tassign_competency_generator $assign_generator */
-        $assign_generator = $generator->get_plugin_generator('tassign_competency');
 
-        $fw = $assign_generator->hierarchy_generator()->create_comp_frame([]);
+        $fw = $this->generator()->hierarchy_generator()->create_comp_frame([]);
 
-        $comp1 = $assign_generator->create_competency([
+        $comp1 = $this->generator()->create_competency(null, $fw->id, [
             'shortname' => 'comp1',
             'fullname' => 'Competency 1',
             'description' => 'Competency 1 description',
             'idnumber' => 'comp1',
-        ], $fw->id);
+        ]);
 
-        $comp2 = $assign_generator->create_competency([
+        $comp2 = $this->generator()->create_competency(null, $fw->id, [
             'shortname' => 'comp2',
             'fullname' => 'Competency 2',
             'description' => 'Competency 2 description',
             'idnumber' => 'comp2',
-        ], $fw->id);
+        ]);
 
         $user1 = $generator->create_user();
         $user2 = $generator->create_user();
@@ -228,7 +224,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
     }
 
     public function test_competencies_able_assign_by_self_are_loaded() {
-        $user1 = $this->generator()->create_user();
+        $user1 = $this->getDataGenerator()->create_user();
 
         ['comps' => $comps] = $this->generate_competencies($user1->id);
 
@@ -266,8 +262,8 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
     }
 
     public function test_competencies_able_to_assign_by_others_are_loaded() {
-        $user1 = $this->generator()->create_user();
-        $user2 = $this->generator()->create_user();
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
 
         // User is now managing another user and can assign competencies for them
         $manager_job = job_assignment::create(['userid' => $user2->id, 'idnumber' => 1]);
@@ -311,7 +307,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
     public function test_result_gets_ordered_by_name_by_default() {
         $this->generate_competencies();
 
-        $user1 = $this->generator()->create_user();
+        $user1 = $this->getDataGenerator()->create_user();
 
         $this->setUser($user1);
 
@@ -340,7 +336,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
     public function test_result_gets_ordered_by_fullname() {
         $this->generate_competencies();
 
-        $user1 = $this->generator()->create_user();
+        $user1 = $this->getDataGenerator()->create_user();
 
         $this->setUser($user1);
 
@@ -408,7 +404,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
     public function test_can_be_filtered_by_text() {
         $this->generate_competencies();
 
-        $user1 = $this->generator()->create_user();
+        $user1 = $this->getDataGenerator()->create_user();
 
         $this->setUser($user1);
 
@@ -445,7 +441,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
     public function test_can_be_filtered_by_framework() {
         [, $fws] = array_values($this->generate_competencies());
 
-        $user1 = $this->generator()->create_user();
+        $user1 = $this->getDataGenerator()->create_user();
 
         $this->setUser($user1);
 
@@ -472,7 +468,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
     public function test_can_be_filtered_by_path() {
         ['comps' => $comp] = $this->generate_competencies();
 
-        $user1 = $this->generator()->create_user();
+        $user1 = $this->getDataGenerator()->create_user();
 
         $this->setUser($user1);
 
@@ -500,7 +496,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
     public function test_can_be_filtered_by_parent() {
         [$comp] = array_values($this->generate_competencies());
 
-        $user1 = $this->generator()->create_user();
+        $user1 = $this->getDataGenerator()->create_user();
 
         $this->setUser($user1);
 
@@ -525,7 +521,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
     }
 
     public function test_can_be_filtered_by_status() {
-        $user1 = $this->generator()->create_user();
+        $user1 = $this->getDataGenerator()->create_user();
 
         ['fws' => $fws] = $this->generate_competencies($user1->id);
 
@@ -594,8 +590,8 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
     }
 
     public function test_can_be_filtered_by_assignment_type_but_returns_empty_result() {
-        $user1 = $this->generator()->create_user();
-        $user2 = $this->generator()->create_user();
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
 
         // Only create assignments for user 1
         $this->generate_competencies($user1->id);
@@ -639,7 +635,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
     }
 
     public function test_can_be_filtered_by_assignment_type() {
-        $user1 = $this->generator()->create_user();
+        $user1 = $this->getDataGenerator()->create_user();
 
         $this->generate_competencies($user1->id);
 
@@ -815,7 +811,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
     public function test_can_be_filtered_by_competency_type() {
         $data = $this->generate_competencies();
 
-        $user1 = $this->generator()->create_user();
+        $user1 = $this->getDataGenerator()->create_user();
 
         $this->setUser($user1);
 
@@ -1012,17 +1008,20 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $fw = $hierarchy_generator->create_org_frame(['fullname' => 'Framework 3']);
         $org = $hierarchy_generator->create_org(['frameworkid' => $fw->id, 'fullname' => 'Organisation 1']);
 
-        $cohort = $this->generator()->create_cohort();
+
+        $assignment_generator = $this->generator()->assignment_generator();
+
+        $cohort = $assignment_generator->create_cohort();
 
         // Create an assignment for a competency
-        $data['ass'][] = $this->generator()->create_user_assignment($comp_one->id, $user_id, ['status' => assignment::STATUS_ACTIVE, 'type' => assignment::TYPE_ADMIN]);
-        $data['ass'][] = $this->generator()->create_user_assignment($comp_three->id, $user_id, ['status' => assignment::STATUS_ACTIVE, 'type' => assignment::TYPE_ADMIN]);
-        $data['ass'][] = $this->generator()->create_user_assignment($comp_two->id, $user_id, ['status' => assignment::STATUS_ACTIVE, 'type' => assignment::TYPE_SELF]);
-        $data['ass'][] = $this->generator()->create_user_assignment($comp_four->id, $user_id, ['status' => assignment::STATUS_ACTIVE, 'type' => assignment::TYPE_OTHER]);
-        $data['ass'][] = $this->generator()->create_user_assignment($comp_five->id, $user_id, ['status' => assignment::STATUS_ACTIVE, 'type' => assignment::TYPE_SYSTEM]);
-        $data['ass'][] = $this->generator()->create_position_assignment($comp_nine->id, $pos->id, ['status' => assignment::STATUS_ACTIVE]);
-        $data['ass'][] = $this->generator()->create_organisation_assignment($comp_seven->id, $org->id, ['status' => assignment::STATUS_ACTIVE]);
-        $data['ass'][] = $this->generator()->create_cohort_assignment($comp_eight->id, $cohort->id, ['status' => assignment::STATUS_ACTIVE]);
+        $data['ass'][] = $assignment_generator->create_user_assignment($comp_one->id, $user_id, ['status' => assignment::STATUS_ACTIVE, 'type' => assignment::TYPE_ADMIN]);
+        $data['ass'][] = $assignment_generator->create_user_assignment($comp_three->id, $user_id, ['status' => assignment::STATUS_ACTIVE, 'type' => assignment::TYPE_ADMIN]);
+        $data['ass'][] = $assignment_generator->create_user_assignment($comp_two->id, $user_id, ['status' => assignment::STATUS_ACTIVE, 'type' => assignment::TYPE_SELF]);
+        $data['ass'][] = $assignment_generator->create_user_assignment($comp_four->id, $user_id, ['status' => assignment::STATUS_ACTIVE, 'type' => assignment::TYPE_OTHER]);
+        $data['ass'][] = $assignment_generator->create_user_assignment($comp_five->id, $user_id, ['status' => assignment::STATUS_ACTIVE, 'type' => assignment::TYPE_SYSTEM]);
+        $data['ass'][] = $assignment_generator->create_position_assignment($comp_nine->id, $pos->id, ['status' => assignment::STATUS_ACTIVE]);
+        $data['ass'][] = $assignment_generator->create_organisation_assignment($comp_seven->id, $org->id, ['status' => assignment::STATUS_ACTIVE]);
+        $data['ass'][] = $assignment_generator->create_cohort_assignment($comp_eight->id, $cohort->id, ['status' => assignment::STATUS_ACTIVE]);
 
         if ($user_id) {
             job_assignment::create([
@@ -1046,9 +1045,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
     private function create_self_assignable_competency(array $data, int $framework_id) {
         global $DB;
 
-        /** @var tassign_competency_generator $assign_generator */
-        $assign_generator = $this->getDataGenerator()->get_plugin_generator('tassign_competency');
-        $comp = $assign_generator->create_competency($data, $framework_id);
+        $comp = $this->generator()->create_competency(null, $framework_id, $data);
 
         $DB->insert_record(
             'comp_assign_availability',
@@ -1083,10 +1080,10 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
     /**
      * Get hierarchy specific generator
      *
-     * @return tassign_competency_generator
+     * @return totara_competency_generator
      */
     protected function generator() {
-        return $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        return $this->getDataGenerator()->get_plugin_generator('totara_competency');
     }
 
     private function expand() {

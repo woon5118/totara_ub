@@ -30,7 +30,7 @@ use totara_assignment\user_groups;
 
 defined('MOODLE_INTERNAL') || die();
 
-class tassign_competency_user_group_deleted_testcase extends advanced_testcase {
+class totara_competency_user_group_deleted_testcase extends advanced_testcase {
 
     public function test_it_deletes_user_assignments_tracking_enabled() {
         [
@@ -306,14 +306,14 @@ class tassign_competency_user_group_deleted_testcase extends advanced_testcase {
 
         // We need to create a user group
         $cohorts = [
-            $this->generator()->create_cohort_and_add_members($users[0]),
-            $this->generator()->create_cohort_and_add_members($users[1]),
+            $this->generator()->assignment_generator()->create_cohort_and_add_members($users[0]),
+            $this->generator()->assignment_generator()->create_cohort_and_add_members($users[1]),
         ];
 
         // We need to create an assignment
         $assignments = [
-            $this->generator()->create_cohort_assignment($comps[0]->id, $cohorts[0]->id, ['status' => 1]),
-            $this->generator()->create_cohort_assignment($comps[0]->id, $cohorts[1]->id, ['status' => 1]),
+            $this->generator()->assignment_generator()->create_cohort_assignment($comps[0]->id, $cohorts[0]->id, ['status' => 1]),
+            $this->generator()->assignment_generator()->create_cohort_assignment($comps[0]->id, $cohorts[1]->id, ['status' => 1]),
         ];
 
         return [
@@ -329,14 +329,14 @@ class tassign_competency_user_group_deleted_testcase extends advanced_testcase {
 
         // We need to create a user group
         $positions = [
-            $this->generator()->create_position_and_add_members($users[0]),
-            $this->generator()->create_position_and_add_members($users[1]),
+            $this->generator()->assignment_generator()->create_position_and_add_members($users[0]),
+            $this->generator()->assignment_generator()->create_position_and_add_members($users[1]),
         ];
 
         // We need to create an assignment
         $assignments = [
-            $this->generator()->create_position_assignment($comps[0]->id, $positions[0]->id, ['status' => 1]),
-            $this->generator()->create_position_assignment($comps[0]->id, $positions[1]->id, ['status' => 1]),
+            $this->generator()->assignment_generator()->create_position_assignment($comps[0]->id, $positions[0]->id, ['status' => 1]),
+            $this->generator()->assignment_generator()->create_position_assignment($comps[0]->id, $positions[1]->id, ['status' => 1]),
         ];
 
         return [
@@ -352,14 +352,14 @@ class tassign_competency_user_group_deleted_testcase extends advanced_testcase {
 
         // We need to create a user group
         $organisations = [
-            $this->generator()->create_organisation_and_add_members($users[0]),
-            $this->generator()->create_organisation_and_add_members($users[1]),
+            $this->generator()->assignment_generator()->create_organisation_and_add_members($users[0]),
+            $this->generator()->assignment_generator()->create_organisation_and_add_members($users[1]),
         ];
 
         // We need to create an assignment
         $assignments = [
-            $this->generator()->create_organisation_assignment($comps[0]->id, $organisations[0]->id, ['status' => 1]),
-            $this->generator()->create_organisation_assignment($comps[0]->id, $organisations[1]->id, ['status' => 1]),
+            $this->generator()->assignment_generator()->create_organisation_assignment($comps[0]->id, $organisations[0]->id, ['status' => 1]),
+            $this->generator()->assignment_generator()->create_organisation_assignment($comps[0]->id, $organisations[1]->id, ['status' => 1]),
         ];
 
         return [
@@ -375,8 +375,8 @@ class tassign_competency_user_group_deleted_testcase extends advanced_testcase {
 
         // We need to create an assignment
         $assignments = [
-            $this->generator()->create_user_assignment($comps[0]->id, $users[0]->id, ['status' => 1]),
-            $this->generator()->create_user_assignment($comps[0]->id, $users[1]->id, ['status' => 1]),
+            $this->generator()->assignment_generator()->create_user_assignment($comps[0]->id, $users[0]->id, ['status' => 1]),
+            $this->generator()->assignment_generator()->create_user_assignment($comps[0]->id, $users[1]->id, ['status' => 1]),
         ];
 
         return [
@@ -391,8 +391,8 @@ class tassign_competency_user_group_deleted_testcase extends advanced_testcase {
         $comps = $this->generate_competencies();
         // We need to create a user
         $users = [
-            $this->generator()->create_user(),
-            $this->generator()->create_user(),
+            $this->generator()->assignment_generator()->create_user(),
+            $this->generator()->assignment_generator()->create_user(),
         ];
 
         return [
@@ -410,22 +410,22 @@ class tassign_competency_user_group_deleted_testcase extends advanced_testcase {
         $fw = $this->generator()->hierarchy_generator()->create_comp_frame([]);
         $type = $this->generator()->hierarchy_generator()->create_comp_type(['idnumber' => 'type1']);
 
-        $comps[] = $comp_one = $this->generator()->create_competency([
+        $comps[] = $comp_one = $this->generator()->create_competency(null, $fw->id, [
             'shortname' => 'acc',
             'fullname' => 'Accounting',
             'description' => 'Counting profits',
             'idnumber' => 'accc',
             'typeid' => $type,
-        ], $fw->id);
+        ]);
 
-        $comps[] = $comp_two = $this->generator()->create_competency([
+        $comps[] = $comp_two = $this->generator()->create_competency(null, $fw->id, [
             'shortname' => 'c-chef',
             'fullname' => 'Chef proficiency',
             'description' => 'Bossing around',
             'idnumber' => 'cook-chef-c',
             'typeid' => $type,
             'parentid' => $comp_one->id,
-        ], $fw->id);
+        ]);
 
         return $comps;
     }
@@ -433,10 +433,10 @@ class tassign_competency_user_group_deleted_testcase extends advanced_testcase {
     /**
      * Get hierarchy specific generator
      *
-     * @return tassign_competency_generator
+     * @return totara_competency_generator
      */
     protected function generator() {
-        return $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        return $this->getDataGenerator()->get_plugin_generator('totara_competency');
     }
 
     /**

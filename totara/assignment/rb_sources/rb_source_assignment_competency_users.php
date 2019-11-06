@@ -928,61 +928,62 @@ class rb_source_assignment_competency_users extends rb_base_source {
 
         require_once($CFG->libdir . '/phpunit/classes/util.php');
         $data_generator = phpunit_util::get_data_generator();
-        /** @var tassign_competency_generator $assignment_generator */
-        $assignment_generator = $data_generator->get_plugin_generator('tassign_competency');
 
-        $user1 = $assignment_generator->create_user();
-        $user2 = $assignment_generator->create_user();
+        /** @var totara_competency_generator $competency_generator */
+        $competency_generator = $data_generator->get_plugin_generator('totara_competency');
 
-        $fw = $assignment_generator->hierarchy_generator()->create_comp_frame([]);
-        $fw2 = $assignment_generator->hierarchy_generator()->create_comp_frame([]);
+        $user1 = $data_generator->create_user();
+        $user2 = $data_generator->create_user();
 
-        $type1 = $assignment_generator->hierarchy_generator()->create_comp_type(['idnumber' => 'type1']);
-        $type2 = $assignment_generator->hierarchy_generator()->create_comp_type(['idnumber' => 'type2']);
+        $fw = $competency_generator->hierarchy_generator()->create_comp_frame([]);
+        $fw2 = $competency_generator->hierarchy_generator()->create_comp_frame([]);
 
-        $comp1 = $assignment_generator->create_competency([
+        $type1 = $competency_generator->hierarchy_generator()->create_comp_type(['idnumber' => 'type1']);
+        $type2 = $competency_generator->hierarchy_generator()->create_comp_type(['idnumber' => 'type2']);
+
+        $comp1 = $competency_generator->create_competency(null, $fw->id, [
             'shortname' => 'acc',
             'fullname' => 'Accounting',
             'description' => 'Counting profits',
             'idnumber' => 'accc',
             'typeid' => $type1,
-        ], $fw->id);
+        ]);
 
-        $comp2 = $assignment_generator->create_competency([
+        $comp2 = $competency_generator->create_competency(null, $fw2->id, [
             'shortname' => 'c-chef',
             'fullname' => 'Chef proficiency',
             'description' => 'Bossing around',
             'idnumber' => 'cook-chef-c',
             'typeid' => $type1,
-        ], $fw2->id);
+        ]);
 
-        $comp3 = $assignment_generator->create_competency([
+        $comp3 = $competency_generator->create_competency(null, $fw->id, [
             'shortname' => 'des',
             'fullname' => 'Designing interiors',
             'description' => 'Decorating things',
             'idnumber' => 'des',
             'parentid' => $comp1->id,
             'typeid' => $type2,
-        ], $fw->id);
+        ]);
 
-        $comp4 = $assignment_generator->create_competency([
+        $comp4 = $competency_generator->create_competency(null, $fw2->id, [
             'shortname' => 'c-baker',
             'fullname' => 'Baking skill-set',
             'description' => 'Baking amazing things',
             'idnumber' => 'cook-baker',
             'typeid' => $type2,
-        ], $fw2->id);
+        ]);
 
-        $comp5 = $assignment_generator->create_competency([
+        $comp5 = $competency_generator->create_competency(null, $fw->id, [
             'shortname' => 'c-cook',
             'fullname' => 'Cooking',
             'description' => 'More cooking',
             'idnumber' => 'cook',
             'parentid' => $comp3->id,
             'typeid' => $type2,
-        ], $fw->id);
+        ]);
 
-        $comp6 = $assignment_generator->create_competency([
+        $comp6 = $competency_generator->create_competency(null, $fw2->id, [
             'shortname' => 'c-inv',
             'fullname' => 'Invisible',
             'description' => 'More hidden cooking',
@@ -990,11 +991,11 @@ class rb_source_assignment_competency_users extends rb_base_source {
             'visible' => false,
             'parentid' => $comp1->id,
             'typeid' => $type2,
-        ], $fw2->id);
+        ]);
 
         // Create an assignment for a competency
-        $assignment_generator->create_user_assignment($comp1->id, $user1->id, ['status' => assignment::STATUS_ACTIVE]);
-        $assignment_generator->create_user_assignment($comp3->id, $user2->id, ['status' => assignment::STATUS_ACTIVE]);
+        $competency_generator->assignment_generator()->create_user_assignment($comp1->id, $user1->id, ['status' => assignment::STATUS_ACTIVE]);
+        $competency_generator->assignment_generator()->create_user_assignment($comp3->id, $user2->id, ['status' => assignment::STATUS_ACTIVE]);
 
         (new \tassign_competency\expand_task($DB))->expand_all();
     }

@@ -132,10 +132,10 @@ class totara_competency_webapi_resolver_query_self_assignable_competencies_testc
     /**
      * Get hierarchy specific generator
      *
-     * @return tassign_competency_generator|component_generator_base
+     * @return totara_competency_assignment_generator|component_generator_base
      */
     protected function generator() {
-        return $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        return $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
     }
 
 }

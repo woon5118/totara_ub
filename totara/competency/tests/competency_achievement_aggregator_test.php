@@ -32,11 +32,11 @@ use totara_competency\pathway_aggregator;
 use totara_competency\entities\competency_achievement;
 
 /**
- * Class totara_competency_competency_achievement_aggregator_testcase
+ * Class totara_competency_achievement_aggregator_testcase
  *
  * Tests behaviour of the competency_achievement_aggregator class.
  */
-class totara_competency_competency_achievement_aggregator_testcase extends advanced_testcase {
+class totara_competency_achievement_aggregator_testcase extends advanced_testcase {
 
     /**
      * @param pathway_achievement[] $pathway_achievements
@@ -65,8 +65,8 @@ class totara_competency_competency_achievement_aggregator_testcase extends advan
     private function generate_active_expanded_user_assignments($competency, $users, $assignments_per_user = 1) {
         global $DB;
 
-        /** @var tassign_competency_generator $assignment_generator */
-        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        /** @var totara_competency_assignment_generator $assignment_generator */
+        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
 
         $assignment_ids = [];
         foreach ($users as $user) {

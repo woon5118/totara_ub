@@ -33,8 +33,8 @@ global $DB;
 
 $USER = get_admin();
 
-/** @var tassign_competency_generator $gen */
-$gen = phpunit_util::get_data_generator()->get_plugin_generator('tassign_competency');
+/** @var totara_competency_generator $gen */
+$gen = phpunit_util::get_data_generator()->get_plugin_generator('totara_competency');
 
 if (!file_exists(totara::config()->dirroot . '/vendor/fzaninotto/faker/src/autoload.php')) {
     echo "In order to execute this script you need to execute: 'composer require fzaninotto/faker'!\n";
@@ -93,7 +93,7 @@ switch (strtolower($what)) {
 
         totara::transaction(function () use ($gen, $how_many, $faker) {
             for ($i = 1; $i <= $how_many; $i++) {
-                $gen->create_cohort(['name' => $faker->realText(100)]);
+                $gen->assignment_generator()->create_cohort(['name' => $faker->realText(100)]);
             }
         });
 
@@ -105,7 +105,7 @@ switch (strtolower($what)) {
 
         totara::transaction(function () use ($gen, $how_many) {
             for ($i = 1; $i <= $how_many; $i++) {
-                $gen->create_user();
+                $gen->assignment_generator()->create_user();
             }
         });
 
@@ -310,7 +310,7 @@ function create_competencies(Generator $faker, $framework, $parent, $max_count, 
 }
 
 
-function create_pos_framework(Generator $faker, tassign_competency_generator $gen = null, $data = []) {
+function create_pos_framework(Generator $faker, totara_competency_generator $gen = null, $data = []) {
 
     $data = array_merge([
         'fullname' => $faker->realText(100),
@@ -324,18 +324,18 @@ function create_pos_framework(Generator $faker, tassign_competency_generator $ge
     return $gen->hierarchy_generator()->create_pos_frame($data);
 }
 
-function create_position(Generator $faker, tassign_competency_generator $gen, $parent = 0, $framework = null, $data = []) {
+function create_position(Generator $faker, totara_competency_generator $gen, $parent = 0, $framework = null, $data = []) {
 
     $framework = $framework->id ?? $framework ?? create_pos_framework($faker, $gen)->id;
 
-    return $gen->create_position(array_merge([
+    return $gen->assignment_generator()->create_position(array_merge([
         'fullname' => $faker->realText(100),
         'description' => $faker->realText(400),
         'parentid' => $parent,
     ], $data), $framework);
 }
 
-function create_positions(Generator $faker, tassign_competency_generator $gen, $framework, $parent, $max_count, $depth) {
+function create_positions(Generator $faker, totara_competency_generator $gen, $framework, $parent, $max_count, $depth) {
 
     if ($depth < 1) {
         return [];
@@ -358,7 +358,7 @@ function create_positions(Generator $faker, tassign_competency_generator $gen, $
     return $items;
 }
 
-function create_org_framework(Generator $faker, tassign_competency_generator $gen = null, $data = []) {
+function create_org_framework(Generator $faker, totara_competency_generator $gen = null, $data = []) {
 
     $data = array_merge([
         'fullname' => $faker->realText(100),
@@ -372,18 +372,18 @@ function create_org_framework(Generator $faker, tassign_competency_generator $ge
     return $gen->hierarchy_generator()->create_org_frame($data);
 }
 
-function create_organisation(Generator $faker, tassign_competency_generator $gen, $parent = 0, $framework = null, $data = []) {
+function create_organisation(Generator $faker, totara_competency_generator $gen, $parent = 0, $framework = null, $data = []) {
 
     $framework = $framework->id ?? $framework ?? create_org_framework($faker, $gen)->id;
 
-    return $gen->create_organisation(array_merge([
+    return $gen->assignment_generator()->create_organisation(array_merge([
         'fullname' => $faker->realText(100),
         'description' => $faker->realText(400),
         'parentid' => $parent,
     ], $data), $framework);
 }
 
-function create_organisations(Generator $faker, tassign_competency_generator $gen, $framework, $parent, $max_count, $depth) {
+function create_organisations(Generator $faker, totara_competency_generator $gen, $framework, $parent, $max_count, $depth) {
 
     if ($depth < 1) {
         return [];

@@ -56,8 +56,8 @@ class task_competency_achievement_aggregation_testcase extends advanced_testcase
     private function generate_active_expanded_user_assignments($competency, $users) {
         global $DB;
 
-        /** @var tassign_competency_generator $assignment_generator */
-        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        /** @var totara_competency_assignment_generator $assignment_generator */
+        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
 
         $assignment_ids = [];
         foreach ($users as $user) {

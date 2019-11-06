@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
 use tassign_competency\models\assignment_actions;
@@ -26,7 +26,23 @@ use totara_competency\entities\assignment;
 use totara_assignment\user_groups;
 use totara_job\job_assignment;
 
-class tassign_competency_generator extends component_generator_base {
+require_once(__DIR__ . '/totara_competency_generator.class.php');
+
+class totara_competency_assignment_generator {
+
+    /**
+     * @var totara_competency_generator
+     */
+    protected $generator;
+
+    /**
+     * totara_competency_assignment_generator constructor.
+     *
+     * @param totara_competency_generator $generator
+     */
+    public function __construct(totara_competency_generator $generator) {
+        $this->generator = $generator;
+    }
 
     /**
      * Create a competency assignment for an organisation
@@ -42,7 +58,7 @@ class tassign_competency_generator extends component_generator_base {
         }
 
         if (is_null($competency_id)) {
-            $competency_id = $this->create_competency()->id;
+            $competency_id = $this->generator->create_competency()->id;
         }
 
         $attributes['competency_id'] = $competency_id;
@@ -66,7 +82,7 @@ class tassign_competency_generator extends component_generator_base {
         }
 
         if (is_null($competency_id)) {
-            $competency_id = $this->create_competency()->id;
+            $competency_id = $this->generator->create_competency()->id;
         }
 
         $attributes['competency_id'] = $competency_id;
@@ -90,7 +106,7 @@ class tassign_competency_generator extends component_generator_base {
         }
 
         if (is_null($competency_id)) {
-            $competency_id = $this->create_competency()->id;
+            $competency_id = $this->generator->create_competency()->id;
         }
 
         $attributes['competency_id'] = $competency_id;
@@ -126,7 +142,7 @@ class tassign_competency_generator extends component_generator_base {
         }
 
         if (is_null($competency_id)) {
-            $competency_id = $this->create_competency()->id;
+            $competency_id = $this->generator->create_competency()->id;
         }
 
         $attributes['competency_id'] = $competency_id;
@@ -200,7 +216,7 @@ class tassign_competency_generator extends component_generator_base {
      * @return stdClass
      */
     public function create_cohort(array $attributes = []) {
-        return $this->datagenerator->create_cohort($attributes);
+        return $this->data_generator()->create_cohort($attributes);
     }
 
     /**
@@ -211,7 +227,7 @@ class tassign_competency_generator extends component_generator_base {
      * @return stdClass
      */
     public function create_cohort_and_add_members($members, array $attributes = []) {
-        $cohort = $this->datagenerator->create_cohort($attributes);
+        $cohort = $this->data_generator()->create_cohort($attributes);
 
         if (!is_array($members)) {
             $members = [$members];
@@ -231,7 +247,7 @@ class tassign_competency_generator extends component_generator_base {
      * @return stdClass
      */
     public function create_user(array $attributes = []) {
-        return $this->datagenerator->create_user($attributes);
+        return $this->data_generator()->create_user($attributes);
     }
 
     /**
@@ -247,10 +263,10 @@ class tassign_competency_generator extends component_generator_base {
         }
 
         if (empty($attributes['frameworkid'])) {
-            $attributes['frameworkid'] = $this->hierarchy_generator()->create_org_frame([])->id;
+            $attributes['frameworkid'] = $this->generator->hierarchy_generator()->create_org_frame([])->id;
         }
 
-        return $this->hierarchy_generator()->create_org($attributes);
+        return $this->generator->hierarchy_generator()->create_org($attributes);
     }
 
     /**
@@ -324,37 +340,10 @@ class tassign_competency_generator extends component_generator_base {
         }
 
         if (empty($attributes['frameworkid'])) {
-            $attributes['frameworkid'] = $this->hierarchy_generator()->create_pos_frame([])->id;
+            $attributes['frameworkid'] = $this->generator->hierarchy_generator()->create_pos_frame([])->id;
         }
 
-        return $this->hierarchy_generator()->create_pos($attributes);
-    }
-    /**
-     * Create a competency and a corresponding framework if needed
-     *
-     * @param array $attributes Record attributes
-     * @param int|null $framework_id Framework ID, creates new if not supplied
-     * @return stdClass
-     */
-    public function create_competency(array $attributes = [], ?int $framework_id = null) {
-        if (!empty($framework_id)) {
-            $attributes['frameworkid'] = $framework_id;
-        }
-
-        if (empty($attributes['frameworkid'])) {
-            $attributes['frameworkid'] = $this->hierarchy_generator()->create_comp_frame([])->id;
-        }
-
-        return $this->hierarchy_generator()->create_comp($attributes);
-    }
-
-    /**
-     * Hierarchy generator shortcut
-     *
-     * @return totara_hierarchy_generator
-     */
-    public function hierarchy_generator() {
-        return $this->datagenerator->get_plugin_generator('totara_hierarchy');
+        return $this->generator->hierarchy_generator()->create_pos($attributes);
     }
 
     /**
@@ -377,6 +366,15 @@ class tassign_competency_generator extends component_generator_base {
         global $USER;
 
         return $USER->id ?: $fallback;
+    }
+
+    /**
+     * Get basic testing data generator
+     *
+     * @return testing_data_generator
+     */
+    protected function data_generator() {
+        return phpunit_util::get_data_generator();
     }
 
 }

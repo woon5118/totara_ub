@@ -36,7 +36,7 @@ use totara_criteria\entities\criterion as criterion_entity;
 /**
  * Tests covering the competency observer making sure the events do the right thing
  */
-class totara_competency_competency_observer_testcase extends advanced_testcase {
+class totara_competency_observer_testcase extends advanced_testcase {
 
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
@@ -53,11 +53,11 @@ class totara_competency_competency_observer_testcase extends advanced_testcase {
         $comp_changed = clone $comp;
         $comp_changed->aggregationmethod = \competency::AGGREGATION_METHOD_ALL;
 
-        $this->assert_not_has_criteria($comp_changed->id);
+        $this->assert_does_not_have_criteria($comp_changed->id);
 
         competency_updated::create_from_old_and_new($comp_changed, $comp)->trigger();
 
-        $this->assert_not_has_criteria($comp_changed->id);
+        $this->assert_does_not_have_criteria($comp_changed->id);
     }
 
     public function test_updated_event_when_aggregation_method_did_not_change() {
@@ -67,11 +67,11 @@ class totara_competency_competency_observer_testcase extends advanced_testcase {
 
         $comp_changed = clone $comp;
 
-        $this->assert_not_has_criteria($comp_changed->id);
+        $this->assert_does_not_have_criteria($comp_changed->id);
 
         competency_updated::create_from_old_and_new($comp_changed, $comp)->trigger();
 
-        $this->assert_not_has_criteria($comp_changed->id);
+        $this->assert_does_not_have_criteria($comp_changed->id);
     }
 
     public function test_updated_event_when_aggregation_method_is_not_set() {
@@ -82,11 +82,11 @@ class totara_competency_competency_observer_testcase extends advanced_testcase {
         $comp_changed = clone $comp;
         $comp_changed->aggregation_method = null;
 
-        $this->assert_not_has_criteria($comp_changed->id);
+        $this->assert_does_not_have_criteria($comp_changed->id);
 
         competency_updated::create_from_old_and_new($comp_changed, $comp)->trigger();
 
-        $this->assert_not_has_criteria($comp_changed->id);
+        $this->assert_does_not_have_criteria($comp_changed->id);
     }
 
     public function test_updated_event_gets_processed_if_aggregation_method_changed() {
@@ -97,7 +97,7 @@ class totara_competency_competency_observer_testcase extends advanced_testcase {
         $comp_changed = clone $comp;
         $comp_changed->aggregationmethod = \competency::AGGREGATION_METHOD_ALL;
 
-        $this->assert_not_has_criteria($comp_changed->id);
+        $this->assert_does_not_have_criteria($comp_changed->id);
 
         competency_updated::create_from_old_and_new($comp_changed, $comp)->trigger();
 
@@ -109,11 +109,11 @@ class totara_competency_competency_observer_testcase extends advanced_testcase {
 
         $comp = $this->create_competency(\competency::AGGREGATION_METHOD_ANY);
 
-        $this->assert_not_has_criteria($comp->id);
+        $this->assert_does_not_have_criteria($comp->id);
 
         competency_created::create_from_instance($comp)->trigger();
 
-        $this->assert_not_has_criteria($comp->id);
+        $this->assert_does_not_have_criteria($comp->id);
     }
 
     public function test_created_event_creates_defaults() {
@@ -121,7 +121,7 @@ class totara_competency_competency_observer_testcase extends advanced_testcase {
 
         $comp = $this->create_competency(\competency::AGGREGATION_METHOD_ANY);
 
-        $this->assert_not_has_criteria($comp->id);
+        $this->assert_does_not_have_criteria($comp->id);
 
         competency_created::create_from_instance($comp)->trigger();
 
@@ -161,7 +161,7 @@ class totara_competency_competency_observer_testcase extends advanced_testcase {
         return $comp;
     }
 
-    protected function assert_not_has_criteria(int $competency_id) {
+    protected function assert_does_not_have_criteria(int $competency_id) {
         $criteria = $this->get_criteria($competency_id);
         $this->assertEquals(0, count($criteria), 'Expected no default criteria to be present');
     }

@@ -139,22 +139,22 @@ abstract class totara_competency_testcase extends advanced_testcase {
         $other_users_to_add = [$users->item(1), $users->item(2)];
 
         // Create position
-        $position = $this->generator()->create_position_and_add_members($users_to_add);
-        $another_pos = $this->generator()->create_position_and_add_members($other_users_to_add);
+        $position = $this->generator()->assignment_generator()->create_position_and_add_members($users_to_add);
+        $another_pos = $this->generator()->assignment_generator()->create_position_and_add_members($other_users_to_add);
 
         // Create organisation
-        $organisation = $this->generator()->create_organisation_and_add_members($users_to_add);
-        $another_org = $this->generator()->create_organisation_and_add_members($other_users_to_add);
+        $organisation = $this->generator()->assignment_generator()->create_organisation_and_add_members($users_to_add);
+        $another_org = $this->generator()->assignment_generator()->create_organisation_and_add_members($other_users_to_add);
 
         // Create audience
-        $audience = $this->generator()->create_cohort_and_add_members($users_to_add);
-        $another_aud = $this->generator()->create_cohort_and_add_members($other_users_to_add);
+        $audience = $this->generator()->assignment_generator()->create_cohort_and_add_members($users_to_add);
+        $another_aud = $this->generator()->assignment_generator()->create_cohort_and_add_members($other_users_to_add);
 
         // First assignments set
 
         // Create position competency assignment
         $assignments->set(
-            $aa = $this->generator()->create_position_assignment($competencies->first()->id, $position->id),
+            $aa = $this->generator()->assignment_generator()->create_position_assignment($competencies->first()->id, $position->id),
             "p_{$position->id}_{$competencies->first()->id}"
         );
 
@@ -163,7 +163,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
 
         // Create another position assignment that we'll archive
         $assignments->set(
-            $ass = $this->generator()->create_position_assignment($competencies->first()->id, $another_pos->id),
+            $ass = $this->generator()->assignment_generator()->create_position_assignment($competencies->first()->id, $another_pos->id),
             "p_{$another_pos->id}_{$competencies->first()->id}"
         );
 
@@ -184,7 +184,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
 
         // Create organisation competency assignment
         $assignments->set(
-            $aa = $this->generator()->create_organisation_assignment($competencies->item(1)->id, $organisation->id),
+            $aa = $this->generator()->assignment_generator()->create_organisation_assignment($competencies->item(1)->id, $organisation->id),
             "o_{$organisation->id}_{$competencies->item(1)->id}"
         );
 
@@ -193,7 +193,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
 
         // Create another position assignment that we'll archive
         $assignments->set(
-            $ass = $this->generator()->create_organisation_assignment($competencies->item(1)->id, $another_org->id),
+            $ass = $this->generator()->assignment_generator()->create_organisation_assignment($competencies->item(1)->id, $another_org->id),
             "o_{$another_org->id}_{$competencies->first()->id}"
         );
 
@@ -214,13 +214,13 @@ abstract class totara_competency_testcase extends advanced_testcase {
 
         // Create audience competency assignment
         $assignments->set(
-            $this->generator()->create_cohort_assignment($competencies->item(2)->id, $audience->id),
+            $this->generator()->assignment_generator()->create_cohort_assignment($competencies->item(2)->id, $audience->id),
             "a_{$audience->id}_{$competencies->item(2)->id}"
         );
 
         // Create another position assignment that we'll archive
         $assignments->set(
-            $ass = $this->generator()->create_cohort_assignment($competencies->item(2)->id, $another_aud->id),
+            $ass = $this->generator()->assignment_generator()->create_cohort_assignment($competencies->item(2)->id, $another_aud->id),
             "o_{$another_aud->id}_{$competencies->first()->id}"
         );
 
@@ -237,7 +237,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
 
         // Then we are going to create an individual assignment for the first competency again.
         $assignments->set(
-            $aa = $this->generator()->create_user_assignment($competencies->first()->id, $users->first()->id),
+            $aa = $this->generator()->assignment_generator()->create_user_assignment($competencies->first()->id, $users->first()->id),
             "i_{$users->first()->id}_{$competencies->first()->id}"
         );
 
@@ -246,7 +246,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
 
         // And the one to archive, this time from a mid competency
         $assignments->set(
-            $ass = $this->generator()->create_user_assignment($competencies->item(1)->id, $users->item(1)->id),
+            $ass = $this->generator()->assignment_generator()->create_user_assignment($competencies->item(1)->id, $users->item(1)->id),
             "i_{$users->item(1)->id}_{$competencies->item(1)->id}"
         );
 
@@ -355,18 +355,18 @@ abstract class totara_competency_testcase extends advanced_testcase {
         );
 
         // Create position
-        $position = $this->generator()->create_position_and_add_members($pos_users);
+        $position = $this->generator()->assignment_generator()->create_position_and_add_members($pos_users);
 
         // Create organisation
-        $organisation = $this->generator()->create_organisation_and_add_members($org_users);
+        $organisation = $this->generator()->assignment_generator()->create_organisation_and_add_members($org_users);
 
         // Create audience
-        $audience = $this->generator()->create_cohort_and_add_members($audience_users);
+        $audience = $this->generator()->assignment_generator()->create_cohort_and_add_members($audience_users);
 
         // Create assignments for a position and organisation
         for ($i = 1; $i <= 3; $i++) {
             $assignments->item('pos')->append(
-                $this->generator()->create_position_assignment(
+                $this->generator()->assignment_generator()->create_position_assignment(
                     $competencies->item($i)->id,
                     $position->id,
                     $this->attributes_with_ts()
@@ -374,7 +374,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
             );
 
             $assignments->item('org')->append(
-                $this->generator()->create_organisation_assignment(
+                $this->generator()->assignment_generator()->create_organisation_assignment(
                     $competencies->item($i)->id,
                     $organisation->id,
                     $this->attributes_with_ts()
@@ -382,7 +382,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
             );
 
             $assignments->item('audience')->append(
-                $this->generator()->create_cohort_assignment(
+                $this->generator()->assignment_generator()->create_cohort_assignment(
                     $competencies->item($i)->id,
                     $audience->id,
                     $this->attributes_with_ts()
@@ -390,7 +390,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
             );
 
             $assignments->item('user')->append(
-                $this->generator()->create_user_assignment(
+                $this->generator()->assignment_generator()->create_user_assignment(
                     $competencies->item($i)->id,
                     $users->item(18)->id,
                     $this->attributes_with_ts()
@@ -398,7 +398,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
             );
 
             $assignments->item('user')->append(
-                $this->generator()->create_user_assignment(
+                $this->generator()->assignment_generator()->create_user_assignment(
                     $competencies->item($i)->id,
                     $users->item(19)->id,
                     $this->attributes_with_ts()
@@ -408,7 +408,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
 
         // Let's create self assignments as well
         $assignments->item('user')->append(
-            $this->generator()->create_self_assignment($competencies->item(4)->id, $users->item(19)->id)
+            $this->generator()->assignment_generator()->create_self_assignment($competencies->item(4)->id, $users->item(19)->id)
         );
 
         $task = new expand_task($GLOBALS['DB']);
@@ -440,7 +440,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
 
             if ($assignment->user_group_type === user_groups::USER &&
                 $assignment->user_group_id === $users->item(19)->id) {
-                $this->generator()->archive_assignment($assignment, false);
+                $this->generator()->assignment_generator()->archive_assignment($assignment, false);
             }
         });
 
@@ -465,24 +465,28 @@ abstract class totara_competency_testcase extends advanced_testcase {
     protected function create_some_competencies(): ?core_collection {
         $competencies = new core_collection();
 
-        $competencies->append($this->generator()->create_competency());
+        $scale = scale::repository()->one();
+
+        $fw = $this->generator()->create_framework($scale);
+
+        $competencies->append($this->generator()->create_competency(null, $fw));
 
         $competencies->append(
             $this->generator()
-                ->create_competency(
-                    ['fullname' => 'Something. This is a predefined key phrase for searching a competency. Another thing'], $competencies->first()->frameworkid
+                ->create_competency(null, $competencies->first()->frameworkid,
+                    ['fullname' => 'Something. This is a predefined key phrase for searching a competency. Another thing']
                 )
         );
 
         $competencies->append(
             $this->generator()
-                ->create_competency(
-                    ['description' => 'The description. This is a predefined key phrase for searching a competency'], $competencies->first()->frameworkid
+                ->create_competency(null, $competencies->first()->frameworkid,
+                    ['description' => 'The description. This is a predefined key phrase for searching a competency']
                 )
         );
 
-        $competencies->append($comp = $this->generator()->create_competency());
-        $competencies->append($this->generator()->create_competency([], $comp->frameworkid));
+        $competencies->append($comp = $this->generator()->create_competency(null, $this->generator()->create_framework($scale)));
+        $competencies->append($this->generator()->create_competency(null, $comp->frameworkid));
 
         return $competencies;
     }
@@ -532,10 +536,10 @@ abstract class totara_competency_testcase extends advanced_testcase {
     /**
      * Get competency data generator
      *
-     * @return tassign_competency_generator
+     * @return totara_competency_generator
      */
     public function generator() {
-        return $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        return $this->getDataGenerator()->get_plugin_generator('totara_competency');
     }
 
     /**

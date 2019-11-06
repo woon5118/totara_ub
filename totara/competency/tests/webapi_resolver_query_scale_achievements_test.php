@@ -150,7 +150,7 @@ class totara_competency_webapi_resolver_query_scale_achievements_testcase extend
     }
 
     protected function create_data() {
-        $assign_generator = $this->generator();
+        $assign_generator = $this->generator()->assignment_generator();
 
         $data = new class() {
             public $scale;
@@ -164,14 +164,14 @@ class totara_competency_webapi_resolver_query_scale_achievements_testcase extend
 
         $data->scale = $hierarchy_generator->create_scale('comp');
 
-        $data->fw1 = $assign_generator->hierarchy_generator()->create_comp_frame(['scale' => $data->scale->id]);
+        $data->fw1 = $hierarchy_generator->create_comp_frame(['scale' => $data->scale->id]);
 
-        $data->comp1 = $assign_generator->create_competency([
+        $data->comp1 = $this->generator()->create_competency(null, $data->fw1->id, [
             'shortname' => 'c-chef',
             'fullname' => 'Chef proficiency',
             'description' => 'Bossing around',
             'idnumber' => 'cook-chef-c',
-        ], $data->fw1->id);
+        ]);
 
         $data->assignment1 = $assign_generator->create_user_assignment(
             $data->comp1->id,
@@ -185,10 +185,10 @@ class totara_competency_webapi_resolver_query_scale_achievements_testcase extend
     /**
      * Get assignment specific generator
      *
-     * @return tassign_competency_generator|component_generator_base
+     * @return totara_competency_generator|component_generator_base
      */
     protected function generator() {
-        return $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        return $this->getDataGenerator()->get_plugin_generator('totara_competency');
     }
 
     private function activate_additional_pathways() {

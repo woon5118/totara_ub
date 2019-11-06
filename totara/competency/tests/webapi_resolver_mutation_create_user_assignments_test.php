@@ -228,28 +228,26 @@ class totara_competency_webapi_resolver_mutation_create_user_assignments_testcas
     protected function create_data() {
         $generator = $this->getDataGenerator();
 
-        $assign_generator = $this->generator();
-
         $data = new class() {
             public $fw1;
             public $user1, $user2;
             public $comp1, $comp2;
         };
-        $data->fw1 = $assign_generator->hierarchy_generator()->create_comp_frame([]);
+        $data->fw1 = $this->generator()->hierarchy_generator()->create_comp_frame([]);
 
-        $data->comp1 = $assign_generator->create_competency([
+        $data->comp1 = $this->generator()->create_competency(null, $data->fw1->id, [
             'shortname' => 'c-chef',
             'fullname' => 'Chef proficiency',
             'description' => 'Bossing around',
             'idnumber' => 'cook-chef-c',
-        ], $data->fw1->id);
+        ]);
 
-        $data->comp2 = $assign_generator->create_competency([
+        $data->comp2 = $this->generator()->create_competency(null, $data->fw1->id, [
             'shortname' => 'c-chef',
             'fullname' => 'Chef proficiency',
             'description' => 'Bossing around',
             'idnumber' => 'cook-chef-c',
-        ], $data->fw1->id);
+        ]);
 
         $data->user1 = $generator->create_user();
         $data->user2 = $generator->create_user();
@@ -260,10 +258,10 @@ class totara_competency_webapi_resolver_mutation_create_user_assignments_testcas
     /**
      * Get hierarchy specific generator
      *
-     * @return tassign_competency_generator|component_generator_base
+     * @return totara_competency_generator|component_generator_base
      */
     protected function generator() {
-        return $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        return $this->getDataGenerator()->get_plugin_generator('totara_competency');
     }
 
     private function set_self_assignable($comp_id) {

@@ -18,13 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  * @category test
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-abstract class tassign_competency_assignment_actions_testcase extends advanced_testcase {
+abstract class totara_competency_assignment_actions_testcase extends advanced_testcase {
 
     protected function setUp() {
         parent::setUp();
@@ -48,35 +48,36 @@ abstract class tassign_competency_assignment_actions_testcase extends advanced_t
         $data['types'][] = $type1 = $this->generator()->hierarchy_generator()->create_comp_type(['idnumber' => 'type1']);
         $data['types'][] = $type2 = $this->generator()->hierarchy_generator()->create_comp_type(['idnumber' => 'type2']);
 
-        $data['competencies'][] = $one = $this->generator()->create_competency([
+        $data['competencies'][] = $one = $this->generator()->create_competency(null, $fw->id, [
             'shortname' => 'acc',
             'fullname' => 'Accounting',
             'description' => 'Counting profits',
             'idnumber' => 'accc',
             'typeid' => $type1,
-        ], $fw->id);
+        ]);
 
-        $data['competencies'][] = $two = $this->generator()->create_competency([
+        $data['competencies'][] = $two = $this->generator()->create_competency(null, $fw2->id, [
             'shortname' => 'c-chef',
             'fullname' => 'Chef proficiency',
             'description' => 'Bossing around',
             'idnumber' => 'cook-chef-c',
             'typeid' => $type1,
-        ], $fw2->id);
+        ]);
 
-        $data['competencies'][] = $three = $this->generator()->create_competency([
+        $data['competencies'][] = $three = $this->generator()->create_competency(null, $fw->id, [
             'shortname' => 'des',
             'fullname' => 'Designing interiors',
             'description' => 'Decorating things',
             'idnumber' => 'des',
             'parentid' => $one->id,
             'typeid' => $type2,
-        ], $fw->id);
+        ]);
 
         // Create assignments for competencies
-        $data['assignments'][] = $this->generator()->create_user_assignment($one->id);
-        $data['assignments'][] = $this->generator()->create_user_assignment($two->id);
-        $data['assignments'][] = $this->generator()->create_user_assignment($three->id);
+        $gen = $this->generator()->assignment_generator();
+        $data['assignments'][] = $gen->create_user_assignment($one->id);
+        $data['assignments'][] = $gen->create_user_assignment($two->id);
+        $data['assignments'][] = $gen->create_user_assignment($three->id);
 
         return $data;
     }
@@ -84,10 +85,10 @@ abstract class tassign_competency_assignment_actions_testcase extends advanced_t
     /**
      * Get hierarchy specific generator
      *
-     * @return tassign_competency_generator
+     * @return totara_competency_generator
      */
     protected function generator() {
-        return $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        return $this->getDataGenerator()->get_plugin_generator('totara_competency');
     }
 
 }

@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  * @category test
  */
 
@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__.'/assignment_actions_testcase.php');
 
-class tassign_competency_user_log_testcase extends tassign_competency_assignment_actions_testcase {
+class totara_competency_user_log_testcase extends totara_competency_assignment_actions_testcase {
 
     public function test_log() {
         ['assignments' => $assignments] = $this->generate_assignments();
@@ -117,7 +117,7 @@ class tassign_competency_user_log_testcase extends tassign_competency_assignment
         $hierarchy_generator = $this->generator()->hierarchy_generator();
         $fw = $hierarchy_generator->create_pos_frame(['fullname' => 'Framework 2']);
         $pos = $hierarchy_generator->create_pos(['frameworkid' => $fw->id, 'fullname' => 'Position 1']);
-        $user = $this->generator()->create_user();
+        $user = $this->getDataGenerator()->create_user();
 
         $assignment = $this->create_position_assignment($user->id, $pos->id, $competencies[0]->id);
         $this->assert_has_log_entry_amount(0, $assignment->id);
@@ -218,7 +218,7 @@ class tassign_competency_user_log_testcase extends tassign_competency_assignment
         ];
         job_assignment::create($job_data);
 
-        $record = $this->generator()->create_position_assignment(
+        $record = $this->generator()->assignment_generator()->create_position_assignment(
             $comp_id,
             $pos_id,
             ['status' => assignment::STATUS_ACTIVE]

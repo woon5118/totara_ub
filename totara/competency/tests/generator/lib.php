@@ -22,10 +22,4 @@
  * @package totara_competency
  */
 
-/**
- * Adds data generator support
- */
-
-// NOTE: MOODLE_INTERNAL is not verified here because we load this before setup.php!
-
-require_once(__DIR__.'/totara_competency_generator.class.php');
+require_once(__DIR__ . '/totara_competency_generator.class.php');

@@ -60,7 +60,7 @@ class totara_competency_webapi_resolver_query_role_ratings_testcase extends adva
         $totara_hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
 
         /** @var tassign_competency_generator $tassign_competency_generator */
-        $tassign_competency_generator = $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        $tassign_competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
 
         $compfw = $totara_hierarchy_generator->create_comp_frame([]);
         $comp = $totara_hierarchy_generator->create_comp(['frameworkid' => $compfw->id]);

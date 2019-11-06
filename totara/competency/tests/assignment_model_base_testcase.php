@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  * @category test
  */
 
@@ -52,29 +52,26 @@ abstract class assignment_model_base_testcase extends advanced_testcase {
 
     protected function create_data() {
         $generator = $this->getDataGenerator();
-
-        $assign_generator = $this->generator();
-
         $data = new class() {
             public $fw1;
             public $user1, $user2;
             public $comp1, $comp2;
         };
-        $data->fw1 = $assign_generator->hierarchy_generator()->create_comp_frame([]);
+        $data->fw1 = $this->generator()->hierarchy_generator()->create_comp_frame([]);
 
-        $data->comp1 = $assign_generator->create_competency([
+        $data->comp1 = $this->generator()->create_competency(null, $data->fw1->id, [
             'shortname' => 'c-chef',
             'fullname' => 'Chef proficiency',
             'description' => 'Bossing around',
             'idnumber' => 'cook-chef-c',
-        ], $data->fw1->id);
+        ]);
 
-        $data->comp2 = $assign_generator->create_competency([
+        $data->comp2 = $this->generator()->create_competency(null, $data->fw1->id, [
             'shortname' => 'c-chef',
             'fullname' => 'Chef proficiency',
             'description' => 'Bossing around',
             'idnumber' => 'cook-chef-c',
-        ], $data->fw1->id);
+        ]);
 
         $data->user1 = $generator->create_user();
         $data->user2 = $generator->create_user();
@@ -85,10 +82,10 @@ abstract class assignment_model_base_testcase extends advanced_testcase {
     /**
      * Get hierarchy specific generator
      *
-     * @return tassign_competency_generator|component_generator_base
+     * @return totara_competency_generator|component_generator_base
      */
     protected function generator() {
-        return $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        return $this->getDataGenerator()->get_plugin_generator('totara_competency');
     }
 
 }

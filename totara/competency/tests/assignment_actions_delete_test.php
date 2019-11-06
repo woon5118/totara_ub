@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  * @category test
  */
 
@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__.'/assignment_actions_testcase.php');
 
-class tassign_competency_actions_delete_testcase extends tassign_competency_assignment_actions_testcase {
+class totara_competency_actions_delete_testcase extends totara_competency_assignment_actions_testcase {
 
     public function test_delete_multiple() {
         ['assignments' => $assignments] = $this->generate_assignments();
