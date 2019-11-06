@@ -36,7 +36,7 @@ class scale_value extends entity_formatter {
         return [
             'id' => null,
             'name' => string_field_formatter::class,
-            'idnumber' => string_field_formatter::class,
+            'idnumber' => null,
             'description' => string_field_formatter::class,
             'scaleid' => null,
             'numericscore' => null,
