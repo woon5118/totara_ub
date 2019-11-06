@@ -32,6 +32,7 @@ use mod_facetoface\asset_helper;
 use mod_facetoface\form\asset_edit;
 
 $id = optional_param('id', 0, PARAM_INT);
+$backurl = optional_param('b', '', PARAM_LOCALURL);
 
 $params = ['id' => $id];
 $baseurl = new moodle_url('/mod/facetoface/asset/edit.php', $params);
@@ -48,13 +49,17 @@ if (is_siteadmin()) {
 }
 
 $asset = new asset($id);
-$returnurl = new moodle_url('/mod/facetoface/asset/manage.php', $params);
+if (!empty($backurl)) {
+    $returnurl = new moodle_url($backurl);
+} else {
+    $returnurl = new moodle_url('/mod/facetoface/asset/manage.php', $params);
+}
 
 if ($asset->get_custom()) {
     redirect($returnurl, get_string('error:incorrectassetid', 'mod_facetoface'), null, notification::ERROR);
 }
 
-$mform = new asset_edit(null, ['asset' => $asset], 'post', '', ['class' => 'dialog-nobind'], true, null, 'mform_modal');
+$mform = new asset_edit(null, ['asset' => $asset, 'backurl' => $returnurl], 'post', '', ['class' => 'dialog-nobind'], true, null, 'mform_modal');
 
 if ($mform->is_cancelled()) {
     redirect($returnurl);

@@ -52,9 +52,10 @@ $facilitators = array();
 foreach($itemids as $itemid) {
     $facilitator = new facilitator($itemid);
     $facilitator_user = new facilitator_user($facilitator);
+    $fullname = $facilitator_user->get_fullname_link();
     $res = (object)[
         'id' => $facilitator->get_id(),
-        'name' => $facilitator->get_name() . $facilitator_user->get_fullname_link(),
+        'name' => $fullname !== '' ? get_string('facilitatordisplayname', 'mod_facetoface', (object)['name' => $facilitator->get_name(), 'fullname' => $fullname]) : $facilitator->get_name(),
         'hidden' => $facilitator->get_hidden(),
         'custom' => $facilitator->get_custom()
     ];

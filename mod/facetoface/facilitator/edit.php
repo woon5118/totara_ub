@@ -34,6 +34,7 @@ use mod_facetoface\form\facilitator_edit;
 use mod_facetoface\output\seminar_dialog_selected;
 
 $id = optional_param('id', 0, PARAM_INT);
+$backurl = optional_param('b', '', PARAM_LOCALURL);
 
 $params = ['id' => $id];
 $baseurl = new moodle_url('/mod/facetoface/facilitator/edit.php', $params);
@@ -50,7 +51,11 @@ if (is_siteadmin()) {
 }
 
 $facilitator = new facilitator($id);
-$returnurl = new moodle_url('/mod/facetoface/facilitator/manage.php');
+if (!empty($backurl)) {
+    $returnurl = new moodle_url($backurl);
+} else {
+    $returnurl = new moodle_url('/mod/facetoface/facilitator/manage.php');
+}
 
 if ($facilitator->get_custom()) {
     redirect($returnurl, get_string('error:incorrectfacilitatorid', 'mod_facetoface'), null, notification::ERROR);
@@ -85,7 +90,7 @@ $args = [
 $PAGE->requires->js_init_call('M.totara_seminar_facilitator.init', [$args], false, $jsmodule);
 
 $facilitator = new facilitator_user($facilitator);
-$customdata = ['facilitator' => $facilitator, 'adhoc' => false];
+$customdata = ['facilitator' => $facilitator, 'adhoc' => false, 'backurl' => $returnurl];
 $mform = new facilitator_edit(null, $customdata, 'post', '', ['class' => 'manage_facilitator dialog-nobind'], true, null, 'mform_modal');
 
 if ($mform->is_cancelled()) {

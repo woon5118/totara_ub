@@ -49,6 +49,11 @@ final class seminarevent_detail_section_builder {
     private $id = '';
 
     /**
+     * @var string
+     */
+    private $intro = '';
+
+    /**
      * @var array
      */
     private $details = [];
@@ -112,6 +117,17 @@ final class seminarevent_detail_section_builder {
     }
 
     /**
+     * Set the summary text of this section.
+     *
+     * @param string $intro
+     * @return self
+     */
+    public function set_summary(string $intro): self {
+        $this->intro = $intro;
+        return $this;
+    }
+
+    /**
      * Set the id text of this section.
      *
      * @param string $id
@@ -132,6 +148,7 @@ final class seminarevent_detail_section_builder {
             [
                 'class' => $this->class,
                 'title' => $this->title,
+                'intro' => $this->intro,
                 'id' => $this->id,
                 'details' => $this->details,
             ]

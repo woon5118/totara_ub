@@ -79,6 +79,7 @@ $option = (new render_event_info_option())
     ->set_displaysignupinfo(!$signedup)
     ->set_heading($seminar->get_name())
     ->set_backurl($returnurl->out(false))
+    ->set_pageurl($pageurl)
     ->set_backtoeventinfo(true)
     ->set_backtoallsessions(true);
 

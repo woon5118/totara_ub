@@ -30,18 +30,23 @@
     * id: string id
     * class: part of css class
     * align: content alignment (far, center or near)
+    * label: label text for accessibility
+    * group: display as button group
     * commandlinks: array containing buttons
     * commandlinks.name: name used for part of the css class name
     * commandlinks.primary: true to accent a button
     * commandlinks.href: link url
     * commandlinks.text: link text in HTML
     * commandlinks.icon: use icon instead of text
+    * commandlinks.disabled: disable a button
 
     Example content (json):
     {
         "id" : "id-123456",
         "class" : "",
         "align" : "far",
+        "label": "",
+        "group" : false,
         "commandlinks" : [
             {
                 "name" : "back",
@@ -59,9 +64,15 @@
     }
 }}
 
-<div class="mod_facetoface__action{{#class}} mod_facetoface__action-{{.}}{{/class}}{{#align}} mod_facetoface__action--{{.}}{{/align}}"{{#id}} id="{{.}}"{{/id}}>
+<div class="mod_facetoface__action{{#class}} mod_facetoface__action-{{.}}{{/class}}{{#align}} mod_facetoface__action--{{.}}{{/align}}{{#group}} btn-group{{/group}}"{{#id}} id="{{.}}"{{/id}} role="group"{{#label}} aria-label="{{.}}"{{/label}}>
     {{#commandlinks}}
-        {{#icon}}<a href="{{href}}" class="mod_facetoface__action__{{name}}">{{#context}}{{> &&template }}{{/context}}</a>{{/icon}}
-        {{^icon}}<a href="{{href}}" role="button" class="btn {{#primary}}btn-primary{{/primary}}{{^primary}}btn-default{{/primary}} mod_facetoface__action__{{name}}">{{{text}}}</a>{{/icon}}
+        {{#disabled}}
+            {{#icon}}<span role="link" aria-disabled="true" class="disabled commandlink mod_facetoface__action__{{name}}">{{#context}}{{> &&template }}{{/context}}</span>{{/icon}}
+            {{^icon}}<span role="button" aria-disabled="true" class="disabled commandlink btn {{#primary}}btn-primary{{/primary}}{{^primary}}btn-default{{/primary}} mod_facetoface__action__{{name}}">{{{text}}}</span>{{/icon}}
+        {{/disabled}}
+        {{^disabled}}
+            {{#icon}}<a href="{{href}}" class="commandlink mod_facetoface__action__{{name}}">{{#context}}{{> &&template }}{{/context}}</a>{{/icon}}
+            {{^icon}}<a href="{{href}}" role="button" class="commandlink btn {{#primary}}btn-primary{{/primary}}{{^primary}}btn-default{{/primary}} mod_facetoface__action__{{name}}">{{{text}}}</a>{{/icon}}
+        {{/disabled}}
     {{/commandlinks}}
 </div>

@@ -53,6 +53,14 @@ body.path-mod-facetoface div#fgroup_id_recipients input[id*="id_booked_type"] {
     margin-left: 15px;
 }
 
+#page-mod-facetoface-reports-assets,
+#page-mod-facetoface-reports-facilitators,
+#page-mod-facetoface-reports-rooms {
+    #page-content {
+        padding-top: 0;
+    }
+}
+
 .mod_facetoface-addremove button {
     min-width: 100px;
 }
@@ -232,12 +240,8 @@ select.menuf2f-select {
             justify-content: center;
         }
 
-        > a {
-            margin-right: @totara_style-spacing_small;
-
-            &:last-child {
-                margin-right: 0;
-            }
+        &:not(.btn-group) > .commandlink + .commandlink {
+            margin-left: @totara_style-spacing_small;
         }
     }
 
@@ -550,6 +554,11 @@ select.menuf2f-select {
                 }
             }
         }
+
+        &__roomdetails {
+            display: block;
+            font-size: @totara_style-size_12;
+        }
     }
 
     &__event_details {
@@ -651,6 +660,10 @@ select.menuf2f-select {
     &__action-editevent {
         position: absolute;
         right: floor((@grid-gutter-width / 2));
+    }
+    // Extra space below the upcoming sessions table.
+    &__action-detailfooter {
+        margin-top: @totara_style-spacing_medium;
     }
     &__sessionlist {
         clear: right;
@@ -828,6 +841,13 @@ select.menuf2f-select {
                         > dt {
                             margin-top: floor(@line-height-computed / 4);
                         }
+                    }
+
+                    // We need the good-old clearfix in the description block of the detail page.
+                    &__intro::after {
+                        clear: both;
+                        content: '';
+                        display: block;
                     }
                 }
             }

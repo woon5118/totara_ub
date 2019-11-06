@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Class Asset represents Seminar Asset
  */
-final class asset implements seminar_iterator_item {
+final class asset implements seminar_iterator_item, seminar_attachment_item {
 
     use traits\crud_mapper;
 
@@ -145,7 +145,7 @@ final class asset implements seminar_iterator_item {
     /**
      * Store asset into database
      */
-    public function save() {
+    public function save(): void {
         global $USER;
 
         $this->usermodified = $USER->id;
@@ -260,7 +260,7 @@ final class asset implements seminar_iterator_item {
      *
      * @param int $timestart
      * @param int $timefinish
-     * @param seminar_event $sessionid
+     * @param seminar_event $seminarevent
      * @return bool
      */
     public function is_available(int $timestart, int $timefinish, seminar_event $seminarevent) : bool {
@@ -410,7 +410,7 @@ final class asset implements seminar_iterator_item {
 
     /**
      * Set whether this asset allows conflicts
-     * @param bool $allowconflicts
+     * @param int $allowconflicts
      *
      * @return asset $this
      */
@@ -450,6 +450,7 @@ final class asset implements seminar_iterator_item {
 
     /**
      * Get the time this asset was created
+     * @return int
      */
     public function get_timecreated() : int {
         return (int)$this->timecreated;
@@ -457,6 +458,7 @@ final class asset implements seminar_iterator_item {
 
     /**
      * Get the time this asset was last modified
+     * @return int
      */
     public function get_timemodified() : int {
         return (int)$this->timemodified;

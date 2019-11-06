@@ -753,6 +753,32 @@ final class signup implements seminar_iterator_item {
     }
 
     /**
+     * Map session data object to class instance.
+     *
+     * @param \stdClass|session_data|session_signup_data $object
+     * @param boolean $strict Set false to ignore bogus properties
+     * @return signup
+     */
+    public function from_record(\stdClass $object, bool $strict = true): signup {
+        // First, flush all properties.
+        $this->map_object((object)get_object_vars(new self()));
+        // This is an ugly guess game.
+        if (isset($object->facetoface)) {
+            // OK, this object looks like session_data.
+            $this->seminarevent = (new seminar_event())->from_record_with_dates($object, $strict);
+            if (isset($object->bookedsession)) {
+                $this->map_object($object->bookedsession, $strict);
+            }
+        } else {
+            // This looks like session_signup_data.
+            $this->map_object($object, $strict);
+            $this->seminarevent = null;
+        }
+        $this->settings = [];
+        return $this;
+    }
+
+    /**
      * Return the object that has all of properties that are mapped with the database's table.
      * @return stdClass
      */

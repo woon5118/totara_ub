@@ -60,11 +60,14 @@ class facilitator_name_link extends base {
         if (isset($extrafields->userid) && (int)$extrafields->userid > 0) {
             $userid = (int)$extrafields->userid;
             $facilitator_user = facilitator_user::seek_by_userid($userid);
+            $a = new \stdClass();
+            $a->name = $value;
             if ($isexport) {
-                $value .= " ({$facilitator_user->get_fullname()}) ";
+                $a->fullname = $facilitator_user->get_fullname();
             } else {
-                $value .= $facilitator_user->get_fullname_link();
+                $a->fullname = $facilitator_user->get_fullname_link();
             }
+            $value = get_string('facilitatordisplayname', 'mod_facetoface', $a);
         }
         return $value;
     }

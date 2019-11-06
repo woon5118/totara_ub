@@ -60,6 +60,9 @@ final class render_event_info_option {
     /** @var string|null */
     private $backurl = null;
 
+    /** @var string|null */
+    private $pageurl = null;
+
     /**
      * @return boolean
      */
@@ -238,5 +241,28 @@ final class render_event_info_option {
     public function set_backurl(?string $value): self {
         $this->backurl = $value;
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_pageurl(): string {
+        return $this->pageurl ?? '';
+    }
+
+    /**
+     * @param string|null $value
+     * @return self
+     */
+    public function set_pageurl(?string $value): self {
+        $this->pageurl = $value;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_current_url(): string {
+        return $this->get_pageurl() ?: $this->get_backurl();
     }
 }

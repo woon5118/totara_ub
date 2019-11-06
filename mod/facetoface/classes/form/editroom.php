@@ -26,6 +26,7 @@ namespace mod_facetoface\form;
 defined('MOODLE_INTERNAL') || die();
 
 use html_writer;
+use mod_facetoface\user_helper;
 
 global $CFG;
 require_once($CFG->dirroot . '/lib/formslib.php');
@@ -47,11 +48,16 @@ class editroom extends \moodleform {
         $seminar = empty($this->_customdata['seminar']) ? null : $this->_customdata['seminar'];
         /** @var \mod_facetoface\seminar_event $seminarevent */
         $seminarevent = empty($this->_customdata['seminarevent']) ? null : $this->_customdata['seminarevent'];
+        /** @var string */
+        $backurl = $this->_customdata['backurl'] ?? '';
 
         $roomnamelength = \mod_facetoface\room::ROOM_NAME_LENGTH;
 
         $mform->addElement('hidden', 'id', $room->get_id());
         $mform->setType('id', PARAM_INT);
+
+        $mform->addElement('hidden', 'b', $backurl);
+        $mform->setType('b', PARAM_URL);
 
         if (!empty($seminar)) {
             $mform->addElement('hidden', 'f', $seminar->get_id());
@@ -107,37 +113,19 @@ class editroom extends \moodleform {
         if (!empty($room) && $room->exists()) {
             $mform->addElement('header', 'versions', get_string('versioncontrol', 'mod_facetoface'));
 
-            $created = new \StdClass();
-            $created->user = get_string('unknownuser');
-            $usercreated = $room->get_usercreated();
-            if (!empty($usercreated)) {
-                $url = user_get_profile_url($usercreated);
-                $fullname = fullname(\core_user::get_user($usercreated));
-                $created->user = $url ? html_writer::link($url, $fullname) : html_writer::span($fullname);
-            }
-            $created->time = empty($room->get_timecreated()) ? '' : userdate($room->get_timecreated());
             $mform->addElement(
                 'static',
                 'versioncreated',
                 get_string('created', 'mod_facetoface'),
-                get_string('timestampbyuser', 'mod_facetoface', $created)
+                user_helper::get_timestamp_and_profile($room->get_timecreated(), $room->get_usercreated())
             );
 
             if (!empty($room->get_timemodified()) and $room->get_timemodified() != $room->get_timecreated()) {
-                $modified = new \stdClass();
-                $modified->user = get_string('unknownuser');
-                $usermodified = $room->get_usermodified();
-                if (!empty($usermodified)) {
-                    $url = user_get_profile_url($usermodified);
-                    $fullname = fullname(\core_user::get_user($usermodified));
-                    $modified->user = $url ? html_writer::link($url, $fullname) : html_writer::span($fullname);
-                }
-                $modified->time = empty($room->get_timemodified()) ? '' : userdate($room->get_timemodified());
                 $mform->addElement(
                     'static',
                     'versionmodified',
                     get_string('modified'),
-                    get_string('timestampbyuser', 'mod_facetoface', $modified)
+                    user_helper::get_timestamp_and_profile($room->get_timemodified(), $room->get_usermodified())
                 );
             }
         }

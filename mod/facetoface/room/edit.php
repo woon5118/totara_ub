@@ -32,6 +32,7 @@ use mod_facetoface\room_helper;
 use mod_facetoface\form\editroom as room_edit;
 
 $id = optional_param('id', 0, PARAM_INT);
+$backurl = optional_param('b', '', PARAM_LOCALURL);
 
 $params = ['id' => $id];
 $baseurl = new moodle_url('/mod/facetoface/room/edit.php', $params);
@@ -48,13 +49,17 @@ if (is_siteadmin()) {
 }
 
 $room = new room($id);
-$returnurl = new moodle_url('/mod/facetoface/room/manage.php', $params);
+if (!empty($backurl)) {
+    $returnurl = new moodle_url($backurl);
+} else {
+    $returnurl = new moodle_url('/mod/facetoface/room/manage.php', $params);
+}
 
 if ($room->get_custom()) {
     redirect($returnurl, get_string('error:incorrectroomid', 'mod_facetoface'), null, notification::ERROR);
 }
 
-$mform = new room_edit(null, ['room' => $room], 'post', '', ['class' => 'dialog-nobind'], true, null, 'mform_modal');
+$mform = new room_edit(null, ['room' => $room, 'backurl' => $returnurl], 'post', '', ['class' => 'dialog-nobind'], true, null, 'mform_modal');
 
 if ($mform->is_cancelled()) {
     redirect($returnurl);

@@ -109,26 +109,22 @@ class facilitator_user {
     public function get_fullname_link(bool $link = true): string {
         global $OUTPUT;
         if (empty($this->fullname)) {
-            return $this->fullname;
+            return '';
         }
 
         $userid = $this->facilitator->get_userid();
         if (static::is_userid_active($userid)) {
-            $url = user_get_profile_url($userid);
-            if ($url && $link) {
-                $link = html_writer::link($url, $this->fullname);
-                $html = " ({$link}) ";
-            } else {
-                $html = " ({$this->fullname}) ";
+            if (!$link) {
+                return $this->fullname;
             }
+            return user_helper::get_profile($userid, $this->fullname);
         } else {
-             $icon = $OUTPUT->flex_icon('warning', [
-                 'classes' => 'ft-size-100 ft-state-warning',
-                 'alt' => get_string('facilitatoruserdeleted', 'mod_facetoface')
-             ]);
-            $html = " ({$this->fullname}{$icon}) ";
+            $icon = $OUTPUT->flex_icon('warning', [
+                'classes' => 'ft-size-100 ft-state-warning',
+                'alt' => get_string('facilitatoruserdeleted', 'mod_facetoface')
+            ]);
+            return $this->fullname . $icon;
         }
-        return $html;
     }
 
     /**

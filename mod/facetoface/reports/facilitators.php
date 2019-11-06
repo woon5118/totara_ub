@@ -25,94 +25,9 @@ require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/mod/facetoface/rb_sources/rb_facetoface_summary_facilitator_embedded.php');
 
-use \mod_facetoface\facilitator;
-use \mod_facetoface\facilitator_user;
-
-$facilitatorid = optional_param('facilitatorid', 0, PARAM_INT);
-$backurl = optional_param('b', '', PARAM_URL);
-$sid = optional_param('sid', '0', PARAM_INT);
-$debug = optional_param('debug', 0, PARAM_INT);
-$popup = optional_param('popup', 0, PARAM_INT);
+use mod_facetoface\detail\facilitator_content;
 
 require_login(0, false);
 
-$params = [
-    'facilitatorid' => $facilitatorid,
-    'sid' => $sid,
-    'debug' => $debug,
-    'popup' => $popup
-];
-$baseurl = new moodle_url('/mod/facetoface/reports/facilitators.php', $params);
-$systemcontext = context_system::instance();
-if (!$popup) {
-    admin_externalpage_setup('modfacetofacefacilitators', '', null, $baseurl);
-} else {
-    $PAGE->set_pagelayout('popup');
-    $PAGE->set_url($baseurl);
-    $PAGE->set_context($systemcontext);
-}
-
-if (!$facilitatorid) {
-    echo $OUTPUT->header();
-    $managefacilitatorsurl = new moodle_url('/mod/facetoface/facilitator/manage.php');
-    echo $OUTPUT->container(get_string('selectfacilitator', 'mod_facetoface', $managefacilitatorsurl->out()));
-    echo $OUTPUT->footer();
-    exit();
-}
-
-$report = null;
-if (rb_facetoface_summary_facilitator_embedded::is_capable_static($USER->id)) {
-    // Verify global restrictions.
-    $shortname = 'facetoface_summary_facilitator';
-    $reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname));
-    $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
-    $config = (new rb_config())->set_global_restriction_set($globalrestrictionset)->set_sid($sid);
-    $report = reportbuilder::create_embedded($shortname, $config);
-    if (!$report) {
-        print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
-    }
-    if (!$popup) {
-        $PAGE->set_button($report->edit_button());
-    }
-}
-$facilitator = new facilitator($facilitatorid);
-$facilitator_user = new facilitator_user($facilitator);
-
-$title = get_string('viewfacilitator', 'mod_facetoface');
-$PAGE->set_title($title);
-
-echo $OUTPUT->header();
-/** @var mod_facetoface_renderer $renderer */
-$renderer = $PAGE->get_renderer('mod_facetoface');
-$renderer->setcontext($systemcontext);
-
-echo $renderer->heading($PAGE->title);
-echo $renderer->render(\mod_facetoface\output\facilitator_details::create($facilitator_user));
-
-if ($report) {
-    /** @var totara_reportbuilder_renderer $reportrenderer */
-    $reportrenderer = $PAGE->get_renderer('totara_reportbuilder');
-    // This must be done after the header and before any other use of the report.
-    list($reporthtml, $debughtml) = $reportrenderer->report_html($report, $debug);
-    echo $debughtml;
-    $report->display_restrictions();
-    echo $renderer->heading(get_string('upcomingsessionsinfacilitator', 'mod_facetoface'));
-    echo $reportrenderer->print_description($report->description, $report->_id);
-    // Print saved search options and filters.
-    $report->display_saved_search_options();
-    $report->display_search();
-    $report->display_sidebar_search();
-    echo $reporthtml;
-    if (!$popup && !empty($backurl)) {
-        echo $renderer->single_button($backurl, get_string('goback', 'mod_facetoface'), 'get');
-    }
-    if (!$popup && has_capability('mod/facetoface:managesitewidefacilitators', $systemcontext)) {
-        echo $renderer->single_button(
-            new moodle_url('/mod/facetoface/facilitator/manage.php', ['published' => 0]),
-            get_string('backtofacilitators', 'mod_facetoface'),
-            'get'
-        );
-    }
-    $report->include_js();
-}
-echo $renderer->footer();
+$content = new facilitator_content('facilitatorid', '/mod/facetoface/reports/facilitators.php');
+$content->display();

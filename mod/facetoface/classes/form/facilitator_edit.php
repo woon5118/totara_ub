@@ -32,6 +32,7 @@ use mod_facetoface\facilitator_type;
 use mod_facetoface\facilitator_helper;
 use mod_facetoface\customfield_area\facetofacefacilitator as facilitatorcustomfield;
 use mod_facetoface\seminar_event;
+use mod_facetoface\user_helper;
 
 class facilitator_edit extends \moodleform {
     /**
@@ -48,6 +49,8 @@ class facilitator_edit extends \moodleform {
         $seminar = empty($this->_customdata['seminar']) ? null : $this->_customdata['seminar'];
         /** @var \mod_facetoface\seminar_event $seminarevent */
         $seminarevent = empty($this->_customdata['seminarevent']) ? null : $this->_customdata['seminarevent'];
+        /** @var string */
+        $backurl = $this->_customdata['backurl'] ?? '';
 
         $prefix = $filearea = facilitatorcustomfield::get_area_name();
         $tblprefix = facilitatorcustomfield::get_prefix();
@@ -58,6 +61,9 @@ class facilitator_edit extends \moodleform {
 
         $mform->addElement('hidden', 'id', $facilitator->get_id());
         $mform->setType('id', PARAM_INT);
+
+        $mform->addElement('hidden', 'b', $backurl);
+        $mform->setType('b', PARAM_URL);
 
         if (!empty($seminar)) {
             $mform->addElement('hidden', 'f', $seminar->get_id());
@@ -130,37 +136,19 @@ class facilitator_edit extends \moodleform {
         if ($facilitator->exists()) {
             $mform->addElement('header', 'versions', get_string('versioncontrol', 'mod_facetoface'));
 
-            $created = new \stdClass();
-            $created->user = get_string('unknownuser');
-            $usercreated = $facilitator->get_usercreated();
-            if (!empty($usercreated)) {
-                $url = user_get_profile_url($usercreated);
-                $fullname = fullname(\core_user::get_user($usercreated));
-                $created->user = $url ? html_writer::link($url, $fullname) : html_writer::span($fullname);
-            }
-            $created->time = empty($facilitator->get_timecreated()) ? '' : userdate($facilitator->get_timecreated());
             $mform->addElement(
                 'static',
                 'versioncreated',
                 get_string('created', 'mod_facetoface'),
-                get_string('timestampbyuser', 'mod_facetoface', $created)
+                user_helper::get_timestamp_and_profile($facilitator->get_timecreated(), $facilitator->get_usercreated())
             );
 
             if (!empty($facilitator->get_timemodified()) && $facilitator->get_timemodified() != $facilitator->get_timecreated()) {
-                $modified = new \stdClass();
-                $modified->user = get_string('unknownuser');
-                $usermodified = $facilitator->get_usermodified();
-                if (!empty($usermodified)) {
-                    $url = user_get_profile_url($usermodified);
-                    $fullname = fullname(\core_user::get_user($usermodified));
-                    $modified->user = $url ? html_writer::link($url, $fullname) : html_writer::span($fullname);
-                }
-                $modified->time = empty($facilitator->get_timemodified()) ? '' : userdate($facilitator->get_timemodified());
                 $mform->addElement(
                     'static',
                     'versionmodified',
                     get_string('modified'),
-                    get_string('timestampbyuser', 'mod_facetoface', $modified)
+                    user_helper::get_timestamp_and_profile($facilitator->get_timemodified(), $facilitator->get_usermodified())
                 );
             }
         }

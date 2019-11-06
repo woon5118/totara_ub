@@ -534,6 +534,9 @@ class customfield_define_location extends customfield_define_base {
         if ($displaytype === GMAP_DISPLAY_ADDRESS_ONLY || $displaytype === GMAP_DISPLAY_MAP_AND_ADDRESS) {
             $output[] = html_writer::tag('span', $fielddata->address);
             if ($displaytype === GMAP_DISPLAY_ADDRESS_ONLY) {
+                if ((string)$fielddata->address === '') {
+                    return '';
+                }
                 return implode("", $output);
             }
         }

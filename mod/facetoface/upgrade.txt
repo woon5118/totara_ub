@@ -8,6 +8,10 @@ information provided here is intended especially for developers.
 * seminar_event::get_discountcost() now returns string instead of int.
 * The first argument to seminar_event::set_discountcost() was an int, it has been changed to string
 * seminar_event_helper::delete_seminarevent() has been changed to trigger the session_deleted event
+* The user profile links are now retrieved through the mod_facetoface\user_helper class
+* In mod_facetoface_renderer, render_room_details() and render_asset_details() have been rewritten to share the code base
+* The asset, facilitator and room links no longer open a popup window
+* The asset, facilitator and room classes have implemented the seminar_attachment_item interface
 * The following capabilities are added to 'editingteacher' and 'teacher' roles:
   * mod/facetoface:manageadhocroom
   * mod/facetoface:managesitewideroom
@@ -121,6 +125,7 @@ information provided here is intended especially for developers.
   * room and room_details CSS classes have been deprecated in get_room_details_html()
   * generaltable and fullwidth CSS classes have been removed from print_session_list_table(),
     please use mod_facetoface__sessionlist__table instead
+  * f2f, roomdetails, dl-horizontal classes have been removed from render_room_details() and render_asset_details()
 * The class parameter has been added to the seminarevent_actionbar mustache template
 * The icon, filters.show_tooltips and links parameters have been added to the seminarevent_filterbar mustache template
   Also, the CSS class name has been changed to contain the class parameter

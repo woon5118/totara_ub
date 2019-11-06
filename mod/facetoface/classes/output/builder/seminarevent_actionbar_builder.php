@@ -55,6 +55,16 @@ class seminarevent_actionbar_builder {
     private $commandlinks = [];
 
     /**
+     * @var string
+     */
+    private $label = '';
+
+    /**
+     * @var boolean
+     */
+    private $group = false;
+
+    /**
      * @param string $id    part of element id
      */
     public function __construct(string $id) {
@@ -68,10 +78,11 @@ class seminarevent_actionbar_builder {
      * @param string|\moodle_url $url
      * @param string|\pix_icon   $textoricon label text or icon
      * @param bool               $primary    true to accent the element
+     * @param bool               $disabled   true to disable a button
      *
      * @return seminarevent_actionbar_builder
      */
-    public function add_commandlink(string $name, $url, $textoricon, bool $primary = false): seminarevent_actionbar_builder {
+    public function add_commandlink(string $name, $url, $textoricon, bool $primary = false, bool $disabled = false): seminarevent_actionbar_builder {
         if ($url instanceof \moodle_url) {
             $url = $url->out(false);
         }
@@ -79,6 +90,7 @@ class seminarevent_actionbar_builder {
             'name' => $name,
             'href' => $url,
             'primary' => $primary,
+            'disabled' => $disabled,
         ];
         if ($textoricon instanceof \pix_icon) {
             global $OUTPUT;
@@ -119,6 +131,28 @@ class seminarevent_actionbar_builder {
     }
 
     /**
+     * Set the label text for accessibility.
+     *
+     * @param string $label
+     * @return seminarevent_actionbar_builder
+     */
+    public function set_label(string $label): seminarevent_actionbar_builder {
+        $this->label = $label;
+        return $this;
+    }
+
+    /**
+     * Set the appearance of buttons.
+     *
+     * @param boolean $group Set true to group buttons together.
+     * @return seminarevent_actionbar_builder
+     */
+    public function set_buttongroup(bool $group): seminarevent_actionbar_builder {
+        $this->group = $group;
+        return $this;
+    }
+
+    /**
      * Create a seminarevent_actionbar object.
      *
      * @return seminarevent_actionbar
@@ -130,6 +164,8 @@ class seminarevent_actionbar_builder {
                 'class' => $this->class,
                 'align' => $this->align ?: 'near',
                 'commandlinks' => array_values($this->commandlinks),
+                'label' => $this->label,
+                'group' => $this->group,
             ]
         );
     }

@@ -22,10 +22,13 @@
  */
 
 use core\output\flex_icon;
-
+use mod_facetoface\asset;
 use mod_facetoface\asset_list;
 use mod_facetoface\attendance_taking_status;
 use mod_facetoface\attendees_helper;
+use mod_facetoface\customfield_area\facetofaceasset;
+use mod_facetoface\customfield_area\facetofacefacilitator;
+use mod_facetoface\customfield_area\facetofaceroom;
 use mod_facetoface\event_time;
 use mod_facetoface\render_event_info_option;
 use mod_facetoface\reservations;
@@ -38,6 +41,7 @@ use mod_facetoface\seminar_session;
 use mod_facetoface\signup;
 use mod_facetoface\signup_helper;
 use mod_facetoface\trainer_helper;
+use mod_facetoface\user_helper;
 use mod_facetoface\internal\session_data;
 
 use mod_facetoface\dashboard\filter_list;
@@ -45,6 +49,7 @@ use mod_facetoface\dashboard\render_session_list_config;
 use mod_facetoface\dashboard\render_session_option;
 use mod_facetoface\dashboard\filters\event_time_filter;
 use mod_facetoface\dashboard\filters\room_filter;
+use mod_facetoface\facilitator;
 use mod_facetoface\output\session_time;
 use mod_facetoface\output\show_previous_events;
 
@@ -60,7 +65,7 @@ use mod_facetoface\output\seminarevent_detail_section;
 use mod_facetoface\output\seminarevent_detail_session_list;
 use mod_facetoface\output\seminarevent_information;
 use mod_facetoface\output\session_list_table;
-
+use mod_facetoface\seminar_attachment_item;
 use mod_facetoface\signup\state\attendance_state;
 use mod_facetoface\signup\state\booked;
 use mod_facetoface\signup\state\event_cancelled;
@@ -1681,97 +1686,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @return string
      */
     public function render_room_details(room $room): string {
-
-        $output = array();
-        $output[] = html_writer::start_tag('dl', array('class' => 'f2f roomdetails dl-horizontal'));
-
-        // Room name.
-        $output[] = html_writer::tag('dt', get_string('roomname', 'facetoface'));
-        $output[] = html_writer::tag('dd', $room->get_name());
-
-        $options = array('prefix' => 'facetofaceroom', 'extended' => true);
-        // Converts to item required by Custom Fields.
-        $cf_item = (object)['id' => $room->get_id()];
-        $fields = customfield_get_data($cf_item, 'facetoface_room', 'facetofaceroom', true, $options);
-        if (!empty($fields)) {
-
-            foreach ($fields as $field => $value) {
-
-                $output[] = html_writer::tag('dt', $field);
-                $output[] = html_writer::tag('dd', $value);
-            }
-        }
-
-        // Capacity.
-        $output[] = html_writer::tag('dt', get_string('capacity', 'facetoface'));
-        $output[] = html_writer::tag('dd', $room->get_capacity());
-
-        // Allow scheduling conflicts.
-        $output[] = html_writer::tag('dt', get_string('allowroomconflicts', 'facetoface'));
-        $output[] = html_writer::tag('dd', $room->get_allowconflicts() ? get_string('yes') : get_string('no'));
-
-        // Room link.
-        if (!empty($room->get_url())) {
-            // No conditions, everyone allow to see the room link who can access the room information.
-            $roomurl = s($room->get_url());
-            $output[] = html_writer::tag('dt', get_string('roomurl', 'mod_facetoface'));
-            $output[] = html_writer::tag('dd', html_writer::link(new moodle_url($roomurl), $roomurl));
-        }
-
-        // Description.
-        if (!empty($room->get_description())) {
-            $output[] = html_writer::tag('dt', get_string('roomdescription', 'facetoface'));
-            $descriptionhtml = file_rewrite_pluginfile_urls(
-                $room->get_description(),
-                'pluginfile.php',
-                \context_system::instance()->id,
-                'mod_facetoface',
-                'room',
-                $room->get_id()
-            );
-            $descriptionhtml = format_text($descriptionhtml, FORMAT_HTML);
-            $output[] = html_writer::tag('dd', $descriptionhtml);
-        }
-
-        // Created.
-        $created = new stdClass();
-        $created->user = get_string('unknownuser');
-        if (!empty($room->get_usercreated())) {
-            $url = user_get_profile_url($room->get_usercreated());
-            $user = fullname(\core_user::get_user($room->get_usercreated()));
-            if ($url) {
-                $created->user = html_writer::link($url, $user);
-            } else {
-                $created->user = html_writer::span($user);
-            }
-        }
-        $created->time = userdate($room->get_timecreated());
-        $output[] = html_writer::tag('dt', get_string('created', 'mod_facetoface'));
-        $output[] = html_writer::tag('dd', get_string('timestampbyuser', 'mod_facetoface', $created));
-
-        // Modified.
-        if (!empty($room->get_timemodified())) {
-            $modified = new stdClass();
-            $modified->user = get_string('unknownuser');
-            if (!empty($room->get_usermodified())) {
-                $url = user_get_profile_url($room->get_usermodified());
-                $user = fullname(\core_user::get_user($room->get_usermodified()));
-                if ($url) {
-                    $modified->user = html_writer::link($url, $user);
-                } else {
-                    $modified->user = html_writer::span($user);
-                }
-            }
-            $modified->time = userdate($room->get_timemodified());
-            $output[] = html_writer::tag('dt', get_string('modified'));
-            $output[] = html_writer::tag('dd', get_string('timestampbyuser', 'mod_facetoface', $modified));
-        }
-
-        $output[] = html_writer::end_tag('dl');
-
-        $output = implode('', $output);
-
-        return $output;
+        return $this->render_attachment_details($room, facetofaceroom::class, 'room');
     }
 
     /**
@@ -1817,7 +1732,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             }
         }
 
-        return $this->render_details_popup_html($room->get_name(), 'room', $url, $backurl, $roomhtml);
+        return $this->render_details_inplace_html($room->get_name(), 'room', $url, $backurl, $roomhtml);
     }
 
     /**
@@ -1830,7 +1745,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $url = new moodle_url('/mod/facetoface/reports/facilitators.php', [
             'facilitatorid' => $facilitator->get_id(),
         ]);
-        return $this->render_details_popup_html($facilitator->get_name(), 'facilitator', $url, $backurl);
+        return $this->render_details_inplace_html($facilitator->get_name(), 'facilitator', $url, $backurl);
     }
 
     /**
@@ -1844,11 +1759,11 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $url = new moodle_url('/mod/facetoface/reports/assets.php', array(
             'assetid' => $asset->get_id(),
         ));
-        return $this->render_details_popup_html($asset->get_name(), 'asset', $url, $backurl);
+        return $this->render_details_inplace_html($asset->get_name(), 'asset', $url, $backurl);
     }
 
     /**
-     * Gets the HTML output of a details link.
+     * Gets the HTML output of a details link opening in a popup window.
      *
      * @param string $name - The name of the asset without escaping.
      * @param string $class - The CSS class of the link.
@@ -1869,112 +1784,133 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Gets the HTML output of a details link.
+     *
+     * @param string $name - The name of the asset without escaping.
+     * @param string $class - The CSS class of the link.
+     * @param moodle_url $detailurl
+     * @param string|null $backurl
+     * @param string $extrahtml HTML appended to the link
+     * @return string containing asset details with relevant html tags.
+     */
+    public function render_details_inplace_html(string $name, string $class, moodle_url $detailurl, string $backurl = null, string $extrahtml = ''): string {
+        $detailurl = clone($detailurl);
+        $detailurl->param('view', 1);
+        if (!empty($backurl)) {
+            $detailurl->param('b', (new moodle_url($backurl))->out_as_local_url(false));
+        }
+        $link = $this->output->action_link($detailurl, s($name));
+        return html_writer::span($link . $extrahtml, 'mod_facetoface__' . $class . '__detail');
+    }
+
+    /**
      * Render asset meta data
      *
      * @param \mod_facetoface\asset $asset
      * @return string
      */
     public function render_asset_details(\mod_facetoface\asset $asset): string {
-        global $DB;
-
-        $output = [];
-
-        $output[] = html_writer::start_tag('dl', array('class' => 'f2f roomdetails'));
-
-        // Asset name.
-        $output[] = html_writer::tag('dt', get_string('assetname', 'facetoface'));
-        $output[] = html_writer::tag('dd', $asset->get_name());
-
-        $options = array('prefix' => 'facetofaceasset', 'extended' => true);
-        $cfdata = (object)[
-            'id' => $asset->get_id(),
-            'fullname' => $asset->get_name(),
-            'custom' => $asset->get_custom(),
-        ];
-        $fields = customfield_get_data($cfdata, 'facetoface_asset', 'facetofaceasset', true, $options);
-        if (!empty($fields)) {
-            foreach ($fields as $field => $value) {
-
-                $output[] = html_writer::tag('dt', $field);
-                $output[] = html_writer::tag('dd', $value);
-            }
-        }
-
-        // Allow scheduling conflicts.
-        $output[] = html_writer::tag('dt', get_string('allowassetconflicts', 'facetoface'));
-        $output[] = html_writer::tag('dd', $asset->get_allowconflicts() ? get_string('yes') : get_string('no'));
-
-        // Description.
-        if (!empty($asset->get_description())) {
-            $output[] = html_writer::tag('dt', get_string('assetdescription', 'facetoface'));
-            $descriptionhtml = file_rewrite_pluginfile_urls(
-                $asset->get_description(),
-                'pluginfile.php',
-                \context_system::instance()->id,
-                'mod_facetoface',
-                'asset',
-                $asset->get_id()
-            );
-            $descriptionhtml = format_text($descriptionhtml, FORMAT_HTML);
-            $output[] = html_writer::tag('dd', $descriptionhtml);
-        }
-
-        // Created.
-        $created = new stdClass();
-        $created->user = get_string('unknownuser');
-        $usercreated = $asset->get_usercreated();
-        if (!empty($usercreated)) {
-            $created->user = html_writer::link(
-                new moodle_url('/user/view.php', array('id' => $usercreated)),
-                fullname($DB->get_record('user', array('id' => $usercreated)))
-            );
-        }
-        $created->time = userdate($asset->get_timecreated());
-        $output[] = html_writer::tag('dt', get_string('created', 'mod_facetoface'));
-        $output[] = html_writer::tag('dd', get_string('timestampbyuser', 'mod_facetoface', $created));
-
-        // Modified.
-        $timemodified = $asset->get_timemodified();
-        if (!empty($timemodified)) {
-            $modified = new stdClass();
-            $modified->user = get_string('unknownuser');
-            $usermodified = $asset->get_usermodified();
-            if (!empty($usermodified)) {
-                $modified->user = html_writer::link(
-                    new moodle_url('/user/view.php', array('id' => $usermodified)),
-                    fullname($DB->get_record('user', array('id' => $usermodified)))
-                );
-            }
-            $modified->time = userdate($timemodified);
-
-            $output[] = html_writer::tag('dt', get_string('modified'));
-            $output[] = html_writer::tag('dd', get_string('timestampbyuser', 'mod_facetoface', $modified));
-        }
-
-        $output[] = html_writer::end_tag('dl');
-
-        $output = implode('', $output);
-
-        return $output;
+        return $this->render_attachment_details($asset, facetofaceasset::class, 'asset');
     }
 
     /**
-     * Gets the HTML output for facilitator details.
-     * @param \mod_facetoface\facilitator $facilitator - The facilitator instance to get details for
-     * @param string|null $backurl
-     * @return string containing facilitator details with relevant html tags.
+     * Render facilitator meta data
+     *
+     * @param \mod_facetoface\facilitator $facilitator
+     * @return string
      */
-    public function get_facilitator_details(\mod_facetoface\facilitator_user $facilitator, string $backurl = null): string {
-        $url = new moodle_url('/mod/facetoface/reports/facilitators.php', array(
-            'facilitatorid' => $facilitator->get_id(),
-            'b' => $backurl
-        ));
+    public function render_facilitator_details(facilitator $facilitator): string {
+        return $this->render_attachment_details($facilitator, facetofacefacilitator::class, facetofacefacilitator::get_area_name());
+    }
 
-        $popupurl = clone($url);
-        $popupurl->param('popup', 1);
-        $action = new popup_action('click', $popupurl, 'popup', array('width' => 800, 'height' => 600));
-        $link = $this->output->action_link($url, s($facilitator->get_name()), $action, array('class' => 'mod_facetoface__sessionlist__facilitator__link'));
-        return html_writer::span($link, 'mod_facetoface__sessionlist__facilitatordetails');
+    /**
+     * Render the details of asset, room or facilitator.
+     *
+     * @param seminar_attachment_item $item
+     * @param string $customfieldclass a fully qualified class name in the mod_facetoface\customfield_area namespace
+     * @param string $descarea file area for the description
+     * @return string
+     * @throws coding_exception
+     */
+    protected function render_attachment_details(seminar_attachment_item $item, string $customfieldclass, string $descarea): string {
+        if (strpos($customfieldclass, 'mod_facetoface\\customfield_area') !== 0) {
+            throw new coding_exception('Invalid $customfieldclass passed');
+        }
+
+        $displayadmincontents = has_capability('mod/facetoface:addinstance', $this->getcontext());
+        $builder = seminarevent_detail_section::builder();
+
+        // Custom fields.
+        $filearea = $customfieldclass::get_area_name();
+        $tblprefix = $customfieldclass::get_prefix();
+        $options = array('prefix' => $filearea, 'extended' => true);
+        $cfdata = (object)[
+            'id' => $item->get_id(),
+            'fullname' => $item->get_name(),
+            'custom' => $item->get_custom(),
+        ];
+        $fields = customfield_get_data($cfdata, $tblprefix, $filearea, true, $options);
+        if (!empty($fields)) {
+            foreach ($fields as $field => $value) {
+                if ((string)$value !== '') {
+                    $builder->add_detail_unsafe($field, $value);
+                }
+            }
+        }
+
+        // Capacity.
+        if ($item instanceof room) {
+            $builder->add_detail(get_string('capacity', 'mod_facetoface'), (string)$item->get_capacity());
+        }
+
+        if ($item instanceof facilitator) {
+            if (!empty($item->get_userid())) {
+                $facuser = new facilitator_user($item);
+                $builder->add_detail_unsafe(get_string('facilitatorlinkeduser', 'mod_facetoface'), $facuser->get_fullname_link(true));
+            }
+        }
+
+        if ($displayadmincontents) {
+            // Allow scheduling conflicts.
+            $builder->add_detail(get_string('allowassetconflicts', 'mod_facetoface'), $item->get_allowconflicts() ? get_string('yes') : get_string('no'));
+        }
+
+        // Room link.
+        if ($item instanceof room) {
+            if (!empty($item->get_url())) {
+                // No conditions, everyone allow to see the room link who can access the room information.
+                $roomurl = s($item->get_url());
+                $builder->add_detail_unsafe(get_string('roomurl', 'mod_facetoface'), html_writer::link(new moodle_url($roomurl), $roomurl));
+            }
+        }
+
+        // Description.
+        if ($item->get_description() !== '') {
+            $descriptionhtml = file_rewrite_pluginfile_urls(
+                $item->get_description(),
+                'pluginfile.php',
+                \context_system::instance()->id,
+                'mod_facetoface',
+                $descarea,
+                $item->get_id()
+            );
+            $descriptionhtml = format_text($descriptionhtml, FORMAT_HTML);
+            $builder->set_summary($descriptionhtml);
+        }
+
+        if ($displayadmincontents) {
+            // Created.
+            $timecreated = $item->get_timecreated();
+            $builder->add_detail_unsafe(get_string('created', 'mod_facetoface'), user_helper::get_timestamp_and_profile($timecreated, $item->get_usercreated()));
+
+            // Modified.
+            $timemodified = $item->get_timemodified();
+            if (!empty($timemodified) && $timemodified != $timecreated) {
+                $builder->add_detail_unsafe(get_string('modified'), user_helper::get_timestamp_and_profile($timemodified, $item->get_usermodified()));
+            }
+        }
+
+        return $this->render($builder->build());
     }
 
     /**
@@ -2797,7 +2733,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
         $dates = clone $seminarevent->get_sessions();
         if (!$dates->is_empty()) {
-            $backurl = $option->get_backurl();
+            $backurl = $option->get_current_url();
 
             /** @var \mod_facetoface\seminar_session $date */
             foreach ($dates as $date) {
@@ -2843,8 +2779,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 if (!$facilitators->is_empty()) {
                     // Display facilitator information
                     $facilitatoroutput = [];
-                    $backurl = $option->get_backurl();
-                    /** @var facilitator_user[] $facilitators */
+                    /** @var \mod_facetoface\facilitator_user $facilitator */
                     foreach ($facilitators as $facilitator) {
                         $facilitatoroutput[] = $this->get_facilitator_details_html($facilitator, $backurl);
                     }
@@ -2858,6 +2793,8 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 }
                 if (!$assets->is_empty()) {
                     // Display asset information
+                    $assetoutputs = [];
+                    /** @var \mod_facetoface\asset $asset */
                     foreach ($assets as $asset) {
                         $assetoutputs[] = $this->get_asset_details_html($asset, $backurl);
                     }
@@ -3056,7 +2993,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $listitems = [];
         /** @var \mod_facetoface\facilitator_user $facilitator */
         foreach ($facilitators as $facilitator) {
-            $listitems[] = $this->get_facilitator_details($facilitator, $currenturl);
+            $listitems[] = $this->get_facilitator_details_html($facilitator, $currenturl);
         }
         return $this->render_unordered_list($listitems);
     }
@@ -3145,12 +3082,12 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             foreach ($users as $user) {
                 $error = '';
                 $row = [];
-                $userurl = new \moodle_url('/user/view.php', ['id' => $user->id]);
+                $params = [];
                 if ($courseid != SITEID && is_enrolled($context, $user->id)) {
-                    $userurl->param('course', $courseid);
+                    $params['course'] = $courseid;
                 }
                 // User full name column.
-                $row[] = \html_writer::link($userurl, fullname($user));
+                $row[] = user_helper::get_profile($user, null, $params);
 
                 $data = $list->get_user_data($user->id);
 

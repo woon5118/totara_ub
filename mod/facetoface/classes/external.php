@@ -107,17 +107,18 @@ class external extends external_api {
         $context = context_course::instance($courseid);
         /** @var context_course $context */
 
-        $PAGE->set_context($context);
-        $PAGE->set_url(new moodle_url('/mod/facetoface/classes/external.php'));
-
-        /** @var mod_facetoface_renderer $f2f_renderer */
-        $f2f_renderer = $PAGE->get_renderer('mod_facetoface');
-        $f2f_renderer->setcontext($context);
-
         $filters = new filter_list(function (string $parname, $default, string $type) use (&$filterparams) {
             return $filterparams[$parname] ?? $default;
         });
         $filters->add_default_filters();
+
+        $PAGE->set_context($context);
+        // This line assumes that the AJAX is requested from only the event dashboard page.
+        $PAGE->set_url($filters->to_url($seminar, '/mod/facetoface/view.php'));
+
+        /** @var mod_facetoface_renderer $f2f_renderer */
+        $f2f_renderer = $PAGE->get_renderer('mod_facetoface');
+        $f2f_renderer->setcontext($context);
 
         if ($type == 'upcoming') {
             // Upcoming events.
@@ -125,7 +126,7 @@ class external extends external_api {
                 ->set_displayreservation(true)
                 ->set_eventascendingorder(true)
                 ->set_sessionascendingorder(true)
-                ->set_eventtimes([ event_time::FUTURE, event_time::INPROGRESS, event_time::WAITLISTED ]);
+                ->set_eventtimes([event_time::FUTURE, event_time::INPROGRESS, event_time::WAITLISTED]);
             $data = session_list::create($seminar, $filters, $option, $context, 'mod_facetoface_upcoming_events_table')->export_for_template($f2f_renderer);
         } else if ($type == 'past') {
             // Past events.
@@ -134,7 +135,7 @@ class external extends external_api {
                 ->set_displaysignupperiod(false)
                 ->set_eventascendingorder(false)
                 ->set_sessionascendingorder(false)
-                ->set_eventtimes([ event_time::PAST, event_time::CANCELLED ]);
+                ->set_eventtimes([event_time::PAST, event_time::CANCELLED]);
             $data = session_list::create($seminar, $filters, $option, $context, 'mod_facetoface_past_events_table')->export_for_template($f2f_renderer);
             if ($seminar->has_events()) {
                 $data['pastlink'] = $f2f_renderer->render(show_previous_events::create($seminar, $filters, 'previoussessionheading'));

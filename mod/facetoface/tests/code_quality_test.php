@@ -27,9 +27,12 @@ defined('MOODLE_INTERNAL') || die();
 // NOTE: Declare one by one instead of bulky `use \mod_facetoface\{seminar, signup}` to possibly avoid merge conflict
 
 // Model classes
+use mod_facetoface\asset;
+use mod_facetoface\facilitator;
 use mod_facetoface\facilitator_user;
 use mod_facetoface\room;
 use mod_facetoface\seminar;
+use mod_facetoface\seminar_attachment_item;
 use mod_facetoface\seminar_event;
 use mod_facetoface\seminar_session;
 use mod_facetoface\signup;
@@ -52,7 +55,7 @@ use mod_facetoface\dashboard\filter_list;
 use mod_facetoface\dashboard\render_session_option;
 use mod_facetoface\dashboard\render_session_list_config;
 use mod_facetoface\dashboard\filters\filter as dashboard_filter;
-
+use mod_facetoface\detail\content_generator as detail_content_generator;
 use mod_facetoface\query\query_interface;
 use mod_facetoface\query\statement;
 use mod_facetoface\query\event\filter\filter as query_filter;
@@ -85,7 +88,6 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
         mod_facetoface_code_quality_testcase::class,
 
         facilitator_user::class,
-        room::class,
         seminar::class,
         seminar_event::class,
         seminar_session::class,
@@ -124,6 +126,8 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
      */
     private function get_classes_to_test(): array {
         $tested_classes = $this->tested_classes;
+        // Load all attachment classes
+        self::add_inherited_classes($tested_classes, null, seminar_attachment_item::class, 'classes');
         // Load all state classes
         self::add_inherited_classes($tested_classes, 'signup\state', state::class, 'classes/signup/state');
         // Load all condition classes
@@ -138,6 +142,8 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
         self::add_inherited_classes($tested_classes, 'query\event\filter', query_filter::class, 'classes/query/event/filter');
         // Load all query sortorder classes
         self::add_inherited_classes($tested_classes, 'query\event\sortorder', query_sortorder::class, 'classes/query/event/sortorder');
+        // Load all detail content generator classes
+        self::add_inherited_classes($tested_classes, 'detail', detail_content_generator::class, 'classes/detail');
         // Load all template classes
         self::add_inherited_classes($tested_classes, 'output', null, 'classes/output');
         // Load all template builder classes
@@ -151,13 +157,24 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
      * Add inherited classes to the class list array.
      *
      * @param string[]      $tested_classes The array of classes to append the list of found classes
-     * @param string        $namespace      The plugin namespace without 'mod_facetoface\'
+     * @param string|null   $namespace      The relative namespace to mod_facetoface
      * @param string|null   $baseclass      The base class name without a namespace
      * @param string        $relpath        The relative path to /mod/facetoface/
      * @return void
      */
-    private static function add_inherited_classes(array &$tested_classes, string $namespace, ?string $baseclass, string $relpath): void {
-        $classes = \core_component::get_namespace_classes($namespace, $baseclass, 'mod_facetoface');
+    private static function add_inherited_classes(array &$tested_classes, ?string $namespace, ?string $baseclass, string $relpath): void {
+        if ($namespace !== null) {
+            $classes = \core_component::get_namespace_classes($namespace, $baseclass, 'mod_facetoface');
+        } else {
+            // get_namespace_classes() does not work with $namespace = ''.
+            $classes = array_keys(\core_component::get_component_classes_in_namespace('mod_facetoface', ''));
+            if ($baseclass !== null) {
+                $classes = array_filter($classes, function ($class) use ($baseclass) {
+                    $rc = new ReflectionClass($class);
+                    return $rc->implementsInterface($baseclass) || $rc->isSubclassOf($baseclass);
+                });
+            }
+        }
         $tested_classes = array_unique(array_merge($tested_classes, $classes));
         if ($baseclass !== null && !in_array($baseclass, $tested_classes)) {
             $tested_classes[] = $baseclass;

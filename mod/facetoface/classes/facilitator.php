@@ -31,7 +31,7 @@ use \mod_facetoface\customfield_area\facetofacefacilitator as facilitatorcustomf
 /**
  * Class Facilitator represents Seminar Facilitator
  */
-final class facilitator implements seminar_iterator_item {
+final class facilitator implements seminar_iterator_item, seminar_attachment_item {
 
     use traits\crud_mapper;
 
@@ -147,7 +147,7 @@ final class facilitator implements seminar_iterator_item {
     /**
      * Store facilitator into database
      */
-    public function save() {
+    public function save(): void {
         global $USER;
 
         $this->usermodified = $USER->id;
@@ -257,7 +257,7 @@ final class facilitator implements seminar_iterator_item {
      * as well as facilitators where the start- AND end times don't encapsulate that of another session's facilitator
      * @param int $timestart
      * @param int $timefinish
-     * @param seminar_event $sessionid
+     * @param seminar_event $seminarevent
      * @return bool
      */
     public function is_available(int $timestart, int $timefinish, seminar_event $seminarevent): bool {
@@ -417,7 +417,7 @@ final class facilitator implements seminar_iterator_item {
 
     /**
      * Set whether this facilitator allows conflicts
-     * @param bool $allowconflicts
+     * @param int $allowconflicts
      *
      * @return facilitator $this
      */
@@ -454,6 +454,7 @@ final class facilitator implements seminar_iterator_item {
 
     /**
      * Get the time this facilitator was created
+     * @return int
      */
     public function get_timecreated(): int {
         return (int)$this->timecreated;
@@ -461,6 +462,7 @@ final class facilitator implements seminar_iterator_item {
 
     /**
      * Get the time this facilitator was last modified
+     * @return int
      */
     public function get_timemodified(): int {
         return (int)$this->timemodified;
