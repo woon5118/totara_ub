@@ -45,6 +45,7 @@
 }}
 
 <section class="tw-grid"
+    role="list"
     data-tw-grid=""
     data-core-autoinitialise="true"
     data-core-autoinitialise-amd="totara_core/grid">
@@ -53,6 +54,7 @@
   }}<div class="tw-grid__item
         {{#single_column}}tw-grid__item--single-column{{/single_column}}
         {{^single_column}}tw-grid__item--multi-column{{/single_column}}"
+        role="listitem"
         data-tw-grid-item=""
         data-tw-grid-item-ID="{{#template_data}}{{itemid}}{{/template_data}}">
         {{#template_data}}{{> &&template_name }}{{/template_data}}{{!
