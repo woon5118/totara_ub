@@ -107,8 +107,13 @@ abstract class pathway {
             throw new \coding_exception('Path type mismatch');
         }
 
+        $competency = competency::repository()->find($record->comp_id);
+        if (!$competency) {
+            throw new \coding_exception('Competency for given pathway not found');
+        }
+
         $pathway->set_id($record->id);
-        $pathway->set_competency(new competency($record->comp_id));
+        $pathway->set_competency($competency);
         $pathway->set_sortorder($record->sortorder);
         $pathway->set_path_instance_id($record->path_instance_id);
         $pathway->set_status($record->status);

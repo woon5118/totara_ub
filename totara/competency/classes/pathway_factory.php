@@ -88,7 +88,7 @@ class pathway_factory {
 
     /**
      * @param string $type
-     * @return string Namespaced name of the class corresponding to this type.
+     * @return string|pathway Namespaced name of the class corresponding to this type.
      * @throws \coding_exception if the type does not have a valid corresponding class.
      */
     public static function get_classname(string $type): string {
