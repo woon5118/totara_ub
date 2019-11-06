@@ -47,6 +47,7 @@ $string['catalogtype'] = 'Catalogue default view';
 $string['category'] = 'Category';
 $string['changes_saved'] = 'Changes have been saved. {$a->link}';
 $string['changes_saved_delayed_processing'] = 'Changes have been saved and will appear as soon as the processing is complete.';
+$string['closedetails'] = 'Close';
 $string['configcatalogtype'] = 'Enabling the Grid Catalogue requires time to process. You will be notified when the process is complete.';
 $string['configcoursesperpagetotaracatenabled'] = 'Grid catalogue is enabled. You can change the number of records displayed on the catalogue page.';
 $string['configurecatalog'] = 'Configure catalogue';
