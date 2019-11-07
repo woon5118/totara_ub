@@ -26,11 +26,9 @@ namespace totara_competency\rb\display;
 use rb_column;
 use reportbuilder;
 use stdClass;
-use totara_competency\entities\assignment;
 use totara_assignment\user_groups;
 use totara_reportbuilder\rb\display\base;
 
-// TODO: WILL CONFLICT WHEN PUTTING ASSIGNMENT CODE INTO TOTARA COMPETENCY. JUST CHECK STRINGS ARE ALL THERE.
 /**
  * Display class intended for user group type
  */

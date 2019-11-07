@@ -18,7 +18,7 @@
  *
  * @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
 define(['core/str', 'core/modal_factory', 'core/modal_events', 'totara_core/basket_list', 'core/ajax', 'core/notification',

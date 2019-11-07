@@ -18,7 +18,7 @@
  *
  * @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
 define(['totara_core/basket_list', 'totara_competency/list_framework_hierarchy_events'],

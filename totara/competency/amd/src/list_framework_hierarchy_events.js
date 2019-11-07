@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
 define([], function() {

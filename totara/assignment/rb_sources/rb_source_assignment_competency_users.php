@@ -43,7 +43,7 @@ class rb_source_assignment_competency_users extends rb_base_source {
      */
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         $this->usedcomponents[] = 'totara_assignment';
-        $this->usedcomponents[] = 'tassign_competency';
+        $this->usedcomponents[] = 'totara_competency';
 
         if ($groupid instanceof rb_global_restriction_set) {
             throw new coding_exception('Wrong parameter orders detected during report source instantiation.');

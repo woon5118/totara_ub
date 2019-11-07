@@ -30,8 +30,8 @@ use reportbuilder;
 use stdClass;
 use totara_assignment\user_groups;
 use totara_reportbuilder\rb\display\base;
+use totara_reportbuilder\rb\display\format_string;
 
-// TODO: WILL CONFLICT WHEN PUTTING ASSIGNMENT CODE INTO TOTARA COMPETENCY. JUST CHECK STRINGS ARE ALL THERE.
 /**
  * Display class intended for user group type
  */
@@ -52,22 +52,20 @@ class display_user_group extends base {
             return '';
         }
 
-        $isexport = ($format !== 'html');
-
         $extrafields = self::get_extrafields_row($row, $column);
 
         switch ($value) {
             case user_groups::USER:
-                $value = self::get_user($extrafields, $isexport);
+                $value = self::get_user($extrafields, $format, $row, $column, $report);
                 break;
             case user_groups::COHORT:
-                $value = self::get_cohort($extrafields, $isexport);
+                $value = self::get_cohort($extrafields, $format, $row, $column, $report);
                 break;
             case user_groups::POSITION:
-                $value = self::get_position($extrafields, $isexport);
+                $value = self::get_position($extrafields, $format, $row, $column, $report);
                 break;
             case user_groups::ORGANISATION:
-                $value = self::get_organisation($extrafields, $isexport);
+                $value = self::get_organisation($extrafields, $format, $row, $column, $report);
                 break;
             default:
                 throw new \coding_exception('Display function for user_group '.$value.' not implemented.');
@@ -77,7 +75,8 @@ class display_user_group extends base {
         return $value;
     }
 
-    private static function get_user(stdClass $extrafields, bool $isexport): string {
+    private static function get_user(stdClass $extrafields, string $format, stdClass $row,
+                                        rb_column $column, reportbuilder $report): string {
         $value = fullname(
             (object)[
                 'firstname' => $extrafields->user_firstname,
@@ -88,84 +87,72 @@ class display_user_group extends base {
                 'alternatename' => $extrafields->user_alternatename
             ]
         );
+
+        $value = format_string::display($value, $format, $row, $column, $report);
+
         if (!empty($extrafields->user_idnumber)) {
             $value .= " ({$extrafields->user_idnumber})";
         }
-        // Don't show links in spreadsheet.
-        if (!$isexport) {
-            $url = new moodle_url(
-                '/user/view.php',
-                ['id' => $extrafields->user_id]
-            );
-            $value = html_writer::link($url, $value);
+        if ($format !== 'html') {
+            return $value;
         }
-        return $value;
+
+        $url = new moodle_url(
+            '/user/view.php',
+            ['id' => $extrafields->user_id]
+        );
+        return html_writer::link($url, $value);
     }
 
-    /**
-     * This method is called dynamically in the display method based on the user group type
-     *
-     * @param stdClass $extrafields
-     * @param bool $isexport
-     * @return string
-     */
-    private static function get_position(stdClass $extrafields, bool $isexport): string {
-        $value = $extrafields->pos_name;
+    private static function get_position(stdClass $extrafields, string $format, stdClass $row,
+                                            rb_column $column, reportbuilder $report): string {
+        $value = format_string::display($extrafields->pos_name, $format, $row, $column, $report);
         if (!empty($extrafields->pos_idnumber)) {
-            $value .= " ({$extrafields->pos_idnumber})";
+            $value .= s(" ({$extrafields->pos_idnumber})");
         }
-        if (!$isexport) {
-            $url = new moodle_url(
-                '/totara/hierarchy/item/view.php',
-                ['prefix' => 'position', 'id' => $extrafields->pos_id]
-            );
-            $value = html_writer::link($url, $value);
+        if ($format !== 'html') {
+            return $value;
         }
-        return $value;
+
+        $url = new moodle_url(
+            '/totara/hierarchy/item/view.php',
+            ['prefix' => 'position', 'id' => $extrafields->pos_id]
+        );
+        return html_writer::link($url, $value);
     }
 
-    /**
-     * This method is called dynamically in the display method based on the user group type
-     *
-     * @param stdClass $extrafields
-     * @param bool $isexport
-     * @return string
-     */
-    private static function get_organisation(stdClass $extrafields, bool $isexport): string {
-        $value = $extrafields->org_name;
+    private static function get_organisation(stdClass $extrafields, string $format, stdClass $row,
+                                                rb_column $column, reportbuilder $report): string {
+        $value = format_string::display($extrafields->org_name, $format, $row, $column, $report);
         if (!empty($extrafields->org_idnumber)) {
-            $value .= " ({$extrafields->org_idnumber})";
+            $value .= s(" ({$extrafields->org_idnumber})");
         }
-        if (!$isexport) {
-            $url = new moodle_url(
-                '/totara/hierarchy/item/view.php',
-                ['prefix' => 'organisation', 'id' => $extrafields->org_id]
-            );
-            return html_writer::link($url, $value);
+        if ($format !== 'html') {
+            return $value;
         }
-        return $value;
+
+        $url = new moodle_url(
+            '/totara/hierarchy/item/view.php',
+            ['prefix' => 'organisation', 'id' => $extrafields->org_id]
+        );
+        return html_writer::link($url, $value);
     }
 
-    /**
-     * This method is called dynamically in the display method based on the user group type
-     *
-     * @param stdClass $extrafields
-     * @param bool $isexport
-     * @return string
-     */
-    private static function get_cohort(stdClass $extrafields, bool $isexport): string {
-        $value = $extrafields->coh_name;
+    private static function get_cohort(stdClass $extrafields, string $format, stdClass $row,
+                                        rb_column $column, reportbuilder $report): string {
+        $value = format_string::display($extrafields->coh_name, $format, $row, $column, $report);
         if (!empty($extrafields->coh_idnumber)) {
             $value .= " ({$extrafields->coh_idnumber})";
         }
-        if (!$isexport) {
-            $url = new moodle_url(
-                '/cohort/view.php',
-                ['id' => $extrafields->coh_id]
-            );
-            return html_writer::link($url, $value);
+        if ($format !== 'html') {
+            return $value;
         }
-        return $value;
+
+        $url = new moodle_url(
+            '/cohort/view.php',
+            ['id' => $extrafields->coh_id]
+        );
+        return html_writer::link($url, $value);
     }
 
     /**

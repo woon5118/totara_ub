@@ -18,7 +18,7 @@
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
  * @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
 define(['core/str', 'core/templates', 'totara_core/modal_list', 'totara_competency/list_framework_hierarchy_events',
