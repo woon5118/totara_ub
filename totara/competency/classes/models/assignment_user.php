@@ -21,7 +21,7 @@
  * @package tassign_competency
  */
 
-namespace tassign_competency\models;
+namespace totara_competency\models;
 
 use core\orm\entity\repository;
 use core\orm\collection;

@@ -27,7 +27,7 @@ use tassign_competency\event\assignment_user;
 use tassign_competency\event\assignment_user_archived;
 use tassign_competency\event\assignment_user_assigned;
 use tassign_competency\event\assignment_user_unassigned;
-use tassign_competency\models;
+use totara_competency\models;
 
 defined('MOODLE_INTERNAL') || die();
 

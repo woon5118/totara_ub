@@ -24,7 +24,7 @@
 namespace tassign_competency\observers;
 
 use hierarchy_competency\event;
-use tassign_competency\models\assignment_actions;
+use totara_competency\models\assignment_actions;
 
 defined('MOODLE_INTERNAL') || die();
 

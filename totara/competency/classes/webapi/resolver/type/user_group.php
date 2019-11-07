@@ -25,7 +25,7 @@ namespace totara_competency\webapi\resolver\type;
 
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use tassign_competency\models\user_group as user_group_model;
+use totara_competency\models\user_group as user_group_model;
 use totara_core\formatter\field\string_field_formatter;
 
 /**

@@ -21,7 +21,7 @@
  * @package tassign_competency
  */
 
-namespace tassign_competency\models;
+namespace totara_competency\models;
 
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency_assignment_user_log;

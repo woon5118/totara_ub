@@ -29,7 +29,7 @@ use totara_competency\entities\competency_achievement;
 use totara_competency\entities\pathway_achievement;
 use totara_competency\competency_achievement_aggregator;
 use totara_competency\achievement_configuration;
-use tassign_competency\models\assignment_actions;
+use totara_competency\models\assignment_actions;
 use tassign_competency\expand_task;
 
 class pathway_learning_plan_observer_testcase extends advanced_testcase {

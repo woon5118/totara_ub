@@ -29,8 +29,8 @@ use core\orm\cursor_paginator;
 use totara_competency\entities\competency as competency_entity;
 use totara_competency\entities\filters\competency_user_assignment_status;
 use totara_competency\entities\filters\competency_user_assignment_type;
-use tassign_competency\models\assignment;
-use tassign_competency\models\assignment_user;
+use totara_competency\models\assignment;
+use totara_competency\models\assignment_user;
 use totara_assignment\entities\user;
 use totara_competency\models\self_assignable_competency;
 

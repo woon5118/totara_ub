@@ -21,7 +21,7 @@
  * @package tassign_competency
  */
 
-namespace tassign_competency;
+namespace totara_competency;
 
 class assignment_create_exception extends \moodle_exception {
 

@@ -45,7 +45,7 @@ class totara_competency_actions_activate_testcase extends totara_competency_assi
         $assignment3->status = entities\assignment::STATUS_ARCHIVED;
         $assignment3->save();
 
-        $model = new \tassign_competency\models\assignment_actions();
+        $model = new \totara_competency\models\assignment_actions();
         $affected_ids = $model->activate([$assignment1->id, $assignment2->id]);
         $this->assertEquals([$assignment1->id, $assignment2->id], $affected_ids);
 
@@ -69,7 +69,7 @@ class totara_competency_actions_activate_testcase extends totara_competency_assi
         $assignment2->status = entities\assignment::STATUS_ARCHIVED;
         $assignment2->save();
 
-        $model = new \tassign_competency\models\assignment_actions();
+        $model = new \totara_competency\models\assignment_actions();
         $affected_ids = $model->activate($assignment1->id);
         $this->assertEquals([$assignment1->id], $affected_ids);
 
@@ -96,7 +96,7 @@ class totara_competency_actions_activate_testcase extends totara_competency_assi
         $assignment3->status = entities\assignment::STATUS_ARCHIVED;
         $assignment3->save();
 
-        $model = new \tassign_competency\models\assignment_actions();
+        $model = new \totara_competency\models\assignment_actions();
         $affected_ids = $model->activate([$assignment1->id, $assignment2->id, $assignment3->id]);
         $this->assertEquals([$assignment1->id], $affected_ids);
 

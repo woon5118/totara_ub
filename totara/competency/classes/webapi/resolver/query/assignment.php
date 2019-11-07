@@ -25,7 +25,7 @@ namespace totara_competency\webapi\resolver\query;
 
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
-use tassign_competency\models\assignment as assignment_model;
+use totara_competency\models\assignment as assignment_model;
 use totara_core\advanced_feature;
 
 /**

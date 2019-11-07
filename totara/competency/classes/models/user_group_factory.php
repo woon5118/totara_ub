@@ -21,7 +21,7 @@
  * @package tassign_competency
  */
 
-namespace tassign_competency\models;
+namespace totara_competency\models;
 
 use totara_competency\entities\assignment as assignment_entity;
 
@@ -37,7 +37,7 @@ class user_group_factory {
      */
     public static function create(assignment_entity $assignment): user_group {
         /** @var user_group $class_name */
-        $class_name = "\\tassign_competency\\models\\user_group\\{$assignment->user_group_type}";
+        $class_name = "\\totara_competency\\models\\user_group\\{$assignment->user_group_type}";
         if (class_exists($class_name) && is_subclass_of($class_name, user_group::class)) {
             return $class_name::load_by_id($assignment->user_group_id);
         }

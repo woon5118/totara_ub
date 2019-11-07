@@ -26,7 +26,7 @@ global $CFG;
 
 use core\collection;
 use core\orm\entity\repository;
-use tassign_competency\models\assignment as assignment_model;
+use totara_competency\models\assignment as assignment_model;
 use totara_competency\data_providers\competency_progress;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency_achievement;

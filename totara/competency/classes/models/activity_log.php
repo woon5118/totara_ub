@@ -25,7 +25,7 @@ namespace totara_competency\models;
 
 use core\orm\entity\entity;
 use totara_competency\entities\assignment as assignment_entity;
-use tassign_competency\models\assignment as assignment_model;
+use totara_competency\models\assignment as assignment_model;
 
 /**
  * Class activity_log_data

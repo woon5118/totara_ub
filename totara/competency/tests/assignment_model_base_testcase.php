@@ -22,17 +22,17 @@
  * @category test
  */
 
-use tassign_competency\assignment_create_exception;
+use totara_competency\assignment_create_exception;
 use totara_competency\entities\assignment as assignment_entity;
 use totara_competency\entities\competency as competency_entity;
 use totara_competency\entities\competency_assignment_user;
 use tassign_competency\event\assignment_created;
 use tassign_competency\expand_task;
-use tassign_competency\models\assignment as assignment_model;
-use tassign_competency\models\user_group\cohort as cohort_model;
-use tassign_competency\models\user_group\organisation as organisation_model;
-use tassign_competency\models\user_group\position as position_model;
-use tassign_competency\models\user_group\user;
+use totara_competency\models\assignment as assignment_model;
+use totara_competency\models\user_group\cohort as cohort_model;
+use totara_competency\models\user_group\organisation as organisation_model;
+use totara_competency\models\user_group\position as position_model;
+use totara_competency\models\user_group\user;
 use totara_assignment\entities\organisation as organisation_entity;
 use totara_assignment\entities\position as position_entity;
 use totara_assignment\user_groups;

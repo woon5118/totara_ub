@@ -76,7 +76,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
             }
         }
 
-        $model = new \tassign_competency\models\assignment_actions();
+        $model = new \totara_competency\models\assignment_actions();
         $model->activate($assignment_ids);
 
         $expand_task = new \tassign_competency\expand_task($DB);
@@ -502,7 +502,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
 
         $disable_assignment_id = array_pop($assignmentids);
 
-        $model = new \tassign_competency\models\assignment_actions();
+        $model = new \totara_competency\models\assignment_actions();
         $model->archive([$disable_assignment_id]);
         $expand_task = new \tassign_competency\expand_task($DB);
         $expand_task->expand_all();
@@ -597,7 +597,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
 
         $disable_assignment_id = array_pop($assignment_ids);
 
-        $model = new \tassign_competency\models\assignment_actions();
+        $model = new \totara_competency\models\assignment_actions();
         $model->archive([$disable_assignment_id]);
         $expand_task = new \tassign_competency\expand_task($DB);
         $expand_task->expand_all();

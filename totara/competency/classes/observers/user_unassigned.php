@@ -24,7 +24,7 @@
 namespace tassign_competency\observers;
 
 use tassign_competency\event\assignment_user_unassigned;
-use tassign_competency\models\assignment_user;
+use totara_competency\models\assignment_user;
 use tassign_competency\settings;
 
 defined('MOODLE_INTERNAL') || die();

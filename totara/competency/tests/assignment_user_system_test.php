@@ -37,7 +37,7 @@ class totara_competency_assignment_user_system_testcase extends totara_competenc
 
         $user = $this->getDataGenerator()->create_user();
 
-        $assignment_user = new \tassign_competency\models\assignment_user($user->id);
+        $assignment_user = new \totara_competency\models\assignment_user($user->id);
         $assignment_user->create_system_assignment($competencies[0]->id);
 
         $new_assignment = entities\assignment::repository()
@@ -62,7 +62,7 @@ class totara_competency_assignment_user_system_testcase extends totara_competenc
 
         $this->expand();
 
-        $assignment_user = new \tassign_competency\models\assignment_user($user->id);
+        $assignment_user = new \totara_competency\models\assignment_user($user->id);
         $assignment_user->create_system_assignment($competencies[0]->id);
 
         $new_assignment = entities\assignment::repository()
@@ -87,7 +87,7 @@ class totara_competency_assignment_user_system_testcase extends totara_competenc
 
         $this->expand();
 
-        $assignment_user = new \tassign_competency\models\assignment_user($user->id);
+        $assignment_user = new \totara_competency\models\assignment_user($user->id);
         $assignment_user->create_system_assignment($competencies[0]->id);
 
         $new_assignment = entities\assignment::repository()
@@ -107,7 +107,7 @@ class totara_competency_assignment_user_system_testcase extends totara_competenc
         /** @var entities\assignment $assignment */
         $this->create_assignment_for_user($competencies, $user);
 
-        $assignment_user = new \tassign_competency\models\assignment_user($user->id);
+        $assignment_user = new \totara_competency\models\assignment_user($user->id);
         $assignment_user->create_system_assignment($competencies[0]->id);
 
         $new_assignment = entities\assignment::repository()
@@ -134,7 +134,7 @@ class totara_competency_assignment_user_system_testcase extends totara_competenc
 
         delete_user($user);
 
-        $assignment_user = new \tassign_competency\models\assignment_user($user->id);
+        $assignment_user = new \totara_competency\models\assignment_user($user->id);
         $assignment_user->create_system_assignment($competencies[0]->id);
 
         $new_assignment = entities\assignment::repository()

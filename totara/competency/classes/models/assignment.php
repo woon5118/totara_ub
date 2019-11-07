@@ -21,13 +21,13 @@
  * @package tassign_competency
  */
 
-namespace tassign_competency\models;
+namespace totara_competency\models;
 
 use coding_exception;
 use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\query\builder;
-use tassign_competency\assignment_create_exception;
+use totara_competency\assignment_create_exception;
 use totara_competency\entities\assignment as assignment_entity;
 use totara_competency\entities\competency;
 use totara_competency\entities\competency_assignment_user;

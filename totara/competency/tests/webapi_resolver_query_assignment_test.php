@@ -23,7 +23,7 @@
  */
 
 use core\webapi\execution_context;
-use tassign_competency\models\assignment;
+use totara_competency\models\assignment;
 
 defined('MOODLE_INTERNAL') || die();
 

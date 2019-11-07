@@ -26,7 +26,7 @@ namespace totara_competency\webapi\resolver\type;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
 use totara_competency\formatter;
-use tassign_competency\models\assignment as assignment_model;
+use totara_competency\models\assignment as assignment_model;
 
 /**
  * Note: It is the responsibility of the query to ensure the user is permitted to see an organisation.

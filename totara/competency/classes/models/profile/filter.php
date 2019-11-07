@@ -25,7 +25,7 @@ namespace totara_competency\models\profile;
 
 use core\collection;
 use totara_competency\data_providers\assignments;
-use tassign_competency\models\assignment as assignment_model;
+use totara_competency\models\assignment as assignment_model;
 use totara_competency\entities\assignment as assignment_entity;
 
 /**

@@ -22,7 +22,7 @@
  * @category test
  */
 
-use tassign_competency\models\assignment_actions;
+use totara_competency\models\assignment_actions;
 use totara_competency\entities;
 
 defined('MOODLE_INTERNAL') || die();

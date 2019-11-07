@@ -70,7 +70,7 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
         $configuration->save_aggregation();
 
         $assignment1 = $assignment_generator->create_user_assignment($competency1->id, $user1->id);
-        $model = new \tassign_competency\models\assignment_actions();
+        $model = new \totara_competency\models\assignment_actions();
         $model->activate([$assignment1->id]);
         $expand_task = new \tassign_competency\expand_task($DB);
         $expand_task->expand_all();
@@ -166,7 +166,7 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
         $configuration->save_aggregation();
 
         $assignment1 = $assignment_generator->create_user_assignment($competency1->id, $user1->id);
-        $model = new \tassign_competency\models\assignment_actions();
+        $model = new \totara_competency\models\assignment_actions();
         $model->activate([$assignment1->id]);
         $expand_task = new \tassign_competency\expand_task($DB);
         $expand_task->expand_all();

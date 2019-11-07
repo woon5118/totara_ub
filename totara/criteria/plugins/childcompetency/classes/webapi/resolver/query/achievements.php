@@ -32,7 +32,7 @@ use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use criteria_childcompetency\childcompetency;
 use totara_competency\entities\assignment;
-use tassign_competency\models\assignment_user;
+use totara_competency\models\assignment_user;
 use totara_competency\entities\competency;
 use totara_core\advanced_feature;
 use totara_criteria\criterion_not_found_exception;

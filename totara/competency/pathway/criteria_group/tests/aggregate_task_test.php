@@ -38,7 +38,7 @@ class pathway_criteria_group_aggregate_task_testcase extends advanced_testcase {
             $assignment_ids[] = $assignment->id;
         }
 
-        $model = new \tassign_competency\models\assignment_actions();
+        $model = new \totara_competency\models\assignment_actions();
         $model->activate($assignment_ids);
 
         $expand_task = new \tassign_competency\expand_task($DB);
@@ -131,7 +131,7 @@ class pathway_criteria_group_aggregate_task_testcase extends advanced_testcase {
 
         $criteria_group = $competency_generator->create_criteria_group($competency, $criteria);
 
-        (new \tassign_competency\models\assignment_actions())->archive($assignment_ids);
+        (new \totara_competency\models\assignment_actions())->archive($assignment_ids);
         (new \tassign_competency\expand_task($DB))->expand_all();
 
         $task = new aggregate();
@@ -167,7 +167,7 @@ class pathway_criteria_group_aggregate_task_testcase extends advanced_testcase {
         $this->assertEquals(0, iterator_count($to_calculate));
         $to_calculate->close();
 
-        (new \tassign_competency\models\assignment_actions())->archive($assignment_ids);
+        (new \totara_competency\models\assignment_actions())->archive($assignment_ids);
         (new \tassign_competency\expand_task($DB))->expand_all();
 
         $this->assertEmpty($task->get_users_requiring_aggregation($criteria_group->get_id()));

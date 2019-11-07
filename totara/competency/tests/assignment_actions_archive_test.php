@@ -26,7 +26,7 @@ use totara_competency\entities;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency_assignment_user;
 use tassign_competency\expand_task;
-use tassign_competency\models\assignment_actions;
+use totara_competency\models\assignment_actions;
 use totara_job\job_assignment;
 use core\orm\query\table;
 

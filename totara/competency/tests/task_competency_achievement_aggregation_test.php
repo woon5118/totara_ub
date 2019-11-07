@@ -65,7 +65,7 @@ class task_competency_achievement_aggregation_testcase extends advanced_testcase
             $assignment_ids[] = $assignment->id;
         }
 
-        $model = new \tassign_competency\models\assignment_actions();
+        $model = new \totara_competency\models\assignment_actions();
         $model->activate($assignment_ids);
 
         $expand_task = new \tassign_competency\expand_task($DB);
@@ -242,7 +242,7 @@ class task_competency_achievement_aggregation_testcase extends advanced_testcase
         $assignment_ids = $this->generate_active_expanded_user_assignments($competency, [$user]);
         (new pathway_aggregator($pathway))->aggregate([$user->id]);
 
-        (new \tassign_competency\models\assignment_actions())->archive($assignment_ids);
+        (new \totara_competency\models\assignment_actions())->archive($assignment_ids);
         (new \tassign_competency\expand_task($DB))->expand_all();
 
         $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
@@ -313,7 +313,7 @@ class task_competency_achievement_aggregation_testcase extends advanced_testcase
         $task->execute();
 
         // Now archive the assignment.
-        (new \tassign_competency\models\assignment_actions())->archive($assignment_ids);
+        (new \totara_competency\models\assignment_actions())->archive($assignment_ids);
         (new \tassign_competency\expand_task($DB))->expand_all();
 
         $user_ids = $task->get_assigned_users_with_updated_achievements($competency);

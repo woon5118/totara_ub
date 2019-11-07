@@ -25,7 +25,7 @@ use core\orm\query\builder;
 use core\collection as core_collection;
 use core\orm\collection;
 use tassign_competency\expand_task;
-use tassign_competency\models\assignment as assignment_model;
+use totara_competency\models\assignment as assignment_model;
 use totara_assignment\entities\user;
 use totara_assignment\user_groups;
 use totara_competency\entities\assignment;

@@ -21,16 +21,16 @@
  * @package tassign_competency
  */
 
-namespace tassign_competency\models;
+namespace totara_competency\models;
 
 use core\event\base;
 use core\orm\collection;
 use core\orm\query\builder;
-use tassign_competency\assignment_create_exception;
+use totara_competency\assignment_create_exception;
 use totara_competency\entities;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency;
-use tassign_competency\models\assignment as assignment_model;
+use totara_competency\models\assignment as assignment_model;
 use tassign_competency\settings;
 use totara_assignment\filter\hierarchy_item_visible;
 

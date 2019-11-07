@@ -24,7 +24,7 @@
 namespace totara_competency\data_providers;
 
 use core\collection;
-use tassign_competency\models\assignment;
+use totara_competency\models\assignment;
 use totara_competency\models\profile\competency_progress as competency_progress_model;
 
 class competency_progress extends user_data_provider {

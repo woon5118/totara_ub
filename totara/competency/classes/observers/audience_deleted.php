@@ -24,7 +24,7 @@
 namespace tassign_competency\observers;
 
 use core\event;
-use tassign_competency\models\assignment_actions;
+use totara_competency\models\assignment_actions;
 use totara_assignment\user_groups;
 
 defined('MOODLE_INTERNAL') || die();

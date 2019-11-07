@@ -21,9 +21,9 @@
  * @package tassign_competency
  */
 
-namespace tassign_competency\models\user_group;
+namespace totara_competency\models\user_group;
 
-use tassign_competency\models\user_group;
+use totara_competency\models\user_group;
 use totara_assignment\entities\cohort as cohort_entity;
 use totara_assignment\user_groups;
 

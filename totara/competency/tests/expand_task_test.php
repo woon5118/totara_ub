@@ -24,7 +24,7 @@
 
 use totara_competency\entities\assignment;
 use tassign_competency\expand_task;
-use tassign_competency\models\assignment as assignment_model;
+use totara_competency\models\assignment as assignment_model;
 use totara_assignment\user_groups;
 use totara_job\job_assignment;
 
@@ -470,7 +470,7 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
 
         $competencies = [$test_data->comp1->id, $test_data->comp2->id, $test_data->comp3->id];
 
-        $actions = new \tassign_competency\models\assignment_actions();
+        $actions = new \totara_competency\models\assignment_actions();
 
         $test_data->draft_ind = $actions->create_from_competencies($competencies, [user_groups::USER => [$test_data->user1->id]], assignment::TYPE_ADMIN, assignment::STATUS_DRAFT);
         $test_data->draft_coh = $actions->create_from_competencies($competencies, [user_groups::COHORT => [$test_data->cohort1->id]], assignment::TYPE_ADMIN, assignment::STATUS_DRAFT);
