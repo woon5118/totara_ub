@@ -111,9 +111,7 @@ class totara_competency_competency_achievement_aggregator_testcase extends advan
         $competency = $competency_generator->create_competency();
 
         /** @var scale_value $scale_value */
-        $scale_value = $competency->scale->values()
-            ->order_by('sortorder', 'asc')
-            ->first();
+        $scale_value = $competency->scale->sorted_values_high_to_low->first();
 
         $pathway = $competency_generator->create_test_pathway($competency);
         $pathway->set_test_aggregate_current_value($scale_value);
@@ -161,9 +159,7 @@ class totara_competency_competency_achievement_aggregator_testcase extends advan
         $competency = $competency_generator->create_competency();
 
         /** @var scale_value $scale_value */
-        $scale_value = $competency->scale->values()
-            ->order_by('sortorder', 'asc')
-            ->first();
+        $scale_value = $competency->scale->sorted_values_high_to_low->first();
 
         // Two pathways that will return the same scale_value.
         $pathway1 = $competency_generator->create_test_pathway($competency);
@@ -223,9 +219,7 @@ class totara_competency_competency_achievement_aggregator_testcase extends advan
         $competency = $competency_generator->create_competency();
 
         /** @var scale_value $scale_value */
-        $scale_value = $competency->scale->values()
-            ->order_by('sortorder', 'asc')
-            ->first();
+        $scale_value = $competency->scale->sorted_values_high_to_low->first();
 
         // Two pathways that will return the same scale_value.
         $pathway1 = $competency_generator->create_test_pathway($competency);
@@ -292,9 +286,7 @@ class totara_competency_competency_achievement_aggregator_testcase extends advan
         $competency = $competency_generator->create_competency();
 
         /** @var scale_value $scale_value */
-        $scale_value = $competency->scale->values()
-            ->order_by('sortorder', 'asc')
-            ->first();
+        $scale_value = $competency->scale->sorted_values_high_to_low->first();
 
         // Two pathways that will return the same scale_value.
         $pathway1 = $competency_generator->create_test_pathway($competency);
@@ -381,9 +373,7 @@ class totara_competency_competency_achievement_aggregator_testcase extends advan
 
         /** @var scale_value $scale_value1 */
         $scale = $competency->scale;
-        $values = $scale->values()
-            ->order_by('sortorder', 'asc')
-            ->get();
+        $values = $scale->sorted_values_high_to_low;
 
         $scale_value1 = $values->first();
         $values->next();
@@ -466,9 +456,7 @@ class totara_competency_competency_achievement_aggregator_testcase extends advan
         $competency = $competency_generator->create_competency();
 
         /** @var scale_value $scale_value */
-        $scale_value = $competency->scale->values()
-            ->order_by('sortorder', 'asc')
-            ->first();
+        $scale_value = $competency->scale->sorted_values_high_to_low->first();
 
         $pathway = $competency_generator->create_test_pathway($competency);
         $pathway->set_test_aggregate_current_value($scale_value);
@@ -564,9 +552,7 @@ class totara_competency_competency_achievement_aggregator_testcase extends advan
         $competency = $competency_generator->create_competency();
 
         $scale = $competency->scale;
-        $values = $scale->values()
-            ->order_by('sortorder', 'asc')
-            ->get();
+        $values = $scale->sorted_values_high_to_low;
         $scale_value1 = $values->first();
         $values->next();
         /** @var scale_value $scale_value2 */
@@ -650,9 +636,7 @@ class totara_competency_competency_achievement_aggregator_testcase extends advan
         $competency = $competency_generator->create_competency();
 
         $scale = $competency->scale;
-        $values = $scale->values()
-            ->order_by('sortorder', 'asc')
-            ->get();
+        $values = $scale->sorted_values_high_to_low;
 
         /** @var scale_value $scale_value1 */
         $scale_value1 = $values->first();

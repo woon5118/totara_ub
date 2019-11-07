@@ -91,9 +91,7 @@ class task_competency_achievement_aggregation_testcase extends advanced_testcase
 
     private function create_competency_with_pathway() {
         $competency = $this->generate_competency();
-        $scale_value = $competency->scale->values()
-            ->order_by('sortorder', 'asc')
-            ->first();
+        $scale_value = $competency->scale->sorted_values_high_to_low->first();
 
         $pathway = $this->generate_mock_pathway($competency, $scale_value);
         $config = new achievement_configuration($competency);

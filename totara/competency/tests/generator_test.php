@@ -53,10 +53,7 @@ class totara_competency_generator_testcase extends \advanced_testcase {
             ]
         );
         $data->scale = new scale($data->scale->id);
-        $data->scalevalues = $data->scale->values()
-            ->order_by('sortorder', 'asc')
-            ->get()
-            ->all();
+        $data->scalevalues = $data->scale->sorted_values_high_to_low->all();
 
         $framework = $hierarchygenerator->create_comp_frame(['scale' => $data->scale->id]);
         $data->comp = new competency_entity($hierarchygenerator->create_comp(['frameworkid' => $framework->id])->id);

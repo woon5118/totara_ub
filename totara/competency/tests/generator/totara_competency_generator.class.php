@@ -157,9 +157,7 @@ class totara_competency_generator extends component_generator_base {
         $instance = $this->create_pathway(criteria_group::class, $competency, $sort_order);
 
         if (is_null($scale_value)) {
-            $scale_value = $competency->scale->values()
-            ->order_by('sortorder', 'asc')
-            ->first();
+            $scale_value = $competency->scale->sorted_values_high_to_low->first();
         } else if (!$scale_value instanceof $scale_value) {
             $scale_value = new scale_value($scale_value, true, true);
         }
@@ -230,9 +228,7 @@ class totara_competency_generator extends component_generator_base {
         $rater_id = isset($rater_user->id) ? $rater_user->id : $rater_user;
 
         if (is_null($scale_value)) {
-            $scale_value = $competency->scale->values()
-                ->order_by('sortorder', 'asc')
-                ->first();
+            $scale_value = $competency->scale->sorted_values_high_to_low->first();
             $scale_value = $scale_value ? $scale_value->id : null;
         } else if ($scale_value instanceof scale_value) {
             $scale_value = $scale_value->id;

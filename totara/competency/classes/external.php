@@ -77,9 +77,7 @@ class external extends \external_api {
         $results = [];
 
         $scale = new scale($scale_id);
-        $scalevalues = $scale->values()
-            ->order_by('sortorder', 'asc')
-            ->get();
+        $scalevalues = $scale->sorted_values_high_to_low;
 
         $formatter = new string_field_formatter(format::FORMAT_HTML, \context_system::instance());
 

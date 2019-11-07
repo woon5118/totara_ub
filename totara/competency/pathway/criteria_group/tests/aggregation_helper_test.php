@@ -53,9 +53,7 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
         $competency = $competency_generator->create_competency();
 
         /** @var scale_value $scale_value */
-        $scale_value = $competency->scale->values()
-            ->order_by('sortorder', 'asc')
-            ->first();
+        $scale_value = $competency->scale->sorted_values_high_to_low->first();
 
         $group = new criteria_group();
 

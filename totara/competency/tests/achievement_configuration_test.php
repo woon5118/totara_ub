@@ -170,7 +170,7 @@ class totara_competency_achievement_configuration_testcase extends advanced_test
 
         $manual = $generator->create_manual($data->comp, [manual::ROLE_MANAGER], 1);
 
-        $scale_value = $data->comp->scale->values()->order_by('sortorder', 'asc')->first();
+        $scale_value = $data->comp->scale->sorted_values_high_to_low->first();
         $cg = $generator->create_criteria_group($data->comp, [$data->cc[1], $data->cc[2]], $scale_value, null, null, 2);
 
         // Dump the populated configuration - Use an action_time value to allow us to retrieve the correct entry

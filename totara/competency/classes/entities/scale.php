@@ -42,21 +42,31 @@ use core\orm\entity\relations\has_many;
  *
  * @property_read scale_value $default_value
  * @property_read scale_value $min_proficient_value
- * @property-read scale_value[]|collection $scale_values
- * @property-read collection $values
+ * @property-read collection|scale_value[] $values Values for this scale, sorted from lowest to highest value
+ * @property-read collection|scale_value[] $sorted_values_high_to_low Values for this scale, sorted from highest value to lowest
  */
 class scale extends entity {
 
     public const TABLE = 'comp_scale';
 
     /**
-     * Values for this scale
+     * Values for this scale, sorted from lowest to highest value
      *
      * @return has_many
      */
     public function values(): has_many {
         return $this->has_many(scale_value::class, 'scaleid')
             ->order_by('sortorder', 'desc');
+    }
+
+    /**
+     * Values for this scale, sorted from highest value to lowest
+     *
+     * @return has_many
+     */
+    public function sorted_values_high_to_low(): has_many {
+        return $this->has_many(scale_value::class, 'scaleid')
+            ->order_by('sortorder', 'asc');
     }
 
     /**

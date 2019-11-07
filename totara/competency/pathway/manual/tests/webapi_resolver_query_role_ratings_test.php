@@ -67,9 +67,7 @@ class totara_competency_webapi_resolver_query_role_ratings_testcase extends adva
         $this->competency = new competency($comp);
 
         $scale = $this->competency->scale;
-        $values = $scale->values()
-            ->order_by('sortorder', 'asc')
-            ->get();
+        $values = $scale->sorted_values_high_to_low;
         $this->scalevalue1 = $values->first();
         $values->next();
         $this->scalevalue2 = $values->current();
