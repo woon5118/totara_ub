@@ -219,7 +219,6 @@ $string['sync:success'] = 'Sync was successfully initiated. It is running in the
 $string['title:create'] = 'Create assignments';
 $string['title:index'] = 'Manage competency assignments';
 $string['title:sync'] = 'Sync assigned users';
-$string['title:tool_menu'] = 'Competency assignments';
 $string['title:users'] = 'Currently assigned users';
 
 $string['users_to_assign'] = 'Users to assign';

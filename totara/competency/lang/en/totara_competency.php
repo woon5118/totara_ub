@@ -167,6 +167,7 @@ $string['sort:recently_assigned'] = 'Recently assigned';
 $string['status_0'] = 'Active';
 $string['status_1'] = 'Draft';
 $string['status_2'] = 'Deleted';
+$string['title:tool_menu'] = 'Competency assignments';
 $string['type'] = 'Type';
 $string['unassigned'] = 'Unassigned';
 $string['undoall'] = 'Undo all';

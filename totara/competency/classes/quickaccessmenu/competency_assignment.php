@@ -18,14 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
-namespace tassign_competency\quickaccessmenu;
+namespace totara_competency\quickaccessmenu;
 
 use totara_core\advanced_feature;
-use \totara_core\quickaccessmenu\group;
-use \totara_core\quickaccessmenu\item;
+use totara_core\quickaccessmenu\group;
+use totara_core\quickaccessmenu\item;
 use totara_core\quickaccessmenu\provider;
 
 class competency_assignment implements provider {
@@ -38,7 +38,7 @@ class competency_assignment implements provider {
             item::from_provider(
                 'competency_assignment',
                 group::get(group::PERFORM),
-                new \lang_string('title:tool_menu', 'tassign_competency'),
+                new \lang_string('title:tool_menu', 'totara_competency'),
                 4000
             )
         ];
