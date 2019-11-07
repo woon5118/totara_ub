@@ -22,7 +22,7 @@
  * @subpackage reportbuilder
  */
 
-$string['sourcelabel'] = 'Perform';
+$string['sourcelabel'] = 'Performance';
 $string['sourcesummary'] = 'Learners\' progress on their assigned competencies.';
 $string['sourcetitle'] = 'Competency Status History';
 

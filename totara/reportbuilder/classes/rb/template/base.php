@@ -23,6 +23,8 @@
 
 namespace totara_reportbuilder\rb\template;
 
+require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
+
 abstract class base {
 
     /**

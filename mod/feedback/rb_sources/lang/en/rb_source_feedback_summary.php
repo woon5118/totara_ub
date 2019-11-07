@@ -1,6 +1,6 @@
 <?php
 // lang file for mod/feedback/rb_sources/rb_source_feedback_summary.php
-$string['sourcelabel'] = 'Perform';
+$string['sourcelabel'] = 'Course';
 $string['sourcesummary'] = 'Learner responses to the feedback activity used to survey learners in a course.';
 $string['sourcetitle'] = 'Feedback Summary';
 // columns

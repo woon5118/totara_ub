@@ -946,6 +946,7 @@ class reportbuilder {
     protected static $cache_userpermittedreports = null;
     protected static $cache_userpermittedreports_userid = null;
     protected static $cache_sourceclasses = null;
+    protected static $cache_sourcegroups = null;
 
     /**
      * Retreives or creates a cached array of data objects for reports,
@@ -1217,6 +1218,56 @@ class reportbuilder {
             }
         }
         asort($output);
+        return $output;
+    }
+
+    public static function get_source_groups($includenonselectable = false) {
+        // If we've run this function before, return the cached output
+        if (isset(self::$cache_sourcegroups)) {
+            return self::$cache_sourcegroups;
+        }
+
+        $output = [];
+
+        // Load all groups.
+        foreach (self::find_source_dirs() as $dir) {
+            if (is_dir($dir) && $dh = opendir($dir)) {
+                while (($file = readdir($dh)) !== false) {
+                    if (is_dir($file) || !preg_match('|^rb_source_(.*)\.php$|', $file, $matches)) {
+                        continue;
+                    }
+                    $source = $matches[1];
+                    $classname = 'rb_source_' . $source;
+                    if (class_exists($classname) && $classname::is_source_ignored()) {
+                        continue;
+                    }
+
+                    $src = self::get_source_object($source);
+                    if ($src->selectable || $includenonselectable) {
+                        if (empty($src->sourcelabel)) {
+                            $ungrouped[$source] = $src->sourcetitle;
+                        }
+
+                        // Fetch the source label for this object
+                        $sourcelabel = $src->sourcelabel;
+
+                        if (!isset($output[$sourcelabel])) {
+                            $output[$sourcelabel] = [];
+                        }
+
+                        $output[$sourcelabel][$source] = $src->sourcetitle;
+                    }
+                }
+                closedir($dh);
+            }
+        }
+
+        ksort($output);
+        foreach ($output as $group => $sources) {
+            asort($sources);
+        }
+
+        self::$cache_sourcegroups = $output;
         return $output;
     }
 

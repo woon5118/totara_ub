@@ -36,4 +36,13 @@ trait helper {
         $context = \context_system::instance();
         return has_capability('totara/reportbuilder:managereports', $context);
     }
+
+    /**
+     * Returns whether the current user can create reports
+     * @return bool Whether the current user can create reports
+     */
+    private static function user_can_create_reports() {
+        $context = \context_system::instance();
+        return has_capability('totara/reportbuilder:managereports', $context);
+    }
 }

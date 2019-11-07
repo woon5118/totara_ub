@@ -41,14 +41,48 @@ final class template_helper {
     }
 
     /**
+     * Get template groups
+     *
+     * @return array
+     */
+    public static function get_template_groups() : array {
+        static $groups;
+
+        if (isset($groups)) {
+            return $groups;
+        }
+
+        $groups = [];
+        foreach (self::get_templates() as $classname) {
+            $template = self::get_template_object($classname);
+
+            if (!isset($groups[$template->label])) {
+                $groups[$template->label] = [];
+            }
+            $groups[$template->label][$classname] = $template;
+        }
+
+        return $groups;
+    }
+
+    /**
      * Get template class object
      *
-     * @param string $templateclassname
+     * @param string $template The template class
      * @return object|false
      */
-    public static function get_template_object(string $templateclassname) : ?object {
-        if (class_exists($templateclassname) && in_array($templateclassname, self::get_templates())) {
-            return new $templateclassname();
+    public static function get_template_object(string $template) : ?object {
+        // $template is the full namespaced classname.
+        if (class_exists($template) && in_array($template, self::get_templates())) {
+            return new $template();
+        }
+
+        // $template just the name of the class without namespace.
+        foreach (\totara_reportbuilder\template_helper::get_templates() as $class) {
+            $classname = explode("\\", $class);
+            if (end($classname) == $template) {
+                return new $class();
+            }
         }
 
         return false;
