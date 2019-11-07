@@ -30,7 +30,7 @@ class create extends base {
     protected $admin_external_page_name = 'competency_assignment_create';
 
     public function action() {
-        $this->require_capability('tassign/competency:manage', context_system::instance());
+        $this->require_capability('totara/competency:manage', context_system::instance());
 
         return new \tassign_competency\views\create();
     }

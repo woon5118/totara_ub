@@ -55,7 +55,7 @@ class index extends base {
     }
 
     protected function can_assign(): bool {
-        $capability = $this->is_for_current_user() ? 'tassign/competency:assignself' : 'tassign/competency:assignother';
+        $capability = $this->is_for_current_user() ? 'totara/competency:assign_self' : 'totara/competency:assign_other';
         return has_capability($capability, $this->context);
     }
 }

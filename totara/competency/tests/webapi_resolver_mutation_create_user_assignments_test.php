@@ -52,7 +52,7 @@ class totara_competency_webapi_resolver_mutation_create_user_assignments_testcas
         $data = $this->create_data();
 
         $user_role_id = $DB->get_record('role', ['shortname' => 'user'])->id;
-        unassign_capability('tassign/competency:assignself', $user_role_id);
+        unassign_capability('totara/competency:assign_self', $user_role_id);
 
         $this->setUser($data->user1->id);
 
@@ -206,7 +206,7 @@ class totara_competency_webapi_resolver_mutation_create_user_assignments_testcas
 
         $user2_context = context_user::instance($data->user2->id);
         $user_role_id = $DB->get_record('role', ['shortname' => 'user'])->id;
-        assign_capability('tassign/competency:assignother', CAP_ALLOW, $user_role_id, $user2_context->id);
+        assign_capability('totara/competency:assign_other', CAP_ALLOW, $user_role_id, $user2_context->id);
 
         $this->setUser($data->user1);
 

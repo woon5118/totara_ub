@@ -30,7 +30,7 @@ use totara_mvc\report_view;
 class users extends report_view {
 
     protected $title = ['title:users', 'tassign_competency'];
-    
+
     protected function prepare_output($report) {
         $output = array_merge(
             parent::prepare_output($report),
@@ -45,7 +45,7 @@ class users extends report_view {
     protected function set_button(reportbuilder $report) {
         $edit_button = $report->edit_button();
         $sync_button = '';
-        if (has_capability('tassign/competency:manage', \context_system::instance())) {
+        if (has_capability('totara/competency:manage', \context_system::instance())) {
             $sync_button = $this->renderer->single_button(
                 new moodle_url('/totara/assignment/plugins/competency/sync.php'),
                 get_string('button:sync_users', 'tassign_competency'),

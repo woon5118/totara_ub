@@ -39,7 +39,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
     public function test_load_all() {
         ['ass' => $ass] = $this->generate_data();
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_index', [
+        $res = $this->call_webservice_api('totara_competency_assignment_index', [
             'filters' => [],
             'page' => 0,
             'order' => '',
@@ -62,7 +62,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
     public function test_order_by_competency_name_asc() {
         $this->generate_data();
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_index', [
+        $res = $this->call_webservice_api('totara_competency_assignment_index', [
             'filters' => [],
             'page' => 0,
             'order' => 'competency_name',
@@ -78,7 +78,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
     public function test_order_by_competency_name_desc() {
         $this->generate_data();
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_index', [
+        $res = $this->call_webservice_api('totara_competency_assignment_index', [
             'filters' => [],
             'page' => 0,
             'order' => 'competency_name',
@@ -94,7 +94,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
     public function test_order_by_user_group_name_asc() {
         $this->generate_data();
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_index', [
+        $res = $this->call_webservice_api('totara_competency_assignment_index', [
             'filters' => [],
             'page' => 0,
             'order' => 'user_group_name',
@@ -110,7 +110,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
     public function test_order_by_user_group_name_desc() {
         $this->generate_data();
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_index', [
+        $res = $this->call_webservice_api('totara_competency_assignment_index', [
             'filters' => [],
             'page' => 0,
             'order' => 'user_group_name',
@@ -134,7 +134,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
             $updated_at++;
         }
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_index', [
+        $res = $this->call_webservice_api('totara_competency_assignment_index', [
             'filters' => [],
             'page' => 0,
             'order' => 'most_recently_updated',
@@ -159,7 +159,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
 
         // Only types
         $filters = ['assignment_type' => [entities\assignment::TYPE_ADMIN, entities\assignment::TYPE_SELF]];
-        $res = $this->call_webservice_api('tassign_competency_assignment_index', [
+        $res = $this->call_webservice_api('totara_competency_assignment_index', [
             'filters' => $filters,
             'page' => 0,
             'order' => '',
@@ -173,7 +173,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
 
         // Mix of user_group_type and type
         $filters = ['assignment_type' => [user_groups::POSITION, entities\assignment::TYPE_SELF]];
-        $res = $this->call_webservice_api('tassign_competency_assignment_index', [
+        $res = $this->call_webservice_api('totara_competency_assignment_index', [
             'filters' => $filters,
             'page' => 0,
             'order' => '',
@@ -187,7 +187,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
 
         // Just one system filter
         $filters = ['assignment_type' => [entities\assignment::TYPE_SYSTEM]];
-        $res = $this->call_webservice_api('tassign_competency_assignment_index', [
+        $res = $this->call_webservice_api('totara_competency_assignment_index', [
             'filters' => $filters,
             'page' => 0,
             'order' => '',
@@ -201,7 +201,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
 
         // Just user group types
         $filters = ['assignment_type' => [user_groups::POSITION, user_groups::ORGANISATION]];
-        $res = $this->call_webservice_api('tassign_competency_assignment_index', [
+        $res = $this->call_webservice_api('totara_competency_assignment_index', [
             'filters' => $filters,
             'page' => 0,
             'order' => '',
@@ -215,7 +215,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
 
         // non existing types are ignored
         $filters = ['assignment_type' => ['foo', 'bar']];
-        $res = $this->call_webservice_api('tassign_competency_assignment_index', [
+        $res = $this->call_webservice_api('totara_competency_assignment_index', [
             'filters' => $filters,
             'page' => 0,
             'order' => '',

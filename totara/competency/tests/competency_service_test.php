@@ -42,7 +42,7 @@ class totara_competency_service_testcase extends advanced_testcase {
     public function test_it_lists_competencies() {
         $this->generate_competencies();
 
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [],
             'page' => 1,
             'order' => 'fullname',
@@ -75,7 +75,7 @@ class totara_competency_service_testcase extends advanced_testcase {
     public function test_it_lists_competencies_ordered_by_hierarchy() {
         $this->generate_competencies();
 
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [],
             'page' => 0,
             'order' => 'framework_hierarchy',
@@ -100,7 +100,7 @@ class totara_competency_service_testcase extends advanced_testcase {
     public function test_it_has_text_filter() {
         $this->generate_competencies();
 
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [ 'text' => 'des' ],
             'page' => 1,
             'order' => 'fullname',
@@ -120,7 +120,7 @@ class totara_competency_service_testcase extends advanced_testcase {
         ], array_column($result['items'], 'display_name'));
 
         // Searching by description
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [ 'text' => 'cook' ],
             'page' => 1,
             'order' => 'shortname',
@@ -145,7 +145,7 @@ class totara_competency_service_testcase extends advanced_testcase {
     public function test_it_has_framework_filter() {
         [, $fws] = array_values($this->generate_competencies());
 
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [ 'framework' => $fws[1]->id ],
             'page' => 1,
             'order' => 'shortname',
@@ -173,7 +173,7 @@ class totara_competency_service_testcase extends advanced_testcase {
     public function test_it_has_path_filter() {
         ['comps' => $comp] = $this->generate_competencies();
 
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [ 'path' => $comp[0]->id ],
             'page' => 1,
             'order' => 'fullname',
@@ -206,7 +206,7 @@ class totara_competency_service_testcase extends advanced_testcase {
 
         $basket->add([$comp[1]->id, $comp[3]->id, $comp[4]->id]);
 
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [ 'basket' => 'comps' ],
             'page' => 1,
             'order' => 'fullname',
@@ -234,7 +234,7 @@ class totara_competency_service_testcase extends advanced_testcase {
             'parent' => $comp[0]->id,
             'visible' => null,
         ];
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => $filters,
             'page' => 1,
             'order' => 'fullname',
@@ -263,7 +263,7 @@ class totara_competency_service_testcase extends advanced_testcase {
     public function test_it_has_visible_filter() {
         $this->generate_competencies();
 
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [ 'visible' => false ],
             'page' => 1,
             'order' => 'fullname',
@@ -281,7 +281,7 @@ class totara_competency_service_testcase extends advanced_testcase {
             'Invisible'
         ], array_column($result['items'], 'display_name'));
 
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [ 'visible' => null ],
             'page' => 1,
             'order' => 'fullname',
@@ -302,7 +302,7 @@ class totara_competency_service_testcase extends advanced_testcase {
 
         ['fws' => $fws] = $this->generate_competencies();
 
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [ 'assignment_status' => [ 1 ] ],
             'page' => 1,
             'order' => 'fullname',
@@ -331,7 +331,7 @@ class totara_competency_service_testcase extends advanced_testcase {
             'assignment_status' => [ 0 ],
             'framework' => $fws[1]->id,
         ];
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => $filters,
             'page' => 1,
             'order' => 'fullname',
@@ -355,7 +355,7 @@ class totara_competency_service_testcase extends advanced_testcase {
         $data = $this->generate_competencies();
 
         // Has position assignment
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [ 'assignment_type' => [ user_groups::POSITION ] ],
             'page' => 1,
             'order' => 'fullname',
@@ -370,7 +370,7 @@ class totara_competency_service_testcase extends advanced_testcase {
         ], array_column($result['items'], 'display_name'));
 
         // Has organisation assignment
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [ 'assignment_type' => [ user_groups::ORGANISATION ] ],
             'page' => 1,
             'order' => 'fullname',
@@ -385,7 +385,7 @@ class totara_competency_service_testcase extends advanced_testcase {
         ], array_column($result['items'], 'display_name'));
 
         // Has cohort assignment
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [ 'assignment_type' => [ user_groups::COHORT ] ],
             'page' => 1,
             'order' => 'fullname',
@@ -400,7 +400,7 @@ class totara_competency_service_testcase extends advanced_testcase {
         ], array_column($result['items'], 'display_name'));
 
         // Has position and organisation assignment
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [ 'assignment_type' => [ user_groups::POSITION, user_groups::ORGANISATION ] ],
             'page' => 1,
             'order' => 'fullname',
@@ -416,7 +416,7 @@ class totara_competency_service_testcase extends advanced_testcase {
         ], array_column($result['items'], 'display_name'));
 
         // Has self assignment
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [ 'assignment_type' => [ assignment::TYPE_SELF ] ],
             'page' => 1,
             'order' => 'fullname',
@@ -431,7 +431,7 @@ class totara_competency_service_testcase extends advanced_testcase {
         ], array_column($result['items'], 'display_name'));
 
         // Has other assignment
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [ 'assignment_type' => [ assignment::TYPE_OTHER ] ],
             'page' => 1,
             'order' => 'fullname',
@@ -446,7 +446,7 @@ class totara_competency_service_testcase extends advanced_testcase {
         ], array_column($result['items'], 'display_name'));
 
         // Has system assignment
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [ 'assignment_type' => [ assignment::TYPE_SYSTEM ] ],
             'page' => 1,
             'order' => 'fullname',
@@ -461,7 +461,7 @@ class totara_competency_service_testcase extends advanced_testcase {
         ], array_column($result['items'], 'display_name'));
 
         // Has admin assignment
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [ 'assignment_type' => [ assignment::TYPE_ADMIN ] ],
             'page' => 1,
             'order' => 'fullname',
@@ -477,7 +477,7 @@ class totara_competency_service_testcase extends advanced_testcase {
         ], array_column($result['items'], 'display_name'));
 
         // Has system, position and organisation assignment
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [ 'assignment_type' => [ user_groups::ORGANISATION, user_groups::POSITION, assignment::TYPE_SYSTEM ] ],
             'page' => 1,
             'order' => 'fullname',
@@ -495,7 +495,7 @@ class totara_competency_service_testcase extends advanced_testcase {
 
 
         // Has admin, system and position assignment
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [ 'assignment_type' => [ user_groups::POSITION, assignment::TYPE_SYSTEM, assignment::TYPE_ADMIN ] ],
             'page' => 1,
             'order' => 'fullname',
@@ -521,7 +521,7 @@ class totara_competency_service_testcase extends advanced_testcase {
                 assignment::TYPE_ADMIN
             ]
         ];
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => $filters,
             'page' => 1,
             'order' => 'fullname',
@@ -544,7 +544,7 @@ class totara_competency_service_testcase extends advanced_testcase {
         $data = $this->generate_competencies();
 
         // has type 1
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [ 'type' => [ $data['types'][0] ] ],
             'page' => 1,
             'order' => 'fullname',
@@ -561,7 +561,7 @@ class totara_competency_service_testcase extends advanced_testcase {
         ], array_column($result['items'], 'display_name'));
 
         // has type 2
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [ 'type' => [ $data['types'][1] ] ],
             'page' => 1,
             'order' => 'fullname',
@@ -583,7 +583,7 @@ class totara_competency_service_testcase extends advanced_testcase {
         ], array_column($result['items'], 'display_name'));
 
         // has type 1 and 2
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [ 'type' => $data['types'] ],
             'page' => 1,
             'order' => 'fullname',
@@ -611,7 +611,7 @@ class totara_competency_service_testcase extends advanced_testcase {
     public function test_it_paginates_competencies() {
         $this->generate_n_competencies(80);
 
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [],
             'page' => 1,
             'order' => 'fullname',
@@ -628,7 +628,7 @@ class totara_competency_service_testcase extends advanced_testcase {
         $this->assertNull($result['prev']);
         $this->assertEquals(2, $result['next']);
 
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [],
             'page' => 2,
             'order' => 'fullname',
@@ -645,7 +645,7 @@ class totara_competency_service_testcase extends advanced_testcase {
         $this->assertEquals(1, $result['prev']);
         $this->assertEquals(3, $result['next']);
 
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [],
             'page' => 4,
             'order' => 'fullname',
@@ -662,7 +662,7 @@ class totara_competency_service_testcase extends advanced_testcase {
         $this->assertEquals(3, $result['prev']);
         $this->assertNull($result['next']);
 
-        $res = $this->call_webservice_api('tassign_competency_competency_index', [
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
             'filters' => [],
             'page' => 5,
             'order' => 'fullname',
@@ -688,7 +688,7 @@ class totara_competency_service_testcase extends advanced_testcase {
     public function test_it_loads_individual_competency() {
         [ 'comps' => $comp ] = $this->generate_competencies();
 
-        $res = $this->call_webservice_api('tassign_competency_competency_show', [
+        $res = $this->call_webservice_api('totara_competency_competency_show', [
             'id' => $comp[2]->id,
             'include' => [],
         ]);
@@ -706,7 +706,7 @@ class totara_competency_service_testcase extends advanced_testcase {
     public function test_it_loads_individual_competency_with_crumbs() {
         [ 'comps' => $comp, 'fws' => $fws ] = $this->generate_competencies();
 
-        $res = $this->call_webservice_api('tassign_competency_competency_show', [
+        $res = $this->call_webservice_api('totara_competency_competency_show', [
             'id' => $comp[2]->id,
             'include' => [ 'crumbs' => true ],
         ]);
@@ -741,7 +741,7 @@ class totara_competency_service_testcase extends advanced_testcase {
         $assignment = new assignment($ass[1]);
         $user = new user($assignment->user_group_id);
 
-        $res = $this->call_webservice_api('tassign_competency_competency_show', [
+        $res = $this->call_webservice_api('totara_competency_competency_show', [
             'id' => $comp[2]->id,
             'include' => [ 'usergroups' => true ],
         ]);
@@ -763,7 +763,7 @@ class totara_competency_service_testcase extends advanced_testcase {
     public function test_non_existing_competency() {
         $this->generate_competencies();
 
-        $res = $this->call_webservice_api('tassign_competency_competency_show', [
+        $res = $this->call_webservice_api('totara_competency_competency_show', [
             'id' => 666,
             'include' => [],
         ]);

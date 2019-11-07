@@ -53,7 +53,7 @@ class create extends base {
         $content_data = [
             'crumbtrail_template_name' => 'totara_core/crumb_with_title',
             'expandTemplate' => 'tassign_competency/competency_expanded',
-            'expandTemplateWebservice' => 'tassign_competency_competency_show',
+            'expandTemplateWebservice' => 'totara_competency_competency_show',
             'expandTemplateWebserviceArgs' => json_encode(['include' => ['crumbs' => 1, 'usergroups' => 1]]),
             'has_crumbtrail' => true,
             'has_level_toggle' => true,

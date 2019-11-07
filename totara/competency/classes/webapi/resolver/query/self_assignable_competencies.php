@@ -66,8 +66,8 @@ class self_assignable_competencies implements query_resolver {
 
         $context = context_user::instance($args['user_id']);
         $capability = ($args['user_id'] == user::logged_in()->id)
-            ? 'tassign/competency:assignself'
-            : 'tassign/competency:assignother';
+            ? 'totara/competency:assign_self'
+            : 'totara/competency:assign_other';
         require_capability($capability, $context);
     }
 

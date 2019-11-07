@@ -102,12 +102,6 @@ $string['button:sync_users'] = 'Sync assigned users';
 $string['change_competency_selection'] = 'Edit competency selection';
 $string['competencies_selected'] = 'Creating assignments for <strong>{$a} competencies</strong>';
 
-// Capabilities
-$string['competency:view'] = 'View competency assignments';
-$string['competency:manage'] = 'Manage competency assignments';
-$string['competency:assignself'] = 'Assign competency to yourself';
-$string['competency:assignother'] = 'Assign competency to other users';
-
 $string['confirm_assignment_creation_active_singular'] = '{$a->created} active competency assignment was successfully created.';
 $string['confirm_assignment_creation_active_plural'] = '{$a->created} active competency assignments were successfully created.';
 $string['confirm_assignment_creation_draft_singular'] = '{$a->created} draft competency assignment was successfully created.';

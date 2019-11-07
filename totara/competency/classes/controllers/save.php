@@ -52,12 +52,12 @@ class save extends base {
         'service_audiences' => 'totara_assignment_cohort_index',
         'service_positions' => 'totara_assignment_position_index',
         'service_organisations' => 'totara_assignment_organisation_index',
-        'service_create_assignments' => 'tassign_competency_assignment_create_from_baskets',
+        'service_create_assignments' => 'totara_competency_assignment_create_from_baskets',
         'service_update_basket' => 'totara_core_basket_update',
     ];
 
     public function action() {
-        $this->require_capability('tassign/competency:manage', $this->context);
+        $this->require_capability('totara/competency:manage', $this->context);
 
         // Get competencies count
         $basket = new competency_basket($this->basket_key);

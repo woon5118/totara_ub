@@ -44,7 +44,7 @@ class totara_competency_assignment_service_create_testcase extends advanced_test
     public function test_create_draft_assignments() {
         $data = $this->generate_data();
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_create', [
+        $res = $this->call_webservice_api('totara_competency_assignment_create', [
             'basket' => 'comp_basket',
             'usergroups' => $data['user_groups'],
             'status' => assignment::STATUS_DRAFT
@@ -80,7 +80,7 @@ class totara_competency_assignment_service_create_testcase extends advanced_test
     public function test_baskets_get_deleted() {
         $data = $this->generate_data();
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_create', [
+        $res = $this->call_webservice_api('totara_competency_assignment_create', [
             'basket' => 'comp_basket',
             'usergroups' => $data['user_groups'],
             'status' => assignment::STATUS_DRAFT
@@ -102,7 +102,7 @@ class totara_competency_assignment_service_create_testcase extends advanced_test
 
         $data = $this->generate_data();
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_create', [
+        $res = $this->call_webservice_api('totara_competency_assignment_create', [
             'basket' => 'comp_basket',
             'usergroups' => $data['user_groups'],
             'status' => assignment::STATUS_ACTIVE
@@ -136,7 +136,7 @@ class totara_competency_assignment_service_create_testcase extends advanced_test
     public function test_validation_of_competencies() {
         $data = $this->generate_data();
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_create', [
+        $res = $this->call_webservice_api('totara_competency_assignment_create', [
             'basket' => 'bad_comp_basket',
             'usergroups' => $data['user_groups'],
             'status' => assignment::STATUS_DRAFT
@@ -150,7 +150,7 @@ class totara_competency_assignment_service_create_testcase extends advanced_test
     public function test_validation_of_user_groups() {
         $data = $this->generate_data();
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_create', [
+        $res = $this->call_webservice_api('totara_competency_assignment_create', [
             'basket' => 'comp_basket',
             'usergroups' => $data['bad_user_groups'],
             'status' => assignment::STATUS_DRAFT
@@ -164,7 +164,7 @@ class totara_competency_assignment_service_create_testcase extends advanced_test
     public function test_validation_of_assignment_status() {
         $data = $this->generate_data();
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_create', [
+        $res = $this->call_webservice_api('totara_competency_assignment_create', [
             'basket' => 'comp_basket',
             'usergroups' => $data['user_groups'],
             'status' => 325
@@ -177,7 +177,7 @@ class totara_competency_assignment_service_create_testcase extends advanced_test
     public function test_no_duplicates_are_created() {
         $data = $this->generate_data();
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_create', [
+        $res = $this->call_webservice_api('totara_competency_assignment_create', [
             'basket' => 'comp_basket',
             'usergroups' => $data['user_groups'],
             'status' => assignment::STATUS_DRAFT
@@ -193,7 +193,7 @@ class totara_competency_assignment_service_create_testcase extends advanced_test
         $basket = new session_basket('comp_basket');
         $basket->add([$data['competency']->id]);
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_create', [
+        $res = $this->call_webservice_api('totara_competency_assignment_create', [
             'basket' => 'comp_basket',
             'usergroups' => $data['user_groups'],
             'status' => assignment::STATUS_DRAFT
@@ -212,7 +212,7 @@ class totara_competency_assignment_service_create_testcase extends advanced_test
         $user = $this->getDataGenerator()->create_user();
         $data['user_groups'][user_groups::USER][] = $user->id;
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_create', [
+        $res = $this->call_webservice_api('totara_competency_assignment_create', [
             'basket' => 'comp_basket',
             'usergroups' => $data['user_groups'],
             'status' => assignment::STATUS_DRAFT
@@ -229,7 +229,7 @@ class totara_competency_assignment_service_create_testcase extends advanced_test
 
         $one_user_group = [$key = array_keys($data['user_groups'])[0] => $data['user_groups'][$key]];
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_create', [
+        $res = $this->call_webservice_api('totara_competency_assignment_create', [
             'basket' => 'hidden_basket',
             'usergroups' => $one_user_group,
             'status' => assignment::STATUS_ACTIVE

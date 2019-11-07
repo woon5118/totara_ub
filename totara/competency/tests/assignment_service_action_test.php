@@ -36,7 +36,7 @@ class totara_competency_assignment_action_service_testcase extends advanced_test
     }
 
     public function test_action_both_null() {
-        $res = $this->call_webservice_api('tassign_competency_assignment_action', [
+        $res = $this->call_webservice_api('totara_competency_assignment_action', [
             'action' => 'archive',
             'basket' => null,
             'id' => null,
@@ -48,7 +48,7 @@ class totara_competency_assignment_action_service_testcase extends advanced_test
     }
 
     public function test_action_both_not_null() {
-        $res = $this->call_webservice_api('tassign_competency_assignment_action', [
+        $res = $this->call_webservice_api('totara_competency_assignment_action', [
             'action' => 'archive',
             'basket' => 'bla',
             'id' => 1,
@@ -65,7 +65,7 @@ class totara_competency_assignment_action_service_testcase extends advanced_test
         $assignment1 = new entities\assignment($assignments[0]);
         $this->assertEquals(entities\assignment::STATUS_ACTIVE, $assignment1->status);
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_action', [
+        $res = $this->call_webservice_api('totara_competency_assignment_action', [
             'action' => 'archive',
             'basket' => null,
             'id' => $assignment1->id,
@@ -100,7 +100,7 @@ class totara_competency_assignment_action_service_testcase extends advanced_test
         $basket = new \totara_core\basket\session_basket('mytestbasket');
         $basket->add([$assignment1->id, $assignment2->id]);
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_action', [
+        $res = $this->call_webservice_api('totara_competency_assignment_action', [
             'action' => 'archive',
             'basket' => $basket->get_key(),
             'id' => null,
@@ -140,7 +140,7 @@ class totara_competency_assignment_action_service_testcase extends advanced_test
         $basket = new \totara_core\basket\session_basket('mytestbasket');
         $basket->add([$assignment1->id, $assignment2->id, $assignment3->id]);
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_action', [
+        $res = $this->call_webservice_api('totara_competency_assignment_action', [
             'action' => 'archive',
             'basket' => $basket->get_key(),
             'id' => null,
@@ -171,7 +171,7 @@ class totara_competency_assignment_action_service_testcase extends advanced_test
         $assignment1->status = entities\assignment::STATUS_DRAFT;
         $assignment1->save();
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_action', [
+        $res = $this->call_webservice_api('totara_competency_assignment_action', [
             'action' => 'notarealaction',
             'basket' => null,
             'id' => $assignment1->id,
@@ -189,7 +189,7 @@ class totara_competency_assignment_action_service_testcase extends advanced_test
         $assignment1->status = entities\assignment::STATUS_DRAFT;
         $assignment1->save();
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_action', [
+        $res = $this->call_webservice_api('totara_competency_assignment_action', [
             'action' => 'activate',
             'basket' => null,
             'id' => $assignment1->id,
@@ -224,7 +224,7 @@ class totara_competency_assignment_action_service_testcase extends advanced_test
         $basket = new \totara_core\basket\session_basket('mytestbasket');
         $basket->add([$assignment1->id, $assignment2->id]);
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_action', [
+        $res = $this->call_webservice_api('totara_competency_assignment_action', [
             'action' => 'activate',
             'basket' => $basket->get_key(),
             'id' => null,
@@ -264,7 +264,7 @@ class totara_competency_assignment_action_service_testcase extends advanced_test
         $basket = new \totara_core\basket\session_basket('mytestbasket');
         $basket->add([$assignment1->id, $assignment2->id, $assignment3->id]);
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_action', [
+        $res = $this->call_webservice_api('totara_competency_assignment_action', [
             'action' => 'activate',
             'basket' => $basket->get_key(),
             'id' => null,
@@ -292,7 +292,7 @@ class totara_competency_assignment_action_service_testcase extends advanced_test
         $assignment1->status = entities\assignment::STATUS_DRAFT;
         $assignment1->save();
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_action', [
+        $res = $this->call_webservice_api('totara_competency_assignment_action', [
             'action' => 'delete',
             'basket' => null,
             'id' => $assignment1->id,
@@ -326,7 +326,7 @@ class totara_competency_assignment_action_service_testcase extends advanced_test
         $basket = new \totara_core\basket\session_basket('mytestbasket');
         $basket->add([$assignment1->id, $assignment2->id, $assignment3->id]);
 
-        $res = $this->call_webservice_api('tassign_competency_assignment_action', [
+        $res = $this->call_webservice_api('totara_competency_assignment_action', [
             'action' => 'delete',
             'basket' => $basket->get_key(),
             'id' => null,

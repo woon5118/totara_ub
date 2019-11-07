@@ -21,7 +21,7 @@
  * @package tassign_competency
  */
 
-namespace tassign_competency\services;
+namespace totara_competency\services;
 
 use core\format;
 use core\orm\collection;
@@ -92,7 +92,7 @@ class assignment extends \external_api {
     public static function index(array $filters, int $page, string $order_by, string $order_dir) {
         advanced_feature::require('competency_assignment');
 
-        require_capability('tassign/competency:view', \context_system::instance());
+        require_capability('totara/competency:view', \context_system::instance());
 
         $order_dir = (strtolower($order_dir) == 'asc') ? 'ASC' : 'DESC';
 
@@ -167,7 +167,7 @@ class assignment extends \external_api {
     public static function create(string $basket_id, array $user_groups, int $status) {
         advanced_feature::require('competency_assignment');
 
-        require_capability('tassign/competency:manage', \context_system::instance());
+        require_capability('totara/competency:manage', \context_system::instance());
 
         try {
             $basket = new baskets\competency_basket($basket_id);
@@ -236,7 +236,7 @@ class assignment extends \external_api {
     public static function create_from_baskets(string $basket_id, array $user_groups, int $status) {
         advanced_feature::require('competency_assignment');
 
-        require_capability('tassign/competency:manage', \context_system::instance());
+        require_capability('totara/competency:manage', \context_system::instance());
 
         try {
             $basket = new baskets\competency_basket($basket_id);
@@ -389,7 +389,7 @@ class assignment extends \external_api {
     public static function action(string $action, ?string $basket_key, ?int $assignment_id, array $extra) {
         advanced_feature::require('competency_assignment');
 
-        require_capability('tassign/competency:manage', \context_system::instance());
+        require_capability('totara/competency:manage', \context_system::instance());
 
         if (is_null($basket_key) && is_null($assignment_id) || !is_null($basket_key) && !is_null($assignment_id)) {
             throw new \coding_exception('You must supply either basket_id or assignment_id, not both of them');

@@ -141,5 +141,80 @@ $functions = [
         'loginrequired' => true,
         'ajax'          => true
     ],
-
 ];
+
+$assignments = [
+    'totara_competency_assignment_index' => [
+        'classname'     => \totara_competency\services\assignment::class,
+        'methodname'    => 'index',
+        'description'   => 'Returns a list of current assignments',
+        'type'          => 'read',
+        'loginrequired' => true,
+        'ajax'          => true,
+        'capabilities'  => 'totara/competency:view',
+    ],
+
+    'totara_competency_assignment_show' => [
+        'classname'     => \totara_competency\services\assignment::class,
+        'methodname'    => 'index',
+        'description'   => 'Return a single competency assignment',
+        'type'          => 'read',
+        'loginrequired' => true,
+        'ajax'          => true,
+        'capabilities'  => 'totara/competency:view',
+    ],
+
+    'totara_competency_assignment_create' => [
+        'classname'     => \totara_competency\services\assignment::class,
+        'methodname'    => 'create',
+        'description'   => 'Create a competency assignment(s) from a basket',
+        'type'          => 'write',
+        'loginrequired' => true,
+        'ajax'          => true,
+        'capabilities'  => 'totara/competency:manage',
+    ],
+
+    'totara_competency_assignment_create_from_baskets' => [
+        'classname'     => \totara_competency\services\assignment::class,
+        'methodname'    => 'create_from_baskets',
+        'description'   => 'Create a competency assignment(s) from a basket',
+        'type'          => 'write',
+        'loginrequired' => true,
+        'ajax'          => true,
+        'capabilities'  => 'totara/competency:manage',
+    ],
+
+    'totara_competency_assignment_action' => [
+        'classname'     => \totara_competency\services\assignment::class,
+        'methodname'    => 'action',
+        'description'   => 'Run action on one or multiple assignments (activate, archive, delete)',
+        'type'          => 'write',
+        'loginrequired' => true,
+        'ajax'          => true,
+        'capabilities'  => 'totara/competency:manage',
+    ],
+];
+
+$competencies = [
+    'totara_competency_competency_index' => [
+        'classname'     => \totara_competency\services\competency::class,
+        'methodname'    => 'index',
+        'description'   => 'Returns a list of all competencies',
+        'type'          => 'read',
+        'loginrequired' => true,
+        'ajax'          => true,
+        'capabilities'  => 'totara/competency:view',
+    ],
+
+    'totara_competency_competency_show' => [
+        'classname'     => \totara_competency\services\competency::class,
+        'methodname'    => 'show',
+        'description'   => 'Returns one competency',
+        'type'          => 'read',
+        'loginrequired' => true,
+        'ajax'          => true,
+        'capabilities'  => 'totara/competency:view',
+    ],
+];
+
+$functions = array_merge($functions, $assignments, $competencies);

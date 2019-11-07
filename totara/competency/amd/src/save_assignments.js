@@ -67,7 +67,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
         this.selectedModal = null;
         this.services = {
             updateBasket: 'totara_core_basket_update',
-            createAssignments: 'tassign_competency_assignment_create_from_baskets',
+            createAssignments: 'totara_competency_assignment_create_from_baskets',
             users: 'totara_assignment_user_index',
             audiences: 'totara_assignment_cohort_index',
             organisations: 'totara_assignment_organisation_index',

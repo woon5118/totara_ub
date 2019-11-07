@@ -156,8 +156,8 @@ class achievements implements query_resolver {
      */
     public static function can_assign_competencies(int $user_id) {
         return static::is_for_current_user($user_id) ?
-            has_capability('tassign/competency:assignself', context_user::instance($user_id)) :
-            has_capability('tassign/competency:assignother', context_user::instance($user_id));
+            has_capability('totara/competency:assign_self', context_user::instance($user_id)) :
+            has_capability('totara/competency:assign_other', context_user::instance($user_id));
     }
 
     /**

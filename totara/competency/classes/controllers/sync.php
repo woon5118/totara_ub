@@ -36,7 +36,7 @@ class sync extends controller {
     protected $layout = 'noblocks';
 
     public function action() {
-        $this->require_capability('tassign/competency:manage', $this->context);
+        $this->require_capability('totara/competency:manage', $this->context);
 
         $back_url = new moodle_url('/totara/assignment/plugins/competency/users.php');
         if (expand_assignment_task::is_scheduled()) {

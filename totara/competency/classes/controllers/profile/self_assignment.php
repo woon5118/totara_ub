@@ -31,7 +31,7 @@ class self_assignment extends base {
 
     public function action() {
 
-        $capability = $this->is_for_current_user() ? 'tassign/competency:assignself' : 'tassign/competency:assignother';
+        $capability = $this->is_for_current_user() ? 'totara/competency:assign_self' : 'totara/competency:assign_other';
         $this->require_capability($capability, $this->context);
 
         // Add breadcrumbs.

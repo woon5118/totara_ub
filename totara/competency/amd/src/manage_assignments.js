@@ -376,7 +376,7 @@ function(str, ModalFactory, ModalEvents, ListBase, ajax, notification, templates
                 'extra': extraData
             },
             callback: [],
-            methodname: 'tassign_competency_assignment_action'
+            methodname: 'totara_competency_assignment_action'
         };
     };
 
@@ -526,7 +526,7 @@ function(str, ModalFactory, ModalEvents, ListBase, ajax, notification, templates
                 basketType: 'session',
                 list: {
                     map: listMapping(wgt),
-                    service: 'tassign_competency_assignment_index'
+                    service: 'totara_competency_assignment_index'
                 },
                 parent: parent
             };

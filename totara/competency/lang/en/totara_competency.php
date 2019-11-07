@@ -77,8 +77,15 @@ $string['bulkachievementcriteria'] = 'Bulk set achievements criteria';
 $string['cancel'] = 'Cancel';
 $string['changesnotsaved:body'] = 'Changes will be lost if you continue. Do you want to continue?';
 $string['changesnotsaved:title'] = 'Changes have not been save.';
+
+// Capabilities
+$string['competency:assign_self'] = 'Assign competency to yourself';
+$string['competency:assign_other'] = 'Assign competency to other users';
+$string['competency:manage'] = 'Manage competency assignments';
+$string['competency:view'] = 'View competency assignments';
 $string['competency:view_own_profile'] = 'View own competency profile';
 $string['competency:view_other_profile'] = 'View profile of other users';
+
 $string['competency_profile'] = 'Competency profile';
 $string['competencies'] = '{$a} competencies';
 $string['complete_criteria'] = 'Complete the following criteria';

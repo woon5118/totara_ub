@@ -121,7 +121,7 @@ function(ListBase, HierarchyEvents) {
                 basketKey: 'tassign_competency_create_assignment',
                 basketType: 'session',
                 crumbtrail: {
-                    service: 'tassign_competency_competency_show',
+                    service: 'totara_competency_competency_show',
                     stringList: [
                         {
                             component: 'tassign_competency',
@@ -135,7 +135,7 @@ function(ListBase, HierarchyEvents) {
                 },
                 list: {
                     map: listMapping(),
-                    service: 'tassign_competency_competency_index'
+                    service: 'totara_competency_competency_index'
                 },
                 parent: parent
             };

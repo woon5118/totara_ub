@@ -24,6 +24,40 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
+    // View competency assignments.
+    'totara/competency:view' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => [
+            'manager' => CAP_ALLOW
+        ]
+    ],
+    // Manage competency assignments.
+    'totara/competency:manage' => [
+        'riskbitmask' => RISK_CONFIG,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+        ]
+    ],
+    'totara/competency:assign_self' => [
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_USER,
+        'archetypes' => [
+            'user' => CAP_ALLOW
+        ]
+    ],
+    'totara/competency:assign_other' => [
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_USER,
+        'archetypes' => [
+            'staffmanager' => CAP_ALLOW
+        ]
+    ],
+
     // View own competency profile.
     'totara/competency:view_own_profile' => [
         'captype' => 'read',

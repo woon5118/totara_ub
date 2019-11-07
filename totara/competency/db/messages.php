@@ -23,7 +23,7 @@
 
 $messageproviders = [
     'expand_task_finished' => [
-        'capability' => 'tassign/competency:manage',
+        'capability' => 'totara/competency:manage',
         'defaults' => [
             'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
             'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDOFF,
