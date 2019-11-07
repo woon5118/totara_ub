@@ -544,6 +544,7 @@ $string['relative_time_month'] = 'A month ago';
 $string['relative_time_months'] = '{$a} months ago';
 $string['relative_time_years'] = '{$a} years ago';
 $string['remotetotaralangnotavailable'] = 'Because Totara can not connect to download.totaralms.com, we are unable to do language pack installation automatically. Please download the appropriate zip file(s) from https://download.totaralms.com/lang/T{$a->totaraversion}/, copy them to your {$a->langdir} directory and unzip them manually.';
+$string['removesearchtext'] = 'Remove search text filter';
 $string['replaceareyousure'] = 'Are you sure you want to replace \'{$a->search}\' with \'{$a->replace}\'? (y/n)';
 $string['replacedevdebuggingrequired'] = 'Error, you must have developer debugging enabled to run this script.';
 $string['replacedonotrunlive'] = 'DO NOT RUN THIS ON A LIVE SITE.';
