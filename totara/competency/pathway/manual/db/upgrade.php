@@ -132,7 +132,7 @@ function xmldb_pathway_manual_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019070302, 'pathway', 'manual');
     }
 
-    if ($oldversion < 2019070304) {
+    if ($oldversion < 2019070303) {
         // Changes to pathway_manual_rating table
         $table = new xmldb_table('pathway_manual_rating');
 
