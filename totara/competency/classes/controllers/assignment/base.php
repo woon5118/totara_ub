@@ -21,7 +21,7 @@
  * @package totara_userstatus
  */
 
-namespace tassign_competency\controllers;
+namespace totara_competency\controllers\assignment;
 
 use context;
 use totara_core\advanced_feature;

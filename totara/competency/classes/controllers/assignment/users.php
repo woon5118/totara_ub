@@ -18,10 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
-namespace tassign_competency\controllers;
+namespace totara_competency\controllers\assignment;
 
 use context_system;
 use totara_mvc\has_report;
@@ -43,7 +43,7 @@ class users extends base {
 
         \totara_reportbuilder\event\report_viewed::create_from_report($report)->trigger();
 
-        return new \tassign_competency\views\users('totara_competency/users', $report, $sid, $debug);
+        return new \totara_competency\views\users('totara_competency/users', $report, $sid, $debug);
     }
 
 }

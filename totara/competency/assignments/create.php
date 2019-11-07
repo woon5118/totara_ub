@@ -18,9 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package tassign_competency
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+ * @package totara_competency
  */
 
-require_once(__DIR__ . '/../../../../config.php');
+require_once(__DIR__ . '/../../../config.php');
 
-(new \tassign_competency\controllers\sync())->process();
+(new \totara_competency\controllers\assignment\create())->process();

@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 class rb_assignment_competency_users_embedded extends rb_base_embedded {
 
     public function __construct() {
-        $this->url = '/totara/assignment/plugins/competency/users.php';
+        $this->url = '/totara/competency/assignments/users.php';
         $this->source = 'assignment_competency_users';
         $this->shortname = 'assignment_competency_users';
         $this->fullname = get_string('sourcetitle', 'rb_source_assignment_competency_users');

@@ -18,9 +18,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
-require_once(__DIR__ . '/../../../../config.php');
+namespace totara_competency\controllers\assignment;
 
-(new \tassign_competency\controllers\index())->process();
+use context_system;
+
+class create extends base {
+
+    protected $admin_external_page_name = 'competency_assignment_create';
+
+    public function action() {
+        $this->require_capability('totara/competency:manage', context_system::instance());
+
+        return new \totara_competency\views\create();
+    }
+
+}

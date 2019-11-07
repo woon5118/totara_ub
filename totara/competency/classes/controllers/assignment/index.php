@@ -18,10 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
-namespace tassign_competency\controllers;
+namespace totara_competency\controllers\assignment;
 
 use context_system;
 
@@ -32,7 +32,7 @@ class index extends base {
     public function action() {
         $this->require_capability('totara/competency:manage', context_system::instance());
 
-        return new \tassign_competency\views\index();
+        return new \totara_competency\views\index();
     }
 
 }

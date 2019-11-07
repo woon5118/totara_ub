@@ -21,9 +21,9 @@
  * @package tassign_competencies
  */
 
-namespace tassign_competency\views;
+namespace totara_competency\views;
 
-use tassign_competency\views\filters\assignments as filters;
+use totara_competency\views\filters\assignments as filters;
 use totara_core\output\select_region_panel;
 use totara_core\output\select_tree;
 

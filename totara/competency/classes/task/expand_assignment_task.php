@@ -143,7 +143,7 @@ class expand_assignment_task extends adhoc_task {
         $message->fullmessageformat = FORMAT_MARKDOWN;
         $message->fullmessagehtml   = markdown_to_html($body);
         $message->smallmessage      = $subject;
-        $message->contexturl        = new \moodle_url('/totara/assignment/plugins/competency/users.php');
+        $message->contexturl        = new \moodle_url('/totara/competency/assignments/users.php');
         $message->contexturlname    = get_string('title:users', 'totara_competency');
 
         message_send($message);

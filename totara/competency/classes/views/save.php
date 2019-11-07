@@ -21,7 +21,7 @@
  * @package tassign_competencies
  */
 
-namespace tassign_competency\views;
+namespace totara_competency\views;
 
 use totara_mvc\view;
 
@@ -29,7 +29,7 @@ class save extends view {
 
     protected $url = 'save.php';
 
-    protected $location = '/totara/assignment/plugins/competency/';
+    protected $location = '/totara/competency/assignments/';
 
     protected $title = ['title:create', 'tassign_competency'];
 

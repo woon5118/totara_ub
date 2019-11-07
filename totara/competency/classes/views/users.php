@@ -21,7 +21,7 @@
  * @package tassign_competencies
  */
 
-namespace tassign_competency\views;
+namespace totara_competency\views;
 
 use moodle_url;
 use reportbuilder;
@@ -35,7 +35,7 @@ class users extends report_view {
         $output = array_merge(
             parent::prepare_output($report),
             [
-                'index_url' => new moodle_url($this->config->wwwroot.'/totara/assignment/plugins/competency/index.php'),
+                'index_url' => new moodle_url($this->config->wwwroot.'/totara/competency/assignments/index.php'),
                 'title' => $this->title,
             ]
         );
@@ -47,7 +47,7 @@ class users extends report_view {
         $sync_button = '';
         if (has_capability('totara/competency:manage', \context_system::instance())) {
             $sync_button = $this->renderer->single_button(
-                new moodle_url('/totara/assignment/plugins/competency/sync.php'),
+                new moodle_url('/totara/competency/assignments/sync.php'),
                 get_string('button:sync_users', 'tassign_competency'),
                 'post'
             );

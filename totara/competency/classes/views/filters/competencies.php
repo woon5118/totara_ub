@@ -18,10 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
-namespace tassign_competency\views\filters;
+namespace totara_competency\views\filters;
 
 use totara_competency\entities\competency_type;
 use totara_core\output\select_multi;

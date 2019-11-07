@@ -18,14 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
-namespace tassign_competency\controllers;
+namespace totara_competency\controllers\assignment;
 
 use core\output\notification;
 use totara_competency\baskets\competency_basket;
-use tassign_competency\views;
+use totara_competency\views;
 use totara_assignment\services\cohort;
 use totara_assignment\services\organisation;
 use totara_assignment\services\position;

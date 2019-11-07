@@ -18,10 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
-namespace tassign_competency\controllers;
+namespace totara_competency\controllers\assignment;
 
 use context;
 use context_system;
@@ -38,7 +38,7 @@ class sync extends controller {
     public function action() {
         $this->require_capability('totara/competency:manage', $this->context);
 
-        $back_url = new moodle_url('/totara/assignment/plugins/competency/users.php');
+        $back_url = new moodle_url('/totara/competency/assignments/users.php');
         if (expand_assignment_task::is_scheduled()) {
             $message = get_string('sync:is_scheduled', 'tassign_competency');
             $message_type = notification::NOTIFY_ERROR;

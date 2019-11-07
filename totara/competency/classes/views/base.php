@@ -21,7 +21,7 @@
  * @package tassign_competencies
  */
 
-namespace tassign_competency\views;
+namespace totara_competency\views;
 
 use moodle_url;
 use totara_core\output\select_region_panel;
@@ -31,7 +31,7 @@ abstract class base extends view {
 
     protected $content_template = '';
 
-    protected $location = '/totara/assignment/plugins/competency/';
+    protected $location = '/totara/competency/assignments/';
 
     protected function prepare_output($output) {
         $output = [
