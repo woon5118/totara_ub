@@ -31,7 +31,7 @@ use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use totara_competency\assignment_create_exception;
-use tassign_competency\baskets;
+use totara_competency\baskets\competency_basket;
 use totara_competency\entities;
 use totara_competency\models;
 use totara_core\advanced_feature;
@@ -170,7 +170,7 @@ class assignment extends \external_api {
         require_capability('totara/competency:manage', \context_system::instance());
 
         try {
-            $basket = new baskets\competency_basket($basket_id);
+            $basket = new competency_basket($basket_id);
             // If competencies got deleted or hidden show error message
             $diff = $basket->sync();
             if (!empty($diff)) {
@@ -239,7 +239,7 @@ class assignment extends \external_api {
         require_capability('totara/competency:manage', \context_system::instance());
 
         try {
-            $basket = new baskets\competency_basket($basket_id);
+            $basket = new competency_basket($basket_id);
             // If competencies got deleted or hidden show error message
             $diff = $basket->sync();
             if (!empty($diff)) {
