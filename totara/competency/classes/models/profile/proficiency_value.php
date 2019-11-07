@@ -117,7 +117,8 @@ class proficiency_value {
 
         $value->scale_id = $assignment->competency->scale->id;
 
-        if ($assignment->current_achievement) {
+        // We need to check that the achievement actually has a value as it could not have it yet
+        if ($assignment->current_achievement && $assignment->current_achievement->value) {
             $value->id = $assignment->current_achievement->value->id;
             $value->name = $assignment->current_achievement->value->name;
             $value->proficient = boolval($assignment->current_achievement->value->proficient);
