@@ -27,7 +27,7 @@ use totara_competency\assignment_create_exception;
 use totara_competency\entities\assignment as assignment_entity;
 use totara_competency\entities\competency as competency_entity;
 use totara_competency\entities\competency_assignment_user;
-use tassign_competency\event\assignment_created;
+use totara_competency\event\assignment_created;
 use tassign_competency\expand_task;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\models\user_group\cohort as cohort_model;

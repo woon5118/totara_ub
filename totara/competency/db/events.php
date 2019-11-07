@@ -26,14 +26,69 @@ defined('MOODLE_INTERNAL') || die();
 $observers = [
     [
         'eventname' => \hierarchy_competency\event\competency_updated::class,
-        'callback' => \totara_competency\observer\competency::class.'::updated',
+        'callback' => \totara_competency\observers\competency::class.'::updated',
     ],
     [
         'eventname' => \hierarchy_competency\event\competency_created::class,
-        'callback' => \totara_competency\observer\competency::class.'::created',
+        'callback' => \totara_competency\observers\competency::class.'::created',
     ],
     [
         'eventname' => \hierarchy_competency\event\competency_deleted::class,
-        'callback' => \totara_competency\observer\competency::class.'::deleted',
+        'callback' => \totara_competency\observers\competency::class.'::deleted',
+    ],
+    // Assignment events
+    [
+        'eventname' => \totara_competency\event\assignment_created::class,
+        'callback'  => \totara_competency\observers\assignment::class.'::created'
+    ],
+    [
+        'eventname' => \totara_competency\event\assignment_activated::class,
+        'callback'  => \totara_competency\observers\assignment::class.'::activated'
+    ],
+    [
+        'eventname' => \totara_competency\event\assignment_archived::class,
+        'callback'  => \totara_competency\observers\assignment::class.'::archived'
+    ],
+    [
+        'eventname' => \totara_competency\event\assignment_deleted::class,
+        'callback'  => \totara_competency\observers\assignment::class.'::deleted'
+    ],
+    [
+        'eventname' => \totara_competency\event\assignment_user_assigned::class,
+        'callback'  => \totara_competency\observers\user_log::class.'::log'
+    ],
+    [
+        'eventname' => \totara_competency\event\assignment_user_archived::class,
+        'callback'  => \totara_competency\observers\user_log::class.'::log'
+    ],
+    [
+        'eventname' => \totara_competency\event\assignment_user_unassigned::class,
+        'callback'  => \totara_competency\observers\user_log::class.'::log'
+    ],
+    [
+        'eventname' => \totara_competency\event\assignment_user_unassigned::class,
+        'callback'  => \totara_competency\observers\user_unassigned::class.'::unassigned'
+    ],
+    // Reacting to deleting competencies:
+    [
+        'eventname' => \hierarchy_competency\event\competency_deleted::class,
+        'callback'  => \totara_competency\observers\competency_deleted::class.'::observe'
+    ],
+    // Reacting to deleting user groups:
+    [
+        'eventname' => \core\event\user_deleted::class,
+        'callback'  => \totara_competency\observers\user_deleted::class.'::observe'
+    ],
+    [
+        'eventname' => \core\event\cohort_deleted::class,
+        'callback'  => \totara_competency\observers\audience_deleted::class.'::observe'
+    ],
+    [
+        'eventname' => \hierarchy_position\event\position_deleted::class,
+        'callback'  => \totara_competency\observers\position_deleted::class.'::observe'
+    ],
+    [
+        'eventname' => \hierarchy_organisation\event\organisation_deleted::class,
+        'callback'  => \totara_competency\observers\organisation_deleted::class.'::observe'
     ],
 ];

@@ -18,15 +18,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
-namespace tassign_competency\observers;
+namespace totara_competency\observers;
 
-use tassign_competency\event\assignment_activated;
-use tassign_competency\event\assignment_archived;
-use tassign_competency\event\assignment_created;
-use tassign_competency\event\assignment_deleted;
+use totara_competency\event\assignment_activated;
+use totara_competency\event\assignment_archived;
+use totara_competency\event\assignment_created;
+use totara_competency\event\assignment_deleted;
 use totara_competency\entities;
 use tassign_competency\task\expand_assignment_task;
 

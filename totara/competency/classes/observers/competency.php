@@ -21,7 +21,7 @@
  * @package totara_competency
  */
 
-namespace totara_competency\observer;
+namespace totara_competency\observers;
 
 use core\event\base;
 use hierarchy_competency\event\competency_created;

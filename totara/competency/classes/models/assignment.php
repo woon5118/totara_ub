@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
 namespace totara_competency\models;
@@ -32,11 +32,11 @@ use totara_competency\entities\assignment as assignment_entity;
 use totara_competency\entities\competency;
 use totara_competency\entities\competency_assignment_user;
 use totara_competency\entities\competency_assignment_user_log;
-use tassign_competency\event\assignment_activated;
-use tassign_competency\event\assignment_archived;
-use tassign_competency\event\assignment_created;
-use tassign_competency\event\assignment_deleted;
-use tassign_competency\event\assignment_user_archived;
+use totara_competency\event\assignment_activated;
+use totara_competency\event\assignment_archived;
+use totara_competency\event\assignment_created;
+use totara_competency\event\assignment_deleted;
+use totara_competency\event\assignment_user_archived;
 use totara_assignment\entities\hierarchy_item;
 use totara_assignment\entities\user;
 use totara_assignment\filter\hierarchy_item_visible;
