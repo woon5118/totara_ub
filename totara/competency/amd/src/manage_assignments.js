@@ -147,7 +147,7 @@ function(str, ModalFactory, ModalEvents, ListBase, ajax, notification, templates
             that = this;
 
         var stringKeys = [
-            {key: 'action:' + modalType + ':modal:header', component: 'tassign_competency'}
+            {key: 'action:' + modalType + ':modal:header', component: 'totara_competency'}
         ];
 
         if (that.loader) {
@@ -159,7 +159,7 @@ function(str, ModalFactory, ModalEvents, ListBase, ajax, notification, templates
         if (template !== '') {
             body = templates.render(template, []);
         } else {
-            stringKeys.push({key: 'action:' + modalType + ':modal', component: 'tassign_competency'});
+            stringKeys.push({key: 'action:' + modalType + ':modal', component: 'totara_competency'});
         }
 
         str.get_strings(stringKeys).then(function(strings) {
@@ -305,7 +305,7 @@ function(str, ModalFactory, ModalEvents, ListBase, ajax, notification, templates
         var params = {affected: data.length},
             type = data.length > 0 ? "success" : "error";
 
-        this.showNotification(type, 'action:confirm:' + action + ':' + type, 'tassign_competency', params);
+        this.showNotification(type, 'action:confirm:' + action + ':' + type, 'totara_competency', params);
     };
 
     /**
@@ -325,7 +325,7 @@ function(str, ModalFactory, ModalEvents, ListBase, ajax, notification, templates
             messageKey = messageKey + ':skipped';
         }
 
-        this.showNotification(type, messageKey, 'tassign_competency', params);
+        this.showNotification(type, messageKey, 'totara_competency', params);
     };
 
     /**
@@ -430,20 +430,20 @@ function(str, ModalFactory, ModalEvents, ListBase, ajax, notification, templates
             key: 'delete',
             name: 'remove',
             string: 'action:delete',
-            component: 'tassign_competency',
+            component: 'totara_competency',
             classes: 'tw-list__hover_warning'
         },
         {
             key: 'activate',
             name: 'activate',
             string: 'action:activate',
-            component: 'tassign_competency',
+            component: 'totara_competency',
         },
         {
             key: 'archive',
             name: 'archive',
             string: 'action:archive',
-            component: 'tassign_competency',
+            component: 'totara_competency',
         }];
     };
 
@@ -469,28 +469,28 @@ function(str, ModalFactory, ModalEvents, ListBase, ajax, notification, templates
                 {
                     dataPath: 'competency_name',
                     headerString: {
-                        component: 'tassign_competency',
+                        component: 'totara_competency',
                         key: 'header:competency_name',
                     },
                 },
                 {
                     dataPath: 'assignment_type_name',
                     headerString: {
-                        component: 'tassign_competency',
+                        component: 'totara_competency',
                         key: 'header:assignment_type',
                     },
                 },
                 {
                     dataPath: 'user_group_name',
                     headerString: {
-                        component: 'tassign_competency',
+                        component: 'totara_competency',
                         key: 'assigned_type_detail',
                     },
                 },
                 {
                     dataPath: 'status_name',
                     headerString: {
-                        component: 'tassign_competency',
+                        component: 'totara_competency',
                         key: 'header:status',
                     },
                     size: 'sm'
@@ -522,7 +522,7 @@ function(str, ModalFactory, ModalEvents, ListBase, ajax, notification, templates
             var wgt = new Assignment();
 
             var data = {
-                basketKey: 'tassign_competency_manage_assignment',
+                basketKey: 'totara_competency_manage_assignment',
                 basketType: 'session',
                 list: {
                     map: listMapping(wgt),

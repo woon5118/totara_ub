@@ -197,7 +197,7 @@ class expanded_users {
         if (empty($this->user_ids)) {
             return $item;
         }
-        return str_replace($this->individual_string, get_string('individual', 'tassign_competency'), $item);
+        return str_replace($this->individual_string, get_string('individual', 'totara_competency'), $item);
     }
 
 }

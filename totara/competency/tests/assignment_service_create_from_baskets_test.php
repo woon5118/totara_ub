@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package totara_assignment
+ * @package totara_competency
  * @category test
  */
 
@@ -148,7 +148,7 @@ class totara_competency_assignment_service_create_from_baskets_testcase extends 
         $this->assertWebserviceSuccess($res);
         $this->assert_has_notification(
             \core\notification::SUCCESS,
-            get_string('confirm_assignment_creation_draft_plural', 'tassign_competency', (object) ['created' => 2])
+            get_string('confirm_assignment_creation_draft_plural', 'totara_competency', (object) ['created' => 2])
         );
     }
 
@@ -163,7 +163,7 @@ class totara_competency_assignment_service_create_from_baskets_testcase extends 
         $this->assertWebserviceSuccess($res);
         $this->assert_has_notification(
             \core\notification::SUCCESS,
-            get_string('confirm_assignment_creation_active_plural', 'tassign_competency', (object) ['created' => 2])
+            get_string('confirm_assignment_creation_active_plural', 'totara_competency', (object) ['created' => 2])
         );
     }
 
@@ -183,7 +183,7 @@ class totara_competency_assignment_service_create_from_baskets_testcase extends 
         $this->assertWebserviceSuccess($res);
         $this->assert_has_notification(
             \core\notification::SUCCESS,
-            get_string('confirm_assignment_creation_draft_singular', 'tassign_competency', (object) ['created' => 1])
+            get_string('confirm_assignment_creation_draft_singular', 'totara_competency', (object) ['created' => 1])
         );
     }
 
@@ -203,7 +203,7 @@ class totara_competency_assignment_service_create_from_baskets_testcase extends 
         $this->assertWebserviceSuccess($res);
         $this->assert_has_notification(
             \core\notification::SUCCESS,
-            get_string('confirm_assignment_creation_active_singular', 'tassign_competency', (object) ['created' => 1])
+            get_string('confirm_assignment_creation_active_singular', 'totara_competency', (object) ['created' => 1])
         );
     }
 
@@ -277,7 +277,7 @@ class totara_competency_assignment_service_create_from_baskets_testcase extends 
 
         $this->assert_has_notification(
             \core\notification::SUCCESS,
-            get_string($key, 'tassign_competency', (object)['created' => $created, 'skipped' => $skipped])
+            get_string($key, 'totara_competency', (object)['created' => $created, 'skipped' => $skipped])
         );
     }
 

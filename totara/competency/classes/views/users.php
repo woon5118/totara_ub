@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competencies
+ * @package totara_competency
  */
 
 namespace totara_competency\views;
@@ -48,7 +48,7 @@ class users extends report_view {
         if (has_capability('totara/competency:manage', \context_system::instance())) {
             $sync_button = $this->renderer->single_button(
                 new moodle_url('/totara/competency/assignments/sync.php'),
-                get_string('button:sync_users', 'tassign_competency'),
+                get_string('button:sync_users', 'totara_competency'),
                 'post'
             );
         }

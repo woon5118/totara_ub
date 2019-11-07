@@ -68,7 +68,7 @@
     data-manage-assignments-url="{{index_url}}">
 
     <a href="{{index_url}}" class="tw-assignCompSave__backLink" data-tw-assignCompSave-backBtn="">
-        {{#str}}assignment:back_to_assignments, tassign_competency{{/str}}
+        {{#str}}assignment:back_to_assignments, totara_competency{{/str}}
     </a>
 
     <h2 class="tw-assignCompSave__title">{{title}}</h2>
@@ -78,13 +78,13 @@
             {{{count_string}}}
         </div>
         <a href="{{create_url}}" class="tw-assignCompSave__basket_link">
-            {{#str}}change_competency_selection, tassign_competency{{/str}}
+            {{#str}}change_competency_selection, totara_competency{{/str}}
         </a>
     </div>
 
     <div class="tw-assignCompSave__assign">
         <h4 class="tw-assignCompSave__assign_header">
-            {{#str}}users_to_assign, tassign_competency{{/str}}
+            {{#str}}users_to_assign, totara_competency{{/str}}
         </h4>
         <div class="tw-assignCompSave__assign_selector" data-tw-assignCompSave-tree="">{{{user_groups}}}</div>
     </div>
@@ -92,7 +92,7 @@
     <div class="tw-assignCompSave__selected tw-loader__overlay" data-tw-loader-target="">
         <div class="tw-assignCompSave__selected_empty {{#user_groups_count}}tw-assignCompSave__hidden{{/user_groups_count}}"
             data-tw-assignCompSave-selected-empty="">
-            {{#str}}user_groups_empty, tassign_competency{{/str}}
+            {{#str}}user_groups_empty, totara_competency{{/str}}
         </div>
 
         {{#user_group_types}}
@@ -103,18 +103,18 @@
     <div class="tw-assignCompSave__overview">
         <h3 class="tw-assignCompSave__overview_count">
             <span data-tw-assignCompSave-selected-group-count="">{{user_groups_count}}</span>
-            {{#str}}user_groups_selected, tassign_competency{{/str}}
+            {{#str}}user_groups_selected, totara_competency{{/str}}
         </h3>
 
         <a href="#" class="tw-assignCompSave__overview_users tw-assignCompSave__disabled" data-tw-assignCompSave-browse-individuals=""
         role="button" aria-disabled="true">
             {{#flex_icon}}users{{/flex_icon}}
-            {{#str}}browse_users, tassign_competency{{/str}}
+            {{#str}}browse_users, totara_competency{{/str}}
         </a>
 
         <button class="tw-assignComp__btn tw-assignComp__btn_prim tw-assignCompSave__overview_btn tw-assignComp__btn_disabled"
         data-tw-assignCompSave-save="" aria-disabled="true">
-            {{#str}}save:create_assignments, tassign_competency{{/str}}
+            {{#str}}save:create_assignments, totara_competency{{/str}}
         </button>
     </div>
 </div>

@@ -131,7 +131,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
             return;
         }
 
-        str.get_string('save:modal:body', 'tassign_competency', count * this.competenciesCount).then(function(fetchedString) {
+        str.get_string('save:modal:body', 'totara_competency', count * this.competenciesCount).then(function(fetchedString) {
             var templateData = {'count_string': fetchedString};
 
             if (that.saveConfirmationModal) {
@@ -667,7 +667,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
                             },
                             dataPath: 'user_group_names',
                             headerString: {
-                                component: 'tassign_competency',
+                                component: 'totara_competency',
                                 key: 'sort:user_group_name',
                             }
                         }],
@@ -690,7 +690,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
                     }]
                 },
                 title: [{
-                    component: 'tassign_competency',
+                    component: 'totara_competency',
                     key: 'browse_selected_user_groups'
                 }]
             };
@@ -758,7 +758,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
             'key': 'positionplural'
         },
         {
-            'component': 'tassign_competency',
+            'component': 'totara_competency',
             'key': 'save:modal:header',
         });
 

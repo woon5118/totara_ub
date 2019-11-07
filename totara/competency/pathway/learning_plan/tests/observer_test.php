@@ -63,7 +63,7 @@ class pathway_learning_plan_observer_testcase extends advanced_testcase {
         $great = scale_value::repository()->where('name', '=', 'Great')->one();
         $good = scale_value::repository()->where('name', '=', 'Good')->one();
 
-        /** @var tassign_competency_generator $assignment_generator */
+        /** @var totara_competency_assignment_generator $assignment_generator */
         $assignment_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
         $assignment = $assignment_generator->create_user_assignment($comp->id, $user->id);
         (new assignment_actions())->activate([$assignment->id]);
@@ -170,7 +170,7 @@ class pathway_learning_plan_observer_testcase extends advanced_testcase {
 
         $great = scale_value::repository()->where('name', '=', 'Great')->one();
 
-        /** @var tassign_competency_generator $assignment_generator */
+        /** @var totara_competency_assignment_generator $assignment_generator */
         $assignment_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
         $assignment = $assignment_generator->create_user_assignment($comp->id, $user->id);
         (new assignment_actions())->activate([$assignment->id]);

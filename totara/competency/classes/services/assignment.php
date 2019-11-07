@@ -185,7 +185,7 @@ class assignment extends \external_api {
         } catch (assignment_create_exception $exception) {
             // Gracefully fail those exceptions as those could be caused by edge cases we want to cover
             \core\notification::add(
-                get_string('error_create_assignments', 'tassign_competency'),
+                get_string('error_create_assignments', 'totara_competency'),
                 notification::NOTIFY_ERROR
             );
             return [];
@@ -273,7 +273,7 @@ class assignment extends \external_api {
         } catch (assignment_create_exception $exception) {
             // Gracefully fail those exceptions as those could be caused by edge cases we want to cover
             \core\notification::add(
-                get_string('error_create_assignments', 'tassign_competency'),
+                get_string('error_create_assignments', 'totara_competency'),
                 notification::NOTIFY_ERROR
             );
             return [];
@@ -329,7 +329,7 @@ class assignment extends \external_api {
             $confirm_string = sprintf("confirm_assignment_creation_none_%s", $skipped_singular_plural);
         }
         \core\notification::add(
-            get_string($confirm_string, 'tassign_competency', (object)$string_data),
+            get_string($confirm_string, 'totara_competency', (object)$string_data),
             count($assignments) ? notification::NOTIFY_SUCCESS : notification::NOTIFY_WARNING
         );
     }

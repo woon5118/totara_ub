@@ -38,13 +38,13 @@ class save extends base {
 
     protected $admin_external_page_name = 'competency_assignment_create';
 
-    protected $basket_key = 'tassign_competency_create_assignment';
+    protected $basket_key = 'totara_competency_create_assignment';
 
     protected $basket_keys = [
-        'basket_users' => 'tassign_competency_select_users',
-        'basket_audiences' => 'tassign_competency_select_audiences',
-        'basket_positions' => 'tassign_competency_select_positions',
-        'basket_organisations' => 'tassign_competency_select_organisations',
+        'basket_users' => 'totara_competency_select_users',
+        'basket_audiences' => 'totara_competency_select_audiences',
+        'basket_positions' => 'totara_competency_select_positions',
+        'basket_organisations' => 'totara_competency_select_organisations',
     ];
 
     protected $services = [
@@ -66,13 +66,13 @@ class save extends base {
         $view = new views\save('totara_competency/save', []);
 
         if (empty($items)) {
-            $message = get_string('basket:empty_basket_can_not_proceed_creating_assignment', 'tassign_competency');
+            $message = get_string('basket:empty_basket_can_not_proceed_creating_assignment', 'totara_competency');
             redirect($view->get_absolute_url('create.php'), $message, null, notification::NOTIFY_ERROR);
         }
 
         $basket_diff = $basket->sync();
         if (!empty($basket_diff)) {
-            $message = get_string('error_competencies_out_of_sync', 'tassign_competency', count($basket_diff));
+            $message = get_string('error_competencies_out_of_sync', 'totara_competency', count($basket_diff));
             redirect($view->get_absolute_url('create.php'), $message, null, notification::NOTIFY_WARNING);
         }
 
@@ -91,7 +91,7 @@ class save extends base {
         $template_data = array_merge(
             [
                 'basket_competencies' => $this->basket_key,
-                'count_string' => get_string('competencies_selected', 'tassign_competency', count($items)),
+                'count_string' => get_string('competencies_selected', 'totara_competency', count($items)),
                 'count' => count($items),
                 'user_groups_count' => $total,
                 'user_groups' => $this->create_dropdown(),
@@ -169,7 +169,7 @@ class save extends base {
             null,
             true,
             false,
-            get_string('action:add_user_groups', 'tassign_competency'),
+            get_string('action:add_user_groups', 'totara_competency'),
             true,
             true
         );

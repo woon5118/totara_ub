@@ -37,7 +37,7 @@ class cohort extends user_group {
             $name = $cohort->display_name;
         } else {
             $is_deleted = true;
-            $name = get_string('deleted_audience', 'tassign_competency');
+            $name = get_string('deleted_audience', 'totara_competency');
         }
         return new static($id, $name, $is_deleted);
     }

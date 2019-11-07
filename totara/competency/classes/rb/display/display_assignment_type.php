@@ -52,7 +52,7 @@ class display_assignment_type extends base {
                 $type_name = get_string('user_group_type:'.$value, 'totara_competency');
                 break;
             default:
-                $type_name = get_string('assignment_type:'.$value, 'tassign_competency');
+                $type_name = get_string('assignment_type:'.$value, 'totara_competency');
                 break;
         }
 

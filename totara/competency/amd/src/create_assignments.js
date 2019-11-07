@@ -84,14 +84,14 @@ function(ListBase, HierarchyEvents) {
                     dataPath: 'fullname',
                     expandedViewTrigger: true,
                     headerString: {
-                        component: 'tassign_competency',
+                        component: 'totara_competency',
                         key: 'header:competency_name',
                     },
                 },
                 {
                     dataPath: 'assignments_count',
                     headerString: {
-                        component: 'tassign_competency',
+                        component: 'totara_competency',
                         key: 'assigned_user_groups',
                     },
                     size: 'sm'
@@ -118,17 +118,17 @@ function(ListBase, HierarchyEvents) {
             var wgt = new Assignment();
 
             var data = {
-                basketKey: 'tassign_competency_create_assignment',
+                basketKey: 'totara_competency_create_assignment',
                 basketType: 'session',
                 crumbtrail: {
                     service: 'totara_competency_competency_show',
                     stringList: [
                         {
-                            component: 'tassign_competency',
+                            component: 'totara_competency',
                             key: 'all_competencies',
                         },
                         {
-                            component: 'tassign_competency',
+                            component: 'totara_competency',
                             key: 'all_competencies_framework',
                         }
                     ]

@@ -33,7 +33,7 @@ abstract class filters {
 
     public static function create_region_panel(): select_region_panel {
         return select_region_panel::create(
-            get_string('filter', 'tassign_competency'),
+            get_string('filter', 'totara_competency'),
             static::create_region_panel_filters(),
             true,
             true,
@@ -48,16 +48,16 @@ abstract class filters {
     public static function create_assignment_type_filter(): select_multi {
         return select_multi::create(
             'assignment_type',
-            get_string('header:assignment_type', 'tassign_competency'),
+            get_string('header:assignment_type', 'totara_competency'),
             true,
             [
                 user_groups::POSITION     => get_string('position', 'totara_hierarchy'),
                 user_groups::ORGANISATION => get_string('organisation', 'totara_hierarchy'),
                 user_groups::COHORT       => get_string('cohort', 'totara_cohort'),
-                assignment::TYPE_ADMIN    => get_string('assignment_type:admin', 'tassign_competency'),
-                assignment::TYPE_SELF     => get_string('assignment_type:self', 'tassign_competency'),
-                assignment::TYPE_OTHER    => get_string('assignment_type:other', 'tassign_competency'),
-                assignment::TYPE_SYSTEM   => get_string('assignment_type:system', 'tassign_competency'),
+                assignment::TYPE_ADMIN    => get_string('assignment_type:admin', 'totara_competency'),
+                assignment::TYPE_SELF     => get_string('assignment_type:self', 'totara_competency'),
+                assignment::TYPE_OTHER    => get_string('assignment_type:other', 'totara_competency'),
+                assignment::TYPE_SYSTEM   => get_string('assignment_type:system', 'totara_competency'),
             ]
         );
     }

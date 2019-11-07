@@ -37,7 +37,7 @@ $ADMIN->add(
     'competencies',
     new admin_externalpage(
         'competency_assignment',
-        get_string('title:index', 'tassign_competency'),
+        get_string('title:index', 'totara_competency'),
         "{$CFG->wwwroot}/totara/competency/assignments/index.php",
         "totara/competency:manage",
         !advanced_feature::is_enabled('competency_assignment')
@@ -57,7 +57,7 @@ $ADMIN->add(
     'competencies',
     new admin_externalpage(
         'competency_assignment_create',
-        get_string('title:create', 'tassign_competency'),
+        get_string('title:create', 'totara_competency'),
         "{$CFG->wwwroot}/totara/competency/assignments/create.php",
         "totara/competency:manage",
         !advanced_feature::is_enabled('competency_assignment')

@@ -390,7 +390,7 @@ class assignment {
                     break;
             }
         } else {
-            $type_name = get_string('assignment_type:' . $this->entity->type, 'tassign_competency');
+            $type_name = get_string('assignment_type:' . $this->entity->type, 'totara_competency');
         }
 
         return $type_name;
@@ -410,7 +410,7 @@ class assignment {
      * @return string
      */
     public function get_status_name(): string {
-        return get_string('status:'.$this->entity->status_name, 'tassign_competency');
+        return get_string('status:'.$this->entity->status_name, 'totara_competency');
     }
 
     /**
@@ -441,15 +441,15 @@ class assignment {
                 if ($this->entity->user_group_type !== user_groups::USER) {
                     return $this->get_user_group_name();
                 }
-                return get_string('directly_assigned', 'tassign_competency');
+                return get_string('directly_assigned', 'totara_competency');
             case assignment_entity::TYPE_OTHER:
-                return get_string('directly_assigned', 'tassign_competency');
+                return get_string('directly_assigned', 'totara_competency');
             case assignment_entity::TYPE_SYSTEM:
-                return get_string('continuous_tracking', 'tassign_competency');
+                return get_string('continuous_tracking', 'totara_competency');
             case assignment_entity::TYPE_SELF:
-                return get_string('assignment_type:self', 'tassign_competency');
+                return get_string('assignment_type:self', 'totara_competency');
             case assignment_entity::TYPE_LEGACY:
-                return get_string('assignment_type:legacy', 'tassign_competency');
+                return get_string('assignment_type:legacy', 'totara_competency');
             default:
                 return $this->get_user_group_name();
         }
@@ -474,12 +474,12 @@ class assignment {
                 $assigner = $this->get_assigner();
                 $name = fullname((object)$assigner->to_array());
                 $role = $type === assignment_entity::TYPE_ADMIN ? 'admin' : 'manager';
-                $role_string = get_string('assigner_role:'.$role, 'tassign_competency');
+                $role_string = get_string('assigner_role:'.$role, 'totara_competency');
                 $name .= " ({$role_string})";
                 break;
             case $type === assignment_entity::TYPE_SYSTEM:
             case $type === assignment_entity::TYPE_SELF:
-                $name = get_string('assignment_reason:'.$type, 'tassign_competency');
+                $name = get_string('assignment_reason:'.$type, 'totara_competency');
                 break;
             default:
                 $name = $this->get_user_group_name();

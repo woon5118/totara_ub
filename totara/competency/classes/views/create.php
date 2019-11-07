@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competencies
+ * @package totara_competency
  */
 
 namespace totara_competency\views;
@@ -31,7 +31,7 @@ class create extends base {
 
     protected $content_template = 'totara_competency/_competencies';
 
-    protected $title = ['title:create', 'tassign_competency'];
+    protected $title = ['title:create', 'totara_competency'];
 
     public function __construct(array $data = []) {
         parent::__construct('totara_competency/create', $data);
@@ -59,7 +59,7 @@ class create extends base {
             'has_level_toggle' => true,
             'has_count' => true,
             'has_paging' => true,
-            'heading' => get_string('all_competencies', 'tassign_competency'),
+            'heading' => get_string('all_competencies', 'totara_competency'),
             'order_by' => $this->create_sorting(),
             'primary_filter_tree' => filters::create_framework_filter(),
             'selection_basket' => $selection_basket_data
@@ -75,16 +75,16 @@ class create extends base {
     private function create_sorting() {
         return select_tree::create(
             'sorting',
-            get_string('sort', 'tassign_competency'),
+            get_string('sort', 'totara_competency'),
             false,
             [
                 (object)[
-                    'name' => get_string('sort:framework_hierarchy', 'tassign_competency'),
+                    'name' => get_string('sort:framework_hierarchy', 'totara_competency'),
                     'key' => 'framework_hierarchy',
                     'default' => true
                 ],
                 (object)[
-                    'name' => get_string('sort:competency_name', 'tassign_competency'),
+                    'name' => get_string('sort:competency_name', 'totara_competency'),
                     'key' => 'fullname',
                 ],
             ],

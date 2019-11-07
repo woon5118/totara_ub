@@ -103,7 +103,7 @@ class pathway_learning_plan_learning_plan_testcase extends advanced_testcase {
 
         $great = scale_value::repository()->where('name', '=', 'Great')->one();
 
-        /** @var tassign_competency_generator $assignment_generator */
+        /** @var totara_competency_assignment_generator $assignment_generator */
         $assignment_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
         $assignment = $assignment_generator->create_user_assignment($comp->id, $user->id);
         $other_assignment = $assignment_generator->create_user_assignment($comp->id, $other_assigned_user->id);

@@ -886,13 +886,13 @@ class rb_source_assignment_competency_users extends rb_base_source {
     public function rb_filter_assignment_types() {
         // TODO extract this as it can be used by the other filters
         return [
-            user_groups::POSITION     => get_string('filter:user_group:position', 'tassign_competency'),
-            user_groups::ORGANISATION => get_string('filter:user_group:organisation', 'tassign_competency'),
-            user_groups::COHORT       => get_string('filter:user_group:cohort', 'tassign_competency'),
-            assignment::TYPE_ADMIN    => get_string('assignment_type:admin', 'tassign_competency'),
-            assignment::TYPE_SELF     => get_string('assignment_type:self', 'tassign_competency'),
-            assignment::TYPE_OTHER    => get_string('assignment_type:other', 'tassign_competency'),
-            assignment::TYPE_SYSTEM   => get_string('assignment_type:system', 'tassign_competency'),
+            user_groups::POSITION     => get_string('filter:user_group:position', 'totara_competency'),
+            user_groups::ORGANISATION => get_string('filter:user_group:organisation', 'totara_competency'),
+            user_groups::COHORT       => get_string('filter:user_group:cohort', 'totara_competency'),
+            assignment::TYPE_ADMIN    => get_string('assignment_type:admin', 'totara_competency'),
+            assignment::TYPE_SELF     => get_string('assignment_type:self', 'totara_competency'),
+            assignment::TYPE_OTHER    => get_string('assignment_type:other', 'totara_competency'),
+            assignment::TYPE_SYSTEM   => get_string('assignment_type:system', 'totara_competency'),
         ];
     }
 

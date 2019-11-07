@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package totara_assignment
+ * @package totara_competency
  * @category test
  */
 
@@ -243,7 +243,7 @@ class totara_competency_assignment_service_create_testcase extends advanced_test
         // In case there's a mismatch a notification was added and no assignments created
         $this->assert_has_notification(
             \core\notification::ERROR,
-            get_string('error_create_assignments', 'tassign_competency')
+            get_string('error_create_assignments', 'totara_competency')
         );
     }
 

@@ -37,7 +37,7 @@ class organisation extends user_group {
             $name = $position->display_name;
         } else {
             $is_deleted = true;
-            $name = get_string('deleted_organisation', 'tassign_competency');
+            $name = get_string('deleted_organisation', 'totara_competency');
         }
         return new static($id, $name, $is_deleted);
     }

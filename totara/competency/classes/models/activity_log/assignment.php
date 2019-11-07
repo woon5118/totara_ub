@@ -77,7 +77,7 @@ class assignment extends activity_log {
                     case entities\assignment::TYPE_SYSTEM:
                         return get_string('activitylog_assignedcontinuous', 'totara_competency');
                     case entities\assignment::TYPE_LEGACY:
-                        return get_string('assignment_type:legacy', 'tassign_competency');
+                        return get_string('assignment_type:legacy', 'totara_competency');
                     case entities\assignment::TYPE_SELF:
                         return get_string('activitylog_assignedself', 'totara_competency');
                     case entities\assignment::TYPE_ADMIN:

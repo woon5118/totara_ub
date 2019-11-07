@@ -55,8 +55,8 @@ class totara_competency_webapi_resolver_query_competency_plans_testcase extends 
         /** @var totara_hierarchy_generator $totara_hierarchy_generator */
         $totara_hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
 
-        /** @var tassign_competency_generator $tassign_competency_generator */
-        $tassign_competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
+        /** @var totara_competency_assignment_generator $totara_competency_generator */
+        $totara_competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
 
         $compfw = $totara_hierarchy_generator->create_comp_frame([]);
         $comp = $totara_hierarchy_generator->create_comp(['frameworkid' => $compfw->id]);
@@ -73,7 +73,7 @@ class totara_competency_webapi_resolver_query_competency_plans_testcase extends 
         $this->user1 = $this->getDataGenerator()->create_user();
         $this->user2 = $this->getDataGenerator()->create_user();
 
-        $this->user1_assignment = $tassign_competency_generator->create_user_assignment($this->competency->id, $this->user1->id);
+        $this->user1_assignment = $totara_competency_generator->create_user_assignment($this->competency->id, $this->user1->id);
 
         $expand_task = new expand_task($DB);
         $expand_task->expand_all();

@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competencies
+ * @package totara_competency
  */
 
 namespace totara_competency\views;
@@ -31,7 +31,7 @@ class save extends view {
 
     protected $location = '/totara/competency/assignments/';
 
-    protected $title = ['title:create', 'tassign_competency'];
+    protected $title = ['title:create', 'totara_competency'];
 
     protected function prepare_output($output) {
         $output = array_merge($output, [

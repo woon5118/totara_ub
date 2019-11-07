@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competencies
+ * @package totara_competency
  */
 
 namespace totara_competency\views;
@@ -31,7 +31,7 @@ class index extends base {
 
     protected $content_template = 'totara_competency/_assignments';
 
-    protected $title = ['title:index', 'tassign_competency'];
+    protected $title = ['title:index', 'totara_competency'];
 
     public function __construct(array $data = []) {
         parent::__construct('totara_competency/index', $data);
@@ -68,7 +68,7 @@ class index extends base {
             'has_level_toggle' => false,
             'has_paging' => true,
             'has_count' => true,
-            'heading' => get_string('all_assignments', 'tassign_competency'),
+            'heading' => get_string('all_assignments', 'totara_competency'),
             'order_by' => $this->create_sorting(),
             'primary_filter_tree' => filters::create_status_filter(),
             'selection_basket' => $selection_basket_data
@@ -80,20 +80,20 @@ class index extends base {
     private function create_sorting() {
         return select_tree::create(
             'sorting',
-            get_string('sort', 'tassign_competency'),
+            get_string('sort', 'totara_competency'),
             false,
             [
                 (object)[
-                    'name' => get_string('sort:competency_name', 'tassign_competency'),
+                    'name' => get_string('sort:competency_name', 'totara_competency'),
                     'key' => 'competency_name',
                     'default' => true
                 ],
                 (object)[
-                    'name' => get_string('sort:user_group_name', 'tassign_competency'),
+                    'name' => get_string('sort:user_group_name', 'totara_competency'),
                     'key' => 'user_group_name',
                 ],
                 (object)[
-                    'name' => get_string('sort:most_recently_updated', 'tassign_competency'),
+                    'name' => get_string('sort:most_recently_updated', 'totara_competency'),
                     'key' => 'most_recently_updated',
                 ],
             ],

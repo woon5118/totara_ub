@@ -138,7 +138,7 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
-        /** @var tassign_competency_generator $assignment_generator */
+        /** @var totara_competency_assignment_generator $assignment_generator */
         $assignment_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
 
         $user1 = $this->getDataGenerator()->create_user();

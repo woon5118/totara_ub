@@ -35,7 +35,7 @@ class user extends user_group {
         if (!$user->deleted) {
             $name = fullname((object)$user->to_array());
         } else {
-            $name = get_string('deleted_user', 'tassign_competency');
+            $name = get_string('deleted_user', 'totara_competency');
         }
         return new static($id, $name, $user->deleted);
     }
