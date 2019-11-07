@@ -62,7 +62,7 @@ function(str, ModalFactory, ModalEvents, ListBase, ajax, notification, templates
                     break;
                 case 'bulkArchive':
                     action = 'archive';
-                    template = 'tassign_competency/archive_bulk_modal';
+                    template = 'totara_competency/archive_bulk_modal';
                     break;
             }
 
@@ -118,9 +118,9 @@ function(str, ModalFactory, ModalEvents, ListBase, ajax, notification, templates
                     break;
                 case 'archiveClicked':
                     action = modalType = 'archive';
-                    template = 'tassign_competency/archive_modal';
+                    template = 'totara_competency/archive_modal';
                     if (extra.user_group_type !== 'user') {
-                        template = 'tassign_competency/archive_modal_group';
+                        template = 'totara_competency/archive_modal_group';
                         modalType = modalType + '_group';
                     }
                     break;

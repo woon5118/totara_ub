@@ -29,12 +29,12 @@ use totara_core\output\select_tree;
 
 class create extends base {
 
-    protected $content_template = 'tassign_competency/_competencies';
+    protected $content_template = 'totara_competency/_competencies';
 
     protected $title = ['title:create', 'tassign_competency'];
 
     public function __construct(array $data = []) {
-        parent::__construct('tassign_competency/create', $data);
+        parent::__construct('totara_competency/create', $data);
     }
 
     protected function prepare_output($output) {
@@ -52,7 +52,7 @@ class create extends base {
 
         $content_data = [
             'crumbtrail_template_name' => 'totara_core/crumb_with_title',
-            'expandTemplate' => 'tassign_competency/competency_expanded',
+            'expandTemplate' => 'totara_competency/competency_expanded',
             'expandTemplateWebservice' => 'totara_competency_competency_show',
             'expandTemplateWebserviceArgs' => json_encode(['include' => ['crumbs' => 1, 'usergroups' => 1]]),
             'has_crumbtrail' => true,

@@ -29,12 +29,12 @@ use totara_core\output\select_tree;
 
 class index extends base {
 
-    protected $content_template = 'tassign_competency/_assignments';
+    protected $content_template = 'totara_competency/_assignments';
 
     protected $title = ['title:index', 'tassign_competency'];
 
     public function __construct(array $data = []) {
-        parent::__construct('tassign_competency/index', $data);
+        parent::__construct('totara_competency/index', $data);
     }
 
     protected function create_region_panel(): select_region_panel {

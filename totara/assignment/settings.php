@@ -74,7 +74,7 @@ if (advanced_feature::is_enabled('competency_assignment')) {
 
     if ($ADMIN->fulltree) {
         $settings_page->add(new admin_setting_heading(
-            'tassign_competency/heading',
+            'totara_competency/heading',
             new lang_string('settings:unassignment:header', 'tassign_competency'),
             new lang_string('settings:unassignment:text', 'tassign_competency')
         ));
@@ -86,7 +86,7 @@ if (advanced_feature::is_enabled('competency_assignment')) {
         ));
 
         $settings_page->add(new admin_setting_continuous_tracking(
-            'tassign_competency/continuous_tracking',
+            'totara_competency/continuous_tracking',
             new lang_string('settings:continuous_tracking', 'tassign_competency'),
             new lang_string('settings:continuous_tracking:description', 'tassign_competency')
         ));

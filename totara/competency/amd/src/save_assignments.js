@@ -21,7 +21,7 @@
  * @package tassign_competency
  */
 
-define(['core/str', 'core/templates', 'totara_core/modal_list', 'tassign_competency/list_framework_hierarchy_events',
+define(['core/str', 'core/templates', 'totara_core/modal_list', 'totara_competency/list_framework_hierarchy_events',
 'core/ajax', 'core/notification', 'totara_core/loader_manager', 'core/modal_factory', 'totara_core/session_basket', 'totara_core/simple_basket'],
 function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, Loader, ModalFactory, SessionBasket, SimpleBasket) {
 
@@ -135,13 +135,13 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
             var templateData = {'count_string': fetchedString};
 
             if (that.saveConfirmationModal) {
-                TemplatesManager.render('tassign_competency/save_modal', templateData).then(function(result) {
+                TemplatesManager.render('totara_competency/save_modal', templateData).then(function(result) {
                     that.saveConfirmationModal.setBody(result);
                     that.saveConfirmationModal.show();
                 });
             } else {
                 ModalFactory.create({
-                    body: TemplatesManager.render('tassign_competency/save_modal', templateData),
+                    body: TemplatesManager.render('totara_competency/save_modal', templateData),
                     title: that.strings.confirmationHeader,
                     type: ModalFactory.types.CONFIRM
                 }).done(function(modal) {
@@ -325,7 +325,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
                 return;
             }
 
-            TemplatesManager.render('tassign_competency/save_selected_user_group_body', {
+            TemplatesManager.render('totara_competency/save_selected_user_group_body', {
                 basket: that.basketKeys[type],
                 items: items,
                 title: that.strings[type],
@@ -490,7 +490,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
                     expandable: {
                         args: {include: {crumbs: 1}},
                         service: 'totara_assignment_organisation_show',
-                        template: 'tassign_competency/hierarchy_expanded',
+                        template: 'totara_competency/hierarchy_expanded',
                     },
                     levelToggle: true,
                     list: {
@@ -581,7 +581,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
                     expandable: {
                         args: {include: {crumbs: 1}},
                         service: 'totara_assignment_position_show',
-                        template: 'tassign_competency/hierarchy_expanded',
+                        template: 'totara_competency/hierarchy_expanded',
                     },
                     levelToggle: true,
                     list: {
@@ -663,7 +663,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
                         },
                         {
                             columnTemplate: {
-                                template: 'tassign_competency/save_user_group_names',
+                                template: 'totara_competency/save_user_group_names',
                             },
                             dataPath: 'user_group_names',
                             headerString: {

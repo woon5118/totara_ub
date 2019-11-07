@@ -24,7 +24,7 @@
 namespace tassign_competency\controllers;
 
 use core\output\notification;
-use tassign_competency\baskets\competency_basket;
+use totara_competency\baskets\competency_basket;
 use tassign_competency\views;
 use totara_assignment\services\cohort;
 use totara_assignment\services\organisation;
@@ -63,7 +63,7 @@ class save extends base {
         $basket = new competency_basket($this->basket_key);
         $items = $basket->load();
 
-        $view = new views\save('tassign_competency/save', []);
+        $view = new views\save('totara_competency/save', []);
 
         if (empty($items)) {
             $message = get_string('basket:empty_basket_can_not_proceed_creating_assignment', 'tassign_competency');

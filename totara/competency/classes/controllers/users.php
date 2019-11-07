@@ -43,7 +43,7 @@ class users extends base {
 
         \totara_reportbuilder\event\report_viewed::create_from_report($report)->trigger();
 
-        return new \tassign_competency\views\users('tassign_competency/users', $report, $sid, $debug);
+        return new \tassign_competency\views\users('totara_competency/users', $report, $sid, $debug);
     }
 
 }

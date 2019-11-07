@@ -37,7 +37,7 @@ class admin_setting_unassign_behaviour extends admin_setting_configselect {
     public const KEEP_NOT_NULL = 1;
     public const DELETE = 2;
 
-    public const NAME = 'tassign_competency/unassign_behaviour';
+    public const NAME = 'totara_competency/unassign_behaviour';
 
 
     public function __construct($name, $visiblename, $description) {
