@@ -31,7 +31,7 @@ use totara_competency\entities;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency;
 use totara_competency\models\assignment as assignment_model;
-use tassign_competency\settings;
+use totara_competency\settings;
 use totara_assignment\filter\hierarchy_item_visible;
 
 class assignment_actions {

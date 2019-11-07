@@ -23,7 +23,7 @@
  */
 
 
-use tassign_competency\admin_setting_continuous_tracking;
+use totara_competency\admin_setting_continuous_tracking;
 use totara_competency\entities\assignment;
 use totara_competency\expand_task;
 use totara_assignment\user_groups;
@@ -48,7 +48,7 @@ class totara_competency_user_group_deleted_testcase extends advanced_testcase {
         $this->assertCount(2, $users);
         $this->assertCount(2, $assignments);
 
-        set_config('continuous_tracking', admin_setting_continuous_tracking::ENABLED, 'tassign_competency');
+        set_config('continuous_tracking', admin_setting_continuous_tracking::ENABLED, 'totara_competency');
 
         // Removing a user
         delete_user($users[0]);
@@ -83,7 +83,7 @@ class totara_competency_user_group_deleted_testcase extends advanced_testcase {
         $this->assertCount(2, $users);
         $this->assertCount(2, $assignments);
 
-        set_config('continuous_tracking', admin_setting_continuous_tracking::DISABLED, 'tassign_competency');
+        set_config('continuous_tracking', admin_setting_continuous_tracking::DISABLED, 'totara_competency');
 
         // Removing a user
         delete_user($users[0]);
@@ -120,7 +120,7 @@ class totara_competency_user_group_deleted_testcase extends advanced_testcase {
         $this->assertCount(2, $cohorts);
         $this->assertCount(2, $assignments);
 
-        set_config('continuous_tracking', admin_setting_continuous_tracking::ENABLED, 'tassign_competency');
+        set_config('continuous_tracking', admin_setting_continuous_tracking::ENABLED, 'totara_competency');
 
         // Removing a user
         cohort_delete_cohort($cohorts[0]);
@@ -160,7 +160,7 @@ class totara_competency_user_group_deleted_testcase extends advanced_testcase {
         $this->assertCount(2, $assignments);
 
 
-        set_config('continuous_tracking', admin_setting_continuous_tracking::DISABLED, 'tassign_competency');
+        set_config('continuous_tracking', admin_setting_continuous_tracking::DISABLED, 'totara_competency');
 
         // Removing a position
         $hierarchy = new \position();
@@ -200,7 +200,7 @@ class totara_competency_user_group_deleted_testcase extends advanced_testcase {
         $this->assertCount(2, $assignments);
 
 
-        set_config('continuous_tracking', admin_setting_continuous_tracking::ENABLED, 'tassign_competency');
+        set_config('continuous_tracking', admin_setting_continuous_tracking::ENABLED, 'totara_competency');
 
         // Removing a position
         $hierarchy = new \position();
@@ -240,7 +240,7 @@ class totara_competency_user_group_deleted_testcase extends advanced_testcase {
         $this->assertCount(2, $organisations);
         $this->assertCount(2, $assignments);
 
-        set_config('continuous_tracking', admin_setting_continuous_tracking::ENABLED, 'tassign_competency');
+        set_config('continuous_tracking', admin_setting_continuous_tracking::ENABLED, 'totara_competency');
 
         // Removing a position
         $hierarchy = new \organisation();
@@ -280,7 +280,7 @@ class totara_competency_user_group_deleted_testcase extends advanced_testcase {
         $this->assertCount(2, $organisations);
         $this->assertCount(2, $assignments);
 
-        set_config('continuous_tracking', admin_setting_continuous_tracking::DISABLED, 'tassign_competency');
+        set_config('continuous_tracking', admin_setting_continuous_tracking::DISABLED, 'totara_competency');
 
         // Removing a position
         $hierarchy = new \organisation();

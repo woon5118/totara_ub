@@ -18,10 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
-namespace tassign_competency;
+namespace totara_competency;
 
 use admin_setting_configselect;
 
@@ -47,8 +47,8 @@ class admin_setting_continuous_tracking extends admin_setting_configselect {
         }
 
         $this->choices = [
-            self::DISABLED => get_string('settings:continuous_tracking:disabled', 'tassign_competency'),
-            self::ENABLED => get_string('settings:continuous_tracking:enabled', 'tassign_competency')
+            self::DISABLED => get_string('settings:continuous_tracking:disabled', 'totara_competency'),
+            self::ENABLED => get_string('settings:continuous_tracking:enabled', 'totara_competency')
         ];
         return true;
     }

@@ -22,7 +22,7 @@
  * @category test
  */
 
-use tassign_competency\admin_setting_continuous_tracking;
+use totara_competency\admin_setting_continuous_tracking;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency_assignment_user;
 use totara_competency\entities\competency_assignment_user_log;
@@ -110,7 +110,7 @@ class totara_competency_user_log_testcase extends totara_competency_assignment_a
     }
 
     public function test_log_user_added_to_user_group() {
-        set_config('continuous_tracking', admin_setting_continuous_tracking::ENABLED, 'tassign_competency');
+        set_config('continuous_tracking', admin_setting_continuous_tracking::ENABLED, 'totara_competency');
 
         ['competencies' => $competencies] = $this->generate_assignments();
 

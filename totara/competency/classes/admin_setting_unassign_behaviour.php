@@ -18,10 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
-namespace tassign_competency;
+namespace totara_competency;
 
 use admin_setting_configselect;
 
@@ -50,9 +50,9 @@ class admin_setting_unassign_behaviour extends admin_setting_configselect {
         }
 
         $this->choices = [
-            self::KEEP => get_string('settings:unassign_behaviour:keep', 'tassign_competency'),
-            self::KEEP_NOT_NULL => get_string('settings:unassign_behaviour:keep_not_null', 'tassign_competency'),
-            self::DELETE => get_string('settings:unassign_behaviour:delete', 'tassign_competency')
+            self::KEEP => get_string('settings:unassign_behaviour:keep', 'totara_competency'),
+            self::KEEP_NOT_NULL => get_string('settings:unassign_behaviour:keep_not_null', 'totara_competency'),
+            self::DELETE => get_string('settings:unassign_behaviour:delete', 'totara_competency')
         ];
         return true;
     }

@@ -18,20 +18,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
-namespace tassign_competency;
+namespace totara_competency;
 
 class settings {
 
     public static function is_continuous_tracking_enabled(): bool {
-        $config = (int) get_config('tassign_competency', 'continuous_tracking');
+        $config = (int) get_config('totara_competency', 'continuous_tracking');
         return $config === admin_setting_continuous_tracking::ENABLED;
     }
 
     public static function should_unassign_keep_records(): bool {
-        $config = (int) get_config('tassign_competency', 'unassign_behaviour');
+        $config = (int) get_config('totara_competency', 'unassign_behaviour');
         return $config === admin_setting_unassign_behaviour::KEEP;
     }
 

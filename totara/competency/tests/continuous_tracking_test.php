@@ -22,7 +22,7 @@
  * @category test
  */
 
-use tassign_competency\admin_setting_continuous_tracking;
+use totara_competency\admin_setting_continuous_tracking;
 use totara_competency\entities;
 use totara_job\job_assignment;
 
@@ -39,7 +39,7 @@ class totara_competency_continuous_tracking_testcase extends advanced_testcase {
     }
 
     public function test_continuous_tracking_disabled() {
-        set_config('continuous_tracking', admin_setting_continuous_tracking::DISABLED, 'tassign_competency');
+        set_config('continuous_tracking', admin_setting_continuous_tracking::DISABLED, 'totara_competency');
 
         [
             'pos' => $pos,
@@ -79,7 +79,7 @@ class totara_competency_continuous_tracking_testcase extends advanced_testcase {
     }
 
     public function test_continuous_tracking_enabled() {
-        set_config('continuous_tracking', admin_setting_continuous_tracking::ENABLED, 'tassign_competency');
+        set_config('continuous_tracking', admin_setting_continuous_tracking::ENABLED, 'totara_competency');
 
         [
             'pos' => $pos,

@@ -163,6 +163,19 @@ $string['searchcourses'] = 'Search courses';
 $string['selectpathtype'] = 'Select path type';
 $string['selectcourses'] = 'Select courses';
 $string['selectcriteriontype'] = 'Select additional criteria for this path';
+
+$string['settings:unassignment:header'] = 'Automatic user unassignment behaviour';
+$string['settings:unassignment:text'] = 'Configuration for determining the consequences of a user being unassigned from a competency due to them losing membership of an assigned audience, being removed from an assigned position or organisation, or their assigned audience, position or organisation being deleted.';
+$string['settings:continuous_tracking'] = 'Continuous achievement tracking';
+$string['settings:continuous_tracking:description'] = 'Users\' achievement progress, rating and proficiency status are only tracked while they are assigned to a competency, and tracking ceases once they are unassigned. Enabling continuous achievement tracking will ensure that unassigned users who have no other active assignments to the competency can continue to be tracked after unassignment via a new individual assignment generated for them by the system.';
+$string['settings:continuous_tracking:enabled'] = 'Enabled';
+$string['settings:continuous_tracking:disabled'] = 'Disabled';
+$string['settings:unassign_behaviour'] = 'User assignment and record';
+$string['settings:unassign_behaviour:description'] = '<p><strong>"Archive"</strong> means that a record that the user was assigned to the competency will be kept, as well as any achievement, rating and proficiency status recorded for them while assigned. Once archived, achievement progress on the competency will no longer be tracked.</p><p><strong>"Delete"</strong> means that all data about their assignment, and related achievement, rating and proficiency status will be deleted permanently.</p>';
+$string['settings:unassign_behaviour:keep'] = 'Archive always (regardless of whether user has achieved a rating or not)';
+$string['settings:unassign_behaviour:keep_not_null'] = 'Archive ONLY IF user has achieved a rating in the competency (otherwise delete)';
+$string['settings:unassign_behaviour:delete'] = 'Delete always (regardless of whether user has achieved a rating or not)';
+
 $string['setupbasic'] = 'Basic';
 $string['setupbasictitle'] = 'Basic set up';
 $string['setupcustom'] = 'Custom';
@@ -188,4 +201,6 @@ $string['user_group_type:position'] = 'Position';
 $string['user_group_type:organisation'] = 'Organisation';
 $string['userdataitemachievement'] = 'Achievement records';
 $string['userdataitemachievement_help'] = 'When purging, the user\'s achievement data will be removed. However, after purging is complete, the records may be added back again if they still meet the criteria. For instance, if a user has completed a course that is linked to a competency, then an achievement record will be created again despite being purged previously.';
+$string['userdataitemassignment_user'] = 'Competency assignments';
+$string['userdataitemassignment_user_help'] = 'This includes individual assignments and assignments due to the user being a member of an audience, being in a position or in an organisation. When purging, any achievement data associated with the assignments will also be purged (even if these data items are not selected). After purging, group-based assignments may be dynamically created again, if they user still meets the criteria for the assignment (by being a member of a group).';
 $string['viewing'] = 'Viewing';

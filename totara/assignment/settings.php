@@ -23,8 +23,8 @@
  * @subpackage competency
  */
 
-use tassign_competency\admin_setting_continuous_tracking;
-use tassign_competency\admin_setting_unassign_behaviour;
+use totara_competency\admin_setting_continuous_tracking;
+use totara_competency\admin_setting_unassign_behaviour;
 use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
@@ -75,20 +75,20 @@ if (advanced_feature::is_enabled('competency_assignment')) {
     if ($ADMIN->fulltree) {
         $settings_page->add(new admin_setting_heading(
             'totara_competency/heading',
-            new lang_string('settings:unassignment:header', 'tassign_competency'),
-            new lang_string('settings:unassignment:text', 'tassign_competency')
+            new lang_string('settings:unassignment:header', 'totara_competency'),
+            new lang_string('settings:unassignment:text', 'totara_competency')
         ));
 
         $settings_page->add(new admin_setting_unassign_behaviour(
             admin_setting_unassign_behaviour::NAME,
-            new lang_string('settings:unassign_behaviour', 'tassign_competency'),
-            new lang_string('settings:unassign_behaviour:description', 'tassign_competency')
+            new lang_string('settings:unassign_behaviour', 'totara_competency'),
+            new lang_string('settings:unassign_behaviour:description', 'totara_competency')
         ));
 
         $settings_page->add(new admin_setting_continuous_tracking(
             'totara_competency/continuous_tracking',
-            new lang_string('settings:continuous_tracking', 'tassign_competency'),
-            new lang_string('settings:continuous_tracking:description', 'tassign_competency')
+            new lang_string('settings:continuous_tracking', 'totara_competency'),
+            new lang_string('settings:continuous_tracking:description', 'totara_competency')
         ));
     }
 }

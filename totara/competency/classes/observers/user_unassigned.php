@@ -25,7 +25,7 @@ namespace totara_competency\observers;
 
 use totara_competency\event\assignment_user_unassigned;
 use totara_competency\models\assignment_user;
-use tassign_competency\settings;
+use totara_competency\settings;
 
 defined('MOODLE_INTERNAL') || die();
 
