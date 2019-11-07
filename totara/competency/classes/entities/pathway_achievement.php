@@ -48,10 +48,10 @@ class pathway_achievement extends entity {
 
     public const TABLE = 'totara_competency_pathway_achievement';
 
-    /** @const int Achievement is current */
+    /** @var int Achievement is current */
     public const STATUS_CURRENT = 0;
 
-    /** @const int Achievement is not current */
+    /** @var int Achievement is not current */
     public const STATUS_ARCHIVED = 1;
 
     public static function get_current(pathway $pathway, int $user_id): pathway_achievement {

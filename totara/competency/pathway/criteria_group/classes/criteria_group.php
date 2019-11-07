@@ -311,7 +311,7 @@ class criteria_group extends pathway {
     /**
      * Returns the scale value associated with this pathway.
      *
-     * @return ?scale_value A null return value indicates that any scale value may be returned
+     * @return scale_value|null ?scale_value A null return value indicates that any scale value may be returned
      */
     public function get_scale_value(): ?scale_value {
         return $this->scale_value;
@@ -320,7 +320,7 @@ class criteria_group extends pathway {
     /**
      * Set the scale value associated with this pathway.
      *
-     * @param  scale_value Scale value to set
+     * @param scale_value $scale_value
      * @return $this
      */
     public function set_scale_value(scale_value $scale_value) {
@@ -340,7 +340,8 @@ class criteria_group extends pathway {
     /**
      * Add a criterion that must be completed
      *
-     * @param criterion $child Child group to add
+     * @param criterion $criterion
+     * @return $this
      */
     public function add_criterion(criterion $criterion): pathway {
         // Check that the criterion ids are unique.
@@ -363,6 +364,7 @@ class criteria_group extends pathway {
      * Remove the specified criterion
      *
      * @param int $key Assigned key of the criterion to remove
+     * @return $this
      */
     public function remove_criterion(int $key): pathway {
         $id = $this->criteria[$key]->get_id();
@@ -412,7 +414,7 @@ class criteria_group extends pathway {
      */
     public function get_summarized_criteria_set(): array {
         $result = array_map(
-            function ($criterion) {
+            function (criterion $criterion) {
                 return $criterion->display_instance()->get_configuration();
             },
             $this->get_criteria()
@@ -514,8 +516,9 @@ class criteria_group extends pathway {
     /**
      * Retrieve the current configuration from the database
      *
-     * @param ?int $id Instance id
+     * @param int|null $id
      * @return \stdClass | null
+     * @throws \dml_exception
      */
     public static function dump_pathway_configuration(?int $id = null) {
         global $DB;
