@@ -28,8 +28,8 @@ namespace totara_competency\entities;
 use core\orm\query\builder;
 use core\orm\query\field;
 use core\orm\query\subquery;
-use tassign_competency\filter\competency_assignment_status;
-use tassign_competency\filter\competency_assignment_type;
+use totara_competency\entities\filters\competency_assignment_status;
+use totara_competency\entities\filters\competency_assignment_type;
 use totara_assignment\entities\hierarchy_item_repository;
 
 class competency_repository extends hierarchy_item_repository {

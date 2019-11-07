@@ -30,7 +30,7 @@ use core\orm\entity\filter\filter;
 /**
  * Filters for all ids in the given basket, used for showing selected items in the interface
  *
- * @package tassign_competency\filter
+ * @package totara_competency\entities\filters
  */
 class basket extends filter {
 

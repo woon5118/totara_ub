@@ -21,7 +21,7 @@
  * @package tassign_competency
  */
 
-namespace tassign_competency\filter;
+namespace totara_competency\entities\filters;
 
 use core\orm\query\field;
 use totara_competency\entities\assignment;
@@ -34,7 +34,7 @@ use core\orm\entity\filter\filter;
  * We need to combine them so that if i.e. someone filters by type 'admin' and 'position'
  * we check both columns
  *
- * @package tassign_competency\filter
+ * @package totara_competency\entities\filters
  */
 class competency_assignment_type extends filter {
 

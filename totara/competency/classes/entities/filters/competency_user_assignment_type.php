@@ -21,7 +21,7 @@
  * @package tassign_competency
  */
 
-namespace tassign_competency\filter;
+namespace totara_competency\entities\filters;
 
 use coding_exception;
 use core\orm\query\field;
@@ -34,7 +34,7 @@ use core\orm\entity\filter\filter;
 /**
  * This filter filters by assignment type only considering assignments of given user
  *
- * @package tassign_competency\filter
+ * @package totara_competency\entities\filters
  */
 class competency_user_assignment_type extends filter {
 

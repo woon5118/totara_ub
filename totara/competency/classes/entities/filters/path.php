@@ -21,7 +21,7 @@
  * @package tassign_competency
  */
 
-namespace tassign_competency\filter;
+namespace totara_competency\entities\filters;
 
 use core\orm\entity\filter\filter;
 

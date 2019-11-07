@@ -26,7 +26,7 @@ namespace totara_competency\entities;
 
 use core\orm\query\field;
 use core\orm\query\raw_field;
-use tassign_competency\filter\competency_assignment_type;
+use totara_competency\entities\filters\competency_assignment_type;
 use totara_assignment\filter\basket;
 use totara_assignment\user_groups;
 use core\orm\query\builder;

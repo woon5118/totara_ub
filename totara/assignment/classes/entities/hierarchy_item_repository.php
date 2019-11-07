@@ -25,7 +25,7 @@ namespace totara_assignment\entities;
 
 
 use core\orm\query\subquery;
-use tassign_competency\filter\path;
+use totara_competency\entities\filters\path;
 use totara_assignment\entities\traits\has_visible_filter;
 use totara_assignment\filter\basket;
 use totara_assignment\filter\hierarchy_item_visible;

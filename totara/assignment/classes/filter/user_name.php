@@ -31,7 +31,7 @@ use core\orm\query\raw_field;
 /**
  * Filters for some user name information
  *
- * @package tassign_competency\filter
+ * @package totara_competency\entities\filters
  */
 class user_name extends like {
 

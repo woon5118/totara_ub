@@ -21,21 +21,32 @@
  * @package tassign_competency
  */
 
-namespace tassign_competency\filter;
+namespace totara_competency\entities\filters;
 
+use coding_exception;
 use totara_competency\entities\assignment;
 use core\orm\query\builder;
 use core\orm\query\field;
 use core\orm\entity\filter\filter;
 
-class competency_assignment_status extends filter {
+class competency_user_assignment_status extends filter {
 
     public function apply() {
+        $user_id = $this->params[0] ?? null;
+        if (!($user_id > 0)) {
+            throw new coding_exception('Missing user id for user assignment type filter');
+        }
+
         $val = $this->value;
         if (count($val) === 1 && !is_null($val[0])) {
             $assigned = $val[0] === 1;
+
             $exist_builder = builder::table(assignment::TABLE)
+                ->join(['totara_assignment_competency_users', 'ua'], 'id', 'assignment_id')
+                ->where('ua.user_id', $user_id)
+                ->where('status', assignment::STATUS_ACTIVE)
                 ->where_field('competency_id', new field('id', $this->builder));
+
             if ($assigned) {
                 $this->builder->where_exists($exist_builder);
             } else {
