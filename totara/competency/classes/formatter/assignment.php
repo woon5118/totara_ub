@@ -21,7 +21,7 @@
  * @package totara_userstatus
  */
 
-namespace tassign_competency\formatter;
+namespace totara_competency\formatter;
 
 use tassign_competency\models\assignment as assignment_model;
 use totara_core\formatter\field\date_field_formatter;

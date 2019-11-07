@@ -21,46 +21,32 @@
  * @package tassign_competency
  */
 
-namespace tassign_competency\webapi\resolver\type;
+namespace totara_competency\webapi\resolver\type;
 
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use tassign_competency\models\user_group as user_group_model;
-use totara_core\formatter\field\string_field_formatter;
+use totara_competency\formatter;
+use tassign_competency\models\assignment as assignment_model;
 
 /**
  * Note: It is the responsibility of the query to ensure the user is permitted to see an organisation.
  */
-class user_group implements type_resolver {
+class assignment implements type_resolver {
 
     /**
      * @param string $field
-     * @param user_group_model $user_group
+     * @param assignment $assignment
      * @param array $args
      * @param execution_context $ec
      * @return mixed
      */
-    public static function resolve(string $field, $user_group, array $args, execution_context $ec) {
-        if (!$user_group instanceof user_group_model) {
-            throw new \coding_exception('Accepting only entities.');
+    public static function resolve(string $field, $assignment, array $args, execution_context $ec) {
+        if (!$assignment instanceof assignment_model) {
+            throw new \coding_exception('Accepting only assignment models.');
         }
 
-        $format = $args['format'] ?? null;
-
-        switch ($field) {
-            case 'id':
-                return $user_group->get_id();
-            case 'name':
-                $formatter = new string_field_formatter($format, \context_system::instance());
-                return $formatter->format($user_group->get_name());
-            case 'is_deleted':
-                return $user_group->is_deleted();
-            case 'type':
-                return $user_group->get_type();
-            default:
-                throw new \coding_exception("Unknown field '{$field}' for user_group type");
-        }
+        $formatter = new formatter\assignment($assignment, \context_system::instance());
+        return $formatter->format($field, $args['format'] ?? null);
     }
-
 
 }

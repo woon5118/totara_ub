@@ -21,7 +21,7 @@
  * @package tassign_competency
  */
 
-namespace tassign_competency\webapi\resolver\query;
+namespace totara_competency\webapi\resolver\query;
 
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
@@ -45,7 +45,7 @@ class assignment implements query_resolver {
 
         require_login();
 
-        return assignment_model::load_by_id($args['assignmentid']);
+        return assignment_model::load_by_id($args['assignment_id']);
     }
 
 }
