@@ -97,15 +97,43 @@ class pathway_learning_plan_evaluator_testcase extends advanced_testcase {
         // Manually insert into dp plan_competency_value to exercise the table sql explicitly
         // The full process is exercised in pathway_learning_plan_learning_plan_testcase::test_integration
         // found in learning_plan_test.php
-        $this->create_rating_record($data->competency->id, $data->users[1]->id, $data->scalevalues[4]->id, $now++);
 
-        $this->create_userid_table_records($data->user_id_table, $data->competency->id, [$data->users[1]->id]);
         $evaluator = new learning_plan_evaluator($data->lp_pathway, $data->user_id_source);
+
+        // Adding an empty
+        $this->create_rating_record($data->competency->id, $data->users[1]->id, 0, $now++);
+        $this->create_userid_table_records($data->user_id_table, $data->competency->id, [$data->users[1]->id]);
 
         // Now aggregate first time for user1
         $evaluator->aggregate($now++);
 
         $expected = [
+            [
+                'pathway_id' => $data->lp_pathway->get_id(),
+                'scale_value_id' => null,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'related_info' => [],
+            ],
+        ];
+        $this->verify_userid_table_records($data->user_id_table, [$data->users[1]->id => 1]);
+        $this->verify_pathway_achievements($data->users[1]->id, $expected);
+
+        // Let's start from scratch to simulate that aggregation works with an existing achievement record with no scale value
+        $data->user_id_table->delete();
+
+        $this->create_rating_record($data->competency->id, $data->users[1]->id, $data->scalevalues[4]->id, $now++);
+        $this->create_userid_table_records($data->user_id_table, $data->competency->id, [$data->users[1]->id]);
+
+        // Now aggregate second time for user1
+        $evaluator->aggregate($now++);
+
+        $expected = [
+            [
+                'pathway_id' => $data->lp_pathway->get_id(),
+                'scale_value_id' => null,
+                'status' => pathway_achievement::STATUS_ARCHIVED,
+                'related_info' => [],
+            ],
             [
                 'pathway_id' => $data->lp_pathway->get_id(),
                 'scale_value_id' => $data->scalevalues[4]->id,
@@ -128,6 +156,12 @@ class pathway_learning_plan_evaluator_testcase extends advanced_testcase {
 
         $expected = [
             1 => [
+                [
+                    'pathway_id' => $data->lp_pathway->get_id(),
+                    'scale_value_id' => null,
+                    'status' => pathway_achievement::STATUS_ARCHIVED,
+                    'related_info' => [],
+                ],
                 [
                     'pathway_id' => $data->lp_pathway->get_id(),
                     'scale_value_id' => $data->scalevalues[4]->id,
@@ -156,6 +190,12 @@ class pathway_learning_plan_evaluator_testcase extends advanced_testcase {
 
         $expected = [
             1 => [
+                [
+                    'pathway_id' => $data->lp_pathway->get_id(),
+                    'scale_value_id' => null,
+                    'status' => pathway_achievement::STATUS_ARCHIVED,
+                    'related_info' => [],
+                ],
                 [
                     'pathway_id' => $data->lp_pathway->get_id(),
                     'scale_value_id' => $data->scalevalues[4]->id,

@@ -54,7 +54,7 @@ class learning_plan_evaluator_user_source extends pathway_evaluator_user_source 
         $temp_user_id_column = $this->temp_user_table->get_user_id_column();
         [$temp_set_sql, $temp_set_params] = $this->temp_user_table->get_set_has_changed_sql_with_params(1);
         $competency_id = $pathway->get_competency()->id;
-        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('', true, null);
+        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('', false, null);
         if (!empty($temp_wh)) {
             $temp_wh = "{$temp_wh} AND ";
         }
