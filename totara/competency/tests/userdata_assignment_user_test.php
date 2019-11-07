@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency_assignment_user;
 use totara_competency\entities\competency_assignment_user_log;
-use tassign_competency\userdata\assignment_user;
+use totara_competency\userdata\assignment_user;
 use totara_assignment\user_groups;
 use totara_job\job_assignment;
 use totara_userdata\userdata\item;
