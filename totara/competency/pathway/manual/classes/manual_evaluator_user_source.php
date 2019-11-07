@@ -52,11 +52,12 @@ class manual_evaluator_user_source extends pathway_evaluator_user_source {
         $temp_table_name = $this->temp_user_table->get_table_name();
         $temp_user_id_column = $this->temp_user_table->get_user_id_column();
         [$temp_set_sql, $temp_set_params] = $this->temp_user_table->get_set_has_changed_sql_with_params(1);
-        $competency_id = $pathway->get_competency()->id;
-        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('', true, null, $competency_id);
+        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('', true, null);
         if (!empty($temp_wh)) {
             $temp_wh = "{$temp_wh} AND ";
         }
+
+        $competency_id = $pathway->get_competency()->id;
 
         // TODO: These are good queries to use for creation of indexes / other performance enhancement options
 

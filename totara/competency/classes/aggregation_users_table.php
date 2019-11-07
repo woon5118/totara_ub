@@ -48,6 +48,9 @@ class aggregation_users_table {
     /** @var string $competency_id_column Name of the column containing the ids of competencies to consider for aggregation */
     private $competency_id_column = 'competency_id';
 
+    /** @var ?int $competency_id_value Competency_id value to use in filtering */
+    private $competency_id_value = null;
+
     /** @var string $has_changed_column Name of the column to set for users that have changes. */
     private $has_changed_column = 'has_changed';
 
@@ -253,6 +256,36 @@ class aggregation_users_table {
     }
 
     /**
+     * Set the competency_id value to filter rows on
+     *
+     * @param ?int $competecy_id
+     * @return self
+     */
+    public function set_comptency_id_value(?int $comptency_id): self {
+        $this->competency_id_value = $comptency_id;
+        return $this;
+    }
+
+    /**
+     * Reset the competency_id value to remove filtering
+     *
+     * @return self
+     */
+    public function reset_comptency_id_value(): self {
+        $this->set_comptency_id_value(null);
+        return $this;
+    }
+
+    /**
+     * Return the current competency_id_value used in filtering
+     * @return ?int
+     */
+    public function get_competency_id_value(): ?int {
+        return $this->competency_id_value;
+    }
+
+
+    /**
      * Remove all rows from the users table associated with the key
      *
      * @return self
@@ -329,11 +362,14 @@ class aggregation_users_table {
     ): array {
         $record = [
             $this->get_user_id_column() => $user_id_value,
-            $this->get_competency_id_column() => $competency_id_value
         ];
 
         if (!is_null($has_changed_value) && empty($this->has_changed_column)) {
             $record[$this->get_has_changed_column()] = $has_changed_value;
+        }
+
+        if (!empty($this->competency_id_column) && !empty($competency_id_value)) {
+            $record[$this->competency_id_column] = $competency_id_value;
         }
 
         if (!empty($this->process_key_column) && !empty($this->process_key_value)) {
@@ -357,7 +393,7 @@ class aggregation_users_table {
      */
     public function get_insert_values_sql_with_params(
         ?int $user_id_value = null,
-        ?int $comp_id_value = null,
+        ?int $competency_id_value = null,
         $has_changed_value = null
     ): array {
         $sql = [];
@@ -368,9 +404,9 @@ class aggregation_users_table {
             $params['user_id'] = $user_id_value;
         }
 
-        if (!is_null($comp_id_value)) {
+        if (!empty($this->competency_id_column) && !empty($competency_id_value)) {
             $sql[] = ":competency_id";
-            $params['competency_id'] = $comp_id_value;
+            $params['competency_id'] = $competency_id_value;
         }
 
         if (!is_null($has_changed_value) && !empty($this->has_changed_column)) {
@@ -387,13 +423,17 @@ class aggregation_users_table {
     }
 
     /**
-     * Return the parameters for filtering on the process_key and update_operation
+     * Return the parameters for filtering on the process_key, competency_id and update_operation
      *
      * @param  bool $include_update_operation Include filtering on the update_operation?
      * @return array
      */
     public function get_filter(bool $include_update_operation = true) {
         $filter = [];
+
+        if (!empty($this->competency_id_column) && !empty($this->competency_id_value)) {
+            $filter[$this->competency_id_column] = $this->competency_id_value;
+        }
 
         if (!empty($this->process_key_column) && !empty($this->process_key_value)) {
             $filter[$this->process_key_column] = $this->process_key_value;
@@ -412,7 +452,6 @@ class aggregation_users_table {
      * @param string $table_alias
      * @param bool $include_update_operation Include filtering on the update_operation?
      * @param mixed|null $has_change_value Include filtering with this has_changed_value
-     * @param int|null $competency_id_value
      * @param string $param_prefix Prefix to use for the parameters
      * @return array [string, array]
      */
@@ -420,7 +459,6 @@ class aggregation_users_table {
         string $table_alias = '',
         bool $include_update_operation = true,
         $has_change_value = null,
-        ?int $competency_id_value = null,
         string $param_prefix = 'autbl'
     ) {
         $sql_parts = [];
@@ -428,9 +466,9 @@ class aggregation_users_table {
 
         $table_alias = !empty($table_alias) ? $table_alias . '.' : $table_alias;
 
-        if (!is_null($competency_id_value)) {
+        if (!empty($this->competency_id_value) && !empty($this->competency_id_column)) {
             $sql_parts[] = "{$table_alias}{$this->competency_id_column} = :{$param_prefix}_competency_id";
-            $params[$param_prefix . '_competency_id'] = $competency_id_value;
+            $params[$param_prefix . '_competency_id'] = $this->competency_id_value;
         }
 
         if (!empty($this->process_key_value) && !empty($this->process_key_column)) {

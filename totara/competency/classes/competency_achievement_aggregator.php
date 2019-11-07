@@ -99,6 +99,7 @@ final class competency_achievement_aggregator {
             $aggregation_time = time();
         }
 
+        $this->user_id_source->set_competency_id_value($competency_id);
         $this->user_id_source->archive_non_assigned_achievements($competency_id, $aggregation_time);
         $user_assignment_records = $this->user_id_source->get_users_to_reaggregate($competency_id, $aggregation_time);
 

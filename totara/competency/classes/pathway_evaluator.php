@@ -47,6 +47,7 @@ abstract class pathway_evaluator {
 
         /** @var string $operation_value */
         $operation_value = $pathway->get_path_type() . '__' . $pathway->get_id();
+        $user_id_source->set_competency_id_value($pathway->get_competency()->id);
         $user_id_source->set_update_operation_value($operation_value);
         $this->user_id_source = $user_id_source;
 

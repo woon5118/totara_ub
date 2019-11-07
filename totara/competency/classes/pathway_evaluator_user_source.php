@@ -45,7 +45,7 @@ class pathway_evaluator_user_source {
 
     /**
      * Return the user_id_source
-     * @return mixed Source used for obtaining currently assigned users
+     * @return aggregation_users_table Source used for obtaining currently assigned users
      */
     public function get_source() {
         return $this->temp_user_table;
@@ -75,8 +75,7 @@ class pathway_evaluator_user_source {
         $temp_user_id_column = $this->temp_user_table->get_user_id_column();
         [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('',
             false,
-            null,
-            $pathway->get_competency()->id
+            null
         );
         $temp_wh = !empty($temp_wh) ? " WHERE {$temp_wh}" : '';
 
@@ -118,9 +117,8 @@ class pathway_evaluator_user_source {
 
         $temp_table_name = $this->temp_user_table->get_table_name();
         $user_id_column = $this->temp_user_table->get_user_id_column();
-        $competency_id = $pathway->get_competency()->id;
         [$set_haschanged_sql, $set_haschanged_params] = $this->temp_user_table->get_set_has_changed_sql_with_params(1);
-        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('', false, null, $competency_id);
+        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('', false, null);
         if (!empty($temp_wh)) {
             $temp_wh = " AND {$temp_wh}";
         }
@@ -129,7 +127,6 @@ class pathway_evaluator_user_source {
             [
                 'pathwayid' => $pathway->get_id(),
                 'currentstatus' => pathway_achievement::STATUS_CURRENT,
-                'competency_id' => $pathway->get_competency()->id
             ],
             $set_haschanged_params,
             $temp_wh_params
@@ -166,6 +163,14 @@ class pathway_evaluator_user_source {
     }
 
     /**
+     * Set the competency_id_value to use in filtering
+     * @param int $competency_id
+     */
+    public function set_competency_id_value(int $competency_id) {
+        $this->temp_user_table->set_comptency_id_value($competency_id);
+    }
+
+    /**
      * Reaggregate all users with changed completion values
      *
      * @param pathway $pathway
@@ -178,8 +183,7 @@ class pathway_evaluator_user_source {
         $temp_alias = 'tmp';
         $temp_table_name = $this->temp_user_table->get_table_name();
         $userid_column = $this->temp_user_table->get_user_id_column();
-        $competency_id = $pathway->get_competency()->id;
-        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params($temp_alias, true, 1, $competency_id);
+        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params($temp_alias, true, 1);
 
         $sql =
             "SELECT {$temp_alias}.{$userid_column} as user_id, 

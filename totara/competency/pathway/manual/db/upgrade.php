@@ -130,7 +130,7 @@ function xmldb_pathway_manual_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019070302, 'pathway', 'manual');
     }
 
-    if ($oldversion < 2019070303) {
+    if ($oldversion < 2019110700) {
         // Changes to pathway_manual_rating table
         $table = new xmldb_table('pathway_manual_rating');
 
@@ -155,7 +155,7 @@ function xmldb_pathway_manual_upgrade($oldversion) {
         $table->add_key('patmanrat_fk_assiby', XMLDB_KEY_FOREIGN, array('assigned_by'), 'user', array('id'));
 
         // Criteria_group savepoint reached.
-        upgrade_plugin_savepoint(true, 2019070303, 'pathway', 'manual');
+        upgrade_plugin_savepoint(true, 2019110700, 'pathway', 'manual');
     }
 
     return true;

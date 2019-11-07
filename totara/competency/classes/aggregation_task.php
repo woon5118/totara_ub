@@ -89,6 +89,7 @@ class aggregation_task {
             $reaggregate_competencies[$row->comp_id] = true;
 
             $pathway = pathway_factory::from_record($row);
+
             $pw_evaluator = pathway_evaluator_factory::create($pathway, $this->pw_user_id_source);
             $pw_evaluator->aggregate($aggregation_time);
         }

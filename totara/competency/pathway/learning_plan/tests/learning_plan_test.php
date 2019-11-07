@@ -149,7 +149,7 @@ class pathway_learning_plan_learning_plan_testcase extends advanced_testcase {
         $this->assertNull($pathway_achievement->scale_value_id);
 
         $source_table = new aggregation_users_table();
-        $source_table->queue_for_aggregation($user->id, 1);
+        $source_table->queue_for_aggregation($user->id, $competency->id);
         $comp_user_source = new competency_aggregator_user_source($source_table, true);
         (new competency_achievement_aggregator(new achievement_configuration($competency), $comp_user_source))->aggregate();
 

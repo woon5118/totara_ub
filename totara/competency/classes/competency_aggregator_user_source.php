@@ -43,6 +43,10 @@ class competency_aggregator_user_source {
         $this->full_user_set = $full_user_set;
     }
 
+    public function set_competency_id_value(?int $competency_id) {
+        $this->temp_user_table->set_comptency_id_value($competency_id);
+    }
+
     /**
      * Archive achievements of users no longer assigned
      * @param int $competency_id
@@ -57,7 +61,7 @@ class competency_aggregator_user_source {
 
         $temp_table_name = $this->temp_user_table->get_table_name();
         $temp_user_id_column = $this->temp_user_table->get_user_id_column();
-        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('', false, null, $competency_id);
+        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('', false, null);
         if (!empty($temp_wh)) {
             $temp_wh = ' WHERE ' . $temp_wh;
         }
