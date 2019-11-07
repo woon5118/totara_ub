@@ -24,7 +24,7 @@
 
 use core\orm\query\builder;
 use totara_competency\entities;
-use tassign_competency\expand_task;
+use totara_competency\expand_task;
 use totara_competency\models\assignment_user;
 
 defined('MOODLE_INTERNAL') || die();

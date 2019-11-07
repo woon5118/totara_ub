@@ -36,8 +36,8 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
-        /** @var tassign_competency_generator $assignment_generator */
-        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
+        /** @var totara_competency_assignment_generator $assignment_generator */
+        $assignment_generator = $competency_generator->assignment_generator();
 
         $user1 = $this->getDataGenerator()->create_user();
         $course1 = $this->getDataGenerator()->create_course();
@@ -72,7 +72,7 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
         $assignment1 = $assignment_generator->create_user_assignment($competency1->id, $user1->id);
         $model = new \totara_competency\models\assignment_actions();
         $model->activate([$assignment1->id]);
-        $expand_task = new \tassign_competency\expand_task($DB);
+        $expand_task = new \totara_competency\expand_task($DB);
         $expand_task->expand_all();
 
         $this->assertEquals(1, $DB->count_records('totara_assignment_competency_users'));
@@ -168,7 +168,7 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
         $assignment1 = $assignment_generator->create_user_assignment($competency1->id, $user1->id);
         $model = new \totara_competency\models\assignment_actions();
         $model->activate([$assignment1->id]);
-        $expand_task = new \tassign_competency\expand_task($DB);
+        $expand_task = new \totara_competency\expand_task($DB);
         $expand_task->expand_all();
 
         $this->assertEquals(1, $DB->count_records('totara_assignment_competency_users'));

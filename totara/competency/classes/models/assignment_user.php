@@ -27,7 +27,7 @@ use core\orm\entity\repository;
 use core\orm\collection;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency_assignment_user;
-use tassign_competency\expand_task;
+use totara_competency\expand_task;
 use totara_assignment\entities\user;
 use totara_assignment\user_groups;
 

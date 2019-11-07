@@ -47,7 +47,7 @@ $ADMIN->add(
     'competencies',
     new admin_externalpage(
         'competency_assignment_users',
-        get_string('title:users', 'tassign_competency'),
+        get_string('title:users', 'totara_competency'),
         "{$CFG->wwwroot}/totara/assignment/plugins/competency/users.php",
         "totara/competency:manage",
         !advanced_feature::is_enabled('competency_assignment')

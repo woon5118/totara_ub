@@ -29,7 +29,7 @@ use criteria_linkedcourses\linkedcourses;
 use criteria_onactivate\onactivate;
 use pathway_manual\manual;
 use totara_competency\entities\assignment;
-use tassign_competency\expand_task;
+use totara_competency\expand_task;
 use totara_competency\models\assignment_actions;
 use totara_assignment\entities\user;
 use totara_competency\entities\competency as competency_entity;

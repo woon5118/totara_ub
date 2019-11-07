@@ -79,7 +79,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $model = new \totara_competency\models\assignment_actions();
         $model->activate($assignment_ids);
 
-        $expand_task = new \tassign_competency\expand_task($DB);
+        $expand_task = new \totara_competency\expand_task($DB);
         $expand_task->expand_all();
 
         return $assignment_ids;
@@ -504,7 +504,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
 
         $model = new \totara_competency\models\assignment_actions();
         $model->archive([$disable_assignment_id]);
-        $expand_task = new \tassign_competency\expand_task($DB);
+        $expand_task = new \totara_competency\expand_task($DB);
         $expand_task->expand_all();
 
         $aggregator = new competency_achievement_aggregator($achievement_configuration);
@@ -599,7 +599,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
 
         $model = new \totara_competency\models\assignment_actions();
         $model->archive([$disable_assignment_id]);
-        $expand_task = new \tassign_competency\expand_task($DB);
+        $expand_task = new \totara_competency\expand_task($DB);
         $expand_task->expand_all();
 
         // Add a new pathway achievement, which would prompt a new competency record if it were possible.

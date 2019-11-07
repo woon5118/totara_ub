@@ -27,7 +27,7 @@ use context;
 use context_system;
 use core\output\notification;
 use moodle_url;
-use tassign_competency\task\expand_assignment_task;
+use totara_competency\task\expand_assignment_task;
 use totara_core\advanced_feature;
 use totara_mvc\controller;
 

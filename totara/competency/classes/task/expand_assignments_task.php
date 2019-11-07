@@ -18,12 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
-namespace tassign_competency\task;
+namespace totara_competency\task;
 
-use tassign_competency\expand_task;
+use totara_competency\expand_task;
 
 /**
  * Update competency user assignment table
@@ -33,7 +33,7 @@ class expand_assignments_task extends \core\task\scheduled_task {
     use expand_task_trait;
 
     public function get_name() {
-        return get_string('expand_assignments_task', 'tassign_competency');
+        return get_string('expand_assignments_task', 'totara_competency');
     }
 
     public function execute() {

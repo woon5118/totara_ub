@@ -22,16 +22,28 @@
  * @package totara_competency
  */
 
+use totara_competency\task\competency_achievement_aggregation;
+use totara_competency\task\expand_assignments_task;
+
 defined('MOODLE_INTERNAL') || die();
 
 $tasks = [
     [
-        'classname' => 'totara_competency\task\competency_achievement_aggregation',
+        'classname' => competency_achievement_aggregation::class,
         'blocking' => 0,
         'minute' => '0',
         'hour' => '*',
         'day' => '*',
         'dayofweek' => '*',
         'month' => '*'
-    ]
+    ],
+    [
+    'classname' => expand_assignments_task::class,
+    'blocking' => 0,
+    'minute' => '0',
+    'hour' => '*',
+    'day' => '*',
+    'dayofweek' => '*',
+    'month' => '*'
+],
 ];

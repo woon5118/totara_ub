@@ -18,14 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
-namespace tassign_competency\task;
+namespace totara_competency\task;
 
 use core\message\message;
 use core\task\adhoc_task;
-use tassign_competency\expand_task;
+use totara_competency\expand_task;
 
 /**
  * Ad-hoc tack for expanding an assignment to be triggered when the assignment was created or changed.
@@ -71,7 +71,7 @@ class expand_assignment_task extends adhoc_task {
      */
     public static function is_scheduled() {
         global $DB;
-        $params = ['component' => 'tassign_competency', 'classname' => "\\".self::class];
+        $params = ['component' => 'totara_competency', 'classname' => "\\" . self::class];
         return $DB->record_exists('task_adhoc', $params);
     }
 
@@ -83,7 +83,7 @@ class expand_assignment_task extends adhoc_task {
     public static function schedule(array $task_data) {
         $adhocktask = new static();
         $adhocktask->set_custom_data($task_data);
-        $adhocktask->set_component('tassign_competency');
+        $adhocktask->set_component('totara_competency');
         \core\task\manager::queue_adhoc_task($adhocktask);
     }
 
@@ -106,7 +106,7 @@ class expand_assignment_task extends adhoc_task {
     }
 
     /**
-     * Schedule to expand all with optional user notifictaion
+     * Schedule to expand all with optional user notification
      *
      * @param int|null $notify_user_id
      */
@@ -128,13 +128,13 @@ class expand_assignment_task extends adhoc_task {
 
         $userto = $DB->get_record('user', ['id' => $user_id], '*', MUST_EXIST);
 
-        $subject = get_string('expand_task:notification:subject', 'tassign_competency');
-        $body = get_string('expand_task:notification:body', 'tassign_competency');
+        $subject = get_string('expand_task:notification:subject', 'totara_competency');
+        $body = get_string('expand_task:notification:body', 'totara_competency');
 
         $message = new message();
         $message->courseid          = 0;
         $message->notification      = 1;
-        $message->component         = 'tassign_competency';
+        $message->component         = 'totara_competency';
         $message->name              = 'expand_task_finished';
         $message->userfrom          = \core_user::get_noreply_user();
         $message->userto            = $userto;
@@ -144,7 +144,7 @@ class expand_assignment_task extends adhoc_task {
         $message->fullmessagehtml   = markdown_to_html($body);
         $message->smallmessage      = $subject;
         $message->contexturl        = new \moodle_url('/totara/assignment/plugins/competency/users.php');
-        $message->contexturlname    = get_string('title:users', 'tassign_competency');
+        $message->contexturlname    = get_string('title:users', 'totara_competency');
 
         message_send($message);
     }

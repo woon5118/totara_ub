@@ -29,7 +29,7 @@ use totara_mvc\report_view;
 
 class users extends report_view {
 
-    protected $title = ['title:users', 'tassign_competency'];
+    protected $title = ['title:users', 'totara_competency'];
 
     protected function prepare_output($report) {
         $output = array_merge(

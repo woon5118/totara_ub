@@ -27,7 +27,7 @@ use core\webapi\execution_context;
 use pathway_learning_plan\entities\plan_competency_value;
 use pathway_learning_plan\models\competency_plan;
 use pathway_learning_plan\webapi\resolver\query\competency_plans;
-use tassign_competency\expand_task;
+use totara_competency\expand_task;
 use totara_competency\entities\competency;
 
 defined('MOODLE_INTERNAL') || die();

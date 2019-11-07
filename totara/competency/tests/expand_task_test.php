@@ -23,7 +23,7 @@
  */
 
 use totara_competency\entities\assignment;
-use tassign_competency\expand_task;
+use totara_competency\expand_task;
 use totara_competency\models\assignment as assignment_model;
 use totara_assignment\user_groups;
 use totara_job\job_assignment;

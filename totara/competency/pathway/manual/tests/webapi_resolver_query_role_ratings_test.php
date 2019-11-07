@@ -27,7 +27,7 @@ use core\webapi\execution_context;
 use pathway_manual\manual;
 use pathway_manual\models\role_rating;
 use pathway_manual\webapi\resolver\query\role_ratings;
-use tassign_competency\expand_task;
+use totara_competency\expand_task;
 use totara_competency\models\assignment;
 use totara_competency\entities\competency;
 use totara_job\job_assignment;

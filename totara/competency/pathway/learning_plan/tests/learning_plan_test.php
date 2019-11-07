@@ -21,7 +21,7 @@
  * @package pathway_learning_plan
  */
 
-use tassign_competency\expand_task;
+use totara_competency\expand_task;
 use totara_competency\models\assignment_actions;
 use totara_competency\achievement_configuration;
 use totara_competency\competency_achievement_aggregator;

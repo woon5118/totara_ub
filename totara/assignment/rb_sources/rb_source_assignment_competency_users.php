@@ -997,7 +997,7 @@ class rb_source_assignment_competency_users extends rb_base_source {
         $competency_generator->assignment_generator()->create_user_assignment($comp1->id, $user1->id, ['status' => assignment::STATUS_ACTIVE]);
         $competency_generator->assignment_generator()->create_user_assignment($comp3->id, $user2->id, ['status' => assignment::STATUS_ACTIVE]);
 
-        (new \tassign_competency\expand_task($DB))->expand_all();
+        (new \totara_competency\expand_task($DB))->expand_all();
     }
 
     /**

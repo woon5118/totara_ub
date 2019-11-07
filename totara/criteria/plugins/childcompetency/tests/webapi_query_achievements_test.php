@@ -27,7 +27,7 @@ use core\webapi\execution_context;
 use criteria_childcompetency\webapi\resolver\query\achievements;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency_assignment_user_log;
-use tassign_competency\expand_task;
+use totara_competency\expand_task;
 use totara_assignment\user_groups;
 use totara_competency\entities\assignment_availability;
 use totara_criteria\criterion;

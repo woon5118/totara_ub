@@ -29,7 +29,7 @@ use core\orm\collection;
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use totara_competency\entities\assignment;
-use tassign_competency\expand_task;
+use totara_competency\expand_task;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\models\assignment_actions;
 use totara_assignment\user_groups;

@@ -24,7 +24,7 @@
 use totara_competency\entities\competency_assignment_user_log;
 use totara_competency\data_providers;
 use totara_competency\models\assignment_actions;
-use tassign_competency\expand_task;
+use totara_competency\expand_task;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\configuration_change;

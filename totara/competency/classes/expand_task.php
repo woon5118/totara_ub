@@ -18,10 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package tassign_competency
+ * @package totara_competency
  */
 
-namespace tassign_competency;
+namespace totara_competency;
 
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency_assignment_user;
@@ -110,7 +110,7 @@ class expand_task {
         if (!$assignment->id) {
             return;
         }
-        $assignment_id = (int)$assignment->id;
+        $assignment_id = (int) $assignment->id;
 
         // load all current source targets relations of the assignment
         // to avoid more requests to the database when checking if entry

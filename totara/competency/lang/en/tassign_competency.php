@@ -133,10 +133,6 @@ $string['event:assignment_user_unassigned'] = 'User competency assignment unassi
 $string['error_competencies_out_of_sync'] = 'An error occurred with your selection. {$a} competencies were removed from your selection due to no longer being available for assignment.';
 $string['error_create_assignments'] = 'An error occurred during assignment creation, due to modifications to the competencies or user groups after you selected them. Your selection has been updated to reflect these changes – please verify before proceeding.';
 
-$string['expand_assignments_task'] = 'Expand competencies to users relation for competency assignment';
-$string['expand_task:notification:subject'] = 'Competency assignments: Sync assigned users task is complete';
-$string['expand_task:notification:body'] = 'All users assigned to competencies have been synced.';
-
 $string['filter'] = 'Filter';
 
 $string['filter:assignment_status'] = 'Assignment status';
@@ -166,8 +162,6 @@ $string['header:competency_name'] = 'Competency name';
 $string['header:status'] = 'Status';
 
 $string['individual'] = 'Individual';
-
-$string['messageprovider:expand_task_finished'] = 'Sync assigned users finished';
 
 $string['no_user_groups'] = 'No assignments';
 
@@ -219,7 +213,6 @@ $string['sync:success'] = 'Sync was successfully initiated. It is running in the
 $string['title:create'] = 'Create assignments';
 $string['title:index'] = 'Manage competency assignments';
 $string['title:sync'] = 'Sync assigned users';
-$string['title:users'] = 'Currently assigned users';
 
 $string['users_to_assign'] = 'Users to assign';
 $string['user_group_name'] = 'Assigned user group';

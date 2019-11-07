@@ -101,6 +101,12 @@ $string['enablecompetency_assignment_desc'] = 'This option will let you: Enable(
 $string['enabled'] = 'Enabled';
 $string['editcompetency'] = 'Edit comptency: {$a}';
 $string['event:linked_courses_updated'] = 'Linked courses updated';
+
+// Expand task related
+$string['expand_assignments_task'] = 'Expand competencies to users relation for competency assignment';
+$string['expand_task:notification:subject'] = 'Competency assignments: Sync assigned users task is complete';
+$string['expand_task:notification:body'] = 'All users assigned to competencies have been synced.';
+
 $string['framework'] = 'Framework';
 $string['fullname'] = 'Full name';
 $string['general'] = 'General';
@@ -120,6 +126,9 @@ $string['loading'] = 'Loading...';
 $string['managetypes_aggregation'] = 'Manage aggregation types';
 $string['managetypes_pathway'] = 'Manage pathway types';
 $string['mandatory'] = 'Mandatory';
+
+$string['messageprovider:expand_task_finished'] = 'Sync assigned users finished';
+
 $string['my_competency_profile'] = '{$a} Competency profile';
 $string['my_rating'] = 'My rating';
 $string['next'] = 'Next';
@@ -168,6 +177,7 @@ $string['status_0'] = 'Active';
 $string['status_1'] = 'Draft';
 $string['status_2'] = 'Deleted';
 $string['title:tool_menu'] = 'Competency assignments';
+$string['title:users'] = 'Currently assigned users';
 $string['type'] = 'Type';
 $string['unassigned'] = 'Unassigned';
 $string['undoall'] = 'Undo all';

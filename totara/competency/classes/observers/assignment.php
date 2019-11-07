@@ -28,7 +28,7 @@ use totara_competency\event\assignment_archived;
 use totara_competency\event\assignment_created;
 use totara_competency\event\assignment_deleted;
 use totara_competency\entities;
-use tassign_competency\task\expand_assignment_task;
+use totara_competency\task\expand_assignment_task;
 
 defined('MOODLE_INTERNAL') || die();
 
