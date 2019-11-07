@@ -84,7 +84,7 @@ class aggregate extends scheduled_task {
         return $DB->get_fieldset_sql(
             "
                SELECT DISTINCT tacu.user_id
-                 FROM {totara_assignment_competency_users} tacu
+                 FROM {totara_competency_assignment_users} tacu
                  JOIN {totara_competency_pathway} cp
                    ON tacu.competency_id = cp.comp_id
             LEFT JOIN {totara_competency_pathway_achievement} cupa
@@ -114,7 +114,7 @@ class aggregate extends scheduled_task {
 
         $sql = "
                SELECT " . $DB->sql_concat_join("'_'", ["tacu.user_id", "tci.id"]) . ", tacu.user_id, tci.id
-                 FROM {totara_assignment_competency_users} tacu
+                 FROM {totara_competency_assignment_users} tacu
                  JOIN {totara_competency_pathway} cp
                    ON tacu.competency_id = cp.comp_id
                   AND path_type = 'criteria_group'

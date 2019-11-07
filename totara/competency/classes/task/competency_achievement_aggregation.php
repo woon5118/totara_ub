@@ -81,7 +81,7 @@ class competency_achievement_aggregation extends scheduled_task {
         //    the timestamp. If we don't do this, then those edge cases mean the change will never be caught.
         $sql = "
            SELECT DISTINCT tacu.user_id
-             FROM {totara_assignment_competency_users} tacu
+             FROM {totara_competency_assignment_users} tacu
              JOIN {totara_competency_pathway_achievement} cupa
                ON tacu.user_id = cupa.user_id
              JOIN {totara_competency_pathway} cp

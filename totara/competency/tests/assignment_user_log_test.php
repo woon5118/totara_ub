@@ -153,7 +153,7 @@ class totara_competency_user_log_testcase extends totara_competency_assignment_a
         // User still has an active assignment (system assignment due to continuous tracking)
         // Let's archive the existing system assignment to really end the tracking
         $new_assignment = assignment::repository()
-            ->join(['totara_assignment_competency_users', 'ass_user'], 'id', 'assignment_id')
+            ->join(['totara_competency_assignment_users', 'ass_user'], 'id', 'assignment_id')
             ->where('ass_user.user_id', $user->id)
             ->where('type', assignment::TYPE_SYSTEM)
             ->order_by('id')

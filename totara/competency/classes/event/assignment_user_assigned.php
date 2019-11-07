@@ -33,7 +33,7 @@ class assignment_user_assigned extends assignment_user {
     protected function init() {
         $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_OTHER;
-        $this->data['objecttable'] = 'totara_assignment_competency_users';
+        $this->data['objecttable'] = 'totara_competency_assignment_users';
     }
 
     /**

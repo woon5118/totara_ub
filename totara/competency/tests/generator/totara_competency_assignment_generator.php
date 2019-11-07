@@ -190,7 +190,7 @@ class totara_competency_assignment_generator {
             'archived_at' => null
         ], $attributes);
 
-        return (object) array_merge(['id' => $this->db()->insert_record('totara_assignment_competencies', (object) $attributes)], $attributes);
+        return (object) array_merge(['id' => $this->db()->insert_record('totara_competency_assignments', (object) $attributes)], $attributes);
     }
 
     /**

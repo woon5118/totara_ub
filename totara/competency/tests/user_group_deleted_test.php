@@ -53,15 +53,15 @@ class totara_competency_user_group_deleted_testcase extends advanced_testcase {
         // Removing a user
         delete_user($users[0]);
 
-        $this->assertEmpty($this->db()->get_record('totara_assignment_competencies', [
+        $this->assertEmpty($this->db()->get_record('totara_competency_assignments', [
             'id' => $assignments[0]->id,
         ]));
 
-        $this->assertEquals(1, $this->db()->get_field('totara_assignment_competencies', 'status', [
+        $this->assertEquals(1, $this->db()->get_field('totara_competency_assignments', 'status', [
             'id' => $assignments[1]->id
         ]));
 
-        $this->assertEmpty($this->db()->get_record('totara_assignment_competencies', [
+        $this->assertEmpty($this->db()->get_record('totara_competency_assignments', [
             'user_group_id' => $users[0]->id,
             'competency_id' => $comps[0]->id,
         ]));
@@ -88,15 +88,15 @@ class totara_competency_user_group_deleted_testcase extends advanced_testcase {
         // Removing a user
         delete_user($users[0]);
 
-        $this->assertEmpty($this->db()->get_record('totara_assignment_competencies', [
+        $this->assertEmpty($this->db()->get_record('totara_competency_assignments', [
             'id' => $assignments[0]->id,
         ]));
 
-        $this->assertEquals(1, $this->db()->get_field('totara_assignment_competencies', 'status', [
+        $this->assertEquals(1, $this->db()->get_field('totara_competency_assignments', 'status', [
             'id' => $assignments[1]->id
         ]));
 
-        $this->assertEmpty($this->db()->get_record('totara_assignment_competencies', [
+        $this->assertEmpty($this->db()->get_record('totara_competency_assignments', [
             'user_group_id' => $users[0]->id,
             'competency_id' => $comps[0]->id,
         ]));
@@ -125,15 +125,15 @@ class totara_competency_user_group_deleted_testcase extends advanced_testcase {
         // Removing a user
         cohort_delete_cohort($cohorts[0]);
 
-        $this->assertEquals(2, $this->db()->get_field('totara_assignment_competencies', 'status', [
+        $this->assertEquals(2, $this->db()->get_field('totara_competency_assignments', 'status', [
             'id' => $assignments[0]->id
         ]));
 
-        $this->assertEquals(1, $this->db()->get_field('totara_assignment_competencies', 'status', [
+        $this->assertEquals(1, $this->db()->get_field('totara_competency_assignments', 'status', [
             'id' => $assignments[1]->id
         ]));
 
-        $this->assertIsObject($this->db()->get_record('totara_assignment_competencies', [
+        $this->assertIsObject($this->db()->get_record('totara_competency_assignments', [
             'user_group_id' => $users[0]->id,
             'user_group_type' => user_groups::USER,
             'competency_id' => $comps[0]->id,
@@ -167,15 +167,15 @@ class totara_competency_user_group_deleted_testcase extends advanced_testcase {
 
         $hierarchy->delete_hierarchy_item($positions[0]->id);
 
-        $this->assertEquals(2, $this->db()->get_field('totara_assignment_competencies', 'status', [
+        $this->assertEquals(2, $this->db()->get_field('totara_competency_assignments', 'status', [
             'id' => $assignments[0]->id
         ]));
 
-        $this->assertEquals(1, $this->db()->get_field('totara_assignment_competencies', 'status', [
+        $this->assertEquals(1, $this->db()->get_field('totara_competency_assignments', 'status', [
             'id' => $assignments[1]->id
         ]));
 
-        $this->assertEmpty($this->db()->get_record('totara_assignment_competencies', [
+        $this->assertEmpty($this->db()->get_record('totara_competency_assignments', [
             'user_group_id' => $users[0]->id,
             'competency_id' => $comps[0]->id,
         ]));
@@ -207,15 +207,15 @@ class totara_competency_user_group_deleted_testcase extends advanced_testcase {
 
         $hierarchy->delete_hierarchy_item($positions[0]->id);
 
-        $this->assertEquals(2, $this->db()->get_field('totara_assignment_competencies', 'status', [
+        $this->assertEquals(2, $this->db()->get_field('totara_competency_assignments', 'status', [
             'id' => $assignments[0]->id
         ]));
 
-        $this->assertEquals(1, $this->db()->get_field('totara_assignment_competencies', 'status', [
+        $this->assertEquals(1, $this->db()->get_field('totara_competency_assignments', 'status', [
             'id' => $assignments[1]->id
         ]));
 
-        $this->assertIsObject($this->db()->get_record('totara_assignment_competencies', [
+        $this->assertIsObject($this->db()->get_record('totara_competency_assignments', [
             'user_group_id' => $users[0]->id,
             'user_group_type' => user_groups::USER,
             'competency_id' => $comps[0]->id,
@@ -247,15 +247,15 @@ class totara_competency_user_group_deleted_testcase extends advanced_testcase {
 
         $hierarchy->delete_hierarchy_item($organisations[0]->id);
 
-        $this->assertEquals(2, $this->db()->get_field('totara_assignment_competencies', 'status', [
+        $this->assertEquals(2, $this->db()->get_field('totara_competency_assignments', 'status', [
             'id' => $assignments[0]->id
         ]));
 
-        $this->assertEquals(1, $this->db()->get_field('totara_assignment_competencies', 'status', [
+        $this->assertEquals(1, $this->db()->get_field('totara_competency_assignments', 'status', [
             'id' => $assignments[1]->id
         ]));
 
-        $this->assertIsObject($this->db()->get_record('totara_assignment_competencies', [
+        $this->assertIsObject($this->db()->get_record('totara_competency_assignments', [
             'user_group_id' => $users[0]->id,
             'user_group_type' => user_groups::USER,
             'competency_id' => $comps[0]->id,
@@ -287,15 +287,15 @@ class totara_competency_user_group_deleted_testcase extends advanced_testcase {
 
         $hierarchy->delete_hierarchy_item($organisations[0]->id);
 
-        $this->assertEquals(2, $this->db()->get_field('totara_assignment_competencies', 'status', [
+        $this->assertEquals(2, $this->db()->get_field('totara_competency_assignments', 'status', [
             'id' => $assignments[0]->id
         ]));
 
-        $this->assertEquals(1, $this->db()->get_field('totara_assignment_competencies', 'status', [
+        $this->assertEquals(1, $this->db()->get_field('totara_competency_assignments', 'status', [
             'id' => $assignments[1]->id
         ]));
 
-        $this->assertEmpty($this->db()->get_record('totara_assignment_competencies', [
+        $this->assertEmpty($this->db()->get_record('totara_competency_assignments', [
             'user_group_id' => $users[0]->id,
             'competency_id' => $comps[0]->id,
         ]));

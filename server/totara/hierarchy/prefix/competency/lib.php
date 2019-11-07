@@ -1005,7 +1005,7 @@ class competency extends hierarchy {
 
             // Count competency assignments
             [$in_sql, $in_params] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
-            $data['assignments'] = $DB->count_records_select('totara_assignment_competencies', "competency_id {$in_sql}", $in_params);
+            $data['assignments'] = $DB->count_records_select('totara_competency_assignments', "competency_id {$in_sql}", $in_params);
 
             // number of comp_relations records
             [$ids1sql, $ids1params] = sql_sequence('id1', $ids);
@@ -1058,7 +1058,7 @@ class competency extends hierarchy {
 
         // Count the number of assignments of a competency and its descendants
         [$in_sql, $in_params] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
-        $data['assignments'] = $DB->count_records_select('totara_assignment_competencies', "competency_id {$in_sql}", $in_params);
+        $data['assignments'] = $DB->count_records_select('totara_competency_assignments', "competency_id {$in_sql}", $in_params);
 
         return $data;
     }

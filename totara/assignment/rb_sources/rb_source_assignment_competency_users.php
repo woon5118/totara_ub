@@ -52,7 +52,7 @@ class rb_source_assignment_competency_users extends rb_base_source {
         // Remember the active global restriction set.
         $this->globalrestrictionset = $globalrestrictionset;
 
-        $this->base = "{totara_assignment_competency_users}";
+        $this->base = "{totara_competency_assignment_users}";
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();
@@ -96,7 +96,7 @@ class rb_source_assignment_competency_users extends rb_base_source {
             new rb_join(
                 'assignment',
                 'INNER',
-                "{totara_assignment_competencies}",
+                "{totara_competency_assignments}",
                 "base.assignment_id = assignment.id",
                 REPORT_BUILDER_RELATION_MANY_TO_ONE
             ),

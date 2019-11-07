@@ -70,7 +70,7 @@ class aggregate extends scheduled_task {
         return $DB->get_fieldset_sql(
             "
                SELECT DISTINCT tacu.user_id
-                 FROM {totara_assignment_competency_users} tacu
+                 FROM {totara_competency_assignment_users} tacu
                  JOIN {dp_plan_competency_value} pcv
                    ON tacu.competency_id = pcv.competency_id
                  JOIN {totara_competency_pathway} cp

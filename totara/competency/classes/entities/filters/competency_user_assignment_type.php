@@ -57,7 +57,7 @@ class competency_user_assignment_type extends filter {
             $this->init_types();
 
             $exist_builder = builder::table(assignment::TABLE)
-                ->join(['totara_assignment_competency_users', 'ua'], 'id', 'assignment_id')
+                ->join(['totara_competency_assignment_users', 'ua'], 'id', 'assignment_id')
                 ->where('ua.user_id', $user_id)
                 ->where('status', assignment::STATUS_ACTIVE)
                 ->where_field('competency_id', new field('id', $this->builder));

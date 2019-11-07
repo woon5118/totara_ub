@@ -99,7 +99,7 @@ class rb_source_competency_status extends rb_base_source {
             new rb_join(
                 'assignment',
                 'INNER',
-                "{totara_assignment_competencies}",
+                "{totara_competency_assignments}",
                 "base.assignment_id = assignment.id",
                 REPORT_BUILDER_RELATION_MANY_TO_ONE
             ),

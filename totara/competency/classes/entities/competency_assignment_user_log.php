@@ -38,7 +38,7 @@ use core\orm\entity\entity;
  */
 class competency_assignment_user_log extends entity {
 
-    public const TABLE = 'totara_assignment_competencies_users_log';
+    public const TABLE = 'totara_competency_assignment_user_logs';
 
     public const CREATED_TIMESTAMP = 'created_at';
     public const UPDATED_TIMESTAMP = '';

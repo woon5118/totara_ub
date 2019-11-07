@@ -108,7 +108,7 @@ final class competency_achievement_aggregator {
                     tacu.assignment_id,
                     COALESCE(ca.id, NULL) AS comp_achievement_id,
                     COALESCE(ca.scale_value_id, NULL) AS scale_value_id
-                 FROM {totara_assignment_competency_users} tacu
+                 FROM {totara_competency_assignment_users} tacu
             LEFT JOIN {totara_competency_achievement} ca
                    ON tacu.user_id = ca.user_id
                   AND tacu.assignment_id = ca.assignment_id
@@ -184,7 +184,7 @@ final class competency_achievement_aggregator {
         $to_archive = $DB->get_fieldset_sql(
             'SELECT ca.id
             FROM {totara_competency_achievement} ca
-       LEFT JOIN {totara_assignment_competency_users} tacu
+       LEFT JOIN {totara_competency_assignment_users} tacu
               ON ca.assignment_id = tacu.assignment_id
              AND ca.user_id = tacu.user_id
            WHERE tacu.id IS NULL

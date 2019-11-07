@@ -56,7 +56,7 @@ class totara_competency_assignment_generator_testcase extends advanced_testcase 
     }
 
     public function test_it_generates_raw_assignment() {
-        $this->assertEquals(0, $this->db()->count_records('totara_assignment_competencies'));
+        $this->assertEquals(0, $this->db()->count_records('totara_competency_assignments'));
 
         $ass = $this->generator()->create_assignment([
             'competency_id' => $this->competency_generator()->create_competency()->id,
@@ -64,12 +64,12 @@ class totara_competency_assignment_generator_testcase extends advanced_testcase 
             'user_group_id' => $this->generator()->create_user()->id,
         ]);
 
-        $this->assertEquals($ass, array_values($this->db()->get_records('totara_assignment_competencies'))[0]);
-        $this->assertEquals(1, $this->db()->count_records('totara_assignment_competencies'));
+        $this->assertEquals($ass, array_values($this->db()->get_records('totara_competency_assignments'))[0]);
+        $this->assertEquals(1, $this->db()->count_records('totara_competency_assignments'));
     }
 
     public function test_it_overrides_default_attributes_in_a_raw_assignment() {
-        $this->assertEquals(0, $this->db()->count_records('totara_assignment_competencies'));
+        $this->assertEquals(0, $this->db()->count_records('totara_competency_assignments'));
 
         $attributes = [
             'competency_id' => $this->competency_generator()->create_competency()->id,
@@ -86,64 +86,64 @@ class totara_competency_assignment_generator_testcase extends advanced_testcase 
 
         $ass = $this->generator()->create_assignment($attributes);
 
-        $record = array_values($this->db()->get_records('totara_assignment_competencies'))[0];
+        $record = array_values($this->db()->get_records('totara_competency_assignments'))[0];
 
         // Check that record contains all out attributes:
         $attributes['id'] = $ass->id;
         $this->assertEquals((object) $attributes, $record);
 
         $this->assertEquals($ass, $record);
-        $this->assertEquals(1, $this->db()->count_records('totara_assignment_competencies'));
+        $this->assertEquals(1, $this->db()->count_records('totara_competency_assignments'));
     }
 
     public function test_it_generates_assignment_for_a_user() {
-        $this->assertEquals(0, $this->db()->count_records('totara_assignment_competencies'));
+        $this->assertEquals(0, $this->db()->count_records('totara_competency_assignments'));
 
         $ass = $this->generator()->create_user_assignment();
 
-        $this->assertEquals($ass, $record = array_values($this->db()->get_records('totara_assignment_competencies'))[0]);
-        $this->assertEquals(1, $this->db()->count_records('totara_assignment_competencies'));
+        $this->assertEquals($ass, $record = array_values($this->db()->get_records('totara_competency_assignments'))[0]);
+        $this->assertEquals(1, $this->db()->count_records('totara_competency_assignments'));
 
         $this->assertEquals(user_groups::USER, $record->user_group_type);
     }
 
     public function test_it_generates_assignment_for_a_position() {
-        $this->assertEquals(0, $this->db()->count_records('totara_assignment_competencies'));
+        $this->assertEquals(0, $this->db()->count_records('totara_competency_assignments'));
 
         $ass = $this->generator()->create_position_assignment();
 
-        $this->assertEquals($ass, $record = array_values($this->db()->get_records('totara_assignment_competencies'))[0]);
-        $this->assertEquals(1, $this->db()->count_records('totara_assignment_competencies'));
+        $this->assertEquals($ass, $record = array_values($this->db()->get_records('totara_competency_assignments'))[0]);
+        $this->assertEquals(1, $this->db()->count_records('totara_competency_assignments'));
 
         $this->assertEquals(user_groups::POSITION, $record->user_group_type);
     }
 
     public function test_it_generates_assignment_for_an_organisation() {
-        $this->assertEquals(0, $this->db()->count_records('totara_assignment_competencies'));
+        $this->assertEquals(0, $this->db()->count_records('totara_competency_assignments'));
 
         $ass = $this->generator()->create_organisation_assignment();
 
-        $this->assertEquals($ass, $record = array_values($this->db()->get_records('totara_assignment_competencies'))[0]);
-        $this->assertEquals(1, $this->db()->count_records('totara_assignment_competencies'));
+        $this->assertEquals($ass, $record = array_values($this->db()->get_records('totara_competency_assignments'))[0]);
+        $this->assertEquals(1, $this->db()->count_records('totara_competency_assignments'));
 
 
         $this->assertEquals(user_groups::ORGANISATION, $record->user_group_type);
     }
 
     public function test_it_generates_assignment_for_an_audience() {
-        $this->assertEquals(0, $this->db()->count_records('totara_assignment_competencies'));
+        $this->assertEquals(0, $this->db()->count_records('totara_competency_assignments'));
 
         $ass = $this->generator()->create_audience_assignment();
 
-        $this->assertEquals($ass, $record = array_values($this->db()->get_records('totara_assignment_competencies'))[0]);
-        $this->assertEquals(1, $this->db()->count_records('totara_assignment_competencies'));
+        $this->assertEquals($ass, $record = array_values($this->db()->get_records('totara_competency_assignments'))[0]);
+        $this->assertEquals(1, $this->db()->count_records('totara_competency_assignments'));
 
         $this->assertEquals(user_groups::COHORT, $record->user_group_type);
 
         $ass = $this->generator()->create_cohort_assignment();
 
-        $this->assertEquals($ass, $record = array_values($this->db()->get_records('totara_assignment_competencies'))[1]);
-        $this->assertEquals(2, $this->db()->count_records('totara_assignment_competencies'));
+        $this->assertEquals($ass, $record = array_values($this->db()->get_records('totara_competency_assignments'))[1]);
+        $this->assertEquals(2, $this->db()->count_records('totara_competency_assignments'));
 
         $this->assertEquals(user_groups::COHORT, $record->user_group_type);
     }

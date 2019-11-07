@@ -75,7 +75,7 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
         $expand_task = new \totara_competency\expand_task($DB);
         $expand_task->expand_all();
 
-        $this->assertEquals(1, $DB->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(1, $DB->count_records('totara_competency_assignment_users'));
 
         // At this point we have the competency with it's configured criteria and aggregation.
         // We also have a user with an active and expanded assignment to that competency.
@@ -171,7 +171,7 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
         $expand_task = new \totara_competency\expand_task($DB);
         $expand_task->expand_all();
 
-        $this->assertEquals(1, $DB->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(1, $DB->count_records('totara_competency_assignment_users'));
 
         // At this point we have the competency with it's configured criteria and aggregation.
         // We also have a user with an active and expanded assignment to that competency.

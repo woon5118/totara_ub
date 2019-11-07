@@ -176,7 +176,7 @@ class assignments extends user_data_provider {
                     ->where('user_id', $this->get_user()->id)
                     ->where_field('assignment_id', new field('id', builder::table(assignment::TABLE)));
 
-                $archived = builder::table('totara_assignment_competencies_users_log')
+                $archived = builder::table('totara_competency_assignment_user_logs')
                     ->where('user_id', $this->get_user()->id)
                     ->where_field('assignment_id', new field('id', builder::table(assignment::TABLE)));
 

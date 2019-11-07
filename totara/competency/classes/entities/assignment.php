@@ -81,7 +81,7 @@ class assignment extends entity {
     // Assignments to account for pre-perform achievements, archived when created...
     public const TYPE_LEGACY = 'legacy';
 
-    public const TABLE = 'totara_assignment_competencies';
+    public const TABLE = 'totara_competency_assignments';
 
     protected $extra_attributes = [
         'status_name',

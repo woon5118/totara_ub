@@ -91,7 +91,7 @@ function totara_competency_install_migrate_achievements() {
             ];
 
             // We aren't going to batch assignments, since we'd need to get the assignment id anyway, to insert into achievements...
-            $comp_assignment['id'] = $DB->insert_record('totara_assignment_competencies', $comp_assignment);
+            $comp_assignment['id'] = $DB->insert_record('totara_competency_assignments', $comp_assignment);
         }
 
         $comp_achievement = new stdClass();

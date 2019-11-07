@@ -416,7 +416,7 @@ class organisation extends hierarchy {
         [$ids_sql, $ids_params] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
 
         // Count the number of competency assignments for the framework and its descendants
-        $data['comp_assignments'] = $DB->count_records_select('totara_assignment_competencies', "user_group_type = 'organisation' AND user_group_id {$ids_sql}", $ids_params);
+        $data['comp_assignments'] = $DB->count_records_select('totara_competency_assignments', "user_group_type = 'organisation' AND user_group_id {$ids_sql}", $ids_params);
 
         // Number of job assignment records with matching organisation.
         $data['job_assignment'] = $DB->count_records_select('job_assignment', "organisationid {$ids_sql}", $ids_params);
@@ -459,7 +459,7 @@ class organisation extends hierarchy {
             $data['related_goals'] = $DB->count_records_select('goal_grp_org', "orgid {$ids_sql}", $ids_params);
 
             // Count the number of competency assignments for the framework and its descendants
-            $data['comp_assignments'] = $DB->count_records_select('totara_assignment_competencies', "user_group_type = 'organisation' AND user_group_id {$ids_sql}", $ids_params);
+            $data['comp_assignments'] = $DB->count_records_select('totara_competency_assignments', "user_group_type = 'organisation' AND user_group_id {$ids_sql}", $ids_params);
         } else {
             $data['job_assignment'] = 0;
             $data['assigned_comps'] = 0;

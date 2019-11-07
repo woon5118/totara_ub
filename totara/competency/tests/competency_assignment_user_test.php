@@ -121,7 +121,7 @@ class totara_competency_assignment_user_testcase extends advanced_testcase {
 
         // Let's create a fake assignment and see that it works.
         // Fake log entry
-        builder::table('totara_assignment_competencies_users_log')
+        builder::table('totara_competency_assignment_user_logs')
             ->insert([
                 'assignment_id' => $assignment->id,
                 'user_id' => $user->id,

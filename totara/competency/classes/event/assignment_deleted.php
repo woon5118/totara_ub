@@ -33,7 +33,7 @@ class assignment_deleted extends assignment {
     protected function init() {
         $this->data['crud'] = 'd';
         $this->data['edulevel'] = self::LEVEL_OTHER;
-        $this->data['objecttable'] = 'totara_assignment_competencies';
+        $this->data['objecttable'] = 'totara_competency_assignments';
     }
 
     /**

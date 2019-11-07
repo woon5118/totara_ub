@@ -123,7 +123,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="totara_assignment_competencies" COMMENT="Totara assignments">
+    <TABLE NAME="totara_competency_assignments" COMMENT="Totara assignments">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="type" TYPE="char" LENGTH="25" NOTNULL="true" SEQUENCE="false" COMMENT="auto, self, admin, other, system, etc."/>
@@ -149,7 +149,7 @@
         <INDEX NAME="type" UNIQUE="false" FIELDS="type"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="totara_assignment_competency_users" COMMENT="Totara Competency Users">
+    <TABLE NAME="totara_competency_assignment_users" COMMENT="Totara Competency Users">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="assignment_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -160,12 +160,12 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="fk_assignment_id" TYPE="foreign" FIELDS="assignment_id" REFTABLE="totara_assignment_competencies" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="fk_assignment_id" TYPE="foreign" FIELDS="assignment_id" REFTABLE="totara_competency_assignments" REFFIELDS="id" ONDELETE="cascade"/>
         <KEY NAME="fk_user_id" TYPE="foreign" FIELDS="user_id" REFTABLE="user" REFFIELDS="id"/>
         <KEY NAME="fk_competency_id" TYPE="foreign" FIELDS="competency_id" REFTABLE="comp" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="totara_assignment_competencies_users_log" COMMENT="Keep a history of all changes regarding assigned users to competencies to be able to refer to it later, not meant to be cleared while related assignments exist">
+    <TABLE NAME="totara_competency_assignment_user_logs" COMMENT="Keep a history of all changes regarding assigned users to competencies to be able to refer to it later, not meant to be cleared while related assignments exist">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="assignment_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -175,7 +175,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="fk_assignment_id" TYPE="foreign" FIELDS="assignment_id" REFTABLE="totara_assignment_competencies" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="fk_assignment_id" TYPE="foreign" FIELDS="assignment_id" REFTABLE="totara_competency_assignments" REFFIELDS="id" ONDELETE="cascade"/>
         <KEY NAME="fk_user_id" TYPE="foreign" FIELDS="user_id" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>

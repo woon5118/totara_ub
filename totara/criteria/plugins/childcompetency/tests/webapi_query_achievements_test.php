@@ -179,7 +179,7 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends \advan
         $comp->availability()->save((new assignment_availability())->set_attribute('availability', 1));
 
         // Fake log entry
-        builder::table('totara_assignment_competencies_users_log')
+        builder::table('totara_competency_assignment_user_logs')
             ->insert([
                 'assignment_id' => $archived_assignment->id,
                 'user_id' => $data['user']->id,

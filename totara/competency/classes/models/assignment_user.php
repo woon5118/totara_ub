@@ -127,8 +127,8 @@ class assignment_user {
      */
     private function fetch_active_assignments($competency_ids = null): collection {
         return assignment::repository()
-            ->join('totara_assignment_competency_users', 'id', 'assignment_id')
-            ->where('totara_assignment_competency_users.user_id', $this->user_id)
+            ->join('totara_competency_assignment_users', 'id', 'assignment_id')
+            ->where('totara_competency_assignment_users.user_id', $this->user_id)
             ->where('status', assignment::STATUS_ACTIVE)
             ->when(!is_null($competency_ids), function (repository $repository) use ($competency_ids) {
                 $repository->where('competency_id', $competency_ids);
@@ -144,8 +144,8 @@ class assignment_user {
      */
     private function fetch_archived_assignments($competency_ids = null): collection {
         return assignment::repository()
-            ->join('totara_assignment_competencies_users_log', 'id', 'assignment_id')
-            ->where('totara_assignment_competencies_users_log.user_id', $this->user_id)
+            ->join('totara_competency_assignment_user_logs', 'id', 'assignment_id')
+            ->where('totara_competency_assignment_user_logs.user_id', $this->user_id)
             ->where('status', assignment::STATUS_ARCHIVED)
             ->when(!is_null($competency_ids), function (repository $repository) use ($competency_ids) {
                 $repository->where('competency_id', $competency_ids);

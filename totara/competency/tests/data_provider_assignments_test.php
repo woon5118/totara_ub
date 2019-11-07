@@ -84,7 +84,7 @@ class totara_competency_data_provider_assignments_testcase extends totara_compet
                 // correctly by asserting that a record in a log table exists...
                 $this->assertEquals($assignment::STATUS_ARCHIVED, $assignment->status);
                 $this->assertTrue(
-                    builder::table('totara_assignment_competencies_users_log')
+                    builder::table('totara_competency_assignment_user_logs')
                         ->where('user_id', $target_user->id)
                         ->where('assignment_id', $assignment->id)
                         ->exists()

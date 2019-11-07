@@ -60,8 +60,8 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
     public function test_expand_one() {
         $test_data = $this->prepare_assignments();
 
-        $this->assertEquals(36, $this->db->count_records('totara_assignment_competencies'));
-        $this->assertEquals(0, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(36, $this->db->count_records('totara_competency_assignments'));
+        $this->assertEquals(0, $this->db->count_records('totara_competency_assignment_users'));
 
         $assignment = $test_data->active_ind->all()[0];
 
@@ -69,7 +69,7 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
         $task->expand_single($assignment->get_id());
 
         // there should only be one row now
-        $this->assertEquals(1, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(1, $this->db->count_records('totara_competency_assignment_users'));
 
         $this->assert_records_exist(
             $assignment->get_id(),
@@ -81,20 +81,20 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
     public function test_expand_one_non_existent() {
         $test_data = $this->prepare_assignments();
 
-        $this->assertEquals(36, $this->db->count_records('totara_assignment_competencies'));
-        $this->assertEquals(0, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(36, $this->db->count_records('totara_competency_assignments'));
+        $this->assertEquals(0, $this->db->count_records('totara_competency_assignment_users'));
 
         $task = new expand_task($this->db);
         $task->expand_single(999);
 
-        $this->assertEquals(0, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(0, $this->db->count_records('totara_competency_assignment_users'));
     }
 
     public function test_expand_multiple() {
         $test_data = $this->prepare_assignments();
 
-        $this->assertEquals(36, $this->db->count_records('totara_assignment_competencies'));
-        $this->assertEquals(0, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(36, $this->db->count_records('totara_competency_assignments'));
+        $this->assertEquals(0, $this->db->count_records('totara_competency_assignment_users'));
 
         $assignment1 = $test_data->draft_ind->all()[0];
         $assignment2 = $test_data->active_ind->all()[0];
@@ -104,7 +104,7 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
         $task->expand_multiple([$assignment1->get_field('id'), $assignment2->get_field('id'), $assignment3->get_field('id')]);
 
         // there should be one row now
-        $this->assertEquals(1, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(1, $this->db->count_records('totara_competency_assignment_users'));
 
         $this->assert_records_exist(
             $assignment2->get_field('id'),
@@ -116,8 +116,8 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
     public function test_expand_multiple_unusual_array_content() {
         $test_data = $this->prepare_assignments();
 
-        $this->assertEquals(36, $this->db->count_records('totara_assignment_competencies'));
-        $this->assertEquals(0, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(36, $this->db->count_records('totara_competency_assignments'));
+        $this->assertEquals(0, $this->db->count_records('totara_competency_assignment_users'));
 
         $assignment1 = $test_data->draft_ind->all()[0];
         $assignment2 = $test_data->active_ind->all()[0];
@@ -126,7 +126,7 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
         $task->expand_multiple(["{$assignment1->get_field('id')}", $assignment2->get_field('id'), "dsds", "fssds"]);
 
         // there should be two rows now
-        $this->assertEquals(1, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(1, $this->db->count_records('totara_competency_assignment_users'));
 
         $this->assert_records_exist(
             $assignment2->get_field('id'),
@@ -139,20 +139,20 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
         $task = new expand_task($this->db);
         $task->expand_multiple([]);
 
-        $this->assertEquals(0, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(0, $this->db->count_records('totara_competency_assignment_users'));
     }
 
     public function test_expand_all_users() {
         $test_data = $this->prepare_assignments();
 
-        $this->assertEquals(36, $this->db->count_records('totara_assignment_competencies'));
-        $this->assertEquals(0, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(36, $this->db->count_records('totara_competency_assignments'));
+        $this->assertEquals(0, $this->db->count_records('totara_competency_assignment_users'));
 
         $task = new expand_task($this->db);
         $task->expand_all();
 
         // three active assignments for user user_group where expanded
-        $this->assertEquals(3, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(3, $this->db->count_records('totara_competency_assignment_users'));
 
         foreach ($test_data->draft_ind as $assignment) {
             $this->assert_records_dont_exist(
@@ -187,8 +187,8 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
     public function test_expand_all_cohorts() {
         $test_data = $this->prepare_assignments();
 
-        $this->assertEquals(36, $this->db->count_records('totara_assignment_competencies'));
-        $this->assertEquals(0, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(36, $this->db->count_records('totara_competency_assignments'));
+        $this->assertEquals(0, $this->db->count_records('totara_competency_assignment_users'));
 
         cohort_add_member($test_data->cohort2->id, $test_data->user2->id);
 
@@ -196,7 +196,7 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
         $task->expand_all();
 
         // adding the cohort member added three more records
-        $this->assertEquals(6, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(6, $this->db->count_records('totara_competency_assignment_users'));
 
         foreach ($test_data->active_coh as $assignment) {
             $this->assert_records_exist(
@@ -218,7 +218,7 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
         $task->expand_all();
 
         // adding the cohort member added three more records
-        $this->assertEquals(9, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(9, $this->db->count_records('totara_competency_assignment_users'));
 
         foreach ($test_data->active_ind as $assignment) {
             $this->assert_records_exist(
@@ -240,8 +240,8 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
     public function test_expand_all_cohort_member_removed() {
         $test_data = $this->prepare_assignments();
 
-        $this->assertEquals(36, $this->db->count_records('totara_assignment_competencies'));
-        $this->assertEquals(0, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(36, $this->db->count_records('totara_competency_assignments'));
+        $this->assertEquals(0, $this->db->count_records('totara_competency_assignment_users'));
 
         cohort_add_member($test_data->cohort2->id, $test_data->user2->id);
 
@@ -249,7 +249,7 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
         $task->expand_all();
 
         // adding the cohort member added three more records
-        $this->assertEquals(6, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(6, $this->db->count_records('totara_competency_assignment_users'));
 
         foreach ($test_data->active_coh as $assignment) {
             $this->assert_records_exist(
@@ -271,7 +271,7 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
         $task->expand_all();
 
         // the records for the user who was removed from the cohort should be gone now
-        $this->assertEquals(3, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(3, $this->db->count_records('totara_competency_assignment_users'));
 
         foreach ($test_data->active_coh as $assignment) {
             $this->assert_records_dont_exist(
@@ -285,8 +285,8 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
     public function test_expand_all_position() {
         $test_data = $this->prepare_assignments();
 
-        $this->assertEquals(36, $this->db->count_records('totara_assignment_competencies'));
-        $this->assertEquals(0, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(36, $this->db->count_records('totara_competency_assignments'));
+        $this->assertEquals(0, $this->db->count_records('totara_competency_assignment_users'));
 
         $job_data = [
             'userid' => $test_data->user3->id,
@@ -300,7 +300,7 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
         $task->expand_all();
 
         // assigning the position added three more records
-        $this->assertEquals(6, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(6, $this->db->count_records('totara_competency_assignment_users'));
 
         foreach ($test_data->active_pos as $assignment) {
             $this->assert_records_exist(
@@ -322,7 +322,7 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
         $task->expand_all();
 
         // assigning the position added three more records
-        $this->assertEquals(9, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(9, $this->db->count_records('totara_competency_assignment_users'));
 
         foreach ($test_data->active_pos as $assignment) {
             $this->assert_records_exist(
@@ -336,8 +336,8 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
     public function test_expand_all_organisation() {
         $test_data = $this->prepare_assignments();
 
-        $this->assertEquals(36, $this->db->count_records('totara_assignment_competencies'));
-        $this->assertEquals(0, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(36, $this->db->count_records('totara_competency_assignments'));
+        $this->assertEquals(0, $this->db->count_records('totara_competency_assignment_users'));
 
         $job_data = [
             'userid' => $test_data->user3->id,
@@ -351,7 +351,7 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
         $task->expand_all();
 
         // assigning the organisation added three more records
-        $this->assertEquals(6, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(6, $this->db->count_records('totara_competency_assignment_users'));
 
         foreach ($test_data->active_org as $assignment) {
             $this->assert_records_exist(
@@ -373,7 +373,7 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
         $task->expand_all();
 
         // assigning the organisation added three more records
-        $this->assertEquals(9, $this->db->count_records('totara_assignment_competency_users'));
+        $this->assertEquals(9, $this->db->count_records('totara_competency_assignment_users'));
 
         foreach ($test_data->active_org as $assignment) {
             $this->assert_records_exist(
@@ -524,7 +524,7 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
                     'user_id' => $user_id,
                     'competency_id' => $competency_id
                 ];
-                $this->assertTrue($this->db->record_exists('totara_assignment_competency_users', $params));
+                $this->assertTrue($this->db->record_exists('totara_competency_assignment_users', $params));
             }
         }
     }
@@ -545,7 +545,7 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
                     'user_id' => $user_id,
                     'competency_id' => $competency_id
                 ];
-                $this->assertFalse($this->db->record_exists('totara_assignment_competency_users', $params));
+                $this->assertFalse($this->db->record_exists('totara_competency_assignment_users', $params));
             }
         }
     }

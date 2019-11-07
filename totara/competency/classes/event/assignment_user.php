@@ -50,7 +50,7 @@ abstract class assignment_user extends base {
         ];
         /** @var static $event */
         $event = static::create($data);
-        $event->add_record_snapshot('totara_assignment_competency_users', (object)$assignment_user->get_attributes_raw());
+        $event->add_record_snapshot('totara_competency_assignment_users', (object)$assignment_user->get_attributes_raw());
         return $event;
     }
 

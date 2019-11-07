@@ -72,7 +72,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         // For the most part, we just need to make sure we've made it here without an exception.
 
         $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
-        $this->assertEquals(0, $DB->count_records('totara_assignment_competencies'));
+        $this->assertEquals(0, $DB->count_records('totara_competency_assignments'));
     }
 
     public function test_single_current_comp_record() {
@@ -89,7 +89,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         $achievements = $DB->get_records('totara_competency_achievement');
         $this->assertCount(0, $achievements);
 
-        $assignments = $DB->get_records('totara_assignment_competencies');
+        $assignments = $DB->get_records('totara_competency_assignments');
         $this->assertCount(0, $assignments);
 
         // Now add the comp_record_history.
@@ -119,7 +119,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         $this->assertNull($achievement->time_proficient);
         $this->assertTimeCurrent($achievement->last_aggregated);
 
-        $assignments = $DB->get_records('totara_assignment_competencies');
+        $assignments = $DB->get_records('totara_competency_assignments');
         $this->assertCount(1, $assignments);
 
         $assignment = array_pop($assignments);
@@ -158,7 +158,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         $this->assertNull($achievement->time_proficient);
         $this->assertTimeCurrent($achievement->last_aggregated);
 
-        $assignments = $DB->get_records('totara_assignment_competencies');
+        $assignments = $DB->get_records('totara_competency_assignments');
         $this->assertCount(1, $assignments);
 
         $assignment = array_pop($assignments);
@@ -213,7 +213,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         $this->assertCount(2, $achievements);
 
         // Let's check that only one assignment was created for the first record
-        $assignments = $DB->get_records('totara_assignment_competencies');
+        $assignments = $DB->get_records('totara_competency_assignments');
         $this->assertCount(1, $assignments);
 
         $assignment = array_pop($assignments);
@@ -310,7 +310,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         $this->assertEquals(10, $DB->count_records('totara_competency_achievement'));
 
         // Only 5 assignments should be created.
-        $assignments = $DB->get_records('totara_assignment_competencies');
+        $assignments = $DB->get_records('totara_competency_assignments');
         $this->assertCount(5, $assignments);
 
         /* Bob / Talking */
@@ -325,7 +325,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         $this->assertEquals(competency_achievement::ARCHIVED_ASSIGNMENT, $achievement->status);
 
         // Let's check that it matches the assignment
-        $assignment = $DB->get_record('totara_assignment_competencies', ['id' => $achievement->assignment_id], '*', MUST_EXIST);
+        $assignment = $DB->get_record('totara_competency_assignments', ['id' => $achievement->assignment_id], '*', MUST_EXIST);
 
         $this->assertEquals($bob, $assignment->user_group_id); // In this case user group id is user id
         $this->assertEquals('user', $assignment->user_group_type); // User group type is user
@@ -365,7 +365,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         $this->assertEquals(competency_achievement::ARCHIVED_ASSIGNMENT, $achievement->status);
 
         // Let's check that it matches the assignment
-        $assignment = $DB->get_record('totara_assignment_competencies', ['id' => $achievement->assignment_id], '*', MUST_EXIST);
+        $assignment = $DB->get_record('totara_competency_assignments', ['id' => $achievement->assignment_id], '*', MUST_EXIST);
 
         $this->assertEquals($bob, $assignment->user_group_id); // In this case user group id is user id
         $this->assertEquals('user', $assignment->user_group_type); // User group type is user
@@ -389,7 +389,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         $this->assertEquals(competency_achievement::ARCHIVED_ASSIGNMENT, $achievement->status);
 
         // Let's check that it matches the assignment
-        $assignment = $DB->get_record('totara_assignment_competencies', ['id' => $achievement->assignment_id], '*', MUST_EXIST);
+        $assignment = $DB->get_record('totara_competency_assignments', ['id' => $achievement->assignment_id], '*', MUST_EXIST);
 
         $this->assertEquals($alice, $assignment->user_group_id); // In this case user group id is user id
         $this->assertEquals('user', $assignment->user_group_type); // User group type is user
@@ -421,7 +421,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         $this->assertEquals(competency_achievement::ARCHIVED_ASSIGNMENT, $achievement->status);
 
         // Let's check that it matches the assignment
-        $assignment = $DB->get_record('totara_assignment_competencies', ['id' => $achievement->assignment_id], '*', MUST_EXIST);
+        $assignment = $DB->get_record('totara_competency_assignments', ['id' => $achievement->assignment_id], '*', MUST_EXIST);
 
         $this->assertEquals($alice, $assignment->user_group_id); // In this case user group id is user id
         $this->assertEquals('user', $assignment->user_group_type); // User group type is user
@@ -461,7 +461,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         $this->assertEquals(competency_achievement::ARCHIVED_ASSIGNMENT, $achievement->status);
 
         // Let's check that it matches the assignment
-        $assignment = $DB->get_record('totara_assignment_competencies', ['id' => $achievement->assignment_id], '*', MUST_EXIST);
+        $assignment = $DB->get_record('totara_competency_assignments', ['id' => $achievement->assignment_id], '*', MUST_EXIST);
 
         $this->assertEquals($eve, $assignment->user_group_id); // In this case user group id is user id
         $this->assertEquals('user', $assignment->user_group_type); // User group type is user
@@ -522,7 +522,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         $this->assertCount(2, $achievements);
 
         // Let's check that only one assignment was created for the first record
-        $assignments = $DB->get_records('totara_assignment_competencies');
+        $assignments = $DB->get_records('totara_competency_assignments');
         $this->assertCount(1, $assignments);
 
         $assignment = array_pop($assignments);
