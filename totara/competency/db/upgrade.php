@@ -140,5 +140,25 @@ function xmldb_totara_competency_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019082702, 'totara', 'competency');
     }
 
+    if ($oldversion < 2019110800) {
+        $table = new xmldb_table('totara_assignment_competencies');
+        if ($dbman->table_exists($table)) {
+            $dbman->rename_table($table, 'totara_competency_assignments');
+        }
+
+        $table = new xmldb_table('totara_assignment_competency_users');
+        if ($dbman->table_exists($table)) {
+            $dbman->rename_table($table, 'totara_competency_assignment_users');
+        }
+
+        $table = new xmldb_table('totara_assignment_competencies_users_log');
+        if ($dbman->table_exists($table)) {
+            $dbman->rename_table($table, 'totara_competency_assignment_user_logs');
+        }
+
+        // Competency savepoint reached.
+        upgrade_plugin_savepoint(true, 2019110800, 'totara', 'competency');
+    }
+
     return true;
 }
