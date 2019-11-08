@@ -80,7 +80,7 @@ abstract class totara_sync_csv_testcase extends advanced_testcase {
     /**
      * Run the check_sanity
      *
-     * @return bool
+     * @return array containing idnumbers of all records that are invalid
      */
     public function check_sanity() {
         $synctable = $this->get_element()->get_source_sync_table();

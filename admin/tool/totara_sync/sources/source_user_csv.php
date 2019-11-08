@@ -211,6 +211,12 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
                 }
             }
 
+            if (isset($dbrow['email'])) {
+                if ($dbrow['email'] === '' && !$csvsaveemptyfields) {
+                    $dbrow['email'] = null;
+                }
+            }
+
             if (isset($dbrow['emailstop'])) {
                 // If email stop is empty then set it to null.
                 // (if an empty string is inserted into an integer field in the DB is will become 0).

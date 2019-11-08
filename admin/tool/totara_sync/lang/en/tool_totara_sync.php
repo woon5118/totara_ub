@@ -331,6 +331,7 @@ $string['duplicateuserswithemailx'] = 'Duplicate users with email {$a->duplicate
 $string['duplicateusernamexdb'] = 'Username {$a->username} is already registered. Skipped user {$a->idnumber}';
 $string['duplicateusersemailxdb'] = 'Email {$a->email} is already registered. Skipped user {$a->idnumber}';
 $string['duplicateidnumberx'] = 'Duplicate idnumber {$a}';
+$string['emptyemailusercreation'] = 'Empty email address. Skipped user {$a->idnumber}';
 $string['emptyvalueauthx'] = 'Auth cannot be empty. Skipped user {$a->idnumber}';
 $string['emptyvalueemailx'] = 'Email cannot be empty (duplicates not allowed). Skipped user {$a->idnumber}';
 $string['emptyvaluefirstnamex'] = 'First name cannot be empty. Skipped user {$a->idnumber}';

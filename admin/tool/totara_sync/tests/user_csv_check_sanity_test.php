@@ -274,7 +274,7 @@ class tool_totara_sync_user_csv_check_sanity_testcase extends advanced_testcase 
         $this->assertCount(17, $DB->get_records('totara_sync_log'));
 
         // Get empty emails.
-        $badids = $element->check_empty_values($synctable, 'email', 'emptyvalueemailx');
+        $badids = $element->get_empty_emails_for_user_creation($synctable);
         $this->assertEquals(array(16), $badids);
         $this->assertCount(18, $DB->get_records('totara_sync_log'));
 
@@ -287,7 +287,13 @@ class tool_totara_sync_user_csv_check_sanity_testcase extends advanced_testcase 
         // Get invalid emails.
         $badids = $element->get_invalid_emails($synctable);
         sort($badids);
-        $this->assertEquals(array(16, 18), $badids); // Empty email address is also invalid.
+        $this->assertEquals(array(18), $badids); // Empty email address is also invalid.
+        $this->assertCount(21, $DB->get_records('totara_sync_log'));
+
+        // Get empty emails for user creation.
+        $badids = $element->get_empty_emails_for_user_creation($synctable);
+        sort($badids);
+        $this->assertEquals(array(16), $badids); // Empty email address is also invalid.
         $this->assertCount(22, $DB->get_records('totara_sync_log'));
 
         // Can't check custom field sanity check in this test - it's too complicated.
@@ -328,7 +334,8 @@ class tool_totara_sync_user_csv_check_sanity_testcase extends advanced_testcase 
             13 => 'idnum013',
             14 => 'idnum014',
             15 => 'idnum015',
-            16 => 'idnum016', // This may have failed due to two different tests - we can't be sure which, but we're just happy it failed.
+            // Record with idnum016 is intentially not here because because 'allow_create' needs to be set to 0 for check_users_unable_to_revive sanity check.
+            // The scenario is coveved fully via tool_totara_sync_user_csv_check_email_sanity_testcase and tool_totara_sync_user_db_check_email_sanity_testcase
             17 => 'idnum017',
             18 => 'idnum018',
             30 => 'idnum030',
@@ -338,7 +345,7 @@ class tool_totara_sync_user_csv_check_sanity_testcase extends advanced_testcase 
             35 => 'idnum035'
         ), $invalididnumbers);
 
-        $this->assertEquals(25, count($DB->get_records('totara_sync_log')));
+        $this->assertEquals(23, count($DB->get_records('totara_sync_log')));
     }
 
 }

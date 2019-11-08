@@ -27,6 +27,9 @@ require_once($CFG->dirroot.'/admin/tool/totara_sync/sources/databaselib.php');
 
 abstract class totara_sync_database_testcase extends advanced_testcase {
 
+    /* @var \tool_totara_sync\internal\source\csv_trait|totara_sync_source */
+    protected $source;
+
     /** @var moodle_database */
     protected $ext_dbconnection = null;
 
@@ -113,6 +116,7 @@ abstract class totara_sync_database_testcase extends advanced_testcase {
         $this->ext_dbconnection = null;
         $this->elementname = null;
         $this->sourcetable = null;
+        $this->source      = null;
     }
 
     public abstract function create_external_db_table();
@@ -124,6 +128,42 @@ abstract class totara_sync_database_testcase extends advanced_testcase {
         $elements = totara_sync_get_elements(true);
         /** @var totara_sync_element_user $element */
         return $elements[$this->elementname];
+    }
+
+    /**
+     * Sets the source config.
+     *
+     * @param array $config
+     */
+    public function set_source_config($config) {
+        foreach ($config as $k => $v) {
+            $this->source->set_config($k, $v);
+        }
+    }
+
+    /**
+     * Sets the element config.
+     *
+     * @param array $config
+     */
+    public function set_element_config($config) {
+        foreach ($config as $k => $v) {
+            $this->get_element()->set_config($k, $v);
+        }
+    }
+
+    /**
+     * Run the check_sanity
+     *
+     * @return array containing idnumbers of all records that are invalid
+     */
+    public function check_sanity() {
+        $synctable = $this->get_element()->get_source_sync_table();
+        $synctable_clone = $this->get_element()->get_source_sync_table_clone($synctable);
+        $result = $this->get_element()->check_sanity($synctable, $synctable_clone);
+        $this->source->drop_table($synctable_clone);
+
+        return $result;
     }
 }
 

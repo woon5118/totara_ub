@@ -804,6 +804,12 @@ class totara_sync_element_user extends totara_sync_element {
             if (empty($this->config->defaultsyncemail)) {
                 $badids = $this->get_invalid_emails($synctable);
                 $invalidids = array_merge($invalidids, $badids);
+
+                // Users should never be created with empty emails.
+                if (!empty($this->config->allow_create)) {
+                    $badids = $this->get_empty_emails_for_user_creation($synctable);
+                    $invalidids = array_merge($invalidids, $badids);
+                }
             }
 
             // Duplicate emails not allowed.
@@ -1169,6 +1175,38 @@ class totara_sync_element_user extends totara_sync_element {
                 $this->addlog(get_string('invalidemailx', 'tool_totara_sync', $r), 'error', 'checksanity');
                 $invalidids[] = $r->id;
             }
+            unset($r);
+        }
+        $rs->close();
+
+        return $invalidids;
+    }
+
+    /**
+     * Sanity check to ensure users are never created with empty emails
+     *
+     * Other sanity checks are used when updating users taking into account the CSV empty string and duplicate email settings
+     *
+     * @param string $synctable sync table name
+     * @return array with invalid ids from synctable for invalid emails
+     */
+    public function get_empty_emails_for_user_creation($synctable) {
+        global $DB;
+
+        $invalidids = array();
+
+        $sql = "SELECT s.id, s.idnumber
+                  FROM {{$synctable}} s
+             LEFT JOIN {user} u ON u.idnumber = s.idnumber
+                 WHERE (s.email IS NULL OR s.email = '')
+                   AND u.idnumber IS NULL AND s.idnumber IS NOT NULL AND s.idnumber != ''
+              ORDER BY s.idnumber";
+        $rs = $DB->get_recordset_sql($sql);
+
+        foreach ($rs as $r) {
+            $this->addlog(get_string('emptyemailusercreation', 'tool_totara_sync', $r), 'error', 'checksanity');
+            $invalidids[] = $r->id;
+
             unset($r);
         }
         $rs->close();
