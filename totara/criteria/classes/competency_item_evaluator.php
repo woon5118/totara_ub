@@ -54,16 +54,17 @@ class competency_item_evaluator extends item_evaluator {
               JOIN {totara_criteria_item_record} tcir
                 ON tcir.criterion_item_id = tci.id
               JOIN (
-                   SELECT tca.comp_id, tca.user_id, MAX(tca.proficient) AS proficient
+                   SELECT DISTINCT tca.comp_id, tca.user_id
                      FROM {totara_competency_achievement} tca
-                    WHERE tca.status = :achievementstatus
-                    GROUP BY tca.comp_id, tca.user_id
-                      HAVING MAX(tca.proficient) = :isproficient) p
+                    WHERE tca.status = :achievementstatus 
+                        AND tca.proficient = :isproficient
+                ) p
                 ON tci.item_id = p.comp_id
                AND tcir.user_id = p.user_id
              WHERE tci.criterion_id = :criterionid
                AND tci.item_type = :itemtype
-               AND tcir.criterion_met = :currentmet";
+               AND tcir.criterion_met = :currentmet
+               ";
 
         $select_params = [
             'achievementstatus' => competency_achievement::ACTIVE_ASSIGNMENT,

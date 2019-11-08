@@ -109,15 +109,16 @@ class aggregation_task {
         // Although order by may have a slight impact on the query performance, with the possible number of rows
         // that may be returned, it is better to do ordering on the database
         $sql = "
-            SELECT *
+            SELECT tcp.*
             FROM {totara_competency_pathway} tcp
+            JOIN {comp} c ON tcp.comp_id = c.id 
             WHERE tcp.path_type {$pathtype_sql}
                 AND tcp.status = :activestatus
                 AND tcp.comp_id IN (
                     SELECT DISTINCT competency_id
                     FROM {{$this->table->get_table_name()}}
                 )
-            ORDER BY tcp.comp_id";
+            ORDER BY c.sortthread DESC";
         $params['activestatus'] = pathway::PATHWAY_STATUS_ACTIVE;
 
         return $DB->get_recordset_sql($sql, $params);
