@@ -36,60 +36,64 @@ class course_item_evaluator extends item_evaluator {
         $criterion_id = $criterion->get_id();
 
         // Not linking with the users_source here as we've already ensured that there is a record for applicable users in the parent
-        $itemid_sql =
-            "SELECT tci.id
-               FROM {totara_criteria_item} tci 
+
+        // MySQL doesn't allow using the same table in the update and the where - therefore had to settle for multiple queries
+        // First selecting the records to change, then performing the update
+
+        $meet_select_sql =
+            "SELECT tcir.id
+               FROM {totara_criteria_item_record} tcir
+               JOIN {totara_criteria_item} tci
+                 ON tci.id = tcir.criterion_item_id
+          LEFT JOIN {course_completions} cc
+                 ON cc.course = tci.item_id
+                AND cc.userid = tcir.user_id
+                AND cc.status IN (:statuscomplete, :statusrpl)
               WHERE tci.criterion_id = :criterionid
-                AND tci.item_type = :itemtype";
+                AND tci.item_type = :itemtype
+                AND tcir.criterion_met = :currentmet";
 
-        $userid_sql =
-            "SELECT cc.userid
-               FROM {totara_criteria_item} tci 
-               JOIN {course_completions} cc 
-                 ON cc.course = tci.item_id 
-              WHERE tci.criterion_id = :criterionid2
-                AND tci.item_type = :itemtype2
-                AND (cc.status = :statuscomplete OR cc.status = :statusrpl)";
+        $user_completed_wh = " AND cc.id IS NOT NULL";
+        $user_not_completed_wh = " AND cc.id IS NULL";
 
-        // Handle courses that are completed but item_record still indicates 'not met'
-        $sql =
-           "UPDATE {totara_criteria_item_record}
-               SET criterion_met = :newmet, 
-                   timeevaluated = :now
-             WHERE criterion_met = :currentmet
-               AND criterion_item_id IN ({$itemid_sql})
-               AND user_id IN ({$userid_sql})";
-
-        $params = [
-            'now' => $now,
-            'itemtype' => 'course',
+        $select_params = [
             'criterionid' => $criterion_id,
-            'newmet' => 1,
+            'itemtype' => 'course',
             'currentmet' => 0,
-            'itemtype2' => 'course',
-            'criterionid2' => $criterion_id,
             'statuscomplete' => COMPLETION_STATUS_COMPLETE,
             'statusrpl' => COMPLETION_STATUS_COMPLETEVIARPL
         ];
 
-        $DB->execute($sql, $params);
-
-        // Now do the reverse.
-        // Todo: deal with timecompleted?? Is it part of the check for whether a course is complete.
-        //       And if there happens to be an inconsistency between timecompleted and status, is the course considered complete or not?
-
-        // We also need to make provision for users without a course_completion record
-        // TODO: Test performance!!!
-         $sql =
+        $update_sql =
            "UPDATE {totara_criteria_item_record}
                SET criterion_met = :newmet, 
                    timeevaluated = :now
-             WHERE criterion_met = :currentmet
-               AND criterion_item_id IN ({$itemid_sql})
-               AND user_id NOT IN ({$userid_sql})";
-        $params['newmet'] = 0;
-        $params['currentmet'] = 1;
+             WHERE id ";
 
-        $DB->execute($sql, $params);
+        // Users that must meet
+        $must_meet_record_ids = $DB->get_fieldset_sql($meet_select_sql . $user_completed_wh, $select_params);
+        if (!empty($must_meet_record_ids)) {
+            [$id_sql, $update_params] = $DB->get_in_or_equal($must_meet_record_ids, SQL_PARAMS_NAMED);
+            $update_params['newmet'] = 1;
+            $update_params['now'] = $now;
+
+            $DB->execute($update_sql . $id_sql, $update_params);
+        }
+
+        // Then users that must not meet - we need to handle users that doesn't yet have a completion record -
+        // thus the need for the left join on course_completions
+        $select_params['currentmet'] = 1;
+        $must_not_meet_record_ids = $DB->get_fieldset_sql($meet_select_sql . $user_not_completed_wh, $select_params);
+        if (!empty($must_not_meet_record_ids)) {
+            [$id_sql, $update_params] = $DB->get_in_or_equal($must_not_meet_record_ids, SQL_PARAMS_NAMED);
+            $update_params['newmet'] = 0;
+            $update_params['now'] = $now;
+
+            $DB->execute($update_sql . $id_sql, $update_params);
+        }
+
+        // Todo: deal with timecompleted?? Is it part of the check for whether a course is complete.
+        //       And if there happens to be an inconsistency between timecompleted and status, is the course considered complete or not?
     }
+
 }
