@@ -17,60 +17,64 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
-  @package pathway_manual
+  @package totara_competency
 -->
 
 <template>
-  <div>
-    <a :href="backLinkUrl" class="tui-pathwayManual-rateCompetencies__backLink">
-      {{ $str('back_to_competency_profile', 'totara_competency') }}
-    </a>
-    <RateUserCompetencies v-if="userId" :user-id="userId" :role="role" />
+  <div class="tui-pathwayManual-userHeaderWithPhoto">
+    <div class="tui-pathwayManual-userHeaderWithPhoto__photoContainer">
+      <img
+        :src="photoUrl"
+        :alt="fullName"
+        class="tui-pathwayManual-userHeaderWithPhoto__photoContainer_photo"
+      />
+    </div>
+    <h2 class="tui-pathwayManual-userHeaderWithPhoto__title">
+      {{ pageTitle }}
+    </h2>
   </div>
 </template>
 
 <script>
-import RateUserCompetencies from 'pathway_manual/containers/RateUserCompetencies';
-
 export default {
-  components: { RateUserCompetencies },
-
   props: {
-    userId: {
-      type: Number,
-    },
-    role: {
+    pageTitle: {
+      required: true,
       type: String,
     },
-  },
-
-  computed: {
-    backLinkUrl() {
-      return this.$url('/totara/competency/profile/', {
-        user_id: this.userId,
-      });
+    photoUrl: {
+      required: true,
+      type: String,
+    },
+    fullName: {
+      required: true,
+      type: String,
     },
   },
 };
 </script>
 
 <style lang="scss">
-.tui-pathwayManual-rateCompetencies {
-  &__backLink {
-    display: inline-block;
-    align-self: start;
-    padding-bottom: var(--tui-gap-1);
+.tui-pathwayManual-userHeaderWithPhoto {
+  display: table-row;
+
+  &__photoContainer,
+  &__title {
+    display: table-cell;
+  }
+
+  &__photoContainer {
+    max-width: 75px;
+    vertical-align: middle;
+    &_photo {
+      width: 100%;
+    }
+  }
+
+  &__title {
+    margin: 0;
+    padding-left: 1.5rem;
+    vertical-align: middle;
   }
 }
 </style>
-
-<lang-strings>
-  {
-    "pathway_manual": [
-      "rate_competencies"
-    ],
-    "totara_competency": [
-      "back_to_competency_profile"
-    ]
-  }
-</lang-strings>
