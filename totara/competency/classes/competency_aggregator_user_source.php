@@ -106,7 +106,7 @@ class competency_aggregator_user_source {
                     )
                 AND assignment_id NOT IN (
                     SELECT tacu.assignment_id
-                      FROM {totara_assignment_competency_users} tacu
+                      FROM {totara_competency_assignment_users} tacu
                      WHERE tacu.competency_id = :compid2
                     )";
 
@@ -148,7 +148,7 @@ class competency_aggregator_user_source {
                     tacu.assignment_id,
                     COALESCE(ca.id, NULL) AS comp_achievement_id,
                     COALESCE(ca.scale_value_id, NULL) AS scale_value_id
-                 FROM {totara_assignment_competency_users} tacu
+                 FROM {totara_competency_assignment_users} tacu
                  JOIN {" . $temp_tablename . "} {$temp_alias} 
                    ON tacu.user_id = {$temp_alias}.{$temp_user_id_column} 
                   AND tacu.competency_id = {$temp_alias}.{$temp_competency_id_column}

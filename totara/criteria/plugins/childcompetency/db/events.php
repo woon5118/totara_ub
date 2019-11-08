@@ -21,36 +21,46 @@
  * @package criteria_coursecompletion
  */
 
+use criteria_childcompetency\observer\achievement as achievement_observer;
+use criteria_childcompetency\observer\competency as competency_observer;
+use hierarchy_competency\event\competency_created;
+use hierarchy_competency\event\competency_deleted;
+use hierarchy_competency\event\competency_moved;
+use totara_competency\event\assignment_user_archived;
+use totara_competency\event\assignment_user_assigned;
+use totara_competency\event\assignment_user_unassigned;
+use totara_competency\event\competency_achievement_updated;
+
 defined('MOODLE_INTERNAL') || die();
 
 $observers = [
     [
-        'eventname' => '\hierarchy_competency\event\competency_created',
-        'callback' => \criteria_childcompetency\observer\competency::class.'::competency_created',
+        'eventname' => competency_created::class,
+        'callback' => competency_observer::class.'::competency_created',
     ],
     [
-        'eventname' => '\hierarchy_competency\event\competency_moved',
-        'callback' => \criteria_childcompetency\observer\competency::class.'::competency_moved',
+        'eventname' => competency_moved::class,
+        'callback' => competency_observer::class.'::competency_moved',
     ],
     [
-        'eventname' => '\hierarchy_competency\event\competency_deleted',
-        'callback' => \criteria_childcompetency\observer\competency::class.'::competency_deleted',
+        'eventname' => competency_deleted::class,
+        'callback' => competency_observer::class.'::competency_deleted',
     ],
     [
-        'eventname' => 'totara_competency\event\competency_achievement_updated',
-        'callback' => \criteria_childcompetency\observer\achievement::class.'::competency_achievement_updated',
+        'eventname' => competency_achievement_updated::class,
+        'callback' => achievement_observer::class.'::competency_achievement_updated',
     ],
     [
-        'eventname' => '\tassign_competency\event\assignment_user_assigned',
-        'callback' => \criteria_childcompetency\observer\achievement::class.'::user_assigned',
+        'eventname' => assignment_user_assigned::class,
+        'callback' => achievement_observer::class.'::user_assigned',
     ],
     [
-        'eventname' => '\tassign_competency\event\assignment_user_unassigned',
-        'callback' => \criteria_childcompetency\observer\achievement::class.'::user_unassigned',
+        'eventname' => assignment_user_unassigned::class,
+        'callback' => achievement_observer::class.'::user_unassigned',
     ],
     [
-        'eventname' => '\tassign_competency\event\assignment_user_archived',
-        'callback' => \criteria_childcompetency\observer\achievement::class.'::user_assignment_archived',
+        'eventname' => assignment_user_archived::class,
+        'callback' => achievement_observer::class.'::user_assignment_archived',
     ],
 
 ];

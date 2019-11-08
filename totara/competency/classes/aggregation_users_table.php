@@ -611,7 +611,7 @@ class aggregation_users_table {
         $sql =
             "SELECT tacu.id,
                     tacu.user_id
-               FROM {totara_assignment_competency_users} tacu
+               FROM {totara_competency_assignment_users} tacu
           LEFT JOIN {{$this->get_table_name()}} agg_queue
                  ON agg_queue.{$this->competency_id_column} = tacu.competency_id
                 AND agg_queue.{$this->user_id_column} = tacu.user_id

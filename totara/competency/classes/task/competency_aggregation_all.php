@@ -72,7 +72,7 @@ class competency_aggregation_all extends scheduled_task {
             "INSERT INTO {" . $table->get_table_name() . "}
             (" . $insert_columns . ")
              SELECT user_id, competency_id, {$insert_values_sql}
-              FROM {totara_assignment_competency_users} tacu
+              FROM {totara_competency_assignment_users} tacu
               JOIN {totara_competency_pathway} pw
                 ON tacu.competency_id = pw.comp_id
               GROUP BY user_id, competency_id";

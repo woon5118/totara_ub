@@ -21,13 +21,13 @@
  * @package totara_competency
  */
 
-use pathway_manual\manual;
 use totara_competency\entities\competency;
 use totara_competency\entities\competency_achievement;
-use totara_competency\linked_courses;
-use totara_competency\task\competency_aggregation_all;
 use totara_competency\entities\pathway_achievement;
-use totara_criteria\criterion;
+use totara_competency\expand_task;
+use totara_competency\linked_courses;
+use totara_competency\models\assignment_actions;
+use totara_competency\task\competency_aggregation_all;
 
 /**
  * This is an integration test with multiple users assigned to multiple competencies
@@ -61,11 +61,11 @@ class totara_competency_integration_testcase extends advanced_testcase {
             public $generator;
             /** @var totara_hierarchy_generator $hierarchy_generator */
             public $hierarchy_generator;
-            /** @var totara_criteria_generator $competency_generator */
+            /** @var totara_competency_generator $competency_generator */
             public $competency_generator;
             /** @var totara_criteria_generator $criteria_generator */
             public $criteria_generator;
-            /** @var tassign_competency_generator $assign_generator */
+            /** @var totara_competency_assignment_generator $assign_generator */
             public $assign_generator;
 
             public function assign_users_to_competencies(array $to_assign) {
@@ -77,10 +77,10 @@ class totara_competency_integration_testcase extends advanced_testcase {
                     $assignment_ids[] = $assignment->id;
                 }
 
-                $model = new \tassign_competency\models\assignment_actions();
+                $model = new assignment_actions();
                 $model->activate($assignment_ids);
 
-                $expand_task = new \tassign_competency\expand_task($DB);
+                $expand_task = new expand_task($DB);
                 $expand_task->expand_all();
 
                 return $assignment_ids;
@@ -91,7 +91,7 @@ class totara_competency_integration_testcase extends advanced_testcase {
         $data->hierarchy_generator = $data->generator->get_plugin_generator('totara_hierarchy');
         $data->competency_generator = $data->generator->get_plugin_generator('totara_competency');
         $data->criteria_generator = $data->generator->get_plugin_generator('totara_criteria');
-        $data->assign_generator = $data->generator->get_plugin_generator('tassign_competency');
+        $data->assign_generator = $data->competency_generator->assignment_generator();
 
         $data->scale = $data->hierarchy_generator->create_scale(
             'comp',

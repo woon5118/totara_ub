@@ -25,8 +25,9 @@
 use criteria_coursecompletion\coursecompletion;
 use pathway_criteria_group\aggregation_helper;
 use pathway_criteria_group\criteria_group;
-use tassign_competency\models\assignment_actions;
 use totara_competency\entities\scale_value;
+use totara_competency\expand_task;
+use totara_competency\models\assignment_actions;
 
 class pathway_criteria_group_aggregation_helper_testcase extends advanced_testcase {
 
@@ -71,8 +72,8 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
 
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
-        /** @var tassign_competency_generator $assignment_generator */
-        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        /** @var totara_competency_assignment_generator $assignment_generator */
+        $assignment_generator = $competency_generator->assignment_generator();
 
         $to_create = [
             'Comp A' => [
@@ -124,7 +125,7 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
             ];
         }
 
-        $expand_task = new \tassign_competency\expand_task($DB);
+        $expand_task = new expand_task($DB);
         $expand_task->expand_all();
         $sink->close();
 

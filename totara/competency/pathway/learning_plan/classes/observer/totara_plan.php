@@ -38,7 +38,7 @@ class totara_plan {
 
         // Check that we have an active learning_plan
         $sql = "SELECT 1
-                  FROM {totara_assignment_competency_users} tacu
+                  FROM {totara_competency_assignment_users} tacu
                   JOIN {totara_competency_pathway} tcp
                     ON tcp.comp_id = tacu.competency_id
                  WHERE tacu.competency_id = :compid

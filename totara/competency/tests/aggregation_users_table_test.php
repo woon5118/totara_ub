@@ -22,9 +22,9 @@
  */
 
 
-use tassign_competency\expand_task;
-use tassign_competency\models\assignment_actions;
 use totara_competency\aggregation_users_table;
+use totara_competency\expand_task;
+use totara_competency\models\assignment_actions;
 
 class totara_competency_aggregation_users_table_testcase extends \advanced_testcase {
 
@@ -505,8 +505,8 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
 
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
-        /** @var tassign_competency_generator $assignment_generator */
-        $assignment_generator = $this->getDataGenerator()->get_plugin_generator('tassign_competency');
+        /** @var totara_competency_assignment_generator $assignment_generator */
+        $assignment_generator = $competency_generator->assignment_generator();
 
         $competencies = [];
         $competencies[1] = $competency_generator->create_competency();

@@ -24,9 +24,9 @@
 
 namespace criteria_childcompetency\observer;
 
-use tassign_competency\event\assignment_user_archived;
-use tassign_competency\event\assignment_user_assigned;
-use tassign_competency\event\assignment_user_unassigned;
+use totara_competency\event\assignment_user_archived;
+use totara_competency\event\assignment_user_assigned;
+use totara_competency\event\assignment_user_unassigned;
 use totara_competency\event\competency_achievement_updated;
 use totara_criteria\entities\criteria_item as item_entity;
 use totara_criteria\event\criteria_achievement_changed;

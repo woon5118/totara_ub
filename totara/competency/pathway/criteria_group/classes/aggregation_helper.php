@@ -53,7 +53,7 @@ class aggregation_helper {
         $sql = "SELECT DISTINCT tacu.id,
                        tcp.comp_id, 
                        tacu.user_id
-                  FROM {totara_assignment_competency_users} tacu
+                  FROM {totara_competency_assignment_users} tacu
                   JOIN {totara_competency_pathway} tcp
                     ON tcp.comp_id = tacu.competency_id
                   JOIN {pathway_criteria_group} pcg

@@ -21,17 +21,17 @@
  * @package pathway_criteria_group
  */
 
-namespace totara_competency\observer;
+namespace totara_competency\observers;
 
 
-use tassign_competency\event\assignment_user_archived;
-use tassign_competency\event\assignment_user_assigned;
-use tassign_competency\event\assignment_user_unassigned;
 use totara_competency\aggregation_users_table;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\pathway_achievement;
+use totara_competency\event\assignment_user_archived;
+use totara_competency\event\assignment_user_assigned;
+use totara_competency\event\assignment_user_unassigned;
 
-class assignment {
+class assignment_aggregation {
 
     public static function user_assigned(assignment_user_assigned $event) {
         // Simply mark the user for aggregation
