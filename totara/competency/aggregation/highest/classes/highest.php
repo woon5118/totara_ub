@@ -39,16 +39,16 @@ class highest extends overall_aggregation {
 
         foreach ($this->pathways as $pathway) {
             $achievement = pathway_achievement::get_current($pathway, $user_id);
-            $value_achieved = $this->get_scale_value($achievement->scale_value_id);
+            $value_achieved = $this->get_scale_value($achievement);
 
             if (!is_null($value_achieved)) {
                 if (is_null($highest_achievement)) {
                     $highest_achievement = $achievement;
                     $achieved_via = [$achievement];
                 } else {
-                    $highest_value = $this->get_scale_value($highest_achievement->scale_value_id);
+                    $highest_value = $this->get_scale_value($highest_achievement);
 
-                    if ($value_achieved->sortorder > $highest_value->sortorder) {
+                    if ($value_achieved->sortorder < $highest_value->sortorder) {
                         $highest_achievement = $achievement;
                         $achieved_via = [$achievement];
                     } else if ($value_achieved->sortorder == $highest_value->sortorder) {
@@ -63,15 +63,21 @@ class highest extends overall_aggregation {
         }
     }
 
-    private function get_scale_value(?int $id): ?scale_value {
-        if (is_null($id)) {
+    /**
+     * Let's make sure we only request each scale_value only once
+     *
+     * @param pathway_achievement|null $achievement
+     * @return scale_value|null
+     */
+    private function get_scale_value(?pathway_achievement $achievement): ?scale_value {
+        if (is_null($achievement->scale_value)) {
             return null;
         }
 
-        if (!isset($this->scale_values_cache[$id])) {
-            $this->scale_values_cache[$id] = new scale_value($id);
+        if (!isset($this->scale_values_cache[$achievement->scale_value_id])) {
+            $this->scale_values_cache[$achievement->scale_value_id] = $achievement->scale_value;
         }
 
-        return $this->scale_values_cache[$id];
+        return $this->scale_values_cache[$achievement->scale_value_id];
     }
 }
