@@ -23,6 +23,9 @@
 
 namespace mod_facetoface\query\event\filter;
 
+use core\orm\query\builder;
+use mod_facetoface\query\event\filter_factory;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -60,21 +63,20 @@ final class room_filter extends filter {
      * @inheritDoc
      */
     public function get_where_and_params(int $time): array {
-        if (0 == $this->roomid) {
-            // No point to query for a room with id as zero.
-            return ["(1=1)", []];
+        debugging('The method ' . __METHOD__ . '() has been deprecated and no longer effective. Please use the apply() counterpart instead.', DEBUG_DEVELOPER);
+        return ["(1=1)", []];
+    }
+
+    public function apply(builder $builder, int $time): void {
+        if (empty($this->roomid)) {
+            return;
         }
-
-        $sql = "
-            s.id IN (
-                SELECT sd.sessionid
-                FROM {facetoface_sessions_dates} sd
-                JOIN {facetoface_room_dates} frd ON frd.sessionsdateid = sd.id
-                WHERE frd.roomid = :roomid
-            )
-        ";
-
-        $params = ['roomid' => $this->roomid];
-        return [$sql, $params];
+        $builder->where_exists(function (builder $inner) {
+            $inner->select('sessionid')
+                ->from('facetoface_sessions_dates', 'sd')
+                ->join(['facetoface_room_dates', 'frd'], 'id', 'sessionsdateid')
+                ->where('frd.roomid', $this->roomid)
+                ->where_field('sd.sessionid', 's.id');
+        });
     }
 }

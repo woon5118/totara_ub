@@ -23,11 +23,18 @@
 
 namespace mod_facetoface\dashboard\filters;
 
+use Closure;
 use context;
+use core\orm\query\builder;
+use core\orm\query\properties;
+use core\orm\query\sql\query as sql_query;
+use core\orm\query\sql\where;
 use mod_facetoface\seminar;
 use mod_facetoface\event_time;
+use mod_facetoface\query\query_helper;
 use mod_facetoface\query\event\query;
 use mod_facetoface\query\event\filter\event_time_filter as query_event_time_filter;
+use mod_facetoface\query\event\filter_factory;
 
 /**
  * Provide the event timeline filter.
@@ -80,9 +87,11 @@ final class event_time_filter implements filter {
     public static function get_options(seminar $seminar): array {
         return [
             event_time::ALL => get_string('filter_event:all', 'mod_facetoface'),
-            event_time::UPCOMING => get_string('filter_event:upcoming', 'mod_facetoface'),
+            event_time::FUTURE => get_string('filter_event:future', 'mod_facetoface'),
             event_time::INPROGRESS => get_string('filter_event:inprogress', 'mod_facetoface'),
-            event_time::OVER => get_string('filter_event:over', 'mod_facetoface'),
+            event_time::PAST => get_string('filter_event:past', 'mod_facetoface'),
+            event_time::WAITLISTED => get_string('filter_event:waitlisted', 'mod_facetoface'),
+            event_time::CANCELLED => get_string('filter_event:cancelled', 'mod_facetoface'),
         ];
     }
 
@@ -116,18 +125,22 @@ final class event_time_filter implements filter {
 
     /**
      * @inheritDoc
+     * @todo Use query builfer
      */
     public static function is_visible(seminar $seminar, context $context, ?int $userid): bool {
         global $DB;
         /** @var \moodle_database $DB */
 
         $time = time();
+
         $sql =
         'SELECT COUNT(
             DISTINCT CASE
-                WHEN ((m.cntdates IS NULL OR :t1 < m.mintimestart) AND s.cancelledstatus = 0) THEN 1
-                WHEN ((m.mintimestart <= :t2 AND :t3 < m.maxtimefinish) AND s.cancelledstatus = 0) THEN 2
-                WHEN (m.maxtimefinish  <= :t4 OR s.cancelledstatus = 1) THEN 3
+                WHEN (:t1 < m.mintimestart AND s.cancelledstatus = 0) THEN :et1
+                WHEN ((m.mintimestart <= :t2 AND :t3 < m.maxtimefinish) AND s.cancelledstatus = 0) THEN :et2
+                WHEN (m.maxtimefinish  <= :t4 AND s.cancelledstatus = 0) THEN :et3
+                WHEN (m.cntdates IS NULL AND s.cancelledstatus = 0) THEN :et4
+                WHEN (s.cancelledstatus != 0) THEN :et5
             END)
          FROM {facetoface_sessions} s
          LEFT JOIN (
@@ -141,6 +154,11 @@ final class event_time_filter implements filter {
          WHERE s.facetoface = :f2f';
 
         $params = [
+            'et1' => event_time::UPCOMING,
+            'et2' => event_time::INPROGRESS,
+            'et3' => event_time::OVER,
+            'et4' => event_time::WAITLISTED,
+            'et5' => event_time::CANCELLED,
             't1' => $time,
             't2' => $time,
             't3' => $time,

@@ -36,6 +36,7 @@ interface filter {
      */
     const OPTION_ORDER = 0;
     const OPTION_TOOLTIPS = 1;
+    const OPTION_PARAMTYPE = 2;
 
     /**
      * Load the filter value.

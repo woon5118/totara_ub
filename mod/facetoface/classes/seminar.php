@@ -299,6 +299,10 @@ final class seminar implements seminar_iterator_item {
      */
     private $completiondelay = null;
     /**
+     * @var int {facetoface}.decluttersessiontable
+     */
+    private $decluttersessiontable = 0;
+    /**
      * @var string facetoface table name
      */
     const DBTABLE = 'facetoface';
@@ -384,8 +388,7 @@ final class seminar implements seminar_iterator_item {
      */
     public function has_events(): bool {
         global $DB;
-        $any = $DB->get_records('facetoface_sessions', [ 'facetoface' => $this->id ], '', 'id', 0, 1);
-        return !empty($any);
+        return $DB->record_exists('facetoface_sessions', ['facetoface' => $this->id]);
     }
 
     /**
@@ -1174,6 +1177,21 @@ final class seminar implements seminar_iterator_item {
      */
     public function set_completiondelay(?int $completiondelay): seminar {
         $this->completiondelay = $completiondelay;
+        return $this;
+    }
+
+    /**
+     * @return int 0 or 1
+     */
+    public function get_decluttersessiontable(): int {
+        return (int)(bool)$this->decluttersessiontable;
+    }
+    /**
+     * @param int $decluttersessiontable 0 or 1
+     * @return seminar
+     */
+    public function set_decluttersessiontable(int $decluttersessiontable) : seminar {
+        $this->decluttersessiontable = (int)(bool)$decluttersessiontable;
         return $this;
     }
 

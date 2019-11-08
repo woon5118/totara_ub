@@ -32,4 +32,18 @@ $icons = array(
                     'classes' => 'ft-seminar',
                 ),
         ),
+    'mod_facetoface|filters' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-sliders',
+                ),
+        ),
+    'mod_facetoface|moreactions' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-ellipsis-h',
+                ),
+        ),
 );

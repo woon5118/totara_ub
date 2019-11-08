@@ -22,17 +22,20 @@
  */
 
 namespace mod_facetoface\query\event\sortorder;
+
+use core\orm\query\builder;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Retrieving a sort order SQL statement for seminar_event. This class will be primarily used in \mod_facetoface\query\query, 
+ * Retrieving a sort order SQL statement for seminar_event. This class will be primarily used in \mod_facetoface\query\query,
  * and its method will be invoked in function ::get_event_sql_and_params.
  */
 abstract class sortorder {
     /**
      * Returning sort sql for seminar_event list. With a key word SORT ORDER at first, so that when we read at the value return,
      * it makes more sense.
-     * 
+     *
      * Context of parent SQL, that the returned SQL of this function will be a part of.
      * s.* => for {facetoface_sessions} table,
      * m. => [
@@ -44,4 +47,11 @@ abstract class sortorder {
      * @return string
      */
     abstract public function get_sort_sql(): string;
+
+    /**
+     * Apply sorting order to the current query builder.
+     * @param builder $builder
+     * @return void
+     */
+    abstract public function apply(builder $builder): void;
 }

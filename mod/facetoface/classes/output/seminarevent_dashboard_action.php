@@ -21,32 +21,24 @@
  * @package mod_facetoface
  */
 
-namespace mod_facetoface;
+namespace mod_facetoface\output;
+
+use \core\output\template;
+use \mod_facetoface\output\builder\seminarevent_dashboard_action_builder;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Provide the type-safe bookedsession field of session_data.
- *
- * {facetoface_signups} fields
- * @property-read integer $id
- * @property-read integer $sessionid
- * @property-read integer $userid
- * @property-read string|null $discountcode
- * @property-read integer $notificationtype
- * @property-read integer $archived
- * @property-read integer $bookedby
- * @property-read integer $managerid
- * @property-read integer $jobassignmentid
- *
- * @property-read integer $facetoface
- * @property-read integer $cancelledstatus
- * @property-read integer $timemodified
- * @property-read integer $timecreated
- * @property-read integer $timegraded
- * @property-read integer $statuscode
- * @property-read integer $timecancelled
- * @property-read integer $mailedconfirmation
+ * Render "Actions" table cell in the seminar event dashboard
  */
-final class session_signup_data extends \stdClass {
+final class seminarevent_dashboard_action extends template {
+    /**
+     * Create a new builder object.
+     *
+     * @param string $class
+     * @return seminarevent_dashboard_action_builder
+     */
+    public static function builder(): seminarevent_dashboard_action_builder {
+        return new seminarevent_dashboard_action_builder();
+    }
 }

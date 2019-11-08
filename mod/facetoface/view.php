@@ -25,6 +25,7 @@ use mod_facetoface\dashboard\filter_list;
 use mod_facetoface\event_time;
 use mod_facetoface\output\show_previous_events;
 use mod_facetoface\dashboard\render_session_option;
+use mod_facetoface\output\seminarevent_dashboard;
 
 require_once '../../config.php';
 require_once $CFG->dirroot . '/mod/facetoface/lib.php';
@@ -95,61 +96,8 @@ echo $OUTPUT->header();
 if (empty($cm->visible) and !has_capability('mod/facetoface:viewemptyactivities', $context)) {
     notice(get_string('activityiscurrentlyhidden'));
 }
-echo $OUTPUT->box_start();
 
-if ($filters->are_default()) {
-    $stringid = 'allsessionsin';
-} else {
-    $stringid = 'allfilteredsessionsin';
-}
-echo $OUTPUT->heading(get_string($stringid, 'facetoface', $seminar->get_name()), 2);
-
-echo self_completion_form($cm, $course);
-
-if (!empty($seminar->get_intro())) {
-    echo $OUTPUT->box(format_module_intro('facetoface', $seminar->get_properties(), $cm->id), 'generalbox', 'intro');
-}
-
-// Display a warning about previously mismatched self approval sessions.
-$f2f_renderer->selfapproval_notice($seminar->get_id());
-
-$hassessions = $seminar->has_events();
-
-// only print the filter bar if this seminar has events
-if ($hassessions) {
-    echo $f2f_renderer->render_filter_bar($seminar, $filters);
-}
-
-echo $f2f_renderer->render_action_bar($seminar);
-
-// Upcoming sessions
-$option = (new render_session_option())
-    ->set_displayreservation(true)
-    ->set_eventascendingorder(true)
-    ->set_sessionascendingorder(true)
-    ->set_eventtimes([ event_time::UPCOMING, event_time::INPROGRESS ]);
-echo $OUTPUT->heading(get_string('upcomingsessions', 'mod_facetoface'), 3);
-echo $f2f_renderer->render_session_list($seminar, $filters, $option);
-
-// Previous sessions
-$option = (new render_session_option())
-    ->set_displayreservation(false)
-    ->set_displaysignupperiod(false)
-    ->set_eventascendingorder(false)
-    ->set_sessionascendingorder(false)
-    ->set_eventtimes([ event_time::OVER ]);
-echo $OUTPUT->heading(get_string('previoussessions', 'mod_facetoface'), 3, null, 'previoussessionheading');
-echo $OUTPUT->render(show_previous_events::create($seminar, $filters, 'previoussessionheading'));
-echo $f2f_renderer->render_session_list($seminar, $filters, $option);
-
-// only print the export form if this seminar has events
-if ($hassessions) {
-    $f2f_renderer->attendees_export_form($seminar);
-}
-
-echo $OUTPUT->box_end();
-
-$f2f_renderer->declare_interest($seminar);
+echo $f2f_renderer->render(seminarevent_dashboard::create($seminar, $context, $cm, $course));
 
 echo $OUTPUT->footer($course);
 

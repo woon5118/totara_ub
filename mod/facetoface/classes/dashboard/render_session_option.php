@@ -169,4 +169,13 @@ final class render_session_option {
         $this->sessionascendingorder = $value;
         return $this;
     }
+
+    /**
+     * Convert to an object for debugging purposes.
+     *
+     * @return \stdClass
+     */
+    public function to_object(): \stdClass {
+        return (object)get_object_vars($this);
+    }
 }

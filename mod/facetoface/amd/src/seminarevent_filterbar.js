@@ -26,6 +26,7 @@ define([], function () {
     const ATTR_SHOW_TOOLTIPS = 'data-show-tooltips';
     var filter = {
         init: function (root) {
+            root.classList.add('mod_facetoface__filter--active');
             /**
              * Execute Array.forEach for <select> elements in the root element.
              * @param {Function} callback A callback function that is passed to the forEach method.

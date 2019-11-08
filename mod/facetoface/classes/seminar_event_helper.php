@@ -27,6 +27,7 @@ namespace mod_facetoface;
 defined('MOODLE_INTERNAL') || die();
 
 use context_module;
+use mod_facetoface\internal\session_data;
 use mod_facetoface\signup\state\{
     attendance_state,
     booked,

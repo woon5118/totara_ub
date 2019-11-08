@@ -23,6 +23,7 @@
 
 namespace mod_facetoface\query\event\filter;
 
+use core\orm\query\builder;
 use mod_facetoface\event_time;
 
 defined('MOODLE_INTERNAL') || die();
@@ -62,6 +63,12 @@ final class event_time_filter extends filter {
      * @inheritDoc
      */
     public function get_where_and_params(int $time): array {
+        debugging('The method ' . __METHOD__ . '() has been deprecated and no longer effective. Please use the apply() counterpart instead.', DEBUG_DEVELOPER);
+
         return $this->filter->get_where_and_params($time);
+    }
+
+    public function apply(builder $builder, int $time): void {
+        $this->filter->apply($builder, $time);
     }
 }

@@ -182,6 +182,16 @@ if ($ADMIN->fulltree) { // Improve performance.
 $settings = new admin_settingpage('modfacetofacactivitydefaults', get_string('activitydefaults', 'mod_facetoface'), 'totara/core:modconfig', $moduleenabled);
 $ADMIN->add('modfacetofacefolder', $settings);
 if ($ADMIN->fulltree) {
+    // vvv Appearance vvv
+    $settings->add(new admin_setting_heading('facetoface/appearance', new lang_string('appearanceheader', 'mod_facetoface'), ''));
+
+    $settings->add(new admin_setting_configcheckbox('facetoface_decluttersessiontable',
+        new lang_string('decluttersessiontable', 'mod_facetoface'),
+        new lang_string('decluttersessiontable_help', 'mod_facetoface'), 0));
+
+    // ^^^ Appearance ^^^
+
+    // vvv Attendance tracking and grading vvv
     $settings->add(new admin_setting_heading('facetoface/attendancetrackingheader', new lang_string('attendancetrackingheader', 'facetoface'), ''));
 
     $options = [];
@@ -235,6 +245,9 @@ if ($ADMIN->fulltree) {
     );
 
     $settings->add(new admin_setting_configtext('facetoface/gradepass', new lang_string('gradepass', 'mod_facetoface'), new lang_string('gradepass_help', 'mod_facetoface'), (string)\mod_facetoface\seminar::GRADE_PASS_DEFAULT, PARAM_FLOAT));
+    // ^^^ Attendance tracking and grading ^^^
+
+    // vvv Sign-up Workflow vvv
 
     $settings->add(new admin_setting_heading('facetoface_signupworkflow_header', new lang_string('signupworkflowheader', 'facetoface'), ''));
 
@@ -295,6 +308,7 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('facetoface/reservedays',
         new lang_string('setting:reservedays', 'mod_facetoface'),
         new lang_string('setting:reservedays_desc', 'mod_facetoface'), 2, PARAM_INT));
+    // ^^^ Sign-up Workflow ^^^
 }
 
 // Event defaults.

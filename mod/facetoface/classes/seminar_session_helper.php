@@ -32,6 +32,7 @@ final class seminar_session_helper {
 
     /**
      * Return Event session status as a localised string.
+     * Use get_status_from() if possible.
      * @param \stdClass $session    {facetoface_sessions} database record
      * @param \stdClass|null $date  {facetoface_sessions_dates} database record
      * @param integer $timenow      The timestamp to calculate status
@@ -39,16 +40,26 @@ final class seminar_session_helper {
      *                              Empty string if the event is waitlisted or the function fails
      */
     public static function get_status(\stdClass $session, ?\stdClass $date, int $timenow = 0): string {
+        $seminarevent = (new seminar_event())->from_record($session, false);
+        $seminarsession = $date !== null ? (new seminar_session())->from_record($date, false) : null;
+        return self::get_status_from($seminarevent, $seminarsession, $timenow);
+    }
 
+    /**
+     * Return Event session status as a localised string.
+     * @param seminar_event $seminarevent
+     * @param seminar_session|null $seminarsession
+     * @param integer $timenow      The timestamp to calculate status
+     * @return string               Non-empty string if success
+     *                              Empty string if the event is waitlisted or the function fails
+     */
+    public static function get_status_from(seminar_event $seminarevent, ?seminar_session $seminarsession, int $timenow = 0): string {
         if ($timenow <= 0) {
             $timenow = time();
         }
-        // NOTE: Use the following syntax if a seminar_event instance is required
-        // $seminarevent = (new seminar_event())->from_record($session, false);
-        $seminarsession = $date !== null ? (new seminar_session())->from_record($date, false) : null;
-        if (!empty($session->cancelledstatus)) {
+        if (!empty($seminarevent->get_cancelledstatus())) {
             $status = 'cancelled';
-        } else if ($date === null) {
+        } else if ($seminarsession === null) {
             // Empty for wait-listed events.
             return '';
         } else if ($seminarsession->is_over($timenow)) {
@@ -65,5 +76,47 @@ final class seminar_session_helper {
             return '';
         }
         return get_string('sessionstatus:' . $status, 'mod_facetoface');
+    }
+
+    /**
+     * Get the attendance taking status.
+     *
+     * @param seminar_event $seminarevent
+     * @param seminar_session $seminarsession
+     * @param integer $attendancetime one of seminar::SESSION_ATTENDANCE_xxx
+     * @param integer $timenow any timestamp or 0 for current time
+     * @return array of [state, icon, text, url] that need to pass through set_state(), set_icon(), set_text() and set_link() respectively
+     */
+    public static function get_attendance_taking_status(seminar_event $seminarevent, seminar_session $seminarsession, int $attendancetime, int $timenow = 0): array {
+        if (!empty($seminarevent->get_cancelledstatus())) {
+            return ['cancelled', '', '', ''];
+        }
+
+        $helper = new attendees_helper($seminarevent);
+        if (!$helper->count_attendees()) {
+            return ['none', '', get_string('attendancetracking:noattendees', 'mod_facetoface'), ''];
+        }
+
+        $status = $seminarsession->get_attendance_taking_status($attendancetime, $timenow);
+        switch ($status) {
+            case attendance_taking_status::CLOSED_UNTILEND:
+                return ['locked', '', get_string('attendancetracking:openatend', 'mod_facetoface'), ''];
+
+            case attendance_taking_status::CLOSED_UNTILSTART:
+                return ['locked', '', get_string('attendancetracking:openatstart', 'mod_facetoface'), ''];
+
+            case attendance_taking_status::OPEN:
+                // no break
+
+            case attendance_taking_status::ALLSAVED:
+                $url = new \moodle_url('/mod/facetoface/attendees/takeattendance.php', ['s' => $seminarevent->get_id(), 'sd' => $seminarsession->get_id()]);
+                if ($status == attendance_taking_status::ALLSAVED) {
+                    return ['saved', 'check-circle-success', get_string('attendancetracking:saved', 'mod_facetoface'), $url];
+                } else {
+                    return ['open', '', get_string('attendancetracking:open', 'mod_facetoface'), $url];
+                }
+        }
+
+        throw new \coding_exception("Invalid attendance taking status: {$status}");
     }
 }

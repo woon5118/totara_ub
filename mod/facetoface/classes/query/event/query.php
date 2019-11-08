@@ -23,10 +23,12 @@
 
 namespace mod_facetoface\query\event;
 
+use core\orm\query\sql\query as sql_query;
+use mod_facetoface\seminar;
+use mod_facetoface\query\query_helper;
+use mod_facetoface\query\statement;
 use mod_facetoface\query\event\filter\filter;
 use mod_facetoface\query\event\sortorder\sortorder;
-use mod_facetoface\query\statement;
-use mod_facetoface\seminar;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -124,47 +126,25 @@ final class query implements event_query {
      * @inheritdoc
      */
     public function get_statement(): statement {
-        $sql = "
-          SELECT s.*
-          FROM {facetoface_sessions} s
-
-          LEFT JOIN (
-            SELECT
-              fsd.sessionid,
-              COUNT(fsd.id) AS cntdates,
-              MIN(fsd.timestart) AS mintimestart,
-              MAX(fsd.timestart) AS maxtimestart,
-              MIN(fsd.timefinish) AS mintimefinish,
-              MAX(fsd.timefinish) AS maxtimefinish
-            FROM {facetoface_sessions_dates} fsd
-            GROUP BY fsd.sessionid
-          ) m ON m.sessionid = s.id
-
-          WHERE s.facetoface = :facetoface
-        ";
-
-        $params = [
-            'facetoface' => $this->seminar->get_id()
-        ];
+        $builder = filter_factory::query_sessions_and_dates($this->seminar);
 
         if (!empty($this->filters)) {
             // Start building our where clause here, if there are any filters provided for this query object.
             $time = $this->time > 0 ? $this->time : time();
-            $wheresqls = [];
-
             foreach ($this->filters as $filter) {
-                [$wheresql, $whereparams] = $filter->get_where_and_params($time);
-
-                $wheresqls[] = $wheresql;
-                $params = array_merge($params, $whereparams);
+                $filter->apply($builder, $time);
             }
-
-            $sql .= " AND " . implode(" AND ", $wheresqls);
         }
 
         if (null !== $this->sortorder) {
-            $sql .= " " . $this->sortorder->get_sort_sql();
+            $this->sortorder->apply($builder);
         }
+
+        [$sql, $params] = sql_query::from_builder($builder)->build();
+
+        // !!!!!!!!!!!!!!!! DEBUG: SHOULD BE REMOVED !!!!!!!!!!!!!!!!
+        // echo query_helper::highlight($sql, $params);
+        // !!!!!!!!!!!!!!!! DEBUG: SHOULD BE REMOVED !!!!!!!!!!!!!!!!
 
         return new statement($sql, $params);
     }

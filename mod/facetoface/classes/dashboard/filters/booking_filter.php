@@ -81,6 +81,9 @@ final class booking_filter implements filter {
             query_booking_filter::ALL => get_string('filter_booking:all', 'mod_facetoface'),
             query_booking_filter::OPEN => get_string('filter_booking:open', 'mod_facetoface'),
             query_booking_filter::BOOKED => get_string('filter_booking:booked', 'mod_facetoface'),
+            query_booking_filter::WAITLISTED => get_string('filter_booking:waitlisted', 'mod_facetoface'),
+            query_booking_filter::REQUESTED => get_string('filter_booking:requested', 'mod_facetoface'),
+            query_booking_filter::CANCELLED => get_string('filter_booking:cancelled', 'mod_facetoface'),
         ];
         return $select;
     }

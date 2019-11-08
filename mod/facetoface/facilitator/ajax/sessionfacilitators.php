@@ -89,14 +89,11 @@ $tblprefix = facilitatorcustomfield::get_prefix();
 $facilitatorslist = facilitator_list::get_available(0, 0, $seminarevent);
 $availablefacilitators = facilitator_list::get_available($timestart, $timefinish, $seminarevent);
 foreach ($facilitatorslist as $facilitatorid => $facilitator) {
+    /** @var \mod_facetoface\facilitator_user $facilitator */
 
-    $fullname = $facilitator->get_name();
-    if (!empty($facilitator->get_fullname())) {
-        $fullname .= " ({$facilitator->get_fullname()}) ";
-    }
     $dialogdata = (object)[
         'id' => $facilitatorid,
-        'fullname' => $fullname,
+        'fullname' => $facilitator->get_display_name(),
         'custom' => $facilitator->get_custom(),
     ];
 

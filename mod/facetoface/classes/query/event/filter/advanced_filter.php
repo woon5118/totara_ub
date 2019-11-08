@@ -23,10 +23,8 @@
 
 namespace mod_facetoface\query\event\filter;
 
-use mod_facetoface\signup\state\attendance_state;
-use mod_facetoface\signup\state\booked;
-use mod_facetoface\seminar;
-use mod_facetoface\signup\condition\event_taking_attendance;
+use core\orm\query\builder;
+use mod_facetoface\query\event\filter_factory;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -37,11 +35,18 @@ final class advanced_filter extends filter {
     const ALL = 0;
     const ATTENDANCE_OPEN = 1;
     const ATTENDANCE_SAVED = 2;
+    const OVERBOOKED = 3;
+    const UNDERBOOKED = 4;
 
     /**
      * @var int
      */
     private $value;
+
+    /**
+     * @var int
+     */
+    private $userid;
 
     /**
      * @param int $value    ALL, OPEN or SAVED
@@ -61,81 +66,48 @@ final class advanced_filter extends filter {
     }
 
     /**
+     * @param integer $userid
+     * @return advanced_filter
+     */
+    public function set_userid(int $userid): advanced_filter {
+        $this->userid = $userid;
+        return $this;
+    }
+
+    /**
      * @inheritDoc
      */
     public function get_where_and_params(int $time): array {
-        global $DB;
-        /** @var \moodle_database $DB */
+        debugging('The method ' . __METHOD__ . '() has been deprecated and no longer effective. Please use the apply() counterpart instead.', DEBUG_DEVELOPER);
+        return ["(1=1)", []];
+    }
 
-        // The external use will always have the keyword 'AND' before hand, therefore, it should have something here to returned
-        // for the event_time criteria.
-        $sql = "(1=1)";
-        $params = [];
+    public function apply(builder $builder, int $time): void {
+        switch ($this->value) {
+            case self::ATTENDANCE_OPEN:
+                // no break
 
-        if ($this->value != self::ATTENDANCE_OPEN && $this->value != self::ATTENDANCE_SAVED) {
-            return [ $sql, $params ];
+            case self::ATTENDANCE_SAVED:
+                filter_factory::event_not_cancelled($builder);
+                filter_factory::event_booked($builder);
+                $builder->where(function (builder $mediator) use ($time) {
+                    $mediator->where(function (builder $inner) use ($time) {
+                        filter_factory::event_attendance($inner, $time, $this->value == self::ATTENDANCE_SAVED);
+                    })->or_where(function (builder $inner) use ($time) {
+                        filter_factory::session_attendance($inner, $time, $this->value == self::ATTENDANCE_SAVED);
+                    });
+                });
+                break;
+
+            case self::OVERBOOKED:
+                filter_factory::event_not_past_or_cancelled($builder, $time);
+                filter_factory::booking_capacity($builder, '>', 'max');
+                break;
+
+            case self::UNDERBOOKED:
+                filter_factory::event_not_past_or_cancelled($builder, $time);
+                filter_factory::booking_capacity($builder, '<', 'min');
+                break;
         }
-
-        $statuses = attendance_state::get_all_attendance_code_with([booked::class]);
-        [$statsql, $params] = $DB->get_in_or_equal($statuses, SQL_PARAMS_NAMED, 'af_su');
-        $sql = "EXISTS (
-            SELECT su.id
-            FROM {facetoface_signups} su
-            JOIN {facetoface_signups_status} ss ON su.id = ss.signupid
-            JOIN {user} u ON u.id = su.userid
-            WHERE su.sessionid = s.id
-            AND su.archived = 0
-            AND ss.superceded = 0
-            AND ss.statuscode {$statsql}
-            AND u.deleted = 0
-        )";
-
-        $sql_at_any = 'f2f.attendancetime = :at_any_af AND EXISTS (
-            SELECT sd.id
-            FROM {facetoface_sessions_dates} sd
-            WHERE sd.sessionid = s.id
-        )';
-        $sql_at_fstart = 'f2f.attendancetime = :at_fstart_af AND m.mintimestart <= :timeopen1_af';
-        $sql_at_lend = 'f2f.attendancetime = :at_lend_af AND m.mintimefinish < :timenow_af';
-        $sql_at_lstart = 'f2f.attendancetime = :at_lstart_af AND m.maxtimestart <= :timeopen2_af';
-
-        $sql .= " AND EXISTS (
-            SELECT f2f.id
-            FROM {facetoface} f2f
-            WHERE f2f.id = s.facetoface
-            AND f2f.sessionattendance != 0
-            AND s.cancelledstatus = 0
-            AND (({$sql_at_any}) OR ({$sql_at_fstart}) OR ({$sql_at_lend}) OR ({$sql_at_lstart}))
-        )";
-        $params['at_any_af'] = seminar::EVENT_ATTENDANCE_UNRESTRICTED;
-        $params['at_fstart_af'] = seminar::EVENT_ATTENDANCE_FIRST_SESSION_START;
-        $params['at_lend_af'] = seminar::EVENT_ATTENDANCE_LAST_SESSION_END;
-        $params['at_lstart_af'] = seminar::EVENT_ATTENDANCE_LAST_SESSION_START;
-        $params['timeopen1_af'] = $time + event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START;
-        $params['timeopen2_af'] = $time + event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START;
-        $params['timenow_af'] = $time;
-
-        if ($this->value == self::ATTENDANCE_OPEN) {
-            $existence = 'EXISTS';
-        } else if ($this->value == self::ATTENDANCE_SAVED) {
-            $existence = 'NOT EXISTS';
-        } else {
-            error_log("Unknown attendance filter value: {$this->value}");
-            return ['('.$sql.')', $params];
-        }
-        $sql .= " AND $existence (
-            SELECT su.id
-            FROM {facetoface_signups} su
-            LEFT JOIN {facetoface_signups_dates_status} sds ON sds.signupid = su.id
-            WHERE su.sessionid = s.id
-            AND su.archived = 0
-            AND (sds.attendancecode IS NULL OR (sds.attendancecode = 0 OR sds.attendancecode = :bookingcode_af))
-            AND (COALESCE(sds.superceded, 0) = 0)
-        )";
-        $params['bookingcode_af'] = booked::get_code();
-
-        $sql = '('.$sql.')';
-
-        return [$sql, $params];
     }
 }

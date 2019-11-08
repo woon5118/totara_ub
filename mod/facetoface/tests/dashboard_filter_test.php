@@ -28,6 +28,7 @@ use mod_facetoface\dashboard\filters\advanced_filter;
 use mod_facetoface\dashboard\filters\booking_filter;
 use mod_facetoface\dashboard\filters\event_time_filter;
 use mod_facetoface\dashboard\filters\room_filter;
+use mod_facetoface\dashboard\filters\facilitator_filter;
 use mod_facetoface\query\event\filter\booking_filter as query_booking_filter;
 use mod_facetoface\query\event\filter\advanced_filter as query_advanced_filter;
 use mod_facetoface\signup_helper;
@@ -88,14 +89,20 @@ class mod_facetoface_dashboard_filter_testcase extends advanced_testcase {
      * @param int|string $timestart
      * @param int|string $timeend
      * @param int|string $roomid
+     * @param int|string $facilitatorid
      * @return \stdClass
      */
-    protected function prepare_date($timestart, $timeend, $roomid): \stdClass {
+    protected function prepare_date($timestart, $timeend, $roomid, $facilitatorid): \stdClass {
         $sessiondate = new stdClass();
         $sessiondate->timestart = (string)$timestart;
         $sessiondate->timefinish = (string)$timeend;
         $sessiondate->sessiontimezone = '99';
-        $sessiondate->roomids[] = $roomid;
+        if (!empty($roomid)) {
+            $sessiondate->roomids[] = $roomid;
+        }
+        if (!empty($facilitatorid)) {
+            $sessiondate->facilitatorids[] = $facilitatorid;
+        }
         return $sessiondate;
     }
 
@@ -107,7 +114,7 @@ class mod_facetoface_dashboard_filter_testcase extends advanced_testcase {
      * @param string|null $stateclass
      * @return array [ user_id => \mod_facetoface\signup ]
      */
-    private function create_users_signups(int $numusers, seminar_event $seminarevent, $stateclass = null): array {
+    private function create_users_signups(int $numusers, seminar_event $seminarevent, ?string $stateclass = null): array {
         $generator = $this->getDataGenerator();
         $users = [];
         for ($i = 0; $i < $numusers; $i++) {
@@ -131,83 +138,69 @@ class mod_facetoface_dashboard_filter_testcase extends advanced_testcase {
         return $users;
     }
 
-    public function data_provider_advanced_filter(): array {
-        return [
-            [ seminar::SESSION_ATTENDANCE_END ],
-            [ seminar::SESSION_ATTENDANCE_START ],
-            [ seminar::SESSION_ATTENDANCE_UNRESTRICTED ],
-        ];
-    }
-
-    /**
-     * @dataProvider data_provider_advanced_filter
-     */
-    public function test_advanced_filter(int $sessionattendance) {
+    public function test_advanced_filter() {
         global $DB;
         /** @var \moodle_database $DB */
 
         $filter = new advanced_filter();
 
-        // get_options() always returns [ All, Open, Saved ]
-        $this->assertCount(3, $filter->get_options($this->seminar));
+        // get_options() always returns [ All, Open, Saved, Overbooked, Underbooked ]
+        $this->assertCount(5, $filter->get_options($this->seminar));
 
-        $admin = $this->generator->create_user();
+        $teacher = $this->generator->create_user();
         $student = $this->generator->create_user();
-
-        $managerrole = $DB->get_record('role', array('shortname' => 'manager'));
-        role_assign($managerrole->id, $admin->id, context_system::instance());
+        $teacherrole = $DB->get_record('role', array('shortname' => 'teacher'));
+        role_assign($teacherrole->id, $teacher->id, context_system::instance());
         $studentrole = $DB->get_record('role', array('shortname' => 'student'));
         role_assign($studentrole->id, $student->id, context_system::instance());
 
         // Some sanity checks
-        $this->assertTrue(has_capability('mod/facetoface:takeattendance', $this->context, $admin));
+        $this->assertTrue(has_capability('mod/facetoface:takeattendance', $this->context, $teacher));
         $this->assertFalse(has_capability('mod/facetoface:takeattendance', $this->context, $student));
 
-        $room = $this->facetoface_generator->add_site_wide_room([]);
         $seminareventid = $this->facetoface_generator->add_session(['facetoface' => $this->seminar->get_id(), 'sessiondates' => []]);
         $seminarevent = new seminar_event($seminareventid);
         $this->create_users_signups(1, $seminarevent, booked::class);
 
         $now = time();
-        seminar_event_helper::merge_sessions($seminarevent, [$this->prepare_date($now - DAYSECS * 2, $now - DAYSECS, $room->id)]);
+        seminar_event_helper::merge_sessions($seminarevent, [$this->prepare_date($now - DAYSECS * 2, $now - DAYSECS, 0, 0)]);
 
-        // No session attendance tracking, no attendance filter
-        $this->seminar->set_sessionattendance(seminar::SESSION_ATTENDANCE_DISABLED)->save();
+        // Always visible to trainers, always hide from students
         $filter->set_param_value(query_advanced_filter::ALL);
-        $this->assertFalse($filter->is_visible($this->seminar, $this->context, $admin->id));
+        $this->assertTrue($filter->is_visible($this->seminar, $this->context, $teacher->id));
         $this->assertFalse($filter->is_visible($this->seminar, $this->context, $student->id));
         $filter->set_param_value(query_advanced_filter::ATTENDANCE_OPEN);
-        $this->assertFalse($filter->is_visible($this->seminar, $this->context, $admin->id));
+        $this->assertTrue($filter->is_visible($this->seminar, $this->context, $teacher->id));
         $this->assertFalse($filter->is_visible($this->seminar, $this->context, $student->id));
         $filter->set_param_value(query_advanced_filter::ATTENDANCE_SAVED);
-        $this->assertFalse($filter->is_visible($this->seminar, $this->context, $admin->id));
+        $this->assertTrue($filter->is_visible($this->seminar, $this->context, $teacher->id));
         $this->assertFalse($filter->is_visible($this->seminar, $this->context, $student->id));
-
-        // With seminar events, yes attendance filter for admin
-        $this->seminar->set_sessionattendance($sessionattendance)->save();
-        $filter->set_param_value(query_advanced_filter::ALL);
-        $this->assertTrue($filter->is_visible($this->seminar, $this->context, $admin->id));
+        $filter->set_param_value(query_advanced_filter::UNDERBOOKED);
+        $this->assertTrue($filter->is_visible($this->seminar, $this->context, $teacher->id));
         $this->assertFalse($filter->is_visible($this->seminar, $this->context, $student->id));
-        $filter->set_param_value(query_advanced_filter::ATTENDANCE_OPEN);
-        $this->assertTrue($filter->is_visible($this->seminar, $this->context, $admin->id));
-        $this->assertFalse($filter->is_visible($this->seminar, $this->context, $student->id));
-        $filter->set_param_value(query_advanced_filter::ATTENDANCE_SAVED);
-        $this->assertTrue($filter->is_visible($this->seminar, $this->context, $admin->id));
+        $filter->set_param_value(query_advanced_filter::OVERBOOKED);
+        $this->assertTrue($filter->is_visible($this->seminar, $this->context, $teacher->id));
         $this->assertFalse($filter->is_visible($this->seminar, $this->context, $student->id));
     }
 
     public function test_booking_filter() {
         $filter = new booking_filter();
 
-        // get_options() always returns [ All, Open, Booked ]
-        $this->assertCount(3, $filter->get_options($this->seminar));
+        // get_options() always returns [ All, Open, Booked, Waitlisted, Requested, Cancelled ]
+        $this->assertCount(6, $filter->get_options($this->seminar));
 
-        // So far, booking_filter::is_visible() just returns true for everyone/everything
+        // So far, booking_filter::is_visible() just returns true
         $filter->set_param_value(query_booking_filter::ALL);
         $this->assertTrue($filter->is_visible($this->seminar, $this->context, null));
         $filter->set_param_value(query_booking_filter::BOOKED);
         $this->assertTrue($filter->is_visible($this->seminar, $this->context, null));
         $filter->set_param_value(query_booking_filter::OPEN);
+        $this->assertTrue($filter->is_visible($this->seminar, $this->context, null));
+        $filter->set_param_value(query_booking_filter::WAITLISTED);
+        $this->assertTrue($filter->is_visible($this->seminar, $this->context, null));
+        $filter->set_param_value(query_booking_filter::REQUESTED);
+        $this->assertTrue($filter->is_visible($this->seminar, $this->context, null));
+        $filter->set_param_value(query_booking_filter::CANCELLED);
         $this->assertTrue($filter->is_visible($this->seminar, $this->context, null));
     }
 
@@ -220,10 +213,10 @@ class mod_facetoface_dashboard_filter_testcase extends advanced_testcase {
             [ [ [ -DAYSECS ], [ -DAYSECS * 2 ] ], false, false, 'Past events only' ],
             [ [ [ -HOURSECS ], [ -HOURSECS * 2 ] ], false, false, 'Ongoing events only' ],
             [ [ [ DAYSECS ], [ DAYSECS * 2 ] ], false, false, 'Future events only' ],
-            [ [ [], [ DAYSECS ] ], false, false, 'Future event + waitlisted event' ],
+            [ [ [], [ DAYSECS ] ], false, true, 'Future event + waitlisted event' ],
             [ [ [ -DAYSECS, DAYSECS ], [ -YEARSECS, YEARSECS ]  ], false, false, 'Ongoing events with future and past sessions' ],
             [ [ [], [] ], true, true, 'Waitlisted event + cancelled waitlisted event' ],
-            [ [ [ -DAYSECS ], [ -DAYSECS * 2 ] ], true, false, 'Past event + cancelled past event' ],
+            [ [ [ -DAYSECS ], [ -DAYSECS * 2 ] ], true, true, 'Past event + cancelled past event' ],
             [ [ [ -HOURSECS ], [ -HOURSECS * 2 ] ], true, true, 'Ongoing event + cancelled ongoing event' ],
             [ [ [ -DAYSECS, DAYSECS ], [ -YEARSECS, YEARSECS ]  ], true, true, 'Ongoing future and past sessions + cancelled ongoing event' ],
             [ [ [], [ DAYSECS ] ], true, true, 'Future event + cancelled waitlisted event' ],
@@ -240,18 +233,17 @@ class mod_facetoface_dashboard_filter_testcase extends advanced_testcase {
     public function test_event_time_filter(array $sessionstimes, bool $cancelfirst, bool $visibility, string $tag) {
         $filter = new event_time_filter();
 
-        // get_options() always returns [ All, Upcoming, InProgress, Over ]
-        $this->assertCount(4, $filter->get_options($this->seminar));
+        // get_options() always returns [ All, Future, InProgress, Past, Waitlisted, Cancelled ]
+        $this->assertCount(6, $filter->get_options($this->seminar));
 
         // is_visible() returns false if no seminar events
         $this->assertFalse($filter->is_visible($this->seminar, $this->context, null));
 
         $seminareventids = [];
         foreach ($sessionstimes as $sessiontimes) {
-            $room = $this->facetoface_generator->add_site_wide_room([]);
-            $dates = array_map(function ($time) use ($room) {
+            $dates = array_map(function ($time) {
                 $now = time();
-                return $this->prepare_date($now + $time, $now + $time + HOURSECS  * 6, $room->id);
+                return $this->prepare_date($now + $time, $now + $time + HOURSECS  * 6, 0, 0);
             }, $sessiontimes);
             $seminareventids[] = $this->facetoface_generator->add_session(['facetoface' => $this->seminar->get_id(), 'sessiondates' => $dates ]);
         }
@@ -263,7 +255,7 @@ class mod_facetoface_dashboard_filter_testcase extends advanced_testcase {
         }
 
         // get_options() always returns [ All, Upcoming, InProgress, Over ]
-        $this->assertCount(4, $filter->get_options($this->seminar));
+        $this->assertCount(6, $filter->get_options($this->seminar));
 
         $this->assertSame($visibility, $filter->is_visible($this->seminar, $this->context, null));
     }
@@ -282,24 +274,59 @@ class mod_facetoface_dashboard_filter_testcase extends advanced_testcase {
         // Adding rooms does not make any difference
         $this->assertCount(0, $filter->get_options($this->seminar));
 
-        $dates = [ $this->prepare_date(1000, 2000, $room1->id) ];
+        $dates = [ $this->prepare_date(1000, 2000, $room1->id, 0) ];
         $this->facetoface_generator->add_session(['facetoface' => $this->seminar->get_id(), 'sessiondates' => $dates ]);
         // If only one room is used, then get_options() returns an empty array
         $this->assertCount(0, $filter->get_options($this->seminar));
 
-        $dates = [ $this->prepare_date(3000, 4000, $room1->id) ];
+        $dates = [ $this->prepare_date(3000, 4000, $room1->id, 0) ];
         $this->facetoface_generator->add_session(['facetoface' => $this->seminar->get_id(), 'sessiondates' => $dates ]);
         // Adding another seminar event with the same room does not make any difference
         $this->assertCount(0, $filter->get_options($this->seminar));
 
-        $dates = [ $this->prepare_date(5000, 6000, $room2->id) ];
+        $dates = [ $this->prepare_date(5000, 6000, $room2->id, 0) ];
         $this->facetoface_generator->add_session(['facetoface' => $this->seminar->get_id(), 'sessiondates' => $dates ]);
         // 2 rooms + All
         $this->assertCount(3, $filter->get_options($this->seminar));
 
-        $dates = [ $this->prepare_date(7000, 8000, $room3->id) ];
+        $dates = [ $this->prepare_date(7000, 8000, $room3->id, 0) ];
         $this->facetoface_generator->add_session(['facetoface' => $this->seminar->get_id(), 'sessiondates' => $dates ]);
         // 3 rooms + All
+        $this->assertCount(4, $filter->get_options($this->seminar));
+    }
+
+    public function test_facilitator_filter() {
+        $filter = new facilitator_filter();
+
+        // is_visible() just returns true
+        $this->assertTrue($filter->is_visible($this->seminar, $this->context, null));
+        // No facilitators, no seminar events
+        $this->assertCount(0, $filter->get_options($this->seminar));
+
+        $fac1 = $this->facetoface_generator->add_site_wide_facilitator([ 'name' => 'Facilitator 1' ]);
+        $fac2 = $this->facetoface_generator->add_site_wide_facilitator([ 'name' => 'Facilitator 2' ]);
+        $fac3 = $this->facetoface_generator->add_site_wide_facilitator([ 'name' => 'Facilitator 3' ]);
+        // Adding facilitators does not make any difference
+        $this->assertCount(0, $filter->get_options($this->seminar));
+
+        $dates = [ $this->prepare_date(1000, 2000, 0, $fac1->id) ];
+        $this->facetoface_generator->add_session(['facetoface' => $this->seminar->get_id(), 'sessiondates' => $dates ]);
+        // If only one facilitator is used, then get_options() returns an empty array
+        $this->assertCount(0, $filter->get_options($this->seminar));
+
+        $dates = [ $this->prepare_date(3000, 4000, 0, $fac1->id) ];
+        $this->facetoface_generator->add_session(['facetoface' => $this->seminar->get_id(), 'sessiondates' => $dates ]);
+        // Adding another seminar event with the same facilitator does not make any difference
+        $this->assertCount(0, $filter->get_options($this->seminar));
+
+        $dates = [ $this->prepare_date(5000, 6000, 0, $fac2->id) ];
+        $this->facetoface_generator->add_session(['facetoface' => $this->seminar->get_id(), 'sessiondates' => $dates ]);
+        // 2 facilitators + All
+        $this->assertCount(3, $filter->get_options($this->seminar));
+
+        $dates = [ $this->prepare_date(7000, 8000, 0, $fac3->id) ];
+        $this->facetoface_generator->add_session(['facetoface' => $this->seminar->get_id(), 'sessiondates' => $dates ]);
+        // 3 facilitators + All
         $this->assertCount(4, $filter->get_options($this->seminar));
     }
 }

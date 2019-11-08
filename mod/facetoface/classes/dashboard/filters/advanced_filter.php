@@ -81,6 +81,8 @@ final class advanced_filter implements filter {
             query_advanced_filter::ALL => get_string('filter_advanced:all', 'mod_facetoface'),
             query_advanced_filter::ATTENDANCE_OPEN => get_string('filter_advanced:attendanceopen', 'mod_facetoface'),
             query_advanced_filter::ATTENDANCE_SAVED => get_string('filter_advanced:attendancesaved', 'mod_facetoface'),
+            query_advanced_filter::OVERBOOKED => get_string('filter_advanced:overbooked', 'mod_facetoface'),
+            query_advanced_filter::UNDERBOOKED => get_string('filter_advanced:underbooked', 'mod_facetoface'),
         ];
         return $select;
     }
@@ -117,12 +119,12 @@ final class advanced_filter implements filter {
      * @inheritDoc
      */
     public static function is_visible(seminar $seminar, context $context, ?int $userid): bool {
-        // Hide if session attendance tracking is disabled.
-        if (!$seminar->get_sessionattendance()) {
-            return false;
-        }
-        // Hide if the user does not have capability to take attendance.
-        return has_capability('mod/facetoface:takeattendance', $context, $userid);
+        // Hide from non-editor users.
+        return has_any_capability([
+            'mod/facetoface:viewattendees', 'mod/facetoface:editevents',
+            'mod/facetoface:addattendees', 'mod/facetoface:addattendees',
+            'mod/facetoface:takeattendance'
+        ], $context, $userid);
     }
 
     /**

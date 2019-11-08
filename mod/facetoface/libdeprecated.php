@@ -1264,7 +1264,7 @@ function facetoface_cleanup_session_data($session) {
 function facetoface_print_session_list($courseid, $facetoface, $sessions) {
     global $USER, $OUTPUT, $PAGE;
 
-    debugging('facetoface_print_session_list() function has been deprecated, please use renderer::print_session_list()',
+    debugging('facetoface_print_session_list() function has been deprecated, please use mod_facetoface\output\session_list_table',
         DEBUG_DEVELOPER);
 
     $timenow = time();

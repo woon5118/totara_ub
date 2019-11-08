@@ -149,11 +149,16 @@ final class room_helper {
      * Can we display 'Join now' link button?
      * @param seminar_event $seminarevent
      * @param seminar_session $session
-     * @param signup|null $signup, if null is passed, create new signup instance with global $USER and $seminarevent
+     * @param signup|null $signup signup instance or null to use the signup of the current user
+     * @param int $time time stamp or 0 to use the current time
      * @return bool
      */
-    public static function show_joinnow(seminar_event $seminarevent, seminar_session $session, ?signup $signup = null): bool {
-        return self::has_time_come($session) && (self::is_attendee_booked($seminarevent, $signup) || self::seek_event_role($seminarevent));
+    public static function show_joinnow(seminar_event $seminarevent, seminar_session $session, ?signup $signup = null, int $time = 0): bool {
+        global $USER;
+        if (is_null($signup)) {
+            $signup = signup::create($USER->id, $seminarevent);
+        }
+        return self::has_time_come($session, $time) && (signup_helper::is_booked($signup, false) || self::seek_event_role($seminarevent));
     }
 
     /**
@@ -161,33 +166,17 @@ final class room_helper {
      * Has time come to display the 'Join now' link button
      * from 15 minutes prior to the session start time, until the session end time
      * @param seminar_session $session
+     * @param int $time time stamp or 0 to use the current time
      * @return bool
      */
-    private static function has_time_come(seminar_session $session): bool {
-        $time = time();
+    private static function has_time_come(seminar_session $session, int $time = 0): bool {
+        if ($time <= 0) {
+            $time = time();
+        }
         if (($session->get_timestart() - self::JOIN_NOW_TIME) < $time && $time < $session->get_timefinish()) {
             return true;
         }
         return false;
-    }
-
-    /**
-     * Is attendee 'booked' to current seminar event.
-     * @param seminar_event $seminarevent
-     * @param signup|null $signup, if null is passed, create new signup instance with global $USER and $seminarevent
-     * @return bool
-     */
-    private static function is_attendee_booked(seminar_event $seminarevent, ?signup $signup = null): bool {
-        global $USER;
-        // Private cache
-        static $states = [];
-        if (!isset($states[$seminarevent->get_id()][$USER->id])) {
-            if (is_null($signup)) {
-                $signup = signup::create($USER->id, $seminarevent);
-            }
-            $states[$seminarevent->get_id()][$USER->id] = $signup->get_state() instanceof \mod_facetoface\signup\state\booked;
-        }
-        return (bool)$states[$seminarevent->get_id()][$USER->id];
     }
 
     /**

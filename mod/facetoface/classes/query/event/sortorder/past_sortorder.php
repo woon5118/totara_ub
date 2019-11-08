@@ -23,6 +23,9 @@
 
 namespace mod_facetoface\query\event\sortorder;
 
+use core\orm\query\builder;
+use mod_facetoface\query\event\filter_factory;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -39,12 +42,19 @@ final class past_sortorder extends sortorder {
      * @inheritdoc
      */
     public function get_sort_sql(): string {
+        debugging('The method ' . __METHOD__ . '() has been deprecated and no longer effective. Please use the apply() counterpart instead.', DEBUG_DEVELOPER);
+        return "";
+    }
+
+    public function apply(builder $builder): void {
         // PostgreSQL and MySQL sort NULL in a different order. We need wait-listed events to be the furthest future
         // events, meaning NULL needs to act as a positive maximum value. So we use PHP_INT_MAX as the
         // timestart/timefinish for events that are waitlisted (whose actual timestart/finish is NULL)
         $max = PHP_INT_MAX;
-        return
-            "ORDER BY s.cancelledstatus DESC, coalesce(m.mintimestart, {$max}), " .
-            "coalesce(m.maxtimefinish, {$max}), s.id";
+        $builder->reset_order_by()
+                ->order_by('s.cancelledstatus', 'desc')
+                ->order_by_raw("COALESCE(m.mintimestart, {$max}) ASC")
+                ->order_by_raw("COALESCE(m.maxtimefinish, {$max}) ASC")
+                ->order_by('s.id', 'asc');
     }
 }

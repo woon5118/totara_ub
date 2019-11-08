@@ -30,8 +30,27 @@ defined('MOODLE_INTERNAL') || die();
  * event_time enumeration.
  */
 abstract class event_time {
+    /** All events */
     const ALL = 0;
+
+    /** Future events and wait-listed events */
     const UPCOMING = 1;
+
+    /** Ongoing events */
     const INPROGRESS = 2;
+
+    /** Past events and cancelled events */
     const OVER = 3;
+
+    /** Future events only */
+    const FUTURE = 4;
+
+    /** Past events only */
+    const PAST = 5;
+
+    /** Wait-listed events only */
+    const WAITLISTED = 6;
+
+    /** Cancelled events only */
+    const CANCELLED = 7;
 }

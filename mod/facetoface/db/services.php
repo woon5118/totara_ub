@@ -21,20 +21,16 @@
  * @package mod_facetoface
  */
 
-namespace mod_facetoface;
-
-defined('MOODLE_INTERNAL') || die();
-
-/**
- * Provide the type-safe sessiondates field of session_data.
- *
- * {facetoface_sessions_dates} fields
- * @property-read integer $id
- * @property-read integer $sessionid
- * @property-read string  $sessiontimezone
- * @property-read integer $roomid
- * @property-read integer $timestart
- * @property-read integer $timefinish
- */
-final class session_date_data extends \stdClass {
-}
+$functions = [
+    // Render the session list table.
+    'mod_facetoface_render_session_list' => [
+        'classname'         => 'mod_facetoface\external',
+        'methodname'        => 'render_session_list',
+        'classpath'         => 'mod/facetoface/classes/external.php',
+        'description'       => 'Render the session list in tabular format',
+        'type'              => 'read',
+        'loginrequired'     => true,
+        'ajax'              => true,
+        'capabilities'      => ''
+    ],
+];

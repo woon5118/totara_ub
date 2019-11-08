@@ -123,6 +123,7 @@ class mod_facetoface_generator extends testing_module_generator {
         $defaults['maxmanagerreserves'] = 1;
         $defaults['reservecanceldays'] = 1;
         $defaults['reservedays'] = 2;
+        $defaults['decluttersessiontable'] = 0;
         $defaults['sessionattendance'] = seminar::SESSION_ATTENDANCE_DEFAULT;
         $defaults['attendancetime'] = seminar::EVENT_ATTENDANCE_DEFAULT;
         $defaults['eventgradingmanual'] = 0;
@@ -170,7 +171,7 @@ class mod_facetoface_generator extends testing_module_generator {
             $sessiondate->timestart = $time;
             $sessiondate->timefinish = $time + (DAYSECS * 2);
             $sessiondate->sessiontimezone = 'Pacific/Auckland';
-            $sessiondate->roomids = [];
+            $sessiondate->roomids = array();
             $sessiondate->assetids = array();
             $sessiondate->facilitatorids = array();
             $sessiondates = array($sessiondate);
@@ -181,8 +182,9 @@ class mod_facetoface_generator extends testing_module_generator {
                     $sessiondate->timestart = (int)$date;
                     $sessiondate->timefinish = (int)$date + (DAYSECS * 2);
                     $sessiondate->sessiontimezone = 'Pacific/Auckland';
-                    $sessiondate->roomid = 0;
+                    $sessiondate->roomids = array();
                     $sessiondate->assetids = array();
+                    $sessiondate->facilitatorids = array();
                     return $sessiondate;
                 } else {
                     return (object) (array) $date;

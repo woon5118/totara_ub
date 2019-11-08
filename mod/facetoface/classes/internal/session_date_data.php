@@ -21,24 +21,20 @@
  * @package mod_facetoface
  */
 
-namespace mod_facetoface\output;
-
-use \core\output\template;
-use \mod_facetoface\output\builder\actions_in_dashboard_builder;
+namespace mod_facetoface\internal;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Render "Actions" table cell in the seminar event dashboard
+ * Provide the type-safe sessiondates field of session_data.
+ *
+ * {facetoface_sessions_dates} fields
+ * @property-read integer $id
+ * @property-read integer $sessionid
+ * @property-read string  $sessiontimezone
+ * @property-read integer $roomid
+ * @property-read integer $timestart
+ * @property-read integer $timefinish
  */
-final class actions_in_dashboard extends template {
-    /**
-     * Create a new builder object.
-     *
-     * @param string $class
-     * @return actions_in_dashboard_builder
-     */
-    public static function builder(): actions_in_dashboard_builder {
-        return new actions_in_dashboard_builder();
-    }
+final class session_date_data extends \stdClass {
 }

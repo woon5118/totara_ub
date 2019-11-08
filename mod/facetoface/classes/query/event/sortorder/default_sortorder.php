@@ -23,6 +23,8 @@
 
 namespace mod_facetoface\query\event\sortorder;
 
+use core\orm\query\builder;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -50,6 +52,11 @@ final class default_sortorder extends sortorder {
      * @inheritdoc
      */
     public function get_sort_sql(): string {
-        return $this->order->get_sort_sql();
+        debugging('The method ' . __METHOD__ . '() has been deprecated and no longer effective. Please use the apply() counterpart instead.', DEBUG_DEVELOPER);
+        return "";
+    }
+
+    public function apply(builder $builder): void {
+        $this->order->sorter($builder);
     }
 }

@@ -29,6 +29,9 @@ use mod_facetoface\seminar;
 use mod_facetoface\query\event\query;
 use mod_facetoface\dashboard\filters\filter;
 use mod_facetoface\output\builder\seminarevent_filterbar_builder;
+use mod_facetoface\query\event\filter\event_times_filter;
+use mod_facetoface\query\event\sortorder\future_sortorder;
+use mod_facetoface\query\event\sortorder\past_sortorder;
 
 /**
  * Provide filter management on the event dashboard.
@@ -156,6 +159,20 @@ class filter_list {
     }
 
     /**
+     * Walk the filter list.
+     *
+     * @param callable $callback
+     * @return void
+     */
+    public function walk(callable $callback): void {
+        foreach ($this->filters as $class => $filter) {
+            $name = $filter->get_param_name();
+            $type = $filter->get_filterbar_option(filter::OPTION_PARAMTYPE) ?: PARAM_INT;
+            $callback($name, $type, $filter);
+        }
+    }
+
+    /**
      * Create a new seminarevent_filterbar_builder instance and supply filter values.
      *
      * @param seminar           $seminar    A seminar instance
@@ -201,14 +218,37 @@ class filter_list {
      * Build an SQL query.
      *
      * @param seminar           $seminar    A seminar instance
-     * @param context           $context    A context
-     * @param integer|null      $userid     A user ID or null to use the current user
+     * @param context           $context    NOT USED
+     * @param integer|null      $userid     NOT USED
      * @return query
      */
     public function to_query(seminar $seminar, context $context, int $userid = null): query {
         $query = new query($seminar);
         foreach ($this->filters as $unused => $filter) {
             $filter->modify_query($query);
+        }
+        return $query;
+    }
+
+    /**
+     * Build an SQL query with option.
+     *
+     * @param seminar $seminar
+     * @param context $context
+     * @param integer|null $userid
+     * @param render_session_option|null $option
+     * @return query
+     */
+    public function to_query_with_option(seminar $seminar, context $context, int $userid = null, render_session_option $option = null): query {
+        $query = $this->to_query($seminar, $context, $userid);
+        if ($option === null) {
+            return $query;
+        }
+        $query->with_filter(new event_times_filter($option->get_eventtimes()));
+        if ($option->get_eventascendingorder()) {
+            $query->with_sortorder(new past_sortorder());
+        } else {
+            $query->with_sortorder(new future_sortorder());
         }
         return $query;
     }

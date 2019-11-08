@@ -565,9 +565,6 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
                 }
 
                 $contextmodule = context_module::instance($cm->id);
-                $viewattendees = has_capability('mod/facetoface:viewattendees', $contextmodule);
-                $editevents = has_capability('mod/facetoface:editevents', $contextmodule);
-                $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
                 $reserveinfo = array();
                 if (!empty($seminar->get_managerreserve())) {
                     // Include information about reservations when drawing the list of sessions.
@@ -578,9 +575,13 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
                 $f2fsessionarray = array_slice($f2fsessionarray, 0, $display, true);
                 $output .= html_writer::tag('h4', format_string($seminar->get_name()));
                 $f2frenderer->setcontext($contextmodule);
+                $option = new \mod_facetoface\dashboard\render_session_option();
+                $config = new \mod_facetoface\dashboard\render_session_list_config($seminar, $contextmodule, $option);
+                $config->reserveinfo = $reserveinfo;
+                $config->minimal = true;
+                $config->returntoallsessions = false;
                 $output .= html_writer::start_div('no-overflow');
-                $output .= $f2frenderer->print_session_list_table($f2fsessionarray, $viewattendees, $editevents,
-                    $displaytimezones, $reserveinfo, null, true, false);
+                $output .= $f2frenderer->render_session_list_table($f2fsessionarray, $config);
                 $output .= html_writer::end_div();
             }
         }

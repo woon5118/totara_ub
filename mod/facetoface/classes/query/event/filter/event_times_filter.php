@@ -24,7 +24,9 @@
 
 namespace mod_facetoface\query\event\filter;
 
+use core\orm\query\builder;
 use mod_facetoface\event_time;
+use mod_facetoface\query\event\filter_factory;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -81,36 +83,64 @@ final class event_times_filter extends filter {
      * @inheritDoc
      */
     public function get_where_and_params(int $time): array {
-        // The external use will always have the keyword 'AND' before hand, therefore, it should have something here to returned
-        // for the event_time criteria.
-        $sql = "(1=1)";
-        $params = [];
+        debugging('The method ' . __METHOD__ . '() has been deprecated and no longer effective. Please use the apply() counterpart instead.', DEBUG_DEVELOPER);
+        return ["(1=1)", []];
+    }
 
-        if (!empty($this->eventtimes)) {
-            $sql = '';
-            foreach ($this->eventtimes as $eventtime) {
-                $param1 = self::new_param();
-                $params[$param1] = $time;
-
-                if ($sql !== '') {
-                    $sql .= ' OR ';
-                }
-                if ($eventtime === event_time::UPCOMING) {
-                    // (wait-listed OR first session_date not started) AND (not cancelled)
-                    $sql .= "((m.cntdates IS NULL OR :{$param1} < m.mintimestart) AND s.cancelledstatus = 0)";
-                } else if ($eventtime === event_time::INPROGRESS) {
-                    // (first session_date started AND last session_date not finished) AND (not cancelled)
-                    $param2 = self::new_param();
-                    $sql .= "((m.mintimestart <= :{$param1} AND :{$param2} < m.maxtimefinish) AND s.cancelledstatus = 0)";
-                    $params[$param2] = $time;
-                } else if ($eventtime === event_time::OVER) {
-                    // (last session_date finished) OR (cancelled)
-                    $sql .= "(m.maxtimefinish  <= :{$param1} OR s.cancelledstatus = 1)";
-                }
-            }
-            $sql = '(' . $sql . ')';
+    /**
+     * @inheritDoc
+     */
+    public function apply(builder $builder, int $time): void {
+        if (empty($this->eventtimes) || (count($this->eventtimes) === 1 && $this->eventtimes[0] == event_time::ALL)) {
+            return;
         }
 
-        return [$sql, $params];
+        $builder->where(function (builder $outer) use ($time) {
+            foreach ($this->eventtimes as $eventtime) {
+                switch ($eventtime) {
+                    case event_time::UPCOMING:
+                        $outer->or_where(function (builder $inner) use ($time) {
+                            filter_factory::event_upcoming($inner, $time);
+                        });
+                        break;
+
+                    case event_time::OVER:
+                        $outer->or_where(function (builder $inner) use ($time) {
+                            filter_factory::event_over($inner, $time);
+                        });
+                        break;
+
+                    case event_time::FUTURE:
+                        $outer->or_where(function (builder $inner) use ($time) {
+                            filter_factory::event_future($inner, $time);
+                        });
+                        break;
+
+                    case event_time::INPROGRESS:
+                        $outer->or_where(function (builder $inner) use ($time) {
+                            filter_factory::event_inprogress($inner, $time);
+                        });
+                        break;
+
+                    case event_time::PAST:
+                        $outer->or_where(function (builder $inner) use ($time) {
+                            filter_factory::event_past($inner, $time);
+                        });
+                        break;
+
+                    case event_time::WAITLISTED:
+                        $outer->or_where(function (builder $inner) {
+                            filter_factory::event_waitlisted($inner);
+                        });
+                        break;
+
+                    case event_time::CANCELLED:
+                        $outer->or_where(function (builder $inner) {
+                            filter_factory::event_cancelled($inner);
+                        });
+                        break;
+                }
+            }
+        });
     }
 }

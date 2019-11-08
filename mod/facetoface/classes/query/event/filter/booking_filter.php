@@ -23,9 +23,16 @@
 
 namespace mod_facetoface\query\event\filter;
 
-use mod_facetoface\signup\state\declined;
-use mod_facetoface\signup\state\user_cancelled;
+use core\orm\query\builder;
+use mod_facetoface\query\event\filter_factory;
+use mod_facetoface\signup\state\attendance_state;
+use mod_facetoface\signup\state\booked;
 use mod_facetoface\signup\state\event_cancelled;
+use mod_facetoface\signup\state\user_cancelled;
+use mod_facetoface\signup\state\requested;
+use mod_facetoface\signup\state\requestedadmin;
+use mod_facetoface\signup\state\requestedrole;
+use mod_facetoface\signup\state\waitlisted;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -36,6 +43,9 @@ final class booking_filter extends filter {
     const ALL = 0;
     const OPEN = 1;
     const BOOKED = 2;
+    const WAITLISTED = 3;
+    const REQUESTED = 4;
+    const CANCELLED = 5;
 
     /**
      * @var int
@@ -77,59 +87,37 @@ final class booking_filter extends filter {
      * @inheritDoc
      */
     public function get_where_and_params(int $time): array {
-        // The external use will always have the keyword 'AND' before hand, therefore, it should have something here to returned
-        // for the event_time criteria.
-        $sql = "(1=1)";
-        $params = [];
+        debugging('The method ' . __METHOD__ . '() has been deprecated and no longer effective. Please use the apply() counterpart instead.', DEBUG_DEVELOPER);
+        return ["(1=1)", []];
+    }
 
-        if ($this->value == self::OPEN) {
-            $sql = '(
-                (m.cntdates IS NULL OR :timenow1_bkf < m.mintimestart)
-                AND (s.cancelledstatus = 0)
-                AND (s.registrationtimestart = 0 OR s.registrationtimestart <= :timenow2_bkf)
-                AND (s.registrationtimefinish = 0 OR s.registrationtimefinish >= :timenow3_bkf)
-                AND (
-                    SELECT COUNT(su.id)
-                      FROM {facetoface_signups} su
-                      JOIN {facetoface_signups_status} sus ON sus.signupid = su.id
-                     WHERE su.archived = 0
-                       AND sus.superceded = 0
-                       AND sus.statuscode != :stat_decl_bkf
-                       AND sus.statuscode != :stat_ucan_bkf
-                       AND sus.statuscode != :stat_ecan_bkf
-                       AND su.sessionid = s.id
-                    ) < s.capacity
-                )';
-            $params = [
-                'timenow1_bkf' => $time,
-                'timenow2_bkf' => $time,
-                'timenow3_bkf' => $time,
-                'stat_decl_bkf' => declined::get_code(),
-                'stat_ucan_bkf' => user_cancelled::get_code(),
-                'stat_ecan_bkf' => event_cancelled::get_code(),
-            ];
-        } else if ($this->value == self::BOOKED) {
-            global $USER;
-            $sql = '(s.cancelledstatus = 0) AND EXISTS (
-                SELECT su.sessionid
-                  FROM {facetoface_signups} su
-                  JOIN {facetoface_signups_status} sus ON sus.signupid = su.id
-                 WHERE su.archived = 0
-                   AND su.userid = :uid_bkf
-                   AND sus.superceded = 0
-                   AND sus.statuscode != :stat_decl_bkf
-                   AND sus.statuscode != :stat_ucan_bkf
-                   AND sus.statuscode != :stat_ecan_bkf
-                   AND su.sessionid = s.id
-                )';
-            $params = [
-                'uid_bkf' => $this->userid ?: $USER->id,
-                'stat_decl_bkf' => declined::get_code(),
-                'stat_ucan_bkf' => user_cancelled::get_code(),
-                'stat_ecan_bkf' => event_cancelled::get_code(),
-            ];
+    public function apply(builder $builder, int $time): void {
+        switch ($this->value) {
+            case self::OPEN:
+                filter_factory::event_upcoming($builder, $time);
+                filter_factory::registration_open($builder, $time);
+                filter_factory::booking_capacity($builder, '<', 'max');
+                filter_factory::event_user_signup_available($builder, $this->userid);
+                break;
+
+            case self::BOOKED:
+                filter_factory::event_not_cancelled($builder);
+                filter_factory::event_user_signup_with($builder, $this->userid, attendance_state::get_all_attendance_code_with([booked::class]));
+                break;
+
+            case self::WAITLISTED:
+                filter_factory::event_not_cancelled($builder);
+                filter_factory::event_user_signup_with($builder, $this->userid, [waitlisted::get_code()]);
+                break;
+
+            case self::REQUESTED:
+                filter_factory::event_not_cancelled($builder);
+                filter_factory::event_user_signup_with($builder, $this->userid, [requested::get_code(), requestedadmin::get_code(), requestedrole::get_code()]);
+                break;
+
+            case self::CANCELLED:
+                filter_factory::event_user_signup_with($builder, $this->userid, [user_cancelled::get_code()]);
+                break;
         }
-
-        return [$sql, $params];
     }
 }

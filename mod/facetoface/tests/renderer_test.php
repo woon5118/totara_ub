@@ -183,7 +183,10 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
      * @return \mod_facetoface_renderer
      */
     private function create_f2f_renderer(): mod_facetoface_renderer {
-        global $PAGE;
+        global $PAGE, $CFG;
+        /** @var \moodle_page $PAGE */
+
+        require_once($CFG->dirroot.'/mod/facetoface/renderer.php');
 
         // only admin can see the attendance taking column
         $this->setAdminUser();
@@ -192,7 +195,7 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         $renderer = new \mod_facetoface_renderer($PAGE, null);
         $renderer->setcontext($sysctx);
         $PAGE->set_context($sysctx);
-        // We need to set the url as this is queried during the run of print_session_list_table.
+        // We need to set the url as this is queried during the run of render_session_list_table.
         $PAGE->set_url('/mod/facetoface/view.php');
 
         return $renderer;
@@ -248,7 +251,7 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
      * @param boolean $cancelled
      * @param integer $sessionattendance
      * @param integer $attendancetime \mod_facetoface\seminar::ATTENDANCE_TIME_xxx
-     * @return array [ seminar_id, session_id, room_id ]
+     * @return integer[] [ seminar_id, session_id, room_id ]
      */
     private function create_seminar_session_and_room($startdate, bool $cancelled, int $sessionattendance, int $attendancetime) : array {
         $course = $this->getDataGenerator()->create_course();
@@ -270,40 +273,6 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
     }
 
     /**
-     * Create users and sign-ups.
-     *
-     * @param integer $numusers
-     * @param seminar_event $seminarevent
-     * @param string|null $stateclass
-     * @return array [ user_id => \mod_facetoface\signup ]
-     */
-    private function create_users_signups(int $numusers, seminar_event $seminarevent, $stateclass = null) : array {
-        global $DB;
-
-        $generator = $this->getDataGenerator();
-        $users = [];
-        for ($i = 0; $i < $numusers; $i++) {
-            $user = $generator->create_user();
-            $generator->enrol_user($user->id, $seminarevent->get_seminar()->get_course());
-
-            $signup = signup::create($user->id, $seminarevent);
-
-            signup_helper::signup($signup);
-
-            if ($stateclass) {
-                $state = new $stateclass($signup);
-                $rc = new ReflectionClass($signup);
-                $method = $rc->getMethod('update_status');
-                $method->setAccessible(true);
-                $method->invoke($signup, $state);
-            }
-
-            $users += [ $user->id => $signup ];
-        }
-        return $users;
-    }
-
-    /**
      * Create a DOMDocument without warnings and errors.
      *
      * @param string $html
@@ -316,334 +285,9 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
     }
 
     /**
-     * Get the nodes of the table cells of the first row.
-     *
-     * @param string $html
-     * @param integer $expectednumcells
-     * @return DOMNodeList
+     * Ensure that render_session_list_table() renders the list using the given $sessions parameter.
      */
-    private function get_table_cells(string $html, int $expectednumcells) : DOMNodeList {
-        $doc = self::new_domdocument($html);
-
-        $tables = $doc->getElementsByTagName('table');
-        $this->assertCount(1, $tables);
-
-        $hdrs = $tables[0]->getElementsByTagName('thead')[0]->getElementsByTagName('tr')[0]->getElementsByTagName('th');
-        $this->assertCount($expectednumcells, $hdrs);
-
-        $rows = $tables[0]->getElementsByTagName('tbody')[0]->getElementsByTagName('tr');
-        $this->assertCount(1, $rows);
-
-        $cells = $rows[0]->getElementsByTagName('td');
-        $this->assertCount($expectednumcells, $cells);
-
-        return $cells;
-    }
-
-    /**
-     * @return array
-     */
-    public function data_provider_for_session_list_table_waitlisted() {
-        return [
-            // NOTE: The HTML output is actually "<ul><li>Wait-listed</li><li>Booking open</li></ul>"
-            [ false, seminar::SESSION_ATTENDANCE_DISABLED, 8, [ '0 / 1', 'Wait-listedBooking open', '', '', '', '', '' ] ],
-            [ false, seminar::SESSION_ATTENDANCE_END, 9, [ '0 / 1', 'Wait-listedBooking open', '', '', '', '', '', '' ] ],
-            [ false, seminar::SESSION_ATTENDANCE_START, 9, [ '0 / 1', 'Wait-listedBooking open', '', '', '', '', '', '' ] ],
-            [ false, seminar::SESSION_ATTENDANCE_UNRESTRICTED, 9, [ '0 / 1', 'Wait-listedBooking open', '', '', '', '', '', '' ] ],
-            [ true, seminar::SESSION_ATTENDANCE_DISABLED, 8, [ '0 / 1', 'Cancelled', '', '', '', '', 'Cancelled', '' ] ],
-            [ true, seminar::SESSION_ATTENDANCE_END, 9, [ '0 / 1', 'Cancelled', '', '', '', '', 'Cancelled', '' ] ],
-            [ true, seminar::SESSION_ATTENDANCE_START, 9, [ '0 / 1', 'Cancelled', '', '', '', '', 'Cancelled', '' ] ],
-            [ true, seminar::SESSION_ATTENDANCE_UNRESTRICTED, 9, [ '0 / 1', 'Cancelled', '', '', '', '', 'Cancelled', '' ] ],
-        ];
-    }
-
-    /**
-     * Test a wait-listed event on a session list table.
-     *
-     * @dataProvider data_provider_for_session_list_table_waitlisted
-     */
-    public function test_session_list_table_waitlisted(bool $cancelled, int $sessionattendance, int $cols, array $expections) {
-
-        $this->markTestSkipped('will be fixed in TL-21830');
-
-        $course = $this->getDataGenerator()->create_course();
-        $f2f = $this->facetoface_generator->create_instance([
-            'course' => $course->id,
-            'sessionattendance' => $sessionattendance,
-        ]);
-        $sessionid = $this->facetoface_generator->add_session(['facetoface' => $f2f->id, 'sessiondates' => [], 'capacity' => 1, 'cancelledstatus' => (int)$cancelled]);
-
-        $seminarevent = new seminar_event($sessionid);
-        $session = $seminarevent->to_record();
-        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
-        $renderer = $this->create_f2f_renderer();
-
-        $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, $sessionattendance, 0);
-        $cells = $this->get_table_cells($outhtml, $cols);
-
-        $this->assertSame($expections[0], $cells[0]->nodeValue, 'Capacity');
-        $this->assertSame($expections[1], $cells[1]->nodeValue, 'Event status');
-        $this->assertSame($expections[2], $cells[2]->nodeValue, 'Sign-up period');
-        $this->assertSame($expections[3], $cells[3]->nodeValue, 'Session times');
-        $this->assertSame($expections[4], $cells[4]->nodeValue, 'Rooms');
-        $this->assertSame($expections[5], $cells[5]->nodeValue, 'Facilitators');
-        $this->assertSame($expections[6], $cells[6]->nodeValue, 'Session status');
-        // Attendance tracking table column is visible only if session attendance tracking is enabled
-        if (isset($expections[7])) {
-            $this->assertSame($expections[7], $cells[7]->nodeValue, 'Attendance tracking');
-        }
-    }
-
-    /**
-     * @return array
-     */
-    public function data_provider_for_session_list_table_room_sessionstatus() {
-        $yes = true;
-        $no_ = false;
-        $dis = seminar::SESSION_ATTENDANCE_DISABLED;
-        $end = seminar::SESSION_ATTENDANCE_END;
-        $sta = seminar::SESSION_ATTENDANCE_START;
-        $any = seminar::SESSION_ATTENDANCE_UNRESTRICTED;
-        return [
-            [ $no_, $dis, 7, -DAYSECS, [ 'Chamber', 'Session over' ], 'Past event' ],
-            [ $no_, $dis, 7, -MINSECS, [ 'Chamber', 'Session in progress' ], 'In progress' ],
-            [ $no_, $dis, 7, +DAYSECS, [ 'Chamber', 'Upcoming' ], 'Future event' ],
-            [ $no_, $end, 8, -DAYSECS, [ 'Chamber', 'Session over' ], 'Past event' ],
-            [ $no_, $end, 8, -MINSECS, [ 'Chamber', 'Session in progress' ], 'In progress' ],
-            [ $no_, $end, 8, +DAYSECS, [ 'Chamber', 'Upcoming' ], 'Future event' ],
-            [ $no_, $sta, 8, -DAYSECS, [ 'Chamber', 'Session over' ], 'Past event' ],
-            [ $no_, $sta, 8, -MINSECS, [ 'Chamber', 'Session in progress' ], 'In progress' ],
-            [ $no_, $sta, 8, +DAYSECS, [ 'Chamber', 'Upcoming' ], 'Future event' ],
-            [ $no_, $any, 8, -DAYSECS, [ 'Chamber', 'Session over' ], 'Past event' ],
-            [ $no_, $any, 8, -MINSECS, [ 'Chamber', 'Session in progress' ], 'In progress' ],
-            [ $no_, $any, 8, +DAYSECS, [ 'Chamber', 'Upcoming' ], 'Future event' ],
-            [ $yes, $dis, 7, -DAYSECS, [ 'Chamber', 'Cancelled' ], 'Past event' ],
-            [ $yes, $dis, 7, -MINSECS, [ 'Chamber', 'Cancelled' ], 'In progress' ],
-            [ $yes, $dis, 7, +DAYSECS, [ 'Chamber', 'Cancelled' ], 'Future event' ],
-            [ $yes, $end, 8, -DAYSECS, [ 'Chamber', 'Cancelled' ], 'Past event' ],
-            [ $yes, $end, 8, -MINSECS, [ 'Chamber', 'Cancelled' ], 'In progress' ],
-            [ $yes, $end, 8, +DAYSECS, [ 'Chamber', 'Cancelled' ], 'Future event' ],
-            [ $yes, $sta, 8, -DAYSECS, [ 'Chamber', 'Cancelled' ], 'Past event' ],
-            [ $yes, $sta, 8, -MINSECS, [ 'Chamber', 'Cancelled' ], 'In progress' ],
-            [ $yes, $sta, 8, +DAYSECS, [ 'Chamber', 'Cancelled' ], 'Future event' ],
-            [ $yes, $any, 8, -DAYSECS, [ 'Chamber', 'Cancelled' ], 'Past event' ],
-            [ $yes, $any, 8, -MINSECS, [ 'Chamber', 'Cancelled' ], 'In progress' ],
-            [ $yes, $any, 8, +DAYSECS, [ 'Chamber', 'Cancelled' ], 'Future event' ],
-        ];
-    }
-
-    /**
-     * Test room and session status columns on a session list table.
-     *
-     * @dataProvider data_provider_for_session_list_table_room_sessionstatus
-     */
-    public function test_session_list_table_room_sessionstatus(bool $cancelled, int $sessionattendance, int $cols, int $timestart, array $expections, string $tag) {
-
-        $this->markTestSkipped('will be fixed in TL-21830');
-
-        $now = time();
-        $course = $this->getDataGenerator()->create_course();
-        $f2f = $this->facetoface_generator->create_instance([
-            'course' => $course->id,
-            'sessionattendance' => $sessionattendance,
-        ]);
-        $room = $this->facetoface_generator->add_site_wide_room([ 'name' => 'Chamber', 'allowconflicts' => 1 ]);
-        $date = $this->prepare_date($now + $timestart, $now + $timestart + HOURSECS, $room->id);
-        $sessionid = $this->facetoface_generator->add_session(['facetoface' => $f2f->id, 'sessiondates' => [$date], 'capacity' => 1, 'cancelledstatus' => (int)$cancelled ]);
-
-        $seminarevent = new seminar_event($sessionid);
-        $session = $seminarevent->to_record();
-        $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
-        $renderer = $this->create_f2f_renderer();
-
-        $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, $sessionattendance, seminar::ATTENDANCE_TIME_ANY);
-        $cells = $this->get_table_cells($outhtml, $cols);
-
-        $this->assertSame($expections[0], $cells[4]->nodeValue, 'Room');
-        $this->assertSame($expections[1], $cells[5]->nodeValue, 'Session status');
-    }
-
-    /**
-     * @return array
-     */
-    public function data_provider_for_session_list_table_attendance_tracking_not_saved() {
-        $yes = true;
-        $no_ = false;
-        $unlock = event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START * 2 / 3;
-        return [
-            [ $no_, $no_, -DAYSECS, [ 'No attendees', 'No attendees', 'No attendees' ], 'Past event' ],
-            [ $no_, $no_, -MINSECS, [ 'No attendees', 'No attendees', 'No attendees' ], 'In progress' ],
-            [ $no_, $no_, +$unlock, [ 'No attendees', 'No attendees', 'No attendees' ], 'Future event unlocked' ],
-            [ $no_, $no_, +DAYSECS, [ 'No attendees', 'No attendees', 'No attendees' ], 'Future event locked' ],
-            [ $no_, $yes, -DAYSECS, [ 'Take attendance', 'Take attendance', 'Take attendance' ], 'Past event' ],
-            [ $no_, $yes, -MINSECS, [ 'Will open at session end time', 'Take attendance', 'Take attendance' ], 'In progress' ],
-            [ $no_, $yes, +$unlock, [ 'Will open at session end time', 'Take attendance', 'Take attendance' ], 'Future event unlocked' ],
-            [ $no_, $yes, +DAYSECS, [ 'Will open at session end time', 'Will open at session start time', 'Take attendance' ], 'Future event locked' ],
-            [ $yes, $no_, -DAYSECS, [ '', '', '' ], 'Past event' ],
-            [ $yes, $no_, -MINSECS, [ '', '', '' ], 'In progress' ],
-            [ $yes, $no_, +$unlock, [ '', '', '' ], 'Future event unlocked' ],
-            [ $yes, $no_, +DAYSECS, [ '', '', '' ], 'Future event locked' ],
-            [ $yes, $yes, -DAYSECS, [ '', '', '' ], 'Past event' ],
-            [ $yes, $yes, -MINSECS, [ '', '', '' ], 'In progress' ],
-            [ $yes, $yes, +$unlock, [ '', '', '' ], 'Future event unlocked' ],
-            [ $yes, $yes, +DAYSECS, [ '', '', '' ], 'Future event locked' ],
-        ];
-    }
-
-    /**
-     * Test attendance tracking columns on a session list table while not taking attendance.
-     *
-     * @dataProvider data_provider_for_session_list_table_attendance_tracking_not_saved
-     */
-    public function test_session_list_table_attendance_tracking_not_saved(bool $cancelled, bool $signupuser, int $timestart, array $expections, string $tag) {
-
-        $this->markTestSkipped('will be fixed in TL-21830');
-
-        $cols = 8;
-
-        $now = time();
-        $course = $this->getDataGenerator()->create_course();
-        $f2f = $this->facetoface_generator->create_instance([
-            'course' => $course->id,
-        ]);
-        $room = $this->facetoface_generator->add_site_wide_room([ 'name' => 'Chamber', 'allowconflicts' => 1 ]);
-
-        // Create a future session so that sign-up and cancellation work
-        $date = $this->prepare_date($now + DAYSECS, $now + DAYSECS * 2, $room->id);
-        $sessionid = $this->facetoface_generator->add_session(['facetoface' => $f2f->id, 'sessiondates' => [$date], 'capacity' => 1 ]);
-
-        $seminarevent = new seminar_event($sessionid);
-        $this->assertCount(1, $seminarevent->get_sessions(true));
-
-        $seminarsession = seminar_session_list::from_seminar_event($seminarevent)->current();
-        /** @var seminar_session $seminarsession */
-
-        if ($signupuser) {
-            $this->create_users_signups(1, $seminarevent, booked::class);
-        }
-
-        if ($cancelled) {
-            $this->assertTrue($seminarevent->cancel());
-        }
-
-        // Set the actual time to the session
-        $seminarsession
-            ->set_timestart($now + $timestart)
-            ->set_timefinish($now + $timestart + HOURSECS)
-            ->save();
-
-        $session = $seminarevent->to_record();
-        $session->sessiondates = [ $seminarsession->to_record() ];
-
-        $renderer = $this->create_f2f_renderer();
-
-        $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, seminar::SESSION_ATTENDANCE_END);
-        $cells = $this->get_table_cells($outhtml, $cols);
-        $this->assertSame($expections[0], $cells[6]->nodeValue);
-
-        $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, seminar::SESSION_ATTENDANCE_START);
-        $cells = $this->get_table_cells($outhtml, $cols);
-        $this->assertSame($expections[1], $cells[6]->nodeValue);
-
-        $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, seminar::SESSION_ATTENDANCE_UNRESTRICTED);
-        $cells = $this->get_table_cells($outhtml, $cols);
-        $this->assertSame($expections[2], $cells[6]->nodeValue);
-    }
-
-    /**
-     * @return array
-     */
-    public function data_provider_for_session_list_table_attendance_tracking_saved() {
-        $yes = true;
-        $no_ = false;
-        $noset = not_set::get_code();
-        $fully = fully_attended::get_code();
-        $unlock = event_taking_attendance::UNLOCKED_SECS_PRIOR_TO_START * 2 / 3;
-        return [
-            [ $no_, $noset, -DAYSECS, [ 'Take attendance', 'Take attendance', 'Take attendance' ], 'Past event' ],
-            [ $no_, $noset, -MINSECS, [ 'Will open at session end time', 'Take attendance', 'Take attendance' ], 'In progress' ],
-            [ $no_, $noset, +$unlock, [ 'Will open at session end time', 'Take attendance', 'Take attendance' ], 'Future event unlocked' ],
-            [ $no_, $noset, +DAYSECS, [ 'Will open at session end time', 'Will open at session start time', 'Take attendance' ], 'Future event locked' ],
-            [ $no_, $fully, -DAYSECS, [ 'Attendance saved', 'Attendance saved', 'Attendance saved' ], 'Past event' ],
-            [ $no_, $fully, -MINSECS, [ 'Will open at session end time', 'Attendance saved', 'Attendance saved' ], 'In progress' ],
-            [ $no_, $fully, +$unlock, [ 'Will open at session end time', 'Attendance saved', 'Attendance saved' ], 'Future event unlocked' ],
-            [ $no_, $fully, +DAYSECS, [ 'Will open at session end time', 'Will open at session start time', 'Attendance saved' ], 'Future event locked' ],
-            [ $yes, $noset, -DAYSECS, [ '', '', '' ], 'Past event' ],
-            [ $yes, $noset, -MINSECS, [ '', '', '' ], 'In progress' ],
-            [ $yes, $noset, +$unlock, [ '', '', '' ], 'Future event unlocked' ],
-            [ $yes, $noset, +DAYSECS, [ '', '', '' ], 'Future event locked' ],
-            [ $yes, $fully, -DAYSECS, [ '', '', '' ], 'Past event' ],
-            [ $yes, $fully, -MINSECS, [ '', '', '' ], 'In progress' ],
-            [ $yes, $fully, +$unlock, [ '', '', '' ], 'Future event unlocked' ],
-            [ $yes, $fully, +DAYSECS, [ '', '', '' ], 'Future event locked' ],
-        ];
-    }
-
-    /**
-     * Test attendance tracking columns on a session list table when taking attendance.
-     *
-     * @dataProvider data_provider_for_session_list_table_attendance_tracking_saved
-     */
-    public function test_session_list_table_attendance_tracking_saved(bool $cancelled, int $attendancecode, int $timestart, array $expections, string $tag) {
-
-        $this->markTestSkipped('will be fixed in TL-21830');
-
-        $cols = 8;
-
-        $now = time();
-        $course = $this->getDataGenerator()->create_course();
-        $f2f = $this->facetoface_generator->create_instance([
-            'course' => $course->id,
-            'sessionattendance' => seminar::SESSION_ATTENDANCE_UNRESTRICTED
-        ]);
-        $room = $this->facetoface_generator->add_site_wide_room([ 'name' => 'Chamber', 'allowconflicts' => 1 ]);
-
-        // Create a future session so that sign-up and cancellation work
-        $date = $this->prepare_date($now + DAYSECS, $now + DAYSECS * 2, $room->id);
-        $sessionid = $this->facetoface_generator->add_session(['facetoface' => $f2f->id, 'sessiondates' => [$date], 'capacity' => 1 ]);
-
-        $seminarevent = new seminar_event($sessionid);
-        $this->assertCount(1, $seminarevent->get_sessions(true));
-
-        $seminarsession = seminar_session_list::from_seminar_event($seminarevent)->current();
-        /** @var seminar_session $seminarsession */
-
-        $signup = current($this->create_users_signups(1, $seminarevent, booked::class));
-
-        $this->assertTrue(attendance_helper::process_session_attendance([$signup->get_id() => $attendancecode], $seminarsession->get_id()));
-
-        if ($cancelled) {
-            $this->assertTrue($seminarevent->cancel());
-        }
-
-        // Set the actual time to the session
-        $seminarsession
-            ->set_timestart($now + $timestart)
-            ->set_timefinish($now + $timestart + HOURSECS)
-            ->save();
-
-        $session = $seminarevent->to_record();
-        $session->sessiondates = [ $seminarsession->to_record() ];
-
-        $renderer = $this->create_f2f_renderer();
-
-        $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, seminar::SESSION_ATTENDANCE_END);
-        $cells = $this->get_table_cells($outhtml, $cols);
-        $this->assertSame($expections[0], $cells[6]->nodeValue);
-
-        $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, seminar::SESSION_ATTENDANCE_START);
-        $cells = $this->get_table_cells($outhtml, $cols);
-        $this->assertSame($expections[1], $cells[6]->nodeValue);
-
-        $outhtml = $renderer->print_session_list_table([ $session ], true, false, false, [], null, false, true, seminar::SESSION_ATTENDANCE_UNRESTRICTED);
-        $cells = $this->get_table_cells($outhtml, $cols);
-        $this->assertSame($expections[2], $cells[6]->nodeValue);
-    }
-
-    /**
-     * Ensure that print_session_list_table() renders the list using the given $sessions parameter.
-     */
-    public function test_print_session_list_table_with_crafted_records() {
+    public function test_render_session_list_table_with_crafted_records() {
         $course = $this->getDataGenerator()->create_course();
         $f2f = $this->facetoface_generator->create_instance(['course' => $course->id]);
         $room1 = $this->facetoface_generator->add_custom_room([ 'name' => 'Chamber', 'allowconflicts' => 1 ]);
@@ -682,7 +326,19 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         room_helper::sync($data->sessiondateid, [$data->roomid]);
 
         $renderer = $this->create_f2f_renderer();
-        $html = $renderer->print_session_list_table($sessions, false, true, false, array(), null, true, false, false, 0, false, false);
+        $option = new mod_facetoface\dashboard\render_session_option();
+        $config = new mod_facetoface\dashboard\render_session_list_config(new seminar(), context_system::instance(), $option);
+        $config->viewattendees = false;
+        $config->editevents = true;
+        $config->displaytimezones = false;
+        $config->reserveinfo = array();
+        $config->minimal = true;
+        $config->returntoallsessions = false;
+        $config->sessionattendance = seminar::SESSION_ATTENDANCE_DISABLED;
+        $config->eventattendance = seminar::EVENT_ATTENDANCE_DEFAULT;
+        $config->viewsignupperiod = false;
+        $config->viewactions = false;
+        $html = $renderer->render_session_list_table($sessions, $config);
 
         // .. multiple rooms in the session
         $this->assertContains('Chamber', $html);
@@ -696,12 +352,12 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
 
         /** @var DOMNode[] $rows */
         // .. and the list is sorted by custom order
-        $this->assertContains('April', $rows[0]->nodeValue);
-        $this->assertContains('August', $rows[1]->nodeValue);
-        $this->assertContains('February', $rows[2]->nodeValue);
-        $this->assertContains('March', $rows[3]->nodeValue);
-        $this->assertContains('December', $rows[4]->nodeValue);
-        $this->assertContains('Wait-listed', $rows[5]->nodeValue);
-        $this->assertContains('September', $rows[6]->nodeValue);
+        $this->assertContains('April', $rows[0]->textContent);
+        $this->assertContains('August', $rows[1]->textContent);
+        $this->assertContains('February', $rows[2]->textContent);
+        $this->assertContains('March', $rows[3]->textContent);
+        $this->assertContains('December', $rows[4]->textContent);
+        $this->assertContains('Wait-listed', $rows[5]->textContent);
+        $this->assertContains('September', $rows[6]->textContent);
     }
 }

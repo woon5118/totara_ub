@@ -22,21 +22,29 @@
 
 {{!
 
-    @template mod_facetoface/actions_in_dashboard
+    @template mod_facetoface/seminarevent_dashboard_action
 
     This template generates an actions table cell.
 
     Context variables required for this template:
     * noactions: set true to indicate there are no actions
-    * nonactionable: text to display if noactions == true
-    * viewevent: (optional)
-    * viewevent.link: url
-    * viewevent.text: text of the 'view event' button
-    * hasicons: set true if icons.length > 0
+    * nonactionable: text to display if noactions is true
+    * hasbuttons: set true if the button and/or any menu items exist
+    * button: (optional)
+    * button.link: url
+    * button.text: text of the button
+    * hasmenus: set true if one or more menu items
+    * menuicon: flex_icon or pix_icon template data
+    * menutext: text of the menu button
+    * menus: (optional)
+    * menus.separator: this is a separator
+    * menus.link: url
+    * menus.text: text of the menu item
+    * hasicons: set true if one or more icons
     * icons: (optional)
     * icons.link: url
     * icons.icon: flex_icon or pix_icon template data
-    * haslinks: set true if links.length > 0
+    * haslinks: set true if one or more links
     * links: (optional)
     * links.link: url
     * links.text: text of the link
@@ -75,11 +83,29 @@
     }
 }}
 
-<div class="mod_facetoface__sessionlist__action{{#noactions}}--none{{/noactions}}">
+<div class="mod_facetoface__sessionlist__action{{#noactions}}--none{{/noactions}}" data-core-autoinitialise-amd="mod_facetoface/seminarevent_dashboard_action" data-core-autoinitialise="true">
     {{#noactions}}{{nonactionable}}{{/noactions}}
-    {{#viewevent}}<a href="{{link}}" role="button" class="mod_facetoface__sessionlist__action__eventinfo btn btn-default btn-sm">{{text}}</a>{{/viewevent}}
+    {{#hasbuttons}}
+        <div role="group" class="mod_facetoface__sessionlist__action__buttons btn-group">
+            {{#button}}
+                <a href="{{link}}" role="button" class="mod_facetoface__sessionlist__action__eventinfo btn btn-default btn-sm">{{text}}</a>
+            {{/button}}
+            {{#hasmenus}}
+                <a href="#" role="button" id="{{menuid}}" {{#menuicon}}title="{{menutext}}"{{/menuicon}} class="mod_facetoface__sessionlist__action__dropdown btn btn-default btn-sm dropdown-toggle" aria-haspopup="true" aria-expanded="false" aria-label="{{menutext}}">
+                    {{#menuicon}}{{#context}}{{> &&template }}{{/context}}{{/menuicon}}
+                    {{^menuicon}}{{menutext}}{{/menuicon}}
+                </a>
+                <ul role="menu" class="mod_facetoface__sessionlist__action__dropdown__menu dropdown-menu dropdown-menu-right" aria-labelledby="{{menuid}}" data-f2f-dropdown-id="{{menuid}}">
+                    {{#menus}}
+                        {{#separator}}<li role="separator" class="divider"></li>{{/separator}}
+                        {{^separator}}<li role="none"><a role="menuitem" href="{{link}}" class="dropdown-item">{{#icon}}{{#context}}{{> &&template }}{{/context}}{{/icon}}{{text}}</a></li>{{/separator}}
+                    {{/menus}}
+                </ul>
+            {{/hasmenus}}
+        </div>
+    {{/hasbuttons}}
     {{#hasicons}}
-        <nav class="mod_facetoface__sessionlist__action__buttons">
+        <nav class="mod_facetoface__sessionlist__action__icons">
             {{#icons}}
                 <a href="{{link}}">{{#icon}}{{#context}}{{> &&template }}{{/context}}{{/icon}}</a>
             {{/icons}}

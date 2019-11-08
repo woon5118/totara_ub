@@ -29,6 +29,7 @@
     Context variables required for this template:
     * method: get or post
     * formid: string id of the form
+    * noscript: do not load script
     * params: array containing key/value pairs as input elements of type hidden
     * params.name: name attribute
     * params.value: value attribute
@@ -135,16 +136,16 @@
     }
 }}
 
-<form method="{{method}}" class="mod_facetoface__filter" id="mod_facetoface__filter_{{formid}}" data-core-autoinitialise-amd="mod_facetoface/seminarevent_filterbar" data-core-autoinitialise="true">
+<form method="{{method}}" class="mod_facetoface__filter" id="mod_facetoface__filter_{{formid}}"{{^noscript}} data-core-autoinitialise-amd="mod_facetoface/seminarevent_filterbar" data-core-autoinitialise="true"{{/noscript}}>
     {{#icon}}{{#context}}{{> &&template }}{{/context}}{{/icon}}
     {{#params}}
         <input type="hidden" name="{{name}}" value="{{value}}">
     {{/params}}
     {{#filters}}
         {{^disabled}}
-            <div class="mod_facetoface__filter__item__{{class}}">
-                <label for="mod_facetoface__filter_{{formid}}__{{name}}" class="mod_facetoface__filter__item__{{class}}__label">{{{label}}}</label>
-                <select id="mod_facetoface__filter_{{formid}}__{{name}}" name="{{name}}" disabled autocomplete="off" class="mod_facetoface__filter__item__{{class}}__select" data-webkit-init-value="{{webkit_init_value}}"{{#show_tooltips}} data-show-tooltips="true"{{/show_tooltips}}>
+            <div class="mod_facetoface__filter__item mod_facetoface__filter__item__{{class}}">
+                <label for="mod_facetoface__filter_{{formid}}__{{name}}" class="mod_facetoface__filter__item__label mod_facetoface__filter__item__{{class}}__label">{{{label}}}</label>
+                <select id="mod_facetoface__filter_{{formid}}__{{name}}" name="{{name}}" disabled autocomplete="off" class="mod_facetoface__filter__item__select mod_facetoface__filter__item__{{class}}__select" data-webkit-init-value="{{webkit_init_value}}"{{#show_tooltips}} data-show-tooltips="true"{{/show_tooltips}}>
                     {{#options}}
                         <option value="{{value}}"{{#selected}} selected{{/selected}}>{{name}}</option>
                     {{/options}}

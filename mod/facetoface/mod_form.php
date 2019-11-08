@@ -104,6 +104,11 @@ class mod_facetoface_mod_form extends moodleform_mod {
         $mform->setDefault('display', MDL_F2F_DEFAULT_EVENTS_ON_COURSE);
         $mform->addHelpButton('display', 'sessionsoncoursepage', 'facetoface');
 
+        $mform->addElement('checkbox', 'decluttersessiontable', get_string('decluttersessiontable', 'mod_facetoface'));
+        $mform->addHelpButton('decluttersessiontable', 'decluttersessiontable', 'mod_facetoface');
+        $mform->setType('decluttersessiontable', PARAM_BOOL);
+        $mform->setDefault('decluttersessiontable', get_config('facetoface', 'decluttersessiontable'));
+
         if (has_capability('mod/facetoface:configurecancellation', $this->context)) {
             // User cancellation settings.
             $radioarray = array();
@@ -664,6 +669,10 @@ class mod_facetoface_mod_form extends moodleform_mod {
         // Completion delay should be set to null if disabled.
         if (!isset($data->completiondelayenabled)) {
             $data->completiondelay = null;
+        }
+
+        if (empty($data->decluttersessiontable)) {
+            $data->decluttersessiontable = 0;
         }
 
         return $data;

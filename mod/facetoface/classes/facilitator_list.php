@@ -69,7 +69,7 @@ final class facilitator_list  implements \Iterator {
 
             $sql = "SELECT DISTINCT ff.*, {$usernamefields}
                       FROM {facetoface_facilitator} ff
-                 LEFT JOIN {user} u ON u.id = ff.userid 
+                 LEFT JOIN {user} u ON u.id = ff.userid
                       JOIN {facetoface_facilitator_dates} ffd ON ffd.facilitatorid = ff.id
                       JOIN {facetoface_sessions_dates} fsd ON fsd.id = ffd.sessionsdateid
                       JOIN {facetoface_sessions} fs ON fs.id = fsd.sessionid AND fs.cancelledstatus = 0
@@ -137,6 +137,35 @@ final class facilitator_list  implements \Iterator {
         // Construct all the facilitators and add them to the iterator list.
         foreach ($facilitators as $facilitatordata) {
             $facilitator = new facilitator_user($facilitatordata);
+            $list->add($facilitator);
+        }
+        return $list;
+    }
+
+    /**
+     * Get the relevant facilitators for a seminar activity
+     * @param int $seminarid
+     * @return facilitator_list
+     */
+    public static function get_distinct_users_from_seminar(int $seminarid): facilitator_list {
+        // TODO: Refactor from_seminar, from_seminarevent and from_session
+
+        global $DB;
+
+        $usernamefields = get_all_user_name_fields(true, 'u');
+
+        $sql = "SELECT DISTINCT ff.*, {$usernamefields}
+                  FROM {facetoface_facilitator} ff
+             LEFT JOIN {user} u ON u.id = ff.userid
+            INNER JOIN {facetoface_facilitator_dates} ffd ON ffd.facilitatorid = ff.id
+            INNER JOIN {facetoface_sessions_dates} fsd ON fsd.id = ffd.sessionsdateid
+            INNER JOIN {facetoface_sessions} fs ON fs.id = fsd.sessionid
+                 WHERE ff.hidden = 0 AND fs.facetoface = :facetofaceid
+              ORDER BY ff.name ASC, ff.id ASC";
+        $rs = $DB->get_recordset_sql($sql, ['facetofaceid' => $seminarid]);
+        $list = new static();
+        foreach ($rs as $record) {
+            $facilitator = new facilitator_user($record);
             $list->add($facilitator);
         }
         return $list;

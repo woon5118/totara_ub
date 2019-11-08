@@ -23,6 +23,8 @@
 
 namespace mod_facetoface\query\event\filter;
 
+use core\orm\query\builder;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -74,4 +76,13 @@ abstract class filter {
      * @return array
      */
     abstract public function get_where_and_params(int $time): array;
+
+    /**
+     * Apply filter to the current query builder.
+     *
+     * @param builder $builder
+     * @param integer $time The current timestamp
+     * @return void
+     */
+    abstract public function apply(builder $builder, int $time): void;
 }

@@ -23,6 +23,9 @@
 
 namespace mod_facetoface\query\event\filter;
 
+use core\orm\query\builder;
+use mod_facetoface\query\event\filter_factory;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -55,19 +58,23 @@ final class past_event_filter extends filter {
      * @inheritDoc
      */
     public function get_where_and_params(int $time): array {
-        // The external use will always have the keyword 'AND' before hand, therefore, it should have something here to returned
-        // for the event_time criteria.
-        $sql = "(1=1)";
-        $params = [];
+        debugging('The method ' . __METHOD__ . '() has been deprecated and no longer effective. Please use the apply() counterpart instead.', DEBUG_DEVELOPER);
+        return ["(1=1)", []];
+    }
 
+    public function apply(builder $builder, int $time): void {
         if ($this->timeperiod > 0) {
-            $sql = '(((m.mintimestart IS NULL OR m.maxtimefinish IS NULL) OR (m.mintimestart > :timefrom_pef) OR (m.maxtimefinish > :timenow_pef)) AND s.cancelledstatus = 0)';
-            $params = [
-                'timefrom_pef' => $time - ($this->timeperiod * DAYSECS),
-                'timenow_pef' => $time,
-            ];
+            $builder->where(function (builder $outer) use ($time) {
+                $outer->where('s.cancelledstatus', '=', 0)
+                    ->where(function (builder $inner) use ($time) {
+                        $timefrom = $time - ($this->timeperiod * DAYSECS);
+                        $inner->or_where(function (builder $leaf) {
+                            $leaf->where_null('m.mintimestart')->where_null('m.maxtimefinish', true);
+                        })
+                        ->or_where('m.mintimestart', '>', $timefrom)
+                        ->or_where('m.maxtimefinish', '>', $time);
+                    });
+            });
         }
-
-        return [$sql, $params];
     }
 }

@@ -507,15 +507,11 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
     if (!has_capability('mod/facetoface:view', $contextmodule)) {
         return null; // Not allowed to view this activity.
     }
-    // Can view attendees.
-    $viewattendees = has_capability('mod/facetoface:viewattendees', $contextmodule);
-    $editevents = has_capability('mod/facetoface:editevents', $contextmodule);
     // Can see "view all sessions" link even if activity is hidden/currently unavailable.
     $iseditor = has_any_capability(array('mod/facetoface:viewattendees', 'mod/facetoface:editevents',
                                         'mod/facetoface:addattendees', 'mod/facetoface:addattendees',
                                         'mod/facetoface:takeattendance'), $contextmodule);
     // Other variables that will be required by calls further down to print_session_list_table.
-    $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
     $reserveinfo = array();
 
     $timenow = time();
@@ -634,16 +630,12 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
         /** @var \mod_facetoface_renderer $f2frenderer */
         $f2frenderer = $PAGE->get_renderer('mod_facetoface');
         $f2frenderer->setcontext($contextmodule);
-        $output .= $f2frenderer->print_session_list_table(
-            $sessions,
-            $viewattendees,
-            $editevents,
-            $displaytimezones,
-            $reserveinfo,
-            $PAGE->url,
-            true,
-            false
-        );
+        $option = new mod_facetoface\dashboard\render_session_option();
+        $config = new mod_facetoface\dashboard\render_session_list_config($seminar, $contextmodule, $option);
+        $config->reserveinfo = $reserveinfo;
+        $config->minimal = true;
+        $config->returntoallsessions = false;
+        $output .= $f2frenderer->render_session_list_table($sessions, $config);
 
         // Add "view all sessions" row to table.
         $output .= $htmlviewallsessions;
@@ -686,16 +678,12 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                 /** @var mod_facetoface_renderer $f2frenderer */
                 $f2frenderer = $PAGE->get_renderer('mod_facetoface');
                 $f2frenderer->setcontext($contextmodule);
-                $output .= $f2frenderer->print_session_list_table(
-                    $displaysessions,
-                    $viewattendees,
-                    $editevents,
-                    $displaytimezones,
-                    $reserveinfo,
-                    $PAGE->url,
-                    true,
-                    false
-                );
+                $option = new mod_facetoface\dashboard\render_session_option();
+                $config = new mod_facetoface\dashboard\render_session_list_config($seminar, $contextmodule, $option);
+                $config->reserveinfo = $reserveinfo;
+                $config->minimal = true;
+                $config->returntoallsessions = false;
+                $output .= $f2frenderer->render_session_list_table($displaysessions, $config);
 
                 $output .= ($iseditor || ($coursemodule->visible && $coursemodule->available)) ? $htmlviewallsessions : $strviewallsessions;
                 if (($iseditor || ($coursemodule->visible && $coursemodule->available)) && $declareinterest_enable) {

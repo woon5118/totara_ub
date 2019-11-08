@@ -21,9 +21,11 @@
  * @package mod_facetoface
  */
 
-namespace mod_facetoface;
+namespace mod_facetoface\internal;
 
-use mod_facetoface\signup\state\{attendance_state, booked, requested, requestedadmin, requestedrole, waitlisted};
+use mod_facetoface\seminar_event;
+use mod_facetoface\seminar_event_helper;
+use mod_facetoface\signup;
 
 defined('MOODLE_INTERNAL') || die();
 

@@ -29,6 +29,9 @@ use mod_facetoface\facilitator;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * facilitator_user class
+ */
 class facilitator_user {
 
     /** @var \mod_facetoface\facilitator $facilitator */
@@ -39,7 +42,7 @@ class facilitator_user {
 
     /**
      * Seminar facilitator_user constructor
-     * @param facilitator|stdClass
+     * @param facilitator|stdClass $facilitator
      */
     public function __construct($facilitator) {
         if ($facilitator instanceof facilitator) {
@@ -55,11 +58,10 @@ class facilitator_user {
      * Mostly for "get_property" methods
      * @param string $method
      * @param array $arguments
-     * @return |null
      */
     public function __call(string $method, array $arguments = []) {
         if (method_exists($this->facilitator, $method)) {
-            return $this->facilitator->{$method}();
+            return $this->facilitator->{$method}(...$arguments);
         }
         debugging('Invalid class method accessed! ' . $method, DEBUG_DEVELOPER);
         return null;
@@ -101,9 +103,10 @@ class facilitator_user {
     /**
      * Get user(not facilitator) full name link to user profile or not
      * depends from capabilities
+     * @param boolean $link
      * @return string
      */
-    public function get_fullname_link($link = true): string {
+    public function get_fullname_link(bool $link = true): string {
         global $OUTPUT;
         if (empty($this->fullname)) {
             return $this->fullname;
@@ -161,5 +164,17 @@ class facilitator_user {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Get a facilitator's name for displaying.
+     * @return string
+     */
+    public function get_display_name(): string {
+        if (!empty($this->get_fullname())) {
+            $a = (object)['name' => $this->get_name(), 'fullname' => $this->get_fullname()];
+            return get_string('facilitatordisplayname', 'mod_facetoface', $a);
+        }
+        return $this->get_name();
     }
 }

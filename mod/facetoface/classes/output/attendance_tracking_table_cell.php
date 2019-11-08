@@ -109,6 +109,23 @@ class attendance_tracking_table_cell extends \html_table_cell {
     }
 
     /**
+     * Set a text or a link of this cell.
+     *
+     * @param string $html
+     * @param string|\moodle_url|null $url
+     *
+     * @return attendance_tracking_table_cell
+     */
+    public function set_text_or_link(string $html, $url): attendance_tracking_table_cell {
+        if ($url === null || $url === '') {
+            return $this->set_text($html);
+        }
+        $this->url = $url;
+        $this->linkhtml = $html;
+        return $this;
+    }
+
+    /**
      * Set the state of attendance tracking.
      *
      * @param string $state The state name

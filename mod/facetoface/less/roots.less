@@ -17,6 +17,16 @@
 
 @mod_facetoface-ui-dialog-width: 870px;
 
+@mod_facetoface-border-colour: @totara_style-color_neutral_3;
+@mod_facetoface-spacing-small: @totara_style-spacing_small;
+
+@mod_facetoface-breakpoint_mobile: @totara_style-screen_sm_min;
+@mod_facetoface-navbar-font-size: @totara_style-size_14;
+@mod_facetoface-navbar-font-height: @totara_style-size_14;
+@mod_facetoface-navbar-height: @mod_facetoface-navbar-font-height * 2;
+@mod_facetoface-cancel-close-size: @totara_style-size_40;
+
+
 .f2fsessionlinks,
 .f2fsessionnotice {
     display: block;
@@ -207,6 +217,7 @@ select.menuf2f-select {
 }
 
 .mod_facetoface {
+    // +++ Action bars +++ //
     &__action {
         display: flex;
         align-items: center;
@@ -244,90 +255,147 @@ select.menuf2f-select {
         }
     }
 
-    @border-colour: @totara_style-color_neutral_3;
+    &__list-items {
+        .no-list-style();
+    }
 
+    // +++ Filters +++ //
+    // Note: do NOT use the 'ch' unit unless we can drop IE11
     &__filter {
+        @filter-spacing-medium: @totara_style-spacing_medium;
+        @filter-spacing-small: @totara_style-spacing_small;
+
         .flex-wrap-vertical-center();
-        padding: 0 @totara_style-spacing_small @totara_style-spacing_small @totara_style-spacing_small;
-        margin: @totara_style-spacing_medium 0;
-        border: 1px @border-colour solid;
+
+        border: 1px @mod_facetoface-border-colour solid;
         border-radius: @border-radius-default;
+        margin: @filter-spacing-medium 0;
+        padding: 0 @filter-spacing-small;
 
         .flex-icon {
             font-size: @ft-size-400;
-            margin-top: @totara_style-spacing_small;
+            margin-top: @filter-spacing-small;
         }
 
         .child() {
-            .flex-wrap-vertical-center();
-            margin: @totara_style-spacing_small @totara_style-spacing_small 0 @totara_style-spacing_small;
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: column;
+            margin: 0 @filter-spacing-small 0 @filter-spacing-small;
             max-width: 100%;
         }
 
-        .filter-item() {
+        &__item {
             .child();
 
             &__label {
                 margin: 0;
                 // Override Moodle form
                 font: inherit;
-                padding: 0;
+                font-size: @totara_style-size_11;
+                letter-spacing: @totara_style-size_1;
+                line-height: @totara_style-size_16;
+                padding: 0 0 @totara_style-size_1;
             }
 
             &__select {
-                margin: 0 @totara_style-spacing_small;
-                max-width: 100%;
                 // Override Moodle form
                 font-size: inherit;
-                height: 2.5em;
+                margin-bottom: @totara_style-size_base;
+                max-width: 100%;
+                padding-top: 0;
+                padding-bottom: 0;
             }
-        }
 
-        &__item {
-            // Note: use 'ch' unit only if we can drop the support of IE
-
-            &__room {
-                .filter-item();
+            .filter-select-fixed(@width: 15em) {
                 &__select {
                     // Avoid min-width here
                     // Otherwise the <select> element could cover the whole screen width if a room name is very loooong!
-                    width: 15em; // IE11 works with max-width instead of width here
                     text-overflow: ellipsis;
+                    width: @width; // do NOT use max-width as it freaks out IE11
                 }
+            }
+
+            .filter-select-variable(@width) {
+                &__select {
+                    min-width: @width;
+                }
+            }
+
+            &__room {
+                .filter-select-fixed();
+            }
+
+            &__facilitator {
+                .filter-select-fixed();
             }
 
             &__eventtime {
-                .filter-item();
-                &__select {
-                    min-width: 8em;
-                }
+                .filter-select-variable(8em);
             }
 
             &__advanced {
-                .filter-item();
-                &__select {
-                    min-width: 10em;
-                }
+                .filter-select-variable(10em);
             }
 
             &__book {
-                .filter-item();
-                &__select {
-                    min-width: 12em;
-                }
+                .filter-select-variable(8em);
             }
         }
 
         &__link {
             .child();
+            visibility: hidden;
+        }
+
+        &--active {
+            .mod_facetoface__filter__link {
+                visibility: visible;
+            }
         }
     }
 
+    // Container of upcoming and/or past event list
+    &__sessions {
+        &__spinner {
+            font-size: 2em;
+        }
+
+        &__spinner,
+        &__debug,
+        &__empty {
+            display: none;
+        }
+
+        &.loading {
+            .mod_facetoface__sessions__spinner {
+                display: block;
+            }
+            .mod_facetoface__sessionlist__appendix,
+            .mod_facetoface__sessionlist {
+                display: none;
+            }
+        }
+
+        &.empty {
+            .mod_facetoface__sessions__empty {
+                display: block;
+            }
+        }
+
+        &.debug {
+            .mod_facetoface__sessions__debug {
+                display: block;
+            }
+        }
+    }
+
+    // Seminar event list tables
     &__sessionlist {
         // Make the session list table horizontally scrollable in the content area,
-        // so it wouldn't overlap the blocks on right side
-        overflow-x: auto;
+        // so it wouldn't overlap the blocks on the right side.
         margin-bottom: @totara_style-spacing_large;
+        overflow-x: auto;
 
         &--empty {
             padding: @totara_style-spacing_medium;
@@ -359,10 +427,12 @@ select.menuf2f-select {
             // Always accent
             > tbody > tr {
                 background-color: @table-bg-accent;
+                // We don't use the hover colour at the moment.
                 // &:hover {
                 //     background-color: @table-bg-hover;
                 // }
             }
+
             // Add a border between sessions
             &__sessionrow {
                 @table-thin-border-color: mix(@table-border-color, @totara_style-color_neutral_7, 80%);
@@ -374,12 +444,7 @@ select.menuf2f-select {
                     border-top: 2px solid @table-border-color;
                 }
 
-                // Simulate highlight and dimmed_text of T12
-                &.userbooked {
-                    &:not(.over):not(.cancelled) {
-                        .highlight;
-                    }
-                }
+                // Simulate dimmed_text of T12
                 &:not(.userbooked) {
                     &.started,
                     &.cancelled,
@@ -396,8 +461,6 @@ select.menuf2f-select {
         }
 
         &__event-status {
-            .no-list-style();
-
             &__event,
             &__booking,
             &__user {
@@ -413,42 +476,55 @@ select.menuf2f-select {
             display: block;
         }
 
-        &__room,
-        &__facilitator {
-            max-width: 15em;
-            > ul.roomlist {
-                .no-list-style();
-            }
-            > ul.roomlist {
-                margin: 0;
-                padding: 0;
-                > li.room {
-                    list-style-type: none;
-                }
-            }
-            > ul.facilitatorlist {
-                margin: 0;
-                padding: 0;
-                > li.facilitator {
-                    list-style-type: none;
-                }
-            }
+        // Override Bootstrap.
+        &__table td.mod_facetoface__sessionlist__actions {
+            vertical-align: middle;
         }
 
-        &__roomdetails,
-        &__facilitatordetails {
-            font-size: @totara_style-size_13;
-            display: block;
-            .roomurl {
-                color: @totara_style-color_neutral_1;
-            }
+        &__actions {
+            // This does not seem to work on Chrome.
+            width: 0;
         }
 
         &__action {
-            &__buttons {
+            // Override Bootstrap.
+            &__buttons.btn-group {
+                display: flex;
+                justify-content: center;
+            }
+            // Override Bootstrap.
+            &__buttons.btn-group &__dropdown.dropdown-toggle {
+                padding: @padding-small-vertical @totara_style-spacing_small;
+            }
+            &__icons {
                 display: flex;
                 font-size: @totara_style-size_16;
-                margin-bottom: @totara_style-spacing_x_small;
+            }
+            &__icons + &__links {
+                margin-top: @totara_style-spacing_x_small;
+            }
+            &__dropdown {
+                > .flex-icon {
+                    font-size: 111%;
+                    // This hackery disables font hinting and grid fitting to get a better rendering result of the "..." button.
+                    transform: rotate(.001deg);
+                }
+
+                // Override Bootstrap.
+                &__menu.dropdown-menu {
+                    position: fixed;
+                    left: auto;
+                    margin: 0;
+
+                    > li > a {
+                        color: @dropdown-link-color;
+                        &:hover, &:focus {
+                            color: @dropdown-link-active-color;
+                            background-color: @dropdown-link-active-bg;
+                            text-decoration: none;
+                        }
+                    }
+                }
             }
             &__link {
                 display: block;
@@ -490,7 +566,7 @@ select.menuf2f-select {
         }
     }
 
-    // Put "Add event" on the right side of <h3>Events</h3>
+    // Put "Add event", "Edit event" et al on the right side of the heading text.
     &__action-dashboard,
     &__action-editevent,
     &__action-eventinfo {
@@ -534,14 +610,15 @@ select.menuf2f-select {
     }
 
     .divider() {
-        border-bottom: 1px solid @border-colour;
+        border-bottom: 1px solid @mod_facetoface-border-colour;
     }
 
     &__action-reservation {
-        border-top: 1px solid @border-colour;
+        border-top: 1px solid @mod_facetoface-border-colour;
         padding-top: @mod_facetoface-spacing-default;
     }
 
+    // +++ Navigation bar +++ //
     &__navigation {
         .divider();
 
@@ -551,7 +628,7 @@ select.menuf2f-select {
         margin-right: 0px - floor((@grid-gutter-width / 2));
         padding-left:  ceil((@grid-gutter-width / 2));
         padding-right: floor((@grid-gutter-width / 2));
-        position: relative; // For web browsers that don't support sticky position
+        position: relative; // IE11 does not support sticky position
         position: sticky;
         top: 0;
         z-index: 100;
@@ -560,7 +637,7 @@ select.menuf2f-select {
             display: flex;
 
             a {
-                border-right: 1px solid @border-colour;
+                border-right: 1px solid @mod_facetoface-border-colour;
                 font-size: @mod_facetoface-navbar-font-size;
                 line-height: @mod_facetoface-navbar-font-height;
                 margin: ((@mod_facetoface-navbar-height - @mod_facetoface-navbar-font-height) / 2) 0;
@@ -583,6 +660,7 @@ select.menuf2f-select {
         }
     }
 
+    // +++ Event page +++ //
     &__eventinfo {
         display: flex;
         margin-bottom: @mod_facetoface-spacing-default;
@@ -841,7 +919,7 @@ select.menuf2f-select {
     }
 }
 
-@media only screen and (max-width: 767px) {
+@media only screen and (max-width: @mod_facetoface-breakpoint_mobile) {
     .mod_facetoface {
         &__navigation {
             padding-left:  ceil((@grid-gutter-width / 3));

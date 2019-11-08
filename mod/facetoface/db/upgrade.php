@@ -836,5 +836,19 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2019091000, 'facetoface');
     }
 
+    if ($oldversion < 2019112700) {
+        // Define field decluttersessiontable to be added to facetoface.
+        $table = new xmldb_table('facetoface');
+        $field = new xmldb_field('decluttersessiontable', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'waitlistautoclean');
+
+        // Conditionally launch add field decluttersessiontable.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2019112700, 'facetoface');
+    }
+
     return true;
 }
