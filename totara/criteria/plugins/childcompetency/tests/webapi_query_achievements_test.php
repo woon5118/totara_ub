@@ -151,11 +151,18 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends \advan
         $this->setUser($data['user']);
 
         // Let's create a competency with no assignment...
-        $na_competency = $this->competency_generator()->create_competency(null, $data['competencies'][0]->frameworkid,
-            ['parentid' => $data['competencies'][0]->id]); // No value
+        $na_competency = $this->competency_generator()->create_competency(
+            null,
+            $data['competencies'][0]->frameworkid,
+            ['parentid' => $data['competencies'][0]->id]
+        ); // No value
 
         // Archived competency
-        $archived_competency = $this->competency_generator()->create_competency(null, $data['competencies'][0]->frameworkid, ['parentid' => $data['competencies'][0]->id]);
+        $archived_competency = $this->competency_generator()->create_competency(
+            null,
+            $data['competencies'][0]->frameworkid,
+            ['parentid' => $data['competencies'][0]->id]
+        );
         $archived_assignment = $this->competency_generator()
             ->assignment_generator()
             ->create_assignment([

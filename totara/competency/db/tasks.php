@@ -38,12 +38,12 @@ $tasks = [
         'month' => '*'
     ],
     [
-    'classname' => expand_assignments_task::class,
-    'blocking' => 0,
-    'minute' => '0',
-    'hour' => '*',
-    'day' => '*',
-    'dayofweek' => '*',
-    'month' => '*'
-],
+        'classname' => expand_assignments_task::class,
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ],
 ];
