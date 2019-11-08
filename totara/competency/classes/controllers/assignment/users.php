@@ -33,7 +33,7 @@ class users extends base {
     protected $admin_external_page_name = 'competency_assignment_users';
 
     public function action() {
-        $this->require_capability('totara/competency:view', context_system::instance());
+        $this->require_capability('totara/competency:view_assignments', context_system::instance());
 
         // Reportbuilder basic arguments
         $sid = $this->get_param('sid',  PARAM_INT, 0);

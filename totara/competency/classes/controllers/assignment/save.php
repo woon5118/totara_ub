@@ -57,7 +57,7 @@ class save extends base {
     ];
 
     public function action() {
-        $this->require_capability('totara/competency:manage', $this->context);
+        $this->require_capability('totara/competency:manage_assignments', $this->context);
 
         // Get competencies count
         $basket = new competency_basket($this->basket_key);

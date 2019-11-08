@@ -25,7 +25,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
     // View competency assignments.
-    'totara/competency:view' => [
+    'totara/competency:view_assignments' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => [
@@ -33,7 +33,7 @@ $capabilities = [
         ]
     ],
     // Manage competency assignments.
-    'totara/competency:manage' => [
+    'totara/competency:manage_assignments' => [
         'riskbitmask' => RISK_CONFIG,
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,

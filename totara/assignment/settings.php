@@ -39,7 +39,7 @@ $ADMIN->add(
         'competency_assignment',
         get_string('title:index', 'totara_competency'),
         "{$CFG->wwwroot}/totara/competency/assignments/index.php",
-        "totara/competency:manage",
+        "totara/competency:manage_assignments",
         !advanced_feature::is_enabled('competency_assignment')
     )
 );
@@ -49,7 +49,7 @@ $ADMIN->add(
         'competency_assignment_users',
         get_string('title:users', 'totara_competency'),
         "{$CFG->wwwroot}/totara/competency/assignments/users.php",
-        "totara/competency:manage",
+        "totara/competency:manage_assignments",
         !advanced_feature::is_enabled('competency_assignment')
     )
 );
@@ -59,7 +59,7 @@ $ADMIN->add(
         'competency_assignment_create',
         get_string('title:create', 'totara_competency'),
         "{$CFG->wwwroot}/totara/competency/assignments/create.php",
-        "totara/competency:manage",
+        "totara/competency:manage_assignments",
         !advanced_feature::is_enabled('competency_assignment')
     )
 );
@@ -69,7 +69,7 @@ if (advanced_feature::is_enabled('competency_assignment')) {
     if (!is_array($settings_page->req_capability)) {
         $settings_page->req_capability = [$settings_page->req_capability];
     }
-    $settings_page->req_capability[] = 'totara/competency:manage';
+    $settings_page->req_capability[] = 'totara/competency:manage_assignments';
     $settings_page->req_capability = array_unique($settings_page->req_capability);
 
     if ($ADMIN->fulltree) {

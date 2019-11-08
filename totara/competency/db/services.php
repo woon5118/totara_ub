@@ -151,7 +151,7 @@ $assignments = [
         'type'          => 'read',
         'loginrequired' => true,
         'ajax'          => true,
-        'capabilities'  => 'totara/competency:view',
+        'capabilities'  => 'totara/competency:view_assignments',
     ],
 
     'totara_competency_assignment_show' => [
@@ -161,7 +161,7 @@ $assignments = [
         'type'          => 'read',
         'loginrequired' => true,
         'ajax'          => true,
-        'capabilities'  => 'totara/competency:view',
+        'capabilities'  => 'totara/competency:view_assignments',
     ],
 
     'totara_competency_assignment_create' => [
@@ -171,7 +171,7 @@ $assignments = [
         'type'          => 'write',
         'loginrequired' => true,
         'ajax'          => true,
-        'capabilities'  => 'totara/competency:manage',
+        'capabilities'  => 'totara/competency:manage_assignments',
     ],
 
     'totara_competency_assignment_create_from_baskets' => [
@@ -181,7 +181,7 @@ $assignments = [
         'type'          => 'write',
         'loginrequired' => true,
         'ajax'          => true,
-        'capabilities'  => 'totara/competency:manage',
+        'capabilities'  => 'totara/competency:manage_assignments',
     ],
 
     'totara_competency_assignment_action' => [
@@ -191,7 +191,7 @@ $assignments = [
         'type'          => 'write',
         'loginrequired' => true,
         'ajax'          => true,
-        'capabilities'  => 'totara/competency:manage',
+        'capabilities'  => 'totara/competency:manage_assignments',
     ],
 ];
 
@@ -203,7 +203,7 @@ $competencies = [
         'type'          => 'read',
         'loginrequired' => true,
         'ajax'          => true,
-        'capabilities'  => 'totara/competency:view',
+        'capabilities'  => 'totara/competency:view_assignments',
     ],
 
     'totara_competency_competency_show' => [
@@ -213,7 +213,7 @@ $competencies = [
         'type'          => 'read',
         'loginrequired' => true,
         'ajax'          => true,
-        'capabilities'  => 'totara/competency:view',
+        'capabilities'  => 'totara/competency:view_assignments',
     ],
 ];
 

@@ -92,7 +92,7 @@ class competency extends \external_api {
     public static function index(array $filters = [], int $page = 0, string $order_by = '', string $order_dir = '') {
         advanced_feature::require('competency_assignment');
 
-        require_capability('totara/competency:view', context_system::instance());
+        require_capability('totara/competency:view_assignments', context_system::instance());
 
         if (!array_key_exists('visible', $filters)) {
             $filters['visible'] = true;
@@ -157,7 +157,7 @@ class competency extends \external_api {
     public static function show(int $id, array $options) {
         advanced_feature::require('competency_assignment');
 
-        require_capability('totara/competency:view', context_system::instance());
+        require_capability('totara/competency:view_assignments', context_system::instance());
 
         /** @var entities\competency $competency */
         $competency = entities\competency::repository()->find($id);

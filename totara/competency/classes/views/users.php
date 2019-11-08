@@ -45,7 +45,7 @@ class users extends report_view {
     protected function set_button(reportbuilder $report) {
         $edit_button = $report->edit_button();
         $sync_button = '';
-        if (has_capability('totara/competency:manage', \context_system::instance())) {
+        if (has_capability('totara/competency:manage_assignments', \context_system::instance())) {
             $sync_button = $this->renderer->single_button(
                 new moodle_url('/totara/competency/assignments/sync.php'),
                 get_string('button:sync_users', 'totara_competency'),
