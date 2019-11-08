@@ -76,7 +76,7 @@ class manual_evaluator_user_source extends pathway_evaluator_user_source {
                            AND tcpa.user_id = pmr.user_id
                            AND tcpa.status = :activestatus
                          WHERE pmr.comp_id = :competencyid
-                           AND (tcpa.id IS NULL OR pmr.date_assigned > tcpa.last_aggregated)
+                           AND (tcpa.id IS NULL OR pmr.date_assigned >= tcpa.last_aggregated)
                     )";
 
         $params = array_merge(
