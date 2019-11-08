@@ -50,13 +50,11 @@ define(['jquery', 'core/config'], function($, mdlconfig) {
 
             component.add_handlers();
 
-            /* eslint-disable no-unused-vars */
             // Create the dialog.
             component.totaraDialog_handler_preRequisite = function() {
                 // Base url.
                 var baseurl = '';
             };
-            /* eslint-enable */
 
             // Make a wrapper function to avoid the race condition between bundle.js and totaraDialog.
             const uniqueId = 'initialise_component_totara_dialog';

@@ -25,7 +25,7 @@ define(['jquery', 'core/str', 'core/notification'], function($, mdlstrings, Noti
         /**
          * Module initialisation method called by php js_call_amd().
          */
-        init : function() {
+        init : function(args) {
             $('.deletecompletionhistorybutton').on('click', function (e) {
                 e.preventDefault();
 

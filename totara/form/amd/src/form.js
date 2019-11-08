@@ -172,7 +172,6 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
             return null;
         },
 
-        /* eslint-disable no-unused-vars */
         /**
          * Compares the value of this element using the given operator, additional args for comparison operator types.
          *
@@ -184,7 +183,6 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
             var args = [value].concat(Array.prototype.slice.call(arguments));
             return Form.prototype.compare.apply(null, args);
         },
-        /* eslint-enable */
 
         /**
          * Returns true if the value of this element is empty.
@@ -226,7 +224,6 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
             }
         },
 
-        /* eslint-disable no-unused-vars */
         /**
          * Called via an event when the value of this element has changed.
          *
@@ -236,7 +233,6 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
         changed: function(event) {
             this.getForm().valueChanged(this.getId(), this.getValue());
         },
-        /* eslint-enable */
 
         /**
          * Disables this element, if possible.
@@ -717,7 +713,7 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
                             function () {
                                 deferred.resolve();
                             },
-                            function () {
+                            function (e) {
                                 MODULE.debug('Failed to initialise the items within a group of type ' + groupData.module, self,
                                     MODULE.LOGLEVEL.error);
                                 deferred.reject();
@@ -1577,7 +1573,7 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
                         deferred.resolve(form);
                     });
                 },
-                function () {
+                function (e) {
                     MODULE.debug('Failed to initialise items in form #' + formData.id, Form, MODULE.LOGLEVEL.info);
                 }
             );

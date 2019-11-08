@@ -35,7 +35,7 @@ define(['jquery'], function($) {
             }
 
 
-            $('#tfiid_previewbutton_tool_sitepolicy_form_translationform').on('click', function() {
+            $('#tfiid_previewbutton_tool_sitepolicy_form_translationform').on('click', function(event) {
                 // We need to continue with the submit on preview in order to show the latest data
                 $('#tfiid_preview_tool_sitepolicy_form_translationform').val('1');
             });

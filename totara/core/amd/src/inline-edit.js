@@ -116,7 +116,7 @@ define(['core/str'], function(str) {
             }
         });
 
-        this.input.addEventListener('focusout', function() {
+        this.input.addEventListener('focusout', function(e) {
             self.cancel();
         });
 

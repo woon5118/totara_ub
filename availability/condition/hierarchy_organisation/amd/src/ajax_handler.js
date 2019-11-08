@@ -19,7 +19,7 @@
  * @author Alastair Munro <alastair.munro@totaralearning.com>
  * @package availability_hierarchy_organisation
  */
-define(['jquery'], function($) {
+define(['jquery', 'core/config'], function($, mdlcfg) {
 
     var _cache = {};
 

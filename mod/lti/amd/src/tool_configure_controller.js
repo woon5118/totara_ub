@@ -270,7 +270,6 @@ define(['jquery', 'core/ajax', 'core/notification', 'core/templates', 'mod_lti/e
             .done(function(types, proxies) {
                 var requiredstrings = [];
 
-                /* eslint-disable no-unused-vars */
                 types.map(function(el, i){
                     var requiredstring = {key: 'toolisbeingused', component: 'mod_lti', param: el.instancecount};
                     requiredstrings.push(requiredstring);
@@ -279,7 +278,7 @@ define(['jquery', 'core/ajax', 'core/notification', 'core/templates', 'mod_lti/e
                     var requiredstring = {key: 'toolisbeingused', component: 'mod_lti', param: el.instancecount};
                     requiredstrings.push(requiredstring);
                 });
-                /* eslint-enable */
+
 
                 str.get_strings(requiredstrings).then(function(strings) {
                     var stringindex = 0;

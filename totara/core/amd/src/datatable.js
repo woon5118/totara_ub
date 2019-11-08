@@ -20,9 +20,6 @@
  * @package totara
  * @subpackage core/assign
  */
-
-/* eslint-disable no-unused-vars */
-
 define(['jquery', 'core/str', 'core/config', 'totara_core/jquery.dataTables-lazy'], function($, mdlstrings, mdlcfg) {
     var datatable = {
         init: function (module, suffix, itemid) {

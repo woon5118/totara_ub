@@ -78,7 +78,7 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, mdlcfg) {
         stagesSelectDialog: function() {
             var handler = new totaraDialog_handler();
 
-            handler._print = function(e) {
+            handler._print = function(e, printurl) {
                 var urlparam = $('#printform').serialize();
 
                 M.util.help_popups.setup(Y);

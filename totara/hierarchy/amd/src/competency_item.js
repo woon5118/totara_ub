@@ -23,17 +23,16 @@
  * @package totara_hierarchy
  */
 
-/* eslint-disable no-implicit-globals */
-
 define(['jquery', 'core/config', 'core/str'], function ($, config, strings) {
 
     /* global totaraDialog
               totaraDialogs
               totaraMultiSelectDialog
-              totaraDialog_handler_assignEvidence
               totaraDialog_handler_treeview
-              totaraDialog_handler_compEvidence
               totaraDialog_handler_treeview_multiselect */
+
+    var totaraDialog_handler_assignEvidence = function() {};
+    var totaraDialog_handler_compEvidence = function() {};
 
     var loadItemDialogs = function(id, competencyuseresourcelevelevidence) {
         // Add related competency dialog.
@@ -50,8 +49,6 @@ define(['jquery', 'core/config', 'core/str'], function ($, config, strings) {
         if (typeof competencyuseresourcelevelevidence !== 'undefined' && competencyuseresourcelevelevidence) {
 
             // Create handler for the assign evidence dialog
-            totaraDialog_handler_assignEvidence = function() {};
-
             totaraDialog_handler_assignEvidence.prototype = new totaraDialog_handler_treeview();
 
             totaraDialog_handler_assignEvidence.prototype._handle_update_hierarchy = function(list) {
@@ -107,8 +104,6 @@ define(['jquery', 'core/config', 'core/str'], function ($, config, strings) {
         } else { // use course-level dialog
 
             // Create handler for the dialog
-            totaraDialog_handler_compEvidence = function() {};
-
             totaraDialog_handler_compEvidence.prototype = new totaraDialog_handler_treeview_multiselect();
 
             /**

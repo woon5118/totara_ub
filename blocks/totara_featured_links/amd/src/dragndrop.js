@@ -37,7 +37,7 @@ define(['jquery', 'core/ajax', 'jqueryui'], function($, ajax) {
             );
         },
         _mouseDrag: function(event) {
-            var i, item, intersection,
+            var i, item, itemElement, intersection,
                 o = this.options,
                 scrolled = false;
 
@@ -116,6 +116,7 @@ define(['jquery', 'core/ajax', 'jqueryui'], function($, ajax) {
 
                 // Cache variables and intersection, continue if no intersection
                 item = this.items[i];
+                itemElement = item.item[0];
                 intersection = this._intersectsWithPointer(item);
                 if (!intersection) {
                     continue;
@@ -192,7 +193,7 @@ define(['jquery', 'core/ajax', 'jqueryui'], function($, ajax) {
                 tolerance: 'intersect',
                 items: ' > [id^=block-totara-featured-links-tile-]',
                 opacity: 0.5,
-                update: function(event) {
+                update: function(event, ui) {
                     var sortedIDs = $(event.target).sortableGrid("toArray");
                     ajax.call([
                         {

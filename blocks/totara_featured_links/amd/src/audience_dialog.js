@@ -33,7 +33,9 @@ define([
     /* global totaraDialog
               totaraDialog_handler_treeview_multiselect */
 
+    var tileid = '';
     var configDialog = {};
+    var handler;
     var strings = {
         ok: '',
         cancel: '',
@@ -58,7 +60,10 @@ define([
             this._make_deletable($('.selected', this._container));
         };
 
+        tileid = configDialog.instanceid;
+
         var ehandler = new totaraDialog_handler_restrictcohorts();
+        handler = ehandler;
 
         var dbuttons = {};
         dbuttons[strings.ok] = function() {

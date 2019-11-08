@@ -155,8 +155,6 @@ define([
             M.util.js_complete(MODULE);
         },
 
-        /* eslint-disable no-unused-vars */
-
         /**
          * @private
          */
@@ -190,7 +188,6 @@ define([
             });
             this.ajaxSubmitTimeoutID = 0;
         },
-        /* eslint-enable */
 
         /**
          * Returns a string describing this object.

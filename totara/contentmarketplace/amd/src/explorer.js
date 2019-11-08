@@ -27,8 +27,6 @@
  * @package    totara_contentmarketplace
  */
 
-/* eslint-disable no-unused-vars */
-
 define(['jquery', 'core/str', 'core/config', 'core/templates', 'core/modal_factory', 'core/modal_events', 'totara_contentmarketplace/filters'], function($, Str, mdlcfg, templates, ModalFactory, ModalEvents, Filters) {
 
     // This must match \totara_contentmarketplace\explorer::MODE_CREATE_COURSE

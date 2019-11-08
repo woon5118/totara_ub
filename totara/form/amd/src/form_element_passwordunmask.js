@@ -139,7 +139,7 @@ define(['jquery', 'totara_form/form'], function($, Form) {
         // Just a safety guard, if for any reason someone focuses on the mask input
         // shift focus automatically to the input focus.
         // This is not entirely accessible, but it will do the job for the time being.
-        this.mask.focus(function(){
+        this.mask.focus(function(e){
             input.focus();
         });
 

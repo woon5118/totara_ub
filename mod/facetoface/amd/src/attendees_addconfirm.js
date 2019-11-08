@@ -22,7 +22,7 @@
 
 define(['jquery'], function($) {
     var addConfirm = {
-        init: function() {
+        init: function(args) {
             /**
             *  Attaches mouse events to the loaded content.
             */
