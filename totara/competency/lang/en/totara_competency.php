@@ -81,8 +81,8 @@ $string['changesnotsaved:title'] = 'Changes have not been save.';
 // Capabilities
 $string['competency:assign_self'] = 'Assign competency to yourself';
 $string['competency:assign_other'] = 'Assign competency to other users';
-$string['competency:manage'] = 'Manage competency assignments';
-$string['competency:view'] = 'View competency assignments';
+$string['competency:manage_assignments'] = 'Manage competency assignments';
+$string['competency:view_assignments'] = 'View competency assignments';
 $string['competency:view_own_profile'] = 'View own competency profile';
 $string['competency:view_other_profile'] = 'View profile of other users';
 
