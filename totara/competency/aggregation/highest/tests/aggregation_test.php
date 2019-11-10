@@ -21,8 +21,10 @@
  * @package aggregation_highest
  */
 
+use core\orm\collection;
 use totara_competency\aggregation_users_table;
 use totara_competency\entities\scale_value;
+use totara_competency\pathway;
 use totara_competency\pathway_evaluator;
 use totara_competency\entities\pathway_achievement;
 use aggregation_highest\highest;
@@ -51,7 +53,7 @@ class aggregation_highest_aggregation_testcase extends advanced_testcase {
 
         $achievement_detail = $this->getMockForAbstractClass(base_achievement_detail::class);
 
-        $pathway1 = $this->getMockBuilder(\totara_competency\pathway::class)
+        $pathway1 = $this->getMockBuilder(pathway::class)
                          ->setMethods(['aggregate_current_value', 'get_id', 'get_competency'])
                          ->getMockForAbstractClass();
         $pathway1->method('aggregate_current_value')->willReturn($achievement_detail);
@@ -64,7 +66,7 @@ class aggregation_highest_aggregation_testcase extends advanced_testcase {
         $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway1, $pw_user_source]);
         $pathway_evaluator->aggregate();
 
-        $aggregation = new \aggregation_highest\highest();
+        $aggregation = new highest();
         $aggregation->set_pathways([$pathway1])
                     ->aggregate_for_user($user->id);
 
@@ -88,7 +90,7 @@ class aggregation_highest_aggregation_testcase extends advanced_testcase {
         $achievement_detail = $this->getMockForAbstractClass(base_achievement_detail::class);
         $achievement_detail->set_scale_value_id($scale_value->id);
 
-        $pathway1 = $this->getMockBuilder(\totara_competency\pathway::class)
+        $pathway1 = $this->getMockBuilder(pathway::class)
                          ->setMethods(['aggregate_current_value', 'get_id', 'get_competency'])
                          ->getMockForAbstractClass();
         $pathway1->set_competency($competency);
@@ -110,7 +112,10 @@ class aggregation_highest_aggregation_testcase extends advanced_testcase {
         $current_achievement = pathway_achievement::get_current($pathway1, $user->id);
 
         $this->assertEquals($scale_value->id, $aggregation->get_achieved_value_id($user->id));
-        $this->assertEquals([$current_achievement], $aggregation->get_achieved_via($user->id));
+        $achieved_via = $aggregation->get_achieved_via($user->id);
+        $this->assertContainsOnlyInstancesOf(pathway_achievement::class, $achieved_via);
+        $achieved_via_ids = collection::new($achieved_via)->pluck('id');
+        $this->assertEquals([$current_achievement->id], $achieved_via_ids);
     }
 
     public function test_multiple_pathways_returning_value_or_null() {
@@ -125,8 +130,14 @@ class aggregation_highest_aggregation_testcase extends advanced_testcase {
         $scale = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy')->create_scale('comp');
         $scale_values = $DB->get_records('comp_scale_values', ['scaleid' => $scale->id], 'sortorder DESC');
 
+        // Now the ordering of scale values can be confusing. The sortorder is reversed in relation to the actual meaning.
+        // This means the lower the sortorder the higher the actual value.
+
+        // So we are now starting with the lowest and skip it as we only use the second and the highest value for this test
+        $scale_value1 = new scale_value(array_shift($scale_values));
+
         $achievement_detail1 = $this->getMockForAbstractClass(base_achievement_detail::class);
-        $pathway1 = $this->getMockBuilder(\totara_competency\pathway::class)
+        $pathway1 = $this->getMockBuilder(pathway::class)
                          ->setMethods(['aggregate_current_value', 'get_id', 'get_competency'])
                          ->getMockForAbstractClass();
         $pathway1->method('aggregate_current_value')->willReturn($achievement_detail1);
@@ -139,10 +150,11 @@ class aggregation_highest_aggregation_testcase extends advanced_testcase {
         $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway1, $pw_user_source]);
         $pathway_evaluator->aggregate();
 
-        $scale_value2 = new scale_value(array_pop($scale_values));
+        // This is the second value and we use it to give the user an achievement
+        $scale_value2 = new scale_value(array_shift($scale_values));
         $achievement_detail2 = $this->getMockForAbstractClass(base_achievement_detail::class);
         $achievement_detail2->set_scale_value_id($scale_value2->id);
-        $pathway2 = $this->getMockBuilder(\totara_competency\pathway::class)
+        $pathway2 = $this->getMockBuilder(pathway::class)
                          ->setMethods(['aggregate_current_value', 'get_id', 'get_competency'])
                          ->getMockForAbstractClass();
         $pathway2->method('aggregate_current_value')->willReturn($achievement_detail2);
@@ -152,10 +164,11 @@ class aggregation_highest_aggregation_testcase extends advanced_testcase {
         $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway2, $pw_user_source]);
         $pathway_evaluator->aggregate();
 
-        $scale_value3 = new scale_value(array_pop($scale_values));
+        // This is the highest value, which should be the one the users gets at the end as it's the highest
+        $scale_value3 = new scale_value(array_shift($scale_values));
         $achievement_detail3 = $this->getMockForAbstractClass(base_achievement_detail::class);
         $achievement_detail3->set_scale_value_id($scale_value3->id);
-        $pathway3a = $this->getMockBuilder(\totara_competency\pathway::class)
+        $pathway3a = $this->getMockBuilder(pathway::class)
                          ->setMethods(['aggregate_current_value', 'get_id', 'get_competency'])
                          ->getMockForAbstractClass();
         $pathway3a->method('aggregate_current_value')->willReturn($achievement_detail3);
@@ -165,7 +178,7 @@ class aggregation_highest_aggregation_testcase extends advanced_testcase {
         $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway3a, $pw_user_source]);
         $pathway_evaluator->aggregate();
 
-        $pathway3b = $this->getMockBuilder(\totara_competency\pathway::class)
+        $pathway3b = $this->getMockBuilder(pathway::class)
                          ->setMethods(['aggregate_current_value', 'get_id', 'get_competency'])
                          ->getMockForAbstractClass();
         $pathway3b->method('aggregate_current_value')->willReturn($achievement_detail3);
@@ -175,7 +188,7 @@ class aggregation_highest_aggregation_testcase extends advanced_testcase {
         $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway3b, $pw_user_source]);
         $pathway_evaluator->aggregate();
 
-        $aggregation = new \aggregation_highest\highest();
+        $aggregation = new highest();
         $aggregation->set_pathways([$pathway1, $pathway2, $pathway3a, $pathway3b])
                     ->aggregate_for_user($user->id);
 
@@ -183,6 +196,9 @@ class aggregation_highest_aggregation_testcase extends advanced_testcase {
         $current_achievement3b = pathway_achievement::get_current($pathway3b, $user->id);
 
         $this->assertEquals($scale_value3->id, $aggregation->get_achieved_value_id($user->id));
-        $this->assertEquals([$current_achievement3a, $current_achievement3b], $aggregation->get_achieved_via($user->id));
+        $achieved_via = $aggregation->get_achieved_via($user->id);
+        $this->assertContainsOnlyInstancesOf(pathway_achievement::class, $achieved_via);
+        $achieved_via_ids = collection::new($achieved_via)->pluck('id');
+        $this->assertEqualsCanonicalizing([$current_achievement3a->id, $current_achievement3b->id], $achieved_via_ids);
     }
 }
