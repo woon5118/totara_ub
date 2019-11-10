@@ -29,7 +29,14 @@ use totara_competency\entities\pathway_achievement;
 use totara_competency\overall_aggregation;
 
 class first extends overall_aggregation {
-    protected function do_aggregation(int $user_id) {
+
+    /**
+     * Aggregate the user and get the first achievement the user has
+     *
+     * @param int $user_id
+     * @return void
+     */
+    protected function do_aggregation(int $user_id): void {
         /** @var pathway[] $ordered_pathways */
         $ordered_pathways = [];
         foreach ($this->get_pathways() as $pathway) {
@@ -39,21 +46,20 @@ class first extends overall_aggregation {
 
         foreach ($ordered_pathways as $pathway) {
             $achievement = pathway_achievement::get_current($pathway, $user_id);
-            $value_id = $achievement->scale_value_id;
-            if (isset($value_id)) {
-                $this->set_user_achievement($user_id, $value_id, [$achievement]);
+            if ($achievement->scale_value_id) {
+                $this->set_user_achievement($user_id, [$achievement], $achievement->scale_value_id);
                 break;
             }
         }
     }
 
     /**
-     * Return the name of the javascript function handling pathway aggration editing
+     * Return the name of the javascript function handling pathway aggregation editing
      *
-     * @return ?string Javascript function name. In v1, this must be the name of an existing
-     *                function in achievement_paths.js. Null or an empty string indicates
-     *                that no user interaction is required / allowed when changing to this
-     *                aggregation type
+     * @return string|null Javascript function name. In v1, this must be the name of an existing
+     *                     function in achievement_paths.js. Null or an empty string indicates
+     *                     that no user interaction is required / allowed when changing to this
+     *                     aggregation type
      */
     public function get_aggregation_js_function(): ?string {
         return 'calculateSortorderFromDisplay';

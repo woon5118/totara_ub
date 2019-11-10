@@ -32,7 +32,13 @@ class highest extends overall_aggregation {
 
     private $scale_values_cache = [];
 
-    protected function do_aggregation(int $user_id) {
+    /**
+     * Aggregate the user and return the highest value the user got
+     *
+     * @param int $user_id
+     * @return void
+     */
+    protected function do_aggregation(int $user_id): void {
         /** @var pathway_achievement|null $highest_achievement */
         $highest_achievement = null;
         $achieved_via = [];
@@ -59,7 +65,7 @@ class highest extends overall_aggregation {
         }
 
         if (isset($highest_achievement)) {
-            $this->set_user_achievement($user_id, $highest_achievement->scale_value_id, $achieved_via);
+            $this->set_user_achievement($user_id, $achieved_via, $highest_achievement->scale_value_id);
         }
     }
 

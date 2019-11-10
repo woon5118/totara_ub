@@ -48,11 +48,14 @@ class test_aggregation extends overall_aggregation {
 
     /**
      * Test aggregation.
+     *
+     * @param int $user_id
+     * @return void
      */
-    protected function do_aggregation(int $user_id) {
+    protected function do_aggregation(int $user_id): void {
         $this->set_user_achievement($user_id,
-            $this->test_achieved_value_ids[$user_id] ?? null,
-            $this->test_achieved_vias[$user_id] ?? []
+            $this->test_achieved_vias[$user_id] ?? [],
+            $this->test_achieved_value_ids[$user_id] ?? null
         );
     }
 

@@ -23,8 +23,7 @@
 
 namespace totara_competency;
 
-
-use totara_competency\entities\competency_pathway_achievement;
+use totara_competency\entities\pathway_achievement;
 
 abstract class overall_aggregation {
 
@@ -70,7 +69,7 @@ abstract class overall_aggregation {
 
     /**
      * @param int $user_id Id of user to aggregate
-     * @return [int, array] Keys: scale_value_id, achieved_via
+     * @return array [int, array] Keys: scale_value_id, achieved_via
      */
     public function aggregate_for_user(int $user_id): array {
         if (!isset($this->user_achievement[$user_id])) {
@@ -83,13 +82,23 @@ abstract class overall_aggregation {
             : $this->user_achievement[$user_id];
     }
 
-    abstract protected function do_aggregation(int $user_id);
+    /**
+     * Aggregate a users value for a competency
+     *
+     * @param int $user_id
+     * @return void
+     */
+    abstract protected function do_aggregation(int $user_id): void;
 
-    protected function set_user_achievement($user_id, ?int $scale_value_id = null, array $achieved_via) {
+    /**
+     * @param $user_id
+     * @param array|pathway_achievement[] $achieved_via
+     * @param int|null $scale_value_id
+     */
+    protected function set_user_achievement($user_id, array $achieved_via, ?int $scale_value_id = null) {
         // For now taking the last value set
         $this->user_achievement[$user_id] = ['scale_value_id' => $scale_value_id, 'achieved_via' => $achieved_via];
     }
-
 
     /**
      * Return id of the achieved scale value

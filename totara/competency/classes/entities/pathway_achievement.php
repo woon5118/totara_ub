@@ -26,6 +26,7 @@ namespace totara_competency\entities;
 
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
+use core\orm\entity\repository;
 use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\pathway;
 
@@ -54,12 +55,18 @@ class pathway_achievement extends entity {
     /** @var int Achievement is not current */
     public const STATUS_ARCHIVED = 1;
 
+    /**
+     * Get the current achievement for given pathway and user
+     *
+     * @param pathway $pathway
+     * @param int $user_id
+     * @return pathway_achievement
+     */
     public static function get_current(pathway $pathway, int $user_id): pathway_achievement {
-
         $achievements = static::repository()
-            ->where('pathway_id', '=', $pathway->get_id())
-            ->where('user_id', '=', $user_id)
-            ->where('status', '=', static::STATUS_CURRENT)
+            ->where('pathway_id', $pathway->get_id())
+            ->where('user_id', $user_id)
+            ->where('status', static::STATUS_CURRENT)
             ->order_by('last_aggregated','desc')
             ->get();
 

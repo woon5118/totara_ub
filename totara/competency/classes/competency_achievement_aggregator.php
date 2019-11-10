@@ -24,6 +24,7 @@
 namespace totara_competency;
 
 
+use core\orm\collection;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\scale_value;
@@ -52,7 +53,7 @@ final class competency_achievement_aggregator {
     /**
      * aggregator constructor.
      * @param achievement_configuration $achievement_configuration
-     * @param competency_aggregator_user_source_list $user_id_source
+     * @param competency_aggregator_user_source $user_id_source
      */
     public function __construct(
         achievement_configuration $achievement_configuration,
@@ -113,7 +114,9 @@ final class competency_achievement_aggregator {
                 $previous_comp_achievement = new competency_achievement($user_assignment_record->comp_achievement_id);
             }
 
-            if ($user_assignment_record->scale_value_id != $user_achievement['scale_value_id'] || is_null($previous_comp_achievement)) {
+            if ($user_assignment_record->scale_value_id != $user_achievement['scale_value_id']
+                || is_null($previous_comp_achievement)
+            ) {
                 // New achieved value
                 if (!is_null($previous_comp_achievement)) {
                     $previous_comp_achievement->status = competency_achievement::SUPERSEDED;
@@ -142,21 +145,14 @@ final class competency_achievement_aggregator {
                     $DB->insert_record('totara_competency_achievement_via', $via_record);
                 }
 
-                $achieved_via_ids = array_map(
-                    function (pathway_achievement $achievement) {
-                        return $achievement->id;
-                    },
-                    $user_achievement['achieved_via']
-                );
+                $achieved_via_ids = collection::new($user_achievement['achieved_via'])->pluck('id');
 
-                competency_achievement_updated::create(
-                    [
-                        'context' => \context_system::instance(),
-                        'objectid' => $new_comp_achievement->id,
-                        'relateduserid' => $user_id,
-                        'other' => ['competency_id' => $competency_id, 'achieved_via_ids' => $achieved_via_ids],
-                    ]
-                )->trigger();
+                competency_achievement_updated::create([
+                    'context' => \context_system::instance(),
+                    'objectid' => $new_comp_achievement->id,
+                    'relateduserid' => $user_id,
+                    'other' => ['competency_id' => $competency_id, 'achieved_via_ids' => $achieved_via_ids],
+                ])->trigger();
             } else {
                 // No change.
                 $previous_comp_achievement->last_aggregated = $aggregation_time;
@@ -174,14 +170,11 @@ final class competency_achievement_aggregator {
      * @return bool True if the scale value is proficient.
      */
     private function is_proficient($value_id): bool {
-        if (is_null($this->proficient_scale_value_ids)) {
+        if (!isset($this->proficient_scale_value_ids[$value_id])) {
             $value = new scale_value($value_id);
-            if ($value->proficient) {
-                $this->proficient_scale_value_ids[$value->id] = $value->id;
-                return true;
-            }
+            $this->proficient_scale_value_ids[$value_id] = (bool) $value->proficient;
         }
 
-        return isset($this->proficient_scale_value_ids[$value_id]);
+        return $this->proficient_scale_value_ids[$value_id];
     }
 }
