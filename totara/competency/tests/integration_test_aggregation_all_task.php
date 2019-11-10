@@ -21,6 +21,7 @@
  * @package totara_competency
  */
 
+use pathway_manual\manual;
 use totara_competency\entities\competency;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\pathway_achievement;
@@ -28,6 +29,7 @@ use totara_competency\expand_task;
 use totara_competency\linked_courses;
 use totara_competency\models\assignment_actions;
 use totara_competency\task\competency_aggregation_all;
+use totara_job\job_assignment;
 
 /**
  * This is an integration test with multiple users assigned to multiple competencies
@@ -130,9 +132,33 @@ class totara_competency_integration_aggregation_all_task_testcase extends advanc
             $data->competencies[$idx] = new competency($comp);
         }
 
+        // Users with job assignments
+        $data->users['manager'] = $data->generator->create_user(['username' => 'manager']);
+        $data->users['appraiser'] = $data->generator->create_user(['username' => 'appraiser']);
+
+        // Job assignments
+        $managerja = job_assignment::create_default($data->users['manager']->id, [
+            'fullname' => 'Manager job',
+            'idnumber' => 'MANAGERJOB',
+        ]);
+
         for ($i = 1; $i <= $this->num_users; $i++) {
             $data->users[$i] = $data->generator->create_user(['username' => "user{$i}"]);
+
+            // All users get manager as manager and appraiser as appraiser
+            job_assignment::create_default($data->users[$i]->id, [
+                'managerjaid' => $managerja->id,
+                'fullname' => 'Managed by manager',
+                'idnumber' => "User{$i}managed",
+            ]);
+
+            job_assignment::create_default($data->users[$i]->id, [
+                'appraiserid' => $data->users['appraiser']->id,
+                'fullname' => 'Appraised by appraiser',
+                'idnumber' => "User{$i}appraised",
+            ]);
         }
+
 
         // Create courses and enroll all users in all courses
         for ($i = 1; $i <= $this->num_courses; $i++) {
@@ -603,6 +629,90 @@ class totara_competency_integration_aggregation_all_task_testcase extends advanc
             [
                 'competency_id' => $data->competencies[1]->id,
                 'user_id' => $data->users[2]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[2]->id,
+                'proficient' => 0,
+            ],
+        ]);
+    }
+
+    /**
+     * Test competency_aggregate_all with manual pathway.
+     */
+    public function test_aggregation_all_task_single_manual() {
+        $data = $this->setup_data();
+
+        /** @var manual $pathway */
+        $pathway = $data->competency_generator->create_manual($data->competencies[1], [manual::ROLE_MANAGER]);
+
+        // Assign users
+        $to_assign = [
+            ['user_id' => $data->users[1]->id, 'competency_id' => $data->competencies[1]->id],
+            ['user_id' => $data->users[2]->id, 'competency_id' => $data->competencies[1]->id],
+            ['user_id' => $data->users[3]->id, 'competency_id' => $data->competencies[1]->id],
+        ];
+        $data->assign_users_to_competencies($to_assign);
+
+        $ratings = [];
+        // Manager gives rating
+        $ratings[2] = $pathway->set_manual_value($data->users[2]->id,
+            $data->users['manager']->id,
+            manual::ROLE_MANAGER,
+            $data->scalevalues[4]->id
+        );
+        $ratings[3] = $pathway->set_manual_value($data->users[3]->id,
+            $data->users['manager']->id,
+            manual::ROLE_MANAGER,
+            $data->scalevalues[2]->id
+        );
+
+        // Now run the task
+        (new competency_aggregation_all())->execute();
+
+        $this->verify_item_records([]);
+
+        $this->verify_pathway_achievements([
+            [
+                'pathway_id' => $pathway->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'scale_value_id' => null,
+                'related_info' => [],
+            ],
+            [
+                'pathway_id' => $pathway->get_id(),
+                'user_id' => $data->users[2]->id,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[4]->id,
+                'related_info' => ['rating_id' => $ratings[2]->id],
+            ],
+            [
+                'pathway_id' => $pathway->get_id(),
+                'user_id' => $data->users[3]->id,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[2]->id,
+                'related_info' => ['rating_id' =>$ratings[3]->id],
+            ],
+        ]);
+
+        $this->verify_competency_achievements([
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => null,
+                'proficient' => 0,
+            ],
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[2]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[4]->id,
+                'proficient' => 1,
+            ],
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[3]->id,
                 'status' => competency_achievement::ACTIVE_ASSIGNMENT,
                 'scale_value_id' => $data->scalevalues[2]->id,
                 'proficient' => 0,
