@@ -84,9 +84,12 @@ class aggregation_task {
 
         $pathway_rows = $this->get_active_pathways_for_assigned_users();
 
-        $reaggregate_competencies = [];
+        $curr_competency = 0;
         foreach ($pathway_rows as $row) {
-            $reaggregate_competencies[$row->comp_id] = true;
+            if (!empty($curr_competency) && $row->comp_id != $curr_competency) {
+                $this->aggregate_competency_achievements($curr_competency, $aggregation_time);
+            }
+            $curr_competency = $row->comp_id;
 
             $pathway = pathway_factory::from_record($row);
 
@@ -94,8 +97,8 @@ class aggregation_task {
             $pw_evaluator->aggregate($aggregation_time);
         }
 
-        foreach ($reaggregate_competencies as $competency_id => $value) {
-            $this->aggregate_competency_achievements($competency_id, $aggregation_time);
+        if (!empty($curr_competency)) {
+            $this->aggregate_competency_achievements($curr_competency, $aggregation_time);
         }
     }
 
@@ -118,7 +121,7 @@ class aggregation_task {
                     SELECT DISTINCT competency_id
                     FROM {{$this->table->get_table_name()}}
                 )
-            ORDER BY c.sortthread DESC";
+            ORDER BY c.depthlevel DESC";
         $params['activestatus'] = pathway::PATHWAY_STATUS_ACTIVE;
 
         return $DB->get_recordset_sql($sql, $params);
