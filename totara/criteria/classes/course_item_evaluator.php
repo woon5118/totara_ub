@@ -31,7 +31,9 @@ class course_item_evaluator extends item_evaluator {
      * @param int $now
      */
     protected function update_criterion_completion(criterion $criterion, int $now) {
-        global $DB;
+        global $DB, $CFG;
+
+        require_once($CFG->dirroot . '/completion/completion_completion.php');
 
         $criterion_id = $criterion->get_id();
 
