@@ -121,7 +121,7 @@ class aggregation_task {
                     SELECT DISTINCT competency_id
                     FROM {{$this->table->get_table_name()}}
                 )
-            ORDER BY c.depthlevel DESC";
+            ORDER BY c.depthlevel DESC, tcp.comp_id";
         $params['activestatus'] = pathway::PATHWAY_STATUS_ACTIVE;
 
         return $DB->get_recordset_sql($sql, $params);
