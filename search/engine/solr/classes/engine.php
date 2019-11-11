@@ -262,7 +262,9 @@ class engine extends \core_search\engine {
         $query = new \SolrDisMaxQuery();
 
         $this->set_query($query, $data->q);
-        $this->add_fields($query);
+        if (!$this->config->discardsearchfieldnames) {
+            $this->add_fields($query);
+        }
 
         // Search filters applied, we don't cache these filters as we don't want to pollute the cache with tmp filters
         // we are really interested in caching contexts filters instead.
