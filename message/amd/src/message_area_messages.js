@@ -457,7 +457,7 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/cust
                 });
             });
             if (requests.length > 0) {
-                $.when(Ajax.call(requests)).then(function() {
+                Promise.all(Ajax.call(requests)).then(function() {
                     // Store the last message on the page, and the last message being deleted.
                     var updatemessage = null;
                     var messages = this.messageArea.find(SELECTORS.MESSAGE);
