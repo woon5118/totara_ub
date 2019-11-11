@@ -39,11 +39,16 @@ class admin_setting_unassign_behaviour extends admin_setting_configselect {
 
     public const NAME = 'totara_competency/unassign_behaviour';
 
-
+    /**
+     * @inheritDoc
+     */
     public function __construct($name, $visiblename, $description) {
         parent::__construct($name, $visiblename, $description, self::KEEP_NOT_NULL, null);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function load_choices() {
         if (is_array($this->choices)) {
             return true;

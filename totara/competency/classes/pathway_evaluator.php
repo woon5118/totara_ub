@@ -38,7 +38,7 @@ abstract class pathway_evaluator {
      * Constructor.
      *
      * @param pathway $pathway
-     * @param pathway_user_source $user_source
+     * @param pathway_evaluator_user_source $user_id_source
      */
     public function __construct(pathway $pathway, pathway_evaluator_user_source $user_id_source) {
         // Making use of an update_operation value to enable us to determine which users have
@@ -57,7 +57,7 @@ abstract class pathway_evaluator {
     /**
      * Evaluate user achievements for the specific pathway of all assigned users
      *
-     * @param int|null $evaluation_time
+     * @param int|null $evaluation_time defaults to null, uses current time if omitted or null
      */
     public function aggregate(?int $evaluation_time = null) {
 
@@ -80,6 +80,7 @@ abstract class pathway_evaluator {
     /**
      * Evaluate the value achieved for all assigned users
      * Each plugin should override this method if it requires specific evaluation steps
+     *
      * @param int $evaluation_time
      */
     protected function evaluate_user_achievements(int $evaluation_time) {
@@ -87,16 +88,14 @@ abstract class pathway_evaluator {
     }
 
     /**
-     * reaggregate all users with changed completion values
+     * Reaggregate all users with changed completion values
      * Plugins should override this method if it requires additional joins or actions
      *
      * @param int $evaluation_time
      */
     protected function reaggregate(int $evaluation_time) {
-        global $DB;
-
         /** @var \moodle_recordset $to_reaggregate */
-        $to_reaggregate = $this->user_id_source->get_users_to_reaggregate($this->pathway, $evaluation_time);
+        $to_reaggregate = $this->user_id_source->get_users_to_reaggregate($this->pathway);
 
         // We do not update has_changed even if this pathway doesn't result in a new value as another pathway may also
         // have set the flag. Yes, it may mean that we re-aggregate too many users on the higher levels, but at least

@@ -28,6 +28,9 @@ use totara_criteria\criterion;
 
 class achievement_detail extends base_achievement_detail {
 
+    /**
+     * @inheritDoc
+     */
     public function get_achieved_via_strings(): array {
         $criteria_met = [];
         foreach ($this->related_info as $criteria_plugin_name) {

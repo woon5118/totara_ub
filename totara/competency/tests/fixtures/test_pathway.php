@@ -78,7 +78,7 @@ class test_pathway extends pathway {
     /**
      * Not supported for test pathway.
      */
-    protected function fetch_configuration() {
+    protected function fetch_configuration(): void {
         // Do nothing.
     }
 
@@ -99,7 +99,7 @@ class test_pathway extends pathway {
     /**
      * Not supported for test pathway.
      */
-    protected function delete_configuration() {
+    protected function delete_configuration(): void {
         // Do nothing.
     }
 

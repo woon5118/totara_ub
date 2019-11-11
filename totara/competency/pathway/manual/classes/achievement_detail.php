@@ -28,6 +28,9 @@ use totara_competency\base_achievement_detail;
 
 class achievement_detail extends base_achievement_detail {
 
+    /**
+     * @inheritDoc
+     */
     public function get_achieved_via_strings(): array {
         if (empty($this->related_info)) {
             return [];

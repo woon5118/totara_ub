@@ -62,9 +62,9 @@ abstract class base_achievement_detail {
      * which would then process this information into strings that can be displayed.
      *
      * @param array $related_info
-     * @return base_achievement_detail
+     * @return $this
      */
-    public function set_related_info(array $related_info): base_achievement_detail {
+    public function set_related_info(array $related_info): self {
         $this->related_info = $related_info;
         return $this;
     }
@@ -78,9 +78,9 @@ abstract class base_achievement_detail {
 
     /**
      * @param int|null $scale_value_id
-     * @return base_achievement_detail
+     * @return $this
      */
-    public function set_scale_value_id(?int $scale_value_id): base_achievement_detail {
+    public function set_scale_value_id(?int $scale_value_id): self {
         $this->scale_value_id = $scale_value_id;
         return $this;
     }

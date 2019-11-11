@@ -25,7 +25,7 @@ require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->libdir.'/tablelib.php');
 
-use totara_competency\plugintypes;
+use totara_competency\plugin_types;
 use totara_core\advanced_feature;
 
 $actiontype = optional_param('type', '', PARAM_ALPHANUMEXT);
@@ -36,8 +36,8 @@ require_login();
 $systemcontext = context_system::instance();
 require_capability('moodle/site:config', $systemcontext);
 
-$types = plugintypes::get_installed_plugins('criteria', 'totara_criteria');
-$enabledtypes = plugintypes::get_enabled_plugins('criteria', 'totara_criteria');
+$types = plugin_types::get_installed_plugins('criteria', 'totara_criteria');
+$enabledtypes = plugin_types::get_enabled_plugins('criteria', 'totara_criteria');
 
 if (!empty($actiontype) && !empty($action)) {
     require_sesskey();
@@ -48,13 +48,13 @@ if (!empty($actiontype) && !empty($action)) {
 
     switch ($action) {
         case 'enable':
-            $enabledtypes = plugintypes::enable_plugin($actiontype, 'criteria', 'totara_criteria');
-            $types = plugintypes::get_installed_plugins('criteria', 'totara_criteria');
+            $enabledtypes = plugin_types::enable_plugin($actiontype, 'criteria', 'totara_criteria');
+            $types = plugin_types::get_installed_plugins('criteria', 'totara_criteria');
             break;
 
         case 'disable':
-            $enabledtypes = plugintypes::disable_plugin($actiontype, 'criteria', 'totara_criteria');
-            $types = plugintypes::get_installed_plugins('criteria', 'totara_criteria');
+            $enabledtypes = plugin_types::disable_plugin($actiontype, 'criteria', 'totara_criteria');
+            $types = plugin_types::get_installed_plugins('criteria', 'totara_criteria');
             break;
     }
 }

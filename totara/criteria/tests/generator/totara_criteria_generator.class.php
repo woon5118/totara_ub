@@ -27,7 +27,7 @@ use criteria_childcompetency\childcompetency;
 use criteria_coursecompletion\coursecompletion;
 use criteria_linkedcourses\linkedcourses;
 use criteria_onactivate\onactivate;
-use totara_competency\plugintypes;
+use totara_competency\plugin_types;
 use totara_criteria\criterion;
 use totara_criteria\criterion_factory;
 use totara_criteria\entities\criterion as criterion_entity;
@@ -164,7 +164,7 @@ class totara_criteria_generator extends component_generator_base {
      * @return criterion
      */
     public function create_test_criterion(string $plugin): criterion {
-        plugintypes::enable_plugin($plugin, 'criteria', 'totara_criteria');
+        plugin_types::enable_plugin($plugin, 'criteria', 'totara_criteria');
         $criterion = criterion_factory::create($plugin);
         $criterion->update_items();
         return $criterion;

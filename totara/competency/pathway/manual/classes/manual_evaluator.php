@@ -33,7 +33,7 @@ class manual_evaluator extends pathway_evaluator {
      * Constructor.
      *
      * @param pathway $pathway
-     * @param pathway_user_source $user_source
+     * @param pathway_evaluator_user_source $user_id_source
      */
     public function __construct(pathway $pathway, pathway_evaluator_user_source $user_id_source) {
         $manual_user_source = $this->get_manual_user_source($user_id_source);
@@ -42,8 +42,9 @@ class manual_evaluator extends pathway_evaluator {
 
     /**
      * Instantiate and return a manual_user_source using the same user_id_source as the pathway
+     *
      * @param pathway_evaluator_user_source $user_id_source
-     * @return manual_user_source
+     * @return manual_evaluator_user_source
      */
     private function get_manual_user_source(pathway_evaluator_user_source $user_id_source): manual_evaluator_user_source {
         return new manual_evaluator_user_source($user_id_source->get_source(), $user_id_source->is_full_user_set());

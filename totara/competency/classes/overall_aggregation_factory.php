@@ -63,7 +63,7 @@ class overall_aggregation_factory {
      *
      * @param string $type
      * @return string
-     * @throws \coding_exception
+     * @throws \coding_exception if the type does not exist
      */
     public static function get_classname(string $type): string {
         $classname = static::get_namespace($type) . '\\' . $type;
@@ -80,7 +80,7 @@ class overall_aggregation_factory {
      * @throws \coding_exception if the type is not enabled
      */
     private static function require_enabled($type) {
-        $enabledtypes = plugintypes::get_enabled_plugins('aggregation', 'totara_competency');
+        $enabledtypes = plugin_types::get_enabled_plugins('aggregation', 'totara_competency');
         if (!in_array($type, $enabledtypes)) {
             throw new \coding_exception("Invalid type", "Aggregation type '{$type}' is not enabled");
         }

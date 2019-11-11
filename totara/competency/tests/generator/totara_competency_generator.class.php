@@ -36,7 +36,7 @@ use totara_competency\entities\scale;
 use totara_competency\entities\scale_value;
 use totara_competency\pathway;
 use totara_competency\pathway_aggregation;
-use totara_competency\plugintypes;
+use totara_competency\plugin_types;
 use totara_criteria\criterion;
 
 global $CFG;
@@ -409,7 +409,7 @@ class totara_competency_generator extends component_generator_base {
      * @return test_pathway|pathway
      */
     public function create_test_pathway(?competency $competency = null): pathway {
-        plugintypes::enable_plugin('test_pathway', 'pathway', 'totara_competency');
+        plugin_types::enable_plugin('test_pathway', 'pathway', 'totara_competency');
 
         $pathway = new test_pathway();
         if (!is_null($competency)) {

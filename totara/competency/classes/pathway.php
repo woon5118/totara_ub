@@ -67,9 +67,6 @@ abstract class pathway {
      * Instantiation
      ********************************************************************/
 
-    /**
-     * Constructor.
-     */
     final public function __construct() {
         $reflect = new \ReflectionClass($this);
         $this->path_type = $reflect->getShortName();
@@ -107,6 +104,7 @@ abstract class pathway {
             throw new \coding_exception('Path type mismatch');
         }
 
+        /** @var competency $competency */
         $competency = competency::repository()->find($record->comp_id);
         if (!$competency) {
             throw new \coding_exception('Competency for given pathway not found');
@@ -126,7 +124,7 @@ abstract class pathway {
     /**
      * Load the data specific to the type of pathway.
      */
-    abstract protected function fetch_configuration();
+    abstract protected function fetch_configuration(): void;
 
 
     /****************************************************************************
@@ -156,7 +154,6 @@ abstract class pathway {
             }
         }
     }
-
 
     /**
      * Save the pathway
@@ -241,6 +238,7 @@ abstract class pathway {
     /**
      * 'Delete' the pathway and all its associated configuration
      *
+     * @return $this
      */
     final public function delete() {
         if ($this->is_active()) {
@@ -253,7 +251,7 @@ abstract class pathway {
     /**
      * Delete the pathway specific detail
      */
-    abstract protected function delete_configuration();
+    abstract protected function delete_configuration(): void;
 
     /**
      * Delete all pathway data relating to a specific competency.
@@ -284,17 +282,14 @@ abstract class pathway {
      ****************************************************************************/
 
     /**
-     * Get the pathway id
-     * @return ?int Id of the pathway
+     * @return int|null Id of the pathway
      */
     public function get_id(): ?int {
         return $this->id;
     }
 
     /**
-     * Set the pathway id
-     *
-     * @param ?int $id New pathway id
+     * @param int|null $id New pathway id
      * @return $this
      */
     private function set_id(?int $id): pathway {
@@ -303,7 +298,6 @@ abstract class pathway {
     }
 
     /**
-     * Get the competency
      * @return competency
      */
     public function get_competency(): competency {
@@ -311,8 +305,6 @@ abstract class pathway {
     }
 
     /**
-     * Set the competency
-     *
      * @param competency $competency
      * @return $this
      */
@@ -323,8 +315,6 @@ abstract class pathway {
     }
 
     /**
-     * Get the sortorder
-     *
      * @return int Current sortorder
      */
     public function get_sortorder(): int {
@@ -332,8 +322,6 @@ abstract class pathway {
     }
 
     /**
-     * Set the sortorder
-     *
      * @param int $sortorder
      * @return $this
      */
@@ -343,8 +331,6 @@ abstract class pathway {
     }
 
     /**
-     *  Get the pathway type
-     *
      * @return string
      */
     public function get_path_type(): string {
@@ -354,18 +340,14 @@ abstract class pathway {
     // No set_path_type - derived from class
 
     /**
-     * Get instance id
-     *
-     * @return ?int Path instance id
+     * @return int|null Path instance id
      */
     public function get_path_instance_id(): ?int {
         return $this->path_instance_id;
     }
 
     /**
-     * Set the instance id
-     *
-     * @param ?int Path instance id
+     * @param int|null Path instance id
      * @return $this
      */
     protected function set_path_instance_id(?int $instance_id): pathway {
@@ -374,8 +356,6 @@ abstract class pathway {
     }
 
     /**
-     * Is this pathway active?
-     *
      * @return bool
      */
     public function is_active(): bool {
@@ -383,8 +363,6 @@ abstract class pathway {
     }
 
     /**
-     * Is this pathway archived?
-     *
      * @return bool
      */
     public function is_archived(): bool {
@@ -392,8 +370,6 @@ abstract class pathway {
     }
 
     /**
-     * Return the pathway status
-     *
      * @return int
      */
     public function get_status(): int {
@@ -401,7 +377,7 @@ abstract class pathway {
     }
 
     /**
-     * Return a string presentation of the pathway status
+     * Return a human readable string of the pathway status
      *
      * @return string
      */
@@ -411,6 +387,11 @@ abstract class pathway {
             static::PATHWAY_STATUS_ARCHIVED => 'pathwaystatusarchived',
         ];
 
+        if (!isset($string_keys[$this->status])) {
+            debugging("Missing translation string for pathway status {$this->status}", DEBUG_DEVELOPER);
+            return 'pathwaystatusunknown';
+        }
+
         return strtoupper(get_string($string_keys[$this->status], 'totara_competency'));
     }
 
@@ -419,18 +400,14 @@ abstract class pathway {
      *
      * @param int $status New status
      * @return $this
-     * @throws \coding_exception
      */
     protected function set_status(int $status): pathway {
-        switch ($status) {
-            case static::PATHWAY_STATUS_ACTIVE:
-            case static::PATHWAY_STATUS_ARCHIVED:
-                $this->status = $status;
-                break;
-
-            default:
-                throw new \coding_exception('Unknown pathway status');
+        if ($status !== static::PATHWAY_STATUS_ACTIVE
+            && $status !== static::PATHWAY_STATUS_ARCHIVED
+        ) {
+            throw new \coding_exception('Unknown pathway status');
         }
+        $this->status = $status;
 
         return $this;
     }
@@ -455,6 +432,11 @@ abstract class pathway {
             static::PATHWAY_SINGLE_VALUE => 'pathwaysinglevalue',
         ];
 
+        if (!isset($string_keys[static::CLASSIFICATION])) {
+            debugging("Missing translation string for pathway classification name ".static::CLASSIFICATION, DEBUG_DEVELOPER);
+            return 'pathwayunknownclassification';
+        }
+
         return strtoupper(get_string($string_keys[static::CLASSIFICATION], 'totara_competency'));
     }
 
@@ -463,7 +445,7 @@ abstract class pathway {
      *
      * Override this method for pathways that can be set to correspond to particular value.
      *
-     * @return ?scale_value A null return value indicates that any scale value may be returned
+     * @return scale_value|null A null return value indicates that any scale value may be returned
      */
     public function get_scale_value(): ?scale_value {
         return null;
@@ -636,8 +618,8 @@ abstract class pathway {
     /**
      * Retrieve the pathway configuration
      *
-     * @param ?int $id Instance id
-     * @return \stdClass | null
+     * @param int|null $id Instance id
+     * @return \stdClass|null
      */
     public static function dump_pathway_configuration(?int $id = null) {
         return null;

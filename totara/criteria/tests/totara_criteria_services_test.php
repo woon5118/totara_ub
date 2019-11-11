@@ -20,7 +20,7 @@
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  */
 
-use totara_competency\plugintypes;
+use totara_competency\plugin_types;
 
 global $CFG;
 require_once($CFG->dirroot . '/lib/externallib.php');
@@ -44,7 +44,7 @@ class totara_criteria_services_testcase extends advanced_testcase {
         $data = $this->setup_data();
 
         // Test foreach enabled criterion type
-        $enabledtypes = plugintypes::get_enabled_plugins('criteria', 'totara_criteria');
+        $enabledtypes = plugin_types::get_enabled_plugins('criteria', 'totara_criteria');
         foreach ($enabledtypes as $type) {
             $res = \external_api::call_external_function(
                 'totara_criteria_get_definition_template',

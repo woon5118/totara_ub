@@ -32,22 +32,40 @@ class learning_plan extends pathway {
 
     public const CLASSIFICATION = self::PATHWAY_MULTI_VALUE;
 
-    protected function fetch_configuration() {
+    /**
+     * @inheritDoc
+     */
+    protected function fetch_configuration(): void {
         // Do nothing.
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function save_configuration() {
         // Do nothing.
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function configuration_is_dirty(): bool {
         return false;
     }
 
-    protected function delete_configuration() {
+    /**
+     * @inheritDoc
+     */
+    protected function delete_configuration(): void {
         // Do nothing.
     }
 
+    /**
+     * Get the current value from the learning plan and aggregate the pathway with it
+     *
+     * @param int $user_id
+     * @return base_achievement_detail
+     */
     public function aggregate_current_value(int $user_id): base_achievement_detail {
         global $DB;
 
@@ -58,7 +76,6 @@ class learning_plan extends pathway {
         );
 
         $achievement_detail = new achievement_detail();
-
         if ($scale_value_id) {
             $achievement_detail->set_scale_value_id($scale_value_id);
         }
@@ -66,10 +83,16 @@ class learning_plan extends pathway {
         return $achievement_detail;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function get_edit_template(): string {
         return 'pathway_learning_plan/edit';
     }
 
+    /**
+     * @inheritDoc
+     */
     public function get_view_template(): string {
         return 'pathway_learning_plan/view';
     }

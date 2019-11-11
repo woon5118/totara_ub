@@ -23,7 +23,7 @@
 
 namespace totara_criteria;
 
-use totara_competency\plugintypes;
+use totara_competency\plugin_types;
 
 /**
  * Criterion factory class to obtain an instance of the specific criterion type
@@ -101,7 +101,7 @@ class criterion_factory {
      * @throws \coding_exception if the type is not enabled
      */
     private static function require_enabled($type) {
-        $enabledtypes = plugintypes::get_enabled_plugins('criteria', 'totara_criteria');
+        $enabledtypes = plugin_types::get_enabled_plugins('criteria', 'totara_criteria');
 
         if (!in_array($type, $enabledtypes)) {
             throw new \coding_exception("Invalid type", "Criterion type '{$type}' is not enabled");

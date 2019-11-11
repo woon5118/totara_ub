@@ -61,7 +61,7 @@ class manual extends pathway {
     /**
      * Load the manual configuration from the database
      */
-    protected function fetch_configuration() {
+    protected function fetch_configuration(): void {
         global $DB;
 
         $this->set_roles(
@@ -175,7 +175,7 @@ class manual extends pathway {
     /**
      * Delete the pathway specific detail
      */
-    protected function delete_configuration() {
+    protected function delete_configuration(): void {
         global $DB;
 
         $DB->delete_records('pathway_manual_role', ['path_manual_id' => $this->get_path_instance_id()]);

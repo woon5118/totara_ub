@@ -23,6 +23,7 @@
 
 namespace totara_competency;
 
+use moodle_recordset;
 use totara_competency\entities\pathway_achievement;
 
 class pathway_evaluator_user_source {
@@ -34,7 +35,6 @@ class pathway_evaluator_user_source {
     protected $full_user_set = false;
 
     /**
-     * Constructor.
      * @param aggregation_users_table $temp_user_table Source containing the user ids
      * @param bool $full_user_set Does this source contain all users?
      */
@@ -45,6 +45,7 @@ class pathway_evaluator_user_source {
 
     /**
      * Return the user_id_source
+     *
      * @return aggregation_users_table Source used for obtaining currently assigned users
      */
     public function get_source() {
@@ -53,6 +54,7 @@ class pathway_evaluator_user_source {
 
     /**
      * Does the source hold a full set of user ids?
+     *
      * @return bool
      */
     public function is_full_user_set(): bool {
@@ -61,6 +63,7 @@ class pathway_evaluator_user_source {
 
     /**
      * Archive patwhays achievement records of users no longer assigned
+     *
      * @param pathway $pathway
      * @param int $aggregation_time
      */
@@ -79,16 +82,18 @@ class pathway_evaluator_user_source {
         );
         $temp_wh = !empty($temp_wh) ? " WHERE {$temp_wh}" : '';
 
-        $sql =
-            "UPDATE {totara_competency_pathway_achievement}
-                SET status = :archived,
-                    last_aggregated = :aggregationtime
-              WHERE pathway_id = :pathwayid
+        $sql = "
+            UPDATE {totara_competency_pathway_achievement}
+            SET status = :archived,
+                last_aggregated = :aggregationtime
+            WHERE pathway_id = :pathwayid
                 AND status = :currentstatus
                 AND user_id NOT IN ( 
                     SELECT {$temp_user_id_column}
-                      FROM {" . $temp_table_name . "}
-                      {$temp_wh})";
+                    FROM {{$temp_table_name}}
+                    {$temp_wh}
+                )
+        ";
 
         $params = array_merge(
             [
@@ -105,6 +110,7 @@ class pathway_evaluator_user_source {
 
     /**
      * Mark users who don't yet have a pathway_achievement record as having changed
+     *
      * @param pathway $pathway
      */
     public function mark_newly_assigned_users(pathway $pathway) {
@@ -133,7 +139,7 @@ class pathway_evaluator_user_source {
         );
 
         $sql =
-            "UPDATE {" . $temp_table_name . "}
+            "UPDATE {{$temp_table_name}}
                 SET {$set_haschanged_sql}
               WHERE {$user_id_column} NOT IN (
                     SELECT tcpa.user_id
@@ -156,6 +162,7 @@ class pathway_evaluator_user_source {
 
     /**
      * Set the operation key to distinguish between different pathways
+     *
      * @param $update_operation_value
      */
     public function set_update_operation_value($update_operation_value) {
@@ -164,6 +171,7 @@ class pathway_evaluator_user_source {
 
     /**
      * Set the competency_id_value to use in filtering
+     *
      * @param int $competency_id
      */
     public function set_competency_id_value(int $competency_id) {
@@ -174,10 +182,9 @@ class pathway_evaluator_user_source {
      * Reaggregate all users with changed completion values
      *
      * @param pathway $pathway
-     * @param int $aggregation_time
-     * @return \moodle_recordset
+     * @return moodle_recordset
      */
-    public function get_users_to_reaggregate(pathway $pathway, int $aggregation_time): \moodle_recordset {
+    public function get_users_to_reaggregate(pathway $pathway): moodle_recordset {
         global $DB;
 
         $temp_alias = 'tmp';
@@ -185,15 +192,16 @@ class pathway_evaluator_user_source {
         $userid_column = $this->temp_user_table->get_user_id_column();
         [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params($temp_alias, true, 1);
 
-        $sql =
-            "SELECT {$temp_alias}.{$userid_column} as user_id, 
+        $sql = "
+            SELECT {$temp_alias}.{$userid_column} as user_id, 
                     tcpa.id as achievement_id,
                     tcpa.scale_value_id
-               FROM {" . $temp_table_name . "} {$temp_alias}
-          LEFT JOIN {totara_competency_pathway_achievement} tcpa
+            FROM {{$temp_table_name}} {$temp_alias}
+            LEFT JOIN {totara_competency_pathway_achievement} tcpa
                  ON tcpa.pathway_id = :pathwayid
-                AND tcpa.user_id = {$temp_alias}.{$userid_column}
-                AND tcpa.status = :currentstatus";
+                    AND tcpa.user_id = {$temp_alias}.{$userid_column}
+                    AND tcpa.status = :currentstatus
+        ";
 
         $params = [
             'pathwayid' => $pathway->get_id(),

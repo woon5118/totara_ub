@@ -23,6 +23,7 @@
 
 namespace totara_competency;
 
+use moodle_recordset;
 use totara_competency\entities\competency_achievement;
 
 class competency_aggregator_user_source {
@@ -128,10 +129,9 @@ class competency_aggregator_user_source {
      * Get users to consider for reaggregation
      *
      * @param int $competency_id
-     * @param int $aggregation_time
-     * @return \moodle_recordset
+     * @return moodle_recordset
      */
-    public function get_users_to_reaggregate(int $competency_id, int $aggregation_time): \moodle_recordset {
+    public function get_users_to_reaggregate(int $competency_id): moodle_recordset {
         global $DB;
 
         // Find assignments of all users that were marked as having changes

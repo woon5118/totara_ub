@@ -27,6 +27,7 @@ namespace pathway_criteria_group;
 use totara_competency\pathway;
 use totara_competency\pathway_evaluator;
 use totara_competency\pathway_evaluator_user_source;
+use totara_criteria\criterion;
 use totara_criteria\item_evaluator;
 use totara_criteria\item_evaluator_user_source;
 
@@ -36,10 +37,8 @@ class criteria_group_evaluator extends pathway_evaluator {
     private $item_evaluator_user_source;
 
     /**
-     * Constructor.
-     *
      * @param pathway $pathway
-     * @param pathway_user_source $user_source
+     * @param pathway_evaluator_user_source $user_id_source
      */
     public function __construct(pathway $pathway, pathway_evaluator_user_source $user_id_source) {
         parent::__construct($pathway, $user_id_source);
@@ -54,6 +53,7 @@ class criteria_group_evaluator extends pathway_evaluator {
      */
     protected function evaluate_user_achievements(int $aggregation_time) {
         // First update all criteria item_records for assigned users.
+        /** @var criterion $criterion */
         foreach ($this->pathway->get_criteria() as $criterion) {
             /** @var item_evaluator $item_evaluator */
             $item_evaluator_class = $criterion::item_evaluator();
@@ -66,10 +66,14 @@ class criteria_group_evaluator extends pathway_evaluator {
 
     /**
      * Instantiate and return a item_evaluator_user_source using the same user_id_source as the pathway
+     *
      * @param pathway_evaluator_user_source $user_id_source
      * @return item_evaluator_user_source
      */
     private function get_item_evaluator_user_source(pathway_evaluator_user_source $user_id_source): item_evaluator_user_source {
-        return new item_evaluator_user_source($user_id_source->get_source(), $user_id_source->is_full_user_set());
+        return new item_evaluator_user_source(
+            $user_id_source->get_source(),
+            $user_id_source->is_full_user_set()
+        );
     }
 }

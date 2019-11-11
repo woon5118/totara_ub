@@ -97,11 +97,11 @@ class achievement_configuration {
      * Set the scale aggregation type used in this competency
      *
      * @param string $type Scale aggregation type
-     * @throws \coding_exception
+     * @return $this
      */
     public function set_aggregation_type(string $type): achievement_configuration {
         // Check that the type is valid - this will throw an error if invalid
-        $classname = overall_aggregation_factory::get_classname($type);
+        overall_aggregation_factory::get_classname($type);
 
         $this->aggregation_type = $type;
         return $this;
@@ -139,8 +139,8 @@ class achievement_configuration {
     /**
      * Delete the specified pathways from the competency
      *
-     * @param [object] Array of pathway type/id pairs
-     * @param ?int $action_time Time when this action was initiated.
+     * @param array $pathways
+     * @param int|null $action_time
      */
     public function delete_pathways(array $pathways, ?int $action_time = null) {
         global $DB;
@@ -175,8 +175,8 @@ class achievement_configuration {
     /**
      * Link and save pathways defined in the default preset to this competency if it has no existing pathways
      *
-     * @param ?int $action_time Time when this action was initiated.
-     * return $this
+     * @param int|null $action_time Time when this action was initiated.
+     * @return $this
      */
     public function link_default_preset(?int $action_time = null): achievement_configuration {
         global $DB;
@@ -210,7 +210,7 @@ class achievement_configuration {
     /**
      * Save an aggregation type
      *
-     * @param ?int $action_time Time when this action was initiated.
+     * @param int|null $action_time Time when this action was initiated.
      * @return $this
      */
     public function save_aggregation(?int $action_time = null): achievement_configuration {
@@ -282,7 +282,9 @@ class achievement_configuration {
     /**
      * Dump the current configuration in json format for historical purposes in the history table
      *
-     * @param ?int $action time Action time to use
+     * @param int|null $action_time
+     * @param string|null $configuration_dump
+     * @return $this
      */
     public function save_configuration_history(?int $action_time = null, ?string $configuration_dump = null) {
         global $DB;
@@ -323,6 +325,8 @@ class achievement_configuration {
         $entry->save();
 
         $transaction->allow_commit();
+
+        return $this;
     }
 
     /**

@@ -37,6 +37,7 @@ use totara_criteria\criterion;
  */
 
 class achievement_criteria {
+
     /**
      * Get available overall aggregation methods
      *
@@ -44,7 +45,7 @@ class achievement_criteria {
      */
     public static function get_available_overall_aggregation_methods(): array {
         $methods = [];
-        $enabledtypes = plugintypes::get_enabled_plugins('aggregation', 'totara_competency');
+        $enabledtypes = plugin_types::get_enabled_plugins('aggregation', 'totara_competency');
         foreach ($enabledtypes as $agg_type) {
             $methods[] = overall_aggregation_factory::create($agg_type);
         }
@@ -62,7 +63,6 @@ class achievement_criteria {
      * @return array of pathways
      */
     public static function get_default_pathways(scale $scale, ?int $comp_id = null): array {
-
         // Manager rating
         // Self rating
         // Completion of linked coursed for minumum proficiency value

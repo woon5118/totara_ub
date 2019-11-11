@@ -27,6 +27,7 @@ namespace pathway_criteria_group;
 use core\orm\query\builder;
 use pathway_criteria_group\entities\criteria_group as criteria_group_entity;
 use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
+use stdClass;
 use totara_competency\base_achievement_detail;
 use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\pathway;
@@ -60,10 +61,8 @@ class criteria_group extends pathway {
 
     /**
      * Load the criteria_group configuration from the database
-     *
-     * @throws \coding_exception
      */
-    protected function fetch_configuration() {
+    protected function fetch_configuration(): void {
         global $DB;
 
         if (empty($this->get_path_instance_id())) {
@@ -145,8 +144,6 @@ class criteria_group extends pathway {
 
     /**
      * Save the criteria_group, associated criteria and approval roles
-     *
-     * @throws \coding_exception
      */
     protected function save_configuration() {
         global $DB;
@@ -172,7 +169,7 @@ class criteria_group extends pathway {
         }
 
         // Create new criteria_group instance
-        $record = new \stdClass();
+        $record = new stdClass();
         $record->scale_value_id = $this->get_scale_value()->id;
         $record->status = static::PATHWAY_STATUS_ACTIVE;
         $record->timemodified = time();
@@ -240,40 +237,9 @@ class criteria_group extends pathway {
     }
 
     /**
-     * Link the criteria to the criteria_group
-     * and update critids
-     */
-    private function link_criteria_to_group() {
-        global $DB;
-
-        $this->critids = [];
-
-        if (empty($this->get_criteria())) {
-            return;
-        }
-
-        // Insert new criteria_group_criterion rows
-        $toinsert = [];
-
-        foreach ($this->get_criteria() as $criterion) {
-            $toinsert[] = (object)[
-                'criteria_group_id' => $this->get_path_instance_id(),
-                'criterion_type' => $criterion->get_plugin_type(),
-                'criterion_id' => $criterion->get_id(),
-            ];
-
-            $this->critids[] = $criterion->get_id();
-        }
-
-        if (!empty($toinsert)) {
-            $DB->insert_records('pathway_criteria_group_criterion', $toinsert);
-        }
-    }
-
-    /**
      * 'Delete' the pathway specific detail by archiving it
      */
-    protected function delete_configuration() {
+    protected function delete_configuration(): void {
         global $DB;
 
         if (empty($this->get_path_instance_id())) {
@@ -323,7 +289,7 @@ class criteria_group extends pathway {
      * @param scale_value $scale_value
      * @return $this
      */
-    public function set_scale_value(scale_value $scale_value) {
+    public function set_scale_value(scale_value $scale_value): pathway {
         $this->scale_value = $scale_value;
         return $this;
     }
@@ -478,7 +444,7 @@ class criteria_group extends pathway {
     /**
      * Get a short description of the content of this pathway
      *
-     * @return Short description
+     * @return string  Short description
      */
     public function get_short_description(): string {
         $criteria_types = [];
@@ -517,8 +483,7 @@ class criteria_group extends pathway {
      * Retrieve the current configuration from the database
      *
      * @param int|null $id
-     * @return \stdClass | null
-     * @throws \dml_exception
+     * @return stdClass|null
      */
     public static function dump_pathway_configuration(?int $id = null) {
         global $DB;
@@ -542,6 +507,7 @@ class criteria_group extends pathway {
     /*************************************************************************************************
      * Per user
      * ***********************************************************************************************/
+
     /**
      * Return obtained scale value for this user
      * (Not naming it aggregate to avoid confusion of aggregation of all pathway results for this user)

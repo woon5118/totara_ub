@@ -30,7 +30,7 @@ use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
 use totara_competency\entities\configuration_change;
 use totara_competency\entities\scale_value;
-use totara_competency\plugintypes;
+use totara_competency\plugin_types;
 use totara_core\advanced_feature;
 use totara_criteria\criterion_factory;
 
@@ -285,7 +285,7 @@ class external extends \external_api {
 
         $results = [];
 
-        $types = plugintypes::get_enabled_plugins('criteria', 'totara_criteria');
+        $types = plugin_types::get_enabled_plugins('criteria', 'totara_criteria');
 
         foreach ($types as $type) {
             $criterion = criterion_factory::create($type);

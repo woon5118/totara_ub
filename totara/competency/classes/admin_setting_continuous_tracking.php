@@ -36,11 +36,16 @@ class admin_setting_continuous_tracking extends admin_setting_configselect {
     public const DISABLED = 0;
     public const ENABLED = 1;
 
-
+    /**
+     * @inheritDoc
+     */
     public function __construct($name, $visiblename, $description) {
         parent::__construct($name, $visiblename, $description, self::ENABLED, null);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function load_choices() {
         if (is_array($this->choices)) {
             return true;

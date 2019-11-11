@@ -105,7 +105,7 @@ class aggregation_task {
     private function get_active_pathways_for_assigned_users(): \moodle_recordset {
         global $DB;
 
-        $pathway_types = plugintypes::get_enabled_plugins('pathway', 'totara_competency');
+        $pathway_types = plugin_types::get_enabled_plugins('pathway', 'totara_competency');
         [$pathtype_sql, $params] = $DB->get_in_or_equal($pathway_types, SQL_PARAMS_NAMED);
 
         // Get active pathways for assigned users

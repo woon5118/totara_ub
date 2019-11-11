@@ -22,7 +22,7 @@
  */
 
 use totara_competency\pathway_factory;
-use totara_competency\plugintypes;
+use totara_competency\plugin_types;
 use totara_criteria\criterion;
 
 class totara_competency_pathway_factory_testcase extends \advanced_testcase {
@@ -155,8 +155,8 @@ class totara_competency_pathway_factory_testcase extends \advanced_testcase {
         require_once $CFG->dirroot.'/totara/competency/tests/fixtures/fake_multivalue_type.php';
         require_once $CFG->dirroot.'/totara/competency/tests/fixtures/fake_singlevalue_type.php';
 
-        plugintypes::enable_plugin('fake_multivalue_type', 'pathway', 'totara_competency');
-        plugintypes::enable_plugin('fake_singlevalue_type', 'pathway', 'totara_competency');
+        plugin_types::enable_plugin('fake_multivalue_type', 'pathway', 'totara_competency');
+        plugin_types::enable_plugin('fake_singlevalue_type', 'pathway', 'totara_competency');
     }
 
 }

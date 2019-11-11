@@ -36,15 +36,16 @@ abstract class overall_aggregation {
     /** @var array Achievement information per user */
     private $user_achievement = [];
 
-
-    /**
-     * Constructor.
-     */
     final public function __construct() {
         $reflect = new \ReflectionClass($this);
         $this->agg_type = $reflect->getShortName();
     }
 
+    /**
+     * Returns the type of the aggregation, i.e. highest or first
+     *
+     * @return string
+     */
     public function get_agg_type(): string {
         return $this->agg_type;
     }
@@ -125,13 +126,18 @@ abstract class overall_aggregation {
         return $this->user_achievement[$user_id]['achieved_via'];
     }
 
+    /**
+     * Human readable title for this aggregation
+     *
+     * @return string
+     */
     public function get_title(): string {
         $namespace = (new \ReflectionClass($this))->getNamespaceName();
         return get_string('title', $namespace);
     }
 
     /**
-     * Get the description of the aggregation type for display purposes
+     * Get the human readable description of the aggregation type for display purposes
      *
      * @return string
      */
@@ -141,12 +147,12 @@ abstract class overall_aggregation {
     }
 
     /**
-     * Return the name of the javascript function handling pathway aggration editing
+     * Return the name of the javascript function handling pathway aggregation editing
      *
-     * @return ?string Javascript function name. In v1, this must be the name of an existing
-     *                function in achievement_paths.js. Null or an empty string indicates
-     *                that no user interaction is required / allowed when changing to this
-     *                aggregation type
+     * @return string|null Javascript function name. In v1, this must be the name of an existing
+     *                     function in achievement_paths.js. Null or an empty string indicates
+     *                     that no user interaction is required / allowed when changing to this
+     *                     aggregation type
      */
     public function get_aggregation_js_function(): ?string {
         return null;

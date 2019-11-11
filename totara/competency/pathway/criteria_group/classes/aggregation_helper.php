@@ -33,9 +33,8 @@ class aggregation_helper {
      * Add entries to totara_competency_aggregation_queue for each competency with a pathway with
      * any of the provided criteria
      *
-     * @param $criteria_ids
-     * @param $user_id
-     * @throws \coding_exception
+     * @param array $criteria_ids
+     * @param int|null $user_id
      */
     public static function mark_for_reaggregate_from_criteria(array $criteria_ids, ?int $user_id = null) {
         global $DB;

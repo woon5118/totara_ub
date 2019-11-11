@@ -37,7 +37,7 @@ class aggregation_users_table {
     /**
      * @var bool
      */
-    protected $is_temporary;
+    protected $is_temporary = false;
 
     /** @var string $table_name Name of the table containing information on the users to consider for aggregation */
     private $table_name = 'totara_competency_aggregation_queue';
@@ -110,21 +110,24 @@ class aggregation_users_table {
         }
 
         $this->is_temporary = $is_temporary;
-        if ($this->is_temporary) {
-            $this->create_temp_table();
-        }
+        $this->create_temp_table();
     }
 
     /**
      * Make sure any temporary table is dropped when this object gets destroyed
      */
     public function __destruct() {
-        if ($this->is_temporary) {
-            $this->drop_temp_table();
-        }
+        $this->drop_temp_table();
     }
 
+    /**
+     * Drop temporary table
+     */
     private function drop_temp_table() {
+        if (!$this->is_temporary) {
+            return;
+        }
+
         global $CFG, $DB;
 
         require_once($CFG->dirroot . '/lib/ddllib.php');
@@ -137,6 +140,10 @@ class aggregation_users_table {
      * Generate a temporary table or if it already exists truncate it
      */
     private function create_temp_table() {
+        if (!$this->is_temporary) {
+            return;
+        }
+
         global $CFG, $DB;
 
         require_once($CFG->dirroot . '/lib/ddllib.php');
@@ -197,14 +204,14 @@ class aggregation_users_table {
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function get_has_changed_column(): ?string {
         return $this->has_changed_column;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function get_process_key_column(): ?string {
         return $this->process_key_column;
@@ -213,24 +220,25 @@ class aggregation_users_table {
     /**
      * Set the process_key value to filter rows on
      *
-     * @param mixed $process_key_value
-     * @return self
+     * @param string|null $process_key_value
+     * @return $this
      */
-    public function set_process_key_value($process_key_value): self {
-        $this->process_key_value = (string)$process_key_value;
+    public function set_process_key_value(?string $process_key_value): self {
+        $this->process_key_value = $process_key_value;
         return $this;
     }
 
     /**
      * Return the key value
-     * @return mixed
+     *
+     * @return string|null
      */
-    public function get_process_key_value() {
+    public function get_process_key_value(): ?string {
         return $this->process_key_value;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function get_update_operation_column(): ?string {
         return $this->update_operation_column;
@@ -239,27 +247,28 @@ class aggregation_users_table {
     /**
      * Set the update_operation value to filter rows on
      *
-     * @param mixed $update_operation_value
+     * @param string|null $update_operation_value
      * @return self
      */
-    public function set_update_operation_value($update_operation_value): self {
+    public function set_update_operation_value(?string $update_operation_value): self {
         $this->update_operation_value = $update_operation_value;
         return $this;
     }
 
     /**
      * Return the currently set update operation value
-     * @return mixed
+     *
+     * @return string|null
      */
-    public function get_update_operation_value() {
+    public function get_update_operation_value(): ?string {
         return $this->update_operation_value;
     }
 
     /**
      * Set the competency_id value to filter rows on
      *
-     * @param ?int $competecy_id
-     * @return self
+     * @param int|null $comptency_id
+     * @return $this
      */
     public function set_comptency_id_value(?int $comptency_id): self {
         $this->competency_id_value = $comptency_id;
@@ -269,7 +278,7 @@ class aggregation_users_table {
     /**
      * Reset the competency_id value to remove filtering
      *
-     * @return self
+     * @return $this
      */
     public function reset_comptency_id_value(): self {
         $this->set_comptency_id_value(null);
@@ -278,7 +287,8 @@ class aggregation_users_table {
 
     /**
      * Return the current competency_id_value used in filtering
-     * @return ?int
+     *
+     * @return int|null
      */
     public function get_competency_id_value(): ?int {
         return $this->competency_id_value;
@@ -288,7 +298,7 @@ class aggregation_users_table {
     /**
      * Remove all rows from the users table associated with the key
      *
-     * @return self
+     * @return $this
      */
     public function truncate(): self {
         global $DB;
@@ -298,11 +308,11 @@ class aggregation_users_table {
 
     /**
      * Reset the has_changed flag for all users
-     * @param mixed $new_has_changed_value Value to set the has_changed_column to
-     * @return aggregation_users_table
-     * @throws \dml_exception
+     *
+     * @param int $new_has_changed_value Value to set the has_changed_column to
+     * @return $this
      */
-    public function reset_has_changed($new_has_changed_value): aggregation_users_table {
+    public function reset_has_changed(int $new_has_changed_value): self {
         global $DB;
 
         if (empty($this->has_changed_column)) {
@@ -323,7 +333,7 @@ class aggregation_users_table {
      *
      * @param mixed $new_has_changed_value Value to set the has_changed_column to
      * @param  string $table_alias
-     * @return [string, array] Array containing the column(s) and parameters
+     * @return array [sql, params] Array containing the column(s) and parameters
      */
     public function get_set_has_changed_sql_with_params($new_has_changed_value, string $table_alias = ''): array {
         $sql = '';
@@ -387,7 +397,7 @@ class aggregation_users_table {
      * Return the SQL snippet and parameters for inserting
      *
      * @param int|null $user_id_value
-     * @param int|null $comp_id_value
+     * @param int|null $competency_id_value
      * @param null $has_changed_value
      * @return array [string, array]
      */
@@ -512,8 +522,9 @@ class aggregation_users_table {
      *
      * @param int $user_id
      * @param int $competency_id
+     * @return $this
      */
-    public function queue_for_aggregation(int $user_id, int $competency_id): void {
+    public function queue_for_aggregation(int $user_id, int $competency_id): self {
         global $DB;
 
         $exists = $DB->record_exists(
@@ -529,6 +540,8 @@ class aggregation_users_table {
             $record = $this->get_insert_record($user_id, $competency_id);
             $DB->insert_record($this->table_name, $record);
         }
+
+        return $this;
     }
 
     /**
@@ -598,8 +611,9 @@ class aggregation_users_table {
      * Queue aggregation to be processed in the background for all assigned users
      *
      * @param int $competency_id
+     * @return $this
      */
-    public function queue_all_assigned_users_for_aggregation(int $competency_id): void {
+    public function queue_all_assigned_users_for_aggregation(int $competency_id): self {
         global $DB;
 
         $process_key_wh = '';
@@ -634,12 +648,16 @@ class aggregation_users_table {
         );
 
         $DB->insert_records_via_batch($this->table_name, $to_add);
+
+        return $this;
     }
 
     /**
      * delete all rows belonging to the current process
+     *
+     * @return $this
      */
-    public function delete(): void {
+    public function delete(): self {
         global $DB;
 
         $params = [];
@@ -648,6 +666,8 @@ class aggregation_users_table {
         }
 
         $DB->delete_records($this->table_name, $params);
+
+        return $this;
     }
 
 }

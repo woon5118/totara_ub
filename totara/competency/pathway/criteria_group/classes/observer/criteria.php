@@ -28,6 +28,11 @@ use totara_criteria\event\criteria_achievement_changed;
 
 class criteria {
 
+    /**
+     * Listen to the criteria_achievement_changed event and mark all users for reaggregation affected
+     *
+     * @param criteria_achievement_changed $event
+     */
     public static function criteria_achievement_changed(criteria_achievement_changed $event) {
         aggregation_helper::mark_for_reaggregate_from_criteria($event->other['criteria_ids'], $event->relateduserid);
     }

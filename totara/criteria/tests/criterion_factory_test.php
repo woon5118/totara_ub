@@ -21,7 +21,7 @@
  * @package totara_criteria
  */
 
-use totara_competency\plugintypes;
+use totara_competency\plugin_types;
 use totara_criteria\criterion;
 use totara_criteria\criterion_factory;
 
@@ -42,7 +42,7 @@ class totara_criteria_criterion_factory_testcase extends \advanced_testcase {
      */
     public function test_create_disabled_type() {
 
-        plugintypes::disable_plugin('coursecompletion', 'criteria', 'totara_criteria');
+        plugin_types::disable_plugin('coursecompletion', 'criteria', 'totara_criteria');
 
         $this->expectException('coding_exception');
         $this->expectExceptionMessage("Criterion type 'coursecompletion' is not enabled");
@@ -54,7 +54,7 @@ class totara_criteria_criterion_factory_testcase extends \advanced_testcase {
      */
     public function test_create() {
 
-        $enabled_types = plugintypes::get_enabled_plugins('criteria', 'totara_criteria');
+        $enabled_types = plugin_types::get_enabled_plugins('criteria', 'totara_criteria');
         foreach ($enabled_types as $plugin_type) {
             $instance = criterion_factory::create($plugin_type);
             $this->assertSame($plugin_type, $instance->get_plugin_type());
@@ -75,7 +75,7 @@ class totara_criteria_criterion_factory_testcase extends \advanced_testcase {
      * Test fetch disabled type
      */
     public function test_fetch_disabled_type() {
-        plugintypes::disable_plugin('coursecompletion', 'criteria', 'totara_criteria');
+        plugin_types::disable_plugin('coursecompletion', 'criteria', 'totara_criteria');
 
         $this->expectException('coding_exception');
         $this->expectExceptionMessage("Criterion type 'coursecompletion' is not enabled");
@@ -128,7 +128,7 @@ class totara_criteria_criterion_factory_testcase extends \advanced_testcase {
      * Test dump_criterion_configuration disabled type
      */
     public function test_dump_criterion_configuration_disabled_type() {
-        plugintypes::disable_plugin('coursecompletion', 'criteria', 'totara_criteria');
+        plugin_types::disable_plugin('coursecompletion', 'criteria', 'totara_criteria');
 
         $this->expectException('coding_exception');
         $this->expectExceptionMessage("Criterion type 'coursecompletion' is not enabled");

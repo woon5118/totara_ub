@@ -65,7 +65,7 @@ class learning_plan_evaluator_user_source extends pathway_evaluator_user_source 
         // First query - Mark all users with one or more rating since the last achievement aggregation or
         // who has a rating without an achievement record yet
         $sql =
-            "UPDATE {" . $temp_table_name . "}
+            "UPDATE {{$temp_table_name}}
                 SET {$temp_set_sql} 
               WHERE {$temp_wh}
                     {$temp_user_id_column} IN (
@@ -93,7 +93,7 @@ class learning_plan_evaluator_user_source extends pathway_evaluator_user_source 
 
         // Second query - user has no rating and no achievement record
         $sql =
-            "UPDATE {" . $temp_table_name . "}
+            "UPDATE {{$temp_table_name}}
                 SET {$temp_set_sql} 
               WHERE {$temp_wh}
                     {$temp_user_id_column} NOT IN (

@@ -32,9 +32,9 @@ class pathway_evaluator_factory {
     /**
      * Create a new instance of pathway_evaluator for the given pathway.
      *
-     * @param string $pathway_type
+     * @param pathway $pathway
      * @param pathway_evaluator_user_source $user_id_source
-     * @return pathway_evaluator  for the requested pathway type
+     * @return pathway_evaluator for the requested pathway type
      */
     public static function create(pathway $pathway, pathway_evaluator_user_source $user_id_source): pathway_evaluator {
         $classname = static::get_classname($pathway->get_path_type());

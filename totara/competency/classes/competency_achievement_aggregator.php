@@ -102,7 +102,7 @@ final class competency_achievement_aggregator {
 
         $this->user_id_source->set_competency_id_value($competency_id);
         $this->user_id_source->archive_non_assigned_achievements($competency_id, $aggregation_time);
-        $user_assignment_records = $this->user_id_source->get_users_to_reaggregate($competency_id, $aggregation_time);
+        $user_assignment_records = $this->user_id_source->get_users_to_reaggregate($competency_id);
 
         foreach ($user_assignment_records as $user_assignment_record) {
             $user_id = $user_assignment_record->user_id;
@@ -151,7 +151,10 @@ final class competency_achievement_aggregator {
                     'context' => \context_system::instance(),
                     'objectid' => $new_comp_achievement->id,
                     'relateduserid' => $user_id,
-                    'other' => ['competency_id' => $competency_id, 'achieved_via_ids' => $achieved_via_ids],
+                    'other' => [
+                        'competency_id' => $competency_id,
+                        'achieved_via_ids' => $achieved_via_ids
+                    ],
                 ])->trigger();
             } else {
                 // No change.

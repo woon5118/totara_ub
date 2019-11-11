@@ -28,7 +28,7 @@ use pathway_criteria_group\entities\criteria_group as criteria_group_entity;
 use totara_competency\entities\assignment;
 use totara_competency\entities\pathway;
 use totara_competency\entities\scale_value;
-use totara_competency\plugintypes;
+use totara_competency\plugin_types;
 use totara_competency\webapi\resolver\query\scale_achievements;
 
 defined('MOODLE_INTERNAL') || die();
@@ -196,8 +196,8 @@ class totara_competency_webapi_resolver_query_scale_achievements_testcase extend
         require_once $CFG->dirroot.'/totara/competency/tests/fixtures/fake_multivalue_type.php';
         require_once $CFG->dirroot.'/totara/competency/tests/fixtures/fake_singlevalue_type.php';
 
-        plugintypes::enable_plugin('fake_multivalue_type', 'pathway', 'totara_competency');
-        plugintypes::enable_plugin('fake_singlevalue_type', 'pathway', 'totara_competency');
+        plugin_types::enable_plugin('fake_multivalue_type', 'pathway', 'totara_competency');
+        plugin_types::enable_plugin('fake_singlevalue_type', 'pathway', 'totara_competency');
     }
 
 }

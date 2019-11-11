@@ -36,7 +36,7 @@ class fake_singlevalue_type extends pathway {
     /**
      * Load the data specific to the type of pathway.
      */
-    protected function fetch_configuration() {
+    protected function fetch_configuration(): void {
         // TODO: Implement fetch_configuration() method.
     }
 
@@ -59,7 +59,7 @@ class fake_singlevalue_type extends pathway {
     /**
      * Delete the pathway specific detail
      */
-    protected function delete_configuration() {
+    protected function delete_configuration(): void {
         // TODO: Implement delete_configuration() method.
     }
 

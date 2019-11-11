@@ -24,6 +24,8 @@
 namespace totara_competency;
 
 
+use stdClass;
+
 /**
  * Pathway factory class to obtain an instance of the specific pathway type
  */
@@ -37,7 +39,7 @@ class pathway_factory {
      * @param string $type
      * @return pathway of the requested type
      */
-    public static function create(string $type) {
+    public static function create(string $type): pathway {
         static::require_enabled($type);
 
         $classname = static::get_classname($type);
@@ -52,7 +54,7 @@ class pathway_factory {
      * @param int $id Optional pathway instance id
      * @return pathway of the requested type
      */
-    public static function fetch(string $type, int $id = null) {
+    public static function fetch(string $type, int $id = null): pathway {
         static::require_enabled($type);
 
         $classname = static::get_classname($type);
@@ -63,10 +65,10 @@ class pathway_factory {
     /**
      * Instantiate an instance of the specified pathway type with the provided detail
      *
-     * @param \stdClass $record
+     * @param stdClass $record
      * @return pathway of the requested type
      */
-    public static function from_record($record) {
+    public static function from_record(stdClass $record): pathway {
         static::require_enabled($record->path_type);
 
         $classname = static::get_classname($record->path_type);
@@ -109,7 +111,7 @@ class pathway_factory {
      * @throws \coding_exception if the type is not enabled
      */
     private static function require_enabled($type) {
-        $enabledtypes = plugintypes::get_enabled_plugins('pathway', 'totara_competency');
+        $enabledtypes = plugin_types::get_enabled_plugins('pathway', 'totara_competency');
         if (!in_array($type, $enabledtypes)) {
             throw new \coding_exception(
                 "Pathway type '{$type}' not found.",
@@ -122,8 +124,8 @@ class pathway_factory {
      * Retrieve the pathway data from the database and return it in an associative array
      *
      * @param string $type Pathway type to instantiate
-     * @param ?int $id Pathway instance id
-     * @return \stdClass | null
+     * @param int|null $id Pathway instance id
+     * @return stdClass | null
      */
     public static function dump_pathway_configuration(string $type, ?int $id = null) {
         $classname = static::get_classname($type);
@@ -164,7 +166,12 @@ class pathway_factory {
         return $types;
     }
 
+    /**
+     * Get all enabled pathway type plugins
+     *
+     * @return string[]|array
+     */
     public static function get_pathway_types(): array {
-        return plugintypes::get_enabled_plugins('pathway', 'totara_competency');
+        return plugin_types::get_enabled_plugins('pathway', 'totara_competency');
     }
 }

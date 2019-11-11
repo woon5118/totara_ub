@@ -32,7 +32,7 @@ use totara_competency\achievement_configuration;
 use totara_competency\achievement_criteria;
 use totara_competency\pathway;
 use totara_competency\pathway_factory;
-use totara_competency\plugintypes;
+use totara_competency\plugin_types;
 use totara_core\advanced_feature;
 use totara_mvc\admin_controller;
 use totara_mvc\tui_view;
@@ -230,7 +230,7 @@ class competency_controller extends admin_controller {
         ];
 
         // Pathway types
-        $types = plugintypes::get_enabled_plugins('pathway', 'totara_competency');
+        $types = plugin_types::get_enabled_plugins('pathway', 'totara_competency');
         foreach ($types as $type) {
             $pw = pathway_factory::create($type);
             $toadd = [
