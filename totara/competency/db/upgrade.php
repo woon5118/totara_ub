@@ -160,5 +160,14 @@ function xmldb_totara_competency_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019110800, 'totara', 'competency');
     }
 
+    if ($oldversion < 2019110802) {
+        // Delete old scheduled task
+        $DB->delete_records('task_scheduled', ['classname' => '\tassign_competency\task\expand_assignments_task']);
+        $DB->delete_records('task_adhoc', ['classname' => '\tassign_competency\task\expand_assignments_task']);
+
+        // Competency savepoint reached.
+        upgrade_plugin_savepoint(true, 2019110802, 'totara', 'competency');
+    }
+
     return true;
 }
