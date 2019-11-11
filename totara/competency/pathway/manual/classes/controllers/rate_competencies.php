@@ -41,6 +41,7 @@ class rate_competencies extends base {
         return tui_view::create('pathway_manual/pages/RateCompetencies', [
             'user-id' => $this->user->id,
             'role' => $this->get_role_from_params(),
+            'current-user-id' => (int)$this->currently_logged_in_user()->id,
         ])
             ->set_title($page_title);
     }

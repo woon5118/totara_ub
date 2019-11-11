@@ -25,7 +25,12 @@
     <a :href="backLinkUrl" class="tui-pathwayManual-rateCompetencies__backLink">
       {{ $str('back_to_competency_profile', 'totara_competency') }}
     </a>
-    <RateUserCompetencies v-if="userId" :user-id="userId" :role="role" />
+    <RateUserCompetencies
+      v-if="userId"
+      :user-id="userId"
+      :role="role"
+      :current-user-id="currentUserId"
+    />
   </div>
 </template>
 
@@ -41,6 +46,9 @@ export default {
     },
     role: {
       type: String,
+    },
+    currentUserId: {
+      type: Number,
     },
   },
 

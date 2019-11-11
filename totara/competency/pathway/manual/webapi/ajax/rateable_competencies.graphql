@@ -17,10 +17,15 @@ query pathway_manual_rateable_competencies($user_id: core_id!, $role: String!) {
           display_name
         }
         last_rating {
+          rater {
+            id
+            fullname
+          }
           date: timestamp(format: DATE)
           comment
           scale_value {
             id
+            name
           }
         }
       }

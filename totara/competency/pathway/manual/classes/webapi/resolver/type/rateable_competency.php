@@ -45,7 +45,7 @@ class rateable_competency implements type_resolver {
             case 'competency':
                 return $competency->get_entity();
             case 'last_rating':
-                return null; // TODO: Actually return something
+                return $competency->get_role_rating()->get_latest_rating();
             default:
                 throw new \coding_exception('Unknown field', $field);
         }

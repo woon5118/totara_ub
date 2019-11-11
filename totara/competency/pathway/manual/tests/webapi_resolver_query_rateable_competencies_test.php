@@ -194,4 +194,56 @@ class pathway_manual_webapi_resolver_query_rateable_competencies_testcase extend
         rateable_competency_type::resolve('last_rating', $returned_competency, [], $this->execution_context());
     }
 
+    /**
+     * Check last_rating field is resolved according to role.
+     */
+    public function test_resolve_last_rating_field() {
+        $this->setUser($this->user1->id);
+
+        $managerja = job_assignment::create_default($this->user2->id);
+        job_assignment::create_default($this->user1->id, ['managerjaid' => $managerja->id]);
+
+        $rateable_competency_role_self = new rateable_competency($this->competency1, $this->user1, manual::ROLE_SELF);
+        $rateable_competency_role_manager = new rateable_competency($this->competency1, $this->user1, manual::ROLE_MANAGER);
+
+        // No rating exists.
+        $last_rating = rateable_competency_type::resolve(
+            'last_rating',
+            $rateable_competency_role_self,
+            [],
+            $this->execution_context()
+        );
+        $this->assertNull($last_rating);
+
+        // Rating for self.
+        $rating_self = $this->generator->create_manual_rating(
+            $this->competency1,
+            $this->user1,
+            $this->user1,
+            manual::ROLE_SELF
+        );
+        // Rating made by manager.
+        $rating_manager = $this->generator->create_manual_rating(
+            $this->competency1,
+            $this->user1,
+            $this->user2,
+            manual::ROLE_MANAGER
+        );
+
+        $last_rating = rateable_competency_type::resolve(
+            'last_rating',
+            $rateable_competency_role_self,
+            [],
+            $this->execution_context()
+        );
+        $this->assertEquals($rating_self, $last_rating);
+
+        $last_rating = rateable_competency_type::resolve(
+            'last_rating',
+            $rateable_competency_role_manager,
+            [],
+            $this->execution_context()
+        );
+        $this->assertEquals($rating_manager, $last_rating);
+    }
 }

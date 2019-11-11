@@ -57,6 +57,8 @@
         v-for="(scale, index) in data.scales"
         :key="index"
         :scale="scale"
+        :role="role"
+        :current-user-id="currentUserId"
       />
     </div>
     <div v-else>
@@ -84,6 +86,10 @@ export default {
     role: {
       required: true,
       type: String,
+    },
+    currentUserId: {
+      required: true,
+      type: Number,
     },
   },
 
@@ -163,6 +169,7 @@ export default {
     "pathway_manual": [
       "no_rateable_competencies",
       "number_of_competencies",
+      "rate_competencies",
       "rate_user",
       "rate_competencies",
       "rating_as_appraiser",

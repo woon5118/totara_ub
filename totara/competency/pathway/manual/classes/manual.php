@@ -472,7 +472,7 @@ class manual extends pathway {
         $roles = $this->get_roles_that_apply_to_user($subject_id, $rater_id);
 
         if (!isset($roles[$as_role])) {
-            throw new \coding_exception('No permissioms');
+            throw new \coding_exception('No permissions');
         }
         $rating->assigned_by_role = $as_role;
         $rating->save();

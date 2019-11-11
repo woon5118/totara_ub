@@ -100,4 +100,15 @@ class rateable_competency {
         return $role_ratings;
     }
 
+    /**
+     * Get the latest rating.
+     *
+     * @return role_rating
+     */
+    public function get_role_rating(): role_rating {
+        if (empty($this->role)) {
+            throw new \coding_exception('role property must be set');
+        }
+        return new role_rating($this->entity, $this->user, $this->role);
+    }
 }
