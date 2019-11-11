@@ -80,7 +80,7 @@ class scale {
         $sql = "
             INSERT INTO {{$table->get_table_name()}}
                 ({$table->get_user_id_column()}, {$table->get_competency_id_column()})
-            SELECT tcau.user_id, tcau.competency_id 
+            SELECT DISTINCT tcau.user_id, tcau.competency_id 
             FROM {totara_competency_assignment_users} tcau 
             JOIN {comp} c ON tcau.competency_id = c.id
             JOIN {comp_scale_assignments} csa ON c.frameworkid = csa.frameworkid
@@ -88,7 +88,7 @@ class scale {
                 ON tcau.competency_id = q.{$table->get_competency_id_column()}
                  AND tcau.user_id = q.{$table->get_user_id_column()}
                  {$process_key_cond}
-            WHERE csa.scaleid = :sale_id AND q.id IS NULL 
+            WHERE csa.scaleid = :scale_id AND q.id IS NULL 
         ";
 
         $DB->execute($sql, ['scale_id' => $scale_id]);
