@@ -416,6 +416,7 @@ class organisation extends hierarchy {
         [$ids_sql, $ids_params] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
 
         // Count the number of competency assignments for the framework and its descendants
+        // TODO TL-23039 create a proper API method to not have a hard dependency on the assignment table here
         $data['comp_assignments'] = $DB->count_records_select('totara_competency_assignments', "user_group_type = 'organisation' AND user_group_id {$ids_sql}", $ids_params);
 
         // Number of job assignment records with matching organisation.
@@ -459,6 +460,7 @@ class organisation extends hierarchy {
             $data['related_goals'] = $DB->count_records_select('goal_grp_org', "orgid {$ids_sql}", $ids_params);
 
             // Count the number of competency assignments for the framework and its descendants
+            // TODO TL-23039 create a proper API method to not have a hard dependency on the assignment table here
             $data['comp_assignments'] = $DB->count_records_select('totara_competency_assignments', "user_group_type = 'organisation' AND user_group_id {$ids_sql}", $ids_params);
         } else {
             $data['job_assignment'] = 0;

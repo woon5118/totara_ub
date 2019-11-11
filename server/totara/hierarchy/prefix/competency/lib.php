@@ -159,6 +159,7 @@ class competency extends hierarchy {
         global $DB;
 
         // First delete all competency achievement pathways for the competency
+        // TODO TL-23039 Find a way to move this into the competency observer
         foreach ($items as $competency_id) {
             pathway::delete_all_for_competency($competency_id);
         }
@@ -1005,6 +1006,7 @@ class competency extends hierarchy {
 
             // Count competency assignments
             [$in_sql, $in_params] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
+            // TODO TL-23039 create a proper API method to not have a hard dependency on the assignment table here
             $data['assignments'] = $DB->count_records_select('totara_competency_assignments', "competency_id {$in_sql}", $in_params);
 
             // number of comp_relations records
@@ -1058,6 +1060,7 @@ class competency extends hierarchy {
 
         // Count the number of assignments of a competency and its descendants
         [$in_sql, $in_params] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
+        // TODO TL-23039 create a proper API method to not have a hard dependency on the assignment table here
         $data['assignments'] = $DB->count_records_select('totara_competency_assignments', "competency_id {$in_sql}", $in_params);
 
         return $data;
