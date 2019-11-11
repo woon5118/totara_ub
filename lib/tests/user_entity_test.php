@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_assignment
+ * @package core
  * @category test
  */
 
@@ -26,7 +26,7 @@ use core\entities\user;
 
 defined('MOODLE_INTERNAL') || die();
 
-class totara_assignment_user_testcase extends advanced_testcase {
+class core_user_entity_testcase extends advanced_testcase {
 
     public function test_logged_in_users() {
         $user = $this->getDataGenerator()->create_user();

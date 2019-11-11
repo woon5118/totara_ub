@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package totara_assignment
+ * @package core
  * @category test
  */
 
@@ -29,7 +29,7 @@ use totara_job\job_assignment;
 
 defined('MOODLE_INTERNAL') || die();
 
-class totara_assignment_expand_testcase extends advanced_testcase {
+class core_entity_expand_testcase extends advanced_testcase {
 
     public function test_cohort_expansion() {
         $generator = $this->getDataGenerator();

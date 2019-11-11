@@ -18,13 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_assignment
+ * @package core
  * @category test
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-class totara_assignment_cohort_service_testcase extends advanced_testcase {
+class core_cohort_service_testcase extends advanced_testcase {
 
     use \totara_core\phpunit\webservice_utils;
 

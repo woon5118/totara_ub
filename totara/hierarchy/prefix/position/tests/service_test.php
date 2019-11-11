@@ -18,13 +18,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_assignment
+ * @package hierarchy_position
  * @category test
  */
 
+use totara_core\basket\session_basket;
+
 defined('MOODLE_INTERNAL') || die();
 
-class totara_assignment_organisation_service_testcase extends advanced_testcase {
+class hierarchy_position_service_testcase extends advanced_testcase {
 
     use \totara_core\phpunit\webservice_utils;
 
@@ -33,13 +35,13 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
         $this->setAdminUser();
     }
 
-    public function test_it_lists_organisations() {
-        $this->generate_organisations();
+    public function test_it_lists_positions() {
+        $this->generate_positions();
 
-        $res = $this->call_webservice_api('hierarchy_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_position_index', [
             'filters' => [],
             'page' => 1,
-            'order' => 'shortname',
+            'order' => 'description',
             'direction' => 'desc'
         ]);
 
@@ -51,16 +53,13 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
         $this->assertNull($data['prev']);
         $this->assertNull($data['next']);
 
-        $this->assertEquals(
-            [
-                'Sony Inc',
-                'Samsung Inc',
-                'Procter &#38; Gamble',
-                'Good Will',
-                'Apple',
-            ],
-            array_column($data['items'], 'display_name')
-        );
+        $this->assertEquals([
+            'Cook',
+            'Designer',
+            'Accountant',
+            'Chef',
+            'Baker',
+        ], array_column($data['items'], 'display_name'));
 
         // Only certain fields have been returned
         $this->assertEqualsCanonicalizing(
@@ -75,11 +74,11 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
         );
     }
 
-    public function test_it_has_search_filter() {
-        $this->generate_organisations();
+    public function test_it_has_text_filter() {
+        $this->generate_positions();
 
-        $res = $this->call_webservice_api('hierarchy_organisation_index', [
-            'filters' => ['text' => 'inc'],
+        $res = $this->call_webservice_api('hierarchy_position_index', [
+            'filters' => ['text' => 'des'],
             'page' => 1,
             'order' => 'fullname',
             'direction' => 'asc'
@@ -93,20 +92,14 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
         $this->assertNull($data['prev']);
         $this->assertNull($data['next']);
 
-        $this->assertEquals(
-            [
-                'Samsung Inc',
-                'Sony Inc',
-            ],
-            array_column($data['items'], 'display_name')
-        );
+        $this->assertEquals(['Designer'], array_column($data['items'], 'display_name'));
 
         // Searching by description
-        $res = $this->call_webservice_api('hierarchy_organisation_index', [
-            'filters' => ['text' => 'good'],
+        $res = $this->call_webservice_api('hierarchy_position_index', [
+            'filters' => ['text' => 'cook'],
             'page' => 1,
-            'order' => 'idnumber',
-            'direction' => 'desc'
+            'order' => 'shortname',
+            'direction' => 'asc'
         ]);
 
         $data = $res['data'] ?? null;
@@ -119,17 +112,18 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
 
         $this->assertEquals(
             [
-                'Good Will',
-                'Procter &#38; Gamble',
+                'Baker',
+                'Chef',
+                'Cook',
             ],
             array_column($data['items'], 'display_name')
         );
     }
 
     public function test_it_has_framework_filter() {
-        [, $fws] = array_values($this->generate_organisations());
+        [, $fws] = array_values($this->generate_positions());
 
-        $res = $this->call_webservice_api('hierarchy_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_position_index', [
             'filters' => ['framework' => $fws[1]->id],
             'page' => 1,
             'order' => 'shortname',
@@ -145,18 +139,18 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
         $this->assertNull($data['next']);
         $this->assertEquals(
             [
-                'Good Will',
-                'Samsung Inc',
+                'Baker',
+                'Chef',
             ],
             array_column($data['items'], 'display_name')
         );
     }
 
     public function test_it_has_path_filter() {
-        ['orgs' => $orgs] = $this->generate_organisations();
+        ['pos' => $pos] = $this->generate_positions();
 
-        $res = $this->call_webservice_api('hierarchy_organisation_index', [
-            'filters' => ['path' => $orgs[0]->id],
+        $res = $this->call_webservice_api('hierarchy_position_index', [
+            'filters' => ['path' => $pos[0]->id],
             'page' => 1,
             'order' => 'fullname',
             'direction' => 'asc'
@@ -171,24 +165,22 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
         $this->assertNull($data['next']);
         $this->assertEquals(
             [
-                'Apple',
-                'Good Will',
-                'Procter &#38; Gamble',
-                'Samsung Inc',
+                'Cook',
+                'Designer',
             ],
             array_column($data['items'], 'display_name')
         );
     }
 
     public function test_it_has_basket_filter() {
-        ['orgs' => $orgs] = $this->generate_organisations();
+        ['pos' => $pos] = $this->generate_positions();
 
-        $basket = new \totara_core\basket\session_basket('orgs');
+        $basket = new session_basket('pos');
 
-        $basket->add([$orgs[2]->id, $orgs[4]->id]);
+        $basket->add([$pos[1]->id, $pos[3]->id, $pos[4]->id]);
 
-        $res = $this->call_webservice_api('hierarchy_organisation_index', [
-            'filters' => ['basket' => 'orgs'],
+        $res = $this->call_webservice_api('hierarchy_position_index', [
+            'filters' => ['basket' => 'pos'],
             'page' => 1,
             'order' => 'fullname',
             'direction' => 'asc'
@@ -203,18 +195,19 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
         $this->assertNull($data['next']);
         $this->assertEquals(
             [
-                'Apple',
-                'Good Will',
+                'Baker',
+                'Chef',
+                'Cook',
             ],
             array_column($data['items'], 'display_name')
         );
     }
 
     public function test_it_has_parent_filter() {
-        [$orgs] = array_values($this->generate_organisations());
+        [$pos] = array_values($this->generate_positions());
 
-        $res = $this->call_webservice_api('hierarchy_organisation_index', [
-            'filters' => ['parent' => $orgs[0]->id],
+        $res = $this->call_webservice_api('hierarchy_position_index', [
+            'filters' => ['parent' => $pos[0]->id, 'visible' => null, ],
             'page' => 1,
             'order' => 'fullname',
             'direction' => 'asc'
@@ -229,18 +222,17 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
         $this->assertNull($data['next']);
         $this->assertEquals(
             [
-                'Apple',
-                'Procter &#38; Gamble',
-                'Samsung Inc',
+                'Designer',
+                'Invisible',
             ],
             array_column($data['items'], 'display_name')
         );
     }
 
     public function test_it_has_visible_filter() {
-        $this->generate_organisations();
+        $this->generate_positions();
 
-        $res = $this->call_webservice_api('hierarchy_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_position_index', [
             'filters' => ['visible' => false],
             'page' => 1,
             'order' => 'fullname',
@@ -256,7 +248,7 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
         $this->assertNull($data['next']);
         $this->assertEquals(['Invisible'], array_column($data['items'], 'display_name'));
 
-        $res = $this->call_webservice_api('hierarchy_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_position_index', [
             'filters' => ['visible' => null],
             'page' => 1,
             'order' => 'fullname',
@@ -274,10 +266,10 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
     }
 
     public function test_it_has_type_filter() {
-        ['types' => $types] = $this->generate_organisations();
+        ['types' => $types] = $this->generate_positions();
 
         // has type 1
-        $res = $this->call_webservice_api('hierarchy_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_position_index', [
             'filters' => ['type' => [$types[0]]],
             'page' => 1,
             'order' => 'fullname',
@@ -289,14 +281,14 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
         $this->assertWebserviceSuccess($res);
         $this->assertEquals(
             [
-                'Procter &#38; Gamble',
-                'Sony Inc',
+                'Accountant',
+                'Chef',
             ],
             array_column($data['items'], 'display_name')
         );
 
         // has type 2
-        $res = $this->call_webservice_api('hierarchy_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_position_index', [
             'filters' => ['type' => [$types[1]]],
             'page' => 1,
             'order' => 'fullname',
@@ -308,15 +300,15 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
         $this->assertWebserviceSuccess($res);
         $this->assertEquals(
             [
-                'Apple',
-                'Good Will',
-                'Samsung Inc',
+                'Baker',
+                'Cook',
+                'Designer',
             ],
             array_column($data['items'], 'display_name')
         );
 
         // has type 1 and 2
-        $res = $this->call_webservice_api('hierarchy_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_position_index', [
             'filters' => ['type' => $types],
             'page' => 1,
             'order' => 'fullname',
@@ -328,82 +320,82 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
         $this->assertWebserviceSuccess($res);
         $this->assertEquals(
             [
-                'Apple',
-                'Good Will',
-                'Procter &#38; Gamble',
-                'Samsung Inc',
-                'Sony Inc',
+                'Accountant',
+                'Baker',
+                'Chef',
+                'Cook',
+                'Designer',
             ],
             array_column($data['items'], 'display_name')
         );
     }
 
-    public function test_it_paginates_organisations() {
-        $this->generate_n_organisations(65);
+    public function test_it_paginates_positions() {
+        $this->generate_n_positions(80);
 
-        $res = $this->call_webservice_api('hierarchy_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_position_index', [
             'filters' => [],
             'page' => 1,
-            'order' => 'description',
-            'direction' => 'desc'
+            'order' => 'fullname',
+            'direction' => 'asc'
         ]);
 
         $data = $res['data'] ?? null;
 
         $this->assertWebserviceSuccess($res);
         $this->assertCount(20, $first = $data['items']);
-        $this->assertEquals(65, $data['total']);
+        $this->assertEquals(80, $data['total']);
         $this->assertEquals(1, $data['page']);
         $this->assertEquals(4, $data['pages']);
         $this->assertNull($data['prev']);
         $this->assertEquals(2, $data['next']);
 
-        $res = $this->call_webservice_api('hierarchy_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_position_index', [
             'filters' => [],
             'page' => 2,
-            'order' => 'description',
-            'direction' => 'desc'
+            'order' => 'fullname',
+            'direction' => 'asc'
         ]);
 
         $data = $res['data'] ?? null;
 
         $this->assertWebserviceSuccess($res);
         $this->assertCount(20, $second = $data['items']);
-        $this->assertEquals(65, $data['total']);
+        $this->assertEquals(80, $data['total']);
         $this->assertEquals(2, $data['page']);
         $this->assertEquals(4, $data['pages']);
         $this->assertEquals(1, $data['prev']);
         $this->assertEquals(3, $data['next']);
 
-        $res = $this->call_webservice_api('hierarchy_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_position_index', [
             'filters' => [],
             'page' => 4,
-            'order' => 'description',
-            'direction' => 'desc'
+            'order' => 'fullname',
+            'direction' => 'asc'
         ]);
 
         $data = $res['data'] ?? null;
 
         $this->assertWebserviceSuccess($res);
-        $this->assertCount(5, $fourth = $data['items']);
-        $this->assertEquals(65, $data['total']);
+        $this->assertCount(20, $fourth = $data['items']);
+        $this->assertEquals(80, $data['total']);
         $this->assertEquals(4, $data['page']);
         $this->assertEquals(4, $data['pages']);
         $this->assertEquals(3, $data['prev']);
         $this->assertNull($data['next']);
 
-        $res = $this->call_webservice_api('hierarchy_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_position_index', [
             'filters' => [],
             'page' => 5,
-            'order' => 'description',
-            'direction' => 'desc'
+            'order' => 'fullname',
+            'direction' => 'asc'
         ]);
 
         $data = $res['data'] ?? null;
 
         $this->assertWebserviceSuccess($res);
         $this->assertCount(0, $fifth = $data['items']);
-        $this->assertEquals(65, $data['total']);
+        $this->assertEquals(80, $data['total']);
         $this->assertEquals(5, $data['page']);
         $this->assertEquals(4, $data['pages']);
         $this->assertEquals(4, $data['prev']);
@@ -415,63 +407,60 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
         $this->assertEmpty(array_intersect(array_column($second, 'id'), array_column($fourth, 'id')));
     }
 
-    public function test_it_loads_individual_organisation() {
-        [
-            'orgs' => $org,
-            'fws' => $fws,
-        ] = $this->generate_organisations();
+    public function test_it_loads_individual_position() {
+        ['pos' => $pos, 'fws' => $fws] = $this->generate_positions();
 
-        $res = $this->call_webservice_api('hierarchy_organisation_show', [
-            'id' => $org[2]->id,
+        $res = $this->call_webservice_api('hierarchy_position_show', [
+            'id' => $pos[2]->id,
             'include' => [],
         ]);
 
         $data = $res['data'] ?? null;
 
         $this->assertWebserviceSuccess($res);
-        $this->assertEquals($org[2]->id, $data['id']);
-        $this->assertEquals($org[2]->shortname, $data['shortname']);
-        $this->assertEquals($org[2]->idnumber, $data['idnumber']);
-        $this->assertEquals($org[2]->description, $data['description']);
-        $this->assertEquals($org[2]->frameworkid, $data['frameworkid']);
-        $this->assertEquals($org[2]->visible, $data['visible']);
+        $this->assertEquals($pos[2]->id, $data['id']);
+        $this->assertEquals($pos[2]->shortname, $data['shortname']);
+        $this->assertEquals($pos[2]->idnumber, $data['idnumber']);
+        $this->assertEquals($pos[2]->description, $data['description']);
+        $this->assertEquals($pos[2]->frameworkid, $data['frameworkid']);
+        $this->assertEquals($pos[2]->visible, $data['visible']);
 
         // Test it can apply crumbs as well
-        $res = $this->call_webservice_api('hierarchy_organisation_show', [
-            'id' => $org[4]->id,
+        $res = $this->call_webservice_api('hierarchy_position_show', [
+            'id' => $pos[4]->id,
             'include' => ['crumbs' => true],
         ]);
 
         $data = $res['data'] ?? null;
 
         $this->assertWebserviceSuccess($res);
-        $this->assertEquals($org[4]->id, $data['id']);
-        $this->assertEquals($org[4]->shortname, $data['shortname']);
-        $this->assertEquals($org[4]->idnumber, $data['idnumber']);
-        $this->assertEquals($org[4]->description, $data['description']);
-        $this->assertEquals($org[4]->frameworkid, $data['frameworkid']);
-        $this->assertEquals($org[4]->visible, $data['visible']);
+        $this->assertEquals($pos[4]->id, $data['id']);
+        $this->assertEquals($pos[4]->shortname, $data['shortname']);
+        $this->assertEquals($pos[4]->idnumber, $data['idnumber']);
+        $this->assertEquals($pos[4]->description, $data['description']);
+        $this->assertEquals($pos[4]->frameworkid, $data['frameworkid']);
+        $this->assertEquals($pos[4]->visible, $data['visible']);
 
         $this->assertCount(4, $data['crumbtrail']);
-        $this->assertEquals($org[4]->frameworkid, $data['crumbtrail'][0]['id']);
-        $this->assertEquals($fws[1]->fullname, $data['crumbtrail'][0]['name']);
+        $this->assertEquals($pos[4]->frameworkid, $data['crumbtrail'][0]['id']);
+        $this->assertEquals($fws[0]->fullname, $data['crumbtrail'][0]['name']);
         $this->assertEquals('framework', $data['crumbtrail'][0]['type']);
 
-        $this->assertEquals($org[0]->fullname, $data['crumbtrail'][1]['name']);
-        $this->assertEquals($org[0]->id, $data['crumbtrail'][1]['id']);
-        $this->assertEquals('organisation', $data['crumbtrail'][1]['type']);
+        $this->assertEquals($pos[0]->id, $data['crumbtrail'][1]['id']);
+        $this->assertEquals($pos[0]->fullname, $data['crumbtrail'][1]['name']);
+        $this->assertEquals('position', $data['crumbtrail'][1]['type']);
 
-        $this->assertEquals($org[3]->id, $data['crumbtrail'][2]['id']);
-        $this->assertEquals($org[3]->fullname, $data['crumbtrail'][2]['name']);
-        $this->assertEquals('organisation', $data['crumbtrail'][2]['type']);
+        $this->assertEquals($pos[2]->id, $data['crumbtrail'][2]['id']);
+        $this->assertEquals($pos[2]->fullname, $data['crumbtrail'][2]['name']);
+        $this->assertEquals('position', $data['crumbtrail'][2]['type']);
 
-        $this->assertEquals($org[4]->id, $data['crumbtrail'][3]['id']);
-        $this->assertEquals($org[4]->fullname, $data['crumbtrail'][3]['name']);
-        $this->assertEquals('organisation', $data['crumbtrail'][3]['type']);
+        $this->assertEquals($pos[4]->id, $data['crumbtrail'][3]['id']);
+        $this->assertEquals($pos[4]->fullname, $data['crumbtrail'][3]['name']);
+        $this->assertEquals('position', $data['crumbtrail'][3]['type']);
     }
 
-    public function test_non_existing_organisation() {
-        $res = $this->call_webservice_api('hierarchy_organisation_show', [
+    public function test_non_existing_position() {
+        $res = $this->call_webservice_api('hierarchy_position_show', [
             'id' => 999,
             'include' => [],
         ]);
@@ -483,73 +472,70 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
     }
 
     /**
-     * Create a few organisations with knows names to test search
-     *
-     * @return \stdClass[]
+     * Create a few positions with knows names to test search
      */
-    protected function generate_organisations() {
+    protected function generate_positions() {
         $data = [
-            'orgs' => [],
+            'pos' => [],
             'fws' => [],
-            'types' => []
+            'types' => [],
         ];
 
-        $data['fws'][] = $fw = $this->create_organisation_framework();
-        $data['fws'][] = $fw2 = $this->create_organisation_framework();
+        $data['fws'][] = $fw = $this->create_position_framework();
+        $data['fws'][] = $fw2 = $this->create_position_framework();
 
-        $data['types'][] = $type1 = $this->org_generator()->create_org_type(['idnumber' => 'type1']);
-        $data['types'][] = $type2 = $this->org_generator()->create_org_type(['idnumber' => 'type2']);
+        $data['types'][] = $type1 = $this->pos_generator()->create_pos_type(['idnumber' => 'type1']);
+        $data['types'][] = $type2 = $this->pos_generator()->create_pos_type(['idnumber' => 'type2']);
 
-        $data['orgs'][] = $one = $this->create_organisation([
-            'shortname' => 'Sony',
-            'fullname' => 'Sony Inc',
-            'description' => 'Digital discovery',
-            'idnumber' => 'sinc',
+        $data['pos'][] = $one = $this->create_position([
+            'shortname' => 'acc',
+            'fullname' => 'Accountant',
+            'description' => 'Counting profits',
+            'idnumber' => 'acc',
             'typeid' => $type1,
         ], $fw->id);
 
-        $data['orgs'][] = $this->create_organisation([
-            'shortname' => 'P&G',
-            'fullname' => 'Procter & Gamble',
-            'description' => 'Consumer Goods corp',
-            'idnumber' => 'cgc',
-            'parentid' => $one->id,
+        $data['pos'][] = $this->create_position([
+            'shortname' => 'c-chef',
+            'fullname' => 'Chef',
+            'description' => 'Bossing around',
+            'idnumber' => 'cook-chef',
             'typeid' => $type1,
-        ], $fw->id);
+        ], $fw2->id);
 
-        $data['orgs'][] = $this->create_organisation([
-            'shortname' => 'Apple',
-            'fullname' => 'Apple',
-            'description' => 'Stay connected',
-            'idnumber' => 'apple',
+        $data['pos'][] = $three = $this->create_position([
+            'shortname' => 'des',
+            'fullname' => 'Designer',
+            'description' => 'Decorating things',
+            'idnumber' => 'des',
             'parentid' => $one->id,
             'typeid' => $type2,
         ], $fw->id);
 
-        $data['orgs'][] = $four = $this->create_organisation([
-            'shortname' => 'Samsung',
-            'fullname' => 'Samsung Inc',
-            'description' => 'Always connected',
-            'idnumber' => 'sams',
-            'parentid' => $one->id,
+        $data['pos'][] = $this->create_position([
+            'shortname' => 'c-baker',
+            'fullname' => 'Baker',
+            'description' => 'Baking amazing things',
+            'idnumber' => 'cook-baker',
             'typeid' => $type2,
         ], $fw2->id);
 
-        $data['orgs'][] = $this->create_organisation([
-            'shortname' => 'GW',
-            'fullname' => 'Good Will',
-            'description' => 'Your family store',
-            'idnumber' => 'gws',
-            'parentid' => $four->id,
+        $data['pos'][] = $this->create_position([
+            'shortname' => 'c-cook',
+            'fullname' => 'Cook',
+            'description' => 'More cooking',
+            'idnumber' => 'cook',
+            'parentid' => $three->id,
             'typeid' => $type2,
-        ], $fw2->id);
+        ], $fw->id);
 
-        $data['orgs'][] = $this->create_organisation([
-            'shortname' => 'Inv',
+        $data['pos'][] = $this->create_position([
+            'shortname' => 'c-inv',
             'fullname' => 'Invisible',
-            'description' => 'Always connected',
-            'idnumber' => 'oinv',
+            'description' => 'More hidden cooking',
+            'idnumber' => 'cook-hidden',
             'visible' => false,
+            'parentid' => $one->id,
             'typeid' => $type2,
         ], $fw2->id);
 
@@ -557,20 +543,20 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
     }
 
     /**
-     * Create n organisations
+     * Create n positions
      *
-     * @param int $n Number of organisations
+     * @param int $n Number of positions
      * @return \stdClass[]
      */
-    protected function generate_n_organisations(int $n = 50) {
-        $fw = $this->create_organisation_framework();
+    protected function generate_n_positions(int $n = 50) {
+        $fw = $this->create_position_framework();
 
         $i = 1;
 
         $items = [];
 
         do {
-            $items[] = $this->create_organisation([], $fw->id);
+            $items[] = $this->create_position([], $fw->id);
 
             $i++;
         } while ($i <= $n);
@@ -579,31 +565,31 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
     }
 
     /**
-     * Create organisation
+     * Create position
      *
      * @param array $attributes
      * @param int|null $framework_id
      * @return stdClass
      */
-    protected function create_organisation(array $attributes = [], ?int $framework_id = null) {
+    protected function create_position(array $attributes = [], ?int $framework_id = null) {
 
         if (is_null($framework_id)) {
-            $framework_id = $this->create_organisation_framework();
+            $framework_id = $this->create_position_framework();
         }
 
         $attributes = array_merge($attributes, ['frameworkid' => $framework_id]);
 
-        return $this->org_generator()->create_org($attributes);
+        return $this->pos_generator()->create_pos($attributes);
     }
 
     /**
-     * Create organisation framework
+     * Create position framework
      *
      * @param array $attributes
      * @return stdClass
      */
-    protected function create_organisation_framework(array $attributes = []) {
-        return $this->org_generator()->create_org_frame($attributes);
+    protected function create_position_framework(array $attributes = []) {
+        return $this->pos_generator()->create_pos_frame($attributes);
     }
 
     /**
@@ -611,7 +597,7 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
      *
      * @return totara_hierarchy_generator
      */
-    protected function org_generator() {
+    protected function pos_generator() {
         return $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
     }
 }
