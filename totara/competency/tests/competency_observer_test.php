@@ -36,7 +36,7 @@ use totara_criteria\entities\criterion as criterion_entity;
 /**
  * Tests covering the competency observer making sure the events do the right thing
  */
-class totara_competency_observer_testcase extends advanced_testcase {
+class totara_competency_competency_observer_testcase extends advanced_testcase {
 
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
