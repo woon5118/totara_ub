@@ -131,3 +131,24 @@ function totara_competency_install_migrate_achievements() {
         $DB->insert_records('totara_competency_achievement', $comp_achievements);
     }
 }
+
+/**
+ * This function is used to update web service definitions for core if we're upgrading from moodle.
+ * This should be temporary until these core services are moved to GQL
+ *
+ * @return void
+ */
+function totara_competency_install_core_services() {
+    // Let's check whether we need to do anything at all
+    global $DB, $CFG;
+
+    // If it's already been created, no point to waste resources on running descriptions upgrade
+    if ($DB->record_exists('external_functions', ['name' => 'core_user_index'])) {
+        return;
+    }
+
+    require_once $CFG->libdir . '/db/upgradelib.php';
+
+    // This will refresh external services from core without an explicit version bumps
+    external_update_descriptions('core');
+}

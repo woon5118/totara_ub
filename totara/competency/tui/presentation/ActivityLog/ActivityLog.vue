@@ -174,10 +174,8 @@ export default {
     ],
     "totara_competency": [
       "activity_log",
+      "assignment",
       "activitylog_proficientstatus"
     ],
-    "totara_competency": [
-      "assignment"
-    ]
   }
 </lang-strings>

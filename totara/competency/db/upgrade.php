@@ -169,5 +169,23 @@ function xmldb_totara_competency_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019110802, 'totara', 'competency');
     }
 
+    if ($oldversion < 2019110803) {
+        // Let's check whether we need to do anything at all
+        global $DB, $CFG;
+
+        // If it's already been created, no point to waste resources on running descriptions upgrade
+        if (!$DB->record_exists('external_functions', ['name' => 'core_user_index'])) {
+            require_once $CFG->libdir . '/db/upgradelib.php';
+            // This will remove old web services added by totara_assignment
+            external_update_descriptions('totara_assignment');
+
+            // This will refresh external services from core without an explicit version bumps
+            external_update_descriptions('core');
+
+            // Competency savepoint reached.
+            upgrade_plugin_savepoint(true, 2019110803, 'totara', 'competency');
+        }
+    }
+
     return true;
 }
