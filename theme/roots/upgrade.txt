@@ -4,6 +4,7 @@ This file describes API changes for 'theme_roots'.
 
 * "secure" page layout now uses layout/secure.php
 * Styling changes applied to login page theme/roots/less/totara/login.less
+* Updated tool_usertours/tourstep template
 
 === 12.0 ===
 

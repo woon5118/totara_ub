@@ -1,0 +1,5 @@
+This files describes API changes in /admin/usertours/.
+
+=== 13.0 ===
+
+* Updated tool_usertours/tourstep template

@@ -167,9 +167,17 @@ function(ajax, BootstrapTour, $, templates, str, log, notification) {
          * Mark the specified step as being shownd by the user.
          *
          * @method  markStepShown
+         * @param {Object} data Bootstrap tour object data 
          */
-        markStepShown: function() {
+        markStepShown: function(data) {
             var stepConfig = this.getStepConfig(this.getCurrentStepNumber());
+            if (this.isLastStep(this.stepNumber)) {
+                data.template.find('[data-role="next"]').removeClass('btn-primary').addClass('btn-default');
+                data.template.find('[data-role="end"]').addClass('btn-primary').removeClass('btn-default');
+            } else {
+                data.template.find('[data-role="next"]').addClass('btn-primary').removeClass('btn-default');
+                data.template.find('[data-role="end"]').removeClass('btn-primary').addClass('btn-default');
+            }
             $.when(
                 ajax.call([
                     {
