@@ -21,6 +21,8 @@
  * @package totara_competency
  */
 
+use totara_competency\admin_setting_continuous_tracking;
+use totara_competency\admin_setting_unassign_behaviour;
 use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die;
@@ -58,5 +60,65 @@ if ($hassiteconfig) {
             !advanced_feature::is_enabled('competency_assignment')
         )
     );
+
+    $ADMIN->add(
+        'competencies',
+        new admin_externalpage(
+            'competency_assignment',
+            get_string('title:index', 'totara_competency'),
+            "{$CFG->wwwroot}/totara/competency/assignments/index.php",
+            "totara/competency:manage_assignments",
+            !advanced_feature::is_enabled('competency_assignment')
+        )
+    );
+    $ADMIN->add(
+        'competencies',
+        new admin_externalpage(
+            'competency_assignment_users',
+            get_string('title:users', 'totara_competency'),
+            "{$CFG->wwwroot}/totara/competency/assignments/users.php",
+            "totara/competency:manage_assignments",
+            !advanced_feature::is_enabled('competency_assignment')
+        )
+    );
+    $ADMIN->add(
+        'competencies',
+        new admin_externalpage(
+            'competency_assignment_create',
+            get_string('title:create', 'totara_competency'),
+            "{$CFG->wwwroot}/totara/competency/assignments/create.php",
+            "totara/competency:manage_assignments",
+            !advanced_feature::is_enabled('competency_assignment')
+        )
+    );
+
+    if (advanced_feature::is_enabled('competency_assignment')) {
+        $settings_page = \hierarchy_competency\admin_settings::load_or_create_settings_page($ADMIN);
+        if (!is_array($settings_page->req_capability)) {
+            $settings_page->req_capability = [$settings_page->req_capability];
+        }
+        $settings_page->req_capability[] = 'totara/competency:manage_assignments';
+        $settings_page->req_capability = array_unique($settings_page->req_capability);
+
+        if ($ADMIN->fulltree) {
+            $settings_page->add(new admin_setting_heading(
+                'totara_competency/heading',
+                new lang_string('settings:unassignment:header', 'totara_competency'),
+                new lang_string('settings:unassignment:text', 'totara_competency')
+            ));
+
+            $settings_page->add(new admin_setting_unassign_behaviour(
+                admin_setting_unassign_behaviour::NAME,
+                new lang_string('settings:unassign_behaviour', 'totara_competency'),
+                new lang_string('settings:unassign_behaviour:description', 'totara_competency')
+            ));
+
+            $settings_page->add(new admin_setting_continuous_tracking(
+                'totara_competency/continuous_tracking',
+                new lang_string('settings:continuous_tracking', 'totara_competency'),
+                new lang_string('settings:continuous_tracking:description', 'totara_competency')
+            ));
+        }
+    }
 }
 
