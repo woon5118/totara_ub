@@ -3,6 +3,7 @@
 namespace totara_competency\entities;
 
 use core\orm\entity\entity;
+use core\orm\query\builder;
 use totara_competency\aggregation_users_table;
 
 /**
@@ -22,12 +23,12 @@ class configuration_change extends entity {
     public const CHANGED_AGGREGATION = 'aggregation_changed';
     public const CHANGED_MIN_PROFICIENCY = 'min_proficiency_changed';
 
-
     /**
      * Log a configuration change
      *
+     * @param int $competency_id
      * @param string $change_type Type of change to log
-     * @param ?int $action_time Action time. Only 1 configuration change log entry is created for a specific time
+     * @param int|null $action_time
      * @return configuration_change
      */
     public static function add_competency_entry(
@@ -81,20 +82,27 @@ class configuration_change extends entity {
     public static function min_proficiency_change(int $scale_id, int $new_min_proficiency_id) {
         // Get all competencies using this scale.
         $competencies = competency::repository()
-            ->join(competency_framework::TABLE, competency::TABLE . 'frameworkid', '=', competency_framework::TABLE . 'id')
-            ->join('comp_scale_assignments', competency_framework::TABLE . 'id', '=', 'comp_scale_assignments.frameworkid')
-            ->where('comp_scale_assignments.scaleid', '=', $scale_id)
-            ->get();
+            ->join([scale_assignment::TABLE, 'csa'], 'frameworkid', 'csa.frameworkid')
+            ->where('csa.scaleid', $scale_id)
+            ->get_lazy();
 
         $time = time();
+        $related_info = json_encode(['new_min_proficiency_id' => $new_min_proficiency_id]);
+        $records = [];
 
         foreach ($competencies as $competency) {
-            $entry = new configuration_change();
+            $entry = new \stdClass();
             $entry->comp_id = $competency->id;
             $entry->change_type = self::CHANGED_MIN_PROFICIENCY;
             $entry->time_changed = $time;
-            $entry->related_info = json_encode(['new_min_proficiency_id' => $new_min_proficiency_id]);
-            $entry->save();
+            $entry->related_info = $related_info;
+            $records[] = $entry;
+        }
+
+        if (!empty($records)) {
+            // For performance reasons we do a batch insert here
+            // as potentially a lot of records could be affected
+            builder::get_db()->insert_records_via_batch(configuration_change::TABLE, $records);
         }
     }
 
