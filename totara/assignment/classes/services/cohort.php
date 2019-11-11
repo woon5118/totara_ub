@@ -87,12 +87,12 @@ class cohort extends \external_api {
             $order = 'id';
         }
 
-        return \totara_assignment\entities\cohort::repository()
+        return \core\entities\cohort::repository()
             ->select_only_fields_for_picker()
             ->set_filters($filters)
             ->order_by($order, $direction)
             ->paginate($page)
-            ->transform(function (\totara_assignment\entities\cohort $item) {
+            ->transform(function (\core\entities\cohort $item) {
                 return [
                     'id' => $item->id,
                     'display_name' => format_string($item->name),

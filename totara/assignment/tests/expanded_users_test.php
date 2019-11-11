@@ -22,7 +22,7 @@
  * @category test
  */
 
-use totara_assignment\expanded_users;
+use totara_competency\expanded_users;
 use totara_job\job_assignment;
 
 defined('MOODLE_INTERNAL') || die();

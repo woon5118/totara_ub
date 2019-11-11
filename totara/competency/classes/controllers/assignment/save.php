@@ -30,7 +30,7 @@ use totara_assignment\services\cohort;
 use totara_assignment\services\organisation;
 use totara_assignment\services\position;
 use totara_assignment\services\user;
-use totara_assignment\user_groups;
+use totara_competency\user_groups;
 use totara_core\basket\session_basket;
 use totara_core\output\select_tree;
 

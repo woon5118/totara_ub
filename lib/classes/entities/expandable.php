@@ -17,22 +17,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_assignment
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+ * @package core
  */
 
-namespace totara_assignment\filter;
+namespace core\entities;
 
+interface expandable {
 
-use core\orm\entity\filter\filter;
-
-class visible extends filter {
-
-    public function apply() {
-        // TODO might add optional column change if any other name used for visibility column elsewhere
-        if (!is_null($this->value)) {
-            $this->builder->where('visible', $this->value);
-        }
-    }
+    /**
+     * @return array
+     */
+    public function expand(): array;
 
 }

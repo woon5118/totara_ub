@@ -26,7 +26,7 @@ namespace totara_competency\observers;
 use core\event;
 use totara_competency\models\assignment_actions;
 use totara_competency\models\assignment_user;
-use totara_assignment\user_groups;
+use totara_competency\user_groups;
 
 defined('MOODLE_INTERNAL') || die();
 

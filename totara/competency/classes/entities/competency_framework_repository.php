@@ -24,7 +24,7 @@
 namespace totara_competency\entities;
 
 
-use totara_assignment\entities\hierarchy_framework_repository;
+use totara_hierarchy\entities\hierarchy_framework_repository;
 
 class competency_framework_repository extends hierarchy_framework_repository {
 

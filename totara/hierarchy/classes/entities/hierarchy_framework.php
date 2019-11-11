@@ -18,26 +18,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_assignment
+ * @package totara_hierarchy
  */
 
-namespace totara_assignment\entities;
-
+namespace totara_hierarchy\entities;
 
 use core\orm\entity\entity;
 
 /**
  * Hierarchy framework base entity
  *
- * @property string $fullname
  * @property string $shortname
  * @property string $idnumber
  * @property string $description
- * @property int $timecreated
+ * @property int $sortorder
+ * @property int $visible
+ * @property int $hidecustomfields
+ * @property int $timecreatedcat
  * @property int $timemodified
  * @property int $usermodified
+ * @property string $fullname
+ *
+ * @method static hierarchy_framework_repository repository()
  */
-abstract class hierarchy_type extends entity {
+abstract class hierarchy_framework extends entity {
 
     const CREATED_TIMESTAMP = 'timecreated';
     const UPDATED_TIMESTAMP = 'timemodified';

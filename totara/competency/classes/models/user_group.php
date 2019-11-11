@@ -79,7 +79,7 @@ abstract class user_group {
     }
 
     /**
-     * Get type string, see type constants in \totara_assignment\user_groups class for examples
+     * Get type string, see type constants in \totara_competency\user_groups class for examples
      *
      * @return string
      */

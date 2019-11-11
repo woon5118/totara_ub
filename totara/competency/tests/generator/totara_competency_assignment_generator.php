@@ -23,7 +23,7 @@
 
 use totara_competency\models\assignment_actions;
 use totara_competency\entities\assignment;
-use totara_assignment\user_groups;
+use totara_competency\user_groups;
 use totara_job\job_assignment;
 
 require_once(__DIR__ . '/totara_competency_generator.class.php');

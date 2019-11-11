@@ -18,25 +18,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package totara_assignment
+ * @package core
  */
 
-namespace totara_assignment;
+namespace core\orm\entity\filter;
 
-class user_groups {
+use core\orm\query\builder;
+use core\orm\query\field;
+use core\orm\query\raw_field;
 
-    const USER = 'user';
-    const POSITION = 'position';
-    const ORGANISATION = 'organisation';
-    const COHORT = 'cohort';
+/**
+ * Filters for some user name information
+ *
+ * @package totara_competency\entities\filters
+ */
+class user_name extends like {
 
-    public static function get_available_types() {
-        return [
-            self::USER,
-            self::POSITION,
-            self::ORGANISATION,
-            self::COHORT
-        ];
+    public function __construct() {
+        parent::__construct([
+            new raw_field(builder::concat(
+                new field('firstname', $this->builder),
+                "' '",
+                new field('lastname', $this->builder)
+            )),
+            new raw_field(builder::concat(
+                new field('lastname', $this->builder),
+                "' '",
+                new field('firstname', $this->builder)
+            )),
+        ]);
     }
 
 }

@@ -69,11 +69,11 @@ class position_framework extends \external_api {
             $filters['visible'] = true;
         }
 
-        return \totara_assignment\entities\position_framework::repository()
+        return \hierarchy_position\entities\position_framework::repository()
             ->set_filters($filters)
             ->order_by($order, $direction)
             ->paginate($page)
-            ->transform(function (\totara_assignment\entities\position_framework $item) {
+            ->transform(function (\hierarchy_position\entities\position_framework $item) {
                 $fullname = format_string($item->fullname);
                 return [
                     'id' => $item->id,

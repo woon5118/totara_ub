@@ -24,8 +24,8 @@
 namespace totara_competency\models\user_group;
 
 use totara_competency\models\user_group;
-use totara_assignment\entities\cohort as cohort_entity;
-use totara_assignment\user_groups;
+use core\entities\cohort as cohort_entity;
+use totara_competency\user_groups;
 
 class cohort extends user_group {
 

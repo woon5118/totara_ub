@@ -27,7 +27,7 @@ use core\orm\entity\repository;
 use core\orm\query\field;
 use totara_competency\entities\assignment;
 use totara_competency\entities\assignment_repository;
-use totara_assignment\user_groups;
+use totara_competency\user_groups;
 use totara_competency\entities\competency_assignment_user;
 use core\orm\query\builder;
 

@@ -25,7 +25,7 @@ namespace totara_competency\userdata;
 
 use core\orm\query\builder;
 use totara_competency\entities;
-use totara_assignment\user_groups;
+use totara_competency\user_groups;
 use totara_userdata\userdata\export;
 use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;

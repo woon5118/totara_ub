@@ -18,15 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_assignment
+ * @package core
  */
 
-namespace totara_assignment\filter;
-
+namespace core\orm\entity\filter;
 
 use core\orm\query\builder;
 use core\orm\query\field;
-use core\orm\entity\filter\filter;
 
 class hierarchy_item_visible extends filter {
 
@@ -46,7 +44,7 @@ class hierarchy_item_visible extends filter {
     protected function get_framework_join() {
         // We are getting framework class name and from it getting its table name
         $table = $this->entity_class::get_framework_class()::TABLE;
-        /** @var $fw_join \core\orm\join */
+        /** @var $fw_join \core\orm\query\join */
         if (!$fw_join = $this->builder->get_join($table)) {
             $this->builder->join($table, 'frameworkid', 'id');
             $fw_join = $this->builder->get_join($table);

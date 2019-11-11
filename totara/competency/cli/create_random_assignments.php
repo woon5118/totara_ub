@@ -18,16 +18,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package totara_assignment
+ * @package totara_competency
  */
 
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency;
-use totara_assignment\entities\cohort;
-use totara_assignment\entities\organisation;
-use totara_assignment\entities\position;
-use totara_assignment\entities\user;
-use totara_assignment\user_groups;
+use core\entities\cohort;
+use hierarchy_organisation\entities\organisation;
+use hierarchy_position\entities\position;
+use core\entities\user;
+use totara_competency\user_groups;
 
 define('CLI_SCRIPT', 1);
 

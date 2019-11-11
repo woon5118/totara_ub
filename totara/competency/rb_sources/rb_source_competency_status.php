@@ -23,7 +23,7 @@
  */
 
 use totara_competency\entities\assignment;
-use totara_assignment\user_groups;
+use totara_competency\user_groups;
 use totara_competency\entities\competency_achievement;
 use totara_core\advanced_feature;
 use totara_job\rb\source\report_trait;

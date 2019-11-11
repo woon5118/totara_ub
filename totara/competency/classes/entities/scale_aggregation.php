@@ -23,7 +23,7 @@
 
 namespace totara_competency\entities;
 
-use totara_assignment\entities\hierarchy_item;
+use totara_hierarchy\entities\hierarchy_item;
 
 // Currently only required to re-use the constants
 global $CFG;

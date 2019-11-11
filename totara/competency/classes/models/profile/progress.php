@@ -25,7 +25,7 @@ namespace totara_competency\models\profile;
 
 use core\orm\collection;
 use stdClass;
-use totara_assignment\entities\user;
+use core\entities\user;
 use totara_competency\data_providers\assignments;
 use totara_competency\entities\competency_achievement;
 

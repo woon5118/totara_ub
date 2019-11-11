@@ -82,14 +82,14 @@ class user extends \external_api {
         $name_order = totara_get_all_user_name_fields(true, '', null, null, true);
         $order = "{$name_order} {$direction}, id asc";
 
-        return \totara_assignment\entities\user::repository()
+        return \core\entities\user::repository()
             ->select_full_name_fields_only()
             ->filter_by_not_deleted()
             ->filter_by_not_guest()
             ->set_filters($filters)
             ->order_by_raw($order)
             ->paginate($page)
-            ->transform(function (\totara_assignment\entities\user $item) {
+            ->transform(function (\core\entities\user $item) {
                 $user_name_fields = totara_get_all_user_name_fields();
                 $user = new \stdClass();
                 foreach ($user_name_fields as $field) {

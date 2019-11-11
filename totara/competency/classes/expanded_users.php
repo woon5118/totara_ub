@@ -21,7 +21,7 @@
  * @package $END$
  */
 
-namespace totara_assignment;
+namespace totara_competency;
 
 
 use Closure;

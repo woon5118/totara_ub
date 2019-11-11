@@ -21,7 +21,7 @@
  * @package totara_competency
  */
 
-use totara_assignment\user_groups;
+use totara_competency\user_groups;
 use totara_competency\models\activity_log;
 use totara_competency\entities\competency_assignment_user_log;
 use totara_competency\entities\assignment;

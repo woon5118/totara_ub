@@ -25,10 +25,10 @@ namespace totara_competency\models\activity_log;
 
 use core\orm\entity\entity;
 use totara_competency\entities\competency_assignment_user_log;
-use totara_assignment\entities\cohort;
-use totara_assignment\entities\organisation;
-use totara_assignment\entities\position;
-use totara_assignment\entities\user;
+use core\entities\cohort;
+use hierarchy_organisation\entities\organisation;
+use hierarchy_position\entities\position;
+use core\entities\user;
 use totara_competency\models\activity_log;
 use totara_competency\entities;
 

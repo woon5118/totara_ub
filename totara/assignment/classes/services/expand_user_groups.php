@@ -27,7 +27,7 @@ namespace totara_assignment\services;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
-use totara_assignment\expanded_users;
+use totara_competency\expanded_users;
 use totara_core\advanced_feature;
 use totara_core\basket\session_basket;
 

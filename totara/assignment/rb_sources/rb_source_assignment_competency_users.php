@@ -22,7 +22,7 @@
  */
 
 use totara_competency\entities\assignment;
-use totara_assignment\user_groups;
+use totara_competency\user_groups;
 use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();

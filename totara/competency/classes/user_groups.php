@@ -17,13 +17,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_assignment
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+ * @package totara_competency
  */
 
-namespace totara_assignment\entities;
+namespace totara_competency;
 
+class user_groups {
 
-class position_repository extends hierarchy_item_repository {
+    const USER = 'user';
+    const POSITION = 'position';
+    const ORGANISATION = 'organisation';
+    const COHORT = 'cohort';
+
+    public static function get_available_types() {
+        return [
+            self::USER,
+            self::POSITION,
+            self::ORGANISATION,
+            self::COHORT
+        ];
+    }
 
 }

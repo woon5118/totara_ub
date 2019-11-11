@@ -25,7 +25,7 @@ namespace pathway_learning_plan\entities;
 
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
-use totara_assignment\entities\user;
+use core\entities\user;
 use totara_competency\entities\competency;
 use totara_competency\entities\scale_value;
 

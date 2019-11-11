@@ -24,8 +24,8 @@
 namespace totara_competency\baskets;
 
 use totara_competency\entities\competency;
-use totara_assignment\filter\basket;
-use totara_assignment\filter\hierarchy_item_visible;
+use core\orm\entity\filter\basket;
+use core\orm\entity\filter\hierarchy_item_visible;
 use totara_core\basket\basket_interface;
 use totara_core\basket\session_basket;
 

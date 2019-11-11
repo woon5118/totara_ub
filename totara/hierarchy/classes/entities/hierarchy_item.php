@@ -18,10 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_assignment
+ * @package totara_hierarchy
  */
 
-namespace totara_assignment\entities;
+namespace totara_hierarchy\entities;
 
 use ReflectionClass;
 use core\orm\collection;

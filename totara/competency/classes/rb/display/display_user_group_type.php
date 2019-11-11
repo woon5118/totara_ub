@@ -26,7 +26,7 @@ namespace totara_competency\rb\display;
 use rb_column;
 use reportbuilder;
 use stdClass;
-use totara_assignment\user_groups;
+use totara_competency\user_groups;
 use totara_reportbuilder\rb\display\base;
 
 /**

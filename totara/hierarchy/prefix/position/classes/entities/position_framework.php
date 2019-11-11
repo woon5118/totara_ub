@@ -18,17 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_assignment
+ * @package hierarchy_position
  */
 
-namespace totara_assignment\entities;
+namespace hierarchy_position\entities;
 
-
-use core\orm\entity\entity;
+use totara_hierarchy\entities\hierarchy_framework;
 
 /**
- * Hierarchy framework base entity
- *
  * @property string $shortname
  * @property string $idnumber
  * @property string $description
@@ -40,30 +37,10 @@ use core\orm\entity\entity;
  * @property int $usermodified
  * @property string $fullname
  *
- * @method static hierarchy_framework_repository repository()
+ * @method static position_framework_repository repository()
  */
-abstract class hierarchy_framework extends entity {
+class position_framework extends hierarchy_framework {
 
-    const CREATED_TIMESTAMP = 'timecreated';
-    const UPDATED_TIMESTAMP = 'timemodified';
+    public const TABLE = 'pos_framework';
 
-    const SET_UPDATED_WHEN_CREATED = true;
-
-    /**
-     * Extra attributes to append
-     *
-     * @var array
-     */
-    protected $extra_attributes = [
-        'display_name'
-    ];
-
-    /**
-     * Return display name
-     *
-     * @return string
-     */
-    protected function get_display_name_attribute() {
-        return $this->fullname;
-    }
 }

@@ -18,14 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package totara_assignment
+ * @package core
  */
 
-namespace totara_assignment\filter;
+namespace core\orm\entity\filter;
 
 use totara_core\basket\basket_interface;
 use totara_core\basket\session_basket;
-use core\orm\entity\filter\filter;
 
 /**
  * Filters for all ids in the given basket, used for showing selected items in the interface

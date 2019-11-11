@@ -18,58 +18,51 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_assignment
+ * @package core
  */
 
-namespace totara_assignment\entities;
+namespace core\entities;
 
-
-use totara_assignment\filter\visible;
-use totara_assignment\entities\traits\has_visible_filter;
-use core\orm\query\field;
-use core\orm\entity\filter\like;
+use core\orm\entity\traits\has_visible_filter;
+use core\orm\entity\filter\basket;
+use core\orm\entity\filter\visible;
 use core\orm\entity\repository;
+use core\orm\query\field;
+use core\orm\entity\filter\in;
+use core\orm\entity\filter\like;
 
-abstract class hierarchy_framework_repository extends repository {
-
-    protected $order = 'sortorder';
+/**
+ * @package totara_competency\entities
+ */
+class cohort_repository extends repository {
 
     use has_visible_filter;
 
-    /**
-     * Default set of filters for hierarchy frameworks
-     *
-     * @return array
-     */
-    protected function get_default_filters(): array {
+    public function get_default_filters(): array {
         return [
-            'text' => new like([
-                new field('fullname', $this->builder),
-                new field('idnumber', $this->builder),
-                new field('shortname', $this->builder),
-                new field('description', $this->builder)
-            ]),
+            'basket' => new basket(),
             'visible' => new visible(),
+            'text' => new like([
+                new field('name', $this->builder),
+                new field('description', $this->builder),
+                new field('idnumber', $this->builder),
+            ]),
+            'ids' => new in('id')
         ];
     }
 
-    public function order_by(string $column, string $direction = 'asc') {
-        $allowed_order_columnns = [
+    /**
+     * Select only limited subset of columns intended to be used with picker dialogue
+     *
+     * @return $this
+     */
+    public function select_only_fields_for_picker() {
+        $this->add_select([
             'id',
-            'fullname',
-            'shortname',
+            'name',
             'description',
             'idnumber',
-            'sortorder',
-            'timecreated',
-            'timemodified',
-            'usermodified'
-        ];
-        if (!in_array($column, $allowed_order_columnns)) {
-            $column = 'sortorder';
-        }
-
-        parent::order_by($column, $direction);
+        ]);
 
         return $this;
     }

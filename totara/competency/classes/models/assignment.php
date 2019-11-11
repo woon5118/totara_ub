@@ -24,9 +24,12 @@
 namespace totara_competency\models;
 
 use coding_exception;
+use core\entities\cohort;
 use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\query\builder;
+use hierarchy_organisation\entities\organisation;
+use hierarchy_position\entities\position;
 use totara_competency\assignment_create_exception;
 use totara_competency\entities\assignment as assignment_entity;
 use totara_competency\entities\competency;
@@ -37,10 +40,10 @@ use totara_competency\event\assignment_archived;
 use totara_competency\event\assignment_created;
 use totara_competency\event\assignment_deleted;
 use totara_competency\event\assignment_user_archived;
-use totara_assignment\entities\hierarchy_item;
-use totara_assignment\entities\user;
-use totara_assignment\filter\hierarchy_item_visible;
-use totara_assignment\user_groups;
+use totara_hierarchy\entities\hierarchy_item;
+use core\entities\user;
+use core\orm\entity\filter\hierarchy_item_visible;
+use totara_competency\user_groups;
 use totara_competency\models\profile\proficiency_value;
 
 class assignment {
@@ -244,10 +247,7 @@ class assignment {
             throw new assignment_create_exception('Competency cannot be be assigned by given type');
         }
 
-        $class = "totara_assignment\\entities\\{$user_group_type}";
-        if (!class_exists($class)) {
-            throw new assignment_create_exception('Invalid user group has been passed');
-        }
+        $class = static::get_entity_class_by_user_group_type($user_group_type);
 
         /** @var entity|user|hierarchy_item $class */
         $repo = $repo = $class::repository()
@@ -598,6 +598,39 @@ class assignment {
      */
     public function to_array(): array {
         return $this->entity->to_array();
+    }
+
+    /**
+     * Get entity class bu user group type
+     *
+     * @param string $type
+     * @return string
+     */
+    public static function get_entity_class_by_user_group_type(string $type): string {
+
+        switch ($type) {
+            case 'user':
+                $class_name = user::class;
+                break;
+            case 'cohort':
+                $class_name = cohort::class;
+                break;
+            case 'position':
+                $class_name = position::class;
+                break;
+            case 'organisation':
+                $class_name = organisation::class;
+                break;
+            default:
+                $class_name = null;
+                break;
+        }
+
+        if (!class_exists($class_name)) {
+            throw new \coding_exception('Invalid entity found!');
+        }
+
+        return $class_name;
     }
 
 }

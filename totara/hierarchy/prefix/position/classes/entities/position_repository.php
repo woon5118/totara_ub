@@ -18,12 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_assignment
+ * @package hierarchy_position
  */
 
-namespace totara_assignment\entities;
+namespace hierarchy_position\entities;
 
+use totara_hierarchy\entities\hierarchy_item_repository;
 
-class organisation_framework_repository extends hierarchy_framework_repository {
+class position_repository extends hierarchy_item_repository {
 
 }

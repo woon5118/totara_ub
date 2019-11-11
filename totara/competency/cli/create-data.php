@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_assignment
+ * @package totara_competency
  */
 
 use Faker\Generator;
@@ -167,9 +167,9 @@ switch (strtolower($what)) {
 
     case 'add_to_pos':
         echo "Creating members for positions...\n";
-        $positions = \totara_assignment\entities\position::repository()->get();
+        $positions = \hierarchy_position\entities\position::repository()->get();
 
-        $counter = \totara_assignment\entities\position::repository()
+        $counter = \hierarchy_position\entities\position::repository()
             ->select_raw('count(*) + 1 as next_num')
             ->where_like_starts_with('idnumber', 'posass_')
             ->one();
@@ -184,7 +184,7 @@ switch (strtolower($what)) {
             foreach ($positions as $position) {
                 $count = rand(1, intval($argv[2] ?? 3));
 
-                $users = \totara_assignment\entities\user::repository()
+                $users = \core\entities\user::repository()
                     ->limit($count)
                     ->order_by_raw('random()')
                     ->get();
@@ -206,9 +206,9 @@ switch (strtolower($what)) {
     case 'add_to_org':
         echo "Creating members for organisations...\n";
 
-        $organisations = \totara_assignment\entities\organisation::repository()->get();
+        $organisations = \hierarchy_organisation\entities\organisation::repository()->get();
 
-        $counter = \totara_assignment\entities\organisation::repository()
+        $counter = \hierarchy_organisation\entities\organisation::repository()
             ->select_raw('count(*) + 1 as next_num')
             ->where_like_starts_with('idnumber', 'posass_')
             ->one();
@@ -224,7 +224,7 @@ switch (strtolower($what)) {
             foreach ($organisations as $organisation) {
                 $count = rand(1, intval($argv[2] ?? 3));
 
-                $users = \totara_assignment\entities\user::repository()
+                $users = \core\entities\user::repository()
                     ->limit($count)
                     ->order_by_raw('random()')
                     ->get();
@@ -248,7 +248,7 @@ switch (strtolower($what)) {
 
         $count = rand(1, intval($argv[2] ?? 3));
 
-        $users = \totara_assignment\entities\user::repository()
+        $users = \core\entities\user::repository()
             ->limit($count)
             ->order_by_raw('random()')
             ->get();

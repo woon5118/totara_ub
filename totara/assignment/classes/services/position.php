@@ -90,14 +90,14 @@ class position extends \external_api {
             $filters['visible'] = true;
         }
 
-        return \totara_assignment\entities\position::repository()
+        return \hierarchy_position\entities\position::repository()
             ->reset_select()
             ->select_only_fields_for_picker()
             ->with_children_count()
             ->set_filters($filters)
             ->order_by($order, $direction)
             ->paginate($page)
-            ->transform(function (\totara_assignment\entities\position $item) {
+            ->transform(function (\hierarchy_position\entities\position $item) {
                 $name = format_string($item->fullname);
                 return [
                     'id' => $item->id,
@@ -144,8 +144,8 @@ class position extends \external_api {
         $context = context_system::instance();
         require_capability('totara/hierarchy:viewposition', $context);
 
-        /** @var \totara_assignment\entities\position $item */
-        $item = \totara_assignment\entities\position::repository()->find($id);
+        /** @var \hierarchy_position\entities\position $item */
+        $item = \hierarchy_position\entities\position::repository()->find($id);
         if (empty($item)) {
             return [];
         }

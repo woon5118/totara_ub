@@ -18,15 +18,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_assignment
+ * @package hierarchy_organisation
  */
 
-namespace totara_assignment\entities;
-
+namespace hierarchy_organisation\entities;
 
 use core\orm\collection;
-use totara_assignment\entities\expand;
-use totara_assignment\entities\expandable;
+use core\entities\expand;
+use core\entities\expandable;
+use hierarchy_position\entities\position;
+use hierarchy_position\entities\position_framework;
+use totara_hierarchy\entities\hierarchy_item;
 
 /**
  * @property string $shortname Short name
@@ -45,26 +47,21 @@ use totara_assignment\entities\expandable;
  * @property string $sortthread Sortorder
  * @property bool $totarasync Totara sync flag
  *
- * @property int $timevalidfrom Valid from time
- * @property int $timevalidto Valid to time
+ * @method static organisation_repository repository()
  *
  * @property-read position $parent Parent item
  * @property-read collection $children Immediate children
  * @property-read position_framework $framework Position framework
  *
- *
- * @method static organisation_repository repository()
- *
  * @package totara_competency\entities
  */
-class position extends hierarchy_item implements expandable {
+class organisation extends hierarchy_item implements expandable {
 
     use expand;
 
     protected $expand_table = 'job_assignment';
     protected $expand_select_column = 'userid';
-    protected $expand_query_column = 'positionid';
+    protected $expand_query_column = 'organisationid';
 
-    public const TABLE = 'pos';
-
+    public const TABLE = 'org';
 }

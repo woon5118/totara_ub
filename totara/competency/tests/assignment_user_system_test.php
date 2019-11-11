@@ -42,7 +42,7 @@ class totara_competency_assignment_user_system_testcase extends totara_competenc
 
         $new_assignment = entities\assignment::repository()
             ->where('type', entities\assignment::TYPE_SYSTEM)
-            ->where('user_group_type', \totara_assignment\user_groups::USER)
+            ->where('user_group_type', \totara_competency\user_groups::USER)
             ->where('user_group_id', $user->id)
             ->order_by('type')
             ->first();
@@ -67,7 +67,7 @@ class totara_competency_assignment_user_system_testcase extends totara_competenc
 
         $new_assignment = entities\assignment::repository()
             ->where('type', entities\assignment::TYPE_SYSTEM)
-            ->where('user_group_type', \totara_assignment\user_groups::USER)
+            ->where('user_group_type', \totara_competency\user_groups::USER)
             ->where('user_group_id', $user->id)
             ->order_by('type')
             ->first();
@@ -92,7 +92,7 @@ class totara_competency_assignment_user_system_testcase extends totara_competenc
 
         $new_assignment = entities\assignment::repository()
             ->where('type', entities\assignment::TYPE_SYSTEM)
-            ->where('user_group_type', \totara_assignment\user_groups::USER)
+            ->where('user_group_type', \totara_competency\user_groups::USER)
             ->where('user_group_id', $user->id)
             ->order_by('type')
             ->first();
@@ -112,7 +112,7 @@ class totara_competency_assignment_user_system_testcase extends totara_competenc
 
         $new_assignment = entities\assignment::repository()
             ->where('type', entities\assignment::TYPE_SYSTEM)
-            ->where('user_group_type', \totara_assignment\user_groups::USER)
+            ->where('user_group_type', \totara_competency\user_groups::USER)
             ->where('user_group_id', $user->id)
             ->order_by('type')
             ->first();
@@ -139,7 +139,7 @@ class totara_competency_assignment_user_system_testcase extends totara_competenc
 
         $new_assignment = entities\assignment::repository()
             ->where('type', entities\assignment::TYPE_SYSTEM)
-            ->where('user_group_type', \totara_assignment\user_groups::USER)
+            ->where('user_group_type', \totara_competency\user_groups::USER)
             ->where('user_group_id', $user->id)
             ->order_by('type')
             ->first();
@@ -171,7 +171,7 @@ class totara_competency_assignment_user_system_testcase extends totara_competenc
         // The original assignment is still there
         $this->assertEquals(1, entities\assignment::repository()
             ->where('type', entities\assignment::TYPE_ADMIN)
-            ->where('user_group_type', \totara_assignment\user_groups::POSITION)
+            ->where('user_group_type', \totara_competency\user_groups::POSITION)
             ->where('user_group_id', $pos->id)
             ->count()
         );
@@ -180,7 +180,7 @@ class totara_competency_assignment_user_system_testcase extends totara_competenc
         /** @var entities\assignment $new_assignment */
         $new_assignment = entities\assignment::repository()
             ->where('type', entities\assignment::TYPE_SYSTEM)
-            ->where('user_group_type', \totara_assignment\user_groups::USER)
+            ->where('user_group_type', \totara_competency\user_groups::USER)
             ->where('user_group_id', $user->id)
             ->order_by('type')
             ->first();
@@ -223,7 +223,7 @@ class totara_competency_assignment_user_system_testcase extends totara_competenc
         // The original assignment is still there
         $this->assertEquals(1, entities\assignment::repository()
             ->where('type', entities\assignment::TYPE_ADMIN)
-            ->where('user_group_type', \totara_assignment\user_groups::POSITION)
+            ->where('user_group_type', \totara_competency\user_groups::POSITION)
             ->where('user_group_id', $pos->id)
             ->count()
         );

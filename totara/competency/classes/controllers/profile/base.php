@@ -28,7 +28,7 @@ use context_system;
 use context_user;
 use moodle_exception;
 use moodle_url;
-use totara_assignment\entities\user;
+use core\entities\user;
 use totara_core\advanced_feature;
 use totara_mvc\controller;
 use totara_mvc\view;

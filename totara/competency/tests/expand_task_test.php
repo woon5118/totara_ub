@@ -25,7 +25,7 @@
 use totara_competency\entities\assignment;
 use totara_competency\expand_task;
 use totara_competency\models\assignment as assignment_model;
-use totara_assignment\user_groups;
+use totara_competency\user_groups;
 use totara_job\job_assignment;
 
 defined('MOODLE_INTERNAL') || die();

@@ -24,7 +24,7 @@
 namespace totara_competency\entities;
 
 
-use totara_assignment\entities\hierarchy_framework;
+use totara_hierarchy\entities\hierarchy_framework;
 use core\orm\collection;
 
 /**

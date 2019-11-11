@@ -23,7 +23,7 @@
 
 namespace totara_competency\data_providers;
 
-use totara_assignment\entities\user;
+use core\entities\user;
 use core\orm\collection;
 use core\orm\entity\entity;
 

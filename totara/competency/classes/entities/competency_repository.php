@@ -30,7 +30,7 @@ use core\orm\query\field;
 use core\orm\query\subquery;
 use totara_competency\entities\filters\competency_assignment_status;
 use totara_competency\entities\filters\competency_assignment_type;
-use totara_assignment\entities\hierarchy_item_repository;
+use totara_hierarchy\entities\hierarchy_item_repository;
 
 class competency_repository extends hierarchy_item_repository {
 

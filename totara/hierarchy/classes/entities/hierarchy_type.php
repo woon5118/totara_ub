@@ -18,63 +18,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_assignment
+ * @package totara_hierarchy
  */
 
-namespace totara_assignment\entities;
+namespace totara_hierarchy\entities;
 
-
-use totara_assignment\entities\expand;
-use totara_assignment\entities\expandable;
 use core\orm\entity\entity;
 
 /**
- * @property int $contextid
- * @property string $name
+ * Hierarchy framework base entity
+ *
+ * @property string $fullname
+ * @property string $shortname
  * @property string $idnumber
  * @property string $description
- * @property int $descriptionformat
- * @property bool $visible
- * @property string $component
  * @property int $timecreated
- * @property int $cohorttype
- * @property int $modifierid
  * @property int $timemodified
- * @property bool $visibility
- * @property int $alertmembers
- * @property int $startdate
- * @property int $enddate
- * @property bool $active
- * @property int $calculationstatus
- * @property int $activecollectionid
- * @property int $draftcollectionid
- * @property bool $broken
- * @property-read string $display_name
- *
- * @method static cohort_repository repository()
- *
- * @package totara_competency\entities
+ * @property int $usermodified
  */
-class cohort extends entity implements expandable {
+abstract class hierarchy_type extends entity {
 
-    use expand;
+    const CREATED_TIMESTAMP = 'timecreated';
+    const UPDATED_TIMESTAMP = 'timemodified';
 
-    protected $expand_table = 'cohort_members';
-    protected $expand_select_column = 'userid';
-    protected $expand_query_column = 'cohortid';
+    const SET_UPDATED_WHEN_CREATED = true;
 
-    public const TABLE = 'cohort';
-
+    /**
+     * Extra attributes to append
+     *
+     * @var array
+     */
     protected $extra_attributes = [
         'display_name'
     ];
 
     /**
-     * Get unified display name that can be referred to safely, just an alias in this case
+     * Return display name
      *
      * @return string
      */
     protected function get_display_name_attribute() {
-        return $this->name;
+        return $this->fullname;
     }
 }

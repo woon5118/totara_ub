@@ -25,9 +25,9 @@
 global $CFG;
 
 use core\orm\query\builder;
-use totara_assignment\entities\position;
-use totara_assignment\entities\user;
-use totara_assignment\user_groups;
+use hierarchy_position\entities\position;
+use core\entities\user;
+use totara_competency\user_groups;
 use totara_competency\data_providers\assignments;
 use totara_competency\entities\assignment;
 

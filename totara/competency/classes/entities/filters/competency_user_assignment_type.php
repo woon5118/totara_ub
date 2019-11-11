@@ -27,7 +27,7 @@ use coding_exception;
 use core\orm\query\field;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency;
-use totara_assignment\user_groups;
+use totara_competency\user_groups;
 use core\orm\query\builder;
 use core\orm\entity\filter\filter;
 

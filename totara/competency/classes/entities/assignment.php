@@ -28,7 +28,7 @@ use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many;
 use core\orm\entity\relations\has_one;
-use totara_assignment\entities\user;
+use core\entities\user;
 
 /**
  * Assignment entity

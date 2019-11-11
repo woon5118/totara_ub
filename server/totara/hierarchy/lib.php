@@ -3177,7 +3177,7 @@ class hierarchy {
     }
 
     /**
-     * Get data related to multiple hiearchy items.
+     * Get data related to multiple hierarchy items.
      *
      * @param int|int[] $ids Hierarchy item id
      * @return array|bool

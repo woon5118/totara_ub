@@ -32,7 +32,7 @@ use totara_competency\entities\assignment;
 use totara_competency\entities\competency;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\settings;
-use totara_assignment\filter\hierarchy_item_visible;
+use core\orm\entity\filter\hierarchy_item_visible;
 
 class assignment_actions {
 

@@ -28,7 +28,8 @@ use totara_competency\entities\competency_assignment_user;
 use totara_competency\entities\competency_assignment_user_repository;
 use totara_competency\event\assignment_user_assigned;
 use totara_competency\event\assignment_user_unassigned;
-use totara_assignment\entities\expandable;
+use totara_competency\models\assignment as assignment_model;
+use core\entities\expandable;
 
 class expand_task {
 
@@ -203,10 +204,7 @@ class expand_task {
      * @return array
      */
     private function expand_entity(string $type, int $target_id): array {
-        $class_name = "\\totara_assignment\\entities\\".$type;
-        if (!class_exists($class_name)) {
-            throw new \coding_exception('Invalid entity found!');
-        }
+        $class_name = assignment_model::get_entity_class_by_user_group_type($type);
         if (is_subclass_of($class_name, expandable::class)) {
             /** @var expandable $entity */
             $entity = new $class_name($target_id);
@@ -260,5 +258,4 @@ class expand_task {
         );
         return array_map('intval', $ids);
     }
-
 }

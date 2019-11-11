@@ -27,8 +27,8 @@ use core\orm\collection;
 use core\orm\entity\relations\has_one;
 use core\orm\entity\relations\has_many;
 use core\orm\entity\relations\has_one_through;
-use totara_assignment\entities\hierarchy_item;
-use totara_assignment\user_groups;
+use totara_hierarchy\entities\hierarchy_item;
+use totara_competency\user_groups;
 
 // Currently only required to re-use the constants
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');

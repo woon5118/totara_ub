@@ -22,9 +22,9 @@
  * @category test
  */
 
-use totara_assignment\entities\cohort;
-use totara_assignment\entities\organisation;
-use totara_assignment\entities\position;
+use core\entities\cohort;
+use hierarchy_organisation\entities\organisation;
+use hierarchy_position\entities\position;
 use totara_job\job_assignment;
 
 defined('MOODLE_INTERNAL') || die();

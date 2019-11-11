@@ -23,7 +23,7 @@
  */
 
 use core\collection;
-use totara_assignment\entities\user;
+use core\entities\user;
 use totara_competency\models\profile\filter;
 use totara_competency\models\profile\item;
 use totara_competency\models\profile\progress;

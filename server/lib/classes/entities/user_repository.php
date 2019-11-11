@@ -24,10 +24,24 @@
 
 namespace core\entities;
 
+use core\orm\entity\filter\basket;
+use core\orm\entity\filter\in;
+use core\orm\entity\filter\user_name;
 use core\orm\entity\repository;
 use user_picture;
 
 class user_repository extends repository {
+
+    /**
+     * @return array
+     */
+    protected function get_default_filters(): array {
+        return [
+            'basket' => new basket(),
+            'text' => new user_name(),
+            'ids' => new in('id')
+        ];
+    }
 
     /**
      * Filter only users not marked as deleted

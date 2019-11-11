@@ -31,7 +31,7 @@ use totara_competency\entities\filters\competency_user_assignment_status;
 use totara_competency\entities\filters\competency_user_assignment_type;
 use totara_competency\models\assignment;
 use totara_competency\models\assignment_user;
-use totara_assignment\entities\user;
+use core\entities\user;
 use totara_competency\models\self_assignable_competency;
 
 class self_assignable_competencies extends user_data_provider {

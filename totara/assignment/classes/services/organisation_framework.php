@@ -69,11 +69,11 @@ class organisation_framework extends \external_api {
             $filters['visible'] = true;
         }
 
-        return \totara_assignment\entities\organisation_framework::repository()
+        return \hierarchy_organisation\entities\organisation_framework::repository()
             ->set_filters($filters)
             ->order_by($order, $direction)
             ->paginate($page)
-            ->transform(function (\totara_assignment\entities\organisation_framework $item) {
+            ->transform(function (\hierarchy_organisation\entities\organisation_framework $item) {
                 $fullname = format_string($item->fullname);
                 return [
                     'id' => $item->id,

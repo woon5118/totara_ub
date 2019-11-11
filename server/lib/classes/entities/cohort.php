@@ -52,12 +52,15 @@ use core\orm\entity\entity;
  *
  * @package totara_competency\entities
  */
-class cohort extends entity {
+class cohort extends entity implements expandable {
+
+    use expand;
+
+    protected $expand_table = 'cohort_members';
+    protected $expand_select_column = 'userid';
+    protected $expand_query_column = 'cohortid';
 
     public const TABLE = 'cohort';
-    public const CREATED_TIMESTAMP = 'timecreated';
-    public const UPDATED_TIMESTAMP = 'timemodified';
-    public const SET_UPDATED_WHEN_CREATED = true;
 
     protected $extra_attributes = [
         'display_name'

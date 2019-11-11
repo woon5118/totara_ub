@@ -18,13 +18,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_assignment
+ * @package hierarchy_position
  */
 
-namespace totara_assignment\entities;
-
+namespace hierarchy_position\entities;
 
 use core\orm\collection;
+use core\entities\expand;
+use core\entities\expandable;
+use totara_hierarchy\entities\hierarchy_item;
 
 /**
  * @property string $shortname Short name
@@ -43,21 +45,26 @@ use core\orm\collection;
  * @property string $sortthread Sortorder
  * @property bool $totarasync Totara sync flag
  *
- * @method static organisation_repository repository()
+ * @property int $timevalidfrom Valid from time
+ * @property int $timevalidto Valid to time
  *
  * @property-read position $parent Parent item
  * @property-read collection $children Immediate children
  * @property-read position_framework $framework Position framework
  *
+ *
+ * @method static position_repository repository()
+ *
  * @package totara_competency\entities
  */
-class organisation extends hierarchy_item implements expandable {
+class position extends hierarchy_item implements expandable {
 
     use expand;
 
     protected $expand_table = 'job_assignment';
     protected $expand_select_column = 'userid';
-    protected $expand_query_column = 'organisationid';
+    protected $expand_query_column = 'positionid';
 
-    public const TABLE = 'org';
+    public const TABLE = 'pos';
+
 }

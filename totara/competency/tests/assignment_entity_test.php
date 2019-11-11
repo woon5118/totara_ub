@@ -117,7 +117,7 @@ class totara_competency_assignment_entity_testcase extends advanced_testcase {
         $assignment1 = new assignment();
         $assignment1->competency_id = $comp1->id;
         $assignment1->type = assignment::TYPE_ADMIN;
-        $assignment1->user_group_type = \totara_assignment\user_groups::USER;
+        $assignment1->user_group_type = \totara_competency\user_groups::USER;
         $assignment1->user_group_id = 1;
         $assignment1->status = assignment::STATUS_DRAFT;
         $assignment1->created_by = 0;
@@ -126,28 +126,28 @@ class totara_competency_assignment_entity_testcase extends advanced_testcase {
         $assignment2 = new assignment();
         $assignment2->competency_id = $comp2->id;
         $assignment2->type = assignment::TYPE_ADMIN;
-        $assignment2->user_group_type = \totara_assignment\user_groups::ORGANISATION;
+        $assignment2->user_group_type = \totara_competency\user_groups::ORGANISATION;
         $assignment2->user_group_id = 2;
         $assignment2->status = assignment::STATUS_DRAFT;
         $assignment2->created_by = 0;
         $assignment2->save();
 
         $assignments = assignment::repository()
-            ->filter_by_user_group_type(\totara_assignment\user_groups::USER)
+            ->filter_by_user_group_type(\totara_competency\user_groups::USER)
             ->get();
 
         $this->assertCount(1, $assignments);
-        $this->assertEquals(\totara_assignment\user_groups::USER, $assignments->first()->user_group_type);
+        $this->assertEquals(\totara_competency\user_groups::USER, $assignments->first()->user_group_type);
 
         $assignments = assignment::repository()
-            ->filter_by_user_group_type(\totara_assignment\user_groups::ORGANISATION)
+            ->filter_by_user_group_type(\totara_competency\user_groups::ORGANISATION)
             ->get();
 
         $this->assertCount(1, $assignments);
-        $this->assertEquals(\totara_assignment\user_groups::ORGANISATION, $assignments->first()->user_group_type);
+        $this->assertEquals(\totara_competency\user_groups::ORGANISATION, $assignments->first()->user_group_type);
 
         $assignments = assignment::repository()
-            ->filter_by_user_group_type(\totara_assignment\user_groups::POSITION)
+            ->filter_by_user_group_type(\totara_competency\user_groups::POSITION)
             ->get();
 
         $this->assertCount(0, $assignments);

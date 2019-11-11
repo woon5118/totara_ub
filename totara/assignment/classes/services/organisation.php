@@ -87,14 +87,14 @@ class organisation extends \external_api {
             $filters['visible'] = true;
         }
 
-        return \totara_assignment\entities\organisation::repository()
+        return \hierarchy_organisation\entities\organisation::repository()
             ->reset_select()
             ->select_only_fields_for_picker()
             ->with_children_count()
             ->set_filters($filters)
             ->order_by($order, $direction)
             ->paginate($page)
-            ->transform(function (\totara_assignment\entities\organisation $item) {
+            ->transform(function (\hierarchy_organisation\entities\organisation $item) {
                 $name = format_string($item->fullname);
                 return [
                     'id' => $item->id,
@@ -142,8 +142,8 @@ class organisation extends \external_api {
 
         require_capability('totara/hierarchy:vieworganisation', $context);
 
-        /** @var \totara_assignment\entities\organisation $item */
-        $item = \totara_assignment\entities\organisation::repository()->find($id);
+        /** @var \hierarchy_organisation\entities\organisation $item */
+        $item = \hierarchy_organisation\entities\organisation::repository()->find($id);
         if (empty($item)) {
             return [];
         }

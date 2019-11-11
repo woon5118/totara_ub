@@ -24,8 +24,8 @@
 namespace totara_competency\models\user_group;
 
 use totara_competency\models\user_group;
-use totara_assignment\entities\organisation as organisation_entity;
-use totara_assignment\user_groups;
+use hierarchy_organisation\entities\organisation as organisation_entity;
+use totara_competency\user_groups;
 
 class organisation extends user_group {
 

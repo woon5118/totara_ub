@@ -25,7 +25,7 @@ namespace totara_competency\entities\helpers;
 
 
 use core\format;
-use totara_assignment\entities\hierarchy_item;
+use totara_hierarchy\entities\hierarchy_item;
 use core\orm\query\builder;
 use totara_core\formatter\field\string_field_formatter;
 

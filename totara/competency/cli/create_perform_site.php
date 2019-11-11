@@ -31,7 +31,7 @@ use pathway_manual\manual;
 use totara_competency\entities\assignment;
 use totara_competency\expand_task;
 use totara_competency\models\assignment_actions;
-use totara_assignment\entities\user;
+use core\entities\user;
 use totara_competency\entities\competency as competency_entity;
 use totara_competency\entities\scale_value;
 use totara_competency\linked_courses;

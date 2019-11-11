@@ -18,28 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_assignment
+ * @package hierarchy_organisation
  */
 
-namespace totara_assignment\entities;
+namespace hierarchy_organisation\entities;
 
+use totara_hierarchy\entities\hierarchy_item_repository;
 
-/**
- * @property string $shortname
- * @property string $idnumber
- * @property string $description
- * @property int $sortorder
- * @property int $visible
- * @property int $hidecustomfields
- * @property int $timecreatedcat
- * @property int $timemodified
- * @property int $usermodified
- * @property string $fullname
- *
- * @method static position_framework_repository repository()
- */
-class position_framework extends hierarchy_framework {
+class organisation_repository extends hierarchy_item_repository {
 
-    public const TABLE = 'pos_framework';
-    
 }

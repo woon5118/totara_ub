@@ -18,52 +18,57 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_assignment
+ * @package totara_hierarchy
  */
 
-namespace totara_assignment\entities;
+namespace totara_hierarchy\entities;
 
-
-use totara_assignment\entities\traits\has_visible_filter;
-use totara_assignment\filter\basket;
-use totara_assignment\filter\visible;
-use core\orm\entity\repository;
+use core\orm\entity\filter\visible;
+use core\orm\entity\traits\has_visible_filter;
 use core\orm\query\field;
-use core\orm\entity\filter\in;
 use core\orm\entity\filter\like;
+use core\orm\entity\repository;
 
-/**
- * @package totara_competency\entities
- */
-class cohort_repository extends repository {
+abstract class hierarchy_framework_repository extends repository {
+
+    protected $order = 'sortorder';
 
     use has_visible_filter;
 
-    public function get_default_filters(): array {
+    /**
+     * Default set of filters for hierarchy frameworks
+     *
+     * @return array
+     */
+    protected function get_default_filters(): array {
         return [
-            'basket' => new basket(),
-            'visible' => new visible(),
             'text' => new like([
-                new field('name', $this->builder),
-                new field('description', $this->builder),
+                new field('fullname', $this->builder),
                 new field('idnumber', $this->builder),
+                new field('shortname', $this->builder),
+                new field('description', $this->builder)
             ]),
-            'ids' => new in('id')
+            'visible' => new visible(),
         ];
     }
 
-    /**
-     * Select only limited subset of columns intended to be used with picker dialogue
-     *
-     * @return $this
-     */
-    public function select_only_fields_for_picker() {
-        $this->add_select([
+    public function order_by(string $column, string $direction = 'asc') {
+        $allowed_order_columnns = [
             'id',
-            'name',
+            'fullname',
+            'shortname',
             'description',
             'idnumber',
-        ]);
+            'sortorder',
+            'timecreated',
+            'timemodified',
+            'usermodified'
+        ];
+        if (!in_array($column, $allowed_order_columnns)) {
+            $column = 'sortorder';
+        }
+
+        parent::order_by($column, $direction);
 
         return $this;
     }

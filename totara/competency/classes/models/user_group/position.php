@@ -24,8 +24,8 @@
 namespace totara_competency\models\user_group;
 
 use totara_competency\models\user_group;
-use totara_assignment\entities\position as position_entity;
-use totara_assignment\user_groups;
+use hierarchy_position\entities\position as position_entity;
+use totara_competency\user_groups;
 
 class position extends user_group {
 

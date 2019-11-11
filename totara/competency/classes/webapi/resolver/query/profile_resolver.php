@@ -25,7 +25,7 @@ namespace totara_competency\webapi\resolver\query;
 
 use context_user;
 use core\webapi\query_resolver;
-use totara_assignment\entities\user;
+use core\entities\user;
 use totara_core\advanced_feature;
 
 abstract class profile_resolver implements query_resolver {

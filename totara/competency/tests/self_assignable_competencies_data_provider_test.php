@@ -26,11 +26,10 @@ use core\webapi\execution_context;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency;
 use totara_competency\expand_task;
-use totara_assignment\user_groups;
+use totara_competency\user_groups;
 use totara_competency\data_providers\self_assignable_competencies as data_provider;
 use totara_competency\entities\competency as competency_entity;
 use totara_competency\models\self_assignable_competency;
-use totara_competency\webapi\resolver\query\self_assignable_competencies;
 use totara_job\job_assignment;
 
 defined('MOODLE_INTERNAL') || die();

@@ -28,7 +28,7 @@ use context_user;
 use core\orm\cursor;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
-use totara_assignment\entities\user;
+use core\entities\user;
 use totara_competency\data_providers\self_assignable_competencies as provider;
 use totara_core\advanced_feature;
 

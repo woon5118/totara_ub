@@ -26,8 +26,8 @@ use totara_competency\entities\assignment;
 use totara_competency\entities\competency;
 use totara_competency\entities\competency_framework;
 use totara_competency\task\expand_assignment_task;
-use totara_assignment\entities\user;
-use totara_assignment\user_groups;
+use core\entities\user;
+use totara_competency\user_groups;
 use totara_core\basket\session_basket;
 
 defined('MOODLE_INTERNAL') || die();

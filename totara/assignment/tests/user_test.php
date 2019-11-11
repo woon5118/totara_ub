@@ -22,7 +22,7 @@
  * @category test
  */
 
-use totara_assignment\entities\user;
+use core\entities\user;
 
 defined('MOODLE_INTERNAL') || die();
 

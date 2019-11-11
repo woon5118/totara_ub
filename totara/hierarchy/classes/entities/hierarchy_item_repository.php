@@ -18,17 +18,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_assignment
+ * @package totara_hierarchy
  */
 
-namespace totara_assignment\entities;
-
+namespace totara_hierarchy\entities;
 
 use core\orm\query\subquery;
 use totara_competency\entities\filters\path;
-use totara_assignment\entities\traits\has_visible_filter;
-use totara_assignment\filter\basket;
-use totara_assignment\filter\hierarchy_item_visible;
+use core\orm\entity\traits\has_visible_filter;
+use core\orm\entity\filter\basket;
+use core\orm\entity\filter\hierarchy_item_visible;
 use core\orm\entity\repository;
 use core\orm\query\field;
 use core\orm\entity\filter\equal;
