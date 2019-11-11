@@ -384,8 +384,10 @@ class totara_competency_generator extends component_generator_base {
         foreach ($competencies as $competency => $scale_value) {
             $plan_generator->add_learning_plan_competency($plan->id, $competency);
 
-            (new dp_competency_component($plan))
-                ->set_value($competency, $for_user, $scale_value, (object) ['manual' => true]);
+            if (!is_null($scale_value)) {
+                (new dp_competency_component($plan))
+                    ->set_value($competency, $for_user, $scale_value, (object)['manual' => true]);
+            }
         }
 
         if ($completed) {

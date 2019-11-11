@@ -52,6 +52,8 @@ class totara_competency_integration_aggregation_all_task_testcase extends advanc
 //            $this->markTestSkipped('PHPUNIT_LONGTEST is not defined');
 //        }
 
+        $this->setAdminUser();
+
         $data = new class() {
             public $scale;
             public $scalevalues;
@@ -715,6 +717,121 @@ class totara_competency_integration_aggregation_all_task_testcase extends advanc
                 'user_id' => $data->users[3]->id,
                 'status' => competency_achievement::ACTIVE_ASSIGNMENT,
                 'scale_value_id' => $data->scalevalues[2]->id,
+                'proficient' => 0,
+            ],
+        ]);
+    }
+
+    /**
+     * Test competency_aggregate_all with learning_plan pathway.
+     */
+    public function test_aggregation_all_task_single_learning_plan() {
+        $data = $this->setup_data();
+
+        /** @var [learning_plan] $pathways */
+        $pathways = [];
+        $pathways[1] = $data->competency_generator->create_learning_plan_pathway($data->competencies[1]);
+        $pathways[2] = $data->competency_generator->create_learning_plan_pathway($data->competencies[2]);
+
+        // Assign users
+        $to_assign = [
+            ['user_id' => $data->users[1]->id, 'competency_id' => $data->competencies[1]->id],
+            ['user_id' => $data->users[2]->id, 'competency_id' => $data->competencies[1]->id],
+            ['user_id' => $data->users[3]->id, 'competency_id' => $data->competencies[1]->id],
+            ['user_id' => $data->users[1]->id, 'competency_id' => $data->competencies[2]->id],
+            ['user_id' => $data->users[4]->id, 'competency_id' => $data->competencies[2]->id],
+        ];
+        $data->assign_users_to_competencies($to_assign);
+
+        // Create learning plans
+        $data->competency_generator->create_learning_plan_with_competencies($data->users[1]->id,
+            [$data->competencies[1]->id => null, $data->competencies[2]->id => $data->scalevalues[3]->id]);
+        $data->competency_generator->create_learning_plan_with_competencies($data->users[2]->id,
+            [$data->competencies[1]->id => $data->scalevalues[4]->id]);
+        $data->competency_generator->create_learning_plan_with_competencies($data->users[3]->id,
+            [$data->competencies[1]->id => $data->scalevalues[2]->id]);
+        $data->competency_generator->create_learning_plan_with_competencies($data->users[4]->id,
+            [$data->competencies[2]->id => null]);
+
+        $this->waitForSecond();
+
+        // Now run the task
+        (new competency_aggregation_all())->execute();
+
+        $this->verify_item_records([]);
+
+        $this->verify_pathway_achievements([
+            [
+                'pathway_id' => $pathways[1]->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'scale_value_id' => null,
+                'related_info' => [],
+            ],
+            [
+                'pathway_id' => $pathways[1]->get_id(),
+                'user_id' => $data->users[2]->id,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[4]->id,
+                'related_info' => [],
+            ],
+            [
+                'pathway_id' => $pathways[1]->get_id(),
+                'user_id' => $data->users[3]->id,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[2]->id,
+                'related_info' => [],
+            ],
+            [
+                'pathway_id' => $pathways[2]->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[3]->id,
+                'related_info' => [],
+            ],
+            [
+                'pathway_id' => $pathways[2]->get_id(),
+                'user_id' => $data->users[4]->id,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'scale_value_id' => null,
+                'related_info' => [],
+            ],
+        ]);
+
+        $this->verify_competency_achievements([
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => null,
+                'proficient' => 0,
+            ],
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[2]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[4]->id,
+                'proficient' => 1,
+            ],
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[3]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[2]->id,
+                'proficient' => 0,
+            ],
+            [
+                'competency_id' => $data->competencies[2]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[3]->id,
+                'proficient' => 0,
+            ],
+            [
+                'competency_id' => $data->competencies[2]->id,
+                'user_id' => $data->users[4]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => null,
                 'proficient' => 0,
             ],
         ]);
