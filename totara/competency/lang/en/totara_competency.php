@@ -69,6 +69,7 @@ $string['applysuccess'] = 'Changes applied successfully';
 $string['archived'] = 'Archived';
 $string['assign_competencies'] = 'Assign competencies';
 $string['assigned'] = 'Assigned';
+$string['assignment'] = 'Assignment';
 $string['assignment_archived_at'] = 'Assignment archived {$a}';
 $string['assignmentcreationavailability'] = 'Assignment creation availability';
 $string['back_to'] = '« Back to {$a}';

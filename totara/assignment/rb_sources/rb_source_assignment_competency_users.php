@@ -42,7 +42,6 @@ class rb_source_assignment_competency_users extends rb_base_source {
      * @param rb_global_restriction_set $globalrestrictionset
      */
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
-        $this->usedcomponents[] = 'totara_assignment';
         $this->usedcomponents[] = 'totara_competency';
 
         if ($groupid instanceof rb_global_restriction_set) {

@@ -7,7 +7,7 @@
       class="tui-AssignmentFilter_label"
       for="competency-profile-activity-log-filter"
     >
-      {{ $str('assignment', 'totara_assignment') }}
+      {{ $str('assignment', 'totara_competency') }}
     </label>
     <select
       id="competency-profile-activity-log-filter"
@@ -99,7 +99,7 @@ export default {
       "moodle": [
         "all"
       ],
-      "totara_assignment": [
+      "totara_competency": [
         "assignment"
       ]
     }

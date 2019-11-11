@@ -79,7 +79,7 @@ export default {
         },
         {
           key: 'assignment',
-          title: this.$str('assignment', 'totara_assignment'),
+          title: this.$str('assignment', 'totara_competency'),
           size: 'sm',
         },
       ],
@@ -176,7 +176,7 @@ export default {
       "activity_log",
       "activitylog_proficientstatus"
     ],
-    "totara_assignment": [
+    "totara_competency": [
       "assignment"
     ]
   }
