@@ -23,6 +23,8 @@
 
 global $DB, $PAGE;
 
+use totara_completioneditor\event\course_completion_edited;
+
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/totara/completioneditor/classes/course_editor.php');
 
@@ -226,7 +228,10 @@ if ($form->is_cancelled()) {
         // Save the current course completion changes.
         $coursecompletion = \totara_completioneditor\course_editor::get_current_completion_from_data($data);
 
-        if (\core_completion\helper::write_course_completion($coursecompletion, 'Completion manually edited')) {
+        if ($completion_id = \core_completion\helper::write_course_completion($coursecompletion, 'Completion manually edited')) {
+            $updated_completion_record = $DB->get_record('course_completions', ['id' => $completion_id]);
+            course_completion_edited::create_for_completion_record($updated_completion_record)->trigger();
+
             $url->remove_params(['section']);
             redirect($url, get_string('completionchangessaved', 'totara_completioneditor'),
                 null, \core\output\notification::NOTIFY_SUCCESS);

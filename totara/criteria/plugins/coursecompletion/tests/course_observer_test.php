@@ -62,7 +62,7 @@ class criteria_coursecompletion_course_observer_testcase extends \advanced_testc
         $this->assertEquals(course_completed::class, get_class($cc_event));
         $sink->clear();
 
-        course_observer::course_completed($cc_event);
+        course_observer::course_completion_changed($cc_event);
         $events = $sink->get_events();
         $this->assertEmpty($events);
         $sink->close();
@@ -83,7 +83,7 @@ class criteria_coursecompletion_course_observer_testcase extends \advanced_testc
         $sink->clear();
 
         $sink = $this->redirectEvents();
-        course_observer::course_completed($cc_event);
+        course_observer::course_completion_changed($cc_event);
         $events = $sink->get_events();
         $this->assertEmpty($events);
         $sink->close();
@@ -108,7 +108,7 @@ class criteria_coursecompletion_course_observer_testcase extends \advanced_testc
         $this->assertEquals(course_completed::class, get_class($cc_event));
         $sink->clear();
 
-        course_observer::course_completed($cc_event);
+        course_observer::course_completion_changed($cc_event);
         $events = $sink->get_events();
         $this->assertEquals(1, count($events));
         $event = reset($events);
@@ -138,7 +138,7 @@ class criteria_coursecompletion_course_observer_testcase extends \advanced_testc
         $this->assertEquals(course_completed::class, get_class($cc_event));
         $sink->clear();
 
-        course_observer::course_completed($cc_event);
+        course_observer::course_completion_changed($cc_event);
         $events = $sink->get_events();
         $this->assertEquals(1, count($events));
         $event = reset($events);

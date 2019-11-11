@@ -18,14 +18,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Brendan Cox <brendan.cox@totaralearning.com>
+ * @author Riana Rossow <riana.rossow@totaralearning.com>
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package criteria_coursecompletion
  */
+
+use core\event\course_completed;
+use criteria_coursecompletion\observer\course as course_observer;
+use totara_completioneditor\event\course_completion_edited;
 
 defined('MOODLE_INTERNAL') || die();
 
 $observers = [
     [
-        'eventname' => '\core\event\course_completed',
-        'callback' => criteria_coursecompletion\observer\course::class.'::course_completed',
+        'eventname' => course_completed::class,
+        'callback' => course_observer::class.'::course_completion_changed',
+    ],
+    [
+        'eventname' => course_completion_edited::class,
+        'callback' => course_observer::class.'::course_completion_changed',
     ],
 ];
