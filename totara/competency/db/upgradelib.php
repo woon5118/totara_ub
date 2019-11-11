@@ -150,5 +150,5 @@ function totara_competency_install_core_services() {
     require_once $CFG->libdir . '/db/upgradelib.php';
 
     // This will refresh external services from core without an explicit version bumps
-    external_update_descriptions('core');
+    external_update_descriptions('moodle');
 }

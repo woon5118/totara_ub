@@ -180,7 +180,7 @@ function xmldb_totara_competency_upgrade($oldversion) {
             external_update_descriptions('totara_assignment');
 
             // This will refresh external services from core without an explicit version bumps
-            external_update_descriptions('core');
+            external_update_descriptions('moodle');
 
             // Competency savepoint reached.
             upgrade_plugin_savepoint(true, 2019110803, 'totara', 'competency');
