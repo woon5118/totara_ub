@@ -39,7 +39,7 @@ class users extends base {
         $sid = $this->get_param('sid',  PARAM_INT, 0);
         $debug = $this->get_param('debug', PARAM_BOOL, false);
 
-        $report = $this->load_embedded_report('assignment_competency_users');
+        $report = $this->load_embedded_report('competency_assignment_users');
 
         \totara_reportbuilder\event\report_viewed::create_from_report($report)->trigger();
 

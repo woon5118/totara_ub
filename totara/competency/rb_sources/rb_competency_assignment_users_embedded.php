@@ -23,13 +23,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-class rb_assignment_competency_users_embedded extends rb_base_embedded {
+class rb_competency_assignment_users_embedded extends rb_base_embedded {
 
     public function __construct() {
         $this->url = '/totara/competency/assignments/users.php';
-        $this->source = 'assignment_competency_users';
-        $this->shortname = 'assignment_competency_users';
-        $this->fullname = get_string('sourcetitle', 'rb_source_assignment_competency_users');
+        $this->source = 'competency_assignment_users';
+        $this->shortname = 'competency_assignment_users';
+        $this->fullname = get_string('sourcetitle', 'rb_source_competency_assignment_users');
 
         $this->columns = $this->define_columns();
         $this->filters = $this->define_filters();
@@ -72,7 +72,7 @@ class rb_assignment_competency_users_embedded extends rb_base_embedded {
             [
                 'type' => 'assignment_created_by',
                 'value' => 'namelink',
-                'heading' => get_string('label:assignment_created_by', 'rb_source_assignment_competency_users')
+                'heading' => get_string('label:assignment_created_by', 'rb_source_competency_assignment_users')
             ],
             [
                 'type' => 'assignment',

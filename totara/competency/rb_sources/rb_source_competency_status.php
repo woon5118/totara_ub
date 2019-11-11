@@ -217,7 +217,7 @@ class rb_source_competency_status extends rb_base_source {
                 new rb_column_option(
                     'assignment',
                     'assignment_type',
-                    get_string('label:assignment_type', 'rb_source_assignment_competency_users'),
+                    get_string('label:assignment_type', 'rb_source_competency_assignment_users'),
                     "(
                         CASE WHEN type = '".assignment::TYPE_ADMIN."' AND user_group_type <> '".user_groups::USER."'
                         THEN user_group_type
@@ -231,7 +231,7 @@ class rb_source_competency_status extends rb_base_source {
                 new rb_column_option(
                     'assignment',
                     'user_group',
-                    get_string('label:user_group', 'rb_source_assignment_competency_users'),
+                    get_string('label:user_group', 'rb_source_competency_assignment_users'),
                     'assignment.user_group_type',
                     [
                         'joins' => ['assignment_cohorts', 'assignment_positions', 'assignment_organisations', 'auser'],
