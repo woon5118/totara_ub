@@ -23,6 +23,7 @@
  */
 
 use totara_competency\task\competency_aggregation_all;
+use totara_competency\task\competency_aggregation_queue;
 use totara_competency\task\expand_assignments_task;
 
 defined('MOODLE_INTERNAL') || die();
@@ -49,9 +50,9 @@ $tasks = [
         'month' => '*'
     ],
     [
-        'classname' => \totara_competency\task\competency_aggregation_queue::class,
+        'classname' => competency_aggregation_queue::class,
         'blocking' => 0,
-        'minute' => '*/10',
+        'minute' => '*',
         'hour' => '*',
         'day' => '*',
         'dayofweek' => '*',
