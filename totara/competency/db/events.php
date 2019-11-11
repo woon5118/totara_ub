@@ -27,6 +27,10 @@ use core\event\user_deleted;
 use hierarchy_competency\event\competency_created;
 use hierarchy_competency\event\competency_deleted;
 use hierarchy_competency\event\competency_updated;
+use hierarchy_competency\event\scale_min_proficient_value_updated;
+use hierarchy_competency\event\scale_updated;
+use hierarchy_competency\event\scale_value_created;
+use hierarchy_competency\event\scale_value_deleted;
 use hierarchy_organisation\event\organisation_deleted;
 use hierarchy_position\event\position_deleted;
 use totara_competency\event\assignment_activated;
@@ -43,6 +47,7 @@ use totara_competency\observers\competency as competency_observer;
 use totara_competency\observers\competency_deleted as competency_deleted_observer;
 use totara_competency\observers\organisation_deleted as organisation_deleted_observer;
 use totara_competency\observers\position_deleted as position_deleted_observer;
+use totara_competency\observers\scale as scale_observer;
 use totara_competency\observers\user_deleted as user_deleted_observer;
 use totara_competency\observers\user_log as user_log_observer;
 use totara_competency\observers\user_unassigned as user_unassigned_observer;
@@ -61,6 +66,22 @@ $observers = [
     [
         'eventname' => competency_deleted::class,
         'callback' => competency_observer::class.'::deleted',
+    ],
+    [
+        'eventname' => scale_updated::class,
+        'callback' => scale_observer::class.'::updated',
+    ],
+    [
+        'eventname' => scale_min_proficient_value_updated::class,
+        'callback' => scale_observer::class.'::min_proficient_value_updated',
+    ],
+    [
+        'eventname' => scale_value_created::class,
+        'callback' => scale_observer::class.'::value_created',
+    ],
+    [
+        'eventname' => scale_value_deleted::class,
+        'callback' => scale_observer::class.'::value_deleted',
     ],
     // Assignment events
     [

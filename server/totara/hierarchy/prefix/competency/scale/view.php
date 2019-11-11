@@ -22,6 +22,9 @@
  * @subpackage totara_hierarchy
  */
 
+use hierarchy_competency\event\scale_min_proficient_value_updated;
+use hierarchy_competency\event\scale_updated;
+
 require_once(__DIR__ . '/../../../../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/lib.php');
@@ -137,13 +140,14 @@ if ($canupdatescales || $candeletescales) {
 
         if ($swap && $move) {
             // Swap sortorders
-          $transaction = $DB->start_delegated_transaction();
+            $transaction = $DB->start_delegated_transaction();
 
-          if ($DB->set_field('comp_scale_values', 'sortorder', $move->sortorder, array('id' => $swap->id))
+            if ($DB->set_field('comp_scale_values', 'sortorder', $move->sortorder, array('id' => $swap->id))
               && $DB->set_field('comp_scale_values', 'sortorder', $swap->sortorder, array('id' => $move->id))
-             ) {
-            $transaction->allow_commit();
-          }
+            ) {
+                $transaction->allow_commit();
+                scale_updated::create_from_instance($scale)->trigger();
+            }
         }
     }
 
@@ -233,7 +237,8 @@ if ($canupdatescales || $candeletescales) {
             // Unset as we use another variable of the same name later.
             unset($proficient);
 
-            \totara_competency\entities\configuration_change::min_proficiency_change($scale->id, $scale->minproficiencyid);
+            scale_updated::create_from_instance($scale)->trigger();
+            scale_min_proficient_value_updated::create_from_instance($scale)->trigger();
 
             \core\notification::success(get_string('competencyscalechangeapplied', 'totara_hierarchy'));
         }

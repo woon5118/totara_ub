@@ -43,6 +43,7 @@ $string['eventmoveditem'] = 'Moved Competency';
 $string['eventupdatedframework'] = 'Updated Competency Framework';
 $string['eventupdateditem'] = 'Updated Competency';
 $string['eventupdatedscale'] = 'Updated Competency Scale';
+$string['eventupdatedscaleminprofid'] = 'Updated minimum proficient value of Competency Scale';
 $string['eventupdatedscalevalue'] = 'Updated Competency Scale Value';
 $string['eventupdatedtype'] = 'Updated Competency Type';
 $string['eventvieweditem'] = 'Viewed Competency';
