@@ -36,7 +36,7 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
     public function test_it_lists_organisations() {
         $this->generate_organisations();
 
-        $res = $this->call_webservice_api('totara_assignment_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_index', [
             'filters' => [],
             'page' => 1,
             'order' => 'shortname',
@@ -78,7 +78,7 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
     public function test_it_has_search_filter() {
         $this->generate_organisations();
 
-        $res = $this->call_webservice_api('totara_assignment_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_index', [
             'filters' => ['text' => 'inc'],
             'page' => 1,
             'order' => 'fullname',
@@ -102,7 +102,7 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
         );
 
         // Searching by description
-        $res = $this->call_webservice_api('totara_assignment_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_index', [
             'filters' => ['text' => 'good'],
             'page' => 1,
             'order' => 'idnumber',
@@ -129,7 +129,7 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
     public function test_it_has_framework_filter() {
         [, $fws] = array_values($this->generate_organisations());
 
-        $res = $this->call_webservice_api('totara_assignment_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_index', [
             'filters' => ['framework' => $fws[1]->id],
             'page' => 1,
             'order' => 'shortname',
@@ -155,7 +155,7 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
     public function test_it_has_path_filter() {
         ['orgs' => $orgs] = $this->generate_organisations();
 
-        $res = $this->call_webservice_api('totara_assignment_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_index', [
             'filters' => ['path' => $orgs[0]->id],
             'page' => 1,
             'order' => 'fullname',
@@ -187,7 +187,7 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
 
         $basket->add([$orgs[2]->id, $orgs[4]->id]);
 
-        $res = $this->call_webservice_api('totara_assignment_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_index', [
             'filters' => ['basket' => 'orgs'],
             'page' => 1,
             'order' => 'fullname',
@@ -213,7 +213,7 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
     public function test_it_has_parent_filter() {
         [$orgs] = array_values($this->generate_organisations());
 
-        $res = $this->call_webservice_api('totara_assignment_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_index', [
             'filters' => ['parent' => $orgs[0]->id],
             'page' => 1,
             'order' => 'fullname',
@@ -240,7 +240,7 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
     public function test_it_has_visible_filter() {
         $this->generate_organisations();
 
-        $res = $this->call_webservice_api('totara_assignment_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_index', [
             'filters' => ['visible' => false],
             'page' => 1,
             'order' => 'fullname',
@@ -256,7 +256,7 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
         $this->assertNull($data['next']);
         $this->assertEquals(['Invisible'], array_column($data['items'], 'display_name'));
 
-        $res = $this->call_webservice_api('totara_assignment_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_index', [
             'filters' => ['visible' => null],
             'page' => 1,
             'order' => 'fullname',
@@ -277,7 +277,7 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
         ['types' => $types] = $this->generate_organisations();
 
         // has type 1
-        $res = $this->call_webservice_api('totara_assignment_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_index', [
             'filters' => ['type' => [$types[0]]],
             'page' => 1,
             'order' => 'fullname',
@@ -296,7 +296,7 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
         );
 
         // has type 2
-        $res = $this->call_webservice_api('totara_assignment_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_index', [
             'filters' => ['type' => [$types[1]]],
             'page' => 1,
             'order' => 'fullname',
@@ -316,7 +316,7 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
         );
 
         // has type 1 and 2
-        $res = $this->call_webservice_api('totara_assignment_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_index', [
             'filters' => ['type' => $types],
             'page' => 1,
             'order' => 'fullname',
@@ -341,7 +341,7 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
     public function test_it_paginates_organisations() {
         $this->generate_n_organisations(65);
 
-        $res = $this->call_webservice_api('totara_assignment_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_index', [
             'filters' => [],
             'page' => 1,
             'order' => 'description',
@@ -358,7 +358,7 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
         $this->assertNull($data['prev']);
         $this->assertEquals(2, $data['next']);
 
-        $res = $this->call_webservice_api('totara_assignment_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_index', [
             'filters' => [],
             'page' => 2,
             'order' => 'description',
@@ -375,7 +375,7 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
         $this->assertEquals(1, $data['prev']);
         $this->assertEquals(3, $data['next']);
 
-        $res = $this->call_webservice_api('totara_assignment_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_index', [
             'filters' => [],
             'page' => 4,
             'order' => 'description',
@@ -392,7 +392,7 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
         $this->assertEquals(3, $data['prev']);
         $this->assertNull($data['next']);
 
-        $res = $this->call_webservice_api('totara_assignment_organisation_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_index', [
             'filters' => [],
             'page' => 5,
             'order' => 'description',
@@ -421,7 +421,7 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
             'fws' => $fws,
         ] = $this->generate_organisations();
 
-        $res = $this->call_webservice_api('totara_assignment_organisation_show', [
+        $res = $this->call_webservice_api('hierarchy_organisation_show', [
             'id' => $org[2]->id,
             'include' => [],
         ]);
@@ -437,7 +437,7 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
         $this->assertEquals($org[2]->visible, $data['visible']);
 
         // Test it can apply crumbs as well
-        $res = $this->call_webservice_api('totara_assignment_organisation_show', [
+        $res = $this->call_webservice_api('hierarchy_organisation_show', [
             'id' => $org[4]->id,
             'include' => ['crumbs' => true],
         ]);
@@ -471,7 +471,7 @@ class totara_assignment_organisation_service_testcase extends advanced_testcase 
     }
 
     public function test_non_existing_organisation() {
-        $res = $this->call_webservice_api('totara_assignment_organisation_show', [
+        $res = $this->call_webservice_api('hierarchy_organisation_show', [
             'id' => 999,
             'include' => [],
         ]);

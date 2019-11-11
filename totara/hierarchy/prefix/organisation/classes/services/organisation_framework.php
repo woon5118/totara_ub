@@ -18,11 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_assignment
+ * @package hierarchy_organisation
  */
 
-namespace totara_assignment\services;
-
+namespace hierarchy_organisation\services;
 
 use external_function_parameters;
 use external_single_structure;
@@ -33,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/lib/externallib.php');
 
-class position_framework extends \external_api {
+class organisation_framework extends \external_api {
 
     /**
      * @return external_function_parameters
@@ -63,17 +62,17 @@ class position_framework extends \external_api {
      * @return array
      */
     public static function index(array $filters, int $page, string $order, string $direction) {
-        require_capability('totara/hierarchy:viewpositionframeworks', \context_system::instance());
+        require_capability('totara/hierarchy:vieworganisationframeworks', \context_system::instance());
 
         if (!array_key_exists('visible', $filters)) {
             $filters['visible'] = true;
         }
 
-        return \hierarchy_position\entities\position_framework::repository()
+        return \hierarchy_organisation\entities\organisation_framework::repository()
             ->set_filters($filters)
             ->order_by($order, $direction)
             ->paginate($page)
-            ->transform(function (\hierarchy_position\entities\position_framework $item) {
+            ->transform(function (\hierarchy_organisation\entities\organisation_framework $item) {
                 $fullname = format_string($item->fullname);
                 return [
                     'id' => $item->id,
@@ -82,7 +81,6 @@ class position_framework extends \external_api {
                 ];
             })->to_array();
     }
-
     /**
      * @return null
      */

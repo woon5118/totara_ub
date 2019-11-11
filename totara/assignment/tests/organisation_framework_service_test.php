@@ -36,7 +36,7 @@ class totara_assignment_organisation_framework_service_testcase extends advanced
     public function test_it_lists_all_organisation_frameworks() {
         $fws = $this->generate_n_frameworks(150);
 
-        $res = $this->call_webservice_api('totara_assignment_organisation_framework_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_framework_index', [
             'filters' => [],
             'page' => 0,
             'order' => 'id',
@@ -53,7 +53,7 @@ class totara_assignment_organisation_framework_service_testcase extends advanced
     public function test_it_lists_organisation_frameworks() {
         $this->generate_frameworks();
 
-        $res = $this->call_webservice_api('totara_assignment_organisation_framework_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_framework_index', [
             'filters' => [],
             'page' => 1,
             'order' => 'description',
@@ -83,7 +83,7 @@ class totara_assignment_organisation_framework_service_testcase extends advanced
     public function test_it_has_text_filter() {
         $this->generate_frameworks();
 
-        $res = $this->call_webservice_api('totara_assignment_organisation_framework_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_framework_index', [
             'filters' => ['text' => 'des'],
             'page' => 1,
             'order' => 'fullname',
@@ -101,7 +101,7 @@ class totara_assignment_organisation_framework_service_testcase extends advanced
         $this->assertEquals(['Designer'], array_column($data['items'], 'display_name'));
 
         // Searching by description
-        $res = $this->call_webservice_api('totara_assignment_organisation_framework_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_framework_index', [
             'filters' => ['text' => 'cook'],
             'page' => 1,
             'order' => 'shortname',
@@ -129,7 +129,7 @@ class totara_assignment_organisation_framework_service_testcase extends advanced
     public function test_it_has_visible_filter() {
         $this->generate_frameworks();
 
-        $res = $this->call_webservice_api('totara_assignment_organisation_framework_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_framework_index', [
             'filters' => ['visible' => false],
             'page' => 1,
             'order' => 'fullname',
@@ -145,7 +145,7 @@ class totara_assignment_organisation_framework_service_testcase extends advanced
         $this->assertNull($data['next']);
         $this->assertEquals(['Invisible'], array_column($data['items'], 'display_name'));
 
-        $res = $this->call_webservice_api('totara_assignment_organisation_framework_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_framework_index', [
             'filters' => ['visible' => null],
             'page' => 1,
             'order' => 'fullname',
@@ -165,7 +165,7 @@ class totara_assignment_organisation_framework_service_testcase extends advanced
     public function test_it_paginates_organisation_frameworks() {
         $this->generate_n_frameworks(80);
 
-        $res = $this->call_webservice_api('totara_assignment_organisation_framework_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_framework_index', [
             'filters' => [],
             'page' => 1,
             'order' => 'fullname',
@@ -182,7 +182,7 @@ class totara_assignment_organisation_framework_service_testcase extends advanced
         $this->assertNull($data['prev']);
         $this->assertEquals(2, $data['next']);
 
-        $res = $this->call_webservice_api('totara_assignment_organisation_framework_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_framework_index', [
             'filters' => [],
             'page' => 2,
             'order' => 'fullname',
@@ -199,7 +199,7 @@ class totara_assignment_organisation_framework_service_testcase extends advanced
         $this->assertEquals(1, $data['prev']);
         $this->assertEquals(3, $data['next']);
 
-        $res = $this->call_webservice_api('totara_assignment_organisation_framework_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_framework_index', [
             'filters' => [],
             'page' => 4,
             'order' => 'fullname',
@@ -216,7 +216,7 @@ class totara_assignment_organisation_framework_service_testcase extends advanced
         $this->assertEquals(3, $data['prev']);
         $this->assertNull($data['next']);
 
-        $res = $this->call_webservice_api('totara_assignment_organisation_framework_index', [
+        $res = $this->call_webservice_api('hierarchy_organisation_framework_index', [
             'filters' => [],
             'page' => 5,
             'order' => 'fullname',

@@ -26,11 +26,10 @@ namespace totara_competency\controllers\assignment;
 use core\output\notification;
 use totara_competency\baskets\competency_basket;
 use totara_competency\views;
-use totara_assignment\services\cohort;
-use totara_assignment\services\organisation;
-use totara_assignment\services\position;
-use totara_assignment\services\user;
-use totara_competency\user_groups;
+use core\external\cohort;
+use hierarchy_organisation\services\organisation;
+use hierarchy_position\services\position;
+use core\external\user;
 use totara_core\basket\session_basket;
 use totara_core\output\select_tree;
 
@@ -48,10 +47,10 @@ class save extends base {
     ];
 
     protected $services = [
-        'service_users' => 'totara_assignment_user_index',
-        'service_audiences' => 'totara_assignment_cohort_index',
-        'service_positions' => 'totara_assignment_position_index',
-        'service_organisations' => 'totara_assignment_organisation_index',
+        'service_users' => 'core_user_index',
+        'service_audiences' => 'core_cohort_index',
+        'service_positions' => 'hierarchy_position_index',
+        'service_organisations' => 'hierarchy_organisation_index',
         'service_create_assignments' => 'totara_competency_assignment_create_from_baskets',
         'service_update_basket' => 'totara_core_basket_update',
     ];

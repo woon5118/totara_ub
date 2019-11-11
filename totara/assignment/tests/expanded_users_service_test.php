@@ -40,7 +40,7 @@ class totara_assignment_expanded_users_service_testcase extends expanded_users_t
     }
 
     public function test_with_empty_basket() {
-        $res = $this->call_webservice_api('totara_assignment_expand_user_groups_index', [
+        $res = $this->call_webservice_api('totara_competency_expand_user_groups_index', [
             'baskets' => [
                 'user' => 'foobar'
             ],
@@ -62,7 +62,7 @@ class totara_assignment_expanded_users_service_testcase extends expanded_users_t
         $user_basket = new session_basket('user_basket');
         $user_basket->add([666, 667, 668]);
 
-        $res = $this->call_webservice_api('totara_assignment_expand_user_groups_index', [
+        $res = $this->call_webservice_api('totara_competency_expand_user_groups_index', [
             'baskets' => [
                 'user' => 'user_basket'
             ],
@@ -86,7 +86,7 @@ class totara_assignment_expanded_users_service_testcase extends expanded_users_t
         $user_basket = new session_basket('user_basket');
         $user_basket->add([$data->user17->id, $data->user18->id]);
 
-        $res = $this->call_webservice_api('totara_assignment_expand_user_groups_index', [
+        $res = $this->call_webservice_api('totara_competency_expand_user_groups_index', [
             'baskets' => [
                 'user' => 'user_basket'
             ],
@@ -126,7 +126,7 @@ class totara_assignment_expanded_users_service_testcase extends expanded_users_t
         $pos_basket = new session_basket('position_basket');
         $pos_basket->add([$data->pos1->id]);
 
-        $res = $this->call_webservice_api('totara_assignment_expand_user_groups_index', [
+        $res = $this->call_webservice_api('totara_competency_expand_user_groups_index', [
             'baskets' => [
                 'position' => 'position_basket'
             ],
@@ -190,7 +190,7 @@ class totara_assignment_expanded_users_service_testcase extends expanded_users_t
         $pos_basket = new session_basket('user_basket');
         $pos_basket->add([$data->user16->id, $data->user17->id]);
 
-        $res = $this->call_webservice_api('totara_assignment_expand_user_groups_index', [
+        $res = $this->call_webservice_api('totara_competency_expand_user_groups_index', [
             'baskets' => [
                 'position' => 'position_basket',
                 'user' => 'user_basket',
@@ -267,7 +267,7 @@ class totara_assignment_expanded_users_service_testcase extends expanded_users_t
         $coh_basket = new session_basket('cohort_basket');
         $coh_basket->add([$data->cohort1->id]);
 
-        $res = $this->call_webservice_api('totara_assignment_expand_user_groups_index', [
+        $res = $this->call_webservice_api('totara_competency_expand_user_groups_index', [
             'baskets' => [
                 'position' => 'position_basket',
                 'user' => 'user_basket',

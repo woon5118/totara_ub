@@ -18,13 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_assignment
+ * @package hierarchy_position
  */
 
-namespace totara_assignment\services;
+namespace hierarchy_position\services;
 
 use external_function_parameters;
-use external_multiple_structure;
 use external_single_structure;
 use external_value;
 
@@ -33,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/lib/externallib.php');
 
-class cohort extends \external_api {
+class position_framework extends \external_api {
 
     /**
      * @return external_function_parameters
@@ -43,20 +42,14 @@ class cohort extends \external_api {
             [
                 'filters' => new external_single_structure(
                     [
-                        'text' => new external_value(PARAM_TEXT, 'Search by audience name', VALUE_OPTIONAL, null),
-                        'visible' => new external_value(PARAM_BOOL, 'Visibility of the items', VALUE_OPTIONAL, true),
-                        'basket' => new external_value(PARAM_ALPHANUMEXT, 'selection in the basket', VALUE_OPTIONAL, null),
-                        'ids' => new external_multiple_structure(
-                            new external_value(PARAM_INT, 'ids', VALUE_OPTIONAL),
-                            'ids to filter by',
-                            VALUE_OPTIONAL
-                        ),
+                        'text' => new external_value(PARAM_TEXT, 'Text search field value', VALUE_OPTIONAL, null),
+                        'visible' => new external_value(PARAM_BOOL, 'Filter by visible', VALUE_OPTIONAL, true),
                     ],
                     VALUE_REQUIRED
                 ),
-                'page' => new external_value(PARAM_INT, 'pagination: page to load', VALUE_REQUIRED),
-                'order' => new external_value(PARAM_ALPHANUMEXT, 'name of column to order by', VALUE_REQUIRED),
-                'direction' => new external_value(PARAM_ALPHA, 'direction of ordering (either ASC or DESC)', VALUE_REQUIRED),
+                'page' => new external_value(PARAM_INT, 'Pagination: page to load', VALUE_REQUIRED),
+                'order' => new external_value(PARAM_ALPHANUMEXT, 'Name of column to order by - not used currently', VALUE_REQUIRED),
+                'direction' => new external_value(PARAM_ALPHA, 'either ASC or DESC - not used currently', VALUE_REQUIRED),
             ]
         );
     }
@@ -69,34 +62,22 @@ class cohort extends \external_api {
      * @return array
      */
     public static function index(array $filters, int $page, string $order, string $direction) {
-        // TODO TL-20285 - Decide on how we deal with system vs. category audiences
-        require_capability('moodle/cohort:view', \context_system::instance());
+        require_capability('totara/hierarchy:viewpositionframeworks', \context_system::instance());
 
         if (!array_key_exists('visible', $filters)) {
             $filters['visible'] = true;
         }
 
-        $allowed_order_columns = [
-            'id',
-            'name',
-            'idnumber',
-            'timecreated',
-            'timemodified',
-        ];
-        if (!in_array($order, $allowed_order_columns)) {
-            $order = 'id';
-        }
-
-        return \core\entities\cohort::repository()
-            ->select_only_fields_for_picker()
+        return \hierarchy_position\entities\position_framework::repository()
             ->set_filters($filters)
             ->order_by($order, $direction)
             ->paginate($page)
-            ->transform(function (\core\entities\cohort $item) {
+            ->transform(function (\hierarchy_position\entities\position_framework $item) {
+                $fullname = format_string($item->fullname);
                 return [
                     'id' => $item->id,
-                    'display_name' => format_string($item->name),
-                    'idnumber' => $item->idnumber,
+                    'display_name' => $fullname,
+                    'fullname' => $fullname
                 ];
             })->to_array();
     }

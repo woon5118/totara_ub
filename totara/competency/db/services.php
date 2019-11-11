@@ -193,6 +193,22 @@ $assignments = [
         'ajax'          => true,
         'capabilities'  => 'totara/competency:manage_assignments',
     ],
+
+    // Expand user groups
+    'totara_competency_expand_user_groups_index' => [
+        'classname'     => \totara_competency\services\expand_user_groups::class,
+        'methodname'    => 'index',
+        'description'   => 'Expand user groups to preview what user groups do users have',
+        'type'          => 'read',
+        'loginrequired' => true,
+        'ajax'          => true,
+        'capabilities'  => implode(',', [
+            'moodle/user:viewdetails',
+            'moodle/cohort:view',
+            'totara/hierarchy:viewposition',
+            'totara/hierarchy:vieworganisation',
+        ]),
+    ],
 ];
 
 $competencies = [

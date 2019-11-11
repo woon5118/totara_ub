@@ -1134,6 +1134,30 @@ $functions = array(
         'capabilities'  => '',
         'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
     ),
+
+    // TOTARA: temporary services to be replaced with GQL
+
+    // List users
+    'core_user_index' => [
+        'classname'     => \core\external\user::class,
+        'methodname'    => 'index',
+        'description'   => 'List or search for users',
+        'type'          => 'read',
+        'loginrequired' => true,
+        'ajax'          => true,
+        'capabilities'  => 'moodle/user:viewdetails',
+    ],
+
+    // List audiences
+    'core_cohort_index' => [
+        'classname'     => \core\external\cohort::class,
+        'methodname'    => 'index',
+        'description'   => 'List or search for audiences',
+        'type'          => 'read',
+        'loginrequired' => true,
+        'ajax'          => true,
+        'capabilities'  => 'moodle/cohort:view',
+    ],
 );
 
 $services = array(

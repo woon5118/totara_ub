@@ -18,10 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_assignment
+ * @package hierarchy_organisation
  */
 
-namespace totara_assignment\services;
+namespace hierarchy_organisation\services;
 
 use context_system;
 use core\format;

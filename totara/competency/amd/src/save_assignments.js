@@ -68,10 +68,10 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
         this.services = {
             updateBasket: 'totara_core_basket_update',
             createAssignments: 'totara_competency_assignment_create_from_baskets',
-            users: 'totara_assignment_user_index',
-            audiences: 'totara_assignment_cohort_index',
-            organisations: 'totara_assignment_organisation_index',
-            positions: 'totara_assignment_position_index'
+            users: 'core_user_index',
+            audiences: 'core_cohort_index',
+            organisations: 'hierarchy_organisation_index',
+            positions: 'hierarchy_position_index'
         };
         this.strings = {};
         this.widget = '';
@@ -392,7 +392,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
                             },
                         }],
                     },
-                    service: 'totara_assignment_user_index',
+                    service: 'core_user_index',
                 },
                 onClosed: function() {
                     that.resetTreeList();
@@ -474,7 +474,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
                     externalBasket: that.baskets.organisations,
                     key: 'organisations',
                     crumbtrail: {
-                        service: 'totara_assignment_organisation_show',
+                        service: 'hierarchy_organisation_show',
                         stringList: [
                             {
                                 component: 'totara_hierarchy',
@@ -489,7 +489,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
                     events: eventData,
                     expandable: {
                         args: {include: {crumbs: 1}},
-                        service: 'totara_assignment_organisation_show',
+                        service: 'hierarchy_organisation_show',
                         template: 'totara_competency/hierarchy_expanded',
                     },
                     levelToggle: true,
@@ -510,7 +510,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
                             hasExpandedView: true,
                             hasHierarchy: true,
                         },
-                        service: 'totara_assignment_organisation_index',
+                        service: 'hierarchy_organisation_index',
                     },
                     onClosed: function() {
                         that.resetTreeList();
@@ -524,7 +524,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
                             component: 'totara_hierarchy',
                             key: 'allframeworks'
                         }],
-                        service: 'totara_assignment_organisation_framework_index',
+                        service: 'hierarchy_organisation_framework_index',
                         serviceArgs: {
                             direction: 'asc',
                             filters: [],
@@ -565,7 +565,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
                     externalBasket: that.baskets.positions,
                     key: 'positions',
                     crumbtrail: {
-                        service: 'totara_assignment_position_show',
+                        service: 'hierarchy_position_show',
                         stringList: [
                             {
                                 component: 'totara_hierarchy',
@@ -580,7 +580,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
                     events: eventData,
                     expandable: {
                         args: {include: {crumbs: 1}},
-                        service: 'totara_assignment_position_show',
+                        service: 'hierarchy_position_show',
                         template: 'totara_competency/hierarchy_expanded',
                     },
                     levelToggle: true,
@@ -601,7 +601,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
                             hasExpandedView: true,
                             hasHierarchy: true,
                         },
-                        service: 'totara_assignment_position_index',
+                        service: 'hierarchy_position_index',
                     },
                     onClosed: function() {
                         that.resetTreeList();
@@ -615,7 +615,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
                             component: 'totara_hierarchy',
                             key: 'allframeworks'
                         }],
-                        service: 'totara_assignment_position_framework_index',
+                        service: 'hierarchy_position_framework_index',
                         serviceArgs: {
                             direction: 'asc',
                             filters: [],
@@ -672,7 +672,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
                             }
                         }],
                     },
-                    service: 'totara_assignment_expand_user_groups_index',
+                    service: 'totara_competency_expand_user_groups_index',
                     serviceArgs: {
                         baskets: {
                             cohort: that.basketKeys.audiences,

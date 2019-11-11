@@ -36,7 +36,7 @@ class totara_assignment_user_service_testcase extends advanced_testcase {
     public function test_it_lists_users() {
         $this->generate_users();
 
-        $res = $this->call_webservice_api('totara_assignment_user_index', [
+        $res = $this->call_webservice_api('core_user_index', [
             'filters' => [],
             'page' => 1,
             'order' => 'name',
@@ -64,7 +64,7 @@ class totara_assignment_user_service_testcase extends advanced_testcase {
     public function test_it_searches_users() {
         $this->generate_users();
 
-        $res = $this->call_webservice_api('totara_assignment_user_index', [
+        $res = $this->call_webservice_api('core_user_index', [
             'filters' => ['text' => 'john'],
             'page' => 1,
             'order' => 'name',
@@ -97,7 +97,7 @@ class totara_assignment_user_service_testcase extends advanced_testcase {
         $basket = new \totara_core\basket\session_basket('users');
         $basket->add([$users[0]->id, $users[4]->id]);
 
-        $res = $this->call_webservice_api('totara_assignment_user_index', [
+        $res = $this->call_webservice_api('core_user_index', [
             'filters' => ['basket' => 'users'],
             'page' => 1,
             'order' => 'name',
@@ -120,7 +120,7 @@ class totara_assignment_user_service_testcase extends advanced_testcase {
     public function test_it_searches_users_by_non_existent_basket() {
         $users = $this->generate_users();
 
-        $res = $this->call_webservice_api('totara_assignment_user_index', [
+        $res = $this->call_webservice_api('core_user_index', [
             'filters' => ['basket' => 'idonotexist'],
             'page' => 1,
             'order' => 'name',
@@ -136,7 +136,7 @@ class totara_assignment_user_service_testcase extends advanced_testcase {
     public function test_it_paginates_users() {
         $this->generate_n_users();
 
-        $res = $this->call_webservice_api('totara_assignment_user_index', [
+        $res = $this->call_webservice_api('core_user_index', [
             'filters' => [],
             'page' => 1,
             'order' => 'name',
@@ -153,7 +153,7 @@ class totara_assignment_user_service_testcase extends advanced_testcase {
         $this->assertNull($data['prev']);
         $this->assertEquals(2, $data['next']);
 
-        $res = $this->call_webservice_api('totara_assignment_user_index', [
+        $res = $this->call_webservice_api('core_user_index', [
             'filters' => [],
             'page' => 2,
             'order' => 'name',
@@ -170,7 +170,7 @@ class totara_assignment_user_service_testcase extends advanced_testcase {
         $this->assertEquals(1, $data['prev']);
         $this->assertEquals(3, $data['next']);
 
-        $res = $this->call_webservice_api('totara_assignment_user_index', [
+        $res = $this->call_webservice_api('core_user_index', [
             'filters' => [],
             'page' => 3,
             'order' => 'name',
@@ -187,7 +187,7 @@ class totara_assignment_user_service_testcase extends advanced_testcase {
         $this->assertEquals(2, $data['prev']);
         $this->assertNull($data['next']);
 
-        $res = $this->call_webservice_api('totara_assignment_user_index', [
+        $res = $this->call_webservice_api('core_user_index', [
             'filters' => [],
             'page' => 4,
             'order' => 'name',

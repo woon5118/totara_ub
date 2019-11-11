@@ -29,7 +29,7 @@ use core\lock\lock_config;
 trait expand_task_trait {
 
     private function get_expand_task_lock(): lock {
-        $cron_lock_factory = lock_config::get_lock_factory('totara_assignment');
+        $cron_lock_factory = lock_config::get_lock_factory('totara_competency');
         if (!$cron_lock = $cron_lock_factory->get_lock('expand_assignments', 10)) {
             throw new \moodle_exception('locktimeout');
         }

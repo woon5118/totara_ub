@@ -36,7 +36,7 @@ class totara_assignment_cohort_service_testcase extends advanced_testcase {
     public function test_it_lists_cohorts() {
         $this->generate_cohorts();
 
-        $res = $this->call_webservice_api('totara_assignment_cohort_index', [
+        $res = $this->call_webservice_api('core_cohort_index', [
             'filters' => [],
             'page' => 1,
             'order' => 'idnumber',
@@ -76,7 +76,7 @@ class totara_assignment_cohort_service_testcase extends advanced_testcase {
     public function test_it_searches_cohorts() {
         $this->generate_cohorts();
 
-        $res = $this->call_webservice_api('totara_assignment_cohort_index', [
+        $res = $this->call_webservice_api('core_cohort_index', [
             'filters' => ['text' => 'staff'],
             'page' => 1,
             'order' => 'name',
@@ -101,7 +101,7 @@ class totara_assignment_cohort_service_testcase extends advanced_testcase {
         );
 
         // Searching by description
-        $res = $this->call_webservice_api('totara_assignment_cohort_index', [
+        $res = $this->call_webservice_api('core_cohort_index', [
             'filters' => ['text' => 'here'],
             'page' => 1,
             'order' => 'name',
@@ -131,7 +131,7 @@ class totara_assignment_cohort_service_testcase extends advanced_testcase {
         $basket = new \totara_core\basket\session_basket('cohorts');
         $basket->add([$cohorts[1]->id, $cohorts[4]->id]);
 
-        $res = $this->call_webservice_api('totara_assignment_cohort_index', [
+        $res = $this->call_webservice_api('core_cohort_index', [
             'filters' => ['basket' => 'cohorts'],
             'page' => 1,
             'order' => 'name',
@@ -153,7 +153,7 @@ class totara_assignment_cohort_service_testcase extends advanced_testcase {
     public function test_it_searches_cohorts_by_nonexistent_basket() {
         $this->generate_cohorts();
 
-        $res = $this->call_webservice_api('totara_assignment_cohort_index', [
+        $res = $this->call_webservice_api('core_cohort_index', [
             'filters' => ['basket' => 'idonotexist'],
             'page' => 1,
             'order' => 'name',
@@ -169,7 +169,7 @@ class totara_assignment_cohort_service_testcase extends advanced_testcase {
     public function test_it_has_visibility_filter() {
         $this->generate_cohorts();
 
-        $res = $this->call_webservice_api('totara_assignment_cohort_index', [
+        $res = $this->call_webservice_api('core_cohort_index', [
             'filters' => ['visible' => false],
             'page' => 1,
             'order' => 'name',
@@ -185,7 +185,7 @@ class totara_assignment_cohort_service_testcase extends advanced_testcase {
         $this->assertNull($data['next']);
         $this->assertEquals(['Invisible'], array_column($data['items'], 'display_name'));
 
-        $res = $this->call_webservice_api('totara_assignment_cohort_index', [
+        $res = $this->call_webservice_api('core_cohort_index', [
             'filters' => ['visible' => null],
             'page' => 1,
             'order' => 'name',
@@ -205,7 +205,7 @@ class totara_assignment_cohort_service_testcase extends advanced_testcase {
     public function test_it_paginates_cohorts() {
         $this->generate_n_cohorts(70);
 
-        $res = $this->call_webservice_api('totara_assignment_cohort_index', [
+        $res = $this->call_webservice_api('core_cohort_index', [
             'filters' => [],
             'page' => 1,
             'order' => 'name',
@@ -222,7 +222,7 @@ class totara_assignment_cohort_service_testcase extends advanced_testcase {
         $this->assertNull($data['prev']);
         $this->assertEquals(2, $data['next']);
 
-        $res = $this->call_webservice_api('totara_assignment_cohort_index', [
+        $res = $this->call_webservice_api('core_cohort_index', [
             'filters' => [],
             'page' => 2,
             'order' => 'name',
@@ -239,7 +239,7 @@ class totara_assignment_cohort_service_testcase extends advanced_testcase {
         $this->assertEquals(1, $data['prev']);
         $this->assertEquals(3, $data['next']);
 
-        $res = $this->call_webservice_api('totara_assignment_cohort_index', [
+        $res = $this->call_webservice_api('core_cohort_index', [
             'filters' => [],
             'page' => 4,
             'order' => 'name',
@@ -256,7 +256,7 @@ class totara_assignment_cohort_service_testcase extends advanced_testcase {
         $this->assertEquals(3, $data['prev']);
         $this->assertNull($data['next']);
 
-        $res = $this->call_webservice_api('totara_assignment_cohort_index', [
+        $res = $this->call_webservice_api('core_cohort_index', [
             'filters' => [],
             'page' => 5,
             'order' => 'name',
