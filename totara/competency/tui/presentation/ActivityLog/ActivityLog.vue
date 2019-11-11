@@ -176,6 +176,6 @@ export default {
       "activity_log",
       "assignment",
       "activitylog_proficientstatus"
-    ],
+    ]
   }
 </lang-strings>
