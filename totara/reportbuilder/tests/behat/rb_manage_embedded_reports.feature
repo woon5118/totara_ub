@@ -7,7 +7,7 @@ Feature: Check reports for subsystems are not visible in reportbuilder when disa
 
   Scenario: Verify Record of Learning appears in reportbuilder if enabled
     When I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable Record of Learning" to "Show"
+    And I set the field "Enable Record of Learning" to "Enable"
     And I press "Save changes"
     Then I should see "Changes saved"
 

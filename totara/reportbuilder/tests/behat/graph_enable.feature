@@ -37,7 +37,7 @@ Feature: Graphs in Report builder
   Scenario: Enable/Disable report graph setting and display report with graph and/or without graph
     Given I am on a totara site
     And I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable report builder graphs" to "Show"
+    And I set the field "Enable report builder graphs" to "Enable"
     And I press "Save changes"
 
     And I click on "Reports" in the totara menu
@@ -58,7 +58,7 @@ Feature: Graphs in Report builder
   Scenario: Enable report graph setting and display report without graph
     Given I am on a totara site
     And I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable report builder graphs" to "Show"
+    And I set the field "Enable report builder graphs" to "Enable"
     And I press "Save changes"
 
     When I click on "Reports" in the totara menu

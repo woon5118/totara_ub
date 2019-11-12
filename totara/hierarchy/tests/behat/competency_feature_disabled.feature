@@ -44,7 +44,7 @@ Feature: The competencies can be disabled
 
   Scenario: Show competency feature. All links and options related to the feature should be in place.
     Given I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable Competencies" to "Show"
+    And I set the field "Enable Competencies" to "Enable"
     And I press "Save changes"
 
     # Check competency component is displayed in learning plans.

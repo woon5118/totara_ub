@@ -63,7 +63,7 @@ Feature: Test Dashboard for cohort users
 
       # Dasboard shows in the Totara menu
     And I set the following administration settings values:
-      | enabletotaradashboard | Show |
+      | enabletotaradashboard | Enable |
     And I log out
 
     When I log in as "student1"

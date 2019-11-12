@@ -29,7 +29,7 @@ Feature: Test Required Learning Main menu item
     Then "Required Learning" row "Visibility" column of "totaramenutable" table should contain "Feature disabled"
 
     When I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable Programs" to "Show"
+    And I set the field "Enable Programs" to "Enable"
     And I set the field "Enable Certifications" to "Disable"
     And I press "Save changes"
     And I navigate to "Main menu" node in "Site administration > Navigation"
@@ -37,7 +37,7 @@ Feature: Test Required Learning Main menu item
 
     When I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable Programs" to "Disable"
-    And I set the field "Enable Certifications" to "Show"
+    And I set the field "Enable Certifications" to "Enable"
     And I press "Save changes"
     And I navigate to "Main menu" node in "Site administration > Navigation"
     Then "Required Learning" row "Visibility" column of "totaramenutable" table should contain "Show when accessible"
