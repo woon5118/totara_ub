@@ -50,11 +50,11 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
             'comp',
             ['name' => 'Test scale', 'description' => 'Test scale'],
             [
-                1 => ['name' => 'No clue', 'proficient' => 0, 'sortorder' => 1, 'default' => 1],
-                2 => ['name' => 'Learning', 'proficient' => 0, 'sortorder' => 2, 'default' => 0],
+                5 => ['name' => 'No clue', 'proficient' => 0, 'sortorder' => 5, 'default' => 1],
+                4 => ['name' => 'Learning', 'proficient' => 0, 'sortorder' => 4, 'default' => 0],
                 3 => ['name' => 'Getting there', 'proficient' => 0, 'sortorder' => 3, 'default' => 0],
-                4 => ['name' => 'Almost there', 'proficient' => 1, 'sortorder' => 4, 'default' => 0],
-                5 => ['name' => 'Arrived', 'proficient' => 1, 'sortorder' => 4, 'default' => 0],
+                2 => ['name' => 'Almost there', 'proficient' => 1, 'sortorder' => 2, 'default' => 0],
+                1 => ['name' => 'Arrived', 'proficient' => 1, 'sortorder' => 1, 'default' => 0],
             ]
         );
         $rows = $DB->get_records('comp_scale_values', ['scaleid' => $data->scale->id], 'sortorder');
@@ -114,7 +114,7 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $instance->set_competency($data->comp);
         $instance->add_criterion($data->cc[1]);
         $instance->add_criterion($data->cc[2]);
-        $instance->set_scale_value(reset($data->scalevalues));
+        $instance->set_scale_value($data->scalevalues[5]);
 
         // Check no existing pathway rows
         $this->validate_num_rows([
@@ -154,7 +154,7 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
 
         $instance = new criteria_group();
         $instance->set_competency($data->comp);
-        $instance->set_scale_value(reset($data->scalevalues));
+        $instance->set_scale_value($data->scalevalues[5]);
         $instance->add_criterion($data->cc[1]);
         $instance->save();
 
@@ -276,7 +276,7 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
 
         $instance = new criteria_group();
         $instance->set_competency($data->comp);
-        $instance->set_scale_value(reset($data->scalevalues));
+        $instance->set_scale_value($data->scalevalues[5]);
         $instance->add_criterion($data->cc[1]);
         $instance->add_criterion($data->cc[2]);
         $instance->save();
@@ -364,7 +364,7 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
 
         $instance = new criteria_group();
         $instance->set_competency($data->comp);
-        $instance->set_scale_value(reset($data->scalevalues));
+        $instance->set_scale_value($data->scalevalues[5]);
         $instance->add_criterion($data->cc[1]);
         $instance->add_criterion($data->cc[2]);
         $instance->save();
@@ -416,7 +416,7 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
 
         $instance = new criteria_group();
         $instance->set_competency($data->comp);
-        $instance->set_scale_value(reset($data->scalevalues));
+        $instance->set_scale_value($data->scalevalues[5]);
         $instance->add_criterion($data->cc[1]);
         $instance->add_criterion($data->cc[2]);
         $instance->save();

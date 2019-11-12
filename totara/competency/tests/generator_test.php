@@ -45,11 +45,11 @@ class totara_competency_generator_testcase extends \advanced_testcase {
             'comp',
             ['name' => 'Test scale', 'description' => 'Test scale'],
             [
-                1 => ['name' => 'No clue', 'proficient' => 0, 'sortorder' => 1, 'default' => 1],
-                2 => ['name' => 'Learning', 'proficient' => 0, 'sortorder' => 2, 'default' => 0],
+                5 => ['name' => 'No clue', 'proficient' => 0, 'sortorder' => 5, 'default' => 1],
+                4 => ['name' => 'Learning', 'proficient' => 0, 'sortorder' => 4, 'default' => 0],
                 3 => ['name' => 'Getting there', 'proficient' => 0, 'sortorder' => 3, 'default' => 0],
-                4 => ['name' => 'Almost there', 'proficient' => 1, 'sortorder' => 4, 'default' => 0],
-                5 => ['name' => 'Arrived', 'proficient' => 1, 'sortorder' => 4, 'default' => 0],
+                2 => ['name' => 'Almost there', 'proficient' => 1, 'sortorder' => 2, 'default' => 0],
+                1 => ['name' => 'Arrived', 'proficient' => 1, 'sortorder' => 1, 'default' => 0],
             ]
         );
         $data->scale = new scale($data->scale->id);
@@ -94,11 +94,11 @@ class totara_competency_generator_testcase extends \advanced_testcase {
     public function test_generator_criteria_group_single_criteria() {
         $data = $this->setup_data();
 
-        $cg = $this->generator()->create_criteria_group($data->comp, $data->cc[1], $data->scalevalues[1]);
+        $cg = $this->generator()->create_criteria_group($data->comp, $data->cc[1], $data->scalevalues[3]);
 
         $this->validate_criteria_group($cg, [
             'comp_id' => $data->comp->id,
-            'scale_value_id' => $data->scalevalues[1]->id,
+            'scale_value_id' => $data->scalevalues[4]->id,
             'criteria' => [$data->cc[1]],
         ]);
     }
@@ -109,11 +109,11 @@ class totara_competency_generator_testcase extends \advanced_testcase {
     public function test_generator_criteria_group_active_multi_criteria() {
         $data = $this->setup_data();
 
-        $cg = $this->generator()->create_criteria_group($data->comp, [$data->cc[1], $data->cc[2]], $data->scalevalues[2]);
+        $cg = $this->generator()->create_criteria_group($data->comp, [$data->cc[1], $data->cc[2]], $data->scalevalues[3]);
 
         $this->validate_criteria_group($cg, [
             'comp_id' => $data->comp->id,
-            'scale_value_id' => $data->scalevalues[2]->id,
+            'scale_value_id' => $data->scalevalues[3]->id,
             'status' => pathway::PATHWAY_STATUS_ACTIVE,
             'criteria' => [$data->cc[1], $data->cc[2]],
         ]);

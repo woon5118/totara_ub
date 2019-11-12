@@ -58,11 +58,11 @@ class pathway_learning_plan_evaluator_testcase extends advanced_testcase {
             'comp',
             ['name' => 'Test scale', 'description' => 'Test scale'],
             [
-                1 => ['name' => 'No clue', 'proficient' => 0, 'sortorder' => 1, 'default' => 1],
-                2 => ['name' => 'Learning', 'proficient' => 0, 'sortorder' => 2, 'default' => 0],
+                5 => ['name' => 'No clue', 'proficient' => 0, 'sortorder' => 5, 'default' => 1],
+                4 => ['name' => 'Learning', 'proficient' => 0, 'sortorder' => 4, 'default' => 0],
                 3 => ['name' => 'Getting there', 'proficient' => 0, 'sortorder' => 3, 'default' => 0],
-                4 => ['name' => 'Almost there', 'proficient' => 1, 'sortorder' => 4, 'default' => 0],
-                5 => ['name' => 'Arrived', 'proficient' => 1, 'sortorder' => 4, 'default' => 0],
+                2 => ['name' => 'Almost there', 'proficient' => 1, 'sortorder' => 2, 'default' => 0],
+                1 => ['name' => 'Arrived', 'proficient' => 1, 'sortorder' => 1, 'default' => 0],
             ]
         );
         $rows = $DB->get_records('comp_scale_values', ['scaleid' => $data->scale->id], 'sortorder');
@@ -121,7 +121,7 @@ class pathway_learning_plan_evaluator_testcase extends advanced_testcase {
         // Let's start from scratch to simulate that aggregation works with an existing achievement record with no scale value
         $data->user_id_table->delete();
 
-        $this->create_rating_record($data->competency->id, $data->users[1]->id, $data->scalevalues[4]->id, $now++);
+        $this->create_rating_record($data->competency->id, $data->users[1]->id, $data->scalevalues[2]->id, $now++);
         $this->create_userid_table_records($data->user_id_table, $data->competency->id, [$data->users[1]->id]);
 
         // Now aggregate second time for user1
@@ -136,7 +136,7 @@ class pathway_learning_plan_evaluator_testcase extends advanced_testcase {
             ],
             [
                 'pathway_id' => $data->lp_pathway->get_id(),
-                'scale_value_id' => $data->scalevalues[4]->id,
+                'scale_value_id' => $data->scalevalues[2]->id,
                 'status' => pathway_achievement::STATUS_CURRENT,
                 'related_info' => [],
             ],
@@ -146,7 +146,7 @@ class pathway_learning_plan_evaluator_testcase extends advanced_testcase {
 
         // Update user1's value. Add a value for user2, but do not 'assign' user2
         $this->create_rating_record($data->competency->id, $data->users[1]->id, $data->scalevalues[3]->id, $now++);
-        $this->create_rating_record($data->competency->id, $data->users[2]->id, $data->scalevalues[2]->id, $now++);
+        $this->create_rating_record($data->competency->id, $data->users[2]->id, $data->scalevalues[4]->id, $now++);
 
         // Reset the has_changed flag
         $data->user_id_table->reset_has_changed(0);
@@ -164,7 +164,7 @@ class pathway_learning_plan_evaluator_testcase extends advanced_testcase {
                 ],
                 [
                     'pathway_id' => $data->lp_pathway->get_id(),
-                    'scale_value_id' => $data->scalevalues[4]->id,
+                    'scale_value_id' => $data->scalevalues[2]->id,
                     'status' => pathway_achievement::STATUS_ARCHIVED,
                     'related_info' => [],
                 ],
@@ -198,7 +198,7 @@ class pathway_learning_plan_evaluator_testcase extends advanced_testcase {
                 ],
                 [
                     'pathway_id' => $data->lp_pathway->get_id(),
-                    'scale_value_id' => $data->scalevalues[4]->id,
+                    'scale_value_id' => $data->scalevalues[2]->id,
                     'status' => pathway_achievement::STATUS_ARCHIVED,
                     'related_info' => [],
                 ],
@@ -212,7 +212,7 @@ class pathway_learning_plan_evaluator_testcase extends advanced_testcase {
             2 => [
                 [
                     'pathway_id' => $data->lp_pathway->get_id(),
-                    'scale_value_id' => $data->scalevalues[2]->id,
+                    'scale_value_id' => $data->scalevalues[4]->id,
                     'status' => pathway_achievement::STATUS_CURRENT,
                     'related_info' => [],
                 ],

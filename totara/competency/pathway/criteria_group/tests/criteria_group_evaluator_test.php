@@ -54,11 +54,11 @@ class pathway_criteria_group_evaluator_testcase extends \advanced_testcase {
             'comp',
             ['name' => 'Test scale', 'description' => 'Test scale'],
             [
-                1 => ['name' => 'No clue', 'proficient' => 0, 'sortorder' => 1, 'default' => 1],
-                2 => ['name' => 'Learning', 'proficient' => 0, 'sortorder' => 2, 'default' => 0],
+                5 => ['name' => 'No clue', 'proficient' => 0, 'sortorder' => 5, 'default' => 1],
+                4 => ['name' => 'Learning', 'proficient' => 0, 'sortorder' => 4, 'default' => 0],
                 3 => ['name' => 'Getting there', 'proficient' => 0, 'sortorder' => 3, 'default' => 0],
-                4 => ['name' => 'Almost there', 'proficient' => 1, 'sortorder' => 4, 'default' => 0],
-                5 => ['name' => 'Arrived', 'proficient' => 1, 'sortorder' => 4, 'default' => 0],
+                2 => ['name' => 'Almost there', 'proficient' => 1, 'sortorder' => 2, 'default' => 0],
+                1 => ['name' => 'Arrived', 'proficient' => 1, 'sortorder' => 1, 'default' => 0],
             ]
         );
         $rows = $DB->get_records('comp_scale_values', ['scaleid' => $data->scale->id], 'sortorder');
@@ -109,7 +109,7 @@ class pathway_criteria_group_evaluator_testcase extends \advanced_testcase {
                                 'user_id' => 1,
                                 'existing_achievement' => [
                                     'status' => pathway_achievement::STATUS_CURRENT,
-                                    'scale_value' => 4,
+                                    'scale_value' => 2,
                                 ],
                                 'criteria_met' => false,
                                 'criteria_met_has_changed' => false,
@@ -121,7 +121,7 @@ class pathway_criteria_group_evaluator_testcase extends \advanced_testcase {
                     1 => [
                         [
                             'status' => pathway_achievement::STATUS_CURRENT,
-                            'scale_value' => 4,
+                            'scale_value' => 2,
                         ]
                     ],
                 ],
@@ -137,7 +137,7 @@ class pathway_criteria_group_evaluator_testcase extends \advanced_testcase {
                                 'user_id' => 1,
                                 'existing_achievement' => [
                                     'status' => pathway_achievement::STATUS_CURRENT,
-                                    'scale_value' => 4,
+                                    'scale_value' => 2,
                                 ],
                                 'criteria_met' => false,
                                 'criteria_met_has_changed' => true,
@@ -149,7 +149,7 @@ class pathway_criteria_group_evaluator_testcase extends \advanced_testcase {
                     1 => [
                         [
                             'status' => pathway_achievement::STATUS_ARCHIVED,
-                            'scale_value' => 4,
+                            'scale_value' => 2,
                         ],
                         [
                             'status' => pathway_achievement::STATUS_CURRENT,
@@ -169,7 +169,7 @@ class pathway_criteria_group_evaluator_testcase extends \advanced_testcase {
                                 'user_id' => 1,
                                 'existing_achievement' => [
                                     'status' => pathway_achievement::STATUS_CURRENT,
-                                    'scale_value' => 4,
+                                    'scale_value' => 2,
                                 ],
                                 'criteria_met' => true,
                                 'criteria_met_has_changed' => true,
@@ -181,7 +181,7 @@ class pathway_criteria_group_evaluator_testcase extends \advanced_testcase {
                     1 => [
                         [
                             'status' => pathway_achievement::STATUS_ARCHIVED,
-                            'scale_value' => 4,
+                            'scale_value' => 2,
                         ],
                         [
                             'status' => pathway_achievement::STATUS_CURRENT,

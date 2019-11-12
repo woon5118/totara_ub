@@ -58,11 +58,11 @@ class pathway_manual_evaluator_testcase extends advanced_testcase {
             'comp',
             ['name' => 'Test scale', 'description' => 'Test scale'],
             [
-                1 => ['name' => 'No clue', 'proficient' => 0, 'sortorder' => 1, 'default' => 1],
-                2 => ['name' => 'Learning', 'proficient' => 0, 'sortorder' => 2, 'default' => 0],
+                5 => ['name' => 'No clue', 'proficient' => 0, 'sortorder' => 5, 'default' => 1],
+                4 => ['name' => 'Learning', 'proficient' => 0, 'sortorder' => 4, 'default' => 0],
                 3 => ['name' => 'Getting there', 'proficient' => 0, 'sortorder' => 3, 'default' => 0],
-                4 => ['name' => 'Almost there', 'proficient' => 1, 'sortorder' => 4, 'default' => 0],
-                5 => ['name' => 'Arrived', 'proficient' => 1, 'sortorder' => 4, 'default' => 0],
+                2 => ['name' => 'Almost there', 'proficient' => 1, 'sortorder' => 2, 'default' => 0],
+                1 => ['name' => 'Arrived', 'proficient' => 1, 'sortorder' => 1, 'default' => 0],
             ]
         );
         $rows = $DB->get_records('comp_scale_values', ['scaleid' => $data->scale->id], 'sortorder');
@@ -136,48 +136,6 @@ class pathway_manual_evaluator_testcase extends advanced_testcase {
                 'subject' => $data->users['user']->id,
                 'rater' => $data->users['appraiser']->id,
                 'role' => manual::ROLE_APPRAISER,
-                'scalevalue' => $data->scalevalues[2]->id,
-                'date_assigned' => $now++,
-            ],
-        ]);
-
-        // Reset the has_changed flag
-        $data->user_id_table->reset_has_changed(0);
-
-        // Aggregate
-        $evaluator->aggregate($now++);
-
-        $expected = [
-            [
-                'pathway_id' => $data->manual->get_id(),
-                'scale_value_id' => $data->scalevalues[3]->id,
-                'status' => pathway_achievement::STATUS_ARCHIVED,
-                'related_info' => [],
-            ],
-            [
-                'pathway_id' => $data->manual->get_id(),
-                'scale_value_id' => $data->scalevalues[2]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
-                'related_info' => [],
-            ],
-        ];
-
-        $this->verify_userid_table_records($data->user_id_table, [$data->users['user']->id => 1]);
-        $this->verify_pathway_achievements($data->users['user']->id, $expected);
-
-        // Add a few more rating rows to ensure we get the latest - not the highest
-        $this->create_rating_records($data->competency->id, [
-            [
-                'subject' => $data->users['user']->id,
-                'rater' => $data->users['user']->id,
-                'role' => manual::ROLE_SELF,
-                'scalevalue' => $data->scalevalues[1]->id,
-                'date_assigned' => $now++,
-            ],
-            [
-                'subject' => $data->users['user']->id,
-                'rater' => $data->users['manager']->id,
-                'role' => manual::ROLE_MANAGER,
                 'scalevalue' => $data->scalevalues[4]->id,
                 'date_assigned' => $now++,
             ],
@@ -198,13 +156,55 @@ class pathway_manual_evaluator_testcase extends advanced_testcase {
             ],
             [
                 'pathway_id' => $data->manual->get_id(),
-                'scale_value_id' => $data->scalevalues[2]->id,
+                'scale_value_id' => $data->scalevalues[4]->id,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'related_info' => [],
+            ],
+        ];
+
+        $this->verify_userid_table_records($data->user_id_table, [$data->users['user']->id => 1]);
+        $this->verify_pathway_achievements($data->users['user']->id, $expected);
+
+        // Add a few more rating rows to ensure we get the latest - not the highest
+        $this->create_rating_records($data->competency->id, [
+            [
+                'subject' => $data->users['user']->id,
+                'rater' => $data->users['user']->id,
+                'role' => manual::ROLE_SELF,
+                'scalevalue' => $data->scalevalues[5]->id,
+                'date_assigned' => $now++,
+            ],
+            [
+                'subject' => $data->users['user']->id,
+                'rater' => $data->users['manager']->id,
+                'role' => manual::ROLE_MANAGER,
+                'scalevalue' => $data->scalevalues[2]->id,
+                'date_assigned' => $now++,
+            ],
+        ]);
+
+        // Reset the has_changed flag
+        $data->user_id_table->reset_has_changed(0);
+
+        // Aggregate
+        $evaluator->aggregate($now++);
+
+        $expected = [
+            [
+                'pathway_id' => $data->manual->get_id(),
+                'scale_value_id' => $data->scalevalues[3]->id,
                 'status' => pathway_achievement::STATUS_ARCHIVED,
                 'related_info' => [],
             ],
             [
                 'pathway_id' => $data->manual->get_id(),
                 'scale_value_id' => $data->scalevalues[4]->id,
+                'status' => pathway_achievement::STATUS_ARCHIVED,
+                'related_info' => [],
+            ],
+            [
+                'pathway_id' => $data->manual->get_id(),
+                'scale_value_id' => $data->scalevalues[2]->id,
                 'status' => pathway_achievement::STATUS_CURRENT,
                 'related_info' => [],
             ],

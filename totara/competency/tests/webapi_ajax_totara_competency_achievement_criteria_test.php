@@ -45,11 +45,11 @@ class totara_competency_webapi_ajax_totara_competency_achievement_criteria_testc
             'comp',
             ['name' => 'Test scale', 'description' => 'Test scale'],
             [
-                1 => ['name' => 'No clue', 'proficient' => 0, 'sortorder' => 1, 'default' => 1],
-                2 => ['name' => 'Learning', 'proficient' => 0, 'sortorder' => 2, 'default' => 0],
+                5 => ['name' => 'No clue', 'proficient' => 0, 'sortorder' => 5, 'default' => 1],
+                4 => ['name' => 'Learning', 'proficient' => 0, 'sortorder' => 4, 'default' => 0],
                 3 => ['name' => 'Getting there', 'proficient' => 0, 'sortorder' => 3, 'default' => 0],
-                4 => ['name' => 'Almost there', 'proficient' => 1, 'sortorder' => 4, 'default' => 0],
-                5 => ['name' => 'Arrived', 'proficient' => 1, 'sortorder' => 5, 'default' => 0],
+                2 => ['name' => 'Almost there', 'proficient' => 1, 'sortorder' => 2, 'default' => 0],
+                1 => ['name' => 'Arrived', 'proficient' => 1, 'sortorder' => 1, 'default' => 0],
             ]
         );
         $rows = $DB->get_records('comp_scale_values', ['scaleid' => $data->scale->id], 'sortorder');
@@ -129,7 +129,7 @@ class totara_competency_webapi_ajax_totara_competency_achievement_criteria_testc
         $pw = $competency_generator->create_manual($data->comp, [manual::ROLE_MANAGER]);
         $pathways[$pw->get_id()] = $pw;
 
-        $pw = $competency_generator->create_criteria_group($data->comp, $cc, $data->scalevalues[4]->id, null, null, 2);
+        $pw = $competency_generator->create_criteria_group($data->comp, $cc, $data->scalevalues[2]->id, null, null, 2);
         $pathways[$pw->get_id()] = $pw;
 
         $operationname = 'totara_competency_achievement_criteria';

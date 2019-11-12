@@ -47,11 +47,11 @@ class pathway_criteria_group_services_testcase extends advanced_testcase {
             'comp',
             ['name' => 'Test scale', 'description' => 'Test scale'],
             [
-                1 => ['name' => 'No clue', 'proficient' => 0, 'sortorder' => 1, 'default' => 1],
-                2 => ['name' => 'Learning', 'proficient' => 0, 'sortorder' => 2, 'default' => 0],
+                5 => ['name' => 'No clue', 'proficient' => 0, 'sortorder' => 5, 'default' => 1],
+                4 => ['name' => 'Learning', 'proficient' => 0, 'sortorder' => 4, 'default' => 0],
                 3 => ['name' => 'Getting there', 'proficient' => 0, 'sortorder' => 3, 'default' => 0],
-                4 => ['name' => 'Almost there', 'proficient' => 1, 'sortorder' => 4, 'default' => 0],
-                5 => ['name' => 'Arrived', 'proficient' => 1, 'sortorder' => 4, 'default' => 0],
+                2 => ['name' => 'Almost there', 'proficient' => 1, 'sortorder' => 2, 'default' => 0],
+                1 => ['name' => 'Arrived', 'proficient' => 1, 'sortorder' => 1, 'default' => 0],
             ]
         );
         $rows = $DB->get_records('comp_scale_values', ['scaleid' => $data->scale->id], 'sortorder');
@@ -118,7 +118,7 @@ class pathway_criteria_group_services_testcase extends advanced_testcase {
                     'type' => "coursecompletion",
                 ],
             ],
-            'scalevalue' => reset($data->scalevalues)->id,
+            'scalevalue' => $data->scalevalues[5]->id,
             'sortorder' => 1,
             'actiontime' => time(),
         ];
@@ -176,7 +176,7 @@ class pathway_criteria_group_services_testcase extends advanced_testcase {
                     'type' => "linkedcourses",
                 ],
             ],
-            'scalevalue' => reset($data->scalevalues)->id,
+            'scalevalue' => $data->scalevalues[5]->id,
             'sortorder' => 1,
             'actiontime' => time(),
         ];
