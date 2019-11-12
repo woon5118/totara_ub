@@ -152,7 +152,7 @@ trait report_trait {
             array('joins' => $join,
                   'dbdatatype' => 'char',
                   'outputformat' => 'text',
-                  'displayfunc' => 'plaintext')
+                  'displayfunc' => 'format_string')
         );
         $columnoptions[] = new \rb_column_option(
             'course',
