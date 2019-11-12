@@ -344,6 +344,33 @@ class sqlsrv_native_moodle_database extends moodle_database {
             'version' => $server_info['SQLServerVersion'],
         );
 
+        // Totara: use database compatibility overrides instead of database engine version, see
+        // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-database-transact-sql-compatibility-level?view=sql-server-ver15
+
+        $compatibility_levels = [
+            80 => '8.0',
+            90 => '9.0',
+            100 => '10.0',
+            110 => '11.0',
+            120 => '12.0',
+            130 => '13.0',
+            140 => '14.0',
+            150 => '15.0',
+        ];
+
+        // Do not use ger_record() or similar here because it might internally need the server version and end up in infinite loop.
+        $rsrc = $this->do_query("SELECT compatibility_level FROM sys.databases WHERE name=?", [$this->dbname], SQL_QUERY_AUX, false, false);
+        if ($rsrc) {
+            if ($row = sqlsrv_fetch_array($rsrc, SQLSRV_FETCH_ASSOC)) {
+                if (isset($compatibility_levels[$row['compatibility_level']])) {
+                    $this->serverinfo['version'] = $compatibility_levels[$row['compatibility_level']];
+                } else {
+                    error_log('unknown compatibility level detected in MS SQL server database: ' . $row['compatibility_level']);
+                }
+            }
+            sqlsrv_free_stmt($rsrc);
+        }
+
         return $this->serverinfo;
     }
 
