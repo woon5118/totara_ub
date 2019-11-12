@@ -24,40 +24,23 @@
 namespace totara_competency\observers;
 
 use hierarchy_competency\event\scale_min_proficient_value_updated;
-use hierarchy_competency\event\scale_updated;
-use hierarchy_competency\event\scale_value_created;
-use hierarchy_competency\event\scale_value_deleted;
 use totara_competency\aggregation_users_table;
 use totara_competency\entities\configuration_change;
 
 class scale {
 
     /**
-     * When a scale is updated we need to queue reaggregation for
-     * all users assigned to any competency with that scale
+     * React if the minimum proficient value change
      *
-     * @param scale_updated $event
+     * @param scale_min_proficient_value_updated $event
      */
-    public static function updated(scale_updated $event) {
-        self::queue_for_reaggregation($event->objectid);
-    }
+    public static function min_proficient_value_updated(scale_min_proficient_value_updated $event) {
+        $scale_id = $event->objectid;
+        $min_prof_id = $event->other['minproficiencyid'];
 
-    /**
-     * When a scale value gets deleted we need to queue all related records for reaggregation
-     *
-     * @param scale_value_deleted $event
-     */
-    public static function value_deleted(scale_value_deleted $event) {
-        self::queue_for_reaggregation($event->other['scaleid']);
-    }
+        configuration_change::min_proficiency_change($scale_id, $min_prof_id);
 
-    /**
-     * When a scale value gets added we need to queue all related records for reaggregation
-     *
-     * @param scale_value_created $event
-     */
-    public static function value_created(scale_value_created $event) {
-        self::queue_for_reaggregation($event->other['scaleid']);
+        self::queue_for_reaggregation($scale_id);
     }
 
     /**
@@ -92,18 +75,6 @@ class scale {
         ";
 
         $DB->execute($sql, ['scale_id' => $scale_id]);
-    }
-
-    /**
-     * React if the minimum proficient value change
-     *
-     * @param scale_min_proficient_value_updated $event
-     */
-    public static function min_proficient_value_updated(scale_min_proficient_value_updated $event) {
-        $scale_id = $event->objectid;
-        $min_prof_id = $event->other['minproficiencyid'];
-
-        configuration_change::min_proficiency_change($scale_id, $min_prof_id);
     }
 
 }

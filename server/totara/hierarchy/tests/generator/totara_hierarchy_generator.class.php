@@ -312,7 +312,7 @@ class totara_hierarchy_generator extends component_generator_base {
                 1
             );
             if (count($minproficiencyid) > 0) {
-                $minproficiencyid = array_pop($minproficiencyid)->id;
+                $minproficiencyid = array_shift($minproficiencyid)->id;
                 $DB->set_field('comp_scale', 'minproficiencyid', $minproficiencyid, array('id' => $scaleid));
             }
         }

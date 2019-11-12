@@ -68,20 +68,8 @@ $observers = [
         'callback' => competency_observer::class.'::deleted',
     ],
     [
-        'eventname' => scale_updated::class,
-        'callback' => scale_observer::class.'::updated',
-    ],
-    [
         'eventname' => scale_min_proficient_value_updated::class,
         'callback' => scale_observer::class.'::min_proficient_value_updated',
-    ],
-    [
-        'eventname' => scale_value_created::class,
-        'callback' => scale_observer::class.'::value_created',
-    ],
-    [
-        'eventname' => scale_value_deleted::class,
-        'callback' => scale_observer::class.'::value_deleted',
     ],
     // Assignment events
     [
