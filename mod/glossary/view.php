@@ -47,6 +47,12 @@ if (!empty($id)) {
     print_error('invalidid', 'glossary');
 }
 
+$url = new moodle_url('/mod/glossary/view.php', array('id' => $id));
+if (isset($mode)) {
+    $url->param('mode', $mode);
+}
+$PAGE->set_url($url);
+
 require_course_login($course->id, true, $cm);
 $context = context_module::instance($cm->id);
 require_capability('mod/glossary:view', $context);
@@ -274,11 +280,6 @@ $strwaitingapproval = get_string('waitingapproval', 'glossary');
 /// If we are in approval mode, prit special header
 $PAGE->set_title($glossary->name);
 $PAGE->set_heading($course->fullname);
-$url = new moodle_url('/mod/glossary/view.php', array('id'=>$cm->id));
-if (isset($mode)) {
-    $url->param('mode', $mode);
-}
-$PAGE->set_url($url);
 
 if (!empty($CFG->enablerssfeeds) && !empty($CFG->glossary_enablerssfeeds)
     && $glossary->rsstype && $glossary->rssarticles) {
