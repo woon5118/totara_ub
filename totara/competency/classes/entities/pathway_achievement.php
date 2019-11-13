@@ -114,5 +114,4 @@ class pathway_achievement extends entity {
     public function scale_value(): belongs_to {
         return $this->belongs_to(scale_value::class, 'scale_value_id');
     }
-
 }

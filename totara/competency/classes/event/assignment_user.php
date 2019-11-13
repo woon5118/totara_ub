@@ -31,6 +31,15 @@ use totara_competency\entities\competency_assignment_user;
 abstract class assignment_user extends base {
 
     /**
+     * Return related assignment id
+     *
+     * @return int|null
+     */
+    public function get_assignment_id() {
+        return $this->data['other']['assignment_id'] ?? null;
+    }
+
+    /**
      * Create instance of event.
      *
      * @param competency_assignment_user $assignment_user
@@ -50,7 +59,7 @@ abstract class assignment_user extends base {
         ];
         /** @var static $event */
         $event = static::create($data);
-        $event->add_record_snapshot('totara_competency_assignment_users', (object)$assignment_user->get_attributes_raw());
+        $event->add_record_snapshot('totara_competency_assignment_users', (object) $assignment_user->get_attributes_raw());
         return $event;
     }
 

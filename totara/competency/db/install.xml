@@ -4,6 +4,32 @@
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
+    <TABLE NAME="totara_competency_assignments" COMMENT="Totara assignments">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="25" NOTNULL="true" SEQUENCE="false" COMMENT="auto, self, admin, other, system, etc."/>
+        <FIELD NAME="competency_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="user_group_type" TYPE="char" LENGTH="25" NOTNULL="true" SEQUENCE="false" COMMENT="user, cohort, position, organisation, etc"/>
+        <FIELD NAME="user_group_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="References the id of selected user/user group"/>
+        <FIELD NAME="optional" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Mandatory/Optional"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Assignment status. e.g: 0 - Draft, 1 - Activated, 2 - Archived See assignment entity class for details."/>
+        <FIELD NAME="created_by" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="References the ID of the user created the assignment"/>
+        <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="updated_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="archived_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_competency_id" TYPE="foreign" FIELDS="competency_id" REFTABLE="comp" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="user_group_type-user_group_id" UNIQUE="false" FIELDS="user_group_type, user_group_id"/>
+        <INDEX NAME="type-user_group_type-user_group_id" UNIQUE="false" FIELDS="type, user_group_type, user_group_id"/>
+        <INDEX NAME="user_group_id" UNIQUE="false" FIELDS="user_group_id"/>
+        <INDEX NAME="user_group_type" UNIQUE="false" FIELDS="user_group_type"/>
+        <INDEX NAME="type" UNIQUE="false" FIELDS="type"/>
+      </INDEXES>
+    </TABLE>
     <TABLE NAME="totara_competency_pathway" COMMENT="Criteria or actions required to receive a scale value">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
@@ -39,7 +65,7 @@
         <FIELD NAME="scale_value_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Scale value achieved"/>
         <FIELD NAME="date_achieved" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Date when the user achieved this value"/>
         <FIELD NAME="last_aggregated" TYPE="int" LENGTH="18" NOTNULL="false" SEQUENCE="false" COMMENT="Last time this was aggregated"/>
-        <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Pathway achievment status"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Pathway achievement status"/>
         <FIELD NAME="related_info" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Other related information"/>
       </FIELDS>
       <KEYS>
@@ -69,12 +95,13 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_assignment_id" TYPE="foreign" FIELDS="assignment_id" REFTABLE="totara_competency_assignments" REFFIELDS="id" ONDELETE="cascade"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="totara_competency_achievement_via" COMMENT="Record of pathways that contributed to a specific competency achievment">
+    <TABLE NAME="totara_competency_achievement_via" COMMENT="Record of pathways that contributed to a specific competency achievement">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="comp_achievement_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of user achievment record"/>
+        <FIELD NAME="comp_achievement_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of user achievement record"/>
         <FIELD NAME="pathway_achievement_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of pathway achievement record"/>
       </FIELDS>
       <KEYS>
@@ -94,6 +121,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_assignment_id" TYPE="foreign" FIELDS="assignment_id" REFTABLE="totara_competency_assignments" REFFIELDS="id" ONDELETE="cascade"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="comconfch_ux" UNIQUE="true" FIELDS="comp_id, assignment_id, time_changed, change_type"/>
@@ -110,6 +138,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_assignment_id" TYPE="foreign" FIELDS="assignment_id" REFTABLE="totara_competency_assignments" REFFIELDS="id" ONDELETE="cascade"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="totara_competency_temp_users" COMMENT="Temporary table used during evaluation and aggregation of user achievements">
@@ -122,32 +151,6 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
-    </TABLE>
-    <TABLE NAME="totara_competency_assignments" COMMENT="Totara assignments">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="type" TYPE="char" LENGTH="25" NOTNULL="true" SEQUENCE="false" COMMENT="auto, self, admin, other, system, etc."/>
-        <FIELD NAME="competency_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="user_group_type" TYPE="char" LENGTH="25" NOTNULL="true" SEQUENCE="false" COMMENT="user, cohort, position, organisation, etc"/>
-        <FIELD NAME="user_group_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="References the id of selected user/user group"/>
-        <FIELD NAME="optional" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Mandatory/Optional"/>
-        <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Assignment status. e.g: 0 - Draft, 1 - Activated, 2 - Archived See assignment entity class for details."/>
-        <FIELD NAME="created_by" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="References the ID of the user created the assignment"/>
-        <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="updated_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="archived_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="fk_competency_id" TYPE="foreign" FIELDS="competency_id" REFTABLE="comp" REFFIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="user_group_type-user_group_id" UNIQUE="false" FIELDS="user_group_type, user_group_id"/>
-        <INDEX NAME="type-user_group_type-user_group_id" UNIQUE="false" FIELDS="type, user_group_type, user_group_id"/>
-        <INDEX NAME="user_group_id" UNIQUE="false" FIELDS="user_group_id"/>
-        <INDEX NAME="user_group_type" UNIQUE="false" FIELDS="user_group_type"/>
-        <INDEX NAME="type" UNIQUE="false" FIELDS="type"/>
-      </INDEXES>
     </TABLE>
     <TABLE NAME="totara_competency_assignment_users" COMMENT="Totara Competency Users">
       <FIELDS>

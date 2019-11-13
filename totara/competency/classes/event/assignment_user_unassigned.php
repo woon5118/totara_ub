@@ -51,6 +51,6 @@ class assignment_user_unassigned extends assignment_user {
      * @return string
      */
     public function get_description() {
-        return 'User got unassigned to a competency';
+        return 'User has been unassigned from a competency';
     }
 }

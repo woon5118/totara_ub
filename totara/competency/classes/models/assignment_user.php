@@ -25,8 +25,10 @@ namespace totara_competency\models;
 
 use core\orm\entity\repository;
 use core\orm\collection;
+use core\orm\query\builder;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency_assignment_user;
+use totara_competency\models\assignment as assignment_model;
 use totara_competency\expand_task;
 use core\entities\user;
 use totara_competency\user_groups;
@@ -37,6 +39,11 @@ class assignment_user {
      * @var int
      */
     private $user_id;
+
+    /**
+     * @var assignment_model|null
+     */
+    protected $assignment = null;
 
     /**
      * @param int $user_id
@@ -52,6 +59,93 @@ class assignment_user {
      */
     public function get_id() {
         return $this->user_id;
+    }
+
+    /**
+     * Set assignment model for a given user
+     *
+     * @param \totara_competency\models\assignment $assignment
+     * @return $this
+     */
+    public function set_assignment(assignment_model $assignment) {
+        $this->assignment = $assignment;
+
+        return $this;
+    }
+
+    /**
+     * Delete related data to one user of the competency assignment
+     */
+    public function delete_related_data() {
+        $this->must_have_assignment();
+
+        builder::get_db()->transaction(function() {
+            $this->delete_achievements()
+                ->delete_log();
+        });
+
+        return $this;
+    }
+
+    /**
+     * Delete achievement for a given assignment and user
+     *
+     * @return $this
+     */
+    protected function delete_achievements() {
+        $this->must_have_assignment();
+
+        $this->assignment
+            ->get_entity()
+            ->achievements()
+            ->where('user_id', $this->user_id)
+            ->delete();
+
+        return $this;
+    }
+
+    /**
+     * Delete user log entries for a given assignment and user
+     *
+     * @return $this
+     */
+    protected function delete_log() {
+        $this->must_have_assignment();
+
+        $this->assignment
+            ->get_entity()
+            ->user_logs()
+            ->where('user_id', $this->user_id)
+            ->delete();
+
+        return $this;
+    }
+
+    /**
+     * Check whether a user has achievements for a given assignment
+     *
+     * @return bool
+     */
+    public function has_achievement() {
+        $this->must_have_assignment();
+
+        return $this->assignment
+            ->get_entity()
+            ->achievements()
+            ->where('user_id', $this->user_id)
+            ->where_not_null('scale_value_id')
+            ->exists();
+    }
+
+    /**
+     * Make sure assignment has been set for a given model
+     *
+     * @throws \coding_exception
+     */
+    protected function must_have_assignment() {
+        if (is_null($this->assignment)) {
+            throw new \coding_exception('Assignment must be set for a given user');
+        }
     }
 
     /**
@@ -95,6 +189,12 @@ class assignment_user {
         return count($this->get_active_assignments_for_competency($competency_id)) > 0;
     }
 
+    /**
+     * Check whether a user has archived assignments
+     *
+     * @param int|null $competency_id
+     * @return bool
+     */
     public function has_archived_assignments(int $competency_id): bool {
         return count($this->fetch_archived_assignments($competency_id)) > 0;
     }

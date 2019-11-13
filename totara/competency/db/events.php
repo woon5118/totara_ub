@@ -63,11 +63,11 @@ $observers = [
     ],
     [
         'eventname' => \totara_competency\event\assignment_user_unassigned::class,
-        'callback'  => \totara_competency\observers\user_log::class.'::log'
+        'callback'  => \totara_competency\observers\user_unassigned::class.'::unassigned'
     ],
     [
         'eventname' => \totara_competency\event\assignment_user_unassigned::class,
-        'callback'  => \totara_competency\observers\user_unassigned::class.'::unassigned'
+        'callback'  => \totara_competency\observers\user_log::class.'::log'
     ],
     // Reacting to deleting competencies:
     [

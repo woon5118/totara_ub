@@ -24,6 +24,7 @@
 namespace totara_competency\observers;
 
 use totara_competency\event\assignment_user_unassigned;
+use totara_competency\models\assignment as assignment_model;
 use totara_competency\models\assignment_user;
 use totara_competency\settings;
 
@@ -52,7 +53,15 @@ class user_unassigned {
 
         // Delete related competency records if unassign behaviour is set up that way
         if (!settings::should_unassign_keep_records()) {
-            // TODO TL-20480 implement actual behaviour
+
+            $assignment_user = (new assignment_user($user_id))
+                ->set_assignment(assignment_model::load_by_id($event->get_assignment_id()));
+
+            if (settings::should_unassign_keep_achieved_records() && $assignment_user->has_achievement()) {
+                return true;
+            }
+
+            $assignment_user->delete_related_data();
         }
 
         return true;

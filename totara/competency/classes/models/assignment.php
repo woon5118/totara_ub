@@ -161,22 +161,7 @@ class assignment {
         // Create the event as long as we still have an id in the instance
         $event = assignment_deleted::create_from_assignment($this->entity);
 
-        // TODO Change once real foreign keys are there as we don't need to delete related records manually
-        builder::get_db()->transaction(function () {
-            // Delete all user records for those assignments
-            competency_assignment_user::repository()
-                ->where('assignment_id', $this->get_id())
-                ->delete();
-
-            // Delete all log records for those assignments
-            competency_assignment_user_log::repository()
-                ->where('assignment_id', $this->get_id())
-                ->delete();
-
-            $this->entity->delete();
-        });
-
-        // TODO Delete related competency records?
+        $this->entity->delete();
 
         $event->trigger();
     }

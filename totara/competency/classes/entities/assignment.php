@@ -23,6 +23,7 @@
 
 namespace totara_competency\entities;
 
+use coding_exception;
 use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
@@ -47,6 +48,8 @@ use core\entities\user;
  *
  * @property-read string $status_name Textual representation of status int
  * @property-read competency_achievement $current_achievement Current achievement
+ * @property-read collection $current_achievements Current achievements
+ * @property-read collection $achievements All achievements
  * @property-read competency $competency
  * @property-read user $assigner
  * @property-read collection $assignment_users
@@ -103,8 +106,31 @@ class assignment extends entity {
         ];
     }
 
+    /**
+     * Related competency
+     *
+     * @return belongs_to
+     */
     public function competency(): belongs_to {
-        return $this->belongs_to(\totara_competency\entities\competency::class, 'competency_id');
+        return $this->belongs_to(competency::class, 'competency_id');
+    }
+
+    /**
+     * All competency achievements
+     *
+     * @return has_many
+     */
+    public function user_logs(): has_many {
+        return $this->has_many(competency_assignment_user_log::class, 'assignment_id');
+    }
+
+    /**
+     * All competency achievements
+     *
+     * @return has_many
+     */
+    public function achievements(): has_many {
+        return $this->has_many(competency_achievement::class, 'assignment_id');
     }
 
     /**
@@ -113,8 +139,7 @@ class assignment extends entity {
      * @return has_many
      */
     public function current_achievements(): has_many {
-        return $this->has_many(competency_achievement::class, 'assignment_id')
-            ->where('status', 'in', [competency_achievement::ACTIVE_ASSIGNMENT, competency_achievement::ARCHIVED_ASSIGNMENT]);
+        return $this->achievements() ->where('status', 'in', [competency_achievement::ACTIVE_ASSIGNMENT, competency_achievement::ARCHIVED_ASSIGNMENT]);
     }
 
     /**
@@ -184,7 +209,7 @@ class assignment extends entity {
                 $name = self::STATUS_NAME_ARCHIVED;
                 break;
             default:
-                throw new \coding_exception("Unknown assignment status '{$this->status}'");
+                throw new coding_exception("Unknown assignment status '{$this->status}'");
                 break;
         }
         return $name;

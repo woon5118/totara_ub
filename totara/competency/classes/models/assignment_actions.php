@@ -128,7 +128,7 @@ class assignment_actions {
     }
 
     /**
-     * Activate one or multiple assignments
+     * Delete one or multiple assignments
      *
      * @param array|int $ids either one id or an array
      * @param bool $force Ignore assignment status when executing delete statement
