@@ -64,20 +64,20 @@ class learning_plan_evaluator_user_source extends pathway_evaluator_user_source 
         // Using 2 queries for clarify. Might consider joining them in future if it is more performant
         // First query - Mark all users with one or more rating since the last achievement aggregation or
         // who has a rating without an achievement record yet
-        $sql =
-            "UPDATE {{$temp_table_name}}
-                SET {$temp_set_sql} 
-              WHERE {$temp_wh}
-                    {$temp_user_id_column} IN (
-                        SELECT dplan.user_id
-                           FROM {dp_plan_competency_value} dplan
-                     LEFT JOIN {totara_competency_pathway_achievement} tcpa
-                            ON tcpa.pathway_id = :pathwayid
-                           AND tcpa.user_id = dplan.user_id
-                           AND tcpa.status = :activestatus
-                         WHERE dplan.competency_id = :competencyid
-                           AND (tcpa.id IS NULL OR dplan.date_assigned > tcpa.last_aggregated)
-                    )";
+        $sql = "
+            UPDATE {{$temp_table_name}}
+            SET {$temp_set_sql} 
+            WHERE {$temp_wh}
+                {$temp_user_id_column} IN (
+                    SELECT dplan.user_id
+                    FROM {dp_plan_competency_value} dplan
+                    LEFT JOIN {totara_competency_pathway_achievement} tcpa
+                        ON tcpa.pathway_id = :pathwayid
+                            AND tcpa.user_id = dplan.user_id
+                            AND tcpa.status = :activestatus
+                    WHERE dplan.competency_id = :competencyid
+                        AND (tcpa.id IS NULL OR dplan.date_assigned >= tcpa.last_aggregated)
+                )";
 
         $params = array_merge(
             [
@@ -92,19 +92,22 @@ class learning_plan_evaluator_user_source extends pathway_evaluator_user_source 
         $DB->execute($sql, $params);
 
         // Second query - user has no rating and no achievement record
-        $sql =
-            "UPDATE {{$temp_table_name}}
-                SET {$temp_set_sql} 
-              WHERE {$temp_wh}
-                    {$temp_user_id_column} NOT IN (
-                        SELECT dplan.user_id
-                          FROM {dp_plan_competency_value} dplan
-                         WHERE dplan.competency_id = :competencyid)
+        $sql = "
+            UPDATE {{$temp_table_name}}
+            SET {$temp_set_sql} 
+            WHERE {$temp_wh}
+                {$temp_user_id_column} NOT IN (
+                    SELECT dplan.user_id
+                    FROM {dp_plan_competency_value} dplan
+                    WHERE dplan.competency_id = :competencyid
+                )
                 AND {$temp_user_id_column} NOT IN (
-                        SELECT tcpa.user_id
-                          FROM {totara_competency_pathway_achievement} tcpa
-                         WHERE tcpa.pathway_id = :pathwayid
-                           AND tcpa.status = :activestatus)";
+                    SELECT tcpa.user_id
+                    FROM {totara_competency_pathway_achievement} tcpa
+                    WHERE tcpa.pathway_id = :pathwayid
+                        AND tcpa.status = :activestatus
+                )
+        ";
 
         $params = array_merge(
             [

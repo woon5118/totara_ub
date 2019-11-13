@@ -64,20 +64,21 @@ class manual_evaluator_user_source extends pathway_evaluator_user_source {
         // Using 2 queries for clarify. Might consider joining them in future if it is more performant
         // First query - Mark all users with one or more rating since the last achievement aggregation
         // or who has a rating without an achievement record yet>
-        $sql =
-            "UPDATE {{$temp_table_name}}
-                SET {$temp_set_sql} 
-              WHERE {$temp_wh}
-                    {$temp_user_id_column} IN (
-                        SELECT DISTINCT pmr.user_id
-                          FROM {pathway_manual_rating} pmr
-                     LEFT JOIN {totara_competency_pathway_achievement} tcpa
-                            ON tcpa.pathway_id = :pathwayid
+        $sql = "
+            UPDATE {{$temp_table_name}}
+            SET {$temp_set_sql} 
+            WHERE {$temp_wh}
+                {$temp_user_id_column} IN (
+                    SELECT pmr.user_id
+                    FROM {pathway_manual_rating} pmr
+                    LEFT JOIN {totara_competency_pathway_achievement} tcpa
+                        ON tcpa.pathway_id = :pathwayid
                            AND tcpa.user_id = pmr.user_id
                            AND tcpa.status = :activestatus
-                         WHERE pmr.comp_id = :competencyid
-                           AND (tcpa.id IS NULL OR pmr.date_assigned >= tcpa.last_aggregated)
-                    )";
+                    WHERE pmr.comp_id = :competencyid
+                        AND (tcpa.id IS NULL OR pmr.date_assigned >= tcpa.last_aggregated)
+                )
+        ";
 
         $params = array_merge(
             [
@@ -92,19 +93,22 @@ class manual_evaluator_user_source extends pathway_evaluator_user_source {
         $DB->execute($sql, $params);
 
         // Second query - user has no rating and no achievement record
-        $sql =
-            "UPDATE {{$temp_table_name}}
-                SET {$temp_set_sql} 
-              WHERE {$temp_wh}
-                    {$temp_user_id_column} NOT IN (
-                        SELECT pmr.user_id
-                          FROM {pathway_manual_rating} pmr
-                         WHERE pmr.comp_id = :competencyid)
+        $sql = "
+            UPDATE {{$temp_table_name}}
+            SET {$temp_set_sql} 
+            WHERE {$temp_wh}
+                 {$temp_user_id_column} NOT IN (
+                    SELECT pmr.user_id
+                    FROM {pathway_manual_rating} pmr
+                    WHERE pmr.comp_id = :competencyid
+                )
                 AND {$temp_user_id_column} NOT IN (
-                        SELECT tcpa.user_id
-                          FROM {totara_competency_pathway_achievement} tcpa
-                         WHERE tcpa.pathway_id = :pathwayid
-                           AND tcpa.status = :activestatus)";
+                    SELECT tcpa.user_id
+                    FROM {totara_competency_pathway_achievement} tcpa
+                    WHERE tcpa.pathway_id = :pathwayid
+                        AND tcpa.status = :activestatus
+                )
+        ";
 
         $params = array_merge(
             [

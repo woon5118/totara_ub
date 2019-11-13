@@ -76,10 +76,7 @@ class pathway_evaluator_user_source {
 
         $temp_table_name = $this->temp_user_table->get_table_name();
         $temp_user_id_column = $this->temp_user_table->get_user_id_column();
-        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('',
-            false,
-            null
-        );
+        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('', false, null);
         $temp_wh = !empty($temp_wh) ? " WHERE {$temp_wh}" : '';
 
         $sql = "
@@ -138,15 +135,17 @@ class pathway_evaluator_user_source {
             $temp_wh_params
         );
 
-        $sql =
-            "UPDATE {{$temp_table_name}}
+        $sql = "
+            UPDATE {{$temp_table_name}}
                 SET {$set_haschanged_sql}
-              WHERE {$user_id_column} NOT IN (
-                    SELECT tcpa.user_id
-                    FROM {totara_competency_pathway_achievement} tcpa
-                   WHERE tcpa.pathway_id = :pathwayid
-                     AND tcpa.status = :currentstatus)
-                     {$temp_wh}";
+            WHERE {$user_id_column} NOT IN (
+                SELECT tcpa.user_id
+                FROM {totara_competency_pathway_achievement} tcpa
+                WHERE tcpa.pathway_id = :pathwayid
+                    AND tcpa.status = :currentstatus
+            )
+            {$temp_wh}
+        ";
 
         $DB->execute($sql, $params);
     }

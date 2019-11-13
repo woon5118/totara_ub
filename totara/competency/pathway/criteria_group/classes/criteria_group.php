@@ -89,6 +89,8 @@ class criteria_group extends pathway {
 
         $this->criteria = [];
 
+        // TODO performance optimisation: load the entities right away and init criterion objects with it
+        //      this will save a few queries
         $rows = $DB->get_records(
             'pathway_criteria_group_criterion',
             ['criteria_group_id' => $this->get_path_instance_id()],
