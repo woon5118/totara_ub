@@ -25,6 +25,7 @@ namespace totara_competency;
 
 
 use stdClass;
+use totara_competency\entities\pathway as pathway_entity;
 
 /**
  * Pathway factory class to obtain an instance of the specific pathway type
@@ -63,17 +64,17 @@ class pathway_factory {
     }
 
     /**
-     * Instantiate an instance of the specified pathway type with the provided detail
+     * Instantiate an instance of the specified pathway type with the provided entity
      *
-     * @param stdClass $record
+     * @param pathway_entity $path
      * @return pathway of the requested type
      */
-    public static function from_record(stdClass $record): pathway {
-        static::require_enabled($record->path_type);
+    public static function from_entity(pathway_entity $path): pathway {
+        static::require_enabled($path->path_type);
 
-        $classname = static::get_classname($record->path_type);
+        $classname = static::get_classname($path->path_type);
 
-        return $classname::from_record($record);
+        return $classname::from_entity($path);
     }
 
     /**

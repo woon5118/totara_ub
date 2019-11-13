@@ -23,7 +23,10 @@
 
 namespace totara_competency;
 
+use core\orm\collection;
+use core\orm\query\builder;
 use totara_competency\entities\competency;
+use totara_competency\entities\pathway as pathway_entity;
 
 /**
  * Class to run the aggregation on a list of users and competencies.
@@ -82,16 +85,18 @@ class aggregation_task {
         //      For each competency
         //          Aggregate achievement
 
-        $pathway_rows = $this->get_active_pathways_for_assigned_users();
+        $pathways = $this->get_active_pathways_for_assigned_users();
 
-        $curr_competency = 0;
-        foreach ($pathway_rows as $row) {
-            if (!empty($curr_competency) && $row->comp_id != $curr_competency) {
+        /** @var competency $curr_competency */
+        $curr_competency = null;
+        foreach ($pathways as $pathway_entity) {
+            if (!empty($curr_competency) && $pathway_entity->comp_id != $curr_competency->id) {
                 $this->aggregate_competency_achievements($curr_competency, $aggregation_time);
             }
-            $curr_competency = $row->comp_id;
 
-            $pathway = pathway_factory::from_record($row);
+            $curr_competency = $pathway_entity->competency;
+
+            $pathway = pathway_factory::from_entity($pathway_entity);
 
             $pw_evaluator = pathway_evaluator_factory::create($pathway, $this->pw_user_id_source);
             $pw_evaluator->aggregate($aggregation_time);
@@ -102,39 +107,38 @@ class aggregation_task {
         }
     }
 
-    private function get_active_pathways_for_assigned_users(): \moodle_recordset {
-        global $DB;
-
+    /**
+     * @return collection|pathway_entity[]
+     */
+    private function get_active_pathways_for_assigned_users(): collection {
         $pathway_types = plugin_types::get_enabled_plugins('pathway', 'totara_competency');
-        [$pathtype_sql, $params] = $DB->get_in_or_equal($pathway_types, SQL_PARAMS_NAMED);
 
-        // Get active pathways for assigned users
-        // Although order by may have a slight impact on the query performance, with the possible number of rows
-        // that may be returned, it is better to do ordering on the database
-        $sql = "
-            SELECT tcp.*
-            FROM {totara_competency_pathway} tcp
-            JOIN {comp} c ON tcp.comp_id = c.id 
-            WHERE tcp.path_type {$pathtype_sql}
-                AND tcp.status = :activestatus
-                AND tcp.comp_id IN (
-                    SELECT DISTINCT competency_id
-                    FROM {{$this->table->get_table_name()}}
-                )
-            ORDER BY c.depthlevel DESC, tcp.comp_id";
-        $params['activestatus'] = pathway::PATHWAY_STATUS_ACTIVE;
+        return pathway_entity::repository()
+            ->join(['comp', 'c'], 'comp_id', 'id')
+            ->where('path_type', $pathway_types)
+            ->where('status', pathway::PATHWAY_STATUS_ACTIVE)
+            ->where_exists(function (builder $builder) {
+                $uses_process_key = $this->table->get_process_key_column() && $this->table->get_process_key_value();
 
-        return $DB->get_recordset_sql($sql, $params);
+                $builder->from($this->table->get_table_name())
+                    ->where_field($this->table->get_competency_id_column(), "c.id")
+                    ->when($uses_process_key, function (builder $builder) {
+                        $builder->where($this->table->get_process_key_column(), $this->table->get_process_key_value());
+                    });
+            })
+            ->order_by('c.depthlevel', 'desc')
+            ->order_by('comp_id', 'asc')
+            ->with('competency')
+            ->get();
     }
 
     /**
      * Perform competency achievement aggregation for all users who were marked as having changes
      *
-     * @param int $comp_id
+     * @param competency $competency
      * @param int $aggregation_time
      */
-    private function aggregate_competency_achievements(int $comp_id, int $aggregation_time) {
-        $competency = new competency($comp_id);
+    private function aggregate_competency_achievements(competency $competency, int $aggregation_time) {
         $configuration = new achievement_configuration($competency);
         $competency_aggregator = new competency_achievement_aggregator($configuration, $this->comp_user_id_source);
         $competency_aggregator->aggregate($aggregation_time);

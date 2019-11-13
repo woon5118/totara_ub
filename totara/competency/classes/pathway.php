@@ -79,46 +79,52 @@ abstract class pathway {
      * @return static
      */
     final public static function fetch(int $id): pathway {
-        global $DB;
+        $entity = pathway_entity::repository()->find_or_fail($id);
 
-        $record = $DB->get_record('totara_competency_pathway', ['id' => $id], '*', MUST_EXIST);
-
-        return static::from_record($record);
+        return static::from_entity($entity);
     }
 
     /**
      * Set the instance attributes from the record
      *
-     * @param \stdClass $record
+     * @param pathway_entity $entity
      * @return static
      */
-    final public static function from_record($record): pathway {
-        $classname = "\\pathway_{$record->path_type}\\{$record->path_type}";
-        if (!class_exists($classname) || !is_subclass_of($classname, 'totara_competency\pathway')) {
-            throw new \coding_exception("Pathway type '{$record->path_type}' does not exist or is not enabled.");
-        }
+    final public static function from_entity(pathway_entity $entity): pathway {
+        $classname = self::get_pathway_class($entity);
 
         /** @var pathway $pathway */
         $pathway = new $classname();
-        if ($pathway->path_type !== $record->path_type) {
+        if ($pathway->path_type !== $entity->path_type) {
             throw new \coding_exception('Path type mismatch');
         }
 
-        /** @var competency $competency */
-        $competency = competency::repository()->find($record->comp_id);
-        if (!$competency) {
+        if (!$entity->competency) {
             throw new \coding_exception('Competency for given pathway not found');
         }
 
-        $pathway->set_id($record->id);
-        $pathway->set_competency($competency);
-        $pathway->set_sortorder($record->sortorder);
-        $pathway->set_path_instance_id($record->path_instance_id);
-        $pathway->set_status($record->status);
+        $pathway->set_id($entity->id);
+        $pathway->set_competency($entity->competency);
+        $pathway->set_sortorder($entity->sortorder);
+        $pathway->set_path_instance_id($entity->path_instance_id);
+        $pathway->set_status($entity->status);
 
         $pathway->fetch_configuration();
 
         return $pathway;
+    }
+
+    /**
+     * @param \stdClass|pathway_entity $pathway
+     * @return string
+     * @throws \coding_exception
+     */
+    protected static function get_pathway_class($pathway): string {
+        $classname = "\\pathway_{$pathway->path_type}\\{$pathway->path_type}";
+        if (!class_exists($classname) || !is_subclass_of($classname, pathway::class)) {
+            throw new \coding_exception("Pathway type '{$pathway->path_type}' does not exist or is not enabled.");
+        }
+        return $classname;
     }
 
     /**
