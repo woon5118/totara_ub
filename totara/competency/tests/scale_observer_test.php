@@ -183,12 +183,14 @@ class totara_competency_scale_observer_testcase extends advanced_testcase {
                 [
                     $table->get_user_id_column() => $user1->id,
                     $table->get_competency_id_column() => $comp1->id,
-                    $table->get_process_key_column() => null
+                    $table->get_process_key_column() => null,
+                    $table->get_has_changed_column() => 1
                 ],
                 [
                     $table->get_user_id_column() => $user2->id,
                     $table->get_competency_id_column() => $comp1->id,
-                    $table->get_process_key_column() => 'iamprocessing'
+                    $table->get_process_key_column() => 'iamprocessing',
+                    $table->get_has_changed_column() => 0
                 ],
             ]
         );
@@ -203,17 +205,119 @@ class totara_competency_scale_observer_testcase extends advanced_testcase {
             [
                 'user_id' => $user1->id,
                 'competency_id' => $comp1->id,
-                'process_key' => null
+                'process_key' => null,
+                'has_changed' => 1
             ],
             [
                 'user_id' => $user2->id,
                 'competency_id' => $comp1->id,
-                'process_key' => 'iamprocessing'
+                'process_key' => 'iamprocessing',
+                'has_changed' => 0
             ],
             [
                 'user_id' => $user2->id,
                 'competency_id' => $comp1->id,
-                'process_key' => null
+                'process_key' => null,
+                'has_changed' => 1
+            ],
+        ];
+        $this->assert_queued_records_exist($expected);
+    }
+
+    public function test_minimum_proficient_value_changed_with_existing_record_which_is_not_changed() {
+        advanced_feature::enable('competency_assignment');
+
+        $scale1 = $this->create_scale();
+        $scale2 = $this->create_scale();
+        $comp1 = $this->create_competency($scale1->id);
+        $comp2 = $this->create_competency($scale2->id);
+
+        // We don't want the create event fired here
+        $sink = $this->redirectEvents();
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+        $user4 = $this->getDataGenerator()->create_user();
+
+        $assignment_generator = $this->generator()->assignment_generator();
+        $assignment_generator->create_user_assignment($comp1->id, $user1->id, ['status' => assignment_entity::STATUS_ACTIVE]);
+        $assignment_generator->create_user_assignment($comp1->id, $user2->id, ['status' => assignment_entity::STATUS_ACTIVE]);
+        $assignment_generator->create_user_assignment($comp2->id, $user1->id, ['status' => assignment_entity::STATUS_ACTIVE]);
+        $assignment_generator->create_user_assignment($comp2->id, $user2->id, ['status' => assignment_entity::STATUS_ACTIVE]);
+        $assignment_generator->create_user_assignment($comp2->id, $user3->id, ['status' => assignment_entity::STATUS_ACTIVE]);
+        // Have one assignment archived
+        $assignment_generator->create_user_assignment($comp1->id, $user4->id, ['status' => assignment_entity::STATUS_ARCHIVED]);
+
+        (new expand_task($GLOBALS['DB']))->expand_all();
+
+        $sink->close();
+
+        $scale_values = scale_value::repository()
+            ->where('scaleid', $scale1->id)
+            ->order_by('sortorder', 'DESC')
+            ->get();
+
+        $lowest = $scale_values->first();
+
+        $this->assertNotEquals($scale1->minproficiencyid, $lowest->id);
+
+        $scale1 = new scale_entity($scale1);
+        $scale1->minproficiencyid = $lowest->id;
+        $scale1->save();
+
+        $table = new aggregation_users_table();
+
+        $this->assert_queued_records_exist([]);
+
+        builder::get_db()->insert_records(
+            $table->get_table_name(),
+            [
+                [
+                    $table->get_user_id_column() => $user1->id,
+                    $table->get_competency_id_column() => $comp1->id,
+                    $table->get_process_key_column() => null,
+                    $table->get_has_changed_column() => 0
+                ],
+                [
+                    $table->get_user_id_column() => $user2->id,
+                    $table->get_competency_id_column() => $comp1->id,
+                    $table->get_process_key_column() => 'iamprocessing',
+                    $table->get_has_changed_column() => 0
+                ],
+            ]
+        );
+
+        $this->assertEquals(2, builder::get_db()->count_records($table->get_table_name()));
+
+        scale_min_proficient_value_updated::create_from_instance((object)$scale1->to_array())->trigger();
+
+        $this->assertEquals(4, builder::get_db()->count_records($table->get_table_name()));
+
+        $expected = [
+            [
+                'user_id' => $user1->id,
+                'competency_id' => $comp1->id,
+                'process_key' => null,
+                'has_changed' => 0
+            ],
+            [
+                'user_id' => $user2->id,
+                'competency_id' => $comp1->id,
+                'process_key' => 'iamprocessing',
+                'has_changed' => 0
+            ],
+            [
+                'user_id' => $user1->id,
+                'competency_id' => $comp1->id,
+                'process_key' => null,
+                'has_changed' => 1
+            ],
+            [
+                'user_id' => $user2->id,
+                'competency_id' => $comp1->id,
+                'process_key' => null,
+                'has_changed' => 1
             ],
         ];
         $this->assert_queued_records_exist($expected);
@@ -265,7 +369,11 @@ class totara_competency_scale_observer_testcase extends advanced_testcase {
                     if (!array_key_exists('process_key', $values)
                         || $values['process_key'] == $record->{$table->get_process_key_column()}
                     ) {
-                        unset($actual_records[$key]);
+                        if (!array_key_exists('has_changed', $values)
+                            || $values['has_changed'] == $record->{$table->get_has_changed_column()}
+                        ) {
+                            unset($actual_records[$key]);
+                        }
                     }
                 }
             }

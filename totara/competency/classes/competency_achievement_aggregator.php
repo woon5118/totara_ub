@@ -25,8 +25,8 @@ namespace totara_competency;
 
 
 use core\orm\collection;
+use totara_competency\entities\achievement_via;
 use totara_competency\entities\competency_achievement;
-use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\scale_value;
 use totara_competency\event\competency_achievement_updated;
 
@@ -92,8 +92,6 @@ final class competency_achievement_aggregator {
      * @param int|null $aggregation_time
      */
     public function aggregate(?int $aggregation_time = null) {
-        global $DB;
-
         $competency_id = $this->get_achievement_configuration()->get_competency()->id;
 
         if (is_null($aggregation_time)) {
@@ -114,8 +112,12 @@ final class competency_achievement_aggregator {
                 $previous_comp_achievement = new competency_achievement($user_assignment_record->comp_achievement_id);
             }
 
-            if ($user_assignment_record->scale_value_id != $user_achievement['scale_value_id']
-                || is_null($previous_comp_achievement)
+            $is_proficient = (int) $this->is_proficient($user_achievement['scale_value_id']);
+
+            // If the scale value changed or the proficiency value then we supersede the old record and create a new one
+            if (is_null($previous_comp_achievement)
+                || $user_assignment_record->scale_value_id != $user_achievement['scale_value_id']
+                || $user_assignment_record->proficient != $is_proficient
             ) {
                 // New achieved value
                 if (!is_null($previous_comp_achievement)) {
@@ -129,7 +131,7 @@ final class competency_achievement_aggregator {
                 $new_comp_achievement->user_id = $user_id;
                 $new_comp_achievement->assignment_id = $user_assignment_record->assignment_id;
                 $new_comp_achievement->scale_value_id = $user_achievement['scale_value_id'];
-                $new_comp_achievement->proficient = (int) $this->is_proficient($user_achievement['scale_value_id']);
+                $new_comp_achievement->proficient = $is_proficient;
                 $new_comp_achievement->status = competency_achievement::ACTIVE_ASSIGNMENT;
                 $new_comp_achievement->time_created = $aggregation_time;
                 $new_comp_achievement->time_status = $aggregation_time;
@@ -139,10 +141,10 @@ final class competency_achievement_aggregator {
                 $new_comp_achievement->save();
 
                 foreach ($user_achievement['achieved_via'] as $pathway_achievement) {
-                    $via_record = new \stdClass();
-                    $via_record->comp_achievement_id = $new_comp_achievement->id;
-                    $via_record->pathway_achievement_id = $pathway_achievement->id;
-                    $DB->insert_record('totara_competency_achievement_via', $via_record);
+                    $via = new achievement_via();
+                    $via->comp_achievement_id = $new_comp_achievement->id;
+                    $via->pathway_achievement_id = $pathway_achievement->id;
+                    $via->save();
                 }
 
                 $achieved_via_ids = collection::new($user_achievement['achieved_via'])->pluck('id');

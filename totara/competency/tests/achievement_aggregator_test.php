@@ -22,15 +22,22 @@
  * @package totara_competency
  */
 
+use hierarchy_competency\event\scale_min_proficient_value_updated;
 use totara_competency\aggregation_users_table;
 use totara_competency\competency_aggregator_user_source;
+use totara_competency\entities\achievement_via;
+use totara_competency\entities\assignment;
 use totara_competency\entities\competency;
 use totara_competency\achievement_configuration;
 use totara_competency\competency_achievement_aggregator;
 use totara_competency\entities\pathway_achievement;
+use totara_competency\event\competency_achievement_updated;
+use totara_competency\expand_task;
+use totara_competency\models\assignment_actions;
 use totara_competency\overall_aggregation;
 use totara_competency\entities\scale_value;
 use totara_competency\entities\competency_achievement;
+use totara_competency\pathway;
 use totara_competency\pathway_evaluator_user_source;
 use pathway_test_pathway\test_pathway_evaluator;
 use aggregation_test_aggregation\test_aggregation;
@@ -76,15 +83,16 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $assignment_ids = [];
         foreach ($users as $user) {
             for ($i = 0; $i < $assignments_per_user; $i++) {
-                $assignment = $assignment_generator->create_user_assignment($competency->id, $user->id);
+                $assignment = $assignment_generator->create_user_assignment(
+                    $competency->id,
+                    $user->id,
+                    ['status' => assignment::STATUS_ACTIVE]
+                );
                 $assignment_ids[] = $assignment->id;
             }
         }
 
-        $model = new \totara_competency\models\assignment_actions();
-        $model->activate($assignment_ids);
-
-        $expand_task = new \totara_competency\expand_task($DB);
+        $expand_task = new expand_task($DB);
         $expand_task->expand_all();
 
         return $assignment_ids;
@@ -111,8 +119,6 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
     }
 
     public function test_with_one_user_requiring_completion() {
-        global $DB;
-
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
         $competency = $competency_generator->create_competency();
@@ -129,36 +135,28 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $user = $this->getDataGenerator()->create_user();
         $this->generate_active_expanded_user_assignments($competency, [$user]);
 
-        $source_table = new aggregation_users_table();
-        $source_table->queue_for_aggregation($user->id, $competency->id);
-        $pw_user_source = new pathway_evaluator_user_source($source_table, true);
-        (new test_pathway_evaluator($pathway, $pw_user_source))->aggregate(time());
+        $this->aggregate_pathway($pathway, $user);
 
-        $comp_user_source = new competency_aggregator_user_source($source_table, true);
-        $aggregator = new competency_achievement_aggregator($achievement_configuration, $comp_user_source);
-
-        $achievement = pathway_achievement::get_current($pathway, $user->id);
-        $aggregation_method = $this->create_aggregation_method_achieved_by([$achievement]);
-        $aggregator->set_aggregation_instance($aggregation_method);
-
-        $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
+        $this->assertEquals(0, competency_achievement::repository()->count());
 
         $event_sink = $this->redirectEvents();
+        $aggregator = $this->get_competency_aggregator_for_pathway_and_user($pathway, $user);
+        $pw_achievement = pathway_achievement::get_current($pathway, $user->id);
         $aggregator->aggregate();
         $events = $event_sink->get_events();
 
-        $comp_records = $DB->get_records('totara_competency_achievement');
-        $this->assertCount(1, $comp_records);
-        $comp_record = reset($comp_records);
-        $this->assertEquals($scale_value->id, $comp_record->scale_value_id);
+        $achievements = competency_achievement::repository()->get();
+        $this->assertCount(1, $achievements);
+        $achievement = $achievements->shift();
+        $this->assertEquals($scale_value->id, $achievement->scale_value_id);
 
-        $via_records = $DB->get_records('totara_competency_achievement_via');
+        $via_records = achievement_via::repository()->get();
         $this->assertCount(1, $via_records);
-        $via_record = reset($via_records);
-        $this->assertEquals($achievement->id, $via_record->pathway_achievement_id);
+        $via_record = $via_records->shift();
+        $this->assertEquals($pw_achievement->id, $via_record->pathway_achievement_id);
 
         $event = reset($events);
-        $this->assertInstanceOf(\totara_competency\event\competency_achievement_updated::class, $event);
+        $this->assertInstanceOf(competency_achievement_updated::class, $event);
         $event_sink->close();
     }
 
@@ -224,7 +222,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $this->assertNotEquals($via_record1->pathway_achievement_id, $via_record2->pathway_achievement_id);
 
         $event = reset($events);
-        $this->assertInstanceOf(\totara_competency\event\competency_achievement_updated::class, $event);
+        $this->assertInstanceOf(competency_achievement_updated::class, $event);
         $event_sink->close();
     }
 
@@ -389,7 +387,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
 
         // The value changed, so an event was sent.
         $event = reset($events);
-        $this->assertInstanceOf(\totara_competency\event\competency_achievement_updated::class, $event);
+        $this->assertInstanceOf(competency_achievement_updated::class, $event);
         $event_sink->close();
     }
 
@@ -409,77 +407,68 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         /** @var scale_value $scale_value2 */
         $scale_value2 = $values->current();
 
-        $pathway1 = $competency_generator->create_test_pathway($competency);
-        $pathway1->set_test_aggregate_current_value($scale_value1);
-
-        $achievement_configuration = new achievement_configuration($competency);
-        $achievement_configuration->set_aggregation_type('test_aggregation');
+        $pathway = $competency_generator->create_test_pathway($competency);
+        $pathway->set_test_aggregate_current_value($scale_value1);
 
         $user = $this->getDataGenerator()->create_user();
         $this->generate_active_expanded_user_assignments($competency, [$user]);
 
-        $source_table = new aggregation_users_table();
-        $source_table->queue_for_aggregation($user->id, $competency->id);
-        $pw_user_source = new pathway_evaluator_user_source($source_table, true);
-        (new test_pathway_evaluator($pathway1, $pw_user_source))->aggregate(time());
-        $achievement1 = pathway_achievement::get_current($pathway1, $user->id);
+        $this->aggregate_pathway($pathway, $user);
 
-        $source_table = new aggregation_users_table();
-        $source_table->queue_for_aggregation($user->id, $competency->id);
-        $comp_user_source = new competency_aggregator_user_source($source_table, true);
-        $aggregator = new competency_achievement_aggregator($achievement_configuration, $comp_user_source);
+        $pw_achievement1 = pathway_achievement::get_current($pathway, $user->id);
 
-        $aggregation_method = $this->create_aggregation_method_achieved_by([$achievement1]);
-        $aggregator->set_aggregation_instance($aggregation_method);
+        $this->assertEquals(0, competency_achievement::repository()->count());
 
-        $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
-
+        $aggregator = $this->get_competency_aggregator_for_pathway_and_user($pathway, $user);
         $aggregator->aggregate();
 
         // Should all be about scale value and achievement #1.
-        $comp_records = $DB->get_records('totara_competency_achievement');
-        $this->assertCount(1, $comp_records);
-        $comp_record = reset($comp_records);
-        $this->assertEquals($scale_value1->id, $comp_record->scale_value_id);
+        $achievements = competency_achievement::repository()->get();
+        $this->assertCount(1, $achievements);
+        $achievement = $achievements->shift();
+        $this->assertEquals($scale_value1->id, $achievement->scale_value_id);
 
-        $via_records = $DB->get_records('totara_competency_achievement_via');
+        $via_records = achievement_via::repository()->get();
         $this->assertCount(1, $via_records);
-        $via_record = array_pop($via_records);
-        $this->assertEquals($via_record->pathway_achievement_id, $achievement1->id);
+        $via_record = $via_records->pop();
+        $this->assertEquals($via_record->pathway_achievement_id, $pw_achievement1->id);
 
         $this->assertNotEquals($scale_value1->id, $scale_value2->id);
 
         $pathway2 = $competency_generator->create_test_pathway($competency);
         $pathway2->set_test_aggregate_current_value($scale_value2);
 
-        (new test_pathway_evaluator($pathway2, $pw_user_source))->aggregate(time());
-        $achievement2 = pathway_achievement::get_current($pathway2, $user->id);
-
-        $aggregation_method = $this->create_aggregation_method_achieved_by([$achievement2]);
-        $aggregator->set_aggregation_instance($aggregation_method);
+        $this->aggregate_pathway($pathway2, $user);
+        $pw_achievement2 = pathway_achievement::get_current($pathway2, $user->id);
 
         $event_sink = $this->redirectEvents();
+        $aggregator = $this->get_competency_aggregator_for_pathway_and_user($pathway2, $user);
         $aggregator->aggregate();
         $events = $event_sink->get_events();
 
         // Order by newest at they back so they can be popped off in that order.
-        $comp_records = $DB->get_records('totara_competency_achievement', [], 'time_created ASC, id ASC');
-        $this->assertCount(2, $comp_records);
-        $comp_record2 = array_pop($comp_records);
+        $achievements = competency_achievement::repository()
+            ->order_by('time_created', 'asc')
+            ->order_by('id', 'asc')
+            ->get();
+        $this->assertCount(2, $achievements);
+        $comp_record2 = $achievements->pop();
         $this->assertEquals($scale_value2->id, $comp_record2->scale_value_id);
-        $comp_record1 = array_pop($comp_records);
+        $comp_record1 = $achievements->pop();
         $this->assertEquals($scale_value1->id, $comp_record1->scale_value_id);
 
-        $via_records = $DB->get_records('totara_competency_achievement_via', [], 'id ASC');
+        $via_records = achievement_via::repository()
+            ->order_by('id', 'asc')
+            ->get();
         $this->assertCount(2, $via_records);
-        $via_record = array_pop($via_records);
+        $via_record = $via_records->pop();
         $this->assertEquals($via_record->comp_achievement_id, $comp_record2->id);
-        $via_record = array_pop($via_records);
+        $via_record = $via_records->pop();
         $this->assertEquals($via_record->comp_achievement_id, $comp_record1->id);
 
         // The value changed, so an event was sent.
         $event = reset($events);
-        $this->assertInstanceOf(\totara_competency\event\competency_achievement_updated::class, $event);
+        $this->assertInstanceOf(competency_achievement_updated::class, $event);
         $event_sink->close();
     }
 
@@ -537,15 +526,15 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $this->assertEquals($achievement->id, $via_record->pathway_achievement_id);
 
         $event = reset($events);
-        $this->assertInstanceOf(\totara_competency\event\competency_achievement_updated::class, $event);
+        $this->assertInstanceOf(competency_achievement_updated::class, $event);
 
         // Follow-on scenario. One of the assignments is archived. The status on just that comp_record should reflect that.
 
         $disable_assignment_id = array_pop($assignmentids);
 
-        $model = new \totara_competency\models\assignment_actions();
+        $model = new assignment_actions();
         $model->archive([$disable_assignment_id]);
-        $expand_task = new \totara_competency\expand_task($DB);
+        $expand_task = new expand_task($DB);
         $expand_task->expand_all();
 
         $aggregator = new competency_achievement_aggregator($achievement_configuration, $comp_user_source);
@@ -581,8 +570,154 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         // any comp records with active assignments should become superseded and replaced with a new one
         // (which is just the case if the scale value they had has gone from proficient to not or vice versa).
 
-        // We may want to wait until TL-20274 is in before doing this as it might be modified following that anyway.
-        $this->markTestIncomplete();
+        /** @var totara_competency_generator $competency_generator */
+        $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+        $competency = $competency_generator->create_competency();
+
+        /** @var scale_value[] $scale_values */
+        $scale_values = $competency->scale->sorted_values_high_to_low;
+
+        $min_proficiency_value = $competency->scale->minproficiencyid;
+
+        // Going through the scale values and find the last value before it becomes proficient
+        $scale_values = $competency->scale->values;
+        $non_proficient_value = $min_proficient_value = null;
+        foreach ($scale_values as $value) {
+            if ($value->proficient) {
+                $min_proficient_value = $value;
+                break;
+            } else {
+                $non_proficient_value = $value;
+            }
+        }
+        // Make sure we got the right values
+        $this->assertInstanceOf(scale_value::class, $non_proficient_value);
+        $this->assertEquals(0, $non_proficient_value->proficient);
+        $this->assertInstanceOf(scale_value::class, $min_proficient_value);
+        $this->assertEquals(1, $min_proficient_value->proficient);
+        $this->assertEquals($min_proficient_value->id, $competency->scale->minproficiencyid);
+
+        $user = $this->getDataGenerator()->create_user();
+
+        $pathway = $competency_generator->create_test_pathway($competency);
+        $pathway->set_test_aggregate_current_value($non_proficient_value);
+
+        $this->aggregate_pathway($pathway, $user);
+
+        $assignmentids = $this->generate_active_expanded_user_assignments($competency, [$user], 1);
+
+        $this->assertEquals(0, competency_achievement::repository()->count());
+
+        $event_sink = $this->redirectEvents();
+        $aggregator = $this->get_competency_aggregator_for_pathway_and_user($pathway, $user);
+        $aggregator->aggregate();
+        $events = $event_sink->get_events();
+
+        $achievements = competency_achievement::repository()->get();
+        $this->assertEquals(1, $achievements->count());
+        /** @var competency_achievement $achievement */
+        $achievement = $achievements->first();
+
+        // The user has an achievement but is not considered proficient
+        $this->assertEquals(competency_achievement::ACTIVE_ASSIGNMENT, $achievement->status);
+        $this->assertEquals(0, $achievement->proficient);
+
+        // alright, now change the minimum proficiency value and trigger the event
+        // which is the quickest way of queuing the change
+        $scale = $competency->scale;
+        $scale->minproficiencyid = $non_proficient_value->id;
+        $scale->save();
+
+        $non_proficient_value->proficient = 1;
+        $non_proficient_value->save();
+
+        scale_min_proficient_value_updated::create_from_instance((object)$scale->to_array())->trigger();
+
+        $event_sink = $this->redirectEvents();
+        $aggregator = $this->get_competency_aggregator_for_pathway_and_user($pathway, $user);
+        $aggregator->aggregate();
+        $events = $event_sink->get_events();
+
+        $achievements = competency_achievement::repository()
+            ->order_by('id', 'asc')
+            ->get();
+        $this->assertEquals(2, $achievements->count());
+
+        // The first one is the old proficient one, now superseded
+        $achievement = $achievements->shift();
+        $this->assertEquals(competency_achievement::SUPERSEDED, $achievement->status);
+        $this->assertEquals(0, $achievement->proficient);
+        $this->assertEquals($non_proficient_value->id, $achievement->scale_value_id);
+
+        // The second one is the new one with the same scale value id but without being proficient
+        $achievement = $achievements->shift();
+        $this->assertEquals(competency_achievement::ACTIVE_ASSIGNMENT, $achievement->status);
+        $this->assertEquals(1, $achievement->proficient);
+        $this->assertEquals($non_proficient_value->id, $achievement->scale_value_id);
+
+        // ok now change it back and see if it also switches back to proficient
+        $scale = $competency->scale;
+        $scale->minproficiencyid = $min_proficient_value->id;
+        $scale->save();
+
+        $non_proficient_value->proficient = 0;
+        $non_proficient_value->save();
+
+        scale_min_proficient_value_updated::create_from_instance((object)$scale->to_array())->trigger();
+
+        $event_sink = $this->redirectEvents();
+        $aggregator = $this->get_competency_aggregator_for_pathway_and_user($pathway, $user);
+        $aggregator->aggregate();
+        $events = $event_sink->get_events();
+
+        $achievements = competency_achievement::repository()
+            ->order_by('id', 'asc')
+            ->get();
+        $this->assertEquals(3, $achievements->count());
+
+        // The first one is the old proficient one, now superseded
+        $achievement = $achievements->shift();
+        $this->assertEquals(competency_achievement::SUPERSEDED, $achievement->status);
+        $this->assertEquals(0, $achievement->proficient);
+        $this->assertEquals($non_proficient_value->id, $achievement->scale_value_id);
+
+        // The second one is also superseded
+        $achievement = $achievements->shift();
+        $this->assertEquals(competency_achievement::SUPERSEDED, $achievement->status);
+        $this->assertEquals(1, $achievement->proficient);
+        $this->assertEquals($non_proficient_value->id, $achievement->scale_value_id);
+
+        // The third one is the new one with the same scale value id but without being proficient
+        $achievement = $achievements->shift();
+        $this->assertEquals(competency_achievement::ACTIVE_ASSIGNMENT, $achievement->status);
+        $this->assertEquals(0, $achievement->proficient);
+        $this->assertEquals($non_proficient_value->id, $achievement->scale_value_id);
+    }
+
+    protected function aggregate_pathway(pathway $pathway, stdClass $user) {
+        $competency = $pathway->get_competency();
+
+        $source_table = new aggregation_users_table();
+        $source_table->queue_for_aggregation($user->id, $competency->id);
+
+        $pw_user_source = new pathway_evaluator_user_source($source_table, true);
+        (new test_pathway_evaluator($pathway, $pw_user_source))->aggregate(time());
+    }
+
+    protected function get_competency_aggregator_for_pathway_and_user(pathway $pathway, stdClass $user) {
+        $source_table = new aggregation_users_table();
+
+        $achievement_configuration = new achievement_configuration($pathway->get_competency());
+        $achievement_configuration->set_aggregation_type('test_aggregation');
+
+        $comp_user_source = new competency_aggregator_user_source($source_table, true);
+        $aggregator = new competency_achievement_aggregator($achievement_configuration, $comp_user_source);
+
+        $achievement = pathway_achievement::get_current($pathway, $user->id);
+        $aggregation_method = $this->create_aggregation_method_achieved_by([$achievement]);
+        $aggregator->set_aggregation_instance($aggregation_method);
+
+        return $aggregator;
     }
 
     public function test_archived_assignment_not_updated() {
@@ -639,14 +774,14 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $this->assertEquals($achievement->id, $via_record->pathway_achievement_id);
 
         $event = reset($events);
-        $this->assertInstanceOf(\totara_competency\event\competency_achievement_updated::class, $event);
+        $this->assertInstanceOf(competency_achievement_updated::class, $event);
         $event_sink->close();
 
         $disable_assignment_id = array_pop($assignment_ids);
 
-        $model = new \totara_competency\models\assignment_actions();
+        $model = new assignment_actions();
         $model->archive([$disable_assignment_id]);
-        $expand_task = new \totara_competency\expand_task($DB);
+        $expand_task = new expand_task($DB);
         $expand_task->expand_all();
 
         // Add a new pathway achievement, which would prompt a new competency record if it were possible.

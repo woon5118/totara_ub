@@ -139,25 +139,29 @@ class competency_aggregator_user_source {
         $temp_tablename = $this->temp_user_table->get_table_name();
         $temp_user_id_column = $this->temp_user_table->get_user_id_column();
         $temp_competency_id_column = $this->temp_user_table->get_competency_id_column();
-        [$user_id_wh, $params] = $this->temp_user_table->get_filter_sql_with_params($temp_alias, false, 1);
+        [$temp_cond, $params] = $this->temp_user_table->get_filter_sql_with_params("", false, 1);
         $params['newstatus'] = competency_achievement::ACTIVE_ASSIGNMENT;
         $params['competencyid'] = $competency_id;
 
-        $sql = "SELECT tacu.id,
-                    tacu.user_id,
-                    tacu.assignment_id,
-                    COALESCE(ca.id, NULL) AS comp_achievement_id,
-                    COALESCE(ca.scale_value_id, NULL) AS scale_value_id
-                 FROM {totara_competency_assignment_users} tacu
-                 JOIN {" . $temp_tablename . "} {$temp_alias} 
-                   ON tacu.user_id = {$temp_alias}.{$temp_user_id_column} 
-                  AND tacu.competency_id = {$temp_alias}.{$temp_competency_id_column}
+        $sql = "
+            SELECT tacu.id,
+                tacu.user_id,
+                tacu.assignment_id,
+                ca.id AS comp_achievement_id,
+                ca.scale_value_id,
+                ca.proficient
+            FROM {totara_competency_assignment_users} tacu
             LEFT JOIN {totara_competency_achievement} ca
-                   ON tacu.user_id = ca.user_id
+                ON tacu.user_id = ca.user_id
                   AND tacu.assignment_id = ca.assignment_id
                   AND ca.status = :newstatus
-                WHERE tacu.competency_id = :competencyid
-                  AND {$user_id_wh}";
+            WHERE tacu.competency_id = :competencyid
+                  AND tacu.user_id IN (
+                        SELECT {$temp_user_id_column}
+                        FROM {{$temp_tablename}} 
+                        WHERE {$temp_cond}
+                  )
+        ";
 
         return $DB->get_recordset_sql($sql, $params);
     }

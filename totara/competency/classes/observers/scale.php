@@ -53,17 +53,29 @@ class scale {
 
         $table = new aggregation_users_table();
 
+        $process_key_cond = $has_changed_insert = $has_changed_select = $has_changed_cond = "";
         if ($table->get_process_key_column()) {
             $process_key_cond = "AND q.{$table->get_process_key_column()} IS NULL";
+        }
+        // Only if there's a has_changed column we always add 1 into it to make sure the competency will be aggregated
+        // even if no other changes on pathways happened.
+        if ($table->get_has_changed_column()) {
+            $has_changed_insert = ", {$table->get_has_changed_column()}";
+            $has_changed_select = ", 1 AS has_changed";
+            $has_changed_cond = " AND q.has_changed = 1";
         }
 
         // For performance reasons we use one query to query and insert new rows
         // We do not insert values which are already in the queue table
-        // to avoid rows being processed twice
+        // to avoid rows being processed twice.
         $sql = "
             INSERT INTO {{$table->get_table_name()}}
-                ({$table->get_user_id_column()}, {$table->get_competency_id_column()})
-            SELECT DISTINCT tcau.user_id, tcau.competency_id 
+                (
+                    {$table->get_user_id_column()}, 
+                    {$table->get_competency_id_column()}
+                    {$has_changed_insert}
+                )    
+            SELECT DISTINCT tcau.user_id, tcau.competency_id {$has_changed_select}
             FROM {totara_competency_assignment_users} tcau 
             JOIN {comp} c ON tcau.competency_id = c.id
             JOIN {comp_scale_assignments} csa ON c.frameworkid = csa.frameworkid
@@ -71,7 +83,8 @@ class scale {
                 ON tcau.competency_id = q.{$table->get_competency_id_column()}
                  AND tcau.user_id = q.{$table->get_user_id_column()}
                  {$process_key_cond}
-            WHERE csa.scaleid = :scale_id AND q.id IS NULL 
+                 {$has_changed_cond}
+            WHERE csa.scaleid = :scale_id AND q.id IS NULL
         ";
 
         $DB->execute($sql, ['scale_id' => $scale_id]);
