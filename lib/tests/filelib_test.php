@@ -953,7 +953,7 @@ EOF;
 
         // Test example MIME type (doc).
         $this->assertEquals('application/msword', $mimeinfo['doc']['type']);
-        $this->assertEquals('document', $mimeinfo['doc']['icon']);
+        $this->assertEquals('word', $mimeinfo['doc']['icon']);
         $this->assertEquals(array('document'), $mimeinfo['doc']['groups']);
         $this->assertFalse(isset($mimeinfo['doc']['string']));
         $this->assertFalse(isset($mimeinfo['doc']['defaulticon']));

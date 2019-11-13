@@ -1040,6 +1040,13 @@ $icons = array(
                     'classes' => 'fa-file-video-o',
                 ),
         ),
+    'file-word' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-file-word-o',
+                ),
+        ),
     'filter' =>
         array(
             'data' =>
@@ -2190,6 +2197,7 @@ $deprecated = array(
     'core|f/video' => 'file-video',
     'core|f/wav' => 'file-sound',
     'core|f/wmv' => 'file-video',
+    'core|f/word' => 'file-word',
     'core|help' => 'help',
     'core|i/admin' => 'settings',
     'core|i/agg_mean' => 'mean',
