@@ -35,8 +35,35 @@ abstract class assignment_user extends base {
      *
      * @return int|null
      */
-    public function get_assignment_id() {
+    public function get_assignment_id(): ?int {
         return $this->data['other']['assignment_id'] ?? null;
+    }
+
+    /**
+     * Return related competency id
+     *
+     * @return int|null
+     */
+    public function get_competency_id(): ?int {
+        return $this->data['other']['competency_id'] ?? null;
+    }
+
+    /**
+     * Return related assignment type
+     *
+     * @return int|null
+     */
+    public function get_assignment_type(): ?int {
+        return $this->data['other']['type'] ?? null;
+    }
+
+    /**
+     * Return related assignment id
+     *
+     * @return int|null
+     */
+    public function get_user_id(): ?int {
+        return $this->data['relateduserid'] ?? null;
     }
 
     /**

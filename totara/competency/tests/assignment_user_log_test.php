@@ -110,7 +110,8 @@ class totara_competency_user_log_testcase extends totara_competency_assignment_a
     }
 
     public function test_log_user_added_to_user_group() {
-        set_config('continuous_tracking', admin_setting_continuous_tracking::ENABLED, 'totara_competency');
+        \totara_competency\settings::enable_continuous_tracking();
+        \totara_competency\settings::unassign_keep_records();
 
         ['competencies' => $competencies] = $this->generate_assignments();
 
@@ -131,6 +132,7 @@ class totara_competency_user_log_testcase extends totara_competency_assignment_a
                 ->where('assignment_id', $assignment->id)
                 ->count()
         );
+
         $this->assert_has_log_entry_amount(2, $assignment->id);
         $this->assert_log_entry_exists($user->id, $assignment->id, competency_assignment_user_log::ACTION_ASSIGNED);
         $this->assert_log_entry_exists($user->id, $assignment->id, competency_assignment_user_log::ACTION_TRACKING_START);

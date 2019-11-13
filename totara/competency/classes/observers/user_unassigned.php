@@ -26,6 +26,7 @@ namespace totara_competency\observers;
 use totara_competency\event\assignment_user_unassigned;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\models\assignment_user;
+use totara_competency\models\assignment_user_log;
 use totara_competency\settings;
 
 defined('MOODLE_INTERNAL') || die();
@@ -36,35 +37,104 @@ defined('MOODLE_INTERNAL') || die();
 class user_unassigned {
 
     /**
-     * Triggered via assignment_user_unassigned event.
+     * Event
+     *
+     * @var assignment_user_unassigned
+     */
+    protected $event;
+
+    /**
+     * Assignment user model
+     *
+     * @var assignment_user
+     */
+    protected $assignment_user;
+
+    /**
+     * user_unassigned constructor.
      *
      * @param assignment_user_unassigned $event
-     * @return bool true on success
      */
-    public static function unassigned(assignment_user_unassigned $event) {
-        $data = $event->get_data();
-        $competency_id = $data['other']['competency_id'] ?? null;
-        $user_id = $data['relateduserid'];
+    public function __construct(assignment_user_unassigned $event) {
+        $this->event = $event;
+        $this->assignment_user = (new assignment_user($event->get_user_id()))
+            ->set_assignment(assignment_model::load_by_id($this->event->get_assignment_id()));
+    }
 
-        // Create a new assignment for continuous tracking if setting is enabled
-        if (settings::is_continuous_tracking_enabled()) {
-            (new assignment_user($user_id))->create_system_assignment($competency_id);
-        }
-
-        // Delete related competency records if unassign behaviour is set up that way
-        if (!settings::should_unassign_keep_records()) {
-
-            $assignment_user = (new assignment_user($user_id))
-                ->set_assignment(assignment_model::load_by_id($event->get_assignment_id()));
-
-            if (settings::should_unassign_keep_achieved_records() && $assignment_user->has_achievement()) {
-                return true;
-            }
-
-            $assignment_user->delete_related_data();
-        }
+    /**
+     * React to the user unassigned
+     *
+     * @return bool
+     */
+    public function handle() {
+        $this->create_system_assignment()
+            ->log_activity()
+            ->remove_related_records();
 
         return true;
     }
 
+    /**
+     * Create system assignments if continuous tracking is enabled
+     *
+     * @return $this
+     */
+    protected function create_system_assignment() {
+        // Create a new assignment for continuous tracking if setting is enabled
+        if (settings::is_continuous_tracking_enabled()) {
+            (new assignment_user($this->event->get_user_id()))
+                ->create_system_assignment($this->event->get_competency_id());
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove related records if the site-wide setting is set to remove records
+     *
+     * @return $this
+     */
+    protected function remove_related_records() {
+        // Delete related competency records if unassign behaviour is set up that way
+        if (!settings::should_unassign_keep_records()) {
+            if (settings::should_unassign_keep_achieved_records() && $this->assignment_user->has_achievement()) {
+                return $this;
+            }
+
+            $this->assignment_user->delete_related_data();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Log activity
+     *
+     * @return $this
+     */
+    protected function log_activity() {
+
+        $log = new assignment_user_log(
+            $this->event->get_assignment_id(),
+            $this->event->get_user_id(),
+            $this->event->get_competency_id(),
+            $this->event->get_assignment_type()
+        );
+
+        $log->log_unassign_user_group();
+
+        return $this;
+    }
+
+    /**
+     * Triggered via assignment_user_unassigned event.
+     *
+     * @param assignment_user_unassigned $event
+     * @return bool
+     */
+    public static function observe(assignment_user_unassigned $event) {
+        $observer = new static($event);
+
+        return $observer->handle();
+    }
 }

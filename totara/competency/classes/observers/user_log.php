@@ -60,10 +60,6 @@ class user_log {
                     // Log this action
                     $log->log_assign();
                     break;
-                case assignment_user_unassigned::class:
-                    // Log this action
-                    $log->log_unassign_user_group();
-                    break;
             }
         }
 

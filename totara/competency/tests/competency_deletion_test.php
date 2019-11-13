@@ -41,9 +41,6 @@ require_once($CFG->dirroot . '/totara/hierarchy/prefix/competency/lib.php');
  */
 class totara_competency_deletion_testcase extends advanced_testcase {
 
-    /** @var totara_competency_generator|component_generator_base */
-    private $generator;
-
     /** @var \totara_competency\entities\competency */
     private $comp_1;
 
@@ -51,13 +48,11 @@ class totara_competency_deletion_testcase extends advanced_testcase {
     private $comp_2;
 
     protected function setUp() {
-        $this->generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
-        $this->comp_1 = $this->generator->create_competency('A');
-        $this->comp_2 = $this->generator->create_competency('B');
+        $this->comp_1 = $this->generator()->create_competency('A');
+        $this->comp_2 = $this->generator()->create_competency('B');
     }
 
     protected function tearDown() {
-        $this->generator = null;
         $this->comp_1 = null;
         $this->comp_2 = null;
     }
@@ -109,7 +104,7 @@ class totara_competency_deletion_testcase extends advanced_testcase {
      */
     public function test_configuration_logs_deleted() {
         $config_change_attributes = [
-            'assignment_id' => 0,
+            'assignment_id' => null,
             'time_changed' => 0,
             'change_type' => 0,
         ];
@@ -119,7 +114,7 @@ class totara_competency_deletion_testcase extends advanced_testcase {
             ->save();
 
         $config_history_attributes = [
-            'assignment_id' => 0,
+            'assignment_id' => null,
             'active_from' => 0,
             'active_to' => 0,
             'configuration' => 0,
@@ -173,11 +168,15 @@ class totara_competency_deletion_testcase extends advanced_testcase {
         $path_achievement_2 = (new pathway_achievement(array_merge($path_achievement_attributes, ['pathway_id' => $path_2->id])))
             ->save();
 
+        $user = $this->getDataGenerator()->create_user();
+        $assignment = $this->generator()->assignment_generator()->create_user_assignment($this->comp_1->id, $user->id);
+        $another_assignment = $this->generator()->assignment_generator()->create_user_assignment($this->comp_2->id, $user->id);
+
         $achievement_attributes = [
-            'user_id' => 0,
-            'assignment_id' => 0,
-            'scale_value_id' => 0,
-            'proficient' => 0,
+            'user_id' => $user->id,
+            'assignment_id' => $assignment->id,
+            'scale_value_id' => 1,
+            'proficient' => 1,
             'status' => 0,
             'time_created' => 0,
             'time_status' => 0,
@@ -187,7 +186,10 @@ class totara_competency_deletion_testcase extends advanced_testcase {
         ];
         $achievement_1 = (new competency_achievement(array_merge($achievement_attributes, ['comp_id' => $this->comp_1->id])))
             ->save();
-        $achievement_2 = (new competency_achievement(array_merge($achievement_attributes, ['comp_id' => $this->comp_2->id])))
+        $achievement_2 = (new competency_achievement(array_merge($achievement_attributes, [
+            'comp_id' => $this->comp_2->id,
+            'assignment_id' => $another_assignment->id,
+        ])))
             ->save();
 
         $achievement_via_1 = (new achievement_via([

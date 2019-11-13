@@ -54,20 +54,20 @@ $observers = [
         'callback'  => \totara_competency\observers\assignment::class.'::deleted'
     ],
     [
+        // TODO if you are introducing another observer for this event, please consider moving logging there
+        // to avoid clashes
         'eventname' => \totara_competency\event\assignment_user_assigned::class,
         'callback'  => \totara_competency\observers\user_log::class.'::log'
     ],
     [
+        // TODO if you are introducing another observer for this event, please consider moving logging there
+        // to avoid clashes
         'eventname' => \totara_competency\event\assignment_user_archived::class,
         'callback'  => \totara_competency\observers\user_log::class.'::log'
     ],
     [
         'eventname' => \totara_competency\event\assignment_user_unassigned::class,
-        'callback'  => \totara_competency\observers\user_unassigned::class.'::unassigned'
-    ],
-    [
-        'eventname' => \totara_competency\event\assignment_user_unassigned::class,
-        'callback'  => \totara_competency\observers\user_log::class.'::log'
+        'callback'  => \totara_competency\observers\user_unassigned::class.'::observe'
     ],
     // Reacting to deleting competencies:
     [

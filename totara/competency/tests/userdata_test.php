@@ -55,9 +55,7 @@ class totara_competency_userdata_testcase extends advanced_testcase {
     private $scale_value;
 
     protected function setUp() {
-        /** @var totara_competency_generator $generator */
-        $generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
-        $this->competency = $generator->create_competency();
+        $this->competency = $this->generator()->create_competency();
         $this->scale_value = scale_value::repository()->order_by('id')->first();
 
         $this->user1 = $this->getDataGenerator()->create_user();
@@ -160,12 +158,14 @@ class totara_competency_userdata_testcase extends advanced_testcase {
     }
 
     private function create_achievement_data(stdClass $user, int $records_to_create = 3): array {
+        $assignment = $this->generator()->assignment_generator()->create_user_assignment($this->competency->id, $user->id);
+
         $achievements['achievements'] = [];
         for ($i = 0; $i < $records_to_create; $i++) {
             $achievement = new competency_achievement();
             $achievement->user_id = $user->id;
             $achievement->comp_id = $this->competency->id;
-            $achievement->assignment_id = $i . $user->id;
+            $achievement->assignment_id = $assignment->id;
             $achievement->scale_value_id = $this->scale_value->id;
             $achievement->proficient = 1;
             $achievement->status = 1;
@@ -178,9 +178,7 @@ class totara_competency_userdata_testcase extends advanced_testcase {
             $achievements['achievements'][] = $achievement->save();
         }
 
-        /** @var totara_competency_generator $generator */
-        $generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
-        $pathway = $generator->create_test_pathway($this->competency);
+        $pathway = $this->generator()->create_test_pathway($this->competency);
 
         $achievements['pathway_achievements'] = [];
         for ($i = 0; $i < $records_to_create; $i++) {
@@ -233,6 +231,14 @@ class totara_competency_userdata_testcase extends advanced_testcase {
 
     private function count_data(stdClass $user): int {
         return achievement::execute_count(new target_user($user), context_system::instance());
+    }
+
+    /**
+     * Get competency generator
+     * @return totara_competency_generator
+     */
+    protected function generator() {
+        return $this->getDataGenerator()->get_plugin_generator('totara_competency');
     }
 
 }

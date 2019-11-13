@@ -26,6 +26,11 @@ namespace totara_competency\models;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency_assignment_user_log;
 
+/**
+ * Class assignment_user_log
+ *
+ * @package totara_competency\models
+ */
 class assignment_user_log {
     /**
      * @var string
@@ -47,6 +52,14 @@ class assignment_user_log {
      */
     private $competency_id;
 
+    /**
+     * assignment_user_log constructor.
+     *
+     * @param int $assignment_id
+     * @param int $user_id
+     * @param int|null $competency_id
+     * @param string|null $assignment_type
+     */
     public function __construct(int $assignment_id, int $user_id, ?int $competency_id = null, ?string $assignment_type = null) {
         $this->assignment_id = $assignment_id;
         $this->user_id = $user_id;
