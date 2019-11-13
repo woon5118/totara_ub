@@ -113,9 +113,6 @@ class totara_competency_scale_observer_testcase extends advanced_testcase {
 
         scale_min_proficient_value_updated::create_from_instance((object)$scale1->to_array())->trigger();
 
-        $records = builder::get_db()->get_records($table->get_table_name());
-        $this->assertCount(2, $records);
-
         $expected = [
             [
                 'user_id' => $user1->id,
@@ -198,8 +195,6 @@ class totara_competency_scale_observer_testcase extends advanced_testcase {
         $this->assertEquals(2, builder::get_db()->count_records($table->get_table_name()));
 
         scale_min_proficient_value_updated::create_from_instance((object)$scale1->to_array())->trigger();
-
-        $this->assertEquals(3, builder::get_db()->count_records($table->get_table_name()));
 
         $expected = [
             [
@@ -291,8 +286,6 @@ class totara_competency_scale_observer_testcase extends advanced_testcase {
         $this->assertEquals(2, builder::get_db()->count_records($table->get_table_name()));
 
         scale_min_proficient_value_updated::create_from_instance((object)$scale1->to_array())->trigger();
-
-        $this->assertEquals(4, builder::get_db()->count_records($table->get_table_name()));
 
         $expected = [
             [

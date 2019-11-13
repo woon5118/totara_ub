@@ -72,7 +72,7 @@ class totara_competency_actions_activate_testcase extends totara_competency_assi
 
         $model = new assignment_actions();
         $affected_ids = $model->activate($assignment1->id);
-        $this->assertEqualsCanonicalizing([$assignment1->id], $affected_ids);
+        $this->assertEquals([$assignment1->id], $affected_ids);
 
         $assignment1->refresh();
         $assignment2->refresh();
@@ -99,7 +99,7 @@ class totara_competency_actions_activate_testcase extends totara_competency_assi
 
         $model = new assignment_actions();
         $affected_ids = $model->activate([$assignment1->id, $assignment2->id, $assignment3->id]);
-        $this->assertEqualsCanonicalizing([$assignment1->id], $affected_ids);
+        $this->assertEquals([$assignment1->id], $affected_ids);
 
         $assignment1->refresh();
         $assignment2->refresh();

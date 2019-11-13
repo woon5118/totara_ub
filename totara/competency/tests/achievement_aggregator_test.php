@@ -574,22 +574,15 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
         $competency = $competency_generator->create_competency();
 
-        /** @var scale_value[] $scale_values */
-        $scale_values = $competency->scale->sorted_values_high_to_low;
+        $keyed_scale_values = $competency
+            ->scale
+            ->sorted_values_high_to_low
+            ->key_by('sortorder')
+            ->all(true);
 
-        $min_proficiency_value = $competency->scale->minproficiencyid;
+        $min_proficient_value = $competency->scale->min_proficient_value;
+        $non_proficient_value = $keyed_scale_values[$min_proficient_value->sortorder + 1];
 
-        // Going through the scale values and find the last value before it becomes proficient
-        $scale_values = $competency->scale->values;
-        $non_proficient_value = $min_proficient_value = null;
-        foreach ($scale_values as $value) {
-            if ($value->proficient) {
-                $min_proficient_value = $value;
-                break;
-            } else {
-                $non_proficient_value = $value;
-            }
-        }
         // Make sure we got the right values
         $this->assertInstanceOf(scale_value::class, $non_proficient_value);
         $this->assertEquals(0, $non_proficient_value->proficient);
@@ -604,14 +597,12 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
 
         $this->aggregate_pathway($pathway, $user);
 
-        $assignmentids = $this->generate_active_expanded_user_assignments($competency, [$user], 1);
+        $this->generate_active_expanded_user_assignments($competency, [$user], 1);
 
         $this->assertEquals(0, competency_achievement::repository()->count());
 
-        $event_sink = $this->redirectEvents();
         $aggregator = $this->get_competency_aggregator_for_pathway_and_user($pathway, $user);
         $aggregator->aggregate();
-        $events = $event_sink->get_events();
 
         $achievements = competency_achievement::repository()->get();
         $this->assertEquals(1, $achievements->count());
@@ -633,10 +624,8 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
 
         scale_min_proficient_value_updated::create_from_instance((object)$scale->to_array())->trigger();
 
-        $event_sink = $this->redirectEvents();
         $aggregator = $this->get_competency_aggregator_for_pathway_and_user($pathway, $user);
         $aggregator->aggregate();
-        $events = $event_sink->get_events();
 
         $achievements = competency_achievement::repository()
             ->order_by('id', 'asc')
@@ -665,10 +654,8 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
 
         scale_min_proficient_value_updated::create_from_instance((object)$scale->to_array())->trigger();
 
-        $event_sink = $this->redirectEvents();
         $aggregator = $this->get_competency_aggregator_for_pathway_and_user($pathway, $user);
         $aggregator->aggregate();
-        $events = $event_sink->get_events();
 
         $achievements = competency_achievement::repository()
             ->order_by('id', 'asc')
