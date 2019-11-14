@@ -534,7 +534,7 @@ class manual extends pathway {
      *
      * @param int $subject_user Subject user ID.
      * @param int $rater_user Rater user ID.
-     * @return array Array of roles => roles, e.g. [manual::SELF => manual::SELF, manual::MANAGER => manual::MANGER, etc...]
+     * @return array Array of roles => roles, e.g. [manual::SELF => manual::SELF, manual::MANAGER => manual::MANAGER, etc...]
      */
     public function get_roles_that_apply_to_user(int $subject_user, int $rater_user) {
         $roles_that_apply = [];

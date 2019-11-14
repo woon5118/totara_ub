@@ -105,7 +105,7 @@ $string['done'] = 'Done';
 $string['enablecompetency_assignment'] = 'Enable Competency Assignment';
 $string['enablecompetency_assignment_desc'] = 'This option will let you: Enable(show)/Disable Competency Assignment feature on this site.';
 $string['enabled'] = 'Enabled';
-$string['editcompetency'] = 'Edit comptency: {$a}';
+$string['editcompetency'] = 'Edit competency: {$a}';
 $string['event:linked_courses_updated'] = 'Linked courses updated';
 
 // Expand task related
@@ -160,6 +160,7 @@ $string['proficient'] = 'Proficient';
 $string['proficient_on'] = 'Proficient {$a}';
 $string['proficient_value'] = 'Proficient value';
 $string['progress_name_by_user'] = '{$a->progress_name} by {$a->user_fullname_role}';
+$string['rating_none'] = 'None';
 $string['rating_scale'] = 'Rating scale';
 $string['removelinkedcourse'] = 'Remove linked course';
 $string['removedlinkedcourse'] = 'Removed linked course';

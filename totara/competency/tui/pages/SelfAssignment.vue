@@ -250,6 +250,7 @@ export default {
               user_id: this.userId,
               competency_ids: this.selectedItems,
             },
+            refetchAll: false,
           })
           .then(data => {
             if (

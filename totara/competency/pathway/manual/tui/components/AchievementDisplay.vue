@@ -52,7 +52,12 @@
           class="tui-pathwayManual-achievementDisplay__rating"
         >
           <div class="tui-pathwayManual-achievementDisplay__rating_value">
-            {{ role.latest_rating.scale_value.name }}
+            <span v-if="role.latest_rating.scale_value">
+              {{ role.latest_rating.scale_value.name }}
+            </span>
+            <span v-else>
+              {{ $str('rating_set_to_none', 'pathway_manual') }}
+            </span>
           </div>
           <div
             v-if="isSelf(role)"
@@ -275,7 +280,8 @@ export default {
       "no_rating_given",
       "rater_details_removed",
       "raters",
-      "raters_info"
+      "raters_info",
+      "rating_set_to_none"
     ]
   }
 </lang-strings>

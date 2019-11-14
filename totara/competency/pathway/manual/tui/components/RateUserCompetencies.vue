@@ -17,6 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
+  @author Matthias Bonk <matthias.bonk@totaralearning.com>
   @package pathway_manual
 -->
 
@@ -59,7 +60,32 @@
         :scale="scale"
         :role="role"
         :current-user-id="currentUserId"
+        @input="updateRatings"
       />
+      <div class="tui-pathwayManual-rateUserCompetencies__submitButtons">
+        <ButtonGroup>
+          <Button
+            :styleclass="{ primary: 'true' }"
+            :text="$str('submit', 'moodle')"
+            :disabled="!hasSelected"
+            type="submit"
+            @click="showModal"
+          />
+          <Button
+            :text="$str('cancel', 'moodle')"
+            :disabled="!hasSelected"
+            @click="formCancel"
+          />
+        </ButtonGroup>
+      </div>
+      <ModalPresenter :open="modalOpen" @request-close="modalRequestClose">
+        <ConfirmModal
+          :num-selected="numSelected"
+          :is-for-self="isForSelf"
+          :subject-user-fullname="data.user.fullname"
+          @confirm-submit="submitRatings"
+        />
+      </ModalPresenter>
     </div>
     <div v-else>
       <em>{{ $str('no_rateable_competencies', 'pathway_manual') }}</em>
@@ -68,15 +94,27 @@
 </template>
 
 <script>
+import Button from 'totara_core/presentation/form/Button';
+import ButtonGroup from 'totara_core/presentation/form/ButtonGroup';
+import ConfirmModal from 'pathway_manual/presentation/ConfirmModal';
+import ModalPresenter from 'totara_core/presentation/modal/ModalPresenter';
 import ScaleTable from 'pathway_manual/containers/ScaleTable';
 import UserHeaderWithPhoto from 'pathway_manual/presentation/UserHeaderWithPhoto';
 
+import CreateManualRatingsMutation from '../../webapi/ajax/create_manual_ratings.graphql';
 import RateableCompetenciesQuery from '../../webapi/ajax/rateable_competencies.graphql';
 
 const ROLE_SELF = 'self';
 
 export default {
-  components: { UserHeaderWithPhoto, ScaleTable },
+  components: {
+    Button,
+    ButtonGroup,
+    ConfirmModal,
+    ModalPresenter,
+    UserHeaderWithPhoto,
+    ScaleTable,
+  },
 
   props: {
     userId: {
@@ -91,11 +129,17 @@ export default {
       required: true,
       type: Number,
     },
+    goBackLink: {
+      required: true,
+      type: String,
+    },
   },
 
   data() {
     return {
       data: {},
+      modalOpen: false,
+      selectedRatings: [],
     };
   },
 
@@ -106,6 +150,92 @@ export default {
 
     isForSelf() {
       return this.role === ROLE_SELF;
+    },
+
+    hasSelected() {
+      return this.selectedRatings.length > 0;
+    },
+
+    numSelected() {
+      return this.selectedRatings.length;
+    },
+  },
+
+  methods: {
+    formCancel() {
+      window.location.href = this.goBackLink;
+    },
+
+    updateRatings(rating) {
+      // Remove rating for this competency from array if it already exists.
+      this.selectedRatings = this.selectedRatings.filter(function(
+        previousRating
+      ) {
+        return previousRating.comp_id !== rating.comp_id;
+      });
+      // Map -1 value ("None" selection) to null.
+      if (parseInt(rating.scale_value_id) === -1) {
+        rating.scale_value_id = null;
+      }
+      // Don't add rating when empty option was selected (-2 value).
+      if (parseInt(rating.scale_value_id) !== -2) {
+        this.selectedRatings.push(rating);
+      }
+
+      // Warn user about leaving the page when having unsaved selections.
+      if (this.hasSelected) {
+        window.addEventListener('beforeunload', this.unloadHandler);
+      } else {
+        window.removeEventListener('beforeunload', this.unloadHandler);
+      }
+    },
+
+    unloadHandler(e) {
+      // For older browsers that still show custom message.
+      let discardUnsavedChanges = this.$str(
+        'unsaved_ratings_warning',
+        'pathway_manual'
+      );
+      e.preventDefault();
+      e.returnValue = discardUnsavedChanges;
+      return discardUnsavedChanges;
+    },
+
+    submitRatings() {
+      window.removeEventListener('beforeunload', this.unloadHandler);
+      this.modalOpen = false;
+      this.$apollo
+        .mutate({
+          // Query
+          mutation: CreateManualRatingsMutation,
+          // Parameters
+          variables: {
+            user_id: this.userId,
+            role: this.role,
+            ratings: this.selectedRatings,
+          },
+          refetchAll: false,
+        })
+        .then(data => {
+          if (data.data && data.data.pathway_manual_create_manual_ratings) {
+            window.location.href = this.goBackLink;
+          } else {
+            // TODO Handle this case.
+            alert('Something went wrong. Saving failed.');
+          }
+        })
+        .catch(error => {
+          // TODO Handle error case
+          console.log('error');
+          console.error(error);
+        });
+    },
+
+    showModal() {
+      this.modalOpen = true;
+    },
+    modalRequestClose() {
+      this.modalOpen = false;
     },
   },
 
@@ -161,6 +291,10 @@ export default {
       margin-bottom: var(--tui-gap-7);
     }
   }
+
+  &__submitButtons {
+    float: right;
+  }
 }
 </style>
 
@@ -173,7 +307,12 @@ export default {
       "rate_user",
       "rate_competencies",
       "rating_as_appraiser",
-      "rating_as_manager"
+      "rating_as_manager",
+      "unsaved_ratings_warning"
+    ],
+    "moodle": [
+      "cancel",
+      "submit"
     ]
   }
 </lang-strings>

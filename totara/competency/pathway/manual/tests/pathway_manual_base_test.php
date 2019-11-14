@@ -24,6 +24,7 @@
 use core\entities\user;
 use totara_competency\entities\competency;
 use totara_competency\entities\scale;
+use totara_job\job_assignment;
 
 abstract class pathway_manual_base_testcase extends advanced_testcase {
 
@@ -71,9 +72,6 @@ abstract class pathway_manual_base_testcase extends advanced_testcase {
         $this->user1 = new user($this->getDataGenerator()->create_user(), false);
         $this->user2 = new user($this->getDataGenerator()->create_user(), false);
 
-        $this->competency1 = $this->generator->create_competency();
-        $this->competency2 = $this->generator->create_competency();
-
         $this->scale1 = $this->generator->create_scale('1', '1', [
             ['name' => '11', 'proficient' => false, 'default' => true, 'sortorder' => 1],
             ['name' => '12', 'proficient' => true, 'default' => false, 'sortorder' => 2],
@@ -82,6 +80,12 @@ abstract class pathway_manual_base_testcase extends advanced_testcase {
             ['name' => '21', 'proficient' => false, 'default' => true, 'sortorder' => 1],
             ['name' => '22', 'proficient' => true, 'default' => false, 'sortorder' => 2],
         ]);
+
+        $fw1 = $this->generator->create_framework($this->scale1);
+        $fw2 = $this->generator->create_framework($this->scale2);
+
+        $this->competency1 = $this->generator->create_competency('comp1', $fw1);
+        $this->competency2 = $this->generator->create_competency('comp2', $fw2);
     }
 
     /**
@@ -97,4 +101,43 @@ abstract class pathway_manual_base_testcase extends advanced_testcase {
         $this->scale2 = null;
     }
 
+    /**
+     * Get the id for a given scale value name.
+     *
+     * @param string $name
+     * @return mixed
+     */
+    protected function get_scale_value_id(string $name) {
+        global $DB;
+        return $DB->get_field_sql(
+            "SELECT id FROM {comp_scale_values} WHERE "
+            . $DB->sql_compare_text('name') . " = " . $DB->sql_compare_text(':name'),
+            ['name' => $name],
+            MUST_EXIST
+        );
+    }
+
+    /**
+     * Make a user a manager of the other user and assign the capability to rate.
+     *
+     * @param int $user_id
+     * @param int $manager_id
+     */
+    protected function set_as_rating_manager(int $user_id, int $manager_id) {
+        global $DB;
+
+        $manager_ja = job_assignment::create_default($manager_id);
+        job_assignment::create_default(
+            $user_id,
+            ['managerjaid' => $manager_ja->id]
+        );
+
+        $user_role_id = $DB->get_record('role', ['shortname' => 'user'])->id;
+        assign_capability(
+            'totara/competency:rate_other_competencies',
+            CAP_ALLOW,
+            $user_role_id,
+            context_user::instance($manager_id)
+        );
+    }
 }

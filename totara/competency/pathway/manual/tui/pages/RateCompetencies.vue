@@ -30,6 +30,7 @@
       :user-id="userId"
       :role="role"
       :current-user-id="currentUserId"
+      :go-back-link="goBackLink"
     />
   </div>
 </template>
@@ -49,6 +50,10 @@ export default {
     },
     currentUserId: {
       type: Number,
+    },
+    goBackLink: {
+      required: true,
+      type: String,
     },
   },
 

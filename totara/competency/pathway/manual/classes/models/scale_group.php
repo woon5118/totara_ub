@@ -67,7 +67,7 @@ class scale_group {
      * @return scale_value[]|collection
      */
     public function get_scale_values() {
-        return $this->scale->values;
+        return $this->scale->sorted_values_high_to_low;
     }
 
     /**

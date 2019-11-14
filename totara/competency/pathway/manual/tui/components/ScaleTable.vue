@@ -85,7 +85,13 @@
           {{ getRater(row.last_rating.rater) }}
         </span>
       </Cell>
-      <Cell size="2" />
+      <Cell size="2">
+        <ScaleSelect
+          :competency-id="parseInt(row.competency.id)"
+          :scale="scale"
+          @input="value => selectCompValue(row.competency.id, value)"
+        />
+      </Cell>
     </template>
   </Table>
 </template>
@@ -94,6 +100,7 @@
 import Cell from 'totara_core/presentation/datatable/Cell';
 import FlexIcon from 'totara_core/containers/icons/FlexIcon';
 import HeaderCell from 'totara_core/presentation/datatable/HeaderCell';
+import ScaleSelect from 'totara_competency/presentation/ScaleSelect';
 import ScaleTooltip from 'totara_competency/presentation/ScaleTooltip';
 import Table from 'totara_core/presentation/datatable/Table';
 import Tooltip from 'totara_competency/containers/Tooltip';
@@ -101,7 +108,15 @@ import Tooltip from 'totara_competency/containers/Tooltip';
 const ROLE_SELF = 'self';
 
 export default {
-  components: { Cell, FlexIcon, HeaderCell, ScaleTooltip, Table, Tooltip },
+  components: {
+    Cell,
+    FlexIcon,
+    HeaderCell,
+    ScaleSelect,
+    ScaleTooltip,
+    Table,
+    Tooltip,
+  },
 
   props: {
     currentUserId: {
@@ -141,6 +156,14 @@ export default {
       } else {
         return this.$str('rater_details_removed', 'pathway_manual');
       }
+    },
+    selectCompValue(compId, value) {
+      // TODO: Decide in TL-22009 if this should also be used for comments.
+      this.$emit('input', {
+        comp_id: compId,
+        scale_value_id: value,
+        comment: '',
+      });
     },
   },
 };
