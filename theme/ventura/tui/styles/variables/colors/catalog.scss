@@ -1,0 +1,70 @@
+//
+// This file is part of Totara Learn
+//
+// Copyright (C) 2019 onwards Totara Learning Solutions LTD
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+// @copyright 2019 onwards Totara Learning Solutions LTD
+// @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+// @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
+// @package   theme_ventura
+
+//
+// Catalog
+//
+--tui-catalog-item-bg-color: var(--tui-color-neutral-1);
+--tui-catalog-item-border-color: var(--tui-color-neutral-5);
+--tui-catalog-item-text-color: var(--tui-color-neutral-7);
+
+// Catalog primary filter
+--tui-catalog-primfilter-border-color: var(--tui-color-neutral-5);
+
+// Catalog expanded details
+--tui-catalog-details-bg-color: var(--tui-color-neutral-1);
+--tui-catalog-details-border-color: var(--tui-color-neutral-5);
+
+// Catalog expanded details goto link box
+--tui-catalog-details-goto-bg-color: var(--tui-color-neutral-2);
+--tui-catalog-details-goto-border-color: var(--tui-color-neutral-5);
+
+// Catalog manage button group
+--tui-catalog-managebtn-group-bg-color: var(--tui-color-neutral-1);
+--tui-catalog-managebtn-group-bg-color-focus: var(--tui-color-state-highlight);
+--tui-catalog-managebtn-group-border-color: var(--tui-color-neutral-5);
+
+// Catalog share menu
+--tui-catalog-share-bg-color: var(--tui-color-neutral-1);
+--tui-catalog-share-border-color: var(--tui-color-neutral-5);
+
+// Catalog grid item additional text (metadata)
+--tui-catalog-details-additional-text-color: var(--tui-color-neutral-6);
+
+// Catalog grid item additional text (metadata)
+--tui-catalog-togglebtn-bg-color: var(--tui-color-neutral-1);
+--tui-catalog-togglebtn-bg-color-active: var(--tui-color-neutral-4);
+--tui-catalog-togglebtn-bg-color-focus: var(--tui-color-neutral-3);
+--tui-catalog-togglebtn-bg-color-selected: var(--tui-color-neutral-4);
+--tui-catalog-togglebtn-border-color: var(--tui-color-neutral-5);
+--tui-catalog-togglebtn-text-color: var(--tui-color-state);
+
+// Catalog grid item hero
+--tui-catalog-item-hero-bg-color: var(--tui-color-neutral-7);
+--tui-catalog-item-hero-icon-bg-color: var(--tui-color-neutral-1);
+--tui-catalog-item-hero-text-color: var(--tui-color-neutral-1);
+// Catalog grid item featured
+--tui-catalog-item-featured-bg-color: var(--tui-color-secondary);
+--tui-catalog-item-featured-text-color: var(--tui-color-neutral-1);
+// Catalog grid item additional text (metadata)
+--tui-catalog-item-additional-text-color: var(--tui-color-neutral-6);

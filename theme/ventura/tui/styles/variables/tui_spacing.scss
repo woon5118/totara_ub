@@ -1,0 +1,47 @@
+//
+// This file is part of Totara Learn
+//
+// Copyright (C) 2019 onwards Totara Learning Solutions LTD
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+// @copyright 2019 onwards Totara Learning Solutions LTD
+// @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+// @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
+// @package   theme_ventura
+
+$tui-gap: 0.4rem;
+
+:root {
+  // Common spacing used for margin & padding
+  --tui-gap-1: ($tui-gap * 1);
+  --tui-gap-2: ($tui-gap * 2);
+  --tui-gap-3: ($tui-gap * 3);
+  --tui-gap-4: ($tui-gap * 4);
+  --tui-gap-5: ($tui-gap * 5);
+  --tui-gap-6: ($tui-gap * 6);
+  --tui-gap-7: ($tui-gap * 7);
+  --tui-gap-8: ($tui-gap * 8);
+  --tui-gap-9: ($tui-gap * 9);
+  --tui-gap-10: ($tui-gap * 10);
+  --tui-gap-11: ($tui-gap * 11);
+  --tui-gap-12: ($tui-gap * 12);
+}
+/**
+ * Grid
+ **/
+$tui-grid-gutter--small: var(--tui-gap-1);
+$tui-grid-gutter--large: var(--tui-gap-5);
+// Global default for 'how many columns are in the grid'
+$tui-grid-maxUnits: 12;

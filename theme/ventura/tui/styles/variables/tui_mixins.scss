@@ -1,0 +1,42 @@
+//
+// This file is part of Totara Learn
+//
+// Copyright (C) 2019 onwards Totara Learning Solutions LTD
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+// @copyright 2019 onwards Totara Learning Solutions LTD
+// @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+// @author    Simon Chester <simon.chester@totaralearning.com>
+// @package   theme_ventura
+
+@mixin sr-only {
+  /* The use of '!important' here is an exception and should not be replicated else where */
+  /* stylelint-disable declaration-no-important */
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  clip: rect(0, 0, 0, 0) !important;
+  /* stylelint-enable */
+}
+
+@mixin tui-focus {
+  outline: 1px dashed var(--tui-color-state-focus);
+  outline-offset: 1px;
+}
