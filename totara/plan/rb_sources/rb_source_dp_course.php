@@ -666,7 +666,9 @@ class rb_source_dp_course extends rb_base_source {
      * @param reportbuilder $report
      */
     public function post_params(reportbuilder $report) {
-        $this->userid = $report->get_param_value('userid');
+        global $DB;
+
+        $this->userid = (int)$report->get_param_value('userid');
 
         if ($this->userid) {
             $this->base = $this->get_dp_status_base_sql($this->userid);
@@ -688,6 +690,26 @@ class rb_source_dp_course extends rb_base_source {
             $this->sourceparams = $params;
 
             $this->sourcejoins = ['ctx', 'course_completion'];
+
+            // Replace course_completion_history join after we know if we a looking at one user RoL or not.
+            foreach ($this->joinlist as $key => $join) {
+                if ($join->name === 'course_completion_history') {
+                    $this->joinlist[$key] = new rb_join(
+                        'course_completion_history',
+                        'LEFT',
+                        "(SELECT " . $DB->sql_concat('userid', 'courseid') . " uniqueid,
+                            userid,
+                            courseid,
+                            COUNT(id) AS historycount
+                        FROM {course_completion_history}
+                        WHERE userid = {$this->userid}
+                        GROUP BY userid, courseid)",
+                        'course_completion_history.courseid = base.courseid',
+                        REPORT_BUILDER_RELATION_ONE_TO_ONE
+                    );
+                    break;
+                }
+            }
         }
     }
 
