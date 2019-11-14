@@ -31,6 +31,7 @@ use totara_competency\entities\competency_assignment_user_log;
 use totara_competency\entities\scale_value;
 use totara_competency\expand_task;
 use totara_competency\settings;
+use totara_competency\task\competency_achievement_aggregation;
 
 class totara_competency_user_unassigned_testcase extends advanced_testcase {
 
@@ -59,8 +60,14 @@ class totara_competency_user_unassigned_testcase extends advanced_testcase {
             ->where('assignment_id', $ass->id)
             ->one(true);
 
+        $data = $this->get_unrelated_data($user, $ass);
+
+        $unrelated_data = $this->get_unrelated_data($user, $ass);
+
         // And that the data is gone...
         (new expand_task(builder::get_db()))->expand_single($ass->id);
+
+        $this->assert_data_untouched($unrelated_data, $user, $ass);
 
         // Achievement
         $this->assertEquals(
@@ -131,8 +138,12 @@ class totara_competency_user_unassigned_testcase extends advanced_testcase {
             ->where('assignment_id', $ass->id)
             ->one(true);
 
+        $unrelated_data = $this->get_unrelated_data($user, $ass);
+
         // And that the data is gone...
         (new expand_task(builder::get_db()))->expand_single($ass->id);
+
+        $this->assert_data_untouched($unrelated_data, $user, $ass);
 
         // Achievement
         $this->assertEquals(
@@ -179,19 +190,22 @@ class totara_competency_user_unassigned_testcase extends advanced_testcase {
         // Set tracking setting
         settings::unassign_delete_empty_records();
 
-        // TODO we should create the learning plan empty thing here to check that it behaves correctly
-        // For this case it should be the same as keep
-
         $user = $data['users'][0];
         $pos = $data['positions'][0];
         $ass = $data['assignments'][0];
 
-        $log_count = competency_assignment_user_log::repository()
+        // We fake achievement with null scale_value
+        competency_achievement::repository()
             ->where('assignment_id', $ass->id)
             ->where('user_id', $user->id)
-            ->count();
+            ->update([
+                'scale_value_id' => null
+            ]);
 
-        $this->assertGreaterThan(0, $log_count);
+        $this->assertGreaterThan(0, competency_assignment_user_log::repository()
+            ->where('assignment_id', $ass->id)
+            ->where('user_id', $user->id)
+            ->count());
 
         // We need to remove user from a position and check that the event has been fired
         // To remove user from a position we need to remove the related job assignment record.
@@ -205,12 +219,16 @@ class totara_competency_user_unassigned_testcase extends advanced_testcase {
             ->where('assignment_id', $ass->id)
             ->one(true);
 
+        $unrelated_data = $this->get_unrelated_data($user, $ass);
+
         // And that the data is gone...
         (new expand_task(builder::get_db()))->expand_single($ass->id);
 
+        $this->assert_data_untouched($unrelated_data, $user, $ass);
+
         // Achievement
         $this->assertEquals(
-            1,
+            0,
             competency_achievement::repository()
                 ->where('user_id', $user->id)
                 ->where('assignment_id', $ass->id)
@@ -219,7 +237,7 @@ class totara_competency_user_unassigned_testcase extends advanced_testcase {
 
         // Let's check that cascading kicked in and we don't have records keyed with the given achievement_id
         $this->assertEquals(
-            1,
+            0,
             achievement_via::repository()
                 ->where('comp_achievement_id', $achievement->id)
                 ->count()
@@ -235,11 +253,107 @@ class totara_competency_user_unassigned_testcase extends advanced_testcase {
         );
 
         // We'd have more entries created by events
-        $this->assertGreaterThan(
-            $log_count,
+        $this->assertEquals(
+            0,
             competency_assignment_user_log::repository()
                 ->where('assignment_id', $ass->id)
                 ->where('user_id', $user->id)
+                ->count()
+        );
+    }
+
+    /**
+     * @test_it_deletes_assignment_correctly
+     */
+    public function test_it_deletes_assignment_correctly() {
+        $data = $this->create_data();
+
+        $assignment = totara_competency\models\assignment::load_by_id($data['assignments'][0]->id);
+
+        $achievements = $assignment->get_entity()->achievements;
+
+        $this->assertGreaterThan(
+            0,
+            achievement_via::repository()
+                ->where('comp_achievement_id', $achievements->pluck('id'))
+                ->count()
+        );
+
+        $unrelated = competency_assignment_user::repository()
+            ->where('assignment_id', '!=', $assignment->get_id())
+            ->count();
+
+        $this->assertGreaterThan(0, $unrelated);
+
+        $unrelated_achievements = competency_achievement::repository()
+            ->where('assignment_id', '!=', $assignment->get_id())
+            ->count();
+
+
+        $this->assertGreaterThan(
+            0,
+            competency_achievement::repository()
+                ->where('assignment_id', $assignment->get_id())
+                ->count()
+        );
+
+        $this->assertGreaterThan(
+            0,
+            competency_assignment_user::repository()
+                ->where('assignment_id', $assignment->get_id())
+                ->count()
+        );
+
+        $this->assertGreaterThan(
+            0,
+            competency_assignment_user_log::repository()
+                ->where('assignment_id', $assignment->get_id())
+                ->count()
+        );
+
+        // After deleting ID will be set to null
+        $assignment_id = $assignment->get_id();
+        $assignment->force_delete();
+
+        $this->assertEquals(
+            0,
+            competency_assignment_user::repository()
+                ->where('assignment_id', $assignment_id)
+                ->count()
+        );
+
+        $this->assertEquals(
+            0,
+            competency_assignment_user_log::repository()
+                ->where('assignment_id', $assignment_id)
+                ->count()
+        );
+
+        $this->assertEquals(
+            $unrelated,
+            competency_assignment_user::repository()
+                ->where('assignment_id', '!=', $assignment_id)
+                ->count()
+        );
+
+        $this->assertEquals(
+            $unrelated,
+            competency_assignment_user::repository()
+                ->where('assignment_id', '!=', $assignment_id)
+                ->count()
+        );
+
+        $this->assertEquals(
+            $unrelated_achievements,
+            competency_achievement::repository()
+                ->where('assignment_id', '!=', $assignment_id)
+                ->count()
+        );
+
+        $this->assertEquals(
+            0,
+            achievement_via::repository()
+                ->where('comp_achievement_id', $achievements->pluck('id'))
                 ->count()
         );
     }
@@ -259,6 +373,7 @@ class totara_competency_user_unassigned_testcase extends advanced_testcase {
 
         $pos = $this->generator()->assignment_generator()
             ->create_position_and_add_members([$user, $another_user]);
+
         $another_pos = $this->generator()->assignment_generator()
             ->create_position_and_add_members([$user, $another_user]);
 
@@ -268,9 +383,10 @@ class totara_competency_user_unassigned_testcase extends advanced_testcase {
 
         $another_ass = $this->generator()
             ->assignment_generator()
-            ->create_position_assignment($comp->id, $pos->id);
+            ->create_position_assignment($comp->id, $another_pos->id);
 
         (new expand_task(builder::get_db()))->expand_single($ass->id);
+        (new expand_task(builder::get_db()))->expand_single($another_ass->id);
 
         $manual_pathway = $this->generator()->create_manual($comp);
 
@@ -280,7 +396,7 @@ class totara_competency_user_unassigned_testcase extends advanced_testcase {
 
         // assign user to competency
         $this->generator()->create_manual_rating($manual_pathway, $user, $user, manual::ROLE_SELF, $value);
-        (new totara_competency\task\competency_achievement_aggregation())->execute();
+        (new competency_achievement_aggregation())->execute();
 
         return [
             'users' => [
@@ -303,6 +419,66 @@ class totara_competency_user_unassigned_testcase extends advanced_testcase {
                 $another_ass
             ]
         ];
+    }
+
+    /**
+     * Get number of unrelated entries from the tables we are manipulating...
+     *
+     * @param $user
+     * @param $assignment
+     * @return array
+     */
+    protected function get_unrelated_data($user, $assignment) {
+        // We need to get some of the data we're manipulating
+        $achievements = competency_achievement::repository()
+            ->where('assignment_id', '!=', $assignment->id)
+            ->or_where(function(builder $builder) use ($assignment, $user) {
+                $builder->where('assignment_id', $assignment->id)
+                    ->where('user_id', '!=', $user->id);
+            })
+            ->count();
+
+        $assignment_user_log_entries = competency_assignment_user_log::repository()
+            ->where('assignment_id', '!=', $assignment->id)
+            ->or_where(function(builder $repository) use ($assignment, $user) {
+                $repository->where('assignment_id', $assignment->id)
+                    ->where('user_id', '!=', $user->id);
+            })
+            ->count();
+
+        return compact('achievements', 'assignment_user_log_entries');
+    }
+
+    /**
+     * Assert that data for other users is not touched
+     *
+     * @param array $data Data returned by get_unrelated_data
+     * @param $user
+     * @param $assignment
+     */
+    protected function assert_data_untouched(array $data, $user, $assignment) {
+        $this->assertEquals(
+            $data['achievements'],
+            competency_achievement::repository()
+                ->where('assignment_id', '!=', $assignment->id)
+                ->or_where(function(builder $repository) use ($assignment, $user) {
+                    $repository->where('assignment_id', $assignment->id)
+                        ->where('user_id', '!=', $user->id);
+                })
+                ->count()
+        );
+
+        // We'll have to do greater or equal as other records might have been created
+        $this->assertGreaterThanOrEqual(
+            $data['assignment_user_log_entries'],
+            competency_assignment_user_log::repository()
+                ->where('assignment_id', '!=', $assignment->id)
+                ->or_where(function(builder $repository) use ($assignment, $user) {
+                    $repository->where('assignment_id', $assignment->id)
+                        ->where('user_id', '!=', $user->id);
+                })
+                ->count()
+        );
     }
 
     /**
