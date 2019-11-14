@@ -299,8 +299,10 @@ final class attendees_list_helper {
                 // Custom fields validate.
                 $data['id'] = 0;
                 if (count($headers) > 1) { // Custom field(s) exists.
+                    // If $cfparams requires for changes, change $cfparams in attendees_add_file form too.
+                    $cfparams = array('hidden' => '0', 'locked' => '0');
                     list($cferrors, $data) =
-                        customfield_validation_filedata((object)$data, 'facetofacesignup', 'facetoface_signup');
+                        customfield_validation_filedata((object)$data, 'facetofacesignup', 'facetoface_signup', $cfparams);
                     if (!empty($cferrors)) {
                         $errors = array_merge($errors, $cferrors);
                         continue;

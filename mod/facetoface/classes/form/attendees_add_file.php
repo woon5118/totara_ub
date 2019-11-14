@@ -35,11 +35,9 @@ class attendees_add_file extends \moodleform {
 
         // Get list of required customfields.
         $customfieldnames = [];
-        $customfields = customfield_get_fields_definition('facetoface_signup');
+        $cfparams = array('hidden' => '0', 'locked' => '0');
+        $customfields = customfield_get_fields_definition('facetoface_signup', $cfparams);
         foreach ($customfields as $customfield) {
-            if ($customfield->locked || $customfield->hidden) {
-                continue;
-            }
             if ($customfield->required) {
                 $this->requiredcfnames[] = $customfield->shortname;
             }

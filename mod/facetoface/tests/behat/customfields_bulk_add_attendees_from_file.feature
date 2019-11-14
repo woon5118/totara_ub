@@ -169,3 +169,23 @@ Feature: Add seminar attendees from csv file with custom fields
     Then I should see "Tui, Moa" in the "John1 Smith1" "table_row"
     And I should see "Moa, Tuatara" in the "John2 Smith2" "table_row"
     And I should see "Tuatara" in the "John3 Smith3" "table_row"
+
+  @_file_upload
+  Scenario: Add users via file upload with customfield hidden
+
+    And I click on "Hide" "link" in the "Requests for session organiser" "table_row"
+    And I click on "Hide" "link" in the "Signup date/time" "table_row"
+
+    And I am on "Course 1" course homepage
+    And I follow "View all events"
+    And I follow "Add event"
+    And I press "Save changes"
+
+    And I click on "Attendees" "link"
+    And I set the field "Attendee actions" to "Add users via file upload"
+    And I upload "mod/facetoface/tests/fixtures/f2f_attendees_customfields_hidden.csv" file to "CSV text file" filemanager
+    And I press "Continue"
+    When I press "Confirm"
+    Then I should see "John1 Smith1"
+    And I should see "John2 Smith2"
+    And I should see "John3 Smith3"

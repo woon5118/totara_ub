@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* Added array $conditions as 4th optional parameter to totara\customfield\fieldlib::customfield_validation_filedata() function
 * A new default column 'Event Attendance' is added to the event reports
 * seminar_event::is_session_open() function has been deprecated, please use seminar_session::is_attendance_open()
 * seminar_event::is_any_attendance_open() function has been deprecated, please use seminar_event::is_any_session_attendance_open()

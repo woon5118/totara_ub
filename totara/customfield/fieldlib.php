@@ -576,17 +576,18 @@ function customfield_validation($itemnew, $prefix, $tableprefix) {
  * @param object  $itemnew      The CSV file data we are overwrite and validating
  * @param string  $prefix       The custom field prefix (organisation, position, etc)
  * @param string  $tableprefix  The table prefix (org_type, pos_type, etc)
-  *
+ * @param array   $conditions   Optional array $fieldname=>requestedvalue with AND in between
+ *
  * @return list array $err $newdata
  */
-function customfield_validation_filedata($itemnew, $prefix, $tableprefix) {
+function customfield_validation_filedata($itemnew, $prefix, $tableprefix, array $conditions = []) {
 
     // Load fields (and cache)
     static $fields = [];
     $err = array();
 
     if (!isset($fields[$prefix])) {
-        $fields[$prefix] = customfield_get_fields_definition($tableprefix);
+        $fields[$prefix] = customfield_get_fields_definition($tableprefix, $conditions);
     }
     foreach ($fields[$prefix] as $field) {
         if (isset($itemnew->{$field->shortname})) {
