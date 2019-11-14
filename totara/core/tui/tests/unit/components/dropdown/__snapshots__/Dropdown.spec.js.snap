@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Dropdown render correctly 1`] = `
+<div class="tui-dropdown">
+  <!---->
+  <transition-stub name="tui-dropdown__animation-default">
+    <div aria-hidden="true" aria-labelledby="id-trigger" role="menu" class="tui-dropdown__menu" style="display: none;">
+      <div class="tui-dropdown__content tui-dropdown__content--separator">
+        <propsprovider-stub provide="function () { [native code] }"></propsprovider-stub>
+      </div>
+    </div>
+  </transition-stub>
+</div>
+`;
