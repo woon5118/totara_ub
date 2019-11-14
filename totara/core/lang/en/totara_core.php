@@ -598,6 +598,7 @@ $string['selectanassessor'] = 'Select an assessor...';
 $string['selectaproficiency'] = 'Select a proficiency...';
 $string['selectionlimited'] = 'There is a maximum limit of {$a} selected managers';
 $string['selectrow'] = 'Select row';
+$string['select_a_tab'] = 'Select a tab';
 $string['selectallpageselected'] = 'All {$a->count} rows on this page are selected.';
 $string['selectentireresult']  = 'Select entire result';
 $string['selectentireresultselected'] = 'All rows in this result are selected.';
