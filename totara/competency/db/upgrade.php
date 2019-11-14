@@ -187,5 +187,26 @@ function xmldb_totara_competency_upgrade($oldversion) {
         }
     }
 
+    // Add more foreign keys
+    if ($oldversion < 2019111400) {
+        global $DB;
+
+        $dbman = $DB->get_manager();
+
+        $key = new xmldb_key('fk_assignment_id', XMLDB_KEY_FOREIGN, ['assignment_id'], 'totara_competency_assignments', ['id'], 'cascade');
+
+        $table = new xmldb_table('totara_competency_achievement');
+        $dbman->add_key($table, $key);
+
+        $table = new xmldb_table('totara_competency_configuration_change');
+        $dbman->add_key($table, $key);
+
+        $table = new xmldb_table('totara_competency_configuration_history');
+        $dbman->add_key($table, $key);
+
+        // Competency savepoint reached.
+        upgrade_plugin_savepoint(true, 2019111400, 'totara', 'competency');
+    }
+
     return true;
 }
