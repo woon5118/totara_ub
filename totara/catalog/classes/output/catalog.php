@@ -155,6 +155,56 @@ class catalog extends template {
             $data->debug = static::get_debugging_data($catalog, $orderbykey);
         }
 
+        $selectors = array_merge($data->panel_region_template_data['selectors'], $data->primary_region_template_data['selectors']);
+
+        $strs = array_map(function($filter) {
+            $res = new \stdClass();
+            switch ($filter->template_name) {
+                case "totara_core/select_multi":
+                    $res->label = $filter->template_data['title'];
+
+                    $selected = array_reduce($filter->template_data['options'], function($value, $option) {
+                        if ($option->active && $value === null) {
+                            return $option->name;
+                        } else if ($option->active) {
+                            return $value . ', ' . $option->name;
+                        } else {
+                            return $value;
+                        }
+                    }, null);
+
+                    if ($selected === null) {
+                        $res = null;
+                    } else {
+                        $res->content = $selected;
+                    }
+
+                    break;
+                case "totara_core/select_tree":
+                    $res->label = $filter->template_data['title'];
+                    if (is_string($filter->template_data['active_name'])) {
+                        $res->content = $filter->template_data['active_name'];
+                    } else if (get_class($filter->template_data['active_name']) == 'lang_string') {
+                        $res->content = $filter->template_data['active_name']->out();
+                    }
+                    break;
+                case "totara_core/select_search_text":
+                    if ($filter->template_data['current_val']) {
+                        $res->label = $filter->template_data['title'];
+                        $res->content = $filter->template_data['current_val'];
+                    } else {
+                        $res = null;
+                    }
+                    break;
+                default:
+                    $res = "unknown template name:". $filter['template_name'];
+                    break;
+            };
+            return $res;
+        }, $selectors);
+
+        $data->sr_content = array_values(array_filter($strs));
+
         return new static((array)$data);
     }
 

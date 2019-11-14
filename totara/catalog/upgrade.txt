@@ -8,3 +8,5 @@ information provided here is intended especially for developers.
 * updated totara_catalog/item_wide template setting the role of the details section to dialog
 * updated totara_catalog/item_style_toggle adding role attributes to improve accessibility
 * updated totara_catalog/results_share chaning the share button to an actual button
+* updated totara_catalog/results_count template, adding screen reader text for filters
+* updated totara_catalog/catalog template, adding aria atomic to grid section

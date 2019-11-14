@@ -86,6 +86,7 @@ $string['filter_heading'] = 'Filter Heading';
 $string['filters'] = 'Filters';
 $string['filtershide'] = 'Hide filters';
 $string['filtersshow'] = 'Show filters';
+$string['filtersused'] = 'Filters used';
 $string['fts_search_input'] = 'Search';
 $string['full_name'] = 'Full name';
 $string['general'] = 'General';
