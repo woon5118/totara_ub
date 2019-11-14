@@ -24,6 +24,14 @@
  * these should be called like get_string('key', 'totara_core');
  */
 
+$string['a11yachievementtarget'] = 'Achievement target';
+$string['a11yachievedrequiredgoal'] = 'Achieved required goal';
+$string['a11y_filter_panel_desc'] = 'The following options are used to filter the result data';
+$string['a11y_active_filter_type'] = '{$a} active filter type';
+$string['a11y_active_filter_type_plural'] = '{$a} active filter types';
+$string['a11y_collapse_row'] = 'Collapse row';
+$string['a11y_expand_row'] = 'Expand row';
+$string['activate'] = 'Activate';
 $string['activitycompletionunlockedtext'] = 'When you save changes, completion state for all learners who have completed this activity will be erased. If you change your mind about this, do not save the form.';
 $string['activitycompletionunlockednoresettext'] = 'Completion has been unlocked without deleting activity completion data. After this change different users may have received their completion status for different reasons.';
 $string['accordion:accordionitem'] = 'Accordion Item';
@@ -281,6 +289,7 @@ $string['facetoface'] = 'Seminar';
 $string['feature_not_available'] = 'Feature {$a} is not available.';
 $string['filtershide'] = 'Hide filters';
 $string['filtersshow'] = 'Show filters';
+$string['filter_clear_active'] = 'Clear all active filters';
 $string['findcourses'] = 'Find Courses';
 $string['findlearning'] = 'Find Learning';
 $string['flexibleicons'] = 'Flexible icons';
@@ -293,6 +302,7 @@ $string['heading'] = 'Heading';
 $string['headingcolumnsdescription'] = 'The fields below define which data appear in the Report Heading Block. This block contains information about a specific user, and can appear in many locations throughout the site.';
 $string['headingmissingvalue'] = 'Value to display if no data found';
 $string['hidefeature'] = 'Hide';
+$string['hide_filters'] = 'Hide filters';
 $string['hierarchies'] = 'Hierarchies';
 $string['home'] = 'Home';
 $string['hourlyon'] = 'Hourly on';
@@ -607,6 +617,7 @@ $string['sendregistrationdatatask'] = 'Send site registration data';
 $string['sendremindermessagestask'] = 'Send reminder messages';
 $string['settings'] = 'Settings';
 $string['showfeature'] = 'Show';
+$string['show_filters'] = 'Show filters';
 $string['sitemanager'] = 'Site Manager';
 $string['siteregistrationemailbody'] = 'Site {$a} was not able to register itself automatically. Access to push data to our registrations site is probably blocked by a firewall.';
 $string['sitetype'] = 'Type of site';

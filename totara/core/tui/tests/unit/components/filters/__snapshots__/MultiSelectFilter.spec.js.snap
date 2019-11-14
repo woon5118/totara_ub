@@ -1,0 +1,36 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MultiSelectFilter.vue matches snapshot 1`] = `
+<fieldset-stub
+  class="tui-multiSelectFilter"
+  legend="title"
+>
+  <div
+    class="tui-multiSelectFilter__item"
+  >
+    <checkboxbutton-stub>
+      
+        Include courses
+      
+    </checkboxbutton-stub>
+  </div>
+  <div
+    class="tui-multiSelectFilter__item"
+  >
+    <checkboxbutton-stub>
+      
+        Include programs
+      
+    </checkboxbutton-stub>
+  </div>
+  <div
+    class="tui-multiSelectFilter__item"
+  >
+    <checkboxbutton-stub>
+      
+        Include users
+      
+    </checkboxbutton-stub>
+  </div>
+</fieldset-stub>
+`;

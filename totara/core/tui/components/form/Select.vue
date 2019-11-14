@@ -68,7 +68,7 @@ export default {
 
   props: {
     id: String,
-    ariaLabel: String,
+    ariaLabel: [Boolean, String],
     ariaLabelledby: String,
     autocomplete: String,
     autofocus: Boolean,
