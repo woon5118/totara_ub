@@ -23,6 +23,8 @@
 
 // #dock is 12000, modal must be above that
 :root {
+  --tui-zindex-modal: 100050;
+  --tui-zindex-modal-backdrop: 100040;
   --tui-zindex-navbar: 1000;
   --tui-zindex-loading-page: 100060;
 }

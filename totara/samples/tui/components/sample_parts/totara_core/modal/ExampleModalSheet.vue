@@ -16,35 +16,27 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @package totara_core
+  @author Simon Chester <simon.chester@totaralearning.com>
+  @package totara_samples
 -->
 
 <template>
-  <Button
-    :text="$str('cancel', 'moodle')"
-    :disabled="disabled"
-    @click="$emit('click', $event)"
-  />
+  <Modal size="sheet" :aria-labelledby="$id('title')">
+    <div>
+      <h1 :id="$id('title')">
+        Arbitrary content
+      </h1>
+      goes here
+    </div>
+  </Modal>
 </template>
 
 <script>
-import Button from 'totara_core/components/buttons/Button';
+import Modal from 'totara_core/components/modal/Modal';
 
 export default {
   components: {
-    Button,
-  },
-  props: {
-    disabled: Boolean,
+    Modal,
   },
 };
 </script>
-
-<lang-strings>
-{
-  "moodle": [
-    "cancel"
-  ]
-}
-</lang-strings>
