@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`presentation/datatable/ExpandedRow.vue Checks snapshot 1`] = `
+<div
+  class="tui-dataTableExpandableRow"
+>
+  <arrow-stub
+    distance="32"
+    side="top"
+    size="large"
+  />
+   
+  <div
+    class="tui-dataTableExpandableRow__placement"
+  >
+    <div
+      class="tui-dataTableExpandableRow__close"
+    >
+      <closebutton-stub
+        size="200"
+      />
+    </div>
+     
+    <div
+      class="tui-dataTableExpandableRow__content"
+    />
+  </div>
+</div>
+`;

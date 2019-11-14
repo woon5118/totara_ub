@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`presentation/datatable/SelectVisibleRowsCell.vue Checks snapshot 1`] = `
+<div
+  class="tui-dataTableSelectVisibleRowsCell"
+  role="cell"
+  selectallrows="select all rows"
+>
+  <checkbox-stub
+    arialabel="5"
+  />
+   
+  <span
+    class="tui-dataTableCell__label"
+  >
+    
+    5
+  
+  </span>
+</div>
+`;

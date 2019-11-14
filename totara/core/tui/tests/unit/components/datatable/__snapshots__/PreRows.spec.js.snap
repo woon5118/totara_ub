@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`presentation/datatable/PreRows.vue Checks snapshot 1`] = `
+<div
+  aria-live="polite"
+  class="tui-dataTablePreRows"
+  role="row"
+/>
+`;
