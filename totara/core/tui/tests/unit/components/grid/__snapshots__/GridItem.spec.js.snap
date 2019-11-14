@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`presentation/grid/GridItem.vue Checks snapshot 1`] = `
+<li
+  class="tui-grid-item tui-grid-item--grow tui-grid-item--no-shrink tui-grid-item--overflow tui-grid-item--no-hyphens"
+  style="order: 1;"
+/>
+`;

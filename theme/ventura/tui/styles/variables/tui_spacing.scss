@@ -37,11 +37,15 @@ $tui-gap: 0.4rem;
   --tui-gap-10: ($tui-gap * 10);
   --tui-gap-11: ($tui-gap * 11);
   --tui-gap-12: ($tui-gap * 12);
+
+  //
+  // Grid
+  //
+
+  // default gutter value starts with a global gutter value, changes to other
+  // global gutter values at viewport/container breakpoints
+  --tui-grid-gutter: var(--tui-gap-5);
+  // Global default for 'how many columns are in the grid'
+  // specified for use with theme.getVar('tui-grid-maxunits') in Grid.vue
+  --tui-grid-maxunits: 12;
 }
-/**
- * Grid
- **/
-$tui-grid-gutter--small: var(--tui-gap-1);
-$tui-grid-gutter--large: var(--tui-gap-5);
-// Global default for 'how many columns are in the grid'
-$tui-grid-maxUnits: 12;

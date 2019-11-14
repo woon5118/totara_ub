@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`presentation/grid/Grid.vue Checks snapshot 1`] = `
+<ul
+  class="tui-grid tui-grid--vertical tui-grid--vertical-gap"
+  id="grid"
+>
+  <vuecomponent-stub
+    class="tui-grid-item--first"
+    grows="true"
+    order="2"
+    overflows="true"
+    sizedata="[object Object]"
+    units="8"
+  />
+</ul>
+`;
