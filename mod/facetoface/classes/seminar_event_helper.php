@@ -53,7 +53,8 @@ final class seminar_event_helper {
 
         // Refresh list of current sessions from the database for merging, then clear it again.  This ensures that
         // all other singleton instances down the line will get the updated list when get_sessions() is called.
-        $currentsessions = $seminarevent->get_sessions(true);
+        $sessionstobedeleted = $seminarevent->get_sessions(true);
+        $sessionsindb = iterator_to_array($sessionstobedeleted);
         $seminarevent->clear_sessions();
 
         // Cloning dates to prevent messing with original data. $dates = unserialize(serialize($dates)) will also work.
@@ -62,11 +63,48 @@ final class seminar_event_helper {
         }, $dates);
 
         // Get a list of sessions that should be updated/inserted.
-        $dates = self::filter_sessions($dates, $currentsessions);
+        $dates = self::filter_sessions($dates, $sessionstobedeleted);
+
+        // Move out conflict dates.
+        /** @var seminar_session[] $sessionsindb */
+        $uniquetime = 0;
+        $get_unique_time = function () use (&$uniquetime, &$sessionsindb) {
+            while (++$uniquetime) {
+                foreach ($sessionsindb as $session) {
+                    if ($session->get_timestart() == $uniquetime || $session->get_timefinish() == $uniquetime) {
+                        continue 2;
+                    }
+                }
+                return $uniquetime;
+            }
+        };
+
+        if (!empty($dates)) {
+            foreach ($dates as $date) {
+                foreach ($sessionsindb as &$sessiondb) {
+                    /** @var seminar_session $sessiondb */
+                    if ((int)$date->id === $sessiondb->get_id()) {
+                        continue;
+                    }
+                    $update = false;
+                    if ((int)$date->timestart === $sessiondb->get_timestart()) {
+                        $sessiondb->set_timestart($get_unique_time());
+                        $update = true;
+                    }
+                    if ((int)$date->timefinish === $sessiondb->get_timefinish()) {
+                        $sessiondb->set_timefinish($get_unique_time());
+                        $update = true;
+                    }
+                    if ($update) {
+                        $sessiondb->save();
+                    }
+                }
+            }
+        }
 
         // Delete the current sessions that were not filtered out. These sessions did not match any input date provided
         // so we assume that they should be deleted.
-        $currentsessions->delete();
+        $sessionstobedeleted->delete();
 
         // Update or create sessions with their associated assets.
         foreach ($dates as $date) {

@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use mod_facetoface\{attendance_taking_status, seminar, seminar_event, seminar_session, signup};
+use mod_facetoface\{attendance_taking_status, seminar, seminar_event, seminar_event_helper, seminar_session, signup};
 use mod_facetoface\signup\state\fully_attended;
 
 class mod_facetoface_seminar_event_testcase extends advanced_testcase {
@@ -296,5 +296,183 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
 
         $this->assertFalse($event->is_attendance_open(time()));
         $this->assertSame(attendance_taking_status::CANCELLED, $event->get_attendance_taking_status(null, time()));
+    }
+
+    public function test_rotate_session_dates() {
+        global $DB;
+
+        $gen = $this->getDataGenerator();
+        /** @var mod_facetoface_generator $f2fgen */
+        $f2fgen = $gen->get_plugin_generator('mod_facetoface');
+        $course = $gen->create_course();
+
+        $times = [
+            1111111111, 2222222222, 3333333333
+        ];
+        $rooms = [
+            $f2fgen->add_site_wide_room([])->id,
+            $f2fgen->add_site_wide_room([])->id,
+            $f2fgen->add_site_wide_room([])->id,
+        ];
+        sort($rooms);
+
+        $f2f = $f2fgen->create_instance(['course' => $course->id, 'name' => 'Test seminar']);
+        $dates = [
+            (object)[
+                'timestart' => $times[0],
+                'timefinish' => $times[0] + 100,
+                'sessiontimezone' => '99',
+                'roomid' => $rooms[0],
+                'assetids' => []
+            ],
+            (object)[
+                'timestart' => $times[1],
+                'timefinish' => $times[1] + 100,
+                'sessiontimezone' => '99',
+                'roomid' => $rooms[1],
+                'assetids' => []
+            ],
+            (object)[
+                'timestart' => $times[2],
+                'timefinish' => $times[2] + 100,
+                'sessiontimezone' => '99',
+                'roomid' => $rooms[2],
+                'assetids' => []
+            ]
+        ];
+        $sessionid = $f2fgen->add_session(array('facetoface' => $f2f->id, 'sessiondates' => $dates));
+        $seminarevent = new seminar_event($sessionid);
+        $sessions = iterator_to_array($seminarevent->get_sessions(true), false);
+        /** @var seminar_session[] $sessions */
+        $newdates = [
+            (object)[
+                'id' => $sessions[0]->get_id(),
+                'timestart' => $sessions[1]->get_timestart(),
+                'timefinish' => $sessions[1]->get_timefinish(),
+                'sessiontimezone' => '99',
+                'roomid' => $rooms[0],
+                'assetids' => []
+            ],
+            (object)[
+                'id' => $sessions[1]->get_id(),
+                'timestart' => $sessions[2]->get_timestart(),
+                'timefinish' => $sessions[2]->get_timefinish(),
+                'sessiontimezone' => '99',
+                'roomid' => $rooms[1],
+                'assetids' => []
+            ],
+            (object)[
+                'id' => $sessions[2]->get_id(),
+                'timestart' => $sessions[0]->get_timestart(),
+                'timefinish' => $sessions[0]->get_timefinish(),
+                'sessiontimezone' => '99',
+                'roomid' => $rooms[2],
+                'assetids' => []
+            ]
+        ];
+
+        $transaction = $DB->start_delegated_transaction();
+        seminar_event_helper::merge_sessions($seminarevent, $newdates);
+        $transaction->allow_commit();
+
+        $newsessions = iterator_to_array($seminarevent->get_sessions(true), false);
+        usort($newsessions, function ($x, $y) {
+            return $x->get_roomid() <=> $y->get_roomid();
+        });
+        $this->assertCount(3, $newsessions);
+        $this->assertEquals($sessions[1]->get_timestart(), $newsessions[0]->get_timestart());
+        $this->assertEquals($sessions[2]->get_timestart(), $newsessions[1]->get_timestart());
+        $this->assertEquals($sessions[0]->get_timestart(), $newsessions[2]->get_timestart());
+    }
+
+    public function test_shift_session_dates() {
+        global $DB;
+
+        $gen = $this->getDataGenerator();
+        /** @var mod_facetoface_generator $f2fgen */
+        $f2fgen = $gen->get_plugin_generator('mod_facetoface');
+        $course = $gen->create_course();
+
+        $times = [
+            1111111111, 2222222222, 3333333333, 4444444444
+        ];
+        $rooms = [
+            $f2fgen->add_site_wide_room([])->id,
+            $f2fgen->add_site_wide_room([])->id,
+            $f2fgen->add_site_wide_room([])->id,
+        ];
+        sort($rooms);
+
+        $f2f = $f2fgen->create_instance(['course' => $course->id, 'name' => 'Test seminar']);
+        $dates = [
+            (object)[
+                'timestart' => $times[0],
+                'timefinish' => $times[0] + 1000,
+                'sessiontimezone' => '99',
+                'roomid' => $rooms[0],
+                'assetids' => []
+            ],
+            (object)[
+                'timestart' => $times[1],
+                'timefinish' => $times[1] + 1000,
+                'sessiontimezone' => '99',
+                'roomid' => $rooms[1],
+                'assetids' => []
+            ],
+            (object)[
+                'timestart' => $times[2],
+                'timefinish' => $times[2] + 1000,
+                'sessiontimezone' => '99',
+                'roomid' => $rooms[2],
+                'assetids' => []
+            ]
+        ];
+        $sessionid = $f2fgen->add_session(array('facetoface' => $f2f->id, 'sessiondates' => $dates));
+        $seminarevent = new seminar_event($sessionid);
+        $sessions = iterator_to_array($seminarevent->get_sessions(true), false);
+        /** @var seminar_session[] $sessions */
+        $newdates = [
+            (object)[
+                'id' => $sessions[0]->get_id(),
+                'timestart' => $times[1],
+                'timefinish' => $times[1] + 100,
+                'sessiontimezone' => '99',
+                'roomid' => $rooms[0],
+                'assetids' => []
+            ],
+            (object)[
+                'id' => $sessions[1]->get_id(),
+                'timestart' => $times[2],
+                'timefinish' => $times[2] + 100,
+                'sessiontimezone' => '99',
+                'roomid' => $rooms[1],
+                'assetids' => []
+            ],
+            (object)[
+                'id' => $sessions[2]->get_id(),
+                'timestart' => $times[3],
+                'timefinish' => $times[3] + 100,
+                'sessiontimezone' => '99',
+                'roomid' => $rooms[2],
+                'assetids' => []
+            ]
+        ];
+
+        $transaction = $DB->start_delegated_transaction();
+        seminar_event_helper::merge_sessions($seminarevent, $newdates);
+        $transaction->allow_commit();
+
+        /** @var seminar_session[] $newsessions */
+        $newsessions = iterator_to_array($seminarevent->get_sessions(true), false);
+        usort($newsessions, function ($x, $y) {
+            return $x->get_roomid() <=> $y->get_roomid();
+        });
+        $this->assertCount(3, $newsessions);
+        $this->assertEquals($times[1], $newsessions[0]->get_timestart());
+        $this->assertEquals($times[2], $newsessions[1]->get_timestart());
+        $this->assertEquals($times[3], $newsessions[2]->get_timestart());
+        $this->assertEquals($rooms[0], $newsessions[0]->get_roomid());
+        $this->assertEquals($rooms[1], $newsessions[1]->get_roomid());
+        $this->assertEquals($rooms[2], $newsessions[2]->get_roomid());
     }
 }
