@@ -24,6 +24,7 @@
 namespace totara_competency;
 
 use core\orm\collection;
+use core\orm\entity\repository;
 use core\orm\query\builder;
 use totara_competency\entities\competency;
 use totara_competency\entities\pathway as pathway_entity;
@@ -77,7 +78,7 @@ class aggregation_task {
         $aggregation_time = $aggregation_time ?? time();
 
         // Get competencies with active enabled pathways and assigned users
-        //      For each pathway
+        //      For each active pathway
         //          Aggregate
         //      For each user with changes
         //          Perform overall aggregation
@@ -85,51 +86,61 @@ class aggregation_task {
         //      For each competency
         //          Aggregate achievement
 
-        $pathways = $this->get_active_pathways_for_assigned_users();
+        $competencies = $this->get_competency_with_active_pathways_for_assigned_users();
 
         /** @var competency $curr_competency */
-        $curr_competency = null;
-        foreach ($pathways as $pathway_entity) {
-            if (!empty($curr_competency) && $pathway_entity->comp_id != $curr_competency->id) {
-                $this->aggregate_competency_achievements($curr_competency, $aggregation_time);
+        foreach ($competencies as $competency) {
+            // Aggregate each pathway before aggregation the competency itself
+            foreach ($competency->active_pathways as $pathway_entity) {
+                // As we already have the competency attach it to the pathway entity
+                // to avoid another query later down the line
+                $pathway_entity->relate('competency', $competency);
+                $pathway = pathway_factory::from_entity($pathway_entity);
+
+                $pw_evaluator = pathway_evaluator_factory::create($pathway, $this->pw_user_id_source);
+                $pw_evaluator->aggregate($aggregation_time);
             }
 
-            $curr_competency = $pathway_entity->competency;
-
-            $pathway = pathway_factory::from_entity($pathway_entity);
-
-            $pw_evaluator = pathway_evaluator_factory::create($pathway, $this->pw_user_id_source);
-            $pw_evaluator->aggregate($aggregation_time);
-        }
-
-        if (!empty($curr_competency)) {
-            $this->aggregate_competency_achievements($curr_competency, $aggregation_time);
+            $this->aggregate_competency_achievements($competency, $aggregation_time);
         }
     }
 
     /**
-     * @return collection|pathway_entity[]
+     * @return collection|competency[]
      */
-    private function get_active_pathways_for_assigned_users(): collection {
+    private function get_competency_with_active_pathways_for_assigned_users(): collection {
         $pathway_types = plugin_types::get_enabled_plugins('pathway', 'totara_competency');
 
-        return pathway_entity::repository()
-            ->join(['comp', 'c'], 'comp_id', 'id')
-            ->where('path_type', $pathway_types)
-            ->where('status', pathway::PATHWAY_STATUS_ACTIVE)
-            ->where_exists(function (builder $builder) {
-                $uses_process_key = $this->table->get_process_key_column() && $this->table->get_process_key_value();
+        $uses_process_key = $this->table->get_process_key_column() && $this->table->get_process_key_value();
 
-                $builder->from($this->table->get_table_name())
-                    ->where_field($this->table->get_competency_id_column(), "c.id")
-                    ->when($uses_process_key, function (builder $builder) {
-                        $builder->where($this->table->get_process_key_column(), $this->table->get_process_key_value());
-                    });
-            })
-            ->order_by('c.depthlevel', 'desc')
-            ->order_by('comp_id', 'asc')
-            ->with('competency')
+        // Make sure we only load competencies we have an entry in the queue for
+        $queue_builder = builder::table($this->table->get_table_name())
+            ->where_field($this->table->get_competency_id_column(), "c.id")
+            ->when($uses_process_key, function (builder $builder) {
+                $builder->where($this->table->get_process_key_column(), $this->table->get_process_key_value());
+            });
+
+        // Make sure that we only query competencies which have an active pathway
+        $pathway_builder = builder::table(pathway_entity::TABLE)
+            ->where_field('comp_id', "c.id")
+            ->where('path_type', $pathway_types)
+            ->where('status', pathway::PATHWAY_STATUS_ACTIVE);
+
+        $result =  competency::repository()
+            ->as('c')
+            ->where_exists($queue_builder)
+            ->where_exists($pathway_builder)
+            ->order_by('depthlevel', 'desc')
+            ->order_by('id', 'asc')
+            ->with([
+                // We want to get all active pathway entities in one go, using the relation
+                'active_pathways' => function (repository $repository) use ($pathway_types) {
+                    $repository->where('path_type', $pathway_types);
+                }
+            ])
             ->get();
+
+        return $result;
     }
 
     /**

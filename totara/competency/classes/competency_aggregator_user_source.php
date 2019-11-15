@@ -23,8 +23,10 @@
 
 namespace totara_competency;
 
+use core\orm\query\builder;
 use moodle_recordset;
 use totara_competency\entities\competency_achievement;
+use totara_competency\entities\competency_assignment_user;
 
 class competency_aggregator_user_source {
 
@@ -69,17 +71,17 @@ class competency_aggregator_user_source {
 
         // If this is a full list - archive all users not assigned
         if ($this->full_user_set) {
-            $sql =
-                "UPDATE {totara_competency_achievement}
-                    SET status = :newstatus,
-                        time_status = :timestatus
-                  WHERE comp_id = :compid
+            $sql = "
+                UPDATE {totara_competency_achievement}
+                SET status = :newstatus, time_status = :timestatus
+                WHERE comp_id = :compid
                     AND status = :currentstatus
                     AND user_id NOT IN (
                         SELECT {$temp_user_id_column}
-                          FROM {" . $temp_table_name . "}
-                          {$temp_wh}
-                        )";
+                        FROM {" . $temp_table_name . "}
+                            {$temp_wh}
+                    )
+            ";
             $params = array_merge(
                 [
                     'compid' => $competency_id,
@@ -94,22 +96,22 @@ class competency_aggregator_user_source {
         }
 
         // We also need to always archive competency_achievements linked to assignments that are no longer active / available
-        $sql =
-            "UPDATE {totara_competency_achievement}
-                SET status = :newstatus,
-                    time_status = :timestatus
-              WHERE comp_id = :compid
+        $sql = "
+            UPDATE {totara_competency_achievement}
+            SET status = :newstatus, time_status = :timestatus
+            WHERE comp_id = :compid
                 AND status = :currentstatus
                 AND user_id IN (
                     SELECT {$temp_user_id_column}
-                      FROM {" . $temp_table_name . "}
-                      {$temp_wh}
-                    )
+                    FROM {" . $temp_table_name . "}
+                        {$temp_wh}
+                )
                 AND assignment_id NOT IN (
                     SELECT tacu.assignment_id
-                      FROM {totara_competency_assignment_users} tacu
-                     WHERE tacu.competency_id = :compid2
-                    )";
+                    FROM {totara_competency_assignment_users} tacu
+                    WHERE tacu.competency_id = :compid2
+                )
+        ";
 
         $params = array_merge(
             [
@@ -131,39 +133,41 @@ class competency_aggregator_user_source {
      * @param int $competency_id
      * @return moodle_recordset
      */
-    public function get_users_to_reaggregate(int $competency_id): moodle_recordset {
-        global $DB;
-
+    public function get_users_to_reaggregate(int $competency_id) {
         // Find assignments of all users that were marked as having changes
-        $temp_alias = 'tmp';
-        $temp_tablename = $this->temp_user_table->get_table_name();
-        $temp_user_id_column = $this->temp_user_table->get_user_id_column();
-        $temp_competency_id_column = $this->temp_user_table->get_competency_id_column();
-        [$temp_cond, $params] = $this->temp_user_table->get_filter_sql_with_params("", false, 1);
-        $params['newstatus'] = competency_achievement::ACTIVE_ASSIGNMENT;
-        $params['competencyid'] = $competency_id;
+        $subquery = builder::table($this->temp_user_table->get_table_name())
+            ->select($this->temp_user_table->get_user_id_column())
+            ->where_raw(...$this->temp_user_table->get_filter_sql_with_params("", false, 1));
 
-        $sql = "
-            SELECT tacu.id,
-                tacu.user_id,
-                tacu.assignment_id,
-                ca.id AS comp_achievement_id,
-                ca.scale_value_id,
-                ca.proficient
-            FROM {totara_competency_assignment_users} tacu
-            LEFT JOIN {totara_competency_achievement} ca
-                ON tacu.user_id = ca.user_id
-                  AND tacu.assignment_id = ca.assignment_id
-                  AND ca.status = :newstatus
-            WHERE tacu.competency_id = :competencyid
-                  AND tacu.user_id IN (
-                        SELECT {$temp_user_id_column}
-                        FROM {{$temp_tablename}} 
-                        WHERE {$temp_cond}
-                  )
-        ";
+        // First we get all user assignments for the competency where we have users
+        // in the queue table who are marked as having changes
+        $assignment_users = competency_assignment_user::repository()
+            ->where('competency_id', $competency_id)
+            ->where('user_id', 'in', $subquery)
+            ->get();
 
-        return $DB->get_recordset_sql($sql, $params);
+        // Now for all of the assignments / user combinations query
+        // the active achievements. This reduces the number of queries
+        // down to only two and avoids the N+1 problem here
+        $achievements = competency_achievement::repository()
+            ->where('assignment_id', $assignment_users->pluck('assignment_id'))
+            ->where('user_id', 'in', $subquery)
+            ->where('status', competency_achievement::ACTIVE_ASSIGNMENT)
+            ->get();
+
+        // Now combine the two results returning, mapping the achievement to the assignment user record
+        return $assignment_users->map(function (competency_assignment_user $assignment_user) use ($achievements) {
+            $achievement = $achievements->find(function (competency_achievement $achievement) use ($assignment_user) {
+                return $achievement->assignment_id == $assignment_user->assignment_id
+                    && $achievement->user_id == $assignment_user->user_id;
+            });
+
+            return (object) [
+                'user_id' => $assignment_user->user_id,
+                'assignment_id' => $assignment_user->assignment_id,
+                'achievement' => $achievement
+            ];
+        });
     }
 
 }

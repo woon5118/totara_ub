@@ -23,7 +23,9 @@
 
 namespace totara_competency;
 
+use core\orm\collection;
 use totara_competency\entities\pathway_achievement;
+use totara_competency\entities\scale_value;
 
 abstract class overall_aggregation {
 
@@ -70,7 +72,7 @@ abstract class overall_aggregation {
 
     /**
      * @param int $user_id Id of user to aggregate
-     * @return array [int, array] Keys: scale_value_id, achieved_via
+     * @return array [int, array] Keys: scale_value, achieved_via
      */
     public function aggregate_for_user(int $user_id): array {
         if (!isset($this->user_achievement[$user_id])) {
@@ -79,7 +81,7 @@ abstract class overall_aggregation {
 
         // TODO: can possibly make use of a separate class, but seems like an overkill at this point
         return empty($this->user_achievement[$user_id])
-            ? ['scale_value_id' => null, 'achieved_via' => []]
+            ? ['scale_value' => null, 'achieved_via' => []]
             : $this->user_achievement[$user_id];
     }
 
@@ -92,13 +94,73 @@ abstract class overall_aggregation {
     abstract protected function do_aggregation(int $user_id): void;
 
     /**
+     * Get all current achievements for the pathways given
+     *
+     * @param array $pathways
+     * @param int $user_id
+     * @return collection|pathway_achievement[]
+     */
+    protected function get_current_pathway_achievements_for_user(array $pathways, int $user_id) {
+        $pathway_ids = array_map(function (pathway $pathway) {
+            return $pathway->get_id();
+        }, $pathways);
+
+        return pathway_achievement::repository()
+            ->where('pathway_id', $pathway_ids)
+            ->where('user_id', $user_id)
+            ->where('status', pathway_achievement::STATUS_CURRENT)
+            ->order_by('pathway_id', 'asc')
+            ->order_by('last_aggregated','desc')
+            ->with('scale_value')
+            ->get();
+    }
+
+    /**
+     * Filter the collection for achievements of the given pathway and
+     * if there's none found, create a new one
+     *
+     * @param collection $current_achievements
+     * @param pathway $pathway
+     * @param int $user_id
+     * @return pathway_achievement
+     */
+    protected function get_or_create_current_pathway_achievement(collection $current_achievements, pathway $pathway, int $user_id) {
+        $achievements = $current_achievements->filter('pathway_id', $pathway->get_id());
+
+        switch ($achievements->count()) {
+            case 0:
+                $achievement = new pathway_achievement();
+                $achievement->pathway_id = $pathway->get_id();
+                $achievement->user_id = $user_id;
+                $achievement->scale_value_id = null;
+                $achievement->status = pathway_achievement::STATUS_CURRENT;
+                $achievement->date_achieved = time();
+                // It has not been aggregated yet. If we set this to now, we might miss anything that would have
+                // prompted aggregation in the recent past, but maybe cron hasn't run since then.
+                $achievement->last_aggregated = null;
+                break;
+            case 1:
+                $achievement = $achievements->first();
+                break;
+            default:
+                // There's more than one which is not right. But let's not make the whole system stop working because of this.
+                debugging('User has multiple current achievements for pathway with id ' . $pathway->get_id());
+                // We ordered by last_aggregated and that would be our best guess at the correct one.
+                $achievement = $achievements->first();
+                break;
+        }
+
+        return $achievement;
+    }
+
+    /**
      * @param $user_id
      * @param array|pathway_achievement[] $achieved_via
-     * @param int|null $scale_value_id
+     * @param scale_value $scale_value
      */
-    protected function set_user_achievement($user_id, array $achieved_via, ?int $scale_value_id = null) {
+    protected function set_user_achievement($user_id, array $achieved_via, scale_value $scale_value = null) {
         // For now taking the last value set
-        $this->user_achievement[$user_id] = ['scale_value_id' => $scale_value_id, 'achieved_via' => $achieved_via];
+        $this->user_achievement[$user_id] = ['scale_value' => $scale_value, 'achieved_via' => $achieved_via];
     }
 
     /**
@@ -111,7 +173,8 @@ abstract class overall_aggregation {
             return null;
         }
 
-        return $this->user_achievement[$user_id]['scale_value_id'];
+        $value = $this->user_achievement[$user_id]['scale_value'];
+        return $value ? $value->id : null;
     }
 
     /**

@@ -23,6 +23,7 @@
 
 namespace aggregation_test_aggregation;
 
+use totara_competency\entities\scale_value;
 use totara_competency\overall_aggregation;
 
 defined('MOODLE_INTERNAL') || die();
@@ -32,7 +33,10 @@ defined('MOODLE_INTERNAL') || die();
  */
 class test_aggregation extends overall_aggregation {
 
-    private $test_achieved_value_ids = [];
+    /**
+     * @var array|scale_value[]
+     */
+    private $test_achieved_values = [];
     private $test_achieved_vias = [];
 
     /**
@@ -41,7 +45,7 @@ class test_aggregation extends overall_aggregation {
      * @return test_aggregation
      */
     public function set_test_aggregated_data($achieved_values, $achieved_vias): self {
-        $this->test_achieved_value_ids = $achieved_values;
+        $this->test_achieved_values = $achieved_values;
         $this->test_achieved_vias = $achieved_vias;
         return $this;
     }
@@ -55,7 +59,7 @@ class test_aggregation extends overall_aggregation {
     protected function do_aggregation(int $user_id): void {
         $this->set_user_achievement($user_id,
             $this->test_achieved_vias[$user_id] ?? [],
-            $this->test_achieved_value_ids[$user_id] ?? null
+            $this->test_achieved_values[$user_id] ?? null
         );
     }
 

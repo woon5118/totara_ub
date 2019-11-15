@@ -24,10 +24,10 @@
 namespace totara_competency;
 
 
+use context_system;
 use core\orm\collection;
 use totara_competency\entities\achievement_via;
 use totara_competency\entities\competency_achievement;
-use totara_competency\entities\scale_value;
 use totara_competency\event\competency_achievement_updated;
 
 /**
@@ -105,19 +105,20 @@ final class competency_achievement_aggregator {
         foreach ($user_assignment_records as $user_assignment_record) {
             $user_id = $user_assignment_record->user_id;
             $user_achievement = $this->get_aggregation_instance()->aggregate_for_user($user_id);
+            $previous_comp_achievement = $user_assignment_record->achievement;
 
-            if (is_null($user_assignment_record->comp_achievement_id)) {
-                $previous_comp_achievement = null;
-            } else {
-                $previous_comp_achievement = new competency_achievement($user_assignment_record->comp_achievement_id);
+            // We don't necessarily have a scale value in this case we store null
+            $scale_value_id = null;
+            $is_proficient = 0;
+            if ($user_achievement['scale_value']) {
+                $scale_value_id = $user_achievement['scale_value']->id;
+                $is_proficient = $user_achievement['scale_value']->proficient;
             }
-
-            $is_proficient = (int) $this->is_proficient($user_achievement['scale_value_id']);
 
             // If the scale value changed or the proficiency value then we supersede the old record and create a new one
             if (is_null($previous_comp_achievement)
-                || $user_assignment_record->scale_value_id != $user_achievement['scale_value_id']
-                || $user_assignment_record->proficient != $is_proficient
+                || $previous_comp_achievement->scale_value_id != $scale_value_id
+                || $previous_comp_achievement->proficient != $is_proficient
             ) {
                 // New achieved value
                 if (!is_null($previous_comp_achievement)) {
@@ -130,7 +131,7 @@ final class competency_achievement_aggregator {
                 $new_comp_achievement->comp_id = $competency_id;
                 $new_comp_achievement->user_id = $user_id;
                 $new_comp_achievement->assignment_id = $user_assignment_record->assignment_id;
-                $new_comp_achievement->scale_value_id = $user_achievement['scale_value_id'];
+                $new_comp_achievement->scale_value_id = $scale_value_id;
                 $new_comp_achievement->proficient = $is_proficient;
                 $new_comp_achievement->status = competency_achievement::ACTIVE_ASSIGNMENT;
                 $new_comp_achievement->time_created = $aggregation_time;
@@ -150,7 +151,7 @@ final class competency_achievement_aggregator {
                 $achieved_via_ids = collection::new($user_achievement['achieved_via'])->pluck('id');
 
                 competency_achievement_updated::create([
-                    'context' => \context_system::instance(),
+                    'context' => context_system::instance(),
                     'objectid' => $new_comp_achievement->id,
                     'relateduserid' => $user_id,
                     'other' => [
@@ -164,22 +165,6 @@ final class competency_achievement_aggregator {
                 $previous_comp_achievement->save();
             }
         }
-
-        $user_assignment_records->close();
     }
 
-    /**
-     * Checks whether a given scale value is considered proficient.
-     *
-     * @param int $value_id
-     * @return bool True if the scale value is proficient.
-     */
-    private function is_proficient($value_id): bool {
-        if (!isset($this->proficient_scale_value_ids[$value_id])) {
-            $value = new scale_value($value_id);
-            $this->proficient_scale_value_ids[$value_id] = (bool) $value->proficient;
-        }
-
-        return $this->proficient_scale_value_ids[$value_id];
-    }
 }

@@ -24,11 +24,11 @@
 namespace totara_competency\entities;
 
 use core\orm\collection;
-use core\orm\entity\relations\has_one;
 use core\orm\entity\relations\has_many;
+use core\orm\entity\relations\has_one;
 use core\orm\entity\relations\has_one_through;
-use totara_hierarchy\entities\hierarchy_item;
 use totara_competency\user_groups;
+use totara_hierarchy\entities\hierarchy_item;
 
 // Currently only required to re-use the constants
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
@@ -66,13 +66,13 @@ require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
  *
  * @property-read competency $parent Parent item
  * @property-read scale $scale Scale associated with this competency
- * @property-read comp_type $comp_type Competency type
- * @property-read customfields $customfields Custom fields
+ * @property-read competency_type $comp_type Competency type
  * @property-read string $scale_aggregation_type Scale aggregation type
  *
  * @property-read competency_achievement $achievement
  * @property-read collection $availability
- * @property-read pathway[] $pathways
+ * @property-read pathway[]|collection $pathways
+ * @property-read pathway[]|collection $active_pathways
  *
  * @package totara_competency\entities
  */
@@ -85,12 +85,6 @@ class competency extends hierarchy_item {
 
     /** @var array $customfields */
     private $customfields;
-
-    /** @var array $linkedcourses */
-    private $linkedcourses;
-
-    /** @var string $scale_aggregation_type */
-    private $scale_aggregation_type;
 
     /**
      * Related achievement, meant to be used with a user filter
@@ -131,11 +125,12 @@ class competency extends hierarchy_item {
 
             $sql = "
                 SELECT c.*, f.datatype, f.hidden, f.fullname, f.shortname
-                  FROM {comp_type_info_data} c
-            INNER JOIN {comp_type_info_field} f
+                FROM {comp_type_info_data} c
+                INNER JOIN {comp_type_info_field} f
                     ON c.fieldid = f.id
-                 WHERE c.competencyid = :compid
-              ORDER BY f.sortorder";
+                WHERE c.competencyid = :compid
+                ORDER BY f.sortorder
+            ";
 
             $cflds = $DB->get_records_sql($sql, ['compid' => $this->id]);
 
@@ -290,6 +285,17 @@ class competency extends hierarchy_item {
      */
     public function pathways(): has_many {
         return $this->has_many(pathway::class, 'comp_id');
+    }
+
+    /**
+     * Configured pathways for this competency
+     *
+     * @return has_many
+     */
+    public function active_pathways(): has_many {
+        return $this->pathways()
+            ->where('status', \totara_competency\pathway::PATHWAY_STATUS_ACTIVE)
+            ->order_by('sortorder');
     }
 
 }

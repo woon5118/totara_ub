@@ -59,17 +59,17 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
         $test_aggregation = new test_aggregation();
-        $achieved_value_ids = [];
+        $achieved_values = [];
         $achieved_vias = [];
         foreach ($pathway_achievements as $pathway_achievement) {
             $user_id = $pathway_achievement->user_id;
-            $achieved_value_ids[$user_id] = $pathway_achievement->scale_value_id;
+            $achieved_values[$user_id] = $pathway_achievement->scale_value;
             if (!isset($achieved_vias[$user_id])) {
                 $achieved_vias[$user_id] = [];
             }
             $achieved_vias[$user_id][] = $pathway_achievement;
         }
-        $test_aggregation->set_test_aggregated_data($achieved_value_ids, $achieved_vias);
+        $test_aggregation->set_test_aggregated_data($achieved_values, $achieved_vias);
 
         return $test_aggregation;
     }

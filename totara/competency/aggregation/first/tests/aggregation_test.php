@@ -21,11 +21,12 @@
  * @package aggregation_first
  */
 
+use aggregation_first\first;
+use core\orm\collection;
 use totara_competency\aggregation_users_table;
 use totara_competency\base_achievement_detail;
-use totara_competency\entities\scale_value;
 use totara_competency\entities\pathway_achievement;
-use aggregation_first\first;
+use totara_competency\entities\scale_value;
 use totara_competency\pathway;
 use totara_competency\pathway_evaluator;
 use totara_competency\pathway_evaluator_user_source;
@@ -33,14 +34,14 @@ use totara_competency\pathway_evaluator_user_source;
 class aggregation_first_aggregation_testcase extends advanced_testcase {
 
     public function test_with_empty_pathways() {
-        $user_id = 101;
+        $user = $this->getDataGenerator()->create_user();
 
         $aggregation = new first();
         $aggregation->set_pathways([])
-                    ->aggregate_for_user($user_id);
+                    ->aggregate_for_user($user->id);
 
-        $this->assertNull($aggregation->get_achieved_value_id($user_id));
-        $this->assertEquals([], $aggregation->get_achieved_via($user_id));
+        $this->assertNull($aggregation->get_achieved_value_id($user->id));
+        $this->assertEquals([], $aggregation->get_achieved_via($user->id));
     }
 
     public function test_with_single_pathway_returning_null() {
@@ -115,8 +116,9 @@ class aggregation_first_aggregation_testcase extends advanced_testcase {
         // Reload current achievement as values will need to be strings from the database for the expected and actual to match.
         $current_achievement = pathway_achievement::get_current($pathway1_mock, $user->id);
 
+        $achieved_via_ids = collection::new($aggregation->get_achieved_via($user->id))->pluck('id');
         $this->assertEquals($scale_value->id, $aggregation->get_achieved_value_id($user->id));
-        $this->assertEquals([$current_achievement], $aggregation->get_achieved_via($user->id));
+        $this->assertEquals([$current_achievement->id], $achieved_via_ids);
     }
 
     public function test_multiple_pathways_returning_value_or_null() {
@@ -194,8 +196,9 @@ class aggregation_first_aggregation_testcase extends advanced_testcase {
 
         // It skipped the null on the first pathway as it is looking for the first proper value.
         // pathway2 would have been ordered ahead of pathway3, and so we get the below:
+        $achieved_via_ids = collection::new($aggregation->get_achieved_via($user->id))->pluck('id');
         $this->assertEquals($scale_value2->id, $aggregation->get_achieved_value_id($user->id));
-        $this->assertEquals([$current_achievement2], $aggregation->get_achieved_via($user->id));
+        $this->assertEquals([$current_achievement2->id], $achieved_via_ids);
     }
 
 }

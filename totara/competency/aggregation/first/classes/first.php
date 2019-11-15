@@ -24,9 +24,8 @@
 namespace aggregation_first;
 
 
-use totara_competency\pathway;
-use totara_competency\entities\pathway_achievement;
 use totara_competency\overall_aggregation;
+use totara_competency\pathway;
 
 class first extends overall_aggregation {
 
@@ -44,10 +43,11 @@ class first extends overall_aggregation {
         }
         ksort($ordered_pathways);
 
+        $current_achievements = $this->get_current_pathway_achievements_for_user($ordered_pathways, $user_id);
         foreach ($ordered_pathways as $pathway) {
-            $achievement = pathway_achievement::get_current($pathway, $user_id);
-            if ($achievement->scale_value_id) {
-                $this->set_user_achievement($user_id, [$achievement], $achievement->scale_value_id);
+            $achievement = $this->get_or_create_current_pathway_achievement($current_achievements, $pathway, $user_id);
+            if ($achievement->scale_value) {
+                $this->set_user_achievement($user_id, [$achievement], $achievement->scale_value);
                 break;
             }
         }

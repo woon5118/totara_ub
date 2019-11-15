@@ -21,27 +21,27 @@
  * @package aggregation_highest
  */
 
+use aggregation_highest\highest;
 use core\orm\collection;
 use totara_competency\aggregation_users_table;
+use totara_competency\base_achievement_detail;
+use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\scale_value;
 use totara_competency\pathway;
 use totara_competency\pathway_evaluator;
-use totara_competency\entities\pathway_achievement;
-use aggregation_highest\highest;
-use totara_competency\base_achievement_detail;
 use totara_competency\pathway_evaluator_user_source;
 
 class aggregation_highest_aggregation_testcase extends advanced_testcase {
 
     public function test_with_empty_pathways() {
-        $user_id = 101;
+        $user = $this->getDataGenerator()->create_user();
 
         $aggregation = new highest();
         $aggregation->set_pathways([])
-                    ->aggregate_for_user($user_id);
+                    ->aggregate_for_user($user->id);
 
-        $this->assertNull($aggregation->get_achieved_value_id($user_id));
-        $this->assertEquals([], $aggregation->get_achieved_via($user_id));
+        $this->assertNull($aggregation->get_achieved_value_id($user->id));
+        $this->assertEquals([], $aggregation->get_achieved_via($user->id));
     }
 
     public function test_with_single_pathway_returning_null() {

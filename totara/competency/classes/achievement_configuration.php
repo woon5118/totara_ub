@@ -115,21 +115,15 @@ class achievement_configuration {
      * @return pathway[]
      */
     public function get_active_pathways(): array {
-        global $DB;
-
         if (is_null($this->active_pathways)) {
-            $records = $DB->get_records(
-                'totara_competency_pathway',
-                [
-                    'comp_id' => $this->get_competency()->id,
-                    'status' => pathway::PATHWAY_STATUS_ACTIVE
-                ],
-                'sortorder'
-            );
+            $pathways = $this->get_competency()->active_pathways;
 
             $this->active_pathways = [];
-            foreach ($records as $record) {
-                $this->active_pathways[$record->id] = pathway_factory::fetch($record->path_type, $record->id);
+            foreach ($pathways as $pathway) {
+                // We already have the competency entity so attach it to the pathway
+                // to avoid another query further down the line
+                $pathway->relate('competency', $this->get_competency());
+                $this->active_pathways[$pathway->id] = pathway_factory::from_entity($pathway);
             }
         }
 

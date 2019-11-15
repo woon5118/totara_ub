@@ -41,21 +41,26 @@ class highest extends overall_aggregation {
     protected function do_aggregation(int $user_id): void {
         /** @var pathway_achievement|null $highest_achievement */
         $highest_achievement = null;
+        $highest_value = null;
         $achieved_via = [];
 
+        // We load all current achievement for all the pathway in one go
+        // to reduce the number of queries
+        $current_achievements = $this->get_current_pathway_achievements_for_user($this->pathways, $user_id);
         foreach ($this->pathways as $pathway) {
-            $achievement = pathway_achievement::get_current($pathway, $user_id);
-            $value_achieved = $this->get_scale_value($achievement);
+            $achievement = $this->get_or_create_current_pathway_achievement($current_achievements, $pathway, $user_id);
+
+            $value_achieved = $achievement->scale_value;
 
             if (!is_null($value_achieved)) {
                 if (is_null($highest_achievement)) {
                     $highest_achievement = $achievement;
+                    $highest_value = $value_achieved;
                     $achieved_via = [$achievement];
                 } else {
-                    $highest_value = $this->get_scale_value($highest_achievement);
-
                     if ($value_achieved->sortorder < $highest_value->sortorder) {
                         $highest_achievement = $achievement;
+                        $highest_value = $value_achieved;
                         $achieved_via = [$achievement];
                     } else if ($value_achieved->sortorder == $highest_value->sortorder) {
                         $achieved_via[] = $achievement;
@@ -65,7 +70,7 @@ class highest extends overall_aggregation {
         }
 
         if (isset($highest_achievement)) {
-            $this->set_user_achievement($user_id, $achieved_via, $highest_achievement->scale_value_id);
+            $this->set_user_achievement($user_id, $achieved_via, $highest_value);
         }
     }
 
