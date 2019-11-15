@@ -9,34 +9,19 @@ Feature: Test organisation type changes in hierarchies
     And the following "role assigns" exist:
       | user      | role      | contextlevel | reference |
       | manager   | manager   | System       |           |
+
+    And the following hierarchy types exist:
+      | hierarchy    | idnumber | fullname            |
+      | organisation | orgtype1 | Organisation type 1 |
+      | organisation | orgtype2 | Organisation type 2 |
+
+    And the following hierarchy type custom fields exist:
+      | hierarchy    | typeidnumber | type | fullname         | shortname | value |
+      | organisation | orgtype1     | text | Custom field 1_1 | CF1_1     |       |
+      | organisation | orgtype1     | text | Custom field 1_2 | CF1_2     |       |
+      | organisation | orgtype2     | text | Custom field 2_1 | CF2_1     |       |
+
     And I log in as "manager"
-    And I navigate to "Manage types" node in "Site administration > Organisations"
-    And I press "Add a new type"
-    And I set the following fields to these values:
-    | Type full name | Organisation type 1 |
-    And I press "Save changes"
-    And I follow "Organisation type 1"
-    And I set the field "Create a new custom field" to "Text input"
-    And I set the following fields to these values:
-      | Full name                   | Custom field 1_1 |
-      | Short name (must be unique) | CF1_1            |
-    And I press "Save changes"
-    And I set the field "Create a new custom field" to "Text input"
-    And I set the following fields to these values:
-      | Full name                   | Custom field 1_2 |
-      | Short name (must be unique) | CF1_2            |
-    And I press "Save changes"
-    And I navigate to "Manage types" node in "Site administration > Organisations"
-    And I press "Add a new type"
-    And I set the following fields to these values:
-      | Type full name | Organisation type 2 |
-    And I press "Save changes"
-    And I follow "Organisation type 2"
-    And I set the field "Create a new custom field" to "Text input"
-    And I set the following fields to these values:
-      | Full name                   | Custom field 2_1 |
-      | Short name (must be unique) | CF2_1            |
-    And I press "Save changes"
     And I navigate to "Manage organisations" node in "Site administration > Organisations"
     And I press "Add new organisation framework"
     And I set the following fields to these values:

@@ -3,15 +3,14 @@ Feature: Verify grpconcat_menu custom field filter works in the reports
 
   Background:
     Given I am on a totara site
-    And I log in as "admin"
+
+    And the following hierarchy types exist:
+      | hierarchy    | idnumber | fullname            |
+      | organisation | OrgType  | Organisation type 1 |
 
     # Create custom field.
+    And I log in as "admin"
     And I navigate to "Manage types" node in "Site administration > Organisations"
-    And I press "Add a new type"
-    And I set the following fields to these values:
-      | Type full name | Organisation type 1 |
-    And I press "Save changes"
-
     And I follow "Organisation type 1"
     And I set the field "Create a new custom field" to "Menu of choices"
     And I set the following fields to these values:

@@ -10,43 +10,18 @@ Feature: Use customfields in HR import position upload
       | Position Framework 1 | posfw1   |
       | Position Framework 2 | posfw2   |
 
-    And I log in as "admin"
-    And I navigate to "Manage types" node in "Site administration > Positions"
-    And I press "Add a new type"
-    And I set the following fields to these values:
-      | Type full name          | Position type |
-      | Position type ID number | PosType       |
-    And I press "Save changes"
-    And I follow "Position type"
+    And the following hierarchy types exist:
+      | hierarchy | idnumber | fullname      |
+      | position  | PosType  | Position type |
 
-    # Text
-    And I should see "Create a new custom field"
-    And I set the field "datatype" to "Text input"
-    And I should see "Editing custom field: Text input"
-    And I set the following fields to these values:
-      | fullname    | Custom field text input |
-      | shortname   | cftext                  |
-    And I press "Save changes"
-
-    # Location
-    And I should see "Create a new custom field"
-    And I set the field "datatype" to "Location"
-    And I expand all fieldsets
-    And I set the following fields to these values:
-      | Full name         | Custom field location   |
-      | Short name        | cflocation              |
-    And I press "Save changes"
-
-    # URL
-    And I should see "Create a new custom field"
-    And I set the field "datatype" to "URL"
-    And I expand all fieldsets
-    And I set the following fields to these values:
-      | Full name         | Custom field URL        |
-      | Short name        | cfurl                   |
-    And I press "Save changes"
+    And the following hierarchy type custom fields exist:
+      | hierarchy | typeidnumber | type     | fullname                | shortname  | value |
+      | position  | PosType      | text     | Custom field text input | cftext     |       |
+      | position  | PosType      | location | Custom field location   | cflocation |       |
+      | position  | PosType      | url      | Custom field URL        | cfurl      |       |
 
     # HR Import configuration
+    And I log in as "admin"
     And I navigate to "Default settings" node in "Site administration > HR Import"
     And I set the following fields to these values:
         | File access | Upload Files |

@@ -10,24 +10,16 @@ Feature: Upload competencies via HR Import using CSV file
       | Competency Framework 1 | compfw1  |
       | Competency Framework 2 | compfw2  |
 
-    And I log in as "admin"
-    And I navigate to "Manage types" node in "Site administration > Competencies"
-    And I press "Add a new type"
-    And I set the following fields to these values:
-      | Type full name            | Competency type |
-      | Competency type ID number | CompType        |
-    And I press "Save changes"
-    And I follow "Competency type"
+    And the following hierarchy types exist:
+      | hierarchy  | idnumber | fullname        |
+      | competency | CompType | Competency Type |
 
-    And I should see "Create a new custom field"
-    And I set the field "datatype" to "Text input"
-    And I should see "Editing custom field: Text input"
-    And I set the following fields to these values:
-      | fullname    | Custom field text input |
-      | shortname   | cftext                  |
-    And I press "Save changes"
+    And the following hierarchy type custom fields exist:
+      | hierarchy  | typeidnumber | type | fullname                | shortname | value |
+      | competency | CompType     | text | Custom field text input | cftext    |       |
 
     # HR Import configuration
+    And I log in as "admin"
     And I navigate to "Default settings" node in "Site administration > HR Import"
     And I set the following fields to these values:
         | File access | Upload Files |

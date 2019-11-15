@@ -610,6 +610,12 @@ class totara_hierarchy_generator extends component_generator_base {
         $this->create_hierarchy_type_customfield($customfield);
     }
 
+    public function create_hierarchy_type_url($data) {
+        $customfield = $data;
+        $customfield['field']  = 'url';
+        $this->create_hierarchy_type_customfield($customfield);
+    }
+
     public function create_hierarchy_type_datetime($data) {
         $customfield = $data;
         $customfield['field']  = 'datetime';

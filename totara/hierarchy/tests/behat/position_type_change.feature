@@ -9,34 +9,19 @@ Feature: Test position type changes in hierarchies
     And the following "role assigns" exist:
       | user      | role      | contextlevel | reference |
       | manager   | manager   | System       |           |
+
+    And the following hierarchy types exist:
+      | hierarchy | idnumber | fullname        |
+      | position  | postype1 | Position type 1 |
+      | position  | postype2 | Position type 2 |
+
+    And the following hierarchy type custom fields exist:
+      | hierarchy | typeidnumber | type | fullname         | shortname | value |
+      | position  | postype1     | text | Custom field 1_1 | CF1_1     |       |
+      | position  | postype1     | text | Custom field 1_2 | CF1_2     |       |
+      | position  | postype2     | text | Custom field 2_1 | CF2_1     |       |
+
     And I log in as "manager"
-    And I navigate to "Manage types" node in "Site administration > Positions"
-    And I press "Add a new type"
-    And I set the following fields to these values:
-    | Type full name | Position type 1 |
-    And I press "Save changes"
-    And I follow "Position type 1"
-    And I set the field "Create a new custom field" to "Text input"
-    And I set the following fields to these values:
-      | Full name                   | Custom field 1_1 |
-      | Short name (must be unique) | CF1_1            |
-    And I press "Save changes"
-    And I set the field "Create a new custom field" to "Text input"
-    And I set the following fields to these values:
-      | Full name                   | Custom field 1_2 |
-      | Short name (must be unique) | CF1_2            |
-    And I press "Save changes"
-    And I navigate to "Manage types" node in "Site administration > Positions"
-    And I press "Add a new type"
-    And I set the following fields to these values:
-      | Type full name | Position type 2 |
-    And I press "Save changes"
-    And I follow "Position type 2"
-    And I set the field "Create a new custom field" to "Text input"
-    And I set the following fields to these values:
-      | Full name                   | Custom field 2_1 |
-      | Short name (must be unique) | CF2_1            |
-    And I press "Save changes"
     And I navigate to "Manage positions" node in "Site administration > Positions"
     And I press "Add new position framework"
     And I set the following fields to these values:

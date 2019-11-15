@@ -137,29 +137,13 @@ Feature: Test new custom field capabilities
       | posuser     | pos     |
       | posfaceuser | posface |
 
-    And I log in as "admin"
     # Create testing Hierarchy types
-    And I navigate to "Manage types" node in "Site administration > Competencies"
-    And I press "Add a new type"
-    And I set the following fields to these values:
-      | Type full name | Competency Test Type |
-    And I press "Save changes"
-    And I navigate to "Manage company goal types" node in "Site administration > Goals"
-    And I press "Add a new company goal type"
-    And I set the following fields to these values:
-      | Type full name | Goal Test Type |
-    And I press "Save changes"
-    And I navigate to "Manage types" node in "Site administration > Organisations"
-    And I press "Add a new type"
-    And I set the following fields to these values:
-      | Type full name | Organisations Test Type |
-    And I press "Save changes"
-    And I navigate to "Manage types" node in "Site administration > Positions"
-    And I press "Add a new type"
-    And I set the following fields to these values:
-      | Type full name | Positions Test Type |
-    And I press "Save changes"
-    And I log out
+    And the following hierarchy types exist:
+      | hierarchy    | idnumber  | fullname                |
+      | competency   | comptype1 | Competency Test Type    |
+      | goal         | goaltype1 | Goal Test Type          |
+      | organisation | orgtype1  | Organisations Test Type |
+      | position     | postype1  | Positions Test Type     |
 
   Scenario: Check each role that they has access only relevant to their capabilities
 

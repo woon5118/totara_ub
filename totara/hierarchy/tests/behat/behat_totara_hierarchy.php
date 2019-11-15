@@ -294,6 +294,9 @@ class behat_totara_hierarchy extends behat_base {
                 case 'text':
                     $generator->create_hierarchy_type_text($record);
                     break;
+                case 'url':
+                    $generator->create_hierarchy_type_url($record);
+                    break;
                 case 'textarea':
                     $generator->create_hierarchy_type_textarea($record);
                     break;

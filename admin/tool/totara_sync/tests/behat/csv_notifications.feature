@@ -72,22 +72,13 @@ Feature: Verify CSV notifications are displayed correctly.
 
   Scenario: Verify Organisation CSV notifications.
 
-    Given I navigate to "Manage types" node in "Site administration > Organisations"
-    And I press "Add a new type"
-    And I set the following fields to these values:
-      | Type full name              | Organisation Type 1 |
-      | Organisation type ID number | OT1                 |
-    When I press "Save changes"
-    Then I should see "The organisation type \"Organisation Type 1\" has been created"
+    Given the following hierarchy types exist:
+      | hierarchy    | idnumber | fullname            |
+      | organisation | OT1      | Organisation Type 1 |
 
-    When I follow "Organisation Type 1"
-    And I set the field "Create a new custom field" to "Text input"
-    And I should see "Editing custom field: Text input"
-    And I set the following fields to these values:
-      | Full name  | Text Input 1 |
-      | Short name | textinput1   |
-    And I press "Save changes"
-    Then I should see "Text Input 1" in the "Text input" "table_row"
+    And the following hierarchy type custom fields exist:
+      | hierarchy    | typeidnumber | type | fullname     | shortname  | value |
+      | organisation | OT1          | text | Text Input 1 | textinput1 |       |
 
     # Check the empty fields are ignored notification.
     When I navigate to "Manage elements" node in "Site administration > HR Import > Elements"
@@ -145,22 +136,13 @@ Feature: Verify CSV notifications are displayed correctly.
 
   Scenario: Verify Position CSV notifications.
 
-    Given I navigate to "Manage types" node in "Site administration > Positions"
-    And I press "Add a new type"
-    And I set the following fields to these values:
-      | Type full name          | Position Type 1 |
-      | Position type ID number | PT1             |
-    When I press "Save changes"
-    Then I should see "The position type \"Position Type 1\" has been created"
+    Given the following hierarchy types exist:
+      | hierarchy | idnumber | fullname        |
+      | position  | PT1      | Position type 1 |
 
-    When I follow "Position Type 1"
-    And I set the field "Create a new custom field" to "Text input"
-    And I should see "Editing custom field: Text input"
-    And I set the following fields to these values:
-      | Full name  | Text Input 1 |
-      | Short name | textinput1   |
-    And I press "Save changes"
-    Then I should see "Text Input 1" in the "Text input" "table_row"
+    And the following hierarchy type custom fields exist:
+      | hierarchy | typeidnumber | type | fullname     | shortname  | value |
+      | position  | PT1          | text | Text Input 1 | textinput1 |       |
 
     # Check the empty fields are ignored notification.
     When I navigate to "Manage elements" node in "Site administration > HR Import > Elements"
