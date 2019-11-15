@@ -22,6 +22,8 @@
  * @subpackage hierarchy
  */
 
+use hierarchy_competency\event\competency_updated;
+
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/customfield/fieldlib.php');
@@ -117,7 +119,7 @@ if ($itemform->is_cancelled()) {
         redirect($CFG->wwwroot . "/totara/hierarchy/type/change.php?prefix=$prefix&amp;frameworkid={$item->frameworkid}&amp;page={$page}&typeid={$itemnew->typeid}&amp;itemid={$itemnew->id}");
     }
 
-    $itemold = $DB->get_record('comp', array('id' => $itemnew->id));
+    $itemold = $DB->get_record($prefix, array('id' => $itemnew->id));
 
     $itemnew->timemodified = time();
     $itemnew->usermodified = $USER->id;
@@ -164,7 +166,12 @@ if ($itemform->is_cancelled()) {
         $eventclass = "\\hierarchy_{$prefix}\\event\\{$prefix}_created";
         $eventclass::create_from_instance($itemnew)->trigger();
     } else if ($notificationtext === 'updated') {
-        $event = \hierarchy_competency\event\competency_updated::create_from_old_and_new($itemnew, $itemold);
+        if ($prefix == 'comp') {
+            $event = competency_updated::create_from_old_and_new($itemnew, $itemold);
+        } else {
+            $eventclass = "\\hierarchy_{$prefix}\\event\\{$prefix}_updated";
+            $event = $eventclass::create_from_instance($itemnew);
+        }
         $event->trigger();
     }
 
