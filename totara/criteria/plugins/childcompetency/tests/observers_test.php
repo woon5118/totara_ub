@@ -21,17 +21,18 @@
  * @package totara_criteria
  */
 
+use core\orm\collection;
 use core\orm\query\table;
 use criteria_childcompetency\childcompetency;
 use criteria_childcompetency\observer\achievement as achievement_observer;
+use totara_competency\entities\competency as competency_entity;
+use totara_competency\entities\competency_achievement as competency_achievement_entity;
 use totara_competency\event\competency_achievement_updated;
 use totara_criteria\criterion;
-use totara_competency\entities\competency as competency_entity;
-use totara_criteria\entities\criterion as criterion_entity;
 use totara_criteria\entities\criteria_item as item_entity;
 use totara_criteria\entities\criteria_item_record as item_record_entity;
 use totara_criteria\entities\criteria_metadata as metadata_entity;
-use totara_competency\entities\competency_achievement as competency_achievement_entity;
+use totara_criteria\entities\criterion as criterion_entity;
 use totara_criteria\event\criteria_achievement_changed;
 
 /**
@@ -361,7 +362,7 @@ class criteria_childcompetency_observers_testcase extends advanced_testcase {
      * Verify the criteria_item_records are as expected.
      *
      * @param int $child_competency_id - Child competency id
-     * @param array $expected_user_id - User id for which a record is expected
+     * @param array $expected_user_ids
      */
     private function verify_item_records(int $child_competency_id, array $expected_user_ids) {
         $item_type = (new childcompetency())->get_items_type();
@@ -401,8 +402,9 @@ class criteria_childcompetency_observers_testcase extends advanced_testcase {
 
     /**
      * Move the competency to the specied parent and trigger the event
+     *
      * @param competency_entity $competency Competency to move
-     * @param competency|null new_parent Parent to move to. If null, competency is moved to top
+     * @param competency_entity|null $new_parent
      */
     private function move_competency(competency_entity $competency, ?competency_entity $new_parent = null) {
         global $DB;
@@ -422,15 +424,20 @@ class criteria_childcompetency_observers_testcase extends advanced_testcase {
      *
      * @param int $competency_id
      * @param int $user_id
+     * @return \core\event\base
      */
     private function create_achievement_event(int $competency_id, int $user_id) {
         $aggregation_time = time();
+
+        /** @var totara_competency_assignment_generator $assign_generator */
+        $assign_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
+        $assignment = $assign_generator->create_user_assignment($competency_id, $user_id);
 
         // We need to have a valid competency_achievement record for the event
         $new_comp_achievement = new competency_achievement_entity();
         $new_comp_achievement->comp_id = $competency_id;
         $new_comp_achievement->user_id = $user_id;
-        $new_comp_achievement->assignment_id = 1;
+        $new_comp_achievement->assignment_id = $assignment->id;
         $new_comp_achievement->scale_value_id = 1;
         $new_comp_achievement->proficient = 0;
         $new_comp_achievement->status = competency_achievement_entity::ACTIVE_ASSIGNMENT;

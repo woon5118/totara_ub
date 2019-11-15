@@ -307,6 +307,11 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
             ['criterion_id' => $data->criterion->get_id(), 'item_type' => 'competency', 'item_id' => $child_id]
         );
 
+        if (is_null($assignment_id = $achievement['assignment'] ?? null)) {
+            $assignment = $this->generator()->assignment_generator()->create_user_assignment($child_id, $user_id);
+            $assignment_id = $assignment->id;
+        }
+
         foreach ($achievements as $achievement) {
             $this->create_achievement(
                 $child_id,
@@ -383,7 +388,13 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
 
     /**
      * Test update_item_records with totara_competency_achievement row as well as totara_criteria_item_record
+     *
      * @dataProvider achievement_and_item_record_data_provider
+     * @param $child_id
+     * @param $user_id
+     * @param $achievements
+     * @param $criterion_met
+     * @param $expected_is_met
      */
     public function test_update_item_records_achievement_and_item_record(
         $child_id,
@@ -403,10 +414,15 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
         );
         $record_id = $this->create_item_record($item_id, $user_id, $criterion_met);
 
+        if (is_null($assignment_id = $achievement['assignment'] ?? null)) {
+            $assignment = $this->generator()->assignment_generator()->create_user_assignment($child_id, $user_id);
+            $assignment_id = $assignment->id;
+        }
+
         foreach ($achievements as $achievement) {
             $this->create_achievement($child_id,
                 $user_id,
-                $achievement['assignment'] ?? null,
+                $assignment_id,
                 $achievement['proficient'] ?? 0,
                 $achievement['status'] ?? null
             );
@@ -420,4 +436,15 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
         $record = $DB->get_record('totara_criteria_item_record', ['criterion_item_id' => $item_id, 'user_id' => $user_id]);
         $this->assertEquals($expected_is_met, $record->criterion_met);
     }
+
+
+    /**
+     * Get competency specific generator
+     *
+     * @return totara_competency_generator
+     */
+    protected function generator() {
+        return $this->getDataGenerator()->get_plugin_generator('totara_competency');
+    }
+
 }
