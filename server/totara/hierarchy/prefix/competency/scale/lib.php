@@ -32,8 +32,8 @@
   */
 
 use core\orm\query\builder;
-use totara_competency\entities\competency_achievement;
-use totara_competency\entities\scale;
+use totara_competency\entities\assignment;
+use totara_competency\entities\pathway;
 
 /**
  * Determine whether an competency scale is assigned to any frameworks
@@ -66,10 +66,15 @@ function competency_scale_is_assigned($scaleid) {
  * @return boolean
  */
 function competency_scale_is_used(int $scaleid) {
-    $has_achievements = competency_achievement::repository()
+    $has_assignments = assignment::repository()
+        ->join(['comp', 'c'], 'competency_id', 'id')
+        ->join(['comp_scale_assignments', 'sca'], 'c.frameworkid', 'sca.id')
+        ->where('sca.scaleid', $scaleid)
+        ->exists();
+
+    $has_pathways = pathway::repository()
         ->join(['comp', 'c'], 'comp_id', 'id')
         ->join(['comp_scale_assignments', 'sca'], 'c.frameworkid', 'sca.id')
-        ->where('status', competency_achievement::ACTIVE_ASSIGNMENT)
         ->where('sca.scaleid', $scaleid)
         ->exists();
 
@@ -79,7 +84,7 @@ function competency_scale_is_used(int $scaleid) {
         ->where('scale_value_id', '>', 0)
         ->exists();
 
-    return $has_achievements || $has_learning_plan_values;
+    return (($has_assignments && $has_pathways) || $has_learning_plan_values);
 }
 
 
