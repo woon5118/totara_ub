@@ -31,6 +31,10 @@
  * in order to avoid name collisions
   */
 
+use core\orm\query\builder;
+use totara_competency\entities\competency_achievement;
+use totara_competency\entities\scale;
+
 /**
  * Determine whether an competency scale is assigned to any frameworks
  *
@@ -58,31 +62,24 @@ function competency_scale_is_assigned($scaleid) {
  * {@link competency_scale_is_assigned()} which tells you if the scale
  * even is assigned to any frameworks
  *
- * @param <type> $scaleid
+ * @param int $scaleid
  * @return boolean
  */
-function competency_scale_is_used($scaleid) {
-    global $DB;
+function competency_scale_is_used(int $scaleid) {
+    $has_achievements = competency_achievement::repository()
+        ->join(['comp', 'c'], 'comp_id', 'id')
+        ->join(['comp_scale_assignments', 'sca'], 'c.frameworkid', 'sca.id')
+        ->where('status', competency_achievement::ACTIVE_ASSIGNMENT)
+        ->where('sca.scaleid', $scaleid)
+        ->exists();
 
-    $sql = "SELECT
-                cr.competencyid
-            FROM
-                {comp_record} cr
-            LEFT JOIN {comp_scale_values} csv
-              ON csv.id = cr.proficiency
-            WHERE csv.scaleid = ?";
+    $has_learning_plan_values = builder::table('dp_plan_competency_value')
+        ->join(['comp_scale_values', 'csv'], 'scale_value_id', 'id')
+        ->where('csv.scaleid', $scaleid)
+        ->where('scale_value_id', '>', 0)
+        ->exists();
 
-
-    $sql2 = "SELECT
-                pca.scalevalueid
-             FROM
-                {dp_plan_competency_assign} pca
-             JOIN {comp_scale_values} csv
-                ON pca.scalevalueid = csv.id
-            WHERE
-                csv.scaleid = ?";
-
-    return ($DB->record_exists_sql($sql, array($scaleid)) || $DB->record_exists_sql($sql2, array($scaleid)));
+    return $has_achievements || $has_learning_plan_values;
 }
 
 

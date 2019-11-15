@@ -156,7 +156,7 @@ if ($id == 0) {
 
 // Display warning if scale is in use
 if ($scale_used) {
-    echo $OUTPUT->container(get_string('competencyscaleinuse', 'totara_hierarchy'), 'notifysuccess');
+    echo $OUTPUT->notification(get_string('competencyscaleinuse', 'totara_hierarchy'), 'warning');
 }
 
 $valueform->display();
