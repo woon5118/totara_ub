@@ -293,10 +293,10 @@ class totara_competency_install_testcase extends advanced_testcase {
             ['scaleid' => $talking_scale->id, 'sortorder' => $listening_proficient->sortorder + 1]
         );
 
-        $talking_bob = $this->add_comp_record($talking, $bob, $talking_proficient->id, 300, 400);
-        $talking_alice = $this->add_comp_record($talking, $alice, $talking_proficient->id, 300, 400);
-        $listening_bob = $this->add_comp_record($listening, $bob, $listening_proficient->id, 300, 400);
-        $listening_alice = $this->add_comp_record($listening, $alice, $listening_proficient->id, 300, 400);
+        $talking_bob = $this->add_comp_record($talking, $bob, $talking_proficient->id, 301, 401);
+        $talking_alice = $this->add_comp_record($talking, $alice, $talking_proficient->id, 302, 402);
+        $listening_bob = $this->add_comp_record($listening, $bob, $listening_proficient->id, 303, 403);
+        $listening_alice = $this->add_comp_record($listening, $alice, $listening_proficient->id, 304, 404);
 
         $talking_bob_latest = $this->add_comp_record_history($talking, $bob, $talking_bob->proficiency, $talking_bob->timemodified);
         $talking_alice_latest = $this->add_comp_record_history($talking, $alice, $talking_alice->proficiency, $talking_alice->timemodified);

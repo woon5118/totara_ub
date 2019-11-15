@@ -46,14 +46,24 @@ function totara_competency_install_migrate_achievements() {
     // If there's no comp_record, then we'll just be making a history record the most recent timestamp the current one.
 
     $histories = $DB->get_recordset_sql("
-        SELECT crh.id, crh.competencyid, crh.userid, crh.proficiency, crh.timemodified, crh.timeproficient, COALESCE (cr.id, 0) AS comp_record_id
-          FROM {comp_record_history} crh
-     LEFT JOIN {comp_record} cr 
+        SELECT 
+            crh.id, 
+            crh.competencyid, 
+            crh.userid, 
+            crh.proficiency, 
+            crh.timemodified, 
+            crh.timeproficient, 
+            COALESCE (cr.id, 0) AS comp_record_id
+        FROM {comp_record_history} crh
+        LEFT JOIN {comp_record} cr 
             ON crh.competencyid = cr.competencyid
-           AND crh.userid = cr.userid
-           AND (crh.proficiency = cr.proficiency OR crh.proficiency IS NULL AND cr.proficiency IS NULL)
-      ORDER BY crh.competencyid, crh.userid, comp_record_id DESC, crh.timemodified DESC
-        ");
+                AND crh.userid = cr.userid
+                AND (crh.proficiency = cr.proficiency OR crh.proficiency IS NULL AND cr.proficiency IS NULL)
+        ORDER BY crh.competencyid, 
+            crh.userid, 
+            comp_record_id DESC, 
+            crh.timemodified DESC
+    ");
 
     $now = time();
     $all_scale_values = $DB->get_records('comp_scale_values');
@@ -118,10 +128,9 @@ function totara_competency_install_migrate_achievements() {
         $comp_achievement->last_aggregated = $now;
 
         $comp_achievements[] = $comp_achievement;
-        
-        $DB->insert_records_via_batch('totara_competency_achievement', $comp_achievements);
-        $comp_achievements = [];
     }
+
+    $DB->insert_records_via_batch('totara_competency_achievement', $comp_achievements);
 
     $histories->close();
 }
