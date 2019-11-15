@@ -118,18 +118,12 @@ function totara_competency_install_migrate_achievements() {
         $comp_achievement->last_aggregated = $now;
 
         $comp_achievements[] = $comp_achievement;
-
-        if (count($comp_achievements) >= BATCH_INSERT_MAX_ROW_COUNT) {
-            $DB->insert_records('totara_competency_achievement', $comp_achievements);
-            $comp_achievements = [];
-        }
+        
+        $DB->insert_records_via_batch('totara_competency_achievement', $comp_achievements);
+        $comp_achievements = [];
     }
 
     $histories->close();
-
-    if (count($comp_achievements) > 0) {
-        $DB->insert_records('totara_competency_achievement', $comp_achievements);
-    }
 }
 
 /**

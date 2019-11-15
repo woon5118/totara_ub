@@ -51,23 +51,25 @@ class aggregation_highest_aggregation_testcase extends advanced_testcase {
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
         $competency = $competency_generator->create_competency();
 
+        $pathway1 = $competency_generator->create_test_pathway($competency);
+
         $achievement_detail = $this->getMockForAbstractClass(base_achievement_detail::class);
 
-        $pathway1 = $this->getMockBuilder(pathway::class)
+        $pathway1_mock = $this->getMockBuilder(pathway::class)
                          ->setMethods(['aggregate_current_value', 'get_id', 'get_competency'])
                          ->getMockForAbstractClass();
-        $pathway1->method('aggregate_current_value')->willReturn($achievement_detail);
-        $pathway1->method('get_id')->willReturn(201);
-        $pathway1->method('get_competency')->willReturn($competency);
+        $pathway1_mock->method('aggregate_current_value')->willReturn($achievement_detail);
+        $pathway1_mock->method('get_id')->willReturn($pathway1->get_id());
+        $pathway1_mock->method('get_competency')->willReturn($competency);
 
         $source_table = new aggregation_users_table();
         $source_table->queue_for_aggregation($user->id, $competency->id);
         $pw_user_source = new pathway_evaluator_user_source($source_table, true);
-        $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway1, $pw_user_source]);
+        $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway1_mock, $pw_user_source]);
         $pathway_evaluator->aggregate();
 
         $aggregation = new highest();
-        $aggregation->set_pathways([$pathway1])
+        $aggregation->set_pathways([$pathway1_mock])
                     ->aggregate_for_user($user->id);
 
         $this->assertNull($aggregation->get_achieved_value_id($user->id));
@@ -83,6 +85,8 @@ class aggregation_highest_aggregation_testcase extends advanced_testcase {
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
         $competency = $competency_generator->create_competency();
 
+        $pathway1 = $competency_generator->create_test_pathway($competency);
+
         $scale = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy')->create_scale('comp');
         $scale_values = $DB->get_records('comp_scale_values', ['scaleid' => $scale->id]);
         $scale_value = new scale_value(array_pop($scale_values));
@@ -90,26 +94,26 @@ class aggregation_highest_aggregation_testcase extends advanced_testcase {
         $achievement_detail = $this->getMockForAbstractClass(base_achievement_detail::class);
         $achievement_detail->set_scale_value_id($scale_value->id);
 
-        $pathway1 = $this->getMockBuilder(pathway::class)
+        $pathway1_mock = $this->getMockBuilder(pathway::class)
                          ->setMethods(['aggregate_current_value', 'get_id', 'get_competency'])
                          ->getMockForAbstractClass();
-        $pathway1->set_competency($competency);
-        $pathway1->method('aggregate_current_value')->willReturn($achievement_detail);
-        $pathway1->method('get_id')->willReturn(201);
-        $pathway1->method('get_competency')->willReturn($competency);
+        $pathway1_mock->set_competency($competency);
+        $pathway1_mock->method('aggregate_current_value')->willReturn($achievement_detail);
+        $pathway1_mock->method('get_id')->willReturn($pathway1->get_id());
+        $pathway1_mock->method('get_competency')->willReturn($competency);
 
         $source_table = new aggregation_users_table();
         $source_table->queue_for_aggregation($user->id, $competency->id);
         $pw_user_source = new pathway_evaluator_user_source($source_table, true);
-        $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway1, $pw_user_source]);
+        $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway1_mock, $pw_user_source]);
         $pathway_evaluator->aggregate();
 
         $aggregation = new highest();
-        $aggregation->set_pathways([$pathway1])
+        $aggregation->set_pathways([$pathway1_mock])
                     ->aggregate_for_user($user->id);
 
         // Reload current achievement as values will need to be strings from the database for the expected and actual to match.
-        $current_achievement = pathway_achievement::get_current($pathway1, $user->id);
+        $current_achievement = pathway_achievement::get_current($pathway1_mock, $user->id);
 
         $this->assertEquals($scale_value->id, $aggregation->get_achieved_value_id($user->id));
         $achieved_via = $aggregation->get_achieved_via($user->id);
@@ -127,6 +131,11 @@ class aggregation_highest_aggregation_testcase extends advanced_testcase {
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
         $competency = $competency_generator->create_competency();
 
+        $pathway1 = $competency_generator->create_test_pathway($competency);
+        $pathway2 = $competency_generator->create_test_pathway($competency);
+        $pathway3a = $competency_generator->create_test_pathway($competency);
+        $pathway3b = $competency_generator->create_test_pathway($competency);
+
         $scale = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy')->create_scale('comp');
         $scale_values = $DB->get_records('comp_scale_values', ['scaleid' => $scale->id], 'sortorder DESC');
 
@@ -137,63 +146,63 @@ class aggregation_highest_aggregation_testcase extends advanced_testcase {
         $scale_value1 = new scale_value(array_shift($scale_values));
 
         $achievement_detail1 = $this->getMockForAbstractClass(base_achievement_detail::class);
-        $pathway1 = $this->getMockBuilder(pathway::class)
+        $pathway1_mock = $this->getMockBuilder(pathway::class)
                          ->setMethods(['aggregate_current_value', 'get_id', 'get_competency'])
                          ->getMockForAbstractClass();
-        $pathway1->method('aggregate_current_value')->willReturn($achievement_detail1);
-        $pathway1->method('get_id')->willReturn(201);
-        $pathway1->method('get_competency')->willReturn($competency);
+        $pathway1_mock->method('aggregate_current_value')->willReturn($achievement_detail1);
+        $pathway1_mock->method('get_id')->willReturn($pathway1->get_id());
+        $pathway1_mock->method('get_competency')->willReturn($competency);
 
         $source_table = new aggregation_users_table();
         $source_table->queue_for_aggregation($user->id, $competency->id);
         $pw_user_source = new pathway_evaluator_user_source($source_table, true);
-        $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway1, $pw_user_source]);
+        $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway1_mock, $pw_user_source]);
         $pathway_evaluator->aggregate();
 
         // This is the second value and we use it to give the user an achievement
         $scale_value2 = new scale_value(array_shift($scale_values));
         $achievement_detail2 = $this->getMockForAbstractClass(base_achievement_detail::class);
         $achievement_detail2->set_scale_value_id($scale_value2->id);
-        $pathway2 = $this->getMockBuilder(pathway::class)
+        $pathway2_mock = $this->getMockBuilder(pathway::class)
                          ->setMethods(['aggregate_current_value', 'get_id', 'get_competency'])
                          ->getMockForAbstractClass();
-        $pathway2->method('aggregate_current_value')->willReturn($achievement_detail2);
-        $pathway2->method('get_id')->willReturn(202);
-        $pathway2->method('get_competency')->willReturn($competency);
+        $pathway2_mock->method('aggregate_current_value')->willReturn($achievement_detail2);
+        $pathway2_mock->method('get_id')->willReturn($pathway2->get_id());
+        $pathway2_mock->method('get_competency')->willReturn($competency);
 
-        $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway2, $pw_user_source]);
+        $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway2_mock, $pw_user_source]);
         $pathway_evaluator->aggregate();
 
         // This is the highest value, which should be the one the users gets at the end as it's the highest
         $scale_value3 = new scale_value(array_shift($scale_values));
         $achievement_detail3 = $this->getMockForAbstractClass(base_achievement_detail::class);
         $achievement_detail3->set_scale_value_id($scale_value3->id);
-        $pathway3a = $this->getMockBuilder(pathway::class)
+        $pathway3a_mock = $this->getMockBuilder(pathway::class)
                          ->setMethods(['aggregate_current_value', 'get_id', 'get_competency'])
                          ->getMockForAbstractClass();
-        $pathway3a->method('aggregate_current_value')->willReturn($achievement_detail3);
-        $pathway3a->method('get_id')->willReturn(203);
-        $pathway3a->method('get_competency')->willReturn($competency);
+        $pathway3a_mock->method('aggregate_current_value')->willReturn($achievement_detail3);
+        $pathway3a_mock->method('get_id')->willReturn($pathway3a->get_id());
+        $pathway3a_mock->method('get_competency')->willReturn($competency);
 
-        $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway3a, $pw_user_source]);
+        $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway3a_mock, $pw_user_source]);
         $pathway_evaluator->aggregate();
 
-        $pathway3b = $this->getMockBuilder(pathway::class)
+        $pathway3b_mock = $this->getMockBuilder(pathway::class)
                          ->setMethods(['aggregate_current_value', 'get_id', 'get_competency'])
                          ->getMockForAbstractClass();
-        $pathway3b->method('aggregate_current_value')->willReturn($achievement_detail3);
-        $pathway3b->method('get_id')->willReturn(204);
-        $pathway3b->method('get_competency')->willReturn($competency);
+        $pathway3b_mock->method('aggregate_current_value')->willReturn($achievement_detail3);
+        $pathway3b_mock->method('get_id')->willReturn($pathway3b->get_id());
+        $pathway3b_mock->method('get_competency')->willReturn($competency);
 
-        $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway3b, $pw_user_source]);
+        $pathway_evaluator = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway3b_mock, $pw_user_source]);
         $pathway_evaluator->aggregate();
 
         $aggregation = new highest();
-        $aggregation->set_pathways([$pathway1, $pathway2, $pathway3a, $pathway3b])
+        $aggregation->set_pathways([$pathway1_mock, $pathway2_mock, $pathway3a_mock, $pathway3b_mock])
                     ->aggregate_for_user($user->id);
 
-        $current_achievement3a = pathway_achievement::get_current($pathway3a, $user->id);
-        $current_achievement3b = pathway_achievement::get_current($pathway3b, $user->id);
+        $current_achievement3a = pathway_achievement::get_current($pathway3a_mock, $user->id);
+        $current_achievement3b = pathway_achievement::get_current($pathway3b_mock, $user->id);
 
         $this->assertEquals($scale_value3->id, $aggregation->get_achieved_value_id($user->id));
         $achieved_via = $aggregation->get_achieved_via($user->id);

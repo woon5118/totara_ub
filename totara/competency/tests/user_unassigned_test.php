@@ -31,7 +31,7 @@ use totara_competency\entities\competency_assignment_user_log;
 use totara_competency\entities\scale_value;
 use totara_competency\expand_task;
 use totara_competency\settings;
-use totara_competency\task\competency_achievement_aggregation;
+use totara_competency\task\competency_aggregation_all;
 
 class totara_competency_user_unassigned_testcase extends advanced_testcase {
 
@@ -396,7 +396,7 @@ class totara_competency_user_unassigned_testcase extends advanced_testcase {
 
         // assign user to competency
         $this->generator()->create_manual_rating($manual_pathway, $user, $user, manual::ROLE_SELF, $value);
-        (new competency_achievement_aggregation())->execute();
+        (new competency_aggregation_all())->execute();
 
         return [
             'users' => [

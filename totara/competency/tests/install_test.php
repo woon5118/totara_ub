@@ -258,19 +258,29 @@ class totara_competency_install_testcase extends advanced_testcase {
     public function test_multiple_users_and_competencies() {
         global $DB;
 
-        // Competency ids
-        $talking = 100;
-        $listening = 101;
-
-        // User ids.
-        $bob = 200;
-        $alice = 201;
-        $eve = 202;
-
         /** @var totara_hierarchy_generator $totara_hierarchy_generator */
         $totara_hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
         $talking_scale = $totara_hierarchy_generator->create_scale('comp');
         $listening_scale = $totara_hierarchy_generator->create_scale('comp');
+
+        /** @var totara_competency_generator $competency_generator */
+        $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+
+        $competency1 = $competency_generator->create_competency();
+        $competency2 = $competency_generator->create_competency();
+
+        // Competency ids
+        $talking = $competency1->id;
+        $listening = $competency2->id;
+
+        // User ids.
+        $bob = $user1->id;
+        $alice = $user2->id;
+        $eve = $user3->id;
 
         $talking_proficient = $DB->get_record('comp_scale_values', ['id' => $talking_scale->minproficiencyid]);
         $talking_not_proficient = $DB->get_record(

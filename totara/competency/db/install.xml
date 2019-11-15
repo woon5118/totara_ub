@@ -44,6 +44,12 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="comcompat_com_fk" TYPE="foreign" FIELDS="comp_id" REFTABLE="comp" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="ix_sortorder" UNIQUE="false" FIELDS="sortorder"/>
+        <INDEX NAME="ix_path_instance_id" UNIQUE="false" FIELDS="path_instance_id"/>
+        <INDEX NAME="ix_path_type_instance_id" UNIQUE="false" FIELDS="path_type, path_instance_id"/>
+        <INDEX NAME="ix_status" UNIQUE="false" FIELDS="status"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="totara_competency_scale_aggregation" COMMENT="Method of aggregation when determining achieved value">
       <FIELDS>
@@ -71,7 +77,7 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="comupwach_user_fk" TYPE="foreign" FIELDS="user_id" REFTABLE="user" REFFIELDS="id"/>
-        <KEY NAME="comupwach_pw_fk" TYPE="foreign" FIELDS="pathway_id" REFTABLE="totara_competency_pathway" REFFIELDS="id"/>
+        <KEY NAME="comupwach_pw_fk" TYPE="foreign" FIELDS="pathway_id" REFTABLE="totara_competency_pathway" REFFIELDS="id" ONDELETE="cascade"/>
         <KEY NAME="comupwach_sv_fk" TYPE="foreign" FIELDS="scale_value_id" REFTABLE="comp_scale_values" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
@@ -96,7 +102,13 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="fk_assignment_id" TYPE="foreign" FIELDS="assignment_id" REFTABLE="totara_competency_assignments" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="fk_comp_id" TYPE="foreign" FIELDS="comp_id" REFTABLE="comp" REFFIELDS="id"/>
+        <KEY NAME="fk_user_id" TYPE="foreign" FIELDS="user_id" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="fk_scale_value_id" TYPE="foreign" FIELDS="scale_value_id" REFTABLE="comp_scale_values" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="ix_comp_id_user_id" UNIQUE="false" FIELDS="comp_id, user_id"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="totara_competency_achievement_via" COMMENT="Record of pathways that contributed to a specific competency achievement">
       <FIELDS>
@@ -122,10 +134,8 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="fk_assignment_id" TYPE="foreign" FIELDS="assignment_id" REFTABLE="totara_competency_assignments" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="fk_comp_id" TYPE="foreign" FIELDS="comp_id" REFTABLE="comp" REFFIELDS="id"/>
       </KEYS>
-      <INDEXES>
-        <INDEX NAME="comconfch_ux" UNIQUE="true" FIELDS="comp_id, assignment_id, time_changed, change_type"/>
-      </INDEXES>
     </TABLE>
     <TABLE NAME="totara_competency_configuration_history" COMMENT="History of criteria configuration during a specific period">
       <FIELDS>
@@ -139,6 +149,7 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="fk_assignment_id" TYPE="foreign" FIELDS="assignment_id" REFTABLE="totara_competency_assignments" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="fk_comp_id" TYPE="foreign" FIELDS="comp_id" REFTABLE="comp" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="totara_competency_aggregation_queue" COMMENT="Queuing table to hold aggregations to process">
@@ -152,10 +163,11 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_user_id" TYPE="foreign" FIELDS="user_id" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="fk_competency_id" TYPE="foreign" FIELDS="competency_id" REFTABLE="comp" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="user_competency_id" UNIQUE="false" FIELDS="user_id, competency_id"/>
-        <INDEX NAME="competency_id" UNIQUE="false" FIELDS="competency_id"/>
         <INDEX NAME="process_key" UNIQUE="false" FIELDS="process_key"/>
       </INDEXES>
     </TABLE>
@@ -190,7 +202,7 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="action" UNIQUE="false" FIELDS="action"/>
-        <INDEX NAME="created_at" UNIQUE="false" FIELDS="action"/>
+        <INDEX NAME="created_at" UNIQUE="false" FIELDS="created_at"/>
       </INDEXES>
     </TABLE>
   </TABLES>

@@ -259,5 +259,129 @@ function xmldb_totara_competency_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019111400, 'totara', 'competency');
     }
 
+    if ($oldversion < 2019111500) {
+
+        // Define index ix_sortorder (not unique) to be added to totara_competency_pathway.
+        $table = new xmldb_table('totara_competency_pathway');
+        $index = new xmldb_index('ix_sortorder', XMLDB_INDEX_NOTUNIQUE, array('sortorder'));
+
+        // Conditionally launch add index ix_sortorder.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        $index = new xmldb_index('ix_path_instance_id', XMLDB_INDEX_NOTUNIQUE, array('path_instance_id'));
+
+        // Conditionally launch add index ix_path_instance_id.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        $index = new xmldb_index('ix_path_type_instance_id', XMLDB_INDEX_NOTUNIQUE, array('path_type', 'path_instance_id'));
+
+        // Conditionally launch add index ix_path_type_instance_id.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        $index = new xmldb_index('ix_status', XMLDB_INDEX_NOTUNIQUE, array('status'));
+
+        // Conditionally launch add index ix_status.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Define key comupwach_pw_fk (foreign) to be dropped form totara_competency_pathway_achievement.
+        $table = new xmldb_table('totara_competency_pathway_achievement');
+        $key = new xmldb_key('comupwach_pw_fk', XMLDB_KEY_FOREIGN, array('pathway_id'), 'totara_competency_pathway', array('id'));
+
+        // Launch drop key comupwach_pw_fk.
+        $dbman->drop_key($table, $key);
+
+        $key = new xmldb_key('comupwach_pw_fk', XMLDB_KEY_FOREIGN, array('pathway_id'), 'totara_competency_pathway', array('id'), 'cascade');
+
+        // Launch add key comupwach_pw_fk.
+        $dbman->add_key($table, $key);
+
+        // Define index comconfch_ux (unique) to be dropped form totara_competency_configuration_change.
+        $table = new xmldb_table('totara_competency_configuration_change');
+        $index = new xmldb_index('comconfch_ux', XMLDB_INDEX_UNIQUE, array('comp_id', 'assignment_id', 'time_changed', 'change_type'));
+
+        // Conditionally launch drop index comconfch_ux.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Define key fk_comp_id (foreign) to be added to totara_competency_achievement.
+        $table = new xmldb_table('totara_competency_achievement');
+        $key = new xmldb_key('fk_comp_id', XMLDB_KEY_FOREIGN, array('comp_id'), 'comp', array('id'));
+
+        // Launch add key fk_comp_id.
+        $dbman->add_key($table, $key);
+
+        $key = new xmldb_key('fk_user_id', XMLDB_KEY_FOREIGN, array('user_id'), 'user', array('id'));
+
+        // Launch add key fk_user_id.
+        $dbman->add_key($table, $key);
+
+        $key = new xmldb_key('fk_scale_value_id', XMLDB_KEY_FOREIGN, array('scale_value_id'), 'comp_scale_values', array('id'));
+
+        // Launch add key fk_scale_value_id.
+        $dbman->add_key($table, $key);
+
+        $index = new xmldb_index('ix_comp_id_user_id', XMLDB_INDEX_NOTUNIQUE, array('comp_id', 'user_id'));
+
+        // Conditionally launch add index ix_comp_id_user_id.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Define key fk_comp_id (foreign) to be added to totara_competency_configuration_history.
+        $table = new xmldb_table('totara_competency_configuration_history');
+        $key = new xmldb_key('fk_comp_id', XMLDB_KEY_FOREIGN, array('comp_id'), 'comp', array('id'));
+
+        // Launch add key fk_comp_id.
+        $dbman->add_key($table, $key);
+
+        // Define key fk_user_id (foreign) to be added to totara_competency_aggregation_queue.
+        $table = new xmldb_table('totara_competency_aggregation_queue');
+        $key = new xmldb_key('fk_user_id', XMLDB_KEY_FOREIGN, array('user_id'), 'user', array('id'));
+
+        // Launch add key fk_user_id.
+        $dbman->add_key($table, $key);
+
+        $key = new xmldb_key('fk_competency_id', XMLDB_KEY_FOREIGN, array('competency_id'), 'comp', array('id'));
+
+        // Launch add key fk_competency_id.
+        $dbman->add_key($table, $key);
+
+        $index = new xmldb_index('competency_id', XMLDB_INDEX_NOTUNIQUE, array('competency_id'));
+
+        // Conditionally launch drop index competency_id.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Define index created_at (not unique) to be dropped form totara_competency_assignment_user_logs.
+        $table = new xmldb_table('totara_competency_assignment_user_logs');
+        $index = new xmldb_index('created_at', XMLDB_INDEX_NOTUNIQUE, array('action'));
+
+        // Conditionally launch drop index created_at.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        $index = new xmldb_index('created_at', XMLDB_INDEX_NOTUNIQUE, array('created_at'));
+
+        // Conditionally launch add index created_at.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Competency savepoint reached.
+        upgrade_plugin_savepoint(true, 2019111500, 'totara', 'competency');
+    }
+
+
     return true;
 }
