@@ -95,10 +95,10 @@ class totara_catalog_settings_observer_testcase extends advanced_testcase {
         );
         $event->trigger();
 
-        $this->assertEquals(1, $DB->count_records('task_adhoc'));
-        $task = \core\task\manager::get_next_adhoc_task(time());
-        $task->execute();
-        \core\task\manager::adhoc_task_complete($task);
+        $this->assertTrue($DB->record_exists('task_adhoc', ['classname' => '\totara_catalog\task\refresh_catalog_adhoc']));
+        ob_start();
+        self::execute_adhoc_tasks();
+        ob_end_clean();
 
         // check the result after adhoc task completed
         $this->assertSame(2, $DB->count_records('catalog'));

@@ -33,6 +33,10 @@ require_once($CFG->libdir  . '/coursecatlib.php');
 
 /**
  * Test audience visibility in courses.
+ *
+ * To test, run this from the command line from the $CFG->dirroot
+ * vendor/bin/phpunit totara_cohort_course_audiencevisibility_testcase
+ *
  */
 class totara_cohort_course_audiencevisibility_testcase extends advanced_testcase {
     /** @var stdClass $user1 */
@@ -187,6 +191,8 @@ class totara_cohort_course_audiencevisibility_testcase extends advanced_testcase
         totara_cohort_add_association($this->audience2->id, $this->course4->id,
                                         COHORT_ASSN_ITEMTYPE_COURSE, COHORT_ASSN_VALUE_VISIBLE);
 
+        \totara_core\visibility_controller::course()->map()->recalculate_complete_map();
+
         // Check the assignments were created correctly.
         $params = array('cohortid' => $this->audience1->id, 'instanceid' => $this->course2->id,
                             'instancetype' => COHORT_ASSN_ITEMTYPE_COURSE);
@@ -274,7 +280,7 @@ class totara_cohort_course_audiencevisibility_testcase extends advanced_testcase
             // Courses visible to the user.
             foreach ($coursesvisible as $course) {
                 list($visible, $access, $search) = $this->get_visible_info($CFG->audiencevisibility, $content, $this->{$course});
-                $this->assertTrue($visible);
+                $this->assertTrue($visible, $this->{$course}->fullname . ' was expected to be visible but was not');
                 // Test #2: Try to access them.
                 $this->assertTrue($access);
                 // Test #3: Try to do a search for courses.
@@ -392,16 +398,7 @@ class totara_cohort_course_audiencevisibility_testcase extends advanced_testcase
         global $PAGE, $CFG;
         $visible = false;
 
-        $coursecontext = context_course::instance($course->id);
-
-        if ($coursecontext->is_user_access_prevented($userid)) {
-            $access = false;
-        } else if ($audiencevisibility) {
-            $access = check_access_audience_visibility('course', $course, $userid);
-        } else {
-            $access = $course->visible ||
-                has_capability('moodle/course:viewhiddencourses', $coursecontext, $userid);
-        }
+        $access = totara_course_is_viewable($course, $userid);
 
         if ($CFG->catalogtype === 'enhanced') { // Enhanced catalog.
             $search = array();
@@ -435,5 +432,7 @@ class totara_cohort_course_audiencevisibility_testcase extends advanced_testcase
         // Assign audience1 and audience2 to course6 and course 5 respectively.
         totara_cohort_add_association($this->audience2->id, $this->course6->id, COHORT_ASSN_ITEMTYPE_COURSE, COHORT_ASSN_VALUE_VISIBLE);
         totara_cohort_add_association($this->audience1->id, $this->course5->id, COHORT_ASSN_ITEMTYPE_COURSE, COHORT_ASSN_VALUE_VISIBLE);
+
+        \totara_core\visibility_controller::course()->map()->recalculate_complete_map();
     }
 }

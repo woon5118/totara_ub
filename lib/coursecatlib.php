@@ -570,6 +570,9 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         // Purge cache even if fix_course_sortorder() did not do it.
         cache_helper::purge_by_event('changesincoursecat');
 
+        // TOTARA: ensure the map tables are updated.
+        \totara_core\task\visibility_map_regenerate_all::queue();
+
         // Update all fields in the current object.
         $this->restore();
     }
@@ -985,7 +988,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      * @return array array of stdClass objects
      */
     public static function get_course_records($whereclause, $params, $options, $checkvisibility = false) {
-        global $DB, $CFG, $USER;
+        global $DB, $USER;
 
         $ctxselect = context_helper::get_preload_record_columns_sql('ctx');
         $fields = array('c.id', 'c.category', 'c.sortorder',
@@ -999,17 +1002,17 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         }
 
         if ($checkvisibility) {
-            require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
-            list($visibilitysql, $visibilityparams) = totara_visibility_where($USER->id, 'c.id', 'c.visible', 'c.audiencevisible');
-
-            $whereclause .= " AND {$visibilitysql} ";
-            $params = array_merge($params, $visibilityparams);
+            $visibilitysql = \totara_core\visibility_controller::course()->sql_where_visible($USER->id, 'c');
+            if (!$visibilitysql->is_empty()) {
+                $whereclause .= ' AND ' . $visibilitysql->get_sql();
+                $params = array_merge($params, $visibilitysql->get_params());
+            }
         }
 
         $sql = "SELECT ". join(',', $fields). ", $ctxselect
                 FROM {course} c
                 JOIN {context} ctx ON c.id = ctx.instanceid AND ctx.contextlevel = :contextcourse
-                WHERE " . $whereclause . " ORDER BY c.sortorder";
+                WHERE " . $whereclause . " ORDER BY c.sortorder ASC";
 
         $list = $DB->get_records_sql($sql, array('contextcourse' => CONTEXT_COURSE) + $params);
 
@@ -1676,7 +1679,13 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
 
         [$insql, $inparams] = $DB->get_in_or_equal($toload, SQL_PARAMS_NAMED, 'c');
-        [$wheresql, $whereparams] = totara_visibility_where($USER->id);
+        $where = \totara_core\visibility_controller::course()->sql_where_visible($USER->id, 'course');
+        $wheresql = '';
+        $whereparams = [];
+        if (!$where->is_empty()) {
+            $wheresql = ' AND ' . $where->get_sql();
+            $whereparams = $where->get_params();
+        }
 
         // TOTARA: Note that group_concat in MSSQL 2016 and below does not support sorting.
         // Its not a problem here as the cache is used to load courses by get_course_records() which internally
@@ -1685,8 +1694,8 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
 
         $sql = "SELECT course.category, COUNT(course.id) AS coursecount, {$courseids} AS courseids
                   FROM {course} course
-                  JOIN {context} ctx ON ctx.instanceid = course.id AND ctx.contextlevel = 50
-                 WHERE course.category {$insql} AND {$wheresql}
+                  JOIN {context} ctx ON ctx.instanceid = course.id AND ctx.contextlevel = " . CONTEXT_COURSE . "
+                 WHERE course.category {$insql} {$wheresql}
               GROUP BY course.category";
         $params = array_merge($inparams, $whereparams);
         $counts = $DB->get_records_sql($sql, $params);
@@ -2261,6 +2270,9 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             ));
             $event->set_legacy_logdata(array(SITEID, 'category', 'move', 'editcategory.php?id=' . $this->id, $this->id));
             $event->trigger();
+
+            // TOTARA: ensure the map tables are updated.
+            \totara_core\task\visibility_map_regenerate_all::queue();
         }
     }
 

@@ -1940,7 +1940,14 @@ class completion_info {
     public static function get_all_courses($userid, $limit=0) {
         global $DB;
 
-        list($visibilitysql, $visibilityparams) = totara_visibility_where($userid, 'c.id', 'c.visible', 'c.audiencevisible');
+        $visibility = \totara_core\visibility_controller::course()->sql_where_visible($userid, 'c');
+        $visibilitysql = '';
+        $visibilityparams = [];
+        if (!$visibility->is_empty()) {
+            $visibilitysql = ' AND ' . $visibility->get_sql();
+            $visibilityparams = $visibility->get_params();
+        }
+
         $params = array('userid' => $userid);
         $params = array_merge($params, $visibilityparams);
 
@@ -1965,7 +1972,7 @@ class completion_info {
              ON ctx.instanceid = c.id AND ctx.contextlevel = " . CONTEXT_COURSE . "
             WHERE
                 cc.userid = :userid
-            AND {$visibilitysql}
+            {$visibilitysql}
             AND
             (
                 cc.timeenrolled > 0

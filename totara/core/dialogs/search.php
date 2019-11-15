@@ -261,9 +261,13 @@ switch ($searchtype) {
         }
 
         $search_info->sql .= " WHERE {$searchsql} ";
-        list($visibilitysql, $visibilityparams) = totara_visibility_where($USER->id, 'c.id', 'c.visible', 'c.audiencevisible');
-        $search_info->sql .= " AND {$visibilitysql}";
-        $params = array_merge($params, $visibilityparams);
+
+        $visibility = \totara_core\visibility_controller::course()->sql_where_visible($USER->id, 'c');
+
+        if (!$visibility->is_empty()) {
+            $search_info->sql .= ' AND ' . $visibility->get_sql();
+            $params = array_merge($params, $visibility->get_params());
+        }
 
         if ($this->requirecompletion || $this->requirecompletioncriteria) {
             $search_info->sql .= "
@@ -295,23 +299,18 @@ switch ($searchtype) {
         $keywords = totara_search_parse_keywords($query);
         $fields = array('p.fullname', 'p.shortname');
         list($searchsql, $params) = totara_search_get_keyword_where_clause($keywords, $fields, SQL_PARAMS_NAMED);
-        list($visibilitysql, $visibilityparams) = totara_visibility_where(null,
-                                                                          'p.id',
-                                                                          'p.visible',
-                                                                          'p.audiencevisible',
-                                                                          'p',
-                                                                          $searchtype);
+        $visibility = \totara_core\visibility_controller::{$searchtype}()->sql_where_visible($USER->id, 'p');
+
         $search_info->sql = "
-            FROM
-                {prog} p
-            LEFT JOIN
-                {context} ctx
-              ON p.id = ctx.instanceid AND contextlevel = " . CONTEXT_PROGRAM . "
-            WHERE
-                  {$searchsql}
-              AND {$visibilitysql}
+            FROM {prog} p
+            LEFT JOIN {context} ctx ON p.id = ctx.instanceid AND contextlevel = " . CONTEXT_PROGRAM . "
+            WHERE {$searchsql}
         ";
-        $params = array_merge($params, $visibilityparams);
+
+        if (!$visibility->is_empty()) {
+            $search_info->sql .= ' AND ' . $visibility->get_sql();
+            $params = array_merge($params, $visibility->get_params());
+        }
 
         // Adjust the SQL for programs or certifications.
         $search_info->sql .= " AND certifid IS " . ($searchtype == 'program' ? 'NULL' : 'NOT NULL');

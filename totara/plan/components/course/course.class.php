@@ -403,7 +403,7 @@ class dp_course_component extends dp_base_component {
             $PAGE->requires->string_for_js('save', 'totara_core');
             $PAGE->requires->string_for_js('cancel', 'moodle');
             $PAGE->requires->string_for_js('addcourses', 'totara_plan');
-            
+
             $jsparams = [$this->plan->id, $paginated, $component_name];
             $PAGE->requires->js_call_amd('totara_plan/components_course_find', 'init', $jsparams);
         }
@@ -534,13 +534,6 @@ class dp_course_component extends dp_base_component {
             $params['userid'] = $this->plan->userid;
         }
 
-        list($visibilitysql, $visibilityparams) = totara_visibility_where($this->plan->userid,
-                                                                          'c.id',
-                                                                          'c.visible',
-                                                                          'c.audiencevisible',
-                                                                          'c',
-                                                                          'course');
-
         $select = "SELECT ca.*, c.fullname, c.icon, c.visible, c.audiencevisible, psv.name AS priorityname, $completion_field";
 
         // get courses assigned to this plan
@@ -562,12 +555,18 @@ class dp_course_component extends dp_base_component {
         ";
         $params['pscaleid'] = $priorityscaleid;
         list($insql, $inparams) = $DB->get_in_or_equal($list, SQL_PARAMS_NAMED);
+        $params = array_merge($params, $inparams);
         $where = " WHERE ca.id $insql
             AND ca.approved >= :status ";
-        $params = array_merge($params, $inparams, $visibilityparams);
         // We are looking for courses that were added to an approved plan by a user with "Request" permission.
         $params['status'] = DP_APPROVAL_UNAPPROVED;
-        $where .= " AND {$visibilitysql} ";
+
+        $visibility = \totara_core\visibility_controller::course()->sql_where_visible($this->plan->userid, 'c');
+        if (!empty($visibility->is_empty())) {
+            $where .= ' AND ' . $visibility->get_sql();
+            $params = array_merge($params, $visibility->get_params());
+        }
+
         $sort = " ORDER BY c.fullname";
 
         $tableheaders = array(

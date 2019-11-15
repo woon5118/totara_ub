@@ -808,5 +808,73 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020021300, 'totara', 'core');
     }
 
+    if ($oldversion < 2020021700) {
+        // Define table totara_core_course_vis_map to be created.
+        $table = new xmldb_table('totara_core_course_vis_map');
+
+        // Adding fields to table totara_core_course_vis_map.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('roleid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table totara_core_course_vis_map.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('courseid', XMLDB_KEY_FOREIGN, array('courseid'), 'course', array('id'));
+        $table->add_key('roleid', XMLDB_KEY_FOREIGN, array('roleid'), 'role', array('id'));
+
+        // Adding indexes to table totara_core_course_vis_map.
+        $table->add_index('courseid-roleid', XMLDB_INDEX_UNIQUE, array('courseid', 'roleid'));
+
+        // Conditionally launch create table for totara_core_course_vis_map.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table totara_core_program_vis_map to be created.
+        $table = new xmldb_table('totara_core_program_vis_map');
+
+        // Adding fields to table totara_core_program_vis_map.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('programid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('roleid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table totara_core_program_vis_map.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('programid', XMLDB_KEY_FOREIGN, array('programid'), 'course', array('id'));
+        $table->add_key('roleid', XMLDB_KEY_FOREIGN, array('roleid'), 'role', array('id'));
+
+        // Adding indexes to table totara_core_program_vis_map.
+        $table->add_index('programid-roleid', XMLDB_INDEX_UNIQUE, array('programid', 'roleid'));
+
+        // Conditionally launch create table for totara_core_program_vis_map.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table totara_core_program_vis_map to be created.
+        $table = new xmldb_table('totara_core_certification_vis_map');
+
+        // Adding fields to table totara_core_program_vis_map.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('programid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('roleid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table totara_core_program_vis_map.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('programid', XMLDB_KEY_FOREIGN, array('programid'), 'course', array('id'));
+        $table->add_key('roleid', XMLDB_KEY_FOREIGN, array('roleid'), 'role', array('id'));
+
+        // Adding indexes to table totara_core_program_vis_map.
+        $table->add_index('programid-roleid', XMLDB_INDEX_UNIQUE, array('programid', 'roleid'));
+
+        // Conditionally launch create table for totara_core_program_vis_map.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2020021700, 'totara', 'core');
+    }
+
     return true;
 }

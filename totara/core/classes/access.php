@@ -196,7 +196,7 @@ EXISTS (
      *
      * @return string sql fragment with embedded parameters
      */
-    private static function get_role_assignments_subquery($userid) {
+    public static function get_role_assignments_subquery($userid) {
         global $CFG;
 
         $systemcontext = \context_system::instance();

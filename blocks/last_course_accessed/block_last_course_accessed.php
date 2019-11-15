@@ -98,21 +98,23 @@ class block_last_course_accessed extends block_base {
 
         // Get the course and completion data for the course and user. Using a LEFT JOIN allows for
         // the possibility of no completion data, in which case we won't display the progress bar.
-        $sql = "SELECT c.id, c.fullname, cc.status, " . context_helper::get_preload_record_columns_sql('ctx') . "
+        $ctxfields = context_helper::get_preload_record_columns_sql('ctx');
+        $sql = "SELECT c.id, c.fullname, c.visible, c.audiencevisible, cc.status, {$ctxfields}
                 FROM {course} c
                 LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)
                 LEFT JOIN {course_completions} cc ON c.id = cc.course AND cc.userid = :userid
                 WHERE c.id = :courseid";
         $params = array('courseid' => $courseid, 'userid' => $USER->id, 'contextlevel' => CONTEXT_COURSE);
 
-        // Get visibility sql for the courses the user can view.
-        list($visibilitysql, $visibilityparams) = totara_visibility_where($USER->id, 'c.id', 'c.visible', 'c.audiencevisible');
-        $sql .= " AND {$visibilitysql} ";
-        $params = array_merge($params, $visibilityparams);
-
         $course = $DB->get_record_sql($sql, $params);
-
         if (!$course) {
+            // The course does not exist.
+            return $this->content;
+        }
+        // Preload the context.
+        context_helper::preload_from_record($course);
+        if (!totara_course_is_viewable($course)) {
+            // The user can no longer see the course.
             return $this->content;
         }
 
@@ -120,7 +122,6 @@ class block_last_course_accessed extends block_base {
         $last_accessed = totara_core_get_relative_time_text($timestamp, null, true);
 
         // As we have the instance from the database we can use it to set the context for format_string below.
-        context_helper::preload_from_record($course);
         $context = context_course::instance($course->id);
 
         // Build the data object for the template.

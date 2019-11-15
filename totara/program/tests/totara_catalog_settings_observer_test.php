@@ -91,11 +91,11 @@ class totara_program_totara_catalog_settings_observer_testcase extends advanced_
         );
         $event->trigger();
 
-        $this->assertEquals(1, $DB->count_records('task_adhoc'));
-        $task = \core\task\manager::get_next_adhoc_task(time());
+        $this->assertTrue($DB->record_exists('task_adhoc', ['classname' => '\totara_catalog\task\provider_active_task']));
         totara_catalog\cache_handler::reset_all_caches();
-        $task->execute();
-        \core\task\manager::adhoc_task_complete($task);
+        ob_start();
+        self::execute_adhoc_tasks();
+        ob_end_clean();
 
         // check the result after adhoc task completed
         $this->assertSame(1, $DB->count_records('catalog', ['objecttype' => 'program']));

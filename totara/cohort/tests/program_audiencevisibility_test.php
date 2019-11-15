@@ -136,10 +136,10 @@ class totara_cohort_program_audiencevisibility_testcase extends advanced_testcas
         $this->assertEquals(2, $DB->count_records('cohort_members', array('cohortid' => $this->audience2->id)));
 
         // Create 4 programs.
-        $paramsprog1 = array('fullname' => 'Visall', 'visible' => 0, 'audiencevisible' => COHORT_VISIBLE_ALL);
-        $paramsprog2 = array('fullname' => 'Visenronly', 'audiencevisible' => COHORT_VISIBLE_ENROLLED);
-        $paramsprog3 = array('fullname' => 'Visenrandmemb', 'visible' => 0, 'audiencevisible' => COHORT_VISIBLE_AUDIENCE);
-        $paramsprog4 = array('fullname' => 'Visnousers', 'audiencevisible' => COHORT_VISIBLE_NOUSERS);
+        $paramsprog1 = array('fullname' => 'Visall', 'visible' => 0, 'audiencevisible' => COHORT_VISIBLE_ALL, 'idnumber' => 'prog1');
+        $paramsprog2 = array('fullname' => 'Visenronly', 'audiencevisible' => COHORT_VISIBLE_ENROLLED, 'idnumber' => 'prog2');
+        $paramsprog3 = array('fullname' => 'Visenrandmemb', 'visible' => 0, 'audiencevisible' => COHORT_VISIBLE_AUDIENCE, 'idnumber' => 'prog3');
+        $paramsprog4 = array('fullname' => 'Visnousers', 'audiencevisible' => COHORT_VISIBLE_NOUSERS, 'idnumber' => 'prog4');
         $this->program1 = $this->program_generator->create_program($paramsprog1); // Visibility all.
         $this->program2 = $this->program_generator->create_program($paramsprog2); // Visibility enrolled users only.
         $this->program3 = $this->program_generator->create_program($paramsprog3); // Visibility enrolled users and members.
@@ -147,14 +147,13 @@ class totara_cohort_program_audiencevisibility_testcase extends advanced_testcas
 
         // Assign capabilities for user8 and user9.
         $syscontext = context_system::instance();
-        $rolestaffmanager = $DB->get_record('role', array('shortname' => 'staffmanager'));
-        role_assign($rolestaffmanager->id, $this->user8->id, $syscontext->id);
-        assign_capability('totara/coursecatalog:manageaudiencevisibility', CAP_ALLOW, $rolestaffmanager->id, $syscontext);
-        unassign_capability('totara/program:viewhiddenprograms', $rolestaffmanager->id, $syscontext->id);
+        $roleid = $this->getDataGenerator()->create_role();
+        assign_capability('totara/coursecatalog:manageaudiencevisibility', CAP_ALLOW, $roleid, $syscontext);
+        role_assign($roleid, $this->user8->id, $syscontext->id);
 
-        $roletrainer = $DB->get_record('role', array('shortname' => 'teacher'));
-        role_assign($roletrainer->id, $this->user9->id, $syscontext->id);
-        assign_capability('totara/program:viewhiddenprograms', CAP_ALLOW, $roletrainer->id, $syscontext);
+        $roleid = $this->getDataGenerator()->create_role();
+        assign_capability('totara/program:viewhiddenprograms', CAP_ALLOW, $roleid, $syscontext);
+        role_assign($roleid, $this->user9->id, $syscontext->id);
 
         // Assign user1 to program1 visible to all.
         $this->program_generator->assign_program($this->program1->id, array($this->user1->id));
@@ -179,6 +178,8 @@ class totara_cohort_program_audiencevisibility_testcase extends advanced_testcas
         // Assign audience2 to program3 and program4.
         totara_cohort_add_association($this->audience2->id, $this->program3->id, COHORT_ASSN_ITEMTYPE_PROGRAM, COHORT_ASSN_VALUE_VISIBLE);
         totara_cohort_add_association($this->audience2->id, $this->program4->id, COHORT_ASSN_ITEMTYPE_PROGRAM, COHORT_ASSN_VALUE_VISIBLE);
+
+        \totara_core\visibility_controller::program()->map()->recalculate_complete_map();
 
         // Check the assignments were created correctly.
         $params = array('cohortid' => $this->audience1->id, 'instanceid' => $this->program2->id,
@@ -515,8 +516,8 @@ class totara_cohort_program_audiencevisibility_testcase extends advanced_testcas
      */
     protected function create_programs_old_visibility() {
         // Create program with old visibility.
-        $paramsprogram1 = array('fullname' => 'program5', 'visible' => 1);
-        $paramsprogram2 = array('fullname' => 'program6', 'visible' => 0);
+        $paramsprogram1 = array('fullname' => 'program5', 'visible' => 1, 'idnumber' => 'prog5');
+        $paramsprogram2 = array('fullname' => 'program6', 'visible' => 0, 'idnumber' => 'prog6');
         $this->program5 = $this->program_generator->create_program($paramsprogram1); // Visible.
         $this->program6 = $this->program_generator->create_program($paramsprogram2); // Invisible.
 
@@ -527,6 +528,8 @@ class totara_cohort_program_audiencevisibility_testcase extends advanced_testcas
         // Assign audience1 and audience2 to programs.
         totara_cohort_add_association($this->audience2->id, $this->program6->id, COHORT_ASSN_ITEMTYPE_PROGRAM, COHORT_ASSN_VALUE_VISIBLE);
         totara_cohort_add_association($this->audience1->id, $this->program5->id, COHORT_ASSN_ITEMTYPE_PROGRAM, COHORT_ASSN_VALUE_VISIBLE);
+
+        \totara_core\visibility_controller::program()->map()->recalculate_complete_map();
     }
 
     /**
@@ -542,11 +545,11 @@ class totara_cohort_program_audiencevisibility_testcase extends advanced_testcas
         $tomorrow = $today + DAYSECS;
 
         // Not available (just admin), because it is past the available window.
-        $paramsprogram7 = array('fullname' => 'program7', 'availablefrom' => $earlier, 'availableuntil' => $yesterday);
+        $paramsprogram7 = array('fullname' => 'program7', 'availablefrom' => $earlier, 'availableuntil' => $yesterday, 'idnumber' => 'prog7');
         // Available to students until yesterday, but available flag hasn't been processed on cron yet (see below).
-        $paramsprogram8 = array('fullname' => 'program8', 'availablefrom' => $earlier, 'availableuntil' => $yesterday);
+        $paramsprogram8 = array('fullname' => 'program8', 'availablefrom' => $earlier, 'availableuntil' => $yesterday, 'idnumber' => 'prog8');
         // Available to students until tomorrow.
-        $paramsprogram9 = array('fullname' => 'program9', 'availablefrom' => $earlier, 'availableuntil' => $tomorrow);
+        $paramsprogram9 = array('fullname' => 'program9', 'availablefrom' => $earlier, 'availableuntil' => $tomorrow, 'idnumber' => 'prog9');
         $this->program7 = $this->program_generator->create_program($paramsprogram7);
         $this->program8 = $this->program_generator->create_program($paramsprogram8);
         $this->program9 = $this->program_generator->create_program($paramsprogram9);
@@ -565,6 +568,8 @@ class totara_cohort_program_audiencevisibility_testcase extends advanced_testcas
         totara_cohort_add_association($this->audience1->id, $this->program7->id, COHORT_ASSN_ITEMTYPE_PROGRAM, COHORT_ASSN_VALUE_VISIBLE);
         totara_cohort_add_association($this->audience1->id, $this->program8->id, COHORT_ASSN_ITEMTYPE_PROGRAM, COHORT_ASSN_VALUE_VISIBLE);
         totara_cohort_add_association($this->audience1->id, $this->program9->id, COHORT_ASSN_ITEMTYPE_PROGRAM, COHORT_ASSN_VALUE_VISIBLE);
+
+        \totara_core\visibility_controller::program()->map()->recalculate_complete_map();
     }
 
     /**

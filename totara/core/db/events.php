@@ -76,4 +76,42 @@ $observers = array (
         'callback'  => 'totara_core_observer::totara_menu_reset_session_cache',
     ),
 
+    // Totara visibility map regeneration
+    array(
+        'eventname' => '\core\event\course_category_deleted',
+        'callback' => 'totara_core\local\visibility\observer::category_deleted',
+    ),
+    array(
+        'eventname' => '\core\event\course_created',
+        'callback' => 'totara_core\local\visibility\observer::course_created',
+    ),
+    array(
+        'eventname' => '\core\event\course_updated',
+        'callback' => 'totara_core\local\visibility\observer::course_updated',
+    ),
+    array(
+        'eventname' => '\core\event\course_deleted',
+        'callback' => 'totara_core\local\visibility\observer::course_deleted',
+    ),
+    array(
+        'eventname' => '\core\event\course_restored',
+        'callback' => 'totara_core\local\visibility\observer::course_restored',
+    ),
+    array(
+        'eventname' => '\totara_program\event\program_created',
+        'callback' => 'totara_core\local\visibility\observer::program_created',
+    ),
+    array(
+        'eventname' => '\totara_program\event\program_updated',
+        'callback' => 'totara_core\local\visibility\observer::program_updated',
+    ),
+    array(
+        'eventname' => '\totara_certification\event\certification_updated',
+        'callback' => 'totara_core\local\visibility\observer::certification_updated',
+    ),
+    array(
+        'eventname' => '\totara_program\event\program_deleted',
+        'callback' => 'totara_core\local\visibility\observer::program_deleted',
+    ),
+
 );

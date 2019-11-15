@@ -79,6 +79,8 @@ Feature: Check that granting view hidden capabilities allows users to see hidden
       | user     | role                |
       | manager1 | capmanagecategories |
 
+    And I run the scheduled task "\totara_core\task\visibility_map_regenerate_all"
+
     # Configure visibility to normal vis.
     And I set the following administration settings values:
       | audiencevisibility | 0 |

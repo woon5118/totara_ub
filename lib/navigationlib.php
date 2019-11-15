@@ -3192,7 +3192,7 @@ class global_navigation_for_ajax extends global_navigation {
      * @return void.
      */
     protected function load_category($categoryid, $nodetype = self::TYPE_CATEGORY) {
-        global $CFG, $DB;
+        global $CFG, $DB, $USER;
 
         $limit = 20;
         if (!empty($CFG->navcourselimit)) {
@@ -3274,18 +3274,7 @@ class global_navigation_for_ajax extends global_navigation {
                 }
             }
 
-            // Take into account the visibility of courses inside this particular category.
-            list($visibilitysql, $visibilityparams) = totara_visibility_where(null, 'c.id', 'c.visible', 'c.audiencevisible');
-
-            // Get courses based on the categoryid.
-            $sql = "SELECT c.*
-                      FROM {course} c
-                INNER JOIN {context} ctx
-                        ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)
-                     WHERE c.category = :categoryid  AND {$visibilitysql}
-                  ORDER BY c.sortorder ASC";
-            $categoryparams = array_merge(array('categoryid' => $categoryid, 'contextlevel' => CONTEXT_COURSE), $visibilityparams);
-            $courses = $DB->get_recordset_sql($sql, $categoryparams, 0, $limit);
+            $courses = \totara_core\visibility_controller::course()->get_visible_in_category($categoryid, $USER->id);
             foreach ($courses as $course) {
                 $this->add_course($course);
             }

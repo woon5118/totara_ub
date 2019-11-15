@@ -28,7 +28,6 @@ require_once($CFG->dirroot. '/course/lib.php');
 require_once($CFG->libdir. '/coursecatlib.php');
 
 $categoryid = optional_param('categoryid', 0, PARAM_INT); // Category id
-
 if (!$categoryid) {
     if ($CFG->catalogtype === 'enhanced') {
         redirect(new moodle_url('/totara/coursecatalog/courses.php'));

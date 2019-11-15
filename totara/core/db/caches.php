@@ -64,5 +64,15 @@ $definitions = array(
         'mode' => cache_store::MODE_REQUEST,
         'simplekeys' => true,
         'simpledata' => true
-    )
+    ),
+
+    // Cache of course categories and courses,programs,certifications that are visible to the user.
+    'visible_content' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 5,
+        'ttl' => 600
+    ),
 );

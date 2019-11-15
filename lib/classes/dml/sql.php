@@ -389,6 +389,26 @@ class sql implements \ArrayAccess {
         return $result;
     }
 
+    /**
+     * Wraps the given SQL in parenthesis and returns it as a new sql object.
+     *
+     * @param array|sql|string $sql
+     * @param string $glue
+     * @param bool $ignoreempty true means skip sql parts that are empty
+     * @return sql
+     */
+    public static function wrap($sql, string $glue = ' ', bool $ignoreempty = true) {
+        if (is_array($sql)) {
+            $sql = self::combine($sql, $glue, $ignoreempty);
+        } else if (!$sql instanceof sql) {
+            $sql = new sql($sql);
+        }
+        if ($ignoreempty && $sql->is_empty()) {
+            return new sql('');
+        }
+        return $sql->prepend('(')->append(')');
+    }
+
     // NOTE: following ArrayAccess methods add support for: list($sql, $params) = new \code\dml\sql('SELECT ..' , [...]);
 
     /**

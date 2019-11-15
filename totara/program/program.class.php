@@ -351,6 +351,10 @@ class program {
         // delete all tag instances.
         core_tag_tag::remove_all_item_tags('totara_program', 'prog', $this->id);
 
+        // Delete the program context instance.
+        $context = \context_program::instance($this->id);
+        context_helper::delete_instance(CONTEXT_PROGRAM, $this->id);
+
         // delete the program itself
         $DB->delete_records('prog', array('id' => $this->id));
 
@@ -359,7 +363,7 @@ class program {
         $event = \totara_program\event\program_deleted::create(
             array(
                 'objectid' => $this->id,
-                'context' => context_program::instance($this->id),
+                'context' => $context,
                 'userid' => $USER->id,
                 'other' => array(
                     'certifid' => empty($this->certifid) ? 0 : $this->certifid,

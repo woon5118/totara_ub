@@ -71,19 +71,19 @@ class totara_reportbuilder_post_config_visibility_where_testcase extends advance
         // Note that we're not really checking what the result of this function call is - that should be done
         // directly on totara_visibility_where. Just make sure that 'base' and 'available' are part of the result.
         list($wheresql, $params) = $report->post_config_visibility_where('program', 'base', $user->id); // No exception.
-        $this->assertGreaterThan(0, strpos($wheresql, 'base.visible = :tcvwnormalvisible'));
-        $this->assertGreaterThan(0, strpos($wheresql, 'base.visible = :tcvwnormalvisiblenone'));
-        $this->assertGreaterThan(0, strpos($wheresql, 'hascapabilitycontext.id = ctx.id'));
-        $this->assertGreaterThan(0, strpos($wheresql, 'base.availablefrom = 0 OR base.availablefrom < :timefrom'));
-        $this->assertGreaterThan(0, strpos($wheresql, 'base.availableuntil = 0 OR base.availableuntil > :timeuntil'));
+        $this->assertGreaterThan(0, strpos($wheresql, 'base.visible = 1 AND'));
+        $this->assertGreaterThan(0, strpos($wheresql, 'WHERE vh_ctx.contextlevel = :level'));
+        $this->assertEquals(45, $params['level']);
+        $this->assertGreaterThan(0, strpos($wheresql, 'base.availablefrom = 0 OR base.availablefrom < '));
+        $this->assertGreaterThan(0, strpos($wheresql, 'base.availableuntil = 0 OR base.availableuntil > '));
 
         // Check that certifications gives the same result.
         list($wheresql, $params) = $report->post_config_visibility_where('certification', 'base', $user->id);
-        $this->assertGreaterThan(0, strpos($wheresql, 'base.visible = :tcvwnormalvisible'));
-        $this->assertGreaterThan(0, strpos($wheresql, 'base.visible = :tcvwnormalvisiblenone'));
-        $this->assertGreaterThan(0, strpos($wheresql, 'hascapabilitycontext.id = ctx.id'));
-        $this->assertGreaterThan(0, strpos($wheresql, 'base.availablefrom = 0 OR base.availablefrom < :timefrom'));
-        $this->assertGreaterThan(0, strpos($wheresql, 'base.availableuntil = 0 OR base.availableuntil > :timeuntil'));
+        $this->assertGreaterThan(0, strpos($wheresql, 'base.visible = 1 AND'));
+        $this->assertGreaterThan(0, strpos($wheresql, 'WHERE vh_ctx.contextlevel = :level'));
+        $this->assertEquals(45, $params['level']);
+        $this->assertGreaterThan(0, strpos($wheresql, 'base.availablefrom = 0 OR base.availablefrom < '));
+        $this->assertGreaterThan(0, strpos($wheresql, 'base.availableuntil = 0 OR base.availableuntil > '));
 
         // Change the ctx-id field and see that there is an exception.
         try {

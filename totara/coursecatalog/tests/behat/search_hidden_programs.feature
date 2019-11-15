@@ -74,6 +74,8 @@ Feature: Check that searching for hidden programs when toggling course catalog w
       | user       | role                  | contextlevel | reference |
       | catmanager | capviewhiddenlearning | Category     | cat1      |
 
+    And I run the scheduled task "\totara_core\task\visibility_map_regenerate_all"
+
   @javascript
   Scenario: Search for hidden programs in the old catalog
     # Configure visibility to normal vis.

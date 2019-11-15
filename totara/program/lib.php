@@ -111,6 +111,7 @@ function prog_get_all_programs($userid, $sort = '', $limitfrom = '', $limitnum =
                             AND pc.programid = pua.programid
                             AND pc.userid = pua.userid
                         ) ";
+    $progtype = 'program';
     if ($onlyactive) {
         $where .= " AND pc.status <> :statuscomplete";
         $params['statuscomplete'] = STATUS_PROGRAM_COMPLETE;
@@ -120,19 +121,22 @@ function prog_get_all_programs($userid, $sort = '', $limitfrom = '', $limitnum =
     }
     if ($onlycertifications) {
         $where .= " AND p.certifid IS NOT NULL";
+        $progtype = 'certification';
     }
 
     $params['contextlevel'] = CONTEXT_PROGRAM;
     $params['userid'] = $userid;
 
-    list($visibilitysql, $visibilityparams) = totara_visibility_where($userid,
-                                                                      'p.id',
-                                                                      'p.visible',
-                                                                      'p.audiencevisible',
-                                                                      'p',
-                                                                      'certification',
-                                                                      false,
-                                                                      $showhidden);
+    list($visibilitysql, $visibilityparams) = totara_visibility_where(
+        $userid,
+        'p.id',
+        'p.visible',
+        'p.audiencevisible',
+        'p',
+        $progtype,
+        false,
+        $showhidden
+    );
     $params = array_merge($params, $visibilityparams);
     $where .= " AND {$visibilitysql} ";
 
@@ -2484,18 +2488,33 @@ function prog_is_inprogress($progid, $userid) {
 /**
  * Snippet to determine if a program is available based on the available fields.
  *
- * @param string $fieldalias Alias for the program table used in the query
+ * @param string $prog_table_alias Alias for the program table used in the query
  * @param string $separator Character separator between the alias and the field name
- * @param int|null $userid The user ID that wants to see the program (Unused)
+ * @param null $unused Originally the user ID that wants to see the program
  * @return array
  */
-function get_programs_availability_sql($fieldalias, $separator, $userid = null) {
+function get_programs_availability_sql($prog_table_alias, $separator, $unused = null) {
+    global $DB;
+
     $now = time();
 
-    $availabilitysql = " (({$fieldalias}{$separator}available = :available) AND
-                          ({$fieldalias}{$separator}availablefrom = 0 OR {$fieldalias}{$separator}availablefrom < :timefrom) AND
-                          ({$fieldalias}{$separator}availableuntil = 0 OR {$fieldalias}{$separator}availableuntil > :timeuntil))";
-    $availabilityparams = array('available' => AVAILABILITY_TO_STUDENTS, 'timefrom' => $now, 'timeuntil' => $now);
+    $param_available = $DB->get_unique_param('available');
+    $param_timefrom = $DB->get_unique_param('timefrom');
+    $param_timeuntil = $DB->get_unique_param('timeuntil');
+
+    $field_available = $prog_table_alias . $separator . 'available';
+    $field_timefrom = $prog_table_alias . $separator . 'availablefrom';
+    $field_timeuntil = $prog_table_alias . $separator . 'availableuntil';
+
+    $availabilitysql = " (({$field_available} = :{$param_available}) AND
+                          ({$field_timefrom} = 0 OR {$field_timefrom} < :{$param_timefrom}) AND
+                          ({$field_timeuntil} = 0 OR {$field_timeuntil} > :{$param_timeuntil}))";
+
+    $availabilityparams = [
+        $param_available => AVAILABILITY_TO_STUDENTS,
+        $param_timefrom => $now,
+        $param_timeuntil => $now
+    ];
 
     return array($availabilitysql, $availabilityparams);
 }

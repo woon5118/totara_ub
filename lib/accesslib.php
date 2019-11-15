@@ -1448,6 +1448,9 @@ function delete_role($roleid) {
     // Reset any cache of this role, including MUC.
     accesslib_clear_role_cache($roleid);
 
+    // TOTARA: Ensure the map is up to date.
+    \totara_core\task\visibility_map_regenerate_all::queue();
+
     return true;
 }
 
@@ -1523,6 +1526,11 @@ function assign_capability($capability, $permission, $roleid, $contextid, $overw
     // Reset any cache of this role, including MUC.
     accesslib_clear_role_cache($roleid);
 
+    // TOTARA: If this is a view hidden capability then recalculate the map.
+    if (in_array($capability, \totara_core\local\visibility\map::view_hidden_capabilities())) {
+        \totara_core\task\visibility_map_regenerate_all::queue();
+    }
+
     return true;
 }
 
@@ -1591,6 +1599,11 @@ function unassign_capability($capability, $roleid, $contextid = null) {
 
     // Reset any cache of this role, including MUC.
     accesslib_clear_role_cache($roleid);
+
+    // TOTARA: If this is a view hidden capability then recalculate the map.
+    if (in_array($capability, \totara_core\local\visibility\map::view_hidden_capabilities())) {
+        \totara_core\task\visibility_map_regenerate_all::queue();
+    }
 
     return true;
 }
@@ -2608,6 +2621,9 @@ function reset_role_capabilities($roleid) {
 
     // Reset any cache of this role, including MUC.
     accesslib_clear_role_cache($roleid);
+
+    // TOTARA: Ensure the map is up to date.
+    \totara_core\task\visibility_map_regenerate_all::queue();
 }
 
 /**
@@ -5083,6 +5099,9 @@ function role_cap_duplicate($sourcerole, $targetrole) {
         $DB->insert_record('role_capabilities', $cap);
     }
 
+    // TOTARA: Ensure the map is up to date for this role.
+    \totara_core\task\visibility_map_regenerate_all::queue();
+
     // Reset any cache of this role, including MUC.
     accesslib_clear_role_cache($targetrole);
 }
@@ -6001,6 +6020,8 @@ abstract class context extends stdClass implements IteratorAggregate {
         $ids = $DB->get_fieldset_select('role_capabilities', 'DISTINCT roleid', 'contextid = ?', array($this->_id));
         if ($ids) {
             $DB->delete_records('role_capabilities', array('contextid' => $this->_id));
+
+            \totara_core\task\visibility_map_regenerate_all::queue();
 
             // Reset any cache of these roles, including MUC.
             accesslib_clear_role_cache($ids);
@@ -7375,7 +7396,7 @@ class context_user extends context {
         } else if ($dbfamily === 'mssql') {
             $sql = 'UPDATE c
                        SET tenantid = u.tenantid
-                      FROM "ttr_context" c 
+                      FROM "ttr_context" c
                       JOIN "ttr_user" u ON u.id = c.instanceid AND c.contextlevel = ' . CONTEXT_USER . '
                      WHERE c.tenantid <> u.tenantid OR (c.tenantid IS NULL AND u.tenantid IS NOT NULL) OR (c.tenantid IS NOT NULL AND u.tenantid IS NULL)';
         } else { // PostgreSQL

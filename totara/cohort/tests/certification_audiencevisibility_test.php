@@ -187,6 +187,8 @@ class totara_cohort_certification_audiencevisibility_testcase extends advanced_t
         totara_cohort_add_association($this->audience2->id, $this->certif3->id, COHORT_ASSN_ITEMTYPE_CERTIF, COHORT_ASSN_VALUE_VISIBLE);
         totara_cohort_add_association($this->audience2->id, $this->certif4->id, COHORT_ASSN_ITEMTYPE_CERTIF, COHORT_ASSN_VALUE_VISIBLE);
 
+        \totara_core\visibility_controller::certification()->map()->recalculate_complete_map();
+
         // Check the assignments were created correctly.
         $params = array('cohortid' => $this->audience1->id, 'instanceid' => $this->certif2->id,
                         'instancetype' => COHORT_ASSN_ITEMTYPE_CERTIF);
@@ -523,6 +525,8 @@ class totara_cohort_certification_audiencevisibility_testcase extends advanced_t
         // Assign audience1 and audience2 to certif5 and certif6 respectively.
         totara_cohort_add_association($this->audience1->id, $this->certif5->id, COHORT_ASSN_ITEMTYPE_CERTIF, COHORT_ASSN_VALUE_VISIBLE);
         totara_cohort_add_association($this->audience2->id, $this->certif6->id, COHORT_ASSN_ITEMTYPE_CERTIF, COHORT_ASSN_VALUE_VISIBLE);
+
+        \totara_core\visibility_controller::certification()->map()->recalculate_complete_map();
     }
 
     /**
@@ -565,6 +569,8 @@ class totara_cohort_certification_audiencevisibility_testcase extends advanced_t
         totara_cohort_add_association($this->audience1->id, $this->certif7->id, COHORT_ASSN_ITEMTYPE_CERTIF, COHORT_ASSN_VALUE_VISIBLE);
         totara_cohort_add_association($this->audience1->id, $this->certif8->id, COHORT_ASSN_ITEMTYPE_CERTIF, COHORT_ASSN_VALUE_VISIBLE);
         totara_cohort_add_association($this->audience1->id, $this->certif9->id, COHORT_ASSN_ITEMTYPE_CERTIF, COHORT_ASSN_VALUE_VISIBLE);
+
+        \totara_core\visibility_controller::certification()->map()->recalculate_complete_map();
     }
 
     /**

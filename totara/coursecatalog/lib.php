@@ -47,110 +47,44 @@ defined('MOODLE_INTERNAL') || die();
  * If $categoryids is a single integer, just returns the count as an integer
  */
 function totara_get_category_item_count($categoryids, $viewtype = 'course') {
-    global $CFG, $USER, $DB;
-    require_once($CFG->dirroot . '/totara/cohort/lib.php');
+    global $USER, $DB;
 
-    list($insql, $params) = $DB->get_in_or_equal(is_array($categoryids) ? $categoryids : array($categoryids));
-
-    if (!$categories = $DB->get_records_select('course_categories', "id $insql", $params)) {
-        return array();
+    $single = false;
+    $toload = $categoryids;
+    if (!is_array($toload)) {
+        $single = true;
+        $toload = [$toload];
     }
 
-    // What items are we counting, courses, programs, or certifications?
-    switch ($viewtype) {
-        case 'course':
-            $itemtable = "{course}";
-            $itemcontext = CONTEXT_COURSE;
-            $itemalias = 'c';
-            $extrawhere = '';
-            break;
-        case 'program':
-            $itemtable = "{prog}";
-            $itemcontext = CONTEXT_PROGRAM;
-            $itemalias = 'p';
-            $extrawhere = " AND certifid IS NULL";
-            break;
-        case 'certification':
-            $itemtable = "{prog}";
-            $itemcontext = CONTEXT_PROGRAM;
-            $itemalias = 'p';
-            $extrawhere = " AND certifid IS NOT NULL";
-            break;
-        default:
-            print_error('invalid viewtype');
-    }
+    $cache = cache::make('totara_core', 'visible_content');
+    $visible = \totara_core\visibility_controller::get($viewtype, $cache)->get_visible_counts_for_all_categories($USER->id);
 
-    list($insql, $inparams) = $DB->get_in_or_equal(array_keys($categories), SQL_PARAMS_NAMED);
-    $sql = "SELECT instanceid, path
-              FROM {context}
-             WHERE contextlevel = :contextlvl
-               AND instanceid {$insql}
-             ORDER BY depth DESC";
-    $params = array('contextlvl' => CONTEXT_COURSECAT);
-    $params = array_merge($params, $inparams);
-
-    $contextpaths = $DB->get_records_sql_menu($sql, $params);
-
-    // Builds a WHERE snippet that matches any items inside the sub-category.
-    // This won't match the category itself (because of the trailing slash),
-    // But that's okay as we're only interested in the items inside.
-    $contextwhere = array(); $contextparams = array();
-    foreach ($contextpaths as $path) {
-        $paramalias = $DB->get_unique_param('ctx');
-        $contextwhere[] = "ctx.path LIKE :{$paramalias}";
-        $contextparams[$paramalias] = $path . '/%';
-    }
-
-    // Add visibility.
-    list($visibilitysql, $visibilityparams) = totara_visibility_where($USER->id, "{$itemalias}.id", "{$itemalias}.visible", "{$itemalias}.audiencevisible", $itemalias, $viewtype);
-
-    // Get context data for preload.
-    $ctxfields = context_helper::get_preload_record_columns_sql('ctx');
-
-    $sql = "SELECT {$itemalias}.id as itemid, {$itemalias}.visible, {$itemalias}.audiencevisible, ctx.path, {$ctxfields}
-              FROM {context} ctx
-              JOIN {$itemtable} {$itemalias}
-                ON {$itemalias}.id = ctx.instanceid AND ctx.contextlevel = :itemcontext
-             WHERE $visibilitysql AND (" . implode(' OR ', $contextwhere) . ")" . $extrawhere;
-    $params = array_merge(array('itemcontext' => $itemcontext), $visibilityparams, $contextparams);
-
-    // Get all items inside all the categories.
-    $items = $DB->get_records_sql($sql, $params);
-
-    if (!$items) {
-        // Sub-categories are all empty.
-        if (is_array($categoryids)) {
-            return array();
-        } else {
-            return 0;
+    $results = [];
+    foreach ($toload as $id) {
+        // Ensure $id is database safe.
+        $id = (int)$id;
+        if (!$id) {
+            debugging('Invalid category id passed to totara_get_category_item_count() ', DEBUG_DEVELOPER);
+            continue;
         }
-    }
 
-    $results = array();
-    foreach ($items as $item) {
-        // Now we need to figure out which sub-category each item is a member of.
-        foreach ($contextpaths as $categoryid => $contextpath) {
-            // It's a member if the beginning of the contextpath's match.
-            if (substr($item->path, 0, strlen($contextpath.'/')) ==
-                $contextpath.'/') {
-                if (array_key_exists($categoryid, $results)) {
-                    $results[$categoryid]++;
-                } else {
-                    $results[$categoryid] = 1;
-                }
-                break;
+        $results[$id] = 0;
+        if (isset($visible[$id])) {
+            $results[$id] += $visible[$id];
+        }
+        $subcatids = $DB->get_fieldset_select('course_categories', 'id', 'path LIKE :path', ['path' => "%/{$id}/%"]);
+        foreach ($subcatids as $subcatid) {
+            if (isset($visible[$subcatid])) {
+                $results[$id] += $visible[$subcatid];
             }
         }
     }
 
-    if (empty($results)) {
-        return 0;
-    } else if (is_array($categoryids)) {
-        return $results;
-    } else {
-        return current($results);
+    if ($single) {
+        return $results[$categoryids];
     }
 
+    return $results;
 }
 
 /**
@@ -234,11 +168,6 @@ function totara_visibility_where($userid = null, $fieldbaseid = 'course.id', $fi
         $userid = $USER->id;
     }
 
-    if (is_siteadmin($userid)) {
-        // Admins can see all records no matter what the visibility.
-        return array('1=1', array());
-    }
-
     $usercontext = false;
     if ($userid) {
         $usercontext = context_user::instance($userid, IGNORE_MISSING);
@@ -248,160 +177,41 @@ function totara_visibility_where($userid = null, $fieldbaseid = 'course.id', $fi
         }
     }
 
-    // Initialize availability variables, needed for programs and certifications.
-    $availabilitysql = '1=1';
-    $availabilityparams = array();
+    $audiencebased = !empty($CFG->audiencevisibility);
     $separator = ($iscached) ? '_' : '.'; // When the report is caches its fields comes in type_value form.
     $systemcontext = context_system::instance();
 
-    // Evaluate capabilities.
-    switch($type) {
+    $quoted_separator = preg_quote($separator, '#');
+    $regex = "#^([^{$quoted_separator}]+){$quoted_separator}.*\$#";
+    $alias = preg_replace($regex, '$1', $fieldbaseid);
+
+    switch ($type) {
         case 'course':
             $capability = 'moodle/course:viewhiddencourses';
-            $instancetype = COHORT_ASSN_ITEMTYPE_COURSE;
             break;
         case 'program':
-            require_once($CFG->dirroot . '/totara/program/lib.php');
             $capability = 'totara/program:viewhiddenprograms';
-            $instancetype = COHORT_ASSN_ITEMTYPE_PROGRAM;
-            list($availabilitysql, $availabilityparams) = get_programs_availability_sql($tablealias, $separator, $userid);
             break;
         case 'certification':
-            require_once($CFG->dirroot . '/totara/program/lib.php');
             $capability = 'totara/certification:viewhiddencertifications';
-            $instancetype = COHORT_ASSN_ITEMTYPE_CERTIF;
-            list($availabilitysql, $availabilityparams) = get_programs_availability_sql($tablealias, $separator, $userid);
             break;
+        default:
+            throw new \coding_exception('Unknown type', $type);
     }
 
-    if (!empty($CFG->tenantsenabled)) {
-        if ($separator !== '.') {
-            throw new coding_exception('RB caching is supposed to be force disabled when multitenancy is enabled');
-        }
-        // NOTE: rb caching is force turned off when multitenancy is enabled,
-        //       we do not have to care about missing ctx_tenantid here, yay!
-        $tenantwhere = '';
-        if (isguestuser($userid) or !$userid) {
-            $tenantwhere = "ctx{$separator}tenantid IS NULL";
-        } else {
-            if (!empty($usercontext->tenantid)) {
-                if (!empty($CFG->tenantsisolated)) {
-                    $tenantwhere = "ctx{$separator}tenantid = {$usercontext->tenantid}";
-                } else {
-                    $tenantwhere = "(ctx{$separator}tenantid = {$usercontext->tenantid} OR ctx{$separator}tenantid IS NULL)";
-                }
-            }
-        }
-        if ($tenantwhere !== '') {
-            if ($availabilitysql === '1=1') {
-                $availabilitysql = $tenantwhere;
-            } else {
-                $availabilitysql = "{$availabilitysql} AND {$tenantwhere}";
-            }
-        }
+    // Deal with the old showhidden argument, it was always half broken and only worked with traditional visibility.
+    // So just hack it in here in the same way it used to be dealt with.
+    if (!$audiencebased && ($showhidden || has_capability($capability, $systemcontext, $userid))) {
+        return array('1=1', array());
     }
 
-    if (empty($CFG->audiencevisibility)) {
-        if ($showhidden || has_capability($capability, $systemcontext, $userid)) {
-            return array('1=1', array());
-        } else {
-            // Normal visibility unless they have the capability to see hidden learning components.
-            list($capsql, $capparams) = get_has_capability_sql($capability, "ctx{$separator}id", $userid);
-            $sqlnormalvisible = "
-            (({$fieldvisible} = :tcvwnormalvisible) OR
-             ({$fieldvisible} = :tcvwnormalvisiblenone AND
-                 {$capsql}
-             ))";
-            $params = array_merge([
-                                      'tcvwnormalvisible'     => 1,
-                                      'tcvwnormalvisiblenone' => 0
-                                  ],
-                                  $capparams);
-
-            // Add availability sql.
-            if ($availabilitysql !== '1=1') {
-                $sqlnormalvisible .= " AND {$availabilitysql} ";
-                $params = array_merge($params, $availabilityparams);
-            }
-
-            return array($sqlnormalvisible, $params);
-        }
-    } else {
-        // Audience visibility No users. Check for capabilities.
-        $canmanagevisibility = has_capability('totara/coursecatalog:manageaudiencevisibility', $systemcontext, $userid);
-        if ($canmanagevisibility || has_capability($capability, $systemcontext, $userid)) {
-            return array('1=1', array());
-        }
-
-        $sqlnousers = "{$fieldaudvis} != :tcvwaudvisnousers";
-        $paramsnousers = array('tcvwaudvisnousers' => COHORT_VISIBLE_NOUSERS);
-
-        // Add availability sql.
-        if ($availabilitysql !== '1=1') {
-            $sqlnousers .= " AND {$availabilitysql} ";
-            $paramsnousers = array_merge($paramsnousers, $availabilityparams);
-        }
-
-        // Audience visibility all.
-        $sqlall = "{$fieldaudvis} = :tcvwaudvisall";
-        $paramsall = array('tcvwaudvisall' => COHORT_VISIBLE_ALL);
-
-        // Audience visibility selected.
-        $sqlselected = "({$fieldaudvis} = :tcvwaudvisaud AND
-                 EXISTS (SELECT 1
-                           FROM {cohort_visibility} cv
-                           JOIN {cohort_members} cm ON cv.cohortid = cm.cohortid
-                          WHERE cv.instanceid = {$fieldbaseid}
-                            AND cv.instancetype = :tcvwinstancetypeselected
-                            AND cm.userid = :tcvwreportforselected)";
-        if ($instancetype == COHORT_ASSN_ITEMTYPE_COURSE) {
-            $sqlselected .= " OR EXISTS (SELECT 1
-                                         FROM {user_enrolments} ue
-                                         JOIN {enrol} e ON e.id = ue.enrolid
-                                         WHERE e.courseid = {$fieldbaseid}
-                                           AND ue.userid = :tcvwreportforenrolled))";
-        } else {
-            $sqlselected .= " OR EXISTS (SELECT 1
-                                         FROM {prog_user_assignment} pua
-                                         WHERE pua.programid = {$fieldbaseid}
-                                           AND pua.userid = :tcvwreportforenrolled))";
-        }
-
-        $paramsselected = array('tcvwaudvisaud' => COHORT_VISIBLE_AUDIENCE,
-                'tcvwinstancetypeselected' => $instancetype,
-                'tcvwreportforselected' => $userid,
-                'tcvwreportforenrolled' => $userid);
-
-        // Enrolled or assigned user.
-        if ($instancetype == COHORT_ASSN_ITEMTYPE_COURSE) {
-            $sqlenrolled = "({$fieldaudvis} = :tcvwaudvisenr AND EXISTS (SELECT 1
-                                      FROM {user_enrolments} ue
-                                      JOIN {enrol} e ON e.id = ue.enrolid
-                                     WHERE e.courseid = {$fieldbaseid}
-                                       AND ue.userid = :tcvwreportforenrolledonly))";
-            $paramsenrolled = array('tcvwaudvisenr' => COHORT_VISIBLE_ENROLLED,
-                                    'tcvwreportforenrolledonly' => $userid);
-        } else {
-            $sqlenrolled = "({$fieldaudvis} = :tcvwaudvisenr AND EXISTS (SELECT 1
-                                      FROM {prog_user_assignment} pua
-                                     WHERE pua.programid = {$fieldbaseid}
-                                       AND pua.userid = :tcvwreportforenrolledonly))";
-            $paramsenrolled = array('tcvwaudvisenr' => COHORT_VISIBLE_ENROLLED,
-                                    'tcvwreportforenrolledonly' => $userid);
-        }
-
-        // Condition above are overridden when user have capability to see hidden content in this context
-        list($capsql, $capparams) = totara_core\access::get_has_capability_sql($capability, "ctx{$separator}id", $userid);
-
-        $returnsql = "({$sqlnousers} AND ({$sqlall} OR {$sqlselected} OR {$sqlenrolled}) OR {$capsql})";
-        // Force disable materialization for MariaDB, there is a problem with subquery materialization.
-        $returnsql .= $DB->get_optimizer_hint('mariadb_materialization_force_off');
-
-        return [
-            $returnsql,
-            array_merge($paramsnousers, $paramsall, $paramsselected, $paramsenrolled, $capparams)
-        ];
+    $type = \totara_core\visibility_controller::get($type);
+    $type->set_sql_separator($separator);
+    $sql = $type->sql_where_visible($userid, $alias);
+    if ($sql->is_empty()) {
+        return ['1=1', []];
     }
+    return [$sql->get_sql(), $sql->get_params()];
 }
 
 /**
