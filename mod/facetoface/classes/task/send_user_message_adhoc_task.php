@@ -43,18 +43,32 @@ class send_user_message_adhoc_task extends \core\task\adhoc_task {
         $recipient = $data->event->userto;
         cron_setup_user($recipient);
 
-        $message = $this->prepare_message();
-        if (!empty($data->icaldata)) {
-            $this->regenerate_ical($message, $data);
-        }
-        message_send($message);
-        if ($data->addhistory) {
-            $this->add_history();
-        }
+        $message = null;
+        $messagesent = false;
+        try {
+            $message = $this->prepare_message();
+            if (!empty($data->icaldata)) {
+                $this->regenerate_ical($message, $data);
+            }
+            message_send($message);
+            $messagesent = true;
 
-        $this->cleanup($message);
-
-        $trace->finished();
+            if ($data->addhistory) {
+                $this->add_history();
+            }
+        } catch (\moodle_exception $ex) {
+            $class = get_class($ex);
+            $trace->output("Task cancelled due to {$class}: ". $ex->getMessage());
+            if (!$messagesent) {
+                $trace->output('Could not send an email.');
+            }
+            debugging($ex->getTraceAsString(), DEBUG_DEVELOPER);
+        } finally {
+            if ($message) {
+                $this->cleanup($message);
+            }
+            $trace->finished();
+        }
     }
 
     /**
