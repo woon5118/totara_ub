@@ -23,7 +23,7 @@
 <template>
   <div class="tui-samples">
     <Grid>
-      <GridItem :units="3">
+      <GridItem :units="4">
         <FilterSidePanel title="Filter results">
           <SearchFilter
             v-model="filter"
@@ -61,7 +61,7 @@
           </div>
         </FilterSidePanel>
       </GridItem>
-      <GridItem :units="9">
+      <GridItem :grows="true">
         <component :is="component" />
       </GridItem>
     </Grid>
