@@ -127,7 +127,6 @@ if (empty($team->potential) && empty($team->current)) {
         if (count($newallocations) > $spaces) {
             // No spaces left.
             if (!$replacereservations && $reserveinfo['reserved'][$seminarevent->get_id()]) {
-
                 $error = get_string('allocationfull_noreserve', 'mod_facetoface', $spaces);
             } else {
                 $error = get_string('allocationfull_reserve', 'mod_facetoface', $spaces);
@@ -154,8 +153,14 @@ if (empty($team->potential) && empty($team->current)) {
         $removeallocations = array_intersect($removeallocations, array_keys($team->current));
         $removeallocations = array_diff($removeallocations, array_keys($team->cannotunallocate));
 
-        reservations::remove_allocations($seminarevent, $seminar, $removeallocations, $replaceallocations);
-        redirect($redir);
+        $errors = reservations::remove_allocations($seminarevent, $seminar, $removeallocations, $replaceallocations);
+        $message = "";
+        $notifytype = \core\output\notification::NOTIFY_INFO;
+        if ($errors) {
+            $message = \html_writer::alist($errors);
+            $notifytype = \core\output\notification::NOTIFY_ERROR;
+        }
+        redirect($redir, $message, null, $notifytype);
     }
 
     if ($error) {

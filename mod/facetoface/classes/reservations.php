@@ -25,6 +25,7 @@ namespace mod_facetoface;
 
 use \context_course;
 use \mod_facetoface\exception\signup_exception;
+use \mod_facetoface\signup\state\user_cancelled as user_cancelled;
 use \moodle_exception;
 
 
@@ -455,35 +456,42 @@ final class reservations {
         $session = $seminarevent->to_record();
         $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
 
+        $errors = [];
         foreach ($userids as $userid) {
             $transaction = $DB->start_delegated_transaction();
 
             $signup = signup::create($userid, $seminarevent);
-            signup_helper::user_cancel($signup);
-
-            $state = $signup->get_state();
-            $userisinwaitlist = ($state instanceof \mod_facetoface\signup\state\waitlisted);
-            if ($converttoreservations) {
-                // Add one reservation.
-                $book = 1;
-                $waitlist = 0;
-                if ($userisinwaitlist) {
-                    $book = 0;
-                    $waitlist = 1;
+            if (signup_helper::can_user_cancel($signup)) {
+                signup_helper::user_cancel($signup);
+                $state = $signup->get_state();
+                $userisinwaitlist = ($state instanceof \mod_facetoface\signup\state\waitlisted);
+                if ($converttoreservations) {
+                    // Add one reservation.
+                    $book = 1;
+                    $waitlist = 0;
+                    if ($userisinwaitlist) {
+                        $book = 0;
+                        $waitlist = 1;
+                    }
+                    try {
+                        self::add($seminarevent, $managerid, $book, $waitlist);
+                    } catch (signup_exception $e) {
+                        // We cannot create reservation anymore, but we can live with that.
+                    }
                 }
-                try {
-                    self::add($seminarevent, $managerid, $book, $waitlist);
-                } catch (signup_exception $e) {
-                    // We cannot create reservation anymore, but we can live with that.
+                $transaction->allow_commit();
+                // Send notification.
+                if (!empty($session->sessiondates) && $userisinwaitlist === false) {
+                    notice_sender::signup_cancellation(signup::create($userid, $seminarevent));
                 }
-            }
-            $transaction->allow_commit();
-
-            // Send notification.
-            if (!empty($session->sessiondates) && $userisinwaitlist === false) {
-                notice_sender::signup_cancellation(signup::create($userid, $seminarevent));
+            } else {
+                $failures = $signup->get_failures(user_cancelled::class);
+                foreach ($failures as $failure) {
+                    $errors[] = $failure;
+                }
             }
         }
+        return $errors;
     }
 
     /**

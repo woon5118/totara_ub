@@ -65,6 +65,7 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
+            'staffmanager' => CAP_ALLOW,
         )
     ),
 
@@ -76,7 +77,8 @@ $capabilities = array(
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
+            'staffmanager' => CAP_ALLOW,
         )
     ),
 
@@ -124,6 +126,7 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
+            'staffmanager' => CAP_ALLOW,
         )
     ),
 
@@ -136,6 +139,7 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
+            'staffmanager' => CAP_ALLOW,
         )
     ),
 
