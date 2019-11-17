@@ -233,7 +233,7 @@ class legacy_aggregation {
             return true;
         }
 
-        if (totara_feature_disabled('learningplans')) {
+        if (advanced_feature::is_disabled('learningplans')) {
             return false;
         }
 
