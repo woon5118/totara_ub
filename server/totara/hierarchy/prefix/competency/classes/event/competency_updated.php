@@ -37,32 +37,6 @@ defined('MOODLE_INTERNAL') || die();
 class competency_updated extends \totara_hierarchy\event\hierarchy_updated {
 
     /**
-     * In some cases we need to know what changed in comparison to the old
-     * item in the database so in this case we provide the old instance as well
-     * to be able to check this in the observers
-     *
-     * @param \stdClass $new_instance
-     * @param \stdClass $old_instance
-     * @return \core\event\base
-     */
-    public static function create_from_old_and_new(\stdClass $new_instance, \stdClass $old_instance) {
-        $data = array(
-            'objectid' => $new_instance->id,
-            'context' => \context_system::instance(),
-            'other' => [
-                'old_instance' => (array)$old_instance
-            ]
-        );
-
-        self::$preventcreatecall = false;
-        $event = self::create($data);
-        $event->add_record_snapshot($event->objecttable, $new_instance);
-        self::$preventcreatecall = true;
-
-        return $event;
-    }
-
-    /**
      * Returns hierarchy prefix.
      * @return string
      */

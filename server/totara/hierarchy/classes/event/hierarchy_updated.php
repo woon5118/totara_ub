@@ -23,6 +23,9 @@
 
 namespace totara_hierarchy\event;
 
+use core\event\base;
+use stdClass;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -36,7 +39,7 @@ defined('MOODLE_INTERNAL') || die();
  * @author David Curry <david.curry@totaralms.com>
  * @package totara_hierarchy
  */
-abstract class hierarchy_updated extends \core\event\base {
+abstract class hierarchy_updated extends base {
 
     /**
      * Flag for prevention of direct create() call.
@@ -53,10 +56,10 @@ abstract class hierarchy_updated extends \core\event\base {
     /**
      * Create instance of event.
      *
-     * @param   \stdClass $instance A hierarchy item record.
-     * @return  hierarchy_updated
+     * @param stdClass $instance A hierarchy item record.
+     * @return base|hierarchy_updated
      */
-    public static function create_from_instance(\stdClass $instance) {
+    public static function create_from_instance(stdClass $instance) {
         $data = array(
             'objectid' => $instance->id,
             'context' => \context_system::instance(),
@@ -65,6 +68,32 @@ abstract class hierarchy_updated extends \core\event\base {
         self::$preventcreatecall = false;
         $event = self::create($data);
         $event->add_record_snapshot($event->objecttable, $instance);
+        self::$preventcreatecall = true;
+
+        return $event;
+    }
+
+    /**
+     * In some cases we need to know what changed in comparison to the old
+     * item in the database so in this case we provide the old instance as well
+     * to be able to check this in the observers
+     *
+     * @param stdClass $new_instance
+     * @param stdClass $old_instance
+     * @return base|hierarchy_updated
+     */
+    public static function create_from_old_and_new(stdClass $new_instance, stdClass $old_instance) {
+        $data = array(
+            'objectid' => $new_instance->id,
+            'context' => \context_system::instance(),
+            'other' => [
+                'old_instance' => (array)$old_instance
+            ]
+        );
+
+        self::$preventcreatecall = false;
+        $event = self::create($data);
+        $event->add_record_snapshot($event->objecttable, $new_instance);
         self::$preventcreatecall = true;
 
         return $event;

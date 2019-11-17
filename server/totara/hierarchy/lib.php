@@ -29,6 +29,8 @@
  * Library to construct hierarchies such as competencies, positions, etc
  */
 
+use totara_hierarchy\event\hierarchy_updated;
+
 require_once($CFG->dirroot . '/totara/core/utils.php');
 require_once($CFG->dirroot . '/totara/customfield/fieldlib.php');
 
@@ -1989,8 +1991,9 @@ class hierarchy {
 
         // Raise an event to let other parts of the system know.
         if ($triggerevent) {
-                $eventclass = "\\hierarchy_{$this->prefix}\\event\\{$this->prefix}_updated";
-            $eventclass::create_from_instance($updateditem)->trigger();
+            /** @var hierarchy_updated $eventclass */
+            $eventclass = "\\hierarchy_{$this->prefix}\\event\\{$this->prefix}_updated";
+            $eventclass::create_from_old_and_new($updateditem, $olditem)->trigger();
         }
 
         return $updateditem;
