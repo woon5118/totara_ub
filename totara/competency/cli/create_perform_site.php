@@ -4251,6 +4251,9 @@ function create_info_block($data) {
             'show_header' => false,
             'show_border' => false
         ]),
+
+        'timecreated' => time(),
+        'timemodified' => time(),
     ];
 
     builder::table('block_instances')->insert($object);
