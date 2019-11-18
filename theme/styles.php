@@ -46,27 +46,14 @@ if ($slashargument = min_get_slash_argument()) {
 
     // Totara: Removed chunking support as it's not used by currently supported browsers
 
-    // TOTARA: RTL stylesheet.
-    $rtl = false;
-    if (preg_match('#/(rtl(/|$))#', $slashargument, $matches)) {
-        $rtl = true;
-        $slashargument = str_replace($matches[1], '', $slashargument);
-    }
-
-    // Totara: Support for CSS variables
-    $legacy = false;
-    if (preg_match('#/(legacy(/|$))#', $slashargument, $matches)) {
-        $legacy = true;
-        $slashargument = str_replace($matches[1], '', $slashargument);
-    }
-
+    // Totara: Rewrote slash argument handling to be more robust
     $slashargument_parts = explode('/', $slashargument);
-    list($themename, $rev, $type) = $slashargument_parts;
-    $themename = min_clean_param($themename, 'SAFEDIR');
-    $rev       = min_clean_param($rev, 'INT');
-    $type      = min_clean_param($type, 'SAFEDIR');
-    $subtype   = isset($slashargument_parts[3]) ? min_clean_param($slashargument_parts[3], 'SAFEDIR') : null;
-
+    $themename = min_clean_param(array_shift($slashargument_parts), 'SAFEDIR');
+    $rev = min_clean_param(array_shift($slashargument_parts), 'INT');
+    $type = min_clean_param(array_shift($slashargument_parts), 'SAFEDIR');
+    $subtype = $type == 'tui_scss' ? min_clean_param(array_shift($slashargument_parts), 'SAFEDIR') : null;
+    $rtl = in_array('rtl', $slashargument_parts);
+    $legacy = in_array('legacy', $slashargument_parts);
 } else {
     $themename = min_optional_param('theme', 'standard', 'SAFEDIR');
     $rev       = min_optional_param('rev', 0, 'INT');

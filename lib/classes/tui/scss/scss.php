@@ -288,8 +288,8 @@ class scss {
         // handle "@import 'theme_foo/name';"
         // and map to theme/foo/build/styles/_name.scss
 
-        // only handle "normal" scss imports (ignore vanilla css and external requests)
-        if (preg_match('/\.css$|^https?:\/\//', $url)) {
+        // ignore external requests
+        if (preg_match('/^https?:\/\//', $url)) {
             return null;
         }
 
@@ -300,6 +300,10 @@ class scss {
         }
 
         $component_dir = $this->get_component_directory($parts[0]);
+
+        if ($parts[1][0] == '@') {
+            return $component_dir . substr($parts[1], 1);
+        }
 
         // try both normal and the _partial filename
         $urls = [$parts[1], preg_replace('/[^\/]+$/', '_\0', $parts[1])];
