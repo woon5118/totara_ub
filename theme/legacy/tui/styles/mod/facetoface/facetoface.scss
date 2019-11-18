@@ -1,0 +1,646 @@
+//
+// This file is part of Totara Learn
+//
+// Copyright (C) 2019 onwards Totara Learning Solutions LTD
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+// @copyright 2019 onwards Totara Learning Solutions LTD
+// @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+// @package   theme_legacy
+
+// Be mindful of theme colors when styling buttons and links.
+$mod_facetoface-error-colour: $state-danger-text !default;
+$mod_facetoface-overbooked: #f2d9b3 !default;
+$mod_facetoface-cancelled: #e6bdbc !default;
+$mod_facetoface-upcomming: #daead3 !default;
+$mod_facetoface-warning: #ffffc0 !default;
+$mod_facetoface-full: #b3dab6 !default;
+
+.f2fsessionlinks,
+.f2fsessionnotice {
+  display: block;
+  padding: 12px 0 8px;
+}
+
+.f2factivityname {
+  line-height: $line-height-small;
+}
+
+body#page-mod-facetoface-room div.row-fluid {
+  margin: 0;
+}
+
+body#page-mod-facetoface-view div#page-content table.sessions {
+  width: 100%;
+}
+
+body.path-mod-facetoface table.mod-facetoface-attendees {
+  width: 100%;
+}
+
+body.path-mod-facetoface div#fgroup_id_recipients input[id*='id_booked_type'] {
+  margin-left: 15px;
+}
+
+.mod_facetoface-addremove button {
+  min-width: 100px;
+}
+
+.f2f dt {
+  word-wrap: break-word;
+}
+
+.mod_facetoface-room {
+  display: block;
+}
+
+/** This is a hack to get full height divs for the status columns with background colours */
+.reportbuilder-table[data-source='rb_source_facetoface_summary'] tr,
+.reportbuilder-table[data-source='rb_source_facetoface_room_assignments'] tr,
+.reportbuilder-table[data-source='rb_source_facetoface_asset_assignments'] tr {
+  height: 1px;
+}
+
+/** Firefox requires a different hack **/
+.gecko .reportbuilder-table[data-source='rb_source_facetoface_summary'] tr,
+.gecko
+  .reportbuilder-table[data-source='rb_source_facetoface_room_assignments']
+  tr,
+.gecko
+  .reportbuilder-table[data-source='rb_source_facetoface_asset_assignments']
+  tr {
+  height: 100%;
+}
+
+/** IE requires quite a bit more hacking! **/
+.ie .reportbuilder-table[data-source='rb_source_facetoface_summary'] tr,
+.ie
+  .reportbuilder-table[data-source='rb_source_facetoface_room_assignments']
+  tr,
+.ie
+  .reportbuilder-table[data-source='rb_source_facetoface_asset_assignments']
+  tr {
+  height: 100%;
+}
+
+.ie .reportbuilder-table td.session_bookingstatus,
+.ie .reportbuilder-table td.session_overallstatus {
+  overflow: hidden;
+}
+
+.ie .reportbuilder-table td.session_bookingstatus div,
+.ie .reportbuilder-table td.session_overallstatus div {
+  padding-bottom: 9999px;
+  margin-bottom: -9999px;
+}
+
+.reportbuilder-table td.session_bookingstatus,
+.reportbuilder-table td.session_overallstatus {
+  padding: 0;
+  /** Part of the full-height hack mentioned above **/
+  height: inherit;
+}
+
+.reportbuilder-table td.session_bookingstatus > div,
+.reportbuilder-table td.session_overallstatus > div {
+  text-align: center;
+  /** Part of the full-height hack mentioned above **/
+  height: 100%;
+}
+
+.reportbuilder-table .session_bookingstatus > div > span,
+.reportbuilder-table .session_overallstatus > div > span {
+  display: inline-block;
+  margin: $totara_style-spacing_small;
+}
+
+.reportbuilder-table .session_bookingstatus .underbooked,
+.reportbuilder-table .session_overallstatus .ended {
+  background-color: $mod_facetoface-warning;
+}
+
+.reportbuilder-table .session_bookingstatus .available,
+.reportbuilder-table .session_overallstatus .upcoming {
+  background-color: $mod_facetoface-upcomming;
+}
+
+.reportbuilder-table .session_bookingstatus .overbooked {
+  background-color: $mod_facetoface-overbooked;
+}
+
+.reportbuilder-table .session_overallstatus .cancelled {
+  background-color: $mod_facetoface-cancelled;
+}
+
+.reportbuilder-table .session_bookingstatus .fullybooked,
+.reportbuilder-table .session_overallstatus .started {
+  background-color: $mod_facetoface-full;
+}
+
+#page-mod-facetoface-attendees-list-addlist textarea[name='csvinput'] {
+  min-height: 200px;
+}
+
+.mod_facetoface-noshow {
+  display: none;
+}
+
+.mod_facetoface-show-selectdate-dialog {
+  float: right;
+}
+
+.mod_facetoface-assetlist {
+  list-style-type: none;
+  margin: 0;
+}
+
+.ui-dialog [id^='selectassets'][id$='-dialog'] .select,
+.ui-dialog [id^='selectroom'][id$='-dialog'] .select {
+  overflow: auto;
+}
+
+.ui-dialog [id^='selectassets'][id$='-dialog'] .dialog-footer,
+.ui-dialog [id^='selectroom'][id$='-dialog'] .dialog-footer {
+  padding-top: 0.5em;
+  display: block;
+  float: left;
+}
+
+.f2f-ignoreconflicts-checkbox {
+  padding: 10px;
+}
+
+.f2f-usersbox {
+  margin-bottom: 48px;
+}
+
+.f2f-booked-type-error {
+  border: 1px solid $mod_facetoface-error-colour;
+  display: inline-block;
+}
+
+.f2f-booked-type-error-hint {
+  color: $mod_facetoface-error-colour;
+  display: inline-block;
+  width: 50%;
+}
+
+select.menuf2f-actions,
+select.menuf2f-select {
+  display: inline-block;
+}
+
+select.menuf2f-select {
+  margin-right: 0.5em;
+}
+
+.dir-rtl select.menuf2f-select {
+  margin-left: 0.5em;
+}
+
+// styles for the seminar event page
+
+@mixin force-link-color() {
+  color: $link-color;
+
+  &:hover,
+  &:focus {
+    color: $link-hover-color;
+    text-decoration: $link-hover-decoration;
+  }
+}
+
+.mod_facetoface {
+  &__action {
+    display: flex;
+    align-items: center;
+
+    &--near {
+      justify-content: flex-start;
+    }
+    &--far {
+      justify-content: flex-end;
+    }
+    &--center {
+      justify-content: center;
+    }
+  }
+
+  @mixin flex-wrap-vertical-center() {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  &__filter {
+    @include flex-wrap-vertical-center();
+    padding: 0 $totara_style-spacing_small $totara_style-spacing_small
+      $totara_style-spacing_small;
+    margin: $totara_style-spacing_medium 0;
+    border: 1px #e6e6e6 solid;
+    border-radius: $border-radius-default;
+
+    .flex-icon {
+      font-size: $ft-size-400;
+      margin-top: $totara_style-spacing_small;
+    }
+
+    @mixin child() {
+      @include flex-wrap-vertical-center();
+      margin: $totara_style-spacing_small $totara_style-spacing_small 0
+        $totara_style-spacing_small;
+      max-width: 100%;
+    }
+
+    @mixin filter-item() {
+      @include child();
+
+      &__label {
+        margin: 0;
+        // Override Moodle form
+        font: inherit;
+        padding: 0;
+      }
+
+      &__select {
+        margin: 0 $totara_style-spacing_small;
+        max-width: 100%;
+        // Override Moodle form
+        font-size: inherit;
+        height: 2.5em;
+      }
+    }
+
+    &__item {
+      // Note: use 'ch' unit only if we can drop the support of IE
+
+      &__room {
+        @include filter-item();
+        &__select {
+          // Avoid min-width here
+          // Otherwise the <select> element could cover the whole screen width if a room name is very loooong!
+          width: 15em; // IE11 does not support max-width for <select>
+          text-overflow: ellipsis;
+        }
+      }
+
+      &__eventtime {
+        @include filter-item();
+        &__select {
+          min-width: 8em;
+        }
+      }
+
+      &__advanced {
+        @include filter-item();
+        &__select {
+          min-width: 10em;
+        }
+      }
+
+      &__book {
+        @include filter-item();
+        &__select {
+          min-width: 12em;
+        }
+      }
+    }
+
+    &__link {
+      @include child();
+    }
+  }
+
+  &__sessionlist {
+    // Make the session list table horizontally scrollable in the content area,
+    // so it wouldn't overlap the blocks on right side
+    overflow-x: auto;
+    margin-bottom: $totara_style-spacing_large;
+
+    &--empty {
+      padding: $totara_style-spacing_medium;
+    }
+
+    &__show-previous--hidden {
+      display: none;
+    }
+
+    &__table {
+      @extend .table;
+      // Override .table
+      margin-bottom: 0;
+      > thead,
+      > tbody,
+      > tfoot {
+        > tr {
+          > th,
+          > td {
+            // Override the border inserted by Bootstrap
+            border-top: none;
+          }
+        }
+      }
+      // Add bottom border
+      > tbody {
+        border-bottom: 2px solid $table-border-color;
+      }
+      // Always accent
+      > tbody > tr {
+        background-color: $table-bg-accent;
+        // &:hover {
+        //     background-color: $table-bg-hover;
+        // }
+      }
+      // Add a border between sessions
+      &__sessionrow {
+        $table-thin-border-color: mix(
+          $table-border-color,
+          $totara_style-color_neutral_7,
+          80%
+        );
+        border-top: 1px solid $table-thin-border-color;
+        // Add a thick border between events
+        &.firstsession,
+        &.waitlisted {
+          border-top: 2px solid $table-border-color;
+        }
+      }
+    }
+
+    &__eventtime {
+      white-space: nowrap;
+    }
+
+    &__event-status {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+
+      &__event,
+      &__booking,
+      &__user {
+        white-space: nowrap;
+      }
+      &__user {
+        font-size: $totara_style-size_13;
+      }
+    }
+
+    &__timezone {
+      font-size: $totara_style-size_12;
+      display: block;
+    }
+
+    &__room {
+      max-width: 15em;
+      &__link {
+        @include force-link-color();
+      }
+    }
+
+    &__roomdetails {
+      font-size: $totara_style-size_12;
+      display: block;
+    }
+
+    &__action {
+      &__buttons {
+        display: flex;
+        font-size: $totara_style-size_16;
+        margin-bottom: $totara_style-spacing_x_small;
+      }
+      &__link {
+        @include force-link-color();
+        display: block;
+        white-space: nowrap;
+      }
+      &__reserve {
+        display: block;
+        &__link {
+          @include force-link-color();
+        }
+      }
+    }
+
+    &__attendance {
+      &--open__link {
+        @include force-link-color();
+        font-weight: bold;
+      }
+      &--saved__link {
+        @include force-link-color();
+      }
+
+      &--none,
+      &--locked,
+      &--open,
+      &--saved {
+        &__icon,
+        &__icon[class] {
+          // override fontawesome
+          vertical-align: baseline;
+        }
+      }
+    }
+  }
+
+  &__event_details {
+    dt {
+      margin-top: $totara_style-spacing_small;
+    }
+    hr {
+      margin: $totara_style-spacing_small 0;
+    }
+  }
+
+  // Put "Add event" on the right side of <h3>Events</h3>
+  &__action-dashboard,
+  &__action-editevent {
+    float: right;
+  }
+  &__sessionlist {
+    clear: right;
+  }
+}
+
+.dimmed_text {
+  a.mod_facetoface__sessionlist__room__link,
+  a.mod_facetoface__sessionlist__action__link,
+  a.mod_facetoface__sessionlist__action__reserve__link,
+  a.mod_facetoface__sessionlist__attendance--saved__link,
+  a.mod_facetoface__sessionlist__attendance--open__link {
+    &:link {
+      @include force-link-color();
+    }
+    // Workaround for Firefox 66 / Chrome 72 link color bug, visible on seminar events dashboard.
+    @include force-link-color();
+    &:not(:focus) {
+      @include force-link-color();
+    }
+  }
+}
+
+.f2f-inline-box {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+.custom-facetoface-selection {
+  max-width: unset;
+}
+
+.custom-facetoface-label {
+  font-weight: normal;
+}
+
+.f2f-attendees-table {
+  margin-bottom: $form-group-margin-bottom;
+
+  input[name="saveattendance"] {
+    @include button-variant($btn-primary-color, $btn-primary-bg, $btn-primary-border);
+  }
+
+  .actionsbuttons {
+    display: block;
+
+    @media (min-width: $totara_style-screen_md_min) {
+        margin-left: 33.3333%;
+    }
+
+    @media (min-width: $totara_style-screen_lg_min) {
+        margin-left: 25%;
+    }
+  }
+}
+
+.f2f-takeattendance-event-summary {
+  margin: 16px 0;
+}
+
+.f2f-takeattendance-bulk-action-box {
+  margin-bottom: $form-group-margin-bottom;
+  padding: $totara_style-spacing_small;
+  border: 1px #e6e6e6 solid;
+  border-radius: 2px;
+  
+  .bulkactionstring {
+    margin-top: 7px;
+    margin-right: $totara_style-spacing_medium;
+    float: left;
+
+    @media (min-width: $totara_style-screen_md_min) {
+        width: 33.3333%;
+    }
+
+    @media (min-width: $totara_style-screen_lg_min) {
+        width: 25%;
+    }
+  }
+
+  .facetoface-bulk-actions-selector,
+  .facetoface-bulk-actions-picker {
+      float: left;
+  }
+
+  #selectoptionbefore {
+      display: none;
+      color: $mod_facetoface-error-colour;
+      
+      &.f2f-selectionoptionbefore-error {
+          display: block;
+      }
+  }
+
+  &:after {
+      content: '';
+      display: block;
+      clear: both;
+  }
+}
+
+div.mod-facetoface__export-options {
+  margin-top: 16px;
+}
+
+a.mod_facetoface__action_goback {
+  margin: 0 0 3px 5px;
+}
+
+.mod_facetoface__grade.input-group {
+  display: flex;
+
+  input.form-control {
+    width: 6em;
+
+    &:focus::placeholder {
+      opacity: 0;
+    }
+    // Workaround for Edge, which does not see the :focus::placeholder.
+    &:focus::-ms-input-placeholder {
+      opacity: 0;
+    }
+  }
+}
+
+.path-mod-facetoface {
+  form.signinsheet {
+    div.fitem > fieldset {
+      > legend {
+        width: auto;
+        padding-right: 0;
+        margin-right: 10px;
+        .legend {
+          font-weight: normal;
+        }
+      }
+    }
+    .felement {
+      padding-left: 0;
+      select[name='sessiondateid'] {
+        padding-left: 0;
+      }
+      input[name='download'] {
+        margin: 0 15px 5px 0;
+        color: #287b7c;
+      }
+    }
+  }
+}
+
+.path-mod-facetoface {
+  form.import_export {
+    padding-top: $totara_style-spacing_large;
+
+    legend {
+      margin-bottom: $totara_style-spacing_medium;
+    }
+    .fitem {
+        margin-left: 0px;
+    }
+    div.fitem > fieldset {
+      a.mod_facetoface__action_uploadattendance,
+      a.mod_facetoface__action_csvexportupload,
+      select[name='f2f-export-actions'] {
+        margin: 0 10px 3px 0px;
+      }
+    }
+  }
+  table.userstoupload {
+    span.usernotfound {
+      margin-left: $totara_style-size_4;
+    }
+  }
+}

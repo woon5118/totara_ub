@@ -86,3 +86,5 @@ totara/core/js/lib/src/jquery.treeview.js
 totara/core/js/lib/i18n/
 totara/core/amd/src/jquery.dataTables-lazy.js
 totara/webapi/lib/graphql-php/
+theme/legacy/tui/
+theme/legacy/amd/src/bootstrap.js

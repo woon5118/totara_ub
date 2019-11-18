@@ -1,0 +1,454 @@
+//
+// This file is part of Totara Learn
+//
+// Copyright (C) 2019 onwards Totara Learning Solutions LTD
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+// @copyright 2019 onwards Totara Learning Solutions LTD
+// @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+// @author    Joby Harding <joby.harding@totaralearning.com>
+// @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
+// @package   theme_legacy
+
+// Combination of variables taken from bootstrap and the following roots & basis theme files
+// Roots
+// totara/variables.less, bootswatch/variables.less
+// Basis
+// totara/variables.less, bootswatch/variables.less
+
+//
+// Bootstrap
+// These vars overwrite the defaults provided within bootstrap
+//
+$font-size-base: 14px;
+$line-height-base: 1.428571429;
+$line-height-computed: floor(($font-size-base * $line-height-base));
+
+$font-family-sans-serif: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+  'Helvetica Neue', Arial, sans-serif;
+$font-family-serif: Georgia, 'Times New Roman', Times, serif;
+$font-family-monospace: Menlo, Monaco, Consolas, 'Liberation Mono',
+  'Courier New', monospace;
+$font-family-base: $font-family-sans-serif;
+
+$gray-base: #000;
+$gray: lighten($gray-base, 33.5%);
+
+$screen-sm: 768px;
+$screen-sm-min: $screen-sm;
+$grid-float-breakpoint: $screen-sm-min;
+$grid-gutter-width: 30px;
+$panel-default-border: #ddd;
+$padding-large-vertical: 10px;
+$form-group-margin-bottom: 30px;
+
+$navbar-default-bg: #f8f8f8;
+$navbar-height: 50px;
+$navbar-padding-horizontal: floor(($grid-gutter-width / 2));
+$navbar-padding-vertical: (($navbar-height - $line-height-computed) / 2);
+
+//
+// Colours
+//
+$gray-darker: #1d2125;
+$gray-dark: #3d444b;
+$gray-light: #64717d;
+$gray-lighter: #dde1e5;
+$brand-primary: #36a5a6;
+$brand-info: #337ab7;
+$brand-success: #677b2d;
+$brand-warning: #8e660d;
+$brand-danger: #953539;
+
+$state-success-text: #6a7e26;
+$state-success-bg: #f7faee;
+$state-success-border: #b2cb6c;
+$state-info-text: $gray-dark;
+$state-info-bg: #eff7fb;
+$state-info-border: #88b8d5;
+$state-warning-text: #bf8400;
+$state-warning-bg: #fff9ed;
+$state-warning-border: #ecc876;
+$state-danger-text: #bb4247;
+$state-danger-bg: #fef6f6;
+$state-danger-border: #e7898d;
+
+//
+// Fonts
+//
+
+// Ensure WCAG AA minimum text contrast against #fff and #f5f5f5.
+$link-color: darken($brand-primary, 11%);
+$text-color: $gray-dark;
+
+$blockquote-font-size: $font-size-base;
+
+//
+// Common (Used on multiple components)
+//
+$common-border-colour: #c8cfd6;
+$common-hover-bg: #e5e9ed;
+
+//
+// Nav
+//
+$navbar-default-bg: #fff;
+$navbar-border-radius: 0;
+$nav-link-hover-bg: $common-hover-bg;
+// Nav-tabs
+$nav-link-padding: 15px 30px;
+$nav-tabs-background-color: #fff;
+$nav-tabs-border-color: $common-border-colour;
+$nav-tabs-border-active: #4bc3c4;
+// Custom vars originaly from Basis.
+$nav-tabs-link-color: $gray-light;
+$nav-tabs-link-bg: lighten($gray-lighter, 4%);
+
+//
+// Alerts
+//
+$alert-border-radius: 8px;
+$alert-info-border: $brand-info;
+$alert-info-bg: #fff;
+$alert-info-text: $text-color;
+$alert-success-border: $brand-success;
+$alert-success-bg: #fff;
+$alert-success-text: $text-color;
+$alert-warning-border: $brand-warning;
+$alert-warning-bg: #fff;
+$alert-warning-text: $text-color;
+$alert-danger-border: $brand-danger;
+$alert-danger-bg: #fff;
+$alert-danger-text: $text-color;
+
+//
+// Buttons
+//
+$btn-link-disabled-color: $gray-light;
+$btn-primary-border: transparent;
+$btn-success-border: transparent;
+$btn-info-border: transparent;
+$btn-warning-border: transparent;
+$btn-danger-border: transparent;
+$btn-primary-bg: darken($brand-primary, 10%);
+$btn-border-radius-base: 3px;
+$btn-border-radius-small: $btn-border-radius-base;
+$btn-border-radius-large: $btn-border-radius-base;
+// Custom button type.
+$btn-secondary-color: #3d444b;
+$btn-secondary-bg: #c8cfd6;
+$btn-secondary-border: #b6bcc2;
+
+$popover-border-color: #b6bcc2;
+
+//
+// Labels
+//
+$label-primary-bg: darken($brand-primary, 10%);
+
+//
+// Code
+//
+$pre-bg: #fff;
+
+//
+// Theme
+//
+$basis-border-thick: 3px;
+
+//
+// Icons
+//
+
+// Add Bootstrap colours to flexible icons.
+$ft-var-default-color: $gray;
+$ft-var-success-color: $brand-primary;
+$ft-var-warning-color: $brand-warning;
+$ft-var-danger-color: $brand-danger;
+$ft-var-info-color: $brand-info;
+$ft-var-disabled-color: $btn-link-disabled-color;
+
+//
+// Tables
+//
+$moodle-table-striped: true;
+$moodle-table-hover: true;
+
+//
+// Calendar
+//
+$calendar-event-course-color: #ffd3bd; // Pale red.
+$calendar-event-global-color: #d6f8cd; // Pale green.
+$calendar-event-group-color: #fee7ae; // Pale yellow.
+$calendar-event-user-color: #dce7ec; // Pale blue.
+
+//
+// Modal
+//
+$modal-inner-padding: 5px;
+$modal-outer-padding: 15px;
+$modal-border-radius: 4px;
+$modal-backdrop-bg: rgba(0, 0, 0, 0.2);
+
+//
+// Progress bar
+//
+$progress-bar-inverted-color: $gray-light;
+$progress-bar-bg: $brand-info;
+
+//
+// Dock
+//
+$dock-width: 36px;
+$dock-title-margin: 0;
+$dock-panel-width: ($grid-float-breakpoint / 2);
+$dock-title-font-size: 12px;
+$dock-border-style: solid;
+$dock-border-color: $panel-default-border;
+$dock-border-width: 1px;
+$dock-border: $dock-border-width $dock-border-style $dock-border-color;
+
+//
+// Blocks
+//
+$block-header-padding-vertical: ($padding-large-vertical * 1.5);
+$block-border-color: #c8cfd6;
+$block-actions-color: #6a7884;
+$block-actions-bg: #fff;
+$block-actions-border-radius: 6px;
+
+// Totara Menu
+$totara-menu-border-color: #ddd;
+$totara-menu-border-width: 0;
+$totara-menu-border-style: solid;
+$totara-menu-border: $totara-menu-border-width $totara-menu-border-style
+  $totara-menu-border-color;
+$totara-menu-padding-vertical: $navbar-padding-vertical;
+$totara-menu-padding-horizontal: $navbar-padding-horizontal;
+$totara-menu-bg: $gray-dark;
+$totara-menu-link-color: #fff;
+$totara-menu-link-hover-color: $totara-menu-link-color;
+$totara-menu-link-active-color: $totara-menu-link-color;
+$totara-menu-link-hover-bg: $gray-darker;
+$totara-menu-link-active-bg: $totara-menu-link-hover-bg;
+$totara-menu-dropdown-text-indent: ($totara-menu-padding-horizontal * 2);
+
+$totara-menu-dropdown-bg: #f0f2f4;
+$totara-menu-dropdown-hover-bg: #dde1e5;
+$totara-menu-padding-vertical: ceil($line-height-computed / 2);
+
+//
+// Spacing
+//
+$padding-vertical: 4px;
+
+//
+// Totara style Sizes
+//
+
+// IMPORTANT all ratio sizes are calculated from this base
+// To make page elements larger/smaller change $totara_style-html_font_size
+$totara_style-size_base: 10;
+
+// Calculate available Rem sizes from px
+$totara_style-size_1: (1rem / $totara_style-size_base); // 1px
+$totara_style-size_4: (4rem / $totara_style-size_base); // 4px
+$totara_style-size_8: (8rem / $totara_style-size_base); // 8px
+$totara_style-size_11: (11rem / $totara_style-size_base); // 11px
+$totara_style-size_12: (12rem / $totara_style-size_base); // 12px
+$totara_style-size_13: (13rem / $totara_style-size_base); // 13px
+$totara_style-size_14: (14rem / $totara_style-size_base); // 14px
+$totara_style-size_16: (16rem / $totara_style-size_base); // 16px
+$totara_style-size_18: (18rem / $totara_style-size_base); // 18px
+$totara_style-size_24: (24rem / $totara_style-size_base); // 24px
+$totara_style-size_30: (30rem / $totara_style-size_base); // 30px
+$totara_style-size_32: (32rem / $totara_style-size_base); // 32px
+$totara_style-size_40: (40rem / $totara_style-size_base); // 40px
+$totara_style-size_48: (48rem / $totara_style-size_base); // 48px
+
+//
+// Totara style breakpoints
+//
+
+// Media queries breakpoints
+$totara_style-screen_sm_min: 768px; // Matches @screen-sm-min
+$totara_style-screen_md_min: 992px; // Matches @screen-md-min
+$totara_style-screen_lg_min: 1200px; // Matches @screen-lg-min
+$totara_style-screen_xl_min: 1400px;
+
+//
+// Totara style spacing
+//
+
+// Spacing (padding / margin / whitespace)
+$totara_style-spacing_x_small: $totara_style-size_4;
+$totara_style-spacing_small: $totara_style-size_8;
+$totara_style-spacing_medium: $totara_style-size_16;
+$totara_style-spacing_large: $totara_style-size_24;
+$totara_style-spacing_x_large: $totara_style-size_32;
+$totara_style-spacing_xx_large: $totara_style-size_40;
+$totara_style-spacing_xxx_large: $totara_style-size_48;
+
+//
+// Totara style colours
+//
+
+// Neutral colour range
+$totara_style-color_neutral_1: #fff;
+$totara_style-color_neutral_2: #f5f5f5;
+$totara_style-color_neutral_3: #e6e6e6;
+$totara_style-color_neutral_4: #d2d2d2;
+$totara_style-color_neutral_5: #a8b7c7;
+$totara_style-color_neutral_6: #64717d;
+$totara_style-color_neutral_7: #3d444b;
+$totara_style-color_neutral_8: #000;
+
+// Notification colours
+$totara_style-color_info: #337ab7;
+$totara_style-color_alert: #953539;
+$totara_style-color_warning: #8e660d;
+$totara_style-color_success: #677b2d;
+
+// Theme colours
+$totara_style-color_theme_1: #008287;
+
+$totara_style-color_background_highlight: #fdf8e4;
+
+//
+// Totara style typography
+//
+
+// Sets the default font size
+$totara_style-html_font_size: $totara_style-size_base + px;
+
+// Heading font sizes
+$totara_style-font_heading_label_small_size: $totara_style-size_13;
+$totara_style-font_heading_label_medium_size: $totara_style-size_14;
+$totara_style-font_heading_x_small_size: $totara_style-size_14;
+$totara_style-font_heading_small_size: $totara_style-size_18;
+$totara_style-font_heading_medium_size: $totara_style-size_24;
+$totara_style-font_heading_large_size: $totara_style-size_30;
+
+// Body font sizes
+$totara_style-font_body_medium_size: $totara_style-size_14;
+$totara_style-font_body_small_size: $totara_style-size_13;
+$totara_style-font_body_x_small_size: $totara_style-size_12;
+
+// Body font styles
+$totara_style-font_body_disabled_colour: $totara_style-color_neutral_3;
+$totara_style-font_body_placeholder_colour: $totara_style-color_neutral_3;
+
+// Font weight
+$totara_style-font_weight_bold_light: 500;
+
+// Font line heights
+$totara_style-font_line_height_small: 1.25;
+$totara_style-font_line_height_standard: 1.5;
+$totara_style-font_line_height_large: 1.63;
+
+// Link font styles
+$totara_style-font_link_colour: $totara_style-color_theme_1;
+
+// These helper classes have been converted over to mixins below for SCSS
+@mixin totara_style-heading-large {
+  font-size: $totara_style-font_heading_large_size;
+  font-weight: bold;
+  line-height: $totara_style-font_line_height_small;
+}
+
+@mixin totara_style-heading-medium {
+  font-size: $totara_style-font_heading_medium_size;
+  font-weight: bold;
+  line-height: $totara_style-font_line_height_small;
+}
+
+@mixin totara_style-heading-small {
+  font-size: $totara_style-font_heading_small_size;
+  font-weight: bold;
+  line-height: $totara_style-font_line_height_standard;
+}
+
+@mixin totara_style-heading-x-small {
+  font-size: $totara_style-font_heading_x_small_size;
+  font-weight: bold;
+  line-height: $totara_style-font_line_height_standard;
+}
+
+@mixin totara-style-heading-label-medium {
+  font-size: $totara_style-font_heading_label_medium_size;
+  font-weight: $totara_style-font_weight_bold_light;
+  line-height: $totara_style-font_line_height_standard;
+  letter-spacing: $totara_style-size_1;
+  text-transform: uppercase;
+}
+
+@mixin totara-style-heading-label-small {
+  font-size: $totara_style-font_heading_label_small_size;
+  font-weight: $totara_style-font_weight_bold_light;
+  line-height: $totara_style-font_line_height_standard;
+  letter-spacing: $totara_style-size_1;
+  text-transform: uppercase;
+}
+
+@mixin totara-style-body-medium {
+  font-size: $totara_style-font_body_medium_size;
+  font-weight: normal;
+  line-height: $totara_style-font_line_height_standard;
+}
+
+@mixin totara-style-body-small {
+  font-size: $totara_style-font_body_small_size;
+  font-weight: normal;
+  line-height: $totara_style-font_line_height_standard;
+}
+
+@mixin totara-style-body-x-small {
+  font-size: $totara_style-font_body_x_small_size;
+  font-weight: normal;
+  line-height: $totara_style-font_line_height_large;
+}
+
+//
+// Totara style forms
+//
+
+// These helper classes have been converted over to mixins below for SCSS
+@mixin totara-style-textInput {
+  line-height: 1;
+  padding: $totara_style-spacing_small;
+  width: 280px;
+}
+
+@mixin totara-style-textInput-withIcon {
+  padding-left: $totara_style-spacing_x_large;
+}
+
+@mixin totara_style-textInput-Icon {
+  left: $totara_style-spacing_small;
+  position: absolute;
+  top: $totara_style-size_11;
+}
+
+//
+// Totara style shadows
+//
+
+// Shadow depths
+$totara_style-shadow_1: 0 3px 6px 0 rgba(0, 0, 0, 0.16),
+  0 3px 6px 0 rgba(0, 0, 0, 0.23);
+$totara_style-shadow_2: 0 10px 20px 0 rgba(0, 0, 0, 0.19),
+  0 6px 6px 0 rgba(0, 0, 0, 0.26);
+$totara_style-shadow_3: 0 14px 28px 0 rgba(0, 0, 0, 0.25),
+  0 10px 10px 0 rgba(0, 0, 0, 0.26);

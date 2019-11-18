@@ -1,0 +1,9 @@
+This file describes API changes for 'theme_legacy'.
+
+=== 13.0 (changes from roots/basis) ===
+
+* "secure" page layout now uses layout/secure.php
+* Styling changes applied to login page tui/styles/totara/login.scss
+* Updated tool_usertours/tourstep template
+* Upgraded Bootstrap to 3.4.1
+* Deprecated CSS file totara-menu was dropped

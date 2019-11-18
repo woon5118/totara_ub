@@ -1,0 +1,86 @@
+/*!
+ * Bootstrap v3.4.1 (https://getbootstrap.com/)
+ * Copyright 2011-2019 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap-sass/blob/master/LICENSE)
+ */
+
+// Core variables and mixins
+@import 'theme_legacy/bootstrap3/variables';
+
+@import 'theme_legacy/bootstrap3/mixins/alerts';
+@import 'theme_legacy/bootstrap3/mixins/background-variant';
+@import 'theme_legacy/bootstrap3/mixins/border-radius';
+@import 'theme_legacy/bootstrap3/mixins/buttons';
+@import 'theme_legacy/bootstrap3/mixins/center-block';
+@import 'theme_legacy/bootstrap3/mixins/clearfix';
+@import 'theme_legacy/bootstrap3/mixins/forms';
+@import 'theme_legacy/bootstrap3/mixins/gradients';
+@import 'theme_legacy/bootstrap3/mixins/grid-framework';
+@import 'theme_legacy/bootstrap3/mixins/grid';
+@import 'theme_legacy/bootstrap3/mixins/hide-text';
+@import 'theme_legacy/bootstrap3/mixins/image';
+@import 'theme_legacy/bootstrap3/mixins/labels';
+@import 'theme_legacy/bootstrap3/mixins/list-group';
+@import 'theme_legacy/bootstrap3/mixins/nav-divider';
+@import 'theme_legacy/bootstrap3/mixins/nav-vertical-align';
+@import 'theme_legacy/bootstrap3/mixins/opacity';
+@import 'theme_legacy/bootstrap3/mixins/pagination';
+@import 'theme_legacy/bootstrap3/mixins/panels';
+@import 'theme_legacy/bootstrap3/mixins/progress-bar';
+@import 'theme_legacy/bootstrap3/mixins/reset-filter';
+@import 'theme_legacy/bootstrap3/mixins/reset-text';
+@import 'theme_legacy/bootstrap3/mixins/resize';
+@import 'theme_legacy/bootstrap3/mixins/responsive-visibility';
+@import 'theme_legacy/bootstrap3/mixins/size';
+@import 'theme_legacy/bootstrap3/mixins/tab-focus';
+@import 'theme_legacy/bootstrap3/mixins/table-row';
+@import 'theme_legacy/bootstrap3/mixins/text-emphasis';
+@import 'theme_legacy/bootstrap3/mixins/text-overflow';
+@import 'theme_legacy/bootstrap3/mixins/vendor-prefixes';
+
+// Reset and dependencies
+@import 'theme_legacy/bootstrap3/normalize';
+@import 'theme_legacy/bootstrap3/print';
+@import 'theme_legacy/bootstrap3/glyphicons';
+
+// Core CSS
+@import 'theme_legacy/bootstrap3/scaffolding';
+@import 'theme_legacy/bootstrap3/type';
+@import 'theme_legacy/bootstrap3/code';
+@import 'theme_legacy/bootstrap3/grid';
+@import 'theme_legacy/bootstrap3/tables';
+@import 'theme_legacy/bootstrap3/forms';
+@import 'theme_legacy/bootstrap3/buttons';
+
+// Components
+@import 'theme_legacy/bootstrap3/component-animations';
+@import 'theme_legacy/bootstrap3/dropdowns';
+@import 'theme_legacy/bootstrap3/button-groups';
+@import 'theme_legacy/bootstrap3/input-groups';
+@import 'theme_legacy/bootstrap3/navs';
+@import 'theme_legacy/bootstrap3/navbar';
+@import 'theme_legacy/bootstrap3/breadcrumbs';
+@import 'theme_legacy/bootstrap3/pagination';
+@import 'theme_legacy/bootstrap3/pager';
+@import 'theme_legacy/bootstrap3/labels';
+@import 'theme_legacy/bootstrap3/badges';
+@import 'theme_legacy/bootstrap3/jumbotron';
+@import 'theme_legacy/bootstrap3/thumbnails';
+@import 'theme_legacy/bootstrap3/alerts';
+@import 'theme_legacy/bootstrap3/progress-bars';
+@import 'theme_legacy/bootstrap3/media';
+@import 'theme_legacy/bootstrap3/list-group';
+@import 'theme_legacy/bootstrap3/panels';
+@import 'theme_legacy/bootstrap3/responsive-embed';
+@import 'theme_legacy/bootstrap3/wells';
+@import 'theme_legacy/bootstrap3/close';
+
+// Components w/ JavaScript
+@import 'theme_legacy/bootstrap3/modals';
+@import 'theme_legacy/bootstrap3/tooltip';
+@import 'theme_legacy/bootstrap3/popovers';
+@import 'theme_legacy/bootstrap3/carousel';
+
+// Utility classes
+@import 'theme_legacy/bootstrap3/utilities';
+@import 'theme_legacy/bootstrap3/responsive-utilities';

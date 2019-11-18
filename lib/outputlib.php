@@ -420,6 +420,7 @@ class theme_config {
     /**
      * @var array list of YUI CSS modules to be included on each page. This may be used
      * to remove cssreset and use cssnormalise module instead.
+     * @deprecated since Totara 13
      */
     public $yuicssmodules = array('cssreset', 'cssfonts', 'cssgrids', 'cssbase');
 
@@ -683,6 +684,13 @@ class theme_config {
 
         //fix arrows if needed
         $this->check_theme_arrows();
+    
+        // Totara: if on new theme stack, don't load YUI css
+        $new_stack = $this->name == 'ventura' || $this->name == 'legacy' ||
+            in_array('ventura', $this->parents) || in_array('legacy', $this->parents);
+        if ($new_stack) {
+            $this->yuicssmodules = [];
+        }
     }
 
     /**

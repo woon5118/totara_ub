@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<libraries>
+  <library>
+    <location>tui/styles/bootstrap3</location>
+    <name>Bootstrap</name>
+    <license>MIT</license>
+    <version>3.4.1</version>
+    <licenseversion></licenseversion>
+  </library>
+  <library>
+    <location>amd/src/bootstrap.js</location>
+    <name>Bootstrap</name>
+    <license>MIT</license>
+    <version>3.4.1</version>
+    <licenseversion></licenseversion>
+  </library>
+  <library>
+      <location>tui/styles/totara_featured_links/slick/slick</location>
+      <name>Slick</name>
+      <license>MIT</license>
+      <version>1.8.0</version>
+      <licenseversion></licenseversion>
+  </library>
+  <library>
+    <location>tui/styles/fa</location>
+    <name>Font Awesome CSS</name>
+    <license>MIT</license>
+    <version>4.7.0</version>
+    <licenseversion></licenseversion>
+  </library>
+</libraries>
