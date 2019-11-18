@@ -26,7 +26,10 @@ namespace totara_competency\models;
 use core\orm\collection;
 use core\orm\entity\repository;
 use totara_competency\entities\competency;
+use totara_competency\entities\competency_achievement;
 use totara_competency\entities\scale as scale_entity;
+use totara_competency\entities\scale_assignment;
+use totara_core\advanced_feature;
 
 /**
  * Class scale
@@ -40,6 +43,7 @@ use totara_competency\entities\scale as scale_entity;
  * @property-read int $defaultid
  * @property-read int $minproficiencyid
  * @property-read collection $values
+ * @property scale_entity $entity
  *
  * @package totara_competency\models
  */
@@ -109,6 +113,42 @@ class scale extends entity_model {
      */
     public static function find_by_competency_id(int $id, bool $with_values = true): ?self {
         return static::find_by_competency_ids([$id], $with_values)->first();
+    }
+
+    /**
+     * Checks if a scale is used in the system. A scale is used if there are any
+     * achievement records or it's been given a value in a learning plan
+     *
+     * @return bool
+     */
+    public function is_in_use(): bool {
+        $has_achievement = competency_achievement::repository()
+            ->where_not_null('scale_value_id')
+            ->join(['comp', 'c'], 'comp_id', 'id')
+            ->join(['comp_scale_assignments', 'sca'], 'c.frameworkid', 'sca.frameworkid')
+            ->where('sca.scaleid', $this->id)
+            ->exists();
+
+        $used_in_lps = false;
+        if (advanced_feature::is_enabled('learningplans')) {
+            global $CFG;
+            require_once($CFG->dirroot.'/totara/plan/components/competency/competency.class.php');
+
+            $used_in_lps = \dp_competency_component::is_competency_scale_used($this->id);
+        }
+
+        return $has_achievement || $used_in_lps;
+    }
+
+    /**
+     * Checks if a scale is assigned to any framework
+     *
+     * @return bool
+     */
+    public function is_assigned(): bool {
+        return scale_assignment::repository()
+            ->where('scaleid', $this->id)
+            ->exists();
     }
 
     /**

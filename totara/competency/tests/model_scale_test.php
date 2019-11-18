@@ -23,9 +23,11 @@
  */
 
 use core\collection;
+use totara_competency\entities\competency_achievement;
 use totara_competency\entities\scale as scale_entity;
 use totara_competency\entities\scale_value;
 use totara_competency\models\scale;
+use totara_core\advanced_feature;
 
 /**
  * Class totara_competency_model_scale_testcase
@@ -107,6 +109,130 @@ class totara_competency_model_scale_testcase extends advanced_testcase {
 
         // Let's check that it loads scale values correctly
         $this->assert_scale_is_good(new collection([scale::find_by_competency_id($comps->item(2)->id, true)]), true);
+    }
+
+    public function test_if_scale_is_assigned() {
+        $generator = $this->generator();
+
+        $scale = $generator->create_scale('comp', ['name' => 'Scale 1']);
+
+        $scale_model = scale::find_by_id($scale->id);
+
+        $this->assertFalse($scale_model->is_assigned());
+
+        // Now create a framework using the scale
+        $generator->create_comp_frame(['scale' => $scale->id]);
+
+        $this->assertTrue($scale_model->is_assigned());
+    }
+
+    public function test_if_scale_is_used() {
+        $generator = $this->generator();
+
+        $user = $this->getDataGenerator()->create_user();
+
+        $scale = $generator->create_scale('comp', ['name' => 'Scale 1']);
+        $framework = $generator->create_comp_frame(['scale' => $scale->id]);
+
+        $comp = $generator->create_comp(['frameworkid' => $framework->id]);
+
+        $scale_model = scale::find_by_id($scale->id);
+
+        $this->assertFalse($scale_model->is_in_use());
+
+        /** @var totara_competency_generator $comp_generator */
+        $comp_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+
+        $assignment = $comp_generator->assignment_generator()->create_user_assignment($comp->id, $user->id);
+
+        // Creating a record with a null scale_value_id value
+        $achievement = new competency_achievement();
+        $achievement->user_id = $user->id;
+        $achievement->comp_id = $comp->id;
+        $achievement->assignment_id = $assignment->id;
+        $achievement->scale_value_id = null;
+        $achievement->proficient = 0;
+        $achievement->status = competency_achievement::ACTIVE_ASSIGNMENT;
+        $achievement->time_created = time();
+        $achievement->time_proficient = time();
+        $achievement->time_scale_value = time();
+        $achievement->time_status = time();
+        $achievement->save();
+
+        $this->assertFalse($scale_model->is_in_use());
+
+        $achievement->scale_value_id = $scale_model->minproficiencyid;
+        $achievement->save();
+
+        $this->assertTrue($scale_model->is_in_use());
+    }
+
+    public function test_if_scale_is_used_in_learning_plan() {
+        $generator = $this->generator();
+
+        $user = $this->getDataGenerator()->create_user();
+
+        $scale = $generator->create_scale('comp', ['name' => 'Scale 1']);
+        $framework = $generator->create_comp_frame(['scale' => $scale->id]);
+
+        $comp = $generator->create_comp(['frameworkid' => $framework->id]);
+
+        $scale_model = scale::find_by_id($scale->id);
+
+        $this->assertFalse($scale_model->is_in_use());
+
+        /** @var totara_plan_generator $plangenerator */
+        $plangenerator = $this->getDataGenerator()->get_plugin_generator('totara_plan');
+
+        $this->setAdminUser();
+
+        $planrecord = $plangenerator->create_learning_plan(['userid' => $user->id]);
+
+        $plangenerator->add_learning_plan_competency($planrecord->id, $comp->id);
+
+        /** @var dp_competency_component $competency_component */
+        $competency_component = (new development_plan($planrecord->id))->get_component('competency');
+        $competency_component->set_value($comp->id, $user->id, $scale_model->minproficiencyid, new stdClass());
+
+        $this->assertTrue($scale_model->is_in_use());
+
+        // Check that a 0 value does not make it in use
+        $competency_component->set_value($comp->id, $user->id, 0, new stdClass());
+
+        $this->assertFalse($scale_model->is_in_use());
+    }
+
+    public function test_if_scale_is_used_with_learning_plan_disabled() {
+        advanced_feature::disable('learningplans');
+
+        $generator = $this->generator();
+
+        $user = $this->getDataGenerator()->create_user();
+
+        $scale = $generator->create_scale('comp', ['name' => 'Scale 1']);
+        $framework = $generator->create_comp_frame(['scale' => $scale->id]);
+
+        $comp = $generator->create_comp(['frameworkid' => $framework->id]);
+
+        $scale_model = scale::find_by_id($scale->id);
+
+        $this->assertFalse($scale_model->is_in_use());
+
+        /** @var totara_plan_generator $plangenerator */
+        $plangenerator = $this->getDataGenerator()->get_plugin_generator('totara_plan');
+
+        $this->setAdminUser();
+
+        $planrecord = $plangenerator->create_learning_plan(['userid' => $user->id]);
+
+        $plangenerator->add_learning_plan_competency($planrecord->id, $comp->id);
+
+        /** @var dp_competency_component $competency_component */
+        $competency_component = (new development_plan($planrecord->id))->get_component('competency');
+        $competency_component->set_value($comp->id, $user->id, $scale_model->minproficiencyid, new stdClass());
+
+        // We don't count values in learning plans if it's disable
+        $this->assertFalse($scale_model->is_in_use());
     }
 
     /**

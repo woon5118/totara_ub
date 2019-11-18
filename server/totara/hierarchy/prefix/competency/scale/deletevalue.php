@@ -22,6 +22,8 @@
  * @subpackage totara_hierarchy
  */
 
+use totara_competency\models\scale;
+
 require_once(__DIR__ . '/../../../../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/lib.php');
@@ -67,7 +69,7 @@ $deleteparams = array('id' => $value->id, 'delete' => md5($value->timemodified),
 $deleteurl = new moodle_url('/totara/hierarchy/prefix/competency/scale/deletevalue.php', $deleteparams);
 
 // Can't delete if the scale is in use
-if (competency_scale_is_used($value->scaleid)) {
+if (scale::find_by_id($value->scaleid)->is_in_use()) {
     \core\notification::error(get_string('error:nodeletescalevalueinuse', 'totara_hierarchy'));
     redirect($returnurl);
 }

@@ -31,9 +31,7 @@
  * in order to avoid name collisions
   */
 
-use core\orm\query\builder;
-use totara_competency\entities\assignment;
-use totara_competency\entities\pathway;
+use totara_competency\models\scale;
 
 /**
  * Determine whether an competency scale is assigned to any frameworks
@@ -42,12 +40,14 @@ use totara_competency\entities\pathway;
  * {@link competency_scale_is_used()} which tells you if the scale
  * values are actually assigned.
  *
+ * @deprecated since Totara 13
+ *
  * @param int $objectiveid
  * @return boolean
  */
 function competency_scale_is_assigned($scaleid) {
-    global $DB;
-    return $DB->record_exists('comp_scale_assignments', array('scaleid' => $scaleid));
+    debugging('competency_scale_is_assigned() is deprecated. Use the is_assigned() method in '.scale::class, DEBUG_DEVELOPER);
+    return scale::find_by_id($scaleid)->is_assigned();
 }
 
 
@@ -62,39 +62,24 @@ function competency_scale_is_assigned($scaleid) {
  * {@link competency_scale_is_assigned()} which tells you if the scale
  * even is assigned to any frameworks
  *
+ * @deprecated since Totara 13
+ *
  * @param int $scaleid
  * @return boolean
  */
 function competency_scale_is_used(int $scaleid) {
-    $has_assignments = assignment::repository()
-        ->join(['comp', 'c'], 'competency_id', 'id')
-        ->join(['comp_scale_assignments', 'sca'], 'c.frameworkid', 'sca.id')
-        ->where('sca.scaleid', $scaleid)
-        ->exists();
-
-    $has_pathways = pathway::repository()
-        ->join(['comp', 'c'], 'comp_id', 'id')
-        ->join(['comp_scale_assignments', 'sca'], 'c.frameworkid', 'sca.id')
-        ->where('sca.scaleid', $scaleid)
-        ->exists();
-
-    $has_learning_plan_values = builder::table('dp_plan_competency_value')
-        ->join(['comp_scale_values', 'csv'], 'scale_value_id', 'id')
-        ->where('csv.scaleid', $scaleid)
-        ->where('scale_value_id', '>', 0)
-        ->exists();
-
-    return (($has_assignments && $has_pathways) || $has_learning_plan_values);
+    debugging('competency_scale_is_used() is deprecated. Use the is_in_use() method in '.scale::class, DEBUG_DEVELOPER);
+    return scale::find_by_id($scaleid)->is_in_use();
 }
-
 
 /**
  * Returns the ID of the scale value that is marked as proficient, if
  * there is only one. If there are none, or multiple it returns false
  *
+ * @deprecated since Totara 13
+ *
  * @param integer $scaleid ID of the scale to check
  * @return integer|false The ID of the sole proficient scale value or false
- * @deprecated since Totara 13
  */
 function competency_scale_only_proficient_value($scaleid) {
     global $DB;
@@ -186,8 +171,10 @@ function competency_scale_display_table($scales) {
 
         $table->data = array();
         foreach ($scales as $scale) {
-            $scale_used = competency_scale_is_used($scale->id);
-            $scale_assigned = competency_scale_is_assigned($scale->id);
+            $scale_model = scale::find_by_id($scale->id);
+
+            $scale_used = $scale_model->is_in_use();
+            $scale_assigned = $scale_model->is_assigned();
             $line = array();
 
             $line[] = $OUTPUT->action_link(new moodle_url('/totara/hierarchy/prefix/competency/scale/view.php', array('id' => $scale->id, 'prefix' => 'competency')), format_string($scale->name));

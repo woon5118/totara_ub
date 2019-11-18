@@ -22,6 +22,8 @@
  * @subpackage totara_hierarchy
  */
 
+use totara_competency\models\scale;
+
 require_once(__DIR__ . '/../../../../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
@@ -57,11 +59,13 @@ if (!$scale = $DB->get_record('comp_scale', array('id' => $id))) {
 $returnurl = "{$CFG->wwwroot}/totara/hierarchy/framework/index.php?prefix=competency";
 $deleteurl = "{$CFG->wwwroot}/totara/hierarchy/prefix/competency/scale/delete.php?id={$scale->id}&amp;delete=".md5($scale->timemodified)."&amp;sesskey={$USER->sesskey}&amp;prefix=competency";
 
+$scale_model = scale::find_by_id($scaleid);
+
 // Can't delete if the scale is in use or assigned
-if (competency_scale_is_used($id)) {
+if ($scale_model->is_in_use()) {
     print_error('error:nodeletecompetencyscaleinuse', 'totara_hierarchy', $returnurl);
 }
-if (competency_scale_is_assigned($id)) {
+if ($scale_model->is_assigned()) {
     print_error('error:nodeletecompetencyscaleassigned', 'totara_hierarchy', $returnurl);
 }
 

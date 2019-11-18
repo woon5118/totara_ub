@@ -22,6 +22,8 @@
  * @subpackage totara_hierarchy
  */
 
+use totara_competency\models\scale;
+
 require_once(__DIR__ . '/../../../../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once('editvalue_form.php');
@@ -80,7 +82,7 @@ if (!$scale = $DB->get_record('comp_scale', array('id' => $value->scaleid))) {
         print_error('incorrectcompetencyscaleid', 'totara_hierarchy');
 }
 
-$scale_used = competency_scale_is_used($scale->id);
+$scale_used = scale::find_by_id($scale->id)->is_in_use();
 
 // Save scale name for display in the form
 $value->scalename = format_string($scale->name);

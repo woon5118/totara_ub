@@ -25,6 +25,7 @@
 
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/evidence/lib.php');
+require_once($CFG->dirroot.'/totara/plan/component.class.php');
 
 
 if (!defined('MOODLE_INTERNAL')) {
@@ -1210,10 +1211,10 @@ class dp_competency_component extends dp_base_component {
 
 
     /**
-     * Returns true if any competencies use the scale given
+     * Returns true if a priority scale is used for any competency in a learning plan
      *
      * @param integer $scaleid
-     * return boolean
+     * @return boolean
      */
     public static function is_priority_scale_used($scaleid) {
         global $DB;
@@ -1228,6 +1229,24 @@ class dp_competency_component extends dp_base_component {
         return $DB->record_exists_sql($sql, array($scaleid));
     }
 
+    /**
+     * Returns true if any competencies in a learning plan use the scale given.
+     * Means it got a value assigned
+     *
+     * @param integer $scaleid
+     * @return bool
+     */
+    public static function is_competency_scale_used($scaleid) {
+        global $DB;
+
+        $sql = "
+            SELECT pcv.id
+            FROM {dp_plan_competency_value} pcv 
+            JOIN {comp} c ON pcv.competency_id = c.id
+            JOIN {comp_scale_assignments} csa ON c.frameworkid = csa.frameworkid
+            WHERE pcv.scale_value_id > 0 AND csa.scaleid = :scaleid";
+        return $DB->record_exists_sql($sql, ['scaleid' => $scaleid]);
+    }
 
     /**
      * Removes an assigned competency

@@ -23,6 +23,7 @@
  */
 
 use hierarchy_competency\event\scale_min_proficient_value_updated;
+use totara_competency\models\scale;
 
 require_once(__DIR__ . '/../../../../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
@@ -78,8 +79,10 @@ if (!$scale = $DB->get_record('comp_scale', array('id' => $id))) {
     print_error('incorrectcompetencyscaleid', 'totara_hierarchy');
 }
 
-$scale_assigned_to_framework = competency_scale_is_assigned($id);
-$scale_used_by_users = competency_scale_is_used($id);
+$scale_model = scale::find_by_id($scale->id);
+
+$scale_assigned_to_framework = $scale_model->is_assigned();
+$scale_used_by_users = $scale_model->is_in_use();
 
 // Cache text
 $str_edit = get_string('edit');
