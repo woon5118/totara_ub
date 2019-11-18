@@ -141,7 +141,7 @@ define(['core/notification'], function(notification) {
     Basket.prototype.add = function(values) {
         var error = 'You need to implement the add() function of your basket';
         notification.exception({message: error});
-        return Promise.reject();
+        return Promise.reject(values);
     };
 
     /**
@@ -153,7 +153,7 @@ define(['core/notification'], function(notification) {
     Basket.prototype.remove = function(values) {
         var error = 'You need to implement the remove() function of your basket';
         notification.exception({message: error});
-        return Promise.reject();
+        return Promise.reject(values);
     };
 
     /**
@@ -165,7 +165,7 @@ define(['core/notification'], function(notification) {
     Basket.prototype.replace = function(values) {
         var error = 'You need to implement the replace() function of your basket';
         notification.exception({message: error});
-        return Promise.reject();
+        return Promise.reject(values);
     };
 
     /**

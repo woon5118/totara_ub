@@ -114,7 +114,7 @@ define(['core/notification'], function(notification) {
     BasketManager.prototype.onBasketShow = function() { /* Null */ };
 
     /* on basket update */
-    BasketManager.prototype.onBasketUpdate = function(ids) { /* Null */ };
+    BasketManager.prototype.onBasketUpdate = function() { /* Null */ };
 
     /**
      * Set unique basket request key for storing selection

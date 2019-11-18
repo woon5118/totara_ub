@@ -144,10 +144,6 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     var pathType = e.target.closest('[data-cc-add-pathway]').querySelector('option:checked').value;
                         that.addPath(pathType);
                 } else if (e.target.closest('[data-cc-pw-agg-changed]')) {
-                    var wgt = e.target.closest('[data-cc-pw-agg-changed]'),
-                        selectedOption = wgt.querySelector('option:checked'),
-                        aggActions = that.widget.querySelector('[data-cc-pw-agg-actions]');
-
                     that.setOverallAggregation();
                     that.dirty = true;
                 }
@@ -363,7 +359,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     // Add the scalevalues template
                     templatePromises.push(that.showSinglevaluePaths());
 
-                    Promise.all(templatePromises).then(function(data) {
+                    Promise.all(templatePromises).then(function() {
                         that.calculateSortorderFromDisplay();
                         // We've just read all from the database.
                         // The sortorder calculation may have changed the
@@ -410,7 +406,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 }
 
                 if (that.scale_id) {
-                    that.setScaleValues().then(function(responses) {
+                    that.setScaleValues().then(function() {
                         resolve();
                     });
                 } else {
@@ -426,7 +422,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
 
                     ajax.getData(apiArgs).then(function(responses) {
                         that.scale_id = responses.results;
-                        that.setScaleValues().then(function(responses) {
+                        that.setScaleValues().then(function() {
                             resolve();
                         }).catch(function(e) {
                             e.fileName = that.filename;
@@ -510,8 +506,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          * @return {Promise}
          */
         showSinglevaluePaths: function() {
-            var that = this,
-                target = this.widget.querySelector('[data-pw-singlevalues]'),
+            var target = this.widget.querySelector('[data-pw-singlevalues]'),
                 templatename = 'totara_competency/scalevalue_pathways_edit',
                 templatedata = {scalevalues: []};
 
@@ -750,7 +745,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             promiseArr.push(ajax.getData(apiArgs));
 
             if (promiseArr.length > 0) {
-                Promise.all(promiseArr).then(function(data) {
+                Promise.all(promiseArr).then(function() {
                     that.showNotification('success', 'applysuccess', 'totara_competency', {});
                     that.dirty = false;
 
@@ -852,7 +847,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     'methodname': this.endpoints.defaultpreset};
 
             // Get all the pathways and its detail
-            ajax.getData(apiArgs).then(function(responses) {
+            ajax.getData(apiArgs).then(function() {
                 that.updatePage();
             }).catch(function(e) {
                 e.fileName = that.filename;
@@ -878,8 +873,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          * to indicate that final removal will only happen when changes are applied
          */
         removePathway: function(pwKey) {
-            var that = this,
-                pwTarget = this.widget.querySelector('[data-pw-key="' + pwKey + '"]'),
+            var pwTarget = this.widget.querySelector('[data-pw-key="' + pwKey + '"]'),
                 pwOrTarget = this.widget.querySelector('[data-pw-or="' + pwKey + '"]');
 
             if (this.pathways[pwKey]) {
@@ -889,8 +883,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     // Exists on db - show indication that path will be deleted when changes are applied
                     // Show the pw summary detail which have no actions
 
-                    var detailTarget = pwTarget.querySelector('[data-pathway-detail]'),
-                        copyObj = {};
+                    var copyObj = {};
 
                     copyObj[pwKey] = this.pathways[pwKey];
                     Object.assign(this.markedForDeletionPathways, copyObj);
@@ -957,10 +950,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          * Undo the removal of a specific pathway
          */
         undoRemovePathway: function(pwKey) {
-            var that = this,
-                pwTarget = this.widget.querySelector('[data-pw-key="' + pwKey + '"]'),
-                detailTarget = pwTarget.querySelector('[data-pathway-detail]'),
-                templateData,
+            var pwTarget = this.widget.querySelector('[data-pw-key="' + pwKey + '"]'),
                 copyObj = {};
 
             if (!this.markedForDeletionPathways[pwKey]) {
@@ -999,7 +989,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             var that = this,
                 hasSingleUse = this.widget.hasAttribute('data-singleuse') ? this.widget.getAttribute('data-singleuse') : '0';
 
-            return new Promise(function(resolve, reject) {
+            return new Promise(function(resolve) {
                 if (that.critTypes && that.critTypes.length > 0) {
                     resolve();
                 } else {

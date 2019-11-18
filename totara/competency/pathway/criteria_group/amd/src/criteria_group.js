@@ -272,7 +272,7 @@ function(str, notification, templates, ajax) {
                     promiseData.push(crit);
                 }
 
-                templates.renderAppend('pathway_criteria_group/partial_group_criteria', {criteria: promiseData}, target).then(function (responses) {
+                templates.renderAppend('pathway_criteria_group/partial_group_criteria', {criteria: promiseData}, target).then(function () {
                     templates.runTemplateJS('');
                     that.showHideNoCriteria();
                 }).catch(function(e) {
@@ -321,8 +321,8 @@ function(str, notification, templates, ajax) {
             var nCrit = this.pathway.criteria.length,
                 nDeletedCrit = 0;
 
-            for (var key in this.markedForDeletionCriteria) {
-                nDeletedCrit += 1;
+            if (Object.keys(this.markedForDeletionCriteria).length) {
+                nDeletedCrit = 1;
             }
 
             if ((nCrit + nDeletedCrit) == 0) {
@@ -438,7 +438,7 @@ function(str, notification, templates, ajax) {
 
                 // Display the criterion
                 templates.renderAppend(templatename, crit, target).then(
-                    function(responses) {
+                    function() {
                         templates.runTemplateJS('');
                         that.triggerEvent('dirty', {});
                     },

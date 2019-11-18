@@ -138,7 +138,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
                 detailPromise = ajax.getData(apiArgs);
             } else {
                 // For new paths we only have a key not an id
-                detailPromise = that.createEmptyPw(pwKey);
+                detailPromise = that.createEmptyPw();
             }
 
             detailPromise.then(function (responses) {
@@ -296,7 +296,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
             that.showHideNoRaters();
 
             if (promiseArr.length > 0) {
-                Promise.all(promiseArr).then(function(responses) {
+                Promise.all(promiseArr).then(function() {
                     that.triggerEvent('update', {pathway: that.pathway});
                     that.triggerEvent('dirty', {});
                 }).catch(function(e) {
@@ -312,8 +312,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
 
             var idIndex = this.roleIds.indexOf(id),
                 roleIndex = -1,
-                target,
-                roleToRemove;
+                target;
 
             if (idIndex >= 0) {
                 if (this.fullRoles[id]) {
@@ -346,8 +345,8 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
          * @param {int} key
          * @return {Promise}
          */
-        createEmptyPw: function(key) {
-            return new Promise(function(resolve, reject) {
+        createEmptyPw: function() {
+            return new Promise(function(resolve) {
                 resolve({
                     results: {
                         roles: [],

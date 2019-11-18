@@ -22,8 +22,8 @@
  */
 
 define(['core/str', 'core/templates', 'totara_core/modal_list', 'totara_competency/list_framework_hierarchy_events',
-'core/ajax', 'core/notification', 'totara_core/loader_manager', 'core/modal_factory', 'totara_core/session_basket', 'totara_core/simple_basket'],
-function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, Loader, ModalFactory, SessionBasket, SimpleBasket) {
+'core/ajax', 'core/notification', 'totara_core/loader_manager', 'core/modal_factory', 'totara_core/session_basket'],
+function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, Loader, ModalFactory, SessionBasket) {
 
     /**
     * Class constructor for the save assignments.

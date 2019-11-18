@@ -162,7 +162,7 @@ export default {
         singleValueGroup = null,
         bottomGroups = [];
       for (let idx in sortedPaths) {
-        let path = sortedPaths[idx];
+        let path = Object.assign({}, sortedPaths[idx]);
         path.multiCriteria = path.criteria_summary.length > 1;
 
         // multi-value paths are always placed in their own group with scale value 'Any value'

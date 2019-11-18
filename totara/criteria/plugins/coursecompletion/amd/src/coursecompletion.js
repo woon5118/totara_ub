@@ -163,7 +163,7 @@ function(templates, notification, ajax, ModalList, Loader) {
                 if (id == 0) {
                     // New criterion - no detail yet
                     detailPromise = new Promise(function(resolve) {
-                        resolve(that.createEmptyCriterion(key));
+                        resolve(that.createEmptyCriterion());
                     });
 
                 } else {
@@ -285,15 +285,12 @@ function(templates, notification, ajax, ModalList, Loader) {
          * @param {int} key
          * @return {Promise}
          */
-        createEmptyCriterion: function(key) {
-            var that = this;
-
+        createEmptyCriterion: function() {
             // Ensure the basket is empty
             return new Promise(function(resolve) {
                 resolve({
                     results: {
                         id: 0,
-                        // itemsbasketkey: basketkey,
                         items: [],
                         aggregation: {
                             method: 1,
@@ -376,7 +373,7 @@ function(templates, notification, ajax, ModalList, Loader) {
             var that = this;
 
             if (!this.courseAdder) {
-                this.initCourseAdder().then(function(modal) {
+                this.initCourseAdder().then(function() {
                     that.courseAdder.show(that.criterion.itemids);
                 }).catch(function(e) {
                     e.fileName = that.filename;

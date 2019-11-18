@@ -44,8 +44,6 @@ function(templates, notification) {
          * Add event listeners for PwTests
          */
         events: function() {
-            var that = this;
-
             this.widget.addEventListener('click', function(e) {
                 if (!e.target) {
                     return;
