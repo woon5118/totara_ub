@@ -61,6 +61,7 @@ function create_data() {
     $competency_generator = competency_generator();
     $evidence_generator = evidence_generator();
     $evidence_generator->set_create_files(true);
+    $admin_user = get_admin();
 
     $data = [
         'users' => [],
@@ -3032,6 +3033,7 @@ Feel free to browse, list of users is below, their password is 12345.
 
     foreach ($evidence_types as $key => $type) {
         $type['idnumber'] = $key;
+        $type['created_by'] = $type['modified_by'] = $admin_user->id;
         $data['evidence_types'][$key] = $evidence_generator->create_evidence_type_entity($type);
     }
     $data['evidence_types']['coursecompletionimport'] = evidence_type::repository()
