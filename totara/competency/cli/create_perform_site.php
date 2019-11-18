@@ -4194,6 +4194,7 @@ function evidence_generator() {
 function run_tasks() {
     (new expand_task(db()))->expand_all();
     (new totara_competency\task\competency_aggregation_all())->execute();
+    (new totara_competency\task\competency_aggregation_queue())->execute();
 }
 
 function mark_competencies_self_assignable($frameworks, $data) {
