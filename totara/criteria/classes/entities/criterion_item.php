@@ -24,8 +24,10 @@
 namespace totara_criteria\entities;
 
 
+use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
+use core\orm\entity\relations\has_many;
 
 /**
  * One criterion
@@ -35,6 +37,7 @@ use core\orm\entity\relations\belongs_to;
  * @property int $item_id
  *
  * @property-read criterion $criterion
+ * @property-read criteria_item_record[]|collection $item_records
  */
 class criterion_item extends entity {
 
@@ -42,6 +45,10 @@ class criterion_item extends entity {
 
     public function criterion(): belongs_to {
         return $this->belongs_to(criterion::class, 'criterion_id');
+    }
+
+    public function item_records(): has_many {
+        return $this->has_many(criteria_item_record::class, 'criterion_item_id');
     }
 
 }

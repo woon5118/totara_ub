@@ -25,7 +25,9 @@ namespace pathway_criteria_group\entities;
 
 
 use core\orm\entity\entity;
+use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many;
+use totara_competency\entities\scale_value;
 
 /**
  * Pathway per competency
@@ -33,6 +35,7 @@ use core\orm\entity\relations\has_many;
  * @property int $scale_value_id
  *
  * @property-read array|criteria_group_criterion[] $criterions
+ * @property-read scale_value $scale_value
  */
 class criteria_group extends entity {
 
@@ -45,6 +48,10 @@ class criteria_group extends entity {
      */
     public function criterions(): has_many {
         return $this->has_many(criteria_group_criterion::class, 'criteria_group_id');
+    }
+
+    public function scale_value(): belongs_to {
+        return $this->belongs_to(scale_value::class, 'scale_value_id');
     }
 
 }

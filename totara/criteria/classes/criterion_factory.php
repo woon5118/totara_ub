@@ -23,7 +23,9 @@
 
 namespace totara_criteria;
 
+use pathway_criteria_group\entities\criteria_group_criterion;
 use totara_competency\plugin_types;
+use totara_criteria\entities\criterion as criterion_entity;
 
 /**
  * Criterion factory class to obtain an instance of the specific criterion type
@@ -45,7 +47,6 @@ class criterion_factory {
         return new $classname();
     }
 
-
     /**
      * Instantiate a criterion of the specified type and fetch
      * its detail from the database
@@ -61,6 +62,25 @@ class criterion_factory {
         $classname = static::get_classname($type);
 
         return $classname::fetch($id);
+    }
+
+    /**
+     * Instantiate a criterion from a given entity
+     *
+     * @param criterion_entity $criterion
+     * @return criterion of the requested type
+     * @throws \coding_exception
+     */
+    public static function fetch_from_entity(criterion_entity $criterion) {
+        if (!$criterion->exists()) {
+            throw new \coding_exception('A criterion needs to exist');
+        }
+        static::require_enabled($criterion->plugin_type);
+
+        /** @var criterion $classname */
+        $classname = static::get_classname($criterion->plugin_type);
+
+        return $classname::fetch_from_entity($criterion);
     }
 
     /**

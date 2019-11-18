@@ -24,6 +24,8 @@
 
 namespace pathway_criteria_group;
 
+use core\orm\collection;
+use core\orm\entity\repository;
 use core\orm\query\builder;
 use pathway_criteria_group\entities\criteria_group as criteria_group_entity;
 use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
@@ -63,44 +65,42 @@ class criteria_group extends pathway {
      * Load the criteria_group configuration from the database
      */
     protected function fetch_configuration(): void {
-        global $DB;
-
         if (empty($this->get_path_instance_id())) {
             return;
         }
 
-        // Get group information
-        $row = $DB->get_record('pathway_criteria_group', ['id' => $this->get_path_instance_id()]);
+        // Load the group together with the criteria_group_criterion records
+        // and their related records in totara_criteria
+        // (and including their metadata and items)
+        // This will cap the number of queries to maximum 5 to load all records
+        // avoiding additional queries for it further down the line
+        /** @var criteria_group_entity $criteria_group */
+        $criteria_group = criteria_group_entity::repository()
+            ->with([
+                'criterions' => function (repository $repository) {
+                    $repository->with([
+                        'criterion' => function (repository $repository) {
+                            $repository->with('metadata')
+                                ->with('items');
+                        }
+                    ]);
+                }
+            ])
+            ->with('scale_value')
+            ->where('id', $this->get_path_instance_id())
+            ->one();
+
         // A group could be empty
-        if ($row) {
-            if (!empty($row->scale_value_id)) {
-                $this->set_scale_value(new scale_value($row->scale_value_id));
+        if ($criteria_group) {
+            if (!empty($criteria_group->scale_value)) {
+                $this->set_scale_value($criteria_group->scale_value);
             }
 
-            $this->fetch_criteria();
+            foreach ($criteria_group->criterions as $row) {
+                $this->add_criterion(criterion_factory::fetch_from_entity($row->criterion));
+            }
         }
     }
-
-    /**
-     * Fetch all criteria in this group
-     */
-    private function fetch_criteria() {
-        global $DB;
-
-        $this->criteria = [];
-
-        // TODO performance optimisation: load the entities right away and init criterion objects with it
-        //      this will save a few queries
-        $rows = $DB->get_records(
-            'pathway_criteria_group_criterion',
-            ['criteria_group_id' => $this->get_path_instance_id()],
-            'id'
-        );
-        foreach ($rows as $row) {
-            $this->add_criterion(criterion_factory::fetch($row->criterion_type, $row->criterion_id));
-        }
-    }
-
 
     /****************************************************************************
      * Saving
@@ -112,15 +112,15 @@ class criteria_group extends pathway {
      * @return bool
      */
     protected function configuration_is_dirty(): bool {
-        global $DB;
-
         if (empty($this->get_path_instance_id())) {
             return true;
         }
 
-        $criteria_rows = $DB->get_records('pathway_criteria_group_criterion',
-            ['criteria_group_id' => $this->get_path_instance_id()]
-        );
+        /** @var criteria_group_criterion_entity[]|collection $criteria_rows */
+        $criteria_rows = criteria_group_criterion_entity::repository()
+            ->where('criteria_group_id', $this->get_path_instance_id())
+            ->get();
+
         if (count($this->get_criteria()) != count($criteria_rows)) {
             return true;
         }

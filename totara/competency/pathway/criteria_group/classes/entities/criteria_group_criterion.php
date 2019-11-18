@@ -34,6 +34,7 @@ use totara_criteria\entities\criterion;
  * @property int $criteria_group_id
  * @property string $criterion_type
  * @property int $criterion_id
+ * @property-read criterion $criterion
  */
 class criteria_group_criterion extends entity {
 
@@ -45,7 +46,7 @@ class criteria_group_criterion extends entity {
      * @return has_one
      */
     public function criterion(): has_one {
-        return $this->has_one(criterion::class, 'criterion_id');
+        return $this->has_one(criterion::class, 'id', 'criterion_id');
     }
 
 }

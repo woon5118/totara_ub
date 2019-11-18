@@ -24,6 +24,10 @@
 
 namespace totara_criteria;
 
+use core\orm\query\builder;
+use totara_criteria\entities\criteria_item;
+use totara_criteria\entities\criteria_metadata;
+
 /**
  * Base class for a single criterion.
  */
@@ -70,25 +74,32 @@ abstract class criterion {
      *
      * @param int $id Id of the criterion to fetch
      * @return criterion $this
-     * @throws \coding_exception
      */
     final public static function fetch(int $id): criterion {
-        global $DB;
+        $criterion = entities\criterion::repository()->find_or_fail($id);
+        return static::fetch_from_entity($criterion);
+    }
 
+    /**
+     * Fetch specific criterion from the database
+     *
+     * @param entities\criterion $criterion $criterion
+     * @return criterion $this
+     */
+    final public static function fetch_from_entity(entities\criterion $criterion): criterion {
         $instance = new static();
 
-        $record = $DB->get_record('totara_criteria', ['id' => $id], '*', MUST_EXIST);
-        if ($record->plugin_type != $instance->get_plugin_type()) {
+        if ($criterion->plugin_type != $instance->get_plugin_type()) {
             throw new \coding_exception("The specified criterion id is for another type of criterion");
         }
 
-        $instance->set_id($id);
-        $instance->set_aggregation_method($record->aggregation_method ?? static::AGGREGATE_ALL);
-        $instance->set_aggregation_params($record->aggregation_params ?? []);
-        $instance->set_last_evaluated($record->last_evaluated);
+        $instance->set_id($criterion->id);
+        $instance->set_aggregation_method($criterion->aggregation_method ?? static::AGGREGATE_ALL);
+        $instance->set_aggregation_params($criterion->aggregation_params ?? []);
+        $instance->set_last_evaluated($criterion->last_evaluated);
 
-        $instance->fetch_items();
-        $instance->fetch_metadata();
+        $instance->fetch_items($criterion);
+        $instance->fetch_metadata($criterion);
 
         return $instance;
     }
@@ -102,7 +113,7 @@ abstract class criterion {
      *
      * Public scope for testing purposes
      *
-     * @return ?int
+     * @return int|null
      */
     public function get_id(): ?int {
         return $this->id;
@@ -111,7 +122,7 @@ abstract class criterion {
     /**
      * Set the id of the criterion
      *
-     * @param ?int $id New criterion id
+     * @param int|null $id New criterion id
      * @return $this
      */
     public function set_id(?int $id): criterion {
@@ -175,7 +186,7 @@ abstract class criterion {
      *
      * Public scope for testing purposes
      *
-     * @param  array | string $aggregation_params. This can be passed as array or json encoded string
+     * @param array|string $params. This can be passed as array or json encoded string
      * @return $this
      */
     public function set_aggregation_params($params): criterion {
@@ -221,7 +232,7 @@ abstract class criterion {
     /**
      * Replace the ids of items associated with this criterion
      *
-     * @param [int] $itemids Id of items to link to the criterion
+     * @param int[] $itemids Id of items to link to the criterion
      * @return $this
      */
     public function set_item_ids(array $itemids): criterion {
@@ -232,10 +243,11 @@ abstract class criterion {
     /**
      * Add items to the criterion
      *
-     * @param [int] $itemids Id of items to link to the criterion
+     * @param int[] $item_ids Id of items to link to the criterion
+     * @return criterion
      */
-    public function add_items(array $itemids): criterion {
-        $newitems = array_diff($itemids, $this->item_ids);
+    public function add_items(array $item_ids): criterion {
+        $newitems = array_diff($item_ids, $this->item_ids);
         $this->item_ids = array_merge($this->item_ids, $newitems);
 
         return $this;
@@ -244,10 +256,11 @@ abstract class criterion {
     /**
      * Remove the specified items
      *
-     * @param [int] $itemids Ids of items to remove
+     * @param int[] $item_ids Ids of items to remove
+     * @return criterion
      */
-    public function remove_items(array $itemids): criterion {
-        $this->item_ids = array_diff($this->item_ids, $itemids);
+    public function remove_items(array $item_ids): criterion {
+        $this->item_ids = array_diff($this->item_ids, $item_ids);
         return $this;
     }
 
@@ -263,7 +276,7 @@ abstract class criterion {
     /**
      * Replace the metadata of this criterion
      *
-     * @param [\stdClass] $metadata Metadata metakey/metavalue pairs
+     * @param \stdClass[] $metadata Metadata metakey/metavalue pairs
      * @return $this
      */
     public function set_metadata(array $metadata): criterion {
@@ -275,10 +288,10 @@ abstract class criterion {
     /**
      * Add metadata to the criterion
      *
-     * @param [\stdClass] $metadata Metadata metakey/metavalue pairs
-     * @throws \coding_exception
+     * @param \stdClass[]|criteria_metadata[] $metadata Metadata metakey/metavalue pairs
+     * @return criterion
      */
-    public function add_metadata(array $metadata): criterion {
+    public function add_metadata($metadata): criterion {
         foreach ($metadata as $obj) {
             if (is_array($obj)) {
                 $obj = (object)$obj;
@@ -296,7 +309,8 @@ abstract class criterion {
     /**
      * Remove the specified metadata keys
      *
-     * @param [int] $metakeys Keys of metadata to remove
+     * @param int[] $metakeys Keys of metadata to remove
+     * @return criterion
      */
     public function remove_metadata(array $metakeys): criterion {
         foreach ($metakeys as $metakey) {
@@ -308,7 +322,9 @@ abstract class criterion {
 
     /**
      * Set the associated competency
+     *
      * @param int $competency_id
+     * @return criterion
      */
     public function set_competency_id(int $competency_id): criterion {
         $this->add_metadata([
@@ -319,7 +335,8 @@ abstract class criterion {
 
     /**
      * Get the associated competency
-     * @return int?null
+     *
+     * @return int|null
      */
     public function get_competency_id(): ?int {
         foreach ($this->get_metadata() as $metakey => $metaval) {
@@ -334,7 +351,7 @@ abstract class criterion {
     /**
      * Get last_evaluated
      *
-     * @return ?int
+     * @return int|null
      */
     public function get_last_evaluated(): ?int {
         return $this->last_evaluated;
@@ -344,6 +361,7 @@ abstract class criterion {
      * Set last_evaluated
      *
      * @param int|null $last_evaluated
+     * @return criterion
      */
     public function set_last_evaluated(?int $last_evaluated): criterion {
         $this->last_evaluated = $last_evaluated;
@@ -414,11 +432,13 @@ abstract class criterion {
 
     /**
      * Load the items belonging to this criterion
+     *
+     * @param entities\criterion $criterion
      */
-    private function fetch_items() {
+    private function fetch_items(entities\criterion $criterion) {
         $this->item_ids = [];
 
-        $rows = $this->retrieve_items();
+        $rows = $criterion->items;
         foreach ($rows as $row) {
             // item_id is the actual item_id, (course_id, etc)
             $this->item_ids[] = $row->item_id;
@@ -427,45 +447,11 @@ abstract class criterion {
 
     /**
      * Load the metadata of this criterion
+     *
+     * @param entities\criterion $criterion
      */
-    private function fetch_metadata() {
-        $this->metadata = [];
-
-        $rows = $this->retrieve_metadata();
-        $this->add_metadata($rows);
-    }
-
-    /**
-     * Retrieve the items belonging to this criterion
-     */
-    private function retrieve_items() {
-        global $DB;
-
-        if (empty($this->get_id())) {
-            return [];
-        }
-
-        $sql =
-            "SELECT itm.*
-               FROM {totara_criteria_item} itm
-              WHERE itm.criterion_id = :criterionid
-           ORDER BY itm.item_type";
-        $params = ['criterionid' => $this->get_id(), 'itemtype' => $this->get_items_type(), 'notarchived' => 0];
-
-        return $DB->get_records_sql($sql, $params);
-    }
-
-    /**
-     * Retrieve the metadata of this criterion
-     */
-    private function retrieve_metadata() {
-        global $DB;
-
-        if (empty($this->get_id())) {
-            return;
-        }
-
-        return $DB->get_records('totara_criteria_metadata', ['criterion_id' => $this->get_id()]);
+    private function fetch_metadata(entities\criterion $criterion) {
+        $this->add_metadata($criterion->metadata);
     }
 
     /**
@@ -498,6 +484,7 @@ abstract class criterion {
 
     /**
      * Validate the criterion attributes
+     *
      * @return string|null Error description
      */
     protected function validate(): ?string {
@@ -510,8 +497,6 @@ abstract class criterion {
      * @return $this
      */
     public function save(): criterion {
-        global $DB;
-
         $err_message = $this->validate();
         if (!is_null($err_message)) {
             throw new \coding_exception($err_message);
@@ -521,20 +506,19 @@ abstract class criterion {
             return $this;
         }
 
-        $record = new \stdClass();
-        $record->plugin_type = $this->get_plugin_type();
-        $record->aggregation_method = $this->get_aggregation_method();
-        $record->aggregation_params = json_encode($this->get_aggregation_params());
-        $record->criterion_modified = time();
+        $exists = (bool) $this->get_id();
 
-        if ($this->get_id()) {
-            $record->id = $this->get_id();
-            $DB->update_record('totara_criteria', $record);
-        } else {
-            $this->set_id($DB->insert_record('totara_criteria', $record));
-            if (empty($this->item_ids)) {
-                $this->update_items();
-            }
+        $criterion = $exists ? new entities\criterion($this->get_id()) : new entities\criterion();
+        $criterion->plugin_type = $this->get_plugin_type();
+        $criterion->aggregation_method = $this->get_aggregation_method();
+        $criterion->aggregation_params = json_encode($this->get_aggregation_params());
+        $criterion->criterion_modified = time();
+        $criterion->save();
+
+        $this->set_id($criterion->id);
+
+        if (!$exists && empty($this->item_ids)) {
+            $this->update_items();
         }
 
         $this->save_items();
@@ -547,18 +531,22 @@ abstract class criterion {
      * Save the criterion items
      */
     private function save_items() {
-        global $DB;
+        $current_items = criteria_item::repository()
+            ->where('criterion_id', $this->get_id())
+            ->get()
+            ->all();
 
-        $current_items = $DB->get_records_menu('totara_criteria_item', ['criterion_id' => $this->get_id()], '', 'item_id, id');
+        $current_items = array_column($current_items, 'id', 'item_id');
 
-        foreach ($this->get_item_ids() as $itemid) {
-            $this->save_criterion_item($itemid);
-            unset($current_items[$itemid]);
+        foreach ($this->get_item_ids() as $item_id) {
+            $this->save_criterion_item($item_id);
+            unset($current_items[$item_id]);
         }
 
         if (!empty($current_items)) {
-            $DB->delete_records_list('totara_criteria_item_record', 'criterion_item_id', $current_items);
-            $DB->delete_records_list('totara_criteria_item', 'id', $current_items);
+            criteria_item::repository()
+                ->where('id', $current_items)
+                ->delete();
         }
     }
 
@@ -571,37 +559,34 @@ abstract class criterion {
      * Save the metadata of this criterion
      */
     private function save_metadata() {
-        global $DB;
+        $current_keys = criteria_metadata::repository()
+            ->where('criterion_id', $this->get_id())
+            ->get()
+            ->all();
 
-        $current_keys = $DB->get_records_menu('totara_criteria_metadata', ['criterion_id' => $this->get_id()], '', 'metakey, id');
+        $current_keys = array_column($current_keys, 'id', 'metakey');
 
         if (!empty($this->metadata)) {
             foreach ($this->metadata as $metakey => $metaval) {
-                $record = [
-                    'criterion_id' => $this->id,
-                    'metakey' => $metakey,
-                ];
-
-                $existing = isset($current_keys[$metakey]);
-
-                if ($existing) {
-                    $record['id'] = $current_keys[$metakey];
-                    $record['metavalue'] = $metaval;
-                    $DB->update_record('totara_criteria_metadata', $record);
-
+                if (isset($current_keys[$metakey])) {
+                    $metadata = new criteria_metadata($current_keys[$metakey]);
                     unset($current_keys[$metakey]);
                 } else {
-                    $record['metavalue'] = $metaval;
-                    $DB->insert_record('totara_criteria_metadata', $record);
+                    $metadata = new criteria_metadata();
                 }
+                $metadata->metavalue = $metaval;
+                $metadata->criterion_id = $this->id;
+                $metadata->metakey = $metakey;
+                $metadata->save();
             }
         }
 
         if (!empty($current_keys)) {
-            $DB->delete_records_list('totara_criteria_metadata', 'id', $current_keys);
+            criteria_metadata::repository()
+                ->where('id', $current_keys)
+                ->delete();
         }
     }
-
 
     /**
      * Save the criterion_item if it doesn't exist
@@ -609,32 +594,26 @@ abstract class criterion {
      * @param int $item_id Item id to add
      * @return int $id Id of the criterion_item row
      */
-    private function save_criterion_item(int $itemid): int {
-        global $DB;
-
+    private function save_criterion_item(int $item_id): int {
         // Ensure there is only one of each item
-        $id = $DB->get_field(
-            'totara_criteria_item',
-            'id',
-            ['item_type' => $this->get_items_type(), 'item_id' => $itemid, 'criterion_id' => $this->id],
-            IGNORE_MISSING
-        );
+        $criterion = entities\criteria_item::repository()
+            ->where('item_type', $this->get_items_type())
+            ->where('item_id', $item_id)
+            ->where('criterion_id', $this->id)
+            ->one();
 
-        if ($id == false) {
+        if (empty($criterion)) {
             // TODO: Do we need separate constants for the items?
 
             // Insert the criterion_item
-            $record = (object)[
-                'criterion_id' => $this->id,
-                'item_type' => $this->get_items_type(),
-                'item_id' => $itemid,
-                'criterion_modified' => time(),
-            ];
-
-            $id = $DB->insert_record('totara_criteria_item', $record);
+            $criterion = new entities\criteria_item();
+            $criterion->criterion_id = $this->id;
+            $criterion->item_type = $this->get_items_type();
+            $criterion->item_id = $item_id;
+            $criterion->save();
         }
 
-        return $id;
+        return $criterion->id;
     }
 
     /**
@@ -643,17 +622,14 @@ abstract class criterion {
      * @return $this
      */
     public function save_last_evaluated(): criterion {
-        global $DB;
-
         // Not doing anything if not saved previously or last_evaluated not yet set
         if (empty($this->get_id() or empty($this->get_last_evaluated()))) {
             return $this;
         }
 
-        $record = new \stdClass();
-        $record->id = $this->get_id();
-        $record->last_evaluated = $this->get_last_evaluated();
-        $DB->update_record('totara_criteria', $record);
+        $criterion = new entities\criterion($this->get_id());
+        $criterion->last_evaluated = $this->get_last_evaluated();
+        $criterion->save();
 
         return $this;
     }
@@ -663,26 +639,24 @@ abstract class criterion {
      * Delete the criterion
      */
     public function delete() {
-        global $DB;
-
         if (empty($this->get_id())) {
             // Never saved before
             return;
         }
 
-        $trans = $DB->start_delegated_transaction();
+        builder::get_db()->transaction(function () {
+            // Delete all the items and metadata
+            $this->delete_items();
+            $this->delete_metadata();
 
-        // Delete all the items and metadata
-        $this->delete_items();
-        $this->delete_metadata();
+            // Delete the actual criterion
+            entities\criterion::repository()
+                ->where('id', $this->get_id())
+                ->delete();
 
-        // Delete the actual criterion
-        $DB->delete_records('totara_criteria', ['id' => $this->get_id()]);
-
-        // Unset the id as it doesn't exist anymore
-        $this->set_id(null);
-
-        $trans->allow_commit();
+            // Unset the id as it doesn't exist anymore
+            $this->set_id(null);
+        });
     }
 
 
@@ -692,6 +666,7 @@ abstract class criterion {
     private function delete_items() {
         global $DB;
 
+        // TODO replace with ORM
         $sql =
             "DELETE
                FROM {totara_criteria_item_record}
@@ -700,16 +675,19 @@ abstract class criterion {
                    FROM {totara_criteria_item}
                   WHERE criterion_id = :criterionid)";
         $DB->execute($sql, ['criterionid' => $this->get_id()]);
-        $DB->delete_records('totara_criteria_item', ['criterion_id' => $this->get_id()]);
+
+        criteria_item::repository()
+            ->where('criterion_id', $this->get_id())
+            ->delete();
     }
 
     /**
      * Delete the metadata
      */
     private function delete_metadata() {
-        global $DB;
-
-        $DB->delete_records('totara_criteria_metadata', ['criterion_id' => $this->get_id()]);
+        criteria_metadata::repository()
+            ->where('criterion_id', $this->get_id())
+            ->delete();
     }
 
     /**
@@ -804,33 +782,25 @@ abstract class criterion {
     protected function get_item_results($user_id): array {
         global $DB;
 
-        // We can't use $this->item_ids.
-        // They're the id of the course or whatever external thing we're referring to.
-        $criterion_item_ids = array_keys($this->retrieve_items());
+        $sql = "
+            SELECT i.id, COALESCE(r.criterion_met, 0) as criterion_met
+            FROM {totara_criteria_item} i
+            LEFT JOIN {totara_criteria_item_record} r 
+                ON i.id = r.criterion_item_id 
+                    AND r.user_id = :userid
+            WHERE i.criterion_id = :criterionid 
+                AND i.item_type = :itemtype
+        ";
 
-        if (count($criterion_item_ids) == 0) {
-            return [];
-        }
+        $params = [
+            'userid' => $user_id,
+            'criterionid' => $this->get_id(),
+            'itemtype' => $this->get_items_type()
+        ];
 
-        $zero_results = array_fill_keys($criterion_item_ids, 0);
+        $existing_records = $DB->get_records_sql_menu($sql, $params);
 
-        [$insql, $params] = $DB->get_in_or_equal($criterion_item_ids, SQL_PARAMS_NAMED);
-        $params['userid'] = $user_id;
-
-        // There should be no more than 1 row for each item/user combination.
-        // Not selecting the id to pick up if we ever create more than one
-        $existing_records = $DB->get_records_sql_menu(
-            'SELECT criterion_item_id, criterion_met
-                   FROM {totara_criteria_item_record}
-                  WHERE user_id = :userid
-                    AND criterion_item_id ' . $insql,
-            $params
-        );
-
-        // To remind you of php's use of the + operator with arrays:
-        // It joins the arrays. Where keys match, the value from the left-hand array is used and the right hand ignored.
-        // So in this case, if it's in $existing_records, it will use that value, otherwise 0 from $zero_results is used.
-        return $existing_records + $zero_results;
+        return $existing_records;
     }
 
 
