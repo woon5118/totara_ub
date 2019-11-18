@@ -126,8 +126,8 @@ export default {
 <style lang="scss">
 .tui-Details {
   &__description {
-    padding-top: $totara_style_spacing_2;
-    padding-bottom: $totara_style_spacing_4;
+    padding-top: var(--tui-gap-2);
+    padding-bottom: var(--tui-gap-4);
   }
 
   &__show {

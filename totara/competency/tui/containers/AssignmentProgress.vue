@@ -34,7 +34,7 @@ export default {
 
     .tui-chartJs__header {
       padding-bottom: 2rem;
-      font-size: $totara_style-size_16;
+      font-size: var(--tui-font-size-16);
     }
   }
 }

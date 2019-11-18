@@ -97,11 +97,11 @@ export default {
   &__header {
     &_backLink {
       display: inline-block;
-      padding-bottom: $totara_style-spacing_1;
+      padding-bottom: var(--tui-gap-1);
     }
     &_title {
       margin: 0;
-      padding-bottom: $totara_style-spacing_4;
+      padding-bottom: var(--tui-gap-4);
     }
   }
 }

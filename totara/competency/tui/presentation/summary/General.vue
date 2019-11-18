@@ -215,30 +215,30 @@ export default {
 
 <style lang="scss">
 .tui-competencySummaryGeneral {
-  padding-top: $totara_style-size_4;
+  padding-top: var(--tui-font-size-4);
   &__header {
-    margin-bottom: $totara_style-spacing_2;
-    padding-bottom: $totara_style-spacing_1;
-    border-bottom: 1px solid $totara_style-color_neutral_5;
+    margin-bottom: var(--tui-gap-2);
+    padding-bottom: var(--tui-gap-1);
+    border-bottom: 1px solid var(--tui-color-neutral-5);
 
     &_title {
       display: inline-block;
       margin-top: auto;
       margin-bottom: auto;
-      margin-left: $totara_style-spacing_2;
+      margin-left: var(--tui-gap-2);
       font-weight: bold;
-      font-size: $totara_style-size_18;
+      font-size: var(--tui-font-size-18);
     }
 
     &_edit {
       float: right;
-      margin-bottom: $totara_style-spacing_4;
-      padding-left: $totara_style-spacing_2;
+      margin-bottom: var(--tui-gap-4);
+      padding-left: var(--tui-gap-2);
     }
   }
 
   &__list {
-    padding: $totara_style-size_8;
+    padding: var(--tui-font-size-8);
 
     &_label {
       font-weight: bold;
@@ -248,17 +248,17 @@ export default {
     &_row {
       display: flex;
       flex-direction: column;
-      margin-bottom: $totara_style-size_16;
+      margin-bottom: var(--tui-font-size-16);
     }
 
     &_value {
       word-break: break-all;
     }
 
-    @media (min-width: $totara_style-screen_sm_min) {
+    @media (min-width: $tui-screen-sm) {
       &_label {
         width: 40%;
-        padding-right: $totara_style-size_16;
+        padding-right: var(--tui-font-size-16);
       }
 
       &_row {

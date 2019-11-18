@@ -165,32 +165,32 @@ export default {
 <style lang="scss">
 .tui-pathwayLearningPlan-achievementDisplay {
   &__container {
-    @media (min-width: $totara_style-screen_sm_min) {
+    @media (min-width: $tui-screen-sm) {
       display: flex;
     }
   }
 
   &__plans {
-    @media (min-width: $totara_style-screen_sm_min) {
+    @media (min-width: $tui-screen-sm) {
       flex-grow: 1;
     }
   }
 
   &__value {
-    @media (min-width: $totara_style-screen_sm_min) {
+    @media (min-width: $tui-screen-sm) {
       min-width: 20%;
       max-width: 40%;
-      margin-top: $totara_style-spacing_2;
+      margin-top: var(--tui-gap-2);
       margin-left: auto;
-      padding-left: $totara_style-spacing_2;
+      padding-left: var(--tui-gap-2);
 
       &_text {
         text-align: right;
       }
     }
 
-    @media (max-width: $totara_style-screen_sm_min) {
-      padding-top: $totara_style-spacing_2;
+    @media (max-width: $tui-screen-sm) {
+      padding-top: var(--tui-gap-2);
     }
 
     &_name {
@@ -203,7 +203,7 @@ export default {
   }
 
   &--padTop {
-    margin-top: $totara_style-spacing_2;
+    margin-top: var(--tui-gap-2);
   }
 }
 </style>

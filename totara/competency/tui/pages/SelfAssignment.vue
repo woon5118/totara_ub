@@ -341,7 +341,7 @@ export default {
       this.selectedItems = [];
       if (!this.allSelected) {
         for (let item in this.data.items) {
-          if (this.data.items.hasOwnProperty(item)) {
+          if (Object.prototype.hasOwnProperty.call(this.data.items, item)) {
             this.selectedItems.push(this.data.items[item].id);
           }
         }

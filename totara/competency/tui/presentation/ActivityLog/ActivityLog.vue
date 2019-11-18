@@ -160,7 +160,7 @@ export default {
 <style lang="scss">
 .tui-ActivityLog__ {
   &subtitle {
-    padding-top: $totara_style-spacing_2;
+    padding-top: var(--tui-gap-2);
     font-weight: bold;
   }
 }

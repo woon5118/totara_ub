@@ -34,23 +34,23 @@ export default {
   &content {
     &:before {
       position: absolute;
-      top: -$totara_style-size_8;
+      top: calc(0rem - var(--tui-font-size-8));
       left: 50%;
       width: 0;
       height: 0;
-      margin-left: -$totara_style-size_8;
-      border-right: $totara_style-size_8 solid transparent;
-      border-bottom: $totara_style-size_8 solid $totara_style-color_neutral_5;
-      border-left: $totara_style-size_8 solid transparent;
+      margin-left: calc(0rem - var(--tui-font-size-8));
+      border-right: var(--tui-font-size-8) solid transparent;
+      border-bottom: var(--tui-font-size-8) solid var(--tui-color-neutral-5);
+      border-left: var(--tui-font-size-8) solid transparent;
       content: '';
     }
     position: absolute;
     width: max-content;
-    margin-top: $totara_style-size_8;
-    padding: $totara_style-size_8 $totara_style-size_12;
+    margin-top: var(--tui-font-size-8);
+    padding: var(--tui-font-size-8) var(--tui-font-size-12);
 
-    background-color: $totara_style-color_neutral_1;
-    border: $totara_style-size_1 $totara_style-color_neutral_4 solid;
+    background-color: var(--tui-color-neutral-1);
+    border: var(--tui-font-size-1) var(--tui-color-neutral-4) solid;
   }
 }
 </style>

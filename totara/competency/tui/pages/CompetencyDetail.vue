@@ -124,7 +124,7 @@ export default {
   &backLink {
     display: inline-block;
     align-self: start;
-    padding-bottom: $totara_style-spacing_2;
+    padding-bottom: var(--tui-gap-2);
   }
   &nav-links {
     &_title {
@@ -143,24 +143,24 @@ export default {
         margin: 0;
 
         padding: 0;
-        line-height: $totara_style-size_32;
+        line-height: var(--tui-font-size-32);
         list-style: none;
 
         & > li:not(:last-child) {
-          margin-right: $totara_style-size_14;
+          margin-right: var(--tui-font-size-14);
         }
       }
     }
-    @media (min-width: $totara_style-screen_sm_min) {
+    @media (min-width: $tui-screen-sm) {
       display: flex;
       flex-direction: row-reverse;
       &_buttons {
         margin-left: auto;
       }
     }
-    @media (max-width: $totara_style-screen_sm_min) {
+    @media (max-width: $tui-screen-sm) {
       &_buttons {
-        padding-bottom: $totara_style-spacing_4;
+        padding-bottom: var(--tui-gap-4);
       }
     }
   }

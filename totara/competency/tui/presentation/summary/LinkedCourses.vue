@@ -121,47 +121,47 @@ export default {
 
 <style lang="scss">
 .tui-competencyOverviewLinkedCourses {
-  padding-top: $totara_style-spacing_4;
+  padding-top: var(--tui-gap-4);
   &__header {
-    margin-bottom: $totara_style-spacing_2;
-    padding-bottom: $totara_style-spacing_1;
-    border-bottom: 1px solid $totara_style-color_neutral_5;
+    margin-bottom: var(--tui-gap-2);
+    padding-bottom: var(--tui-gap-1);
+    border-bottom: 1px solid var(--tui-color-neutral-5);
 
     &_title {
       display: inline-block;
       margin-top: auto;
       margin-bottom: auto;
-      margin-left: $totara_style-spacing_2;
+      margin-left: var(--tui-gap-2);
       font-weight: bold;
-      font-size: $totara_style-size_18;
+      font-size: var(--tui-font-size-18);
     }
 
     &_edit {
       float: right;
-      margin-bottom: $totara_style-spacing_4;
-      padding-left: $totara_style-spacing_2;
+      margin-bottom: var(--tui-gap-4);
+      padding-left: var(--tui-gap-2);
     }
   }
 
   &__noCourses {
-    padding: $totara_style-size_8;
+    padding: var(--tui-font-size-8);
     font-style: italic;
   }
 
   &__list {
-    padding: $totara_style-size_8 0;
+    padding: var(--tui-font-size-8) 0;
     &_row {
       display: flex;
       flex-direction: column;
-      margin-bottom: $totara_style-size_12;
-      padding-right: $totara_style-size_8;
-      padding-bottom: $totara_style-size_12;
-      padding-left: $totara_style-size_8;
-      border-bottom: $totara_style_size_1 solid $totara_style-color_neutral_4;
+      margin-bottom: var(--tui-font-size-12);
+      padding-right: var(--tui-font-size-8);
+      padding-bottom: var(--tui-font-size-12);
+      padding-left: var(--tui-font-size-8);
+      border-bottom: var(--tui-font-size-1) solid var(--tui-color-neutral-4);
 
       &:first-child {
-        padding-top: $totara_style-size_12;
-        border-top: $totara_style_size_1 solid $totara_style-color_neutral_4;
+        padding-top: var(--tui-font-size-12);
+        border-top: var(--tui-font-size-1) solid var(--tui-color-neutral-4);
       }
 
       span {
@@ -169,7 +169,7 @@ export default {
         width: 50%;
       }
 
-      @media (min-width: $totara_style-screen_sm_min) {
+      @media (min-width: $tui-screen-sm) {
         flex-direction: row;
       }
     }

@@ -215,18 +215,18 @@ export default {
     padding-bottom: 1em;
     border-bottom: 1px solid #dde1e5;
 
-    @media (min-width: $totara_style-screen_sm_min) {
+    @media (min-width: $tui-screen-sm) {
       display: flex;
     }
   }
 
   &__role {
     display: flex;
-    @media (min-width: $totara_style-screen_sm_min) {
+    @media (min-width: $tui-screen-sm) {
       flex-grow: 1;
       max-width: 25%;
     }
-    @media (max-width: $totara_style-screen_sm_min) {
+    @media (max-width: $tui-screen-sm) {
       padding-bottom: 1em;
     }
 
@@ -247,7 +247,7 @@ export default {
   }
 
   &__rating {
-    @media (min-width: $totara_style-screen_sm_min) {
+    @media (min-width: $tui-screen-sm) {
       max-width: 75%;
     }
 

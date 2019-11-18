@@ -39,11 +39,11 @@ export default {
     border: 1px #e7e7e7 solid;
     border-radius: 0.3rem;
 
-    @media (min-width: $totara_style-screen_sm_min) and (max-width: $totara_style-screen_xl_min) {
-      width: $totara_style-screen_sm_min - 0.5rem;
+    @media (min-width: $tui-screen-sm) and (max-width: $tui-screen-xl) {
+      width: $tui-screen-sm - 0.5rem;
     }
 
-    @media (min-width: $totara_style-screen_xl_min) {
+    @media (min-width: $tui-screen-xl) {
       width: calc(50% - 0.5rem);
     }
   }

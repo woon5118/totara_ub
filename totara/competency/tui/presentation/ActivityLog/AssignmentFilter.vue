@@ -71,16 +71,16 @@ export default {
 <style lang="scss">
 .tui-AssignmentFilter {
   display: block;
-  margin-top: $totara_style-spacing_4;
-  margin-bottom: $totara_style-spacing_2;
-  padding: $totara_style-spacing_2;
-  border-top: $totara_style-size_1 solid $totara_style-color_neutral_5;
-  border-bottom: $totara_style-size_1 solid $totara_style-color_neutral_5;
+  margin-top: var(--tui-gap-4);
+  margin-bottom: var(--tui-gap-2);
+  padding: var(--tui-gap-2);
+  border-top: var(--tui-font-size-1) solid var(--tui-color-neutral-5);
+  border-bottom: var(--tui-font-size-1) solid var(--tui-color-neutral-5);
 
   &_label {
     margin: 0;
-    padding-right: $totara_style-spacing_4;
-    padding-left: $totara_style-spacing_2;
+    padding-right: var(--tui-gap-4);
+    padding-left: var(--tui-gap-2);
     vertical-align: middle;
   }
 

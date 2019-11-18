@@ -65,21 +65,21 @@ export default {
 
 <style lang="scss">
 .tui-totaraCompetency-achievementDisplayHeader {
-  padding-bottom: $totara_style-spacing_1;
-  border-bottom: 1px solid $totara_style-color_neutral_5;
+  padding-bottom: var(--tui-gap-1);
+  border-bottom: 1px solid var(--tui-color-neutral-5);
 
   &_title {
     display: inline-block;
     margin-top: auto;
     margin-bottom: auto;
     font-weight: bold;
-    font-size: $totara_style-size_16;
+    font-size: var(--tui-font-size-16);
     vertical-align: middle;
   }
 
   &_help {
     display: inline;
-    margin-bottom: $totara_style-spacing_4;
+    margin-bottom: var(--tui-gap-4);
   }
 }
 </style>

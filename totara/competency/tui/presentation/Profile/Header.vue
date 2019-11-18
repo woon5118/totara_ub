@@ -72,7 +72,7 @@ export default {
 
   flex-direction: column;
 
-  @media (min-width: $totara_style-screen_sm_min) {
+  @media (min-width: $tui-screen-sm) {
     flex-direction: row;
     justify-content: space-between;
   }
@@ -86,7 +86,7 @@ export default {
     padding: 0;
     list-style: none;
 
-    @media (min-width: $totara_style-screen_sm_min) {
+    @media (min-width: $tui-screen-sm) {
       max-width: 80%;
     }
   }
