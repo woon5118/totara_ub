@@ -89,7 +89,7 @@ class criteria_coursecompletion_testcase extends \advanced_testcase {
             }
         }
 
-        $data->instancerows = $DB->get_records('totara_criteria', ['plugin_type' => 'coursecompletion']);
+        $data->instancerows = $DB->get_records('totara_criteria', ['plugin_type' => 'coursecompletion'], 'id');
 
         return $data;
     }

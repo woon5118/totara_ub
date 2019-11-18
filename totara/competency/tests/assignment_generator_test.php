@@ -135,14 +135,14 @@ class totara_competency_assignment_generator_testcase extends advanced_testcase 
 
         $ass = $this->generator()->create_audience_assignment();
 
-        $this->assertEquals($ass, $record = array_values($this->db()->get_records('totara_competency_assignments'))[0]);
+        $this->assertEquals($ass, $record = array_values($this->db()->get_records('totara_competency_assignments', [], 'id'))[0]);
         $this->assertEquals(1, $this->db()->count_records('totara_competency_assignments'));
 
         $this->assertEquals(user_groups::COHORT, $record->user_group_type);
 
         $ass = $this->generator()->create_cohort_assignment();
 
-        $this->assertEquals($ass, $record = array_values($this->db()->get_records('totara_competency_assignments'))[1]);
+        $this->assertEquals($ass, $record = array_values($this->db()->get_records('totara_competency_assignments', [], 'id'))[1]);
         $this->assertEquals(2, $this->db()->count_records('totara_competency_assignments'));
 
         $this->assertEquals(user_groups::COHORT, $record->user_group_type);

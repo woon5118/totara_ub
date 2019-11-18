@@ -69,6 +69,10 @@ class learning_plan extends pathway {
     public function aggregate_current_value(int $user_id): base_achievement_detail {
         global $DB;
 
+        // TODO: At the moment if a user's learning plan is deleted after he received a rating for the competency
+        //       the rating is not deleted from dp_plan_competency_value.
+        //       Waiting for Raven to confirm what is expected behaviour.
+        //       May need to also join with dp_plan and dp_plan_cmpetency_assign
         $scale_value_id = $DB->get_field(
             'dp_plan_competency_value',
             'scale_value_id',

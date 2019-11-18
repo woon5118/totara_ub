@@ -260,11 +260,6 @@ class totara_competency_install_testcase extends advanced_testcase {
         // TODO TL-something fix this test
         $this->markTestSkipped('TODO');
 
-        /** @var totara_hierarchy_generator $totara_hierarchy_generator */
-        $totara_hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
-        $talking_scale = $totara_hierarchy_generator->create_scale('comp');
-        $listening_scale = $totara_hierarchy_generator->create_scale('comp');
-
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
@@ -272,8 +267,12 @@ class totara_competency_install_testcase extends advanced_testcase {
         $user2 = $this->getDataGenerator()->create_user();
         $user3 = $this->getDataGenerator()->create_user();
 
-        $competency1 = $competency_generator->create_competency();
-        $competency2 = $competency_generator->create_competency();
+        $talking_scale = $competency_generator->create_scale();
+        $listening_scale = $competency_generator->create_scale();
+        $talking_fw = $competency_generator->create_framework($talking_scale, 'Talking FW');
+        $listening_fw = $competency_generator->create_framework($listening_scale, 'Listening FW');
+        $competency1 = $competency_generator->create_competency('Talking', $talking_fw);
+        $competency2 = $competency_generator->create_competency('Listening', $listening_fw);
 
         // Competency ids
         $talking = $competency1->id;
@@ -308,7 +307,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         $talking_bob_previous = $this->add_comp_record_history($talking, $bob, $talking_not_proficient->id, $talking_bob->timemodified - 10);
         $talking_alice_previous = $this->add_comp_record_history($talking, $alice, $talking_not_proficient->id, $talking_alice->timemodified - 10);
         // Bob has no previous history for listening.
-        $listening_alice_previous = $this->add_comp_record_history($listening, $alice, $listening_not_proficient->id, $listening_alice->timemodified);
+        $listening_alice_previous = $this->add_comp_record_history($listening, $alice, $listening_not_proficient->id, $listening_alice->timemodified - 10);
 
         $talking_bob_oldest = $this->add_comp_record_history($talking, $bob, null, $talking_bob->timemodified - 20);
         $listening_alice_oldest = $this->add_comp_record_history($listening, $alice, $listening_proficient->id, $listening_alice->timemodified - 20);
@@ -425,7 +424,6 @@ class totara_competency_install_testcase extends advanced_testcase {
 
         $alice_listening_achievements = $DB->get_records('totara_competency_achievement', ['comp_id' => $listening, 'user_id' => $alice], 'time_created desc');
         $this->assertCount(3, $alice_listening_achievements);
-
         $achievement = array_shift($alice_listening_achievements);
         $this->assertEquals($listening_alice_latest->timemodified, $achievement->time_created);
         //$this->assertEquals($listening_alice_latest->proficiency, $achievement->scale_value_id);
