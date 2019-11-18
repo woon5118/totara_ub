@@ -1,5 +1,4 @@
 {
   "component": "totara_criteria",
-  "bundleWith": "totara_core",
   "vendor": "totara"
 }

@@ -27,3 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->version  = 2019100901;       // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2016120505;       // Requires this Moodle version.
 $plugin->component = 'criteria_linkedcourses'; // To check on upgrade, that module sits in correct place
+$plugin->tuidependencies = [
+    'totara_criteria'
+];
