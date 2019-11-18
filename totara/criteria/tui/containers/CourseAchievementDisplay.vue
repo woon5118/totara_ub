@@ -100,7 +100,7 @@ import HeaderCell from 'totara_core/presentation/datatable/HeaderCell';
 import Table from 'totara_core/presentation/datatable/Table';
 
 export default {
-  components: {Cell, CheckIcon, HeaderCell, Table},
+  components: { Cell, CheckIcon, HeaderCell, Table },
   props: {
     achievements: {
       required: true,
