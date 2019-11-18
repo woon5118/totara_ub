@@ -92,6 +92,9 @@ if ($form->is_cancelled()) {
 if ($data = $form->get_data()) {
 
     if (isset($data->savechanges)) {
+        // Do not change the separation string(empty one) for $certification->activeperiod
+        // it will break totara_certification\totara_catalog\certification\dataformatter\activeperiod::get_formatted_value()
+        // if you really need to change it, fix the method above.
         $certification->activeperiod = $data->activenum.' '.$data->activeperiod;
         $certification->minimumactiveperiod = $data->minimumactivenum.' '.$data->minimumactiveperiod;
         $certification->windowperiod = $data->windownum.' '.$data->windowperiod;

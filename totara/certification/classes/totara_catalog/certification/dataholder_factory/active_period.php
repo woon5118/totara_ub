@@ -27,9 +27,9 @@ namespace totara_certification\totara_catalog\certification\dataholder_factory;
 defined('MOODLE_INTERNAL') || die();
 
 use totara_catalog\dataformatter\formatter;
-use totara_catalog\dataformatter\text;
 use totara_catalog\dataholder;
 use totara_catalog\dataholder_factory;
+use totara_certification\totara_catalog\certification\dataformatter\activeperiod as activeperiod;
 
 class active_period extends dataholder_factory {
 
@@ -39,7 +39,7 @@ class active_period extends dataholder_factory {
                 'active_period',
                 new \lang_string('activeperiod', 'totara_certification'),
                 [
-                    formatter::TYPE_PLACEHOLDER_TEXT => new text(
+                    formatter::TYPE_PLACEHOLDER_TEXT => new activeperiod(
                         'active_period_certif.activeperiod'
                     ),
                 ],
