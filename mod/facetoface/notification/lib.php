@@ -825,14 +825,40 @@ class facetoface_notification extends data_object {
      * @return boolean true if message sent
      */
     public function send_to_user($user, $sessionid, $sessiondate = null, array $icaldata = []) {
-        global $CFG;
+        global $CFG, $DB;
 
         // Check that the notification is enabled and that all facetoface notifications are not disabled.
         if (!$this->status || !empty($CFG->facetoface_notificationdisable)) {
             return false;
         }
 
-        $this->send_adhoc_message($this->_event, $user, $sessionid, $icaldata, $sessiondate, true);
+        $this->send_adhoc_message($this->_event, $user, $sessionid, $icaldata, $sessiondate, false);
+
+        // Add history here to prevent double-queueing of messages.
+        if (!empty($sessiondate)) {
+            $dates = [$sessiondate];
+        } else {
+            $dates = $this->_sessions[$sessionid]->sessiondates;
+        }
+        foreach ($dates as $sessiondate) {
+            $uid = (empty($this->_event->ical_uids) ? '' : array_shift($this->_event->ical_uids));
+            $hist = new stdClass();
+            $hist->notificationid = $this->id;
+            $hist->sessionid = $sessionid;
+            $hist->userid = $user->id;
+            $hist->sessiondateid = $sessiondate->id;
+            $hist->ical_uid = $uid;
+            $hist->ical_method = $this->_event->ical_method;
+            $hist->timecreated = time();
+            $DB->insert_record('facetoface_notification_hist', $hist);
+        }
+
+        // Mark notification as sent for user.
+        $sent = new stdClass();
+        $sent->sessionid = $sessionid;
+        $sent->notificationid = $this->id;
+        $sent->userid = $user->id;
+        $DB->insert_record('facetoface_notification_sent', $sent);
 
         return true;
     }

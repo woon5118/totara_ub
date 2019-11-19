@@ -56,7 +56,7 @@ class send_user_message_adhoc_task extends \core\task\adhoc_task {
             if ($data->addhistory) {
                 $this->add_history();
             }
-        } catch (\moodle_exception $ex) {
+        } catch (\Throwable $ex) {
             $class = get_class($ex);
             $trace->output("Task cancelled due to {$class}: ". $ex->getMessage());
             if (!$messagesent) {
@@ -186,7 +186,13 @@ class send_user_message_adhoc_task extends \core\task\adhoc_task {
         if (!$DB->record_exists('facetoface_sessions', ['id' => $sessionid])) {
             return;
         }
+
         if (!empty($sessiondate)) {
+            $dates = [$sessiondate];
+        } else {
+            $dates = $sessions[$sessionid]->sessiondates;
+        }
+        foreach ($dates as $sessiondate) {
             $uid = empty($icaluids) ? '' : array_shift($icaluids);
             $hist = new \stdClass();
             $hist->notificationid = $notificationid;
@@ -197,20 +203,6 @@ class send_user_message_adhoc_task extends \core\task\adhoc_task {
             $hist->ical_method = $icalmethod;
             $hist->timecreated = time();
             $DB->insert_record('facetoface_notification_hist', $hist);
-        } else {
-            $dates = $sessions[$sessionid]->sessiondates;
-            foreach ($dates as $sessiondate) {
-                $uid = empty($icaluids) ? '' : array_shift($icaluids);
-                $hist = new \stdClass();
-                $hist->notificationid = $notificationid;
-                $hist->sessionid = $sessionid;
-                $hist->userid = $signupuser->id;
-                $hist->sessiondateid = $sessiondate->id;
-                $hist->ical_uid = $uid;
-                $hist->ical_method = $icalmethod;
-                $hist->timecreated = time();
-                $DB->insert_record('facetoface_notification_hist', $hist);
-            }
         }
 
         // Mark notification as sent for user.
