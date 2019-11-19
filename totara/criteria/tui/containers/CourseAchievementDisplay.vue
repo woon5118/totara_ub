@@ -28,7 +28,7 @@
     </div>
     <template v-if="hasCourses">
       <Table :data="achievements.items" :expandable-rows="true">
-        <template v-slot:HeaderRow="">
+        <template v-slot:header-row="">
           <HeaderCell size="14">
             <h4>{{ $str('courses', 'totara_criteria') }}</h4>
           </HeaderCell>
@@ -78,7 +78,7 @@
           </Cell>
         </template>
 
-        <template v-slot:expandContent="{ row }">
+        <template v-slot:expand-content="{ row }">
           <h4>{{ row.course.fullname }}</h4>
           <p
             class="tui-criteriaCourseCompletion__summary"

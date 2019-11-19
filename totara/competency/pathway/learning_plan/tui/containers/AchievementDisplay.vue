@@ -45,7 +45,7 @@
               </em>
             </Cell>
           </template>
-          <template v-slot:expandContent="{ row }">
+          <template v-slot:expand-content="{ row }">
             <h4>{{ row.name }}</h4>
             <p v-if="hasDescription(row)" v-html="row.description" />
             <p v-else class="tui-pathwayLearningPlan-achievementDisplay--none">

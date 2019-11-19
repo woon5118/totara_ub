@@ -27,7 +27,7 @@
       :data="achievements.items"
       :expandable-rows="true"
     >
-      <template v-slot:HeaderRow="">
+      <template v-slot:header-row="">
         <HeaderCell size="14">
           <h4>{{ $str('competencies', 'criteria_childcompetency') }}</h4>
         </HeaderCell>
@@ -60,7 +60,7 @@
           <span v-if="row.value" v-text="row.value.name" />
         </Cell>
       </template>
-      <template v-slot:expandContent="{ row }">
+      <template v-slot:expand-content="{ row }">
         <h4>{{ row.competency.fullname }}</h4>
         <p
           class="tui-criteriaChildcompetency__summary"
