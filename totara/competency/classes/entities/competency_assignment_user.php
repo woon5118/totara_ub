@@ -25,6 +25,7 @@ namespace totara_competency\entities;
 
 
 use core\orm\entity\entity;
+use core\orm\entity\relations\belongs_to;
 
 /**
  * entity audience
@@ -37,6 +38,7 @@ use core\orm\entity\entity;
  * @property int $updated_at
  *
  * @property-read string unique_identifier
+ * @property-read assignment $assignment
  *
  * @method static competency_assignment_user_repository repository()
  *
@@ -60,6 +62,10 @@ class competency_assignment_user extends entity {
      */
     protected function get_unique_identifier_attribute(): string {
         return md5($this->user_id.$this->assignment_id.$this->competency_id);
+    }
+
+    public function assignment(): belongs_to {
+        return $this->belongs_to(assignment::class, 'assignment_id');
     }
 
 }

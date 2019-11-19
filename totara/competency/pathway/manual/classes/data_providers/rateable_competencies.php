@@ -23,15 +23,12 @@
 
 namespace pathway_manual\data_providers;
 
-use core\entities\user;
 use core\orm\collection;
 use core\orm\query\builder;
 use core\orm\query\field;
 use pathway_manual\entities\pathway_manual;
 use pathway_manual\entities\role;
 use pathway_manual\manual;
-use pathway_manual\models\rateable_competency;
-use pathway_manual\models\user_competencies;
 use totara_competency\entities\competency;
 use totara_competency\entities\competency_assignment_user;
 use totara_competency\entities\competency_repository;
@@ -45,16 +42,6 @@ use totara_competency\entities\pathway;
  * @package pathway_manual\data_providers
  */
 class rateable_competencies {
-
-    /**
-     * @var user|null
-     */
-    protected $user;
-
-    /**
-     * @var string|null
-     */
-    protected $role;
 
     /**
      * Array of filters to apply when fetching the data
@@ -76,111 +63,47 @@ class rateable_competencies {
     protected $items;
 
     /**
-     * Get all rateable competencies that the specific user is assigned to.
+     * Get the names of the filters that we want to display options of.
      *
-     * @param int|user $user User ID or entity
-     * @return rateable_competencies
+     * @return string[]
      */
-    public static function for_user($user) {
-        if (!$user instanceof user) {
-            $user = new user($user);
+    protected static function get_enabled_filter_options(): array {
+        return [];
+    }
+
+    /**
+     * Get the filter options available for the filters enabled.
+     *
+     * @return array[] Array of filter name => filter options array
+     */
+    protected function fetch_filter_options() {
+        if (!$this->fetched) {
+            $this->fetch();
         }
 
-        $provider = new static();
-        $provider->user = $user;
-        $provider->filters['user_id'] = $user->id;
+        $filter_options = [];
 
-        return $provider;
+        foreach (static::get_enabled_filter_options() as $filter) {
+            if (method_exists($this, 'get_' . $filter . '_filter_options')) {
+                $filter_options[$filter] = $this->{'get_' . $filter . '_filter_options'}();
+            } else {
+                throw new \coding_exception("Filtering by '{$filter}' is currently not supported");
+            }
+        }
+
+        return $filter_options;
     }
 
     /**
-     * Get all rateable competencies for a particular role and assigned user.
-     *
-     * @param int|user $user User ID or entity
-     * @param string $role e.g. manual::ROLE_SELF, manual::ROLE_MANUAL etc
-     * @return rateable_competencies
-     */
-    public static function for_user_and_role($user, string $role) {
-        manual::check_is_valid_role($role, true);
-
-        $provider = self::for_user($user);
-
-        $provider->role = $role;
-        $provider->filters['roles'] = [$role];
-
-        return $provider;
-    }
-
-    /**
-     * Only get competencies that the user is assigned to.
-     *
-     * @param competency_repository $repository
-     * @param int $user_id
-     */
-    protected function filter_by_user_id(competency_repository $repository, int $user_id) {
-        $assignments = builder::table(competency_assignment_user::TABLE)
-            ->where_field('competency_id', new field('id', $repository->get_builder()))
-            ->where('user_id', $user_id);
-
-        $repository->where_exists($assignments);
-    }
-
-    /**
-     * Only get competencies that have the specified pathway roles enabled.
-     *
-     * @param competency_repository $repository
-     * @param string[] $roles
-     */
-    protected function filter_by_roles(competency_repository $repository, array $roles) {
-        manual::check_is_valid_role($roles, true);
-
-        $roles = builder::table(role::TABLE)
-            ->join([pathway_manual::TABLE, 'manual'], 'path_manual_id', 'manual.id')
-            ->join([pathway::TABLE, 'pathway'], 'manual.id', 'pathway.path_instance_id')
-            ->where_field('pathway.comp_id', new field('id', $repository->get_builder()))
-            ->where_in('role', $roles);
-
-        $repository->where_exists($roles);
-    }
-
-    /**
-     * Filter by the roles that the current user has.
-     *
-     * @return self
-     */
-    public function add_current_user_roles_filter(): self {
-        $this->filters['roles'] = manual::get_current_user_roles($this->user->id);
-
-        return $this;
-    }
-
-    /**
-     * Set filters for this provider.
+     * Add filters for this provider.
      *
      * @param array $filters
      * @return $this
      */
-    public function set_filters(array $filters) {
-        $this->filters = $filters;
+    public function add_filters(array $filters) {
+        $this->filters = array_merge($this->filters, $filters);
 
         return $this;
-    }
-
-    /**
-     * Build the query and apply filters for obtaining the data.
-     *
-     * @return competency_repository
-     */
-    protected function build_query(): competency_repository {
-        $repository = competency::repository()
-            ->with('framework.scale.sorted_values_high_to_low')
-            ->set_filters($this->filters)
-            ->order_by('fullname')
-            ->as('competency');
-
-        $this->apply_filters($repository);
-
-        return $repository;
     }
 
     /**
@@ -204,13 +127,61 @@ class rateable_competencies {
     }
 
     /**
+     * Only get competencies that the user is assigned to.
+     *
+     * @param competency_repository $repository
+     * @param int $user_id
+     */
+    private function filter_by_user_id(competency_repository $repository, int $user_id) {
+        $assigned = competency_assignment_user::repository()
+            ->where('user_id', $user_id)
+            ->where_field('competency_id', new field('id', $repository->get_builder()));
+
+        $repository->where_exists($assigned->get_builder());
+    }
+
+    /**
+     * Only get competencies that have the specified pathway roles enabled.
+     *
+     * @param competency_repository $repository
+     * @param string[] $roles
+     */
+    private function filter_by_roles(competency_repository $repository, array $roles) {
+        manual::check_is_valid_role($roles, true);
+
+        $roles = role::repository()
+            ->join([pathway_manual::TABLE, 'manual'], 'path_manual_id', 'manual.id')
+            ->join([pathway::TABLE, 'pathway'], 'manual.id', 'pathway.path_instance_id')
+            ->where_field('pathway.comp_id', new field('id', $repository->get_builder()))
+            ->where_in('role', $roles);
+
+        $repository->where_exists($roles->get_builder());
+    }
+
+    /**
+     * Build the query and apply filters for obtaining the data.
+     *
+     * @return competency_repository
+     */
+    protected function build_query(): competency_repository {
+        $repository = competency::repository();
+
+        $this->apply_filters($repository);
+
+        return $repository;
+    }
+
+    /**
      * Run the query with any added filters and store the result.
      *
      * @return $this
      */
     public function fetch() {
         if (!$this->fetched) {
-            $this->items = $this->build_query()->get();
+            $this->items = $this->build_query()
+                ->order_by('fullname')
+                ->get();
+
             $this->fetched = true;
         }
 
@@ -218,31 +189,16 @@ class rateable_competencies {
     }
 
     /**
-     * Get just a list of the competencies.
+     * Get the competencies.
      *
-     * @return rateable_competency[]
+     * @return competency[]
      */
     public function get_competencies(): array {
         if (!$this->fetched) {
             $this->fetch();
         }
 
-        return $this->items->map(function (competency $competency) {
-            if (isset($this->role)) {
-                return new rateable_competency($competency, $this->user, $this->role);
-            } else {
-                return new rateable_competency($competency, $this->user);
-            }
-        })->all();
-    }
-
-    /**
-     * Get the competencies available for the user.
-     *
-     * @return user_competencies
-     */
-    public function get(): user_competencies {
-        return new user_competencies($this->user, $this->role, $this->get_competencies());
+        return $this->items->all();
     }
 
     /**
@@ -251,7 +207,11 @@ class rateable_competencies {
      * @return int
      */
     public function count(): int {
-        return $this->build_query()->count();
+        if ($this->fetched) {
+            return $this->items->count();
+        } else {
+            return $this->build_query()->count();
+        }
     }
 
 }

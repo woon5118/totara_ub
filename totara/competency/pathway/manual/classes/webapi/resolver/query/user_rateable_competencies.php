@@ -26,11 +26,11 @@ namespace pathway_manual\webapi\resolver\query;
 use context_user;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
-use pathway_manual\data_providers\rateable_competencies as rateable_competencies_provider;
+use pathway_manual\data_providers\user_rateable_competencies as user_rateable_competencies_provider;
 use pathway_manual\manual;
 use pathway_manual\models\user_competencies;
 
-class rateable_competencies implements query_resolver {
+class user_rateable_competencies implements query_resolver {
 
     /**
      * @param array $args
@@ -40,10 +40,20 @@ class rateable_competencies implements query_resolver {
     public static function resolve(array $args, execution_context $ec) {
         $user_id = $args['user_id'];
         $role = $args['role'];
+        $filters = $args['filters'] ?? [];
 
         self::authorize($user_id, $role);
 
-        return rateable_competencies_provider::for_user_and_role($user_id, $role)->get();
+        $data_provider = user_rateable_competencies_provider::for_user_and_role($user_id, $role);
+
+        if (empty($filters)) {
+            // If no filters are specified then we load what available filter options there are too.
+            return $data_provider->get_with_filter_options();
+        } else {
+            return $data_provider
+                ->add_filters($filters)
+                ->get();
+        }
     }
 
     /**

@@ -22,13 +22,7 @@
 
 <template>
   <div class="tui-pathwayManual-userHeaderWithPhoto">
-    <div class="tui-pathwayManual-userHeaderWithPhoto__photoContainer">
-      <img
-        :src="photoUrl"
-        :alt="fullName"
-        class="tui-pathwayManual-userHeaderWithPhoto__photoContainer_photo"
-      />
-    </div>
+    <Avatar :src="photoUrl" :alt="fullName" size="medium" />
     <h2 class="tui-pathwayManual-userHeaderWithPhoto__title">
       {{ pageTitle }}
     </h2>
@@ -36,7 +30,10 @@
 </template>
 
 <script>
+import Avatar from 'totara_core/components/avatar/Avatar';
+
 export default {
+  components: { Avatar },
   props: {
     pageTitle: {
       required: true,
@@ -61,14 +58,6 @@ export default {
   &__photoContainer,
   &__title {
     display: table-cell;
-  }
-
-  &__photoContainer {
-    max-width: 75px;
-    vertical-align: middle;
-    &_photo {
-      width: 100%;
-    }
   }
 
   &__title {

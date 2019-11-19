@@ -16,8 +16,8 @@
       <ActionLink
         v-if="rateCompetenciesUrl"
         :href="rateCompetenciesUrl"
-        class="btn totara_style-btn"
-        v-text="$str('rate_competencies', 'pathway_manual')"
+        :styleclass="{ primary: true }"
+        :text="$str('rate_competencies', 'pathway_manual')"
       />
       <ActionLink
         :href="selfAssignmentUrl"

@@ -51,6 +51,11 @@ class user_competencies {
     protected $role;
 
     /**
+     * @var array
+     */
+    protected $filter_options;
+
+    /**
      * @param user $user
      * @param string $role
      * @param rateable_competency[] $competencies
@@ -73,12 +78,21 @@ class user_competencies {
     }
 
     /**
-     * Return the user that these are for if it is not for the current user.
+     * Get the user the competencies are assigned to.
      *
      * @return user
      */
     public function get_user_for(): user {
         return $this->user;
+    }
+
+    /**
+     * Get the role the competencies have a pathway for.
+     *
+     * @return string
+     */
+    public function get_role(): string {
+        return $this->role;
     }
 
     /**
@@ -98,15 +112,39 @@ class user_competencies {
      * @return bool
      */
     public static function can_rate_competencies(user $for_user, context $context) {
+        $rateable_competencies = (new rateable_competencies())->add_filters([
+            'user_id' => $for_user->id,
+            'roles' => manual::get_current_user_roles($for_user->id),
+        ]);
+
         if ($for_user->is_logged_in()) {
             $has_capability = has_capability('totara/competency:rate_own_competencies', $context);
         } else {
             $has_capability = has_capability('totara/competency:rate_other_competencies', $context);
         }
 
-        return $has_capability && rateable_competencies::for_user($for_user)
-                ->add_current_user_roles_filter()
-                ->count();
+        return $has_capability && $rateable_competencies->count() > 0;
+    }
+
+    /**
+     * Set the filter options to also return.
+     *
+     * @param array $filter_options
+     * @return self
+     */
+    public function set_filter_options(array $filter_options): self {
+        $this->filter_options = $filter_options;
+
+        return $this;
+    }
+
+    /**
+     * Get the filter options for the user.
+     *
+     * @return array|null
+     */
+    public function get_filter_options(): ?array {
+        return $this->filter_options ?? null;
     }
 
 }

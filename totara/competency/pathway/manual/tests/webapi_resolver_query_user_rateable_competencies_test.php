@@ -17,25 +17,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Mark Metcalfe <mark.metcalfe>@totaralearning.com>
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
  * @package pathway_manual
  */
 
 use core\orm\query\builder;
 use core\webapi\execution_context;
 use pathway_manual\manual;
-use pathway_manual\models\rateable_competency;
 use pathway_manual\models\framework_group;
-use pathway_manual\webapi\resolver\query\rateable_competencies;
+use pathway_manual\models\rateable_competency;
+use pathway_manual\webapi\resolver\query\user_rateable_competencies;
 use pathway_manual\webapi\resolver\type\rateable_competency as rateable_competency_type;
-use pathway_manual\webapi\resolver\type\scale_group as scale_group_type;
 use pathway_manual\webapi\resolver\type\user_competencies as user_competencies_type;
 use totara_competency\expand_task;
+use totara_competency\user_groups;
 use totara_job\job_assignment;
 
 require_once(__DIR__ . '/pathway_manual_base_test.php');
 
-class pathway_manual_webapi_resolver_query_rateable_competencies_testcase extends pathway_manual_base_testcase {
+class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase extends pathway_manual_base_testcase {
 
     /**
      * Assign user to competency.
@@ -46,12 +46,12 @@ class pathway_manual_webapi_resolver_query_rateable_competencies_testcase extend
         $this->generator->create_manual($this->competency1, [manual::ROLE_SELF]);
 
         $this->generator->assignment_generator()->create_assignment([
-            'user_group_type' => 'user',
+            'user_group_type' => user_groups::USER,
             'user_group_id' => $this->user1->id,
             'competency_id' => $this->competency1->id,
         ]);
         $this->generator->assignment_generator()->create_assignment([
-            'user_group_type' => 'user',
+            'user_group_type' => user_groups::USER,
             'user_group_id' => $this->user2->id,
             'competency_id' => $this->competency1->id,
         ]);
@@ -71,7 +71,7 @@ class pathway_manual_webapi_resolver_query_rateable_competencies_testcase extend
     public function test_capability_logged_in() {
         $this->setUser($this->user1->id);
 
-        rateable_competencies::resolve(
+        user_rateable_competencies::resolve(
             ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
             $this->execution_context()
         );
@@ -79,7 +79,7 @@ class pathway_manual_webapi_resolver_query_rateable_competencies_testcase extend
         $this->setUser(null);
         $this->expectException(require_login_exception::class);
 
-        rateable_competencies::resolve(
+        user_rateable_competencies::resolve(
             ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
             $this->execution_context()
         );
@@ -90,7 +90,7 @@ class pathway_manual_webapi_resolver_query_rateable_competencies_testcase extend
      */
     public function test_capability_self() {
         $this->setUser($this->user1->id);
-        rateable_competencies::resolve(
+        user_rateable_competencies::resolve(
             ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
             $this->execution_context()
         );
@@ -99,7 +99,7 @@ class pathway_manual_webapi_resolver_query_rateable_competencies_testcase extend
         unassign_capability('totara/competency:rate_own_competencies', $role);
 
         $this->expectException(required_capability_exception::class);
-        rateable_competencies::resolve(
+        user_rateable_competencies::resolve(
             ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
             $this->execution_context()
         );
@@ -114,7 +114,7 @@ class pathway_manual_webapi_resolver_query_rateable_competencies_testcase extend
 
         $this->setUser($this->user2->id);
 
-        rateable_competencies::resolve(
+        user_rateable_competencies::resolve(
             ['user_id' => $this->user1->id, 'role' => manual::ROLE_MANAGER],
             $this->execution_context()
         );
@@ -123,7 +123,7 @@ class pathway_manual_webapi_resolver_query_rateable_competencies_testcase extend
         unassign_capability('totara/competency:rate_other_competencies', $role);
 
         $this->expectException(required_capability_exception::class);
-        rateable_competencies::resolve(
+        user_rateable_competencies::resolve(
             ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
             $this->execution_context()
         );
@@ -137,7 +137,7 @@ class pathway_manual_webapi_resolver_query_rateable_competencies_testcase extend
     public function test_resolve_count_field() {
         $this->setUser($this->user1->id);
 
-        $query = rateable_competencies::resolve(
+        $query = user_rateable_competencies::resolve(
             ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
             $this->execution_context()
         );
@@ -150,7 +150,7 @@ class pathway_manual_webapi_resolver_query_rateable_competencies_testcase extend
     public function test_resolve_user_field() {
         $this->setUser($this->user1->id);
 
-        $query = rateable_competencies::resolve(
+        $query = user_rateable_competencies::resolve(
             ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
             $this->execution_context()
         );
@@ -163,7 +163,7 @@ class pathway_manual_webapi_resolver_query_rateable_competencies_testcase extend
     public function test_resolve_scale_field() {
         $this->setUser($this->user1->id);
 
-        $query = rateable_competencies::resolve(
+        $query = user_rateable_competencies::resolve(
             ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
             $this->execution_context()
         );
@@ -245,4 +245,57 @@ class pathway_manual_webapi_resolver_query_rateable_competencies_testcase extend
         );
         $this->assertEquals($rating_manager, $last_rating);
     }
+
+    /**
+     * Make sure that specifying filters changes the query result.
+     */
+    public function test_resolve_with_filters() {
+        $this->generator->create_manual($this->competency1);
+        $assignment_1 = $this->generator->assignment_generator()->create_assignment([
+            'user_group_type' => user_groups::USER,
+            'user_group_id' => $this->user1->id,
+            'competency_id' => $this->competency1->id,
+        ]);
+
+        $this->generator->create_manual($this->competency2);
+        $assignment_2 = $this->generator->assignment_generator()->create_assignment([
+            'user_group_type' => user_groups::USER,
+            'user_group_id' => $this->user1->id,
+            'competency_id' => $this->competency2->id,
+        ]);
+
+        (new expand_task(builder::get_db()))->expand_all();
+
+        $this->setUser($this->user1->id);
+
+        // Make sure only the first competency assigned is returned, and no filter options are fetched.
+        $assignment_1_query = user_rateable_competencies::resolve([
+            'user_id' => $this->user1->id,
+            'role' => manual::ROLE_SELF,
+            'filters' => [
+                'assignment_reason' => [$assignment_1->id],
+            ]
+        ], $this->execution_context());
+        $this->assertEquals(1, $assignment_1_query->get_count());
+        $this->assertEquals(
+            $this->competency1->id,
+            $assignment_1_query->get_framework_groups()[0]->get_competencies()[0]->get_entity()->id
+        );
+        $this->assertNull($assignment_1_query->get_filter_options());
+
+        // When no filters are specified, then filter options should also be fetched.
+        $query_without_filters = user_rateable_competencies::resolve([
+            'user_id' => $this->user1->id,
+            'role' => manual::ROLE_SELF,
+            'filters' => null,
+        ], $this->execution_context());
+        $this->assertNotNull($query_without_filters->get_filter_options());
+        $this->assertNotEmpty(user_competencies_type::resolve(
+            'filters',
+            $query_without_filters,
+            [],
+            $this->execution_context()
+        )['assignment_reason']);
+    }
+
 }

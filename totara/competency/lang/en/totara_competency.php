@@ -276,6 +276,7 @@ $string['assignment:back_to_assignments'] = '<< Back to manage competency assign
 $string['assignment:createnew'] = 'Create assignments';
 $string['assignment:viewcurrent'] = 'Currently assigned user report';
 
+$string['assignment_reason'] = '{$a->assignment} ({$a->type})';
 $string['assignment_reason:self'] = 'Self-assigned';
 $string['assignment_reason:system'] = 'Continuous tracking';
 

@@ -79,6 +79,16 @@ class totara_hierarchy_generator extends component_generator_base {
                                      'organisation' => 0,
                                      'position' => 0);
 
+    /**
+     * @var int[] Keep track of how many types have been created.
+     */
+    private $type_count = [
+        'competency' => 0,
+        'goal' => 0,
+        'organisation' => 0,
+        'position' => 0,
+    ];
+
     public function reset() {
         parent::reset();
         $this->frameworkcount = array ('competency' => 0,
@@ -89,6 +99,12 @@ class totara_hierarchy_generator extends component_generator_base {
             'goal' => 0,
             'organisation' => 0,
             'position' => 0);
+        $this->type_count = [
+            'competency' => 0,
+            'goal' => 0,
+            'organisation' => 0,
+            'position' => 0,
+        ];
     }
 
     /**
@@ -583,17 +599,27 @@ class totara_hierarchy_generator extends component_generator_base {
 
         $shortprefix = $this->hierarchy_type_prefix[$prefix];
 
-        $type = new \stdClass();
-        $type->idnumber = (isset($data['idnumber']) ? $data['idnumber'] : $prefix.$USER->id);
-        $type->fullname = (isset($data['fullname']) ? $data['fullname'] : 'Hierarchy '.ucfirst($prefix).' type');
+        $type = (object) $data;
+
+        if (!isset($type->fullname)) {
+            $type->fullname = 'Hierarchy ' . ucfirst($prefix) . ' Type ' . ($this->type_count[$prefix] + 1);
+        }
+
+        if (!isset($type->idnumber)) {
+            $type->idnumber = totara_generator_util::create_short_name($type->fullname);
+        }
+
         $type->description  = '';
         $type->timemodified = time();
         $type->usermodified = $USER->id;
         $type->timecreated  = time();
+
         $id = $DB->insert_record($shortprefix.'_type', $type);
         if (!$typeid = $DB->get_field($shortprefix.'_type', 'id', array('idnumber' => $type->idnumber))) {
             throw new coding_exception('Unknown hierarchy type idnumber '.$type->idnumber.' in hierarchy definition');
         }
+
+        $this->type_count[$prefix]++;
         return $id;
     }
 

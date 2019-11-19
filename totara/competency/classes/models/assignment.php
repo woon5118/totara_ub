@@ -465,22 +465,22 @@ class assignment {
             case ($type === assignment_entity::TYPE_ADMIN && $user_group_type === user_groups::USER):
             case $type === assignment_entity::TYPE_OTHER:
                 $assigner = $this->get_assigner();
-                $name = fullname((object)$assigner->to_array());
                 $role = $type === assignment_entity::TYPE_ADMIN ? 'admin' : 'manager';
                 $role_string = get_string('assigner_role:'.$role, 'totara_competency');
-                $name .= " ({$role_string})";
-                break;
+
+                return get_string('assignment_reason', 'totara_competency', [
+                    'assignment' => fullname((object) $assigner->to_array()),
+                    'type' => $role_string,
+                ]);
             case $type === assignment_entity::TYPE_SYSTEM:
             case $type === assignment_entity::TYPE_SELF:
-                $name = get_string('assignment_reason:'.$type, 'totara_competency');
-                break;
+                return get_string('assignment_reason:'.$type, 'totara_competency');
             default:
-                $name = $this->get_user_group_name();
-                $name .= " ({$this->get_type_name()})";
-                break;
+                return get_string('assignment_reason', 'totara_competency', [
+                    'assignment' => format_string($this->get_user_group_name()),
+                    'type' => $this->get_type_name(),
+                ]);
         }
-
-        return $name;
     }
 
     public function get_assigner(): ?user {

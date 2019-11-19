@@ -17,21 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Mark Metcalfe <mark.metcalfe>@totaralearning.com>
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
  * @package pathway_manual
  */
 
 use core\orm\query\builder;
-use pathway_manual\data_providers\rateable_competencies;
+use pathway_manual\data_providers\user_rateable_competencies;
 use pathway_manual\manual;
 use pathway_manual\models\rateable_competency;
 use totara_competency\entities\competency;
 use totara_competency\expand_task;
 use totara_competency\models\assignment;
+use totara_competency\user_groups;
 
 require_once(__DIR__ . '/pathway_manual_base_test.php');
 
-class pathway_manual_data_provider_rateable_competencies_testcase extends pathway_manual_base_testcase {
+class pathway_manual_data_provider_user_rateable_competencies_testcase extends pathway_manual_base_testcase {
 
     /**
      * Test that only competencies that the user has an active assignment for are returned.
@@ -40,36 +41,36 @@ class pathway_manual_data_provider_rateable_competencies_testcase extends pathwa
         $this->generator->create_manual($this->competency1, [manual::ROLE_SELF]);
         $this->generator->create_manual($this->competency2, [manual::ROLE_SELF]);
 
-        $this->assertEmpty(rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->get_competencies());
+        $this->assertEmpty(user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->get_competencies());
 
         $assignment1 = $this->generator->assignment_generator()->create_assignment([
-            'user_group_type' => 'user',
+            'user_group_type' => user_groups::USER,
             'user_group_id' => $this->user1->id,
             'competency_id' => $this->competency1->id,
         ]);
         (new expand_task(builder::get_db()))->expand_all();
 
         $this->assert_has_competencies(
-            rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->get_competencies(),
+            user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->get_competencies(),
             [$this->competency1]
         );
 
         $assignment2 = $this->generator->assignment_generator()->create_assignment([
-            'user_group_type' => 'user',
+            'user_group_type' => user_groups::USER,
             'user_group_id' => $this->user1->id,
             'competency_id' => $this->competency2->id,
         ]);
         (new expand_task(builder::get_db()))->expand_all();
 
         $this->assert_has_competencies(
-            rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->get_competencies(),
+            user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->get_competencies(),
             [$this->competency1, $this->competency2]
         );
 
         // Make sure specifying the filter multiple times doesn't break anything.
-        $this->assertCount(2, rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)
-            ->set_filters(['user_id' => $this->user2->id])
-            ->set_filters(['user_id' => $this->user1->id])
+        $this->assertCount(2, user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)
+            ->add_filters(['user_id' => $this->user2->id])
+            ->add_filters(['user_id' => $this->user1->id])
             ->get_competencies()
         );
 
@@ -77,17 +78,17 @@ class pathway_manual_data_provider_rateable_competencies_testcase extends pathwa
         assignment::load_by_id($assignment2->id)->archive();
 
         // No active assignments left, just archived ones.
-        $this->assertEmpty(rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->get_competencies());
+        $this->assertEmpty(user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->get_competencies());
 
         // Only returns competencies assigned to this user, not other users.
         $this->generator->assignment_generator()->create_assignment([
-            'user_group_type' => 'user',
+            'user_group_type' => user_groups::USER,
             'user_group_id' => $this->user2->id,
             'competency_id' => $this->competency1->id,
         ]);
         (new expand_task(builder::get_db()))->expand_all();
 
-        $this->assertEmpty(rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->get_competencies());
+        $this->assertEmpty(user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->get_competencies());
     }
 
     /**
@@ -95,32 +96,32 @@ class pathway_manual_data_provider_rateable_competencies_testcase extends pathwa
      */
     public function test_filter_by_role() {
         $this->generator->assignment_generator()->create_assignment([
-            'user_group_type' => 'user',
+            'user_group_type' => user_groups::USER,
             'user_group_id' => $this->user1->id,
             'competency_id' => $this->competency1->id,
         ]);
         $this->generator->assignment_generator()->create_assignment([
-            'user_group_type' => 'user',
+            'user_group_type' => user_groups::USER,
             'user_group_id' => $this->user1->id,
             'competency_id' => $this->competency2->id,
         ]);
         (new expand_task(builder::get_db()))->expand_all();
 
-        $this->assertEmpty(rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)
-            ->set_filters(['roles' => [manual::ROLE_SELF, manual::ROLE_MANAGER, manual::ROLE_APPRAISER]])
+        $this->assertEmpty(user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)
+            ->add_filters(['roles' => [manual::ROLE_SELF, manual::ROLE_MANAGER, manual::ROLE_APPRAISER]])
             ->get_competencies()
         );
 
         // Check that competencies with a single pathway and role are filtered properly.
         $this->generator->create_manual($this->competency1, [manual::ROLE_SELF]);
         $this->generator->create_manual($this->competency2, [manual::ROLE_MANAGER]);
-        $this->assert_has_competencies(rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)
-            ->set_filters(['roles' => [manual::ROLE_SELF]])
+        $this->assert_has_competencies(user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)
+            ->add_filters(['roles' => [manual::ROLE_SELF]])
             ->get_competencies(),
             [$this->competency1]
         );
-        $this->assert_has_competencies(rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)
-            ->set_filters(['roles' => [manual::ROLE_MANAGER]])
+        $this->assert_has_competencies(user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)
+            ->add_filters(['roles' => [manual::ROLE_MANAGER]])
             ->get_competencies(),
             [$this->competency2]
         );
@@ -128,8 +129,8 @@ class pathway_manual_data_provider_rateable_competencies_testcase extends pathwa
         // Check that competencies with multiple pathways but with single roles are filtered properly.
         $this->generator->create_manual($this->competency1, [manual::ROLE_APPRAISER]);
         $this->generator->create_manual($this->competency2, [manual::ROLE_APPRAISER]);
-        $this->assert_has_competencies(rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)
-            ->set_filters(['roles' => [manual::ROLE_APPRAISER]])
+        $this->assert_has_competencies(user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)
+            ->add_filters(['roles' => [manual::ROLE_APPRAISER]])
             ->get_competencies(),
             [$this->competency1, $this->competency2]
         );
@@ -137,8 +138,8 @@ class pathway_manual_data_provider_rateable_competencies_testcase extends pathwa
         // Check that competencies with multiple pathways with multiple roles are filtered properly.
         $this->generator->create_manual($this->competency1, [manual::ROLE_SELF, manual::ROLE_APPRAISER]);
         $this->generator->create_manual($this->competency2, [manual::ROLE_MANAGER, manual::ROLE_APPRAISER]);
-        $this->assert_has_competencies(rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)
-            ->set_filters(['roles' => [manual::ROLE_SELF, manual::ROLE_APPRAISER]])
+        $this->assert_has_competencies(user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)
+            ->add_filters(['roles' => [manual::ROLE_SELF, manual::ROLE_APPRAISER]])
             ->get_competencies(),
             [$this->competency1, $this->competency2]
         );
@@ -148,31 +149,31 @@ class pathway_manual_data_provider_rateable_competencies_testcase extends pathwa
      * Test that count() accurately (you guessed it!) counts the competencies.
      */
     public function test_count() {
-        $this->assertEquals(0, rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->count());
+        $this->assertEquals(0, user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->count());
 
         $this->generator->create_manual($this->competency1, [manual::ROLE_SELF]);
-        $this->assertEquals(0, rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->count());
+        $this->assertEquals(0, user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->count());
 
         $this->generator->assignment_generator()->create_assignment([
-            'user_group_type' => 'user',
+            'user_group_type' => user_groups::USER,
             'user_group_id' => $this->user1->id,
             'competency_id' => $this->competency1->id,
         ]);
         (new expand_task(builder::get_db()))->expand_all();
 
-        $this->assertEquals(1, rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->count());
+        $this->assertEquals(1, user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->count());
 
         $this->generator->assignment_generator()->create_assignment([
-            'user_group_type' => 'user',
+            'user_group_type' => user_groups::USER,
             'user_group_id' => $this->user1->id,
             'competency_id' => $this->competency2->id,
         ]);
         (new expand_task(builder::get_db()))->expand_all();
 
-        $this->assertEquals(1, rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->count());
+        $this->assertEquals(1, user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->count());
         $this->generator->create_manual($this->competency2, [manual::ROLE_SELF]);
 
-        $this->assertEquals(2, rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->count());
+        $this->assertEquals(2, user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->count());
     }
 
     /**
@@ -191,18 +192,18 @@ class pathway_manual_data_provider_rateable_competencies_testcase extends pathwa
         foreach ($competencies as $competency) {
             $this->generator->create_manual($competency, [manual::ROLE_SELF]);
             $this->generator->assignment_generator()->create_assignment([
-                'user_group_type' => 'user',
+                'user_group_type' => user_groups::USER,
                 'user_group_id' => $this->user1->id,
                 'competency_id' => $competency->id,
             ]);
         }
         (new expand_task(builder::get_db()))->expand_all();
         $this->assert_has_competencies(
-            rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->get_competencies(),
+            user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->get_competencies(),
             $competencies
         );
 
-        $result = rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->get();
+        $result = user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->get();
 
         $this->assertEquals($this->user1, $result->get_user_for());
 

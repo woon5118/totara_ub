@@ -23,14 +23,15 @@
  */
 
 use aggregation_test_aggregation\test_aggregation;
+use core\entities\user;
 use pathway_criteria_group\criteria_group;
 use pathway_learning_plan\learning_plan;
 use pathway_manual\entities\rating;
 use pathway_manual\manual;
 use pathway_test_pathway\test_pathway;
-use core\entities\user;
 use totara_competency\entities\competency;
 use totara_competency\entities\competency_framework;
+use totara_competency\entities\competency_type;
 use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\entities\scale;
 use totara_competency\entities\scale_value;
@@ -62,6 +63,11 @@ class totara_competency_generator extends component_generator_base {
      * @var totara_competency_assignment_generator
      */
     protected $assignment_generator;
+
+    /**
+     * @var totara_hierarchy_generator
+     */
+    protected $hierarchy_generator;
 
     /**************************************************************************
      * Basic competency creation
@@ -146,6 +152,17 @@ class totara_competency_generator extends component_generator_base {
 
         $scale = $this->hierarchy_generator()->create_scale('comp', $scale_data, $values);
         return new scale($scale, false);
+    }
+
+    /**
+     * Create a test competency type.
+     *
+     * @param array|null $type_record
+     *
+     * @return competency_type
+     */
+    public function create_type(array $type_record = []): competency_type {
+        return new competency_type($this->hierarchy_generator()->create_comp_type($type_record));
     }
 
 
@@ -432,6 +449,11 @@ class totara_competency_generator extends component_generator_base {
         return new test_aggregation();
     }
 
+
+    /**************************************************************************
+     * Internal Helpers
+     **************************************************************************/
+
     /**
      * Get an instance of assignment specific generator
      *
@@ -445,18 +467,17 @@ class totara_competency_generator extends component_generator_base {
         return $this->assignment_generator;
     }
 
-
-    /**************************************************************************
-     * Internal Helpers
-     **************************************************************************/
-
     /**
      * Get the generator used for hierarchies.
      *
      * @return totara_hierarchy_generator|component_generator_base
      */
     public function hierarchy_generator(): totara_hierarchy_generator {
-        return $this->datagenerator->get_plugin_generator('totara_hierarchy');
+        if (is_null($this->hierarchy_generator)) {
+            $this->hierarchy_generator = $this->datagenerator->get_plugin_generator('totara_hierarchy');
+        }
+
+        return $this->hierarchy_generator;
     }
 
 }

@@ -1,5 +1,13 @@
-query pathway_manual_rateable_competencies($user_id: core_id!, $role: String!) {
-  pathway_manual_rateable_competencies(user_id: $user_id, role: $role) {
+query pathway_manual_user_rateable_competencies(
+  $user_id: core_id!
+  $role: String!
+  $filters: pathway_manual_rateable_competencies_filters
+) {
+  pathway_manual_user_rateable_competencies(
+    user_id: $user_id
+    role: $role
+    filters: $filters
+  ) {
     user {
       fullname
       profileimageurl
@@ -32,6 +40,20 @@ query pathway_manual_rateable_competencies($user_id: core_id!, $role: String!) {
             name
           }
         }
+      }
+    }
+    filters {
+      rating_history
+      competency_type {
+        id
+        display_name
+      }
+      assignment_reason {
+        reason
+        assignments {
+          id
+        }
+        key
       }
     }
     count

@@ -43,9 +43,31 @@ All rateable competencies for a specific user, grouped by framework
 type pathway_manual_user_competencies {
   user: core_user! # The user we are rating competencies of
   framework_groups: [pathway_manual_framework_group!]! # Frameworks
+  filters: pathway_manual_user_competencies_filter_options # What we can filter by
   count: Int! # The total amount of competencies available to rate
 }
 
+"""
+The filter options that are available to filter by.
+"""
+type pathway_manual_user_competencies_filter_options {
+  rating_history: Boolean
+  competency_type: [totara_competency_competency_type]
+  assignment_reason: [totara_competency_assignment_reason]
+}
+
+"""
+Filters that have been chosen to filter by.
+"""
+input pathway_manual_rateable_competencies_filters {
+  assignment_reason: [core_id!]
+  rating_history: Boolean
+  competency_type: core_id
+}
+
+"""
+Individual rating
+"""
 input pathway_manual_rating_input {
   comp_id: core_id!
   scale_value_id: core_id
@@ -75,8 +97,9 @@ extend type Query {
   """
   Get all rateable competencies for a user by role
   """
-  pathway_manual_rateable_competencies(
+  pathway_manual_user_rateable_competencies(
     user_id: core_id!
     role: String!
+    filters: pathway_manual_rateable_competencies_filters
   ): pathway_manual_user_competencies!
 }

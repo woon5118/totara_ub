@@ -5,7 +5,12 @@
     @mouseleave="showTooltip = false"
   >
     <span class="tui-MyRatingCell__link-alike">{{ value.name }}</span>
-    <ScaleTooltip v-if="scale" :scale="scale" :display="showTooltip" />
+    <ScaleTooltip
+      v-if="scale"
+      :scale="scale"
+      :display="showTooltip"
+      :reverse-values="true"
+    />
   </div>
 </template>
 

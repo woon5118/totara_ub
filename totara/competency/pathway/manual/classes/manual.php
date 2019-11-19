@@ -25,8 +25,8 @@
 namespace pathway_manual;
 
 use pathway_manual\entities\rating;
-use totara_competency\aggregation_users_table;
 use pathway_manual\entities\role;
+use totara_competency\aggregation_users_table;
 use totara_competency\base_achievement_detail;
 use totara_competency\entities\competency;
 use totara_competency\pathway;

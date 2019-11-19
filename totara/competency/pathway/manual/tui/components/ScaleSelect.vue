@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import Select from 'totara_core/presentation/form/Select';
+import Select from 'totara_core/components/form/Select';
 export default {
   components: { Select },
   props: {

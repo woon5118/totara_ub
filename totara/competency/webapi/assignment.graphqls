@@ -59,6 +59,15 @@ type totara_competency_self_assigned_competencies_result implements core_pageabl
   next_cursor: String!
 }
 
+"""
+Unique reason as to why a competency was assigned.
+"""
+type totara_competency_assignment_reason {
+  reason: String!
+  assignments: [totara_competency_assignment!]!
+  key: String!
+}
+
 input totara_competency_self_assigned_competencies_filter {
   text: param_text
   assignment_type: [param_alphaext]

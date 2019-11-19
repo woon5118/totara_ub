@@ -21,90 +21,52 @@
 -->
 
 <template>
-  <Modal size="normal" :aria-labelledby="$id('title')">
-    <ModalContent
-      :title="$str('submit_ratings_confirmation_header', 'pathway_manual')"
-      :title-id="$id('title')"
-      :close-button="true"
-    >
-      <p>{{ getConfirmMsg() }}</p>
-      <p>
-        <strong>{{
-          $str('submit_ratings_confirmation_question', 'pathway_manual')
-        }}</strong>
-      </p>
-
-      <template v-slot:buttons>
-        <OkCancelGroup @ok="confirm" @cancel="close" />
-      </template>
-    </ModalContent>
-  </Modal>
+  <ModalPresenter :open="open">
+    <Modal size="normal" :aria-labelledby="id">
+      <ModalContent
+        :title="title"
+        :title-id="id"
+        :close-button="true"
+        @dismiss="$emit('cancel')"
+      >
+        <slot />
+        <template v-slot:buttons>
+          <OkCancelGroup @ok="$emit('confirm')" @cancel="$emit('cancel')" />
+        </template>
+      </ModalContent>
+    </Modal>
+  </ModalPresenter>
 </template>
 
 <script>
-import Modal from 'totara_core/presentation/modal/Modal';
-import ModalContent from 'totara_core/presentation/modal/ModalContent';
-import OkCancelGroup from 'totara_core/presentation/buttons/OkCancelGroup';
+import Modal from 'totara_core/components/modal/Modal';
+import ModalContent from 'totara_core/components/modal/ModalContent';
+import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
+import OkCancelGroup from 'totara_core/components/buttons/OkCancelGroup';
 
 export default {
   components: {
     Modal,
     ModalContent,
+    ModalPresenter,
     OkCancelGroup,
   },
 
   props: {
-    numSelected: {
-      required: true,
-      type: Number,
-    },
-    isForSelf: {
+    open: {
       required: true,
       type: Boolean,
     },
-    subjectUserFullname: {
+    title: {
       required: true,
       type: String,
     },
   },
 
-  data: function() {
-    return {
-      name: '',
-    };
-  },
-
-  methods: {
-    close() {
-      this.$emit('request-close');
-    },
-
-    confirm() {
-      this.$emit('confirm-submit');
-    },
-    getConfirmMsg() {
-      let ratingSummary = 'submit_ratings_summary';
-      ratingSummary += this.numSelected === 1 ? '_singular' : '_plural';
-      ratingSummary += this.isForSelf ? '_self' : '_other';
-      let confirmMsgParams = {
-        amount: this.numSelected,
-        subject_user: this.subjectUserFullname,
-      };
-      return this.$str(ratingSummary, 'pathway_manual', confirmMsgParams);
+  computed: {
+    id() {
+      return this.$id('title');
     },
   },
 };
 </script>
-
-<lang-strings>
-  {
-    "pathway_manual": [
-      "submit_ratings_confirmation_header",
-      "submit_ratings_confirmation_question",
-      "submit_ratings_summary_singular_self",
-      "submit_ratings_summary_singular_other",
-      "submit_ratings_summary_plural_self",
-      "submit_ratings_summary_plural_other"
-    ]
-  }
-</lang-strings>

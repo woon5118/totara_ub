@@ -46,6 +46,8 @@ class user_competencies implements type_resolver {
                 return (object) $competencies->get_user_for()->to_array();
             case 'framework_groups':
                 return $competencies->get_framework_groups();
+            case 'filters':
+                return $competencies->get_filter_options();
             case 'count':
                 return $competencies->get_count();
             default:

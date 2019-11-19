@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Mark Metcalfe <mark.metcalfe>@totaralearning.com>
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
  * @package pathway_manual
  */
 
@@ -26,6 +26,7 @@ use pathway_manual\manual;
 use pathway_manual\models\user_competencies;
 use totara_competency\expand_task;
 use totara_competency\models\assignment;
+use totara_competency\user_groups;
 use totara_job\job_assignment;
 
 require_once(__DIR__ . '/pathway_manual_base_test.php');
@@ -42,7 +43,7 @@ class pathway_manual_model_user_competencies_testcase extends pathway_manual_bas
         $this->setUser($this->user1->id);
 
         $assignment = $this->generator->assignment_generator()->create_assignment([
-            'user_group_type' => 'user',
+            'user_group_type' => user_groups::USER,
             'user_group_id' => $this->user1->id,
             'competency_id' => $this->competency1->id,
         ]);
@@ -66,7 +67,7 @@ class pathway_manual_model_user_competencies_testcase extends pathway_manual_bas
         $this->assertFalse(user_competencies::can_rate_competencies($this->user1, $context));
 
         $this->generator->assignment_generator()->create_assignment([
-            'user_group_type' => 'user',
+            'user_group_type' => user_groups::USER,
             'user_group_id' => $this->user1->id,
             'competency_id' => $this->competency1->id,
         ]);
@@ -87,7 +88,7 @@ class pathway_manual_model_user_competencies_testcase extends pathway_manual_bas
         $this->setUser($this->user2->id);
 
         $assignment = $this->generator->assignment_generator()->create_assignment([
-            'user_group_type' => 'user',
+            'user_group_type' => user_groups::USER,
             'user_group_id' => $this->user1->id,
             'competency_id' => $this->competency1->id,
         ]);
@@ -115,7 +116,7 @@ class pathway_manual_model_user_competencies_testcase extends pathway_manual_bas
         $this->assertFalse(user_competencies::can_rate_competencies($this->user1, $context));
 
         $this->generator->assignment_generator()->create_assignment([
-            'user_group_type' => 'user',
+            'user_group_type' => user_groups::USER,
             'user_group_id' => $this->user1->id,
             'competency_id' => $this->competency1->id,
         ]);

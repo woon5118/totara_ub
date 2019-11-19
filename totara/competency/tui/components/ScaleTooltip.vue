@@ -77,15 +77,23 @@ export default {
       type: Boolean,
       default: false,
     },
+    reverseValues: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   computed: {
     scaleValues() {
-      return this.scale.values.slice(0).reverse();
+      if (this.reverseValues) {
+        return this.scale.values.slice(0).reverse();
+      } else {
+        return this.scale.values;
+      }
     },
 
     minProficientValue() {
-      return this.scale.values.find(({ proficient }) => proficient);
+      return this.scaleValues.find(({ proficient }) => proficient);
     },
   },
 

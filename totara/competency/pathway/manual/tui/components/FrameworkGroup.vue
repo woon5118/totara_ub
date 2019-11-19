@@ -117,13 +117,13 @@
 </template>
 
 <script>
-import Cell from 'totara_core/presentation/datatable/Cell';
-import FlexIcon from 'totara_core/containers/icons/FlexIcon';
-import HeaderCell from 'totara_core/presentation/datatable/HeaderCell';
-import ScaleSelect from 'totara_competency/presentation/ScaleSelect';
-import ScaleTooltip from 'totara_competency/presentation/ScaleTooltip';
-import Table from 'totara_core/presentation/datatable/Table';
-import Tooltip from 'totara_competency/containers/Tooltip';
+import Cell from 'totara_core/components/datatable/Cell';
+import FlexIcon from 'totara_core/components/icons/FlexIcon';
+import HeaderCell from 'totara_core/components/datatable/HeaderCell';
+import ScaleSelect from 'totara_competency/components/ScaleSelect';
+import ScaleTooltip from 'totara_competency/components/ScaleTooltip';
+import Table from 'totara_core/components/datatable/Table';
+import Tooltip from 'totara_competency/components/Tooltip';
 
 const ROLE_SELF = 'self';
 
