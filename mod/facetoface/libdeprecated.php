@@ -4060,8 +4060,6 @@ function facetoface_get_facetoface_menu() {
  * @deprecated since Totara 13.0
  */
 function facetoface_confirm_attendees($sessionid, $userids) {
-    global $DB;
-
     debugging('facetoface_confirm_attendees() function has been deprecated, please use signup_helper::confirm_waitlist()',
         DEBUG_DEVELOPER);
 
@@ -4075,9 +4073,6 @@ function facetoface_confirm_attendees($sessionid, $userids) {
 
         if ($signup->can_switch(\mod_facetoface\signup\state\booked::class)) {
             $signup->switch_state(\mod_facetoface\signup\state\booked::class);
-            $conditions = array('sessionid' => $sessionid, 'userid' => $userid);
-            $existingsignup = $DB->get_record('facetoface_signups', $conditions, '*', MUST_EXIST);
-            notice_sender::confirm_booking(new signup($existingsignup->id), $existingsignup->notificationtype);
         } else {
             $failures = $signup->get_failures(\mod_facetoface\signup\state\booked::class);
             if (!empty($failures)) {

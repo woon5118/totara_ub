@@ -467,9 +467,6 @@ final class signup_helper {
 
             if ($signup->can_switch(\mod_facetoface\signup\state\booked::class)) {
                 $signup->switch_state(\mod_facetoface\signup\state\booked::class);
-                $conditions = array('sessionid' => $seminarevent->get_id(), 'userid' => $userid);
-                $existingsignup = $DB->get_record('facetoface_signups', $conditions, '*', MUST_EXIST);
-                notice_sender::confirm_booking(new signup($existingsignup->id), $existingsignup->notificationtype);
             } else {
                 $failures = $signup->get_failures(\mod_facetoface\signup\state\booked::class);
                 if (!empty($failures)) {
