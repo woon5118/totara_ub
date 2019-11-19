@@ -48,15 +48,12 @@ Feature: Test that paging in report builder works correctly
       | user37   | User      | 37-Test  | user37@example.com    |
       | user38   | User      | 38-Test  | user38@example.com    |
       | user39   | User      | 39-Test  | user39@example.com    |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname           | shortname   | source |
+      | Custom user report | report_user | user   |
     And I log in as "admin"
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Custom user report"
-    And I set the field "Source" to "User"
-    When I press "Create report"
-    Then I should see "Edit Report 'Custom user report'"
 
-    When I follow "View This Report"
+    When I navigate to my "Custom user report" report
     Then I should see "41 records shown" in the ".rb-record-count" "css_element"
     And ".paging" "css_element" should exist
     And I should see "Guest user" in the ".reportbuilder-table" "css_element"

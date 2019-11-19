@@ -55,15 +55,13 @@ Feature: Test aggregated user columns can be added and viewed by the admin
     And I press "Save changes"
     And I click on "Save all changes" "button"
     And I wait "1" seconds
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
 
   Scenario: View aggregated fields in the program overview report
-    Given I set the field "Report Name" to "Overview Report"
-    And I set the field "Source" to "Program Overview"
-    And I press "Create report"
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname        | shortname | source           |
+      | Overview Report | report_po | program_overview |
     # It would be nice to add and check some of the other aggregated columns.
-    When I follow "View This Report"
+    When I navigate to my "Overview Report" report
     Then I should see "C+r+s-A" in the "progtest" "table_row"
     And I should see "C,r,s-B" in the "progtest" "table_row"
     And I should see "C.r.s-C" in the "progtest" "table_row"

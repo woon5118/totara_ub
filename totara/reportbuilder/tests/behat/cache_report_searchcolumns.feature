@@ -10,11 +10,11 @@ Feature: Caching works as expected when adding search columns
       | Enable report caching | 1 |
 
   Scenario: Report Builder caching works with search-columns when there is no data for "Custom Seminar Sessions Report"
-    Given I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Custom Seminar Sessions Report"
-    And I set the field "Source" to "Seminar Sessions"
-    And I press "Create report"
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname                       | shortname                             | source             |
+      | Custom Seminar Sessions Report | report_custom_seminar_sessions_report | facetoface_summary |
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I follow "Custom Seminar Sessions Report"
     And I switch to "Filters" tab
     And I select "Building" from the "newsearchcolumn" singleselect
     And I press "Add"

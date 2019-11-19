@@ -207,12 +207,12 @@ Feature: Add a seminar with select position
     Then I should see "Position2"
     And I log out
 
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname     | shortname           | source              |
+      | F2F sessions | report_f2f_sessions | facetoface_sessions |
     And I log in as "admin"
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "F2F sessions"
-    And I set the field "Source" to "Seminar Sign-ups"
-    And I press "Create report"
+    And I follow "F2F sessions"
     And I switch to "Columns" tab
     And I add the "Position on sign up" column to the report
 

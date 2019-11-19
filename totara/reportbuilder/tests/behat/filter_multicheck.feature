@@ -3,12 +3,15 @@ Feature: Filter multicheck works as expected
 
   Background: Set up a user report
     Given I am on a totara site
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname    | shortname      | source  |
+      | All reports | report_reports | reports |
+      | Report 1    | report_user1   | user    |
+      | Report 2    | report_user2   | user    |
+      | Report 3    | report_user3   | user    |
     And I log in as "admin"
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Report 1"
-    And I set the field "Source" to "Users"
-    And I press "Create report"
+    And I navigate to my "Report 1" report
+    And I press "Edit this report"
     And I switch to "Performance" tab
     And I click on "overrideexportoptions" "checkbox"
     And I set the following fields to these values:
@@ -21,11 +24,8 @@ Feature: Filter multicheck works as expected
     And I press "Save changes"
     Then I should see "Report Updated"
 
-    When I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Report 2"
-    And I set the field "Source" to "Users"
-    And I press "Create report"
+    When I navigate to my "Report 2" report
+    And I press "Edit this report"
     And I switch to "Performance" tab
     And I click on "overrideexportoptions" "checkbox"
     And I set the following fields to these values:
@@ -38,11 +38,8 @@ Feature: Filter multicheck works as expected
     And I press "Save changes"
     Then I should see "Report Updated"
 
-    When I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Report 3"
-    And I set the field "Source" to "Users"
-    And I press "Create report"
+    When I navigate to my "Report 3" report
+    And I press "Edit this report"
     And I switch to "Performance" tab
     And I click on "overrideexportoptions" "checkbox"
     And I set the following fields to these values:
@@ -55,19 +52,15 @@ Feature: Filter multicheck works as expected
     And I press "Save changes"
     Then I should see "Report Updated"
 
-    When I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "All report"
-    And I set the field "Source" to "Reports"
-    And I press "Create report"
+    When I navigate to my "All reports" report
+    And I press "Edit this report"
     And I switch to "Filters" tab
     And I select "Export formats" from the "newstandardfilter" singleselect
     And I press "Save changes"
     Then I should see "Filters updated"
 
   Scenario: Test the multicheck filter
-    Given I click on "Reports" in the totara menu
-    When I follow "All report"
+    Given I navigate to my "All reports" report
     Then I should see "Export formats"
     And I should see "Report 1" in the ".reportbuilder-table" "css_element"
     And I should see "Report 2" in the ".reportbuilder-table" "css_element"

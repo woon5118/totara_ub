@@ -16,13 +16,12 @@ Feature: Verify the User System Role filter.
       | learner2 | manager1 |
       | learner3 | manager1 |
       | learner4 | manager1 |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname       | shortname             | source |
+      | My User Report | report_my_user_report | user   |
     When I log in as "admin"
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | My User Report |
-      | Source      | User           |
-    And I press "Create report"
+    And I follow "My User Report"
     Then I should see "Edit Report 'My User Report'"
 
     When I switch to "Filters" tab

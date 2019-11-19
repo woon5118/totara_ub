@@ -104,16 +104,14 @@ Feature: Seminar event cancellation reporting
     And I should see "Event Cancelled" in the "Learner Two" "table_row"
     And I should see "Event Cancelled" in the "Learner Three" "table_row"
 
-
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_701: using "seminar sign ups" source in custom report
-    Given I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | fullname | Custom test event report |
-      | source   | Seminar Sign-ups         |
-    And I press "Create report"
-    And I click on "Columns" "link"
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname                 | shortname                       | source              |
+      | Custom test event report | report_custom_test_event_report | facetoface_sessions |
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I follow "Custom test event report"
+    And I switch to "Columns" tab
     And I set the field "newcolumns" to "Seminar Name"
     And I press "Add"
     And I set the field "newcolumns" to "Status"

@@ -16,6 +16,9 @@ Feature: See that competency proficiency can be updated in Record of Learning: C
     And the following "plans" exist in "totara_plan" plugin:
       | user     | name                   |
       | learner1 | learner1 Learning Plan |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname                                  | shortname            | source        |
+      | Record of learning: All user competencies | report_dp_competency | dp_competency |
 
   @javascript
   Scenario: Test that competency proficiency can be updated in Record of Learning: Competency report
@@ -37,17 +40,9 @@ Feature: See that competency proficiency can be updated in Record of Learning: C
     Then I should see "Competency 1" in the ".dp-plan-component-items" "css_element"
     And I log out
 
-    # Create the report.
-    When I log in as "admin"
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | fullname | Record of learning: All user competencies |
-      | source   | dp_competency                             |
-    And I press "Create report"
-
     # Check the report content.
-    When I click on "View This Report" "link"
+    When I log in as "admin"
+    And I navigate to my "Record of learning: All user competencies" report
     Then I should see "Not Set" in the "learner1 Learning Plan" "table_row"
 
     # Check that the value can be changed.

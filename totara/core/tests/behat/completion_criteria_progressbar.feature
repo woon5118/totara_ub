@@ -62,14 +62,12 @@ Feature: Test progress bar percentange is displayed according to criteria comple
       | Course Title  | Progress |
       | Course 1      | 50%      |
     And I log out
-    # See a Record of learning report for all users.
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname           | shortname                 | source    |
+      | Record of Learning | report_record_of_learning | dp_course |
     And I log in as "admin"
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Record of Learning          |
-      | Source      | Record of Learning: Courses |
-    And I press "Create report"
+    And I navigate to my "Record of Learning" report
+    And I press "Edit this report"
     And I switch to "Columns" tab
     And I delete the "Course Name (linked to course page)" column from the report
     And I delete the "Plan name (linked to plan page)" column from the report
@@ -79,7 +77,6 @@ Feature: Test progress bar percentange is displayed according to criteria comple
     And I add the "Course Name" column to the report
     And I add the "Progress (%)" column to the report
     And I add the "Progress" column to the report
-    And I press "Save changes"
     When I follow "View This Report"
     Then the "reportbuilder-table" table should contain the following:
       | User's Fullname | Course Name | Progress  | Progress  |

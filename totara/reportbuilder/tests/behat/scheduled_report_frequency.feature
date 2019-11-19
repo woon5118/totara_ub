@@ -10,15 +10,9 @@ Feature: Test scheduled reports with new frequency setting
     And the following "users" exist:
       | username | firstname | lastname | email             |
       | user1    | User      | One      | user1@example.com |
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Site Logs |
-      | Source      | Site Logs |
-    And I click on "Create report" "button"
-    And I switch to "Access" tab
-    And I set the field "All users can view this report" to "1"
-    And I press "Save changes"
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname  | shortname        | source        | accessmode |
+      | Site Logs | report_site_logs | site_logstore | 0          |
     And I set the following administration settings values:
       | Minimum scheduled report frequency | 1 |
     And I log out

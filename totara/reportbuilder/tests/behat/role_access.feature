@@ -24,12 +24,12 @@ Feature: Test role access restrictions in Reportbuilder
       | user        | role          | contextlevel | reference |
       | usercreator | coursecreator | System       |           |
       | usermanager | manager       | System       |           |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname         | shortname | source | accessmode |
+      | Some User Report | user      | user   | 1          |
     And I log in as "admin"
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Some User Report"
-    And I set the field "Source" to "User"
-    And I press "Create report"
+    And I navigate to my "Some User Report" report
+    And I press "Edit this report"
 
   Scenario: Verify role access defaults in Reportbuilder
     Given I switch to "Access" tab

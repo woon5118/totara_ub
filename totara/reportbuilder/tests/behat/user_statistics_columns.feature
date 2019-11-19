@@ -28,6 +28,9 @@ Feature: Statistics columns in user reports should show data correctly
       | learner3 | C1     | student |
       | learner3 | C2     | student |
       | learner4 | C1     | student |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname    | shortname          | source | recordsperpage | accessmode |
+      | User Report | report_user_report | user   | 3              | 1          |
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I navigate to "Course completion" node in "Course administration"
@@ -60,14 +63,7 @@ Feature: Statistics columns in user reports should show data correctly
     And I complete the course via rpl for "Learner1 One" with text "RPL"
     And I complete the course via rpl for "Learner2 Two" with text "RPL"
     When I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | User Report |
-      | Source      | User        |
-    And I click on "Create report" "button"
-    And I set the following fields to these values:
-      | Number of records per page | 3 |
-    And I press "Save changes"
+    And I follow "User Report"
     And I switch to "Columns" tab
     And I add the "User's Courses Completed Count" column to the report
     And I click on "View This Report" "link"

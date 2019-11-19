@@ -8,6 +8,9 @@ Feature: Verify that link to approval requests work
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1  | c1       | 0        |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname | shortname       | source              |
+      | Report 1 | report_report_1 | facetoface_sessions |
 
   Scenario: Confirm that the link directs to the approval page
     Given I am on a totara site
@@ -25,13 +28,7 @@ Feature: Verify that link to approval requests work
     And I click on "Add" "button"
     And I click on "Continue" "button"
     And I click on "Confirm" "button"
-    And I navigate to "Reports > Manage user reports" in site administration
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Report 1            |
-      | Source      | facetoface_sessions |
-    And I click on "Create report" "button"
-    And I follow "View"
+    When I navigate to my "Report 1" report
     Then I should see "user test"
     And I should see "Link to approval requests"
     And I follow "Manage approval"

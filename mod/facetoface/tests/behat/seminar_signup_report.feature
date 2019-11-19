@@ -10,6 +10,9 @@ Feature: Users that are in waitlist of seminar's event should be displayed in th
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1  | c101      | 0        |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname | shortname       | source              |
+      | Report 1 | report_report_1 | facetoface_sessions |
 
   @javascript
   Scenario: I should be able to see the waitlist user within the report
@@ -30,11 +33,7 @@ Feature: Users that are in waitlist of seminar's event should be displayed in th
     And I click on "Continue" "button"
     And I click on "Confirm" "button"
     And I navigate to "Reports > Manage user reports" in site administration
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Report 1            |
-      | Source      | facetoface_sessions |
-    And I click on "Create report" "button"
+    And I follow "Report 1"
     And I switch to "Columns" tab
     And I add the "Status" column to the report
     When I navigate to my "Report 1" report

@@ -11,6 +11,9 @@ Feature: Badges report filter
       | user2    | User      | Two      | user2@example.com |
       | user3    | User      | Three    | user3@example.com |
       | user4    | User      | Four     | user4@example.com |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname     | shortname           | source       |
+      | Badge report | report_badge_report | badge_issued |
     And I log in as "admin"
     And I navigate to "Manage badges" node in "Site administration > Badges"
     And I press "Add a new badge"
@@ -52,14 +55,8 @@ Feature: Badges report filter
     And I click on "Award badge" "button"
 
   Scenario: Test badge report builder filter
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Badge report  |
-      | Source      | Badges Issued |
-    And I click on "Create report" "button"
+    And I navigate to my "Badge report" report
     # The badges filter testing should be one of the default filters.
-    And I click on "View This Report" "link"
     Then I should see "User One"
     And I should see "User Two"
     And I should see "User Three"

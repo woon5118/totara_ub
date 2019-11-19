@@ -13,14 +13,13 @@ Feature: Verify functionality of user source report.
       | learner2 | Bob2      | Learner2 | bob2&learner2@example.com | 1           |
       | learner3 | Bob3      | Learner3 | bob3.learner3@example.com | 0           |
       | learner4 | Bob4      | Learner4 | bob4.learner4@example.com | 2           |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname    | shortname          | source | accessmode |
+      | User Report | report_user_report | user   | 0          |
 
     When I log in as "admin"
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | User Report |
-      | Source      | User        |
-    And I press "Create report"
+    And I navigate to my "User Report" report
+    And I press "Edit this report"
     Then I should see "Edit Report 'User Report'"
 
     When I switch to "Columns" tab
@@ -32,11 +31,6 @@ Feature: Verify functionality of user source report.
     And I press "Add"
     And I press "Save changes"
     Then I should see "Columns updated"
-
-    When I switch to "Access" tab
-    And I click on "All users can view this report" "radio"
-    And I press "Save changes"
-    Then I should see "Report Updated"
 
     When I follow "View This Report"
     Then I should see "6 records shown" in the ".rb-record-count" "css_element"
@@ -200,7 +194,6 @@ Feature: Verify functionality of user source report.
       | Bob4 Learner4   | learner4 | Email is private          | Active      |
 
   Scenario: Verify Global Report Restrictions works on the report in user source report.
-
     Given the following "cohorts" exist:
       | name       | idnumber |
       | Audience 1 | A1       |
@@ -228,8 +221,8 @@ Feature: Verify functionality of user source report.
     And I click on "Save" "button" in the "Assign a group to restriction" "totaradialogue"
     Then the following should exist in the "datatable" table:
       | Learner       | Assigned Via        |
-      | Bob1 Learner1 |	Audience Audience 1 |
-      | Bob2 Learner2 |	Audience Audience 1 |
+      | Bob1 Learner1 | Audience Audience 1 |
+      | Bob2 Learner2 | Audience Audience 1 |
 
     When I switch to "Users allowed to select restriction" tab
     And I set the field "menugroupselector" to "Audience"
@@ -237,8 +230,8 @@ Feature: Verify functionality of user source report.
     And I click on "Save" "button" in the "Assign a group to restriction" "totaradialogue"
     Then the following should exist in the "datatable" table:
       | Learner       | Assigned Via        |
-      | Bob3 Learner3 |	Audience Audience 2 |
-      | Bob4 Learner4 |	Audience Audience 2 |
+      | Bob3 Learner3 | Audience Audience 2 |
+      | Bob4 Learner4 | Audience Audience 2 |
     And I log out
 
     # Learner1 should not have any restrictions on what data it can see.
@@ -265,14 +258,13 @@ Feature: Verify functionality of user source report.
       | Bob2 Learner2   | learner2 | bob2&learner2@example.com | Active      |
 
   Scenario: Verify reports extending from the user source class do not support the action column in user source report.
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname                        | shortname                            | source                |
+      | Audiences Orphaned Users Report | report_audience_ophaned_users_report | cohort_orphaned_users |
 
-    When I click on "Home" in the totara menu
+    When I am on homepage
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Audiences Orphaned Users Report |
-      | Source      | Audiences Orphaned Users        |
-    And I press "Create report"
+    And I follow "Audiences Orphaned Users Report"
     Then I should see "Edit Report 'Audiences Orphaned Users Report'"
 
     When I switch to "Columns" tab

@@ -74,16 +74,15 @@ Feature: Managers can create courses
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@example.com |
       | student1 | Student | 1 | student1@example.com |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname       | shortname            | source  |
+      | Courses Report | report_course_report | courses |
     When I log in as "admin"
     And I create a course with:
       | Course full name | Course 1 |
       | Course short name | This is a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long shortname |
     When I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Courses Report |
-      | Source      | Courses        |
-    And I press "Create report"
+    And I follow "Courses Report"
     And I switch to "Columns" tab
     And I add the "Course Shortname" column to the report
     And I follow "View This Report"

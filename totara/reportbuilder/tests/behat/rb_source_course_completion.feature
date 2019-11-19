@@ -25,6 +25,9 @@ Feature: Check that course completion reports don't show multiple enrolment type
     And the following "cohort members" exist:
       | user     | cohort |
       | learner1 | A1     |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname                 | shortname                       | source            |
+      | Course Completion Report | report_course_completion_report | course_completion |
 
   Scenario: User is enrolled in a second course using a different method
     Given I log in as "admin"
@@ -35,12 +38,8 @@ Feature: Check that course completion reports don't show multiple enrolment type
     And I click on "OK" "button" in the "Course audiences (enrolled)" "totaradialogue"
     And I press "Save and display"
     And I run the scheduled task "\enrol_cohort\task\sync_members"
-    When I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Course Completion Report |
-      | Source      | Course Completion        |
-    And I press "Create report"
+    When I navigate to my "Course Completion Report" report
+    And I press "Edit this report"
     And I switch to "Columns" tab
     And I add the "Enrolment Types" column to the report
     And I follow "View This Report"
@@ -57,12 +56,8 @@ Feature: Check that course completion reports don't show multiple enrolment type
     And I click on "OK" "button" in the "Course audiences (enrolled)" "totaradialogue"
     And I press "Save and display"
     And I run the scheduled task "\enrol_cohort\task\sync_members"
-    When I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Course Completion Report |
-      | Source      | Course Completion        |
-    And I press "Create report"
+    When I navigate to my "Course Completion Report" report
+    And I press "Edit this report"
     And I switch to "Columns" tab
     And I add the "Enrolment Types" column to the report
     And I follow "View This Report"
@@ -83,14 +78,9 @@ Feature: Check that course completion reports don't show multiple enrolment type
     And I mark "Learner One" complete by "Editing Trainer" in the course completion report
     And I mark "Learner Two" complete by RPL with "You completed it!" in the course completion report
     And I log out
-    # Create the report
     And I log in as "admin"
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Course Completion Report |
-      | Source      | Course Completion        |
-    And I press "Create report"
+    When I navigate to my "Course Completion Report" report
+    And I press "Edit this report"
     And I switch to "Columns" tab
     And I add the "RPL note" column to the report
     When I follow "View This Report"

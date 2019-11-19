@@ -187,7 +187,7 @@ class totara_program_rb_display_program_course_status_testcase extends advanced_
 
         /** @var totara_reportbuilder_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_reportbuilder');
-        $rid = $generator->create_default_standard_report(['shortname' => 'PO', 'source' => 'program_overview']);
+        $rid = $generator->create_default_custom_report(['shortname' => 'PO', 'source' => 'program_overview']);
 
         $report = reportbuilder::create($rid);
         $column = new rb_column('course', 'shortname', 'shortname', 'shortname', []);
@@ -210,7 +210,7 @@ class totara_program_rb_display_program_course_status_testcase extends advanced_
 
         /** @var totara_reportbuilder_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_reportbuilder');
-        $rid = $generator->create_default_standard_report(['shortname' => 'PO', 'source' => 'program_overview']);
+        $rid = $generator->create_default_custom_report(['shortname' => 'PO', 'source' => 'program_overview']);
 
         $report = reportbuilder::create($rid);
         $column = new rb_column('course', 'shortname', 'shortname', 'shortname', []);
@@ -233,7 +233,7 @@ class totara_program_rb_display_program_course_status_testcase extends advanced_
 
         /** @var totara_reportbuilder_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_reportbuilder');
-        $rid = $generator->create_default_standard_report(['shortname' => 'PO', 'source' => 'program_overview']);
+        $rid = $generator->create_default_custom_report(['shortname' => 'PO', 'source' => 'program_overview']);
 
         $report = reportbuilder::create($rid);
         $column = new rb_column('course', 'shortname', 'shortname', 'shortname', []);
@@ -256,7 +256,7 @@ class totara_program_rb_display_program_course_status_testcase extends advanced_
 
         /** @var totara_reportbuilder_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_reportbuilder');
-        $rid = $generator->create_default_standard_report(['shortname' => 'PO', 'source' => 'program_overview']);
+        $rid = $generator->create_default_custom_report(['shortname' => 'PO', 'source' => 'program_overview']);
 
         $report = reportbuilder::create($rid);
         $column = new rb_column('course', 'shortname', 'shortname', 'shortname', []);
@@ -281,7 +281,7 @@ class totara_program_rb_display_program_course_status_testcase extends advanced_
 
         /** @var totara_reportbuilder_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_reportbuilder');
-        $rid = $generator->create_default_standard_report(['shortname' => 'PO', 'source' => 'program_overview']);
+        $rid = $generator->create_default_custom_report(['shortname' => 'PO', 'source' => 'program_overview']);
 
         $report = reportbuilder::create($rid);
         $column = new rb_column('course', 'shortname', 'shortname', 'shortname', []);
@@ -338,7 +338,7 @@ class totara_program_rb_display_program_course_status_testcase extends advanced_
 
         /** @var totara_reportbuilder_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_reportbuilder');
-        $rid = $generator->create_default_standard_report(['shortname' => 'PO', 'source' => 'program_overview']);
+        $rid = $generator->create_default_custom_report(['shortname' => 'PO', 'source' => 'program_overview']);
 
         $report = reportbuilder::create($rid);
         $column = new rb_column('course', 'shortname', 'shortname', 'shortname', []);

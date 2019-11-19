@@ -9,12 +9,13 @@ Feature: Test report builder saved search
       | user2    | User2-firstname  | Test     | user2@example.com     |
       | user3    | User3-firstname  | Test     | user3@example.com     |
       | user4    | User4-firstname  | Test     | user4@example.com     |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname             | shortname    | source |
+      | Custom user report 1 | report_user1 | user   |
+      | Custom user report 2 | report_user2 | user   |
     And I log in as "admin"
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Custom user report 1"
-    And I set the field "Source" to "User"
-    When I press "Create report"
+    When I navigate to my "Custom user report 1" report
+    And I press "Edit this report"
     Then I should see "Edit Report 'Custom user report 1'"
     When I switch to "Access" tab
     And I set the following fields to these values:
@@ -22,11 +23,8 @@ Feature: Test report builder saved search
     And I press "Save changes"
     Then I should see "Report Updated"
 
-    When I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Custom user report 2"
-    And I set the field "Source" to "User"
-    And I press "Create report"
+    When I navigate to my "Custom user report 2" report
+    And I press "Edit this report"
     Then I should see "Edit Report 'Custom user report 2'"
     When I switch to "Access" tab
     And I set the following fields to these values:
@@ -37,8 +35,7 @@ Feature: Test report builder saved search
 
   Scenario: I can delete a saved search
     Given I log in as "admin"
-    When I click on "Reports" in the totara menu
-    And I follow "Custom user report 1"
+    When I navigate to my "Custom user report 1" report
     And I set the field "user-fullname" to "Search 1"
     And I press "id_submitgroupstandard_addfilter"
     And I press "Save this search"
@@ -56,8 +53,7 @@ Feature: Test report builder saved search
   Scenario: I can delete a saved search that is being used for a scheduled report
     # Create a saved search.
     Given I log in as "admin"
-    When I click on "Reports" in the totara menu
-    And I follow "Custom user report 1"
+    When I navigate to my "Custom user report 1" report
     And I set the field "user-fullname" to "Search 1"
     And I press "id_submitgroupstandard_addfilter"
     And I press "Save this search"
@@ -113,8 +109,7 @@ Feature: Test report builder saved search
 
     # Delete the search.
     When I log in as "admin"
-    And I click on "Reports" in the totara menu
-    And I follow "Custom user report 1"
+    And I navigate to my "Custom user report 1" report
     And I follow "Manage your saved searches"
     And I click on "Delete" "link" in the "My search 1" "table_row"
     Then I should see "This saved search is currently being used by 3 scheduled reports. Deleting it will also delete these scheduled reports. Are you sure?"

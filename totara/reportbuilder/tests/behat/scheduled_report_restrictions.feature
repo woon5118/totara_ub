@@ -11,13 +11,9 @@ Feature: Test that report builder scheduled report recipient settings restrict w
       | name | idnumber |
       | CH1  | CH1      |
       | CH2  | CH2      |
-    And I log in as "admin"
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Schedulable Report"
-    And I set the field "Source" to "User"
-    And I press "Create report"
-    And I log out
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname           | shortname   | source |
+      | Schedulable Report | report_user | user   |
 
   Scenario: I can add audiences, system users, external emails, and myself by default
     When I log in as "admin"

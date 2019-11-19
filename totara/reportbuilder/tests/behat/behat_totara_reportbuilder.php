@@ -110,11 +110,11 @@ class behat_totara_reportbuilder extends behat_base {
      * @Given /^I navigate to my "([^"]*)" report$/
      */
     public function i_navigate_to_my_report($reportname) {
-        \behat_hooks::set_step_readonly(false);
-        $this->execute('behat_totara_core::i_click_on_in_the_totara_menu', 'Reports');
-        $this->execute("behat_general::i_click_on_in_the", array($this->escape($reportname), 'link', ".reportmanager", "css_element"));
-        $this->execute("behat_general::assert_element_contains_text", array($this->escape($reportname), "#region-main h2", "css_element"));
-
+        behat_hooks::set_step_readonly(false);
+        global $DB;
+        $report = $DB->get_record('report_builder', ['fullname' => $this->escape($reportname)], 'id', MUST_EXIST);
+        $url = new moodle_url('/totara/reportbuilder/report.php', ['id' => $report->id]);
+        $this->getSession()->visit($this->locate_path($url->out_as_local_url(false)));
     }
 
     /**

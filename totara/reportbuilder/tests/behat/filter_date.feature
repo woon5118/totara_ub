@@ -6,12 +6,12 @@ Feature: Use the reportbuilder date filter
 
   Scenario: Reportbuilder date filter validation
     Given I am on a totara site
-    And I log in as "admin"
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname         | shortname               | source |
+      | Test User Report | report_test_user_report | user   |
+    When I log in as "admin"
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Test user report"
-    And I set the field "Source" to "User"
-    And I press "Create report"
+    And I follow "Test User Report"
     And I switch to "Filters" tab
     And I select "User Last Login" from the "newstandardfilter" singleselect
     And I press "Save changes"

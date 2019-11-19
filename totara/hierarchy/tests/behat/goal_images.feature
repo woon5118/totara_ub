@@ -12,6 +12,12 @@ Feature: Test use of images in goals and goal custom fields
     And the following "goal" frameworks exist:
       | fullname       | idnumber |
       | Goal Framework | goalfw   |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname                 | shortname                       | source              |
+      | Test Goal Custom Fields  | report_test_goal_custom_fields  | goal_custom         |
+      | Test Goal Summary        | report_test_goal_summary        | goal_summary        |
+      | Test Goal Status         | report_test_goal_details        | goal_details        |
+      | Test Goal Status History | report_test_goal_status_history | goal_status_history |
     And I log in as "admin"
 
     # Add images to the private files block to use later
@@ -221,11 +227,7 @@ Feature: Test use of images in goals and goal custom fields
     When I log out
     And I log in as "admin"
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Name   | Test Goal Custom Fields |
-      | Source | Goal Custom Fields      |
-    And I press "Create report"
+    And I follow "Test Goal Custom Fields"
     Then I should see "Edit Report 'Test Goal Custom Fields'"
 
     When I switch to "Columns" tab
@@ -247,11 +249,7 @@ Feature: Test use of images in goals and goal custom fields
 
     When I am on site homepage
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Name   | Test Goal Summary |
-      | Source | Goal Summary      |
-    And I press "Create report"
+    And I follow "Test Goal Summary"
     Then I should see "Edit Report 'Test Goal Summary'"
 
     When I switch to "Columns" tab
@@ -270,11 +268,7 @@ Feature: Test use of images in goals and goal custom fields
 
     When I am on site homepage
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Name   | Test Goal Status |
-      | Source | Goal Status      |
-    And I press "Create report"
+    And I follow "Test Goal Status"
     Then I should see "Edit Report 'Test Goal Status'"
 
     When I switch to "Columns" tab
@@ -292,11 +286,7 @@ Feature: Test use of images in goals and goal custom fields
 
     When I am on site homepage
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Name   | Test Goal Status History |
-      | Source | Goal Status History      |
-    And I press "Create report"
+    And I follow "Test Goal Status History"
     Then I should see "Edit Report 'Test Goal Status History'"
 
     When I switch to "Columns" tab

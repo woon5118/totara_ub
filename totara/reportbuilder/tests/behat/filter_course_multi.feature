@@ -18,14 +18,14 @@ Feature: Use the multi-item course filter
     And I log in as "admin"
     And the following config values are set as admin:
       | audiencevisibility | 1 |
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
 
   @javascript
   Scenario: Use filter with Courses report source
-    Given I set the field "Report Name" to "Courses"
-    And I set the field "Source" to "Courses"
-    And I press "Create report"
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname | shortname | source  |
+      | Courses  | courses   | courses |
+    And I navigate to my "Courses" report
+    And I press "Edit this report"
     And I switch to "Filters" tab
     And I select "Course (multi-item)" from the "newstandardfilter" singleselect
     And I press "Save changes"
@@ -76,10 +76,10 @@ Feature: Use the multi-item course filter
 
   @javascript
   Scenario: Test filter with spaces
-    Given I set the field "Report Name" to "Courses"
-    And I set the field "Source" to "Courses"
-    And I press "Create report"
-    When I follow "View This Report"
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname | shortname | source  |
+      | Courses  | courses   | courses |
+    When I navigate to my "Courses" report
     Then I should see "CourseOne" in the ".reportbuilder-table" "css_element"
     And I should see "CourseTwo" in the ".reportbuilder-table" "css_element"
     And I should see "CourseThree" in the ".reportbuilder-table" "css_element"
@@ -98,9 +98,11 @@ Feature: Use the multi-item course filter
 
   @javascript
   Scenario: Add filter with Seminar Sessions report source
-    Given I set the field "Report Name" to "Seminar Sessions"
-    And I set the field "Source" to "Seminar Sessions"
-    And I press "Create report"
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname         | shortname          | source             |
+      | Seminar Sessions | facetoface_summary | facetoface_summary |
+    And I navigate to my "Seminar Sessions" report
+    And I press "Edit this report"
     And I switch to "Filters" tab
     And I select "Course (multi-item)" from the "newstandardfilter" singleselect
     And I press "Save changes"

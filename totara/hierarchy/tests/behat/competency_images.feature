@@ -18,6 +18,10 @@ Feature: Test use of images in competencies and competency custom fields
     And the following "competency" frameworks exist:
       | fullname            | idnumber    |
       | Test Comp Framework | tstcompfw   |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname                       | shortname                             | source              |
+      | Test Competency Status         | report_test_competency_status         | competency_evidence |
+      | Test Competency Status History | report_test_competency_status_history | comp_status_history |
     And I log in as "admin"
 
     # Add images to the private files block to use later
@@ -151,11 +155,7 @@ Feature: Test use of images in competencies and competency custom fields
     And I run the "\totara_hierarchy\task\update_competencies_task" task
 
     When I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Name   | Test Competency Status |
-      | Source | Competency Status      |
-    And I press "Create report"
+    And I follow "Test Competency Status"
     Then I should see "Edit Report 'Test Competency Status'"
 
     When I switch to "Columns" tab
@@ -175,11 +175,7 @@ Feature: Test use of images in competencies and competency custom fields
     And I should see image with alt text "logo3 on customfield text area"
 
     When I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Name   | Test Competency Status History |
-      | Source | Competency Status History      |
-    And I press "Create report"
+    And I follow "Test Competency Status History"
     Then I should see "Edit Report 'Test Competency Status History'"
 
     When I switch to "Columns" tab

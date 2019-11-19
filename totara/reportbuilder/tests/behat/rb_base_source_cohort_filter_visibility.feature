@@ -27,24 +27,16 @@ Feature: Test the capability to see and use audience filter for report builder
       | course | cohort  |
       | C1     | AUD2986 |
 
-
   Scenario: create user report with audience filter, test moodle/cohort:view capability
-    Given I log in as "admin"
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname    | shortname          | source | accessmode |
+      | User Report | report_user_report | user   | 0          |
+    And I log in as "admin"
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | User Report |
-      | Source      | User        |
-    And I click on "Create report" "button"
-    And I press "Save changes"
-
+    And I follow "User Report"
     And I switch to "Filters" tab
     And I select "User is a member of audience" from the "newstandardfilter" singleselect
     And I press "Add"
-
-    And I switch to "Access" tab
-    And I set the field "All users can view this report" to "1"
-    And I press "Save changes"
 
     And I click on "View This Report" "link"
     # Make sure that we are still can see and use Audience filter for admins.
@@ -73,22 +65,15 @@ Feature: Test the capability to see and use audience filter for report builder
     And I should see "Learner4 Four"
 
   Scenario: create course report with audience filter, test moodle/cohort:view capability
-    Given I log in as "admin"
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname      | shortname            | source  | accessmode |
+      | Course Report | report_course_report | courses | 0          |
+    And I log in as "admin"
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Course Report |
-      | Source      | Courses       |
-    And I click on "Create report" "button"
-    And I press "Save changes"
-
+    And I follow "Course Report"
     And I switch to "Filters" tab
     And I select "Course with enrolled audience(s)" from the "newstandardfilter" singleselect
     And I press "Add"
-
-    And I switch to "Access" tab
-    And I set the field "All users can view this report" to "1"
-    And I press "Save changes"
     And I click on "View This Report" "link"
 
     # Make sure that we are still can see and use Audience filter for admins.
@@ -111,7 +96,10 @@ Feature: Test the capability to see and use audience filter for report builder
     And I should see "Course 1"
 
   Scenario: create program report with audience filter, test moodle/cohort:view capability
-    Given I log in as "admin"
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname       | shortname             | source  | accessmode |
+      | Program Report | report_program_report | program | 0          |
+    And I log in as "admin"
     And I click on "Programs" in the totara menu
     And I press "Add a new program"
     And I set the following fields to these values:
@@ -125,20 +113,10 @@ Feature: Test the capability to see and use audience filter for report builder
     Then I should see "4 learner(s) assigned: 4 active, 0 exception(s)"
 
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Program Report |
-      | Source      | Programs       |
-    And I click on "Create report" "button"
-    And I press "Save changes"
-
+    And I follow "Program Report"
     And I switch to "Filters" tab
     And I select "Program with enrolled audience(s)" from the "newstandardfilter" singleselect
     And I press "Add"
-
-    And I switch to "Access" tab
-    And I set the field "All users can view this report" to "1"
-    And I press "Save changes"
     And I click on "View This Report" "link"
 
     # Make sure that we are still can see and use Audience filter for admins.

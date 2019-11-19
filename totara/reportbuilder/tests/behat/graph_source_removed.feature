@@ -10,15 +10,14 @@ Feature: Graph source columns in the report builder
       | username | firstname | lastname | email             |
       | user1    | User      | One      | user1@example.com |
       | user2    | User      | Two      | user2@example.com |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname           | shortname                 | source |
+      | Custom user report | report_custom_user_report | user   |
     And I log in as "admin"
 
   Scenario: Add and delete graph column in Report builder
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Custom User report |
-      | Source      | User               |
-    And I press "Create report"
+    And I follow "Custom user report"
     And I switch to "Columns" tab
     And I add the "User's Courses Started Count" column to the report
     And I switch to "Graph" tab

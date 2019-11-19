@@ -19,15 +19,14 @@ Feature: Cohort report filter
       | user1 | CH1    |
       | user2 | CH1    |
       | user1 | CH2    |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname    | shortname          | source |
+      | User report | report_user_report | user   |
 
   Scenario: Test cohort report builder filter
     Given I log in as "admin"
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | User report  |
-      | Source      | User         |
-    And I click on "Create report" "button"
+    And I follow "User report"
     And I switch to "Filters" tab
     And I set the field "newstandardfilter" to "User is a member of audience"
     And I click on "Add" "button"

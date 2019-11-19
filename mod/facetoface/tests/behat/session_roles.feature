@@ -36,6 +36,9 @@ Feature: Use facetoface session roles
       | student1  | event 1      |
       | student2  | event 1      |
       | student3  | event 1      |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname     | shortname           | source             | accessmode |
+      | F2F sessions | report_f2f_sessions | facetoface_summary | 0          |
 
     And I log in as "admin"
     And I set the following administration settings values:
@@ -46,16 +49,9 @@ Feature: Use facetoface session roles
     And I press "Save changes"
 
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "F2F sessions"
-    And I set the field "Source" to "Seminar Sessions"
-    And I press "Create report"
+    And I follow "F2F sessions"
     And I switch to "Columns" tab
     And I add the "Event Learner" column to the report
-    And I press "Save changes"
-    And I switch to "Access" tab
-    And I set the field "All users can view this report" to "1"
-    And I press "Save changes"
     And I log out
 
     And I log in as "teacher1"

@@ -1,7 +1,6 @@
 @totara @totara_reportbuilder @totara_scheduledreports @javascript
 Feature: Test the generation of scheduled reports events.
 
-
   Background:
     Given I am on a totara site
     And the following "users" exist:
@@ -19,17 +18,10 @@ Feature: Test the generation of scheduled reports events.
     And the following "role assigns" exist:
       | user | role                   | contextlevel | reference |
       | srm  | ScheduledReportManager | System       |           |
-    And I log in as "admin"
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Test Report#1"
-    And I set the field "Source" to "User"
-    And I press "Create report"
-    And I switch to "Access" tab
-    And I set the field "All users can view this report" to "1"
-    And I press "Save changes"
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname      | shortname | source | accessmode |
+      | Test Report#1 | user      | user   | 0          |
 
-    Given I log out
     And I log in as "u1"
     And I click on "Reports" in the totara menu
     And I select "Test Report#1" from the "addanewscheduledreport[reportid]" singleselect
@@ -42,8 +34,6 @@ Feature: Test the generation of scheduled reports events.
     And I press "Save changes"
     And I log out
 
-
-  # -------------------------------
   Scenario: scheduled_report_event_00: scheduled report events from owner page
     # Creation event
     When I log in as "admin"
@@ -82,18 +72,13 @@ Feature: Test the generation of scheduled reports events.
     Then "Scheduled report deleted" row "Description" column of "reportlog" table should contain "deleted a scheduled report"
     And "Scheduled report deleted" row "User full name" column of "reportlog" table should contain "User One"
 
-
-  # -------------------------------
   Scenario: scheduled_report_event_01: scheduled report events from scheduled report source
-    Given I log in as "admin"
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname              | shortname                    | source            | accessmode |
+      | All scheduled reports | report_all_scheduled_reports | scheduled_reports | 0          |
+    And I log in as "admin"
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "All scheduled reports"
-    And I set the field "Source" to "Scheduled reports"
-    And I press "Create report"
-    And I switch to "Access" tab
-    And I set the field "All users can view this report" to "1"
-    And I press "Save changes"
+    And I follow "All scheduled reports"
     And I switch to "Columns" tab
     And I add the "Scheduler actions" column to the report
     And I press "Save changes"

@@ -113,6 +113,10 @@ Feature: Learner creates learning plan with competencies.
       | Active | 1                 |
     And I press "Save changes"
 
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname                                | shortname                      | source        |
+      | Record of Learning: Competencies report | report_rol_competencies_report | dp_competency |
+
     And I set the field "menugroupselector" to "Audience"
     And I wait "1" seconds
     And I click on "Audience 1" "link" in the "Assign a group to restriction" "totaradialogue"
@@ -123,15 +127,7 @@ Feature: Learner creates learning plan with competencies.
     And I click on "Audience 1" "link" in the "Assign a group to restriction" "totaradialogue"
     And I click on "Save" "button" in the "Assign a group to restriction" "totaradialogue"
 
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Record of Learning: Competencies report |
-      | Source      | Record of Learning: Competencies        |
-    And I click on "Create report" "button"
-    And I press "Save changes"
-
-    When I click on "View This Report" "link"
+    When I navigate to my "Record of Learning: Competencies report" report
     And the following should exist in the "reportbuilder-table" table:
       | Plan            | Plan status | Competency name |
       | Learning Plan 1 | Approved    | Competency 1    |

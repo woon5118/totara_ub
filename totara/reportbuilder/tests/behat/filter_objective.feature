@@ -12,14 +12,13 @@ Feature: Verify the blank date filter works for reports that use it.
     And the following "objectives" exist in "totara_plan" plugin:
       | user     | plan            | name        |
       | learner1 | Learning Plan 1 | Objective 1 |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname       | shortname             | source       |
+      | RoL Objectives | report_rol_objectives | dp_objective |
 
     When I log in as "admin"
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | RoL Objectives                 |
-      | Source      | Record of Learning: Objectives |
-    And I press "Create report"
+    And I follow "RoL Objectives"
     Then I should see "Edit Report 'RoL Objectives'"
 
   Scenario: Verify no results are retrieved when filtering blank dates on the date created field.

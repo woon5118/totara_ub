@@ -27,6 +27,9 @@ Feature: Single hierarchy report filter
       | user2 | org1a        |
       | user3 | org1b        |
       | user4 | org2z        |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname    | shortname          | source |
+      | User report | report_user_report | user   |
     And I log in as "admin"
     And I navigate to "Manage organisations" node in "Site administration > Organisations"
     And I click on "Org Fram" "link"
@@ -37,11 +40,7 @@ Feature: Single hierarchy report filter
     And I click on "Move" "button"
     And I click on "Continue" "button"
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | User report |
-      | Source      | User        |
-    And I click on "Create report" "button"
+    And I follow "User report"
     And I switch to "Filters" tab
     And I set the field "newstandardfilter" to "User's Organisation(s)"
     And I click on "Add" "button"

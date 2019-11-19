@@ -14,6 +14,9 @@ Feature: Test the basic functionality of the Totara report graph block
       | learner4 | Learner4  | US      |
       | learner5 | Learner5  | AU      |
       | learner6 | Learner6  | CZ      |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname       | shortname             | source |
+      | My user report | report_my_user_report | user   |
 
     When I log in as "admin"
     And I navigate to "General settings" node in "Site administration > Reports"
@@ -21,11 +24,7 @@ Feature: Test the basic functionality of the Totara report graph block
     And I set the field "Graph Library" to "SVGGraph"
     And I press "Save changes"
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | My user report |
-      | Source      | User           |
-    And I press "Create report"
+    And I follow "My user report"
     Then I should see "Edit Report 'My user report'"
 
     When I switch to "Columns" tab

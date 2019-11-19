@@ -10,15 +10,10 @@ Feature: Test that report builder reports can be scheduled
     And the following "users" exist:
       | username | firstname | lastname  | email          |
       | u1       | User      | One       | u1@example.com |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname           | shortname | source | accessmode |
+      | Schedulable Report | user      | user   | 0          |
     And I log in as "admin"
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Schedulable Report"
-    And I set the field "Source" to "User"
-    And I press "Create report"
-    And I switch to "Access" tab
-    And I set the field "All users can view this report" to "1"
-    And I press "Save changes"
 
   Scenario: Report builder reports can be scheduled daily
     When I click on "Reports" in the totara menu

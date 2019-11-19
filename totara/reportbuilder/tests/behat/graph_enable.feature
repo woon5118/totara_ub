@@ -7,7 +7,6 @@ Feature: Graphs in Report builder
 
   Background:
     Given I am on a totara site
-    And I log in as "admin"
     And the following "users" exist:
       | username | firstname | country |
       | trainer1 | Trainer   | NZ      |
@@ -17,16 +16,16 @@ Feature: Graphs in Report builder
       | learner4 | Learner4  | US      |
       | learner5 | Learner5  | AU      |
       | learner6 | Learner6  | CZ      |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname       | shortname             | source |
+      | My user report | report_my_user_report | user   |
+    And I log in as "admin"
     And I navigate to "General settings" node in "Site administration > Reports"
 #    Can't run this on ChartJS, since behat can't look into the resulting chart elements
     And I set the field "Graph Library" to "SVGGraph"
     And I press "Save changes"
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | My user report |
-      | Source      | User           |
-    And I press "Create report"
+    And I follow "My user report"
     And I switch to "Columns" tab
     And I delete the "User's Fullname (linked to profile with icon)" column from the report
     And I delete the "User Last Login" column from the report

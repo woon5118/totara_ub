@@ -14,17 +14,17 @@ Feature: Make sure the message report is shown correctly
     And the following job assignments exist:
       | user     | manager  |
       | user1    | manager1 |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname              | shortname                    | source         | accessmode |
+      | Custom message report | report_custom_message_report | totaramessages | 1          |
     And I log in as "admin"
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Custom message report"
-    And I set the field "Source" to "Message"
-    And I press "Create report"
-    And I click on "Access" "link" in the ".tabtree" "css_element"
+    And I navigate to my "Custom message report" report
+    And I press "Edit this report"
+    And I switch to "Access" tab
     And the field "Only certain users can view this report (see below)" matches value "1"
     And I set the field "Authenticated user" to "1"
     And I press "Save changes"
-    And I click on "Content" "link" in the ".tabtree" "css_element"
+    And I switch to "Content" tab
     And I set the field "Show records matching all of the checked criteria below" to "true"
     And I set the field "Show records based on user" to "1"
     And I set the field "Records for user's direct reports for any of the user's job assignments" to "1"

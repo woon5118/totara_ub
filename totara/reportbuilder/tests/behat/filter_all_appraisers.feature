@@ -27,12 +27,12 @@ Feature: Use the multi-item appraiser filter
       | user3   | manager2 | appraiser1 |
       | user4   | manager3 | appraiser2 |
       | user5   |          | appraiser3 |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname     | shortname           | source | accessmode |
+      | Users Report | report_users_report | user   | 1          |
     And I log in as "admin"
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    Given I set the field "Report Name" to "Users Report"
-    And I set the field "Source" to "user"
-    And I press "Create report"
+    And I follow "Users Report"
     And I switch to "Filters" tab
     And I select "User's Appraiser(s)" from the "newstandardfilter" singleselect
     And I press "Add"

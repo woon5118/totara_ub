@@ -35,18 +35,17 @@ Feature: Seminar sessions report overview
     # Enable roles for student and trainer
     And I navigate to "Global settings" node in "Site administration > Seminars"
     And I click on "Learner" "checkbox" in the "#admin-facetoface_session_roles" "css_element"
-    # Trainer is ambigous with Editing Trainer
+    # Trainer is ambiguous with Editing Trainer
     And I click on "s__facetoface_session_roles[4]" "checkbox" in the "#admin-facetoface_session_roles" "css_element"
     And I press "Save changes"
 
     # Prepare report
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname        | shortname              | source             |
+      | Seminar Summary | report_seminar_summary | facetoface_summary |
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Seminar Summary          |
-      | Source      | Seminar Sessions |
-    And I press "Create report"
-    And I click on "Columns" "link"
+    And I follow "Seminar Summary"
+    And I switch to "Columns" tab
     And I set the field "newcolumns" to "Number of Attendees"
     And I press "Add"
     And I set the field "newcolumns" to "Overbooking allowed"

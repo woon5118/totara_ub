@@ -14,7 +14,6 @@ Feature: Global report restrictions multiple interactions
       | user4    | User      | Four     | user4@example.invalid |
       | user5    | User      | Five     | user5@example.invalid |
       | user6    | User      | Six      | user6@example.invalid |
-    And I log in as "admin"
 
     # Set up audiences.
     Given the following "cohorts" exist:
@@ -27,6 +26,12 @@ Feature: Global report restrictions multiple interactions
       | user1 | CH0    |
       | user2 | CH0    |
       | user3 | CH0    |
+
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname        | shortname              | source         | accessmode | globalrestriction |
+      | User report     | report_user_report     | user           | 0          | 1                 |
+
+    And I log in as "admin"
     And I navigate to "Audiences" node in "Site administration > Audiences"
     And I follow "Dynamic audience"
     And I switch to "Rule sets" tab
@@ -145,19 +150,6 @@ Feature: Global report restrictions multiple interactions
     And I click on "Save" "button" in the "Assign a group to restriction" "totaradialogue"
     And I wait "1" seconds
     And I follow "All Restrictions"
-
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | User report |
-      | Source      | User        |
-    And I press "Create report"
-    And I switch to "Content" tab
-    And I set the field "Global report restrictions" to "1"
-    And I press "Save changes"
-    And I switch to "Access" tab
-    And I set the field "All users can view this report" to "1"
-    And I press "Save changes"
 
   Scenario: Test complex global report visibility
     Given I click on "Reports" in the totara menu

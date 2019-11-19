@@ -92,13 +92,11 @@ Feature: Seminar Event Registration Closure
     And I log in as "admin"
 
   Scenario: Session registration closure denies all pending requests and stops updates
-    Given I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Global Session Status |
-      | Source      | Seminar Sign-ups      |
-    And I press "Create report"
-    And I should see "Global Session Status"
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname              | shortname                    | source              |
+      | Global Session Status | report_global_session_status | facetoface_sessions |
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I follow "Global Session Status"
     And I switch to "Columns" tab
     And I add the "Status" column to the report
     And I click on "View This Report" "link"

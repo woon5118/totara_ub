@@ -1,7 +1,6 @@
 @totara @totara_reportbuilder @totara_scheduledreports @javascript
 Feature: Test the embedded scheduled reports report source.
 
-
   Background:
     Given I am on a totara site
     And the following "users" exist:
@@ -30,6 +29,11 @@ Feature: Test the embedded scheduled reports report source.
       | Audience #3 | 2        | Audience #3 | System       | 0         |
     And the following config values are set as admin:
       | allowedscheduledrecipients | audiences,systemusers,emailexternalusers | totara_reportbuilder |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname      | shortname         | source    | accessmode |
+      | Test Report#1 | report_user1      | user      | 0          |
+      | Test Report#2 | report_appraisal1 | appraisal | 0          |
+      | Test Report#3 | report_user2      | user      | 0          |
     And I log in as "admin"
     And I navigate to "Manage embedded reports" node in "Site administration > Reports"
     And I set the field "report-name" to "Scheduled reports"
@@ -39,34 +43,6 @@ Feature: Test the embedded scheduled reports report source.
     And I add the "Recipients (audiences)" column to the report
     And I add the "Recipients (system users)" column to the report
     And I add the "Recipients (external)" column to the report
-    And I press "Save changes"
-
-    Given I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Test Report#1"
-    And I set the field "Source" to "User"
-    And I press "Create report"
-    And I switch to "Access" tab
-    And I set the field "All users can view this report" to "1"
-    And I press "Save changes"
-
-    Given I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Test Report#2"
-    And I set the field "Source" to "Appraisal Status"
-    And I press "Create report"
-    And I switch to "Access" tab
-    And I set the field "All users can view this report" to "1"
-    And I press "Save changes"
-
-    Given I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Test Report#3"
-    And I set the field "Source" to "User"
-    And I press "Create report"
-    And I switch to "Access" tab
-    And I set the field "All users can view this report" to "1"
-    And I press "Save changes"
     And I log out
 
     Given I log in as "srm"

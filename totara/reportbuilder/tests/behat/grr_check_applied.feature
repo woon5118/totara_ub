@@ -10,7 +10,7 @@ Feature: Check global report restrictions default settings
     And I set the following administration settings values:
       | Enable report restrictions | 1 |
 
-  Scenario: Check default embeded report status
+  Scenario: Check default embedded report status
     Given I navigate to "Manage embedded reports" node in "Site administration > Reports"
     And I click on "Edit this report" "button"
     And I switch to "Columns" tab
@@ -30,12 +30,11 @@ Feature: Check global report restrictions default settings
     And I should see "No" in the "Goal Summary (View)" "table_row"
 
   Scenario: Check default created report status
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname        | shortname              | source         |
+      | Audience report | report_audience_report | cohort_members |
     Given I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Audience report  |
-      | Source      | Audience Members |
-    And I press "Create report"
+    And I follow "Audience report"
     And I switch to "Content" tab
     Then the field "Global report restrictions" matches value "1"
     When I follow "Manage user reports"

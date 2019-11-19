@@ -27,13 +27,12 @@ Feature: Test unrestricted user columns can be added and viewed by the admin
       | user3  | P1       | 1        | user1    |
       | user5  | P1       | 1        | user4    |
       | user6  | P1       | 1        | user4    |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname    | shortname          | source |
+      | User report | report_user_report | user   |
     And I log in as "admin"
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | User report |
-      | Source      | User        |
-    And I press "Create report"
+    And I follow "User report"
     And I should see "Edit Report 'User report'"
     And I switch to "Columns" tab
     And I add the "User's Email (ignoring user display setting)" column to the report

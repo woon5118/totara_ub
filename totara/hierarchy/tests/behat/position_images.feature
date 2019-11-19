@@ -9,6 +9,9 @@ Feature: Test use of images in positions and position custom fields
     And the following "position" frameworks exist:
       | fullname           | idnumber |
       | Test Pos Framework | tstposfw   |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname       | shortname             | source |
+      | Test Positions | report_test_positions | pos    |
     And I log in as "admin"
 
     # Add images to the private files block to use later
@@ -106,11 +109,7 @@ Feature: Test use of images in positions and position custom fields
     # Also check reports
     When I am on site homepage
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Name   | Test Positions |
-      | Source | Positions      |
-    And I press "Create report"
+    And I follow "Test Positions"
     Then I should see "Edit Report 'Test Positions'"
 
     When I switch to "Columns" tab

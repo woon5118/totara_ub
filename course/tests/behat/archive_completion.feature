@@ -85,7 +85,11 @@ Feature: Test we can manually archive course completion.
 
   @javascript @totara_reportbuilder
   Scenario: Grades are archived but can be viewed via report builder
-    Given I log in as "admin"
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname                                        | shortname                                              | source                |
+      | Test course completion report                   | report_test_course_completion_report                   | course_completion     |
+      | Test course completion including history report | report_test_course_completion_including_history_report | course_completion_all |
+    And I log in as "admin"
     And I am on "Course 1" course homepage with editing mode on
     And I navigate to "Course completion" node in "Course administration"
     And I click on "Expand all" "link"
@@ -129,12 +133,8 @@ Feature: Test we can manually archive course completion.
     And "//table[@id='completion-progress']//th/a[text()='Learner Three']/ancestor::tr//span[contains(@title, 'Completed')]" "xpath_element" should exist
     And "//table[@id='completion-progress']//th/a[text()='Learner Four']/ancestor::tr//span[contains(@title, 'Completed')]" "xpath_element" should exist
 
-    When I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Test course completion report |
-      | Source      | Course Completion             |
-    And I press "Create report"
+    When I navigate to my "Test course completion report" report
+    And I press "Edit this report"
     And I follow "Columns"
     And I set the field "newcolumns" to "Grade and required grade"
     And I set the field "newcustomheading" to "1"
@@ -167,14 +167,7 @@ Feature: Test we can manually archive course completion.
     And "Learner Three" row "Required grade" column of "report_test_course_completion_report" table should contain "57.1% (42.9% to complete)"
     And "Learner Four" row "Required grade" column of "report_test_course_completion_report" table should contain "85.7% (42.9% to complete)"
 
-    When I am on homepage
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Test course completion including history report |
-      | Source      | Course Completion Including History |
-    And I press "Create report"
-    And I follow "View This Report"
+    When I navigate to my "Test course completion including history report" report
     Then "Learner Three" row "Grade at time of completion" column of "report_test_course_completion_including_history_report" table should contain "57.1%"
     And "Learner Four" row "Grade at time of completion" column of "report_test_course_completion_including_history_report" table should contain "85.7%"
     And I should not see "Learner One"

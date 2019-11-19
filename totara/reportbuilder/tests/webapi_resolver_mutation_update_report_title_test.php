@@ -47,7 +47,7 @@ class totara_reportbuilder_webapi_resolver_mutation_update_report_title_testcase
     private function create_report($source, $fullname) {
         /** @var totara_reportbuilder_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_reportbuilder');
-        return $generator->create_default_standard_report([
+        return $generator->create_default_custom_report([
             'fullname' => $fullname,
             'shortname' => \reportbuilder::create_shortname($fullname),
             'source' => $source

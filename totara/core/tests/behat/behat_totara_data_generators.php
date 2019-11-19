@@ -273,7 +273,7 @@ class behat_totara_data_generators extends behat_base {
                 'required' => array()
             ),
             'standard_report' => array(
-                'datagenerator' => 'default_standard_report',
+                'datagenerator' => 'default_custom_report',
                 'required' => array('fullname', 'shortname', 'source'),
             )
         ),

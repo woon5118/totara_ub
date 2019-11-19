@@ -46,13 +46,12 @@ Feature: Verify menuofchoices custom field filter works in the reports
     And I press "Save and display"
 
     # Create 'courses' custom report.
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname            | shortname                  | source  |
+      | Test courses report | report_test_courses_report | courses |
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Test courses report |
-      | Source      | Courses             |
-    And I press "Create report"
-    And I follow "Filters"
+    And I follow "Test courses report"
+    And I switch to "Filters" tab
     And I set the field "newstandardfilter" to "Course menu"
     And I press "Add"
     And I press "Save changes"

@@ -14,21 +14,12 @@ Feature: Create global report no restrictions
       | user4    | User      | Four     | user4@example.invalid |
       | user5    | User      | Five     | user5@example.invalid |
       | user6    | User      | Six      | user6@example.invalid |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname        | shortname              | source         | accessmode | globalrestriction |
+      | User report     | report_user_report     | user           | 0          | 1                 |
     And I log in as "admin"
     And I set the following administration settings values:
       | Enable report restrictions | 1 |
-    And I press "Save changes"
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | User report |
-      | Source      | User        |
-    And I press "Create report"
-    And I switch to "Content" tab
-    And I set the field "Global report restrictions" to "1"
-    And I press "Save changes"
-    And I switch to "Access" tab
-    And I set the field "All users can view this report" to "1"
     And I press "Save changes"
     And I navigate to "Global report restrictions" node in "Site administration > Reports"
     And I press "New restriction"

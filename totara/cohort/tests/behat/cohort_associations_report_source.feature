@@ -76,11 +76,11 @@ Feature: Test the cohort associations report source.
 
   # -------------------------------
   Scenario: cohort_associations_rs_00: custom report contents
-    Given I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Audiences"
-    And I set the field "Source" to "Audience: Enrolled Learning"
-    And I press "Create report"
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname  | shortname        | source              |
+      | Audiences | report_audiences | cohort_associations |
+    And I navigate to my "Audiences" report
+    And I press "Edit this report"
     And I switch to "Columns" tab
     And I change the "Name" column to "Name (with icon and link)" in the report
     And I add the "Audience Name" column to the report
@@ -88,7 +88,6 @@ Feature: Test the cohort associations report source.
     And I add the "Assignment due date" column to the report
     And I add the "Actual due date" column to the report
     And I add the "Actions" column to the report
-    And I press "Save changes"
 
     Given I switch to "Filters" tab
     And I select "Audience Name" from the "newstandardfilter" singleselect
@@ -158,7 +157,6 @@ Feature: Test the cohort associations report source.
     And I change the "Name" column to "Name (with icon and link)" in the report
     And I add the "Audience Name" column to the report
     And I add the "Id" column to the report
-    And I press "Save changes"
 
     Given I switch to "Filters" tab
     And I select "Audience Name" from the "newstandardfilter" singleselect

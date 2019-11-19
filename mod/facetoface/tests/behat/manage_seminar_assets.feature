@@ -8,6 +8,9 @@ Feature: Ability to view the seminar's asset, even though the asset is being use
     And the following "global assets" exist in "mod_facetoface" plugin:
       | name   |
       | asset1 |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname      | shortname            | source             |
+      | Asset Session | report_asset_session | facetoface_summary |
 
   @javascript
   Scenario: Seminar asset is displaying within the report builder
@@ -40,16 +43,12 @@ Feature: Ability to view the seminar's asset, even though the asset is being use
     And I click on "Save changes" "button"
     And I should see "In progress"
     And I navigate to "Reports > Manage user reports" in site administration
-    And I click on "Create report" "button"
-    And I set the following fields to these values:
-      | fullname | Asset Session    |
-      | source   | Seminar Sessions |
-    And I click on "Create report" "button"
-    And I click on "Columns" "link"
+    And I follow "Asset Session"
+    And I switch to "Columns" tab
     And I set the field "newcolumns" to "Asset Name"
     And I click on "Add" "button"
     And I click on "Save changes" "button"
-    And I click on "Filters" "link"
+    And I switch to "Filters" tab
     And I set the field "newstandardfilter" to "Asset Availability"
     And I click on "Add" "button"
     And I click on "Save changes" "button"

@@ -198,8 +198,6 @@ class behat_totara_hierarchy extends behat_base {
         $data = $table->getHash();
         $firstrow = reset($data);
 
-        file_put_contents('/tmp/hash.txt', var_export($data, true));
-
         // Check required fields are present.
         foreach ($required as $reqname) {
             if (!isset($firstrow[$reqname])) {

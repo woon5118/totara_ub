@@ -16,22 +16,9 @@ Feature: Verify the columns and filters of a the Learning plans report source.
       | learner1 | Learning Plan 2 |
       | learner1 | Learning Plan 3 |
       | learner1 | Learning Plan 4 |
-
-    When I log in as "admin"
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Learning Plans |
-      | Source      | Learning Plans |
-    And I press "Create report"
-    Then I should see "Edit Report 'Learning Plans'"
-
-    # Make the report avaialbel to everyone.
-    When I switch to "Access" tab
-    And I click on "All users can view this report" "radio"
-    And I press "Save changes"
-    Then I should see "Report Updated"
-    And I log out
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname       | shortname             | source  | accessmode |
+      | Learning Plans | report_learning_plans | dp_plan | 0          |
 
     # Login as the learner and progress plans 2, 3 and 4 to pending approval.
     When I log in as "learner1"

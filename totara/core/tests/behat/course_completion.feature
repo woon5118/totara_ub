@@ -60,6 +60,9 @@ Feature: Users completion of courses
 
   @javascript
   Scenario: Test course deletion only removes records relating to that course
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname                    | shortname                          | source                |
+      | Historic Completions Report | report_historic_completions_report | course_completion_all |
     When I log in as "user001"
     And I am on "Course 1" course homepage
     And I click on "Activity One" "link"
@@ -84,12 +87,7 @@ Feature: Users completion of courses
     And I navigate to "Completions archive" node in "Course administration"
     And I press "Continue"
     And I press "Continue"
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Historic Completions Report"
-    And I set the field "Source" to "Course Completion Including History"
-    And I press "Create report"
-    And I click on "View This Report" "link"
+    And I navigate to my "Historic Completions Report" report
     Then I should see "No" in the "Course 1" "table_row"
     And I should see "No" in the "Course 2" "table_row"
     When I click on "Home" in the totara menu

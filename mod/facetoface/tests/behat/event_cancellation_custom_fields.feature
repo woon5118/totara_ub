@@ -197,18 +197,16 @@ Feature: Seminar event cancellation custom fields
     And I should see the "Green leaves on customfield text area" image in the "//dt[contains(., 'canceltextarea')]//following-sibling::dd" "xpath_element"
     And I should see image with alt text "Green leaves on customfield text area"
 
-
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_501: create seminar events custom report with custom cancellation fields
-    Given I log out
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname                 | shortname                       | source             |
+      | Custom test event report | report_custom_test_event_report | facetoface_summary |
+    And I log out
     And I log in as "admin"
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | fullname | Custom test event report |
-      | source   | Seminar Sessions         |
-    And I press "Create report"
-    And I click on "Columns" "link"
+    And I follow "Custom test event report"
+    And I switch to "Columns" tab
     And I set the field "newcolumns" to "cancelcheckbox"
     And I press "Add"
     And I set the field "newcolumns" to "canceldatetime"

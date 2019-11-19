@@ -19,16 +19,10 @@ Feature: Report builder table block
       | learner7    | Learner   | 7        |
       | learner8    | Learner   | 8        |
       | learner9    | Learner   | 9        |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname    | shortname          | source | recordsperpage | accessmode |
+      | User report | report_user_report | user   | 5              | 1          |
     And I log in as "admin"
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | User report |
-      | Source      | User        |
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Number of records per page | 5 |
-    And I press "Save changes"
 
   Scenario: Test report block navigation without sid
     # Add and configure block without sid
@@ -64,7 +58,7 @@ Feature: Report builder table block
 
   Scenario: Test report block navigation with sid
     # Create saved search for report.
-    And I click on "View This Report" "link"
+    And I navigate to my "User report" report
     # User filter field.
     And I set the following fields to these values:
       | user-fullname | learner |
@@ -123,7 +117,9 @@ Feature: Report builder table block
 
   Scenario: Test report block navigation with sid from filter
   # Add Filter
-    And I click on "Filters" "link"
+    And I navigate to my "User report" report
+    And I press "Edit this report"
+    And I switch to "Filters" tab
     And I set the following fields to these values:
       | newsearchcolumn | User's Fullname |
     And I press "Save changes"
@@ -176,6 +172,8 @@ Feature: Report builder table block
 
   Scenario: Test block settings by user that does not have access to report
     # Make report public
+    And I navigate to my "User report" report
+    And I press "Edit this report"
     And I switch to "Access" tab
     And I click on "All users can view this report" "radio"
     And I press "Save changes"
@@ -213,7 +211,7 @@ Feature: Report builder table block
 
   Scenario: Test block settings when report saved search became not public
     # Make public saved search
-    And I click on "View This Report" "link"
+    And I navigate to my "User report" report
     And I set the following fields to these values:
       | user-fullname | learner |
     # "Search" button ambigous with "Search by" form section

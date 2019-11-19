@@ -18,6 +18,9 @@ Feature: Seminar timezones in reports
       | user  | course | role    |
       | user1 | C1     | student |
       | user2 | C1     | student |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname     | shortname           | source              |
+      | F2F sessions | report_f2f_sessions | facetoface_sessions |
 
     And I log in as "admin"
     And I am on "Course 1" course homepage with editing mode on
@@ -117,11 +120,8 @@ Feature: Seminar timezones in reports
     And I press "Confirm"
     And I wait until "Second User" "text" exists
 
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "F2F sessions"
-    And I set the field "Source" to "Seminar Sign-ups"
-    And I press "Create report"
+    And I navigate to my "F2F sessions" report
+    And I press "Edit this report"
     And I switch to "Columns" tab
     And I add the "Session Finish Date/Time" column to the report
     And I add the "Session Start Date/Time (linked to activity)" column to the report
@@ -162,6 +162,9 @@ Feature: Seminar timezones in reports
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname    | shortname          | source             |
+      | F2F summary | report_f2f_summary | facetoface_summary |
 
     And I log in as "admin"
     And I am on "Course 1" course homepage with editing mode on
@@ -211,11 +214,8 @@ Feature: Seminar timezones in reports
     And I press "OK"
     And I press "Save changes"
 
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "F2F summary"
-    And I set the field "Source" to "Seminar Sessions"
-    And I press "Create report"
+    And I navigate to my "F2F summary" report
+    And I press "Edit this report"
     And I switch to "Columns" tab
     And I add the "Session Start Date/Time (linked to activity)" column to the report
     And I add the "Session Start Date/Time" column to the report

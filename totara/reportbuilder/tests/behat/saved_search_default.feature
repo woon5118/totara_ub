@@ -11,12 +11,13 @@ Feature: Test that saved search defaults in report builder works correctly
       | user2    | User2-firstname  | Test     | user2@example.com     |
       | user3    | User3-firstname  | Test     | user3@example.com     |
       | user4    | User4-firstname  | Test     | user4@example.com     |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname             | shortname                   | source |
+      | Custom user report 1 | report_custom_user_report_1 | user   |
+      | Custom user report 2 | report_custom_user_report_2 | user   |
     And I log in as "admin"
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Custom user report 1"
-    And I set the field "Source" to "User"
-    When I press "Create report"
+    And I follow "Custom user report 1"
     Then I should see "Edit Report 'Custom user report 1'"
     When I switch to "Access" tab
     And I set the following fields to these values:
@@ -25,10 +26,7 @@ Feature: Test that saved search defaults in report builder works correctly
     Then I should see "Report Updated"
 
     When I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Custom user report 2"
-    And I set the field "Source" to "User"
-    And I press "Create report"
+    And I follow "Custom user report 2"
     Then I should see "Edit Report 'Custom user report 2'"
     When I switch to "Access" tab
     And I set the following fields to these values:

@@ -8,6 +8,10 @@ Feature: Verify grpconcat_menu custom field filter works in the reports
       | hierarchy    | idnumber | fullname            |
       | organisation | OrgType  | Organisation type 1 |
 
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname         | shortname               | source |
+      | Test user report | report_test_user_report | user   |
+
     # Create custom field.
     And I log in as "admin"
     And I navigate to "Manage types" node in "Site administration > Organisations"
@@ -62,11 +66,7 @@ Feature: Verify grpconcat_menu custom field filter works in the reports
 
     # Create 'users' custom report.
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Test user report |
-      | Source      | User             |
-    And I press "Create report"
+    And I follow "Test user report"
     And I follow "Filters"
     And I set the field "newstandardfilter" to "Org menu"
     And I press "Add"

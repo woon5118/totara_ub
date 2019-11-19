@@ -11,6 +11,9 @@ Feature: The Certification Completion report displays correctly for a learner.
       | fullname         | shortname | format | enablecompletion |
       | Certify Course   | CC1       | topics | 1                |
       | Recertify Course | RC1       | topics | 1                |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname                        | shortname   | source                   | accessmode |
+      | Certification Completion Report | certif_comp | certification_completion | 0          |
     And I log in as "admin"
     And I set self completion for "Certify Course" in the "Miscellaneous" category
     And I set self completion for "Recertify Course" in the "Miscellaneous" category
@@ -44,16 +47,6 @@ Feature: The Certification Completion report displays correctly for a learner.
       | program | user    |
       | tstcert | user001 |
       | tstcert | user002 |
-
-    # Add Certification Completion report so we can check the status.
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Certification Completion Report"
-    And I set the field "Source" to "Certification Completion"
-    And I press "Create report"
-    And I follow "Access"
-    And I click on "All users can view this report" "radio"
-    And I press "Save changes"
     And I log out
 
   Scenario: A users certification red-amber-green status is correct

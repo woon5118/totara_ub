@@ -20,6 +20,9 @@ Feature: Test the visibility to see the seminar events report depending on the c
       | activity   | name           | course  | idnumber |
       | facetoface | Seminar 17392A | C17392A | S17392A  |
       | facetoface | Seminar 17392B | C17392B | S17392B  |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname       | shortname      | source            | accessmode |
+      | Seminar Events | seminar_events | facetoface_events | 0          |
 
     And I am on "Course 17392A" course homepage
     And I follow "Seminar 17392A"
@@ -29,16 +32,6 @@ Feature: Test the visibility to see the seminar events report depending on the c
     And I am on "Course 17392B" course homepage
     And I follow "Seminar 17392B"
     And I follow "Add event"
-    And I press "Save changes"
-
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Seminar Events"
-    And I set the field "Source" to "Seminar Events"
-    And I press "Create report"
-    And I wait until "Edit Report 'Seminar Events'" "text" exists
-    And I click on "Access" "link" in the ".tabtree" "css_element"
-    And I set the field "All users can view this report" to "1"
     And I press "Save changes"
     And I log out
 

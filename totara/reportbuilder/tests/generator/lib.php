@@ -318,9 +318,110 @@ class totara_reportbuilder_generator extends component_generator_base {
     }
 
     /**
+     * Creates report only with the columns/filters defined in the default report properties.
+     *
+     * @param $record
+     *
+     * @return int report ID
+     */
+    public function create_default_custom_report($record) {
+        global $DB, $CFG;
+        require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
+
+        $defaults = [
+            'hidden'            => 0,
+            'accessmode'        => REPORT_BUILDER_ACCESS_MODE_NONE,
+            'contentmode'       => REPORT_BUILDER_CONTENT_MODE_NONE,
+            'recordsperpage'    => 40,
+            'toolbarsearch'     => 1,
+            'globalrestriction' =>  get_config('reportbuilder', 'globalrestrictiondefault'),
+            'timemodified'      => time(),
+            'defaultsortorder'  => SORT_ASC
+        ];
+
+        if (!is_array($record)) {
+            $record = (array)$record;
+        }
+
+        // Update record defaults here.
+        foreach ($defaults as $key => $value) {
+            if (!isset($record[$key])) {
+                $record[$key] = $value;
+            }
+        }
+
+        // It is not possible to create custom embedded reports.
+        $record['embed'] = 0;
+
+        $id = $DB->insert_record('report_builder', $record, true);
+
+        // Restrict report access to the site administrators only.
+        if ($record['accessmode'] == REPORT_BUILDER_ACCESS_MODE_ANY) {
+            reportbuilder_set_default_access($id);
+        }
+
+        $src = reportbuilder::get_source_object($record['source']);
+
+        // Create columns for new report based on default columns.
+        if (isset($src->defaultcolumns) && is_array($src->defaultcolumns)) {
+            $so = 1;
+            foreach ($src->defaultcolumns as $option) {
+                $heading = isset($option['heading']) ? $option['heading'] : null;
+                $hidden = isset($option['hidden']) ? $option['hidden'] : 0;
+                $column = $src->new_column_from_option($option['type'],
+                    $option['value'], null, null, $heading, !empty($heading), $hidden);
+                $todb = new stdClass();
+                $todb->reportid = $id;
+                $todb->type = $column->type;
+                $todb->value = $column->value;
+                $todb->heading = $column->heading;
+                $todb->hidden = $column->hidden;
+                $todb->transform = $column->transform;
+                $todb->aggregate = $column->aggregate;
+                $todb->sortorder = $so;
+                $todb->customheading = 0; // initially no columns are customised
+                $DB->insert_record('report_builder_columns', $todb);
+                $so++;
+            }
+        }
+
+        // Create filters for new report based on default filters.
+        if (isset($src->defaultfilters) && is_array($src->defaultfilters)) {
+            $so = 1;
+            foreach ($src->defaultfilters as $option) {
+                $todb = new stdClass();
+                $todb->reportid = $id;
+                $todb->type = $option['type'];
+                $todb->value = $option['value'];
+                $todb->advanced = isset($option['advanced']) ? $option['advanced'] : 0;
+                $todb->defaultvalue = isset($option['defaultvalue']) ? serialize($option['defaultvalue']) : '';
+                $todb->sortorder = $so;
+                $todb->region = isset($option['region']) ? $option['region'] : rb_filter_type::RB_FILTER_REGION_STANDARD;
+                $DB->insert_record('report_builder_filters', $todb);
+                $so++;
+            }
+        }
+
+        // Create toolbar search columns for new report based on default toolbar search columns.
+        if (isset($src->defaulttoolbarsearchcolumns) && is_array($src->defaulttoolbarsearchcolumns)) {
+            foreach ($src->defaulttoolbarsearchcolumns as $option) {
+                $todb = new stdClass();
+                $todb->reportid = $id;
+                $todb->type = $option['type'];
+                $todb->value = $option['value'];
+                $DB->insert_record('report_builder_search_cols', $todb);
+            }
+        }
+
+        return $id;
+    }
+
+    /**
      * First created the report
      * then injected the default columns
      * for the report
+     *
+     * @deprecated since Totara 13
      *
      * @param array $record
      * @return int $record id

@@ -18,15 +18,12 @@ Feature: Multichoice category report filter
       | Course 1a | c1a       | cat1a    |
       | Course 1b | c1b       | cat1b    |
       | Course 2  | c2        | cat2     |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname      | shortname            | source  |
+      | Course report | report_course_report | courses |
     And I log in as "admin"
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Course report |
-      | Source      | Courses       |
-    And I click on "Create report" "button"
+    And I navigate to my "Course report" report
     # The category multichoice filter is a default one.
-    And I click on "View This Report" "link"
     Then I should see "Course 0"
     And I should see "Course 1z"
     And I should see "Course 1a"

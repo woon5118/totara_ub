@@ -135,7 +135,10 @@ Feature: Program courses can be ordered within a courseset
     And "//*[text()='Test Course 3']//a[contains(@class, 'coursedownlink')]" "xpath_element" in the "//body" "xpath_element" should not be visible
 
   Scenario: Ensure ordered courses within a program appear correctly in the Program Overview report builder report
-    Given I log in as "admin"
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname         | shortname | source           |
+      | Program Overview | report_po | program_overview |
+    And I log in as "admin"
     When I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Test Program 1" "link"
@@ -161,11 +164,8 @@ Feature: Program courses can be ordered within a courseset
     And "Test Course 4" "text" should appear after "Test Course 1" "text"
     And "Test Course 3" "text" should appear after "Test Course 4" "text"
 
-    When I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Program Overview"
-    And I set the field "Source" to "Program Overview"
-    And I press "Create report"
+    When I navigate to my "Program Overview" report
+    And I press "Edit this report"
     Then I should see "Edit Report 'Program Overview'"
     When I switch to "Access" tab
     And I set the following fields to these values:
@@ -191,6 +191,9 @@ Feature: Program courses can be ordered within a courseset
     And the following "program assignments" exist in "totara_program" plugin:
       | program        | user    |
       | certification1 | user001 |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname               | shortname | source                 |
+      | Certification Overview | report_co | certification_overview |
     When I log in as "admin"
     And I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I click on "Miscellaneous" "link"
@@ -217,11 +220,8 @@ Feature: Program courses can be ordered within a courseset
     And "Test Course 4" "text" should appear after "Test Course 1" "text"
     And "Test Course 3" "text" should appear after "Test Course 4" "text"
 
-    When I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Certification Overview"
-    And I set the field "Source" to "Certification Overview"
-    And I press "Create report"
+    When I navigate to my "Certification Overview" report
+    And I press "Edit this report"
     Then I should see "Edit Report 'Certification Overview'"
     When I switch to "Access" tab
     And I set the following fields to these values:

@@ -13,6 +13,9 @@ Feature: Event Name Site Logs report filter
     And the following "courses" exist:
       | fullname | shortname | format |
       | Course 1 | C1        | topics |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname  | shortname        | source        |
+      | Site Logs | report_site_logs | site_logstore |
 
   @javascript
   Scenario: Test site logs event name filter
@@ -22,12 +25,8 @@ Feature: Event Name Site Logs report filter
       | Custom instance name | Self enrolment |
 
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Site Logs |
-      | Source      | Site Logs |
-    And I click on "Create report" "button"
-    And I follow "Columns"
+    And I follow "Site Logs"
+    And I switch to "Columns" tab
     And I add the "Event Class Name" column to the report
     And I log out
 

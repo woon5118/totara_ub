@@ -26,6 +26,9 @@ Feature: Test the site logstore report
       | activity   | name            | course               | idnumber  | anonymous | publish_stats | section |
       | feedback   | Site feedback   | Acceptance test site | feedback0 | 2         | 1             | 1       |
       | feedback   | Course feedback | C1                   | feedback1 | 2         | 1             | 0       |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname  | shortname        | source        |
+      | Site Logs | report_site_logs | site_logstore |
     When I log in as "manager"
     And I am on site homepage
     And I follow "Site feedback"
@@ -56,11 +59,7 @@ Feature: Test the site logstore report
 
     And I log in as "admin"
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Site Logs |
-      | Source      | Site Logs |
-    And I press "Create report"
+    And I follow "Site Logs"
     And I switch to "Columns" tab
     And I add the "Event Name (linked to event source)" column to the report
     When I follow "View This Report"
@@ -69,5 +68,4 @@ Feature: Test the site logstore report
     And I should see "Course module viewed"
     And I should see "User logged out"
     And I should see "Response submitted"
-    And I should see "Report created"
     And I should see "Report updated"

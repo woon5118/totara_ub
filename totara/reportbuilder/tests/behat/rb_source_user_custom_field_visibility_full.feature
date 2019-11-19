@@ -173,12 +173,12 @@ Feature: Full visibility of user report source custom field values
 
 
   Scenario: rb_source_user_customfield000: view report with full custom field visibility as various users
-    Given I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Full visibility user report"
-    And I set the field "Source" to "User"
-    And I press "Create report"
-    And I follow "Columns"
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname                    | shortname                          | source | accessmode |
+      | Full visibility user report | report_full_visibility_user_report | user   | 0          |
+    And I navigate to my "Full visibility user report" report
+    And I press "Edit this report"
+    And I switch to "Columns" tab
     And I add the "TestCheckbox" column to the report
     And I add the "TestDate" column to the report
     And I add the "TestDT1" column to the report
@@ -186,10 +186,6 @@ Feature: Full visibility of user report source custom field values
     And I add the "TestMenu" column to the report
     And I add the "TestTextArea" column to the report
     And I add the "TestTextField" column to the report
-
-    Given I click on "Access" "link" in the ".tabtree" "css_element"
-    And I click on "All users can view this report" "radio"
-    And I press "Save changes"
 
     When I navigate to my "Full visibility user report" report
     And the following should exist in the "report_full_visibility_user_report" table:

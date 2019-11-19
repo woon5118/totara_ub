@@ -5,14 +5,13 @@ Feature: Global restriction initial display setting
   I need to be able to enable Global restriction initial display
 
   Scenario: Enable global restriction initial display
-    Given I log in as "admin"
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname  | shortname        | source        |
+      | Site Logs | report_site_logs | site_logstore |
+    And I log in as "admin"
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Site Logs |
-      | Source      | Site Logs |
-    And I click on "Create report" "button"
-    And I follow "Columns"
+    And I follow "Site Logs"
+    And I switch to "Columns" tab
     And I add the "Event Class Name" column to the report
     When I switch to "Performance" tab
     Then I should not see "'Restrict initial display in all report builder reports' setting has been enabled."
@@ -20,7 +19,6 @@ Feature: Global restriction initial display setting
     When I click on "View This Report" "link"
     Then I should see "\core\event\course_viewed"
     And I should see "\core\event\user_loggedin"
-    And I should see "\totara_reportbuilder\event\report_created"
     And I should see "\totara_reportbuilder\event\report_updated"
 
     And I set the following administration settings values:
@@ -38,5 +36,4 @@ Feature: Global restriction initial display setting
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then I should see "\core\event\course_viewed"
     And I should not see "\core\event\user_loggedin"
-    And I should not see "\totara_reportbuilder\event\report_created"
     And I should not see "\totara_reportbuilder\event\report_updated"

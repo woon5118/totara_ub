@@ -33,15 +33,15 @@ Feature: Use the multi-item hierarchy filter
       | user2 | pos1     | org2         |
       | user3 | pos2     | org1         |
       | user4 | pos2     | org2         |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname | shortname | source |
+      | Users    | user      | user   |
     And I log in as "admin"
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
+    And I navigate to my "Users" report
+    And I press "Edit this report"
 
   Scenario: Use position filter with User report source
-    Given I set the field "Report Name" to "Users"
-    And I set the field "Source" to "user"
-    And I press "Create report"
-    And I switch to "Filters" tab
+    Given I switch to "Filters" tab
     And I select "User's Position(s)" from the "newstandardfilter" singleselect
     And I press "Add"
     And I select "User's Position Framework ID Number(s)" from the "newstandardfilter" singleselect
@@ -85,10 +85,7 @@ Feature: Use the multi-item hierarchy filter
     And I should not see "user5" in the ".reportbuilder-table" "css_element"
 
   Scenario: Use organisation filter with User report source
-    Given I set the field "Report Name" to "Users"
-    And I set the field "Source" to "User"
-    And I press "Create report"
-    And I switch to "Filters" tab
+    Given I switch to "Filters" tab
     And I select "User's Organisation(s)" from the "newstandardfilter" singleselect
     And I press "Save changes"
     And I follow "View This Report"
@@ -121,10 +118,7 @@ Feature: Use the multi-item hierarchy filter
     And I should not see "user5" in the ".reportbuilder-table" "css_element"
 
   Scenario: Hierachy filters controls are disabled when filter is not used
-    Given I set the field "Report Name" to "Users"
-    And I set the field "Source" to "User"
-    And I press "Create report"
-    And I switch to "Filters" tab
+    Given I switch to "Filters" tab
     And I select "User's Organisation(s)" from the "newstandardfilter" singleselect
     And I press "Add"
     And I select "User's Position(s)" from the "newstandardfilter" singleselect

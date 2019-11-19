@@ -6,18 +6,14 @@ Feature: Test that report builder can export reports
 
   Background: Set up a user report
     Given I am on a totara site
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname       | shortname  | source |
+      | User report 1  | user       | user   |
     And I log in as "admin"
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "User report 1"
-    And I set the field "Source" to "User"
-    And I press "Create report"
 
   Scenario: Export report to CVS
     # NOTE: the CSV export is hacked to not force download in behat which makes it testable
-    Given I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I follow "User report 1"
-    And I follow "View This Report"
+    Given I navigate to my "User report 1" report
     And I set the field "id_format" to "CSV"
     And I click on "Export" "button"
     And I should see "\"User's Fullname\",Username,\"User Last Login\""
@@ -36,9 +32,7 @@ Feature: Test that report builder can export reports
     And the field "s_reportbuilder_exportoptions[wkpdflandscape]" matches value "0"
     And the field "s_reportbuilder_exportoptions[wkpdfportrait]" matches value "0"
 
-    When I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I follow "User report 1"
-    And I follow "View This Report"
+    When I navigate to my "User report 1" report
     Then the "format" select box should contain "CSV"
     And the "format" select box should contain "Excel"
     And the "format" select box should contain "ODS"
@@ -70,9 +64,7 @@ Feature: Test that report builder can export reports
       | s_reportbuilder_exportoptions[wkpdfportrait]  | 0 |
     And I press "Save changes"
     Then I should see "Changes saved"
-    When I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I follow "User report 1"
-    And I follow "View This Report"
+    When I navigate to my "User report 1" report
     Then the "format" select box should contain "CSV"
     And the "format" select box should contain "csv_excel"
     And the "format" select box should not contain "Excel"
@@ -125,9 +117,7 @@ Feature: Test that report builder can export reports
     And the field "exportoptions[pdflandscape]" matches value "0"
     And the field "exportoptions[pdfportrait]" matches value "0"
 
-    When I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I follow "User report 1"
-    And I follow "View This Report"
+    When I navigate to my "User report 1" report
     Then the "format" select box should contain "CSV"
     And the "format" select box should contain "csv_excel"
     And the "format" select box should not contain "Excel"

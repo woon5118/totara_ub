@@ -71,7 +71,7 @@ class totara_hierarchy_organisation_dialog_content_hierarchy_get_framework_testc
         /** @var totara_reportbuilder_generator $reportgenerator */
         $reportgenerator = $generator->get_plugin_generator("totara_reportbuilder");
 
-        $rid = $reportgenerator->create_default_standard_report((object)[
+        $rid = $reportgenerator->create_default_custom_report((object)[
             'fullname' => 'ROL',
             'shortname' => 'ROL',
             'source' => 'dp_certification',

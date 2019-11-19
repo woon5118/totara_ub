@@ -12,6 +12,9 @@ Feature: Verify I can see all appropriate fields in the goal custom fields repor
     And the following "goal" hierarchy exists:
       | framework | fullname       | idnumber | description                              |
       | CGF1      | Company Goal 1 | CG1      | <p>Precise and accurate description!</p> |
+    And the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname                  | shortname                        | source      |
+      | Goal Custom Fields report | report_goal_custom_fields_report | goal_custom |
 
     # Add a couple of goals to the admin user.
     And I log in as "admin"
@@ -33,20 +36,16 @@ Feature: Verify I can see all appropriate fields in the goal custom fields repor
   Scenario: Verify the basic goal fields can be see in the Goal Custom Fields report.
     Given I log in as "admin"
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Goal Custom Fields report |
-      | Source      | Goal Custom Fields        |
-    And I press "Create report"
+    And I follow "Goal Custom Fields report"
 
     # Add the description column to the report.
-    And I follow "Columns"
+    And I switch to "Columns" tab
     And I set the field "newcolumns" to "Goal Description"
     And I press "Add"
     And I press "Save changes"
 
     # Add the description filter to the report.
-    And I follow "Filters"
+    And I switch to "Filters" tab
     And I set the field "newstandardfilter" to "Goal Description"
     And I press "Add"
     And I press "Save changes"
@@ -96,14 +95,10 @@ Feature: Verify I can see all appropriate fields in the goal custom fields repor
     And I log out
     And I log in as "admin"
     And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Goal Custom Fields report |
-      | Source      | Goal Custom Fields        |
-    And I press "Create report"
+    And I follow "Goal Custom Fields report"
 
     # Add the description column to the report.
-    And I follow "Columns"
+    And I switch to "Columns" tab
     And I set the field "newcolumns" to "Status"
     And I press "Add"
     And I set the field "newcolumns" to "Target date"

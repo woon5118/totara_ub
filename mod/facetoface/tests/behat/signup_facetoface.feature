@@ -150,6 +150,9 @@ Feature: Sign up to a seminar
 
   @totara_customfield
   Scenario: Sign up with note and ensure that other reports do not have manage button
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname       | shortname           | source              |
+      | Other sign-ups | report_f2f_sessions | facetoface_sessions |
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I should see "Sign-up"
@@ -161,16 +164,10 @@ Feature: Sign up to a seminar
     And I log out
 
     And I log in as "admin"
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Other sign-ups   |
-      | Source      | Seminar Sign-ups |
-    And I press "Create report"
-    And I click on "Columns" "link"
-    And I set the field "newcolumns" to "All sign up custom fields"
-    And I press "Add"
-    And I press "Save changes"
+    And I navigate to my "Other sign-ups" report
+    And I press "Edit this report"
+    And I switch to "Columns" tab
+    And I add the "All sign up custom fields" column to the report
     And I click on "Reports" in the totara menu
     When I click on "Other sign-ups" "link"
     Then I should not see "edit" in the "Sam1 Student1" "table_row"
@@ -466,6 +463,9 @@ Feature: Sign up to a seminar
     And I should see image with alt text "Green leaves on customfield text area"
 
   Scenario: bulk adding and removing attendees saves custom field data for all users
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname              | shortname           | source              |
+      | Seminar signup report | report_f2f_sessions | facetoface_sessions |
     When I log in as "admin"
     And I navigate to "Custom fields" node in "Site administration > Seminars"
 
@@ -533,12 +533,8 @@ Feature: Sign up to a seminar
 
     When I log out
     And I log in as "admin"
-    And I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the following fields to these values:
-      | Report Name | Seminar signup report |
-      | Source      | Seminar Sign-ups      |
-    And I press "Create report"
+    And I navigate to my "Seminar signup report" report
+    And I press "Edit this report"
     And I switch to "Columns" tab
     And I change the "Session Start" column to "Signup input" in the report
     And I set the field "newcolumns" to "User cancellation input"

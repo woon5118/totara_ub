@@ -171,14 +171,13 @@ Feature: No visibility of user report source custom field values
       | Description | An international organization of evil bent on world domination |
     And I press "Update profile"
 
-
   Scenario: rb_source_user_customfield002: view report with custom field value admin only visibility as various users
-    Given I navigate to "Manage user reports" node in "Site administration > Reports"
-    And I press "Create report"
-    And I set the field "Report Name" to "Invisible user report"
-    And I set the field "Source" to "User"
-    And I press "Create report"
-    And I follow "Columns"
+    Given the following "standard_report" exist in "totara_reportbuilder" plugin:
+      | fullname              | shortname                    | source | accessmode |
+      | Invisible user report | report_invisible_user_report | user   | 0          |
+    And I navigate to my "Invisible user report" report
+    And I press "Edit this report"
+    And I switch to "Columns" tab
     And I add the "TestCheckbox" column to the report
     And I add the "TestDate" column to the report
     And I add the "TestDT1" column to the report
@@ -186,10 +185,6 @@ Feature: No visibility of user report source custom field values
     And I add the "TestMenu" column to the report
     And I add the "TestTextArea" column to the report
     And I add the "TestTextField" column to the report
-
-    Given I click on "Access" "link" in the ".tabtree" "css_element"
-    And I click on "All users can view this report" "radio"
-    And I press "Save changes"
 
     When I navigate to my "Invisible user report" report
     And the following should exist in the "report_invisible_user_report" table:
@@ -220,7 +215,6 @@ Feature: No visibility of user report source custom field values
     And I should not see "TestMenu"
     And I should not see "TestTextArea"
     And I should not see "TestTextField"
-
 
     Given I log out
     And I log in as "kaos"
