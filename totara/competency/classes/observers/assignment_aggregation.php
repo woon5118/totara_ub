@@ -35,17 +35,17 @@ class assignment_aggregation {
 
     public static function user_assigned(assignment_user_assigned $event) {
         // Simply mark the user for aggregation
-        (new aggregation_users_table())->queue_for_aggregation($event->relateduserid, $event->other['competency_id']);
+        (new aggregation_users_table())->queue_for_aggregation($event->relateduserid, $event->get_competency_id());
     }
 
     public static function user_unassigned(assignment_user_unassigned $event) {
         // Nothing needed for re-aggregation - parents will be picked up by childcompetency criteria
-        static::archive_user_achievements($event->relateduserid, $event->other['competency_id']);
+        static::archive_user_achievements($event->relateduserid, $event->get_competency_id());
     }
 
     public static function user_archived(assignment_user_archived $event) {
         // Nothing needed for re-aggregation - parents will be picked up by childcompetency criteria
-        static::archive_user_achievements($event->relateduserid, $event->other['competency_id']);
+        static::archive_user_achievements($event->relateduserid, $event->get_competency_id());
     }
 
     /**

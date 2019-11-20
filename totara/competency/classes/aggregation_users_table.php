@@ -369,8 +369,8 @@ class aggregation_users_table {
             $this->get_user_id_column() => $user_id_value,
         ];
 
-        if (!is_null($has_changed_value) && empty($this->has_changed_column)) {
-            $record[$this->get_has_changed_column()] = $has_changed_value;
+        if (!empty($this->has_changed_column)) {
+            $record[$this->get_has_changed_column()] = $has_changed_value ?? 0;
         }
 
         if (!empty($this->competency_id_column) && !empty($competency_id_value)) {

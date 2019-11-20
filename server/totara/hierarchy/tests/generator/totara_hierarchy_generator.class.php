@@ -892,6 +892,7 @@ class totara_hierarchy_generator extends component_generator_base {
      * @param $frameworkid
      * @param $prefix
      * @param null $record
+     * @param bool $trigger_event Trigger event flag - set to off to reduce overhead.
      * @return stdClass hierarchy item
      *
      * @todo Define an array of default values then use
@@ -900,7 +901,7 @@ class totara_hierarchy_generator extends component_generator_base {
      *       / remove the need for multiple statements
      *       beginning with: if (!isset($record['...
      */
-    public function create_hierarchy($frameworkid, $prefix, $record = null) {
+    public function create_hierarchy($frameworkid, $prefix, $record = null, bool $trigger_event = true) {
         global $DB, $USER, $CFG;
         require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
 
@@ -958,7 +959,7 @@ class totara_hierarchy_generator extends component_generator_base {
         $record = (object) $record;
         $hierarchy = hierarchy::load_hierarchy($prefix);
         $itemnew = $hierarchy->process_additional_item_form_fields($record);
-        $item = $hierarchy->add_hierarchy_item($itemnew, $itemnew->parentid, $itemnew->frameworkid, false, true, false);
+        $item = $hierarchy->add_hierarchy_item($itemnew, $itemnew->parentid, $itemnew->frameworkid, false, $trigger_event, false);
 
         return $item;
     }
@@ -971,9 +972,12 @@ class totara_hierarchy_generator extends component_generator_base {
      * @param int $quantity The number of hierarchies to create.
      * @param string $name The base name of the hierarchy.
      * @param int $randomise_percent Randomly determine (by percentage) if the hierarchy is created.
+     * @param array $hierarchy_extra_data
+     * @param bool $trigger_event Trigger event flag, turn off to reduce overhead on a large amount of data
      * @return array of hierarchies
+     * @throws coding_exception
      */
-    public function create_hierarchies($frameworkid, $prefix, $quantity, $name = '', $randomise_percent = 0, $hierarchy_extra_data = array() ) {
+    public function create_hierarchies($frameworkid, $prefix, $quantity, $name = '', $randomise_percent = 0, $hierarchy_extra_data = [], bool $trigger_event = true) {
         global $CFG;
         require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
 
@@ -993,7 +997,7 @@ class totara_hierarchy_generator extends component_generator_base {
             if ($randomise_percent == 0 || ($randomise_percent && get_random_act($randomise_percent))) {
                 $hierarchy_data['fullname'] = $name . ' ' . $number++;
                 $create_data = array_merge ($hierarchy_data, $hierarchy_extra_data);
-                $hierarchy = $this->create_hierarchy($frameworkid, $prefix, $create_data);
+                $hierarchy = $this->create_hierarchy($frameworkid, $prefix, $create_data, $trigger_event);
                 $hierarchy_ids[$i] = $hierarchy->id;
             }
         }
