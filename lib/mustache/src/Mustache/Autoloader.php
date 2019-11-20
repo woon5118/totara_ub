@@ -45,6 +45,13 @@ class Mustache_Autoloader
      */
     public static function register($baseDir = null)
     {
+        foreach (spl_autoload_functions() as $loader) {
+            if (is_array($loader) && $loader[0] instanceof self) {
+                return $loader;
+            }
+        }
+
+        // It's not already loaded.
         $loader = new self($baseDir);
         spl_autoload_register(array($loader, 'autoload'));
 
@@ -58,12 +65,12 @@ class Mustache_Autoloader
      */
     public function autoload($class)
     {
-        if ($class[0] === '\\') {
-            $class = substr($class, 1);
-        }
-
         if (strpos($class, 'Mustache') !== 0) {
             return;
+        }
+
+        if ($class[0] === '\\') {
+            $class = substr($class, 1);
         }
 
         $file = sprintf('%s/%s.php', $this->baseDir, str_replace('_', '/', $class));

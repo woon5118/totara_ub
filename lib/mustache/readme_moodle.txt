@@ -13,3 +13,5 @@ mv src /path/to/moodle/lib/mustache/
 mv LICENSE /path/to/moodle/lib/mustache/
 
 3) Add dynamic partial support from TL-9430
+
+4) Fix the autoloader registration again TL-23143
