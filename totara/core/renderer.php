@@ -216,8 +216,6 @@ class totara_core_renderer extends plugin_renderer_base {
      * @return array List of reports.
      */
     public function report_list_export_for_template($reports, $canedit) {
-        global $CFG;
-
         $report_list = array();
         $systemcontext = context_system::instance();
 

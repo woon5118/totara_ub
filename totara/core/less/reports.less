@@ -32,32 +32,35 @@
     padding: 1rem 0;
 
     &__item {
-        position: relative;
 
-        // Hover animation
-        transition-property: transform, box-shadow;
-        transition-duration: 200ms;
-        transition-timing-function: ease-in-out;
-        &:hover {
-            box-shadow: @totara_style-shadow_1;
-            transform: scale(1.01);
-        }
+        &__content {
+            position: relative;
 
-        &__title {
-            font-weight: 600;
-        }
+            // Hover animation
+            transition-property: transform, box-shadow;
+            transition-duration: 200ms;
+            transition-timing-function: ease-in-out;
+            &:hover {
+                box-shadow: @totara_style-shadow_1;
+                transform: scale(1.01);
+            }
 
-        // This is an trick for accessibility where rather than having the entire card be
-        // link, we expand a pseudo-element inside the link to cover the card. This prevents
-        // a screen reader trying to read out the whole card
-        // https://inclusive-components.design/cards/
-        &__link:after {
-            position: absolute;
-            content: ' ';
-            left: 0;
-            top: 0;
-            bottom: 0;
-            right: 0;
+            &__title {
+                font-weight: 600;
+            }
+
+            // This is an trick for accessibility where rather than having the entire card be
+            // link, we expand a pseudo-element inside the link to cover the card. This prevents
+            // a screen reader trying to read out the whole card
+            // https://inclusive-components.design/cards/
+            &__link:after {
+                position: absolute;
+                content: ' ';
+                left: 0;
+                top: 0;
+                bottom: 0;
+                right: 0;
+            }
         }
     }
 }
@@ -79,103 +82,73 @@
 @myReports_grid-border-color: @myReports_base-border-color;
 
 .totara_core__myreports__list--grid {
-    &:after {
-        display: block;
-        content: '';
-        clear: both;
-    }
-
     display: flex;
     flex-wrap: wrap;
-
-    @supports (display: grid) {
-        & {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(@myReports_grid-card-width, 1fr));
-            grid-auto-rows: max-content;
-
-            grid-column-gap: @myReports_grid-spacing;
-            grid-row-gap: @myReports_grid-spacing;
-
-            &:after {
-                display: none;
-            }
-        }
-    }
 
     & .totara_core__myreports__list {
 
         &__item {
-            max-height: @myReports_grid-card-height;
-            min-height: @myReports_grid-card-height / 2;
-            border: 1px solid @myReports_grid-border-color;
+            width: 100%;
 
-            display: flex;
-            flex-direction: column;
-
-            flex: 0 0 auto;
-
-            // fallback for when there isn't grid support
-            width: @myReports_grid-card-width;
-            margin-right: @myReports_grid-spacing;
-            margin-bottom: @myReports_grid-spacing;
-
-            @supports (display: grid) {
+            @media (min-width: @myReports_base-screen_xsm_min) {
                 & {
-                    // This just means fill the grid
+                    width: 50%;
+                }
+            }
+
+            @media (min-width: @totara_style-screen_md_min) {
+                & {
+                    width: 33%;
+                }
+            }
+
+            @media (min-width: @totara_style-screen_lg_min) {
+                & {
+                    width: 25%;
+                }
+            }
+
+            @media (min-width: @totara_style-screen_xl_min) {
+                & {
+                    width: 20%;
+                }
+            }
+
+            &__content {
+                border: 1px solid @myReports_grid-border-color;
+                margin: @myReports_grid-spacing;
+
+                &__image {
+                    background-color: @myReports_base-image-background;
+
+                    img.icon {
+                        display: block;
+                        max-width: 100%;
+                        max-height: 100%;
+
+                        width: auto;
+                        height: 100%;
+
+                        margin: 0 auto;
+                    }
+                }
+
+                &__title {
+                    padding: @myReports_grid-padding;
+                    font-size: @myReports_grid-title_font-size;
+
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
                     width: 100%;
-                    height: 100%;
-                    margin: 0;
                 }
-            }
 
-            &__image {
-                flex: 1 0 50%;
-                background-color: @myReports_base-image-background;
-
-                img.icon {
-                    display: block;
-                    max-width: 100%;
-                    max-height: 100%;
-
-                    width: auto;
-                    height: 100%;
-
-                    margin: 0 auto;
+                &__description {
+                    margin: @myReports_grid-padding;
+                    font-size: @myReports_grid-description_font-size;
+                    height: @myReports_grid-card-height / 2;
+                    overflow: hidden;
                 }
-            }
-
-            &__title {
-                padding: @myReports_grid-padding;
-                font-size: @myReports_grid-title_font-size;
-
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-
-                flex: 0 0 auto;
-            }
-
-            &__description {
-                flex: 1 1 @myReports_grid-card-height; // start big, and then shrink to available space
-                margin: @myReports_grid-padding;
-
-                overflow: hidden;
-                display: -webkit-box;
-                -webkit-line-clamp: 6;
-
-                /* autoprefixer: ignore next */
-                -webkit-box-orient: vertical;
-
-                font-size: @myReports_grid-description_font-size;
-            }
-
-            &__controls {
-                text-align: right;
-                font-size: @myReports_grid-controls_font-size;
-                padding: @myReports_grid-padding;
-
-                flex: 0 0 auto;
             }
         }
     }
@@ -198,72 +171,68 @@
 
     & .totara_core__myreports__list {
         &__item {
-            display: flex;
-            height: @myReports_table-row-height;
 
-            &:first-of-type {
-                border-top: 1px solid @myReports_table-border-color;
-            }
-            border-bottom: 1px solid @myReports_table-border-color;
+            &__content {
+                display: flex;
+                height: @myReports_table-row-height;
 
-            &__image {
-                max-height: 100%;
+                &:first-of-type {
+                    border-top: 1px solid @myReports_table-border-color;
+                }
+                border-bottom: 1px solid @myReports_table-border-color;
 
-                width: auto;
-                height: 100%;
+                &__image {
+                    max-height: 100%;
 
-                flex: 0 0 auto;
-
-                img.icon {
                     width: auto;
                     height: 100%;
 
-                    max-height: 100%;
-                    background-color: @myReports_base-image-background;
+                    flex: 0 0 auto;
 
-                    margin: 0;
-                    padding: 0;
+                    img.icon {
+                        width: auto;
+                        height: 100%;
+
+                        max-height: 100%;
+                        background-color: @myReports_base-image-background;
+
+                        margin: 0;
+                        padding: 0;
+                    }
                 }
-            }
 
-            &__title {
-                padding: @myReports_table-padding;
-                line-height: @myReports_table-row-height - (2 * @myReports_table-padding);
-                font-size: @myReports_table-title_font-size;
+                &__title {
+                    padding: @myReports_table-padding;
+                    line-height: @myReports_table-row-height - (2 * @myReports_table-padding);
+                    font-size: @myReports_table-title_font-size;
 
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
 
-                /* Shorthand flex doesn't work in IE11 with flex-basis being set to 0 */
-                flex-grow: 1;
-                flex-shrink: 1;
-                flex-basis: 0;
-            }
+                    /* Shorthand flex doesn't work in IE11 with flex-basis being set to 0 */
+                    flex-grow: 1;
+                    flex-shrink: 1;
+                    flex-basis: 0;
+                }
 
-            &__description {
-                margin: @myReports_table-padding (2*@myReports_table-padding);
-                overflow: hidden;
-                /* Shorthand flex doesn't work in IE11 with flex-basis being set to 0 */
-                flex-grow: 1;
-                flex-shrink: 1;
-                flex-basis: 0;
-                font-size: @myReports_table-description_font-size;
+                &__description {
+                    margin: @myReports_table-padding (2*@myReports_table-padding);
+                    overflow: hidden;
+                    /* Shorthand flex doesn't work in IE11 with flex-basis being set to 0 */
+                    flex-grow: 1;
+                    flex-shrink: 1;
+                    flex-basis: 0;
+                    font-size: @myReports_table-description_font-size;
+                }
 
-                display: -webkit-box;
-                -webkit-line-clamp: 2;
-
-                /* autoprefixer: ignore next */
-                -webkit-box-orient: vertical;
-
-            }
-
-            &__controls {
-                text-align: right;
-                font-size: @myReports_table-controls_font-size;
-                padding: @myReports_table-padding;
-                line-height: 0.7 * (@myReports_table-row-height - (2 * @myReports_table-padding));
-                flex: 0 0 auto;
+                &__controls {
+                    text-align: right;
+                    font-size: @myReports_table-controls_font-size;
+                    padding: @myReports_table-padding;
+                    line-height: 0.7 * (@myReports_table-row-height - (2 * @myReports_table-padding));
+                    flex: 0 0 auto;
+                }
             }
         }
     }
