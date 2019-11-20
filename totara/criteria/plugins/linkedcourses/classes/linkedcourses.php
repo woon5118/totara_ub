@@ -69,13 +69,7 @@ class linkedcourses extends criterion {
      * @return string|null Error description
      */
     protected function validate(): ?string {
-        foreach ($this->get_metadata() as $metakey => $metaval) {
-            if ($metakey == criterion::METADATA_COMPETENCY_KEY && !empty($metaval)) {
-                return null;
-            }
-        }
-
-        return 'Competency id metadata is required in linkedcourses criteria';
+        return !($this->get_competency_id() > 0) ? 'Competency id metadata is required in linkedcourses criteria' : null;
     }
 
     /**
@@ -83,8 +77,6 @@ class linkedcourses extends criterion {
      * An item is added for each currently linked course - This is in anticipation of merging of TL-22455
      */
     public function update_items(): criterion {
-        global $DB;
-
         $comp_id = $this->get_competency_id();
         if (is_null($comp_id)) {
             throw new \coding_exception('Competency id must be set before items are updated');
