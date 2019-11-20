@@ -1014,9 +1014,10 @@ class database_manager {
             foreach ($tables as $table) {
                 $table->setPrevious(null);
                 $table->setNext(null);
-                $schema->addTable($table);
+                $schema->addTable($table, null, true);
             }
         }
+        $schema->updateAfterAddTable();
         return $schema;
     }
 
