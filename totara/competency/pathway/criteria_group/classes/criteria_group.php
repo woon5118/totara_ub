@@ -69,35 +69,23 @@ class criteria_group extends pathway {
             return;
         }
 
-        // Load the group together with the criteria_group_criterion records
-        // and their related records in totara_criteria
-        // (and including their metadata and items)
-        // This will cap the number of queries to maximum 5 to load all records
-        // avoiding additional queries for it further down the line
+        // Load the group together with the related criterion records
+        // and the scale values
         /** @var criteria_group_entity $criteria_group */
         $criteria_group = criteria_group_entity::repository()
-            ->with([
-                'criterions' => function (repository $repository) {
-                    $repository->with([
-                        'criterion' => function (repository $repository) {
-                            $repository->with('metadata')
-                                ->with('items');
-                        }
-                    ]);
-                }
-            ])
+            ->with('criterions')
             ->with('scale_value')
             ->where('id', $this->get_path_instance_id())
             ->one();
 
-        // A group could be empty
+        // A group could be empty which happens when the pathway got archived
         if ($criteria_group) {
             if (!empty($criteria_group->scale_value)) {
                 $this->set_scale_value($criteria_group->scale_value);
             }
 
             foreach ($criteria_group->criterions as $row) {
-                $this->add_criterion(criterion_factory::fetch_from_entity($row->criterion));
+                $this->add_criterion(criterion_factory::fetch($row->criterion_type, $row->criterion_id));
             }
         }
     }
