@@ -21,6 +21,7 @@
  */
 
 import { globalConfig } from './config';
+export { debounce, throttle } from './internal/util/throttling';
 
 let counter = 1;
 
@@ -129,7 +130,7 @@ export function result(value) {
  * @returns {function}
  */
 export function memoize(fn, keyFn) {
-  return memoizeInternal(fn, keyFn, new Map());
+  return memoizeWithMap(fn, keyFn, new Map());
 }
 
 /**
@@ -142,11 +143,13 @@ export function memoize(fn, keyFn) {
  * @returns {function}
  */
 export function memoizeWeak(fn, keyFn) {
-  return memoizeInternal(fn, keyFn, new WeakMap());
+  return memoizeWithMap(fn, keyFn, new WeakMap());
 }
 
 /**
- * Common internal memoize implementation.
+ * Create a memoized version of the provided function.
+ *
+ * Like `memoize()` but using a the map you pass for key storage.
  *
  * @private
  * @param {function} fn
@@ -154,13 +157,13 @@ export function memoizeWeak(fn, keyFn) {
  * @param {object} map Object implementing Map API (has/get/set)
  * @returns {function}
  */
-function memoizeInternal(fn, keyFn, map) {
+function memoizeWithMap(fn, keyFn, map) {
   return function(arg) {
-    const key = keyFn ? keyFn.apply(null, arguments) : arg;
+    const key = keyFn ? keyFn.apply(this, arguments) : arg;
     if (map.has(key)) {
       return map.get(key);
     }
-    const result = fn.apply(null, arguments);
+    const result = fn.apply(this, arguments);
     map.set(key, result);
     return result;
   };
