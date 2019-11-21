@@ -623,8 +623,7 @@ class aggregation_users_table {
         }
 
         $sql =
-            "SELECT tacu.id,
-                    tacu.user_id
+            "SELECT DISTINCT tacu.user_id
                FROM {totara_competency_assignment_users} tacu
           LEFT JOIN {{$this->get_table_name()}} agg_queue
                  ON agg_queue.{$this->competency_id_column} = tacu.competency_id
@@ -635,19 +634,22 @@ class aggregation_users_table {
 
         $to_add = $DB->get_records_sql($sql, ['compid' => $competency_id]);
 
-        $to_add = array_map(
-            function ($el) use ($competency_id) {
-                $add_el = (object)$this->get_insert_record($el->user_id, $competency_id);
-                if (!empty($this->process_key_column)) {
-                    // We are queuing - ensure process_key is null
-                    $add_el->{$this->process_key_column} = null;
-                }
-                return $add_el;
-            },
-            $to_add
-        );
+        if (!empty($to_add)) {
+            // Add necessary insert columns
+            $to_add = array_map(
+                function ($el) use ($competency_id) {
+                    $add_el = (object)$this->get_insert_record($el->user_id, $competency_id);
+                    if (!empty($this->process_key_column)) {
+                        // We are queuing - ensure process_key is null
+                        $add_el->{$this->process_key_column} = null;
+                    }
+                    return $add_el;
+                },
+                $to_add
+            );
 
-        $DB->insert_records_via_batch($this->table_name, $to_add);
+            $DB->insert_records_via_batch($this->table_name, $to_add);
+        }
 
         return $this;
     }

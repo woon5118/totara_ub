@@ -47,7 +47,9 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
         for ($i = 1; $i <= 2; $i++) {
             $criterion = $data->criteria_generator->create_onactivate(['competency' => $data->competencies[$i]->id]);
             $pathways[$i] = $data->competency_generator->create_criteria_group($data->competencies[$i],
-                [$criterion], $data->scalevalues[5]->id);
+                [$criterion],
+                $data->scalevalues[5]->id
+            );
         }
 
         // First run the task without any assignments - should have no effect
@@ -122,7 +124,6 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
                 'via' => [$pw_achievement_records['2-2']],
             ],
         ]);
-
     }
 
     /**
@@ -135,9 +136,11 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
         // Create a criteria_group on competency 1 with 1 coursecompletion criterion to complete course1
         // Assign users 1, 2 and 3
         // Users 1 and 3 completes the course
-        $criterion = $data->criteria_generator->create_coursecompletion(['courseids' =>[$data->courses[1]->id]]);
+        $criterion = $data->criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id]]);
         $pathway = $data->competency_generator->create_criteria_group($data->competencies[1],
-            [$criterion], $data->scalevalues[4]->id);
+            [$criterion],
+            $data->scalevalues[4]->id
+        );
 
         // Assigning users 1 to 3 to the competency1 and competency2 (competency2 intentionally without criteria)
         $to_assign = [];
@@ -225,7 +228,9 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
         for ($i = 1; $i <= 2; $i++) {
             $criterion = $data->criteria_generator->create_linkedcourses(['competency' => $data->competencies[$i]->id]);
             $pathways[$i] = $data->competency_generator->create_criteria_group($data->competencies[$i],
-                [$criterion], $data->scalevalues[3]->id);
+                [$criterion],
+                $data->scalevalues[3]->id
+            );
         }
 
         // Link courses to competencies
@@ -264,7 +269,9 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
         ];
         foreach ($completed as $course_idx => $user_idxs) {
             foreach ($user_idxs as $user_idx) {
-                $completion = new completion_completion(['course' => $data->courses[$course_idx]->id, 'userid' => $data->users[$user_idx]->id]);
+                $completion = new completion_completion(['course' => $data->courses[$course_idx]->id,
+                    'userid' => $data->users[$user_idx]->id
+                ]);
                 $completion->mark_complete();
             }
         }
@@ -365,14 +372,18 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
         $pathways = [];
 
         // The child competency ...
-        $criterion = $data->criteria_generator->create_coursecompletion(['courseids' =>[$data->courses[1]->id]]);
+        $criterion = $data->criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id]]);
         $pathways['child'] = $data->competency_generator->create_criteria_group($data->competencies[2],
-            [$criterion], $data->scalevalues[2]->id);
+            [$criterion],
+            $data->scalevalues[2]->id
+        );
 
         // The parent competency ...
         $criterion = $data->criteria_generator->create_childcompetency(['competency' => $data->competencies[1]->id]);
         $pathways['parent'] = $data->competency_generator->create_criteria_group($data->competencies[1],
-            [$criterion], $data->scalevalues[4]->id);
+            [$criterion],
+            $data->scalevalues[4]->id
+        );
 
         // Assign users
         $to_assign = [
@@ -431,7 +442,7 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
                 'scale_value_id' => null,
                 'related_info' => [],
             ],
-            'parent-2' =>[
+            'parent-2' => [
                 'pathway_id' => $pathways['parent']->get_id(),
                 'user_id' => $data->users[2]->id,
                 'status' => pathway_achievement::STATUS_CURRENT,
@@ -541,7 +552,7 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
                 'user_id' => $data->users[3]->id,
                 'status' => pathway_achievement::STATUS_CURRENT,
                 'scale_value_id' => $data->scalevalues[4]->id,
-                'related_info' => ['rating_id' =>$ratings[3]->id],
+                'related_info' => ['rating_id' => $ratings[3]->id],
             ],
         ]);
 
@@ -597,13 +608,17 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
 
         // Create learning plans
         $data->competency_generator->create_learning_plan_with_competencies($data->users[1]->id,
-            [$data->competencies[1]->id => null, $data->competencies[2]->id => $data->scalevalues[3]->id]);
+            [$data->competencies[1]->id => null, $data->competencies[2]->id => $data->scalevalues[3]->id]
+        );
         $data->competency_generator->create_learning_plan_with_competencies($data->users[2]->id,
-            [$data->competencies[1]->id => $data->scalevalues[2]->id]);
+            [$data->competencies[1]->id => $data->scalevalues[2]->id]
+        );
         $data->competency_generator->create_learning_plan_with_competencies($data->users[3]->id,
-            [$data->competencies[1]->id => $data->scalevalues[4]->id]);
+            [$data->competencies[1]->id => $data->scalevalues[4]->id]
+        );
         $data->competency_generator->create_learning_plan_with_competencies($data->users[4]->id,
-            [$data->competencies[2]->id => null]);
+            [$data->competencies[2]->id => null]
+        );
 
         $this->waitForSecond();
 
@@ -690,6 +705,104 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
                 'scale_value_id' => null,
                 'proficient' => 0,
                 'via' => [],
+            ],
+        ]);
+    }
+
+    /**
+     * Test aggregation when the user is assigned twice to the same competency
+     * @dataProvider task_to_execute_data_provider
+     */
+    public function user_assigned_twice_before_criteria_added(string $task_to_execute) {
+        global $DB;
+        $data = $this->setup_data();
+
+        // First create 2 audiences
+        $cohort1 = $data->generator->create_cohort();
+        cohort_add_member($cohort1->id, $data->users[1]->id);
+        cohort_add_member($cohort1->id, $data->users[2]->id);
+
+        $cohort2 = $data->generator->create_cohort();
+        cohort_add_member($cohort2->id, $data->users[1]->id);
+        cohort_add_member($cohort2->id, $data->users[3]->id);
+
+        // Now assign both audiences to the competency
+        $data->assign_generator->create_cohort_assignment($data->competencies[1], $cohort1->id);
+        $data->assign_generator->create_cohort_assignment($data->competencies[1], $cohort2->id);
+
+        $expand_task = new expand_task($DB);
+        $expand_task->expand_all();
+
+        // Ensure that although there assignments, we don't create achievements as there are no criteria
+
+        (new competency_aggregation_all())->execute();
+        $this->verify_item_records([]);
+        $this->verify_pathway_achievements([]);
+        $this->verify_competency_achievements([]);
+
+        // No create a criteria_group with onactivate criterion
+        $criterion = $data->criteria_generator->create_onactivate(['competency' => $data->competencies[1]->id]);
+        $pathway = $data->competency_generator->create_criteria_group($data->competencies[1],
+            [$criterion], $data->scalevalues[5]->id
+        );
+
+        // Run the task
+        (new $task_to_execute())->execute();
+
+        $this->verify_item_records([
+            ['item_id' => $data->competencies[1]->id, 'user_id' => $data->users[1]->id, 'criterion_met' => 0],
+            ['item_id' => $data->competencies[1]->id, 'user_id' => $data->users[2]->id, 'criterion_met' => 0],
+            ['item_id' => $data->competencies[1]->id, 'user_id' => $data->users[3]->id, 'criterion_met' => 0],
+        ]);
+
+        $pw_achievement_records = $this->verify_pathway_achievements([
+            '1-1' => [
+                'pathway_id' => $pathway->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'related_info' => ['onactivate'],
+            ],
+            '1-2' => [
+                'pathway_id' => $pathway->get_id(),
+                'user_id' => $data->users[2]->id,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'related_info' => ['onactivate'],
+            ],
+            '1-3' => [
+                'pathway_id' => $pathway->get_id(),
+                'user_id' => $data->users[3]->id,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'related_info' => ['onactivate'],
+            ],
+        ]);
+
+        $this->verify_competency_achievements([
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'proficient' => 0,
+                'via' => [$pw_achievement_records['1-1']],
+            ],
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[2]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'proficient' => 1,
+                'via' => [$pw_achievement_records['1-2']],
+            ],
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[3]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'proficient' => 0,
+                'via' => [$pw_achievement_records['1-3']],
             ],
         ]);
     }

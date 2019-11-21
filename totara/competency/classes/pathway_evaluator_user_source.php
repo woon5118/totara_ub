@@ -192,7 +192,7 @@ class pathway_evaluator_user_source {
         [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params($temp_alias, true, 1);
 
         $sql = "
-            SELECT {$temp_alias}.{$userid_column} as user_id, 
+            SELECT DISTINCT {$temp_alias}.{$userid_column} as user_id, 
                     tcpa.id as achievement_id,
                     tcpa.scale_value_id
             FROM {{$temp_table_name}} {$temp_alias}
