@@ -518,4 +518,23 @@ class external extends \external_api {
         return new \external_value(PARAM_ALPHANUMEXT, 'Aggregation type');
     }
 
+    public static function get_overall_aggregation_parameters() {
+        return new \external_function_parameters(
+            [
+                'comp_id' => new \external_value(PARAM_INT, 'Id of the competency'),
+            ]
+        );
+    }
+
+    public static function get_overall_aggregation(int $comp_id): string {
+        advanced_feature::require('competency_assignment');
+
+        $config = new achievement_configuration(new competency($comp_id));
+        return $config->get_aggregation_type();
+    }
+
+    public static function get_overall_aggregation_returns() {
+        return new \external_value(PARAM_ALPHANUMEXT, 'Aggregation type');
+    }
+
 }

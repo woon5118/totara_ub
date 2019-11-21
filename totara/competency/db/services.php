@@ -141,6 +141,15 @@ $functions = [
         'loginrequired' => true,
         'ajax'          => true
     ],
+
+    'totara_competency_get_overall_aggregation' => [
+        'classname' => \totara_competency\external::class,
+        'methodname'    => 'get_overall_aggregation',
+        'description'   => 'Load the overall aggregation',
+        'type'          => 'read',
+        'loginrequired' => true,
+        'ajax'          => true
+    ],
 ];
 
 $assignments = [

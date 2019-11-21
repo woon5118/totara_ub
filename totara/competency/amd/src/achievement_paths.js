@@ -63,7 +63,8 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             definitionTemplate: 'totara_competency_get_definition_template',
             defaultpreset: 'totara_competency_link_default_preset',
             deletePathways: 'totara_competency_delete_pathways',
-            overallAggregation: 'totara_competency_set_overall_aggregation',
+            getOverallAggregation: 'totara_competency_get_overall_aggregation',
+            setOverallAggregation: 'totara_competency_set_overall_aggregation',
         };
 
         this.filename = 'achievement_paths.js';
@@ -273,7 +274,6 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 this.comp_id = this.widget.getAttribute('data-comp-id');
             }
 
-            this.setOverallAggregation();
             this.setScale().then(function() {
                 that.updatePage();
             });
@@ -301,92 +301,95 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 templatePromises = [],
                 apiArgs;
 
-            this.getCriteriaTypes().then(function() {
-                apiArgs = {
-                    'args': {comp_id: that.comp_id},
-                    'methodname': that.endpoints.pathways};
+            this.getOverallAggregation().then(function() {
 
-                // Get all the pathways and its detail
-                ajax.getData(apiArgs).then(function(responses) {
-                    var pwData = responses.results;
+                that.getCriteriaTypes().then(function() {
+                    apiArgs = {
+                        'args': {comp_id: that.comp_id},
+                        'methodname': that.endpoints.pathways};
 
-                    // Clean out all previous pathway data
-                    that.clearPathways();
+                    // Get all the pathways and its detail
+                    ajax.getData(apiArgs).then(function(responses) {
+                        var pwData = responses.results;
 
-                    that.nPaths = pwData.length;
-                    that.singlevalShown = false;
+                        // Clean out all previous pathway data
+                        that.clearPathways();
 
-                    for (var a = 0; a < pwData.length; a++) {
-                        var pw = pwData[a];
+                        that.nPaths = pwData.length;
+                        that.singlevalShown = false;
 
-                        // pathway must provide templatename
-                        if (!pw.pathway_templatename) {
-                            notification.exception({
-                                fileName: that.filename,
-                                message: 'Templatename for pathway ' + pw.title + ' (' + pw.id + ') is missing',
-                                name: 'Pathway without templatename'
-                            });
+                        for (var a = 0; a < pwData.length; a++) {
+                            var pw = pwData[a];
 
-                            return;
-                        }
+                            // pathway must provide templatename
+                            if (!pw.pathway_templatename) {
+                                notification.exception({
+                                    fileName: that.filename,
+                                    message: 'Templatename for pathway ' + pw.title + ' (' + pw.id + ') is missing',
+                                    name: 'Pathway without templatename'
+                                });
 
-                        // We add a unique key for all paths as new paths don't have ids
-                        pw.key = that.getNextKey();
-                        that.pathways[pw.key] = pw;
-
-                        if (pw.scalevalue) {
-                            that.singlevalShown = true;
-                            that.scalevalues[pw.scalevalue].pathways.push(pw.key);
-                        } else {
-                            var target;
-
-                            if (that.singlevalShown) {
-                                target = that.widget.querySelector('[data-pw-multivalues="high-sortorder"]');
-                            } else {
-                                target = that.widget.querySelector('[data-pw-multivalues="low-sortorder"]');
+                                return;
                             }
 
-                            var templatename = 'totara_competency/partial_pathway';
+                            // We add a unique key for all paths as new paths don't have ids
+                            pw.key = that.getNextKey();
+                            that.pathways[pw.key] = pw;
 
-                            // Display the pathway in the correct div
-                            pw.outerborder = true;
-                            pw.actions = true;
-                            pw.orderable = true;
-                            templatePromises.push(templates.renderAppend(templatename, pw, target));
+                            if (pw.scalevalue) {
+                                that.singlevalShown = true;
+                                that.scalevalues[pw.scalevalue].pathways.push(pw.key);
+                            } else {
+                                var target;
+
+                                if (that.singlevalShown) {
+                                    target = that.widget.querySelector('[data-pw-multivalues="high-sortorder"]');
+                                } else {
+                                    target = that.widget.querySelector('[data-pw-multivalues="low-sortorder"]');
+                                }
+
+                                var templatename = 'totara_competency/partial_pathway';
+
+                                // Display the pathway in the correct div
+                                pw.outerborder = true;
+                                pw.actions = true;
+                                pw.orderable = true;
+                                templatePromises.push(templates.renderAppend(templatename, pw, target));
+                            }
                         }
-                    }
 
-                    // Add the scalevalues template
-                    templatePromises.push(that.showSinglevaluePaths());
+                        // Add the scalevalues template
+                        templatePromises.push(that.showSinglevaluePaths());
 
-                    Promise.all(templatePromises).then(function() {
-                        that.calculateSortorderFromDisplay();
-                        // We've just read all from the database.
-                        // The sortorder calculation may have changed the
-                        // pathways' sortorders, but that was not due to
-                        // any action from the user.
-                        // So - resetting the dirty flag in this case
-                        that.dirty = false;
+                        Promise.all(templatePromises).then(function() {
+                            that.calculateSortorderFromDisplay();
+                            // We've just read all from the database.
+                            // The sortorder calculation may have changed the
+                            // pathways' sortorders, but that was not due to
+                            // any action from the user.
+                            // So - resetting the dirty flag in this case
+                            that.dirty = false;
 
-                        // Manually call init on all templates
-                        // Run global scan
-                        templates.runTemplateJS('');
+                            // Manually call init on all templates
+                            // Run global scan
+                            templates.runTemplateJS('');
 
-                        that.showHideNoPaths();
+                            that.showHideNoPaths();
+                        }).catch(function(e) {
+                            e.fileName = that.filename;
+                            e.name = 'Error displaying pathways';
+                            notification.exception(e);
+                        });
                     }).catch(function(e) {
                         e.fileName = that.filename;
-                        e.name = 'Error displaying pathways';
+                        e.name = 'Error retrieving pathways';
                         notification.exception(e);
                     });
                 }).catch(function(e) {
                     e.fileName = that.filename;
-                    e.name = 'Error retrieving pathways';
+                    e.name = 'Error retrieving criteria types';
                     notification.exception(e);
                 });
-            }).catch(function(e) {
-                e.fileName = that.filename;
-                e.name = 'Error retrieving criteria types';
-                notification.exception(e);
             });
         },
 
@@ -741,7 +744,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             // Overall aggregation
             apiArgs = {
                 'args': {comp_id: this.comp_id, type: this.aggType, actiontime: actionTime},
-                'methodname': this.endpoints.overallAggregation};
+                'methodname': this.endpoints.setOverallAggregation};
             promiseArr.push(ajax.getData(apiArgs));
 
             if (promiseArr.length > 0) {
@@ -978,6 +981,38 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 undoWgt = pwTarget.querySelector('[data-pw-action="undo"]');
             removeWgt.classList.remove('cc_hidden');
             undoWgt.classList.add('cc_hidden');
+        },
+
+        /**
+         * Load the overall aggregation value
+         *
+         * @return {Promise}
+         */
+        getOverallAggregation: function() {
+            var that = this,
+              aggWgt = this.widget.querySelector('[data-cc-pw-agg-changed]');
+
+            return new Promise(function (resolve) {
+                var apiArgs = {
+                    args: {comp_id: that.comp_id},
+                    methodname: that.endpoints.getOverallAggregation
+                };
+
+                ajax.getData(apiArgs).then(function(responses) {
+                    var aggType = responses.results;
+
+                    aggWgt.querySelector('option:checked').removeAttribute('selected');
+                    aggWgt.querySelector('option[value=' + aggType + ']').setAttribute('selected', 'selected');
+
+                    that.setOverallAggregation();
+
+                    resolve();
+                }).catch(function(e) {
+                    e.fileName = that.filename;
+                    e.name = 'Error getting overall aggregation';
+                    notification.exception(e);
+                });
+            });
         },
 
         /**
