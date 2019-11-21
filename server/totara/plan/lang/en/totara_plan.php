@@ -507,6 +507,7 @@ $string['eventpriorityscalecreated'] = 'Priority scale created';
 $string['eventpriorityscaledeleted'] = 'Priority scale deleted';
 $string['eventpriorityscaleupdated'] = 'Priority scale updated';
 $string['eventtemplateupdated'] = 'Workflow changed in plan template';
+$string['event_competency_value_set'] = 'Competency value for user got set';
 $string['evidence'] = 'Evidence';
 $string['evidenceinuseby'] = 'This evidence is used by the following learning plan components';
 $string['evidencelink'] = 'Evidence Link';

@@ -131,5 +131,55 @@ function xmldb_totara_plan_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020062901, 'totara', 'plan');
     }
 
+    // TODO Remove this before we release perform
+
+    if ($oldversion < 2019112103) {
+        // Define key competency_id_fk (foreign) to be added to dp_plan_competency_value.
+        $table = new xmldb_table('dp_plan_competency_value');
+
+        $key = new xmldb_key('competency_id_fk', XMLDB_KEY_FOREIGN, array('competency_id'), 'comp', array('id'));
+        if (!$dbman->key_exists($table, $key)) {
+            $dbman->add_key($table, $key);
+        }
+
+        $key = new xmldb_key('user_id_fk', XMLDB_KEY_FOREIGN, array('user_id'), 'user', array('id'));
+        if (!$dbman->key_exists($table, $key)) {
+            $dbman->add_key($table, $key);
+        }
+
+        $key = new xmldb_key('scale_value_id_fk', XMLDB_KEY_FOREIGN, array('scale_value_id'), 'comp_scale_values', array('id'));
+        if (!$dbman->key_exists($table, $key)) {
+            $dbman->add_key($table, $key);
+        }
+
+        $key = new xmldb_key('positionid_fk', XMLDB_KEY_FOREIGN, array('positionid'), 'pos', array('id'));
+        if (!$dbman->key_exists($table, $key)) {
+            $dbman->add_key($table, $key);
+        }
+
+        $key = new xmldb_key('organisationid_fk', XMLDB_KEY_FOREIGN, array('organisationid'), 'org', array('id'));
+        if (!$dbman->key_exists($table, $key)) {
+            $dbman->add_key($table, $key);
+        }
+
+        $key = new xmldb_key('assessorid_fk', XMLDB_KEY_FOREIGN, array('assessorid'), 'user', array('id'));
+        if (!$dbman->key_exists($table, $key)) {
+            $dbman->add_key($table, $key);
+        }
+
+        $index = new xmldb_index('comp_user_unique', XMLDB_INDEX_UNIQUE, array('competency_id', 'user_id'));
+
+        // Conditionally launch add index comp_user_unique.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Plan savepoint reached.
+        upgrade_plugin_savepoint(true, 2019112103, 'totara', 'plan');
+    }
+
+
+
+
     return true;
 }

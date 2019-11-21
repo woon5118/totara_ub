@@ -1182,36 +1182,22 @@ class dp_competency_component extends dp_base_component {
         $record->date_assigned = time();
 
         // Below are details that learning plans used to save directly to the comp_record table.
-
-        if (isset($details->positionid)) {
-            $record->positionid = $details->positionid;
-        }
-        if (isset($details->organisationid)) {
-            $record->organisationid = $details->organisationid;
-        }
-        if (isset($details->assessorid)) {
-            $record->assessorid = $details->assessorid;
-        }
-        if (isset($details->assessorname)) {
-            $record->assessorname = $details->assessorname;
-        }
-        if (isset($details->assessmenttype)) {
-            $record->assessmenttype = $details->assessmenttype;
-        }
+        $record->positionid = $details->positionid ?? null;
+        $record->organisationid = $details->organisationid ?? null;
+        $record->assessorid = $details->assessorid ?? null;
+        $record->assessorname = $details->assessorname ?? null;
+        $record->assessmenttype = $details->assessmenttype ?? null;
 
         // Set the timeproficient value if it has been passed through and the selected value is considered proficient.
         $record->timeproficient = null;
-        if (!empty($scale_value_id) && $proficient = $DB->get_field('comp_scale_values', 'proficient', array('id' => $scale_value_id))) {
-            if (!empty($details->timeproficient) && $proficient == 1) {
+        if (!empty($scale_value_id) && !empty($details->timeproficient)) {
+            $proficient = $DB->get_field('comp_scale_values', 'proficient', ['id' => $scale_value_id]);
+            if ($proficient == 1) {
                 $record->timeproficient = $details->timeproficient;
             }
         }
 
-        if (!empty($details->manual)) {
-            $record->manual = 1;
-        } else {
-            $record->manual = 0;
-        }
+        $record->manual = !empty($details->manual) ? 1 : 0;
 
         if (empty($record->id)) {
             $record->id = $DB->insert_record('dp_plan_competency_value', $record);
@@ -1219,7 +1205,7 @@ class dp_competency_component extends dp_base_component {
             $DB->update_record('dp_plan_competency_value', $record);
         }
 
-        \totara_plan\event\competency_value_set::create_from_record($record)->trigger();
+        \totara_plan\event\competency_value_set::create_from_record($record, $this->plan)->trigger();
     }
 
 

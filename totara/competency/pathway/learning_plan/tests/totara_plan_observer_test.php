@@ -21,22 +21,20 @@
  * @package pathway_learning_plan
  */
 
-use totara_competency\aggregation_users_table;
-use totara_plan\event\competency_value_set;
-use totara_competency\entities\scale_value;
 use pathway_learning_plan\learning_plan;
+use totara_competency\aggregation_users_table;
 use totara_competency\entities\competency;
 use totara_competency\entities\competency_achievement;
-use totara_competency\entities\pathway_achievement;
-use totara_competency\competency_achievement_aggregator;
-use totara_competency\achievement_configuration;
-use totara_competency\models\assignment_actions;
+use totara_competency\entities\scale_value;
 use totara_competency\expand_task;
+use totara_competency\models\assignment_actions;
 
 class pathway_learning_plan_totara_plan_observer_testcase extends advanced_testcase {
 
     public function test_event_for_competency_with_lp_pathway() {
         global $DB;
+
+        $this->setAdminUser();
 
         $user = $this->getDataGenerator()->create_user();
 
@@ -57,6 +55,11 @@ class pathway_learning_plan_totara_plan_observer_testcase extends advanced_testc
         $comp = $totara_hierarchy_generator->create_comp(['frameworkid' => $compfw->id]);
         $competency = new competency($comp);
 
+        /** @var totara_plan_generator $plan_generator */
+        $plan_generator = $this->getDataGenerator()->get_plugin_generator('totara_plan');
+        $plan = $plan_generator->create_learning_plan(['userid' => $user->id]);
+        $plan_generator->add_learning_plan_competency($plan->id, $comp->id);
+
         $lp_pathway = new learning_plan();
         $lp_pathway->set_competency($competency);
         $lp_pathway->save();
@@ -70,20 +73,16 @@ class pathway_learning_plan_totara_plan_observer_testcase extends advanced_testc
         (new assignment_actions())->activate([$assignment->id]);
         (new expand_task($DB))->expand_all();
 
-        $lp_value_record = new stdClass();
-        $lp_value_record->competency_id = $comp->id;
-        $lp_value_record->user_id = $user->id;
-        $lp_value_record->scale_value_id = $great->id;
-        $lp_value_record->date_assigned = time();
-        $lp_value_record->id = $DB->insert_record('dp_plan_competency_value', $lp_value_record);
-
         $count = competency_achievement::repository()
             ->where('user_id', '=', $user->id)
             ->where('comp_id', '=', $comp->id)
             ->count();
         $this->assertEquals(0, $count);
 
-        competency_value_set::create_from_record($lp_value_record)->trigger();
+        $development_plan = new development_plan($plan->id);
+        /** @var dp_competency_component $component */
+        $component = $development_plan->get_component('competency');
+        $component->set_value($comp->id, $user->id, $great->id, new stdClass());
 
         // Verify that a row was inserted in the aggregation queue
         $source_table = new aggregation_users_table();
@@ -101,10 +100,7 @@ class pathway_learning_plan_totara_plan_observer_testcase extends advanced_testc
 
         $lp_pathway->delete();
 
-        $lp_value_record->scale_value_id = $good->id;
-        $DB->update_record('dp_plan_competency_value', $lp_value_record);
-
-        competency_value_set::create_from_record($lp_value_record)->trigger();
+        $component->set_value($comp->id, $user->id, $good->id, new stdClass());
 
         // As the user is still assigned to the competency
         $this->assertFalse($DB->record_exists($source_table->get_table_name(), []));
@@ -112,6 +108,8 @@ class pathway_learning_plan_totara_plan_observer_testcase extends advanced_testc
 
     public function test_event_for_competency_without_lp_pathway() {
         global $DB;
+
+        $this->setAdminUser();
 
         $user = $this->getDataGenerator()->create_user();
 
@@ -132,6 +130,11 @@ class pathway_learning_plan_totara_plan_observer_testcase extends advanced_testc
         $comp = $totara_hierarchy_generator->create_comp(['frameworkid' => $compfw->id]);
         $competency = new competency($comp);
 
+        /** @var totara_plan_generator $plan_generator */
+        $plan_generator = $this->getDataGenerator()->get_plugin_generator('totara_plan');
+        $plan = $plan_generator->create_learning_plan(['userid' => $user->id]);
+        $plan_generator->add_learning_plan_competency($plan->id, $comp->id);
+
         // No learning plan pathway being set up for competency here.
         // Let's just make sure none is being added by default:
         $this->assertCount(0, $DB->get_records('totara_competency_pathway', ['path_type' => 'learning_plan']));
@@ -144,20 +147,16 @@ class pathway_learning_plan_totara_plan_observer_testcase extends advanced_testc
         (new assignment_actions())->activate([$assignment->id]);
         (new expand_task($DB))->expand_all();
 
-        $record = new stdClass();
-        $record->competency_id = $comp->id;
-        $record->user_id = $user->id;
-        $record->scale_value_id = $great->id;
-        $record->date_assigned = time();
-        $record->id = $DB->insert_record('dp_plan_competency_value', $record);
-
         $count = competency_achievement::repository()
             ->where('user_id', '=', $user->id)
             ->where('comp_id', '=', $comp->id)
             ->count();
         $this->assertEquals(0, $count);
 
-        competency_value_set::create_from_record($record)->trigger();
+        $development_plan = new development_plan($plan->id);
+        /** @var dp_competency_component $component */
+        $component = $development_plan->get_component('competency');
+        $component->set_value($comp->id, $user->id, $great->id, new stdClass());
 
         // Verify that a row was inserted in the aggregation queue
         $source_table = new aggregation_users_table();

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Brendan Cox <brendan.cox@totaralearning.com>
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package totara_plan
  */
 
@@ -42,17 +43,56 @@ class competency_value_set extends base {
 
     /**
      * @param \stdClass $record Record from dp_plan_competency_value
-     * @return competency_value_set
+     * @param \development_plan $plan
+     * @return competency_value_set|base
      */
-    public static function create_from_record($record): competency_value_set {
+    public static function create_from_record($record, \development_plan $plan): self {
         /** @var competency_value_set $event */
         $event = static::create([
             'objectid' => $record->id,
             'relateduserid' => $record->user_id,
-            'other' => ['competency_id' => $record->competency_id],
+            'other' => [
+                'competency_id' => $record->competency_id,
+                'scale_value_id' => $record->scale_value_id,
+                'plan_id' => $plan->id,
+                'plan_name' => $plan->name
+            ],
             'context' => \context_system::instance()
         ]);
 
+        $event->add_record_snapshot('dp_plan_competency_value', $record);
+
         return $event;
     }
+
+    /**
+     * Return localised event name.
+     *
+     * @return string
+     */
+    public static function get_name() {
+        return get_string('event_competency_value_set', 'totara_plan');
+    }
+
+    /**
+     * Returns description of what happened.
+     *
+     * @return string
+     */
+    public function get_description() {
+        $scale_value_id = $this->other['scale_value_id'] ?? '';
+        $plan_id = $this->other['plan_id'] ?? '';
+        return "A scale value with id {$scale_value_id} for user {$this->relateduserid} was set by user {$this->userid} in learning plan with id {$plan_id}";
+    }
+
+    /**
+     * Returns relevant URL.
+     *
+     * @return \moodle_url
+     */
+    public function get_url() {
+        $plan_id = $this->other['plan_id'] ?? '';
+        return new \moodle_url('/totara/plan/component.php', ['id' => $plan_id, 'c' => 'competency']);
+    }
+
 }

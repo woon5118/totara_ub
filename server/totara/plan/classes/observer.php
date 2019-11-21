@@ -24,8 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use hierarchy_competency\event\competency_deleted;
 use totara_competency\event\competency_achievement_updated;
-
 
 class totara_plan_observer {
 
@@ -76,13 +76,12 @@ class totara_plan_observer {
         return true;
     }
 
-    public static function competency_record_updated(competency_achievement_updated $event) {
+    public static function competency_achievement_updated(competency_achievement_updated $event) {
         global $DB;
 
         // TODO: See the later part of this method where alerts are sent if the user has just become proficient
-        // and has a learning plan. This may not need to be done in an observer any more. It might only be done
-        // when a learning plan value is changed. Otherwise, this method will need to be fixed up to work with
-        // current code.
+        //       once we've decided on if and how we send notifications to the user we can either remove this code here
+        //       or use it to still send the old legacy alert
         return;
 
         if (empty($event->other->achieved_via_ids)) {
@@ -160,5 +159,18 @@ class totara_plan_observer {
                 $competency_component->send_component_complete_alert($alert_detail);
             }
         }
+    }
+
+    /**
+     * Delete all plan related records if the competency gets deleted
+     *
+     * @param competency_deleted $event
+     */
+    public static function competency_deleted(competency_deleted $event) {
+        global $DB;
+
+        // Delete all plan related records if the competency gets deleted
+        $DB->delete_records('dp_plan_competency_assign', ['competencyid' => $event->objectid]);
+        $DB->delete_records('dp_plan_competency_value', ['competency_id' => $event->objectid]);
     }
 }
