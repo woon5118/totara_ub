@@ -24,9 +24,12 @@
 
 namespace totara_competency;
 
+use core\orm\entity\repository;
+use core\orm\query\builder;
 use totara_competency\entities\competency;
 use totara_competency\entities\configuration_change;
 use totara_competency\entities\configuration_history;
+use totara_competency\entities\scale_aggregation;
 
 /**
  * Class containing all relvant configuration information for a specific competency
@@ -59,13 +62,12 @@ class achievement_configuration {
      * @return bool
      */
     public function has_aggregation_type(string $aggregation_type = null): bool {
-        global $DB;
-
-        $params = ['comp_id' => $this->get_competency()->id];
-        if ($aggregation_type) {
-            $params['type'] = $aggregation_type;
-        }
-        return $DB->record_exists('totara_competency_scale_aggregation', $params);
+        return scale_aggregation::repository()
+            ->where('comp_id', $this->get_competency()->id)
+            ->when($aggregation_type, function (repository $repository) use ($aggregation_type) {
+                $repository->where('type', $aggregation_type);
+            })
+            ->exists();
     }
 
     /**
@@ -74,18 +76,14 @@ class achievement_configuration {
      * @return string Scale aggregation type
      */
     public function get_aggregation_type(): string {
-        global $DB;
-
         if (empty($this->aggregation_type)) {
-            $sql =
-                "SELECT type
-                   FROM {totara_competency_scale_aggregation}
-                  WHERE comp_id = :comp_id";
-            $param = ['comp_id' => $this->get_competency()->id];
-            $rows = $DB->get_records_sql($sql, $param);
+            /** @var scale_aggregation $aggregation */
+            $aggregation = scale_aggregation::repository()
+                ->where('comp_id', $this->get_competency()->id)
+                ->one();
 
-            if ($rows) {
-                $this->aggregation_type = reset($rows)->type;
+            if ($aggregation) {
+                $this->aggregation_type = $aggregation->type;
             }
         }
 
@@ -143,7 +141,7 @@ class achievement_configuration {
 
         // TODO: For now using the action_time to ensure change log and history is only created once per user action.
         //       A set of changes should ideally be initiated together with logging and history created before making
-        //       all the individual patway and aggregation changes.
+        //       all the individual pathway and aggregation changes.
         //       Will sort it out when the graphQL queries and mutators for the UI is finalised
         $this->save_configuration_history($action_time);
 
@@ -151,7 +149,7 @@ class achievement_configuration {
             try {
                 $pw = pathway_factory::fetch($pathway['type'], $pathway['id']);
             } catch (\Exception $e) {
-                // Ignore non-existant pathways
+                // Ignore non-existent pathways
                 continue;
             }
 
@@ -208,53 +206,39 @@ class achievement_configuration {
      * @return $this
      */
     public function save_aggregation(?int $action_time = null): achievement_configuration {
-        global $DB;
+        builder::get_db()->transaction(function () use ($action_time) {
+            $type = $this->get_aggregation_type();
 
-        $transaction = $DB->start_delegated_transaction();
+            /** @var scale_aggregation $aggregation */
+            $aggregation = scale_aggregation::repository()
+                ->where('comp_id', $this->get_competency()->id)
+                ->one();
 
-        $type = $this->get_aggregation_type();
-        $record = [
-            'comp_id' => $this->get_competency()->id,
-            'timemodified' => time(),
-        ];
-
-        $row = $DB->get_record('totara_competency_scale_aggregation', $record);
-        if ($row) {
-            if ($row->type != $type) {
-                // TODO: For now using the action_time to ensure change log and history is only created once per user action.
-                //       A set of changes should ideally be initiated together with logging and history created before making
-                //       all the individual patway and aggregation changes.
-                //       Will sort it out when the graphQL queries and mutators for the UI is finalised
-                $this->save_configuration_history($action_time);
-
-                $row->type = $type;
-                $DB->update_record('totara_competency_scale_aggregation', $row);
-
-                configuration_change::add_competency_entry(
-                    $this->competency->id,
-                    configuration_change::CHANGED_AGGREGATION,
-                    $action_time
-                );
-            } else {
-                $transaction->allow_commit();
-                return $this;
+            if (!$aggregation) {
+                $aggregation = new scale_aggregation();
+                $aggregation->comp_id = $this->get_competency()->id;
+            } else if ($type == $aggregation->type) {
+                // In case it did not change don't do anything
+                return;
             }
-        } else {
+
+            // TODO: For now using the action_time to ensure change log and history is only created once per user action.
+            //       A set of changes should ideally be initiated together with logging and history created before making
+            //       all the individual patway and aggregation changes.
+            //       Will sort it out when the graphQL queries and mutators for the UI is finalised
             $this->save_configuration_history($action_time);
 
-            // Insert the active row
-            $record = (object)$record;
-            $record->type = $type;
-            $DB->insert_record('totara_competency_scale_aggregation', $record);
+            $aggregation->type = $type;
+            $aggregation->timemodified = time();
+            $aggregation->save();
 
             configuration_change::add_competency_entry(
                 $this->competency->id,
                 configuration_change::CHANGED_AGGREGATION,
                 $action_time
             );
-        }
+        });
 
-        $transaction->allow_commit();
         return $this;
     }
 

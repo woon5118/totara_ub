@@ -504,7 +504,7 @@ class external extends \external_api {
         advanced_feature::require('competency_assignment');
 
         $config = new achievement_configuration(new competency($comp_id));
-        $old_type = $config ->get_aggregation_type();
+        $old_type = $config->get_aggregation_type();
 
         if ($old_type !== $type) {
             $config->set_aggregation_type($type)
