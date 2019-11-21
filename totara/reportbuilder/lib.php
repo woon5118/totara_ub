@@ -1246,7 +1246,7 @@ class reportbuilder {
      */
     public static function get_ignored_sources() {
         static $ignored = null;
-        if (is_null($ignored)) {
+        if (is_null($ignored) || PHPUNIT_TEST) {
             $cache = cache::make('totara_reportbuilder', 'rb_ignored_sources');
             $ignored = $cache->get('all');
 
@@ -1290,7 +1290,7 @@ class reportbuilder {
         global $CFG;
         static $ignored = null;
 
-        if (is_null($ignored)) {
+        if (is_null($ignored) || PHPUNIT_TEST) {
             $cache = cache::make('totara_reportbuilder', 'rb_ignored_embedded');
             $ignored = $cache->get('all');
 
