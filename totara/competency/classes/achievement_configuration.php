@@ -64,7 +64,7 @@ class achievement_configuration {
     public function has_aggregation_type(string $aggregation_type = null): bool {
         return scale_aggregation::repository()
             ->where('comp_id', $this->get_competency()->id)
-            ->when($aggregation_type, function (repository $repository) use ($aggregation_type) {
+            ->when(!empty($aggregation_type), function (repository $repository) use ($aggregation_type) {
                 $repository->where('type', $aggregation_type);
             })
             ->exists();
