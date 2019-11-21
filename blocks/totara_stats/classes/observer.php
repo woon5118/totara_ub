@@ -18,37 +18,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Brendan Cox <brendan.cox@totaralearning.com>
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package block_totara_stats
  */
 
 namespace block_totara_stats;
 
-use totara_competency\event\competency_record_updated;
+use totara_competency\event\competency_achievement_updated;
 
 class observer {
 
-    public static function competency_record_updated(competency_record_updated $event) {
+    public static function competency_achievement_updated(competency_achievement_updated $event) {
         global $DB, $CFG;
         require_once($CFG->dirroot.'/blocks/totara_stats/locallib.php');
 
+        // TODO: Add record as snapshot to event and use that for the data
         $user_id = $event->relateduserid;
         $competency_id = $event->other['competency_id'];
+        $is_proficient = $event->other['proficient'];
 
         $count = $DB->count_records(
             'block_totara_stats',
             ['userid' => $user_id, 'eventtype' => STATS_EVENT_COMP_ACHIEVED, 'data2' => $competency_id]
         );
 
-        if (isset($scale_value)) {
-            $isproficient = $DB->get_field('comp_scale_values', 'proficient', array('id' => $scale_value->get_id()));
-        } else {
-            $isproficient = 0;
-        }
-
         // Check the proficiency is set to "proficient" and check for duplicate data.
-        if ($isproficient && $count == 0) {
+        if ($is_proficient && $count == 0) {
             totara_stats_add_event(time(), $user_id, STATS_EVENT_COMP_ACHIEVED, '', $competency_id);
-        } else if ($isproficient == 0 && $count > 0) {
+        } else if ($is_proficient == 0 && $count > 0) {
             totara_stats_remove_event($user_id, STATS_EVENT_COMP_ACHIEVED, $competency_id);
         }
     }

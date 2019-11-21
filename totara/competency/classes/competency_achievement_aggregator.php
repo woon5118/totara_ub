@@ -150,13 +150,16 @@ final class competency_achievement_aggregator {
 
                 $achieved_via_ids = collection::new($user_achievement['achieved_via'])->pluck('id');
 
+                // TODO: Add record as snapshot to event and use that
                 competency_achievement_updated::create([
                     'context' => context_system::instance(),
                     'objectid' => $new_comp_achievement->id,
                     'relateduserid' => $user_id,
                     'other' => [
                         'competency_id' => $competency_id,
-                        'achieved_via_ids' => $achieved_via_ids
+                        'achieved_via_ids' => $achieved_via_ids,
+                        'scale_value_id' => $scale_value_id,
+                        'proficient' => $is_proficient
                     ],
                 ])->trigger();
             } else {

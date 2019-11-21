@@ -25,7 +25,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $observers = [
     [
-        'eventname' => '\totara_competency\event\competency_record_updated',
-        'callback'  => '\block_totara_stats\observer::competency_record_updated',
+        'eventname' => \totara_competency\event\competency_achievement_updated::class,
+        'callback'  => '\block_totara_stats\observer::competency_achievement_updated',
     ],
 ];
