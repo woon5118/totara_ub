@@ -91,15 +91,15 @@ class competency_controller extends admin_controller {
         $url = new moodle_url('/totara/competency/competency_summary.php', ['id' => $this->competency->id]);
         $title = get_string('competencytitle', 'totara_hierarchy', (object) [
             'framework' => format_string($this->framework->fullname),
-            'fullname' => $this->competency->display_name
+            'fullname' => format_string($this->competency->display_name)
         ]);
         $this->page->set_url($url);
         $this->page->set_title($title);
-        $this->page->navbar->add($this->competency->display_name);
+        $this->page->navbar->add(format_string($this->competency->display_name));
 
         return new tui_view('totara_competency/pages/CompetencySummary', [
             'competency-id' => $this->competency->id,
-            'competency-name' => $this->competency->display_name,
+            'competency-name' => format_string($this->competency->display_name),
             'framework-id' => $this->framework->id,
             'framework-name' => format_string($this->framework->fullname),
             'perform-enabled' => advanced_feature::is_enabled('competency_assignment'),
@@ -119,7 +119,7 @@ class competency_controller extends admin_controller {
             print_error('invalidsection', 'totara_competency', '', $section);
         }
 
-        $heading = get_string('editcompetency', 'totara_competency', $this->competency->display_name);
+        $heading = get_string('editcompetency', 'totara_competency', format_string($this->competency->display_name));
         $this->page->navbar->add($heading);
 
         // TODO: Use one single competency entity instead of using both kinds!

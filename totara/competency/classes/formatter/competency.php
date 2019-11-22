@@ -65,7 +65,7 @@ class competency extends entity_formatter {
             'type' => null,
             'assign_availability' => null,
             'aggregationmethod' => null,
-            'custom_fields' => null,
+            'display_custom_fields' => null,
         ];
     }
 

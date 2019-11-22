@@ -50,7 +50,7 @@ class external extends external_api {
         advanced_feature::require('competency_assignment');
 
         return coursecompletion::fetch($id)
-            -> export_edit_detail();
+            ->export_edit_detail();
     }
 
     public static function get_detail_returns() {

@@ -264,7 +264,8 @@ echo $OUTPUT->heading(format_string($framework->fullname));
 
 $framework->description = file_rewrite_pluginfile_urls($framework->description, 'pluginfile.php', $sitecontext->id,
         'totara_hierarchy', $shortprefix.'_framework', $frameworkid);
-echo $OUTPUT->container($framework->description);
+
+echo $OUTPUT->container(format_text($framework->description));
 echo html_writer::tag('div', '', array('class' => 'clearfix'));
 
 $table->add_toolbar_content($hierarchy->display_action_buttons($cancreateitems, $page), 'right');

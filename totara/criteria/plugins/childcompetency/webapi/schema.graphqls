@@ -2,7 +2,7 @@ type criteria_childcompetency_achievement_item {
   competency: totara_competency_competency!
   assigned: Boolean
   self_assignable: Boolean!
-  value: totara_competency_profile_scale_value_progress
+  value: totara_competency_scale_value
 }
 
 type criteria_childcompetency_achievements {

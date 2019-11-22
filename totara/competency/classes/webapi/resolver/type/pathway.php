@@ -23,8 +23,10 @@
 
 namespace totara_competency\webapi\resolver\type;
 
+use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
+use totara_core\formatter\field\string_field_formatter;
 
 /**
  * General totara competency pathway
@@ -65,8 +67,10 @@ class pathway implements type_resolver {
             case 'classification':
                 return $pathway->get_classification_name();
             case 'scale_value':
+                $format = $args['format'] ?? format::FORMAT_HTML;
+                $formatter = new string_field_formatter($format, \context_system::instance());
                 $scale_value = $pathway->get_scale_value();
-                return is_null($scale_value) ? null : $scale_value->name;
+                return $formatter->format($scale_value ? $scale_value->name : null);
             case 'criteria_summary':
                 return $pathway->get_summarized_criteria_set();
         }

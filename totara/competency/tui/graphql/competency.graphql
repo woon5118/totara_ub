@@ -13,7 +13,7 @@ query totara_competency_competency($competency_id: core_id!) {
     }
     assign_availability
     aggregation_method
-    custom_fields {
+    display_custom_fields {
       title
       value
     }

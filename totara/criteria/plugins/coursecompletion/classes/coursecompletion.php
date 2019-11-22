@@ -116,7 +116,7 @@ class coursecompletion extends criterion {
             $items[] = [
                 'type' => $this->get_items_type(),
                 'id' => $course_id,
-                'name' => get_course_display_name_for_list($course),
+                'name' => format_string(get_course_display_name_for_list($course)),
             ];
         }
 

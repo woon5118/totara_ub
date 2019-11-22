@@ -87,8 +87,8 @@
       </div>
 
       <div
-        v-for="(field, id) in competency.custom_fields"
-        :key="id"
+        v-for="(field, index) in competency.display_custom_fields"
+        :key="index"
         class="tui-competencySummaryGeneral__list_row"
         role="row"
       >

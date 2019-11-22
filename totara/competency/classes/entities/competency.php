@@ -27,6 +27,7 @@ use core\orm\collection;
 use core\orm\entity\relations\has_many;
 use core\orm\entity\relations\has_one;
 use core\orm\entity\relations\has_one_through;
+use core\orm\query\builder;
 use totara_competency\user_groups;
 use totara_hierarchy\entities\hierarchy_item;
 
@@ -60,7 +61,7 @@ require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
  * @property-read int $children_count
  * @property-read int $assignments_count
  * @property-read int[] $assign_availability
- * @property-read array $custom_fields
+ * @property-read object[] $display_custom_fields
  *
  * @method static competency_repository repository()
  *
@@ -82,9 +83,6 @@ class competency extends hierarchy_item {
 
     public const ASSIGNMENT_CREATE_SELF = \competency::ASSIGNMENT_CREATE_SELF;
     public const ASSIGNMENT_CREATE_OTHER = \competency::ASSIGNMENT_CREATE_OTHER;
-
-    /** @var array $customfields */
-    private $customfields;
 
     /**
      * Related achievement, meant to be used with a user filter
@@ -110,54 +108,6 @@ class competency extends hierarchy_item {
             'frameworkid',
             'scaleid'
         );
-    }
-
-    /**
-     * Retrieve all custom field definitions and values for this competency
-     *
-     * @return array of customfield objects, the following is returned: type, title, value
-     */
-    public function get_custom_fields_attribute(): array {
-        global $DB, $CFG;
-
-        if (is_null($this->customfields)) {
-            $this->customfields = [];
-
-            $sql = "
-                SELECT c.*, f.datatype, f.hidden, f.fullname, f.shortname
-                FROM {comp_type_info_data} c
-                INNER JOIN {comp_type_info_field} f
-                    ON c.fieldid = f.id
-                WHERE c.competencyid = :compid
-                ORDER BY f.sortorder
-            ";
-
-            $cflds = $DB->get_records_sql($sql, ['compid' => $this->id]);
-
-            // Now get the values
-            if ($cflds) {
-                foreach ($cflds as $cf) {
-                    // Don't show hidden custom fields.
-                    if ($cf->hidden) {
-                        continue;
-                    }
-
-                    $cf_class = "customfield_{$cf->datatype}";
-                    require_once($CFG->dirroot.'/totara/customfield/field/'.$cf->datatype.'/field.class.php');
-                    $this->customfields[] = (object)[
-                        'type' => $cf->datatype,
-                        'title' => $cf->fullname,
-                        'value' => call_user_func(
-                            [$cf_class, 'display_item_data'],
-                            $cf->data,
-                            ['prefix' => 'comp', 'itemid' => $cf->id, 'extended' => true]
-                        )
-                    ];
-                }
-            }
-        }
-
-        return $this->customfields;
     }
 
     /**
@@ -296,6 +246,43 @@ class competency extends hierarchy_item {
         return $this->pathways()
             ->where('status', \totara_competency\pathway::PATHWAY_STATUS_ACTIVE)
             ->order_by('sortorder');
+    }
+
+    /**
+     * Retrieve all custom field definitions and values for this competency
+     *
+     * @return object[] Array of custom field objects, with type, title and their
+     */
+    protected function get_display_custom_fields_attribute(): array {
+        global $CFG;
+
+        $custom_field_records = builder::table('comp_type_info_data', 'data')
+            ->select(['data.*', 'field.datatype', 'field.hidden', 'field.fullname', 'field.shortname'])
+            ->join(['comp_type_info_field', 'field'], 'fieldid', 'id')
+            ->where('data.competencyid', $this->id)
+            ->where('field.hidden', 0)
+            ->order_by('field.sortorder')
+            ->fetch();
+
+        $fields_to_display = [];
+
+        foreach ($custom_field_records as $field) {
+            /** @var \customfield_base $field_class */
+            $field_class = 'customfield_' . $field->datatype;
+            require_once($CFG->dirroot . '/totara/customfield/field/' . $field->datatype . '/field.class.php');
+
+            $fields_to_display[] = (object) [
+                'type' => $field->datatype,
+                'title' => format_string($field->fullname),
+                'value' => $field_class::display_item_data($field->data, [
+                    'prefix' => \competency::PREFIX,
+                    'itemid' => $field->id,
+                    'extended' => true,
+                ]),
+            ];
+        }
+
+        return $fields_to_display;
     }
 
 }

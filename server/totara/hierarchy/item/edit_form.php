@@ -45,7 +45,7 @@ class item_edit_form extends moodleform {
         $items     = $hierarchy->get_items();
         $types   = $hierarchy->get_types();
         $type   = $hierarchy->get_type_by_id($item->typeid);
-        $typename = ($type) ? $type->fullname : get_string('unclassified', 'totara_hierarchy');
+        $typename = ($type) ? format_string($type->fullname) : get_string('unclassified', 'totara_hierarchy');
 
         /// Add some extra hidden fields
         $mform->addElement('hidden', 'id');

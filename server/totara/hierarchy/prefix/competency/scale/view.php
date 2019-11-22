@@ -263,7 +263,7 @@ echo $OUTPUT->action_link(new moodle_url('/totara/hierarchy/framework/index.php'
 // Display info about scale
 echo $OUTPUT->heading(get_string('scalex', 'totara_hierarchy', format_string($scale->name)), 1);
 $scale->description = file_rewrite_pluginfile_urls($scale->description, 'pluginfile.php', $sitecontext->id, 'totara_hierarchy', 'comp_scale', $scale->id);
-echo html_writer::tag('p', $scale->description);
+echo html_writer::tag('p', format_text($scale->description));
 
 // Print button for creating new scale value
 $button_editscale = '';

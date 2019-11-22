@@ -82,7 +82,7 @@
           <h4>{{ row.course.fullname }}</h4>
           <p
             class="tui-criteriaCourseCompletion__summary"
-            v-html="row.course.summary"
+            v-html="row.course.description"
           />
           <a :href="row.course.url_view" class="btn btn-primary">
             {{ $str('course_link', 'totara_criteria') }}

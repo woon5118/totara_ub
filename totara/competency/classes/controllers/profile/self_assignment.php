@@ -59,7 +59,7 @@ class self_assignment extends base {
         foreach ($frameworks as $framework) {
             $result[] = [
                 'id' => $framework->id,
-                'name' => $framework->fullname
+                'name' => format_string($framework->fullname)
             ];
         }
         return $result;
@@ -73,7 +73,7 @@ class self_assignment extends base {
         foreach ($competency_types as $type) {
             $result[] = [
                 'id' => $type->id,
-                'name' => $type->fullname
+                'name' => format_string($type->fullname)
             ];
         }
         return $result;

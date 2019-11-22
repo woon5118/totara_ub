@@ -116,9 +116,9 @@ class totara_competency_webapi_resolver_query_competency_overview_testcase exten
         $this->assertEquals($comp_idnumber, $result->idnumber);
         $this->assertEquals($comp_description, $result->description);
 
-        $this->assertEquals($field_type, $result->custom_fields[0]->type);
-        $this->assertEquals($field_fullname, $result->custom_fields[0]->title);
-        $this->assertEquals($field_values[1], $result->custom_fields[0]->value);
+        $this->assertEquals($field_type, $result->display_custom_fields[0]->type);
+        $this->assertEquals($field_fullname, $result->display_custom_fields[0]->title);
+        $this->assertEquals($field_values[1], $result->display_custom_fields[0]->value);
     }
 
     /**

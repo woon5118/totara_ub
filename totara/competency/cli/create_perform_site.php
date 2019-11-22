@@ -46,21 +46,54 @@ require __DIR__ . '/../../../config.php';
 require_once($CFG->dirroot . '/lib/clilib.php');
 require_once($CFG->dirroot . '/lib/phpunit/classes/util.php');
 
+global $options;
+[$options, $cli_unrecognized] = cli_get_params([
+    'help' => false,
+    'multilang' => false,
+]);
+
+if ($options['help']) {
+    echo "Perform site generator.
+Use this script to create a site with users, job assignments, positions, organisations, competencies, courses, learning plans and evidence.
+
+Usage: php totara/competency/cli/create_perform_site.php [options]
+
+Options:
+
+  --multilang        Enable multilang header and content strings for generated data
+  --help             Show this screen
+
+";
+    exit(1);
+}
+
+if (\totara_competency\entities\competency::repository()->exists()) {
+    echo "This script has already been run on this installation. Please try again on a clean site.\n";
+    exit(1);
+}
+
+echo "This script will create data for the competency profile functionality testing and demo.\n";
+echo "This will take ~15 seconds.";
+
 // Do stuff as admin user
 core\session\manager::set_user(get_admin());
 
-echo "This script will create data for the competency profile functionality testing and demo.\n";
-echo "Please create data on a clean site.\n";
-echo "This will take ~15 seconds.";
-
 db()->transaction(Closure::fromCallable('create_data'));
+
 echo "\nSite setup complete!\n";
 
 function create_data() {
+    global $options;
+
+    if ($options['multilang']) {
+        enable_multilang();
+    }
+
     $generator = generator();
     $competency_generator = competency_generator();
     $evidence_generator = evidence_generator();
     $evidence_generator->set_create_files(true);
+    $hierarchy_generator = hierarchy_generator();
     $admin_user = get_admin();
 
     $data = [
@@ -87,7 +120,7 @@ Feel free to browse, list of users is below, their password is 12345.
                 'totara/competency:view_own_profile',
                 'moodle/site:viewfullnames', // TODO: Temporary so can see other manual raters, remove this in TL-22484
             ],
-            'description' => 'Has all available assignments (no archived) and has completed every course.',
+            'description' => multilang('Has all available assignments (no archived) and has completed every course.'),
         ],
         'ss' => [
             'firstname' => 'Steven',
@@ -96,7 +129,7 @@ Feel free to browse, list of users is below, their password is 12345.
                 'totara/competency:view_own_profile',
                 'moodle/site:viewfullnames', // TODO: Temporary so can see other manual raters, remove this in TL-22484
             ],
-            'description' => 'Has all available assignments, some archived.',
+            'description' => multilang('Has all available assignments, some archived.'),
         ],
         'dt' => [
             'firstname' => 'Denny',
@@ -105,7 +138,7 @@ Feel free to browse, list of users is below, their password is 12345.
                 'totara/competency:view_own_profile',
                 'moodle/site:viewfullnames', // TODO: Temporary so can see other manual raters, remove this in TL-22484
             ],
-            'description' => 'Has one current and one archived assignment.',
+            'description' => multilang('Has one current and one archived assignment.'),
         ],
         'jt' => [
             'firstname' => 'John',
@@ -114,7 +147,7 @@ Feel free to browse, list of users is below, their password is 12345.
                 'totara/competency:view_own_profile',
                 'moodle/site:viewfullnames', // TODO: Temporary so can see other manual raters, remove this in TL-22484
             ],
-            'description' => 'Has 7 assignments',
+            'description' => multilang('Has 7 assignments'),
         ],
         'ut' => [
             'firstname' => 'Uma',
@@ -122,7 +155,7 @@ Feel free to browse, list of users is below, their password is 12345.
             'caps' => [
                 'totara/competency:view_own_profile'
             ],
-            'description' => 'Has 10 assignments + archived',
+            'description' => multilang('Has 10 assignments + archived'),
         ],
         'sj' => [
             'firstname' => 'Samuel',
@@ -130,7 +163,7 @@ Feel free to browse, list of users is below, their password is 12345.
             'caps' => [
                 'totara/competency:view_own_profile'
             ],
-            'description' => 'Has 3 assignments',
+            'description' => multilang('Has 3 assignments'),
         ],
         'tr' => [
             'firstname' => 'Tim',
@@ -138,7 +171,7 @@ Feel free to browse, list of users is below, their password is 12345.
             'caps' => [
                 'totara/competency:view_own_profile'
             ],
-            'description' => 'Has something.',
+            'description' => multilang('Has something.'),
         ],
         'bw' => [
             'firstname' => 'Bruce',
@@ -146,7 +179,7 @@ Feel free to browse, list of users is below, their password is 12345.
             'caps' => [
                 'totara/competency:view_own_profile'
             ],
-            'description' => 'Has a self-assignment and an audience assignment.',
+            'description' => multilang('Has a self-assignment and an audience assignment.'),
         ],
         'vp' => [
             'firstname' => 'Vladimir',
@@ -154,14 +187,14 @@ Feel free to browse, list of users is below, their password is 12345.
             'caps' => [
                 'totara/competency:view_own_profile'
             ],
-            'description' => 'Has no assignments.',
+            'description' => multilang('Has no assignments.'),
         ],
         'bo' => [
             'firstname' => 'Barack',
             'lastname' => 'Obama',
             'caps' => [
             ],
-            'description' => 'Has assignments, but cannot view his competency profile.',
+            'description' => multilang('Has assignments, but cannot view his competency profile.'),
         ],
         'gb' => [
             'firstname' => 'George',
@@ -169,7 +202,7 @@ Feel free to browse, list of users is below, their password is 12345.
             'caps' => [
                 'totara/competency:view_own_profile'
             ],
-            'description' => 'Has only archived assignments.',
+            'description' => multilang('Has only archived assignments.'),
         ],
         'gm' => [
             'firstname' => 'Glenn',
@@ -177,13 +210,9 @@ Feel free to browse, list of users is below, their password is 12345.
             'caps' => [
                 'totara/competency:view_own_profile'
             ],
-            'description' => 'Has exactly one current assignment',
+            'description' => multilang('Has exactly one current assignment'),
         ],
     ];
-
-    if (user::repository()->where_in('username', array_keys($users))->exists()) {
-        throw new Exception("This script has already been run on this installation. Please try again on a clean site.");
-    }
 
     foreach ($users as $key => $user) {
         $data['users'][$key] = create_user($user, $key);
@@ -192,107 +221,107 @@ Feel free to browse, list of users is below, their password is 12345.
     // Then we need to create a few scale values
     $scales = [
         'low-scale' => [
-            'name' => 'Low detail scale value',
-            'description' => 'This is a rough competency scale value',
+            'name' => multilang('Low detail scale value'),
+            'description' => multilang('This is a rough competency scale value'),
             'values' => [
                 [
-                    'name' => 'Competent',
-                    'description' => 'Rough definition of being competent',
+                    'name' => multilang('Competent'),
+                    'description' => multilang('Rough definition of being competent'),
                     'proficient' => true,
                 ],
                 [
-                    'name' => 'Not competent',
-                    'description' => 'Rough definition of not being competent',
+                    'name' => multilang('Not competent'),
+                    'description' => multilang('Rough definition of not being competent'),
                 ],
             ]
         ],
 
         'overboard-scale' => [
-            'name' => 'Unnecessary detailed scale',
-            'description' => 'This is a very descriptive competency scale value',
+            'name' => multilang('Unnecessary detailed scale'),
+            'description' => multilang('This is a very descriptive competency scale value'),
             'values' => [
                 [
-                    'name' => 'Extremely competent',
-                    'description' => 'No doubt this fella is competent',
+                    'name' => multilang('Extremely competent'),
+                    'description' => multilang('No doubt this fella is competent'),
                     'proficient' => true,
                 ],
                 [
-                    'name' => 'Competent',
-                    'description' => 'There is some merit co call it competent',
+                    'name' => multilang('Competent'),
+                    'description' => multilang('There is some merit co call it competent'),
                     'proficient' => true,
                 ],
                 [
-                    'name' => 'Competent on Tuesdays',
-                    'description' => 'Competent, but only on Tuesdays, do not ask why.',
+                    'name' => multilang('Competent on Tuesdays'),
+                    'description' => multilang('Competent, but only on Tuesdays, do not ask why.'),
                     'proficient' => true,
                 ],
                 [
-                    'name' => 'Not competent on Tuesdays',
-                    'description' => 'Not competent, but only on Tuesdays, do not ask why.',
+                    'name' => multilang('Not competent on Tuesdays'),
+                    'description' => multilang('Not competent, but only on Tuesdays, do not ask why.'),
                     'proficient' => true,
                 ],
                 [
-                    'name' => 'Below average',
-                    'description' => 'We can not call it competent for just yet, maybe wait for Tuesday.',
+                    'name' => multilang('Below average'),
+                    'description' => multilang('We can not call it competent for just yet, maybe wait for Tuesday.'),
                 ],
                 [
-                    'name' => 'Not competent',
-                    'description' => 'Why does this value even exist?',
+                    'name' => multilang('Not competent'),
+                    'description' => multilang('Why does this value even exist?'),
                 ],
             ]
         ],
 
         '4-value-scale' => [
-            'name' => '4 steps to success',
-            'description' => 'Marketing driven scale',
+            'name' => multilang('4 steps to success'),
+            'description' => multilang('Marketing driven scale'),
             'values' => [
                 [
-                    'name' => 'Competent',
-                    'description' => 'Competent. Full stop.',
+                    'name' => multilang('Competent'),
+                    'description' => multilang('Competent. Full stop.'),
                     'proficient' => true,
                 ],
                 [
-                    'name' => 'Competent under supervision',
-                    'description' => 'Success master supervision is required at all times',
+                    'name' => multilang('Competent under supervision'),
+                    'description' => multilang('Success master supervision is required at all times'),
                     'proficient' => true,
                 ],
                 [
-                    'name' => 'On a path to success',
-                    'description' => 'Not competent, but only on Tuesdays, do not ask why.',
+                    'name' => multilang('On a path to success'),
+                    'description' => multilang('Not competent, but only on Tuesdays, do not ask why.'),
                 ],
                 [
-                    'name' => 'Newcomer',
-                    'description' => 'Checkout is in the far left corner',
+                    'name' => multilang('Newcomer'),
+                    'description' => multilang('Checkout is in the far left corner'),
                 ],
             ]
         ],
 
         'star-wars' => [
-            'name' => 'To infinity and beyond',
-            'description' => 'Force driven scale',
+            'name' => multilang('To infinity and beyond'),
+            'description' => multilang('Force driven scale'),
             'values' => [
                 [
-                    'name' => 'Sith Lord',
-                    'description' => 'Cannot go beyond that. Do not confuse with sikh.',
+                    'name' => multilang('Sith Lord'),
+                    'description' => multilang('Cannot go beyond that. Do not confuse with sikh.'),
                     'proficient' => true,
                 ],
                 [
-                    'name' => 'Joined the dark side',
-                    'description' => 'Clearly on a path to success, your lightsaber glows red now.',
+                    'name' => multilang('Joined the dark side'),
+                    'description' => multilang('Clearly on a path to success, your lightsaber glows red now.'),
                     'proficient' => true,
                 ],
                 [
-                    'name' => 'Jedi',
-                    'description' => 'It is pronounced Jed i',
+                    'name' => multilang('Jedi'),
+                    'description' => multilang('It is pronounced Jed i'),
                     'proficient' => true,
                 ],
                 [
-                    'name' => 'Young padawan',
-                    'description' => 'There is much to learn on your path. Do not kill your mentor.',
+                    'name' => multilang('Young padawan'),
+                    'description' => multilang('There is much to learn on your path. Do not kill your mentor.'),
                 ],
                 [
-                    'name' => 'Youngling',
-                    'description' => 'If a new padawan puts a hood on - run away.',
+                    'name' => multilang('Youngling'),
+                    'description' => multilang('If a new padawan puts a hood on - run away.'),
                 ],
             ]
         ],
@@ -303,243 +332,263 @@ Feel free to browse, list of users is below, their password is 12345.
         $data['scales'][$key] = create_scale($scale);
     }
 
+    // Then we need to create some competency types
+    $competency_types = [
+        ['fullname' => multilang('Machinery & transport'), 'idnumber' => 'machine'],
+        ['fullname' => multilang('Management'), 'idnumber' => 'management'],
+        ['fullname' => multilang('Medical'), 'idnumber' => 'medical'],
+    ];
+    foreach ($competency_types as $type) {
+        $data['competency-types'][$type['idnumber']] = $hierarchy_generator->create_comp_type($type);
+    }
+
     // Then we need to create a few competency frameworks
     $competencies = [
         'binary' => [
-            'fullname' => 'Binary competencies',
-            'description' => 'Descriptions that suppose to have competent or not only values',
+            'fullname' => multilang('Binary competencies'),
+            'description' => multilang('Descriptions that suppose to have competent or not only values'),
             'scale' => $data['scales']['low-scale']->id,
             'competencies' => [
                 'literate' => [
-                    'fullname' => 'Being literate',
-                    'description' => 'The name speaks for itself',
+                    'fullname' => multilang('Being literate'),
+                    'description' => multilang('The name speaks for itself'),
                 ],
 
                 'doer' => [
-                    'fullname' => 'Complete tasks independently',
-                    'description' => 'No need for constant badgering to complete a task',
+                    'fullname' => multilang('Complete tasks independently'),
+                    'description' => multilang('No need for constant badgering to complete a task'),
                     'parent' => 'literate',
                 ],
 
                 'initiative' => [
-                    'fullname' => 'Show initiative and come up with ideas',
-                    'description' => 'Being able to come up with ideas',
+                    'fullname' => multilang('Show initiative and come up with ideas'),
+                    'description' => multilang('Being able to come up with ideas'),
                     'parent' => 'literate',
                 ],
 
                 'collider' => [
-                    'fullname' => 'Manage The Large Hadron Collider at CERN',
-                    'description' => 'Nothing too complicated, just another box ticked',
+                    'fullname' => multilang('Manage The Large Hadron Collider at CERN'),
+                    'description' => multilang('Nothing too complicated, just another box ticked'),
                     'parent' => 'doer',
+                    'typeid' => $data['competency-types']['machine'],
                 ],
             ],
         ],
 
         'complex' => [
-            'fullname' => 'Fine-grained competencies',
-            'description' => 'Various competencies that require fine-tuned skills assessment to determine proficiency.',
+            'fullname' => multilang('Fine-grained competencies'),
+            'description' => multilang('Various competencies that require fine-tuned skills assessment to determine proficiency.'),
             'scale' => $data['scales']['overboard-scale']->id,
             'competencies' => [
                 'consultant' => [
-                    'fullname' => 'Sales consultant',
-                    'description' => 'It is not as easy as you think to become a sales consultant',
+                    'fullname' => multilang('Sales consultant'),
+                    'description' => multilang('It is not as easy as you think to become a sales consultant'),
                 ],
 
                 'nurse' => [
-                    'fullname' => 'Registered nurse',
-                    'description' => 'You can not create content without adding a registered nurse in there',
+                    'fullname' => multilang('Registered nurse'),
+                    'description' => multilang('You can not create content without adding a registered nurse in there'),
+                    'typeid' => $data['competency-types']['medical'],
                 ],
 
                 'administrative-nurse' => [
-                    'fullname' => 'Registered administrative nurse',
-                    'description' => 'Become an administrative registered nurse',
+                    'fullname' => multilang('Registered administrative nurse'),
+                    'description' => multilang('Become an administrative registered nurse'),
+                    'typeid' => $data['competency-types']['medical'],
                 ],
 
                 'surgeon' => [
-                    'fullname' => 'Fully qualified surgeon',
-                    'description' => 'Surgeries are serious business',
+                    'fullname' => multilang('Fully qualified surgeon'),
+                    'description' => multilang('Surgeries are serious business'),
+                    'typeid' => $data['competency-types']['medical'],
                 ],
 
                 'priest' => [
-                    'fullname' => 'Fully qualified reverent',
-                    'description' => '9 circles of hell',
+                    'fullname' => multilang('Fully qualified reverent'),
+                    'description' => multilang('9 circles of hell'),
                 ],
 
                 'zoo-keeper' => [
-                    'fullname' => 'Fully qualified zoo keeper',
-                    'description' => 'Do not provoke the gator',
+                    'fullname' => multilang('Fully qualified zoo keeper'),
+                    'description' => multilang('Do not provoke the gator'),
                 ],
 
                 'camp-ground-manager' => [
-                    'fullname' => 'Fully qualified camp ground manager',
-                    'description' => 'You know, this one is on the skilled migrant shortage list.',
+                    'fullname' => multilang('Fully qualified camp ground manager'),
+                    'description' => multilang('You know, this one is on the skilled migrant shortage list.'),
+                    'typeid' => $data['competency-types']['management'],
                 ],
             ],
         ],
 
         '4-value' => [
-            'fullname' => 'Fantasy saga competencies',
-            'description' => 'Mediocrity and courage',
+            'fullname' => multilang('Random competencies'),
+            'description' => multilang('Mediocrity and courage'),
             'scale' => $data['scales']['4-value-scale']->id,
             'competencies' => [
                 'netflix' => [
-                    'fullname' => 'Netflix Qualified',
-                    'description' => 'It takes some skills to pick a show on Netflix, can you?',
+                    'fullname' => multilang('Netflix Qualified'),
+                    'description' => multilang('It takes some skills to pick a show on Netflix, can you?'),
                 ],
                 'shop-keeper' => [
-                    'fullname' => 'Shop keeper',
-                    'description' => 'Keep a hillbilly away and try to survive',
+                    'fullname' => multilang('Shop keeper'),
+                    'description' => multilang('Keep a hillbilly away and try to survive'),
+                    'typeid' => $data['competency-types']['management'],
                 ],
                 'machinery-operator' => [
-                    'fullname' => 'Heavy machinery operator on a rainy day',
-                    'description' => 'Fire up the digger and start shoveling',
+                    'fullname' => multilang('Heavy machinery operator on a rainy day'),
+                    'description' => multilang('Fire up the digger and start shoveling'),
+                    'typeid' => $data['competency-types']['machine'],
                 ],
                 'it' => [
-                    'fullname' => 'Internet Troll',
-                    'description' => 'Do you have what it takes to troll people on the Internet?',
+                    'fullname' => multilang('Internet Troll'),
+                    'description' => multilang('Do you have what it takes to troll people on the Internet?'),
                 ],
                 'sommelier' => [
-                    'fullname' => 'Professional Sommelier',
-                    'description' => 'Do you smell it?',
+                    'fullname' => multilang('Professional Sommelier'),
+                    'description' => multilang('Do you smell it?'),
                 ],
                 'barista' => [
-                    'fullname' => 'Professional Barista',
-                    'description' => 'Please put your cups on the coffee machine to pre-warm it for the customers',
+                    'fullname' => multilang('Professional Barista'),
+                    'description' => multilang('Please put your cups on the coffee machine to pre-warm it for the customers'),
                 ],
                 'bartender' => [
-                    'fullname' => 'Professional Bartender',
-                    'description' => 'The first thing they teach you is not to drink on the job',
+                    'fullname' => multilang('Professional Bartender'),
+                    'description' => multilang('The first thing they teach you is not to drink on the job'),
                 ],
                 'mad-preacher' => [
-                    'fullname' => 'Mad preacher',
-                    'description' => 'Nuff said, you must excel to be proficient in this discipline.',
+                    'fullname' => multilang('Mad preacher'),
+                    'description' => multilang('Nuff said, you must excel to be proficient in this discipline.'),
                 ],
             ]
         ],
 
         'star-wars' => [
-            'fullname' => 'Fantasy saga competencies',
-            'description' => 'In a galaxy far far away...',
+            'fullname' => multilang('Fantasy saga competencies'),
+            'description' => multilang('In a galaxy far far away...'),
             'scale' => $data['scales']['star-wars']->id,
             'competencies' => [
                 'lightsaber' => [
-                    'fullname' => 'Mastering a lightsaber',
-                    'description' => 'It takes time to master an art of using lightsaber in a combat and make it effective against blasters',
+                    'fullname' => multilang('Mastering a lightsaber'),
+                    'description' => multilang('It takes time to master an art of using lightsaber in a combat and make it effective against blasters'),
                 ],
                 'pod-racer' => [
-                    'fullname' => 'Pod racer',
-                    'description' => 'On your path to success, you will need to master pod racing',
+                    'fullname' => multilang('Pod racer'),
+                    'description' => multilang('On your path to success, you will need to master pod racing'),
+                    'typeid' => $data['competency-types']['machine'],
                 ],
                 'storm-trooper' => [
-                    'fullname' => 'Qualified storm trooper',
-                    'description' => 'Start a path to be a professional storm trooper, be above an average clone to stand out',
+                    'fullname' => multilang('Qualified storm trooper'),
+                    'description' => multilang('Start a path to be a professional storm trooper, be above an average clone to stand out'),
                 ],
                 'sith-lord' => [
-                    'fullname' => 'Become the Sith Lord',
-                    'description' => 'Begin your journey to become an evil mastermind starting in a dark corner of Tatooine',
+                    'fullname' => multilang('Become the Sith Lord'),
+                    'description' => multilang('Begin your journey to become an evil mastermind starting in a dark corner of Tatooine'),
                 ],
             ]
         ],
 
         'arbitrary' => [
-            'fullname' => 'Casual competencies',
-            'description' => 'Something you might want to achieve casually',
+            'fullname' => multilang('Casual competencies'),
+            'description' => multilang('Something you might want to achieve casually'),
             'scale' => $data['scales']['default']->id,
             'competencies' => [
                 'teeth-whitening' => [
-                    'fullname' => 'Teeth whitening',
-                    'description' => 'Professional dentists study for a long time to perform that',
+                    'fullname' => multilang('Teeth whitening'),
+                    'description' => multilang('Professional dentists study for a long time to perform that'),
+                    'typeid' => $data['competency-types']['medical'],
                 ],
                 'hoarder' => [
-                    'fullname' => 'Extra-compulsive hoarder',
-                    'description' => 'I don\'t think that I can let this competency slide',
+                    'fullname' => multilang('Extra-compulsive hoarder'),
+                    'description' => multilang('I don\'t think that I can let this competency slide'),
                 ],
                 'cc' => [
-                    'fullname' => 'Couch critic',
-                    'description' => 'This competency is more like an achievement',
+                    'fullname' => multilang('Couch critic'),
+                    'description' => multilang('This competency is more like an achievement'),
                 ],
             ]
         ],
 
         'bs' => [
-            'fullname' => 'PDPD Behavioural Competency Guide',
-            'description' => 'These are examples of the observable behaviours which relate to the competency. They are grouped and ordered to reflect complexity, level 1 being indicators for lower level jobs and level 4/5 indicators for senior or specialist roles and therefore demanding a higher level of competency, however, this does not mean for higher level roles the less complex indicators are not relevant or important. Note there is not a direct read across between the levels in the indicators and the grade structure, as some specialist roles at more junior levels may demand a higher level of application for some competencies. Therefore, the manager/reviewer and member of staff should have a discussion to agree the expected level of competency required for the role and level of the role holder. https://www.nottingham.ac.uk/hr/guidesandsupport/performanceatwork/pdpr/pdpr-behavioural-competency-guide/competency-framework.aspx',
+            'fullname' => multilang('PDPD Behavioural Competency Guide'),
+            'description' => multilang('These are examples of the observable behaviours which relate to the competency. They are grouped and ordered to reflect complexity, level 1 being indicators for lower level jobs and level 4/5 indicators for senior or specialist roles and therefore demanding a higher level of competency, however, this does not mean for higher level roles the less complex indicators are not relevant or important. Note there is not a direct read across between the levels in the indicators and the grade structure, as some specialist roles at more junior levels may demand a higher level of application for some competencies. Therefore, the manager/reviewer and member of staff should have a discussion to agree the expected level of competency required for the role and level of the role holder. https://www.nottingham.ac.uk/hr/guidesandsupport/performanceatwork/pdpr/pdpr-behavioural-competency-guide/competency-framework.aspx'),
             'scale' => $data['scales']['default']->id,
             'competencies' => [
                 // Achieving and delivery
                 'drive' => [
-                    'fullname' => 'Drive for Results',
-                    'description' => 'Success is not just about following the rules. We need people committed to making the University a success. ‘Drive for results’ is the enthusiasms and desire to meet and exceed objectives, University targets and improve one’s own performance. It is about being frustrated with the status quo, wanting to improve the way we do things and making it happen. At a higher level it is about calculated risk taking in the interest of improving overall University performance.',
+                    'fullname' => multilang('Drive for Results'),
+                    'description' => multilang('Success is not just about following the rules. We need people committed to making the University a success. ‘Drive for results’ is the enthusiasms and desire to meet and exceed objectives, University targets and improve one’s own performance. It is about being frustrated with the status quo, wanting to improve the way we do things and making it happen. At a higher level it is about calculated risk taking in the interest of improving overall University performance.'),
                 ],
                 'serving' => [
-                    'fullname' => 'Serving the Customer',
-                    'description' => 'This is the desire to anticipate, meet and exceed the needs and expectations of customers (internally and externally). It implies working together and building long-term customer relationships and focusing one\'s efforts on delivering increased customer value. At levels D and E it requires effective championing and partnership working.',
+                    'fullname' => multilang('Serving the Customer'),
+                    'description' => multilang('This is the desire to anticipate, meet and exceed the needs and expectations of customers (internally and externally). It implies working together and building long-term customer relationships and focusing one\'s efforts on delivering increased customer value. At levels D and E it requires effective championing and partnership working.'),
                 ],
                 'quality' => [
-                    'fullname' => 'Quality Focus',
-                    'description' => 'This is about demonstrating the underlying drive to ensure that quality is not compromised within the working environment. It includes the identification and maintenance of standards to meet the needs of the University, together with a desire for accuracy, order and safety in the workplace. At levels 3 and 4 it is about encouraging and monitoring the actions of others to maintain high standards.',
+                    'fullname' => multilang('Quality Focus'),
+                    'description' => multilang('This is about demonstrating the underlying drive to ensure that quality is not compromised within the working environment. It includes the identification and maintenance of standards to meet the needs of the University, together with a desire for accuracy, order and safety in the workplace. At levels 3 and 4 it is about encouraging and monitoring the actions of others to maintain high standards.'),
                 ],
                 'integrity' => [
-                    'fullname' => 'Integrity',
-                    'description' => 'This is about acting in a way that is consistent with what one says or values and the expectations of both the University and the HE Sector. It requires a demonstration of commitment to openness and ethical values. It includes taking time to respect and understand others and be transparent and honest in all dealing with people internal and external to the University.',
+                    'fullname' => multilang('Integrity'),
+                    'description' => multilang('This is about acting in a way that is consistent with what one says or values and the expectations of both the University and the HE Sector. It requires a demonstration of commitment to openness and ethical values. It includes taking time to respect and understand others and be transparent and honest in all dealing with people internal and external to the University.'),
                 ],
 
                 // Personal effectiveness
                 'planning' => [
-                    'fullname' => 'Planning, organising and flexibility',
-                    'description' => 'This is about adopting a methodical approach to work. It involves planning and organising oneself and others in order to deliver work and prevent future problems. This includes the ability to adapt and change plans as the requirements of the situation change. At the higher levels it involves thinking long-term, strategically and creatively.',
+                    'fullname' => multilang('Planning, organising and flexibility'),
+                    'description' => multilang('This is about adopting a methodical approach to work. It involves planning and organising oneself and others in order to deliver work and prevent future problems. This includes the ability to adapt and change plans as the requirements of the situation change. At the higher levels it involves thinking long-term, strategically and creatively.'),
                 ],
                 'confidence' => [
-                    'fullname' => 'Confidence and self-control',
-                    'description' => 'This is a belief in one\'s own capability to accomplish a task and select an effective approach to a task or problem. This includes confidence in one\'s ability as expressed in increasingly challenging circumstances and confidence in one\'s decisions and opinions. The essence of this behaviour is the question, \'Does the person take on risky or difficulty tasks or measured conflicts with those in power over that person\'? Level D and E are primarily about assertiveness and confidence with one\'s boss or others in more senior positions, not with staff or peers.',
+                    'fullname' => multilang('Confidence and self-control'),
+                    'description' => multilang('This is a belief in one\'s own capability to accomplish a task and select an effective approach to a task or problem. This includes confidence in one\'s ability as expressed in increasingly challenging circumstances and confidence in one\'s decisions and opinions. The essence of this behaviour is the question, \'Does the person take on risky or difficulty tasks or measured conflicts with those in power over that person\'? Level D and E are primarily about assertiveness and confidence with one\'s boss or others in more senior positions, not with staff or peers.'),
                 ],
                 'problem-solving' => [
-                    'fullname' => 'Problem solving and initiative',
-                    'description' => 'This is about engaging in proactive behaviour, seizing opportunities and originating action which goes beyond simply responding to the obvious needs of the situation or to direct requests from others. It is coming up with new or different ideas, or adapting ideas from elsewhere in the University or externally. It is concerned with moving the University forward by applying new ideas or old ideas in a new way to generate solutions and approaches. At the higher levels it is about thinking laterally and creating new concepts.',
+                    'fullname' => multilang('Problem solving and initiative'),
+                    'description' => multilang('This is about engaging in proactive behaviour, seizing opportunities and originating action which goes beyond simply responding to the obvious needs of the situation or to direct requests from others. It is coming up with new or different ideas, or adapting ideas from elsewhere in the University or externally. It is concerned with moving the University forward by applying new ideas or old ideas in a new way to generate solutions and approaches. At the higher levels it is about thinking laterally and creating new concepts.'),
                 ],
                 'info-seeking' => [
-                    'fullname' => 'Critical information seeking',
-                    'description' => 'Critical information seeking requires a selective approach to gathering information aimed at getting the really crucial pieces of information. The ability to seek out information based on an underlying curiosity or desire to know more about subject area, University issues, people, and the sector. It includes asking questions that go beyond what is routine, in order to \'dig\' or press for exact information. Critical information seeking is essential for making sure your decisions are firmly grounded in reality, and that they are the best they can be. ',
+                    'fullname' => multilang('Critical information seeking'),
+                    'description' => multilang('Critical information seeking requires a selective approach to gathering information aimed at getting the really crucial pieces of information. The ability to seek out information based on an underlying curiosity or desire to know more about subject area, University issues, people, and the sector. It includes asking questions that go beyond what is routine, in order to \'dig\' or press for exact information. Critical information seeking is essential for making sure your decisions are firmly grounded in reality, and that they are the best they can be. '),
                 ],
 
                 // Working together
                 'communication' => [
-                    'fullname' => 'Communicating with clarity',
-                    'description' => 'This is about the ability to impart accurate information (both verbal and written) in a timely way and be receptive to other peoples\' opinions. It is also about sharing information across University boundaries and externally. At the higher level, it is about making University communication and understanding with other bodies outside the University more effective.',
+                    'fullname' => multilang('Communicating with clarity'),
+                    'description' => multilang('This is about the ability to impart accurate information (both verbal and written) in a timely way and be receptive to other peoples\' opinions. It is also about sharing information across University boundaries and externally. At the higher level, it is about making University communication and understanding with other bodies outside the University more effective.'),
                 ],
                 'embracing' => [
-                    'fullname' => 'Embracing change',
-                    'description' => 'This is about the ability to make changes to the way you work, adapting to changing circumstances in the University by accepting new and different ideas and approaches. It includes the ability to sustain performance under conditions of rapid change. At higher levels, it is concerned with supporting others through change and having the willingness and ability to enable changes to take place in the most productive way.',
+                    'fullname' => multilang('Embracing change'),
+                    'description' => multilang('This is about the ability to make changes to the way you work, adapting to changing circumstances in the University by accepting new and different ideas and approaches. It includes the ability to sustain performance under conditions of rapid change. At higher levels, it is concerned with supporting others through change and having the willingness and ability to enable changes to take place in the most productive way.'),
                 ],
                 'collaborating' => [
-                    'fullname' => 'Collaborating with others',
-                    'description' => 'This competency implies the intention of working co-operatively with others, to be part of a team, to work together as opposed to working separately or competitively. For this behaviour to be effective, the intention should be genuine. Team work and co-operation may be considered whenever the subject is a member of a group of people functioning as a team. This competency emphasises activity as a member of a group (rather than as a leader); e.g. Level E reflects a peer supporting their group rather than a leader managing the group.',
+                    'fullname' => multilang('Collaborating with others'),
+                    'description' => multilang('This competency implies the intention of working co-operatively with others, to be part of a team, to work together as opposed to working separately or competitively. For this behaviour to be effective, the intention should be genuine. Team work and co-operation may be considered whenever the subject is a member of a group of people functioning as a team. This competency emphasises activity as a member of a group (rather than as a leader); e.g. Level E reflects a peer supporting their group rather than a leader managing the group.'),
                 ],
                 'influencing' => [
-                    'fullname' => 'Influencing and relationship building',
-                    'description' => 'This is the ability to persuade, convince or influence others in order to get them to go along with or support a particular agenda, or get ‘buy in’ from others. It requires the ability to plan how to win support, gain co-operation or overcome barriers using a variety of approaches. Having gained support, it is the ability to build and maintain relationships with networks of people who may be able to effectively assist the organisation. At lower levels it is about presenting clear, logical arguments. At the higher level it requires taking a sophisticated strategic approach to influencing.',
+                    'fullname' => multilang('Influencing and relationship building'),
+                    'description' => multilang('This is the ability to persuade, convince or influence others in order to get them to go along with or support a particular agenda, or get ‘buy in’ from others. It requires the ability to plan how to win support, gain co-operation or overcome barriers using a variety of approaches. Having gained support, it is the ability to build and maintain relationships with networks of people who may be able to effectively assist the organisation. At lower levels it is about presenting clear, logical arguments. At the higher level it requires taking a sophisticated strategic approach to influencing.'),
                 ],
 
                 // Thinking and innovation
                 'innovation' => [
-                    'fullname' => 'Innovation and creativity',
-                    'description' => 'This is about creating and identifying novel approaches to address challenging academic, technical or commercial situations and problems. It is about coming up with new or different ideas, or adapting ideas from elsewhere in the University or externally. It is concerned with moving the University forward by applying new ideas or old ideas in a new way to generate solutions and approaches. At the higher levels it is about thinking laterally and creating new concepts.',
+                    'fullname' => multilang('Innovation and creativity'),
+                    'description' => multilang('This is about creating and identifying novel approaches to address challenging academic, technical or commercial situations and problems. It is about coming up with new or different ideas, or adapting ideas from elsewhere in the University or externally. It is concerned with moving the University forward by applying new ideas or old ideas in a new way to generate solutions and approaches. At the higher levels it is about thinking laterally and creating new concepts.'),
                 ],
                 'thinking' => [
-                    'fullname' => 'Conceptual and strategic thinking',
-                    'description' => '	This is the ability to see things as a whole, identify key issues, see relationships and draw elements together into broad coherent frameworks. This competency describes the ability to relate different events and key pieces of information; to make connections, see patterns and trends; to draw information together into models and frameworks which can then be used to interpret complex situations and identify their salient features. The strategic element involves looking into the future, considering the future needs of the University, Faculty or Department and thinking about how present policies, processes and methods might be progressively affected by future developments and trends; developing long term goals and strategies extending over significant time-spans.',
+                    'fullname' => multilang('Conceptual and strategic thinking'),
+                    'description' => multilang('	This is the ability to see things as a whole, identify key issues, see relationships and draw elements together into broad coherent frameworks. This competency describes the ability to relate different events and key pieces of information; to make connections, see patterns and trends; to draw information together into models and frameworks which can then be used to interpret complex situations and identify their salient features. The strategic element involves looking into the future, considering the future needs of the University, Faculty or Department and thinking about how present policies, processes and methods might be progressively affected by future developments and trends; developing long term goals and strategies extending over significant time-spans.'),
                 ],
 
                 // Managing, leading and developing others
                 'managing' => [
-                    'fullname' => 'Managing and leading the team',
-                    'description' => 'Leading a team or function is about managing and developing others. This competency therefore reflects that to get the best out of people we need to build and integrate all aspects of the performance cycle, including:
+                    'fullname' => multilang('Managing and leading the team'),
+                    'description' => multilang('Leading a team or function is about managing and developing others. This competency therefore reflects that to get the best out of people we need to build and integrate all aspects of the performance cycle, including:
 <ul>
     <li>Being clear about what has to be achieved</li>
     <li>Assembling the necessary resources to meet what has to be done</li>
     <li>Monitoring and addressing gaps in staff development and performance</li>
     <li>Reviewing this people/work match in the light of setting future objectives and leading change to meet University needs.</li>
-</ul>',
+</ul>'),
+                    'typeid' => $data['competency-types']['management'],
                 ],
             ]
         ]
@@ -596,12 +645,12 @@ Feel free to browse, list of users is below, their password is 12345.
     // Then we need to create a few positions
     $positions = [
         'pp' => [
-            'fullname' => 'Primary positions',
-            'description' => 'The positions we can not live without...',
+            'fullname' => multilang('Primary positions'),
+            'description' => multilang('The positions we can not live without...'),
             'positions' => [
                 'janitor' => [
-                    'fullname' => 'Janitor',
-                    'description' => 'No institution or company can survive without a clean closet',
+                    'fullname' => multilang('Janitor'),
+                    'description' => multilang('No institution or company can survive without a clean closet'),
                     'members' => [
                         'gm' => get_user('gm', $data),
                     ],
@@ -613,8 +662,8 @@ Feel free to browse, list of users is below, their password is 12345.
                     ],
                 ],
                 'stargazer' =>  [
-                    'fullname' => 'Stargazer',
-                    'description' => 'There is no point in arguing that this is very important',
+                    'fullname' => multilang('Stargazer'),
+                    'description' => multilang('There is no point in arguing that this is very important'),
                     'members' => [
                         'jm' => get_user('jm', $data),
                         'ss' => get_user('ss', $data),
@@ -631,8 +680,8 @@ Feel free to browse, list of users is below, their password is 12345.
                     ],
                 ],
                 'theologist' => [
-                    'fullname' => 'Theologist',
-                    'description' => 'Endless conversations about religion with a drink in the middle',
+                    'fullname' => multilang('Theologist'),
+                    'description' => multilang('Endless conversations about religion with a drink in the middle'),
                     'members' => [
                         'jm' => get_user('jm', $data),
                         'dt' => get_user('dt', $data),
@@ -649,8 +698,8 @@ Feel free to browse, list of users is below, their password is 12345.
                     ],
                 ],
                 'meter-reader' => [
-                    'fullname' => 'Meter reader',
-                    'description' => 'Reading meters is a unique art of getting analogue or digital readings from various types of meters',
+                    'fullname' => multilang('Meter reader'),
+                    'description' => multilang('Reading meters is a unique art of getting analogue or digital readings from various types of meters'),
                     'members' => [
                         'jm' => get_user('jm', $data),
                         'ss' => get_user('ss', $data),
@@ -668,8 +717,8 @@ Feel free to browse, list of users is below, their password is 12345.
                     ],
                 ],
                 'analyst' => [
-                    'fullname' => 'Static asset analyst in the dynamic environment',
-                    'description' => 'Analyzing assets statically is quite important in the dynamic environment of our modern ever-changing world',
+                    'fullname' => multilang('Static asset analyst in the dynamic environment'),
+                    'description' => multilang('Analyzing assets statically is quite important in the dynamic environment of our modern ever-changing world'),
                     'members' => [
                         'jm' => get_user('jm', $data),
                         'dt' => get_user('dt', $data),
@@ -700,12 +749,12 @@ Feel free to browse, list of users is below, their password is 12345.
             ],
         ],
         'sp' => [
-            'fullname' => 'Secondary positions',
-            'descriptions' => 'These positions are also important, but not as much as primary positions',
+            'fullname' => multilang('Secondary positions'),
+            'descriptions' => multilang('These positions are also important, but not as much as primary positions'),
             'positions' => [
                 'ceo' => [
-                    'fullname' => 'CEO',
-                    'description' => 'Chief Executive Officer',
+                    'fullname' => multilang('CEO'),
+                    'description' => multilang('Chief Executive Officer'),
                     'members' => [
                         'jt' => get_user('jt', $data),
                         'ut' => get_user('ut', $data),
@@ -721,8 +770,8 @@ Feel free to browse, list of users is below, their password is 12345.
                     ],
                 ],
                 'chief-accountant' => [
-                    'fullname' => 'Chief Accountant',
-                    'description' => 'Very important accountant',
+                    'fullname' => multilang('Chief Accountant'),
+                    'description' => multilang('Very important accountant'),
                     'members' => [
                         'jt' => get_user('jt', $data), // To assign and archive
                         'gb' => get_user('gb', $data),
@@ -736,12 +785,12 @@ Feel free to browse, list of users is below, their password is 12345.
                     ]
                 ],
                 'accountant' => [
-                    'fullname' => 'Regular accountant',
-                    'description' => 'Not as important as chief accountant, but still pretty important',
+                    'fullname' => multilang('Regular accountant'),
+                    'description' => multilang('Not as important as chief accountant, but still pretty important'),
                 ],
                 'hr' => [
-                    'fullname' => 'Human Relation Manager',
-                    'description' => 'No one can survive without HR manager, especially the one making decisions without being competent in the area',
+                    'fullname' => multilang('Human Relation Manager'),
+                    'description' => multilang('No one can survive without HR manager, especially the one making decisions without being competent in the area'),
                     'members' => [
                         'gb' => get_user('gb', $data), // To assign and archive
                         'bo' => get_user('bo', $data),
@@ -764,12 +813,12 @@ Feel free to browse, list of users is below, their password is 12345.
     // Then we need to create a few organisations
     $organisations = [
         'europe' => [
-            'fullname' => 'European organizations',
-            'description' => 'The organisations we are relying upon in Europe',
+            'fullname' => multilang('European organizations'),
+            'description' => multilang('The organisations we are relying upon in Europe'),
             'organisations' => [
                 'wwf' => [
-                    'fullname' => 'World Wildlife Fund',
-                    'description' => 'The panda on the logo is so cute...',
+                    'fullname' => multilang('World Wildlife Fund'),
+                    'description' => multilang('The panda on the logo is so cute...'),
                     'members' => [
                         'jm' => get_user('jm', $data),
                         'dt' => get_user('dt', $data),
@@ -790,8 +839,8 @@ Feel free to browse, list of users is below, their password is 12345.
                     ],
                 ],
                 'cola' =>  [
-                    'fullname' => 'Coca-Cola European Partners',
-                    'description' => 'Coca-Cola European Partners plc is a multinational bottling company dedicated to the marketing, production, and distribution of Coca-Cola products. Wikipedia',
+                    'fullname' => multilang('Coca-Cola European Partners'),
+                    'description' => multilang('Coca-Cola European Partners plc is a multinational bottling company dedicated to the marketing, production, and distribution of Coca-Cola products. Wikipedia'),
                     'members' => [
                         'jm' => get_user('jm', $data),
                         'bo' => get_user('bo', $data),
@@ -808,8 +857,8 @@ Feel free to browse, list of users is below, their password is 12345.
                     ],
                 ],
                 'nestle' => [
-                    'fullname' => 'Nestlé',
-                    'description' => 'It is like Nescafe, but better',
+                    'fullname' => multilang('Nestlé'),
+                    'description' => multilang('It is like Nescafe, but better'),
                     'members' => [
                         'jm' => get_user('jm', $data),
                         'tr' => get_user('tr', $data),
@@ -821,8 +870,8 @@ Feel free to browse, list of users is below, their password is 12345.
                     ],
                 ],
                 'nescafe' => [
-                    'fullname' => 'Nescafé',
-                    'description' => 'It is like Nestlé, but wait it is a part of Nesrlé...',
+                    'fullname' => multilang('Nescafé'),
+                    'description' => multilang('It is like Nestlé, but wait it is a part of Nesrlé...'),
                     'members' => [
                         'jm' => get_user('jm', $data),
                         'ss' => get_user('ss', $data),
@@ -842,8 +891,8 @@ Feel free to browse, list of users is below, their password is 12345.
                     ]
                 ],
                 'mercedes' => [
-                    'fullname' => 'Mercedes Benz',
-                    'description' => 'A division of Daimler',
+                    'fullname' => multilang('Mercedes Benz'),
+                    'description' => multilang('A division of Daimler'),
                     'members' => [
                         'jm' => get_user('jm', $data),
                         'dt' => get_user('dt', $data),
@@ -861,24 +910,24 @@ Feel free to browse, list of users is below, their password is 12345.
             ],
         ],
         'na' => [
-            'fullname' => 'North America',
-            'descriptions' => 'We favour these in the North America',
+            'fullname' => multilang('North America'),
+            'descriptions' => multilang('We favour these in the North America'),
             'organisations' => [
                 'greenpeace' => [
-                    'fullname' => 'GreenPeace',
-                    'description' => 'Keeping peace, doing green stuff',
+                    'fullname' => multilang('GreenPeace'),
+                    'description' => multilang('Keeping peace, doing green stuff'),
                 ],
                 'cola' => [
-                    'fullname' => 'Coca Cola LLC LTD etc',
-                    'description' => 'Nothing beats a warm cola on a hot day',
+                    'fullname' => multilang('Coca Cola LLC LTD etc'),
+                    'description' => multilang('Nothing beats a warm cola on a hot day'),
                 ],
                 'apple' => [
-                    'fullname' => 'Apple',
-                    'description' => 'Apple is not the same without Steve',
+                    'fullname' => multilang('Apple'),
+                    'description' => multilang('Apple is not the same without Steve'),
                 ],
                 'google' => [
-                    'fullname' => 'Google',
-                    'description' => 'Please update your Chrome Browser',
+                    'fullname' => multilang('Google'),
+                    'description' => multilang('Please update your Chrome Browser'),
                 ],
             ]
         ]
@@ -891,8 +940,8 @@ Feel free to browse, list of users is below, their password is 12345.
     // Then we need to create a few audiences
     $audiences = [
         'cr' => [
-            'name' => 'Content makers',
-            'description' => 'This audience is for creative staff members',
+            'name' => multilang('Content makers'),
+            'description' => multilang('This audience is for creative staff members'),
             'members' => [
                 'jm' => get_user('jm', $data),
                 'ss' => get_user('ss', $data),
@@ -919,8 +968,8 @@ Feel free to browse, list of users is below, their password is 12345.
             ],
         ],
         'it' => [
-            'name' => 'IT Department',
-            'description' => 'Every respectful company needs to have at least one in-house IT department',
+            'name' => multilang('IT Department'),
+            'description' => multilang('Every respectful company needs to have at least one in-house IT department'),
             'members' => [
                 'jm' => get_user('jm', $data),
                 'ss' => get_user('ss', $data),
@@ -938,8 +987,8 @@ Feel free to browse, list of users is below, their password is 12345.
             ]
         ],
         'vip' => [
-            'name' => 'VIP',
-            'description' => 'Privileged members group',
+            'name' => multilang('VIP'),
+            'description' => multilang('Privileged members group'),
             'members' => [
                 'jm' => get_user('jm', $data),
                 'ss' => get_user('ss', $data),
@@ -1106,43 +1155,43 @@ Feel free to browse, list of users is below, their password is 12345.
     // Then we need to create courses and enrol users to use for the competencies
     $courses = [
         'infosec' => [
-            'fullname' => 'Information security',
+            'fullname' => multilang('Information security'),
             'shortname' => 'Infosec',
         ],
         'recruit' => [
-            'fullname' => 'Recruitment basics',
+            'fullname' => multilang('Recruitment basics'),
             'shortname' => 'Basics',
         ],
         'health' => [
-            'fullname' => 'Health and safety for all',
+            'fullname' => multilang('Health and safety for all'),
             'shortname' => 'Health',
         ],
         'orientation' => [
-            'fullname' => 'New employee orientation',
+            'fullname' => multilang('New employee orientation'),
             'shortname' => 'Orientation',
         ],
         'conversations' => [
-            'fullname' => 'Having difficult conversations',
+            'fullname' => multilang('Having difficult conversations'),
             'shortname' => 'Conversations',
         ],
         'communication' => [
-            'fullname' => 'Communication skills',
+            'fullname' => multilang('Communication skills'),
             'shortname' => 'Communication',
         ],
         'waitangi' => [
-            'fullname' => 'Te Tiriti o Waitangi',
+            'fullname' => multilang('Te Tiriti o Waitangi'),
             'shortname' => 'Waitangi',
         ],
         'nursing' => [
-            'fullname' => 'Professional, ethical and legislated requirements for nursing',
+            'fullname' => multilang('Professional, ethical and legislated requirements for nursing'),
             'shortname' => 'Nursing',
         ],
         'management' => [
-            'fullname' => 'Management essentials',
+            'fullname' => multilang('Management essentials'),
             'shortname' => 'Management',
         ],
         'listening' => [
-            'fullname' => 'Introduction to active listening',
+            'fullname' => multilang('Introduction to active listening'),
             'shortname' => 'Listening',
         ],
     ];
@@ -2877,18 +2926,18 @@ Feel free to browse, list of users is below, their password is 12345.
 
     // Create some basic reusable evidence custom fields
     $evidence_fields = [
-        'photo' => ['datatype' => 'file', 'fullname' => 'Photo(s) of document(s)', 'shortname' => 'photo'],
+        'photo' => ['datatype' => 'file', 'fullname' => multilang('Photo(s) of document(s)'), 'shortname' => 'photo'],
         'notes' => [
             'datatype' => 'textarea',
-            'defaultdata' => '<p>Please add any extra relevant information here.</p>',
+            'defaultdata' => multilang('<p>Please add any extra relevant information here.</p>'),
             'param1' => '30',
             'param2' => '10',
-            'fullname' => 'Additional Notes',
+            'fullname' => multilang('Additional Notes'),
             'shortname' => 'notes',
         ],
         'date' => [
             'datatype' => 'datetime',
-            'fullname' => 'Completed on',
+            'fullname' => multilang('Completed on'),
             'shortname' => 'completed',
             'param1' => '2016',
             'param2' => '2019',
@@ -2896,24 +2945,24 @@ Feel free to browse, list of users is below, their password is 12345.
         ],
         'menu' => [
             'datatype' => 'menu',
-            'fullname' => 'Type',
+            'fullname' => multilang('Type'),
             'shortname' => 'options',
         ],
         'confirm' => [
             'datatype'    => 'checkbox',
-            'fullname'    => 'Manager approval',
+            'fullname'    => multilang('Manager approval'),
             'shortname'   => 'confirm',
         ],
         'text' => [
             'datatype'     => 'text',
             'param1'       => '30',
             'param2'       => '2048',
-            'fullname'     => 'Qualification Name',
+            'fullname'     => multilang('Qualification Name'),
             'shortname'    => 'name',
         ],
         'multi' => [
             'datatype'    => 'multiselect',
-            'fullname'    => 'Other qualifications',
+            'fullname'    => multilang('Other qualifications'),
             'shortname'   => 'degree',
         ],
     ];
@@ -2921,24 +2970,29 @@ Feel free to browse, list of users is below, their password is 12345.
     // Then we need to create some evidence types for the evidence
     $evidence_types = [
         'truck-licence' => [
-            'name' => 'Commercial truck driver licence',
-            'description' => '<p>In New Zealand, driver licensing is controlled by the NZ Transport Agency. There are six classes of motor-vehicle licence and nine licence endorsements. Class 1 governs vehicles with a GLW (gross laden weight) or GCW (gross combined weight) of less than 6,000 kg, and Class 6 governs motorcycles. Classes 2–5 govern heavy vehicles. </p><p>A Class 2 licence allows the holder to drive: </p> <ul><li>any rigid vehicle (including any tractor) with a GLW of more than 6,000 kg but less than 18,001 kg</li> <li>any combination vehicle with a GCW of 12,000 kg or less</li> <li>any combination vehicle consisting of a rigid vehicle with a GLW of 18,000 kg or less towing a light trailer (GLW of 3500 kg or less)</li> <li>any rigid vehicle with a GLW of more than 18,000 kg that has no more than two axles</li> <li>any vehicle covered in Class 1.</li></ul> <p>Class 3 allows the holder to drive: </p> <ul><li>any combination vehicle with a GCW of more than 12,000 kg but less than 25,001 kg</li> <li>any vehicle covered in classes 1 and 2.</li></ul> <p>Class 4 allows the holder to drive: </p> <ul><li>any rigid vehicle (including any tractor) with a GLW of more than 18,000 kg</li> <li>any combination vehicle consisting of a rigid vehicle with a GLW of more than 18,000 kg towing a light trailer (GLW of 3500 kg or less)</li> <li>vehicles covered in classes 1 and 2, but not Class 3.</li></ul> <p>Class 5 allows the holder to drive: </p> <ul><li>any combination vehicle with a GCW of more than 25,000 kg</li> <li>vehicles covered by classes 1, 2, 3 and 4.</li></ul> <p>Before getting a Class 2 licence, a driver must be at least 18 years of age and have held an unrestricted Class 1 licence for at least six months. Gaining a Class 5 is not dependent on holding a Class 3. Once a driver has a Class 2 they can progress straight through to Class 4 and Class 5. Each progression (2 to 3, 2 to 4, or 4 to 5) requires having held an unrestricted licence of the preceding class for at least six months. For drivers aged 25 or over the minimum period for holding the unrestricted time is reduced to three months, or waived entirely on completion of an approved course of instruction. </p><p>Additional endorsements on an NZ driver\'s licence govern provision of special commercial services. The endorsements are: </p> <ul><li>D - Dangerous Goods: transporting hazardous substances. Must be renewed every five years</li> <li>F - Forklift operator</li> <li>I - Driving Instructor: An "I" endorsement is awarded for a specific Class of licence, e.g.: 5-I</li> <li>O - Testing Officer: Driving assessors who test a person prior to being granted a particular class of licence</li> <li>P - Passenger: Transport of fare-paying passengers (bus and taxi drivers, limo-for-hire drivers, and dail-a-driver services)</li> <li>R - Roller: Special vehicle equipped with rollers</li> <li>T - Tracks: Special vehicle equipped with tracks</li> <li>V - Vehicle recovery: Operating a tow truck</li> <li>W - Wheels: Special vehicle equipped with wheels, other than >fire appliances, buses, tractors, vehicle-recovery vehicles, or trade vehicles.</li></ul> <p>The F, R, T and W endorsements are for operating special types of vehicle on the road. Where the holder also has a heavy vehicle (Class 2 or Class 4) licence, they are permitted to drive heavy special vehicles. Otherwise the limits for Class 1 (6,000 kg) apply. </p><p>Being granted an I, O, P and/or V endorsement requires that the applicant passes a "fit and proper person" check, to screen for people with criminal convictions or serious driving infringements. These endorsements are issued for one or five years, at the option of the applicant at the time of purchase. </p>',
+            'name' => multilang('Commercial truck driver licence'),
+            'description' => multilang('<p>In New Zealand, driver licensing is controlled by the NZ Transport Agency. There are six classes of motor-vehicle licence and nine licence endorsements. Class 1 governs vehicles with a GLW (gross laden weight) or GCW (gross combined weight) of less than 6,000 kg, and Class 6 governs motorcycles. Classes 2–5 govern heavy vehicles. </p><p>A Class 2 licence allows the holder to drive: </p> <ul><li>any rigid vehicle (including any tractor) with a GLW of more than 6,000 kg but less than 18,001 kg</li> <li>any combination vehicle with a GCW of 12,000 kg or less</li> <li>any combination vehicle consisting of a rigid vehicle with a GLW of 18,000 kg or less towing a light trailer (GLW of 3500 kg or less)</li> <li>any rigid vehicle with a GLW of more than 18,000 kg that has no more than two axles</li> <li>any vehicle covered in Class 1.</li></ul> <p>Class 3 allows the holder to drive: </p> <ul><li>any combination vehicle with a GCW of more than 12,000 kg but less than 25,001 kg</li> <li>any vehicle covered in classes 1 and 2.</li></ul> <p>Class 4 allows the holder to drive: </p> <ul><li>any rigid vehicle (including any tractor) with a GLW of more than 18,000 kg</li> <li>any combination vehicle consisting of a rigid vehicle with a GLW of more than 18,000 kg towing a light trailer (GLW of 3500 kg or less)</li> <li>vehicles covered in classes 1 and 2, but not Class 3.</li></ul> <p>Class 5 allows the holder to drive: </p> <ul><li>any combination vehicle with a GCW of more than 25,000 kg</li> <li>vehicles covered by classes 1, 2, 3 and 4.</li></ul> <p>Before getting a Class 2 licence, a driver must be at least 18 years of age and have held an unrestricted Class 1 licence for at least six months. Gaining a Class 5 is not dependent on holding a Class 3. Once a driver has a Class 2 they can progress straight through to Class 4 and Class 5. Each progression (2 to 3, 2 to 4, or 4 to 5) requires having held an unrestricted licence of the preceding class for at least six months. For drivers aged 25 or over the minimum period for holding the unrestricted time is reduced to three months, or waived entirely on completion of an approved course of instruction. </p><p>Additional endorsements on an NZ driver\'s licence govern provision of special commercial services. The endorsements are: </p> <ul><li>D - Dangerous Goods: transporting hazardous substances. Must be renewed every five years</li> <li>F - Forklift operator</li> <li>I - Driving Instructor: An "I" endorsement is awarded for a specific Class of licence, e.g.: 5-I</li> <li>O - Testing Officer: Driving assessors who test a person prior to being granted a particular class of licence</li> <li>P - Passenger: Transport of fare-paying passengers (bus and taxi drivers, limo-for-hire drivers, and dail-a-driver services)</li> <li>R - Roller: Special vehicle equipped with rollers</li> <li>T - Tracks: Special vehicle equipped with tracks</li> <li>V - Vehicle recovery: Operating a tow truck</li> <li>W - Wheels: Special vehicle equipped with wheels, other than >fire appliances, buses, tractors, vehicle-recovery vehicles, or trade vehicles.</li></ul> <p>The F, R, T and W endorsements are for operating special types of vehicle on the road. Where the holder also has a heavy vehicle (Class 2 or Class 4) licence, they are permitted to drive heavy special vehicles. Otherwise the limits for Class 1 (6,000 kg) apply. </p><p>Being granted an I, O, P and/or V endorsement requires that the applicant passes a "fit and proper person" check, to screen for people with criminal convictions or serious driving infringements. These endorsements are issued for one or five years, at the option of the applicant at the time of purchase. </p>'),
             'fields' => [
-                array_merge($evidence_fields['menu'], ['param1' => "Class 2\nClass 3\nClass 4\nClass 5"]),
+                array_merge($evidence_fields['menu'], ['param1' => implode("\n", [
+                    multilang('Class 2'),
+                    multilang('Class 3'),
+                    multilang('Class 4'),
+                    multilang('Class 5'),
+                ])]),
                 $evidence_fields['photo'],
                 array_merge($evidence_fields['multi'], [
                     'param1' => json_encode([
-                        ['option' => 'D - Dangerous Goods', 'icon' => 'quality-management', 'default' => '0', 'delete' => '0'],
-                        ['option' => 'R - Roller', 'icon' => 'quality-management', 'default' => '0', 'delete' => '0'],
-                        ['option' => 'T - Tracks', 'icon' => 'quality-management', 'default' => '0', 'delete' => '0'],
-                        ['option' => 'W - Wheels', 'icon' => 'quality-management', 'default' => '0', 'delete' => '0'],
+                        ['option' => multilang('D - Dangerous Goods'), 'icon' => 'quality-management', 'default' => '0', 'delete' => '0'],
+                        ['option' => multilang('R - Roller'), 'icon' => 'quality-management', 'default' => '0', 'delete' => '0'],
+                        ['option' => multilang('T - Tracks'), 'icon' => 'quality-management', 'default' => '0', 'delete' => '0'],
+                        ['option' => multilang('W - Wheels'), 'icon' => 'quality-management', 'default' => '0', 'delete' => '0'],
                     ]),
                 ]),
             ],
         ],
         'participation' => [
-            'name' => 'Participation in project work',
-            'description' => '<p>The employee has successfully participated in project work and demonstrated they are able to work in a team</p>',
+            'name' => multilang('Participation in project work'),
+            'description' => multilang('<p>The employee has successfully participated in project work and demonstrated they are able to work in a team</p>'),
             'fields' => [
                 $evidence_fields['date'],
                 $evidence_fields['notes'],
@@ -2947,8 +3001,8 @@ Feel free to browse, list of users is below, their password is 12345.
             'add_image_to_description' => true,
         ],
         'electrical-safety' => [
-            'name' => 'Electrical safety certificate',
-            'description' => '<p>Proof that the employee is able to perform electrical work in compliance with This Electrical Safety Certificate also confirms that the electrical work complies with the building code for the purposes of Section 19(1)(e) of the Building Act 2004.</p>',
+            'name' => multilang('Electrical safety certificate'),
+            'description' => multilang('<p>Proof that the employee is able to perform electrical work in compliance with This Electrical Safety Certificate also confirms that the electrical work complies with the building code for the purposes of Section 19(1)(e) of the Building Act 2004.</p>'),
             'fields' => [
                 $evidence_fields['date'],
                 $evidence_fields['notes'],
@@ -2956,8 +3010,8 @@ Feel free to browse, list of users is below, their password is 12345.
             ],
         ],
         'seminar' => [
-            'name' => 'Presenting a seminar to colleagues',
-            'description' => '<p>The employee has presented a seminar in one of the following areas: <ul><li>A solo project they themselves have completed</li><li>A project that another employee has completed that they believe is to a high standard</li><li>A potential future project idea that is of interest</li></ul></p>',
+            'name' => multilang('Presenting a seminar to colleagues'),
+            'description' => multilang('<p>The employee has presented a seminar in one of the following areas: <ul><li>A solo project they themselves have completed</li><li>A project that another employee has completed that they believe is to a high standard</li><li>A potential future project idea that is of interest</li></ul></p>'),
             'fields' => [
                 $evidence_fields['date'],
                 $evidence_fields['notes'],
@@ -2966,43 +3020,47 @@ Feel free to browse, list of users is below, their password is 12345.
             'add_image_to_description' => true,
         ],
         'first-aid' => [
-            'name' => 'First aid certificate',
-            'description' => '<p>This course covers<ul><li>assessment of emergency situations</li><li>adult, child and infant resuscitation and choking</li><li>bleeding, shock, fractures, sprains and head injuries</li><li>hypothermia, burns and poisoning</li><li>medical emergencies, including asthma, diabetes and epilepsy</li><li>how to manage complex medical and traumatic emergency care situations</li></ul></p><p>On successful completion of this course you will be awarded a New Zealand Red Cross first aid certificate.</p> <p>Time commitment: 12 hours classroom learning</p> </div> <p>Valid for: 2 Year(s)</p> <h3>Standards</h3> <p><strong>NZQA Unit Standards:</strong> 06400, 06401, 06402</p> <p>If supplied with a valid NZQA ID number, New Zealand Red Cross will lodge these credits for you on successful completion of the course.</p> <p>This course also meets the Department of Labours - First Aid for Workplaces - A Good Practice Guide (September 2009) and all NZQA First Aid training requirements.</p>',
+            'name' => multilang('First aid certificate'),
+            'description' => multilang('<p>This course covers<ul><li>assessment of emergency situations</li><li>adult, child and infant resuscitation and choking</li><li>bleeding, shock, fractures, sprains and head injuries</li><li>hypothermia, burns and poisoning</li><li>medical emergencies, including asthma, diabetes and epilepsy</li><li>how to manage complex medical and traumatic emergency care situations</li></ul></p><p>On successful completion of this course you will be awarded a New Zealand Red Cross first aid certificate.</p> <p>Time commitment: 12 hours classroom learning</p> </div> <p>Valid for: 2 Year(s)</p> <h3>Standards</h3> <p><strong>NZQA Unit Standards:</strong> 06400, 06401, 06402</p> <p>If supplied with a valid NZQA ID number, New Zealand Red Cross will lodge these credits for you on successful completion of the course.</p> <p>This course also meets the Department of Labours - First Aid for Workplaces - A Good Practice Guide (September 2009) and all NZQA First Aid training requirements.</p>'),
             'fields' => [
                 $evidence_fields['photo'],
-                array_merge($evidence_fields['date'], ['fullname' => 'Obtained on']),
-                array_merge($evidence_fields['date'], ['fullname' => 'Expires on']),
+                array_merge($evidence_fields['date'], ['fullname' => multilang('Obtained on')]),
+                array_merge($evidence_fields['date'], ['fullname' => multilang('Expires on')]),
             ],
         ],
         'nursing' => [
-            'name' => 'Completion of the Overseas Nursing Programme (ONP)',
-            'description' => 'Completion of this programme is required for any nurses who received their nursing qualification outside of the United Kingdom to work in the National Health Service.',
+            'name' => multilang('Completion of the Overseas Nursing Programme (ONP)'),
+            'description' => multilang('Completion of this programme is required for any nurses who received their nursing qualification outside of the United Kingdom to work in the National Health Service.'),
             'fields' => [
-                array_merge($evidence_fields['text'], ['fullname' => 'Origin country']),
+                array_merge($evidence_fields['text'], ['fullname' => multilang('Origin country')]),
                 $evidence_fields['photo'],
                 $evidence_fields['date'],
                 array_merge($evidence_fields['multi'], [
                     'param1' => json_encode([
-                        ['option' => 'Associates', 'icon' => 'learning-programs', 'default' => '0', 'delete' => '0'],
-                        ['option' => 'Bachelors', 'icon' => 'learning-programs', 'default' => '1', 'delete' => '0'],
-                        ['option' => 'Masters', 'icon' => 'learning-programs', 'default' => '0', 'delete' => '0'],
-                        ['option' => 'Doctorate', 'icon' => 'learning-programs', 'default' => '0', 'delete' => '0'],
+                        ['option' => multilang('Associates'), 'icon' => 'learning-programs', 'default' => '0', 'delete' => '0'],
+                        ['option' => multilang('Bachelors'), 'icon' => 'learning-programs', 'default' => '1', 'delete' => '0'],
+                        ['option' => multilang('Masters'), 'icon' => 'learning-programs', 'default' => '0', 'delete' => '0'],
+                        ['option' => multilang('Doctorate'), 'icon' => 'learning-programs', 'default' => '0', 'delete' => '0'],
                     ]),
                 ]),
             ],
         ],
         'railway-safety' => [
-            'name' => 'National Rail Safety Standards (NRSS) compliance',
-            'description' => '<p>Rail Participants and Contractors operating and working on the National Rail System (NRS) are subject to the Railways Act 2005 and must either:<ul><li>Hold a track access agreement and rail license covering the scope of the intended activities, or</li><li>Be approved by a Rail Participant holding a track access agreement and a current rail license to work under the scope of those documents.</li></ul>Additionally, all parties operating on the NRS must comply with the provisions contained within the National Rail System Standards (NRSS). These standards provide a framework for the management of safety and change within a Rail Participants safety system. They also meet legislative requirements and New Zealand Transport Agency’s Rail Safety Licensing and Audit Guidelines.</p><p>NRS standards apply to all activities involving the operation of rail vehicles on the National Rail System, including:<ul><li>Definitions (language and terminology)</li><li>Safety Management</li><li>Health assessment of Rail Safety Workers</li><li>Risk Assessment</li><li>Occurrence Management</li><li>Mechanical Engineering Interoperability</li><li>Rail Operations Interoperability</li><li>Audit</li><li>Document Control</li><li>Crisis Management</li><li>Heritage Vehicle and Train Management</li></ul></p>',
+            'name' => multilang('National Rail Safety Standards (NRSS) compliance'),
+            'description' => multilang('<p>Rail Participants and Contractors operating and working on the National Rail System (NRS) are subject to the Railways Act 2005 and must either:<ul><li>Hold a track access agreement and rail license covering the scope of the intended activities, or</li><li>Be approved by a Rail Participant holding a track access agreement and a current rail license to work under the scope of those documents.</li></ul>Additionally, all parties operating on the NRS must comply with the provisions contained within the National Rail System Standards (NRSS). These standards provide a framework for the management of safety and change within a Rail Participants safety system. They also meet legislative requirements and New Zealand Transport Agency’s Rail Safety Licensing and Audit Guidelines.</p><p>NRS standards apply to all activities involving the operation of rail vehicles on the National Rail System, including:<ul><li>Definitions (language and terminology)</li><li>Safety Management</li><li>Health assessment of Rail Safety Workers</li><li>Risk Assessment</li><li>Occurrence Management</li><li>Mechanical Engineering Interoperability</li><li>Rail Operations Interoperability</li><li>Audit</li><li>Document Control</li><li>Crisis Management</li><li>Heritage Vehicle and Train Management</li></ul></p>'),
             'fields' => [
-                array_merge($evidence_fields['menu'], ['param1' => "NRSS/4\nNRSS/5\nNRSS/6"]),
-                array_merge($evidence_fields['date'], ['fullname' => 'Completed on']),
+                array_merge($evidence_fields['menu'], ['param1' => implode("\n", [
+                    multilang('NRSS/4'),
+                    multilang('NRSS/5'),
+                    multilang('NRSS/6'),
+                ])]),
+                array_merge($evidence_fields['date'], ['fullname' => multilang('Completed on')]),
                 $evidence_fields['confirm'],
             ],
         ],
         'safety-checks' => [
-            'name' => 'Can perform safety checks',
-            'description' => '<p>The employee has demonstrated that they are able to independently conduct safety checks required for compliance.</p>',
+            'name' => multilang('Can perform safety checks'),
+            'description' => multilang('<p>The employee has demonstrated that they are able to independently conduct safety checks required for compliance.</p>'),
             'fields' => [
                 $evidence_fields['date'],
                 $evidence_fields['notes'],
@@ -3011,8 +3069,8 @@ Feel free to browse, list of users is below, their password is 12345.
             'add_image_to_description' => true,
         ],
         'orientation' => [
-            'name' => 'Completed new employee orientation',
-            'description' => '<p>Orientation should be completed at the beginning of employment.</p>',
+            'name' => multilang('Completed new employee orientation'),
+            'description' => multilang('<p>Orientation should be completed at the beginning of employment.</p>'),
             'fields' => [
                 $evidence_fields['date'],
                 $evidence_fields['confirm'],
@@ -3020,8 +3078,8 @@ Feel free to browse, list of users is below, their password is 12345.
             'add_image_to_description' => true,
         ],
         'staff-training' => [
-            'name' => 'Can train new staff members',
-            'description' => '<p>The employee has demonstrated that they are able to independently train new staff members.</p>',
+            'name' => multilang('Can train new staff members'),
+            'description' => multilang('<p>The employee has demonstrated that they are able to independently train new staff members.</p>'),
             'fields' => [
                 $evidence_fields['date'],
                 $evidence_fields['notes'],
@@ -3849,19 +3907,19 @@ function create_manual_job_assignments($user, $assignments, $data) {
             switch ($type) {
                 case manual::ROLE_MANAGER:
                     $managerja = job_assignment::create_default($manager->id, [
-                        'fullname' => 'Manager of ' . fullname($user),
+                        'fullname' => multilang('Manager of ' . fullname($user)),
                         'idnumber' => $manager_key . '_manager_of_' . $user_key,
                     ]);
                     $created_assignments[] = job_assignment::create_default($user->id, [
                         'managerjaid' => $managerja->id,
-                        'fullname' => 'Managed by ' . fullname($manager),
+                        'fullname' => multilang('Managed by ' . fullname($manager)),
                         'idnumber' => $user_key . '_managed_by_' . $manager_key,
                     ]);
                     break;
                 case manual::ROLE_APPRAISER:
                     $created_assignments[] = job_assignment::create_default($user->id, [
                         'appraiserid' => $manager->id,
-                        'fullname' => 'Appraised by ' . fullname($manager),
+                        'fullname' => multilang('Appraised by ' . fullname($manager)),
                         'idnumber' => $user_key . '_appraised_by_' . $manager_key,
                     ]);
                     break;
@@ -4028,7 +4086,7 @@ function create_manual_ratings($manual_ratings, $data) {
         $user = get_user($user, $data);
         $comp = get_competency($fw, $comp, $data);
 
-        $placeholder_comment = "Placeholder Comment: Wow, this person definitely possesses this scale value, no doubt about it!";
+        $placeholder_comment = multilang("Placeholder Comment: Wow, this person definitely possesses this scale value, no doubt about it!");
 
         foreach ($values as $rating) {
             [$scale, $index] = explode('_', $rating[2]);
@@ -4248,7 +4306,7 @@ function create_info_block($data) {
             'format' => 1,
         ])),
         'common_config' => json_encode([
-            'title' => 'What to look for?',
+            'title' => multilang('What to look for?'),
             'override_title' => true,
             'enable_hiding' => false,
             'show_header' => false,
@@ -4260,6 +4318,47 @@ function create_info_block($data) {
     ];
 
     builder::table('block_instances')->insert($object);
+}
+
+/**
+ * If multilang is enabled, create a multilang string out of the given string.
+ *
+ * @param string $string
+ * @return string
+ */
+function multilang(string $string): string {
+    global $options;
+    if (!$options['multilang']) {
+        return $string;
+    }
+
+    $multilang_string = '';
+    foreach ($options['languages'] as $lang_code => $lang_name) {
+        $multilang_string .= "<span lang=\"{$lang_code}\" class=\"multilang\">({$lang_name}) $string</span>";
+    }
+    return $multilang_string;
+}
+
+/**
+ * Enable multilang header and content strings for the site.
+ */
+function enable_multilang() {
+    global $options;
+
+    // There is a limit to the number of languages we can have due to the length of name
+    // fields in the DB, since we have to use crappy span tags for each language we want.
+    $options['languages'] = [
+        'en' => 'English', // Should probably keep this one!
+        'fr' => 'Français',
+    ];
+
+    echo "\nEnabling multi-lang strings for the following languages: " .
+        implode(', ', array_keys($options['languages'])) . ".\n";
+
+    (new tool_langimport\controller())->install_languagepacks(array_keys($options['languages']));
+
+    filter_set_global_state('multilang', TEXTFILTER_ON);
+    filter_set_applies_to_strings('multilang', true);
 }
 
 /**

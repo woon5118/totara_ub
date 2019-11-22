@@ -27,7 +27,6 @@ use coding_exception;
 use totara_competency\entities\assignment;
 use totara_competency\entities\scale;
 use totara_competency\entities\scale_value;
-use totara_competency\models\basic_model;
 
 /**
  * Class proficiency value model

@@ -212,7 +212,7 @@ if ($prefix === 'competency' && !empty($item->id)) {
 if ($item->id == 0) {
     echo $OUTPUT->heading(get_string('addnew'.$prefix, 'totara_hierarchy'));
 } else {
-    echo $OUTPUT->heading(get_string('edit'.$prefix, 'totara_hierarchy', $item->fullname));
+    echo $OUTPUT->heading(get_string('edit'.$prefix, 'totara_hierarchy', format_string($item->fullname)));
 }
 
 if ($prefix === 'competency') {

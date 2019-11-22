@@ -23,8 +23,10 @@
 
 namespace totara_competency\webapi\resolver\type;
 
+use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
+use totara_core\formatter\field\string_field_formatter;
 
 /**
  * Summarized pathway criteria
@@ -57,7 +59,10 @@ class summarized_pathway_criteria implements type_resolver {
                 if (!isset($summary->{$field})) {
                     return null;
                 }
-                return $summary->{$field};
+                $formatter = new string_field_formatter($args['format'] ?? format::FORMAT_HTML, \context_system::instance());
+                return array_map(function (string $item) use ($formatter): string {
+                    return $formatter->format($item);
+                }, $summary->{$field});
         }
 
         throw new \coding_exception('Unknown field', $field);

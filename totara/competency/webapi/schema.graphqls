@@ -58,7 +58,7 @@ Competency profile overall progress
 type totara_competency_profile_overall_progress {
   user: core_user
   items: [totara_competency_profile_progress_item!]
-  latest_achievement: String
+  latest_achievement(format: core_format = HTML): String
   filters: [totara_competency_profile_assignment_filter_option!]
 }
 
@@ -68,7 +68,7 @@ To simplify, it is a list of assignments grouped by assignment type, user group 
 """
 type totara_competency_profile_progress_item {
   overall_progress: Int!
-  name: String!
+  name(format: core_format = HTML): String!
   items: [totara_competency_profile_assignment_progress]
 }
 
@@ -97,7 +97,7 @@ Competency profile scale_value progress type that includes extra details (the pe
 type totara_competency_profile_scale_value_progress {
   id: core_id
   scale_id: core_id
-  name: String!
+  name(format: core_format = HTML): String!
   percentage: Int
   proficient: Boolean
 }
@@ -106,12 +106,12 @@ type totara_competency_profile_scale_value_progress {
 Competency profile assignment filter option
 """
 type totara_competency_profile_assignment_filter_option {
-  name: String!
+  name(format: core_format = HTML): String!
   user_group_type: String!
   user_group_id: Int!
   type: String!
   status: Int!
-  status_name: String!
+  status_name(format: core_format = HTML): String!
 }
 
 """
@@ -206,7 +206,7 @@ type totara_competency_competency implements totara_competency_competency_interf
   type: totara_competency_competency_type
   assignments: [totara_competency_assignment]
   assign_availability: [Int]
-  custom_fields: [totara_competency_competency_custom_field]
+  display_custom_fields: [totara_competency_competency_custom_field]
   aggregation_method: Int
 }
 
@@ -372,13 +372,12 @@ enum totara_competency_pathway_status {
 }
 
 """
- Summarized pathway criteria detail
-None of the strings are retrieved from user input - therefore no formatting requirement
+Summarized pathway criteria detail
 """
 type totara_competency_summarized_pathway_criteria {
   item_type: String!
   item_aggregation: String
-  items: [String!]
+  items(format: core_format = HTML): [String!]
 }
 
 """
@@ -394,7 +393,7 @@ type totara_competency_pathway {
   sortorder: Int!
   status: totara_competency_pathway_status!
   classification: totara_competency_pathway_classification!
-  scale_value: String
+  scale_value(format: core_format = HTML): String
   criteria_summary: [totara_competency_summarized_pathway_criteria!]
 }
 
