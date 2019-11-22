@@ -386,11 +386,21 @@ class totara_assign_core {
      * @return array(sql,params) Array containing "WHERE ..." sql snippet and parameters to use in another query.
      */
     protected function get_user_search_where_sql($search, $useralias) {
-        global $CFG;
-        require_once($CFG->dirroot . '/totara/core/searchlib.php');
+        global $DB;
+        if (empty($search)) {
+            return array('', array());
+        }
 
-        $keywords = totara_search_parse_keywords($search);
-        return totara_search_get_keyword_where_clause($keywords, ["{$useralias}.firstname", "{$useralias}.lastname"]);
+        $likeparam = '%' . $DB->sql_like_escape($search) . '%';
+
+        $sql = "(" .
+            $DB->sql_like("{$useralias}.firstname", '?', false, false) .
+            " OR " .
+            $DB->sql_like("{$useralias}.lastname", '?', false, false) .
+            ")";
+        $params = array($likeparam, $likeparam);
+
+        return array($sql, $params);
     }
 
     /**

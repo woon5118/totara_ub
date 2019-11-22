@@ -2173,41 +2173,4 @@ class totara_appraisal_appraisal_testcase extends appraisal_testcase {
         $this->assertEquals(1, $missing->validappraiseecount);
         $this->assertEquals($limit, count($missing->roles));
     }
-
-    public function test_get_current_users_search() {
-        $this->setAdminUser();
-
-        $user1 = $this->getDataGenerator()->create_user(['firstname' => 'Joe Bill', 'lastname' => 'Smith']);
-        $user2 = $this->getDataGenerator()->create_user(['firstname' => 'Bill', 'lastname' => 'Miller']);
-
-        list($appraisal1) = $this->prepare_appraisal_with_users([], [$user1, $user2]);
-        $appraisal1->validate();
-        $appraisal1->activate();
-        $this->update_job_assignments($appraisal1);
-        $assign = new totara_assign_appraisal('appraisal', $appraisal1);
-
-        $this->assert_recordset_users([$user1->id, $user2->id], $assign->get_current_users());
-        $this->assert_recordset_users([$user1->id], $assign->get_current_users('Jo'));
-        $this->assert_recordset_users([$user1->id], $assign->get_current_users('Joe'));
-        $this->assert_recordset_users([$user1->id], $assign->get_current_users('Joe Bill'));
-        $this->assert_recordset_users([$user1->id], $assign->get_current_users('Smith'));
-        $this->assert_recordset_users([$user1->id], $assign->get_current_users('Joe Smith'));
-        $this->assert_recordset_users([$user1->id], $assign->get_current_users('Joe Bill Smith'));
-        $this->assert_recordset_users([$user1->id], $assign->get_current_users('Smith Bill Joe'));
-
-        $this->assert_recordset_users([$user2->id], $assign->get_current_users('Bill Miller'));
-        $this->assert_recordset_users([$user2->id], $assign->get_current_users('Miller Bill'));
-        $this->assert_recordset_users([$user2->id], $assign->get_current_users('Miller'));
-
-        $this->assert_recordset_users([$user1->id, $user2->id], $assign->get_current_users('Bill'));
-    }
-
-    private function assert_recordset_users(array $expected_user_ids, moodle_recordset $recordset) {
-        $record_user_ids = [];
-        foreach ($recordset as $record) {
-            $record_user_ids[] = $record->id;
-        }
-        $recordset->close();
-        $this->assertEqualsCanonicalizing($expected_user_ids, $record_user_ids);
-    }
 }
