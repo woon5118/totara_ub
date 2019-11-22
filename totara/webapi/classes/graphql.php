@@ -29,6 +29,7 @@ use core\webapi\execution_context;
  * Main GraphQL API intended for plugins such as External API or mobile support.
  */
 final class graphql {
+
     /**
      * Returns all schema file contents
      *
@@ -37,19 +38,35 @@ final class graphql {
     public static function get_schema_file_contents() {
         global $CFG;
 
-        $schemas = array();
-
         // NOTE: Subsystems schemas are not supported intentionally,
         //       the reason is that Frankenstyle in subsystems would
         //       make the schema structure illogical.
-        $schemas[] = file_get_contents($CFG->dirroot . '/lib/webapi/schema.graphqls');
 
+        // The core schema file comes first
+        $root_schema_file = $CFG->dirroot . '/lib/webapi/schema.graphqls';
+        if (!file_exists($root_schema_file) || !is_readable($root_schema_file)) {
+            throw new \coding_exception('Core has to have at least a schema.graphqls file');
+        }
+        $schemas = [self::get_schema_file_content($root_schema_file)];
+
+        // Add any additional files from core
+        $filenames = self::get_graphqls_files($CFG->dirroot . '/lib/webapi');
+        foreach ($filenames as $filename) {
+            if (preg_match("/\\/schema\\.graphqls$/", $filename)) {
+                continue;
+            }
+            $schemas[] = self::get_schema_file_content($filename);
+        }
+
+        // Then read all plugin schema files, here the order or names do not matter
+        // as they will all be merged together and then extend the main schema
         $types = \core_component::get_plugin_types();
         foreach ($types as $type => $typedir) {
             $plugins = \core_component::get_plugin_list($type);
             foreach ($plugins as $plugin => $plugindir) {
-                if (file_exists("$plugindir/webapi/schema.graphqls")) {
-                    $schemas[] = file_get_contents("$plugindir/webapi/schema.graphqls");
+                $filenames = self::get_graphqls_files("$plugindir/webapi/");
+                foreach ($filenames as $filename) {
+                    $schemas[] = self::get_schema_file_content($filename);
                 }
             }
         }
@@ -59,8 +76,9 @@ final class graphql {
                 if (!$dir) {
                     continue;
                 }
-                if (file_exists("$dir/webapi/schema.graphqls")) {
-                    debugging('schema.graphqls files are not allowed in core subsystems, use lib/webapi/schema.graphqls instead');
+                $filenames = self::get_graphqls_files("$dir/webapi");
+                if (!empty($filenames)) {
+                    debugging('.graphqls files are not allowed in core subsystems, use lib/webapi/schema.graphqls instead');
                 }
             }
         }
@@ -69,16 +87,56 @@ final class graphql {
     }
 
     /**
+     * Read contents of given schema file
+     *
+     * @param string $filename
+     * @return string
+     * @throws \Exception
+     */
+    private static function get_schema_file_content(string $filename): string {
+        $content = file_get_contents($filename);
+        if ($content === false) {
+            throw new \Exception('Could not read schema file '.$filename);
+        }
+        return $content;
+    }
+
+    /**
+     * Get all .graphqls files in given folder
+     *
+     * @param string $dir
+     * @return array
+     */
+    public static function get_graphqls_files(string $dir): array {
+        if (!file_exists($dir) || !is_readable($dir) || !is_dir($dir)) {
+            return [];
+        }
+
+        $schema_files = [];
+        if ($handle = opendir($dir)) {
+            while (false !== ($file_name = readdir($handle))) {
+                if (preg_match("/\\.graphqls$/", $file_name)) {
+                    $schema_files[] = "{$dir}/{$file_name}";
+                }
+            }
+
+            closedir($handle);
+        }
+        return $schema_files;
+    }
+
+    /**
      * Returns the schema instance
      *
      * @return \GraphQL\Type\Schema
      */
     public static function get_schema() {
-
         $schemas = self::get_schema_file_contents();
 
+        // The first schema file always contains the basic types
         $schema = \GraphQL\Utils\BuildSchema::build(array_shift($schemas));
 
+        // Merge all the rest together and extend the main schema
         if (!empty($schemas)) {
             $schemas = implode("\n", $schemas);
             $extension = \GraphQL\Language\Parser::parse($schemas);

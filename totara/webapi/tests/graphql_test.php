@@ -30,6 +30,32 @@ use core\webapi\execution_context;
 use totara_webapi\local\util;
 
 class totara_webapi_graphql_testcase extends advanced_testcase {
+
+    public function test_get_graphqls_files() {
+        // Non-existant folder
+        $files = graphql::get_graphqls_files(__DIR__.'/fixtures/idontexist');
+        $this->assertIsArray($files);
+        $this->assertEmpty($files);
+
+        // Folder without any graphqls files
+        $files = graphql::get_graphqls_files(__DIR__.'/');
+        $this->assertIsArray($files);
+        $this->assertEmpty($files);
+
+        // Test folder with some test files in it
+        $files = graphql::get_graphqls_files(__DIR__.'/fixtures/webapi');
+        $this->assertIsArray($files);
+        $this->assertCount(3, $files);
+        $this->assertEqualsCanonicalizing(
+            [
+                __DIR__.'/fixtures/webapi/test_schema_1.graphqls',
+                __DIR__.'/fixtures/webapi/test_schema_2.graphqls',
+                __DIR__.'/fixtures/webapi/test_schema_3.graphqls',
+            ],
+            $files
+        );
+    }
+
     public function test_get_schema_file_contents() {
         $schema = graphql::get_schema_file_contents();
 
