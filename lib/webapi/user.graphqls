@@ -1,0 +1,33 @@
+"""
+User information.
+
+NOTE: for privacy reasons the query is responsible of filtering only users that are allowed to be seen
+"""
+type core_user {
+  id: core_id!
+  idnumber: String
+  fullname: String!
+  firstname: String
+  lastname: String
+  email: String
+  address: String
+  phone1: String
+  phone2: String
+  department: String
+  institution: String
+  city: String
+  country: String
+  description(format: core_format = HTML): String
+  descriptionformat: Int
+  profileimageurl: String
+  profileimageurlsmall: String
+  profileimagealt: String
+  lang: String
+  theme: String
+  suspended: Boolean
+  timezone: String
+  interests: Boolean
+  firstaccess(format: core_date_format = TIMESTAMP): core_date
+  lastaccess(format: core_date_format = TIMESTAMP): core_date
+  # TODO add custom profile fields
+}
