@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`editor_weka/components/Weka.vue toolbar is showing and render correctly 1`] = `
+<div
+  class="tui-weka no-yui-ids"
+  id="uid-weka"
+>
+  <toolbar-stub
+    items="[object Object],[object Object],[object Object],[object Object],[object Object],[object Object]"
+  />
+   
+  <div
+    class="tui-rendered"
+    data-placeholder=""
+  >
+    <div
+      class="ProseMirror tui-weka-editor"
+      contenteditable="true"
+    >
+      <p>
+        <br />
+      </p>
+    </div>
+  </div>
+   
+  <div />
+   
+  <div
+    aria-live="polite"
+    role="status"
+  />
+</div>
+`;

@@ -81,6 +81,10 @@ export function unloadedStrings(requests) {
  * @param {array} requests Array of format [{ component: 'foo', key: 'bar' }]
  */
 export async function loadStrings(requests) {
+  if (requests.length === 0) {
+    return;
+  }
+
   return rawLoadStrings(
     requests.map(x => {
       const normalized = normalizeComponent(x.component);

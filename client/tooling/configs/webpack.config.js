@@ -123,7 +123,7 @@ function createConfig({
       use: [require.resolve('../webpack/tui_vue_loader'), 'vue-loader'],
     },
     {
-      test: /\.scss$/,
+      test: /\.s?css$/,
       use: primary
         ? [
             MiniCssExtractPlugin.loader,

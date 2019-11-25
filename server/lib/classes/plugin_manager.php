@@ -1367,7 +1367,9 @@ class core_plugin_manager {
             ),
 
             'editor' => array(
-                'atto', 'textarea'
+                'atto', 'textarea',
+                // Totara
+                'weka'
             ),
 
             'enrol' => array(

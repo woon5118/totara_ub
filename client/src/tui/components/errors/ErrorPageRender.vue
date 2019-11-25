@@ -23,7 +23,8 @@
     </h1>
     <p>
       {{
-        $tryStr('error:pagerender', 'totara_core') ||
+        message ||
+          $tryStr('error:pagerender', 'totara_core') ||
           'An error occurred while rendering the page.'
       }}
     </p>
@@ -49,11 +50,10 @@
 <script>
 export default {
   props: {
+    message: String,
     // error can accept any type as long as it or its .stack property can be converted to a string
     // eslint-disable-next-line vue/require-prop-types
-    error: {
-      default: undefined,
-    },
+    error: {},
     retryable: Boolean,
   },
 

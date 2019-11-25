@@ -287,6 +287,23 @@ class behat_forms extends behat_base {
     }
 
     /**
+     * Sets the specified value to the field with a css selector.
+     *
+     * @Given /^I set the field with css "(?P<field_selector>(?:[^"]|\\")*)" to "(?P<field_value_string>(?:[^"]|\\")*)"$/
+     * @throws ElementNotFoundException Thrown by behat_base::find
+     * @param string $selector
+     * @param string $value
+     * @return void
+     */
+    public function i_set_the_field_with_css_to($selector, $value) {
+        \behat_hooks::set_step_readonly(false);
+        $fieldnode = $this->find('css', $selector);
+        $this->ensure_node_is_visible($fieldnode);
+        $field = behat_field_manager::get_form_field($fieldnode, $this->getSession());
+        $field->set_value($value);
+    }
+
+    /**
      * Checks, the field matches the value. More info in https://help.totaralearning.com/display/DEV/Behat.
      *
      * @Then /^the field "(?P<field_string>(?:[^"]|\\")*)" matches value "(?P<field_value_string>(?:[^"]|\\")*)"$/

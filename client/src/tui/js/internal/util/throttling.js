@@ -95,7 +95,7 @@ export function throttle(fn, wait, options) {
  * @param {function} fn Function to call.
  * @param {number} wait Miliseconds to wait.
  * @param {object} [options]
- * @param {boolean} [options.leading=true] Execute on leading edge?
+ * @param {boolean} [options.leading=false] Execute on leading edge?
  * @param {boolean} [options.trailing=true] Execute on trailing edge?
  * @param {boolean} [options.perArgs=false] Throttle separately per argument set?
  * @returns {function}

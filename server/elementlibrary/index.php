@@ -41,6 +41,7 @@ echo html_writer::tag('li', html_writer::link(new moodle_url('/elementlibrary/to
 echo html_writer::tag('li', html_writer::link(new moodle_url('/elementlibrary/dialogs.php'), 'Dialogs'));
 echo html_writer::tag('li', html_writer::link(new moodle_url('/elementlibrary/verticaltabs.php'), 'Vertical tabs'));
 echo html_writer::tag('li', html_writer::link(new moodle_url('/elementlibrary/flex_icons.php'), 'Flexible icons'));
+echo html_writer::tag('li', html_writer::link(new moodle_url('/elementlibrary/json_editor.php'), 'Json editor node'));
 
 // Only display the pattern library if Roots is a parent.
 // This is as new patterns will not be available in deprecated

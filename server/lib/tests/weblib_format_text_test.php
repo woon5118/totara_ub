@@ -869,4 +869,55 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         self::assertSame('&lt;div&gt;Te&lt;style&gt;background-color:red;&lt;/style&gt;st&lt;/div&gt;', format_text($text, FORMAT_PLAIN));
         self::assertSame('<div class="text_to_html"><div>Test</div></div>', format_text($text, FORMAT_MOODLE));
     }
+
+    /**
+     * A test to make sure that
+     * @return void
+     */
+    public function test_format_json_content(): void {
+        global $CFG, $USER;
+        require_once("{$CFG->dirroot}/lib/filelib.php");
+
+        $this->setAdminUser();
+        $context = context_user::instance($USER->id);
+
+        $file_record = new stdClass();
+        $file_record->itemid = file_get_unused_draft_itemid();
+        $file_record->filename = 'file.png';
+        $file_record->component = 'user';
+        $file_record->filearea = 'draft';
+        $file_record->filepath = '/';
+        $file_record->contextid = $context->id;
+
+        $fs = get_file_storage();
+        $stored_file = $fs->create_file_from_string($file_record, 'some content by bolobala');
+
+        $document = [
+            'type' => 'doc',
+            'content' => [
+                \core\json_editor\node\image::create_raw_node_from_image($stored_file)
+            ]
+        ];
+
+        $content = json_encode($document);
+
+        // We will skip filter for now, as the file is only draft file.
+        $output = format_text($content, FORMAT_JSON_EDITOR, ['filter' => false]);
+
+        $url = moodle_url::make_draftfile_url(
+            $file_record->itemid,
+            $file_record->filepath,
+            $file_record->filename
+        );
+
+        $expected = html_writer::empty_tag(
+            'img',
+            [
+                'src' => $url->out(false),
+                'alt' => ''
+            ]
+        );
+
+        $this->assertEquals($expected, $output);
+    }
 }

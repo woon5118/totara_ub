@@ -148,4 +148,37 @@ final class component implements renderable {
         $framework = $page->requires->framework(framework::class);
         return $framework;
     }
+
+    /**
+     * Returns a span tag that can be transformed by the Tui front end framework into a Tui component.
+     *
+     * This method does not include javascript to the page, it will have to be done via calling renderer/OUTPUT.
+     *
+     * @return string
+     */
+    public function out_html(): string {
+        $attributes = [
+            $this->encode_html_attribute('data-tui-component', $this->get_name()),
+        ];
+
+        if ($this->has_props()) {
+            $attributes[] = $this->encode_html_attribute('data-tui-props', $this->get_props_encoded());
+        }
+
+        return '<span ' . join(' ', $attributes) . '></span>';
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     *
+     * @return string
+     */
+    private function encode_html_attribute(string $key, string $value): string {
+        // TL-22100: use htmlspecialchars() rather than s() as s() will unencode some double encoded HTML entities, resulting
+        // in prop injection and potential XSS. This is not a standard approach, you should be using s() normally.
+        $key = htmlspecialchars($key, ENT_QUOTES, 'UTF-8');
+        $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+        return "{$key}=\"{$value}\"";
+    }
 }

@@ -1,0 +1,10 @@
+query editor_weka_media_type_of_draft_file(
+  $item_id: param_integer!
+  $filename: param_text!
+) {
+  file: editor_weka_draft_file(item_id: $item_id, filename: $filename) {
+    __typename
+    media_type
+    mime_type
+  }
+}

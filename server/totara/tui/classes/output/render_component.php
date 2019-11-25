@@ -52,20 +52,6 @@ trait render_component {
      */
     final protected function render_component(component $component): string {
         $component->register($this->page);
-
-        $attributes = [
-            'data-tui-component' => $component->get_name(),
-        ];
-        if ($component->has_props()) {
-            $attributes['data-tui-props'] = $component->get_props_encoded();
-        }
-
-        array_walk($attributes, function (&$value, $key) {
-            // TL-22100: use htmlspecialchars() rather than s() as s() will unencode some double encoded HTML entities, resulting
-            // in prop injection and potential XSS. This is not a standard approach, you should be using s() normally.
-            $value = htmlspecialchars($key, ENT_QUOTES, 'UTF-8') . '="' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '"';
-        });
-
-        return '<span ' . join(' ', $attributes) . '></span>';
+        return $component->out_html();
     }
 }

@@ -64,6 +64,14 @@ class filter_manager {
      */
     protected $stringfilters = array();
 
+    /**
+     * Totara: this is the list of active filters, by context for filtering the json node.
+     * An array contextid => ordered array of filter name => filter objects.
+     * @since Totara 13.0
+     * @var array
+     */
+    protected $jsonfilters = array();
+
     /** @var array Exploded version of $CFG->stringfilters. */
     protected $stringfilternames = array();
 
@@ -112,6 +120,7 @@ class filter_manager {
         $this->textfilters = array();
         $this->stringfilters = array();
         $this->stringfilternames = array();
+        $this->jsonfilters = []; // Totara: Added support for json node filters.
     }
 
     /**
@@ -123,6 +132,7 @@ class filter_manager {
         $filters = filter_get_active_in_context($context);
         $this->textfilters[$context->id] = array();
         $this->stringfilters[$context->id] = array();
+        $this->jsonfilters[$context->id] = array(); // Totara: Added support for json node filters.
         foreach ($filters as $filtername => $localconfig) {
             $filter = $this->make_filter_object($filtername, $context, $localconfig);
             if (is_null($filter)) {
@@ -131,6 +141,10 @@ class filter_manager {
             $this->textfilters[$context->id][$filtername] = $filter;
             if (in_array($filtername, $this->stringfilternames)) {
                 $this->stringfilters[$context->id][$filtername] = $filter;
+            }
+
+            if ($filter->support_json_content()) {
+                $this->jsonfilters[$context->id][$filtername] = $filter;
             }
         }
     }
@@ -193,6 +207,20 @@ class filter_manager {
     }
 
     /**
+     * @since Totara 13.0
+     * @param \context $context
+     *
+     * @return moodle_text_filter[]
+     */
+    protected function get_json_filters($context): array {
+        if (!isset($this->jsonfilters[$context->id])) {
+            $this->load_filters($context);
+        }
+
+        return $this->jsonfilters[$context->id];
+    }
+
+    /**
      * Get all the filters that apply to a given context for calls to format_string.
      *
      * @param context $context the context.
@@ -220,6 +248,25 @@ class filter_manager {
         // <nolink> tags removed for XHTML compatibility
         $text = str_replace(array('<nolink>', '</nolink>'), '', $text);
         return $text;
+    }
+
+    /**
+     * API to filter the json content.
+     *
+     * @since Totara 13.0
+     * @param string $json_text
+     * @param context $context
+     *
+     * @return string
+     */
+    public function filter_json(string $json_text, context $context): string {
+        $filters = $this->get_json_filters($context);
+
+        foreach ($filters as $filter) {
+            $json_text = $filter->filter_json($json_text);
+        }
+
+        return $json_text;
     }
 
     /**
@@ -483,6 +530,29 @@ abstract class moodle_text_filter {
      * @return string the HTML content after the filtering has been applied.
      */
     public abstract function filter($text, array $options = array());
+
+    /**
+     * Override this function at children level to tell the manager that the filter is
+     * able to support filtering json content.
+     *
+     * @since Totara 13.0
+     * @return bool
+     */
+    public function support_json_content(): bool {
+        return false;
+    }
+
+    /**
+     * Extending this function at the children filter to filter the content of FORMAT_JSON_EDITOR
+     *
+     * @since Totara 13.0
+     *
+     * @param string $json_text
+     * @return string
+     */
+    public function filter_json(string $json_text): string {
+        return $json_text;
+    }
 
     /**
      * Returns true if text can be cleaned after filtering.

@@ -245,6 +245,7 @@ function file_postupdate_standard_editor($data, $field, array $options, $context
         $data->{$field.'trust'} = 0;
     }
 
+    // Totara: make sure that the field "{$field}_editor" does not give us any error.
     $editor = $data->{$field.'_editor'};
 
     if ($options['maxfiles'] == 0 or is_null($filearea) or is_null($itemid) or empty($editor['itemid'])) {

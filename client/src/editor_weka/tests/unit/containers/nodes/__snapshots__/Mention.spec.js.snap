@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`editor_weka/components/nodes/Mention.vue Checks snapshot 1`] = `
+<span
+  class="tui-editorWeka-mention"
+>
+  <mention-stub
+    fullname="Admin User"
+    userid="15"
+  />
+</span>
+`;

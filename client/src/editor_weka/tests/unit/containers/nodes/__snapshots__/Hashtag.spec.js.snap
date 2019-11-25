@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`editor_weka/components/nodes/Hashtag.vue Checks snapshot 1`] = `
+<hashtag-stub
+  text="hashtag-editor_weka"
+  url="/totara/catalog/index.php?[object Object]"
+/>
+`;

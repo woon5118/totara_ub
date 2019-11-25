@@ -1,0 +1,12 @@
+extend type Mutation {
+    """
+    A mutation to fetch the unused draft item id.
+    This is mutation because, if it is a query, apollo-client will try to squeeze
+    the multiple requests into one - as they are identical to each other.
+    Hence, mutation will be better because it will assure that each of query within multiple
+    instnaces to be executed.
+
+    Note that: `fetchPolicy: 'no-cache'` does not help at all.
+    """
+    core_file_unused_draft_item_id: Int!
+}

@@ -79,6 +79,7 @@ class behat_partial_named_selector extends \Behat\Mink\Selector\PartialNamedSele
         // Totara
         'totaradialogue' => 'totaradialogue',
         'definition' => 'definition',
+        'menuitem' => 'menuitem',
     );
 
     /**
@@ -117,6 +118,7 @@ class behat_partial_named_selector extends \Behat\Mink\Selector\PartialNamedSele
         // Totara
         'totaradialogue' => 'totaradialogue',
         'definition' => 'definition',
+        'menuitem' => 'menuitem',
     );
 
     /**
@@ -246,6 +248,12 @@ XPATH
     /descendant::input[@id = %locator% or @id = //label[contains(normalize-space(string(.)), %locator%)]/@for]
 XPATH
         ],
+        'menuitem' => [
+            'role' => <<<XPATH
+.//*
+[(%lowercaseRole% = 'menuitem')][(%idOrValueMatch% or %titleMatch% or %tagTextMatch%)]
+XPATH
+        ]
     ];
 
     /**

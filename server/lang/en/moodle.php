@@ -870,6 +870,7 @@ $string['format_help'] = 'The course format determines the layout of the course 
 * **Topics format**: The course page is organised into topic sections.
 * **Weekly format**: The course page is organised into weekly sections, with the first week starting on the course start date.';
 $string['formathtml'] = 'HTML format';
+$string['formatjsoneditor'] = 'JSON editor format';
 $string['formatmarkdown'] = 'Markdown format';
 $string['formatplain'] = 'Plain text format';
 $string['formattext'] = 'Totara auto-format';

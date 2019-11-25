@@ -1,0 +1,112 @@
+type editor_weka_extension {
+  name: String!
+  tuicomponent: String!
+
+  """
+  Options is an json_encoded string, this string should be decoded in the front-end and pass it to extension itself.
+  """
+  options: String
+}
+
+type editor_weka_editor {
+  extensions(
+    component: param_component
+    area: param_area
+  ): [editor_weka_extension!]!
+  """
+  To tell whether we are displaying toolbar or not.
+  """
+  showtoolbar(
+    component: param_component
+    area: param_area
+  ): Boolean!
+  """
+  The upload repository data
+  """
+  repository_data: editor_weka_repository_data!
+  """
+  The context's id where the editor is being used. This has to be done as part of constructing
+  editor, most likely it can be context_system, if the component that is using editor is not providing one.
+  """
+  context_id: Int!
+  """
+  The current files within weka editor. If there are any.
+  """
+  files(
+    """
+    The component where the files are living.
+    By default, this will be 'user'
+    """
+    component: param_component
+    """
+    The file area which identify the place within the component.
+    By default, the value for this key will be 'draft'
+    """
+    file_area: param_area
+    """
+    The item's id - which should be the file draft id id.
+    """
+    item_id: param_integer
+  ): [editor_weka_file!]!
+}
+
+type editor_weka_file {
+  filename: String!
+  file_size: Int!
+  mime_type: String!
+  url(force_download: Boolean!): String!
+  """
+  If media_type is null, then this file is not a part of any embbedded-able media files.
+  """
+  media_type: editor_weka_media_type
+}
+
+type editor_weka_repository_data {
+  url: String!
+  repository_id: Int!
+}
+
+type editor_weka_file_draft_area {
+  url: String!
+  draftid: Int!
+  repositoryid: Int!
+}
+
+enum editor_weka_media_type {
+  IMAGE
+  VIDEO
+  AUDIO
+}
+
+extend type Query {
+  editor_weka_editor(
+    component: param_component!
+    area: param_area!
+    instance_id: param_integer
+  ): editor_weka_editor
+
+  """
+  A query to fetch the repository data for editor weka.
+  """
+  editor_weka_repository_data(
+    context_id: param_integer
+  ): editor_weka_repository_data!
+
+  """
+  A Query to get the file metadata of a draft file
+  """
+  editor_weka_draft_file(
+    item_id: param_integer!
+    filename: param_text!
+  ): editor_weka_file
+
+  """
+  Query to find the users by name's pattern.
+  """
+  editor_weka_users_by_pattern(
+    pattern: param_text!
+    contextid: param_integer
+    component: param_component
+    area: param_area
+  ): [core_user!]!
+}

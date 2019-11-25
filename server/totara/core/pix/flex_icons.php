@@ -45,6 +45,69 @@ $icons = array(
                     'classes' => 'fa-home',
                 ),
         ),
+    'totara_core|archive_file' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-file-archive-o'
+                )
+        ),
+    'totara_core|pdf_file' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-file-pdf-o'
+                )
+        ),
+    'totara_core|image_file' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-file-image-o'
+                )
+        ),
+    'totara_core|word_file' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-file-word-o'
+                )
+        ),
+    'totara_core|excel_file' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-file-excel-o'
+                )
+        ),
+    'totara_core|file' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-file-o'
+                )
+        ),
+    'totara_core|video_file' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-file-video-o'
+                )
+        ),
+    'totara_core|powerpoint_file' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-file-powerpoint-o'
+                )
+        ),
+    'totara_core|audio_file' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-file-audio-o',
+                )
+        ),
 );
 
 $aliases = array(

@@ -270,6 +270,11 @@ class phpunit_util extends testing_util {
             restore_section_structure_step::reset_caches();
         }
 
+        // Clear core_link mock url
+        if (class_exists('http_mock_request')) {
+            \http_mock_request::clear();
+        }
+
         // purge dataroot directory
         self::reset_dataroot();
 

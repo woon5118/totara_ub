@@ -65,6 +65,13 @@ define('FORMAT_WIKI',     '3');
 define('FORMAT_MARKDOWN', '4');
 
 /**
+ * JSON document, similar to ProseMirror's document format.
+ *
+ * @see /core/formats/json_editor/json_editor
+ */
+define('FORMAT_JSON_EDITOR', '42');
+
+/**
  * A moodle_url comparison using this flag will return true if the base URLs match, params are ignored.
  */
 define('URL_MATCH_BASE', 0);
@@ -846,7 +853,7 @@ class moodle_url {
      * @return moodle_url
      */
     public static function make_webservice_pluginfile_url($contextid, $component, $area, $itemid, $pathname, $filename,
-                                               $forcedownload = false) {
+                                                          $forcedownload = false) {
         global $CFG;
         $urlbase = "$CFG->wwwroot/webservice/pluginfile.php";
         if ($itemid === null) {
@@ -1205,7 +1212,8 @@ function format_text_menu() {
     return array (FORMAT_MOODLE => get_string('formattext'),
                   FORMAT_HTML => get_string('formathtml'),
                   FORMAT_PLAIN => get_string('formatplain'),
-                  FORMAT_MARKDOWN => get_string('formatmarkdown'));
+                  FORMAT_MARKDOWN => get_string('formatmarkdown'),
+                  FORMAT_JSON_EDITOR => get_string('formatjsoneditor'));
 }
 
 /**
@@ -1229,6 +1237,8 @@ function format_text_menu() {
  *      allowxss    :   If true text will not be passed through clean_text.
  *                      This option should not be used unless you are ABSOLUTELY sure it is safe to do so.
  *                      We STRONGLY recommend you do not use this option.
+ *      formatter   :   Totara: the formatter's component, which is for telling the json editor to use which formatter
+ *                      within the system. Fallback to default formatter if none is provided.
  *
  * Deprecated options:
  *      trusted     :   If set to true, and trusttext is enabled, and totara_core_legacy_noclean_trusttext_enabled() returns true
@@ -1240,7 +1250,7 @@ function format_text_menu() {
  * @staticvar array $croncache
  * @param string $text The text to be formatted. This is raw text originally from user input.
  * @param int $format Identifier of the text format to be used
- *            [FORMAT_MOODLE, FORMAT_HTML, FORMAT_PLAIN, FORMAT_MARKDOWN]
+ *            [FORMAT_MOODLE, FORMAT_HTML, FORMAT_PLAIN, FORMAT_MARKDOWN, FORMAT_JSON_EDITOR]
  * @param object/array $options text formatting options
  * @param int $courseiddonotuse deprecated course id, use context option instead
  * @return string
@@ -1353,6 +1363,31 @@ function format_text($text, $format = FORMAT_MOODLE, $options = null, $courseidd
 
         case FORMAT_MARKDOWN:
             $text = markdown_to_html($text, ['allowxss' => true]); // TOTARA: Don't clean it here, we'll clean it if need be shortly.
+            break;
+
+        case FORMAT_JSON_EDITOR:
+            $formatter_component = null;
+            if (isset($options['formatter'])) {
+                $formatter_component = $options['formatter'];
+            }
+
+            $editor = \core\json_editor\json_editor::create($formatter_component);
+
+            if ($filtertext) {
+                $text = $editor->filter_json_content($text, $context);
+            }
+
+            $text = $editor->to_html($text);
+            // clean_text will remove attributes used to render tui components,
+            // so we skip it.
+            // Instead, it is the responsibility of the json_editor formatter to
+            // return safe HTML.
+            $cleantext = false;
+
+            // For filtering html text, json_editor will tell whether we would want to go futher with
+            // filtering text or not. Ideally, only if the formatter is a default one.
+            $filtertext = ($options['filter'] && $editor->use_legacy_filter_text());
+
             break;
 
         default:  // Anything else.
@@ -1616,7 +1651,7 @@ function wikify_links($string) {
  *
  * @param string $text The text to be formatted. This is raw text originally from user input.
  * @param int $format Identifier of the text format to be used
- *            [FORMAT_MOODLE, FORMAT_HTML, FORMAT_PLAIN, FORMAT_WIKI, FORMAT_MARKDOWN]
+ *            [FORMAT_MOODLE, FORMAT_HTML, FORMAT_PLAIN, FORMAT_WIKI, FORMAT_MARKDOWN, FORMAT_JSON_EDITOR]
  * @return string
  */
 function format_text_email($text, $format) {
@@ -1635,6 +1670,12 @@ function format_text_email($text, $format) {
 
         case FORMAT_HTML:
             return html_to_text($text);
+            break;
+
+        case FORMAT_JSON_EDITOR:
+            // Totara: Added support for json_editor content.
+            $editor = \core\json_editor\json_editor::default();
+            return $editor->to_html($text);
             break;
 
         case FORMAT_MOODLE:
@@ -2282,6 +2323,12 @@ function content_to_text($content, $contentformat) {
             // Totara: Do not clean here, we're returning plain text!
             $content = markdown_to_html($content, ['allowxss' => true]);
             $content = html_to_text($content, 75, false);
+            break;
+        case FORMAT_JSON_EDITOR:
+            // Totara: Added support for json_editor content
+            $editor = \core\json_editor\json_editor::default();
+            $content = $editor->to_text($content);
+            $content = wordwrap($content, 75);
             break;
         default:
             // FORMAT_HTML, FORMAT_MOODLE and $contentformat = false, the later one are strings usually formatted through

@@ -41,4 +41,6 @@ $tui-gap: 0.4rem;
   // Global default for 'how many columns are in the grid'
   // specified for use with theme.getVar('tui-grid-maxunits') in Grid.vue
   --tui-grid-maxunits: 12;
+
+  --tui-paragraph-gap: var(--tui-gap-2);
 }

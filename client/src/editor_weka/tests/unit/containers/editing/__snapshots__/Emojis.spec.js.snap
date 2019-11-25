@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`editor_weka/components/editing/Emojis.vue Checks snapshot 1`] = `
+<div
+  class="tui-editorWeka-emojis"
+>
+  <buttonicon-stub
+    arialabel="🙁"
+    styleclass="[object Object]"
+    type="button"
+  >
+    <emoji-stub
+      class="tui-editorWeka-emojis__emoji"
+      shortcode="1F641"
+    />
+  </buttonicon-stub>
+</div>
+`;

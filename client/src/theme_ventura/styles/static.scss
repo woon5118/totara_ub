@@ -30,3 +30,33 @@ html {
 .tui-sr-only {
   @include sr-only();
 }
+
+// rendered editor content
+.tui-rendered {
+  @include tui-font-body();
+  word-break: break-word;
+
+  h2 {
+    @include tui-font-heading-large();
+  }
+
+  h3 {
+    @include tui-font-heading-medium();
+  }
+
+  h4 {
+    @include tui-font-heading-small();
+  }
+
+  h5 {
+    @include tui-font-heading-x-small();
+  }
+
+  &__block {
+    margin-bottom: 10px;
+  }
+
+  &__embedContainer {
+    max-width: 700px;
+  }
+}

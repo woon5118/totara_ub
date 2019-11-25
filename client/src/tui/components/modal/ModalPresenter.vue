@@ -56,6 +56,12 @@ export default {
     open(open) {
       this.childData.open = open;
     },
+
+    isOpen(isOpen) {
+      if (!isOpen) {
+        this.$emit('close-complete');
+      }
+    },
   },
 
   methods: {

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<libraries>
+    <library>
+        <location>tui/js/lib/prosemirror_utils</location>
+        <name>prosemirror-utils</name>
+        <license>Apache</license>
+        <version>0.9.6</version>
+        <licenseversion>2.0</licenseversion>
+    </library>
+    <library>
+        <location>tui/js/lib/prosemirror_schema_list</location>
+        <name>prosemirror-schema-list</name>
+        <license>MIT</license>
+        <version>1.1.2</version>
+        <licenseversion></licenseversion>
+    </library>
+</libraries>

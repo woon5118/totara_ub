@@ -245,6 +245,8 @@ const tui = {
         const component = host.getAttribute('data-tui-component');
         const rawProps = host.getAttribute('data-tui-props');
         const props = rawProps ? JSON.parse(rawProps) : null;
+        // remove attribute to avoid race condition double init
+        host.removeAttribute('data-tui-component');
         tui.mount(component, { props: props }, host);
       } catch (e) {
         console.error(e);

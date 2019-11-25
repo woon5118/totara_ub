@@ -18,7 +18,7 @@
 
 const tui = require('./tui').default;
 
-var root;
+let root;
 
 if (typeof window !== 'undefined') {
   root = window;
@@ -36,20 +36,19 @@ function scan() {
 
 if (typeof window !== 'undefined') {
   window.addEventListener('DOMContentLoaded', scan);
-  document.addEventListener('tui:scan', scan);
-  document.addEventListener('tui:nodes-updated', e => {
+  document.addEventListener('nodes-updated', e => {
     if (e.detail && e.detail.nodes && Array.isArray(e.detail.nodes)) {
       e.detail.nodes.forEach(node => tui.scan(node));
     } else {
       tui.scan();
     }
   });
-}
 
-if (process.env.NODE_ENV == 'development') {
-  const { handleLoadError } = require('./internal/error_overlay');
-  if (window.loadErrors) {
-    window.loadErrors.forEach(handleLoadError);
+  if (process.env.NODE_ENV == 'development') {
+    const { handleLoadError } = require('./internal/error_overlay');
+    if (window.loadErrors) {
+      window.loadErrors.forEach(handleLoadError);
+    }
+    window.loadErrors = { push: handleLoadError };
   }
-  window.loadErrors = { push: handleLoadError };
 }

@@ -95,7 +95,7 @@ function editors_get_enabled() {
     global $CFG;
 
     if (empty($CFG->texteditors)) {
-        $CFG->texteditors = 'atto,textarea';
+        $CFG->texteditors = 'atto,weka,textarea';
     }
     $active = array();
     foreach(explode(',', $CFG->texteditors) as $e) {
@@ -153,7 +153,7 @@ function editors_head_setup() {
     global $CFG;
 
     if (empty($CFG->texteditors)) {
-        $CFG->texteditors = 'atto,textarea';
+        $CFG->texteditors = 'atto,weka,textarea';
     }
     $active = explode(',', $CFG->texteditors);
 
@@ -231,7 +231,7 @@ abstract class texteditor {
      *
      * @param string $elementid id of text area to be converted to editor
      * @param array $options Editor options
-     * @param obejct $fpoptions file picker options
+     * @param object $fpoptions file picker options
      * @return void
      */
     public abstract function use_editor($elementid, array $options=null, $fpoptions = null);

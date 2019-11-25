@@ -57,3 +57,29 @@ export function getModelDef(component) {
 export function set(object, path, value) {
   baseSet(object, path, value, Vue.set);
 }
+
+const defaultPropEqual = (val, old) => val == old;
+
+/**
+ * Create a Vue watcher that warns when prop is changed.
+ *
+ * @param {string} component
+ * @param {string} prop
+ * @param {(val, old) => boolean} propEqual Function to check if prop has the same value.
+ * @returns {(val, old) => void}
+ */
+export const createImmutablePropWatcher = (
+  component,
+  prop,
+  propEqual = defaultPropEqual
+) => (val, old) => {
+  if (!propEqual(val, old)) {
+    console.error(
+      `[${component}] Prop "${prop}" has changed from ${JSON.stringify(old)} ` +
+        `to ${JSON.stringify(val)}. This change will not be reflected. ` +
+        `Instead, recreate the ${component} component instance with the ` +
+        `new prop value. ` +
+        `(change the "key" prop to force a new instance to be created)`
+    );
+  }
+};
