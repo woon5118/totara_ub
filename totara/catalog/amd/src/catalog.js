@@ -296,7 +296,6 @@ define(['core/templates', 'core/ajax', 'core/notification', 'core/event'], funct
                     this.contentUpdateRender(itemGridRequest),
                     this.contentUpdateRender(resultsCount),
                     this.contentUpdateRender(limitFromBtnRequest),
-                    this.contentUpdateRender(resultsEmpty),
                 ]);
             } else {
                 that.widget.setAttribute('data-tw-catalog-jsRenderState', 'ready');
@@ -365,7 +364,7 @@ define(['core/templates', 'core/ajax', 'core/notification', 'core/event'], funct
                         }
                         that.showOverflowEllipsis();
                         // Set focus to first new item & bring into view
-                        if (items && that.pageChangeType === 'resultsOnly') {
+                        if (items && items.length > 0 && that.pageChangeType === 'resultsOnly') {
                             var firstNewItem = items[0].querySelector('[data-tw-grid-item-toggle]');
                             firstNewItem.focus();
                             firstNewItem.scrollIntoView({block: 'start'});
@@ -389,7 +388,7 @@ define(['core/templates', 'core/ajax', 'core/notification', 'core/event'], funct
                     // Promise complete
                     clearTimeout(fallOver);
                     resolve(template);
-                });
+                }).catch(reject);
             });
         },
 
