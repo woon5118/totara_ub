@@ -45,21 +45,13 @@
       </div>
     </div>
     <div v-if="hasRateableCompetencies">
-      <div class="tui-pathwayManual-rateUserCompetencies__filters">
-        <div
-          class="tui-pathwayManual-rateUserCompetencies__filters_competencyCount"
-        >
-          <strong>{{
-            $str('number_of_competencies', 'pathway_manual', data.count)
-          }}</strong>
-        </div>
-      </div>
-      <ScaleTable
-        v-for="(scale, index) in data.scales"
-        :key="index"
-        :scale="scale"
+      <FrameworkGroup
+        v-for="group in data.framework_groups"
+        :key="group.framework.id"
+        :group="group"
         :role="role"
         :current-user-id="currentUserId"
+        :expanded="expandFrameworkGroups"
         @input="updateRatings"
       />
       <div class="tui-pathwayManual-rateUserCompetencies__submitButtons">
@@ -96,15 +88,23 @@
 <script>
 import Button from 'totara_core/presentation/form/Button';
 import ButtonGroup from 'totara_core/presentation/form/ButtonGroup';
-import ConfirmModal from 'pathway_manual/presentation/ConfirmModal';
+import ConfirmModal from 'pathway_manual/components/ConfirmModal';
 import ModalPresenter from 'totara_core/presentation/modal/ModalPresenter';
-import ScaleTable from 'pathway_manual/containers/ScaleTable';
-import UserHeaderWithPhoto from 'pathway_manual/presentation/UserHeaderWithPhoto';
+import FrameworkGroup from 'pathway_manual/containers/FrameworkGroup';
+import UserHeaderWithPhoto from 'pathway_manual/components/UserHeaderWithPhoto';
 
 import CreateManualRatingsMutation from '../../webapi/ajax/create_manual_ratings.graphql';
 import RateableCompetenciesQuery from '../../webapi/ajax/rateable_competencies.graphql';
 
 const ROLE_SELF = 'self';
+
+/**
+ * If there are more than this amount of competencies available to rate,
+ * then the framework groups should be collapsed by default for performance reasons.
+ *
+ * @type {number}
+ */
+const MAX_COMPETENCIES_TO_DISPLAY = 50; // TODO: Should do some performance testing to pick an appropriate number
 
 export default {
   components: {
@@ -113,7 +113,7 @@ export default {
     ConfirmModal,
     ModalPresenter,
     UserHeaderWithPhoto,
-    ScaleTable,
+    FrameworkGroup,
   },
 
   props: {
@@ -145,11 +145,15 @@ export default {
 
   computed: {
     hasRateableCompetencies() {
-      return this.data.count > 0;
+      return this.data.framework_groups.length > 0;
     },
 
     isForSelf() {
       return this.role === ROLE_SELF;
+    },
+
+    expandFrameworkGroups() {
+      return this.data.count < MAX_COMPETENCIES_TO_DISPLAY;
     },
 
     hasSelected() {
@@ -283,12 +287,6 @@ export default {
       margin-bottom: var(--tui-gap-4);
       padding: var(--tui-gap-1) var(--tui-gap-2);
       background-color: var(--tui-color-neutral-4);
-    }
-  }
-
-  &__scaleTable {
-    &:not(:last-child) {
-      margin-bottom: var(--tui-gap-7);
     }
   }
 

@@ -173,7 +173,7 @@ class rateable_competencies {
      */
     protected function build_query(): competency_repository {
         $repository = competency::repository()
-            ->with('scale')
+            ->with('framework.scale.sorted_values_high_to_low')
             ->set_filters($this->filters)
             ->order_by('fullname')
             ->as('competency');
@@ -196,7 +196,7 @@ class rateable_competencies {
             } else if (method_exists($this, 'filter_by_' . $key)) {
                 $this->{'filter_by_' . $key}($repository, $value);
             } else {
-                throw new \moodle_exception("Filtering by '{$key}' is currently not supported");
+                throw new \coding_exception("Filtering by '{$key}' is currently not supported");
             }
         }
 

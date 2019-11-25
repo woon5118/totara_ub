@@ -4,7 +4,11 @@ query pathway_manual_rateable_competencies($user_id: core_id!, $role: String!) {
       fullname
       profileimageurl
     }
-    scales {
+    framework_groups {
+      framework {
+        id
+        display_name
+      }
       values {
         id
         name

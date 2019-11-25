@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
- * @package totara_competency
+ * @package pathway_manual
  */
 
 use core\entities\user;

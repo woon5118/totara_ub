@@ -28,20 +28,22 @@ type pathway_manual_rateable_competency {
 }
 
 """
-A competency scale with scale values and rateable competencies
+A competency framework group with scale values and rateable competencies
 """
-type pathway_manual_scale_group {
+type pathway_manual_framework_group {
+  framework: totara_competency_competency_framework! # The actual framework
   values: [totara_competency_scale_value!]! # The actual scale
-  competencies: [pathway_manual_rateable_competency] # Rateable competencies
+  competencies: [pathway_manual_rateable_competency]! # Rateable competencies
+  count: Int! # Number of rateable competencies
 }
 
 """
-All rateable competencies for a specific user, grouped by scale
+All rateable competencies for a specific user, grouped by framework
 """
 type pathway_manual_user_competencies {
   user: core_user! # The user we are rating competencies of
-  scales: [pathway_manual_scale_group!]! # Scale groups
-  count: Int! # Total number of competencies that we can rate
+  framework_groups: [pathway_manual_framework_group!]! # Frameworks
+  count: Int! # The total amount of competencies available to rate
 }
 
 input pathway_manual_rating_input {

@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Brendan Cox <brendan.cox@totaralearning.com>
- * @package totara_competency
+ * @package pathway_manual
  */
 
 use pathway_manual\achievement_detail;

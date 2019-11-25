@@ -24,6 +24,7 @@
 namespace totara_competency\entities;
 
 
+use core\orm\entity\relations\has_one_through;
 use totara_hierarchy\entities\hierarchy_framework;
 use core\orm\collection;
 
@@ -39,11 +40,29 @@ use core\orm\collection;
  * @property int $usermodified
  * @property string $fullname
  *
+ * @property-read scale $scale
+ *
  * @method static competency_framework_repository repository()
  */
 class competency_framework extends hierarchy_framework {
 
     public const TABLE = 'comp_framework';
+
+    /**
+     * Get related scale
+     *
+     * @return has_one_through
+     */
+    public function scale(): has_one_through {
+        return $this->has_one_through(
+            scale::class,
+            competency_scale_assignment::class,
+            'frameworkid',
+            'id',
+            'id',
+            'scaleid'
+        );
+    }
 
     public function get_competencies_attribute(): collection {
         return competency::repository()

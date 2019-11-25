@@ -44,8 +44,8 @@ class user_competencies implements type_resolver {
         switch ($field) {
             case 'user':
                 return (object) $competencies->get_user_for()->to_array();
-            case 'scales':
-                return $competencies->get_scale_groups();
+            case 'framework_groups':
+                return $competencies->get_framework_groups();
             case 'count':
                 return $competencies->get_count();
             default:

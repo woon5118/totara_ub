@@ -41,11 +41,6 @@ class user_competencies {
     protected $competencies;
 
     /**
-     * @var int
-     */
-    protected $count;
-
-    /**
      * @var user
      */
     protected $user;
@@ -69,21 +64,12 @@ class user_competencies {
     }
 
     /**
-     * Get the scale groups.
+     * Get the framework groups.
      *
-     * @return scale_group[]
+     * @return framework_group[]
      */
-    public function get_scale_groups(): array {
-        return scale_group::build_from_competencies($this->competencies);
-    }
-
-    /**
-     * Get the total number of competencies available.
-     *
-     * @return int
-     */
-    public function get_count(): int {
-        return count($this->competencies);
+    public function get_framework_groups(): array {
+        return framework_group::build_from_competencies($this->competencies);
     }
 
     /**
@@ -93,6 +79,15 @@ class user_competencies {
      */
     public function get_user_for(): user {
         return $this->user;
+    }
+
+    /**
+     * Get the total number of competencies available.
+     *
+     * @return int
+     */
+    public function get_count(): int {
+        return count($this->competencies);
     }
 
     /**

@@ -24,6 +24,7 @@
 namespace totara_competency\entities;
 
 use core\orm\collection;
+use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many;
 use core\orm\entity\relations\has_one;
 use core\orm\entity\relations\has_one_through;
@@ -67,6 +68,7 @@ require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
  * @method static competency_repository repository()
  *
  * @property-read competency $parent Parent item
+ * @property-read competency_framework $framework Framework
  * @property-read scale $scale Scale associated with this competency
  * @property-read competency_type $comp_type Competency type
  * @property-read string $scale_aggregation_type Scale aggregation type
@@ -84,6 +86,15 @@ class competency extends hierarchy_item {
 
     public const ASSIGNMENT_CREATE_SELF = \competency::ASSIGNMENT_CREATE_SELF;
     public const ASSIGNMENT_CREATE_OTHER = \competency::ASSIGNMENT_CREATE_OTHER;
+
+    /**
+     * Get the parent framework.
+     *
+     * @return belongs_to
+     */
+    public function framework(): belongs_to {
+        return $this->belongs_to(competency_framework::class, 'frameworkid');
+    }
 
     /**
      * Related achievement, meant to be used with a user filter

@@ -176,11 +176,11 @@ class pathway_manual_data_provider_rateable_competencies_testcase extends pathwa
     }
 
     /**
-     * Test that when get() is called, the competencies are grouped into scales.
+     * Test that when get() is called, the competencies are grouped into frameworks.
      */
-    public function test_get_scale_groups() {
-        $fw1 = $this->generator->create_framework($this->scale1);
-        $fw2 = $this->generator->create_framework($this->scale2);
+    public function test_get_framework_groups() {
+        $fw1 = $this->generator->create_framework($this->scale1, null, null, ['sortorder' => 2000]);
+        $fw2 = $this->generator->create_framework($this->scale2, null, null, ['sortorder' => 1000]);
         $competencies = [
             $this->generator->create_competency('1', $fw1),
             $this->generator->create_competency('2', $fw1),
@@ -204,18 +204,21 @@ class pathway_manual_data_provider_rateable_competencies_testcase extends pathwa
 
         $result = rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)->get();
 
-        $this->assertEquals(count($competencies), $result->get_count());
         $this->assertEquals($this->user1, $result->get_user_for());
 
-        $this->assertCount(2, $result->get_scale_groups());
+        $this->assertCount(2, $result->get_framework_groups());
 
-        $scale_group1 = $result->get_scale_groups()[0];
-        $this->assertEquals($this->scale1->values, $scale_group1->get_scale_values());
-        $this->assert_has_competencies($scale_group1->get_rateable_competencies(), [$competencies[0], $competencies[1]]);
+        // First framework created but should be second in list because of it's sort order.
+        $framework_group1 = $result->get_framework_groups()[1];
+        $this->assertEquals($this->scale1->values, $framework_group1->get_values());
+        $this->assertEquals($fw1->id, $framework_group1->get_framework()->id);
+        $this->assert_has_competencies($framework_group1->get_competencies(), [$competencies[0], $competencies[1]]);
 
-        $scale_group2 = $result->get_scale_groups()[1];
-        $this->assertEquals($this->scale2->values, $scale_group2->get_scale_values());
-        $this->assert_has_competencies($scale_group2->get_rateable_competencies(), [$competencies[2], $competencies[3]]);
+        // Second framework created but should be first in list because of it's sort order.
+        $framework_group2 = $result->get_framework_groups()[0];
+        $this->assertEquals($this->scale2->values, $framework_group2->get_values());
+        $this->assertEquals($fw2->id, $framework_group2->get_framework()->id);
+        $this->assert_has_competencies($framework_group2->get_competencies(), [$competencies[2], $competencies[3]]);
     }
 
     /**

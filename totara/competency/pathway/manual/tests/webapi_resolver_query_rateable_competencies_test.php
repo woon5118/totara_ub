@@ -25,7 +25,7 @@ use core\orm\query\builder;
 use core\webapi\execution_context;
 use pathway_manual\manual;
 use pathway_manual\models\rateable_competency;
-use pathway_manual\models\scale_group;
+use pathway_manual\models\framework_group;
 use pathway_manual\webapi\resolver\query\rateable_competencies;
 use pathway_manual\webapi\resolver\type\rateable_competency as rateable_competency_type;
 use pathway_manual\webapi\resolver\type\scale_group as scale_group_type;
@@ -169,24 +169,23 @@ class pathway_manual_webapi_resolver_query_rateable_competencies_testcase extend
         );
 
         $expected_rateable_competencies = [new rateable_competency($this->competency1, $this->user1)];
-        $expected_scale_group = scale_group::build_from_competencies($expected_rateable_competencies)[0];
+        $expected_framework_group = framework_group::build_from_competencies($expected_rateable_competencies)[0];
 
-        /** @var scale_group[] $returned_scale_groups */
-        $returned_scale_groups = user_competencies_type::resolve('scales', $query, [], $this->execution_context());
-        $this->assertCount(1, $returned_scale_groups);
-        $returned_scale_group = $returned_scale_groups[0];
+        /** @var framework_group[] $returned_framework_groups */
+        $returned_framework_groups = user_competencies_type::resolve('framework_groups', $query, [], $this->execution_context());
+        $this->assertCount(1, $returned_framework_groups);
+        $returned_framework_group = $returned_framework_groups[0];
 
-        $this->assertCount(1, $returned_scale_group->get_rateable_competencies());
+        $this->assertCount(1, $returned_framework_group->get_competencies());
         $this->assertEquals(
             $expected_rateable_competencies[0]->get_entity()->id,
-            $returned_scale_group->get_rateable_competencies()[0]->get_entity()->id
+            $returned_framework_group->get_competencies()[0]->get_entity()->id
         );
 
-        $returned_scale_values = scale_group_type::resolve('values', $returned_scale_group, [], $this->execution_context());
-        $this->assertEquals($expected_scale_group->get_scale_values(), $returned_scale_values);
+        $this->assertEquals($expected_framework_group->values, $returned_framework_group->values);
 
         /** @var rateable_competency[] $returned_competencies */
-        $returned_competencies = scale_group_type::resolve('competencies', $returned_scale_group, [], $this->execution_context());
+        $returned_competencies = $returned_framework_group->competencies;
         $this->assertCount(1, $returned_competencies);
         $returned_competency = $returned_competencies[0];
 

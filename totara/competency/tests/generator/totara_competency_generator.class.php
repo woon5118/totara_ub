@@ -102,10 +102,11 @@ class totara_competency_generator extends component_generator_base {
      * @param scale|null $scale Competency scale
      * @param string|null $name Framework name
      * @param string|null $description Framework description
+     * @param array|null $framework_data Extra framework data
      * @return competency_framework
      */
-    public function create_framework(scale $scale = null, string $name = null, string $description = null): competency_framework {
-        $framework_data = [];
+    public function create_framework(scale $scale = null, string $name = null,
+                                     string $description = null, array $framework_data = []): competency_framework {
         if (isset($name)) {
             $framework_data['fullname'] = $name;
         }
