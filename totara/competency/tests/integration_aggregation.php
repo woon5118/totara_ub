@@ -322,7 +322,8 @@ class totara_competency_integration_aggregation extends advanced_testcase {
                     && (int)$actual_row->user_id == $expected_row['user_id']
                     && (int)$actual_row->status == $expected_row['status']
                     && (int)$actual_row->scale_value_id == $expected_row['scale_value_id']
-                    && (int)$actual_row->proficient == $expected_row['proficient']) {
+                    && (int)$actual_row->proficient == $expected_row['proficient']
+                    && (!isset($expected_row['assignment_id']) || $actual_row->assignment_id == $expected_row['assignment_id'])) {
                     if (!isset($expected_row['via'])
                         || $this->competency_achievement_via_matches($actual_row->id, $expected_row['via'])) {
                         unset($expected_rows[$key]);

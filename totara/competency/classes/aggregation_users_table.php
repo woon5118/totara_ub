@@ -632,13 +632,13 @@ class aggregation_users_table {
               WHERE tacu.competency_id = :compid
                 AND agg_queue.id IS NULL";
 
-        $to_add = $DB->get_records_sql($sql, ['compid' => $competency_id]);
+        $to_add = $DB->get_fieldset_sql($sql, ['compid' => $competency_id]);
 
         if (!empty($to_add)) {
             // Add necessary insert columns
             $to_add = array_map(
-                function ($el) use ($competency_id) {
-                    $add_el = (object)$this->get_insert_record($el->user_id, $competency_id);
+                function ($user_id) use ($competency_id) {
+                    $add_el = (object)$this->get_insert_record($user_id, $competency_id);
                     if (!empty($this->process_key_column)) {
                         // We are queuing - ensure process_key is null
                         $add_el->{$this->process_key_column} = null;

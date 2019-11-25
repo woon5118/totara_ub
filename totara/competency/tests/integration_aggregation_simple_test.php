@@ -23,7 +23,9 @@
 
 use pathway_manual\manual;
 use totara_competency\entities\competency_achievement;
+use totara_competency\entities\configuration_change;
 use totara_competency\entities\pathway_achievement;
+use totara_competency\expand_task;
 use totara_competency\linked_courses;
 
 global $CFG;
@@ -713,7 +715,7 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
      * Test aggregation when the user is assigned twice to the same competency
      * @dataProvider task_to_execute_data_provider
      */
-    public function user_assigned_twice_before_criteria_added(string $task_to_execute) {
+    public function test_user_assigned_twice_before_criteria_added(string $task_to_execute) {
         global $DB;
         $data = $this->setup_data();
 
@@ -727,15 +729,19 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
         cohort_add_member($cohort2->id, $data->users[3]->id);
 
         // Now assign both audiences to the competency
-        $data->assign_generator->create_cohort_assignment($data->competencies[1], $cohort1->id);
-        $data->assign_generator->create_cohort_assignment($data->competencies[1], $cohort2->id);
+        $assignments = [
+            1 => $data->assign_generator->create_cohort_assignment($data->competencies[1]->id, $cohort1->id),
+            2 => $data->assign_generator->create_cohort_assignment($data->competencies[1]->id, $cohort2->id),
+        ];
 
         $expand_task = new expand_task($DB);
         $expand_task->expand_all();
+        $this->waitForSecond();
 
-        // Ensure that although there assignments, we don't create achievements as there are no criteria
+        // Ensure that although there are assignments, we don't create achievements as there are no criteria
 
-        (new competency_aggregation_all())->execute();
+        // Now run the task
+        (new $task_to_execute())->execute();
         $this->verify_item_records([]);
         $this->verify_pathway_achievements([]);
         $this->verify_competency_achievements([]);
@@ -746,13 +752,23 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
             [$criterion], $data->scalevalues[5]->id
         );
 
+        // In real life, changes to pathways will be made through the UI which will result in a 'configuration_changed'
+        // event being triggered.
+        // This doesn't happen in the generator - therefore manually triggering the event here
+        configuration_change::add_competency_entry(
+            $data->competencies[1]->id,
+            configuration_change::CHANGED_CRITERIA,
+            time()
+        );
+        $this->waitForSecond();
+
         // Run the task
         (new $task_to_execute())->execute();
 
         $this->verify_item_records([
-            ['item_id' => $data->competencies[1]->id, 'user_id' => $data->users[1]->id, 'criterion_met' => 0],
-            ['item_id' => $data->competencies[1]->id, 'user_id' => $data->users[2]->id, 'criterion_met' => 0],
-            ['item_id' => $data->competencies[1]->id, 'user_id' => $data->users[3]->id, 'criterion_met' => 0],
+            ['item_id' => $data->competencies[1]->id, 'user_id' => $data->users[1]->id, 'criterion_met' => 1],
+            ['item_id' => $data->competencies[1]->id, 'user_id' => $data->users[2]->id, 'criterion_met' => 1],
+            ['item_id' => $data->competencies[1]->id, 'user_id' => $data->users[3]->id, 'criterion_met' => 1],
         ]);
 
         $pw_achievement_records = $this->verify_pathway_achievements([
@@ -779,6 +795,7 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
             ],
         ]);
 
+        // Competency achievements are per assignment
         $this->verify_competency_achievements([
             [
                 'competency_id' => $data->competencies[1]->id,
@@ -786,6 +803,16 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
                 'status' => competency_achievement::ACTIVE_ASSIGNMENT,
                 'scale_value_id' => $data->scalevalues[5]->id,
                 'proficient' => 0,
+                'assignment_id' => $assignments[1]->id,
+                'via' => [$pw_achievement_records['1-1']],
+            ],
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'proficient' => 0,
+                'assignment_id' => $assignments[2]->id,
                 'via' => [$pw_achievement_records['1-1']],
             ],
             [
@@ -793,7 +820,8 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
                 'user_id' => $data->users[2]->id,
                 'status' => competency_achievement::ACTIVE_ASSIGNMENT,
                 'scale_value_id' => $data->scalevalues[5]->id,
-                'proficient' => 1,
+                'proficient' => 0,
+                'assignment_id' => $assignments[1]->id,
                 'via' => [$pw_achievement_records['1-2']],
             ],
             [
@@ -802,6 +830,7 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
                 'status' => competency_achievement::ACTIVE_ASSIGNMENT,
                 'scale_value_id' => $data->scalevalues[5]->id,
                 'proficient' => 0,
+                'assignment_id' => $assignments[2]->id,
                 'via' => [$pw_achievement_records['1-3']],
             ],
         ]);
