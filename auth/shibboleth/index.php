@@ -71,6 +71,8 @@
             if ($urltogo === $CFG->wwwroot or $urltogo === $CFG->wwwroot.'/' or $urltogo === $CFG->wwwroot.'/index.php') {
                 if (get_home_page() == HOMEPAGE_TOTARA_DASHBOARD) {
                     $urltogo = $CFG->wwwroot.'/totara/dashboard/';
+                } else if (get_home_page() == HOMEPAGE_TOTARA_GRID_CATALOG) {
+                    $urltogo = $CFG->wwwroot.'/totara/catalog/';
                 }
             }
 

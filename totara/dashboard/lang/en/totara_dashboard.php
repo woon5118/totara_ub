@@ -24,7 +24,7 @@
  */
 
 $string['allowdefaultpageselection'] = "Allow default page selection";
-$string['allowdefaultpageselection_desc'] = "Allow users to select their default page - it can be the Home page or their Dashboard.";
+$string['allowdefaultpageselection_desc'] = "Allow users to select their default page - it can be the Home page or their Dashboard or Find Learning.";
 $string['assigncohorts'] = 'Assign new audiences';
 $string['assignedcohorts'] = 'Assigned audiences';
 $string['availability'] = 'Availability';
@@ -64,8 +64,6 @@ $string['error:unknownbuttonclicked'] = 'Error: unknown button clicked.';
 $string['legacymylearning'] = 'Legacy My Learning';
 $string['locked'] = 'Locked';
 $string['locked_help'] = 'When locked, users will not be able to change dashboard layout. Their previous changes will be hidden but not removed. After unlock users changes to their dashboard will reappear.';
-$string['makedashboardmyhomepage'] = 'Make Dashboard my default page';
-$string['makesitemyhomepage'] = 'Make Home my default page';
 $string['managedashboards'] = 'Manage dashboards';
 $string['name'] = 'Name';
 $string['noavailabledashboards'] = 'No available dashboards found';
@@ -83,3 +81,7 @@ $string['userdataitemtotara_dashboard'] = 'Customised dashboards';
 $string['userdataitemtotara_dashboard_help'] = 'When purging, all the user\'s dashboards will be reset to their original state. When exporting, this will include the name and ID of all the dashboards the user has customised.';
 $string['unpublish'] = 'Unpublish';
 $string['userhomepagechanged'] = 'Your default page was changed';
+
+// Deprecated in 13
+$string['makedashboardmyhomepage'] = 'Make Dashboard my default page';
+$string['makesitemyhomepage'] = 'Make Home my default page';

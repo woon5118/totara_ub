@@ -44,17 +44,17 @@ totara_dashboard::check_feature_enabled();
 $userid = $USER->id;
 
 $availabledash = array_keys(totara_dashboard::get_user_dashboards($userid));
-
+$userhomepagepref = get_user_preferences('user_home_page_preference', -1);
+$userhomedashboardid = get_user_preferences('user_home_totara_dashboard_id');
 // Validate dashboard id.
 if ($id) {
     if (!in_array($id, $availabledash)) {
         // If not available, redirect to default dashboard.
         redirect(new moodle_url('/totara/dashboard/index.php'));
     }
-} else if (get_user_preferences('user_home_page_preference') == HOMEPAGE_TOTARA_DASHBOARD &&
-        in_array(get_user_preferences('user_home_totara_dashboard_id'), $availabledash)) {
+} else if ($userhomepagepref == HOMEPAGE_TOTARA_DASHBOARD && in_array($userhomedashboardid, $availabledash)) {
     // Set home page dashboard id.
-    $id = get_user_preferences('user_home_totara_dashboard_id');
+    $id = $userhomedashboardid;
 } else if (isset($availabledash[0])) {
     // Set first in sort order.
     $id = $availabledash[0];
@@ -86,7 +86,6 @@ if (!$id) {
     }
 
     $PAGE->set_context($context);
-    $PAGE->set_subpage($userpageid);
     $PAGE->set_blocks_editing_capability('totara/dashboard:manageblocks');
     $PAGE->set_pagelayout('dashboard');
     $PAGE->set_pagetype('totara-dashboard-' . $id);
@@ -98,7 +97,8 @@ if (!$id) {
     $PAGE->navbar->ignore_active(true);
 
     // Set dashboard as homepage for user when user home page preference is enabled.
-    if (!empty($CFG->allowdefaultpageselection) and (get_home_page() == HOMEPAGE_SITE)) {
+    $homebutton = '';
+    if (!empty($CFG->allowdefaultpageselection)) {
         if (optional_param('setdefaulthome', 0, PARAM_BOOL)) {
             require_sesskey();
             set_user_preference('user_home_page_preference', HOMEPAGE_TOTARA_DASHBOARD);
@@ -107,8 +107,12 @@ if (!$id) {
             \core\notification::success(get_string('userhomepagechanged', 'totara_dashboard'));
             redirect($url);
         }
-        $newhomeurl = new moodle_url('/totara/dashboard/index.php', array('setdefaulthome' => 1, 'id' => $id, 'sesskey' => sesskey()));
-        $PAGE->settingsnav->add(get_string('makedashboardmyhomepage', 'totara_dashboard'), $newhomeurl, navigation_node::TYPE_SETTING);
+        if ($userhomepagepref != HOMEPAGE_TOTARA_DASHBOARD || !in_array($userhomedashboardid, $availabledash)) {
+            $newhomestring = get_string('makehomepage', 'totara_core');
+            $newhomeurl =
+                new moodle_url('/totara/dashboard/index.php', ['setdefaulthome' => 1, 'id' => $id, 'sesskey' => sesskey()]);
+            $homebutton = $OUTPUT->single_button($newhomeurl, $newhomestring);
+        }
     }
 
     $resetbutton = '';
@@ -171,7 +175,7 @@ if (!$id) {
         $managestring = get_string('managedashboards', 'totara_dashboard');
         $managebutton = $OUTPUT->single_button(new moodle_url("/totara/dashboard/manage.php"), $managestring);
     }
-    $PAGE->set_button($resetbutton . $editbutton . $managebutton);
+    $PAGE->set_button($homebutton . $resetbutton . $editbutton . $managebutton);
 
     // HACK WARNING!  This loads up all this page's blocks in the system context.
     if ($userpageid == 'default') {

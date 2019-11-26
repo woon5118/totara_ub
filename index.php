@@ -29,6 +29,7 @@ if (!file_exists('./config.php')) {
 
 require_once('config.php');
 require_once($CFG->dirroot .'/course/lib.php');
+require_once($CFG->dirroot .'/totara/dashboard/lib.php');
 require_once($CFG->libdir .'/filelib.php');
 
 redirect_if_major_upgrade_required();
@@ -83,7 +84,8 @@ if (is_registration_required()) {
     redirect("$CFG->wwwroot/$CFG->admin/register.php?return=site");
 }
 
-if (get_home_page() == HOMEPAGE_TOTARA_DASHBOARD) {
+$homepage = get_home_page();
+if (in_array($homepage, [HOMEPAGE_TOTARA_DASHBOARD, HOMEPAGE_TOTARA_GRID_CATALOG])) {
     // Totara: the only other option is HOMEPAGE_SITE
     //         and only real logged in users may have dashboards.
     if (!empty($CFG->allowdefaultpageselection)) {
@@ -94,17 +96,24 @@ if (get_home_page() == HOMEPAGE_TOTARA_DASHBOARD) {
             \core\notification::success(get_string('userhomepagechanged', 'totara_dashboard'));
             redirect($url);
         }
-        $newhomeurl = new moodle_url('/', array('setdefaulthome' => 1, 'sesskey' => sesskey()));
-        $PAGE->settingsnav->add(get_string('makesitemyhomepage', 'totara_dashboard'), $newhomeurl, navigation_node::TYPE_SETTING);
     }
-    // Redirect logged-in users to dashboard if required.
+    // Redirect logged-in users to dashboard or grid catalog if required.
     if ($redirect === 1) {
-        require_once($CFG->dirroot . '/totara/dashboard/lib.php');
-
-        // Check for dashboard assignments.
-        if (count(totara_dashboard::get_user_dashboards($USER->id))) {
-            redirect(new moodle_url('/totara/dashboard/index.php'));
+        if ($homepage == HOMEPAGE_TOTARA_DASHBOARD) {
+            $url = new moodle_url('/totara/dashboard/index.php');
+            $availabledash = array_keys(\totara_dashboard::get_user_dashboards($USER->id));
+            $userhomedashboardid = get_user_preferences('user_home_totara_dashboard_id');
+            if (in_array($userhomedashboardid, $availabledash)) {
+                $url->param('id', $userhomedashboardid);
+            }
+            redirect($url);
         }
+        // Else redirect to Totara grid catalog.
+        redirect(new moodle_url('/totara/catalog/index.php'));
+    }
+    if (!empty($CFG->allowdefaultpageselection)) {
+        $newhomeurl = new moodle_url('/', array('setdefaulthome' => 1, 'sesskey' => sesskey()));
+        $PAGE->settingsnav->add(get_string('makehomepage', 'totara_core'), $newhomeurl, navigation_node::TYPE_SETTING);
     }
 }
 $PAGE->set_totara_menu_selected('\totara_core\totara\menu\home');
@@ -123,13 +132,11 @@ if (file_exists($CFG->dirroot.'/local/hub/lib.php') and get_config('local_hub', 
         exit;
     }
 }
-
+$courserenderer = $PAGE->get_renderer('core', 'course');
 $PAGE->set_pagetype('site-index');
 $PAGE->set_docs_path('');
-$editing = $PAGE->user_is_editing();
 $PAGE->set_title($SITE->fullname);
 $PAGE->set_heading($SITE->fullname);
-$courserenderer = $PAGE->get_renderer('core', 'course');
 echo $OUTPUT->header();
 
 // Print Section or custom info.
@@ -140,6 +147,7 @@ $modnamesplural = get_module_types_names(true);
 $modnamesused = $modinfo->get_used_module_names();
 $mods = $modinfo->get_cms();
 
+$editing = $PAGE->user_is_editing();
 if (!empty($CFG->customfrontpageinclude)) {
     include($CFG->customfrontpageinclude);
 
@@ -192,7 +200,6 @@ if (!empty($CFG->customfrontpageinclude)) {
                 " href=\"course/editsection.php?id=$section->id\">" . $OUTPUT->flex_icon('settings', array('alt' => $streditsummary)) . "</a><br /><br />";
         }
 
-        $courserenderer = $PAGE->get_renderer('core', 'course');
         echo $courserenderer->course_section_cm_list($SITE, $section);
 
         echo $courserenderer->course_section_add_cm_control($SITE, $section->section);

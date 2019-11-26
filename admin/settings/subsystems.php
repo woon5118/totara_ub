@@ -186,7 +186,7 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
         new lang_string('configenablecertifications', 'totara_program'),
         advanced_feature::ENABLED));
 
-    $optionalsubsystems->add(new totara_core_admin_setting_feature('enabletotaradashboard',
+    $optionalsubsystems->add(new totara_dashboard_admin_setting_enabledashboard('enabletotaradashboard',
         new lang_string('enabletotaradashboard', 'totara_dashboard'),
         new lang_string('configenabletotaradashboard', 'totara_dashboard'),
         advanced_feature::ENABLED));
@@ -235,7 +235,7 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
         'enhanced' => get_string('catalog_enhanced', 'totara_catalog'),
         'totara' => get_string('catalog_totara', 'totara_catalog'),
     ];
-    $setting = new admin_setting_configselect(
+    $setting = new totara_catalog_admin_setting_catalogtype(
         'catalogtype',
         new lang_string('catalogtype', 'totara_catalog'),
         new lang_string('configcatalogtype', 'totara_catalog'),

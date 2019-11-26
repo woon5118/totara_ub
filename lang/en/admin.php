@@ -1165,6 +1165,7 @@ $string['tlswarning'] = 'No PHP/cURL extension with TLSv1.2 support has been det
 $string['tokenizerrecommended'] = 'Installing the optional PHP Tokenizer extension is recommended -- it improves Totara Networking functionality.';
 $string['tools'] = 'Admin tools';
 $string['toolsmanage'] = 'Manage admin tools';
+$string['totaracataloguegrid'] = 'Totara grid catalogue';
 $string['totaradashboard'] = 'Totara dashboard';
 $string['unattendedoperation'] = 'Unattended operation';
 $string['unbookmarkthispage'] = 'Unbookmark this page';

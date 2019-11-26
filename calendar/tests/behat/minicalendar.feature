@@ -16,7 +16,7 @@ Feature: Open calendar popup
       | student1 | C1 | student |
     And I log in as "admin"
     And I click on "Dashboard" in the totara menu
-    And I follow "Make Dashboard my default page"
+    And I press "Make home page"
 
   @javascript
   Scenario: I view calendar details of a day with multiple events

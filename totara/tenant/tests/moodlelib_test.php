@@ -415,6 +415,8 @@ class totara_tenant_moodlelib_testcase extends advanced_testcase {
 
     public function test_get_home_page() {
 
+        set_config('allowdefaultpageselection', '1');
+
         /** @var totara_tenant_generator $tenantgenerator */
         $tenantgenerator = $this->getDataGenerator()->get_plugin_generator('totara_tenant');
         $tenantgenerator->enable_tenants();

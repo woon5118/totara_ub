@@ -313,6 +313,7 @@ $string['loading'] = 'Loading';
 $string['localpostinstfailed'] = 'There was a problem setting up local modifications to this installation.';
 $string['logo'] = 'Logo';
 $string['logodesc'] = 'Select or upload the image file to be used as the site\'s logo';
+$string['makehomepage'] = 'Make home page';
 $string['managecertifications'] = 'Manage certifications';
 $string['managecustomicons'] = 'Manage custom icons';
 $string['managers'] = 'Manager\'s ';

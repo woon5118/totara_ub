@@ -1150,12 +1150,6 @@ if (defined('BEHAT_SITE_RUNNING') && !defined('BEHAT_TEST')) {
 // note: we can not block non utf-8 installations here, because empty mysql database
 // might be converted to utf-8 in admin/index.php during installation
 
-// Totara: hack settings a bit so that we do not have to look for disabled subsystems everywhere.
-if (advanced_feature::is_disabled('totaradashboard')) {
-    $CFG->defaulthomepage = (string)HOMEPAGE_SITE;
-    $CFG->allowdefaultpageselection = '0';
-}
-
 // Totara: This function to protect against timing attacks was added in PHP 5.6.0.
 if (!function_exists('hash_equals')) {
     function hash_equals($known_string, $user_string) {

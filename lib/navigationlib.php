@@ -1153,6 +1153,17 @@ class global_navigation extends navigation_node {
                 'text' => get_string('dashboard'),
                 'action' => new moodle_url('/totara/dashboard/index.php')
             );
+        } else if (get_config('core', 'catalogtype') == 'totara' &&
+            get_home_page() == HOMEPAGE_TOTARA_GRID_CATALOG &&
+            $page->url->get_path() != '/totara/catalog/index.php'
+        ) {
+            // We are using totara grid catalog for the root element.
+            $properties = array(
+                'key' => 'gridcatalog',
+                'type' => navigation_node::TYPE_SYSTEM,
+                'text' => get_string('findlearning', 'totara_core'),
+                'action' => new moodle_url('/totara/catalog/index.php')
+            );
         } else {
             // We are using the site home for the root element
             $properties = array(

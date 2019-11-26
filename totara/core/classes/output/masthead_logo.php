@@ -50,6 +50,8 @@ class masthead_logo implements \renderable, \templatable {
             if ($id != -1 && in_array($id, $availabledash)) {
                 $defaultpage .= '?id=' . $id;
             }
+        } else if (get_home_page() == HOMEPAGE_TOTARA_GRID_CATALOG) {
+            $defaultpage = $CFG->wwwroot . '/totara/catalog/index.php';
         }
 
         $templatecontext = array(

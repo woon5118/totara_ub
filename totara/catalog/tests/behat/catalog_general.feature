@@ -175,3 +175,31 @@ Feature: Test file for catalog
     # should appear on the browser
     # todo: checking for url content
     Then "input.tw-catalogResultsShare__expanded_input" "css_element" should exist
+
+  # Test it as home page
+  Scenario: User is browsing within find learning home page
+    Given I am on homepage
+
+    And I click on "Find Learning" in the totara menu
+    When I follow "Make home page"
+    Then I should see "Your default page was changed"
+    And I should not see "Make home page"
+
+    When I click on "Home" in the totara menu
+    Then I should see "Make home page"
+
+    When I click on ".masthead_logo--header_link" "css_element"
+    Then I should see "Find Learning"
+    And I should not see "Make home page"
+
+    When I click on "Home" in the totara menu
+    Then I click on "Make home page" "link"
+    And I should see "Your default page was changed"
+
+    When I click on "Find Learning" in the totara menu
+    Then I should see "Make home page"
+
+    When I click on "Dashboard" in the totara menu
+    Then I press "Make home page"
+    And I should see "Your default page was changed"
+    And I should not see "Make home page"

@@ -48,6 +48,8 @@
     data-core-autoinitialise="true"
     data-core-autoinitialise-amd="totara_catalog/manage_btns">
 
+    {{> totara_catalog/default_home_page_block }}
+
     {{#has_buttons}}{{#buttons}}
         <a href="{{{url}}}" class="tw-catalogManageBtns__btn btn">
             {{label}}

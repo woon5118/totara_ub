@@ -150,16 +150,26 @@ preferences,moodle|/user/preferences.php|preferences',
 
     // Navigation settings
     $temp = new admin_settingpage('navigation', new lang_string('menuitem:navigationsettings', 'totara_core'), array('totara/core:appearance'));
-    if (!advanced_feature::is_disabled('totaradashboard')) {
-        $choices = array(
-            HOMEPAGE_SITE => new lang_string('site'),
-            HOMEPAGE_TOTARA_DASHBOARD => new lang_string('totaradashboard', 'admin')
-        );
-        $temp->add(new admin_setting_configselect('defaulthomepage', new lang_string('defaulthomepage', 'admin'),
-            new lang_string('configdefaulthomepage', 'admin'), HOMEPAGE_TOTARA_DASHBOARD, $choices));
-        $temp->add(new admin_setting_configcheckbox('allowdefaultpageselection', new lang_string('allowdefaultpageselection', 'totara_dashboard'),
-            new lang_string('allowdefaultpageselection_desc', 'totara_dashboard'), '1'));
+    // Default home page for users.
+    $choices = [];
+    $choices[HOMEPAGE_SITE] = new lang_string('site');
+    if (advanced_feature::is_enabled('totaradashboard')) {
+        $choices[HOMEPAGE_TOTARA_DASHBOARD] = new lang_string('totaradashboard', 'admin');
     }
+    if (get_config('core', 'catalogtype') == 'totara') {
+        $choices[HOMEPAGE_TOTARA_GRID_CATALOG] = new lang_string('totaracataloguegrid', 'admin');
+    }
+    $temp->add(new totara_core_admin_setting_defaulthomepage(
+        'defaulthomepage',
+        new lang_string('defaulthomepage', 'admin'),
+        new lang_string('configdefaulthomepage', 'admin'),
+        HOMEPAGE_TOTARA_DASHBOARD,
+        $choices
+     ));
+    // Allow default page selection.
+    $temp->add(new admin_setting_configcheckbox('allowdefaultpageselection', new lang_string('allowdefaultpageselection', 'totara_dashboard'),
+        new lang_string('allowdefaultpageselection_desc', 'totara_dashboard'), '0'));
+
     // Totara: allowguestmymoodle setting was remove from Totara 9
     $temp->add(new admin_setting_configcheckbox('navshowfullcoursenames', new lang_string('navshowfullcoursenames', 'admin'), new lang_string('navshowfullcoursenames_help', 'admin'), 0));
     $temp->add(new admin_setting_configcheckbox('navshowcategories', new lang_string('navshowcategories', 'admin'), new lang_string('confignavshowcategories', 'admin'), 1));

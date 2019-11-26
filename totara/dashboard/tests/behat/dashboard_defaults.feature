@@ -21,37 +21,37 @@ Feature: Test Dashboard defaults
   Scenario: Dashboard is default page for all users except admin by default
     When I log in as "student1"
     Then I should see "My Learning" in the ".breadcrumb-nav" "css_element"
-    And I should not see "Make Dashboard my default page"
+    And I should not see "Make home page"
     And I should see "Current Learning"
 
     When I click on "Home" in the totara menu
     Then I should see "Latest announcements"
     And I should not see "Current Learning"
-    And I should see "Make Home my default page"
+    And I should see "Make home page"
 
     When I click on "Dashboard" in the totara menu
     Then I should see "My Learning" in the ".breadcrumb-nav" "css_element"
-    And I should not see "Make Dashboard my default page"
+    And I should not see "Make home page"
 
     When I click on "Home" in the totara menu
-    And I click on "Make Home my default page" "link"
-    And I should not see "Make Home my default page"
+    And I click on "Make home page" "link"
+    And I should not see "Make home page"
     And I should not see "Current Learning"
     And I log out
     And I log in as "student1"
     Then I should see "Latest announcements"
     And I should not see "Current Learning"
-    And I should not see "Make Home my default page"
+    And I should not see "Make home page"
 
     When I click on "Dashboard" in the totara menu
-    And I click on "Make Dashboard my default page" "link"
-    And I should not see "Make Dashboard my default page"
+    And I press "Make home page"
+    And I should not see "Make home page"
     And I should see "Current Learning"
     And I log out
     And I log in as "student1"
     Then I should see "My Learning" in the ".breadcrumb-nav" "css_element"
     And I should see "Current Learning"
-    And I should not see "Make Dashboard my default page"
+    And I should not see "Make home page"
 
   Scenario: Home is default page for admin by default
     When I log in as "admin"
@@ -67,24 +67,24 @@ Feature: Test Dashboard defaults
     And I should not see "Current Learning"
 
     When I click on "Dashboard" in the totara menu
-    And I click on "Make Dashboard my default page" "link"
-    And I should not see "Make Dashboard my default page"
+    And I press "Make home page"
+    And I should not see "Make home page"
     And I should see "Current Learning"
     And I log out
     And I log in as "admin"
     Then I should see "My Learning" in the ".breadcrumb-nav" "css_element"
     And I should see "Current Learning"
-    And I should not see "Make Dashboard my default page"
+    And I should not see "Make home page"
 
     When I click on "Home" in the totara menu
-    And I click on "Make Home my default page" "link"
-    And I should not see "Make Home my default page"
+    And I click on "Make home page" "link"
+    And I should not see "Make home page"
     And I should not see "Current Learning"
     And I log out
     And I log in as "admin"
     Then I should see "Latest announcements"
     And I should not see "Current Learning"
-    And I should not see "Make Home my default page"
+    And I should not see "Make home page"
 
   Scenario: Disable Totara Dashboard feature
     Given I log in as "admin"
@@ -112,26 +112,26 @@ Feature: Test Dashboard defaults
     Then I should see "Latest announcements"
     And I should not see "Current Learning"
     When I click on "Dashboard" in the totara menu
-    And I click on "Make Dashboard my default page" "link"
-    And I should not see "Make Dashboard my default page"
+    And I press "Make home page"
+    And I should not see "Make home page"
     And I should see "Current Learning"
     And I log out
     And I log in as "student1"
     Then I should see "My Learning" in the ".breadcrumb-nav" "css_element"
     And I should see "Current Learning"
-    And I should not see "Make Dashboard my default page"
+    And I should not see "Make home page"
     And I log out
 
     When I log in as "admin"
     Then I should see "Latest announcements"
     And I should not see "Current Learning"
     When I click on "Dashboard" in the totara menu
-    And I click on "Make Dashboard my default page" "link"
-    And I should not see "Make Dashboard my default page"
+    And I press "Make home page"
+    And I should not see "Make home page"
     And I should see "Current Learning"
     And I log out
     And I log in as "admin"
     Then I should see "My Learning" in the ".breadcrumb-nav" "css_element"
     And I should see "Current Learning"
-    And I should not see "Make Dashboard my default page"
+    And I should not see "Make home page"
     And I log out

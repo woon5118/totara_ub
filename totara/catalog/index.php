@@ -27,6 +27,17 @@ global $CFG, $OUTPUT, $PAGE;
 
 require_login();
 
+$pageurl = new moodle_url('/totara/catalog/index.php');
+// Set grid catalog as homepage for user when user home page preference is enabled.
+if (optional_param('setdefaulthome', 0, PARAM_BOOL)) {
+    if (!empty($CFG->allowdefaultpageselection) && $CFG->catalogtype === 'totara') {
+        require_sesskey();
+        set_user_preference('user_home_page_preference', HOMEPAGE_TOTARA_GRID_CATALOG);
+        \core\notification::success(get_string('userhomepagechanged', 'totara_dashboard'));
+        redirect($pageurl);
+    }
+}
+
 // Set page context.
 $systemcontext = context_system::instance();
 $title = get_string('catalog_title', 'totara_catalog');
@@ -37,7 +48,6 @@ $PAGE->set_heading($heading);
 $PAGE->set_pagelayout('noblocks');
 
 // Start page output.
-$pageurl = new moodle_url('/totara/catalog/index.php');
 $PAGE->set_url($pageurl);
 echo $OUTPUT->header();
 echo $OUTPUT->heading($heading, 2, 'tw-catalog__title');

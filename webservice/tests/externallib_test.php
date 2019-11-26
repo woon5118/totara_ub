@@ -139,6 +139,7 @@ class core_webservice_externallib_testcase extends externallib_advanced_testcase
         $DB->insert_record('external_tokens', $externaltoken);
 
         // Set a home page by user preferences.
+        $CFG->allowdefaultpageselection = true;
         $CFG->defaulthomepage = HOMEPAGE_TOTARA_DASHBOARD;
         set_user_preference('user_home_page_preference', HOMEPAGE_SITE);
 

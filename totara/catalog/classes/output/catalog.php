@@ -130,6 +130,16 @@ class catalog extends template {
         $data->panel_region_template_name = $panelregiontemplate->get_template_name();
         $data->panel_region_template_data = $panelregiontemplate->get_template_data();
 
+        // Default home page panel.
+        $data->defaulthomepage = false;
+        $data->defaulthomepage_url = '';
+        $userhomepagepref = get_user_preferences('user_home_page_preference', -1);
+        if (!empty(get_config('core', 'allowdefaultpageselection')) &&
+            (get_home_page() != HOMEPAGE_TOTARA_GRID_CATALOG || $userhomepagepref != HOMEPAGE_TOTARA_GRID_CATALOG))
+        {
+            $data->defaulthomepage = true;
+            $data->defaulthomepage_url = (new \moodle_url('/totara/catalog/index.php', ['setdefaulthome' => '1', 'sesskey' => sesskey()]))->out();
+        }
         // Order by.
         $data->order_by_enabled = $catalog->alphabetical_sorting_enabled();
         if ($data->order_by_enabled) {

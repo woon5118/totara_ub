@@ -505,9 +505,14 @@ define('HOMEPAGE_MY', 1);
 define('HOMEPAGE_USER', 2);
 
 /**
- * The home page shold be totara dashboard
+ * The home page should be totara dashboard
  */
 define('HOMEPAGE_TOTARA_DASHBOARD', 105);
+
+/**
+ * The home page should be totara find learning when catalogtype is grid enabled
+ */
+define('HOMEPAGE_TOTARA_GRID_CATALOG', 155);
 
 /**
  * Hub directory url (should be moodle.org)
@@ -10421,7 +10426,7 @@ function mnet_get_idp_jump_url($user) {
 /**
  * Gets the homepage to use for the current user
  *
- * @return int HOMEPAGE_TOTARA_DASHBOARD or HOMEPAGE_SITE
+ * @return int HOMEPAGE_TOTARA_DASHBOARD or HOMEPAGE_SITE or HOMEPAGE_TOTARA_GRID_CATALOG
  */
 function get_home_page() {
     global $CFG, $USER;
@@ -10430,36 +10435,62 @@ function get_home_page() {
         return HOMEPAGE_SITE;
     }
 
-    if (advanced_feature::is_disabled('totaradashboard')) {
-        return HOMEPAGE_SITE;
-    }
+    $defaulthomepage = $CFG->defaulthomepage ?? false;
+    $catalogtype = get_config('core', 'catalogtype');
+    $gridcatalog = ($defaulthomepage == HOMEPAGE_TOTARA_GRID_CATALOG && $catalogtype == 'totara');
+    $totaradashboard = ($defaulthomepage == HOMEPAGE_TOTARA_DASHBOARD && advanced_feature::is_enabled('totaradashboard'));
+    $pref = get_user_preferences('user_home_page_preference', -1);
 
     if (!empty($USER->tenantid) and $CFG->tenantsisolated) {
         // The front page is not accessible when tenant isolation is active.
+        if (empty($CFG->allowdefaultpageselection)) {
+            if ($gridcatalog) {
+                return HOMEPAGE_TOTARA_GRID_CATALOG;
+            }
+            return HOMEPAGE_TOTARA_DASHBOARD;
+        }
+        if ($pref == -1) {
+            if ($gridcatalog) {
+                return HOMEPAGE_TOTARA_GRID_CATALOG;
+            }
+        } else {
+            if ($pref == HOMEPAGE_TOTARA_GRID_CATALOG && $catalogtype == 'totara') {
+                return HOMEPAGE_TOTARA_GRID_CATALOG;
+            }
+        }
         return HOMEPAGE_TOTARA_DASHBOARD;
     }
 
     if (empty($CFG->allowdefaultpageselection)) {
-        if (isset($CFG->defaulthomepage) and $CFG->defaulthomepage == HOMEPAGE_SITE) {
+        if ($gridcatalog) {
+            return HOMEPAGE_TOTARA_GRID_CATALOG;
+        } else if ($totaradashboard) {
+            return HOMEPAGE_TOTARA_DASHBOARD;
+        } else {
             return HOMEPAGE_SITE;
         }
-        return HOMEPAGE_TOTARA_DASHBOARD;
     }
 
-    $pref = get_user_preferences('user_home_page_preference', -1);
     if ($pref == -1) {
-        if (isset($CFG->defaulthomepage) and $CFG->defaulthomepage == HOMEPAGE_SITE) {
+        if ($totaradashboard) {
+            return HOMEPAGE_TOTARA_DASHBOARD;
+        } else if ($gridcatalog) {
+            return HOMEPAGE_TOTARA_GRID_CATALOG;
+        } else {
             return HOMEPAGE_SITE;
         }
-    }
-    if ($pref == HOMEPAGE_SITE) {
-        return HOMEPAGE_SITE;
+    } else {
+        if ($pref == HOMEPAGE_SITE) {
+            return HOMEPAGE_SITE;
+        } else if ($pref == HOMEPAGE_TOTARA_GRID_CATALOG && $catalogtype == 'totara') {
+            return HOMEPAGE_TOTARA_GRID_CATALOG;
+        }
     }
 
     require_once($CFG->dirroot . '/totara/dashboard/lib.php');
 
     // Check for dashboard assignments.
-    if (count(totara_dashboard::get_user_dashboards($USER->id))) {
+    if (count(totara_dashboard::get_user_dashboards($USER->id)) && advanced_feature::is_enabled('totaradashboard')) {
         return HOMEPAGE_TOTARA_DASHBOARD;
     }
 

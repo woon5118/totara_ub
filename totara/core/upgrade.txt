@@ -3,6 +3,8 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* Added 'Totara grid catalogue' as a third option for 'Default home page for users' setting in Navigation settings
+* Changed 'Allow default page selection' default value from 'Yes' to 'No'
 * totara_core\quickaccessmenu\menu::get_items_in_group() added second argument $includehidden
 * Removed deprecated custom errorlog handling
   The following have all been removed as part of this:
