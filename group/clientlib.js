@@ -42,7 +42,7 @@ function UpdatableGroupsCombo(wwwRoot, courseId) {
                 }
 
                 if (groupsComboEl && o.responseText) {
-                    var groups = eval("("+o.responseText+")");
+                    var groups = JSON.parse(o.responseText);
 
                     // Populate the groups list box.
                     for (var i=0; i<groups.length; i++) {
@@ -80,7 +80,7 @@ function UpdatableMembersCombo(wwwRoot, courseId) {
             if (o.responseText !== undefined) {
                 var selectEl = document.getElementById("members");
                 if (selectEl && o.responseText) {
-                    var roles = eval("("+o.responseText+")");
+                    var roles = JSON.parse(o.responseText);
 
                     // Clear the members list box.
                     if (selectEl) {
