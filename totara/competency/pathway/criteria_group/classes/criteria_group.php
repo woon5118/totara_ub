@@ -25,15 +25,14 @@
 namespace pathway_criteria_group;
 
 use core\orm\collection;
-use core\orm\entity\repository;
 use core\orm\query\builder;
 use pathway_criteria_group\entities\criteria_group as criteria_group_entity;
 use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
 use stdClass;
 use totara_competency\base_achievement_detail;
 use totara_competency\entities\pathway as pathway_entity;
-use totara_competency\pathway;
 use totara_competency\entities\scale_value;
+use totara_competency\pathway;
 use totara_competency\pathway_factory;
 use totara_criteria\criterion;
 use totara_criteria\criterion_factory;
@@ -564,8 +563,7 @@ class criteria_group extends pathway {
         // Clean up empty pathways
         builder::get_db()->transaction(function () {
             // Find and delete criteria group pathway records which are empty
-            $empty_pathway_ids = pathway_entity::repository()
-                ->select('id')
+            $empty_pathways = pathway_entity::repository()
                 ->left_join([criteria_group_entity::TABLE, 'cg'], 'path_instance_id', 'id')
                 ->left_join([criteria_group_criterion_entity::TABLE, 'cgc'], 'path_instance_id', 'criteria_group_id')
                 ->where('path_type', 'criteria_group')
@@ -575,11 +573,11 @@ class criteria_group extends pathway {
                     $builder->or_where('cg.id', null)->or_where('cgc.id', null);
                 })
                 ->group_by('id')
-                ->get()
-                ->pluck('id');
+                ->with('competency')
+                ->get();
 
-            foreach ($empty_pathway_ids as $empty_pathway_id) {
-                $pathway = pathway_factory::fetch('criteria_group', $empty_pathway_id);
+            foreach ($empty_pathways as $empty_pathway) {
+                $pathway = pathway_factory::from_entity($empty_pathway);
                 $pathway->delete();
             }
         });

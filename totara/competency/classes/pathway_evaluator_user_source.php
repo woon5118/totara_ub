@@ -151,6 +151,35 @@ class pathway_evaluator_user_source {
     }
 
     /**
+     * Mark all users of the competency in the queue as changes
+     *
+     * @param int $competency_id
+     */
+    public function mark_all_users_with_competency(int $competency_id) {
+        global $DB;
+
+        $this->temp_user_table->set_comptency_id_value($competency_id);
+        $temp_table_name = $this->temp_user_table->get_table_name();
+        [$set_haschanged_sql, $set_haschanged_params] = $this->temp_user_table->get_set_has_changed_sql_with_params(1);
+        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('', false, null);
+        if (!empty($temp_wh)) {
+            $temp_wh = " AND {$temp_wh}";
+        }
+
+        $params = array_merge($set_haschanged_params, $temp_wh_params);
+
+        $sql = "
+            UPDATE {{$temp_table_name}}
+                SET {$set_haschanged_sql}
+            WHERE 1 = 1 {$temp_wh}
+        ";
+
+        $DB->execute($sql, $params);
+
+        $this->temp_user_table->reset_comptency_id_value();
+    }
+
+    /**
      * Mark users who needs to be reaggregated
      *
      * @param pathway $pathway

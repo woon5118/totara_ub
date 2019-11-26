@@ -24,9 +24,11 @@
 use pathway_manual\manual;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\configuration_change;
-use totara_competency\entities\pathway_achievement;
+use totara_competency\entities\pathway as pathway_entity;
+use totara_competency\entities\pathway_achievement as pathway_achievement_entity;
 use totara_competency\expand_task;
 use totara_competency\linked_courses;
+use totara_competency\pathway;
 
 global $CFG;
 require_once($CFG->dirroot . '/totara/competency/tests/integration_aggregation.php');
@@ -80,21 +82,21 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
             '1-1' => [
                 'pathway_id' => $pathways[1]->get_id(),
                 'user_id' => $data->users[1]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => $data->scalevalues[5]->id,
                 'related_info' => ['onactivate'],
             ],
             '2-1' => [
                 'pathway_id' => $pathways[2]->get_id(),
                 'user_id' => $data->users[1]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => $data->scalevalues[5]->id,
                 'related_info' => ['onactivate'],
             ],
             '2-2' => [
                 'pathway_id' => $pathways[2]->get_id(),
                 'user_id' => $data->users[2]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => $data->scalevalues[5]->id,
                 'related_info' => ['onactivate'],
             ],
@@ -124,6 +126,284 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
                 'scale_value_id' => $data->scalevalues[5]->id,
                 'proficient' => 0,
                 'via' => [$pw_achievement_records['2-2']],
+            ],
+        ]);
+    }
+
+    /**
+     * Test aggregation with a single onactivate criterion which gets archived
+     *
+     * @dataProvider task_to_execute_data_provider
+     */
+    public function test_aggregation_single_onactivate_with_subsequent_archiving(string $task_to_execute) {
+        $data = $this->setup_data();
+
+        // Create a criteria_group on competency 1 and 2 with 1 onactivate criterion on the lowest scale
+        /** @var \pathway_criteria_group\criteria_group[] $pathways */
+        $pathways = [];
+        for ($i = 1; $i <= 2; $i++) {
+            $criterion = $data->criteria_generator->create_onactivate(['competency' => $data->competencies[$i]->id]);
+            $pathways[$i] = $data->competency_generator->create_criteria_group($data->competencies[$i],
+                [$criterion],
+                $data->scalevalues[5]->id
+            );
+        }
+
+        // Now assign some users to competencies with criteria and some to competencies without criteria
+        $to_assign = [];
+        for ($user_idx = 1; $user_idx <= 3; $user_idx++) {
+            $to_assign[] = ['user_id' => $data->users[$user_idx]->id, 'competency_id' => $data->competencies[$user_idx]->id];
+            $to_assign[] = ['user_id' => $data->users[$user_idx]->id, 'competency_id' => $data->competencies[$user_idx + 1]->id];
+        }
+        $data->assign_users_to_competencies($to_assign);
+        $this->waitForSecond();
+
+        (new $task_to_execute())->execute();
+
+        // Now archive one pathway
+        $pathways[1]->delete();
+
+        configuration_change::add_competency_entry(
+            $data->competencies[1]->id,
+            configuration_change::CHANGED_CRITERIA,
+            time()
+        );
+
+        $current_pathway = new pathway_entity($pathways[1]->get_id());
+
+        $this->assertEquals(pathway::PATHWAY_STATUS_ARCHIVED, $current_pathway->status);
+
+        $pw_achievement_records = $this->verify_pathway_achievements([
+            '1-1' => [
+                'pathway_id' => $pathways[1]->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'related_info' => ['onactivate'],
+            ],
+            '2-1' => [
+                'pathway_id' => $pathways[2]->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'related_info' => ['onactivate'],
+            ],
+            '2-2' => [
+                'pathway_id' => $pathways[2]->get_id(),
+                'user_id' => $data->users[2]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'related_info' => ['onactivate'],
+            ],
+        ]);
+
+        $this->verify_competency_achievements([
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'proficient' => 0,
+                'via' => [$pw_achievement_records['1-1']],
+            ],
+            [
+                'competency_id' => $data->competencies[2]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'proficient' => 0,
+                'via' => [$pw_achievement_records['2-1']],
+            ],
+            [
+                'competency_id' => $data->competencies[2]->id,
+                'user_id' => $data->users[2]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'proficient' => 0,
+                'via' => [$pw_achievement_records['2-2']],
+            ],
+        ]);
+
+        $this->waitForSecond();
+
+        (new $task_to_execute())->execute();
+
+        // The pathway achievements should now been archived
+        $pw_achievement_records = $this->verify_pathway_achievements([
+            '1-1' => [
+                'pathway_id' => $pathways[1]->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement_entity::STATUS_ARCHIVED,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'related_info' => ['onactivate'],
+            ],
+            '2-1' => [
+                'pathway_id' => $pathways[2]->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'related_info' => ['onactivate'],
+            ],
+            '2-2' => [
+                'pathway_id' => $pathways[2]->get_id(),
+                'user_id' => $data->users[2]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'related_info' => ['onactivate'],
+            ],
+        ]);
+
+        // The user should have lost the value as there was only one pathway
+        $this->verify_competency_achievements([
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::SUPERSEDED,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'proficient' => 0,
+                'via' => [$pw_achievement_records['1-1']],
+            ],
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => null,
+                'proficient' => 0,
+                'via' => null,
+            ],
+            [
+                'competency_id' => $data->competencies[2]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'proficient' => 0,
+                'via' => [$pw_achievement_records['2-1']],
+            ],
+            [
+                'competency_id' => $data->competencies[2]->id,
+                'user_id' => $data->users[2]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'proficient' => 0,
+                'via' => [$pw_achievement_records['2-2']],
+            ],
+        ]);
+    }
+
+    /**
+     * Test aggregation with a single onactivate criterion which gets archived
+     *
+     * @dataProvider task_to_execute_data_provider
+     */
+    public function test_aggregation_multiple_pathways_with_subsequent_archiving(string $task_to_execute) {
+        $data = $this->setup_data();
+
+        // Create a criteria_group on competency 1 with 1 coursecompletion criterion to complete course1
+        // Assign users 1, 2 and 3
+        // Users 1 and 3 completes the course
+        $criterion = $data->criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id]]);
+        $pathway1 = $data->competency_generator->create_criteria_group($data->competencies[1],
+            [$criterion],
+            $data->scalevalues[4]->id
+        );
+
+        $criterion = $data->criteria_generator->create_onactivate(['competency' => $data->competencies[1]->id]);
+        $pathway2 = $data->competency_generator->create_criteria_group($data->competencies[1],
+            [$criterion],
+            $data->scalevalues[5]->id
+        );
+
+        // Now assign one user to competencies with criteria and some to competencies without criteria
+        $data->assign_users_to_competencies([['user_id' => $data->users[1]->id, 'competency_id' => $data->competencies[1]->id]]);
+        $this->waitForSecond();
+
+        // Complete course for one user
+        $completion = new completion_completion(['course' => $data->courses[1]->id, 'userid' => $data->users[1]->id]);
+        $completion->mark_complete();
+
+        (new $task_to_execute())->execute();
+
+        $pw_achievement_records = $this->verify_pathway_achievements([
+            '1-1' => [
+                'pathway_id' => $pathway1->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[4]->id,
+                'related_info' => ['coursecompletion'],
+            ],
+            '1-2' => [
+                'pathway_id' => $pathway2->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'related_info' => ['onactivate'],
+            ]
+        ]);
+
+        $this->verify_competency_achievements([
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[4]->id,
+                'proficient' => 0,
+                'via' => [$pw_achievement_records['1-1']],
+            ],
+        ]);
+
+        // Now archive the course pathway which leaves only the onactivate
+        $pathway1->delete();
+
+        configuration_change::add_competency_entry(
+            $data->competencies[1]->id,
+            configuration_change::CHANGED_CRITERIA,
+            time()
+        );
+
+        $current_pathway = new pathway_entity($pathway1->get_id());
+
+        $this->assertEquals(pathway::PATHWAY_STATUS_ARCHIVED, $current_pathway->status);
+
+        $this->waitForSecond();
+
+        (new $task_to_execute())->execute();
+
+        // The coursecompletion pathway achievement should now be archived
+        $pw_achievement_records = $this->verify_pathway_achievements([
+            '1-1' => [
+                'pathway_id' => $pathway1->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement_entity::STATUS_ARCHIVED,
+                'scale_value_id' => $data->scalevalues[4]->id,
+                'related_info' => ['coursecompletion'],
+            ],
+            '1-2' => [
+                'pathway_id' => $pathway2->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'related_info' => ['onactivate'],
+            ]
+        ]);
+
+        // Now the value should have changed to the onactivate pathway
+        // as the other one got archived
+        $this->verify_competency_achievements([
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'proficient' => 0,
+                'via' => [$pw_achievement_records['1-2']],
+            ],
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::SUPERSEDED,
+                'scale_value_id' => $data->scalevalues[4]->id,
+                'proficient' => 0,
+                'via' => [$pw_achievement_records['1-1']],
             ],
         ]);
     }
@@ -171,21 +451,21 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
             '1-1' => [
                 'pathway_id' => $pathway->get_id(),
                 'user_id' => $data->users[1]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => $data->scalevalues[4]->id,
                 'related_info' => ['coursecompletion'],
             ],
             '1-2' => [
                 'pathway_id' => $pathway->get_id(),
                 'user_id' => $data->users[2]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => null,
                 'related_info' => [],
             ],
             '1-3' => [
                 'pathway_id' => $pathway->get_id(),
                 'user_id' => $data->users[3]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => $data->scalevalues[4]->id,
                 'related_info' => ['coursecompletion'],
             ],
@@ -300,28 +580,28 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
             '1-1' => [
                 'pathway_id' => $pathways[1]->get_id(),
                 'user_id' => $data->users[1]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => $data->scalevalues[3]->id,
                 'related_info' => ['linkedcourses'],
             ],
             '1-2' => [
                 'pathway_id' => $pathways[1]->get_id(),
                 'user_id' => $data->users[2]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => null,
                 'related_info' => [],
             ],
             '2-1' => [
                 'pathway_id' => $pathways[2]->get_id(),
                 'user_id' => $data->users[1]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => null,
                 'related_info' => [],
             ],
             '2-2' => [
                 'pathway_id' => $pathways[2]->get_id(),
                 'user_id' => $data->users[3]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => null,
                 'related_info' => [],
             ],
@@ -419,35 +699,35 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
             'child-1' => [
                 'pathway_id' => $pathways['child']->get_id(),
                 'user_id' => $data->users[1]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => null,
                 'related_info' => [],
             ],
             'child-2' => [
                 'pathway_id' => $pathways['child']->get_id(),
                 'user_id' => $data->users[2]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => $data->scalevalues[2]->id,
                 'related_info' => ['coursecompletion'],
             ],
             'child-3' => [
                 'pathway_id' => $pathways['child']->get_id(),
                 'user_id' => $data->users[3]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => $data->scalevalues[2]->id,
                 'related_info' => ['coursecompletion'],
             ],
             'parent-1' => [
                 'pathway_id' => $pathways['parent']->get_id(),
                 'user_id' => $data->users[1]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => null,
                 'related_info' => [],
             ],
             'parent-2' => [
                 'pathway_id' => $pathways['parent']->get_id(),
                 'user_id' => $data->users[2]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => $data->scalevalues[4]->id,
                 'related_info' => ['childcompetency'],
             ],
@@ -538,21 +818,21 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
             '1-1' => [
                 'pathway_id' => $pathway->get_id(),
                 'user_id' => $data->users[1]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => null,
                 'related_info' => [],
             ],
             '1-2' => [
                 'pathway_id' => $pathway->get_id(),
                 'user_id' => $data->users[2]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => $data->scalevalues[2]->id,
                 'related_info' => ['rating_id' => $ratings[2]->id],
             ],
             '1-3' => [
                 'pathway_id' => $pathway->get_id(),
                 'user_id' => $data->users[3]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => $data->scalevalues[4]->id,
                 'related_info' => ['rating_id' => $ratings[3]->id],
             ],
@@ -633,35 +913,35 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
             '1-1' => [
                 'pathway_id' => $pathways[1]->get_id(),
                 'user_id' => $data->users[1]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => null,
                 'related_info' => [],
             ],
             '1-2' => [
                 'pathway_id' => $pathways[1]->get_id(),
                 'user_id' => $data->users[2]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => $data->scalevalues[2]->id,
                 'related_info' => [],
             ],
             '1-3' => [
                 'pathway_id' => $pathways[1]->get_id(),
                 'user_id' => $data->users[3]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => $data->scalevalues[4]->id,
                 'related_info' => [],
             ],
             '2-1' => [
                 'pathway_id' => $pathways[2]->get_id(),
                 'user_id' => $data->users[1]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => $data->scalevalues[3]->id,
                 'related_info' => [],
             ],
             '2-4' => [
                 'pathway_id' => $pathways[2]->get_id(),
                 'user_id' => $data->users[4]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => null,
                 'related_info' => [],
             ],
@@ -775,21 +1055,21 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
             '1-1' => [
                 'pathway_id' => $pathway->get_id(),
                 'user_id' => $data->users[1]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => $data->scalevalues[5]->id,
                 'related_info' => ['onactivate'],
             ],
             '1-2' => [
                 'pathway_id' => $pathway->get_id(),
                 'user_id' => $data->users[2]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => $data->scalevalues[5]->id,
                 'related_info' => ['onactivate'],
             ],
             '1-3' => [
                 'pathway_id' => $pathway->get_id(),
                 'user_id' => $data->users[3]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
                 'scale_value_id' => $data->scalevalues[5]->id,
                 'related_info' => ['onactivate'],
             ],

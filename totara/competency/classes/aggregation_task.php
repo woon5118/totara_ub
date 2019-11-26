@@ -28,6 +28,7 @@ use core\orm\entity\repository;
 use core\orm\query\builder;
 use totara_competency\entities\competency;
 use totara_competency\entities\pathway as pathway_entity;
+use totara_competency\entities\pathway_achievement;
 
 /**
  * Class to run the aggregation on a list of users and competencies.
@@ -77,31 +78,53 @@ class aggregation_task {
 
         $aggregation_time = $aggregation_time ?? time();
 
-        // Get competencies with active enabled pathways and assigned users
-        //      For each active pathway
-        //          Aggregate
-        //      For each user with changes
-        //          Perform overall aggregation
-        //          Save competency_achievement
-        //      For each competency
-        //          Aggregate achievement
+        $competencies_with_archived_pws = $this->get_competency_with_archived_pathways();
+        $competencies_with_active_pws = $this->get_competency_with_active_pathways_for_assigned_users();
 
-        $competencies = $this->get_competency_with_active_pathways_for_assigned_users();
+        // We want to combine both results to go only once through it
+        $competency_ids = array_unique(
+            array_merge(
+                $competencies_with_archived_pws->pluck('id'),
+                $competencies_with_active_pws->pluck('id')
+            )
+        );
 
-        /** @var competency $curr_competency */
-        foreach ($competencies as $competency) {
-            // Aggregate each pathway before aggregation the competency itself
-            foreach ($competency->active_pathways as $pathway_entity) {
-                // As we already have the competency attach it to the pathway entity
-                // to avoid another query later down the line
-                $pathway_entity->relate('competency', $competency);
-                $pathway = pathway_factory::from_entity($pathway_entity);
+        /** @var competency $competency */
+        foreach ($competency_ids as $competency_id) {
+            $competency_to_aggregate = null;
 
-                $pw_evaluator = pathway_evaluator_factory::create($pathway, $this->pw_user_id_source);
-                $pw_evaluator->aggregate($aggregation_time);
+            // Aggregate each archived pathway which still has active pathway achievements
+            // before aggregation the competency itself
+            $competency = $competencies_with_archived_pws->find('id', $competency_id);
+            if ($competency) {
+                $competency_to_aggregate = $competency;
+                foreach ($competency->pathways as $pathway_entity) {
+                    // Avoid another query by attaching the competency
+                    $pathway_entity->relate('competency', $competency);
+                    $pathway = pathway_factory::from_entity($pathway_entity);
+                    $pathway->archive_pathway_achievements();
+
+                    // Mark all rows for that competency as has_changed
+                    // so that it will be picked up by the competency achievement aggregation
+                    $this->pw_user_id_source->mark_all_users_with_competency($competency->id);
+                }
             }
 
-            $this->aggregate_competency_achievements($competency, $aggregation_time);
+            // Aggregate each active pathway before aggregation the competency itself
+            $competency = $competencies_with_active_pws->find('id', $competency_id);
+            if ($competency) {
+                $competency_to_aggregate = $competency;
+                foreach ($competency->active_pathways as $pathway_entity) {
+                    // Avoid another query by attaching the competency
+                    $pathway_entity->relate('competency', $competency);
+                    $pathway = pathway_factory::from_entity($pathway_entity);
+
+                    $pw_evaluator = pathway_evaluator_factory::create($pathway, $this->pw_user_id_source);
+                    $pw_evaluator->aggregate($aggregation_time);
+                }
+            }
+
+            $this->aggregate_competency_achievements($competency_to_aggregate, $aggregation_time);
         }
     }
 
@@ -136,6 +159,46 @@ class aggregation_task {
                 // We want to get all active pathway entities in one go, using the relation
                 'active_pathways' => function (repository $repository) use ($pathway_types) {
                     $repository->where('path_type', $pathway_types);
+                }
+            ])
+            ->get();
+
+        return $result;
+    }
+
+    /**
+     * @return collection|competency[]
+     */
+    private function get_competency_with_archived_pathways(): collection {
+        $uses_process_key = $this->table->get_process_key_column() && $this->table->get_process_key_value();
+
+        // Make sure we only load competencies we have an entry in the queue for
+        $queue_builder = builder::table($this->table->get_table_name())
+            ->where_field($this->table->get_competency_id_column(), "c.id")
+            ->when($uses_process_key, function (builder $builder) {
+                $builder->where($this->table->get_process_key_column(), $this->table->get_process_key_value());
+            });
+
+        // We are looking for competencies with archived pathways which have still active pathway_achievements
+        $pathway_builder = builder::table(pathway_entity::TABLE)
+            ->join([pathway_achievement::TABLE, 'pwa'], 'id', 'pathway_id')
+            ->where_field('comp_id', "c.id")
+            ->where('pwa.status', pathway_achievement::STATUS_CURRENT)
+            ->where('status', pathway::PATHWAY_STATUS_ARCHIVED);
+
+        $result =  competency::repository()
+            ->as('c')
+            ->where_exists($queue_builder)
+            ->where_exists($pathway_builder)
+            ->order_by('depthlevel', 'desc')
+            ->order_by('id', 'asc')
+            ->with([
+                // We want to get all archived pathway entities in one go, using the relation
+                'pathways' => function (repository $repository) {
+                    $repository
+                        ->join([pathway_achievement::TABLE, 'pwa'], 'id', 'pathway_id')
+                        ->where('pwa.status', pathway_achievement::STATUS_CURRENT)
+                        ->where('status', pathway::PATHWAY_STATUS_ARCHIVED);
                 }
             ])
             ->get();

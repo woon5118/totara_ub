@@ -236,9 +236,26 @@ abstract class pathway {
         // Configuration is deleted
         $this->delete_configuration();
         $this->set_status(static::PATHWAY_STATUS_ARCHIVED);
+
+        // IMPORTANT: We deliberately do not archive pathway_achievements here
+        // so that our aggregation task picks all archived pathways up which
+        // still have active pathway_achievements
         $this->save();
 
         return $this;
+    }
+
+    /**
+     * Archive pathway achievements of this pathway
+     */
+    public function archive_pathway_achievements() {
+        pathway_achievement::repository()
+            ->where('status', pathway_achievement::STATUS_CURRENT)
+            ->where('pathway_id', $this->get_id())
+            ->update([
+                'last_aggregated' => time(),
+                'status' => pathway_achievement::STATUS_ARCHIVED
+            ]);
     }
 
     /**

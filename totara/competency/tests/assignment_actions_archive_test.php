@@ -115,7 +115,7 @@ class totara_competency_actions_archive_testcase extends totara_competency_assig
 
         $model = new assignment_actions();
         $affected_ids = $model->archive([$assignment1->id, $assignment2->id]);
-        $this->assertEquals([$assignment1->id, $assignment2->id], $affected_ids);
+        $this->assertEqualsCanonicalizing([$assignment1->id, $assignment2->id], $affected_ids);
 
         $assignment1->refresh();
         $assignment2->refresh();

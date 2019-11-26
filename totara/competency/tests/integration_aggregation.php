@@ -24,6 +24,7 @@
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency;
 use totara_competency\entities\scale;
+use totara_competency\entities\scale_value;
 use totara_competency\expand_task;
 use totara_competency\models\assignment_actions;
 use totara_job\job_assignment;
@@ -333,7 +334,7 @@ class totara_competency_integration_aggregation extends advanced_testcase {
             }
         }
 
-        $this->assertSame(0, count($expected_rows));
+        $this->assertEmpty($expected_rows);
     }
 
     /**
