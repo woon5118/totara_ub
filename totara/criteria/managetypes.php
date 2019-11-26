@@ -89,7 +89,7 @@ foreach ($types as $type => $detail) {
     $enabled = '';
     if ($detail->enabled) {
         $url = new moodle_url($PAGE->url, ['type' => $type, 'action' => 'disable', 'sesskey' => sesskey()]);
-        $enabled = \html_writer::link(
+        $enabled = html_writer::link(
             $url,
             $icondisable,
             ['id' => "disable_citeria_type_{$type}", 'title' => $strdisable]
@@ -97,7 +97,7 @@ foreach ($types as $type => $detail) {
         $class   = '';
     } else {
         $url = new moodle_url($PAGE->url, ['type' => $type, 'action' => 'enable', 'sesskey' => sesskey()]);
-        $enabled = \html_writer::link(
+        $enabled = html_writer::link(
             $url,
             $iconenable,
             ['id' => "enable_citeria_type_{$type}", 'title' => $strenable]

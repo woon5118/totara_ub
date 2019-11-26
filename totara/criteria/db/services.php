@@ -22,9 +22,11 @@
  * @package totara_criteria
  */
 
+use totara_criteria\external;
+
 $functions = [
     'totara_criteria_get_definition_template' => [
-        'classname' => \totara_criteria\external::class,
+        'classname' => external::class,
         'methodname' => 'get_definition_template',
         'description' => 'Return the definition template detail to display the specified criterion type ',
         'type' => 'read',

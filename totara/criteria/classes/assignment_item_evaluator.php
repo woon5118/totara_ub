@@ -35,7 +35,7 @@ class assignment_item_evaluator extends item_evaluator {
 
     /**
      * Default value to insert into criterion_met for new item records
-     * @return ?int
+     * @return int|null
      */
     protected function get_default_criteria_met(): ?int {
         return 1;

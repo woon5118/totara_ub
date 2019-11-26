@@ -51,7 +51,7 @@ abstract class item_evaluator {
      * This function should ideally not be overridden, but not making it final
      * to allow test classes to override it and simplify the testing process
      *
-     * @param int $criterion_id
+     * @param criterion $criterion
      */
     public function update_completion(criterion $criterion) {
         // Getting the time at the start. This is used as last_evaluated time to
@@ -74,14 +74,15 @@ abstract class item_evaluator {
 
     /**
      * Evaluate criteria completion / satisfaction for users in the source
-     * @param int $criterion_id
+     *
+     * @param criterion $criterion
      * @param int $now
      */
     abstract protected function update_criterion_completion(criterion $criterion, int $now);
 
     /**
      * Default value to insert into criterion_met for new item records
-     * @return ?int
+     * @return int|null
      */
     protected function get_default_criteria_met(): ?int {
         return 0;

@@ -21,6 +21,7 @@
  * @package totara_criteria
  */
 
+use core\orm\collection;
 use core\orm\query\table;
 use criteria_linkedcourses\linkedcourses;
 use totara_competency\linked_courses;
@@ -144,7 +145,7 @@ class criteria_linkedcourses_linked_courses_observer_testcase extends advanced_t
      * @param int $competency_id
      * @return collection
      */
-    private function get_items(int $competency_id): \core\orm\collection {
+    private function get_items(int $competency_id): collection {
         $item_type = (new linkedcourses())->get_items_type();
 
         return item_entity::repository()
@@ -180,7 +181,7 @@ class criteria_linkedcourses_linked_courses_observer_testcase extends advanced_t
      * Verify the criteria_item_records are as expected.
      *
      * @param int $course_id - Course id
-     * @param array $expected_user_id - User id for which a record is expected
+     * @param array $expected_user_ids
      */
     private function verify_item_records(int $course_id, array $expected_user_ids) {
         $item_type = (new linkedcourses())->get_items_type();
@@ -199,6 +200,7 @@ class criteria_linkedcourses_linked_courses_observer_testcase extends advanced_t
 
     /**
      * Create an item record for the specified course and user
+     *
      * @param int $user_id
      * @param int $course_id
      */

@@ -23,11 +23,11 @@
 
 namespace totara_criteria\webapi\resolver\query;
 
-use context_system;
 use context_user;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use core_course\user_learning\item;
+use Exception;
 use totara_core\advanced_feature;
 use totara_criteria\criterion;
 use totara_criteria\criterion_not_found_exception;
@@ -65,7 +65,7 @@ abstract class course_achievements implements query_resolver {
         try {
             $criterion = static::get_criterion();
             $completion_criteria = $criterion::fetch($instance_id);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new criterion_not_found_exception();
         }
 
@@ -79,7 +79,7 @@ abstract class course_achievements implements query_resolver {
                     $item['course'] = item::one($user_id, $course_record);
                 }
                 $items[] = $item;
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 // Course not found for some reason, maybe it got deleted?
                 // We don't want to return anything in this case.
                 continue;

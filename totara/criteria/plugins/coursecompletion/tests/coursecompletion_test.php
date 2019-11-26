@@ -23,9 +23,10 @@
  */
 
 use criteria_coursecompletion\coursecompletion;
+use criteria_linkedcourses\linkedcourses;
 use totara_criteria\criterion;
 
-class criteria_coursecompletion_testcase extends \advanced_testcase {
+class criteria_coursecompletion_testcase extends advanced_testcase {
 
     private function setup_data() {
         global $DB;
@@ -96,6 +97,9 @@ class criteria_coursecompletion_testcase extends \advanced_testcase {
 
     /**
      * Verify the items existing in the database (linked as well as unlinked)
+     *
+     * @param int $criterion_id
+     * @param array $expected_items
      */
     private function verify_saved_items(int $criterion_id, array $expected_items) {
         global $DB;
@@ -110,8 +114,8 @@ class criteria_coursecompletion_testcase extends \advanced_testcase {
     /**
      * Verify the instance attributes
      *
-     * @param  \stdClass $expected
-     * @param  linkedcourses $actual
+     * @param stdClass $expected
+     * @param linkedcourses $actual
      */
     private function verify_instance($expected, $actual) {
         $this->assertEquals($expected->id ?? 0, $actual->get_id());
@@ -286,7 +290,7 @@ class criteria_coursecompletion_testcase extends \advanced_testcase {
         $rows = $DB->get_records('totara_criteria');
         $this->assertSame(1, count($rows));
 
-        $rows = $DB->get_record('totara_criteria', ['id' => $id]);
+        $row = $DB->get_record('totara_criteria', ['id' => $id]);
         $this->assertFalse($row);
         $rows = $DB->get_records('totara_criteria_item', ['criterion_id' => $id]);
         $this->assertSame(0, count($rows));

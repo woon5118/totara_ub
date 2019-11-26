@@ -24,7 +24,7 @@
 use criteria_coursecompletion\coursecompletion_display;
 use totara_criteria\criterion;
 
-class criteria_coursecompletion_display_testcase extends \advanced_testcase {
+class criteria_coursecompletion_display_testcase extends advanced_testcase {
 
     private function setup_data() {
         $data = new class() {
@@ -75,6 +75,8 @@ class criteria_coursecompletion_display_testcase extends \advanced_testcase {
      * Test configuration display
      *
      * @dataProvider data_provider_test_configuration
+     * @param $aggregation
+     * @param $courses
      */
     public function test_configuration($aggregation, $courses) {
         $data = $this->setup_data();

@@ -25,6 +25,8 @@
 use totara_competency\aggregation_users_table;
 use totara_competency\entities\competency_achievement;
 use totara_criteria\competency_item_evaluator;
+use totara_criteria\criterion;
+use totara_criteria\entities\criterion_item;
 use totara_criteria\item_evaluator_user_source;
 
 class totara_criteria_competency_item_evaluator_testcase extends advanced_testcase {
@@ -54,28 +56,6 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
 
         $data->source_table = new aggregation_users_table();
         return $data;
-    }
-
-    /**
-     * Create a totara_criteria_item row
-     *
-     * @param  int $comp_id
-     * @return int Id of inserted row
-     */
-    private function create_item(int $comp_id): int {
-        global $DB;
-
-        $criterion = new criterion_item();
-        $criterion->plugin_type = 'test';
-        $criterion->aggregation_method = criterion::AGGREGATE_ALL;
-        $criterion->criterion_modified = time();
-        $criterion->save();
-
-        $item = new stdClass();
-        $item->criterion_id = $criterion->id;
-        $item->item_type = 'competency';
-        $item->item_id = $comp_id;
-        return $DB->insert_record('totara_criteria_item', $item);
     }
 
     /**
@@ -156,7 +136,7 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
      *
      * @dataProvider item_record_no_achievement_data_provider
      *
-     * @param int $comp_id
+     * @param $child_id
      * @param int $user_id
      * @param bool $is_met
      */
@@ -412,7 +392,7 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
             'id',
             ['criterion_id' => $data->criterion->get_id(), 'item_type' => 'competency', 'item_id' => $child_id]
         );
-        $record_id = $this->create_item_record($item_id, $user_id, $criterion_met);
+        $this->create_item_record($item_id, $user_id, $criterion_met);
 
         if (is_null($assignment_id = $achievement['assignment'] ?? null)) {
             $assignment = $this->generator()->assignment_generator()->create_user_assignment($child_id, $user_id);

@@ -24,7 +24,7 @@
 use criteria_childcompetency\childcompetency;
 use totara_criteria\criterion;
 
-class criteria_childcompetency_testcase extends \advanced_testcase {
+class criteria_childcompetency_testcase extends advanced_testcase {
 
     private function setup_data() {
         global $DB;
@@ -79,8 +79,8 @@ class criteria_childcompetency_testcase extends \advanced_testcase {
     /**
      * Verify the instance attributes
      *
-     * @param  \stdClass $expected
-     * @param  childcompetency $actual
+     * @param stdClass $expected
+     * @param childcompetency $actual
      */
     private function verify_instance($expected, $actual) {
         $this->assertEquals($expected->id, $actual->get_id());

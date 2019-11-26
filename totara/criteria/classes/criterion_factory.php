@@ -23,7 +23,8 @@
 
 namespace totara_criteria;
 
-use pathway_criteria_group\entities\criteria_group_criterion;
+use coding_exception;
+use stdClass;
 use totara_competency\plugin_types;
 use totara_criteria\entities\criterion as criterion_entity;
 
@@ -69,11 +70,11 @@ class criterion_factory {
      *
      * @param criterion_entity $criterion
      * @return criterion of the requested type
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public static function fetch_from_entity(criterion_entity $criterion) {
         if (!$criterion->exists()) {
-            throw new \coding_exception('A criterion needs to exist');
+            throw new coding_exception('A criterion needs to exist');
         }
         static::require_enabled($criterion->plugin_type);
 
@@ -104,12 +105,12 @@ class criterion_factory {
      *
      * @param string $type
      * @return string
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public static function get_classname(string $type): string {
         $classname = static::get_namespace($type) . "\\{$type}";
         if (!class_exists($classname) || !is_subclass_of($classname, 'totara_criteria\criterion')) {
-            throw new \coding_exception("Invalid type", "Criterion type '{$type}' does not exist");
+            throw new coding_exception("Invalid type", "Criterion type '{$type}' does not exist");
         }
 
         return $classname;
@@ -118,13 +119,13 @@ class criterion_factory {
     /**
      * @param string $type
      * @return void
-     * @throws \coding_exception if the type is not enabled
+     * @throws coding_exception if the type is not enabled
      */
     private static function require_enabled($type) {
         $enabledtypes = plugin_types::get_enabled_plugins('criteria', 'totara_criteria');
 
         if (!in_array($type, $enabledtypes)) {
-            throw new \coding_exception("Invalid type", "Criterion type '{$type}' is not enabled");
+            throw new coding_exception("Invalid type", "Criterion type '{$type}' is not enabled");
         }
     }
 
@@ -133,7 +134,7 @@ class criterion_factory {
      *
      * @param string $type Criterion type
      * @param int $id Id of the criterion
-     * @return \stdClass
+     * @return stdClass
      */
     public static function dump_criterion_configuration(string $type, int $id) {
         static::require_enabled($type);

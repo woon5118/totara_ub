@@ -23,6 +23,7 @@
 
 namespace criteria_childcompetency;
 
+use coding_exception;
 use totara_criteria\competency_item_evaluator;
 use totara_criteria\criterion;
 
@@ -79,7 +80,7 @@ class childcompetency extends criterion {
 
         $comp_id = $this->get_competency_id();
         if (is_null($comp_id)) {
-            throw new \coding_exception('Competency id must be set before items are updated');
+            throw new coding_exception('Competency id must be set before items are updated');
         }
 
         $child_competencies = $DB->get_fieldset_select('comp', 'id', 'parentid = :parentid', ['parentid' => $comp_id]);
@@ -128,7 +129,7 @@ class childcompetency extends criterion {
     /**
      * Export detail for viewing this criterion
      *
-     * @return Array
+     * @return array
      */
     public function export_view_detail(): array {
         $result = [

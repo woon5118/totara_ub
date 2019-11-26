@@ -24,7 +24,7 @@
 
 use criteria_linkedcourses\linkedcourses;
 
-class criteria_linkedcourses_testcase extends \advanced_testcase {
+class criteria_linkedcourses_testcase extends advanced_testcase {
 
     private function setup_data() {
         global $DB;
@@ -98,6 +98,9 @@ class criteria_linkedcourses_testcase extends \advanced_testcase {
 
     /**
      * Verify the metadata in the database
+     *
+     * @param int $criterion_id
+     * @param array $expected_pairs
      */
     private function verify_saved_metadata(int $criterion_id, array $expected_pairs) {
         global $DB;
@@ -114,8 +117,8 @@ class criteria_linkedcourses_testcase extends \advanced_testcase {
     /**
      * Verify the instance attributes
      *
-     * @param  \stdClass $expected
-     * @param  linkedcourses $actual
+     * @param stdClass $expected
+     * @param linkedcourses $actual
      */
     private function verify_instance($expected, $actual) {
         $this->assertEquals($expected->id, $actual->get_id());

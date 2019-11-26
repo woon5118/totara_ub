@@ -144,8 +144,6 @@ class criteria_linkedcourses_items_processor_testcase extends advanced_testcase 
 
         $this->set_up_pathway_with_linked_courses_criteria($competency);
 
-        $criterion_record = $DB->get_record('totara_criteria', ['plugin_type' => 'linkedcourses']);
-
         $add = $this->getDataGenerator()->create_course();
         $keep = $this->getDataGenerator()->create_course();
         $remove = $this->getDataGenerator()->create_course();

@@ -23,19 +23,24 @@
 
 namespace criteria_childcompetency;
 
+use external_api;
+use external_function_parameters;
+use external_multiple_structure;
+use external_single_structure;
+use external_value;
 use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die;
 
-class external extends \external_api {
+class external extends external_api {
 
     /**
      * get_detail
      */
     public static function get_detail_parameters() {
-        return new \external_function_parameters(
+        return new external_function_parameters(
             [
-                'id' => new \external_value(PARAM_INT, 'Criterion id')
+                'id' => new external_value(PARAM_INT, 'Criterion id')
             ]
         );
     }
@@ -48,21 +53,21 @@ class external extends \external_api {
     }
 
     public static function get_detail_returns() {
-        return new \external_single_structure(
+        return new external_single_structure(
             [
-                'metadata' => new \external_multiple_structure(
-                    new \external_single_structure(
+                'metadata' => new external_multiple_structure(
+                    new external_single_structure(
                         [
-                            'metakey' => new \external_value(PARAM_TEXT, 'Metadata key'),
-                            'metavalue' => new \external_value(PARAM_TEXT, 'Metadata value'),
+                            'metakey' => new external_value(PARAM_TEXT, 'Metadata key'),
+                            'metavalue' => new external_value(PARAM_TEXT, 'Metadata value'),
                         ]
                     ),
                     'Child competency metadata'
                 ),
-                'aggregation' => new \external_single_structure(
+                'aggregation' => new external_single_structure(
                     [
-                        'method' => new \external_value(PARAM_INT, 'Aggregation method'),
-                        'reqitems' => new \external_value(PARAM_INT, 'Number or items required for fulfillment'),
+                        'method' => new external_value(PARAM_INT, 'Aggregation method'),
+                        'reqitems' => new external_value(PARAM_INT, 'Number or items required for fulfillment'),
                     ],
                     'Child competency aggregation'
                 ),

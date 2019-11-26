@@ -21,6 +21,7 @@
  * @package totara_criteria
  */
 
+use core\event\base;
 use core\orm\collection;
 use core\orm\query\table;
 use criteria_childcompetency\childcompetency;
@@ -106,12 +107,12 @@ class criteria_childcompetency_observers_testcase extends advanced_testcase {
         $this->assertSame(0, item_record_entity::repository()->count());
 
         // Create a child competency
-        $child_competency = $competency_generator->create_competency('Comp A-1', $framework, ['parentid' => $competency->id]);
+        $competency_generator->create_competency('Comp A-1', $framework, ['parentid' => $competency->id]);
         $this->assertSame(0, item_entity::repository()->count());
         $this->assertSame(0, item_record_entity::repository()->count());
 
         // Create a second child competency and verify again
-        $child_competency2 = $competency_generator->create_competency('Comp A-2', $framework, ['parentid' => $competency->id]);
+        $competency_generator->create_competency('Comp A-2', $framework, ['parentid' => $competency->id]);
         $this->assertSame(0, item_entity::repository()->count());
         $this->assertSame(0, item_record_entity::repository()->count());
     }
@@ -120,8 +121,6 @@ class criteria_childcompetency_observers_testcase extends advanced_testcase {
      * Test observer when a child competency is moved to another competency. Both with criteria
      */
     public function test_competency_moved_to_competency_with_criteria() {
-        global $DB;
-
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
         /** @var totara_criteria_generator $criteria_generator */
@@ -210,8 +209,6 @@ class criteria_childcompetency_observers_testcase extends advanced_testcase {
      * Test observer when a child competency is moved to another competency. Both with criteria
      */
     public function test_competency_moved_to_competency_without_criteria() {
-        global $DB;
-
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
@@ -264,8 +261,6 @@ class criteria_childcompetency_observers_testcase extends advanced_testcase {
      * Test observer when a user's competency achievement changes
      */
     public function test_competency_achievement_updated() {
-        global $DB;
-
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
         /** @var totara_criteria_generator $criteria_generator */
@@ -330,7 +325,7 @@ class criteria_childcompetency_observers_testcase extends advanced_testcase {
      * @param int $competency_id
      * @return collection
      */
-    private function get_items(int $competency_id): \core\orm\collection {
+    private function get_items(int $competency_id): collection {
         $item_type = (new childcompetency())->get_items_type();
 
         return item_entity::repository()
@@ -346,10 +341,8 @@ class criteria_childcompetency_observers_testcase extends advanced_testcase {
      *
      * @param int $competency_id - Competency
      * @param array $expected_item_ids - Exepected item ids
-     * @param array|null $previous_item_id_map - If specified, this is used to ensure that the item row were not replaced
-     *                                           (totara_criteria_item.id is still the same)
      */
-    private function verify_items(int $competency_id, array $expected_item_ids, ?array $previous_item_id_map = null) {
+    private function verify_items(int $competency_id, array $expected_item_ids) {
         $current_items = $this->get_items($competency_id);
 
         $this->assertSame(count($expected_item_ids), $current_items->count());
@@ -424,7 +417,7 @@ class criteria_childcompetency_observers_testcase extends advanced_testcase {
      *
      * @param int $competency_id
      * @param int $user_id
-     * @return \core\event\base
+     * @return base
      */
     private function create_achievement_event(int $competency_id, int $user_id) {
         $aggregation_time = time();
@@ -450,7 +443,7 @@ class criteria_childcompetency_observers_testcase extends advanced_testcase {
 
         $event = competency_achievement_updated::create(
             [
-                'context' => \context_system::instance(),
+                'context' => context_system::instance(),
                 'objectid' => $new_comp_achievement->id,
                 'relateduserid' => $user_id,
                 'other' => ['competency_id' => $competency_id, 'achieved_via_ids' => [1]],
@@ -463,10 +456,10 @@ class criteria_childcompetency_observers_testcase extends advanced_testcase {
     /**
      * Verify the triggered event
      *
-     * @param \phpunit_event_sink $sink
+     * @param phpunit_event_sink $sink
      * @param array $expected_criteria_ids
      */
-    private function verify_event(\phpunit_event_sink $sink, array $expected_criteria_ids = []) {
+    private function verify_event(phpunit_event_sink $sink, array $expected_criteria_ids = []) {
         $this->assertSame(1, $sink->count());
         $events = $sink->get_events();
         $event = reset($events);

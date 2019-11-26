@@ -35,7 +35,7 @@ class coursecompletion_display extends criterion_display {
      * Return the display type of items associated with the criterion
      * TODO: make protected when all UI is on vueJs
      *
-     * @return strign
+     * @return string
      */
     public function get_display_items_type(): string {
         return get_string('courses', 'criteria_coursecompletion');

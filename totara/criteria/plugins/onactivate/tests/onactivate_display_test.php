@@ -23,7 +23,7 @@
 
 use criteria_onactivate\onactivate_display;
 
-class criteria_onactivate_display_testcase extends \advanced_testcase {
+class criteria_onactivate_display_testcase extends advanced_testcase {
 
      /**
       * Test configuration display

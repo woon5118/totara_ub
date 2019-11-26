@@ -22,6 +22,7 @@
  */
 
 use totara_competency\aggregation_users_table;
+use totara_criteria\criterion;
 use totara_criteria\item_evaluator_user_source;
 
 class totara_criteria_item_evaluator_user_source_testcase extends advanced_testcase {
@@ -34,7 +35,7 @@ class totara_criteria_item_evaluator_user_source_testcase extends advanced_testc
         $data = new class() {
             /** @var array $users */
             public $users;
-            /** @var \stdClass $course */
+            /** @var stdClass $course */
             public $course;
             /** @var criterion $criterion */
             public $criterion;
@@ -58,7 +59,7 @@ class totara_criteria_item_evaluator_user_source_testcase extends advanced_testc
         ];
         $data->course = $this->getDataGenerator()->create_course($record);
 
-        /** @var \totara_criteria_generator $generator */
+        /** @var totara_criteria_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
         $record = ['courseids' => [$data->course->id]];
@@ -148,20 +149,11 @@ class totara_criteria_item_evaluator_user_source_testcase extends advanced_testc
     }
 
     public function test_delete_item_records() {
-        global $DB;
-
         $data = $this->setup_data();
         // Add some users to start
         $user_ids = [1, 2, 3, 4, 5];
         $this->insert_temp_users($user_ids);
         $data->full_source->create_item_records($data->criterion->get_id(), 0);
-        $expected = [
-            ['user_id' => 1, 'criterion_met' => 0],
-            ['user_id' => 2, 'criterion_met' => 0],
-            ['user_id' => 3, 'criterion_met' => 0],
-            ['user_id' => 4, 'criterion_met' => 0],
-            ['user_id' => 5, 'criterion_met' => 0],
-        ];
 
         // Now for the tests ...
 

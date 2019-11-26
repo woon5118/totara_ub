@@ -41,12 +41,12 @@ class totara_criteria_services_testcase extends advanced_testcase {
     }
 
     public function test_totara_criteria_get_definition_template_service() {
-        $data = $this->setup_data();
+        $this->setup_data();
 
         // Test foreach enabled criterion type
         $enabledtypes = plugin_types::get_enabled_plugins('criteria', 'totara_criteria');
         foreach ($enabledtypes as $type) {
-            $res = \external_api::call_external_function(
+            $res = external_api::call_external_function(
                 'totara_criteria_get_definition_template',
                 ['type' => $type]
             );

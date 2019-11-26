@@ -24,6 +24,7 @@
 namespace totara_criteria\entities;
 
 
+use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\has_many;
 

@@ -22,6 +22,7 @@
  * @subpackage test
  */
 
+use core\webapi\query_resolver;
 use criteria_coursecompletion\coursecompletion;
 use criteria_coursecompletion\webapi\resolver\query\achievements;
 use totara_criteria\criterion;
@@ -44,7 +45,7 @@ class criteria_coursecompletion_webapi_query_achievements_testcase extends totar
     }
 
     /**
-     * @return string|\core\webapi\query_resolver
+     * @return string|query_resolver
      */
     public function get_resolver_classname(): string {
         return achievements::class;

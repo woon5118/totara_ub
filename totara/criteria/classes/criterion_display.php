@@ -23,6 +23,8 @@
 
 namespace totara_criteria;
 
+use stdClass;
+
 /**
  * Base class related with display of criteria information
  */
@@ -43,10 +45,10 @@ abstract class criterion_display {
     /**
      * Get a summary of the criterion configuration for display purposes
      *
-     * @return \stdClass
+     * @return stdClass
      */
     public function get_configuration() {
-        $result = new \stdClass();
+        $result = new stdClass();
         $result->item_type = $this->get_display_items_type();
         $result->item_aggregation = $this->get_display_aggregation();
         $result->items = $this->get_display_configuration_items();

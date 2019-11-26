@@ -25,7 +25,7 @@ use totara_competency\plugin_types;
 use totara_criteria\criterion;
 use totara_criteria\criterion_factory;
 
-class totara_criteria_criterion_factory_testcase extends \advanced_testcase {
+class totara_criteria_criterion_factory_testcase extends advanced_testcase {
 
     /**
      * Test create invalid type
@@ -34,7 +34,7 @@ class totara_criteria_criterion_factory_testcase extends \advanced_testcase {
 
         $this->expectException('coding_exception');
         $this->expectExceptionMessage("Criterion type 'Invalid' is not enabled");
-        $instance = criterion_factory::create('Invalid');
+        criterion_factory::create('Invalid');
     }
 
     /**
@@ -46,7 +46,7 @@ class totara_criteria_criterion_factory_testcase extends \advanced_testcase {
 
         $this->expectException('coding_exception');
         $this->expectExceptionMessage("Criterion type 'coursecompletion' is not enabled");
-        $instance = criterion_factory::create('coursecompletion');
+        criterion_factory::create('coursecompletion');
     }
 
     /**
@@ -68,7 +68,7 @@ class totara_criteria_criterion_factory_testcase extends \advanced_testcase {
     public function test_fetch_invalid_type() {
         $this->expectException('coding_exception');
         $this->expectExceptionMessage("Criterion type 'Invalid' is not enabled");
-        $instance = criterion_factory::fetch('Invalid', 1);
+        criterion_factory::fetch('Invalid', 1);
     }
 
     /**
@@ -79,7 +79,7 @@ class totara_criteria_criterion_factory_testcase extends \advanced_testcase {
 
         $this->expectException('coding_exception');
         $this->expectExceptionMessage("Criterion type 'coursecompletion' is not enabled");
-        $instance = criterion_factory::fetch('coursecompletion', 1);
+        criterion_factory::fetch('coursecompletion', 1);
     }
 
     /**
@@ -90,7 +90,6 @@ class totara_criteria_criterion_factory_testcase extends \advanced_testcase {
         // Courses
         $courses = [];
 
-        $prefix = 'Course ';
         for ($i = 1; $i <= 5; $i++) {
             $courses[$i] = $this->getDataGenerator()->create_course();
         }
@@ -121,7 +120,7 @@ class totara_criteria_criterion_factory_testcase extends \advanced_testcase {
     public function test_dump_criterion_configuration_invalid_type() {
         $this->expectException('coding_exception');
         $this->expectExceptionMessage("Criterion type 'Invalid' is not enabled");
-        $instance = criterion_factory::dump_criterion_configuration('Invalid', 1);
+        criterion_factory::dump_criterion_configuration('Invalid', 1);
     }
 
     /**
@@ -132,7 +131,7 @@ class totara_criteria_criterion_factory_testcase extends \advanced_testcase {
 
         $this->expectException('coding_exception');
         $this->expectExceptionMessage("Criterion type 'coursecompletion' is not enabled");
-        $instance = criterion_factory::dump_criterion_configuration('coursecompletion', 1);
+        criterion_factory::dump_criterion_configuration('coursecompletion', 1);
     }
 
     /**
@@ -145,7 +144,6 @@ class totara_criteria_criterion_factory_testcase extends \advanced_testcase {
         // Courses
         $courses = [];
 
-        $prefix = 'Course ';
         for ($i = 1; $i <= 5; $i++) {
             $courses[$i] = $this->getDataGenerator()->create_course();
         }

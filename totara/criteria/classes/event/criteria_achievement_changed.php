@@ -24,6 +24,7 @@
 
 namespace totara_criteria\event;
 
+use context_system;
 use core\event\base;
 
 /**
@@ -43,7 +44,7 @@ class criteria_achievement_changed extends base {
     public static function create_with_ids(int $user_id, array $criteria_ids) {
         return criteria_achievement_changed::create(
             [
-                'context' => \context_system::instance(),
+                'context' => context_system::instance(),
                 'relateduserid' => $user_id,
                 'other' => ['criteria_ids' => $criteria_ids]
             ]

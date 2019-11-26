@@ -27,7 +27,7 @@ use totara_criteria\criterion;
 /**
  * Test concrete criterion methods
  */
-class totara_criteria_criterion_testcase extends \advanced_testcase {
+class totara_criteria_criterion_testcase extends advanced_testcase {
 
     /**
      * Test aggregation attributes
@@ -229,7 +229,7 @@ class totara_criteria_criterion_testcase extends \advanced_testcase {
         $mock_criterion2->set_item_ids([1, 2, 3]);
         $mock_criterion2->set_competency_id(345);
         $mock_criterion2->save();
-        $fetched_criterion2 = $mock_criterion2->fetch($mock_criterion2->get_id());
+        $mock_criterion2->fetch($mock_criterion2->get_id());
         $this->assertNotSame($mock_criterion, $fetched_criterion);
         $this->assertEquals($mock_criterion, $fetched_criterion);
 
@@ -238,7 +238,7 @@ class totara_criteria_criterion_testcase extends \advanced_testcase {
         $mock_criterion2->set_competency_id(456);
         $mock_criterion2->add_metadata([['metakey' => 'key1', 'metavalue' => 'value1']]);
         $mock_criterion2->save();
-        $fetched_criterion2 = $mock_criterion2->fetch($mock_criterion2->get_id());
+        $mock_criterion2->fetch($mock_criterion2->get_id());
         $this->assertEquals($mock_criterion, $fetched_criterion);
     }
 

@@ -71,7 +71,7 @@ class item_evaluator_user_source {
      * Create item records for all users in the users_source who doesn't have a item_record
      * @param int $criterion_id
      * @param int $criterion_met Criterion met value to use when creating new item records
-     * @param ?int $timeevaluated
+     * @param int|null $timeevaluated
      */
     public function create_item_records(int $criterion_id, int $criterion_met = 0, ?int $timeevaluated = null) {
         global $DB;

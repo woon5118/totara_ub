@@ -23,9 +23,12 @@
 
 namespace criteria_linkedcourses;
 
+use coding_exception;
 use totara_competency\linked_courses;
 use totara_criteria\course_item_evaluator;
 use totara_criteria\criterion;
+
+global $CFG;
 
 require_once($CFG->dirroot . '/totara/plan/lib.php');
 
@@ -79,7 +82,7 @@ class linkedcourses extends criterion {
     public function update_items(): criterion {
         $comp_id = $this->get_competency_id();
         if (is_null($comp_id)) {
-            throw new \coding_exception('Competency id must be set before items are updated');
+            throw new coding_exception('Competency id must be set before items are updated');
         }
 
         $linked_courses = linked_courses::get_linked_course_ids($comp_id);

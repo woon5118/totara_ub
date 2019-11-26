@@ -82,7 +82,7 @@ class totara_criteria_competency_deletion_testcase extends advanced_testcase {
         $this->assert_exists($criterion_record_1);
         $this->assert_exists($criterion_record_2);
 
-        $hierarchy_comp = new \competency();
+        $hierarchy_comp = new competency();
         $hierarchy_comp->delete_hierarchy_item($comp_1->id);
 
         $this->assert_not_exists($group_entity_1);

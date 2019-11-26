@@ -71,7 +71,7 @@ class criteria_linkedcourses_services_testcase extends advanced_testcase {
             ],
         ];
 
-        $res = \external_api::call_external_function(
+        $res = external_api::call_external_function(
             'criteria_linkedcourses_get_detail',
             ['id' => $data->criterion->get_id()]
         );

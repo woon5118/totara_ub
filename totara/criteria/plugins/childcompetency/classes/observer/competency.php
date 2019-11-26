@@ -46,8 +46,6 @@ class competency {
     }
 
     public static function competency_moved(competency_moved $event) {
-        global $DB;
-
         // The event doesn't provide information on the previous parent.
         // We therefore need to find it through the existing items
         $previous_parent_id = static::get_parent_competency_of_item($event->objectid);

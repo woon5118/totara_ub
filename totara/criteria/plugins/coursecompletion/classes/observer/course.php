@@ -25,6 +25,7 @@
 
 namespace criteria_coursecompletion\observer;
 
+use coding_exception;
 use core\event\base;
 use core\event\course_completed;
 use totara_completioneditor\event\course_completion_edited;
@@ -40,7 +41,7 @@ class course {
      */
     public static function course_completion_changed(base $event) {
         if (!$event instanceof course_completed && !$event instanceof course_completion_edited) {
-            throw new \coding_exception('Expected course_completed or course_completion_edited event');
+            throw new coding_exception('Expected course_completed or course_completion_edited event');
         }
 
         // As the criterion has no knowledge whether this user's satisfaction of the criteria is to be tracked,

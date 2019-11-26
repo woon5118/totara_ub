@@ -23,6 +23,7 @@
 
 namespace criteria_onactivate;
 
+use coding_exception;
 use totara_criteria\assignment_item_evaluator;
 use totara_criteria\criterion;
 
@@ -96,7 +97,7 @@ class onactivate extends criterion {
     public function update_items(): criterion {
         $comp_id = $this->get_competency_id();
         if (is_null($comp_id)) {
-            throw new \coding_exception('Competency id must be set before items are updated');
+            throw new coding_exception('Competency id must be set before items are updated');
         }
 
         $this->set_item_ids([$comp_id]);

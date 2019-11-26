@@ -21,6 +21,7 @@
  * @package totara_criteria
  */
 
+use core\orm\collection;
 use core\orm\query\table;
 use criteria_childcompetency\childcompetency;
 use criteria_childcompetency\items_processor;
@@ -265,10 +266,11 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
 
     /**
      * Get the items linked to childcompetency criteria on the specified competency
+     *
      * @param int $competency_id
      * @return collection
      */
-    private function get_items(int $competency_id): \core\orm\collection {
+    private function get_items(int $competency_id): collection {
         $item_type = (new childcompetency())->get_items_type();
 
         return item_entity::repository()
@@ -304,7 +306,7 @@ class criteria_childcompetency_items_processor_testcase extends advanced_testcas
      * Verify the criteria_item_records are as expected.
      *
      * @param int $child_competency_id - Competency
-     * @param array $expected_user_id - User id for which a record is expected
+     * @param array $expected_user_ids
      */
     private function verify_item_records(int $child_competency_id, array $expected_user_ids) {
         $item_type = (new childcompetency())->get_items_type();

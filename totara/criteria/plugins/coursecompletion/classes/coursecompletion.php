@@ -23,7 +23,6 @@
 
 namespace criteria_coursecompletion;
 
-use totara_criteria\course_item_combined;
 use totara_criteria\course_item_evaluator;
 use totara_criteria\criterion;
 

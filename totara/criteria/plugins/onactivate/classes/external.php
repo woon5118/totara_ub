@@ -24,8 +24,10 @@
 
 namespace criteria_onactivate;
 
+use external_api;
+
 defined('MOODLE_INTERNAL') || die;
 
-class external extends \external_api {
+class external extends external_api {
 
 }

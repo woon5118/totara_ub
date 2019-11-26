@@ -23,17 +23,16 @@
 
 namespace criteria_childcompetency\webapi\resolver\query;
 
-use context_system;
 use context_user;
 use core\orm\collection;
 use core\orm\entity\repository;
-use core\orm\query\builder;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use criteria_childcompetency\childcompetency;
+use Exception;
 use totara_competency\entities\assignment;
-use totara_competency\models\assignment_user;
 use totara_competency\entities\competency;
+use totara_competency\models\assignment_user;
 use totara_core\advanced_feature;
 use totara_criteria\criterion_not_found_exception;
 
@@ -60,7 +59,7 @@ class achievements implements query_resolver {
 
         try {
             $completion_criteria = childcompetency::fetch($instance_id);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new criterion_not_found_exception();
         }
 
@@ -70,7 +69,7 @@ class achievements implements query_resolver {
                 ->where('id', $assignment_id)
                 ->with('competency.children')
                 ->one(true);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new criterion_not_found_exception();
         }
 

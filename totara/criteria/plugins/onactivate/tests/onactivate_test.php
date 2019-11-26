@@ -22,10 +22,11 @@
  * @package totara_criteria
  */
 
+use criteria_linkedcourses\linkedcourses;
 use criteria_onactivate\onactivate;
 use totara_criteria\criterion;
 
-class criteria_onactivate_testcase extends \advanced_testcase {
+class criteria_onactivate_testcase extends advanced_testcase {
 
     private function setup_data() {
         global $DB;
@@ -40,7 +41,6 @@ class criteria_onactivate_testcase extends \advanced_testcase {
             public $metadatarows = [];
         };
 
-        $records = [];
         for ($i = 0; $i < 3; $i++) {
             $record = [
                 'plugin_type' => 'onactivate',
@@ -68,8 +68,8 @@ class criteria_onactivate_testcase extends \advanced_testcase {
     /**
      * Verify the instance attributes
      *
-     * @param  \stdClass $expected
-     * @param  linkedcourses $actual
+     * @param stdClass $expected
+     * @param linkedcourses $actual
      */
     private function verify_instance($expected, $actual) {
         $this->assertEquals($expected->id, $actual->get_id());

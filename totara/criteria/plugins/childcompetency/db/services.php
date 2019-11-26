@@ -21,9 +21,11 @@
  * @package criteria_childcompetency
  */
 
+use criteria_childcompetency\external;
+
 $functions = [
     'criteria_childcompetency_get_detail' => [
-        'classname' => \criteria_childcompetency\external::class,
+        'classname' => external::class,
         'methodname' => 'get_detail',
         'description' => 'Get the detail of the childcompetency criterion',
         'type' => 'get',

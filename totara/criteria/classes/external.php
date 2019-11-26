@@ -24,15 +24,19 @@
 
 namespace totara_criteria;
 
+use external_api;
+use external_function_parameters;
+use external_single_structure;
+use external_value;
 use totara_core\advanced_feature;
 
-class external extends \external_api {
+class external extends external_api {
 
     /** get_definition_template */
     public static function get_definition_template_parameters() {
-        return new \external_function_parameters(
+        return new external_function_parameters(
             [
-                'type' => new \external_value(PARAM_ALPHAEXT, 'Criterion type')
+                'type' => new external_value(PARAM_ALPHAEXT, 'Criterion type')
             ]
         );
     }
@@ -45,11 +49,11 @@ class external extends \external_api {
     }
 
     public static function get_definition_template_returns() {
-        return new \external_single_structure([
-            'type' => new \external_value(PARAM_ALPHAEXT, 'Criterion type'),
-            'criterion_templatename' => new \external_value(PARAM_TEXT, 'Template to use to display and manage instances of this criterion'),
-            'title' => new \external_value(PARAM_TEXT, 'Criterion title'),
-            'singleuse' => new \external_value(PARAM_BOOL, 'Indication whether this is a single-use criterion type', VALUE_OPTIONAL),
+        return new external_single_structure([
+            'type' => new external_value(PARAM_ALPHAEXT, 'Criterion type'),
+            'criterion_templatename' => new external_value(PARAM_TEXT, 'Template to use to display and manage instances of this criterion'),
+            'title' => new external_value(PARAM_TEXT, 'Criterion title'),
+            'singleuse' => new external_value(PARAM_BOOL, 'Indication whether this is a single-use criterion type', VALUE_OPTIONAL),
         ]);
     }
 }

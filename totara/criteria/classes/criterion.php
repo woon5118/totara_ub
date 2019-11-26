@@ -24,7 +24,10 @@
 
 namespace totara_criteria;
 
+use coding_exception;
 use core\orm\query\builder;
+use ReflectionClass;
+use stdClass;
 use totara_criteria\entities\criteria_item;
 use totara_criteria\entities\criteria_metadata;
 
@@ -65,7 +68,7 @@ abstract class criterion {
      * Constructor.
      */
     public function __construct() {
-        $reflect = new \ReflectionClass($this);
+        $reflect = new ReflectionClass($this);
         $this->plugin_type = $reflect->getShortName();
     }
 
@@ -90,7 +93,7 @@ abstract class criterion {
         $instance = new static();
 
         if ($criterion->plugin_type != $instance->get_plugin_type()) {
-            throw new \coding_exception("The specified criterion id is for another type of criterion");
+            throw new coding_exception("The specified criterion id is for another type of criterion");
         }
 
         $instance->set_id($criterion->id);
@@ -162,7 +165,7 @@ abstract class criterion {
      */
     public function set_aggregation_method(int $aggregation_method): criterion {
         if (!in_array($aggregation_method, [static::AGGREGATE_ALL, static::AGGREGATE_ANY_N])) {
-            throw new \coding_exception('Invalid aggregation method used');
+            throw new coding_exception('Invalid aggregation method used');
         }
 
         $this->aggregation_method = $aggregation_method;
@@ -208,7 +211,7 @@ abstract class criterion {
      * @return string
      */
     public function get_title() {
-        $classname = (new \ReflectionClass($this))->getShortName();
+        $classname = (new ReflectionClass($this))->getShortName();
         return get_string('pluginname', "criteria_{$classname}");
     }
 
@@ -276,7 +279,7 @@ abstract class criterion {
     /**
      * Replace the metadata of this criterion
      *
-     * @param \stdClass[] $metadata Metadata metakey/metavalue pairs
+     * @param stdClass[] $metadata Metadata metakey/metavalue pairs
      * @return $this
      */
     public function set_metadata(array $metadata): criterion {
@@ -288,7 +291,7 @@ abstract class criterion {
     /**
      * Add metadata to the criterion
      *
-     * @param \stdClass[]|criteria_metadata[] $metadata Metadata metakey/metavalue pairs
+     * @param stdClass[]|criteria_metadata[] $metadata Metadata metakey/metavalue pairs
      * @return criterion
      */
     public function add_metadata($metadata): criterion {
@@ -298,7 +301,7 @@ abstract class criterion {
             }
 
             if (empty($obj->metakey) || !isset($obj->metavalue)) {
-                throw new \coding_exception("Criterion metadata requires a metakey / metavalue pair");
+                throw new coding_exception("Criterion metadata requires a metakey / metavalue pair");
             }
             $this->metadata[$obj->metakey] = $obj->metavalue;
         }
@@ -499,7 +502,7 @@ abstract class criterion {
     public function save(): criterion {
         $err_message = $this->validate();
         if (!is_null($err_message)) {
-            throw new \coding_exception($err_message);
+            throw new coding_exception($err_message);
         }
 
         if (!$this->is_dirty()) {
@@ -694,7 +697,7 @@ abstract class criterion {
      * Dump the current criterion configuration from the database
      *
      * @param int $id Criterion id
-     * @return \stdClass Criterion configuration
+     * @return stdClass Criterion configuration
      */
     public static function dump_criterion_configuration(int $id) {
         global $DB;
@@ -973,7 +976,7 @@ abstract class criterion {
      * @return string
      */
     public function export_view_aggregation(): string {
-        return $this->get_summarized_aggregation();
+        return '';
     }
 
 
@@ -982,10 +985,10 @@ abstract class criterion {
      * As this will typically be the item names, each plugin should
      * overwrite this to export the correct values
      *
-     * @return  [string] Array of item summaries
+     * @return string[] Array of item summaries
      */
     public function export_view_items(): array {
-        return $this->get_summarized_items();
+        return [];
     }
 
     /**
@@ -993,7 +996,7 @@ abstract class criterion {
      * Plugins will typically interpret the associated metadata and export it accordingly.
      * Plugins should overwrite this function as needed
      *
-     * @return  [string] Array
+     * @return string[]
      */
     public function export_view_metadata(): array {
         return [];

@@ -22,6 +22,7 @@
  * @subpackage test
  */
 
+use core\webapi\query_resolver;
 use criteria_linkedcourses\linkedcourses;
 use criteria_linkedcourses\webapi\resolver\query\achievements;
 use totara_criteria\criterion;
@@ -46,7 +47,7 @@ class criteria_linkedcourses_webapi_query_achievements_testcase extends totara_c
     }
 
     /**
-     * @return string|\core\webapi\query_resolver
+     * @return string|query_resolver
      */
     public function get_resolver_classname(): string {
         return achievements::class;

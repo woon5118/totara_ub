@@ -24,7 +24,7 @@
 use criteria_linkedcourses\linkedcourses_display;
 use totara_criteria\criterion;
 
-class criteria_linkedcourses_display_testcase extends \advanced_testcase {
+class criteria_linkedcourses_display_testcase extends advanced_testcase {
 
     private function setup_data() {
         $data = new class() {
@@ -67,9 +67,10 @@ class criteria_linkedcourses_display_testcase extends \advanced_testcase {
      * Test configuration display
      *
      * @dataProvider data_provider_test_configuration
+     * @param $aggregation
      */
     public function test_configuration($aggregation) {
-        $data = $this->setup_data();
+        $this->setup_data();
 
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 

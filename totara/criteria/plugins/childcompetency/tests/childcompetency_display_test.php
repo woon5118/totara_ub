@@ -24,7 +24,7 @@
 use criteria_childcompetency\childcompetency_display;
 use totara_criteria\criterion;
 
-class criteria_childcompetency_display_testcase extends \advanced_testcase {
+class criteria_childcompetency_display_testcase extends advanced_testcase {
 
      /**
       * Test configuration display - aggregate all

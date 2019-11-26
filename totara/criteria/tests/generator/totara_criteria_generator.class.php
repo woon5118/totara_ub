@@ -110,6 +110,7 @@ class totara_criteria_generator extends component_generator_base {
      *      'competency' => 1,   // Id of competency whose child competencies should be achieved
      *  ]
      *
+     * @param array $data
      * @return criterion
      */
     public function create_onactivate(array $data = []) {

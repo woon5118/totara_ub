@@ -22,9 +22,11 @@
  * @package criteria_linkedcourses
  */
 
+use criteria_linkedcourses\external;
+
 $functions = [
     'criteria_linkedcourses_get_detail' => [
-        'classname' => \criteria_linkedcourses\external::class,
+        'classname' => external::class,
         'methodname' => 'get_detail',
         'description' => 'Get the detail of the linkedcourses criterion',
         'type' => 'get',

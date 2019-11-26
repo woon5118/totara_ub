@@ -76,7 +76,7 @@ class criteria_coursecompletion_services_testcase extends advanced_testcase {
             ];
         }
 
-        $res = \external_api::call_external_function(
+        $res = external_api::call_external_function(
             'criteria_coursecompletion_get_detail',
             ['id' => $data->criterion->get_id()]
         );

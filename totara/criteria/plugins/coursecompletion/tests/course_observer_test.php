@@ -25,7 +25,7 @@ use core\event\course_completed;
 use criteria_coursecompletion\observer\course as course_observer;
 use totara_criteria\event\criteria_achievement_changed;
 
-class criteria_coursecompletion_course_observer_testcase extends \advanced_testcase {
+class criteria_coursecompletion_course_observer_testcase extends advanced_testcase {
 
     private function setup_data() {
         $data = new class() {
@@ -68,9 +68,9 @@ class criteria_coursecompletion_course_observer_testcase extends \advanced_testc
         $sink->close();
 
         // We now generate a coursecompletion criterion but not for this course
-        /** @var \totara_criteria_generator $criteria_generator */
+        /** @var totara_criteria_generator $criteria_generator */
         $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
-        $criterion = $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id]]);
+        $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id]]);
 
         $sink = $this->redirectEvents();
         $completion = new completion_completion(['course' => $data->courses[2]->id, 'userid' => $data->users[2]->id]);

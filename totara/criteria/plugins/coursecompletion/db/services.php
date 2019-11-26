@@ -22,9 +22,11 @@
  * @package criteria_coursecompletion
  */
 
+use criteria_coursecompletion\external;
+
 $functions = [
     'criteria_coursecompletion_get_detail' => [
-        'classname' => \criteria_coursecompletion\external::class,
+        'classname' => external::class,
         'methodname' => 'get_detail',
         'description' => 'Get the detail of the coursecompletion criterion',
         'type' => 'get',

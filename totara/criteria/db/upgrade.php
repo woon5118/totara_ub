@@ -72,7 +72,6 @@ function xmldb_totara_criteria_upgrade($oldversion) {
     }
 
     if ($oldversion < 2019102902) {
-
         // Define key totara_criterion_fk (foreign) to be added to totara_criteria_item.
         $table = new xmldb_table('totara_criteria_item');
         $key = new xmldb_key('totara_criterion_fk', XMLDB_KEY_FOREIGN, array('criterion_id'), 'totara_criteria', array('id'), 'cascade');
