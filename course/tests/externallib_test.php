@@ -2057,7 +2057,7 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
      */
     public function test_get_courses_by_field() {
         global $DB;
-        $this->resetAfterTest(true);
+        filter_set_global_state('mathjaxloader', TEXTFILTER_ON);
 
         $category1 = self::getDataGenerator()->create_category(array('name' => 'Cat 1'));
         $category2 = self::getDataGenerator()->create_category(array('parent' => $category1->id));

@@ -119,6 +119,7 @@ class core_externallib_testcase extends advanced_testcase {
 
     public function test_external_format_text() {
         $settings = external_settings::get_instance();
+        filter_set_global_state('mathjaxloader', TEXTFILTER_ON);
 
         $currentraw = $settings->get_raw();
         $currentfilter = $settings->get_filter();
