@@ -480,9 +480,8 @@ class appraisal {
      * @return bool
      */
     public static function can_auto_link_job_assignments(): bool {
-        global $CFG;
         // If multiple job assignments are allowed, auto-linking should not happen.
-        return empty($CFG->totara_job_allowmultiplejobs);
+        return empty(get_config(null, 'totara_job_allowmultiplejobs'));
     }
 
     /**

@@ -82,6 +82,10 @@ Feature: Automatically link an appraisee's job assignment on appraisal activatio
     And I follow "Appraisals Audience 2"
     And I press "Save"
     And I press "Update"
+    And I run all adhoc tasks
+    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I follow "Appraisal1"
+    And I follow "Assignments"
     Then I should see "Appraisals Audience 2" in the "learner3 lastname" "table_row"
     When I log out
 
