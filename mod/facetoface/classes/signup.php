@@ -722,6 +722,25 @@ final class signup implements seminar_iterator_item {
     }
 
     /**
+     * Tells the signup instance that the system is dealing with attendance.
+     * This must always be set if the signup status could be changed as the result of processing attendance.
+     * @param bool $value
+     * @return signup
+     */
+    public function set_attendance_processed(bool $value): signup {
+        $this->settings['process_attendance'] = $value;
+        return $this;
+    }
+
+    /**
+     * See if attendance is being processed or not.
+     * @return bool
+     */
+    public function get_attendance_processed(): bool {
+        return (bool)($this->settings['process_attendance'] ?? false);
+    }
+
+    /**
      * Return the object that has all of properties that are mapped with the database's table.
      * @return stdClass
      */

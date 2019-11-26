@@ -218,7 +218,7 @@ final class signup_helper {
 
         foreach ($attendance as $signupid => $statuscode) {
             $grade = $grades[$signupid] ?? null;
-            $signup = new signup($signupid);
+            $signup = (new signup($signupid))->set_attendance_processed(true);
             $desiredstate = state::from_code($statuscode);
 
             if (!self::switch_state_and_grade($seminarevent, $signup, $desiredstate, $eventgradingmanual, $grade)) {

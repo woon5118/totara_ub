@@ -22,6 +22,8 @@
  * @package mod_facetoface
  */
 
+use mod_facetoface\event\booking_booked;
+use mod_facetoface\event\signup_status_updated;
 use mod_facetoface\seminar;
 use mod_facetoface\seminar_event;
 use mod_facetoface\seminar_session;
@@ -175,6 +177,99 @@ class mod_facetoface_signup_helper_testcase extends advanced_testcase {
             $this->fail('Must fail when first argument is neither seminar nor stdClass');
         } catch (\coding_exception $e) {
             $this->resetDebugging();
+        }
+    }
+
+    /**
+     * @return array of [time_difference]
+     */
+    public function data_process_attendance_and_email_notification(): array {
+        return [
+            [-WEEKSECS],
+            [-HOURSECS],
+            [+DAYSECS]
+        ];
+    }
+
+    /**
+     * @param int $timediff
+     * @dataProvider data_process_attendance_and_email_notification
+     */
+    public function test_process_attendance_and_email_notification(int $timediff) {
+        $gen = $this->getDataGenerator();
+        $course = $gen->create_course();
+
+        /** @var mod_facetoface_generator $f2fgen */
+        $f2fgen = $gen->get_plugin_generator('mod_facetoface');
+        $f2f = $f2fgen->create_instance(['course' => $course->id]);
+
+        (new seminar($f2f->id))
+            ->set_attendancetime(seminar::EVENT_ATTENDANCE_UNRESTRICTED)
+            ->set_eventgradingmanual(1)
+            ->save();
+
+        $user = $gen->create_user();
+        $gen->enrol_user($user->id, $course->id);
+
+        $now = time();
+        $event = new seminar_event();
+        $event->set_facetoface($f2f->id)->save();
+        $session = new seminar_session();
+        $session->set_timestart($now + YEARSECS)->set_timefinish($now + YEARSECS + HOURSECS)->set_sessionid($event->get_id())->save();
+        $sinkevent = $this->redirectEvents();
+        $sinkemail = $this->redirectEmails();
+
+        $sinkevent->clear();
+        $sinkemail->clear();
+        $signup = (signup::create($user->id, $event))->save()->switch_state(booked::class);
+        $events = $sinkevent->get_events();
+        $this->assertCount(2, $events);
+        $this->assertInstanceOf(signup_status_updated::class, $events[0]);
+        $this->assertInstanceOf(booking_booked::class, $events[1]);
+        self::dispatch_events($events);
+        $this->execute_adhoc_tasks();
+        $messages = $sinkemail->get_messages();
+        $this->assertCount(1, $messages);
+
+        $session->set_timestart($now + $timediff)->set_timefinish($now + $timediff + HOURSECS * 3)->set_sessionid($event->get_id())->save();
+
+        $sinkevent->clear();
+        $sinkemail->clear();
+        $result = signup_helper::process_attendance($event, [$signup->get_id() => fully_attended::get_code()], [$signup->get_id() => null]);
+        $events = $sinkevent->get_events();
+        $this->assertTrue($result);
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(signup_status_updated::class, $events[0]);
+        self::dispatch_events($events);
+        $this->execute_adhoc_tasks();
+        $messages = $sinkemail->get_messages();
+        $this->assertCount(0, $messages);
+
+        $sinkevent->clear();
+        $sinkemail->clear();
+        $result = signup_helper::process_attendance($event, [$signup->get_id() => booked::get_code()], [$signup->get_id() => null]);
+        $events = $sinkevent->get_events();
+        $this->assertTrue($result);
+        $this->assertCount(2, $events);
+        $this->assertInstanceOf(signup_status_updated::class, $events[0]);
+        $this->assertInstanceOf(booking_booked::class, $events[1]);
+        self::dispatch_events($events);
+        $this->execute_adhoc_tasks();
+        $messages = $sinkemail->get_messages();
+        $this->assertCount(0, $messages);
+    }
+
+    /**
+     * Simulate dispatching events.
+     * @param \core\event\base[] $events
+     */
+    private static function dispatch_events(array $events) {
+        foreach ($events as $event) {
+            $disp = new ReflectionProperty(\core\event\base::class, 'dispatched');
+            $disp->setAccessible(true);
+            $disp->setValue($event, false);
+            \core\event\manager::dispatch($event);
+            $disp->setValue($event, true);
         }
     }
 
