@@ -911,7 +911,8 @@ class course_enrolment_manager {
         global $DB;
         list($instancessql, $params, $filter) = $this->get_instance_sql();
         $params['userid'] = $userid;
-        $userenrolments = $DB->get_records_select('user_enrolments', "enrolid $instancessql AND userid = :userid", $params);
+        // Totara: Make sorting order consistent between DBMS.
+        $userenrolments = $DB->get_records_select('user_enrolments', "enrolid $instancessql AND userid = :userid", $params, 'id');
         $instances = $this->get_enrolment_instances();
         $plugins = $this->get_enrolment_plugins(false);
         $inames = $this->get_enrolment_instance_names();

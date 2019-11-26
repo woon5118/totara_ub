@@ -1,4 +1,4 @@
-@javascript @totara @totara_core @totara_dashboard @totara_courseprogressbar @block @block_last_course_accessed @block_totara_featured_links @block_totara_recent_learning
+@javascript @enrol @totara @totara_core @totara_dashboard @totara_courseprogressbar @block @block_last_course_accessed @block_totara_featured_links @block_totara_recent_learning
 Feature: Test progress bars
   Background:
     Given I am on a totara site
@@ -122,7 +122,7 @@ Feature: Test progress bars
     And  I click on "Edit enrolment" "link" in the "Student Two" "table_row"
     And  I set the field "Status" to "Suspended"
     And  I press "Save changes"
-    When I click on ".enrolment:nth-child(2) > .unenrollink" "css_element" in the "Student Two" "table_row"
+    When I click on ".enrolment:nth-child(1) > .unenrollink" "css_element" in the "Student Two" "table_row"
     And  I press "Continue"
     Then I should not see "Program enrolled" in the "Student Two" "table_row"
     And  I log out
