@@ -27,9 +27,10 @@ require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/totara/customfield/fieldlib.php');
 
-use mod_facetoface\facilitator;
 use mod_facetoface\seminar;
+use mod_facetoface\facilitator;
 use mod_facetoface\seminar_event;
+use mod_facetoface\form\facilitator_edit;
 
 $id = required_param('id', PARAM_INT);   // facilitator id.
 $facetofaceid = required_param('f', PARAM_INT);   // Face-to-face id.
@@ -41,19 +42,17 @@ $cm = $seminar->get_coursemodule();
 $context = $seminar->get_contextmodule($cm->id);
 
 ajax_require_login($seminar->get_course(), false, $cm, false, true);
-if (!has_any_capability(['mod/facetoface:managesitewidefacilitators', 'mod/facetoface:manageadhocfacilitators'], $context)) {
+if (!has_capability('mod/facetoface:manageadhocfacilitators', $context)) {
     throw new required_capability_exception($context, $capability, 'nopermissions');
 }
 require_sesskey();
 
 if ($id) {
     $facilitator = new facilitator($id);
-
     // Only custom facilitators can be changed here!
     if (!$facilitator->get_custom()) {
         throw new coding_exception('Site wide facilitators must be edited from the Site administration > Seminar > facilitators menu');
     }
-
     if (!$facilitator->is_available(0, 0, $seminarevent)) {
         // They should never get here, any error will do.
         print_error('Error: facilitator is unavailable in this seminar event');
@@ -69,8 +68,8 @@ $baseurl = new moodle_url('/mod/facetoface/facilitator/ajax/edit.php', ['id' => 
 $PAGE->set_context($context);
 $PAGE->set_url($baseurl);
 
-$customdata = ['facilitator' => $facilitator, 'seminar' => $seminar, 'seminarevent' => $seminarevent, 'context' => $context, 'adhoc' => true];
-$mform = new \mod_facetoface\form\facilitator_edit(null, $customdata, 'post', '', array('class' => 'dialog-nobind'), true, null, 'mform_modal');
+$customdata = ['facilitator' => $facilitator, 'seminar' => $seminar, 'seminarevent' => $seminarevent, 'adhoc' => true];
+$mform = new facilitator_edit(null, $customdata, 'post', '', array('class' => 'dialog-nobind'), true, null, 'mform_modal');
 
 if ($data = $mform->get_data()) {
     $facilitator = $mform->save($data);

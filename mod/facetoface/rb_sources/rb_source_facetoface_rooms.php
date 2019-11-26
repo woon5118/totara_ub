@@ -83,7 +83,7 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source {
         $this->sourcejoins = array("assigned") ;
         $this->add_customfields();
 
-    parent::__construct();
+        parent::__construct();
     }
 
     protected function define_joinlist() {
@@ -115,7 +115,6 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source {
             'assigned.roomid = base.id',
             REPORT_BUILDER_RELATION_ONE_TO_MANY
         );
-
         return $joinlist;
     }
 
@@ -133,13 +132,16 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source {
                 'noexport' => true,
                 'nosort' => true,
                 'joins' => 'assigned',
-                'capability' => 'totara/core:modconfig',
-                'extrafields' => array('hidden' => 'base.hidden', 'cntdates' => 'assigned.cntdates'),
+                'capability' => 'mod/facetoface:managesitewiderooms',
                 'displayfunc' => 'f2f_room_actions',
-                'hidden' => false
+                'hidden' => false,
+                'extrafields' => array(
+                    'hidden' => 'base.hidden',
+                    'cntdates' => 'assigned.cntdates',
+                    'custom' => 'base.custom',
+                ),
             )
         );
-
         return $columnoptions;
     }
 
@@ -156,7 +158,6 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source {
             array(),
             'base.id'
         );
-
         return $filteroptions;
     }
 
@@ -172,6 +173,10 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source {
             ),
             array(
                 'type' => 'room',
+                'value' => 'published'
+            ),
+            array(
+                'type' => 'room',
                 'value' => 'visible'
             ),
             array(
@@ -179,7 +184,6 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source {
                 'value' => 'allowconflicts'
             )
         );
-
         return $defaultcolumns;
     }
 
@@ -188,17 +192,22 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source {
             array(
                 'type' => 'room',
                 'value' => 'name'
-            )
+            ),
+            array(
+                'type' => 'room',
+                'value' => 'roomavailable'
+            ),
         );
-
         return $defaultfilters;
     }
 
     protected function define_paramoptions() {
         $paramoptions = array(
-            new rb_param_option('custom', 'base.custom')
+            new rb_param_option(
+                'published',
+                'base.custom'
+            )
         );
-
         return $paramoptions;
     }
 

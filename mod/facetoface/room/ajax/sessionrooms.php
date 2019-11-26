@@ -95,7 +95,7 @@ foreach ($roomlist as $room) {
 
     customfield_load_data($roomdata, "facetofaceroom", "facetoface_room");
 
-    $roomdata->fullname = (string)$room . " (" . get_string("capacity", "facetoface") . ": {$roomdata->capacity})";
+    $roomdata->fullname = (string)$room . " (" . get_string("capacity", "mod_facetoface") . ": {$roomdata->capacity})";
     if (!$availablerooms->contains($room->get_id()) && $seminarevent->get_cancelledstatus() == 0) {
         $unavailablerooms[$room->get_id()] = $room->get_id();
         $roomdata->fullname .= get_string('roomalreadybooked', 'mod_facetoface');
@@ -116,7 +116,7 @@ $dialog = new \seminar_dialog_content();
 $dialog->baseurl = '/mod/facetoface/room/ajax/sessionrooms.php';
 $dialog->proxy_dom_data(['id', 'name', 'custom', 'capacity']);
 $dialog->type = totara_dialog_content::TYPE_CHOICE_MULTI;
-$dialog->manageadhoc = true;
+$dialog->manageadhoc = has_capability('mod/facetoface:manageadhocrooms', $context);
 $dialog->items = $allrooms;
 $dialog->disabled_items = $unavailablerooms;
 $dialog->selected_items = $selectedrooms;

@@ -36,9 +36,14 @@ $popup = optional_param('popup', 0, PARAM_INT);
 
 require_login(0, false);
 
-$systemcontext = context_system::instance();
-$params = ['facilitatorid' => $facilitatorid, 'sid' => $sid, 'debug' => $debug, 'popup' => $popup];
+$params = [
+    'facilitatorid' => $facilitatorid,
+    'sid' => $sid,
+    'debug' => $debug,
+    'popup' => $popup
+];
 $baseurl = new moodle_url('/mod/facetoface/reports/facilitators.php', $params);
+$systemcontext = context_system::instance();
 if (!$popup) {
     admin_externalpage_setup('modfacetofacefacilitators', '', null, $baseurl);
 } else {
@@ -70,22 +75,19 @@ if (rb_facetoface_summary_facilitator_embedded::is_capable_static($USER->id)) {
         $PAGE->set_button($report->edit_button());
     }
 }
+$facilitator = new facilitator($facilitatorid);
+$facilitator_user = new facilitator_user($facilitator);
 
 $title = get_string('viewfacilitator', 'mod_facetoface');
 $PAGE->set_title($title);
 
 echo $OUTPUT->header();
-
-$facilitator = new facilitator($facilitatorid);
-$facilitator_user = new facilitator_user($facilitator);
 /** @var mod_facetoface_renderer $renderer */
 $renderer = $PAGE->get_renderer('mod_facetoface');
 $renderer->setcontext($systemcontext);
 
 echo $renderer->heading($PAGE->title);
-echo $renderer->render(
-    \mod_facetoface\output\facilitator_details::create($facilitator_user)
-);
+echo $renderer->render(\mod_facetoface\output\facilitator_details::create($facilitator_user));
 
 if ($report) {
     /** @var totara_reportbuilder_renderer $reportrenderer */
@@ -93,27 +95,24 @@ if ($report) {
     // This must be done after the header and before any other use of the report.
     list($reporthtml, $debughtml) = $reportrenderer->report_html($report, $debug);
     echo $debughtml;
-
     $report->display_restrictions();
-
     echo $renderer->heading(get_string('upcomingsessionsinfacilitator', 'mod_facetoface'));
     echo $reportrenderer->print_description($report->description, $report->_id);
-
     // Print saved search options and filters.
     $report->display_saved_search_options();
     $report->display_search();
     $report->display_sidebar_search();
     echo $reporthtml;
-
     if (!$popup && !empty($backurl)) {
         echo $renderer->single_button($backurl, get_string('goback', 'mod_facetoface'), 'get');
     }
-
-    if (!$popup && has_capability('mod/facetoface:addinstance', $systemcontext)) {
-        echo $renderer->single_button(new moodle_url('/mod/facetoface/facilitator/manage.php', ['published' => 0]), get_string('backtofacilitators', 'mod_facetoface'), 'get');
+    if (!$popup && has_capability('mod/facetoface:managesitewidefacilitators', $systemcontext)) {
+        echo $renderer->single_button(
+            new moodle_url('/mod/facetoface/facilitator/manage.php', ['published' => 0]),
+            get_string('backtofacilitators', 'mod_facetoface'),
+            'get'
+        );
     }
-
     $report->include_js();
 }
-
 echo $renderer->footer();

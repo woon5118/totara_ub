@@ -100,8 +100,9 @@ $PAGE->requires->strings_for_js(
 );
 $jsconfig = array(
     'sessionid' => $s, 'can_edit' => 'true', 'facetofaceid' => $seminar->get_id(), 'clone' => $c,
-    'managesitewidefacilitators' => has_capability('mod/facetoface:managesitewidefacilitators', $context),
+    'manageadhocassets' => has_capability('mod/facetoface:manageadhocassets', $context),
     'manageadhocfacilitators' => has_capability('mod/facetoface:manageadhocfacilitators', $context),
+    'manageadhocrooms' => has_capability('mod/facetoface:manageadhocrooms', $context),
 );
 $jsmodule = array(
     'name' => 'totara_f2f_room',

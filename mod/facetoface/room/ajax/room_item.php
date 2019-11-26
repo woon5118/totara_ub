@@ -21,12 +21,12 @@
  * @package mod_facetoface
  */
 
-use mod_facetoface\room;
-
 define('AJAX_SCRIPT', true);
 
 require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
+
+use mod_facetoface\room;
 
 $facetofaceid = required_param('facetofaceid', PARAM_INT);
 $itemseq = required_param('itemids', PARAM_SEQUENCE);
@@ -36,11 +36,7 @@ if (empty($itemids) || empty($itemids[0])) {
     exit();
 }
 
-//$itemid = required_param('itemid', PARAM_INT);
 $seminar = new \mod_facetoface\seminar($facetofaceid);
-if (!$seminar->exists()) {
-    print_error('error:incorrectfacetofaceid', 'facetoface');
-}
 $cm = $seminar->get_coursemodule();
 $context = $seminar->get_contextmodule($cm->id);
 

@@ -8,6 +8,13 @@ information provided here is intended especially for developers.
 * seminar_event::get_discountcost() now returns string instead of int.
 * The first argument to seminar_event::set_discountcost() was an int, it has been changed to string
 * seminar_event_helper::delete_seminarevent() has been changed to trigger the session_deleted event
+* The following capabilities are added to 'editingteacher' and 'teacher' roles:
+  * mod/facetoface:manageadhocroom
+  * mod/facetoface:managesitewideroom
+  * mod/facetoface:manageadhocasset
+  * mod/facetoface:managesitewideasset
+  * mod/facetoface:manageadhocfacilitator
+  * mod/facetoface:managesitewidefacilitator
 * All action links/icons but the "Go to event" button have been moved to the "..." button
 * Seminar session list is now rendered through AJAX request implemented by mod_facetoface\external and seminarevent_dashboard.js
 * Seminar session list now provides a CSS class for each table cell; custom fields are prefixed by 'cf-'

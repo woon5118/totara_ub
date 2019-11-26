@@ -43,6 +43,8 @@ final class asset_helper {
     public static function save(\stdClass $data): asset {
         global $TEXTAREA_OPTIONS;
 
+        $data->custom = $data->notcustom ? 0 : 1;
+
         if ($data->id) {
             $asset = new asset($data->id);
         } else {

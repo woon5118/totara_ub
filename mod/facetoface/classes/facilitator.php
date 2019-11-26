@@ -35,6 +35,8 @@ final class facilitator implements seminar_iterator_item {
 
     use traits\crud_mapper;
 
+    const FACILITATOR_NAME_LENGTH = 100;
+
     /**
      * @var int {facetoface_facilitator}.id
      */

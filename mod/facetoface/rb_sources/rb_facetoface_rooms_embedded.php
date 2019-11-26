@@ -28,7 +28,7 @@ class rb_facetoface_rooms_embedded extends rb_base_embedded {
         $this->shortname = 'facetoface_rooms';
         $this->fullname = get_string('embedded:seminarrooms', 'mod_facetoface');
         $this->columns = array(
-            array('type' => 'room', 'value' => 'name', 'heading' => null),
+            array('type' => 'room', 'value' => 'namelink', 'heading' => null),
             // NOTE: hardcoding custom field ids is not nice, but this should work fine at least in new installs and upgrades,
             //       if fields does not exist it is ignored.
             array('type' => 'facetoface_room', 'value' => 'custom_field_1', 'heading' => null),
@@ -40,19 +40,27 @@ class rb_facetoface_rooms_embedded extends rb_base_embedded {
 
         $this->filters = array(
             array('type' => 'room', 'value' => 'name', 'advanced' => 0),
-            array('type' => 'room', 'value' => 'roomavailable', 'advanced' => 0)
+            array('type' => 'room', 'value' => 'roomavailable', 'advanced' => 0),
+            array('type' => 'room', 'value' => 'published', 'advanced' => 0, 'defaultvalue' => ['value' => 0])
         );
 
-        $this->contentmode = REPORT_BUILDER_CONTENT_MODE_NONE;
+        if (isset($data['published']) && $data['published'] !== false) {
+            $this->embeddedparams['published'] = $data['published'];
+        }
 
-        // Only show published.
-        $this->embeddedparams = array('custom' => '0');
+        $this->contentmode = REPORT_BUILDER_CONTENT_MODE_NONE;
 
         parent::__construct();
     }
 
+    /**
+     * Check if the user is capable of accessing this report.
+     * @param int $reportfor userid of the user that this report is being generated for
+     * @param reportbuilder $report the report object - can use get_param_value to get params
+     * @return boolean true if the user can access this report
+     */
     public function is_capable($reportfor, $report) {
         $context = context_system::instance();
-        return has_capability('totara/core:modconfig', $context, $reportfor);
+        return has_capability('mod/facetoface:managesitewiderooms', $context, $reportfor);
     }
 }

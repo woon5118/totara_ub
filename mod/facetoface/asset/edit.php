@@ -26,49 +26,50 @@ require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/totara/customfield/fieldlib.php');
 
+use \core\notification;
 use mod_facetoface\asset;
-
-admin_externalpage_setup('modfacetofaceassets');
+use mod_facetoface\asset_helper;
+use mod_facetoface\form\asset_edit;
 
 $id = optional_param('id', 0, PARAM_INT);
+
+$params = ['id' => $id];
+$baseurl = new moodle_url('/mod/facetoface/asset/edit.php', $params);
+// Check permissions.
+if (is_siteadmin()) {
+    admin_externalpage_setup('modfacetofaceassets', '', null, $baseurl);
+} else {
+    $context = context_system::instance();
+    $PAGE->set_pagelayout('standard');
+    $PAGE->set_context($context);
+    $PAGE->set_url($baseurl);
+    require_login(0, false);
+    require_capability('mod/facetoface:managesitewideassets', $context);
+}
+
 $asset = new asset($id);
+$returnurl = new moodle_url('/mod/facetoface/asset/manage.php', $params);
 
 if ($asset->get_custom()) {
-    print_error(get_string('error:incorrectassetid', 'facetoface'));
+    redirect($returnurl, get_string('error:incorrectassetid', 'mod_facetoface'), null, notification::ERROR);
 }
 
-$assetlisturl = new moodle_url('/mod/facetoface/asset/manage.php');
+$mform = new asset_edit(null, ['asset' => $asset], 'post', '', ['class' => 'dialog-nobind'], true, null, 'mform_modal');
 
-// We don't need autosave here
-$editoropts = $TEXTAREA_OPTIONS;
-$editoropts['autosave'] = false;
-
-$customdata = ['asset' => $asset, 'editoroptions' => $editoropts];
-$form = new \mod_facetoface\form\asset_edit(null, $customdata, 'post', '', array('class' => 'dialog-nobind'), true, null, 'mform_modal');
-
-if ($form->is_cancelled()) {
-    redirect($assetlisturl);
+if ($mform->is_cancelled()) {
+    redirect($returnurl);
 }
 
-if ($data = $form->get_data()) {
-    $asset = \mod_facetoface\asset_helper::save($data);
-    $message = $id ? get_string('assetcreatesuccess', 'facetoface') : get_string('assetupdatesuccess', 'facetoface');
-    \core\notification::success($message);
-    redirect($assetlisturl);
+if ($data = $mform->get_data()) {
+    $asset = asset_helper::save($data);
+    $message = $id ? get_string('assetupdatesuccess', 'mod_facetoface') : get_string('assetcreatesuccess', 'mod_facetoface');
+    redirect($returnurl, $message, null, notification::SUCCESS);
 }
 
-$url = new moodle_url('/admin/settings.php', array('section' => 'modsettingfacetoface'));
-
-if ($id == 0) {
-    $pageheading = get_string('addasset', 'facetoface');
-} else {
-    $pageheading = get_string('editasset', 'facetoface');
-}
-
+$pageheading = $id ? get_string('editasset', 'mod_facetoface') : get_string('addasset', 'mod_facetoface');
+$PAGE->set_title($pageheading);
 echo $OUTPUT->header();
-
 echo $OUTPUT->heading($pageheading);
 
-$form->display();
-
+$mform->display();
 echo $OUTPUT->footer();

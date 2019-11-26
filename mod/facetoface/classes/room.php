@@ -38,6 +38,7 @@ final class room implements seminar_iterator_item {
     const ROOM_IDENTIFIER_NAME = 0;
     const ROOM_IDENTIFIER_BUILDING = 1;
     const ROOM_IDENTIFIER_LOCATION = 2;
+    const ROOM_NAME_LENGTH = 100;
 
     /**
      * @var int {facetoface_room}.id
@@ -432,8 +433,9 @@ final class room implements seminar_iterator_item {
      * @return room $this
      */
     public function publish(): room {
-        if ($this->custom == false) {
-            print_error('error:cannotrepublishroom', 'facetoface');
+        if ($this->custom === false) {
+            \core\notification::warning(get_string('error:cannotrepublishroom', 'mod_facetoface'));
+            return $this;
         }
         $this->custom = (int)false;
         return $this;

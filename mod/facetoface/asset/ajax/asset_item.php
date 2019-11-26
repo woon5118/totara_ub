@@ -40,7 +40,7 @@ $seminar = new \mod_facetoface\seminar($facetofaceid);
 $cm = $seminar->get_coursemodule();
 $context = $seminar->get_contextmodule($cm->id);
 
-require_login($seminar->get_course(), false, $cm);
+ajax_require_login($seminar->get_course(), false, $cm);
 require_sesskey();
 require_capability('mod/facetoface:editevents', $context);
 
@@ -56,7 +56,6 @@ foreach($itemids as $itemid) {
         'hidden' => $asset->get_hidden(),
         'custom' => $asset->get_custom()
     ];
-
     $assets[] = $res;
 }
 

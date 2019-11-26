@@ -32,33 +32,50 @@ $action = optional_param('action', '', PARAM_ALPHA);
 $confirm = optional_param('confirm', 0, PARAM_BOOL);
 $debug = optional_param('debug', 0, PARAM_INT);
 $sid = optional_param('sid', '0', PARAM_INT);
+$published = optional_param('published', false, PARAM_INT);
 
+$baseurl = new moodle_url('/mod/facetoface/asset/manage.php');
 // Check permissions.
-admin_externalpage_setup('modfacetofaceassets');
+if (is_siteadmin()) {
+    admin_externalpage_setup('modfacetofaceassets', '', null, $baseurl);
+} else {
+    $context = context_system::instance();
+    $PAGE->set_pagelayout('standard');
+    $PAGE->set_context($context);
+    $PAGE->set_url($baseurl);
+    require_login(0, false);
+    require_capability('mod/facetoface:managesitewideassets', $context);
+}
+$PAGE->set_title(get_string('manageassets', 'mod_facetoface'));
 
-$returnurl = new moodle_url('/admin/settings.php', array('section' => 'modsettingfacetoface'));
-
-$config = new rb_config();
-$config->set_sid($sid);
+$config = (new rb_config())->set_sid($sid)->set_embeddata(['published' => $published]);
 $report = reportbuilder::create_embedded('facetoface_assets', $config);
-$redirectto = new moodle_url('/mod/facetoface/asset/manage.php', $report->get_current_url_params());
 
 // Handle actions.
 if ($action === 'delete') {
     if (empty($id)) {
-        print_error('error:assetdoesnotexist', 'facetoface', $returnurl);
+        redirect($baseurl, get_string('error:assetdoesnotexist', 'mod_facetoface'), null, \core\notification::ERROR);
     }
 
     $asset = new asset($id);
-
+    if ($asset->get_custom()) {
+        redirect($baseurl, get_string('error:assetnotpublished', 'mod_facetoface'), null, \core\notification::ERROR);
+    }
     if ($asset->is_used()) {
-        print_error('error:assetisinuse', 'facetoface', $returnurl);
+        redirect($baseurl, get_string('error:assetisinuse', 'mod_facetoface'), null, \core\notification::ERROR);
     }
 
     if (!$confirm) {
         echo $OUTPUT->header();
-        $confirmurl = new moodle_url($redirectto, array('action' => $action, 'id' => $id, 'confirm' => 1, 'sesskey' => sesskey()));
-        echo $OUTPUT->confirm(get_string('deleteassetconfirm', 'facetoface', format_string($asset->get_name())), $confirmurl, $redirectto);
+        $confirmurl = new moodle_url(
+            '/mod/facetoface/asset/manage.php',
+            ['action' => $action, 'id' => $id, 'confirm' => 1, 'sesskey' => sesskey()]
+        );
+        echo $OUTPUT->confirm(
+            get_string('deleteassetconfirm', 'mod_facetoface', format_string($asset->get_name())),
+            $confirmurl,
+            $baseurl
+        );
         echo $OUTPUT->footer();
         die;
     }
@@ -66,33 +83,35 @@ if ($action === 'delete') {
     require_sesskey();
     $asset->delete();
     unset($asset);
+    redirect($baseurl, get_string('assetdeleted', 'mod_facetoface'), null, \core\notification::SUCCESS);
 
-    \core\notification::success(get_string('assetdeleted', 'facetoface'));
-    redirect($redirectto);
 } else if ($action === 'show') {
     if (empty($id)) {
-        print_error('error:assetdoesnotexist', 'facetoface', $returnurl);
+        redirect($baseurl, get_string('error:assetdoesnotexist', 'mod_facetoface'), null, \core\notification::ERROR);
     }
 
     require_sesskey();
     $asset = new asset($id);
+    if ($asset->get_custom()) {
+        redirect($baseurl, get_string('error:assetnotpublished', 'mod_facetoface'), null, \core\notification::ERROR);
+    }
     $asset->show();
     $asset->save();
+    redirect($baseurl, get_string('assetshown', 'mod_facetoface'), null, \core\notification::SUCCESS);
 
-    \core\notification::success(get_string('assetshown', 'facetoface'));
-    redirect($redirectto);
 } else if ($action === 'hide') {
     if (empty($id)) {
-        print_error('error:assetdoesnotexist', 'facetoface', $returnurl);
+        redirect($baseurl, get_string('error:assetdoesnotexist', 'mod_facetoface'), null, \core\notification::ERROR);
     }
 
     require_sesskey();
     $asset = new asset($id);
+    if ($asset->get_custom()) {
+        redirect($baseurl, get_string('error:assetnotpublished', 'mod_facetoface'), null, \core\notification::ERROR);
+    }
     $asset->hide();
     $asset->save();
-
-    \core\notification::success(get_string('assethidden', 'facetoface'));
-    redirect($redirectto);
+    redirect($baseurl, get_string('assethidden', 'mod_facetoface'), null, \core\notification::SUCCESS);
 }
 
 $PAGE->set_button($report->edit_button() . $PAGE->button);
@@ -104,7 +123,7 @@ echo $OUTPUT->header();
 $report->include_js();
 $report->display_restrictions();
 
-echo $OUTPUT->heading(get_string('manageassets', 'facetoface'));
+echo $OUTPUT->heading(get_string('manageassets', 'mod_facetoface'));
 
 // This must be done after the header and before any other use of the report.
 list($reporthtml, $debughtml) = $reportrenderer->report_html($report, $debug);
@@ -117,10 +136,7 @@ $report->display_search();
 $report->display_sidebar_search();
 echo $reporthtml;
 
-$addurl = new moodle_url('/mod/facetoface/asset/edit.php');
-
 echo $OUTPUT->container_start('buttons');
-echo $OUTPUT->single_button($addurl, get_string('addnewasset', 'facetoface'), 'get');
+echo $OUTPUT->single_button(new moodle_url('/mod/facetoface/asset/edit.php'), get_string('addnewasset', 'mod_facetoface'), 'post');
 echo $OUTPUT->container_end();
-
 echo $OUTPUT->footer();

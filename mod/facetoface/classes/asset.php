@@ -33,6 +33,8 @@ final class asset implements seminar_iterator_item {
 
     use traits\crud_mapper;
 
+    const ASSET_NAME_LENGTH = 100;
+
     /**
      * @var int {facetoface_asset}.id
      */

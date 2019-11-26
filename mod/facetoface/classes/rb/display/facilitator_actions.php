@@ -51,8 +51,9 @@ class facilitator_actions extends base {
         $extrafields = self::get_extrafields_row($row, $column);
 
         if ($isexport) {
-            return null;
+            return '';
         }
+
         if ((int)$extrafields->custom > 0) {
             return '';
         }
@@ -63,19 +64,20 @@ class facilitator_actions extends base {
         }
 
         $output = [];
+        $params = ['id' => $value, 'sesskey' => sesskey()];
+
         $output[] = $OUTPUT->action_icon(
-            new moodle_url('/mod/facetoface/facilitator/edit.php', ['id' => $value]),
+            new moodle_url('/mod/facetoface/facilitator/edit.php', $params),
             new flex_icon('edit', [
                 'alt' => get_string('editfacilitator', 'mod_facetoface'),
                 'title' => get_string('editfacilitator', 'mod_facetoface')
             ])
         );
-
         if ($extrafields->hidden && $report->src->get_embeddedurl()) {
             if ($useractive) {
-                $params = array_merge($report->src->get_urlparams(), ['action' => 'show', 'id' => $value, 'sesskey' => sesskey()]);
+                $urlparams = array_merge(array_merge($params, ['action' => 'show']), $report->src->get_urlparams());
                 $output[] = $OUTPUT->action_icon(
-                    new moodle_url($report->src->get_embeddedurl(), $params),
+                    new moodle_url($report->src->get_embeddedurl(), $urlparams),
                     new flex_icon('show', ['alt' => get_string('show'), 'title' => get_string('show')])
                 );
             } else {
@@ -86,28 +88,27 @@ class facilitator_actions extends base {
                 ]);
             }
         } else if ($report->src->get_embeddedurl()) {
-            $params = array_merge($report->src->get_urlparams(), ['action' => 'hide', 'id' => $value, 'sesskey' => sesskey()]);
+            $urlparams = array_merge(array_merge($params, ['action' => 'hide']), $report->src->get_urlparams());
             $output[] = $OUTPUT->action_icon(
-                new moodle_url($report->src->get_embeddedurl(), $params),
+                new moodle_url($report->src->get_embeddedurl(), $urlparams),
                 new flex_icon('hide', ['alt' => get_string('hide'), 'title' => get_string('hide')])
             );
         }
         if ($extrafields->cntdates && $report->src->get_embeddedurl()) {
-            $output[] = $OUTPUT->flex_icon('delete', [
+            $output[] = $OUTPUT->flex_icon('trash', [
                 'classes' => 'ft-state-disabled',
                 'alt' => get_string('currentlyassigned', 'mod_facetoface'),
                 'title' => get_string('currentlyassigned', 'mod_facetoface')
             ]);
         } else {
             if ($report->src->get_embeddedurl()) {
-                $params = array_merge($report->src->get_urlparams(), ['action' => 'delete', 'id' => $value, 'sesskey' => sesskey()]);
+                $urlparams = array_merge(array_merge($params, ['action' => 'delete']), $report->src->get_urlparams());
                 $output[] = $OUTPUT->action_icon(
-                    new moodle_url($report->src->get_embeddedurl(), $params),
-                    new flex_icon('delete', ['alt' => get_string('delete'), 'title' => get_string('delete')])
+                    new moodle_url($report->src->get_embeddedurl(), $urlparams),
+                    new flex_icon('trash', ['alt' => get_string('delete'), 'title' => get_string('delete')])
                 );
             }
         }
-
         return implode('', $output);
     }
 

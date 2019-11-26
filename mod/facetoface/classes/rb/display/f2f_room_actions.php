@@ -22,7 +22,10 @@
  */
 
 namespace mod_facetoface\rb\display;
+
 use totara_reportbuilder\rb\display\base;
+use core\output\flex_icon;
+use moodle_url;
 
 /**
  * Display class intended for room actions
@@ -46,47 +49,58 @@ class f2f_room_actions extends base {
         global $OUTPUT;
 
         $isexport = ($format !== 'html');
+        $extrafields = self::get_extrafields_row($row, $column);
 
         if ($isexport) {
-            return null;
+            return '';
         }
 
-        $extrafields = self::get_extrafields_row($row, $column);
+        if ((int)$extrafields->custom > 0) {
+            return '';
+        }
+
         $output = array();
+        $params = ['id' => $value, 'sesskey' => sesskey()];
 
         $output[] = $OUTPUT->action_icon(
-            new \moodle_url('/mod/facetoface/reports/rooms.php', array('roomid' => $value)),
-            new \pix_icon('t/calendar', get_string('details', 'mod_facetoface'))
+            new moodle_url('/mod/facetoface/room/edit.php', $params),
+            new flex_icon('edit', [
+                'alt' => get_string('editroom', 'mod_facetoface'),
+                'title' => get_string('editroom', 'mod_facetoface')
+            ])
         );
-
-        $output[] = $OUTPUT->action_icon(
-            new \moodle_url('/mod/facetoface/room/edit.php', array('id' => $value)),
-            new \pix_icon('t/edit', get_string('edit'))
-        );
-
         if ($extrafields->hidden && $report->src->get_embeddedurl()) {
-            $params = array_merge($report->src->get_urlparams(), array('action' => 'show', 'id' => $value, 'sesskey' => sesskey()));
+            $urlparams = array_merge(array_merge($params, ['action' => 'show']), $report->src->get_urlparams());
             $output[] = $OUTPUT->action_icon(
-                new \moodle_url($report->src->get_embeddedurl(), $params),
-                new \pix_icon('t/show', get_string('roomshow', 'mod_facetoface'))
+                new moodle_url($report->src->get_embeddedurl(), $urlparams),
+                new flex_icon('show', [
+                    'alt' => get_string('roomshow', 'mod_facetoface'),
+                    'title' => get_string('roomshow', 'mod_facetoface')
+                ])
             );
         } else if ($report->src->get_embeddedurl()) {
-            $params = array_merge($report->src->get_urlparams(), array('action' => 'hide', 'id' => $value, 'sesskey' => sesskey()));
+            $urlparams = array_merge(array_merge($params, ['action' => 'hide']), $report->src->get_urlparams());
             $output[] = $OUTPUT->action_icon(
-                new \moodle_url($report->src->get_embeddedurl(), $params),
-                new \pix_icon('t/hide', get_string('roomhide', 'mod_facetoface'))
+                new moodle_url($report->src->get_embeddedurl(), $urlparams),
+                new flex_icon('hide', [
+                    'alt' => get_string('roomhide', 'mod_facetoface'),
+                    'title' => get_string('roomhide', 'mod_facetoface')
+                ])
             );
 
         }
         if ($extrafields->cntdates) {
-            $output[] = $OUTPUT->pix_icon('t/delete_gray', get_string('currentlyassigned', 'mod_facetoface'), 'moodle', array('class' => 'disabled iconsmall'));
+            $output[] = $OUTPUT->flex_icon('trash', [
+                'classes' => 'ft-state-disabled',
+                'alt' => get_string('currentlyassigned', 'mod_facetoface'),
+                'title' => get_string('currentlyassigned', 'mod_facetoface')
+            ]);
         } else {
             $output[] = $OUTPUT->action_icon(
-                new \moodle_url('/mod/facetoface/room/manage.php', array('action' => 'delete', 'id' => $value)),
-                new \pix_icon('t/delete', get_string('delete'))
+                new moodle_url('/mod/facetoface/room/manage.php', array_merge($params, ['action' => 'delete'])),
+                new flex_icon('trash', ['alt' => get_string('delete'), 'title' => get_string('delete')])
             );
         }
-
         return implode('', $output);
     }
 

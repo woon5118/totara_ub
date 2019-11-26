@@ -23,27 +23,33 @@
 
 define('AJAX_SCRIPT', true);
 
-use \mod_facetoface\room;
-
 require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/totara/customfield/fieldlib.php');
+
+use mod_facetoface\room;
+use mod_facetoface\seminar;
+use mod_facetoface\room_helper;
+use mod_facetoface\seminar_event;
+use mod_facetoface\form\editroom as room_edit;
 
 $id = required_param('id', PARAM_INT);   // Room id.
 $facetofaceid = required_param('f', PARAM_INT);   // Face-to-face id.
 $sessionid = optional_param('s', 0, PARAM_INT);
 
-$seminar = new \mod_facetoface\seminar($facetofaceid);
+$seminar = new seminar($facetofaceid);
+$seminarevent = new seminar_event($sessionid);
 $cm = $seminar->get_coursemodule();
+$context = $seminar->get_contextmodule($cm->id);
 
-$seminarevent = new \mod_facetoface\seminar_event($sessionid);
 if (!$seminarevent->exists()) {
     $seminarevent->set_facetoface($seminar->get_id());
 }
 
-$context = context_module::instance($cm->id);
 ajax_require_login($seminar->get_course(), false, $cm, false, true);
-require_capability('mod/facetoface:editevents', $context);
+if (!has_capability('mod/facetoface:manageadhocrooms', $context)) {
+    throw new required_capability_exception($context, $capability, 'nopermissions');
+}
 require_sesskey();
 
 if ($id) {
@@ -52,7 +58,6 @@ if ($id) {
     if (!$room->get_custom()) {
         throw new coding_exception('Site wide room must be edited from the Site administration > Seminar > Room menu');
     }
-
     if (!$room->is_available(0, 0, $seminarevent)) {
         // They should never get here, any error will do.
         print_error('Error: Room is unavailable in this seminar event');
@@ -67,16 +72,11 @@ send_headers('text/html; charset=utf-8', false);
 $PAGE->set_context($context);
 $PAGE->set_url('/mod/facetoface/room/ajax/room_edit.php', ['id' => $id, 'f' => $facetofaceid]);
 
-// We don't need autosave here
-$editoropts = $TEXTAREA_OPTIONS;
-$editoropts['autosave'] = false;
-
-$customdata = ['room' => $room, 'seminar' => $seminar, 'seminarevent' => $seminarevent, 'editoroptions' => $editoropts];
-$form = new \mod_facetoface\form\editroom(null, $customdata, 'post', '', array('class' => 'dialog-nobind'), true, null, 'mform_modal');
+$customdata = ['room' => $room, 'seminar' => $seminar, 'seminarevent' => $seminarevent];
+$form = new room_edit(null, $customdata, 'post', '', array('class' => 'dialog-nobind'), true, null, 'mform_modal');
 
 if ($data = $form->get_data()) {
-    $data->custom = empty($data->notcustom);
-    $room = \mod_facetoface\room_helper::save($data);
+    $room = room_helper::save($data);
     echo json_encode(
         ['id' => $room->get_id(), 'name' => $room->get_name(), 'custom' => (int)$room->get_custom(), 'capacity' => $room->get_capacity()]
     );

@@ -52,16 +52,12 @@ final class room_helper {
     public static function save(\stdClass $data): room {
         global $TEXTAREA_OPTIONS;
 
-        $custom = $data->custom ?? false; // $data->custom is not always passed
+        $data->custom = $data->notcustom ? 0 : 1;
+
         if ($data->id) {
             $room = new room($data->id);
-            if (!$custom && $room->get_custom()) {
-                $room->publish();
-            } else {
-                // NOTE: Do nothing if the room is already published because we can't unpublish it
-            }
         } else {
-            if ($custom) {
+            if (isset($data->custom) && $data->custom == 1) {
                 $room = room::create_custom_room();
             } else {
                 $room = new room();
@@ -71,7 +67,11 @@ final class room_helper {
         $room->set_allowconflicts($data->allowconflicts);
         $room->set_capacity($data->roomcapacity);
         $room->set_url($data->url);
+        if (empty($data->custom)) {
+            $room->publish();
+        }
 
+        // We need to make sure the room exists before formatting the customfields and description.
         if (!$room->exists()) {
             $room->save();
         }

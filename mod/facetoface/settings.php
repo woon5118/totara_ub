@@ -349,8 +349,8 @@ $settings = new admin_externalpage('modfacetofacetemplates', new lang_string('no
 $ADMIN->add('modfacetofacefolder', $settings);
 
 // Assets.
-$url = new moodle_url('/mod/facetoface/asset/manage.php');
-$settings = new admin_externalpage('modfacetofaceassets', new lang_string('assets','facetoface'), $url, 'totara/core:modconfig');
+$url = new moodle_url('/mod/facetoface/asset/manage.php', ['published' => 0]);
+$settings = new admin_externalpage('modfacetofaceassets', new lang_string('assets','facetoface'), $url, 'mod/facetoface:managesitewideassets');
 $ADMIN->add('modfacetofacefolder', $settings);
 
 // Facilitators.
@@ -359,8 +359,8 @@ $settings = new admin_externalpage('modfacetofacefacilitators', new lang_string(
 $ADMIN->add('modfacetofacefolder', $settings);
 
 // Rooms.
-$url = new moodle_url('/mod/facetoface/room/manage.php');
-$settings = new admin_externalpage('modfacetofacerooms', new lang_string('rooms','facetoface'), $url, 'totara/core:modconfig');
+$url = new moodle_url('/mod/facetoface/room/manage.php', ['published' => 0]);
+$settings = new admin_externalpage('modfacetofacerooms', new lang_string('rooms','facetoface'), $url, 'mod/facetoface:managesitewiderooms');
 $ADMIN->add('modfacetofacefolder', $settings);
 
 // Tell core we already added the settings structure.

@@ -256,7 +256,6 @@ M.totara_f2f_room = M.totara_f2f_room || {
      */
     init_rooms: function() {
         var url = this.url;
-
         /**
          * Create DOM for room with attached action buttons and handlers.
          * @param data room data (name, custom, etc)
@@ -266,7 +265,8 @@ M.totara_f2f_room = M.totara_f2f_room || {
         var render_room_item = function(data, $input, offset) {
             var $elem = $('<li class="roomname" id="roomname' + offset + '_' + data.id + '" data-roomid="' + data.id + '" data-custom="' + data.custom + '" data-capacity="' + data.capacity + '">' + data.name + '</li>');
             require(['core/templates'], function(templates) {
-                if (Number(data.custom) > 0) {
+                var manageadhocrooms = Number(data.custom) > 0 && Boolean(M.totara_f2f_room.config.manageadhocrooms);
+                if (manageadhocrooms) {
                     var $editbutton = $('<a href="#"></a>');
                     $editbutton.click(function(e) {
                         e.preventDefault();
@@ -279,9 +279,8 @@ M.totara_f2f_room = M.totara_f2f_room || {
                         $editbutton.html(html);
                     });
                 }
-
                 var $deletebutton = $('<a href="#"></a>');
-                $deletebutton.click(function(e) {
+                $deletebutton.click(function (e) {
                     e.preventDefault();
                     var $li = $deletebutton.closest('li');
                     var delid = $li.data('roomid') + "";
@@ -293,7 +292,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
                     }
                     $li.remove();
                     var min = 0;
-                    ids.forEach(function(id) {
+                    ids.forEach(function (id) {
                         var li = $('#roomname' + offset + '_' + id);
                         var current = Number(li.data().capacity);
                         if (min === 0 || (min > current && current > 0)) {
@@ -309,17 +308,14 @@ M.totara_f2f_room = M.totara_f2f_room || {
             });
             return $elem;
         };
-
         // Select room dialog.
         $('.show-selectrooms-dialog').each(function() {
             var offset = $(this).data('offset');
             var $roomlist = $('#roomlist' + offset);
             var $input = $('input[name="roomids[' + offset + ']"]');
-
             if ($('input[name="datedelete[' + offset + ']"]').val() > 0) {
                 return;
             }
-
             // Init rooms.
             function load_rooms() {
                 var inititems = $input.val();
@@ -474,7 +470,6 @@ M.totara_f2f_room = M.totara_f2f_room || {
      */
     init_assets: function() {
         var url = this.url;
-
         /**
          * Create DOM for asset with attached action buttons and handlers.
          * @param data asset data (name, custom, etc)
@@ -484,7 +479,8 @@ M.totara_f2f_room = M.totara_f2f_room || {
         var render_asset_item = function(data, $input, offset) {
             var $elem = $('<li class="assetname" id="assetname' + offset + '_' + data.id + '" data-assetid="' + data.id + '" data-custom="' + data.custom + '">' + data.name + '</li>');
             require(['core/templates'], function (templates) {
-                if (Number(data.custom) > 0) {
+                var manageadhocassets = Number(data.custom) > 0 && Boolean(M.totara_f2f_room.config.manageadhocassets);
+                if (manageadhocassets) {
                     var $editbutton = $('<a href="#"></a>');
                     $editbutton.click(function(e) {
                         e.preventDefault();
@@ -497,9 +493,8 @@ M.totara_f2f_room = M.totara_f2f_room || {
                         $editbutton.html(html);
                     });
                 }
-
                 var $deletebutton = $('<a href="#"></a>');
-                $deletebutton.click(function(e) {
+                $deletebutton.click(function (e) {
                     e.preventDefault();
                     var $li = $deletebutton.closest('li');
                     var delid = $li.data('assetid') + "";
@@ -518,17 +513,14 @@ M.totara_f2f_room = M.totara_f2f_room || {
             });
             return $elem;
         };
-
         // Select assets dialog.
         $('.show-selectassets-dialog').each(function() {
             var offset = $(this).data('offset');
             var $assetlist = $('#assetlist' + offset);
             var $input = $('input[name="assetids[' + offset + ']"]');
-
             if ($('input[name="datedelete[' + offset + ']"]').val() > 0) {
                 return;
             }
-
             // Init assets.
             function load_assets() {
                 var inititems = $input.val();
@@ -636,7 +628,6 @@ M.totara_f2f_room = M.totara_f2f_room || {
                 handler.oldLoad(response);
                 var context = $(".ui-dialog [id^='selectassets'][id$='-dialog']"),
                     height = context.height() - $('.dialog-footer', context).outerHeight();
-
                 $('.select', context).outerHeight(height);
             };
 
@@ -670,7 +661,6 @@ M.totara_f2f_room = M.totara_f2f_room || {
      */
     init_facilitators: function() {
         var url = this.url;
-
         /**
          * Create DOM for facilitator with attached action buttons and handlers.
          * @param data facilitator data (name, custom, etc)
@@ -696,31 +686,23 @@ M.totara_f2f_room = M.totara_f2f_room || {
                         $editbutton.html(html);
                     });
                 }
-                var managefacilitators = false;
-                if (Number(data.custom) > 0) {
-                    managefacilitators = Boolean(M.totara_f2f_room.config.manageadhocfacilitators);
-                } else {
-                    managefacilitators = Boolean(M.totara_f2f_room.config.managesitewidefacilitators);
-                }
-                if (managefacilitators) {
-                    var $deletebutton = $('<a href="#"></a>');
-                    $deletebutton.click(function (e) {
-                        e.preventDefault();
-                        var $li = $deletebutton.closest('li');
-                        var delid = $li.data('facilitatorid') + "";
-                        var ids = $input.val().split(',');
-                        var index = ids.indexOf(delid);
-                        if (index > -1) {
-                            ids.splice(index, 1);
-                            $input.val(ids.join());
-                        }
-                        $li.remove();
-                    });
-                    $elem.append($deletebutton);
-                    templates.renderIcon('delete', M.util.get_string('delete', 'totara_core')).done(function (html) {
-                        $deletebutton.html(html);
-                    });
-                }
+                var $deletebutton = $('<a href="#"></a>');
+                $deletebutton.click(function (e) {
+                    e.preventDefault();
+                    var $li = $deletebutton.closest('li');
+                    var delid = $li.data('facilitatorid') + "";
+                    var ids = $input.val().split(',');
+                    var index = ids.indexOf(delid);
+                    if (index > -1) {
+                        ids.splice(index, 1);
+                        $input.val(ids.join());
+                    }
+                    $li.remove();
+                });
+                $elem.append($deletebutton);
+                templates.renderIcon('delete', M.util.get_string('delete', 'totara_core')).done(function (html) {
+                    $deletebutton.html(html);
+                });
             });
             return $elem;
         };
@@ -730,11 +712,9 @@ M.totara_f2f_room = M.totara_f2f_room || {
             var offset = $(this).data('offset');
             var $facilitatorlist = $('#facilitatorlist' + offset);
             var $input = $('input[name="facilitatorids[' + offset + ']"]');
-
             if ($('input[name="datedelete[' + offset + ']"]').val() > 0) {
                 return;
             }
-
             // Init facilitators.
             function load_facilitators() {
                 var inititems = $input.val();

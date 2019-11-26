@@ -28,28 +28,36 @@ class rb_facetoface_assets_embedded extends rb_base_embedded {
         $this->shortname = 'facetoface_assets';
         $this->fullname = get_string('embedded:seminarassets', 'mod_facetoface');
         $this->columns = array(
-            array('type' => 'asset', 'value' => 'name', 'heading' => null),
+            array('type' => 'asset', 'value' => 'namelink', 'heading' => null),
             array('type' => 'asset', 'value' => 'allowconflicts', 'heading' => null),
+            array('type' => 'asset', 'value' => 'published', 'heading' => null),
             array('type' => 'asset', 'value' => 'visible', 'heading' => null),
             array('type' => 'asset', 'value' => 'actions', 'heading' => null)
         );
 
         $this->filters = array(
             array('type' => 'asset', 'value' => 'name', 'advanced' => 0),
-            array('type' => 'asset', 'value' => 'assetavailable', 'advanced' => 0)
+            array('type' => 'asset', 'value' => 'assetavailable', 'advanced' => 0),
+            array('type' => 'asset', 'value' => 'published', 'advanced' => 0, 'defaultvalue' => ['value' => 0])
         );
 
+        if (isset($data['published']) && $data['published'] !== false) {
+            $this->embeddedparams['published'] = $data['published'];
+        }
+
         $this->contentmode = REPORT_BUILDER_CONTENT_MODE_NONE;
-
-        // Only show published.
-        $this->embeddedparams = array('custom' => '0');
-
 
         parent::__construct();
     }
 
+    /**
+     * Check if the user is capable of accessing this report.
+     * @param int $reportfor userid of the user that this report is being generated for
+     * @param reportbuilder $report the report object - can use get_param_value to get params
+     * @return boolean true if the user can access this report
+     */
     public function is_capable($reportfor, $report) {
         $context = context_system::instance();
-        return has_capability('totara/core:modconfig', $context, $reportfor);
+        return has_capability('mod/facetoface:managesitewideassets', $context, $reportfor);
     }
 }

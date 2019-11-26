@@ -23,14 +23,15 @@
 
 namespace mod_facetoface\form;
 
+defined('MOODLE_INTERNAL') || die();
+
 use html_writer;
 use mod_facetoface\facilitator;
 use mod_facetoface\facilitator_user;
 use mod_facetoface\facilitator_type;
+use mod_facetoface\facilitator_helper;
 use mod_facetoface\customfield_area\facetofacefacilitator as facilitatorcustomfield;
 use mod_facetoface\seminar_event;
-
-defined('MOODLE_INTERNAL') || die();
 
 class facilitator_edit extends \moodleform {
     /**
@@ -48,14 +49,12 @@ class facilitator_edit extends \moodleform {
         /** @var \mod_facetoface\seminar_event $seminarevent */
         $seminarevent = empty($this->_customdata['seminarevent']) ? null : $this->_customdata['seminarevent'];
 
-        $context = empty($this->_customdata['context']) ? \context_system::instance() : $this->_customdata['context'];
-        $capability = has_capability('mod/facetoface:managesitewidefacilitators', $context);
-        $adhoc = empty($this->_customdata['context']) ? true : $this->_customdata['adhoc'];
-
         $prefix = $filearea = facilitatorcustomfield::get_area_name();
         $tblprefix = facilitatorcustomfield::get_prefix();
         $component = facilitatorcustomfield::get_component();
         $syscontext = facilitatorcustomfield::get_context();
+
+        $facilitatornamelength = \mod_facetoface\facilitator::FACILITATOR_NAME_LENGTH;
 
         $mform->addElement('hidden', 'id', $facilitator->get_id());
         $mform->setType('id', PARAM_INT);
@@ -64,15 +63,20 @@ class facilitator_edit extends \moodleform {
             $mform->addElement('hidden', 'f', $seminar->get_id());
             $mform->setType('f', PARAM_INT);
         }
+
         if (!empty($seminarevent)) {
             $mform->addElement('hidden', 's', $seminarevent->get_id());
             $mform->setType('s', PARAM_INT);
         }
 
-        $mform->addElement('text', 'name', get_string('facilitatorname', 'facetoface'), ['size' => '45']);
+        // Facilitator name.
+        $mform->addElement('text', 'name', get_string('facilitatorname', 'mod_facetoface'), ['size' => '45']);
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
+        $mform->addRule('name', get_string('facilitatornameedittoolong', 'mod_facetoface', $facilitatornamelength), 'maxlength', $facilitatornamelength);
 
+        // Facilitator type/user.
+        $adhoc = $this->_customdata['adhoc'];
         if (!$adhoc && !defined('AJAX_SCRIPT') || !AJAX_SCRIPT) {
             $class = '';
             if ((bool)$facilitator->get_userid()) {
@@ -98,10 +102,13 @@ class facilitator_edit extends \moodleform {
             $mform->setType('userid', PARAM_INT);
         }
 
+        // Allow booking conflicts.
         $mform->addElement('advcheckbox', 'allowconflicts', get_string('allowfacilitatorconflicts', 'mod_facetoface'));
         $mform->addHelpButton('allowconflicts', 'allowfacilitatorconflicts', 'mod_facetoface');
         $mform->setType('allowconflicts', PARAM_INT);
 
+        // Publish for reuse by other events.
+        $capability = has_capability('mod/facetoface:managesitewidefacilitators', \context_system::instance());
         if ($capability and !empty($seminar) and $facilitator->get_custom()) {
             $mform->addElement('advcheckbox', 'notcustom', get_string('addfacilitatortositewidelist', 'mod_facetoface'));
             $mform->addHelpButton('notcustom', 'addfacilitatortositewidelist', 'mod_facetoface');
@@ -113,11 +120,13 @@ class facilitator_edit extends \moodleform {
         // We don't need autosave here
         $editoropts = $TEXTAREA_OPTIONS;
         $editoropts['autosave'] = false;
-        
+        // Facilitator description.
         $mform->addElement('editor', 'description_editor', get_string('descriptionlabel', 'mod_facetoface'), null, $editoropts);
 
+        // Facilitator custom fields.
         customfield_definition($mform, (object)['id' => $facilitator->get_id()], $prefix, 0, $tblprefix);
 
+        // Version control.
         if ($facilitator->exists()) {
             $mform->addElement('header', 'versions', get_string('versioncontrol', 'mod_facetoface'));
 
@@ -125,11 +134,9 @@ class facilitator_edit extends \moodleform {
             $created->user = get_string('unknownuser');
             $usercreated = $facilitator->get_usercreated();
             if (!empty($usercreated)) {
-                $user = \mod_facetoface\facetoface_user::get_user($usercreated);
-                $created->user = \html_writer::link(
-                    new \moodle_url('/user/view.php', array('id' => $facilitator->get_usercreated())),
-                    fullname($user)
-                );
+                $url = user_get_profile_url($usercreated);
+                $fullname = fullname(\core_user::get_user($usercreated));
+                $created->user = $url ? html_writer::link($url, $fullname) : html_writer::span($fullname);
             }
             $created->time = empty($facilitator->get_timecreated()) ? '' : userdate($facilitator->get_timecreated());
             $mform->addElement(
@@ -144,11 +151,9 @@ class facilitator_edit extends \moodleform {
                 $modified->user = get_string('unknownuser');
                 $usermodified = $facilitator->get_usermodified();
                 if (!empty($usermodified)) {
-                    $user = \mod_facetoface\facetoface_user::get_user($usermodified);
-                    $modified->user = \html_writer::link(
-                        new \moodle_url('/user/view.php', array('id' => $usermodified)),
-                        fullname($user)
-                    );
+                    $url = user_get_profile_url($usermodified);
+                    $fullname = fullname(\core_user::get_user($usermodified));
+                    $modified->user = $url ? html_writer::link($url, $fullname) : html_writer::span($fullname);
                 }
                 $modified->time = empty($facilitator->get_timemodified()) ? '' : userdate($facilitator->get_timemodified());
                 $mform->addElement(
@@ -159,7 +164,7 @@ class facilitator_edit extends \moodleform {
                 );
             }
         }
-
+        // Buttons.
         if (empty($seminar)) {
             $label = null;
             if (!$facilitator->exists()) {
@@ -167,7 +172,7 @@ class facilitator_edit extends \moodleform {
             }
             $this->add_action_buttons(true, $label);
         }
-
+        // Set default/existing data.
         $formdata = (object)[
             'id' => $facilitator->get_id(),
             'userid' => $facilitator->get_userid(),
@@ -213,10 +218,10 @@ class facilitator_edit extends \moodleform {
         // New one.
         if ((int)$data->id == 0) {
             if ((int)$data->userid == 0) {
-                return \mod_facetoface\facilitator_helper::save($data);
+                return facilitator_helper::save($data);
             } else {
                 if (facilitator_user::is_userid_active((int)$data->userid)) {
-                    return \mod_facetoface\facilitator_helper::save($data);
+                    return facilitator_helper::save($data);
                 } else {
                     \core\notification::warning(get_string('facilitatoruserdeleted', 'mod_facetoface'));
                     return false;
@@ -230,14 +235,14 @@ class facilitator_edit extends \moodleform {
             // And also for $oldfacilitator->get_userid() == 0 && (int)$data->userid == 0
             // Nothing change for user record, still same user.
             // All good, just lets save the record.
-            return \mod_facetoface\facilitator_helper::save($data);
+            return facilitator_helper::save($data);
         }
         if ($oldfacilitator->get_userid() > 0 && (int)$data->userid == 0) {
-            return \mod_facetoface\facilitator_helper::save($data);
+            return facilitator_helper::save($data);
         }
         if ($oldfacilitator->get_userid() == 0 && (int)$data->userid > 0) {
             if (facilitator_user::is_userid_active((int)$data->userid)) {
-                return \mod_facetoface\facilitator_helper::save($data);
+                return facilitator_helper::save($data);
             } else {
                 \core\notification::warning(get_string('facilitatoruserdeleted', 'mod_facetoface'));
                 return false;
@@ -257,7 +262,7 @@ class facilitator_edit extends \moodleform {
         $transaction = $DB->start_delegated_transaction();
 
         $data->id = 0;
-        $newfacilitator = \mod_facetoface\facilitator_helper::save($data);
+        $newfacilitator = facilitator_helper::save($data);
 
         $sql = "SELECT DISTINCT ffd.*
                   FROM {facetoface_facilitator_dates} ffd

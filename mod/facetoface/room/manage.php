@@ -22,46 +22,61 @@
  * @package mod_facetoface
  */
 
-use mod_facetoface\room;
-
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
+
+use mod_facetoface\room;
 
 $id = optional_param('id', 0, PARAM_INT);
 $action = optional_param('action', '', PARAM_ALPHA);
 $confirm = optional_param('confirm', 0, PARAM_BOOL);
 $debug = optional_param('debug', 0, PARAM_INT);
 $sid = optional_param('sid', '0', PARAM_INT);
+$published = optional_param('published', false, PARAM_INT);
 
+$baseurl = new moodle_url('/mod/facetoface/room/manage.php');
 // Check permissions.
-admin_externalpage_setup('modfacetofacerooms');
+if (is_siteadmin()) {
+    admin_externalpage_setup('modfacetofacerooms', '', null, $baseurl);
+} else {
+    $context = context_system::instance();
+    $PAGE->set_pagelayout('standard');
+    $PAGE->set_context($context);
+    $PAGE->set_url($baseurl);
+    require_login(0, false);
+    require_capability('mod/facetoface:managesitewiderooms', $context);
+}
+$PAGE->set_title(get_string('managerooms', 'mod_facetoface'));
 
-$returnurl = new moodle_url('/admin/settings.php', array('section' => 'modsettingfacetoface'));
-
-$config = new rb_config();
-$config->set_sid($sid);
+$config = (new rb_config())->set_sid($sid)->set_embeddata(['published' => $published]);
 $report = reportbuilder::create_embedded('facetoface_rooms', $config);
-$redirectto = new moodle_url('/mod/facetoface/room/manage.php', $report->get_current_url_params());
 
 // Handle actions.
 if ($action === 'delete') {
     if (empty($id)) {
-        print_error('error:roomdoesnotexist', 'facetoface', $returnurl);
+        redirect($baseurl, get_string('error:roomdoesnotexist', 'mod_facetoface'), null, \core\notification::ERROR);
     }
 
     $room = new room($id);
     if ($room->get_custom()) {
-        print_error('error:roomnotpublished', 'facetoface', $returnurl);
+        redirect($baseurl, get_string('error:roomnotpublished', 'mod_facetoface'), null, \core\notification::ERROR);
     }
     if ($room->is_used()) {
-        print_error('error:roomisinuse', 'facetoface', $returnurl);
+        redirect($baseurl, get_string('error:roomisinuse', 'mod_facetoface'), null, \core\notification::ERROR);
     }
 
     if (!$confirm) {
         echo $OUTPUT->header();
-        $confirmurl = new moodle_url($redirectto, array('action' => 'delete', 'id' => $id, 'confirm' => 1, 'sesskey' => sesskey()));
-        echo $OUTPUT->confirm(get_string('deleteroomconfirm', 'facetoface', format_string($room->get_name())), $confirmurl, $redirectto);
+        $confirmurl = new moodle_url(
+            new moodle_url('/mod/facetoface/room/manage.php'),
+            ['action' => 'delete', 'id' => $id, 'confirm' => 1, 'sesskey' => sesskey()]
+        );
+        echo $OUTPUT->confirm(
+            get_string('deleteroomconfirm', 'mod_facetoface', format_string($room->get_name())),
+            $confirmurl,
+            $baseurl
+        );
         echo $OUTPUT->footer();
         die;
     }
@@ -69,41 +84,35 @@ if ($action === 'delete') {
     require_sesskey();
     $room->delete();
     unset($room);
+    redirect($baseurl, get_string('roomdeleted', 'mod_facetoface'), null, \core\notification::SUCCESS);
 
-    \core\notification::success(get_string('roomdeleted', 'facetoface'));
-    redirect($redirectto);
 } else if ($action === 'show') {
     if (empty($id)) {
-        print_error('error:roomdoesnotexist', 'facetoface', $returnurl);
+        redirect($baseurl, get_string('error:roomdoesnotexist', 'mod_facetoface'), null, \core\notification::ERROR);
     }
 
     require_sesskey();
     $room = new room($id);
     if ($room->get_custom()) {
-        print_error('error:roomnotpublished', 'facetoface', $returnurl);
+        redirect($baseurl, get_string('error:roomnotpublished', 'mod_facetoface'), null, \core\notification::ERROR);
     }
-
     $room->show();
     $room->save();
+    redirect($baseurl, get_string('roomshown', 'mod_facetoface'), null, \core\notification::SUCCESS);
 
-    \core\notification::success(get_string('roomshown', 'facetoface'));
-    redirect($redirectto);
 } else if ($action === 'hide') {
     if (empty($id)) {
-        print_error('error:roomdoesnotexist', 'facetoface', $returnurl);
+        redirect($baseurl, get_string('error:roomdoesnotexist', 'mod_facetoface'), null, \core\notification::ERROR);
     }
 
     require_sesskey();
     $room = new room($id);
     if ($room->get_custom()) {
-        print_error('error:roomnotpublished', 'facetoface', $returnurl);
+        redirect($baseurl, get_string('error:roomnotpublished', 'mod_facetoface'), null, \core\notification::ERROR);
     }
-
     $room->hide();
     $room->save();
-
-    \core\notification::success(get_string('roomhidden', 'facetoface'));
-    redirect($redirectto);
+    redirect($baseurl, get_string('roomhidden', 'mod_facetoface'), null, \core\notification::SUCCESS);
 }
 
 $PAGE->set_button($report->edit_button() . $PAGE->button);
@@ -115,7 +124,7 @@ echo $OUTPUT->header();
 $report->include_js();
 $report->display_restrictions();
 
-echo $OUTPUT->heading(get_string('managerooms', 'facetoface'));
+echo $OUTPUT->heading(get_string('managerooms', 'mod_facetoface'));
 
 // This must be done after the header and before any other use of the report.
 list($reporthtml, $debughtml) = $reportrenderer->report_html($report, $debug);
@@ -128,10 +137,7 @@ $report->display_search();
 $report->display_sidebar_search();
 echo $reporthtml;
 
-$addurl = new moodle_url('/mod/facetoface/room/edit.php');
-
 echo $OUTPUT->container_start('buttons');
-echo $OUTPUT->single_button($addurl, get_string('addnewroom', 'facetoface'), 'get');
+echo $OUTPUT->single_button(new moodle_url('/mod/facetoface/room/edit.php'), get_string('addnewroom', 'mod_facetoface'), 'post');
 echo $OUTPUT->container_end();
-
 echo $OUTPUT->footer();

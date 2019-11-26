@@ -25,8 +25,7 @@ global $CFG;
 require_once($CFG->dirroot . '/mod/facetoface/rb_sources/rb_facetoface_base_source.php');
 require_once($CFG->dirroot . '/totara/customfield/field/location/define.class.php');
 
-class rb_source_facetoface_asset extends rb_facetoface_base_source
-{
+class rb_source_facetoface_asset extends rb_facetoface_base_source {
     /**
      * Url of embedded report required for certain actions
      * @var string
@@ -86,8 +85,6 @@ class rb_source_facetoface_asset extends rb_facetoface_base_source
             'assigned.assetid = base.id',
             REPORT_BUILDER_RELATION_ONE_TO_MANY
         );
-
-
         return $joinlist;
     }
 
@@ -105,13 +102,16 @@ class rb_source_facetoface_asset extends rb_facetoface_base_source
                     'noexport' => true,
                     'nosort' => true,
                     'joins' => 'assigned',
-                    'capability' => 'totara/core:modconfig',
-                    'extrafields' => array('hidden' => 'base.hidden', 'cntdates' => 'assigned.cntdates'),
+                    'capability' => 'mod/facetoface:managesitewideassets',
                     'displayfunc' => 'f2f_asset_actions',
-                    'hidden' => false
+                    'hidden' => false,
+                    'extrafields' => array(
+                        'hidden' => 'base.hidden',
+                        'cntdates' => 'assigned.cntdates',
+                        'custom' => 'base.custom',
+                    ),
                 )
         );
-
         return $columnoptions;
     }
 
@@ -119,6 +119,7 @@ class rb_source_facetoface_asset extends rb_facetoface_base_source
         $filteroptions = array();
 
         $this->add_assets_fields_to_filters($filteroptions);
+
         $filteroptions[] = new rb_filter_option(
             'asset',
             'assetavailable',
@@ -127,7 +128,6 @@ class rb_source_facetoface_asset extends rb_facetoface_base_source
             array(),
             'base.id'
         );
-
         return $filteroptions;
     }
 
@@ -143,6 +143,10 @@ class rb_source_facetoface_asset extends rb_facetoface_base_source
             ),
             array(
                 'type' => 'asset',
+                'value' => 'published'
+            ),
+            array(
+                'type' => 'asset',
                 'value' => 'visible'
             ),
             array(
@@ -150,7 +154,6 @@ class rb_source_facetoface_asset extends rb_facetoface_base_source
                 'value' => 'allowconflicts'
             )
         );
-
         return $defaultcolumns;
     }
 
@@ -159,18 +162,23 @@ class rb_source_facetoface_asset extends rb_facetoface_base_source
             array(
                 'type' => 'asset',
                 'value' => 'name'
-            )
+            ),
+            array(
+                'type' => 'asset',
+                'value' => 'assetavailable'
+            ),
         );
-
         return $defaultfilters;
     }
 
     protected function define_paramoptions() {
         // this is where you set your hardcoded filters
         $paramoptions = array(
-            new rb_param_option('custom', 'base.custom')
+            new rb_param_option(
+                'published',
+                'base.custom'
+            )
         );
-
         return $paramoptions;
     }
 

@@ -986,10 +986,27 @@ function facetoface_extend_settings_navigation(settings_navigation $settings, na
         $facetofacenode->add(get_string('declareinterestreport', 'facetoface'), new moodle_url('/mod/facetoface/reports/interests.php', array('facetofaceid' => $PAGE->cm->instance)), navigation_node::TYPE_SETTING);
     }
 
+    $context = context_system::instance();
+    if (has_capability('mod/facetoface:managesitewideassets', $context)) {
+        $facetofacenode->add(
+            get_string('assets', 'mod_facetoface'),
+            new moodle_url('/mod/facetoface/asset/manage.php', ['published' => 0]),
+            navigation_node::TYPE_SETTING
+        );
+    }
+
     if (has_capability('mod/facetoface:managesitewidefacilitators', $context)) {
         $facetofacenode->add(
             get_string('facilitators', 'mod_facetoface'),
             new moodle_url('/mod/facetoface/facilitator/manage.php', ['published' => 0]),
+            navigation_node::TYPE_SETTING
+        );
+    }
+
+    if (has_capability('mod/facetoface:managesitewiderooms', $context)) {
+        $facetofacenode->add(
+            get_string('rooms', 'mod_facetoface'),
+            new moodle_url('/mod/facetoface/room/manage.php', ['published' => 0]),
             navigation_node::TYPE_SETTING
         );
     }

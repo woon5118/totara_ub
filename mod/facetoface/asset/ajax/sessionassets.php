@@ -115,7 +115,7 @@ $dialog = new \seminar_dialog_content();
 $dialog->baseurl = '/mod/facetoface/asset/ajax/sessionassets.php';
 $dialog->proxy_dom_data(array('id', 'custom', 'fullname'));
 $dialog->type = \totara_dialog_content::TYPE_CHOICE_MULTI;
-$dialog->manageadhoc = true;
+$dialog->manageadhoc = has_capability('mod/facetoface:manageadhocassets', $context);
 $dialog->items = $allassets;
 $dialog->disabled_items = $unavailableassets;
 $dialog->selected_items = $selectedassets;

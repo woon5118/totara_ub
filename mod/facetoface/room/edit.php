@@ -21,54 +21,55 @@
  * @package mod_facetoface
  */
 
-use mod_facetoface\room;
-
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/totara/customfield/fieldlib.php');
 
+use \core\notification;
+use mod_facetoface\room;
+use mod_facetoface\room_helper;
+use mod_facetoface\form\editroom as room_edit;
+
 $id = optional_param('id', 0, PARAM_INT);
 
-admin_externalpage_setup('modfacetofacerooms', '', ['id' => $id], '/mod/facetoface/room/edit.php');
-
-$room = new room($id);
-
-$roomlisturl = new moodle_url('/mod/facetoface/room/manage.php');
-
-if ($room->get_custom()) {
-    \core\notification::error(get_string('error:incorrectroomid', 'mod_facetoface'));
-    redirect($roomlisturl);
+$params = ['id' => $id];
+$baseurl = new moodle_url('/mod/facetoface/room/edit.php', $params);
+// Check permissions.
+if (is_siteadmin()) {
+    admin_externalpage_setup('modfacetofacerooms', '', null, $baseurl);
+} else {
+    $context = context_system::instance();
+    $PAGE->set_pagelayout('standard');
+    $PAGE->set_context($context);
+    $PAGE->set_url($baseurl);
+    require_login(0, false);
+    require_capability('mod/facetoface:managesitewiderooms', $context);
 }
 
-// We don't need autosave here
-$editoropts = $TEXTAREA_OPTIONS;
-$editoropts['autosave'] = false;
+$room = new room($id);
+$returnurl = new moodle_url('/mod/facetoface/room/manage.php', $params);
 
-$customdata = ['room' => $room, 'editoroptions' => $editoropts];
-$mform = new \mod_facetoface\form\editroom(null, $customdata, 'post', '', array('class' => 'dialog-nobind'), true, null, 'mform_modal');
+if ($room->get_custom()) {
+    redirect($returnurl, get_string('error:incorrectroomid', 'mod_facetoface'), null, notification::ERROR);
+}
+
+$mform = new room_edit(null, ['room' => $room], 'post', '', ['class' => 'dialog-nobind'], true, null, 'mform_modal');
 
 if ($mform->is_cancelled()) {
-    redirect($roomlisturl);
+    redirect($returnurl);
 }
 
 if ($data = $mform->get_data()) {
-    $room = \mod_facetoface\room_helper::save($data);
-    $message = $id ? get_string('roomupdatesuccess', 'facetoface') : get_string('roomcreatesuccess', 'facetoface');
-    \core\notification::success($message);
-    redirect($roomlisturl);
+    $room = room_helper::save($data);
+    $message = $id ? get_string('roomupdatesuccess', 'mod_facetoface') : get_string('roomcreatesuccess', 'mod_facetoface');
+    redirect($returnurl, $message, null, notification::SUCCESS);
 }
 
-if ($id == 0) {
-    $pageheading = get_string('addroom', 'facetoface');
-} else {
-    $pageheading = get_string('editroom', 'facetoface');
-}
-
+$pageheading = $id ? get_string('editroom', 'mod_facetoface') : get_string('addroom', 'mod_facetoface');
+$PAGE->set_title($pageheading);
 echo $OUTPUT->header();
-
 echo $OUTPUT->heading($pageheading);
 
 $mform->display();
-
 echo $OUTPUT->footer();

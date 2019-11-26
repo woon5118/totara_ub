@@ -103,7 +103,7 @@ Feature: Manage custom facilitators by non-admin user
     Then I should see "woof"
     And I press "Save changes"
     When I navigate to "Facilitators" node in "Site administration > Seminars"
-    And I click on "Details" "link" in the "woof" "table_row"
+    And I click on "woof" "link"
     Then I should see image with alt text "hello"
 
   Scenario: Confirm the custom facilitator is available after event cancellation
@@ -128,6 +128,7 @@ Feature: Manage custom facilitators by non-admin user
     And I press "Save changes"
     And "Cancel event" "link" should exist in the "Upcoming" "table_row"
 
+    And I click on "Actions" "button" in the "Upcoming" "table_row"
     When I click on "Cancel event" "link" in the "Upcoming" "table_row"
     Then I should see "Cancelling event in Seminar 21495"
     And I press "Yes"

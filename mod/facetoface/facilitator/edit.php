@@ -30,12 +30,24 @@ use \core\notification;
 use mod_facetoface\facilitator;
 use mod_facetoface\facilitator_user;
 use mod_facetoface\facilitator_type;
+use mod_facetoface\form\facilitator_edit;
 use mod_facetoface\output\seminar_dialog_selected;
 
 $id = optional_param('id', 0, PARAM_INT);
-$baseurl = new moodle_url('/mod/facetoface/facilitator/edit.php', ['id' => $id]);
 
-admin_externalpage_setup('modfacetofacefacilitators', '', null, $baseurl);
+$params = ['id' => $id];
+$baseurl = new moodle_url('/mod/facetoface/facilitator/edit.php', $params);
+// Check permissions.
+if (is_siteadmin()) {
+    admin_externalpage_setup('modfacetofacefacilitators', '', null, $baseurl);
+} else {
+    $context = context_system::instance();
+    $PAGE->set_pagelayout('standard');
+    $PAGE->set_context($context);
+    $PAGE->set_url($baseurl);
+    require_login(0, false);
+    require_capability('mod/facetoface:managesitewidefacilitators', $context);
+}
 
 $facilitator = new facilitator($id);
 $returnurl = new moodle_url('/mod/facetoface/facilitator/manage.php');
@@ -74,7 +86,7 @@ $PAGE->requires->js_init_call('M.totara_seminar_facilitator.init', [$args], fals
 
 $facilitator = new facilitator_user($facilitator);
 $customdata = ['facilitator' => $facilitator, 'adhoc' => false];
-$mform = new \mod_facetoface\form\facilitator_edit(null, $customdata, 'post', '', ['class' => 'manage_facilitator dialog-nobind'], true, null, 'mform_modal');
+$mform = new facilitator_edit(null, $customdata, 'post', '', ['class' => 'manage_facilitator dialog-nobind'], true, null, 'mform_modal');
 
 if ($mform->is_cancelled()) {
     redirect($returnurl);
@@ -82,20 +94,18 @@ if ($mform->is_cancelled()) {
 
 if ($data = $mform->get_data()) {
     $facilitator = $mform->save($data);
-    $message = $id ? get_string('facilitatorcreatesuccess', 'mod_facetoface') : get_string('facilitatorupdatesuccess', 'mod_facetoface');
+    $message = $id ? get_string('facilitatorupdatesuccess', 'mod_facetoface') : get_string('facilitatorcreatesuccess', 'mod_facetoface');
     redirect($returnurl, $message, null, notification::SUCCESS);
 }
 
-if ($id == 0) {
-    $pageheading = get_string('addfacilitator', 'mod_facetoface');
-} else {
-    $pageheading = get_string('editfacilitator', 'mod_facetoface');
-}
-
+$pageheading = $id ? get_string('editfacilitator', 'mod_facetoface') : get_string('addfacilitator', 'mod_facetoface');
+$PAGE->set_title($pageheading);
 echo $OUTPUT->header();
 echo $OUTPUT->heading($pageheading);
+
 if ((bool)$facilitator->get_userid() && !facilitator_user::is_userid_active($facilitator->get_userid())) {
     notification::warning(get_string('facilitatoruserwarning', 'mod_facetoface', $facilitator->get_fullname()));
 }
+
 $mform->display();
 echo $OUTPUT->footer();

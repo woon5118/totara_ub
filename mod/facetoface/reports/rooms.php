@@ -21,11 +21,11 @@
  * @package mod_facetoface
  */
 
-use mod_facetoface\room;
-
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/mod/facetoface/rb_sources/rb_facetoface_summary_room_embedded.php');
+
+use \mod_facetoface\room;
 
 $roomid = optional_param('roomid', 0, PARAM_INT);
 $backurl = optional_param('b', '', PARAM_URL);
@@ -35,13 +35,21 @@ $sid = optional_param('sid', '0', PARAM_INT);
 
 require_login(0, false);
 
-$systemcontext = context_system::instance();
-$PAGE->set_context($systemcontext);
-
-$baseurl = new moodle_url('/mod/facetoface/reports/rooms.php', array('debug' => $debug));
+$params = [
+    'roomid' => $roomid,
+    'debug' => $debug,
+    'popup' => $popup,
+    'sid' => $sid,
+];
+$baseurl = new moodle_url('/mod/facetoface/reports/rooms.php', $params);
 $PAGE->set_url($baseurl);
-if ($popup) {
+$systemcontext = context_system::instance();
+if (!$popup) {
+    admin_externalpage_setup('modfacetofacerooms', '', null, $baseurl);
+} else {
     $PAGE->set_pagelayout('popup');
+    $PAGE->set_url($baseurl);
+    $PAGE->set_context($systemcontext);
 }
 
 if (!$roomid) {
@@ -51,8 +59,6 @@ if (!$roomid) {
     echo $OUTPUT->footer();
     exit();
 }
-
-$room = new room($roomid);
 
 $report = null;
 if (rb_facetoface_summary_room_embedded::is_capable_static($USER->id)) {
@@ -65,14 +71,14 @@ if (rb_facetoface_summary_room_embedded::is_capable_static($USER->id)) {
     if (!$report) {
         print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
     }
-
-    $PAGE->set_button($report->edit_button());
+    if (!$popup) {
+        $PAGE->set_button($report->edit_button());
+    }
 }
+$room = new room($roomid);
 
 $title = get_string('viewroom', 'facetoface');
 $PAGE->set_title($title);
-
-$PAGE->set_heading($title);
 
 echo $OUTPUT->header();
 /** @var mod_facetoface_renderer $renderer */
@@ -80,38 +86,32 @@ $renderer = $PAGE->get_renderer('mod_facetoface');
 $renderer->setcontext($systemcontext);
 
 echo $renderer->heading($PAGE->title);
-
 echo $renderer->render_room_details($room);
 
 if ($report) {
-    $report->display_restrictions();
-
-    echo $renderer->heading(get_string('upcomingsessionsinroom', 'facetoface'));
-
     /** @var totara_reportbuilder_renderer $reportrenderer */
     $reportrenderer = $PAGE->get_renderer('totara_reportbuilder');
-
     // This must be done after the header and before any other use of the report.
     list($reporthtml, $debughtml) = $reportrenderer->report_html($report, $debug);
     echo $debughtml;
-
+    $report->display_restrictions();
+    echo $renderer->heading(get_string('upcomingsessionsinroom', 'mod_facetoface'));
     echo $reportrenderer->print_description($report->description, $report->_id);
-
     // Print saved search options and filters.
     $report->display_saved_search_options();
     $report->display_search();
     $report->display_sidebar_search();
     echo $reporthtml;
-
     if (!$popup && !empty($backurl)) {
-        echo $renderer->single_button($backurl, get_string('goback', 'facetoface'), 'get');
+        echo $renderer->single_button($backurl, get_string('goback', 'mod_facetoface'), 'get');
     }
-
-    if (!$popup && has_capability('mod/facetoface:addinstance', $systemcontext)) {
-        echo $renderer->single_button(new moodle_url('/mod/facetoface/room/manage.php'), get_string('backtorooms', 'facetoface'), 'get');
+    if (!$popup && has_capability('mod/facetoface:managesitewiderooms', $systemcontext)) {
+        echo $renderer->single_button(
+            new moodle_url('/mod/facetoface/room/manage.php', ['published' => 0]),
+            get_string('backtorooms', 'mod_facetoface'),
+            'get'
+        );
     }
-
     $report->include_js();
 }
-
 echo $renderer->footer();

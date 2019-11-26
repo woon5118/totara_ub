@@ -59,7 +59,7 @@ class f2f_asset_name_link extends base {
         $extrafields = self::get_extrafields_row($row, $column);
 
         return \html_writer::link(
-            new \moodle_url('/mod/facetoface/asset/manage.php', array('assetid' => $extrafields->assetid)),
+            new \moodle_url('/mod/facetoface/reports/assets.php', array('assetid' => $extrafields->assetid)),
             $value
         );
     }

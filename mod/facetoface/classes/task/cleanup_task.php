@@ -22,11 +22,13 @@
  */
 
 namespace mod_facetoface\task;
+
 use mod_facetoface\room;
 use mod_facetoface\asset;
 use mod_facetoface\seminar_event;
 use mod_facetoface\signup_helper;
 use mod_facetoface\signup;
+use mod_facetoface\facilitator;
 
 /**
  * Send facetoface notifications
@@ -85,6 +87,7 @@ class cleanup_task extends \core\task\scheduled_task {
         $rs->close();
         $this->remove_unused_custom_rooms();
         $this->remove_unused_custom_assets();
+        $this->remove_unused_custom_facilitators();
     }
 
     /**
@@ -149,6 +152,38 @@ class cleanup_task extends \core\task\scheduled_task {
             // Do a proper asset removal including files and custom fields.
             $asset = new asset($assetid);
             $asset->delete();
+        }
+    }
+
+    /**
+     * Delete old custom facilitators that are no longer used (not available to be chosen by non-creators).
+     */
+    protected function remove_unused_custom_facilitators() {
+        global $DB;
+
+        // First remove invalid links between facilitators and dates.
+        $sql = "SELECT ffd.id
+                  FROM {facetoface_facilitator_dates} ffd
+             LEFT JOIN {facetoface_sessions_dates} fsd ON (fsd.id = ffd.sessionsdateid)
+                 WHERE fsd.id IS NULL";
+        $dateids = $DB->get_fieldset_sql($sql);
+        foreach ($dateids as $dateid) {
+            $DB->delete_records('facetoface_facilitator_dates', array('id' => $dateid));
+        }
+
+        // Now delete all old unused custom facilitators.
+        $sql = "SELECT ff.id
+                  FROM {facetoface_facilitator} ff
+             LEFT JOIN {facetoface_facilitator_dates} ffd ON (ffd.facilitatorid = ff.id)
+                 WHERE ffd.id IS NULL AND ff.custom = 1 AND ff.timecreated < :old";
+
+        // Allow one day for unassigned facilitator as it can be just created and not stored in seminar session yet.
+        $facilitatorids = $DB->get_fieldset_sql($sql, array('old' => time() - 86400));
+
+        foreach ($facilitatorids as $facilitatorid) {
+            // Do a proper facilitator removal including files and custom fields.
+            $facilitator = new facilitator($facilitatorid);
+            $facilitator->delete();
         }
     }
 }

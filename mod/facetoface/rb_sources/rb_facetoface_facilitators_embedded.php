@@ -61,6 +61,6 @@ class rb_facetoface_facilitators_embedded extends rb_base_embedded {
      */
     public function is_capable($reportfor, $report): bool {
         $context = context_system::instance();
-        return has_any_capability(['mod/facetoface:managesitewidefacilitators', 'mod/facetoface:manageadhocfacilitators'], $context, $reportfor);
+        return has_capability('mod/facetoface:managesitewidefacilitators', $context, $reportfor);
     }
 }

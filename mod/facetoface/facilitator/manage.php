@@ -21,20 +21,13 @@
 * @package mod_facetoface
 */
 
-namespace mod_facetoface\facilitator;
-
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
 use mod_facetoface\facilitator;
-use moodle_url;
-use rb_config;
-use reportbuilder;
-use totara_reportbuilder_renderer;
 
 $id = optional_param('id', 0, PARAM_INT);
-$f = optional_param('f', 0, PARAM_INT);
 $action = optional_param('action', '', PARAM_ALPHA);
 $confirm = optional_param('confirm', 0, PARAM_BOOL);
 $debug = optional_param('debug', 0, PARAM_INT);
@@ -42,13 +35,21 @@ $sid = optional_param('sid', '0', PARAM_INT);
 $published = optional_param('published', false, PARAM_INT);
 
 $baseurl = new moodle_url('/mod/facetoface/facilitator/manage.php');
-
 // Check permissions.
-admin_externalpage_setup('modfacetofacefacilitators', '', null, $baseurl);
+if (is_siteadmin()) {
+    admin_externalpage_setup('modfacetofacefacilitators', '', null, $baseurl);
+} else {
+    $context = context_system::instance();
+    $PAGE->set_pagelayout('standard');
+    $PAGE->set_context($context);
+    $PAGE->set_url($baseurl);
+    require_login(0, false);
+    require_capability('mod/facetoface:managesitewidefacilitators', $context);
+}
+$PAGE->set_title(get_string('managefacilitators', 'mod_facetoface'));
 
 $config = (new rb_config())->set_sid($sid)->set_embeddata(['published' => $published]);
 $report = reportbuilder::create_embedded('facetoface_facilitators', $config);
-$baseurl->params($report->get_current_url_params());
 
 // Handle actions.
 if ($action === 'delete') {
@@ -57,7 +58,9 @@ if ($action === 'delete') {
     }
 
     $facilitator = new facilitator($id);
-
+    if ($facilitator->get_custom()) {
+        redirect($baseurl, get_string('error:facilitatornotpublished', 'mod_facetoface'), null, \core\notification::ERROR);
+    }
     if ($facilitator->is_used()) {
         redirect($baseurl, get_string('error:facilitatorisinuse', 'mod_facetoface'), null, \core\notification::ERROR);
     }
@@ -80,7 +83,6 @@ if ($action === 'delete') {
     require_sesskey();
     $facilitator->delete();
     unset($facilitator);
-
     redirect($baseurl, get_string('facilitatordeleted', 'mod_facetoface'), null, \core\notification::SUCCESS);
 
 } else if ($action === 'show') {
@@ -90,16 +92,12 @@ if ($action === 'delete') {
 
     require_sesskey();
     $facilitator = new facilitator($id);
-    if ($facilitator->can_show()) {
-        $facilitator->show();
-        $facilitator->save();
-        $msg = get_string('facilitatorshown', 'mod_facetoface');
-        $msttype = \core\notification::SUCCESS;
-    } else {
-        $msg = get_string('facilitatoruserdeleted', 'mod_facetoface');
-        $msttype = \core\notification::ERROR;
+    if (!$facilitator->can_show()) {
+        redirect($baseurl, get_string('facilitatoruserdeleted', 'mod_facetoface'), null, \core\notification::ERROR);
     }
-    redirect($baseurl, $msg, null, $msttype);
+    $facilitator->show();
+    $facilitator->save();
+    redirect($baseurl, get_string('facilitatorshown', 'mod_facetoface'), null, \core\notification::SUCCESS);
 
 } else if ($action === 'hide') {
     if (empty($id)) {
@@ -108,9 +106,11 @@ if ($action === 'delete') {
 
     require_sesskey();
     $facilitator = new facilitator($id);
+    if ($facilitator->get_custom()) {
+        redirect($baseurl, get_string('error:facilitatornotpublished', 'mod_facetoface'), null, \core\notification::ERROR);
+    }
     $facilitator->hide();
     $facilitator->save();
-
     redirect($baseurl, get_string('facilitatorhidden', 'mod_facetoface'), null, \core\notification::SUCCESS);
 }
 
@@ -136,10 +136,7 @@ $report->display_search();
 $report->display_sidebar_search();
 echo $reporthtml;
 
-$addurl = new moodle_url('/mod/facetoface/facilitator/edit.php');
-
 echo $OUTPUT->container_start('buttons');
-echo $OUTPUT->single_button($addurl, get_string('addnewfacilitator', 'mod_facetoface'), 'get');
+echo $OUTPUT->single_button(new moodle_url('/mod/facetoface/facilitator/edit.php'), get_string('addnewfacilitator', 'mod_facetoface'), 'post');
 echo $OUTPUT->container_end();
-
 echo $OUTPUT->footer();

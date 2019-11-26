@@ -19,6 +19,9 @@ Feature: Configure seminar settings
       | Custom full name      | Activity configurator |
       | contextlevel10        | 1                     |
       | totara/core:modconfig | 1                     |
+      | mod/facetoface:managesitewiderooms  | 1       |
+      | mod/facetoface:managesitewideassets | 1       |
+      | mod/facetoface:managesitewidefacilitators | 1 |
     And I click on "Create this role" "button"
     And the following "role assigns" exist:
       | user         | role         | contextlevel | reference |
@@ -45,3 +48,7 @@ Feature: Configure seminar settings
     When I navigate to "Assets" node in "Site administration > Seminars"
     And I click on "Add a new asset" "button"
     Then I should see "Asset name"
+
+    When I navigate to "Facilitators" node in "Site administration > Seminars"
+    And I click on "Add a new facilitator" "button"
+    Then I should see "Facilitator Name"

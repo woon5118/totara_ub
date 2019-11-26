@@ -144,7 +144,7 @@ Feature: Check facilitator details with all possible custom fields
     And I press "Add a facilitator"
 
     # Verify that the facilitator was created correctly.
-    When I click on "Details" "link"
+    When I click on "facilitator 1" "link"
     Then I should see "View facilitator"
     And I should see "facilitator 1"
     And I should see "150 Willis street"
