@@ -479,7 +479,6 @@ final class graphql {
      */
     public static function execute_operation(execution_context $ec, array $variables) {
         $schema = self::get_schema();
-        $schema->assertValid();
 
         $type = $ec->get_type();
         $operationname = $ec->get_operationname();
