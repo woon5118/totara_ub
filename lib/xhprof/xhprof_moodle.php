@@ -424,6 +424,7 @@ function profiling_list_controls($listurl) {
     $output = '<p class="centerpara buttons">';
     $output .= '&nbsp;<a href="import.php">[' . get_string('import', 'tool_profiling') . ']</a>';
     $output .= '</p>';
+    $output .= '<span class="clearfix"></span>';
 
     return $output;
 }
