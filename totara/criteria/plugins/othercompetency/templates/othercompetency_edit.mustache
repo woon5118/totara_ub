@@ -1,0 +1,116 @@
+{{!
+   This file is part of Totara LMS
+
+   Copyright (C) 2019 onwards Totara Learning Solutions LTD
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See  the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+   @author Marco Song <marco.song@totaralearning.com>
+   @package criteria_othercompetency
+}}
+{{!
+
+    @template criteria_othercompetency/othercompetency_edit
+
+    Template for management of Other Competency criteria
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+        * data-core-autoinitialise: State of this JS auto initilise
+        * data-core-autoinitialise-amd: AMD to be linked to template
+        * data-tw-criterionOtherCompetency: Target for course completion criterion
+        * data-tw-criterionOtherCompetency-detail: Target for detail section
+        * data-tw-criterionOtherCompetency-courses: Target for the courses section
+        * data-tw-criterionOtherCompetency-addCourses: Trigger for showing course adder
+        * data-tw-criterionOtherCompetency-error: Targets for error sections
+        * data-tw-criterionOtherCompetency-aggregation: Target for aggregation section
+        * data-tw-criterionOtherCompetency-aggregationMethod: int Section for the specific aggregation method
+        * data-tw-criterionOtherCompetency-aggregationMethod-changed: Trigger when aggregation settings changed
+        * data-tw-criterionOtherCompetency-aggregationCount: Section for ggregation required count
+        * data-tw-criterionOtherCompetency-aggregationCount-changed: Triger when arequired count changes
+
+    Context variables required for this template:
+        * key
+        * courses
+        * nocourses
+
+}}
+
+<div data-tw-criterionOtherCompetency=""
+     data-core-autoinitialise="true"
+     data-core-autoinitialise-amd="criteria_othercompetency/othercompetency"
+     data-tw-loader-target="">
+    <div data-tw-criterionOtherCompetency-detail="">
+        <div class="tw-criterion-label">
+            <span>{{#str}}competencies, criteria_othercompetency{{/str}}</span>
+        </div>
+        <div class="tw-criterion-value">
+            <div data-tw-criterionOtherCompetency-competencies="">
+            </div>
+
+            <div>
+                <a href="#" data-tw-criterionOtherCompetency-addCompetencies="">
+                    <span class="tw-criterion-smalltitle">
+                        {{#str}}addcompetencies, criteria_othercompetency{{/str}}
+                    </span>
+                </a>
+                <span class="tw-criterion-warning {{^nocompetencies}}tw-criterion-hidden{{/nocompetencies}}" data-tw-criterionOtherCompetency-error="nocompetencies">
+                    {{#flex_icon}}notification-warning{{/flex_icon}}
+                    {{#str}}error:nocompetencies, criteria_othercompetency{{/str}}
+                </span>
+                <span class="tw-criterion-warning {{^courseerror}}tw-criterion-hidden{{/courseerror}}" data-tw-criterionOtherCompetency-error="invalidcourse">
+                    {{#flex_icon}}notification-warning{{/flex_icon}}
+                    {{#str}}error:courseerror, criteria_othercompetency{{/str}}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div data-tw-criterionOtherCompetency-aggregation="">
+        <div class="tw-criterion-label">
+            <span>{{#str}}aggregation, totara_criteria{{/str}}</span>
+        </div>
+        <div class="tw-criterion-value">
+            <div data-tw-criterionOtherCompetency-aggregationMethod="1">
+                <input type="radio"
+                       id="tw_criterionOtherCompetency_agg_all__{{key}}"
+                       name="tw_criterionOtherCompetency_agg__{{key}}"
+                       value="1"
+                       data-tw-criterionOtherCompetency-aggregationMethod-changed="all"/>
+                <label for="tw_criterionOtherCompetency_agg_all__{{key}}"><span>{{#str}}completeall, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
+            </div>
+
+            <div data-tw-criterionOtherCompetency-aggregationMethod="2">
+                <div class="tw-criterion-inline">
+                    <input type="radio"
+                           id="tw_criterionOtherCompetency_agg_any__{{key}}"
+                           name="tw_criterionOtherCompetency_agg__{{key}}"
+                           value="2"
+                           data-tw-criterionOtherCompetency-aggregationMethod-changed="any"/>
+                    <label for="tw_criterionOtherCompetency_agg_any__{{key}}"><span>{{#str}}completeany, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
+                </div>
+
+                <div class="tw-criterion-inline" data-tw-criterionOtherCompetency-aggregationCount="">
+                    <input type="number"
+                           name="tw_criterionOtherCompetency_agg_count__{{key}}"
+                           value="1" min="0"
+                           data-tw-criterionOtherCompetency-aggregationCount-changed=""
+                           disabled="disabled"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
