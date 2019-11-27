@@ -212,6 +212,12 @@ final class graphql {
         return $schema;
     }
 
+    /**
+     * Get the schema based on all the existing graphqls files.
+     * If developer mode is not turned on the parsed schema will be cached to improve performance
+     *
+     * @return Schema
+     */
     protected static function get_parsed_schema(): Schema {
         global $CFG;
         // In debug mode we skip the caching
@@ -228,6 +234,11 @@ final class graphql {
 
         $schema = self::build_schema();
 
+        // Extending a schema is very expensive compared to building the schema
+        // in one BuildScheme::build() call. Unfortunately we cannot just concatenate
+        // all graphqls files as we rely on extending the core schema file.
+        // Printing the final schema and caching the result
+        // will make subsequent build calls possible without extending
         $parsed_schema = Parser::parse(SchemaPrinter::doPrint($schema));
         $cache->set('parsed_schema', AST::toArray($parsed_schema));
 
