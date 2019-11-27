@@ -38,7 +38,7 @@ if (!defined('GRAPHQL_DEVELOPMENT_MODE') or !GRAPHQL_DEVELOPMENT_MODE) {
     die;
 }
 
-$schemas = \totara_webapi\graphql::get_schema_file_contents();
-$schema = implode("\n\n", $schemas);
+$schema = \totara_webapi\graphql::get_schema();
+$schema = \GraphQL\Utils\SchemaPrinter::doPrint($schema);
 $forcedownload = !(defined('BEHAT_SITE_RUNNING') and BEHAT_SITE_RUNNING);
 send_file($schema, "totara.graphqls", null, 0, true, $forcedownload, 'text/plain');
