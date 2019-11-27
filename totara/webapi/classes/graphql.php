@@ -116,6 +116,10 @@ final class graphql {
         if ($handle = opendir($dir)) {
             while (false !== ($file_name = readdir($handle))) {
                 if (preg_match("/\\.graphqls$/", $file_name)) {
+                    $name = basename($file_name, '.graphqls');
+                    if ($name !== clean_param($name, PARAM_SAFEDIR)) {
+                        continue;
+                    }
                     $schema_files[] = "{$dir}/{$file_name}";
                 }
             }
