@@ -66,7 +66,7 @@ class totara_webapi_graphql_testcase extends advanced_testcase {
         }
     }
 
-    public function test_get_schema() {
+    public function test_schema_is_valid() {
         $schema = graphql::get_schema();
         $this->assertInstanceOf('GraphQL\Type\Schema', $schema);
 

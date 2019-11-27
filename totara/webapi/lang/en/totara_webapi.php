@@ -22,4 +22,5 @@
  */
 
 $string['cachedef_persistedoperations'] = 'Persisted GraphQL operations';
+$string['cachedef_schema'] = 'GraphQL schema';
 $string['pluginname'] = 'Web API';

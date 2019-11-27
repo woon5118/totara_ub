@@ -24,6 +24,12 @@
 namespace totara_webapi;
 
 use core\webapi\execution_context;
+use GraphQL\Language\Parser;
+use GraphQL\Type\Schema;
+use GraphQL\Utils\AST;
+use GraphQL\Utils\BuildSchema;
+use GraphQL\Utils\SchemaExtender;
+use GraphQL\Utils\SchemaPrinter;
 
 /**
  * Main GraphQL API intended for plugins such as External API or mobile support.
@@ -31,11 +37,11 @@ use core\webapi\execution_context;
 final class graphql {
 
     /**
-     * Returns all schema file contents
+     * Returns content of core schema file
      *
-     * @return string[]
+     * @return string
      */
-    public static function get_schema_file_contents() {
+    public static function get_core_schema_file_content(): string {
         global $CFG;
 
         // NOTE: Subsystems schemas are not supported intentionally,
@@ -47,11 +53,23 @@ final class graphql {
         if (!file_exists($root_schema_file) || !is_readable($root_schema_file)) {
             throw new \coding_exception('Core has to have at least a schema.graphqls file');
         }
-        $schemas = [self::get_schema_file_content($root_schema_file)];
+        return self::get_schema_file_content($root_schema_file);
+    }
+
+    /**
+     * Returns all schema file contents
+     *
+     * @return string[]
+     */
+    public static function get_schema_file_contents(): array {
+        global $CFG;
+
+        $schemas = [];
 
         // Add any additional files from core
         $filenames = self::get_graphqls_files($CFG->dirroot . '/lib/webapi');
         foreach ($filenames as $filename) {
+            // Core file is skipped as it is read separately
             if (preg_match("/\\/schema\\.graphqls$/", $filename)) {
                 continue;
             }
@@ -135,17 +153,7 @@ final class graphql {
      * @return \GraphQL\Type\Schema
      */
     public static function get_schema() {
-        $schemas = self::get_schema_file_contents();
-
-        // The first schema file always contains the basic types
-        $schema = \GraphQL\Utils\BuildSchema::build(array_shift($schemas));
-
-        // Merge all the rest together and extend the main schema
-        if (!empty($schemas)) {
-            $schemas = implode("\n", $schemas);
-            $extension = \GraphQL\Language\Parser::parse($schemas);
-            $schema = \GraphQL\Utils\SchemaExtender::extend($schema, $extension);
-        }
+        $schema = self::get_parsed_schema();
 
         // Hack custom scalars to use our parsing and serialisation.
         $scalars = \core_component::get_namespace_classes('webapi\scalar', 'core\webapi\scalar');
@@ -189,6 +197,49 @@ final class graphql {
         }
 
         return $schema;
+    }
+
+    protected static function get_parsed_schema(): Schema {
+        global $CFG;
+        // In debug mode we skip the caching
+        if ($CFG->debugdeveloper) {
+            return self::build_schema();
+        }
+
+        $cache = \cache::make('totara_webapi', 'schema');
+        $parsed_schema = $cache->get('parsed_schema');
+        if ($parsed_schema) {
+            $parsed_schema = AST::fromArray($parsed_schema);
+            return BuildSchema::build($parsed_schema);
+        }
+
+        $schema = self::build_schema();
+
+        $parsed_schema = Parser::parse(SchemaPrinter::doPrint($schema));
+        $cache->set('parsed_schema', AST::toArray($parsed_schema));
+
+        return $schema;
+    }
+
+    /**
+     * @return \GraphQL\Type\Schema
+     */
+    protected static function build_schema(): Schema {
+        $schema = self::get_core_schema_file_content();
+        if (empty($schema)) {
+            throw new \Exception('Core schema file content cannot be empty.');
+        }
+
+        // We need to build with the core schema file first as
+        // all other schema files will be treated as extension
+        $schema = \GraphQL\Utils\BuildSchema::build($schema);
+
+        $schemas = self::get_schema_file_contents();
+        if (empty($schemas)) {
+            throw new \Exception('Schema file contents cannot be empty.');
+        }
+
+        return SchemaExtender::extend($schema, Parser::parse(implode("\n", $schemas)));
     }
 
     /**

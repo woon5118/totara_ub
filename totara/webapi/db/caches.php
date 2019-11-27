@@ -22,9 +22,12 @@
  */
 
 $definitions = array(
-    // Used to store data for course categories visible to current user. Helps to browse list of categories.
     'persistedoperations' => array(
         'mode' => cache_store::MODE_REQUEST,
+        'simplekeys' => true,
+    ),
+    'schema' => array(
+        'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,
     ),
 );
