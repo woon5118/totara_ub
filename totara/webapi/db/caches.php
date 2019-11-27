@@ -21,13 +21,13 @@
  * @package totara_webapi
  */
 
-$definitions = array(
-    'persistedoperations' => array(
-        'mode' => cache_store::MODE_REQUEST,
-        'simplekeys' => true,
-    ),
-    'schema' => array(
+$definitions = [
+    'persistedoperations' => [
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,
-    ),
-);
+    ],
+    'schema' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+    ],
+];

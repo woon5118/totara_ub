@@ -126,25 +126,38 @@ final class graphql {
      * @return array
      */
     public static function get_graphqls_files(string $dir): array {
+        return self::get_files_from_dir($dir, 'graphqls');
+    }
+
+    /**
+     * Get all files with given extension from directory
+     *
+     * @param string $dir
+     * @param string $extension
+     * @return array
+     */
+    protected static function get_files_from_dir(string $dir, string $extension): array {
         if (!file_exists($dir) || !is_readable($dir) || !is_dir($dir)) {
             return [];
         }
 
-        $schema_files = [];
+        // We could use glob() but using open/readdir is more performant
+        $files = [];
         if ($handle = opendir($dir)) {
             while (false !== ($file_name = readdir($handle))) {
-                if (preg_match("/\\.graphqls$/", $file_name)) {
-                    $name = basename($file_name, '.graphqls');
+                if (preg_match("/\\.{$extension}$/", $file_name)) {
+                    $name = basename($file_name, ".{$extension}");
                     if ($name !== clean_param($name, PARAM_SAFEDIR)) {
                         continue;
                     }
-                    $schema_files[] = "{$dir}/{$file_name}";
+                    $files[$name] = "{$dir}/{$file_name}";
                 }
             }
 
             closedir($handle);
         }
-        return $schema_files;
+
+        return $files;
     }
 
     /**
@@ -255,65 +268,55 @@ final class graphql {
             throw new \coding_exception('Invalid operation type');
         }
 
+        if ($CFG->debugdeveloper) {
+            return self::build_persisted_operations_array($type);
+        }
+
         $cache = \cache::make('totara_webapi', 'persistedoperations');
         $operations = $cache->get($type);
-        if ($operations) {
-            return $operations;
+        if (!$operations) {
+            $operations = self::build_persisted_operations_array($type);
+            $cache->set($type, $operations);
         }
 
-        $operations = array();
+        return $operations;
+    }
 
-        $files = glob($CFG->libdir . '/webapi/' . $type . '/*.graphql');
-        if ($files) {
-            foreach ($files as $file) {
-                $name = basename($file, '.graphql');
-                if ($name !== clean_param($name, PARAM_SAFEDIR)) {
-                    continue;
-                }
-                $operationname = 'core_' . $name;
-                $operations[$operationname] = $CFG->libdir . '/webapi/' . $type . '/' . $name . '.graphql';
+    /**
+     * Build array containing all persisted operations for the given type
+     * @param string $type
+     * @return array
+     */
+    protected static function build_persisted_operations_array(string $type): array {
+        global $CFG;
+
+        $operations = [];
+
+        $files = self::get_files_from_dir($CFG->libdir . '/webapi/' . $type, 'graphql');
+        foreach ($files as $name => $file) {
+            $operation_name = 'core_' . $name;
+            $operations[$operation_name] = $file;
+        }
+
+        foreach (\core_component::get_core_subsystems() as $subsystem => $full_dir) {
+            $files = self::get_files_from_dir($full_dir . '/webapi/' . $type, 'graphql');
+            foreach ($files as $name => $file) {
+                $operation_name = 'core_' . $subsystem . '_' . $name;
+                $operations[$operation_name] = $file;
             }
         }
 
-        foreach (\core_component::get_core_subsystems() as $subsystem => $fulldir) {
-            if (!file_exists($fulldir . '/webapi/' . $type . '/')) {
-                continue;
-            }
-            $files = glob($fulldir . '/webapi/' . $type . '/*.graphql');
-            if ($files) {
-                foreach ($files as $file) {
-                    $name = basename($file, '.graphql');
-                    if ($name !== clean_param($name, PARAM_SAFEDIR)) {
-                        continue;
-                    }
-                    $operationname = 'core_' . $subsystem . '_' . $name;
-                    $operations[$operationname] = $fulldir . '/webapi/' . $type . '/' . $name . '.graphql';
+        $plugin_types = \core_component::get_plugin_types();
+        foreach ($plugin_types as $plugin_type => $unused) {
+            $plugins = \core_component::get_plugin_list($plugin_type);
+            foreach ($plugins as $plugin => $full_dir) {
+                $files = self::get_files_from_dir($full_dir . '/webapi/' . $type, 'graphql');
+                foreach ($files as $name => $file) {
+                    $operation_name = $plugin_type . '_' . $plugin . '_' . $name;
+                    $operations[$operation_name] = $file;
                 }
             }
         }
-
-        $plugintypes = \core_component::get_plugin_types();
-        foreach ($plugintypes as $plugintype => $unused) {
-            $plugins = \core_component::get_plugin_list($plugintype);
-            foreach ($plugins as $plugin => $fulldir) {
-                if (!file_exists($fulldir . '/webapi/' . $type . '/')) {
-                    continue;
-                }
-                $files = glob($fulldir . '/webapi/' . $type . '/*.graphql');
-                if ($files) {
-                    foreach ($files as $file) {
-                        $name = basename($file, '.graphql');
-                        if ($name !== clean_param($name, PARAM_SAFEDIR)) {
-                            continue;
-                        }
-                        $operationname = $plugintype . '_' . $plugin . '_' . $name;
-                        $operations[$operationname] = $fulldir . '/webapi/' . $type . '/' . $name . '.graphql';
-                    }
-                }
-            }
-        }
-
-        $cache->set($type, $operations);
 
         return $operations;
     }
