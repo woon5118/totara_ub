@@ -95,6 +95,11 @@ abstract class manager {
             return;
         }
 
+        if (PHPUNIT_TEST and \phpunit_util::is_redirecting_hooks()) {
+            \phpunit_util::hook_executed($hook);
+            return;
+        }
+
         foreach (self::$allwatchers[$hookname] as $watcher) {
             if (isset($watcher->includefile) and file_exists($watcher->includefile)) {
                 include_once($watcher->includefile);
