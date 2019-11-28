@@ -122,11 +122,11 @@ class reportbuilder {
     const FILTER = 1;
     const FILTERALL = 2;
 
-    /**
-     * Used to represent the different methods of fetching results and counts for a report.
-     */
+    /** @deprecated */
     const FETCHMETHOD_DATABASE_RECOMMENDATION = 0;
+    /** @deprecated */
     const FETCHMETHOD_STANDARD_RECORDSET = 1;
+    /** @deprecated */
     const FETCHMETHOD_COUNTED_RECORDSET = 2;
 
     /** Disable global restrictions in report */
@@ -273,22 +273,6 @@ class reportbuilder {
      * @var bool
      */
     public $useclonedb;
-
-    /**
-     * Sets how data and counts are collected for the report.
-     *
-     * Values:
-     *   - FETCHMETHOD_COUNTED_RECORDSET: Counted recordsets will be used, allowing counts to be collected when counting records.
-     *   - FETCHMETHOD_STANDARD_RECORDSET: A standard recordset will be used to get data, and a separate query will be executed to get counts.
-     *   - FETCHMETHOD_DATABASE_RECOMMENDATION: Use the system default, which if not set uses the database recommendation (recommended)
-     *
-     * Don't access this property outside of the Report Builder API.
-     * It should be considered private. It is public only because of the report form requirements.
-     *
-     * @internal
-     * @var int
-     */
-    private $fetchmethod = null;
 
     /**
      * Factory method for creating instance of report (both user and embedded reports ids are allowed).
@@ -493,9 +477,6 @@ class reportbuilder {
         if ($this->is_ready()) {
             throw new coding_exception('This report instance cannot be initialised any more.');
         }
-
-        // Set default fetch method for this report.
-        $this->fetchmethod = self::get_default_fetch_method();
 
         // Load restriction set.
         if (!empty($CFG->enableglobalrestrictions)) {
@@ -3846,54 +3827,25 @@ class reportbuilder {
     }
 
     /**
-     * Returns the fetch method this report should use.
+     * Do not use.
      *
-     * @return int One of self::FETCHMETHOD_*
+     * @deprecated
+     *
+     * @return int Always returns FETCHMETHOD_STANDARD_RECORDSET.
      */
     private function get_fetch_method() {
-        global $DB;
-
-        $value = $this->fetchmethod;
-
-        if ($value === self::FETCHMETHOD_STANDARD_RECORDSET) {
-            return self::FETCHMETHOD_STANDARD_RECORDSET;
-        }
-        if ($value === self::FETCHMETHOD_COUNTED_RECORDSET) {
-            return self::FETCHMETHOD_COUNTED_RECORDSET;
-        }
-
-        $default = self::get_default_fetch_method();
-        if ($default === self::FETCHMETHOD_STANDARD_RECORDSET) {
-            return self::FETCHMETHOD_STANDARD_RECORDSET;
-        }
-        if ($default === self::FETCHMETHOD_COUNTED_RECORDSET) {
-            return self::FETCHMETHOD_COUNTED_RECORDSET;
-        }
-
-        if ($DB->recommends_counted_recordset()) {
-            return self::FETCHMETHOD_COUNTED_RECORDSET;
-        }
-
         return self::FETCHMETHOD_STANDARD_RECORDSET;
     }
 
     /**
-     * Returns the default fetch method for report builder reports.
+     * Do not use
      *
-     * @return int One of self::FETCHMETHOD_*
+     * @deprecated
+     *
+     * @return int Always returns FETCHMETHOD_STANDARD_RECORDSET.
      */
     public static function get_default_fetch_method() {
-        $default = get_config('totara_reportbuilder', 'defaultfetchmethod');
-        if ($default !== false) {
-            $default = (int)$default;
-            if ($default === self::FETCHMETHOD_STANDARD_RECORDSET) {
-                return self::FETCHMETHOD_STANDARD_RECORDSET;
-            }
-            if ($default === self::FETCHMETHOD_COUNTED_RECORDSET) {
-                return self::FETCHMETHOD_COUNTED_RECORDSET;
-            }
-        }
-        return self::FETCHMETHOD_DATABASE_RECOMMENDATION;
+        return self::FETCHMETHOD_STANDARD_RECORDSET;
     }
 
     /**
@@ -4781,8 +4733,7 @@ class reportbuilder {
                 $records = $this->get_data(
                     $this->get_report_sort($table),
                     0,
-                    $graph->get_max_records(),
-                    self::FETCHMETHOD_STANDARD_RECORDSET
+                    $graph->get_max_records()
                 );
                 foreach ($records as $record) {
                     $graph->add_record($record);
@@ -4823,54 +4774,10 @@ class reportbuilder {
     }
 
     /**
-     * Gets a counted recordset for the given query, or displays a friendly error.
-     *
-     * Wrapped into a separate function so that we can ensure that all errors given when producing the data are friendly.
-     *
-     * @deprecated since Totara 13 as it is no longer needed. See get_data_for_table();
-     * @since Totara 2.7.29, 2.9.21, 9.9, 10
-     * @throws moodle_exception If the report query fails a moodle_exception with a friendly message is generated instead
-     *      of a dml_read_exception.
-     * @param string $sql
-     * @param array $params
-     * @param int $limitfrom
-     * @param int $limitnum
-     * @param bool $setfilteredcount If set to true after fetching the recordset the filtered count for this report will be set.
-     *      By proxy if the fitlered count is set and there are no filters applied then the full count will also be set.
-     * @return counted_recordset
-     */
-    private function get_counted_recordset_sql($sql, array $params = null, $limitfrom = 0, $limitnum = 0, $setfilteredcount = false) {
-        global $CFG;
-
-        try {
-
-            $reportdb = $this->get_report_db();
-            $recordset = $reportdb->get_counted_recordset_sql($sql, $params, $limitfrom, $limitnum);
-
-        } catch (dml_read_exception $e) {
-
-            // We are wrapping this exception to provide a more user friendly error message.
-            if ($this->is_cached()) {
-                $message = 'error:problemobtainingcachedreportdata';
-            } else {
-                $message = 'error:problemobtainingreportdata';
-            }
-            throw new moodle_exception($message, 'totara_reportbuilder', '', $e->getMessage(), $e->debuginfo);
-
-        }
-
-        if ($setfilteredcount) {
-            $this->set_filtered_count($recordset->get_count_without_limits());
-        }
-
-        return $recordset;
-    }
-
-    /**
      * Returns a recordset containing data suitable for use in the given totara_table.
      *
      * @param totara_table $table
-     * @return moodle_recordset|counted_recordset
+     * @return moodle_recordset
      */
     private function get_data_for_table(totara_table $table): moodle_recordset {
         $orderby = $this->get_report_sort($table);
@@ -4892,26 +4799,16 @@ class reportbuilder {
      * @param string $orderby
      * @param int $limitfrom
      * @param int $limitnum
-     * @param int $method One of self::FETCHMETHOD_USE_*
-     * @return moodle_recordset|counted_recordset
+     * @param int $ignoredmethod
+     * @return moodle_recordset
      */
-    private function get_data(string $orderby = '', int $limitfrom = 0, int $limitnum = 0, int $method = null): moodle_recordset {
+    private function get_data(string $orderby = '', int $limitfrom = 0, int $limitnum = 0, int $ignoredmethod = null): moodle_recordset {
         list($sql, $params, $cache) = $this->build_query(false, true);
         $sql .= $orderby;
 
-        if ($method === null) {
-            $method = $this->get_fetch_method();
-        }
-
         try {
             $reportdb = $this->get_report_db();
-            if ($method === self::FETCHMETHOD_COUNTED_RECORDSET) {
-                // This also sets the filtered count so that when we use it later it doesn't execute the query again!
-                $recordset = $reportdb->get_counted_recordset_sql($sql, $params, $limitfrom, $limitnum, $count);
-                $this->set_filtered_count($count);
-            } else {
-                $recordset = $reportdb->get_recordset_sql($sql, $params, $limitfrom, $limitnum);
-            }
+            $recordset = $reportdb->get_recordset_sql($sql, $params, $limitfrom, $limitnum);
         } catch (dml_exception $e) {
             // We are wrapping this exception to provide a more user friendly error message.
             if ($this->is_cached()) {

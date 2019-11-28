@@ -644,5 +644,13 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019101500, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2019102301) {
+        // Remove unused setting.
+        unset_config('defaultfetchmethod', 'totara_reportbuilder');
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2019102301, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

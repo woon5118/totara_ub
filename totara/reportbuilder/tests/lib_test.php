@@ -1636,18 +1636,10 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
 
     }
 
+    /**
+     * @deprecated
+     */
     public function test_get_fetchmethod() {
-        global $DB;
-
-        $this->resetAfterTest(true);
-
-        $default = reportbuilder::FETCHMETHOD_STANDARD_RECORDSET;
-        if ($DB->recommends_counted_recordset()) {
-            $default = reportbuilder::FETCHMETHOD_COUNTED_RECORDSET;
-        }
-        $plugin = 'totara_reportbuilder';
-        $setting = 'defaultfetchmethod';
-
         $method = new ReflectionMethod(reportbuilder::class, 'get_fetch_method');
         $method->setAccessible(true);
 
@@ -1655,59 +1647,13 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $config = new rb_config();
         $report = reportbuilder::create($rid, $config);
 
-        self::assertEmpty(get_config($plugin, $setting));
-        self::assertSame($default, $method->invoke($report));
-
-        set_config($setting, reportbuilder::FETCHMETHOD_DATABASE_RECOMMENDATION, $plugin);
-        $report = reportbuilder::create($rid, $config);
-        self::assertSame($default, $method->invoke($report));
-
-        set_config($setting, reportbuilder::FETCHMETHOD_COUNTED_RECORDSET, $plugin);
-        $report = reportbuilder::create($rid, $config);
-        self::assertSame(reportbuilder::FETCHMETHOD_COUNTED_RECORDSET, $method->invoke($report));
-
-        set_config($setting, reportbuilder::FETCHMETHOD_STANDARD_RECORDSET, $plugin);
-        $report = reportbuilder::create($rid, $config);
-        self::assertSame(reportbuilder::FETCHMETHOD_STANDARD_RECORDSET, $method->invoke($report));
-
-        set_config($setting, -1, $plugin);
-        $report = reportbuilder::create($rid, $config);
-        self::assertSame($default, $method->invoke($report));
-
-        set_config($setting, 3, $plugin);
-        $report = reportbuilder::create($rid, $config);
-        self::assertSame($default, $method->invoke($report));
-
-        set_config($setting, 'trust', $plugin);
-        $report = reportbuilder::create($rid, $config);
-        self::assertSame($default, $method->invoke($report));
+        self::assertSame(1, $method->invoke($report));
     }
 
+    /**
+     * @deprecated
+     */
     public function test_get_default_fetch_method() {
-        $plugin = 'totara_reportbuilder';
-        $setting = 'defaultfetchmethod';
-
-        self::assertEmpty(get_config($plugin, $setting));
-        self::assertSame(reportbuilder::FETCHMETHOD_DATABASE_RECOMMENDATION, reportbuilder::get_default_fetch_method());
-
-        set_config($setting, reportbuilder::FETCHMETHOD_DATABASE_RECOMMENDATION, $plugin);
-        self::assertSame(reportbuilder::FETCHMETHOD_DATABASE_RECOMMENDATION, reportbuilder::get_default_fetch_method());
-
-        set_config($setting, reportbuilder::FETCHMETHOD_COUNTED_RECORDSET, $plugin);
-        self::assertSame(reportbuilder::FETCHMETHOD_COUNTED_RECORDSET, reportbuilder::get_default_fetch_method());
-
-        set_config($setting, reportbuilder::FETCHMETHOD_STANDARD_RECORDSET, $plugin);
-        self::assertSame(reportbuilder::FETCHMETHOD_STANDARD_RECORDSET, reportbuilder::get_default_fetch_method());
-
-        set_config($setting, -1, $plugin);
-        self::assertSame(reportbuilder::FETCHMETHOD_DATABASE_RECOMMENDATION, reportbuilder::get_default_fetch_method());
-
-        set_config($setting, 3, $plugin);
-        self::assertSame(reportbuilder::FETCHMETHOD_DATABASE_RECOMMENDATION, reportbuilder::get_default_fetch_method());
-
-        set_config($setting, 'trust', $plugin);
-        self::assertSame(reportbuilder::FETCHMETHOD_DATABASE_RECOMMENDATION, reportbuilder::get_default_fetch_method());
-
-        unset_config($setting, $plugin);
+        self::assertSame(1, reportbuilder::get_default_fetch_method());
     }
 }

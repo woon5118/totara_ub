@@ -159,19 +159,6 @@ class mariadb_native_moodle_database extends mysqli_native_moodle_database {
     }
 
     /**
-     * Returns true as MariaDB testing showed that for the queries tested 2 queries was faster than a counted recordset.
-     *
-     * Testing showed that MariaDB 10.2, 10.3, and 10.4 when using counted recordsets performed quicker than two independent queries
-     * on a paginated recordset.
-     * For results on performance testing of paginated results see parent class.
-     *
-     * @return bool
-     */
-    public function recommends_counted_recordset(): bool {
-        return true;
-    }
-
-    /**
      * Gets a database optimizer hint given a Totara identifier for it.
      *
      * @since Totara 12.10 + 13.0
@@ -300,19 +287,10 @@ class mariadb_native_moodle_database extends mysqli_native_moodle_database {
     }
 
     /**
-     * Get a number of records as a moodle_recordset and count of rows without limit statement using a SQL statement.
-     * This is usefull for pagination to avoid second COUNT(*) query.
+     * Do not use.
      *
-     * IMPORTANT NOTES:
-     *   - Wrap queries with UNION in single SELECT. Otherwise an incorrect count will ge given.
+     * @deprecated
      *
-     * Since this method is a little less readable, use of it should be restricted to
-     * code where it's possible there might be large datasets being returned.  For known
-     * small datasets use get_records_sql - it leads to simpler code.
-     *
-     * Overridden to apply hints if required.
-     *
-     * @since Totara 2.6.45, 2.7.28, 2.9.20, 9.8
      * @param string|core\dml\sql $sql the SQL select query to execute.
      * @param array $params array of sql parameters (optional)
      * @param int $limitfrom return a subset of records, starting at this point (optional).

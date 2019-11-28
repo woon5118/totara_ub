@@ -1198,18 +1198,6 @@ class mssql_sql_generator extends sql_generator {
     }
 
     /**
-     * Returns false as MSSQL testing showed that for the queries tested 2 queries was faster than a counted recordset.
-     *
-     * Overridden despite the value matching the default as we know based upon performance testing that false is the correct result.
-     * For results on performance testing of paginated results see parent class.
-     *
-     * @return bool
-     */
-    public function recommends_counted_recordset(): bool {
-        return false;
-    }
-
-    /**
      * Get statement to switch FTS accent sensitivity.
      *
      * @param bool $switch If accent sensitivity should be enabled/disabled.

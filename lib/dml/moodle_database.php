@@ -1534,17 +1534,9 @@ abstract class moodle_database {
     public abstract function get_records_sql($sql, array $params=null, $limitfrom=0, $limitnum=0);
 
     /**
-     * Get a recordset of objects and its count without limits applied given an SQL statement.
+     * Do not use.
      *
-     * This is useful for pagination in that it lets you avoid having to make a second COUNT(*) query.
-     *
-     * IMPORTANT NOTES:
-     *   - Wrap queries with UNION in single SELECT. Otherwise an incorrect count will ge given.
-     *
-     * This method should only be used in situations where a count without limits is required.
-     * If you don't need the count please use get_recordset_sql().
-     *
-     * @since Totara 2.6.45, 2.7.28, 2.9.20, 9.8
+     * @deprecated
      *
      * @throws coding_exception if the database driver does not support this method.
      *
@@ -1561,11 +1553,9 @@ abstract class moodle_database {
     }
 
     /**
-     * Get a number of records as an array of objects and their count without limit statement using a SQL statement.
+     * Do not use.
      *
-     * This is useful for pagination in that it lets you avoid having to make a second COUNT(*) query.
-     *
-     * @since Totara 2.6.45, 2.7.28, 2.9.20, 9.8
+     * @deprecated
      *
      * @param string|sql $sql the SQL select query to execute. The first column of this SELECT statement
      *   must be a unique value (usually the 'id' field), as it will be used as the key of the
@@ -3547,23 +3537,9 @@ abstract class moodle_database {
     }
 
     /**
-     * Returns true if this database engine recommends counted recordsets be used for counting of paginated recordsets.
+     * Do not use counted recordsets.
      *
-     * The results of performance testing:
-     * | Database        | 2 queries vs counted rs | Page 1 perf | Page 4891 perf |
-     * ----------------------------------------------------------------------------
-     * | PostgreSQL 11.1 | 2 queries were          | 80x faster  | 1.6x faster    |
-     * | PostgreSQL 10.6 | 2 queries were          | 25x faster  | 1.2x faster    |
-     * | PostgreSQL 9.6  | 2 queries were          | 10x faster  | Same speed     |
-     * | MySQL 8.0       | 2 queries were          | 11x faster  | 12% slower     |
-     * | MySQL 5.7       | 2 queries were          | 6x faster   | 15% slower     |
-     * | MariaDB 10.4    | Counted rs were         | 1.3x faster | 1.3x faster    |
-     * | MariaDB 10.3    | Counted rs were         | 2.5x faster | 2x faster      |
-     * | MariaDB 10.2    | Counted rs were         | 2.5x faster | 1.5x faster    |
-     * | MSSQL 2017      | 2 queries were          | 1.8x faster | 2x faster      |
-     *
-     * A "Jobs" report source report was used for testing, that includes user and manager detail,
-     * on a dataset of 280K users and 190K job assignments, with a deep hierarchy and multiple jobs.
+     * @deprecated
      *
      * @return bool
      */

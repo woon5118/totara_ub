@@ -630,6 +630,8 @@ class totara_core_dml_testcase extends database_driver_testcase {
     /**
      * Test get_counted_records_sql() and get_counted_recordset_sql() methods
      *
+     * @deprecated
+     *
      * @dataProvider trueFalseProvider
      * @param bool $userecordset If true: get_counted_recordset_sql, false: get_counted_records_sql
      */
@@ -1908,18 +1910,15 @@ ORDER BY tt1.groupid";
     /**
      * Tests recommends_counted_recordset to ensure it returns the result that we expect.
      *
+     * @deprecated
+     *
      * Expected results are thanks to performance testing completed for each database.
      * For results on performance testing of paginated results see moodle_database class.
      */
     public function test_recommends_counted_recordset() {
         $DB = $this->tdb;
 
-        $expected = false;
-        $dbfamily = $DB->get_dbvendor(); // Cannot use get_dbfamily() here because MariaDB returns 'mysql'.
-        if ($dbfamily === 'mariadb') {
-            $expected = true;
-        }
-        self::assertSame($expected, $DB->recommends_counted_recordset());
+        self::assertSame(false, $DB->recommends_counted_recordset());
     }
 
     public function test_get_max_in_params() {

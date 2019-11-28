@@ -1709,19 +1709,9 @@ class sqlsrv_native_moodle_database extends moodle_database {
     }
 
     /**
-     * Get a number of records as a moodle_recordset and count of rows without limit statement using a SQL statement.
-     * This is useful for pagination to avoid second COUNT(*) query.
+     * Do not use.
      *
-     * IMPORTANT NOTES:
-     *   - Wrap queries with UNION in single SELECT. Otherwise an incorrect count will ge given.
-     *   - If an offset greater than 0 and greater than the total number of records is given the SQL query will be
-     *     executed twice, a second time with a 0 offset and limit 1 in order to get a true total count.
-     *
-     * Since this method is a little less readable, use of it should be restricted to
-     * code where it's possible there might be large datasets being returned.  For known
-     * small datasets use get_records_sql - it leads to simpler code.
-     *
-     * @since Totara 2.6.45, 2.7.28, 2.9.20, 9.8
+     * @deprecated
      *
      * @param string|sql $sql the SQL select query to execute.
      * @param array $params array of sql parameters (optional)
@@ -1850,18 +1840,6 @@ class sqlsrv_native_moodle_database extends moodle_database {
         }
 
         return true;
-    }
-
-    /**
-     * Returns false as MSSQL testing showed that for the queries tested 2 queries was faster than a counted recordset.
-     *
-     * Overridden despite the value matching the default as we know based upon performance testing that false is the correct result.
-     * For results on performance testing of paginated results see parent class.
-     *
-     * @return bool
-     */
-    public function recommends_counted_recordset(): bool {
-        return false;
     }
 
     /**

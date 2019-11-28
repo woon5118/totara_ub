@@ -139,20 +139,6 @@ if ($ADMIN->fulltree) {
     // Scheduled reports recipients settings.
     $rb->add(new totara_reportbuilder_admin_setting_configallowedscheduledrecipients());
 
-    $rb->add(
-        new admin_setting_configselect(
-            'totara_reportbuilder/defaultfetchmethod',
-            new lang_string('fetchmethod_default', 'totara_reportbuilder'),
-            new lang_string('fetchmethod_help', 'totara_reportbuilder'),
-            0, // reportbuilder::FETCHMETHOD_DATABASE_RECOMMENDATION
-            [
-                0 => new lang_string('fetchmethod_use_databaserecommendation', 'totara_reportbuilder'), // reportbuilder::FETCHMETHOD_DATABASE_RECOMMENDATION
-                1 => new lang_string('fetchmethod_use_standardrecordset', 'totara_reportbuilder'), // reportbuilder::FETCHMETHOD_STANDARD_RECORDSET
-                2 => new lang_string('fetchmethod_use_countedrecordset', 'totara_reportbuilder'), // reportbuilder::FETCHMETHOD_COUNTED_RECORDSET
-            ]
-        )
-    );
-
     $classes = \core_component::get_namespace_classes('local\graph', '\totara_reportbuilder\local\graph\base', 'totara_reportbuilder');
     $options = array();
 
