@@ -33,25 +33,15 @@ use totara_core\hook\base;
 class criteria_achievement_changed extends base {
 
     /**
-     * @var int
-     */
-    protected $user_id;
-
-    /**
      * @var array
      */
-    protected $criteria_ids;
+    protected $user_criteria_ids;
 
-    public function __construct(int $user_id, array $criteria_ids) {
-        $this->user_id = $user_id;
-        $this->criteria_ids = $criteria_ids;
+    public function __construct(array $user_criteria_ids) {
+        $this->user_criteria_ids = $user_criteria_ids;
     }
 
-    public function get_user_id(): int {
-        return $this->user_id;
-    }
-
-    public function get_criteria_ids(): array {
-        return $this->criteria_ids;
+    public function get_user_criteria_ids(): array {
+        return $this->user_criteria_ids;
     }
 }

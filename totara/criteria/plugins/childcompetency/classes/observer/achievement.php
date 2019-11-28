@@ -66,7 +66,7 @@ class achievement {
             ->pluck('criterion_id');
 
         if (!empty($criteria_ids)) {
-            $hook = new criteria_achievement_changed($user_id, $criteria_ids);
+            $hook = new criteria_achievement_changed([$user_id => $criteria_ids]);
             $hook->execute();
         }
     }

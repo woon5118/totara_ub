@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection ALL */
+
 /*
  * This file is part of Totara LMS
  *
@@ -29,6 +30,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  */
 
+use totara_completionimport\csv_import;
+use totara_completionimport\event\bulk_course_completionimport;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -53,7 +57,6 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         global $DB;
 
         set_config('enablecompletion', 1);
-        $this->resetAfterTest(true);
 
         $importname = 'course';
         $pluginname = 'totara_completionimport_' . $importname;
@@ -65,25 +68,30 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $generatorstart = time();
         $this->assertEquals(1, $DB->count_records('course')); // Site course.
         $coursedefaults = array('enablecompletion' => COMPLETION_ENABLED);
-        for ($i = 1; $i <= self::COUNT_USERS; $i++) {
+        for ($i = 1; $i <= self::COUNT_COURSES; $i++) {
             $this->getDataGenerator()->create_course($coursedefaults);
         }
         // Site course + generated courses.
-        $this->assertEquals(self::COUNT_USERS+1, $DB->count_records('course'),
-            'Record count mismatch for courses');
+        $this->assertEquals(self::COUNT_COURSES + 1,
+            $DB->count_records('course'),
+            'Record count mismatch for courses'
+        );
 
         // Create users
         $this->assertEquals(2, $DB->count_records('user')); // Guest + Admin.
-        for ($i = 1; $i <= self::COUNT_COURSES; $i++) {
+        for ($i = 1; $i <= self::COUNT_USERS; $i++) {
             $this->getDataGenerator()->create_user();
         }
         // Guest + Admin + generated users.
-        $this->assertEquals(self::COUNT_COURSES+2, $DB->count_records('user'),
-            'Record count mismatch for users');
+        $this->assertEquals(self::COUNT_USERS + 2,
+            $DB->count_records('user'),
+            'Record count mismatch for users'
+        );
 
         // Manual enrol should be set.
-        $this->assertEquals(self::COUNT_COURSES, $DB->count_records('enrol', array('enrol'=>'manual')),
-            'Manual enrol is not set for all courses');
+        $this->assertEquals(self::COUNT_COURSES, $DB->count_records('enrol', array('enrol' => 'manual')),
+            'Manual enrol is not set for all courses'
+        );
 
         // Generate import data - product of user and course tables - exluding site course and admin/guest user.
         $fields = array('username', 'courseshortname', 'courseidnumber', 'completiondate', 'grade');
@@ -101,8 +109,11 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
                 WHERE   u.id > 2
                 AND     c.id > 1";
         $imports = $DB->get_recordset_sql($sql, null, 0, self::COUNT_CSV_ROWS);
+        $countevidence = 2;
+
+        $count = 0;
         if ($imports->valid()) {
-            $count = 0;
+            $data = array();
             foreach ($imports as $import) {
                 $data = array();
                 $data['username'] = $import->username;
@@ -135,18 +146,22 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         set_config('create_evidence', 1, 'totara_completionimport_' . $importname);
 
         $importstart = time();
-        \totara_completionimport\csv_import::import($content, $importname, $importstart);
+        csv_import::import($content, $importname, $importstart);
         $importstop = time();
 
         $importtablename = get_tablename($importname);
         $this->assertEquals(self::COUNT_CSV_ROWS + $countevidence, $DB->count_records($importtablename),
-            'Record count mismatch in the import table ' . $importtablename);
+            'Record count mismatch in the import table ' . $importtablename
+        );
         $this->assertEquals($countevidence, $DB->count_records('totara_evidence_item'),
-            'There should be two evidence records');
+            'There should be two evidence records'
+        );
         $this->assertEquals(self::COUNT_CSV_ROWS, $DB->count_records('course_completions'),
-            'Record count mismatch in the course_completions table');
+            'Record count mismatch in the course_completions table'
+        );
         $this->assertEquals(self::COUNT_CSV_ROWS, $DB->count_records('user_enrolments'),
-            'Record count mismatch in the user_enrolments table');
+            'Record count mismatch in the user_enrolments table'
+        );
     }
 
     /**
@@ -156,7 +171,6 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
     public function test_completionimport_resolve_references() {
         global $DB;
 
-        $this->resetAfterTest(true);
         $this->setAdminUser();
 
         set_config('enablecompletion', 1);
@@ -165,15 +179,17 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $course1 = $this->getDataGenerator()->create_course(array(
             'enablecompletion' => COMPLETION_ENABLED,
             'shortname' => 'course1',
-            'idnumber' => '1'));
+            'idnumber' => '1'
+        ));
 
         // Create another course with completion enabled and blank spaces in the shortname and idnumber fields.
         $course2 = $this->getDataGenerator()->create_course(array(
             'enablecompletion' => COMPLETION_ENABLED,
             'shortname' => '   course2   ',
-            'idnumber' => '   2   '));
+            'idnumber' => '   2   '
+        ));
 
-        // Create a user.
+        // Create users.
         $user1 = $this->getDataGenerator()->create_user();
 
         $importname = 'course';
@@ -199,7 +215,8 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $data['grade'] = 77;
         $content .= implode(",", $data) . "\n";
 
-        \totara_completionimport\csv_import::import($content, $importname, $importstart);
+        $sink = $this->redirectEvents();
+        csv_import::import($content, $importname, $importstart);
 
         $importdata = $DB->get_records($importtablename, null, 'id asc');
         $import = end($importdata);
@@ -207,6 +224,12 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
         $this->assertEquals(0, $DB->count_records('totara_evidence_item'), 'Evidence should not be created');
         $this->assertEquals($course1->id, $import->courseid, 'The course was not matched');
+
+        // Expect 1 event with 1 user/course
+        $this->verify_bulk_import_events($sink, [
+            [['userid' => $user1->id, 'courseid' => $course1->id]]
+        ]);
+
 
         //
         // Test completion is saved correctly when csv has empty spaces in shortname and idnumber
@@ -221,7 +244,7 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $data['grade'] = 77;
         $content .= implode(",", $data) . "\n";
 
-        \totara_completionimport\csv_import::import($content, $importname, $importstart);
+        csv_import::import($content, $importname, $importstart);
 
         $importdata = $DB->get_records($importtablename, null, 'id asc');
         $import = end($importdata);
@@ -229,6 +252,9 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
         $this->assertEquals(0, $DB->count_records('totara_evidence_item'), 'Evidence should not be created');
         $this->assertEquals($course1->id, $import->courseid, 'The course was not matched');
+
+        // Not expecting event as we used the same user and course
+        $this->verify_bulk_import_events($sink, []);
 
         //
         // Test completion is saved correctly when course has empty spaces in shortname and idnumber.
@@ -243,7 +269,7 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $data['grade'] = 77;
         $content .= implode(",", $data) . "\n";
 
-        \totara_completionimport\csv_import::import($content, $importname, $importstart);
+        csv_import::import($content, $importname, $importstart);
 
         $importdata = $DB->get_records($importtablename, null, 'id asc');
         $import = end($importdata);
@@ -251,6 +277,11 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
         $this->assertEquals(0, $DB->count_records('totara_evidence_item'), 'Evidence should not be created');
         $this->assertEquals($course2->id, $import->courseid, 'The course was not matched');
+
+        // Expect 1 event with 1 user/course
+        $this->verify_bulk_import_events($sink, [
+            [['userid' => $user1->id, 'courseid' => $course2->id]]
+        ]);
 
         //
         // Test completion is saved correctly when course and csv has empty spaces in shortname and idnumber, crazy hey!
@@ -265,7 +296,7 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $data['grade'] = 77;
         $content .= implode(",", $data) . "\n";
 
-        \totara_completionimport\csv_import::import($content, $importname, $importstart);
+        csv_import::import($content, $importname, $importstart);
 
         $importdata = $DB->get_records($importtablename, null, 'id asc');
         $import = end($importdata);
@@ -273,6 +304,9 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
         $this->assertEquals(0, $DB->count_records('totara_evidence_item'), 'Evidence should not be created');
         $this->assertEquals($course2->id, $import->courseid, 'The course was not matched');
+
+        // Not expecting event - same user / course combination as before
+        $this->verify_bulk_import_events($sink, []);
 
         //
         // Test evidence is created when course is not found.
@@ -289,7 +323,7 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
 
         set_config('create_evidence', 1, 'totara_completionimport_' . $importname);
 
-        \totara_completionimport\csv_import::import($content, $importname, $importstart);
+        csv_import::import($content, $importname, $importstart);
 
         $importdata = $DB->get_records($importtablename, null, 'id asc');
         $import = end($importdata);
@@ -297,5 +331,152 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
         $this->assertEquals(1, $DB->count_records('totara_evidence_item'), 'Evidence should be created');
         $this->assertEquals(null, $import->courseid, 'A courseid should not be set');
+
+        // Not expecting event - unknown course
+        $this->verify_bulk_import_events($sink, []);
+
+        $sink->close();
     }
+
+    /**
+     * Test that the expected bulk_course_completionimport events are triggered
+     */
+    public function test_completionimport_events_multiple_users_courses() {
+        $this->setAdminUser();
+
+        set_config('enablecompletion', 1);
+
+        // Create courses with completion enabled.
+        $course1 = $this->getDataGenerator()->create_course(array(
+            'enablecompletion' => COMPLETION_ENABLED,
+            'shortname' => 'course1',
+            'idnumber' => '1'
+        ));
+
+        $course2 = $this->getDataGenerator()->create_course(array(
+            'enablecompletion' => COMPLETION_ENABLED,
+            'shortname' => 'course2',
+            'idnumber' => '2'
+        ));
+
+        $course3 = $this->getDataGenerator()->create_course(array(
+            'enablecompletion' => COMPLETION_ENABLED,
+            'shortname' => 'course3',
+            'idnumber' => '3'
+        ));
+
+        // Create users.
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+
+        $importname = 'course';
+        $pluginname = 'totara_completionimport_' . $importname;
+        $csvdateformat = get_default_config($pluginname, 'csvdateformat', TCI_CSV_DATE_FORMAT);
+        $completiondate = date($csvdateformat, time());
+        $importstart = time();
+
+        // Generate import data.
+        $fields = array('username', 'courseshortname', 'courseidnumber', 'completiondate', 'grade');
+
+        // Verify event payload for multiple course completions
+        $content = implode(",", $fields) . "\n";
+        $data = array();
+        $data['username'] = $user1->username;
+        $data['courseshortname'] = $course1->shortname;
+        $data['courseidnumber'] = $course1->idnumber;
+        $data['completiondate'] = $completiondate;
+        $data['grade'] = 77;
+        $content .= implode(",", $data) . "\n";
+        $data['username'] = $user2->username;
+        $data['courseshortname'] = $course2->shortname;
+        $data['courseidnumber'] = $course2->idnumber;
+        $data['completiondate'] = $completiondate;
+        $data['grade'] = 75;
+        $content .= implode(",", $data) . "\n";
+        $data['username'] = $user3->username;
+        $data['courseshortname'] = $course1->shortname;
+        $data['courseidnumber'] = $course1->idnumber;
+        $data['completiondate'] = $completiondate;
+        $data['grade'] = 75;
+        $content .= implode(",", $data) . "\n";
+        $data['username'] = $user1->username;
+        $data['courseshortname'] = $course2->shortname;
+        $data['courseidnumber'] = $course2->idnumber;
+        $data['completiondate'] = $completiondate;
+        $data['grade'] = 75;
+        $content .= implode(",", $data) . "\n";
+        $data['username'] = $user2->username;
+        $data['courseshortname'] = $course3->shortname;
+        $data['courseidnumber'] = $course3->idnumber;
+        $data['completiondate'] = $completiondate;
+        $data['grade'] = 88;
+        $content .= implode(",", $data) . "\n";
+
+        $sink = $this->redirectEvents();
+
+        csv_import::import($content, $importname, $importstart);
+
+        // Expect 1 event for each course
+        $this->verify_bulk_import_events($sink, [
+            [
+                ['userid' => $user1->id, 'courseid' => $course1->id],
+                ['userid' => $user3->id, 'courseid' => $course1->id],
+            ],
+            [
+                ['userid' => $user1->id, 'courseid' => $course2->id],
+                ['userid' => $user2->id, 'courseid' => $course2->id],
+            ],
+            [
+                ['userid' => $user2->id, 'courseid' => $course3->id],
+            ],
+        ]);
+
+        $sink->close();
+    }
+
+
+    /**
+     * Verify the triggered bulk_course_completionimport events
+     * @param phpunit_event_sink $sink
+     * @param array $expected_payloads
+     */
+    private function verify_bulk_import_events(phpunit_event_sink $sink, array $expected_payloads) {
+        $classname = bulk_course_completionimport::class;
+        $events = $sink->get_events();
+        $actual_events = array_filter($events, function ($event) use ($classname) {
+            return $event instanceof $classname;
+        });
+
+        $this->assertSame(count($expected_payloads), count($actual_events));
+        if (empty($expected_payloads)) {
+            return;
+        }
+
+        foreach ($actual_events as $event) {
+            $actual_payload = $event->other[bulk_course_completionimport::PAYLOAD_KEY];
+            foreach ($expected_payloads as $key => $expected_payload) {
+                $act_exp_diff = array_udiff(
+                    $actual_payload,
+                    $expected_payload,
+                    function ($a, $e) {
+                        if ($a['userid'] == $e['userid']) {
+                            return $a['courseid'] - $e['courseid'];
+                        }
+                        return $a['userid'] - $e['userid'];
+                    }
+                );
+
+                if (empty($act_exp_diff)) {
+                    unset($expected_payloads[$key]);
+                    break;
+                }
+            }
+        }
+
+        $this->assertEmpty($expected_payloads);
+
+        $sink->clear();
+    }
+
 }

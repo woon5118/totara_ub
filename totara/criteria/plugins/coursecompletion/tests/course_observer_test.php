@@ -23,9 +23,13 @@
 
 use core\event\course_completed;
 use criteria_coursecompletion\observer\course as course_observer;
+use totara_completionimport\event\bulk_course_completionimport;
 use totara_criteria\hook\criteria_achievement_changed;
 
 class criteria_coursecompletion_course_observer_testcase extends advanced_testcase {
+
+    const NUM_USERS = 5;
+    const NUM_COURSES = 5;
 
     private function setup_data() {
         $data = new class() {
@@ -33,11 +37,14 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
             public $users = [];
         };
 
-        for ($course_idx = 1; $course_idx <= 2; $course_idx++) {
+        for ($user_idx = 1; $user_idx <= self::NUM_USERS; $user_idx++) {
+            $data->users[$user_idx] = $this->getDataGenerator()->create_user();
+        }
+
+        for ($course_idx = 1; $course_idx <= self::NUM_COURSES; $course_idx++) {
             $data->courses[$course_idx] = $this->getDataGenerator()->create_course();
 
-            for ($user_idx = 1; $user_idx <= 2; $user_idx++) {
-                $data->users[$user_idx] = $this->getDataGenerator()->create_user();
+            for ($user_idx = 1; $user_idx <= self::NUM_USERS; $user_idx++) {
                 $this->getDataGenerator()->enrol_user($data->users[$user_idx]->id, $data->courses[$course_idx]->id);
             }
         }
@@ -106,25 +113,23 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
         $this->assertEquals(1, count($events));
         $cc_event = reset($events);
         $this->assertEquals(course_completed::class, get_class($cc_event));
-        $sink->clear();
+        $sink->close();
 
         $sink = $this->redirectHooks();
         course_observer::course_completion_changed($cc_event);
-        $hooks = $sink->get_hooks();
-        $this->assertEquals(1, count($hooks));
-        /** @var criteria_achievement_changed $hook */
-        $hook = reset($hooks);
-        $this->assertEquals(criteria_achievement_changed::class, get_class($hook));
-
-        $this->assertEqualsCanonicalizing([$criterion->get_id()], $hook->get_criteria_ids());
+        $this->verify_hook($sink, [$data->users[1]->id => [$criterion->get_id()]]);
         $sink->close();
     }
 
     public function test_course_completed_multiple_items() {
         $data = $this->setup_data();
         $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
-        $criterion1 = $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id]]);
-        $criterion2 = $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id]]);
+
+        $criteria = [
+            1 => $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id]]),
+            2 => $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id], $data->courses[2]->id]),
+            3 => $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[2]->id], $data->courses[3]->id])
+        ];
 
         // No other way to stop event propagation without sinking the course_completed event and manually pass it to the function
         $sink = $this->redirectEvents();
@@ -142,14 +147,66 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
 
         $sink = $this->redirectHooks();
         course_observer::course_completion_changed($cc_event);
+        $this->verify_hook($sink, [$data->users[1]->id => [$criteria[1]->get_id(), $criteria[2]->get_id()]]);
+        $sink->close();
+    }
+
+    public function test_bulk_course_completions_imported() {
+        $data = $this->setup_data();
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        $criteria = [
+            1 => $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id]]),
+            2 => $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id, $data->courses[2]->id]]),
+            3 => $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[3]->id]]),
+        ];
+
+        /**
+         * Create event
+         * user1 - completes course1
+         * user2 - completes courses 1 and 2
+         * user3 - completes course 3
+         * user4 - completes courses 3 and 4
+         * user5 - completes course 4
+         */
+        $course_completions = [
+            ['userid' => $data->users[1]->id, 'courseid' => $data->courses[1]->id],
+            ['userid' => $data->users[2]->id, 'courseid' => $data->courses[1]->id],
+            ['userid' => $data->users[2]->id, 'courseid' => $data->courses[2]->id],
+            ['userid' => $data->users[3]->id, 'courseid' => $data->courses[3]->id],
+            ['userid' => $data->users[4]->id, 'courseid' => $data->courses[3]->id],
+            ['userid' => $data->users[4]->id, 'courseid' => $data->courses[4]->id],
+            ['userid' => $data->users[5]->id, 'courseid' => $data->courses[4]->id],
+        ];
+
+        $import_event = bulk_course_completionimport::create_from_list($course_completions);
+
+        $sink = $this->redirectEvents();
+
+        course_observer::bulk_course_completions_imported($import_event);
+        $this->verify_event($sink, [
+            $data->users[1]->id => [$criteria[1]->get_id(), $criteria[2]->get_id()],
+            $data->users[2]->id => [$criteria[1]->get_id(), $criteria[2]->get_id()],
+            $data->users[3]->id => [$criteria[3]->get_id()],
+            $data->users[4]->id => [$criteria[3]->get_id()],
+        ]);
+        $sink->close();
+    }
+
+
+
+    /**
+     * @param phpunit_event_sink $sink
+     * @param array $expected_user_criteria_ids
+     */
+    private function verify_hook(phpunit_event_sink $sink, array $expected_user_criteria_ids) {
         $hooks = $sink->get_hooks();
         $this->assertEquals(1, count($hooks));
         /** @var criteria_achievement_changed $hook */
         $hook = reset($hooks);
         $this->assertEquals(criteria_achievement_changed::class, get_class($hook));
 
-        $this->assertEqualsCanonicalizing([$criterion1->get_id(), $criterion2->get_id()], $hook->get_criteria_ids());
-        $sink->close();
+        $this->assertEqualsCanonicalizing($event->other[criteria_achievement_changed::PAYLOAD_KEY], $expected_payload);
+        $sink->clear();
     }
-
 }

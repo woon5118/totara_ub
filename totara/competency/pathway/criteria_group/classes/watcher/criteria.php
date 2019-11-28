@@ -34,6 +34,6 @@ class criteria {
      * @param criteria_achievement_changed $hook
      */
     public static function achievement_changed(criteria_achievement_changed $hook) {
-        aggregation_helper::mark_for_reaggregate_from_criteria($hook->get_criteria_ids(), $hook->get_user_id());
+        aggregation_helper::mark_for_reaggregate_from_criteria($hook->get_user_criteria_ids());
     }
 }

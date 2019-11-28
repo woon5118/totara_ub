@@ -153,7 +153,7 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
         $data = $this->setup_data();
 
         $criteria_ids = $data->competency_data['Comp A']['criteria_ids'];
-        aggregation_helper::mark_for_reaggregate_from_criteria($criteria_ids, $data->users[1]->id);
+        aggregation_helper::mark_for_reaggregate_from_criteria([$data->users[1]->id => $criteria_ids]);
 
         $this->verify_queue([
             [
@@ -172,7 +172,7 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
         $data = $this->setup_data();
 
         $criteria_ids = $data->competency_data['Comp A']['criteria_ids'];
-        aggregation_helper::mark_for_reaggregate_from_criteria($criteria_ids, $data->users[3]->id);
+        aggregation_helper::mark_for_reaggregate_from_criteria([$data->users[3]->id => $criteria_ids]);
 
         $this->verify_queue([]);
     }
@@ -186,7 +186,7 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
         $data = $this->setup_data();
 
         $criteria_ids = $data->competency_data['Comp B']['criteria_ids'];
-        aggregation_helper::mark_for_reaggregate_from_criteria($criteria_ids, $data->users[1]->id);
+        aggregation_helper::mark_for_reaggregate_from_criteria([$data->users[1]->id => $criteria_ids]);
 
         // Expecting ad-hoc task with 1 competency id
         $this->verify_queue([
@@ -206,7 +206,7 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
         $data = $this->setup_data();
 
         $criteria_ids = $data->competency_data['Comp B']['criteria_ids'];
-        aggregation_helper::mark_for_reaggregate_from_criteria($criteria_ids, $data->users[2]->id);
+        aggregation_helper::mark_for_reaggregate_from_criteria([$data->users[2]->id => $criteria_ids]);
 
         $this->verify_queue([]);
     }
@@ -223,7 +223,7 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
             $data->competency_data['Comp B']['criteria_ids'],
             $data->competency_data['Comp C']['criteria_ids']
         );
-        aggregation_helper::mark_for_reaggregate_from_criteria($criteria_ids, $data->users[3]->id);
+        aggregation_helper::mark_for_reaggregate_from_criteria([$data->users[3]->id => $criteria_ids]);
 
         $this->verify_queue([
             [
@@ -245,12 +245,17 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
 
         $data = $this->setup_data();
 
-        $criteria_ids = array_merge(
-            $data->competency_data['Comp A']['criteria_ids'],
-            $data->competency_data['Comp B']['criteria_ids'],
-            $data->competency_data['Comp C']['criteria_ids']
-        );
-        aggregation_helper::mark_for_reaggregate_from_criteria($criteria_ids);
+        $user_criteria_ids = [
+            $data->users[1]->id => array_merge($data->competency_data['Comp A']['criteria_ids'],
+                $data->competency_data['Comp B']['criteria_ids']
+            ),
+            $data->users[2]->id => $data->competency_data['Comp A']['criteria_ids'],
+            $data->users[3]->id => array_merge($data->competency_data['Comp B']['criteria_ids'],
+                $data->competency_data['Comp C']['criteria_ids']
+            ),
+        ];
+
+        aggregation_helper::mark_for_reaggregate_from_criteria($user_criteria_ids);
 
         $this->verify_queue([
             [

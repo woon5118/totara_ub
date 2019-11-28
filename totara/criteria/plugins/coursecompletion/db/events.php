@@ -26,6 +26,7 @@
 use core\event\course_completed;
 use criteria_coursecompletion\observer\course as course_observer;
 use totara_completioneditor\event\course_completion_edited;
+use totara_completionimport\event\bulk_course_completionimport;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -37,5 +38,9 @@ $observers = [
     [
         'eventname' => course_completion_edited::class,
         'callback' => course_observer::class.'::course_completion_changed',
+    ],
+    [
+        'eventname' => bulk_course_completionimport::class,
+        'callback' => course_observer::class.'::bulk_course_completions_imported',
     ],
 ];

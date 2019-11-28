@@ -24,6 +24,7 @@
 
 use totara_evidence\customfield_area\evidence;
 use totara_evidence\entities\evidence_item;
+use totara_completionimport\event\bulk_course_completionimport;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -857,6 +858,7 @@ function import_course($importname, $importtime) {
                 if (!empty($completions)) {
                     // Batch import completions.
                     $DB->insert_records_via_batch('course_completions', $completions);
+                    trigger_course_completions_imported_event($completions);
                     $completions = array();
                 }
 
@@ -1088,6 +1090,7 @@ function import_course($importname, $importtime) {
     if (!empty($completions)) {
         // Batch import completions.
         $DB->insert_records_via_batch('course_completions', $completions);
+        trigger_course_completions_imported_event($completions);
         $completions = array();
     }
 
@@ -1958,4 +1961,17 @@ function totara_completionimport_validate_date($csvdateformat, $completiondate) 
     }
 
     return true;
+}
+
+/**
+ * Trigger the course_completions_imported event for a batch of completion records
+ *
+ * @param array $completions
+ */
+function trigger_course_completions_imported_event(array $completions) {
+    $user_courses = array_map(function ($completion) {
+        return ['userid' => $completion->userid, 'courseid' => $completion->course];
+    }, $completions);
+
+    bulk_course_completionimport::create_from_list($user_courses)->trigger();
 }
