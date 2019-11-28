@@ -708,9 +708,10 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             $statuses .= \html_writer::tag('li', clean_string($user_status), [ 'class' => 'mod_facetoface__sessionlist__event-status__user']);
         }
 
-        $attendance_status = $this->event_status_attendance_taking_html($session, $eventattendance);
-        $statuses .= \html_writer::tag('li', $attendance_status, [ 'class' => 'mod_facetoface__sessionlist__event-status__attendance']);
-
+        if ($this->context !== null && has_capability('mod/facetoface:takeattendance', $this->context)) {
+            $attendance_status = $this->event_status_attendance_taking_html($session, $eventattendance);
+            $statuses .= \html_writer::tag('li', $attendance_status, [ 'class' => 'mod_facetoface__sessionlist__event-status__attendance']);
+        }
         $html = \html_writer::tag('ul', $statuses, [ 'class' => 'mod_facetoface__sessionlist__event-status' ]);
         $sessioncell = new html_table_cell($html);
         if ($datescount > 1) {
