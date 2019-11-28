@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/RatingComment.vue Checks snapshot 1`] = `
+<span>
+  <popover-stub
+    position="bottom-right"
+    triggers="click"
+  >
+    
+    fff
+    
+    <textarea
+      class="tui-pathwayManual-ratingComment__textarea"
+    />
+  </popover-stub>
+</span>
+`;

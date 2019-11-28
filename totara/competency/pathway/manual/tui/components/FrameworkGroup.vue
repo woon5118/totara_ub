@@ -41,10 +41,10 @@
       class="tui-pathwayManual-frameworkGroup__table"
     >
       <template v-slot:header-row>
-        <HeaderCell size="4">
+        <HeaderCell size="16">
           <strong>{{ $str('competency', 'totara_hierarchy') }}</strong>
         </HeaderCell>
-        <HeaderCell size="1">
+        <HeaderCell size="4">
           <div class="tui-pathwayManual-frameworkGroup__table__block">
             <strong>{{ $str('last_rating_given', 'pathway_manual') }}</strong>
             <div
@@ -67,7 +67,7 @@
           </div>
         </HeaderCell>
         <HeaderCell
-          size="2"
+          size="8"
           class="tui-pathwayManual-frameworkGroup__table__block"
         >
           <div class="tui-pathwayManual-frameworkGroup__table__block">
@@ -86,12 +86,13 @@
             </div>
           </div>
         </HeaderCell>
+        <HeaderCell size="1" class="tui-pathwayManual-frameworkGroup__block" />
       </template>
       <template v-slot:row="{ row }">
-        <Cell size="4">
+        <Cell size="16">
           {{ row.competency.display_name }}
         </Cell>
-        <Cell size="1">
+        <Cell size="4">
           <span v-if="row.last_rating">
             <span v-if="row.last_rating.scale_value">
               {{ row.last_rating.scale_value.name }}
@@ -104,11 +105,18 @@
             {{ getRater(row.last_rating.rater) }}
           </span>
         </Cell>
-        <Cell size="2">
+        <Cell size="8">
           <ScaleSelect
             :competency-id="parseInt(row.competency.id)"
             :scale="group"
             @input="value => selectCompValue(row.competency.id, value)"
+          />
+        </Cell>
+        <Cell size="1">
+          <RatingComment
+            :has-rating="hasRating(row.competency.id)"
+            :attached-comment="getCurrentComment(row.competency.id)"
+            @update-comment="value => updateComment(row.competency.id, value)"
           />
         </Cell>
       </template>
@@ -122,6 +130,7 @@ import FlexIcon from 'totara_core/components/icons/FlexIcon';
 import HeaderCell from 'totara_core/components/datatable/HeaderCell';
 import ScaleSelect from 'totara_competency/components/ScaleSelect';
 import ScaleTooltip from 'totara_competency/components/ScaleTooltip';
+import RatingComment from 'pathway_manual/components/RatingComment';
 import Table from 'totara_core/components/datatable/Table';
 import Tooltip from 'totara_competency/components/Tooltip';
 
@@ -134,6 +143,7 @@ export default {
     HeaderCell,
     ScaleSelect,
     ScaleTooltip,
+    RatingComment,
     Table,
     Tooltip,
   },
@@ -154,6 +164,10 @@ export default {
     expanded: {
       default: true,
       type: Boolean,
+    },
+    selectedRatings: {
+      required: true,
+      type: Array,
     },
   },
 
@@ -209,6 +223,23 @@ export default {
         comment: '',
       });
     },
+
+    getCurrentComment(compId) {
+      let foundRating = this.getCurrentRating(compId);
+      return foundRating && foundRating.comment ? foundRating.comment : '';
+    },
+    getCurrentRating(compId) {
+      return this.selectedRatings.find(compData => compData.comp_id === compId);
+    },
+    hasRating(compId) {
+      return !!this.getCurrentRating(compId);
+    },
+    updateComment(compId, comment) {
+      this.$emit('update-comment', {
+        comp_id: compId,
+        comment: comment,
+      });
+    },
   },
 };
 </script>
@@ -247,12 +278,22 @@ export default {
       display: inline;
     }
   }
+
+  &__comment-disabled {
+    color: var(--tui-color-neutral-4);
+    :hover {
+      text-decoration: none;
+      cursor: default;
+    }
+  }
 }
 </style>
 
 <lang-strings>
   {
     "pathway_manual": [
+      "comment",
+      "comment_done",
       "competency_framework_count_plural",
       "competency_framework_count_singular",
       "last_rating_given",

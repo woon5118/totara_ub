@@ -38,8 +38,10 @@
         :group="group"
         :role="role"
         :current-user-id="currentUserId"
+        :selected-ratings="selectedRatings"
         :expanded="expandFrameworkGroups"
-        @input="updateRatings"
+        @input="updateRating"
+        @update-comment="updateComment"
       />
       <div class="tui-pathwayManual-rateCompetencies__submitButtons">
         <ButtonGroup>
@@ -88,6 +90,11 @@ import UserCompetenciesFilters from 'pathway_manual/components/UserCompetenciesF
 import CreateManualRatingsMutation from '../../webapi/ajax/create_manual_ratings.graphql';
 import RateableCompetenciesQuery from '../../webapi/ajax/user_rateable_competencies.graphql';
 
+import {
+  NONE_OPTION_VALUE,
+  EMPTY_OPTION_VALUE,
+} from 'totara_competency/components/ScaleSelect';
+
 const ROLE_SELF = 'self';
 
 /**
@@ -133,6 +140,8 @@ export default {
       filterOptions: {},
       showSubmitRatingsModal: false,
       selectedRatings: [],
+      noneOptionValue: NONE_OPTION_VALUE,
+      emptyOptionValue: EMPTY_OPTION_VALUE,
     };
   },
 
@@ -185,20 +194,25 @@ export default {
       window.location.href = this.goBackLink;
     },
 
-    updateRatings(rating) {
-      // Remove rating for this competency from array if it already exists.
-      this.selectedRatings = this.selectedRatings.filter(function(
-        previousRating
-      ) {
-        return previousRating.comp_id !== rating.comp_id;
-      });
-      // Map -1 value ("None" selection) to null.
-      if (parseInt(rating.scale_value_id) === -1) {
-        rating.scale_value_id = null;
-      }
-      // Don't add rating when empty option was selected (-2 value).
-      if (parseInt(rating.scale_value_id) !== -2) {
-        this.selectedRatings.push(rating);
+    updateRating(rating) {
+      if (parseInt(rating.scale_value_id) === this.emptyOptionValue) {
+        // Empty option: Remove rating from array.
+        this.selectedRatings = this.selectedRatings.filter(
+          previousRating => previousRating.comp_id !== rating.comp_id
+        );
+      } else {
+        let previousRating = this.selectedRatings.find(
+          ratingObj => ratingObj.comp_id === rating.comp_id
+        );
+        if (previousRating) {
+          // Was already rated: update value.
+          previousRating.scale_value_id = rating.scale_value_id;
+        } else {
+          // Wasn't in list yet: add to array.
+          rating.comment =
+            typeof rating.comment === 'undefined' ? '' : rating.comment;
+          this.selectedRatings.push(rating);
+        }
       }
 
       // Warn user about leaving the page when having unsaved selections.
@@ -209,6 +223,15 @@ export default {
       }
 
       this.$emit('has-unsaved-ratings', this.hasSelectedRatings);
+    },
+
+    updateComment(newComment) {
+      let rating = this.selectedRatings.find(
+        ratingData => ratingData.comp_id === newComment.comp_id
+      );
+      if (rating) {
+        rating.comment = newComment.comment;
+      }
     },
 
     unloadHandler(e) {
@@ -222,6 +245,25 @@ export default {
       return discardUnsavedChanges;
     },
 
+    // Get rating data for sending to GQL mutation.
+    getRatingsForSaving() {
+      // Throw out invalid elements.
+      let ratings = this.selectedRatings.filter(
+        rating =>
+          typeof rating.comp_id !== 'undefined' &&
+          rating.scale_value_id !== this.emptyOptionValue
+      );
+      return ratings.map(rating => ({
+        comp_id: rating.comp_id,
+        // Map "None" to null.
+        scale_value_id:
+          parseInt(rating.scale_value_id) === this.noneOptionValue
+            ? null
+            : rating.scale_value_id,
+        comment: typeof rating.comment === 'undefined' ? '' : rating.comment,
+      }));
+    },
+
     submitRatings() {
       window.removeEventListener('beforeunload', this.unloadHandler);
       this.showSubmitRatingsModal = false;
@@ -233,7 +275,7 @@ export default {
           variables: {
             user_id: this.user.id,
             role: this.role,
-            ratings: this.selectedRatings,
+            ratings: this.getRatingsForSaving(),
           },
           refetchAll: false,
         })

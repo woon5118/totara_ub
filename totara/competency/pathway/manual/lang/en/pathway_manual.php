@@ -25,9 +25,12 @@ $string['pluginname'] = 'Manual rating';
 
 $string['add_rating'] = 'Add rating';
 $string['addraters'] = 'Add raters';
+$string['comment'] = 'Comment';
+$string['comment_done'] = 'Done';
 $string['comment_wrapper'] = '"{$a}"';
 $string['competency_framework_count_plural'] = '{$a->name}: {$a->count} competencies';
 $string['competency_framework_count_singular'] = '{$a->name}: {$a->count} competency';
+$string['delete_comment'] = 'Delete';
 $string['error:noraters'] = 'No raters selected';
 $string['error:user_lacks_role'] = 'You do not have the {$a->role} role for {$a->user}';
 $string['filter:never_rated'] = 'Never rated';

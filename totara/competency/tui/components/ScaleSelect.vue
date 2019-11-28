@@ -17,7 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Matthias Bonk <matthias.bonk@totaralearning.com>
-  @package pathway_manual
+  @package totara_competency
 -->
 
 <template>
@@ -31,6 +31,10 @@
 
 <script>
 import Select from 'totara_core/components/form/Select';
+
+export const NONE_OPTION_VALUE = -1;
+export const EMPTY_OPTION_VALUE = -2;
+
 export default {
   components: { Select },
   props: {
@@ -55,7 +59,7 @@ export default {
 
   methods: {
     makeSelectOptions(scaleValues) {
-      var emptyOption = [{ label: '', id: -2 }];
+      var emptyOption = [{ label: '', id: EMPTY_OPTION_VALUE }];
       var scaleOptions = scaleValues.map(function(scaleValue) {
         return { label: scaleValue.name, id: scaleValue.id };
       });
@@ -63,12 +67,12 @@ export default {
         {
           // Divider line above None-option
           label: '------------------',
-          id: -1,
+          id: EMPTY_OPTION_VALUE,
           disabled: true,
         },
         {
           label: this.$str('rating_none', 'totara_competency'),
-          id: -1,
+          id: NONE_OPTION_VALUE,
         },
       ];
       return emptyOption.concat(scaleOptions).concat(noneOption);
