@@ -46,5 +46,5 @@ Feature: Guest users can auto-enrol themself in courses where guest access is al
     Then I should see "Guest access"
     And I set the following fields to these values:
       | Password | moodle_rules |
-    And I press "Submit"
+    And I press "Go to course"
     And I should see "Test forum name"

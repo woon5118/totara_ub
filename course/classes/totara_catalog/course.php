@@ -181,7 +181,7 @@ class course extends provider {
             $link->button = new \stdClass();
             $url = new \moodle_url('/enrol/index.php', ['id' => $objectid]);
             $link->button->url = $url->out();
-            $link->button->label = get_string('catalog_enrol', 'moodle');
+            $link->button->label = get_string('catalog_go_to_course', 'moodle');
             return $link;
         }
 

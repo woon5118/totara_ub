@@ -152,15 +152,6 @@ class enrol_guest_plugin extends enrol_plugin {
     public function enrol_page_hook(stdClass $instance) {
         global $CFG, $OUTPUT, $SESSION, $USER;
 
-        if ($instance->password === '') {
-            return null;
-        }
-
-        if (isset($USER->enrol['tempguest'][$instance->courseid]) and $USER->enrol['tempguest'][$instance->courseid] > time()) {
-            // no need to show the guest access when user can already enter course as guest
-            return null;
-        }
-
         require_once("$CFG->dirroot/enrol/guest/locallib.php");
         $form = new enrol_guest_enrol_form(NULL, $instance);
         $instanceid = optional_param('instance', 0, PARAM_INT);

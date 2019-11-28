@@ -138,6 +138,7 @@ class core_course_renderer extends plugin_renderer_base {
         $content .= $this->output->box_start('generalbox info');
         $chelper = new coursecat_helper();
         $chelper->set_show_courses(self::COURSECAT_SHOW_COURSES_EXPANDED);
+        $chelper->set_show_course_links(false);
         $content .= $this->coursecat_coursebox($chelper, $course);
         $content .= $this->output->box_end();
         return $content;
@@ -1132,13 +1133,21 @@ class core_course_renderer extends plugin_renderer_base {
         require_once($CFG->dirroot . "/totara/coursecatalog/lib.php");
         // We are displaying the name using html_writer which will escape the html
         $coursename = $chelper->get_course_formatted_name($course, array('escape' => false));
-        $dimmed = totara_get_style_visibility($course);
-        $coursenamelink = html_writer::link(
-            new moodle_url('/course/view.php', array('id' => $course->id)),
-            $coursename,
-            array('class' => $dimmed, 'style' => 'background-image:url(' . totara_get_icon($course->id, TOTARA_ICON_TYPE_COURSE) . ')')
-        );
-        $content .= html_writer::tag('div', $coursenamelink, array('class' => 'coursename'));
+
+        if ($chelper->get_show_course_links()) {
+            // This is needed for the older 'moodle' and 'enhanced' catalogs
+            $dimmed = totara_get_style_visibility($course);
+            $coursenamelink = html_writer::link(
+                new moodle_url('/course/view.php', array('id' => $course->id)),
+                $coursename,
+                array('class' => $dimmed, 'style' => 'background-image:url(' . totara_get_icon($course->id, TOTARA_ICON_TYPE_COURSE) . ')')
+            );
+            $content .= html_writer::tag('div', $coursenamelink, array('class' => 'coursename'));
+        } else {
+            $courseicon = totara_get_icon($course->id, TOTARA_ICON_TYPE_COURSE);
+            $icon = \html_writer::empty_tag('img', array('src' => $courseicon, 'class' => 'course_icon', 'alt' => ''));
+            $content .= html_writer::tag('div', $icon . $coursename, array('class' => 'coursename'));
+        }
 
         // If we display course in collapsed form but the course has summary or course contacts, display the link to the info page.
         $content .= html_writer::start_tag('div', array('class' => 'moreinfo'));
@@ -1153,14 +1162,7 @@ class core_course_renderer extends plugin_renderer_base {
         }
         $content .= html_writer::end_tag('div'); // .moreinfo
 
-        // print enrolmenticons
-        if ($icons = enrol_get_course_info_icons($course)) {
-            $content .= html_writer::start_tag('div', array('class' => 'enrolmenticons'));
-            foreach ($icons as $pix_icon) {
-                $content .= $this->render($pix_icon);
-            }
-            $content .= html_writer::end_tag('div'); // .enrolmenticons
-        }
+        // TOTARA: removed enrolment icons
 
         $content .= html_writer::end_tag('div'); // .info
 
@@ -2187,6 +2189,10 @@ class coursecat_helper {
     protected $attributes = array();
     /** @var array search criteria if the list is a search result */
     protected $searchcriteria = null;
+    /** Totara
+     *  @var bool to indicate if we should show links on courses
+     */
+    protected $showcourselinks = true;
 
     /**
      * Sets how (if) to show the courses - none, collapsed, expanded, etc.
@@ -2470,4 +2476,23 @@ class coursecat_helper {
         }
         return $name;
     }
+
+    /**
+     * Totara: Gets show course link param
+     *
+     * @return bool showcourselinks
+     */
+    public function get_show_course_links() {
+        return $this->showcourselinks;
+    }
+
+    /**
+     * Totara: Sets show course links param
+     *
+     * @param bool $show
+     */
+    public function set_show_course_links(bool $show) {
+        $this->showcourselinks = $show;
+    }
+
 }

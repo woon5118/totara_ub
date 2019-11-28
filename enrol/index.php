@@ -88,7 +88,6 @@ if (is_enrolled($context, $USER, '', true)) {
 
 $PAGE->set_title($course->shortname);
 $PAGE->set_heading($course->fullname);
-$PAGE->navbar->add(get_string('enrolmentoptions','enrol'));
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('enrolmentoptions','enrol'));
