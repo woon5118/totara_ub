@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2018 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Brendan Cox <brendan.cox@totaralearning.com>
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
- * @package totara_pathway
+ * @package pathway_criteria_group
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace pathway_criteria_group\watcher;
 
-$plugin->version  = 2019112800;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'pathway_criteria_group'; // To check on upgrade, that module sits in correct place
+use pathway_criteria_group\aggregation_helper;
+use totara_criteria\hook\criteria_achievement_changed;
+
+class criteria {
+
+    /**
+     * Listen to the criteria_achievement_changed event and mark all users for reaggregation affected
+     *
+     * @param criteria_achievement_changed $hook
+     */
+    public static function achievement_changed(criteria_achievement_changed $hook) {
+        aggregation_helper::mark_for_reaggregate_from_criteria($hook->get_criteria_ids(), $hook->get_user_id());
+    }
+}

@@ -31,8 +31,8 @@ use totara_competency\entities\competency;
 use totara_competency\achievement_configuration;
 use totara_competency\competency_achievement_aggregator;
 use totara_competency\entities\pathway_achievement;
-use totara_competency\event\competency_achievement_updated;
 use totara_competency\expand_task;
+use totara_competency\hook\competency_achievement_updated;
 use totara_competency\models\assignment_actions;
 use totara_competency\overall_aggregation;
 use totara_competency\entities\scale_value;
@@ -110,12 +110,10 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $user_source = new competency_aggregator_user_source($source_table, true);
         $aggregator = new competency_achievement_aggregator($achievement_configuration, $user_source);
 
-        $event_sink = $this->redirectEvents();
+        $sink = $this->redirectHooks();
         // We're mainly testing that aggregate completes without an exception.
         $aggregator->aggregate();
-        $events = $event_sink->get_events();
-
-        $this->assertCount(0, $events);
+        $this->assertEquals(0, $sink->count());
     }
 
     public function test_with_one_user_requiring_completion() {
@@ -139,11 +137,11 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
 
         $this->assertEquals(0, competency_achievement::repository()->count());
 
-        $event_sink = $this->redirectEvents();
+        $sink = $this->redirectHooks();
         $aggregator = $this->get_competency_aggregator_for_pathway_and_user($pathway, $user);
         $pw_achievement = pathway_achievement::get_current($pathway, $user->id);
         $aggregator->aggregate();
-        $events = $event_sink->get_events();
+        $hooks = $sink->get_hooks();
 
         $achievements = competency_achievement::repository()->get();
         $this->assertCount(1, $achievements);
@@ -155,9 +153,9 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $via_record = $via_records->shift();
         $this->assertEquals($pw_achievement->id, $via_record->pathway_achievement_id);
 
-        $event = reset($events);
-        $this->assertInstanceOf(competency_achievement_updated::class, $event);
-        $event_sink->close();
+        $hook = reset($hooks);
+        $this->assertInstanceOf(competency_achievement_updated::class, $hook);
+        $sink->close();
     }
 
     public function test_with_one_user_requiring_completion_via_two_pathways() {
@@ -201,9 +199,9 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
 
         $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
 
-        $event_sink = $this->redirectEvents();
+        $sink = $this->redirectHooks();
         $aggregator->aggregate();
-        $events = $event_sink->get_events();
+        $hooks = $sink->get_hooks();
 
         $comp_records = $DB->get_records('totara_competency_achievement');
         $this->assertCount(1, $comp_records);
@@ -221,9 +219,9 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         // This should ensure that they we did get a via record for both achievements.
         $this->assertNotEquals($via_record1->pathway_achievement_id, $via_record2->pathway_achievement_id);
 
-        $event = reset($events);
-        $this->assertInstanceOf(competency_achievement_updated::class, $event);
-        $event_sink->close();
+        $hook = reset($hooks);
+        $this->assertInstanceOf(competency_achievement_updated::class, $hook);
+        $sink->close();
     }
 
     public function test_one_user_from_two_via_records_to_one() {
@@ -277,9 +275,10 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $aggregation_method = $this->create_aggregation_method_achieved_by([$achievement2]);
         $aggregator->set_aggregation_instance($aggregation_method);
 
-        $event_sink = $this->redirectEvents();
+        $sink = $this->redirectHooks();
         $aggregator->aggregate();
-        $events = $event_sink->get_events();
+        // Hooks aren't triggered if the value isn't updated.
+        $this->assertEquals(0, $sink->count());
 
         // Check comp_record value. Just to make sure it hasn't been set to null or some such thing when the other
         // achievement was taken away.
@@ -294,9 +293,6 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $this->assertCount(2, $via_records);
         $via_record = array_pop($via_records);
         $this->assertEquals($via_record->pathway_achievement_id, $achievement2->id);
-
-        // Events aren't sent if the value isn't updated.
-        $this->assertCount(0, $events);
     }
 
     public function test_one_user_from_having_value_to_null() {
@@ -363,9 +359,9 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $aggregation_method = $this->create_aggregation_method_achieved_by([$achievement1, $achievement2]);
         $aggregator->set_aggregation_instance($aggregation_method);
 
-        $event_sink = $this->redirectEvents();
+        $sink = $this->redirectHooks();
         $aggregator->aggregate();
-        $events = $event_sink->get_events();
+        $hooks = $sink->get_hooks();
 
         // Order by newest at they back so they can be popped off in that order.
         $comp_records = $DB->get_records('totara_competency_achievement', [], 'time_created ASC, id ASC');
@@ -385,10 +381,10 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         // should the competency_achievement_aggregator save it or not.
         $this->assertEquals(4, $DB->count_records('totara_competency_achievement_via'));
 
-        // The value changed, so an event was sent.
-        $event = reset($events);
-        $this->assertInstanceOf(competency_achievement_updated::class, $event);
-        $event_sink->close();
+        // The value changed, so a hook was executed.
+        $hook = reset($hooks);
+        $this->assertInstanceOf(competency_achievement_updated::class, $hook);
+        $sink->close();
     }
 
     public function test_one_user_with_change_in_scale_value() {
@@ -441,10 +437,10 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $this->aggregate_pathway($pathway2, $user);
         $pw_achievement2 = pathway_achievement::get_current($pathway2, $user->id);
 
-        $event_sink = $this->redirectEvents();
+        $sink = $this->redirectHooks();
         $aggregator = $this->get_competency_aggregator_for_pathway_and_user($pathway2, $user);
         $aggregator->aggregate();
-        $events = $event_sink->get_events();
+        $hooks = $sink->get_hooks();
 
         // Order by newest at they back so they can be popped off in that order.
         $achievements = competency_achievement::repository()
@@ -466,10 +462,10 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $via_record = $via_records->pop();
         $this->assertEquals($via_record->comp_achievement_id, $comp_record1->id);
 
-        // The value changed, so an event was sent.
-        $event = reset($events);
-        $this->assertInstanceOf(competency_achievement_updated::class, $event);
-        $event_sink->close();
+        // The value changed, so a hook was triggered.
+        $hook = reset($hooks);
+        $this->assertInstanceOf(competency_achievement_updated::class, $hook);
+        $sink->close();
     }
 
     public function test_with_one_user_with_two_assignments_requiring_completion() {
@@ -506,9 +502,9 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
 
         $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
 
-        $event_sink = $this->redirectEvents();
+        $sink = $this->redirectHooks();
         $aggregator->aggregate();
-        $events = $event_sink->get_events();
+        $hooks = $sink->get_hooks();
 
         $comp_records = $DB->get_records('totara_competency_achievement');
         $this->assertCount(2, $comp_records);
@@ -525,24 +521,27 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $via_record = reset($via_records);
         $this->assertEquals($achievement->id, $via_record->pathway_achievement_id);
 
-        $event = reset($events);
-        $this->assertInstanceOf(competency_achievement_updated::class, $event);
+        $hook = reset($hooks);
+        $this->assertInstanceOf(competency_achievement_updated::class, $hook);
 
         // Follow-on scenario. One of the assignments is archived. The status on just that comp_record should reflect that.
 
         $disable_assignment_id = array_pop($assignmentids);
 
+        // Don't trigger events for archiving
+        $events_sink = $this->redirectEvents();
         $model = new assignment_actions();
         $model->archive([$disable_assignment_id]);
         $expand_task = new expand_task($DB);
         $expand_task->expand_all();
+        $events_sink->close();
 
         $aggregator = new competency_achievement_aggregator($achievement_configuration, $comp_user_source);
         $aggregation_method = $this->create_aggregation_method_achieved_by([$achievement]);
         $aggregator->set_aggregation_instance($aggregation_method);
-        $event_sink->clear();
+        $sink->clear();
         $aggregator->aggregate();
-        $events = $event_sink->get_events();
+        $hooks = $sink->get_hooks();
 
         $comp_records = $DB->get_records('totara_competency_achievement');
         $this->assertCount(2, $comp_records);
@@ -561,8 +560,8 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $via_record = reset($via_records);
         $this->assertEquals($achievement->id, $via_record->pathway_achievement_id);
 
-        $this->assertCount(0, $events);
-        $event_sink->close();
+        $this->assertCount(0, $hooks);
+        $sink->close();
     }
 
     public function test_change_in_minimum_proficiency() {
@@ -746,9 +745,9 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
 
         $this->assertEquals(0, $DB->count_records('totara_competency_achievement'));
 
-        $event_sink = $this->redirectEvents();
+        $sink = $this->redirectHooks();
         $aggregator->aggregate();
-        $events = $event_sink->get_events();
+        $hooks = $sink->get_hooks();
 
         $comp_records = $DB->get_records('totara_competency_achievement');
         $this->assertCount(1, $comp_records);
@@ -760,9 +759,9 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $via_record = reset($via_records);
         $this->assertEquals($achievement->id, $via_record->pathway_achievement_id);
 
-        $event = reset($events);
-        $this->assertInstanceOf(competency_achievement_updated::class, $event);
-        $event_sink->close();
+        $hook = reset($hooks);
+        $this->assertInstanceOf(competency_achievement_updated::class, $hook);
+        $sink->close();
 
         $disable_assignment_id = array_pop($assignment_ids);
 
@@ -781,9 +780,9 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $aggregation_method = $this->create_aggregation_method_achieved_by([$achievement2]);
         $aggregator->set_aggregation_instance($aggregation_method);
 
-        $event_sink = $this->redirectEvents();
+        $sink = $this->redirectHooks();
         $aggregator->aggregate();
-        $events = $event_sink->get_events();
+        $hooks = $sink->get_hooks();
 
         // There should still be one record.
         $comp_records = $DB->get_records('totara_competency_achievement');

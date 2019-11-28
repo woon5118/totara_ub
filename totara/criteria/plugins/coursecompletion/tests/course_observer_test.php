@@ -23,7 +23,7 @@
 
 use core\event\course_completed;
 use criteria_coursecompletion\observer\course as course_observer;
-use totara_criteria\event\criteria_achievement_changed;
+use totara_criteria\hook\criteria_achievement_changed;
 
 class criteria_coursecompletion_course_observer_testcase extends advanced_testcase {
 
@@ -82,10 +82,10 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
         $this->assertEquals(course_completed::class, get_class($cc_event));
         $sink->clear();
 
-        $sink = $this->redirectEvents();
+        $sink = $this->redirectHooks();
         course_observer::course_completion_changed($cc_event);
-        $events = $sink->get_events();
-        $this->assertEmpty($events);
+        $hooks = $sink->get_hooks();
+        $this->assertEmpty($hooks);
         $sink->close();
     }
 
@@ -108,13 +108,15 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
         $this->assertEquals(course_completed::class, get_class($cc_event));
         $sink->clear();
 
+        $sink = $this->redirectHooks();
         course_observer::course_completion_changed($cc_event);
-        $events = $sink->get_events();
-        $this->assertEquals(1, count($events));
-        $event = reset($events);
-        $this->assertEquals(criteria_achievement_changed::class, get_class($event));
+        $hooks = $sink->get_hooks();
+        $this->assertEquals(1, count($hooks));
+        /** @var criteria_achievement_changed $hook */
+        $hook = reset($hooks);
+        $this->assertEquals(criteria_achievement_changed::class, get_class($hook));
 
-        $this->assertEqualsCanonicalizing([$criterion->get_id()], $event->other['criteria_ids']);
+        $this->assertEqualsCanonicalizing([$criterion->get_id()], $hook->get_criteria_ids());
         $sink->close();
     }
 
@@ -136,15 +138,17 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
         $this->assertEquals(1, count($events));
         $cc_event = reset($events);
         $this->assertEquals(course_completed::class, get_class($cc_event));
-        $sink->clear();
+        $sink->close();
 
+        $sink = $this->redirectHooks();
         course_observer::course_completion_changed($cc_event);
-        $events = $sink->get_events();
-        $this->assertEquals(1, count($events));
-        $event = reset($events);
-        $this->assertEquals(criteria_achievement_changed::class, get_class($event));
+        $hooks = $sink->get_hooks();
+        $this->assertEquals(1, count($hooks));
+        /** @var criteria_achievement_changed $hook */
+        $hook = reset($hooks);
+        $this->assertEquals(criteria_achievement_changed::class, get_class($hook));
 
-        $this->assertEqualsCanonicalizing([$criterion1->get_id(), $criterion2->get_id()], $event->other['criteria_ids']);
+        $this->assertEqualsCanonicalizing([$criterion1->get_id(), $criterion2->get_id()], $hook->get_criteria_ids());
         $sink->close();
     }
 

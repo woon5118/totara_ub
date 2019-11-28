@@ -24,11 +24,9 @@
 namespace totara_competency;
 
 
-use context_system;
 use core\orm\collection;
 use totara_competency\entities\achievement_via;
 use totara_competency\entities\competency_achievement;
-use totara_competency\event\competency_achievement_updated;
 
 /**
  * Class aggregator
@@ -150,18 +148,9 @@ final class competency_achievement_aggregator {
 
                 $achieved_via_ids = collection::new($user_achievement['achieved_via'])->pluck('id');
 
-                // TODO: Add record as snapshot to event and use that
-                competency_achievement_updated::create([
-                    'context' => context_system::instance(),
-                    'objectid' => $new_comp_achievement->id,
-                    'relateduserid' => $user_id,
-                    'other' => [
-                        'competency_id' => $competency_id,
-                        'achieved_via_ids' => $achieved_via_ids,
-                        'scale_value_id' => $scale_value_id,
-                        'proficient' => $is_proficient
-                    ],
-                ])->trigger();
+                $hook = new hook\competency_achievement_updated($new_comp_achievement);
+                $hook->execute();
+
             } else {
                 // No change.
                 $previous_comp_achievement->last_aggregated = $aggregation_time;

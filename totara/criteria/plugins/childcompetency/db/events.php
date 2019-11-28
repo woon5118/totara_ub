@@ -29,7 +29,6 @@ use hierarchy_competency\event\competency_moved;
 use totara_competency\event\assignment_user_archived;
 use totara_competency\event\assignment_user_assigned;
 use totara_competency\event\assignment_user_unassigned;
-use totara_competency\event\competency_achievement_updated;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -45,10 +44,6 @@ $observers = [
     [
         'eventname' => competency_deleted::class,
         'callback' => competency_observer::class.'::competency_deleted',
-    ],
-    [
-        'eventname' => competency_achievement_updated::class,
-        'callback' => achievement_observer::class.'::competency_achievement_updated',
     ],
     [
         'eventname' => assignment_user_assigned::class,

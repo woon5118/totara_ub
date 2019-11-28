@@ -30,7 +30,6 @@ use core\event\base;
 use core\event\course_completed;
 use totara_completioneditor\event\course_completion_edited;
 use totara_criteria\entities\criteria_item;
-use totara_criteria\event\criteria_achievement_changed;
 
 class course {
 
@@ -52,7 +51,8 @@ class course {
         $criteria_ids = self::get_criteria_ids_for_course_id($event->courseid);
 
         if (!empty($criteria_ids)) {
-            criteria_achievement_changed::create_with_ids($event->relateduserid, $criteria_ids)->trigger();
+            $hook = new \totara_criteria\hook\criteria_achievement_changed($event->relateduserid, $criteria_ids);
+            $hook->execute();
         }
     }
 

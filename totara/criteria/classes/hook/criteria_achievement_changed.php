@@ -17,23 +17,41 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * @author Brendan Cox <brendan.cox@totaralearning.com>
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
- * @package pathway_criteria_group
+ * @package totara_criteria
  */
 
-namespace pathway_criteria_group\observer;
+namespace totara_criteria\hook;
 
-use pathway_criteria_group\aggregation_helper;
-use totara_criteria\event\criteria_achievement_changed;
+use totara_core\hook\base;
 
-class criteria {
+/**
+ * Event to be triggered when a user's achievement of a specific criterion changed
+ * The change can be either that the user now satisfies the criteria, or no longer satisfy the criteria
+ */
+class criteria_achievement_changed extends base {
 
     /**
-     * Listen to the criteria_achievement_changed event and mark all users for reaggregation affected
-     *
-     * @param criteria_achievement_changed $event
+     * @var int
      */
-    public static function criteria_achievement_changed(criteria_achievement_changed $event) {
-        aggregation_helper::mark_for_reaggregate_from_criteria($event->other['criteria_ids'], $event->relateduserid);
+    protected $user_id;
+
+    /**
+     * @var array
+     */
+    protected $criteria_ids;
+
+    public function __construct(int $user_id, array $criteria_ids) {
+        $this->user_id = $user_id;
+        $this->criteria_ids = $criteria_ids;
+    }
+
+    public function get_user_id(): int {
+        return $this->user_id;
+    }
+
+    public function get_criteria_ids(): array {
+        return $this->criteria_ids;
     }
 }

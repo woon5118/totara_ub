@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2018 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Dan Marsden <dan@catalyst.net.nz>
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package block_totara_stats
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2019102302;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2017111309;       // Requires this Moodle version.
-$plugin->component = 'block_totara_stats'; // To check on upgrade, that module sits in correct place
+$watchers = [
+    [
+        'hookname' => \totara_competency\hook\competency_achievement_updated::class,
+        'callback' => \block_totara_stats\watcher\competency::class.'::achievement_updated',
+    ],
+];

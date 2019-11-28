@@ -76,6 +76,13 @@ class totara_plan_observer {
         return true;
     }
 
+    /**
+     * TODO needs to be checked to see what we still need from here
+     *
+     * @param competency_achievement_updated $event
+     * @throws PlanException
+     * @throws coding_exception
+     */
     public static function competency_achievement_updated(competency_achievement_updated $event) {
         global $DB;
 

@@ -17,15 +17,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Brendan Cox <brendan.cox@totaralearning.com>
- * @package block_totara_stats
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+ * @package totara_competency
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace totara_competency\hook;
 
-$observers = [
-    [
-        'eventname' => \totara_competency\event\competency_achievement_updated::class,
-        'callback'  => '\block_totara_stats\observer::competency_achievement_updated',
-    ],
-];
+use totara_competency\entities\competency_achievement;
+use totara_core\hook\base;
+
+class competency_achievement_updated extends base {
+
+    /**
+     * @var array
+     */
+    protected $achievement;
+
+    /**
+     * @param competency_achievement $achievement
+     */
+    public function __construct(competency_achievement $achievement) {
+        // Do not store the reference to the achievement directly
+        // as this should be read-only
+        $this->achievement = $achievement->to_array();
+    }
+
+    public function get_achievement(): array {
+        return $this->achievement;
+    }
+
+}

@@ -27,22 +27,10 @@ namespace criteria_childcompetency\observer;
 use totara_competency\event\assignment_user_archived;
 use totara_competency\event\assignment_user_assigned;
 use totara_competency\event\assignment_user_unassigned;
-use totara_competency\event\competency_achievement_updated;
 use totara_criteria\entities\criteria_item as item_entity;
-use totara_criteria\event\criteria_achievement_changed;
+use totara_criteria\hook\criteria_achievement_changed;
 
 class achievement {
-
-    public static function competency_achievement_updated(competency_achievement_updated $event) {
-        // Find all criteria items on this competency's parent (i.e. find all criteria with a 'competency' item
-        // with this competency as item_id) (Not expecting there to be more than 1, but who knows what clients will do)
-        // As the criterion has no knowledge whether this user's satisfaction of the criteria is to be tracked,
-        // it simply generates an criteria_achievement_changed event with the relevant criterion ids and this user's id.
-        // Modules that use these criteria are responsible for initiating the relevant processes to create/update
-        // the item_record(s) for this user
-
-        static::trigger_parent_criteria_achievement_changed($event->relateduserid, $event->other['competency_id']);
-    }
 
     public static function user_assigned(assignment_user_assigned $event) {
         // If the user is assigned to a child competency and the parent has 'childcompetency' criteria
@@ -78,7 +66,8 @@ class achievement {
             ->pluck('criterion_id');
 
         if (!empty($criteria_ids)) {
-            criteria_achievement_changed::create_with_ids($user_id, $criteria_ids)->trigger();
+            $hook = new criteria_achievement_changed($user_id, $criteria_ids);
+            $hook->execute();
         }
     }
 }

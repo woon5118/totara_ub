@@ -17,25 +17,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Brendan Cox <brendan.cox@totaralearning.com>
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package block_totara_stats
  */
 
-namespace block_totara_stats;
+namespace block_totara_stats\watcher;
 
-use totara_competency\event\competency_achievement_updated;
+use totara_competency\hook\competency_achievement_updated;
 
-class observer {
+class competency {
 
-    public static function competency_achievement_updated(competency_achievement_updated $event) {
+    public static function achievement_updated(competency_achievement_updated $hook) {
         global $DB, $CFG;
         require_once($CFG->dirroot.'/blocks/totara_stats/locallib.php');
 
-        // TODO: Add record as snapshot to event and use that for the data
-        $user_id = $event->relateduserid;
-        $competency_id = $event->other['competency_id'];
-        $is_proficient = $event->other['proficient'];
+        $achievement = $hook->get_achievement();
+
+        $user_id = $achievement['user_id'];
+        $competency_id = $achievement['user_id'];
+        $is_proficient = $achievement['proficient'];
 
         $count = $DB->count_records(
             'block_totara_stats',
@@ -49,4 +49,5 @@ class observer {
             totara_stats_remove_event($user_id, STATS_EVENT_COMP_ACHIEVED, $competency_id);
         }
     }
+
 }
