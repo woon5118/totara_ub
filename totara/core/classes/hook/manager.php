@@ -79,6 +79,15 @@ abstract class manager {
         if (during_initial_install()) {
             return;
         }
+
+        // Intercept the hook if redirecting was turned on in PHPUnit
+        // No need to run the rest of the function as we don't want
+        // to execute the hook in this case just store it in the sink
+        if (PHPUNIT_TEST and \phpunit_util::is_redirecting_hooks()) {
+            \phpunit_util::hook_executed($hook);
+            return;
+        }
+
         self::init_all_watchers();
 
         $hookname = get_class($hook);

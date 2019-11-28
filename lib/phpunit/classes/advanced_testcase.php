@@ -465,6 +465,19 @@ abstract class advanced_testcase extends base_testcase {
     }
 
     /**
+     * Starts hook redirection.
+     *
+     * You can verify if hooks were executed or not by inspecting the hooks
+     * array in the returned hook sink instance. The redirection
+     * can be stopped by calling $sink->close();
+     *
+     * @return phpunit_hook_sink
+     */
+    public function redirectHooks() {
+        return phpunit_util::start_hook_redirection();
+    }
+
+    /**
      * Cleanup after all tests are executed.
      *
      * Note: do not forget to call this if overridden...

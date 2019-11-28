@@ -28,6 +28,8 @@
  * @package totara_core
  */
 
+use totara_core\hook\base;
+
 defined('MOODLE_INTERNAL') || die();
 
 class totara_core_hook_testcase extends advanced_testcase {
@@ -184,5 +186,82 @@ class totara_core_hook_testcase extends advanced_testcase {
         foreach ($watchers as $hookname => $unused) {
             $this->assertTrue(class_exists($hookname), 'Invalid hookname detected in hook watcher: ' . $hookname);
         }
+    }
+
+    /**
+     * Test redirecting hooks into a sink to be able to verify if the hooks got executed as expected
+     */
+    public function test_hook_redirection_in_unit_tests() {
+        require_once(__DIR__ . '/fixtures/test_hook.php');
+
+        \totara_core\hook\manager::phpunit_reset();
+
+        // This is the format used in db/hooks.php files.
+        $watchers = [
+            array(
+                'hookname' => 'totara_core_test_hook',
+                'callback' => array('totara_core_test_hook_watcher', 'listen2'),
+                'includefile' => 'totara/core/tests/fixtures/test_hook_watcher.php',
+            ),
+        ];
+
+        \totara_core\hook\manager::phpunit_replace_watchers($watchers);
+
+        $hook = new totara_core_test_hook();
+        $hook->execute();
+
+        $this->assertEquals([2], $hook->info);
+
+        // Reset hook
+        $hook->info = [];
+
+        $sink = $this->redirectHooks();
+        $hook->execute();
+
+        $hooks = $sink->get_hooks();
+        $this->assertIsArray($hooks);
+        $this->assertCount(1, $hooks);
+        $this->assertEquals(1, $sink->count());
+        $this->assertContainsOnlyInstancesOf(totara_core_test_hook::class, $hooks);
+
+        $hook = reset($hooks);
+        // Make sure the watcher did not get executed
+        $this->assertEmpty($hook->info);
+
+        // Now empty the sink and check that it's really empty
+        $sink->clear();
+
+        $this->assertEmpty($sink->get_hooks());
+        $this->assertEquals(0, $sink->count());
+
+        // Try again and test that the hook got added
+        // to make sure that clearing did not stop redirecting
+        $hook->execute();
+
+        $this->assertContainsOnlyInstancesOf(totara_core_test_hook::class, $sink->get_hooks());
+        $this->assertEquals(1, $sink->count());
+
+        // Execute another one and check that both are present
+        $hook->execute();
+
+        $this->assertContainsOnlyInstancesOf(totara_core_test_hook::class, $sink->get_hooks());
+        $this->assertCount(2, $sink->get_hooks());
+        $this->assertEquals(2, $sink->count());
+
+        // Now stop redirecting and test that watchers will work again
+        $sink->close();
+
+        // Sink is still filled
+        $this->assertCount(2, $sink->get_hooks());
+        $this->assertEquals(2, $sink->count());
+
+        $sink->clear();
+        $this->assertEmpty($sink->get_hooks());
+        $this->assertEquals(0, $sink->count());
+
+        $hook->execute();
+
+        $this->assertEquals([2], $hook->info);
+        $this->assertEmpty($sink->get_hooks());
     }
 }

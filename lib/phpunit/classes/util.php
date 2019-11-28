@@ -51,8 +51,11 @@ class phpunit_util extends testing_util {
     /** @var phpunit_phpmailer_sink alternative target for phpmailer messaging */
     protected static $phpmailersink = null;
 
-    /** @var phpunit_message_sink alternative target for moodle messaging */
+    /** @var phpunit_event_sink alternative target for moodle messaging */
     protected static $eventsink = null;
+
+    /** @var phpunit_hook_sink alternative target for hooks */
+    protected static $hooksink = null;
 
     /**
      * @var array Files to skip when dropping dataroot folder
@@ -107,6 +110,7 @@ class phpunit_util extends testing_util {
 
         // Stop any message redirection.
         self::stop_event_redirection();
+        self::stop_hook_redirection();
 
         // Start a new email redirection.
         // This will clear any existing phpmailer redirection.
@@ -903,6 +907,58 @@ class phpunit_util extends testing_util {
     public static function event_triggered(\core\event\base $event) {
         if (self::$eventsink) {
             self::$eventsink->add_event($event);
+        }
+    }
+
+    /**
+     * Start hook redirection.
+     *
+     * @private
+     * Note: Do not call directly from tests,
+     *       use $sink = $this->redirectHooks() instead.
+     *
+     * @return phpunit_hook_sink
+     */
+    public static function start_hook_redirection() {
+        if (self::$hooksink) {
+            self::stop_hook_redirection();
+        }
+        self::$hooksink = new phpunit_hook_sink();
+        return self::$hooksink;
+    }
+
+    /**
+     * End event redirection.
+     *
+     * @private
+     * Note: Do not call directly from tests,
+     *       use $sink->close() instead.
+     */
+    public static function stop_hook_redirection() {
+        self::$hooksink = null;
+    }
+
+    /**
+     * Are hooks redirected to some sink?
+     *
+     * Note: to be called from \totara_core\hook\base only!
+     *
+     * @private
+     * @return bool
+     */
+    public static function is_redirecting_hooks() {
+        return !empty(self::$hooksink);
+    }
+
+    /**
+     * To be called from \totara_core\hook\base only!
+     *
+     * @private
+     * @param \totara_core\hook\base $hook
+     */
+    public static function hook_executed(\totara_core\hook\base $hook) {
+        if (self::$hooksink) {
+            self::$hooksink->add_hook($hook);
         }
     }
 
