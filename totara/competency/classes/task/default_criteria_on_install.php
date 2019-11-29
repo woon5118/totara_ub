@@ -24,10 +24,9 @@
 namespace totara_competency\task;
 
 use core\collection;
-use core\orm\query\builder;
 use core\task\adhoc_task;
 use totara_competency\entities\competency;
-use totara_competency\entities\scale;
+use totara_competency\entities\scale_aggregation;
 use totara_competency\legacy_aggregation;
 use totara_core\advanced_feature;
 
@@ -56,30 +55,14 @@ class default_criteria_on_install extends adhoc_task {
          * @var competency[]|collection $competencies
          */
         $competencies = competency::repository()
-            ->with('children')
-            ->join('totara_competency_scale_aggregation', 'id', '=', 'comp_id', 'left')
-            ->where('totara_competency_scale_aggregation.id', null)
+            ->with('scale')
+            ->left_join([scale_aggregation::TABLE, 'sa'], 'id', 'comp_id')
+            ->where('sa.id', null)
             ->get();
-
-        /**
-         * Links the frameworks to scales.
-         *
-         * Scales are then loaded below. By having them in one separate array, we reduce having to fetch
-         * them again for each competency.
-         */
-        $framework_to_scale = builder::table('comp_scale_assignments')
-            ->select(['frameworkid', 'scaleid'])
-            ->get();
-
-        /** @var scale[]|collection $scales */
-        $scales = scale::repository()->get();
 
         foreach ($competencies as $competency) {
-            $scale_id = $framework_to_scale->item($competency->frameworkid)->scaleid;
-            $scale = $scales->item($scale_id);
-
             $aggregation = new legacy_aggregation($competency);
-            $aggregation->create_default_pathways($scale, false);
+            $aggregation->create_default_pathways($competency->scale, false);
         }
 
         // Linked courses are synced through observers - no need for additional steps here

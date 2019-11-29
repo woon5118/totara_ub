@@ -26,6 +26,7 @@
 namespace totara_competency;
 
 
+use totara_core\advanced_feature;
 use xmldb_table;
 
 /**
@@ -393,13 +394,13 @@ class aggregation_users_table {
      *
      * @param int|null $user_id_value
      * @param int|null $competency_id_value
-     * @param null $has_changed_value
+     * @param int|null $has_changed_value
      * @return array [string, array]
      */
     public function get_insert_values_sql_with_params(
         ?int $user_id_value = null,
         ?int $competency_id_value = null,
-        $has_changed_value = null
+        ?int $has_changed_value = null
     ): array {
         $sql = [];
         $params = [];
@@ -617,14 +618,16 @@ class aggregation_users_table {
             $process_key_wh = " AND agg_queue.{$this->process_key_column} IS NULL";
         }
 
+        $assignment_users_table = aggregation_helper::get_assigned_users_sql_table();
+
         $sql =
-            "SELECT DISTINCT tacu.user_id
-               FROM {totara_competency_assignment_users} tacu
+            "SELECT DISTINCT tcau.user_id
+               FROM {$assignment_users_table} tcau
           LEFT JOIN {{$this->get_table_name()}} agg_queue
-                 ON agg_queue.{$this->competency_id_column} = tacu.competency_id
-                AND agg_queue.{$this->user_id_column} = tacu.user_id
+                 ON agg_queue.{$this->competency_id_column} = tcau.competency_id
+                AND agg_queue.{$this->user_id_column} = tcau.user_id
                     {$process_key_wh}
-              WHERE tacu.competency_id = :compid
+              WHERE tcau.competency_id = :compid
                 AND agg_queue.id IS NULL";
 
         $to_add = $DB->get_fieldset_sql($sql, ['compid' => $competency_id]);

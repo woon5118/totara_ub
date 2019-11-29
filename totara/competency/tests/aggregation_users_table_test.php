@@ -25,6 +25,7 @@
 use totara_competency\aggregation_users_table;
 use totara_competency\expand_task;
 use totara_competency\models\assignment_actions;
+use totara_core\advanced_feature;
 
 class totara_competency_aggregation_users_table_testcase extends \advanced_testcase {
 
@@ -496,6 +497,8 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
      */
     public function test_queue_all_assigned_users_for_aggregation() {
         global $DB;
+
+        advanced_feature::enable('competency_assignment');
 
         $sink = $this->redirectEvents();
         // The assignment table's foreign keys require us to create some actual competencies and users

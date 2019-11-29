@@ -20,6 +20,7 @@ class configuration_change extends entity {
 
     // Configuration change constants
     public const CHANGED_CRITERIA = 'criteria_changed';
+    public const CHANGED_COMPETENCY_AGGREGATION = 'competency_aggregation_changed';
     public const CHANGED_AGGREGATION = 'aggregation_changed';
     public const CHANGED_MIN_PROFICIENCY = 'min_proficiency_changed';
 
@@ -29,17 +30,20 @@ class configuration_change extends entity {
      * @param int $competency_id
      * @param string $change_type Type of change to log
      * @param int|null $action_time
+     * @param bool $queue defaults to true, st to false to skip queueing
      * @return configuration_change
      */
     public static function add_competency_entry(
         int $competency_id,
         string $change_type,
-        ?int $action_time = null
+        ?int $action_time = null,
+        bool $queue = true
     ): configuration_change {
         $valid_types = [
             self::CHANGED_AGGREGATION,
             self::CHANGED_CRITERIA,
             self::CHANGED_MIN_PROFICIENCY,
+            self::CHANGED_COMPETENCY_AGGREGATION,
         ];
 
         if (!in_array($change_type, $valid_types)) {
@@ -60,9 +64,12 @@ class configuration_change extends entity {
             }
         }
 
-        // TODO: It doesn't feel right to do this from an entity!!
-        // Adding each assigned user to the aggregation queuu
-        (new aggregation_users_table())->queue_all_assigned_users_for_aggregation($competency_id);
+        // In some cases we want to do special queueing outside of this function,
+        // TODO Move this somewehere else, it should not be in the entity
+        if ($queue) {
+            // Adding each assigned user to the aggregation queue
+            (new aggregation_users_table())->queue_all_assigned_users_for_aggregation($competency_id);
+        }
 
         $entry = new configuration_change();
         $entry->comp_id = $competency_id;

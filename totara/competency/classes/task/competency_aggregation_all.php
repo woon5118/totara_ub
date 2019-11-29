@@ -24,8 +24,10 @@
 namespace totara_competency\task;
 
 use core\task\scheduled_task;
+use totara_competency\aggregation_helper;
 use totara_competency\aggregation_task;
 use totara_competency\aggregation_users_table;
+use totara_core\advanced_feature;
 
 /**
  * Aggregates competency achievements for all users actively assigned to any competency in the system.
@@ -67,20 +69,25 @@ class competency_aggregation_all extends scheduled_task {
     private function fill_temp_table(aggregation_users_table $table) {
         global $DB;
 
-        [$insert_values_sql, $params] = $table->get_insert_values_sql_with_params(null, null, 0);
+        $assignment_users_table = aggregation_helper::get_assigned_users_sql_table();
 
-        $insert_columns = "user_id, competency_id, ".implode(", ", array_keys($params));
+        $has_changed_column_sql = '';
+        $has_changed_column_value = '';
+        if ($table->get_has_changed_column()) {
+            $has_changed_column_sql = ", {$table->get_has_changed_column()})";
+            $has_changed_column_value = ", 0";
+        }
 
-        $sql =
-            "INSERT INTO {" . $table->get_table_name() . "}
-            (" . $insert_columns . ")
-             SELECT user_id, competency_id, {$insert_values_sql}
-              FROM {totara_competency_assignment_users} tacu
+        $sql = "
+            INSERT INTO {{$table->get_table_name()}}
+            (user_id, competency_id {$has_changed_column_sql}
+             SELECT DISTINCT tcau.user_id, tcau.competency_id {$has_changed_column_value}
+              FROM {$assignment_users_table} tcau
               JOIN {totara_competency_pathway} pw
-                ON tacu.competency_id = pw.comp_id
-              GROUP BY user_id, competency_id";
+                ON tcau.competency_id = pw.comp_id
+        ";
 
-        $DB->execute($sql, $params);
+        $DB->execute($sql, []);
     }
 
 }

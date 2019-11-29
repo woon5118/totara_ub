@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package totara_competency
  */
 
@@ -41,10 +42,14 @@ class criteria_group_evaluator extends pathway_evaluator {
      * @param pathway_evaluator_user_source $user_id_source
      */
     public function __construct(pathway $pathway, pathway_evaluator_user_source $user_id_source) {
+        $user_id_source = new criteria_group_evaluator_user_source(
+            $user_id_source->get_source(),
+            $user_id_source->is_full_user_set()
+        );
         parent::__construct($pathway, $user_id_source);
+
         $this->item_evaluator_user_source = $this->get_item_evaluator_user_source($user_id_source);
     }
-
 
     /**
      * Evaluate the value achieved for each assigned user

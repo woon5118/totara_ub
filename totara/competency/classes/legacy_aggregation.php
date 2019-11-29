@@ -32,6 +32,7 @@ use pathway_criteria_group\criteria_group;
 use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
 use pathway_learning_plan\learning_plan;
 use totara_competency\entities\competency;
+use totara_competency\entities\configuration_change;
 use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\entities\scale;
 use totara_competency\entities\scale_value;
@@ -72,11 +73,17 @@ class legacy_aggregation {
         $aggregation_method = $this->get_mapped_aggregation_method();
         if (is_null($aggregation_method)) {
             $this->remove_criteria();
-            return;
+        } else {
+            $this->update_or_create_default_criteria(new linkedcourses());
+            $this->update_or_create_default_criteria(new childcompetency());
         }
 
-        $this->update_or_create_default_criteria(new linkedcourses());
-        $this->update_or_create_default_criteria(new childcompetency());
+        // Log change and queue all users
+        configuration_change::add_competency_entry(
+            $this->competency->id,
+            configuration_change::CHANGED_COMPETENCY_AGGREGATION,
+            time()
+        );
     }
 
     /**
@@ -181,8 +188,9 @@ class legacy_aggregation {
         if ($criteria->count()) {
             // Update existing criteria
             foreach ($criteria as $criterion_entity) {
-                $criterion_entity->aggregation_method = $aggregation_method;
-                $criterion_entity->save();
+                $criterion = $criterion::fetch_from_entity($criterion_entity);
+                $criterion->set_aggregation_method($aggregation_method);
+                $criterion->save();
             }
         } else {
             $this->create_default_criteria($criterion);
@@ -227,7 +235,7 @@ class legacy_aggregation {
     }
 
     private function should_add_learning_plans(): bool {
-        if (advanced_feature::is_disabled('competency_assignment')) {
+        if (!advanced_feature::is_enabled('competency_assignment')) {
             // If perform isn't enabled, we'll need to add the learning plan pathway here since users will not be able
             // to access an interface to add them themselves if they need them.
             return true;

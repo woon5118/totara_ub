@@ -99,7 +99,7 @@ class competency implements type_resolver {
 
         if ($field == 'aggregationmethod') {
             // This field should show up on NON-perform only
-            return advanced_feature::is_disabled('competency_assignment');
+            return !advanced_feature::is_enabled('competency_assignment');
         }
 
         return true;

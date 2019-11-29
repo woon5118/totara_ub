@@ -32,6 +32,7 @@ use core\orm\collection;
 use totara_completioneditor\event\course_completion_edited;
 use totara_completionimport\event\bulk_course_completionimport;
 use totara_criteria\entities\criteria_item;
+use totara_criteria\hook\criteria_achievement_changed;
 
 class course {
 
@@ -53,7 +54,7 @@ class course {
         $criteria_items = self::get_criteria_items_of_course_ids([$event->courseid]);
 
         if ($criteria_items->count()) {
-            $hook = new \totara_criteria\hook\criteria_achievement_changed([$event->relateduserid => $criteria_items->pluck('criterion_id')]);
+            $hook = new criteria_achievement_changed([$event->relateduserid => $criteria_items->pluck('criterion_id')]);
             $hook->execute();
         }
     }
@@ -107,7 +108,7 @@ class course {
         }
 
         if (!empty($user_criteria_ids)) {
-            $hook = new \totara_criteria\hook\criteria_achievement_changed($user_criteria_ids);
+            $hook = new criteria_achievement_changed($user_criteria_ids);
             $hook->execute();
         }
     }

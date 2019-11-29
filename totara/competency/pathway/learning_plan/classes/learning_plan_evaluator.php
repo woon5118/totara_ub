@@ -35,18 +35,11 @@ class learning_plan_evaluator extends pathway_evaluator {
      * @param pathway_evaluator_user_source $user_id_source
      */
     public function __construct(pathway $pathway, pathway_evaluator_user_source $user_id_source) {
-        $learning_plan_user_source = $this->get_learning_plan_user_source($user_id_source);
-        parent::__construct($pathway, $learning_plan_user_source);
-    }
-
-    /**
-     * Instantiate and return a manual_user_source using the same user_id_source as the pathway
-     *
-     * @param pathway_evaluator_user_source $user_id_source
-     * @return learning_plan_evaluator_user_source
-     */
-    private function get_learning_plan_user_source(pathway_evaluator_user_source $user_id_source): learning_plan_evaluator_user_source {
-        return new learning_plan_evaluator_user_source($user_id_source->get_source(), $user_id_source->is_full_user_set());
+        $user_id_source = new learning_plan_evaluator_user_source(
+            $user_id_source->get_source(),
+            $user_id_source->is_full_user_set()
+        );
+        parent::__construct($pathway, $user_id_source);
     }
 
 }

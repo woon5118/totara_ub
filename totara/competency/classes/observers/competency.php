@@ -84,7 +84,7 @@ class competency {
         $competency_id = $event->get_data()['objectid'];
 
         // Create default criteria based on the current aggregation method
-        if (advanced_feature::is_disabled('competency_assignment')) {
+        if (!advanced_feature::is_enabled('competency_assignment')) {
             $aggregation = new legacy_aggregation(new competency_entity($competency_id));
             $aggregation->create_default_pathways();
         }

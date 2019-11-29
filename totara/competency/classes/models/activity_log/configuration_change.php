@@ -63,6 +63,8 @@ class configuration_change extends activity_log {
         $entity = $this->get_entity();
 
         switch ($entity->change_type) {
+            case entities\configuration_change::CHANGED_COMPETENCY_AGGREGATION:
+                return get_string('activitylog_competencyaggregationchanged', 'totara_competency');
             case entities\configuration_change::CHANGED_AGGREGATION:
                 return get_string('activitylog_aggregationchanged', 'totara_competency');
             case entities\configuration_change::CHANGED_CRITERIA:

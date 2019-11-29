@@ -24,8 +24,10 @@
 namespace totara_competency\observers;
 
 use hierarchy_competency\event\scale_min_proficient_value_updated;
+use totara_competency\aggregation_helper;
 use totara_competency\aggregation_users_table;
 use totara_competency\entities\configuration_change;
+use totara_core\advanced_feature;
 
 class scale {
 
@@ -68,6 +70,9 @@ class scale {
         // For performance reasons we use one query to query and insert new rows
         // We do not insert values which are already in the queue table
         // to avoid rows being processed twice.
+
+        $assignment_users_table = aggregation_helper::get_assigned_users_sql_table();
+
         $sql = "
             INSERT INTO {{$table->get_table_name()}}
                 (
@@ -76,7 +81,7 @@ class scale {
                     {$has_changed_insert}
                 )    
             SELECT DISTINCT tcau.user_id, tcau.competency_id {$has_changed_select}
-            FROM {totara_competency_assignment_users} tcau 
+            FROM {$assignment_users_table} tcau 
             JOIN {comp} c ON tcau.competency_id = c.id
             JOIN {comp_scale_assignments} csa ON c.frameworkid = csa.frameworkid
             LEFT JOIN {{$table->get_table_name()}} q 

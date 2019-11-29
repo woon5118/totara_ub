@@ -37,6 +37,11 @@ require_once($CFG->dirroot . '/totara/competency/tests/integration_aggregation.p
  */
 class totara_competency_integration_aggregation_single_type_multi_run_testcase extends totara_competency_integration_aggregation {
 
+    protected function setUp() {
+        parent::setUp();
+        \totara_core\advanced_feature::enable('competency_assignment');
+    }
+
     /**
      * Test aggregation task with a combination of criteria_groups and multiple runs
      * @dataProvider task_to_execute_data_provider

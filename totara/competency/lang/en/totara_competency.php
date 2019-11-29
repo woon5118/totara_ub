@@ -31,6 +31,7 @@ $string['achievementpaths'] = 'Achievement paths';
 $string['active'] = 'Active';
 $string['activity_log'] = 'Activity log';
 $string['activitylog_aggregationchanged'] = 'Overall rating calculation change';
+$string['activitylog_competencyaggregationchanged'] = 'Aggregation method on the competency changed';
 $string['activitylog_assignedaudience'] = 'Assigned: {$a->audience_name} (Audience)';
 $string['activitylog_assignedcontinuous'] = 'Assignment transferred for continuous tracking';
 $string['activitylog_assignedself'] = 'Assigned: Self-assigned';

@@ -872,7 +872,7 @@ class competency extends hierarchy {
                 AND a.scaleid = s.id
         ", array($frameworkid));
 
-        if (advanced_feature::is_disabled('competency_assignment')) {
+        if (!advanced_feature::is_enabled('competency_assignment')) {
             $mform->addElement('select', 'aggregationmethod', get_string('aggregationmethod', 'totara_hierarchy'), $aggregations);
             $mform->addHelpButton('aggregationmethod', 'competencyaggregationmethod', 'totara_hierarchy');
             $mform->addRule('aggregationmethod', get_string('aggregationmethod', 'totara_hierarchy'), 'required', null);
@@ -1322,7 +1322,7 @@ class competency extends hierarchy {
      * @param array $availabilities
      */
     protected function save_assignment_availabilities(int $comp_id, array $availabilities) {
-        if (advanced_feature::is_disabled('competency_assignment')) {
+        if (!advanced_feature::is_enabled('competency_assignment')) {
             return;
         }
 

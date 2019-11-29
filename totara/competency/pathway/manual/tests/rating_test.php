@@ -26,7 +26,6 @@ use pathway_manual\manual;
 use totara_competency\aggregation_task;
 use totara_competency\aggregation_users_table;
 use totara_competency\entities\competency;
-use totara_competency\pathway_evaluator_user_source_list;
 use totara_job\job_assignment;
 use totara_competency\entities\pathway_achievement;
 use pathway_manual\entities\rating;

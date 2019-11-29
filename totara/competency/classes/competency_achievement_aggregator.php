@@ -25,8 +25,12 @@ namespace totara_competency;
 
 
 use core\orm\collection;
+use stdClass;
 use totara_competency\entities\achievement_via;
+use totara_competency\entities\assignment;
 use totara_competency\entities\competency_achievement;
+use totara_competency\event\competency_achievement_updated;
+use totara_core\advanced_feature;
 
 /**
  * Class aggregator
@@ -105,6 +109,8 @@ final class competency_achievement_aggregator {
             $user_achievement = $this->get_aggregation_instance()->aggregate_for_user($user_id);
             $previous_comp_achievement = $user_assignment_record->achievement;
 
+            $this->ensure_legacy_assignment_exists($competency_id, $user_assignment_record);
+
             // We don't necessarily have a scale value in this case we store null
             $scale_value_id = null;
             $is_proficient = 0;
@@ -156,6 +162,34 @@ final class competency_achievement_aggregator {
                 $previous_comp_achievement->last_aggregated = $aggregation_time;
                 $previous_comp_achievement->save();
             }
+        }
+    }
+
+    /**
+     * If it's a new achievement then we make sure there's an assignment for it.
+     * This creates an archived legacy assignment
+     *
+     * @param int $competency_id
+     * @param stdClass $user_assignment_record
+     */
+    private function ensure_legacy_assignment_exists(int $competency_id, stdClass $user_assignment_record) {
+        if (advanced_feature::is_enabled('competency_assignment')) {
+            return;
+        }
+
+        if ($user_assignment_record->assignment_id === null) {
+            $assignment = new assignment();
+            $assignment->type = assignment::TYPE_LEGACY;
+            $assignment->user_group_type = user_groups::USER;
+            $assignment->competency_id = $competency_id;
+            $assignment->user_group_id = $user_assignment_record->user_id;
+            $assignment->optional = 0;
+            $assignment->status = assignment::STATUS_ARCHIVED;
+            $assignment->created_by = 0;
+            $assignment->archived_at = time();
+            $assignment->save();
+
+            $user_assignment_record->assignment_id = $assignment->id;
         }
     }
 

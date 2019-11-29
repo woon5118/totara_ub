@@ -26,6 +26,7 @@ namespace pathway_learning_plan\observer;
 use totara_competency\entities\competency_assignment_user;
 use totara_competency\aggregation_users_table;
 use totara_competency\pathway;
+use totara_core\advanced_feature;
 use totara_plan\event\competency_value_set;
 
 class totara_plan {
@@ -33,18 +34,27 @@ class totara_plan {
     public static function competency_value_set(competency_value_set $event) {
         global $DB;
 
-        $competency_id = $event->other['competency_id'];
-        $user_id = $event->relateduserid;
+        $competency_id = (int)$event->other['competency_id'];
+        $user_id = (int)$event->relateduserid;
 
-        // Check that we have an active learning_plan
-        $sql = "SELECT 1
-                  FROM {totara_competency_assignment_users} tacu
-                  JOIN {totara_competency_pathway} tcp
-                    ON tcp.comp_id = tacu.competency_id
-                 WHERE tacu.competency_id = :compid
-                   AND tacu.user_id = :userid
-                   AND tcp.path_type = :pathtype
-                   AND tcp.status = :activestatus";
+        // If perform is not enabled we do not need to check any assignments just reaggregate
+        if (!advanced_feature::is_enabled('competency_assignment')) {
+            (new aggregation_users_table())->queue_for_aggregation($user_id, $competency_id);
+            return;
+        }
+
+        // Check that we have an active learning_plan pathway and the user is assigned to the competency
+        $sql = "
+            SELECT 1
+              FROM {totara_competency_assignment_users} tcau
+              JOIN {totara_competency_pathway} tcp
+                ON tcp.comp_id = tcau.competency_id
+             WHERE tcau.competency_id = :compid
+               AND tcau.user_id = :userid
+               AND tcp.path_type = :pathtype
+               AND tcp.status = :activestatus
+       ";
+
         $params = [
             'compid' => $competency_id,
             'userid' => $user_id,

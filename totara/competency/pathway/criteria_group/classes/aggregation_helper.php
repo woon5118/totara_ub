@@ -29,7 +29,8 @@ use totara_competency\entities\pathway as pathway_entity;
 use pathway_criteria_group\entities\criteria_group as criteria_group_entity;
 use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
 use totara_competency\entities\competency_assignment_user as competency_assignment_user_entity;
-
+use totara_competency\pathway;
+use totara_core\advanced_feature;
 
 class aggregation_helper {
 
@@ -40,62 +41,52 @@ class aggregation_helper {
      * @param array $user_criteria_ids Criteria ids per user
      */
     public static function mark_for_reaggregate_from_criteria(array $user_criteria_ids) {
-        global $DB;
-
         if (empty($user_criteria_ids)) {
             return;
         }
 
+        global $DB;
+
         $all_criteria_ids = array_unique(array_merge(...$user_criteria_ids));
 
-        $criteria = criteria_group_criterion_entity::repository()
-            ->as('cgc')
-            ->join([criteria_group_entity::TABLE, 'cg'], 'cgc.criteria_group_id', 'cg.id')
-            ->join([pathway_entity::TABLE, 'pw'], 'cg.id', 'pw.path_instance_id')
-            ->select('cgc.criterion_id')
-            ->add_select('pw.comp_id')
-            ->where('cgc.criterion_id', $all_criteria_ids)
-            ->get();
+        [$criteria_ids_sql, $criteria_ids_params] = $DB->get_in_or_equal($all_criteria_ids, SQL_PARAMS_NAMED);
+        [$user_ids_sql, $user_ids_params] = $DB->get_in_or_equal(array_keys($user_criteria_ids), SQL_PARAMS_NAMED);
 
-        if (!$criteria->count()) {
-            return;
+        $unique_id = $DB->sql_concat_join("'_'", ['tcau.competency_id', 'tcau.user_id']);
+
+        $assignment_users_table = \totara_competency\aggregation_helper::get_assigned_users_sql_table();
+
+        $sql = "SELECT DISTINCT {$unique_id} as id,
+                       tcau.competency_id, 
+                       tcau.user_id
+                  FROM {$assignment_users_table} tcau
+                  JOIN {totara_competency_pathway} tcp
+                    ON tcau.competency_id = tcp.comp_id
+                  JOIN {pathway_criteria_group_criterion} pcgc
+                    ON pcgc.criteria_group_id = tcp.path_instance_id
+                 WHERE tcp.path_type = :pathtype
+                   AND tcp.status = :activestatus
+                   AND pcgc.criterion_id {$criteria_ids_sql}
+                   AND tcau.user_id {$user_ids_sql}";
+
+        $params = [
+            'pathtype' => 'criteria_group',
+            'activestatus' => pathway::PATHWAY_STATUS_ACTIVE,
+        ];
+
+        $params = array_merge($params, $criteria_ids_params, $user_ids_params);
+
+        $rows = $DB->get_records_sql($sql, $params);
+
+        $to_queue = [];
+        foreach ($rows as $row) {
+            $to_queue[] = [
+                'user_id' => $row->user_id,
+                'competency_id' => $row->competency_id
+            ];
         }
 
-        $competency_criteria = [];
-        foreach ($criteria as $criterion) {
-            if (!isset($competency_criteria[$criterion->comp_id])) {
-                $competency_criteria[$criterion->comp_id] = [];
-            }
-            $competency_criteria[$criterion->comp_id][] = $criterion->criterion_id;
-        }
-
-        $key = 'DISTINCT ' .
-            $DB->sql_concat_join("'_'", ['tcau.competency_id', 'tcau.user_id']) .
-            ' AS competency_user_key';
-
-        $competency_ids = $criteria->pluck('comp_id');
-        $assignments = competency_assignment_user_entity::repository()
-            ->as('tcau')
-            ->select_raw($key)
-            ->add_select('competency_id')
-            ->add_select('user_id')
-            ->where('competency_id', $competency_ids)
-            ->where('user_id', array_keys($user_criteria_ids))
-            ->get();
-
-        $to_reaggregate = [];
-        foreach ($assignments as $assignment) {
-            $common = array_intersect($user_criteria_ids[$assignment->user_id], $competency_criteria[$assignment->competency_id]);
-            if (!empty($common)) {
-                // User is assigned and has changed criteria achievement in one or more of the competency's criteria
-                $to_reaggregate[] = ['user_id' => $assignment->user_id, 'competency_id' => $assignment->competency_id];
-            }
-        }
-
-        if (!empty($to_reaggregate)) {
-            $aggregation_table = new aggregation_users_table();
-            $aggregation_table->queue_multiple_for_aggregation($to_reaggregate);
-        }
+        (new aggregation_users_table())->queue_multiple_for_aggregation($to_queue);
     }
 
 }

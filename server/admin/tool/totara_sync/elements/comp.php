@@ -77,7 +77,7 @@ class totara_sync_element_comp extends totara_sync_hierarchy {
         }
 
         // For new items, check aggregationmethod is not null.
-        if (advanced_feature::is_disabled('competency_assignment')) {
+        if (!advanced_feature::is_enabled('competency_assignment')) {
             $sql = "SELECT s.idnumber
                   FROM {{$synctable}} s 
              LEFT JOIN {comp} c 
