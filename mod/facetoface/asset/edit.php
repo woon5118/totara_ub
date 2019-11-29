@@ -39,7 +39,11 @@ if ($asset->get_custom()) {
 
 $assetlisturl = new moodle_url('/mod/facetoface/asset/manage.php');
 
-$customdata = ['asset' => $asset, 'editoroptions' => $TEXTAREA_OPTIONS];
+// We don't need autosave here
+$editoropts = $TEXTAREA_OPTIONS;
+$editoropts['autosave'] = false;
+
+$customdata = ['asset' => $asset, 'editoroptions' => $editoropts];
 $form = new \mod_facetoface\form\asset_edit(null, $customdata, 'post', '', array('class' => 'dialog-nobind'), true, null, 'mform_modal');
 
 if ($form->is_cancelled()) {

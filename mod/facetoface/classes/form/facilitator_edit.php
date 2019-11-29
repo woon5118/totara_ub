@@ -110,7 +110,11 @@ class facilitator_edit extends \moodleform {
         }
         $mform->setType('notcustom', PARAM_INT);
 
-        $mform->addElement('editor', 'description_editor', get_string('descriptionlabel', 'mod_facetoface'), null, $TEXTAREA_OPTIONS);
+        // We don't need autosave here
+        $editoropts = $TEXTAREA_OPTIONS;
+        $editoropts['autosave'] = false;
+        
+        $mform->addElement('editor', 'description_editor', get_string('descriptionlabel', 'mod_facetoface'), null, $editoropts);
 
         customfield_definition($mform, (object)['id' => $facilitator->get_id()], $prefix, 0, $tblprefix);
 
@@ -179,7 +183,7 @@ class facilitator_edit extends \moodleform {
         $formdata = file_prepare_standard_editor(
             $formdata,
             'description',
-            $TEXTAREA_OPTIONS,
+            $editoropts,
             $syscontext,
             $component,
             $filearea,

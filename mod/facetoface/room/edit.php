@@ -41,7 +41,11 @@ if ($room->get_custom()) {
     redirect($roomlisturl);
 }
 
-$customdata = ['room' => $room, 'editoroptions' => $TEXTAREA_OPTIONS];
+// We don't need autosave here
+$editoropts = $TEXTAREA_OPTIONS;
+$editoropts['autosave'] = false;
+
+$customdata = ['room' => $room, 'editoroptions' => $editoropts];
 $mform = new \mod_facetoface\form\editroom(null, $customdata, 'post', '', array('class' => 'dialog-nobind'), true, null, 'mform_modal');
 
 if ($mform->is_cancelled()) {
