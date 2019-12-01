@@ -6,3 +6,5 @@ information provided here is intended especially for developers.
 * updated totara_catalog/details template changing the text of the close button
 * updated totara_catalog/item_narrow template setting the role of the details section to dialog
 * updated totara_catalog/item_wide template setting the role of the details section to dialog
+* updated totara_catalog/item_style_toggle adding role attributes to improve accessibility
+* updated totara_catalog/results_share chaning the share button to an actual button

@@ -170,7 +170,7 @@ Feature: Test file for catalog
     And I follow "Alphabetical"
     And I follow "Latest"
     # Checking the uri of catalog sharing contain orderbykey & itemstyle
-    When I follow "Share"
+    When I click on "Share" "button"
     # The input of sharing url. At this point, when clicking the sharing button, the input
     # should appear on the browser
     # todo: checking for url content
