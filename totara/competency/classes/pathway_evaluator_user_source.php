@@ -158,6 +158,8 @@ class pathway_evaluator_user_source {
     public function mark_all_users_with_competency(int $competency_id) {
         global $DB;
 
+        $previous_competency_id_value = $this->temp_user_table->get_competency_id_value();
+
         $this->temp_user_table->set_comptency_id_value($competency_id);
         $temp_table_name = $this->temp_user_table->get_table_name();
         [$set_haschanged_sql, $set_haschanged_params] = $this->temp_user_table->get_set_has_changed_sql_with_params(1);
@@ -176,7 +178,7 @@ class pathway_evaluator_user_source {
 
         $DB->execute($sql, $params);
 
-        $this->temp_user_table->reset_comptency_id_value();
+        $this->temp_user_table->set_comptency_id_value($previous_competency_id_value);
     }
 
     /**
