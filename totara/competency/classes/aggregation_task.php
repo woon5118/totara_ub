@@ -170,15 +170,6 @@ class aggregation_task {
      * @return collection|competency[]
      */
     private function get_competency_with_archived_pathways(): collection {
-        $uses_process_key = $this->table->get_process_key_column() && $this->table->get_process_key_value();
-
-        // Make sure we only load competencies we have an entry in the queue for
-        $queue_builder = builder::table($this->table->get_table_name())
-            ->where_field($this->table->get_competency_id_column(), "c.id")
-            ->when($uses_process_key, function (builder $builder) {
-                $builder->where($this->table->get_process_key_column(), $this->table->get_process_key_value());
-            });
-
         // We are looking for competencies with archived pathways which have still active pathway_achievements
         $pathway_builder = builder::table(pathway_entity::TABLE)
             ->join([pathway_achievement::TABLE, 'pwa'], 'id', 'pathway_id')
@@ -186,9 +177,8 @@ class aggregation_task {
             ->where('pwa.status', pathway_achievement::STATUS_CURRENT)
             ->where('status', pathway::PATHWAY_STATUS_ARCHIVED);
 
-        $result =  competency::repository()
+        return competency::repository()
             ->as('c')
-            ->where_exists($queue_builder)
             ->where_exists($pathway_builder)
             ->order_by('depthlevel', 'desc')
             ->order_by('id', 'asc')
@@ -202,8 +192,6 @@ class aggregation_task {
                 }
             ])
             ->get();
-
-        return $result;
     }
 
     /**
