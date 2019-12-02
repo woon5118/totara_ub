@@ -68,7 +68,7 @@ Feature: Seminar Signup Manager Approval
     And I should see "Event info"
     And I follow "Event info"
     And I should see "Manager Approval"
-    And I should see "This seminar requires manager approval, you are currently not assigned to a manager in the system. Please contact the site administrator."
+    And I should see "This seminar requires manager approval. Users without a manager cannot join the seminar."
 
   Scenario: Student signs up with two managers assigned with manager select enabled and manager approval required
     # Add two more managers
@@ -127,7 +127,7 @@ Feature: Seminar Signup Manager Approval
     And I follow "Request approval"
     And I should see "Manager Approval"
     And I press "Request approval"
-    Then I should see "This seminar requires manager approval, please select a manager to request approval"
+    Then I should see "This seminar requires manager approval. Please select a manager to request approval"
 
     And I press "Choose manager"
     And I click on "Cassy Cas" "link" in the "Select manager" "totaradialogue"

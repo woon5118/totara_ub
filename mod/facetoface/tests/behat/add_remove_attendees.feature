@@ -131,6 +131,21 @@ Feature: Add - Remove seminar attendees
     And I click on "Wait-list" "link"
     Then I should see "Sam1 Student1"
 
+    # Sessions that requires manager approval should not allow the addition of users without manager.
+    And I follow "Edit settings"
+    And I expand all fieldsets
+    And I set the field "Manager Approval" to "1"
+    And I click on "Save and display" "button"
+    And I follow "Attendees"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam2 Student2, student2@example.com"
+    And I press "Add"
+    And I press "Continue"
+    Then I should see "1 problem(s) encountered during import."
+    When I click on "View results" "link"
+    Then I should see "This seminar requires manager approval. Users without a manager cannot join the seminar." in the "Sam2 Student2" "table_row"
+    And I press "Close"
+
   Scenario: Add users by username via textarea
     Given I log in as "admin"
     And I am on "Course 1" course homepage

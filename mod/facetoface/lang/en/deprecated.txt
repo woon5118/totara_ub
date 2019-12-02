@@ -88,6 +88,7 @@ setting:signupapproval_header,mod_facetoface
 setting:sitenotices,mod_facetoface
 setting:sitenoticeshere,mod_facetoface
 sitenoticesheading,mod_facetoface
+state_eventhassession_fail,mod_facetoface
 updateposition,mod_facetoface
 userpositionheading,mod_facetoface
 xhxm,mod_facetoface
