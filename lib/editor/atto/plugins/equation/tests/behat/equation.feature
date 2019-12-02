@@ -2,9 +2,13 @@
 Feature: Atto equation editor
   To teach maths to students, I need to write equations
 
+  Background:
+    Given I log in as "admin"
+    And I navigate to "Plugins > Filters > Manage filters" in site administration
+    And I set the field with xpath "//table//tr[contains(.,'MathJax')]//*[@name='newstate']" to "On"
+
   @javascript
   Scenario: Create an equation
-    Given I log in as "admin"
     When I open my profile in edit mode
     And I set the field "Description" to "<p>Equation test</p>"
     # Set field on the bottom of page, so equation editor dialogue is visible.
@@ -22,7 +26,6 @@ Feature: Atto equation editor
 
   @javascript
   Scenario: Edit an equation
-    Given I log in as "admin"
     When I open my profile in edit mode
     And I set the field "Description" to "<p>\( \pi \)</p>"
     # Set field on the bottom of page, so equation editor dialogue is visible.
