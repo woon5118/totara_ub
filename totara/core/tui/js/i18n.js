@@ -68,3 +68,40 @@ export async function loadStrings(requests) {
   const str = await amd('core/str');
   await str.get_strings(requests);
 }
+
+let isRtlValue = null;
+
+/**
+ * Check if the current language is right-to-left.
+ *
+ * @returns {boolean}
+ */
+export function isRtl() {
+  if (isRtlValue === null) {
+    isRtlValue = document.body.classList.contains('dir-rtl');
+  }
+  return isRtlValue;
+}
+
+/**
+ * Convert left-to-right side to the correct side for the current language.
+ *
+ * 'left' and 'right get swapped for RTL languages, otherwise side is passed
+ * through unmodified.
+ *
+ * @param {string} side 'left', 'right', 'top', or 'bottom'
+ * @returns {string}
+ */
+export function langSide(side) {
+  if (!isRtl()) {
+    return side;
+  }
+  switch (side) {
+    case 'left':
+      return 'right';
+    case 'right':
+      return 'left';
+    default:
+      return side;
+  }
+}

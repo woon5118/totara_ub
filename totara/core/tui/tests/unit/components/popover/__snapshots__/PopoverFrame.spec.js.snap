@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PopoverFrame matches snapshot 1`] = `
+<div
+  class="tui-popoverFrame tui-popoverFrame--undefined"
+>
+  <arrow-stub
+    size="normal"
+  />
+   
+  <closebutton-stub
+    class="tui-popoverFrame__close"
+    size="200"
+  />
+   
+  <!---->
+   
+  <div
+    class="tui-popoverFrame__content"
+  >
+    <div>
+      hello
+    </div>
+  </div>
+   
+  <!---->
+</div>
+`;
