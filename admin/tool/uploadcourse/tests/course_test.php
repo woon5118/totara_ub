@@ -262,6 +262,120 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
         $this->assertEquals('Use this summary', $DB->get_field_select('course', 'summary', 'shortname = :s', array('s' => 'c1')));
     }
 
+    public function test_update_with_numsections() {
+        global $DB;
+
+        // Add new course specifying number of sections.
+        $mode = tool_uploadcourse_processor::MODE_CREATE_NEW;
+        $updatemode = tool_uploadcourse_processor::UPDATE_NOTHING;
+        $data = array('shortname' => 'newcourse2', 'fullname' => 'New course 2', 'format' => 'topics', 'category' => 1,
+            'numsections' => 15, 'hiddensections' => 5, 'coursedisplay' => 3);
+        // Defaults data.
+        $defaults = array('format' => 'topics');
+        $co = new tool_uploadcourse_course($mode, $updatemode, $data, $defaults);
+        $this->assertTrue($co->prepare());
+        $co->proceed();
+        $courseid = $DB->get_field('course', 'id', array('shortname' => 'newcourse2'));
+        $this->assertEquals(15, (int)$DB->get_field('course_format_options', 'value', ['name' => 'numsections', 'courseid' => $courseid]));
+        $this->assertEquals(5, (int)$DB->get_field('course_format_options', 'value', ['name' => 'hiddensections', 'courseid' => $courseid]));
+        $this->assertEquals(3, (int)$DB->get_field('course_format_options', 'value', ['name' => 'coursedisplay', 'courseid' => $courseid]));
+
+        // Update the course without format, numsections must not change.
+        $mode = tool_uploadcourse_processor::MODE_UPDATE_ONLY;
+        $updatemode = tool_uploadcourse_processor::UPDATE_ALL_WITH_DATA_ONLY;
+        $updatedata = array('shortname' => 'newcourse2', 'fullname' => 'New course 2.1');
+        $co = new tool_uploadcourse_course($mode, $updatemode, $updatedata);
+        $this->assertTrue($co->prepare());
+        $co->proceed();
+        $this->assertEquals($data['format'], $DB->get_field('course', 'format', array('shortname' => 'newcourse2')));
+        $courseid = $DB->get_field('course', 'id', array('shortname' => 'newcourse2'));
+        $this->assertEquals(15, (int)$DB->get_field('course_format_options', 'value', ['name' => 'numsections', 'courseid' => $courseid]));
+        $this->assertEquals(5, (int)$DB->get_field('course_format_options', 'value', ['name' => 'hiddensections', 'courseid' => $courseid]));
+        $this->assertEquals(3, (int)$DB->get_field('course_format_options', 'value', ['name' => 'coursedisplay', 'courseid' => $courseid]));
+
+        // Change the format numsections.
+        $mode = tool_uploadcourse_processor::MODE_UPDATE_ONLY;
+        $updatemode = tool_uploadcourse_processor::UPDATE_ALL_WITH_DATA_ONLY;
+        $updatedata = array('shortname' => 'newcourse2', 'fullname' => 'New course 2.2', 'format' => 'topics', 'numsections' => 20,
+            'hiddensections' => 7, 'coursedisplay' => 4);
+        $co = new tool_uploadcourse_course($mode, $updatemode, $updatedata);
+        $this->assertTrue($co->prepare());
+        $co->proceed();
+        $this->assertEquals($updatedata['format'], $DB->get_field('course', 'format', array('shortname' => 'newcourse2')));
+        $courseid = $DB->get_field('course', 'id', array('shortname' => 'newcourse2'));
+        $this->assertEquals(20, (int)$DB->get_field('course_format_options', 'value', ['name' => 'numsections', 'courseid' => $courseid]));
+        $this->assertEquals(7, (int)$DB->get_field('course_format_options', 'value', ['name' => 'hiddensections', 'courseid' => $courseid]));
+        $this->assertEquals(4, (int)$DB->get_field('course_format_options', 'value', ['name' => 'coursedisplay', 'courseid' => $courseid]));
+
+        // Make sure nothing changed with MODE_CREATE_OR_UPDATE and without csv data.
+        $mode = tool_uploadcourse_processor::MODE_CREATE_OR_UPDATE;
+        $updatemode = tool_uploadcourse_processor::UPDATE_ALL_WITH_DATA_ONLY;
+        $updatedata = array('shortname' => 'newcourse2', 'fullname' => 'New course 2.3');
+        $co = new tool_uploadcourse_course($mode, $updatemode, $updatedata);
+        $this->assertTrue($co->prepare());
+        $co->proceed();
+        $this->assertEquals($data['format'], $DB->get_field('course', 'format', array('shortname' => 'newcourse2')));
+        $courseid = $DB->get_field('course', 'id', array('shortname' => 'newcourse2'));
+        $this->assertEquals(20, (int)$DB->get_field('course_format_options', 'value', ['name' => 'numsections', 'courseid' => $courseid]));
+        $this->assertEquals(7, (int)$DB->get_field('course_format_options', 'value', ['name' => 'hiddensections', 'courseid' => $courseid]));
+        $this->assertEquals(4, (int)$DB->get_field('course_format_options', 'value', ['name' => 'coursedisplay', 'courseid' => $courseid]));
+
+        // Couse format is updated with MODE_CREATE_OR_UPDATE and with new csv data.
+        $mode = tool_uploadcourse_processor::MODE_CREATE_OR_UPDATE;
+        $updatemode = tool_uploadcourse_processor::UPDATE_ALL_WITH_DATA_ONLY;
+        $updatedata = array('shortname' => 'newcourse2', 'fullname' => 'New course 2.4', 'format' => 'topics', 'numsections' => 18,
+            'hiddensections' => 6, 'coursedisplay' => 5);
+        $co = new tool_uploadcourse_course($mode, $updatemode, $updatedata);
+        $this->assertTrue($co->prepare());
+        $co->proceed();
+        $this->assertEquals($data['format'], $DB->get_field('course', 'format', array('shortname' => 'newcourse2')));
+        $courseid = $DB->get_field('course', 'id', array('shortname' => 'newcourse2'));
+        $this->assertEquals(18, (int)$DB->get_field('course_format_options', 'value', ['name' => 'numsections', 'courseid' => $courseid]));
+        $this->assertEquals(6, (int)$DB->get_field('course_format_options', 'value', ['name' => 'hiddensections', 'courseid' => $courseid]));
+        $this->assertEquals(5, (int)$DB->get_field('course_format_options', 'value', ['name' => 'coursedisplay', 'courseid' => $courseid]));
+
+        // Defaults with UPDATE_ALL_WITH_DATA_OR_DEFAUTLS and without csv data.
+        $mode = tool_uploadcourse_processor::MODE_CREATE_OR_UPDATE;
+        $updatemode = tool_uploadcourse_processor::UPDATE_ALL_WITH_DATA_OR_DEFAUTLS;
+        $updatedata = array('shortname' => 'newcourse2', 'fullname' => 'New course 2.5');
+        $co = new tool_uploadcourse_course($mode, $updatemode, $updatedata);
+        $this->assertTrue($co->prepare());
+        $co->proceed();
+        $this->assertEquals($data['format'], $DB->get_field('course', 'format', array('shortname' => 'newcourse2')));
+        $courseid = $DB->get_field('course', 'id', array('shortname' => 'newcourse2'));
+        // Defaults.
+        $this->assertEquals(4, (int)$DB->get_field('course_format_options', 'value', ['name' => 'numsections', 'courseid' => $courseid]));
+        $this->assertEquals(0, (int)$DB->get_field('course_format_options', 'value', ['name' => 'hiddensections', 'courseid' => $courseid]));
+        $this->assertEquals(0, (int)$DB->get_field('course_format_options', 'value', ['name' => 'coursedisplay', 'courseid' => $courseid]));
+
+        // Couse format is updated with MODE_CREATE_OR_UPDATE/UPDATE_ALL_WITH_DATA_OR_DEFAUTLS and with new csv data.
+        $mode = tool_uploadcourse_processor::MODE_CREATE_OR_UPDATE;
+        $updatemode = tool_uploadcourse_processor::UPDATE_ALL_WITH_DATA_OR_DEFAUTLS;
+        $updatedata = array('shortname' => 'newcourse2', 'fullname' => 'New course 2.6', 'format' => 'topics', 'numsections' => 17,
+            'hiddensections' => 7, 'coursedisplay' => 7);
+        $co = new tool_uploadcourse_course($mode, $updatemode, $updatedata);
+        $this->assertTrue($co->prepare());
+        $co->proceed();
+        $this->assertEquals($data['format'], $DB->get_field('course', 'format', array('shortname' => 'newcourse2')));
+        $courseid = $DB->get_field('course', 'id', array('shortname' => 'newcourse2'));
+        $this->assertEquals(17, (int)$DB->get_field('course_format_options', 'value', ['name' => 'numsections', 'courseid' => $courseid]));
+        $this->assertEquals(7, (int)$DB->get_field('course_format_options', 'value', ['name' => 'hiddensections', 'courseid' => $courseid]));
+        $this->assertEquals(7, (int)$DB->get_field('course_format_options', 'value', ['name' => 'coursedisplay', 'courseid' => $courseid]));
+
+        // Defaults: with MODE_UPDATE_ONLY/UPDATE_ALL_WITH_DATA_OR_DEFAUTLS and without csv data.
+        $mode = tool_uploadcourse_processor::MODE_UPDATE_ONLY;
+        $updatemode = tool_uploadcourse_processor::UPDATE_ALL_WITH_DATA_OR_DEFAUTLS;
+        $updatedata = array('shortname' => 'newcourse2', 'fullname' => 'New course 2.7');
+        $co = new tool_uploadcourse_course($mode, $updatemode, $updatedata);
+        $this->assertTrue($co->prepare());
+        $co->proceed();
+        $this->assertEquals($data['format'], $DB->get_field('course', 'format', array('shortname' => 'newcourse2')));
+        $courseid = $DB->get_field('course', 'id', array('shortname' => 'newcourse2'));
+        $this->assertEquals(4, (int)$DB->get_field('course_format_options', 'value', ['name' => 'numsections', 'courseid' => $courseid]));
+        $this->assertEquals(0, (int)$DB->get_field('course_format_options', 'value', ['name' => 'hiddensections', 'courseid' => $courseid]));
+        $this->assertEquals(0, (int)$DB->get_field('course_format_options', 'value', ['name' => 'coursedisplay', 'courseid' => $courseid]));
+    }
+
     public function test_data_saved() {
         global $DB;
         $this->resetAfterTest(true);

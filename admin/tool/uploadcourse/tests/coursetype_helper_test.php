@@ -28,7 +28,7 @@ require_once($CFG->dirroot . "/course/lib.php");
 /**
  * Class coursetype_helper_test
  */
-class coursetype_helper_test extends advanced_testcase {
+class tool_uploadcourse_coursetype_helper_testcase extends advanced_testcase {
     /**
      * Data provider for the test
      * @see coursetype_helper_test::test_get_coursetypeid_from_string

@@ -33,7 +33,7 @@ require_once($CFG->dirroot . "/course/lib.php");
  *
  * Class coursetype_test
  */
-class upload_course_with_coursetype_field_test extends advanced_testcase {
+class tool_uploadcourse_upload_course_with_coursetype_field_testcase extends advanced_testcase {
     /**
      * Create the instance of tool_uploadcourse_course
      *

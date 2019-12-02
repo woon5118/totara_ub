@@ -121,20 +121,26 @@ class tool_uploadcourse_course {
      */
     public function __construct($mode, $updatemode, $rawdata, $defaults = array(), $importoptions = array()) {
 
+        $this->updatemode = tool_uploadcourse_processor::UPDATE_NOTHING;
         if ($mode !== tool_uploadcourse_processor::MODE_CREATE_NEW &&
                 $mode !== tool_uploadcourse_processor::MODE_CREATE_ALL &&
                 $mode !== tool_uploadcourse_processor::MODE_CREATE_OR_UPDATE &&
                 $mode !== tool_uploadcourse_processor::MODE_UPDATE_ONLY) {
             throw new coding_exception('Incorrect mode.');
-        } else if ($updatemode !== tool_uploadcourse_processor::UPDATE_NOTHING &&
+        }
+
+        if ($mode === tool_uploadcourse_processor::MODE_CREATE_OR_UPDATE ||
+            $mode === tool_uploadcourse_processor::MODE_UPDATE_ONLY) {
+            if ($updatemode !== tool_uploadcourse_processor::UPDATE_NOTHING &&
                 $updatemode !== tool_uploadcourse_processor::UPDATE_ALL_WITH_DATA_ONLY &&
                 $updatemode !== tool_uploadcourse_processor::UPDATE_ALL_WITH_DATA_OR_DEFAUTLS &&
                 $updatemode !== tool_uploadcourse_processor::UPDATE_MISSING_WITH_DATA_OR_DEFAUTLS) {
-            throw new coding_exception('Incorrect update mode.');
+                throw new coding_exception('Incorrect update mode.');
+            } else {
+                $this->updatemode = $updatemode;
+            }
         }
-
         $this->mode = $mode;
-        $this->updatemode = $updatemode;
 
         if (isset($rawdata['shortname'])) {
             $this->shortname = $rawdata['shortname'];
@@ -705,13 +711,7 @@ class tool_uploadcourse_course {
         }
 
         // Special case, 'numsections' is not a course format option any more but still should apply from defaults.
-        if (!$exists || !array_key_exists('numsections', $coursedata)) {
-            if (isset($this->rawdata['numsections']) && is_numeric($this->rawdata['numsections'])) {
-                $coursedata['numsections'] = (int)$this->rawdata['numsections'];
-            } else {
-                $coursedata['numsections'] = get_config('moodlecourse', 'numsections');
-            }
-        }
+        $coursedata = $this->set_course_format_options($exists, $coursedata);
 
         // Saving data.
         $this->data = $coursedata;
@@ -982,4 +982,118 @@ class tool_uploadcourse_course {
         $this->statuses[$code] = $message;
     }
 
+    /**
+     * Set course format options from csv data or defaults depend couse upload create/update
+     * @param bool $exists new course/exists course
+     * @param array $coursedata course data
+     * @return array $coursedata
+     */
+    private function set_course_format_options($exists, $coursedata) {
+        // Current course formats are 'demo'/'singleactivity'/'social'/'topics'/'weeks'.
+        // see course/format/'instances' dir.
+        if (empty($coursedata['format'])) {
+            if (empty($this->defaults['format'])) {
+                // Usually this should not be happening, PHPUNIT runs.
+                $coursedata['format'] = get_config('moodlecourse', 'format');
+                return $this->set_course_format_options($exists, $coursedata);
+            }
+            if (!$exists) {
+                // New course, UPDATEMODE is off, set rawdata or default options.
+                $coursedata['format'] = $this->defaults['format'];
+                return $this->set_course_format_options($exists, $coursedata);
+            } else {
+                if ($this->updatemode == tool_uploadcourse_processor::UPDATE_ALL_WITH_DATA_OR_DEFAUTLS) {
+                    $coursedata['format'] = $this->defaults['format'];
+                    return $this->set_course_format_options($exists, $coursedata);
+                }
+            }
+            return $coursedata;
+        }
+
+        $format = $coursedata['format'];
+        if (!$exists) {
+            // New course, UPDATEMODE is off, set rawdata or default options.
+            $coursedata = $this->set_format_properties($coursedata);
+        } else {
+            // Update existing course, using UPDATEMODE.
+            switch ($this->updatemode) {
+                case tool_uploadcourse_processor::UPDATE_NOTHING:
+                    // Update nothing, do nothing.
+                    break;
+                case tool_uploadcourse_processor::UPDATE_ALL_WITH_DATA_ONLY:
+                    // During update, only use data passed from the CSV.
+                    if (in_array($format, array('demo', 'topics', 'weeks'))) {
+                        if (isset($this->rawdata['numsections']) && is_numeric($this->rawdata['numsections'])) {
+                            $coursedata['numsections'] = (int)$this->rawdata['numsections'];
+                        }
+                        if (isset($this->rawdata['hiddensections']) && is_numeric($this->rawdata['hiddensections'])) {
+                            $coursedata['hiddensections'] = (int)$this->rawdata['hiddensections'];
+                        }
+                        if (isset($this->rawdata['coursedisplay']) && is_numeric($this->rawdata['coursedisplay'])) {
+                            $coursedata['coursedisplay'] = (int)$this->rawdata['coursedisplay'];
+                        }
+                    } else if ($format == 'social') {
+                        if (isset($this->rawdata['numdiscussions']) && is_numeric($this->rawdata['numdiscussions'])) {
+                            $coursedata['numdiscussions'] = (int)$this->rawdata['numdiscussions'];
+                        }
+                    } else if ($format == 'singleactivity') {
+                        $availabletypes = format_singleactivity::get_supported_activities();
+                        if (isset($this->rawdata['activitytype']) && array_key_exists($this->rawdata['activitytype'], $availabletypes)) {
+                            $coursedata['activitytype'] = (string)$this->rawdata['activitytype'];
+                        }
+                    }
+                    break;
+                case tool_uploadcourse_processor::UPDATE_ALL_WITH_DATA_OR_DEFAUTLS:
+                    // During update, use either data from the CSV or defaults.
+                    $coursedata = $this->set_format_properties($coursedata);
+                    break;
+                case tool_uploadcourse_processor::UPDATE_MISSING_WITH_DATA_OR_DEFAUTLS:
+                    // During update, update missing values from either data from the CSV or defaults.
+                    // We will never get a missing data for course format, do nothing.
+                    break;
+            }
+        }
+        return $coursedata;
+    }
+
+    /**
+     * Set course format properties
+     * @param array $coursedata course data
+     * @return array $coursedata
+     */
+    private function set_format_properties($coursedata) {
+        $format = $coursedata['format'];
+        $courseconfig = get_config('moodlecourse');
+        if (in_array($format, array('demo', 'topics', 'weeks'))) {
+            if (isset($this->rawdata['numsections']) && is_numeric($this->rawdata['numsections'])) {
+                $coursedata['numsections'] = (int)$this->rawdata['numsections'];
+            } else {
+                $coursedata['numsections'] = $courseconfig->numsections;
+            }
+            if (isset($this->rawdata['hiddensections']) && is_numeric($this->rawdata['hiddensections'])) {
+                $coursedata['hiddensections'] = (int)$this->rawdata['hiddensections'];
+            } else {
+                $coursedata['hiddensections'] = $courseconfig->hiddensections;
+            }
+            if (isset($this->rawdata['coursedisplay']) && is_numeric($this->rawdata['coursedisplay'])) {
+                $coursedata['coursedisplay'] = (int)$this->rawdata['coursedisplay'];
+            } else {
+                $coursedata['coursedisplay'] = $courseconfig->coursedisplay;
+            }
+        } else if ($format == 'social') {
+            if (isset($this->rawdata['numdiscussions']) && is_numeric($this->rawdata['numdiscussions'])) {
+                $coursedata['numdiscussions'] = (int)$this->rawdata['numdiscussions'];
+            } else {
+                $coursedata['numdiscussions'] = 10;
+            }
+        } else if ($format == 'singleactivity') {
+            $availabletypes = format_singleactivity::get_supported_activities();
+            if (isset($this->rawdata['activitytype']) && array_key_exists($this->rawdata['activitytype'], $availabletypes)) {
+                $coursedata['activitytype'] = (string)$this->rawdata['activitytype'];
+            } else {
+                $coursedata['activitytype'] = get_config('format_singleactivity')->activitytype;
+            }
+        }
+        return $coursedata;
+    }
 }
