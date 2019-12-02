@@ -53,7 +53,7 @@ class achievement {
         $criteria_ids = array_unique($criteria_ids);
 
         if (!empty($criteria_ids)) {
-            $hook = new criteria_achievement_changed($user_id, $criteria_ids);
+            $hook = new criteria_achievement_changed([$user_id => $criteria_ids]);
             $hook->execute();
         }
     }

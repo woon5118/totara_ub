@@ -25,6 +25,8 @@ use core\orm\collection;
 use core\orm\query\table;
 use criteria_childcompetency\childcompetency;
 use totara_competency\entities\competency as competency_entity;
+use totara_competency\entities\competency_achievement as competency_achievement_entity;
+use totara_competency\hook\competency_achievement_updated;
 use totara_criteria\criterion;
 use totara_criteria\entities\criteria_item as item_entity;
 use totara_criteria\entities\criteria_item_record as item_record_entity;
@@ -252,68 +254,6 @@ class criteria_childcompetency_observers_testcase extends advanced_testcase {
         $this->assertSame(0, item_record_entity::repository()->count());
     }
 
-    /**
-     * Test observer when a user's competency achievement changes
-     */
-    public function test_competency_achievement_updated() {
-        /** @var totara_competency_generator $competency_generator */
-        $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
-        /** @var totara_criteria_generator $criteria_generator */
-        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
-
-        $framework = $competency_generator->create_framework();
-
-        // Create 2 competencies, each with 1 child. First one has childcompetency criteria
-        $competencies = [];
-        foreach (['Comp A', 'Comp B'] as $name) {
-            $competencies[$name] = $competency_generator->create_competency($name, $framework);
-
-            $childname = $name . '-1';
-            $competencies[$childname] = $competency_generator->create_competency(
-                $childname,
-                $framework,
-                ['parentid' => $competencies[$name]->id]
-            );
-        }
-        $criterion = $criteria_generator->create_childcompetency(['competency' => $competencies['Comp A']->id]);
-
-        // Verify generated data
-        $this->assertSame(4, competency_entity::repository()->count());
-        $this->assertSame(1, criterion_entity::repository()->count());
-
-        // The competency_created observer should have created the necessary items
-        $this->verify_items($competencies['Comp A']->id, [$competencies['Comp A-1']->id]);
-        $this->assertSame(0, item_record_entity::repository()->count());
-
-        $user = $this->getDataGenerator()->create_user();
-
-        // Now for the test :- We only check that the correct events are triggered
-        $sink = $this->redirectEvents();
-
-        // First for child competency of parent without criteria
-        $test_event = $this->create_achievement_event($competencies['Comp B-1']->id, $user->id);
-        achievement_observer::competency_achievement_updated($test_event);
-        $this->assertSame(0, $sink->count());
-
-        // Parent without criteria
-        $test_event = $this->create_achievement_event($competencies['Comp B']->id, $user->id);
-        achievement_observer::competency_achievement_updated($test_event);
-        $this->assertSame(0, $sink->count());
-
-        // Child competency of parent with criteria
-        $test_event = $this->create_achievement_event($competencies['Comp A-1']->id, $user->id);
-        achievement_observer::competency_achievement_updated($test_event);
-        $this->verify_event($sink, [$user->id => [$criterion->get_id()]]);
-        $sink->clear();
-
-        // Parent with criteria
-        $test_event = $this->create_achievement_event($competencies['Comp A']->id, $user->id);
-        achievement_observer::competency_achievement_updated($test_event);
-        $this->assertSame(0, $sink->count());
-
-        $sink->close();
-    }
-
 
     /**
      * Get the items linked to childcompetency criteria on the specified competency
@@ -436,16 +376,8 @@ class criteria_childcompetency_observers_testcase extends advanced_testcase {
         $new_comp_achievement->last_aggregated = $aggregation_time;
         $new_comp_achievement->save();
 
-        $event = competency_achievement_updated::create(
-            [
-                'context' => context_system::instance(),
-                'objectid' => $new_comp_achievement->id,
-                'relateduserid' => $user_id,
-                'other' => ['competency_id' => $competency_id, 'achieved_via_ids' => [1]],
-            ]
-        );
-
-        return $event;
+        $hook = new competency_achievement_updated($new_comp_achievement);
+        $hook->execute();
     }
 
     /**

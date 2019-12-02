@@ -181,10 +181,10 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
 
         $import_event = bulk_course_completionimport::create_from_list($course_completions);
 
-        $sink = $this->redirectEvents();
+        $sink = $this->redirectHooks();
 
         course_observer::bulk_course_completions_imported($import_event);
-        $this->verify_event($sink, [
+        $this->verify_hook($sink, [
             $data->users[1]->id => [$criteria[1]->get_id(), $criteria[2]->get_id()],
             $data->users[2]->id => [$criteria[1]->get_id(), $criteria[2]->get_id()],
             $data->users[3]->id => [$criteria[3]->get_id()],
@@ -196,17 +196,17 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
 
 
     /**
-     * @param phpunit_event_sink $sink
+     * @param phpunit_hook_sink $sink
      * @param array $expected_user_criteria_ids
      */
-    private function verify_hook(phpunit_event_sink $sink, array $expected_user_criteria_ids) {
+    private function verify_hook(phpunit_hook_sink $sink, array $expected_user_criteria_ids) {
         $hooks = $sink->get_hooks();
         $this->assertEquals(1, count($hooks));
         /** @var criteria_achievement_changed $hook */
         $hook = reset($hooks);
         $this->assertEquals(criteria_achievement_changed::class, get_class($hook));
 
-        $this->assertEqualsCanonicalizing($event->other[criteria_achievement_changed::PAYLOAD_KEY], $expected_payload);
+        $this->assertEqualsCanonicalizing($expected_user_criteria_ids, $hook->get_user_criteria_ids());
         $sink->clear();
     }
 }

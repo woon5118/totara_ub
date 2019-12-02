@@ -91,7 +91,7 @@ class criteria_childcompetency_hooks_testcase extends advanced_testcase {
         // Child competency of parent with criteria
         $test_hook = $this->create_achievement_hook($competencies['Comp A-1']->id, $user->id);
         achievement::updated($test_hook);
-        $this->verify_hook($sink, [$criterion->get_id()]);
+        $this->verify_hook($sink, [$user->id => [$criterion->get_id()]]);
         $sink->clear();
 
         // Parent with criteria
@@ -172,13 +172,13 @@ class criteria_childcompetency_hooks_testcase extends advanced_testcase {
      * @param phpunit_hook_sink $sink
      * @param array $expected_criteria_ids
      */
-    private function verify_hook(phpunit_hook_sink $sink, array $expected_criteria_ids = []) {
+    private function verify_hook(phpunit_hook_sink $sink, array $expected_criteria_ids) {
         $this->assertSame(1, $sink->count());
         $hooks = $sink->get_hooks();
         /** @var criteria_achievement_changed $hook */
         $hook = reset($hooks);
         $this->assertInstanceOf(criteria_achievement_changed::class, $hook);
-        $this->assertEqualsCanonicalizing($expected_criteria_ids, $hook->get_criteria_ids());
+        $this->assertEqualsCanonicalizing($expected_criteria_ids, $hook->get_user_criteria_ids());
     }
 
 }
