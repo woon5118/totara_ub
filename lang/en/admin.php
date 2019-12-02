@@ -1183,6 +1183,7 @@ $string['unsupporteddbtablerowformat'] = 'Your database has tables using unsuppo
 $string['unsupporteddbtablerowformatcheck'] = 'Unsupported database table row format';
 $string['unsupportedphpversion7'] = 'PHP version 7.0 and higher is not supported.';
 $string['unsupportedphpversion71'] = 'PHP version 7.1 and higher is not supported.';
+$string['unsupportedphpversion74'] = 'PHP version 7.4 and higher is not supported.';
 $string['unsupportedssltlsconfiguration'] = 'SSL/TLS configuration not supported';
 $string['unsupportedunoconvversion'] = 'unoconv version not supported';
 $string['unsuspenduser'] = 'Activate user account';
