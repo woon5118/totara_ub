@@ -74,4 +74,20 @@ abstract class moodle_recordset implements Iterator {
      * @return void
      */
     public abstract function close();
+
+    /**
+     * Returns array of records with row numbers as keys starting at 0.
+     *
+     * NOTE: this must be called only once because the recordset
+     *       iterator cannot be rewound.
+     *
+     * @return array
+     */
+    public function to_array(): array {
+        $result = [];
+        foreach ($this as $record) {
+            $result[] = $record;
+        }
+        return $result;
+    }
 }

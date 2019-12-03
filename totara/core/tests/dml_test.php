@@ -2791,4 +2791,55 @@ ORDER BY tt1.groupid";
         $this->assertDebuggingCalled('Counted recordsets are deprecated, use two separate queries instead.');
         self::assertSame(1, $count);
     }
+
+    public function test_recordset_to_array() {
+        $DB = $this->tdb;
+        $dbman = $this->tdb->get_manager();
+
+        $table = new xmldb_table('test_table');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'id');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $dbman->create_temp_table($table);
+
+        $id1 = (string)$DB->insert_record('test_table', ['name' => 'one']);
+        $id2 = (string)$DB->insert_record('test_table', ['name' => 'two']);
+        $id3 = (string)$DB->insert_record('test_table', ['name' => 'three']);
+        $id4 = (string)$DB->insert_record('test_table', ['name' => 'two']);
+
+        $sql = 'SELECT name, id FROM "ttr_test_table" ORDER BY id';
+        $rs = $DB->get_recordset_sql($sql);
+        $array = $rs->to_array();
+        $this->assertCount(4, $array);
+        $this->assertSame([0, 1, 2 , 3], array_keys($array));
+        $nestedarray = convert_to_array($array);
+        $expected = [
+            0 => ['name' => 'one', 'id' => $id1],
+            1 => ['name' => 'two', 'id' => $id2],
+            2 => ['name' => 'three', 'id' => $id3],
+            3 => ['name' => 'two', 'id' => $id4],
+        ];
+        $this->assertSame($expected, $nestedarray);
+
+        $array = $rs->to_array();
+        $this->assertSame([], $array);
+        $this->assertDebuggingNotCalled();
+
+        $sql = 'SELECT name, id FROM "ttr_test_table" WHERE 1=2';
+        $rs = $DB->get_recordset_sql($sql);
+        $array = $rs->to_array();
+        $this->assertSame([], $array);
+
+        $sql = 'SELECT name, id FROM "ttr_test_table" ORDER BY id';
+        $rs = $DB->get_recordset_sql($sql);
+        $array = iterator_to_array($rs);
+        $this->assertCount(3, $array);
+        $this->assertSame(['one', 'two', 'three'], array_keys($array));
+
+        $array = $rs->to_array();
+        $this->assertSame([], $array);
+        $this->assertDebuggingNotCalled();
+
+        $dbman->drop_table($table);
+    }
 }

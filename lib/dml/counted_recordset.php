@@ -152,6 +152,18 @@ final class counted_recordset extends moodle_recordset {
     }
 
     /**
+     * Returns array of records with row numbers as keys starting at 0.
+     *
+     * NOTE: this must be called only once because the recordset
+     *       iterator cannot be rewound.
+     *
+     * @return array
+     */
+    public function to_array(): array {
+        return $this->rs->to_array();
+    }
+
+    /**
      * Returns the count of records without limits applied.
      *
      * Count is calculated during construction so that the count is still available after the
