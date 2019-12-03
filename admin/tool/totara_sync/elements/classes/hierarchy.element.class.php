@@ -175,7 +175,6 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
             foreach ($rs as $item) {
                 $this->sync_item($item, $synctable);
             }
-            $rs->close();
         }
 
         /// Delete items.
@@ -211,7 +210,6 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
                         "{$elname} {$r->idnumber}"), 'info', "{$elname}sync");
                 }
             }
-            $rs->close();
         }
 
         $this->get_source()->drop_table();
@@ -419,7 +417,6 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
             foreach ($rs as $r) {
                 $this->addlog(get_string('frameworkxnotexist', 'tool_totara_sync', $r->frameworkidnumber), 'error', 'checksanity');
             }
-            $rs->close();
             return false;
         }
 
@@ -433,7 +430,6 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
             foreach ($rs as $r) {
                 $this->addlog(get_string('duplicateidnumberx', 'tool_totara_sync', $r->idnumber), 'warn', 'checksanity');
             }
-            $rs->close();
         }
 
         // Check parents.
@@ -457,7 +453,6 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
                 $lngstr = empty($this->config->sourceallrecords) ? 'parentxnotexist' : 'parentxnotexistinfile';
                 $this->addlog(get_string($lngstr, 'tool_totara_sync', $r->parentidnumber), 'error', 'checksanity');
             }
-            $rs->close();
             return false;
         }
 
@@ -472,7 +467,6 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
             foreach ($rs as $r) {
                 $this->addlog(get_string('typexnotexist', 'tool_totara_sync', $r->typeidnumber), 'error', 'checksanity');
             }
-            $rs->close();
             return false;
         }
 
@@ -551,10 +545,12 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
                             continue;
                         }
                         $this->addlog(get_string('customfieldsnotype', 'tool_totara_sync', "({$elname}:{$r->idnumber})"), 'error', 'checksanity');
+                        $rs->close();
                         return false;
                     }
                     if (!$typeid = $DB->get_field($elname.'_type', 'id', array('idnumber' => $r->typeidnumber))) {
                         $this->addlog(get_string('typexnotfound', 'tool_totara_sync', $r->typeidnumber), 'error', 'checksanity');
+                        $rs->close();
                         return false;
                     }
                     foreach ($customfields as $c) {
@@ -566,12 +562,12 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
                         if (!$DB->record_exists($elname.'_type_info_field', array('typeid' => $typeid, 'shortname' => $shortname))) {
                             $this->addlog(get_string('customfieldnotexist', 'tool_totara_sync',
                                 (object)array('shortname' => $shortname, 'typeidnumber' => $r->typeidnumber)), 'error', 'checksanity');
+                            $rs->close();
                             return false;
                         }
                     }
                 }
             }
-            $rs->close();
         }
 
         return true;
