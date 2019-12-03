@@ -71,7 +71,7 @@ class aggregation_helper {
 
         $key = 'DISTINCT ' .
             $DB->sql_concat_join("'_'", ['tcau.competency_id', 'tcau.user_id']) .
-            ' AS key';
+            ' AS competency_user_key';
 
         $competency_ids = $criteria->pluck('comp_id');
         $assignments = competency_assignment_user_entity::repository()
