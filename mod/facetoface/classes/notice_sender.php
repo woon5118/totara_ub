@@ -593,11 +593,17 @@ class notice_sender {
                 $notice->facetofaceid = $seminarevent->get_facetoface();
                 // Send original notice for this date.
                 $notice->set_newevent($user, $seminareventid, $date);
+                $icaldata = [];
                 if ($sendical) {
                     $notice->add_ical_attachment($user, $session, $icalattachmentmethod, !$cancel ? $date : [], $cancel ? $date : []);
+                    $icaldata = [
+                        'dates' => !$cancel ? $date : [],
+                        'olddates' => $cancel ? $date : [],
+                        'method' => $icalattachmentmethod
+                    ];
                 }
                 if ($notifyuser) {
-                    $notice->send_to_user($user, $seminareventid, $date);
+                    $notice->send_to_user($user, $seminareventid, $date, $icaldata);
                 }
                 if ($notifymanager) {
                     $notice->send_to_manager($user, $seminareventid);
