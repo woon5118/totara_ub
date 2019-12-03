@@ -53,4 +53,31 @@ class bulk_course_completionimport extends base {
             ]
         );
     }
+
+    /**
+     * Returns localised event name.
+     *
+     * @return string
+     */
+    public static function get_name() {
+        return get_string('event_course_completion_imported', 'totara_completionimport');
+    }
+
+    /**
+     * Returns non-localised event description with id's for admin use only.
+     *
+     * @return string
+     */
+    public function get_description() {
+        return "Completion records for multiple users";
+    }
+
+    /**
+     * Return the user course completions
+     *@return array
+     */
+    public function get_completions(): array {
+        return $this->other[self::PAYLOAD_KEY];
+    }
+
 }

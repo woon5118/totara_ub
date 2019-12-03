@@ -37,10 +37,17 @@ class criteria_achievement_changed extends base {
      */
     protected $user_criteria_ids;
 
+    /**
+     * @param array $user_criteria_ids List of affected criteria per affected user. Key: user_id, Value: array of criteria_ids
+     */
     public function __construct(array $user_criteria_ids) {
         $this->user_criteria_ids = $user_criteria_ids;
     }
 
+    /**
+     * Return a list of criteria ids for all users whose achievements changed
+     * @return array Key: user_id, Value: array of criteria_ids affected
+     */
     public function get_user_criteria_ids(): array {
         return $this->user_criteria_ids;
     }

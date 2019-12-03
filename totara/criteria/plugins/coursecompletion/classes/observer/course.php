@@ -81,8 +81,8 @@ class course {
             $user_courses[$user_id][] = $course_id;
         }
 
-        // Find a list of all unique course ids from the event payload
-        $course_ids = array_unique(array_column($event->other[bulk_course_completionimport::PAYLOAD_KEY], 'courseid'));
+        // Find a list of all unique course ids from the event
+        $course_ids = array_unique(array_column($event->get_completions(), 'courseid'));
 
         // Map course_ids to criterion_ids
         $course_criteria = array_fill_keys($course_ids, []);
