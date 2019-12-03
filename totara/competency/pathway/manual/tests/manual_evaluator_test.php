@@ -24,6 +24,9 @@
 
 use pathway_manual\manual;
 use pathway_manual\manual_evaluator_user_source;
+use pathway_manual\models\roles\appraiser;
+use pathway_manual\models\roles\manager;
+use pathway_manual\models\roles\self_role;
 use totara_competency\aggregation_users_table;
 use totara_competency\entities\competency;
 use totara_competency\entities\pathway_achievement;
@@ -86,7 +89,7 @@ class pathway_manual_evaluator_testcase extends advanced_testcase {
 
         $data->manual = new manual();
         $data->manual->set_competency($data->competency);
-        $data->manual->set_roles([manual::ROLE_MANAGER, manual::ROLE_APPRAISER, manual::ROLE_SELF]);
+        $data->manual->set_roles([manager::class, appraiser::class, self_role::class]);
         $data->manual->save();
 
         $data->user_id_table = new aggregation_users_table();
@@ -107,7 +110,7 @@ class pathway_manual_evaluator_testcase extends advanced_testcase {
             [
                 'subject' => $data->users['user']->id,
                 'rater' => $data->users['manager']->id,
-                'role' => manual::ROLE_MANAGER,
+                'role' => manager::get_name(),
                 'scalevalue' => $data->scalevalues[3]->id,
                 'date_assigned' => $now++,
             ],
@@ -135,7 +138,7 @@ class pathway_manual_evaluator_testcase extends advanced_testcase {
             [
                 'subject' => $data->users['user']->id,
                 'rater' => $data->users['appraiser']->id,
-                'role' => manual::ROLE_APPRAISER,
+                'role' => appraiser::get_name(),
                 'scalevalue' => $data->scalevalues[4]->id,
                 'date_assigned' => $now++,
             ],
@@ -170,14 +173,14 @@ class pathway_manual_evaluator_testcase extends advanced_testcase {
             [
                 'subject' => $data->users['user']->id,
                 'rater' => $data->users['user']->id,
-                'role' => manual::ROLE_SELF,
+                'role' => self_role::get_name(),
                 'scalevalue' => $data->scalevalues[5]->id,
                 'date_assigned' => $now++,
             ],
             [
                 'subject' => $data->users['user']->id,
                 'rater' => $data->users['manager']->id,
-                'role' => manual::ROLE_MANAGER,
+                'role' => manager::get_name(),
                 'scalevalue' => $data->scalevalues[2]->id,
                 'date_assigned' => $now++,
             ],

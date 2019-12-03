@@ -28,6 +28,8 @@ use criteria_linkedcourses\linkedcourses;
 use criteria_onactivate\onactivate;
 use pathway_criteria_group\criteria_group;
 use pathway_manual\manual;
+use pathway_manual\models\roles\manager;
+use pathway_manual\models\roles\self_role;
 use totara_competency\entities\scale;
 use totara_competency\entities\scale_value;
 use totara_criteria\criterion;
@@ -72,12 +74,12 @@ class achievement_criteria {
 
         $pw = new manual();
         $pw->set_sortorder(1)
-            ->set_roles([manual::ROLE_MANAGER]);
+            ->set_roles([manager::get_name()]);
         $pathways[] = $pw;
 
         $pw = new manual();
         $pw->set_sortorder(2)
-            ->set_roles([manual::ROLE_SELF]);
+            ->set_roles([self_role::get_name()]);
         $pathways[] = $pw;
 
         $crit = new linkedcourses();

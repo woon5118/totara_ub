@@ -27,7 +27,8 @@ use core\entities\user;
 use core\orm\entity\entity;
 use moodle_url;
 use pathway_manual\entities\rating;
-use pathway_manual\manual;
+use pathway_manual\models\roles\role;
+use pathway_manual\models\roles\self_role;
 use totara_competency\entities\competency;
 use user_picture;
 
@@ -51,48 +52,21 @@ class role_rating {
     protected $user;
 
     /**
-     * @var string
+     * @var role
      */
     protected $role;
 
-    public function __construct(competency $competency, user $user, string $role) {
-        manual::check_is_valid_role($role, true);
-
+    public function __construct(competency $competency, user $user, role $role) {
         $this->user = $user;
         $this->role = $role;
         $this->competency = $competency;
     }
 
     /**
-     * @return string
+     * @return role
      */
-    public function get_role(): string {
+    public function get_role(): role {
         return $this->role;
-    }
-
-    /**
-     * Does the logged in user have this role?
-     *
-     * @return bool
-     */
-    public function current_user_has_role(): bool {
-        global $USER;
-        return manual::user_has_role($this->user->id, $USER->id, $this->role);
-    }
-
-    /**
-     * @return string
-     */
-    public function get_role_display_name(): string {
-        if ($this->role == manual::ROLE_SELF) {
-            if ($this->user->is_logged_in()) {
-                return get_string('your_rating', 'pathway_manual');
-            } else {
-                return $this->user->fullname;
-            }
-        }
-
-        return get_string('role_' . $this->role, 'pathway_manual');
     }
 
     /**
@@ -103,7 +77,7 @@ class role_rating {
      */
     public function get_default_picture(): moodle_url {
         global $PAGE, $OUTPUT;
-        if ($this->role == manual::ROLE_SELF) {
+        if ($this->role instanceof self_role) {
             $user_picture = new user_picture((object) $this->user->to_array());
             $user_picture->size = 1; // Size f1.
             return $user_picture->get_url($PAGE);
@@ -121,7 +95,7 @@ class role_rating {
         return rating::repository()
             ->where('comp_id', $this->competency->id)
             ->where('user_id', $this->user->id)
-            ->where('assigned_by_role', $this->role)
+            ->where('assigned_by_role', $this->role::get_name())
             ->order_by('date_assigned', 'desc')
             ->first();
     }

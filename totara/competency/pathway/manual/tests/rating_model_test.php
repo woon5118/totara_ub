@@ -24,6 +24,9 @@
 
 use pathway_manual\manual;
 use pathway_manual\models\rating as rating_model;
+use pathway_manual\models\roles\appraiser;
+use pathway_manual\models\roles\manager;
+use pathway_manual\models\roles\self_role;
 use totara_job\job_assignment;
 
 defined('MOODLE_INTERNAL') || die();
@@ -40,7 +43,7 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
         unassign_capability('totara/competency:rate_own_competencies', $user_role_id);
 
         $this->expectException(required_capability_exception::class);
-        rating_model::for_user_and_role($this->user1->id, manual::ROLE_SELF)->create(
+        rating_model::for_user_and_role($this->user1->id, self_role::class)->create(
             $this->competency1->id,
             $this->get_scale_value_id('11'),
             'comment text'
@@ -55,7 +58,7 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
         unassign_capability('totara/competency:rate_other_competencies', $user_role_id);
 
         $this->expectException(required_capability_exception::class);
-        rating_model::for_user_and_role($this->user2->id, manual::ROLE_MANAGER)->create(
+        rating_model::for_user_and_role($this->user2->id, manager::class)->create(
             $this->competency1->id,
             $this->get_scale_value_id('11'),
             'comment text'
@@ -75,7 +78,7 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
         );
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('|Invalid role\(s\) specified|');
+        $this->expectExceptionMessageRegExp('|Invalid role specified: \'non-existent-role\'|');
         rating_model::for_user_and_role($this->user2->id, 'non-existent-role')->create(
             $this->competency1->id,
             $this->get_scale_value_id('11'),
@@ -95,9 +98,9 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
             context_user::instance($this->user2->id)
         );
 
-        $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('|You do not have the role|');
-        rating_model::for_user_and_role($this->user2->id, manual::ROLE_MANAGER)->create(
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessageRegExp('|The following competencies: [\d]+ do not have the manager role enabled.|');
+        rating_model::for_user_and_role($this->user2->id, manager::class)->create(
             $this->competency1->id,
             $this->get_scale_value_id('11'),
             'comment text'
@@ -111,11 +114,11 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
     public function test_create_with_role_not_enabled_for_competency() {
         $this->setUser($this->user2->id);
         $this->set_as_rating_manager($this->user1->id, $this->user2->id);
-        $this->generator->create_manual($this->competency1, [manual::ROLE_SELF]);
+        $this->generator->create_manual($this->competency1, [self_role::class]);
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('|Role manager cannot rate for competency|');
-        rating_model::for_user_and_role($this->user1->id, manual::ROLE_MANAGER)->create(
+        $this->expectExceptionMessageRegExp('|The following competencies: [\d]+ do not have the manager role enabled|');
+        rating_model::for_user_and_role($this->user1->id, manager::class)->create(
             $this->competency1->id,
             $this->get_scale_value_id('11'),
             'comment text'
@@ -129,12 +132,12 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
     public function test_create_with_invalid_scale_value() {
         $this->setUser($this->user2->id);
         $this->set_as_rating_manager($this->user1->id, $this->user2->id);
-        $this->generator->create_manual($this->competency1, [manual::ROLE_MANAGER]);
+        $this->generator->create_manual($this->competency1, [manager::class]);
 
         // Try to set scale value from scale2.
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessageRegExp('|Invalid scale value|');
-        rating_model::for_user_and_role($this->user1->id, manual::ROLE_MANAGER)->create(
+        rating_model::for_user_and_role($this->user1->id, manager::class)->create(
             $this->competency1->id,
             $this->get_scale_value_id('22'),
             'comment text'
@@ -146,11 +149,11 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
 
         $this->setUser($this->user2->id);
         $this->set_as_rating_manager($this->user1->id, $this->user2->id);
-        $this->generator->create_manual($this->competency1, [manual::ROLE_MANAGER]);
+        $this->generator->create_manual($this->competency1, [manager::class]);
         $scale_value_id = $this->get_scale_value_id('11');
 
         $this->assertFalse($DB->record_exists('pathway_manual_rating', ['comp_id' => $this->competency1->id]));
-        rating_model::for_user_and_role($this->user1->id, manual::ROLE_MANAGER)->create(
+        rating_model::for_user_and_role($this->user1->id, manager::class)->create(
             $this->competency1->id,
             $scale_value_id,
             'comment text'
@@ -160,12 +163,12 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
             'user_id' => $this->user1->id,
             'scale_value_id' => $scale_value_id,
             'assigned_by' => $this->user2->id,
-            'assigned_by_role' => manual::ROLE_MANAGER,
+            'assigned_by_role' => manager::get_name(),
         ], '*', MUST_EXIST);
         $this->assertEquals('comment text', $record->comment);
 
         // Test null value for scale value as well.
-        rating_model::for_user_and_role($this->user1->id, manual::ROLE_MANAGER)->create(
+        rating_model::for_user_and_role($this->user1->id, manager::class)->create(
             $this->competency1->id,
             null,
             'comment text 2'
@@ -175,7 +178,7 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
             'user_id' => $this->user1->id,
             'scale_value_id' => null,
             'assigned_by' => $this->user2->id,
-            'assigned_by_role' => manual::ROLE_MANAGER,
+            'assigned_by_role' => manager::get_name(),
         ], '*', MUST_EXIST);
         $this->assertEquals('comment text 2', $record->comment);
     }
@@ -186,8 +189,8 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
         $this->setUser($this->user2->id);
         $this->set_as_rating_manager($this->user1->id, $this->user2->id);
 
-        $this->generator->create_manual($this->competency1, [manual::ROLE_MANAGER]);
-        $this->generator->create_manual($this->competency2, [manual::ROLE_MANAGER]);
+        $this->generator->create_manual($this->competency1, [manager::class]);
+        $this->generator->create_manual($this->competency2, [manager::class]);
         $scale_value_id_1 = $this->get_scale_value_id('11');
         $scale_value_id_2 = $this->get_scale_value_id('22');
 
@@ -206,14 +209,14 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
 
         $this->assertFalse($DB->record_exists('totara_competency_aggregation_queue', []));
 
-        rating_model::for_user_and_role($this->user1->id, manual::ROLE_MANAGER)->create_multiple($ratings);
+        rating_model::for_user_and_role($this->user1->id, manager::class)->create_multiple($ratings);
 
         $record = $DB->get_record('pathway_manual_rating', [
             'comp_id' => $this->competency1->id,
             'user_id' => $this->user1->id,
             'scale_value_id' => $scale_value_id_1,
             'assigned_by' => $this->user2->id,
-            'assigned_by_role' => manual::ROLE_MANAGER,
+            'assigned_by_role' => manager::get_name(),
         ], '*', MUST_EXIST);
         $this->assertEquals('Test comment 1', $record->comment);
 
@@ -222,7 +225,7 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
             'user_id' => $this->user1->id,
             'scale_value_id' => $scale_value_id_2,
             'assigned_by' => $this->user2->id,
-            'assigned_by_role' => manual::ROLE_MANAGER,
+            'assigned_by_role' => manager::get_name(),
         ], '*', MUST_EXIST);
         $this->assertEquals('Test comment 2', $record->comment);
 
@@ -239,27 +242,27 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
     }
 
     public function test_validate_role_for_competencies() {
-        $this->generator->create_manual($this->competency1, [manual::ROLE_MANAGER, manual::ROLE_APPRAISER]);
-        $this->generator->create_manual($this->competency2, [manual::ROLE_MANAGER, manual::ROLE_APPRAISER, manual::ROLE_SELF]);
+        $this->generator->create_manual($this->competency1, [manager::class, appraiser::class]);
+        $this->generator->create_manual($this->competency2, [manager::class, appraiser::class, self_role::class]);
 
         $this->assertTrue(
-            rating_model::for_user_and_role($this->user1->id, manual::ROLE_MANAGER)
+            rating_model::for_user_and_role($this->user1->id, manager::class)
                 ->validate_role_for_competencies([$this->competency1->id, $this->competency2->id])
         );
 
         $this->assertTrue(
-            rating_model::for_user_and_role($this->user1->id, manual::ROLE_APPRAISER)
+            rating_model::for_user_and_role($this->user1->id, appraiser::class)
                 ->validate_role_for_competencies([$this->competency1->id, $this->competency2->id])
         );
 
         $this->assertTrue(
-            rating_model::for_user_and_role($this->user1->id, manual::ROLE_SELF)
+            rating_model::for_user_and_role($this->user1->id, self_role::class)
                 ->validate_role_for_competencies([$this->competency2->id])
         );
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('|Role self cannot rate for competency|');
-        rating_model::for_user_and_role($this->user1->id, manual::ROLE_SELF)
+        $this->expectExceptionMessageRegExp('|The following competencies: [\d]+ do not have the self role enabled|');
+        rating_model::for_user_and_role($this->user1->id, self_role::class)
             ->validate_role_for_competencies([$this->competency1->id, $this->competency2->id]);
     }
 

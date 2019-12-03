@@ -26,6 +26,7 @@ use core\orm\query\builder;
 use pathway_manual\data_providers\user_rateable_competencies;
 use pathway_manual\manual;
 use pathway_manual\models\rateable_competency;
+use pathway_manual\models\roles\self_role;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency_type;
 use totara_competency\expand_task;
@@ -74,7 +75,7 @@ class pathway_manual_data_provider_filters_testcase extends pathway_manual_base_
             $this->setUser($user->id);
 
             foreach ($user_assignments[$user->id] as $assignment) {
-                $competencies = user_rateable_competencies::for_user_and_role($user, manual::ROLE_SELF)
+                $competencies = user_rateable_competencies::for_user_and_role($user, self_role::class)
                     ->add_filters(['assignment_reason' => [$assignment->id]])
                     ->get_competencies();
 
@@ -126,14 +127,14 @@ class pathway_manual_data_provider_filters_testcase extends pathway_manual_base_
 
         $this->setUser($this->user1->id);
 
-        $type_a_competencies = user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)
+        $type_a_competencies = user_rateable_competencies::for_user_and_role($this->user1, self_role::class)
             ->add_filters(['competency_type' => $type_a->id])
             ->get_competencies();
 
         $this->assertCount(1, $type_a_competencies);
         $this->assertEquals($this->competency1->id, $type_a_competencies[0]->get_entity()->id);
 
-        $type_b_competencies = user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)
+        $type_b_competencies = user_rateable_competencies::for_user_and_role($this->user1, self_role::class)
             ->add_filters(['competency_type' => $type_b->id])
             ->get_competencies();
 
@@ -153,14 +154,14 @@ class pathway_manual_data_provider_filters_testcase extends pathway_manual_base_
         $this->assertFalse($this->get_filter_options($this->user1)['rating_history']);
 
         $this->generator->create_manual_rating(
-            $this->competency1, $this->user1, $this->user1, manual::ROLE_SELF, $this->scale1->values->first()
+            $this->competency1, $this->user1, $this->user1, self_role::class, $this->scale1->values->first()
         );
 
         // One competency has a rating, but the other doesn't, so the filter should be enabled.
         $this->assertTrue($this->get_filter_options($this->user1)['rating_history']);
 
         $this->generator->create_manual_rating(
-            $this->competency2, $this->user1, $this->user1, manual::ROLE_SELF, $this->scale1->values->first()
+            $this->competency2, $this->user1, $this->user1, self_role::class, $this->scale1->values->first()
         );
 
         // Both competencies have a rating, and there are no competencies without a rating, so disable the filter again.
@@ -177,7 +178,7 @@ class pathway_manual_data_provider_filters_testcase extends pathway_manual_base_
 
         // Both competencies don't have ratings, so filtering by no ratings will return both of them
         /** @var rateable_competency[] $competencies_without_ratings */
-        $competencies_without_ratings = user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)
+        $competencies_without_ratings = user_rateable_competencies::for_user_and_role($this->user1, self_role::class)
             ->add_filters(['rating_history' => false])
             ->get_competencies();
 
@@ -186,35 +187,35 @@ class pathway_manual_data_provider_filters_testcase extends pathway_manual_base_
         $this->assertEquals($this->competency2->id, $competencies_without_ratings[1]->get_entity()->id);
 
         // And filtering by competencies with ratings will return nothing.
-        $this->assertEmpty(user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)
+        $this->assertEmpty(user_rateable_competencies::for_user_and_role($this->user1, self_role::class)
             ->add_filters(['rating_history' => true])
             ->get_competencies()
         );
 
         $this->generator->create_manual_rating(
-            $this->competency1, $this->user1, $this->user1, manual::ROLE_SELF, $this->scale1->values->first()
+            $this->competency1, $this->user1, $this->user1, self_role::class, $this->scale1->values->first()
         );
 
         // One competency has a rating, the other one doesn't.
         /** @var rateable_competency[] $competencies_with_ratings */
-        $competencies_with_ratings = user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)
+        $competencies_with_ratings = user_rateable_competencies::for_user_and_role($this->user1, self_role::class)
             ->add_filters(['rating_history' => true])
             ->get_competencies();
         $this->assertCount(1, $competencies_with_ratings);
         $this->assertEquals($this->competency1->id, $competencies_with_ratings[0]->get_entity()->id);
 
-        $competencies_without_ratings = user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)
+        $competencies_without_ratings = user_rateable_competencies::for_user_and_role($this->user1, self_role::class)
             ->add_filters(['rating_history' => false])
             ->get_competencies();
         $this->assertCount(1, $competencies_without_ratings);
         $this->assertEquals($this->competency2->id, $competencies_without_ratings[0]->get_entity()->id);
 
         $this->generator->create_manual_rating(
-            $this->competency2, $this->user1, $this->user1, manual::ROLE_SELF, $this->scale1->values->first()
+            $this->competency2, $this->user1, $this->user1, self_role::class, $this->scale1->values->first()
         );
 
         // Both competencies have ratings now.
-        $competencies_with_ratings = user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)
+        $competencies_with_ratings = user_rateable_competencies::for_user_and_role($this->user1, self_role::class)
             ->add_filters(['rating_history' => true])
             ->get_competencies();
 
@@ -222,7 +223,7 @@ class pathway_manual_data_provider_filters_testcase extends pathway_manual_base_
         $this->assertEquals($this->competency1->id, $competencies_with_ratings[0]->get_entity()->id);
         $this->assertEquals($this->competency2->id, $competencies_with_ratings[1]->get_entity()->id);
 
-        $this->assertEmpty(user_rateable_competencies::for_user_and_role($this->user1, manual::ROLE_SELF)
+        $this->assertEmpty(user_rateable_competencies::for_user_and_role($this->user1, self_role::class)
             ->add_filters(['rating_history' => false])
             ->get_competencies()
         );
@@ -260,7 +261,7 @@ class pathway_manual_data_provider_filters_testcase extends pathway_manual_base_
         $competencies = [];
         for ($i = 0; $i < 4; $i++) {
             $competencies[] = $comp = $this->generator->create_competency();
-            $this->generator->create_manual($comp, [manual::ROLE_SELF]);
+            $this->generator->create_manual($comp, [self_role::class]);
         }
 
         $positions = [];
@@ -366,7 +367,7 @@ class pathway_manual_data_provider_filters_testcase extends pathway_manual_base_
      * @return array
      */
     private function get_filter_options(user $user): array {
-        return user_rateable_competencies::for_user_and_role($user, manual::ROLE_SELF)
+        return user_rateable_competencies::for_user_and_role($user, self_role::class)
             ->get_with_filter_options()
             ->get_filter_options();
     }

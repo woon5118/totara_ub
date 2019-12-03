@@ -28,6 +28,9 @@ use criteria_coursecompletion\coursecompletion;
 use criteria_linkedcourses\linkedcourses;
 use criteria_onactivate\onactivate;
 use pathway_manual\manual;
+use pathway_manual\models\roles\appraiser;
+use pathway_manual\models\roles\manager;
+use pathway_manual\models\roles\self_role;
 use totara_competency\entities\assignment;
 use totara_competency\expand_task;
 use totara_competency\models\assignment_actions;
@@ -601,38 +604,38 @@ Feel free to browse, list of users is below, their password is 12345.
     // Then we need to create some manual job assignments so we have some managers and appraisers etc
     $job_assignments = [
         'jm' => [
-            manual::ROLE_MANAGER => [
+            manager::class => [
                 'ut',
                 'sj',
             ],
-            manual::ROLE_APPRAISER => [
+            appraiser::class => [
                 'tr',
             ],
         ],
         'ss' => [
-            manual::ROLE_MANAGER => [
+            manager::class => [
                 'tr',
                 'bw',
             ],
-            manual::ROLE_APPRAISER => [
+            appraiser::class => [
                 'vp',
             ],
         ],
         'dt' => [
-            manual::ROLE_MANAGER => [
+            manager::class => [
                 'vp',
                 'bo',
             ],
-            manual::ROLE_APPRAISER => [
+            appraiser::class => [
                 'gb',
             ],
         ],
         'jt' => [
-            manual::ROLE_MANAGER => [
+            manager::class => [
                 'gb',
                 'gm',
             ],
-            manual::ROLE_APPRAISER => [
+            appraiser::class => [
                 'gm',
             ],
         ],
@@ -2661,7 +2664,7 @@ Feel free to browse, list of users is below, their password is 12345.
     create_manual_rating_pathways([
         [
             'roles' => [
-                manual::ROLE_SELF,
+                self_role::class,
             ],
             'competencies' => [
                 get_competency('complex', 'priest', $data),
@@ -2671,8 +2674,8 @@ Feel free to browse, list of users is below, their password is 12345.
             ],
         ], [
             'roles' => [
-                manual::ROLE_SELF,
-                manual::ROLE_MANAGER,
+                self_role::class,
+                manager::class,
             ],
             'competencies' => [
                 get_competency('binary', 'doer', $data),
@@ -2684,9 +2687,9 @@ Feel free to browse, list of users is below, their password is 12345.
             ],
         ], [
             'roles' => [
-                manual::ROLE_SELF,
-                manual::ROLE_MANAGER,
-                manual::ROLE_APPRAISER,
+                self_role::class,
+                manager::class,
+                appraiser::class,
             ],
             'competencies' => [
                 get_competency('binary', 'literate', $data),
@@ -2696,8 +2699,8 @@ Feel free to browse, list of users is below, their password is 12345.
             ],
         ], [
             'roles' => [
-                manual::ROLE_MANAGER,
-                manual::ROLE_APPRAISER,
+                manager::class,
+                appraiser::class,
             ],
             'competencies' => [
                 get_competency('binary', 'literate', $data),
@@ -2709,7 +2712,7 @@ Feel free to browse, list of users is below, their password is 12345.
             ],
         ], [
             'roles' => [
-                manual::ROLE_MANAGER,
+                manager::class,
             ],
             'competencies' => [
                 get_competency('4-value', 'netflix', $data),
@@ -3907,7 +3910,7 @@ function create_manual_job_assignments($user, $assignments, $data) {
         foreach ($users as $user_key) {
             $user = get_user($user_key, $data);
             switch ($type) {
-                case manual::ROLE_MANAGER:
+                case manager::class:
                     $managerja = job_assignment::create_default($manager->id, [
                         'fullname' => multilang('Manager of ' . fullname($user)),
                         'idnumber' => $manager_key . '_manager_of_' . $user_key,
@@ -3918,7 +3921,7 @@ function create_manual_job_assignments($user, $assignments, $data) {
                         'idnumber' => $user_key . '_managed_by_' . $manager_key,
                     ]);
                     break;
-                case manual::ROLE_APPRAISER:
+                case appraiser::class:
                     $created_assignments[] = job_assignment::create_default($user->id, [
                         'appraiserid' => $manager->id,
                         'fullname' => multilang('Appraised by ' . fullname($manager)),

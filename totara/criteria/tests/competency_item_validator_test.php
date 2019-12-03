@@ -21,7 +21,7 @@
  * @package totara_criteria
  */
 
-use pathway_manual\manual;
+use pathway_manual\models\roles\manager;
 use totara_criteria\validators\competency_item_validator;
 
 class totara_criteria_competency_item_validator_testcase extends advanced_testcase {
@@ -59,7 +59,7 @@ class totara_criteria_competency_item_validator_testcase extends advanced_testca
 
         // With multi value pathway
         $competency4 = $competency_generator->create_competency();
-        $pw4 = $competency_generator->create_manual($competency4, [manual::ROLE_MANAGER]);
+        $pw4 = $competency_generator->create_manual($competency4, [manager::class]);
         $this->assertTrue(competency_item_validator::validate_item($competency4->id));
     }
 

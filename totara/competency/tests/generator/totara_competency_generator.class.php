@@ -28,7 +28,13 @@ use pathway_criteria_group\criteria_group;
 use pathway_learning_plan\learning_plan;
 use pathway_manual\entities\rating;
 use pathway_manual\manual;
+use pathway_manual\models\roles;
+use pathway_manual\models\roles\role;
+use pathway_manual\models\roles\role_factory;
+use pathway_manual\entities\role as role_entity;
 use pathway_test_pathway\test_pathway;
+use tool_totara_sync\task\comp;
+use totara_competency\aggregation_users_table;
 use totara_competency\entities\competency;
 use totara_competency\entities\competency_framework;
 use totara_competency\entities\competency_type;
@@ -207,7 +213,7 @@ class totara_competency_generator extends component_generator_base {
      * Create a manual rating pathway.
      *
      * @param competency|stdClass|int $competency Competency entity, record or ID.
-     * @param string[]|null $roles Possible manual rating roles, e.g. [manual::ROLE_SELF, manual::ROLE_MANAGER]. Defaults to all.
+     * @param string[]|null $roles Possible manual rating roles, e.g. [self_role::class, manager::class]. Defaults to all.
      * @param int|null $sort_order Defaults to being sorted last.
      *
      * @return manual
@@ -216,12 +222,13 @@ class totara_competency_generator extends component_generator_base {
         /** @var manual $instance */
         $instance = $this->create_pathway(manual::class, $competency, $sort_order);
 
-        if (empty($roles)) {
-            $roles = manual::get_all_valid_roles();
-        } else if (array_diff($roles, array_values(manual::get_all_valid_roles()))) {
-            throw new coding_exception('Invalid role(s) specified');
+        if ($roles) {
+            $instance->set_roles($roles);
+        } else {
+            $instance->set_roles(array_map(function (role $role) {
+                return $role::get_name();
+            }, role_factory::create_all()));
         }
-        $instance->set_roles($roles);
 
         return $instance->save();
     }
@@ -229,40 +236,59 @@ class totara_competency_generator extends component_generator_base {
     /**
      * Create a manual rating.
      *
-     * @param competency|manual $competency_or_pathway If competency is specified, then it will create a default manual pathway
+     * Note: If you are wanting the manual rating to be displayed/aggregated,
+     *       you need to make sure there is a pathway for the role you specify.
+     *
+     * @param int|stdClass|competency|manual $competency Competency ID, record or entity, or alternatively a manual pathway.
      * @param int|stdClass|user $subject_user
      * @param int|stdClass|user $rater_user
-     * @param string $as_role e.g. manual::ROLE_SELF, manual::ROLE_MANAGER etc.
+     * @param role|string $as_role Role class or string e.g. pathway_manual\models\roles\manager::class or 'manager'
      * @param scale_value|int|null $scale_value If not specified, defaults to the first scale value set for the competency
      * @param string|null $comment
      *
      * @return rating
      */
-    public function create_manual_rating(
-        $competency_or_pathway, $subject_user, $rater_user, string $as_role, scale_value $scale_value = null, string $comment = null
-    ): rating {
-        if ($competency_or_pathway instanceof manual) {
-            $roles = array_merge($competency_or_pathway->get_roles(), [$as_role]);
-            $manual = $competency_or_pathway->set_roles($roles);
-            $competency = $manual->get_competency();
-        } else if ($competency_or_pathway instanceof competency) {
-            $competency = $competency_or_pathway;
-            $manual = $this->create_manual($competency_or_pathway, [$as_role]);
-        } else {
-            throw new coding_exception('Must specify either a competency or manual pathway');
-        }
-
+    public function create_manual_rating($competency, $subject_user, $rater_user,
+                                         $as_role, $scale_value = null, $comment = null): rating {
         $subject_id = isset($subject_user->id) ? $subject_user->id : $subject_user;
         $rater_id = isset($rater_user->id) ? $rater_user->id : $rater_user;
 
+        if (is_a($as_role, role::class, true)) {
+            $as_role = new $as_role();
+        } else if (!$as_role instanceof role) {
+            $as_role = role_factory::create($as_role);
+        }
+
+        if ($competency instanceof manual) {
+            $competency = $competency->get_competency();
+        }
+
         if (is_null($scale_value)) {
+            if (!$competency instanceof competency) {
+                $competency = new competency($competency);
+            }
             $scale_value = $competency->scale->sorted_values_high_to_low->first();
             $scale_value = $scale_value ? $scale_value->id : null;
         } else if ($scale_value instanceof scale_value) {
             $scale_value = $scale_value->id;
         }
 
-        return $manual->set_manual_value($subject_id, $rater_id, $as_role, $scale_value, $comment);
+        $competency = isset($competency->id) ? $competency->id : $competency;
+
+        $rating = new rating([
+            'comp_id' => $competency,
+            'user_id' => $subject_id,
+            'scale_value_id' => $scale_value,
+            'date_assigned' => time(),
+            'assigned_by' => $rater_id,
+            'assigned_by_role' => $as_role::get_name(),
+            'comment' => $comment,
+        ]);
+        $rating->save();
+
+        (new aggregation_users_table())->queue_for_aggregation($subject_id, $competency);
+
+        return $rating;
     }
 
     /**

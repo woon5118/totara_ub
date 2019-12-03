@@ -22,12 +22,11 @@
  */
 
 use criteria_coursecompletion\coursecompletion;
-use pathway_manual\manual;
+use pathway_manual\models\roles\manager;
 use totara_competency\achievement_configuration;
 use totara_competency\achievement_criteria;
 use totara_competency\entities\competency;
 use totara_competency\entities\configuration_change;
-use totara_competency\entities\scale;
 use totara_criteria\criterion;
 
 class totara_competency_achievement_configuration_testcase extends advanced_testcase {
@@ -175,7 +174,7 @@ class totara_competency_achievement_configuration_testcase extends advanced_test
         /** @var totara_competency_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
-        $manual = $generator->create_manual($data->comp, [manual::ROLE_MANAGER], 1);
+        $manual = $generator->create_manual($data->comp, [manager::class], 1);
 
         $scale_value = $data->comp->scale->sorted_values_high_to_low->first();
         $cg = $generator->create_criteria_group($data->comp, [$data->cc[1], $data->cc[2]], $scale_value, null, null, 2);
@@ -287,7 +286,7 @@ class totara_competency_achievement_configuration_testcase extends advanced_test
         $config = new achievement_configuration($data->comp);
         $this->assertFalse($config->user_can_become_proficient());
 
-        $pw3 = $generator->create_manual($data->comp, [manual::ROLE_MANAGER], 3);
+        $pw3 = $generator->create_manual($data->comp, [manager::class], 3);
         $data->comp->load_relation('active_pathways');
         $config = new achievement_configuration($data->comp);
         $this->assertTrue($config->user_can_become_proficient());

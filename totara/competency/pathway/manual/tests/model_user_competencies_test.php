@@ -23,6 +23,9 @@
 
 use core\orm\query\builder;
 use pathway_manual\manual;
+use pathway_manual\models\roles\appraiser;
+use pathway_manual\models\roles\manager;
+use pathway_manual\models\roles\self_role;
 use pathway_manual\models\user_competencies;
 use totara_competency\expand_task;
 use totara_competency\models\assignment;
@@ -49,7 +52,7 @@ class pathway_manual_model_user_competencies_testcase extends pathway_manual_bas
         ]);
         (new expand_task(builder::get_db()))->expand_all();
 
-        $manual = $this->generator->create_manual($this->competency1, [manual::ROLE_SELF]);
+        $manual = $this->generator->create_manual($this->competency1, [self_role::class]);
 
         // Has capability, has the role and has at least one assigned competency
         $this->assertTrue(user_competencies::can_rate_competencies($this->user1, $context));
@@ -97,8 +100,8 @@ class pathway_manual_model_user_competencies_testcase extends pathway_manual_bas
         $manager_ja = job_assignment::create_default($this->user2->id);
         job_assignment::create(['userid' => $this->user1->id, 'managerjaid' => $manager_ja->id, 'idnumber' => 1]);
 
-        $manual_manager = $this->generator->create_manual($this->competency1, [manual::ROLE_MANAGER]);
-        $this->generator->create_manual($this->competency1, [manual::ROLE_APPRAISER]);
+        $manual_manager = $this->generator->create_manual($this->competency1, [manager::class]);
+        $this->generator->create_manual($this->competency1, [appraiser::class]);
 
         // Has capability, has the role and has at least one assigned competency
         $this->assertTrue(user_competencies::can_rate_competencies($this->user1, $context));

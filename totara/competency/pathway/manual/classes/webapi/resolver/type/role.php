@@ -26,32 +26,34 @@ namespace pathway_manual\webapi\resolver\type;
 use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use pathway_manual\models\role_rating as role;
+use pathway_manual\models\roles\role as role_model;
 use totara_core\formatter\field\string_field_formatter;
 
-defined('MOODLE_INTERNAL') || die();
-
-class role_rating implements type_resolver {
+class role implements type_resolver {
 
     /**
      * Resolves fields for a manual rating role
      *
      * @param string $field
-     * @param role $role_rating
+     * @param role_model $role
      * @param array $args
      * @param execution_context $ec
      * @return mixed
      */
-    public static function resolve(string $field, $role_rating, array $args, execution_context $ec) {
+    public static function resolve(string $field, $role, array $args, execution_context $ec) {
         require_login(null, false, null, false, true);
 
         switch ($field) {
-            case 'role':
-                return $role_rating->get_role();
-            case 'latest_rating':
-                return $role_rating->get_latest_rating();
-            case 'default_profile_picture':
-                return $role_rating->get_default_picture();
+            case 'name':
+                return $role->get_name();
+            case 'display_name':
+                $format = $args['format'] ?? format::FORMAT_HTML;
+                $formatter = new string_field_formatter($format, \context_system::instance());
+                return $formatter->format($role->get_display_name());
+            case 'display_order':
+                return $role->get_display_order();
+            case 'has_role':
+                return $role->has_role();
             default:
                 throw new \coding_exception('Unknown field', $field);
         }

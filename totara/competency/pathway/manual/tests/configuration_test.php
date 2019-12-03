@@ -23,6 +23,9 @@
  */
 
 use pathway_manual\manual;
+use pathway_manual\models\roles\appraiser;
+use pathway_manual\models\roles\manager;
+use pathway_manual\models\roles\self_role;
 use totara_competency\pathway;
 
 class pathway_manual_configuration_testcase extends advanced_testcase {
@@ -34,50 +37,11 @@ class pathway_manual_configuration_testcase extends advanced_testcase {
             public $competency;
         };
 
-        /** @var totara_hierarchy_generator $hierarchy_generator */
+        /** @var totara_competency_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
         $data->competency = $generator->create_competency();
 
         return $data;
-    }
-
-    public function test_check_valid_roles() {
-        // Without validation
-        $this->assertTrue(manual::check_is_valid_role(manual::ROLE_SELF));
-        $this->assertTrue(manual::check_is_valid_role(manual::ROLE_MANAGER));
-        $this->assertTrue(manual::check_is_valid_role(manual::ROLE_APPRAISER));
-        $this->assertTrue(manual::check_is_valid_role([manual::ROLE_SELF, manual::ROLE_MANAGER, manual::ROLE_APPRAISER]));
-
-        // With validation
-        $this->assertTrue(manual::check_is_valid_role(manual::ROLE_SELF, true));
-        $this->assertTrue(manual::check_is_valid_role(manual::ROLE_MANAGER, true));
-        $this->assertTrue(manual::check_is_valid_role(manual::ROLE_APPRAISER, true));
-        $this->assertTrue(manual::check_is_valid_role([manual::ROLE_SELF, manual::ROLE_MANAGER, manual::ROLE_APPRAISER], true));
-
-        // Test invalid roles without validation
-        $this->assertFalse(manual::check_is_valid_role('blah blah blah'));
-        $this->assertFalse(manual::check_is_valid_role(['blah', 'blah blah blah']));
-
-        // Test invalid roles with validation
-        $this->expectExceptionMessage("Invalid role(s) specified: 'blah blah blah'");
-        manual::check_is_valid_role('blah blah blah', true);
-    }
-
-    public function test_setting_valid_roles() {
-        $data = $this->setup_data();
-
-        $manual = new manual();
-        $manual->set_competency($data->competency);
-
-        // Roles are likely to be added without keys. Allowing this permits easier flow when information comes from
-        // the client.
-        $manual->set_roles([manual::ROLE_MANAGER, manual::ROLE_SELF]);
-
-        $returned_roles = $manual->get_roles();
-
-        $this->assertCount(2, $returned_roles);
-        $this->assertEquals(manual::ROLE_MANAGER, $returned_roles[manual::ROLE_MANAGER]);
-        $this->assertEquals(manual::ROLE_SELF, $returned_roles[manual::ROLE_SELF]);
     }
 
     public function test_setting_roles_overwrites() {
@@ -88,15 +52,15 @@ class pathway_manual_configuration_testcase extends advanced_testcase {
 
         // Roles are likely to be added without keys. Allowing this permits easier flow when information comes from
         // the client.
-        $manual->set_roles([manual::ROLE_MANAGER, manual::ROLE_SELF]);
+        $manual->set_roles([manager::class, self_role::class]);
 
         $returned_roles = $manual->get_roles();
         $this->assertCount(2, $returned_roles);
 
-        $manual->set_roles([manual::ROLE_APPRAISER]);
+        $manual->set_roles([appraiser::class]);
         $returned_roles = $manual->get_roles();
         $this->assertCount(1, $returned_roles);
-        $this->assertEquals(manual::ROLE_APPRAISER, $returned_roles[manual::ROLE_APPRAISER]);
+        $this->assertInstanceOf(appraiser::class, $returned_roles[0]);
     }
 
     public function test_setting_invalid_roles() {
@@ -107,7 +71,7 @@ class pathway_manual_configuration_testcase extends advanced_testcase {
 
         $this->expectException(\coding_exception::class);
 
-        $manual->set_roles([manual::ROLE_MANAGER, 'notarole']);
+        $manual->set_roles([manager::class, 'notarole']);
     }
 
     public function test_save_load_configuration() {
@@ -116,7 +80,7 @@ class pathway_manual_configuration_testcase extends advanced_testcase {
         $manual = new manual();
         $manual->set_competency($data->competency);
         $manual->set_sortorder(2);
-        $manual->set_roles([manual::ROLE_MANAGER, manual::ROLE_SELF]);
+        $manual->set_roles([manager::class, self_role::class]);
 
         $manual->save();
         $pw_id = $manual->get_id();
@@ -127,7 +91,7 @@ class pathway_manual_configuration_testcase extends advanced_testcase {
             ['pathway_manual', [], 1],
             ['pathway_manual_role', [], 2],
         ]);
-        $this->validate_roles($instance_id, [manual::ROLE_MANAGER, manual::ROLE_SELF]);
+        $this->validate_roles($instance_id, [manager::get_name(), self_role::get_name()]);
 
         unset($manual);
 
@@ -136,8 +100,8 @@ class pathway_manual_configuration_testcase extends advanced_testcase {
         $roles = $loaded->get_roles();
 
         $this->assertCount(2, $roles);
-        $this->assertEquals(manual::ROLE_MANAGER, $roles[manual::ROLE_MANAGER]);
-        $this->assertEquals(manual::ROLE_SELF, $roles[manual::ROLE_SELF]);
+        $this->assertInstanceOf(self_role::class, $roles[0]);
+        $this->assertInstanceOf(manager::class, $roles[1]);
     }
 
     public function test_update() {
@@ -148,7 +112,7 @@ class pathway_manual_configuration_testcase extends advanced_testcase {
         $manual = new manual();
         $manual->set_competency($data->competency);
         $manual->set_sortorder(2);
-        $manual->set_roles([manual::ROLE_MANAGER, manual::ROLE_SELF]);
+        $manual->set_roles([manager::class, self_role::class]);
 
         $manual->save();
         $pw_id = $manual->get_id();
@@ -159,7 +123,7 @@ class pathway_manual_configuration_testcase extends advanced_testcase {
             ['pathway_manual', [], 1],
             ['pathway_manual_role', [], 2],
         ]);
-        $this->validate_roles($instance_id, [manual::ROLE_MANAGER, manual::ROLE_SELF]);
+        $this->validate_roles($instance_id, [manager::get_name(), self_role::get_name()]);
 
         $pw_row = $DB->get_record('totara_competency_pathway', ['id' => $pw_id]);
         $instance_row = $DB->get_record('pathway_manual', ['id' => $instance_id]);
@@ -175,7 +139,7 @@ class pathway_manual_configuration_testcase extends advanced_testcase {
             ['pathway_manual', [], 1],
             ['pathway_manual_role', [], 2],
         ]);
-        $this->validate_roles($instance_id, [manual::ROLE_MANAGER, manual::ROLE_SELF]);
+        $this->validate_roles($instance_id, [manager::get_name(), self_role::get_name()]);
 
         $updated_pw_row = $DB->get_record('totara_competency_pathway', []);
         $updated_instance_row = $DB->get_record('pathway_manual', []);
@@ -186,7 +150,7 @@ class pathway_manual_configuration_testcase extends advanced_testcase {
         $this->waitForSecond();
 
         // Now make a change - remove role
-        $manual->set_roles([manual::ROLE_MANAGER]);
+        $manual->set_roles([manager::class]);
         $manual->save();
 
         $this->validate_num_rows([
@@ -194,7 +158,7 @@ class pathway_manual_configuration_testcase extends advanced_testcase {
             ['pathway_manual', [], 1],
             ['pathway_manual_role', [], 1],
         ]);
-        $this->validate_roles($instance_id, [manual::ROLE_MANAGER]);
+        $this->validate_roles($instance_id, [manager::get_name()]);
 
         $updated_pw_row = $DB->get_record('totara_competency_pathway', ['id' => $pw_id]);
         // Timemodified should have changed
@@ -209,14 +173,14 @@ class pathway_manual_configuration_testcase extends advanced_testcase {
 
 
         // Add role
-        $manual->set_roles([manual::ROLE_MANAGER, manual::ROLE_APPRAISER]);
+        $manual->set_roles([manager::class, appraiser::class]);
         $manual->save();
 
         $this->validate_num_rows([
             ['pathway_manual', [], 1],
             ['pathway_manual_role', [], 2],
         ]);
-        $this->validate_roles($instance_id, [manual::ROLE_MANAGER, manual::ROLE_APPRAISER]);
+        $this->validate_roles($instance_id, [manager::get_name(), appraiser::get_name()]);
 
         $updated_instance_row = $DB->get_record('pathway_manual', []);
         $this->assertEquals($instance_row, $updated_instance_row);
@@ -230,7 +194,7 @@ class pathway_manual_configuration_testcase extends advanced_testcase {
         $manual = new manual();
         $manual->set_competency($data->competency);
         $manual->set_sortorder(2);
-        $manual->set_roles([manual::ROLE_MANAGER, manual::ROLE_SELF]);
+        $manual->set_roles([manager::class, self_role::class]);
 
         $manual->save();
         $pw_id = $manual->get_id();
@@ -241,7 +205,7 @@ class pathway_manual_configuration_testcase extends advanced_testcase {
             ['pathway_manual', [], 1],
             ['pathway_manual_role', [], 2],
         ]);
-        $this->validate_roles($instance_id, [manual::ROLE_MANAGER, manual::ROLE_SELF]);
+        $this->validate_roles($instance_id, [manager::get_name(), self_role::get_name()]);
 
         $pw_row = $DB->get_record('totara_competency_pathway', ['id' => $pw_id]);
 
@@ -275,7 +239,7 @@ class pathway_manual_configuration_testcase extends advanced_testcase {
         $manual = new manual();
         $manual->set_competency($data->competency);
         $manual->set_sortorder(2);
-        $manual->set_roles([manual::ROLE_MANAGER, manual::ROLE_SELF]);
+        $manual->set_roles([manager::class, self_role::class]);
         $manual->save();
 
         $expected = $DB->get_record('pathway_manual', ['id' => $manual->get_path_instance_id()]);
@@ -297,11 +261,11 @@ class pathway_manual_configuration_testcase extends advanced_testcase {
         $this->assertFalse($manual->is_valid());
 
         // With a role
-        $manual->set_roles([manual::ROLE_MANAGER]);
+        $manual->set_roles([manager::class]);
         $manual->validate();
         $this->assertTrue($manual->is_valid());
 
-        $manual->set_roles([manual::ROLE_SELF, manual::ROLE_APPRAISER]);
+        $manual->set_roles([self_role::class, appraiser::class]);
         $manual->validate();
         $this->assertTrue($manual->is_valid());
 

@@ -24,6 +24,7 @@
 
 use core\orm\query\builder;
 use pathway_manual\manual;
+use pathway_manual\models\roles\self_role;
 use totara_competency\entities\achievement_via;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\competency_assignment_user;
@@ -404,7 +405,7 @@ class totara_competency_user_unassigned_testcase extends advanced_testcase {
             ->one();
 
         // Create a manual rating and aggregate
-        $this->generator()->create_manual_rating($manual_pathway, $user, $user, manual::ROLE_SELF, $value);
+        $this->generator()->create_manual_rating($manual_pathway, $user, $user, self_role::class, $value);
         (new competency_aggregation_all())->execute();
 
         return [

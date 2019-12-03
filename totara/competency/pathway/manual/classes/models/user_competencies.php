@@ -26,7 +26,8 @@ namespace pathway_manual\models;
 use context;
 use core\entities\user;
 use pathway_manual\data_providers\rateable_competencies;
-use pathway_manual\manual;
+use pathway_manual\models\roles\role;
+use pathway_manual\models\roles\role_factory;
 
 /**
  * Class user_competencies
@@ -46,7 +47,7 @@ class user_competencies {
     protected $user;
 
     /**
-     * @var string
+     * @var role
      */
     protected $role;
 
@@ -57,12 +58,10 @@ class user_competencies {
 
     /**
      * @param user $user
-     * @param string $role
+     * @param role $role
      * @param rateable_competency[] $competencies
      */
-    public function __construct(user $user, string $role, array $competencies) {
-        manual::check_is_valid_role($role, true);
-
+    public function __construct(user $user, role $role, array $competencies) {
         $this->user = $user;
         $this->role = $role;
         $this->competencies = $competencies;
@@ -89,9 +88,9 @@ class user_competencies {
     /**
      * Get the role the competencies have a pathway for.
      *
-     * @return string
+     * @return role
      */
-    public function get_role(): string {
+    public function get_role(): role {
         return $this->role;
     }
 
@@ -112,9 +111,13 @@ class user_competencies {
      * @return bool
      */
     public static function can_rate_competencies(user $for_user, context $context) {
+        $roles = array_map(function (role $role) {
+            return $role::get_name();
+        }, roles::get_current_user_roles($for_user->id));
+
         $rateable_competencies = (new rateable_competencies())->add_filters([
             'user_id' => $for_user->id,
-            'roles' => manual::get_current_user_roles($for_user->id),
+            'roles' => $roles,
         ]);
 
         if ($for_user->is_logged_in()) {

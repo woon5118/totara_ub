@@ -24,7 +24,8 @@
 namespace pathway_manual\models;
 
 use core\entities\user;
-use pathway_manual\manual;
+use pathway_manual\models\roles\role;
+use pathway_manual\models\roles\role_factory;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency;
 
@@ -53,16 +54,12 @@ class rateable_competency {
     /**
      * @param competency $entity
      * @param user $user
-     * @param string|null $role Can optionally specify the role that will rate this competency.
+     * @param role|null $role Can optionally specify the role that will rate this competency.
      */
-    public function __construct(competency $entity, user $user, string $role = null) {
+    public function __construct(competency $entity, user $user, role $role = null) {
         $this->entity = $entity;
         $this->user = $user;
-
-        if (isset($role)) {
-            manual::check_is_valid_role($role, true);
-            $this->role = $role;
-        }
+        $this->role = $role;
     }
 
     /**
@@ -91,11 +88,11 @@ class rateable_competency {
      * @return role_rating[]
      */
     public function get_all_role_ratings(): array {
-        $roles = manual::get_roles_for_competency($this->entity);
+        $roles = roles::get_roles_for_competency($this->entity->id);
 
         $role_ratings = [];
         foreach ($roles as $role) {
-            $role_ratings[] = new role_rating($this->entity, $this->user, $role);
+            $role_ratings[] = new role_rating($this->entity, $this->user, $role->set_subject_user($this->user->id));
         }
         return $role_ratings;
     }

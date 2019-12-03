@@ -24,7 +24,7 @@
 
 use pathway_criteria_group\entities\criteria_group;
 use pathway_criteria_group\external;
-use pathway_manual\manual;
+use pathway_manual\models\roles\manager;
 use totara_competency\entities\pathway;
 use totara_competency\linked_courses;
 use totara_criteria\criterion;
@@ -179,7 +179,7 @@ class pathway_criteria_group_external_testcase extends \advanced_testcase {
 
         /** @var totara_competency_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
-        $generator->create_manual($compB->id, [manual::ROLE_MANAGER]);
+        $generator->create_manual($compB->id, [manager::class]);
 
         $pw_id = external::create($compA->id,
             1,

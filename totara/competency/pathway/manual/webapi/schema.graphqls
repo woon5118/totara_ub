@@ -1,4 +1,14 @@
 """
+A role a user might have for another user, e.g. manager
+"""
+type pathway_manual_role {
+  name: String!
+  display_name(format: core_format = HTML): String!
+  display_order: Int!
+  has_role: Boolean!
+}
+
+"""
 An individual rating for a competency made by a user for a user
 """
 type pathway_manual_rating {
@@ -12,9 +22,7 @@ type pathway_manual_rating {
 A role that can rate a competency
 """
 type pathway_manual_role_rating {
-  role: String! # manager, self, etc.
-  role_display_name: String! # "Manager", "Your rating" etc
-  has_role: Boolean! # does the current user have this role?
+  role: pathway_manual_role! # The role
   latest_rating: pathway_manual_rating
   default_profile_picture: String # Picture url to use if there is no rating
 }

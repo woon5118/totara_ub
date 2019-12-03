@@ -24,83 +24,56 @@
 
 use core\orm\query\builder;
 use core\webapi\execution_context;
-use pathway_manual\manual;
 use pathway_manual\models\role_rating;
+use pathway_manual\models\roles\self_role;
 use pathway_manual\webapi\resolver\query\role_ratings;
-use totara_competency\entities\competency;
+use pathway_manual\webapi\resolver\type\role;
+use pathway_manual\webapi\resolver\type\role_rating as role_rating_type;
 use totara_competency\expand_task;
 use totara_competency\models\assignment;
-use totara_job\job_assignment;
 
-defined('MOODLE_INTERNAL') || die();
+require_once(__DIR__ . '/pathway_manual_base_test.php');
 
 /**
  * Tests the query to fetch all roles and their latest ratings for a given user and competency
  */
-class pathway_manual_webapi_resolver_query_role_ratings_testcase extends advanced_testcase {
+class pathway_manual_webapi_resolver_query_role_ratings_testcase extends pathway_manual_base_testcase {
 
     private $scalevalue1;
 
     private $scalevalue2;
 
-    private $manual;
-
-    private $competency;
-
     private $user1_assignment;
-
-    private $user1;
-
-    private $user2;
 
     protected function setUp() {
         global $DB;
+        parent::setUp();
 
-        /** @var totara_hierarchy_generator $totara_hierarchy_generator */
-        $totara_hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
-
-        /** @var totara_competency_assignment_generator $totara_competency_generator */
-        $totara_competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
-
-        $compfw = $totara_hierarchy_generator->create_comp_frame([]);
-        $comp = $totara_hierarchy_generator->create_comp(['frameworkid' => $compfw->id]);
-        $this->competency = new competency($comp);
-
-        $scale = $this->competency->scale;
+        $scale = $this->competency1->scale;
         $values = $scale->sorted_values_high_to_low;
         $this->scalevalue1 = $values->first();
         $values->next();
         $this->scalevalue2 = $values->current();
 
-        $this->manual = new manual();
-        $this->manual->set_competency($this->competency);
-        $this->manual->set_roles([manual::ROLE_SELF, manual::ROLE_MANAGER, manual::ROLE_APPRAISER]);
-        $this->manual->save();
+        $this->generator->create_manual($this->competency1);
 
-        $this->user1 = $this->getDataGenerator()->create_user();
-        $this->user2 = $this->getDataGenerator()->create_user();
-
-        $this->user1_assignment = $totara_competency_generator->create_user_assignment($this->competency->id, $this->user1->id);
-
+        $this->user1_assignment = $this->generator->assignment_generator()->create_user_assignment($this->competency1->id, $this->user1->id);
         $expand_task = new expand_task($DB);
         $expand_task->expand_all();
 
         $role = builder::table('role')->where('shortname', 'user')->value('id');
-        $this->setUser($this->user2);
+        $this->setUser($this->user2->id);
         assign_capability('totara/competency:view_other_profile', CAP_ALLOW, $role, context_user::instance($this->user1->id));
-        $this->setUser($this->user1);
+        $this->setUser($this->user1->id);
         assign_capability('totara/competency:view_own_profile', CAP_ALLOW, $role, context_user::instance($this->user1->id));
 
         $this->setAdminUser();
     }
 
     protected function tearDown() {
+        parent::tearDown();
         $this->scalevalue1 = null;
         $this->scalevalue2 = null;
-        $this->manual = null;
-        $this->user1 = null;
-        $this->user2 = null;
-        $this->competency = null;
         $this->user1_assignment = null;
     }
 
@@ -120,7 +93,7 @@ class pathway_manual_webapi_resolver_query_role_ratings_testcase extends advance
     public function test_self_capability() {
         $role = builder::table('role')->where('shortname', 'user')->value('id');
 
-        $this->setUser($this->user1);
+        $this->setUser($this->user1->id);
         $this->assertNotNull($this->resolve());
 
         unassign_capability('totara/competency:view_own_profile', $role);
@@ -137,7 +110,7 @@ class pathway_manual_webapi_resolver_query_role_ratings_testcase extends advance
     public function test_manager_capability() {
         $role = builder::table('role')->where('shortname', 'user')->value('id');
 
-        $this->setUser($this->user2);
+        $this->setUser($this->user2->id);
         $this->assertNotNull($this->resolve());
 
         unassign_capability('totara/competency:view_other_profile', $role);
@@ -152,15 +125,16 @@ class pathway_manual_webapi_resolver_query_role_ratings_testcase extends advance
      * Make sure that the latest rating is always returned
      */
     public function test_latest_rating_is_returned() {
-        $this->manual->set_manual_value(
+        $this->generator->create_manual_rating(
+            $this->competency1,
             $this->user1->id,
             $this->user1->id,
-            manual::ROLE_SELF,
+            self_role::class,
             $this->scalevalue1->id,
             'Rating One'
         );
 
-        $this->setUser($this->user1);
+        $this->setUser($this->user1->id);
 
         /** @var \pathway_manual\entities\rating $rating */
         $rating = $this->resolve()[0]->get_latest_rating();
@@ -170,10 +144,11 @@ class pathway_manual_webapi_resolver_query_role_ratings_testcase extends advance
         $this->waitForSecond();
         $this->waitForSecond();
 
-        $this->manual->set_manual_value(
+        $this->generator->create_manual_rating(
+            $this->competency1,
             $this->user1->id,
             $this->user1->id,
-            manual::ROLE_SELF,
+            self_role::class,
             $this->scalevalue2->id,
             'Rating Two'
         );
@@ -181,93 +156,6 @@ class pathway_manual_webapi_resolver_query_role_ratings_testcase extends advance
         $rating = $this->resolve()[0]->get_latest_rating();
         $this->assertEquals('Rating Two', $rating->comment);
         $this->assertEquals($this->scalevalue2->id, $rating->scale_value_id);
-    }
-
-    /**
-     * Make sure it can tell if the current user has the role returned
-     */
-    public function test_user_has_role() {
-        $managerja = job_assignment::create_default($this->user2->id);
-        job_assignment::create_default(
-            $this->user1->id,
-            ['managerjaid' => $managerja->id]
-        );
-
-        $appraiser = $this->getDataGenerator()->create_user();
-        job_assignment::create_default(
-            $this->user1->id,
-            ['appraiserid' => $appraiser->id]
-        );
-
-        $this->setUser($this->user1);
-        $query = $this->resolve();
-
-        $this->assertTrue($query[0]->current_user_has_role()); // self
-        $this->assertFalse($query[1]->current_user_has_role()); // manager
-        $this->assertFalse($query[2]->current_user_has_role()); // appraiser
-
-        $this->setUser($this->user2);
-        $query = $this->resolve();
-        $this->assertFalse($query[0]->current_user_has_role()); // self
-        $this->assertTrue($query[1]->current_user_has_role()); // manager
-        $this->assertFalse($query[2]->current_user_has_role()); // appraiser
-
-        $this->setUser($appraiser);
-        $query = $this->resolve();
-        $this->assertFalse($query[0]->current_user_has_role()); // self
-        $this->assertFalse($query[1]->current_user_has_role()); // manager
-        $this->assertTrue($query[2]->current_user_has_role()); // appraiser
-    }
-
-    /**
-     * Make sure that the display order of the roles are fixed, even when there are multiple pathways in different orders
-     */
-    public function test_role_order() {
-        $this->manual->delete();
-
-        $appraiser_pathway = new manual();
-        $appraiser_pathway->set_competency($this->competency);
-        $appraiser_pathway->set_roles([manual::ROLE_APPRAISER]);
-        $appraiser_pathway->save();
-
-        $query = $this->resolve();
-        $this->assertCount(1, $query);
-        $this->assertEquals(manual::ROLE_APPRAISER, $query[0]->get_role());
-
-        $manager_pathway = new manual();
-        $manager_pathway->set_competency($this->competency);
-        $manager_pathway->set_roles([manual::ROLE_MANAGER]);
-        $manager_pathway->save();
-
-        $query = $this->resolve();
-        $this->assertCount(2, $query);
-        $this->assertEquals(manual::ROLE_MANAGER, $query[0]->get_role());
-        $this->assertEquals(manual::ROLE_APPRAISER, $query[1]->get_role());
-
-        $all_pathways = new manual();
-        $all_pathways->set_competency($this->competency);
-        $all_pathways->set_roles([manual::ROLE_MANAGER, manual::ROLE_APPRAISER, manual::ROLE_SELF]);
-        $all_pathways->save();
-
-        $query = $this->resolve();
-        $this->assertCount(3, $query);
-        $this->assertEquals(manual::ROLE_SELF, $query[0]->get_role());
-        $this->assertEquals(manual::ROLE_MANAGER, $query[1]->get_role());
-        $this->assertEquals(manual::ROLE_APPRAISER, $query[2]->get_role());
-    }
-
-    /**
-     * Make sure the display names are correct, and are conditional for the self role
-     */
-    public function test_role_display_names() {
-        $query = $this->resolve();
-        $this->assertEquals(fullname($this->user1), $query[0]->get_role_display_name());
-        $this->assertEquals('Manager', $query[1]->get_role_display_name());
-        $this->assertEquals('Appraiser', $query[2]->get_role_display_name());
-
-        $this->setUser($this->user1);
-        $query = $this->resolve();
-        $this->assertEquals('Your rating', $query[0]->get_role_display_name());
     }
 
     /**
@@ -284,6 +172,27 @@ class pathway_manual_webapi_resolver_query_role_ratings_testcase extends advance
         $expand_task->expand_all();
 
         $this->assertCount(3, $this->resolve()); // load after archiving
+    }
+
+    /**
+     * Make sure we can resolve the role from the type.
+     */
+    public function test_get_role() {
+        $role_rating = $this->resolve()[0];
+
+        /** @var self_role $role */
+        $role = role_rating_type::resolve('role', $role_rating, [], execution_context::create('dev', null));
+
+        $expected_return_values = [
+            'name' => self_role::get_name(),
+            'display_name' => self_role::get_display_name(),
+            'display_order' => self_role::get_display_order(),
+            'has_role' => false,
+        ];
+
+        foreach ($expected_return_values as $field => $expected_value) {
+            $this->assertEquals($expected_value, role::resolve($field, $role, [], execution_context::create('dev', null)));
+        }
     }
 
 }

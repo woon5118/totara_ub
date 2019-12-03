@@ -29,6 +29,8 @@ use core\orm\query\field;
 use pathway_manual\entities\rating;
 use pathway_manual\manual;
 use pathway_manual\models\rateable_competency;
+use pathway_manual\models\roles\role;
+use pathway_manual\models\roles\role_factory;
 use pathway_manual\models\user_competencies;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency;
@@ -52,7 +54,7 @@ class user_rateable_competencies extends rateable_competencies {
     protected $user;
 
     /**
-     * @var string|null
+     * @var role|null
      */
     protected $role;
 
@@ -60,22 +62,25 @@ class user_rateable_competencies extends rateable_competencies {
      * Get all rateable competencies for a particular role and assigned user.
      *
      * @param int|user $user User ID or entity
-     * @param string $role e.g. manual::ROLE_SELF, manual::ROLE_MANUAL etc
+     * @param string|role $role Role string or class
      * @return self
      */
-    public static function for_user_and_role($user, string $role): self {
-        manual::check_is_valid_role($role, true);
-
+    public static function for_user_and_role($user, $role): self {
         if (!$user instanceof user) {
             $user = new user($user);
         }
+
+        if (!$role instanceof role) {
+            $role = role_factory::create($role);
+        }
+        $role->set_subject_user($user->id);
 
         $provider = new static();
         $provider->user = $user;
         $provider->role = $role;
         $provider->add_filters([
             'user_id' => $user->id,
-            'roles' => [$role],
+            'roles' => [$role::get_name()],
         ]);
 
         return $provider;
@@ -182,7 +187,7 @@ class user_rateable_competencies extends rateable_competencies {
         $number_of_competencies_with_rating = rating::repository()
             ->where_in('comp_id', $competencies)
             ->where('user_id', $this->user->id)
-            ->where('assigned_by_role', $this->role)
+            ->where('assigned_by_role', $this->role::get_name())
             ->where('assigned_by', user::logged_in()->id)
             ->count();
 
@@ -201,7 +206,7 @@ class user_rateable_competencies extends rateable_competencies {
             ->select('id')
             ->where_field('comp_id', new field('id', $repository->get_builder()))
             ->where('user_id', $this->user->id)
-            ->where('assigned_by_role', $this->role)
+            ->where('assigned_by_role', $this->role::get_name())
             ->where('assigned_by', user::logged_in()->id);
 
         if ($has_rated) {

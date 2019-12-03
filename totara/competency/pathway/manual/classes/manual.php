@@ -25,22 +25,12 @@
 namespace pathway_manual;
 
 use pathway_manual\entities\rating;
-use pathway_manual\entities\role;
-use totara_competency\aggregation_users_table;
+use pathway_manual\models\roles\role;
+use pathway_manual\models\roles\role_factory;
 use totara_competency\base_achievement_detail;
-use totara_competency\entities\competency;
 use totara_competency\pathway;
-use totara_job\job_assignment;
 
 class manual extends pathway {
-
-    /**
-     * Supported roles
-     */
-    public const ROLE_MANAGER = 'manager';
-    public const ROLE_APPRAISER = 'appraiser';
-    public const ROLE_SELF = 'self';
-    // Todo: manager's manager and whichever others we want.
 
     /**
      * Types of aggregation available in manual
@@ -51,10 +41,10 @@ class manual extends pathway {
 
     public const CLASSIFICATION = self::PATHWAY_MULTI_VALUE;
 
-    /** @var array $roles*/
+    /**
+     * @var role[]
+     */
     private $roles = [];
-
-
 
     /********************************************************************
      * Instantiation
@@ -112,11 +102,11 @@ class manual extends pathway {
         $new_record = new \stdClass();
         $new_record->path_manual_id = $this->get_path_instance_id();
         foreach ($this->roles as $role) {
-            if (!isset($previous_role_records[$role])) {
-                $new_record->role = $role;
+            if (!isset($previous_role_records[$role::get_name()])) {
+                $new_record->role = $role::get_name();
                 $DB->insert_record('pathway_manual_role', $new_record);
             } else {
-                unset($previous_role_records[$role]);
+                unset($previous_role_records[$role::get_name()]);
             }
         }
 
@@ -159,11 +149,11 @@ class manual extends pathway {
         if (!$has_changes) {
             // Compare one by one
             foreach ($this->roles as $role) {
-                if (!isset($previous_role_records[$role])) {
+                if (!isset($previous_role_records[$role::get_name()])) {
                     $has_changes = true;
                     break;
                 } else {
-                    unset($previous_role_records[$role]);
+                    unset($previous_role_records[$role::get_name()]);
                 }
             }
 
@@ -185,110 +175,80 @@ class manual extends pathway {
         $this->set_path_instance_id(null);
     }
 
+
+    /**************************************************************************
+     * Aggregation
+     **************************************************************************/
+
+    /**
+     * @param int $user_id
+     * @return achievement_detail
+     */
+    public function aggregate_current_value(int $user_id): base_achievement_detail {
+        /** @var null|rating $rating */
+        $rating = rating::repository()
+            ->where('comp_id', $this->get_competency()->id)
+            ->where('user_id', $user_id)
+            ->where_in('assigned_by_role', $this->get_role_names())
+            ->order_by('id', 'desc')
+            ->first();
+
+        $achievement_detail = new achievement_detail();
+        $achievement_detail->add_rating($rating);
+
+        return $achievement_detail;
+    }
+
+
     /****************************************************************************
      * Getters and setters
      ****************************************************************************/
 
     /**
-     * Return an array of valid roles.
-     * Index is numeric to simulate unique ids
-     * Starting at 1 to simulate db
-     *
-     * @return array
-     */
-    public static function get_all_valid_roles(): array {
-        return [
-            1 => self::ROLE_MANAGER,
-            2 => self::ROLE_APPRAISER,
-            3 => self::ROLE_SELF,
-        ];
-    }
-
-    /**
-     * Get the order in which we should display the roles.
-     *
-     * @return string[]
-     */
-    public static function get_role_display_order(): array {
-        return [
-            self::ROLE_SELF,
-            self::ROLE_MANAGER,
-            self::ROLE_APPRAISER,
-        ];
-    }
-
-    /**
-     * Check if the specified role(s) are valid.
-     *
-     * @param string|string[] $role Role or multiple roles
-     * @param bool $validate Optionally throws exception if there are invalid roles
-     * @return bool
-     */
-    public static function check_is_valid_role($role, bool $validate = false): bool {
-        if (!is_array($role)) {
-            $role = [$role];
-        }
-
-        $valid_roles = array_values(self::get_all_valid_roles());
-        $invalid_roles = array_diff($role, $valid_roles);
-
-        if (empty($invalid_roles)) {
-            return true;
-        }
-
-        if ($validate) {
-            throw new \coding_exception("Invalid role(s) specified: '" . implode("', '", $invalid_roles) . "'");
-        }
-
-        return false;
-    }
-
-    /**
      * Set roles
      *
-     * @param string[] $roles - Array of role names (value should be the role name, key will be ignored).
+     * @param string[] $roles Array of role classes (e.g. [self_role::class]) or names (e.g. ['self'])
      * @return $this
-     * @throws \coding_exception
      */
     public function set_roles(array $roles): pathway {
-        self::check_is_valid_role($roles, true);
-
-        $this->roles = [];
-        foreach ($roles as $role) {
-            $this->roles[$role] = $role;
-        }
+        $this->roles = role_factory::create_multiple($roles);
         $this->validated = false;
-
         return $this;
     }
 
     /**
      * Get roles
      *
-     * @return array
+     * @return role[]
      */
     public function get_roles() {
         return $this->roles;
     }
 
     /**
-     * Get all unique roles that can add ratings for a competency.
+     * Get role names.
      *
-     * @param competency $competency
      * @return string[]
      */
-    public static function get_roles_for_competency(competency $competency): array {
-        $role_order = array_flip(self::get_role_display_order());
+    public function get_role_names() {
+        return array_map(function (role $role) {
+            return $role::get_name();
+        }, $this->roles);
+    }
 
-        return role::repository()
-            ->select_raw('DISTINCT role')
-            ->join([\totara_competency\entities\pathway::TABLE, 'pathway'], 'path_manual_id', 'pathway.path_instance_id')
-            ->where('pathway.comp_id', $competency->id)
-            ->get()
-            ->sort(function (role $a, role $b) use ($role_order) {
-                return $role_order[$a->role] <=> $role_order[$b->role];
-            })
-            ->pluck('role');
+    /**
+     * Does this pathway have the specified role enabled for it?
+     *
+     * @param role $role
+     * @return bool
+     */
+    public function has_role(role $role) {
+        foreach ($this->roles as $enabled_roles) {
+            if ($role instanceof $enabled_roles) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -310,12 +270,11 @@ class manual extends pathway {
                 ],
             ];
         } else {
-            $result->items = array_map(
-                function ($role) {
-                    return (object)['description' => ucfirst($role)];
-                },
-                $this->get_roles()
-            );
+            $result->items = array_map(function (role $role) {
+                return (object) [
+                    'description' => $role::get_display_name()
+                ];
+            }, $this->get_roles());
         }
 
         return [$result];
@@ -332,7 +291,7 @@ class manual extends pathway {
 
 
     /*******************************************************************************************************
-     * Data exporting
+     * Mustache template data exporting
      *******************************************************************************************************/
 
     /**
@@ -359,15 +318,9 @@ class manual extends pathway {
      * @return string Short description
      */
     public function get_short_description(): string {
-        return implode(
-            ', ',
-            array_map(
-                function ($role) {
-                    return ucfirst($role);
-                },
-                $this->roles
-            )
-        );
+        return implode(', ', array_map(function (role $role) {
+            return $role::get_display_name();
+        }, $this->roles));
     }
 
     /**
@@ -389,20 +342,16 @@ class manual extends pathway {
      * @return array containing 'id', role and name for all linked roles
      */
     public function export_roles(): array {
-        // Picker works on ids which we simulate through the index of items returned by get_all_valid_roles
-        $roleids = array_flip(static::get_all_valid_roles());
-
-        return array_map(
-            function ($role) use ($roleids) {
-                return [
-                    'id' => $roleids[$role],
-                    'role' => $role,
-                    'name' => ucfirst($role),
-                ];
-            },
-            $this->roles
-        );
+        // Picker works on ids which we simulate through using their display order (which is always unique).
+        return array_map(function (role $role) {
+            return [
+                'id' => $role::get_display_order(),
+                'role' => $role::get_name(),
+                'name' => $role::get_display_name(),
+            ];
+        }, $this->roles);
     }
+
     /**
      * Export detail for viewing this pathway
      * This contains translated information ready for display only pages
@@ -417,7 +366,7 @@ class manual extends pathway {
         ];
 
         foreach ($this->roles as $role) {
-            $result['items'][] = ['name' => ucfirst($role)];
+            $result['items'][] = ['name' => $role::get_display_name()];
         }
 
         return $result;
@@ -426,7 +375,7 @@ class manual extends pathway {
     /**
      * Retrieve the current configuration from the database
      *
-     * @param ?int $id Instance id
+     * @param int|null $id Instance id
      * @return \stdClass | null
      */
     public static function dump_pathway_configuration(?int $id = null) {
@@ -438,133 +387,6 @@ class manual extends pathway {
         }
 
         return null;
-    }
-
-
-
-    /**************************************************************************
-     * User specific
-     **************************************************************************/
-
-    /**
-     * Record a manual rating given for a user and competency.
-     *
-     * This will immediately trigger aggregation, which may update the user's pathway achievement.
-     *
-     * @param int $subject_id Id of the user who this rating applies to.
-     * @param int $rater_id Id of user who gave this rating (would be same as subject id in case of self-rating).
-     * @param string $as_role Machine-readable representation of role that rater acts in when giving this rating,
-     *     e.g. self::ROLE_MANAGER.
-     * @param int|null $scale_value_id
-     * @param string|null $comment An optional comment can be provided by the user with this rating.
-     *
-     * @return rating
-     */
-    public function set_manual_value($subject_id, $rater_id, $as_role, ?int $scale_value_id, string $comment = null): rating {
-        $rating = new rating();
-        $rating->comp_id = $this->get_competency()->id;
-        $rating->user_id = $subject_id;
-        $rating->scale_value_id = $scale_value_id;
-        $rating->date_assigned = time();
-        $rating->assigned_by = $rater_id;
-        $rating->comment = $comment;
-
-        $roles = $this->get_roles_that_apply_to_user($subject_id, $rater_id);
-
-        if (!isset($roles[$as_role])) {
-            throw new \coding_exception('No permissions');
-        }
-        $rating->assigned_by_role = $as_role;
-        $rating->save();
-
-        // Do not aggregate here, just schedule for re-aggregation
-        (new aggregation_users_table())->queue_for_aggregation($subject_id, $this->get_competency()->id);
-
-        return $rating;
-    }
-
-    /**
-     * @param int $user_id
-     * @return achievement_detail
-     */
-    public function aggregate_current_value(int $user_id): base_achievement_detail {
-        /** @var null|rating $rating */
-        $rating = rating::repository()
-            ->where('comp_id', $this->get_competency()->id)
-            ->where('user_id', $user_id)
-            ->where('assigned_by_role', $this->get_roles())
-            ->order_by('id', 'desc')
-            ->first();
-
-        $achievement_detail = new achievement_detail();
-        $achievement_detail->add_rating($rating);
-
-        return $achievement_detail;
-    }
-
-    /**
-     * Can one user be rated by another user with a specific role?
-     *
-     * @param int $subject_user Subject user ID
-     * @param int $rater_user Rater user ID
-     * @param string $role Role - e.g. manual::ROLE_SELF, manual::ROLE_MANAGER etc.
-     * @return bool
-     */
-    public static function user_has_role(int $subject_user, int $rater_user, string $role): bool {
-        switch ($role) {
-            case manual::ROLE_SELF:
-                return $subject_user == $rater_user;
-            case manual::ROLE_MANAGER:
-                return job_assignment::is_managing($rater_user, $subject_user);
-            case manual::ROLE_APPRAISER:
-                $job_assignments = job_assignment::get_all($subject_user);
-                foreach ($job_assignments as $job_assignment) {
-                    if ($job_assignment->appraiserid == $rater_user) {
-                        return true;
-                    }
-                }
-                return false;
-            default:
-                throw new \coding_exception('Invalid role');
-        }
-    }
-
-    /**
-     * Get array of the roles that the rater user has in relation to the subject user.
-     *
-     * @param int $subject_user Subject user ID.
-     * @param int $rater_user Rater user ID.
-     * @return array Array of roles => roles, e.g. [manual::SELF => manual::SELF, manual::MANAGER => manual::MANAGER, etc...]
-     */
-    public function get_roles_that_apply_to_user(int $subject_user, int $rater_user) {
-        $roles_that_apply = [];
-
-        foreach ($this->roles as $role) {
-            if (self::user_has_role($subject_user, $rater_user, $role)) {
-                $roles_that_apply[$role] = $role;
-            }
-        }
-
-        return $roles_that_apply;
-    }
-
-    /**
-     * Get all the roles the current user has in relation to the subject user.
-     *
-     * @param int $subject_user Subject user ID.
-     * @return string[] e.g. [manual::MANAGER, manual::APPRAISER]
-     */
-    public static function get_current_user_roles(int $subject_user): array {
-        global $USER;
-        $has_roles = [];
-
-        foreach (self::get_all_valid_roles() as $index => $role) {
-            if (self::user_has_role($subject_user, $USER->id, $role)) {
-                $has_roles[] = $role;
-            };
-        }
-
-        return $has_roles;
     }
 
 }

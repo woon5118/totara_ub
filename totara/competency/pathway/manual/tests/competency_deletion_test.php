@@ -24,6 +24,7 @@
 use core\orm\entity\entity;
 use pathway_manual\entities\pathway_manual;
 use pathway_manual\manual;
+use pathway_manual\models\roles\self_role;
 use totara_competency\entities\pathway;
 
 global $CFG;
@@ -44,11 +45,11 @@ class pathway_manual_competency_deletion_testcase extends advanced_testcase {
         $comp_1 = $generator->create_competency();
         $comp_2 = $generator->create_competency();
 
-        $comp1_manual_pathway = $generator->create_manual($comp_1, [manual::ROLE_SELF]);
-        $comp2_manual_pathway = $generator->create_manual($comp_2, [manual::ROLE_SELF]);
+        $comp1_manual_pathway = $generator->create_manual($comp_1, [self_role::class]);
+        $comp2_manual_pathway = $generator->create_manual($comp_2, [self_role::class]);
 
-        $rating1 = $generator->create_manual_rating($comp1_manual_pathway, $user_1, $user_1, manual::ROLE_SELF);
-        $rating2 = $generator->create_manual_rating($comp2_manual_pathway, $user_2, $user_2, manual::ROLE_SELF);
+        $rating1 = $generator->create_manual_rating($comp_1, $user_1, $user_1, self_role::class);
+        $rating2 = $generator->create_manual_rating($comp_2, $user_2, $user_2, self_role::class);
 
         $path1_entity = new pathway($comp1_manual_pathway->get_id());
         $path2_entity = new pathway($comp2_manual_pathway->get_id());

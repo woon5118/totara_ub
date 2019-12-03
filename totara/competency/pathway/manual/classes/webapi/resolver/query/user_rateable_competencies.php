@@ -27,7 +27,7 @@ use context_user;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use pathway_manual\data_providers\user_rateable_competencies as user_rateable_competencies_provider;
-use pathway_manual\manual;
+use pathway_manual\models\roles\role_factory;
 use pathway_manual\models\user_competencies;
 
 class user_rateable_competencies implements query_resolver {
@@ -73,11 +73,7 @@ class user_rateable_competencies implements query_resolver {
             require_capability('totara/competency:rate_other_competencies', context_user::instance($user_id));
         }
 
-        manual::check_is_valid_role($role, true);
-
-        if (!manual::user_has_role($user_id, $USER->id, $role)) {
-            throw new \coding_exception("You do not have the role {$role} for user {$user_id}");
-        };
+        role_factory::create($role)::require_for_user($user_id);
     }
 
 }

@@ -29,6 +29,7 @@ use core\orm\query\field;
 use pathway_manual\entities\pathway_manual;
 use pathway_manual\entities\role;
 use pathway_manual\manual;
+use pathway_manual\models\roles\role_factory;
 use totara_competency\entities\competency;
 use totara_competency\entities\competency_assignment_user;
 use totara_competency\entities\competency_repository;
@@ -147,7 +148,7 @@ class rateable_competencies {
      * @param string[] $roles
      */
     private function filter_by_roles(competency_repository $repository, array $roles) {
-        manual::check_is_valid_role($roles, true);
+        role_factory::roles_exist($roles, true);
 
         $roles = role::repository()
             ->join([pathway_manual::TABLE, 'manual'], 'path_manual_id', 'manual.id')

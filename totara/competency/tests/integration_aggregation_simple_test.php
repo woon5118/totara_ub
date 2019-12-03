@@ -23,6 +23,7 @@
 
 use pathway_learning_plan\learning_plan;
 use pathway_manual\manual;
+use pathway_manual\models\roles\manager;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\configuration_change;
 use totara_competency\entities\pathway as pathway_entity;
@@ -1198,10 +1199,13 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
      * @dataProvider task_to_execute_data_provider
      */
     public function test_aggregation_single_manual(string $task_to_execute) {
+        /** @var totara_competency_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+
         $data = $this->setup_data();
 
         /** @var manual $pathway */
-        $pathway = $data->competency_generator->create_manual($data->competencies[1], [manual::ROLE_MANAGER]);
+        $pathway = $data->competency_generator->create_manual($data->competencies[1], [manager::class]);
 
         // Assign users
         $to_assign = [
@@ -1213,14 +1217,18 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
 
         $ratings = [];
         // Manager gives rating
-        $ratings[2] = $pathway->set_manual_value($data->users[2]->id,
+        $ratings[2] = $generator->create_manual_rating(
+            $pathway,
+            $data->users[2]->id,
             $data->users['manager']->id,
-            manual::ROLE_MANAGER,
+            manager::class,
             $data->scalevalues[2]->id
         );
-        $ratings[3] = $pathway->set_manual_value($data->users[3]->id,
+        $ratings[3] = $generator->create_manual_rating(
+            $pathway,
+            $data->users[3]->id,
             $data->users['manager']->id,
-            manual::ROLE_MANAGER,
+            manager::class,
             $data->scalevalues[4]->id
         );
 

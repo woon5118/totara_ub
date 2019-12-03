@@ -24,6 +24,8 @@
 
 namespace pathway_manual;
 
+use pathway_manual\models\roles\role;
+use pathway_manual\models\roles\role_factory;
 use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
 use totara_competency\entities\configuration_change;
@@ -102,43 +104,26 @@ class external extends \external_api {
     public static function get_roles(array $filters, int $page, string $order, string $direction) {
         advanced_feature::require('competency_assignment');
 
-        $roles = manual::get_all_valid_roles();
+        $roles = role_factory::create_all();
 
         if (!empty($filters['ids'])) {
-            $ids = $filters['ids'];
-
-            $roles = array_filter(
-                $roles,
-                function ($role, $id) use ($ids) {
-                    return in_array($id, $ids);
-                },
-                ARRAY_FILTER_USE_BOTH
-            );
+            $roles = array_filter($roles, function (role $role) use ($filters) {
+                return in_array($role::get_display_order(), $filters['ids']);
+            });
         }
 
         if (!empty($filters['name'])) {
-            $search = $filters['name'];
-
-            $roles = array_filter(
-                $roles,
-                function ($role, $id) use ($search) {
-                    return stripos($role, $search) !== false;
-                },
-                ARRAY_FILTER_USE_BOTH
-            );
+            $roles = array_filter($roles, function (role $role) use ($filters) {
+                return stripos($role::get_display_name(), $filters['name']) !== false;
+            });
         }
 
         if (!empty($filters['pw_id'])) {
-            $pw_id = $filters['pw_id'];
-            $pw_roles = (new manual($pw_id))->get_configured_roles();
+            $pathway = manual::fetch($filters['pw_id']);
 
-            $roles = array_filter(
-                $roles,
-                function ($role, $id) use ($pw_roles) {
-                    return in_array($id, $pw_roles);
-                },
-                ARRAY_FILTER_USE_BOTH
-            );
+            $roles = array_filter($roles, function (role $role) use ($pathway) {
+                return $pathway->has_role($role);
+            });
         }
 
         $results = [
@@ -151,9 +136,9 @@ class external extends \external_api {
 
         foreach ($roles as $id => $role) {
             $results['items'][] = [
-                'id' => $id,
-                'role' => $role,
-                'name' => ucfirst($role),
+                'id' => $role::get_display_order(),
+                'role' => $role::get_name(),
+                'name' => $role::get_display_name(),
             ];
         }
 

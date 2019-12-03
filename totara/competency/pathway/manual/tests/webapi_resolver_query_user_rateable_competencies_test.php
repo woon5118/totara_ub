@@ -26,6 +26,8 @@ use core\webapi\execution_context;
 use pathway_manual\manual;
 use pathway_manual\models\framework_group;
 use pathway_manual\models\rateable_competency;
+use pathway_manual\models\roles\manager;
+use pathway_manual\models\roles\self_role;
 use pathway_manual\webapi\resolver\query\user_rateable_competencies;
 use pathway_manual\webapi\resolver\type\rateable_competency as rateable_competency_type;
 use pathway_manual\webapi\resolver\type\user_competencies as user_competencies_type;
@@ -43,7 +45,7 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
     protected function setUp() {
         parent::setUp();
 
-        $this->generator->create_manual($this->competency1, [manual::ROLE_SELF]);
+        $this->generator->create_manual($this->competency1, [self_role::class]);
 
         $this->generator->assignment_generator()->create_assignment([
             'user_group_type' => user_groups::USER,
@@ -72,7 +74,7 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
         $this->setUser($this->user1->id);
 
         user_rateable_competencies::resolve(
-            ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
+            ['user_id' => $this->user1->id, 'role' => self_role::class],
             $this->execution_context()
         );
 
@@ -80,7 +82,7 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
         $this->expectException(require_login_exception::class);
 
         user_rateable_competencies::resolve(
-            ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
+            ['user_id' => $this->user1->id, 'role' => self_role::class],
             $this->execution_context()
         );
     }
@@ -91,7 +93,7 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
     public function test_capability_self() {
         $this->setUser($this->user1->id);
         user_rateable_competencies::resolve(
-            ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
+            ['user_id' => $this->user1->id, 'role' => self_role::class],
             $this->execution_context()
         );
 
@@ -100,7 +102,7 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
 
         $this->expectException(required_capability_exception::class);
         user_rateable_competencies::resolve(
-            ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
+            ['user_id' => $this->user1->id, 'role' => self_role::class],
             $this->execution_context()
         );
     }
@@ -115,7 +117,7 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
         $this->setUser($this->user2->id);
 
         user_rateable_competencies::resolve(
-            ['user_id' => $this->user1->id, 'role' => manual::ROLE_MANAGER],
+            ['user_id' => $this->user1->id, 'role' => manager::class],
             $this->execution_context()
         );
 
@@ -124,7 +126,7 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
 
         $this->expectException(required_capability_exception::class);
         user_rateable_competencies::resolve(
-            ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
+            ['user_id' => $this->user1->id, 'role' => self_role::class],
             $this->execution_context()
         );
     }
@@ -138,7 +140,7 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
         $this->setUser($this->user1->id);
 
         $query = user_rateable_competencies::resolve(
-            ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
+            ['user_id' => $this->user1->id, 'role' => self_role::class],
             $this->execution_context()
         );
         $this->assertEquals(1, user_competencies_type::resolve('count', $query, [], $this->execution_context()));
@@ -151,7 +153,7 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
         $this->setUser($this->user1->id);
 
         $query = user_rateable_competencies::resolve(
-            ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
+            ['user_id' => $this->user1->id, 'role' => self_role::class],
             $this->execution_context()
         );
         $this->assertEquals($this->user1->id, user_competencies_type::resolve('user', $query, [], $this->execution_context())->id);
@@ -164,7 +166,7 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
         $this->setUser($this->user1->id);
 
         $query = user_rateable_competencies::resolve(
-            ['user_id' => $this->user1->id, 'role' => manual::ROLE_SELF],
+            ['user_id' => $this->user1->id, 'role' => self_role::class],
             $this->execution_context()
         );
 
@@ -202,8 +204,8 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
         $managerja = job_assignment::create_default($this->user2->id);
         job_assignment::create_default($this->user1->id, ['managerjaid' => $managerja->id]);
 
-        $rateable_competency_role_self = new rateable_competency($this->competency1, $this->user1, manual::ROLE_SELF);
-        $rateable_competency_role_manager = new rateable_competency($this->competency1, $this->user1, manual::ROLE_MANAGER);
+        $rateable_competency_role_self = new rateable_competency($this->competency1, $this->user1, new self_role());
+        $rateable_competency_role_manager = new rateable_competency($this->competency1, $this->user1, new manager());
 
         // No rating exists.
         $last_rating = rateable_competency_type::resolve(
@@ -219,14 +221,14 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
             $this->competency1,
             $this->user1,
             $this->user1,
-            manual::ROLE_SELF
+            self_role::class
         );
         // Rating made by manager.
         $rating_manager = $this->generator->create_manual_rating(
             $this->competency1,
             $this->user1,
             $this->user2,
-            manual::ROLE_MANAGER
+            manager::class
         );
 
         $last_rating = rateable_competency_type::resolve(
@@ -271,7 +273,7 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
         // Make sure only the first competency assigned is returned, and no filter options are fetched.
         $assignment_1_query = user_rateable_competencies::resolve([
             'user_id' => $this->user1->id,
-            'role' => manual::ROLE_SELF,
+            'role' => self_role::class,
             'filters' => [
                 'assignment_reason' => [$assignment_1->id],
             ]
@@ -286,7 +288,7 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
         // When no filters are specified, then filter options should also be fetched.
         $query_without_filters = user_rateable_competencies::resolve([
             'user_id' => $this->user1->id,
-            'role' => manual::ROLE_SELF,
+            'role' => self_role::class,
             'filters' => null,
         ], $this->execution_context());
         $this->assertNotNull($query_without_filters->get_filter_options());

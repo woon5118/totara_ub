@@ -23,6 +23,8 @@
 
 use pathway_learning_plan\learning_plan;
 use pathway_manual\manual;
+use pathway_manual\models\roles\manager;
+use pathway_manual\models\roles\self_role;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\pathway_achievement;
 use totara_competency\hook\competency_configuration_changed;
@@ -61,11 +63,11 @@ class totara_competency_integration_aggregation_single_type_multi_run_testcase e
 
         /** @var manual[] $pathways */
         $data->pathways = [];
-        $data->pathways['manager'] = $data->competency_generator->create_manual($data->competencies[1], [manual::ROLE_MANAGER]);
-        $data->pathways['self'] = $data->competency_generator->create_manual($data->competencies[1], [manual::ROLE_SELF]);
+        $data->pathways['manager'] = $data->competency_generator->create_manual($data->competencies[1], [manager::class]);
+        $data->pathways['self'] = $data->competency_generator->create_manual($data->competencies[1], [self_role::class]);
         $data->pathways['manager_self'] = $data->competency_generator->create_manual(
             $data->competencies[1],
-            [manual::ROLE_MANAGER, manual::ROLE_SELF]
+            [manager::class, self_role::class]
         );
 
         /** @var rating[] $ratings */
@@ -1224,29 +1226,40 @@ class totara_competency_integration_aggregation_single_type_multi_run_testcase e
      * @param string $task_to_execute
      */
     private function manual_multi_run_1($data, string $task_to_execute) {
+        /** @var totara_competency_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+
         // manager rates user1 = 4, user2 = 3
         // user1 rates himself = 3
         // user2 rates himself = 3
 
         // Ratings - order is important for manager_self values
-        $data->ratings['run1-manager-1'] = $data->pathways['manager']->set_manual_value($data->users[1]->id,
+        $data->ratings['run1-manager-1'] = $generator->create_manual_rating(
+            $data->pathways['manager'],
+            $data->users[1]->id,
             $data->users['manager']->id,
-            manual::ROLE_MANAGER,
+            manager::class,
             $data->scalevalues[4]->id
         );
-        $data->ratings['run1-manager-2'] = $data->pathways['manager']->set_manual_value($data->users[2]->id,
-            $data->users['manager']->id,
-            manual::ROLE_MANAGER,
-            $data->scalevalues[3]->id
-        );
-        $data->ratings['run1-self-1'] = $data->pathways['self']->set_manual_value($data->users[1]->id,
-            $data->users[1]->id,
-            manual::ROLE_SELF,
-            $data->scalevalues[3]->id
-        );
-        $data->ratings['run1-self-2'] = $data->pathways['self']->set_manual_value($data->users[2]->id,
+        $data->ratings['run1-manager-2'] = $generator->create_manual_rating(
+            $data->pathways['manager'],
             $data->users[2]->id,
-            manual::ROLE_SELF,
+            $data->users['manager']->id,
+            manager::class,
+            $data->scalevalues[3]->id
+        );
+        $data->ratings['run1-self-1'] = $generator->create_manual_rating(
+            $data->pathways['self'],
+            $data->users[1]->id,
+            $data->users[1]->id,
+            self_role::class,
+            $data->scalevalues[3]->id
+        );
+        $data->ratings['run1-self-2'] = $generator->create_manual_rating(
+            $data->pathways['self'],
+            $data->users[2]->id,
+            $data->users[2]->id,
+            self_role::class,
             $data->scalevalues[3]->id
         );
         $this->waitForSecond();
@@ -1365,18 +1378,25 @@ class totara_competency_integration_aggregation_single_type_multi_run_testcase e
      * @param string $task_to_execute
      */
     private function manual_multi_run_2($data, string $task_to_execute) {
+        /** @var totara_competency_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+
         // user1 rates himself = 2
         // manager rates user1 = 5
 
         // Ratings - order is important for manager_self values
-        $data->ratings['run2-self-1'] = $data->pathways['self']->set_manual_value($data->users[1]->id,
+        $data->ratings['run2-self-1'] = $generator->create_manual_rating(
+            $data->pathways['self'],
             $data->users[1]->id,
-            manual::ROLE_SELF,
+            $data->users[1]->id,
+            self_role::class,
             $data->scalevalues[2]->id
         );
-        $data->ratings['run2-manager-1'] = $data->pathways['manager']->set_manual_value($data->users[1]->id,
+        $data->ratings['run2-manager-1'] = $generator->create_manual_rating(
+            $data->pathways['manager'],
+            $data->users[1]->id,
             $data->users['manager']->id,
-            manual::ROLE_MANAGER,
+            manager::class,
             $data->scalevalues[5]->id
         );
         $this->waitForSecond();

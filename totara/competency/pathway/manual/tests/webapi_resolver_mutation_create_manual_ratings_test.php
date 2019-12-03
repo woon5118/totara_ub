@@ -24,6 +24,7 @@
 
 use core\webapi\execution_context;
 use pathway_manual\manual;
+use pathway_manual\models\roles\manager;
 use pathway_manual\webapi\resolver\mutation\create_manual_ratings;
 use totara_job\job_assignment;
 
@@ -46,8 +47,8 @@ class pathway_manual_webapi_resolver_mutation_create_manual_ratings_testcase ext
 
         $this->setUser($this->user2->id);
         $this->set_as_rating_manager($this->user1->id, $this->user2->id);
-        $this->generator->create_manual($this->competency1, [manual::ROLE_MANAGER]);
-        $this->generator->create_manual($this->competency2, [manual::ROLE_MANAGER]);
+        $this->generator->create_manual($this->competency1, [manager::class]);
+        $this->generator->create_manual($this->competency2, [manager::class]);
 
         $scale_value_id_1 = $this->get_scale_value_id('11');
         $scale_value_id_2 = $this->get_scale_value_id('22');
@@ -57,7 +58,7 @@ class pathway_manual_webapi_resolver_mutation_create_manual_ratings_testcase ext
 
         $args = [
             'user_id' => $this->user1->id,
-            'role' => manual::ROLE_MANAGER,
+            'role' => manager::class,
             'ratings' => [
                 [
                     'comp_id' => $this->competency1->id,
@@ -79,7 +80,7 @@ class pathway_manual_webapi_resolver_mutation_create_manual_ratings_testcase ext
             'user_id' => $this->user1->id,
             'scale_value_id' => $scale_value_id_1,
             'assigned_by' => $this->user2->id,
-            'assigned_by_role' => manual::ROLE_MANAGER,
+            'assigned_by_role' => manager::get_name(),
         ], '*', MUST_EXIST);
         $this->assertEquals('Test comment 1', $record->comment);
 
@@ -88,7 +89,7 @@ class pathway_manual_webapi_resolver_mutation_create_manual_ratings_testcase ext
             'user_id' => $this->user1->id,
             'scale_value_id' => $scale_value_id_2,
             'assigned_by' => $this->user2->id,
-            'assigned_by_role' => manual::ROLE_MANAGER,
+            'assigned_by_role' => manager::get_name(),
         ], '*', MUST_EXIST);
         $this->assertEquals('Test comment 2', $record->comment);
     }
@@ -101,14 +102,14 @@ class pathway_manual_webapi_resolver_mutation_create_manual_ratings_testcase ext
 
         $this->setUser($this->user2->id);
         $this->set_as_rating_manager($this->user1->id, $this->user2->id);
-        $this->generator->create_manual($this->competency1, [manual::ROLE_MANAGER]);
-        $this->generator->create_manual($this->competency2, [manual::ROLE_MANAGER]);
+        $this->generator->create_manual($this->competency1, [manager::class]);
+        $this->generator->create_manual($this->competency2, [manager::class]);
         $scale_value_id_1 = $this->get_scale_value_id('11');
         $scale_value_id_2 = $this->get_scale_value_id('22');
 
         $args = [
             'user_id' => $this->user1->id,
-            'role' => manual::ROLE_MANAGER,
+            'role' => manager::class,
             'ratings' => [
                 [
                     'comp_id' => $this->competency1->id,
@@ -135,7 +136,7 @@ class pathway_manual_webapi_resolver_mutation_create_manual_ratings_testcase ext
             'user_id' => $this->user1->id,
             'scale_value_id' => $scale_value_id_1,
             'assigned_by' => $this->user2->id,
-            'assigned_by_role' => manual::ROLE_MANAGER,
+            'assigned_by_role' => manager::get_name(),
         ], '*', MUST_EXIST);
         $this->assertEquals('Test comment 1', $record->comment);
 
@@ -144,7 +145,7 @@ class pathway_manual_webapi_resolver_mutation_create_manual_ratings_testcase ext
             'user_id' => $this->user1->id,
             'scale_value_id' => $scale_value_id_2,
             'assigned_by' => $this->user2->id,
-            'assigned_by_role' => manual::ROLE_MANAGER,
+            'assigned_by_role' => manager::get_name(),
         ], '*', MUST_EXIST);
         $this->assertEquals('Test comment 2', $record->comment);
     }
@@ -160,13 +161,13 @@ class pathway_manual_webapi_resolver_mutation_create_manual_ratings_testcase ext
 
         $this->setUser($this->user2->id);
         $this->set_as_rating_manager($this->user1->id, $this->user2->id);
-        $this->generator->create_manual($this->competency1, [manual::ROLE_MANAGER]);
-        $this->generator->create_manual($this->competency2, [manual::ROLE_MANAGER]);
+        $this->generator->create_manual($this->competency1, [manager::class]);
+        $this->generator->create_manual($this->competency2, [manager::class]);
         $scale_value_id_1 = $this->get_scale_value_id('11');
 
         $args = [
             'user_id' => $this->user1->id,
-            'role' => manual::ROLE_MANAGER,
+            'role' => manager::class,
             'ratings' => [
                 [
                     'comp_id' => $this->competency1->id,

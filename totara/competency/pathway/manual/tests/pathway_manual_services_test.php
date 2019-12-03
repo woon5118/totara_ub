@@ -22,6 +22,9 @@
 
 use pathway_manual\external;
 use pathway_manual\manual;
+use pathway_manual\models\roles\appraiser;
+use pathway_manual\models\roles\manager;
+use pathway_manual\models\roles\self_role;
 
 global $CFG;
 require_once($CFG->dirroot . '/lib/externallib.php');
@@ -45,19 +48,19 @@ class pathway_manual_services_testcase extends advanced_testcase {
             'total' => 3,
             'items' => [
                 [
-                    'id' => 1,
-                    'role' => manual::ROLE_MANAGER,
-                    'name' => ucfirst(manual::ROLE_MANAGER),
+                    'id'   => self_role::get_display_order(),
+                    'role' => self_role::get_name(),
+                    'name' => self_role::get_display_name(),
                 ],
                 [
-                    'id' => 2,
-                    'role' => manual::ROLE_APPRAISER,
-                    'name' => ucfirst(manual::ROLE_APPRAISER),
+                    'id'   => manager::get_display_order(),
+                    'role' => manager::get_name(),
+                    'name' => manager::get_display_name(),
                 ],
                 [
-                    'id' => 3,
-                    'role' => manual::ROLE_SELF,
-                    'name' => ucfirst(manual::ROLE_SELF),
+                    'id'   => appraiser::get_display_order(),
+                    'role' => appraiser::get_name(),
+                    'name' => appraiser::get_display_name(),
                 ],
             ],
         ];
@@ -65,8 +68,8 @@ class pathway_manual_services_testcase extends advanced_testcase {
     }
 
     public function test_get_roles_ids_filter() {
-
-        $return = external::get_roles(['ids' => [1, 3]], 1, '', 'asc');
+        $ids = [appraiser::get_display_order(), self_role::get_display_order()];
+        $return = external::get_roles(['ids' => $ids], 1, '', 'asc');
         $result = external::clean_returnvalue(external::get_roles_returns(), $return);
 
         $this->assertEquals($return, $result);
@@ -78,14 +81,14 @@ class pathway_manual_services_testcase extends advanced_testcase {
             'total' => 2,
             'items' => [
                 [
-                    'id' => 1,
-                    'role' => manual::ROLE_MANAGER,
-                    'name' => ucfirst(manual::ROLE_MANAGER),
+                    'id'   => self_role::get_display_order(),
+                    'role' => self_role::get_name(),
+                    'name' => self_role::get_display_name(),
                 ],
                 [
-                    'id' => 3,
-                    'role' => manual::ROLE_SELF,
-                    'name' => ucfirst(manual::ROLE_SELF),
+                    'id'   => appraiser::get_display_order(),
+                    'role' => appraiser::get_name(),
+                    'name' => appraiser::get_display_name(),
                 ],
             ],
         ];
@@ -107,9 +110,9 @@ class pathway_manual_services_testcase extends advanced_testcase {
             'total' => 1,
             'items' => [
                 [
-                    'id' => 1,
-                    'role' => manual::ROLE_MANAGER,
-                    'name' => ucfirst(manual::ROLE_MANAGER),
+                    'id'   => manager::get_display_order(),
+                    'role' => manager::get_name(),
+                    'name' => manager::get_display_name(),
                 ],
             ],
         ];

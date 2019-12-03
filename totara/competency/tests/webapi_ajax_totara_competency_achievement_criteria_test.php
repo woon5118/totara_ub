@@ -21,6 +21,7 @@
  * @package totara_competency
  */
 
+use pathway_manual\models\roles\manager;
 use totara_criteria\criterion;
 use \totara_webapi\graphql;
 use core\webapi\execution_context;
@@ -126,7 +127,7 @@ class totara_competency_webapi_ajax_totara_competency_achievement_criteria_testc
 
         $pathways = [];
 
-        $pw = $competency_generator->create_manual($data->comp, [manual::ROLE_MANAGER]);
+        $pw = $competency_generator->create_manual($data->comp, [manager::class]);
         $pathways[$pw->get_id()] = $pw;
 
         $pw = $competency_generator->create_criteria_group($data->comp, $cc, $data->scalevalues[2]->id, null, null, 2);

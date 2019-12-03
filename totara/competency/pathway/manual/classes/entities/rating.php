@@ -27,6 +27,7 @@ namespace pathway_manual\entities;
 use core\entities\user;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
+use pathway_manual\models\roles\role_factory;
 use totara_competency\entities\competency;
 use totara_competency\entities\scale_value;
 
@@ -77,6 +78,15 @@ class rating extends entity {
      */
     public function scale_value(): belongs_to {
         return $this->belongs_to(scale_value::class, 'scale_value_id');
+    }
+
+    /**
+     * Get the role definition class.
+     *
+     * @return \pathway_manual\models\roles\role
+     */
+    public function get_role(): \pathway_manual\models\roles\role {
+        return role_factory::create($this->assigned_by_role);
     }
 
 }

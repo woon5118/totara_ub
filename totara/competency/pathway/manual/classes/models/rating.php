@@ -27,8 +27,9 @@ use context_user;
 use core\entities\user;
 use core\orm\query\builder;
 use pathway_manual\entities\rating as rating_entity;
-use pathway_manual\entities\role;
-use pathway_manual\manual;
+use pathway_manual\entities\role as role_entity;
+use pathway_manual\models\roles\role;
+use pathway_manual\models\roles\role_factory;
 use totara_competency\aggregation_users_table;
 use totara_competency\entities\competency;
 use totara_competency\entities\pathway;
@@ -43,12 +44,12 @@ defined('MOODLE_INTERNAL') || die();
 class rating {
 
     /**
-     * @var int
+     * @var user
      */
-    protected $subject_user_id;
+    protected $subject_user;
 
     /**
-     * @var string
+     * @var role
      */
     protected $role;
 
@@ -57,9 +58,8 @@ class rating {
      * @param string $role
      */
     public function __construct(int $subject_user_id, string $role) {
-        $this->subject_user_id = $subject_user_id;
-        $this->role = $role;
-        manual::check_is_valid_role($role, true);
+        $this->subject_user = new user($subject_user_id);
+        $this->role = role_factory::create($role);
     }
 
     /**
@@ -101,10 +101,10 @@ class rating {
         $this->validate_role_for_competencies(array_column($ratings, 'comp_id'));
 
         $rating_record = [
-            'user_id' => $this->subject_user_id,
+            'user_id' => $this->subject_user->id,
             'date_assigned' => time(),
             'assigned_by' => user::logged_in()->id,
-            'assigned_by_role' => $this->role,
+            'assigned_by_role' => $this->role::get_name(),
         ];
 
         builder::get_db()->transaction(function () use ($ratings, $rating_record) {
@@ -126,15 +126,12 @@ class rating {
      */
     private function require_can_rate_user() {
         // Check capability.
-        $capability = self::is_logged_in_user($this->subject_user_id)
+        $capability = $this->subject_user->is_logged_in()
             ? 'totara/competency:rate_own_competencies'
             : 'totara/competency:rate_other_competencies';
-        require_capability($capability, context_user::instance($this->subject_user_id));
+        require_capability($capability, context_user::instance($this->subject_user->id));
 
-        // Check user's role.
-        if (!manual::user_has_role($this->subject_user_id, user::logged_in()->id, $this->role)) {
-            throw new \coding_exception("You do not have the role {$this->role} for user {$this->subject_user_id}");
-        }
+        $this->role::require_for_user($this->subject_user->id);
     }
 
     /**
@@ -144,19 +141,18 @@ class rating {
      * @return bool
      */
     public function validate_role_for_competencies(array $competency_ids): bool {
-        $competency_ids_with_role = role::repository()
-            ->select('pathway.comp_id')
-            ->join([pathway::TABLE, 'pathway'], 'path_manual_id', 'pathway.path_instance_id')
-            ->where_in('pathway.comp_id', $competency_ids)
-            ->where('role', $this->role)
-            ->get()
-            ->pluck('comp_id');
+        $competencies_with_role = roles::get_competencies_with_role($this->role);
 
-        foreach ($competency_ids as $competency_id) {
-            if (!in_array($competency_id, $competency_ids_with_role)) {
-                throw new \coding_exception("Role {$this->role} cannot rate for competency {$competency_id}");
-            }
+        $invalid_competencies = array_diff($competency_ids, $competencies_with_role->pluck('id'));
+
+        if ($invalid_competencies) {
+            throw new \coding_exception(
+                'The following competencies: ' .
+                implode(', ', $invalid_competencies) .
+                " do not have the {$this->role::get_name()} role enabled."
+            );
         }
+
         return true;
     }
 
@@ -188,7 +184,4 @@ class rating {
         return true;
     }
 
-    protected static function is_logged_in_user(int $user_id): bool {
-        return user::logged_in()->id === $user_id;
-    }
 }

@@ -28,67 +28,57 @@
     />
     <div class="tui-pathwayManual-achievementDisplay__list">
       <div
-        v-for="(role, index) in roles"
+        v-for="(roleRating, index) in roleRatings"
         :key="index"
         class="tui-pathwayManual-achievementDisplay__row"
       >
         <div class="tui-pathwayManual-achievementDisplay__role">
           <img
-            :src="getProfilePhotoUrl(role)"
-            :alt="getUserName(role)"
-            :class="getPhotoClass(role)"
+            :src="getProfilePhotoUrl(roleRating)"
+            :alt="getUserName(roleRating)"
+            :class="getPhotoClass(roleRating)"
           />
           <div class="tui-pathwayManual-achievementDisplay__role_info">
             <div class="tui-pathwayManual-achievementDisplay__role_info_name">
-              {{ role.role_display_name }}
+              {{ getRoleName(roleRating) }}
             </div>
-            <a v-if="role.has_role" :href="getAddRatingUrl(role)">{{
-              $str('add_rating', 'pathway_manual')
-            }}</a>
+            <a
+              v-if="roleRating.role.has_role"
+              :href="getAddRatingUrl(roleRating)"
+              >{{ $str('add_rating', 'pathway_manual') }}</a
+            >
           </div>
         </div>
         <div
-          v-if="hasRating(role)"
+          v-if="hasRating(roleRating)"
           class="tui-pathwayManual-achievementDisplay__rating"
         >
           <div class="tui-pathwayManual-achievementDisplay__rating_value">
-            <span v-if="role.latest_rating.scale_value">
-              {{ role.latest_rating.scale_value.name }}
+            <span v-if="roleRating.latest_rating.scale_value">
+              {{ roleRating.latest_rating.scale_value.name }}
             </span>
             <span v-else>
               {{ $str('rating_set_to_none', 'pathway_manual') }}
             </span>
           </div>
           <div
-            v-if="isSelf(role)"
+            v-if="isSelf(roleRating)"
             class="tui-pathwayManual-achievementDisplay__rating_date"
           >
-            {{ role.latest_rating.date }}
+            {{ roleRating.latest_rating.date }}
+          </div>
+          <div class="tui-pathwayManual-achievementDisplay__rating_date">
+            {{ getNameAndDate(roleRating) }}
           </div>
           <div
-            v-else-if="!raterPurged(role)"
-            class="tui-pathwayManual-achievementDisplay__rating_date"
-          >
-            {{
-              $str('fullname_date', 'pathway_manual', {
-                name: role.latest_rating.rater.fullname,
-                date: role.latest_rating.date,
-              })
-            }}
-          </div>
-          <div v-else>
-            {{ role.latest_rating.date }}
-            <em>{{ $str('rater_details_removed', 'pathway_manual') }}</em>
-          </div>
-          <div
-            v-if="hasComment(role)"
+            v-if="hasComment(roleRating)"
             class="tui-pathwayManual-achievementDisplay__rating_comment"
           >
             {{
               $str(
                 'comment_wrapper',
                 'pathway_manual',
-                role.latest_rating.comment
+                roleRating.latest_rating.comment
               )
             }}
           </div>
@@ -122,72 +112,84 @@ export default {
 
   data: function() {
     return {
-      roles: [],
+      roleRatings: [],
       showInfoTooltip: false,
     };
   },
 
   computed: {
     ratingsEnabled() {
-      return this.roles != null && this.roles.length > 0;
+      return this.roleRatings != null && this.roleRatings.length > 0;
     },
   },
 
   methods: {
-    hasRating(role) {
-      return role.latest_rating != null;
+    hasRating(roleRating) {
+      return roleRating.latest_rating != null;
     },
 
-    raterPurged(role) {
-      return role.latest_rating.rater == null;
+    raterPurged(roleRating) {
+      return roleRating.latest_rating.rater == null;
     },
 
-    hasComment(role) {
-      return role.latest_rating.comment != null;
+    hasComment(roleRating) {
+      return roleRating.latest_rating.comment != null;
     },
 
-    isSelf(rating) {
-      return rating.role === 'self';
+    isSelf(roleRating) {
+      return roleRating.role.name === 'self';
     },
 
-    getAddRatingUrl(role) {
-      // TODO: Return url for making manual ratings in TL-22969
-      return '#' + role.role;
-    },
-
-    getProfilePhotoUrl(role) {
-      if (this.hasRating(role) && !this.raterPurged(role)) {
-        return role.latest_rating.rater.profileimageurl;
+    getRoleName(roleRating) {
+      if (this.isSelf(roleRating)) {
+        if (roleRating.role.has_role) {
+          return this.$str('your_rating', 'pathway_manual');
+        } else {
+          return this.getUserName(roleRating);
+        }
       }
-      return role.default_profile_picture;
+
+      return roleRating.role.display_name;
     },
 
-    getUserName(role) {
-      if (!this.hasRating(role)) {
+    getAddRatingUrl(roleRating) {
+      // TODO: Return url for making manual ratings in TL-22969
+      return '#' + roleRating.role.name;
+    },
+
+    getProfilePhotoUrl(roleRating) {
+      if (this.hasRating(roleRating) && !this.raterPurged(roleRating)) {
+        return roleRating.latest_rating.rater.profileimageurl;
+      }
+      return roleRating.default_profile_picture;
+    },
+
+    getUserName(roleRating) {
+      if (!this.hasRating(roleRating)) {
         return this.$str('no_rating_given', 'pathway_manual');
-      } else if (this.raterPurged(role)) {
+      } else if (this.raterPurged(roleRating)) {
         return this.$str('rater_details_removed', 'pathway_manual');
       }
-      return role.latest_rating.rater.fullname;
+      return roleRating.latest_rating.rater.fullname;
     },
 
-    getNameAndDate(role) {
-      if (this.raterPurged(role)) {
+    getNameAndDate(roleRating) {
+      if (this.raterPurged(roleRating)) {
         return this.$str(
           'date_rater_details_removed',
           'pathway_manual',
-          role.latest_rating.date
+          roleRating.latest_rating.date
         );
       }
       return this.$str('fullname_date', 'pathway_manual', {
-        name: role.latest_rating.rater.fullname,
-        date: role.latest_rating.date,
+        name: roleRating.latest_rating.rater.fullname,
+        date: roleRating.latest_rating.date,
       });
     },
 
-    getPhotoClass(role) {
+    getPhotoClass(roleRating) {
       let cssClass = 'tui-pathwayManual-achievementDisplay__role_photo';
-      if (!this.hasRating(role)) {
+      if (!this.hasRating(roleRating)) {
         cssClass += ' tui-pathwayManual-achievementDisplay__role_photo-none';
       }
       return cssClass;
@@ -195,7 +197,7 @@ export default {
   },
 
   apollo: {
-    roles: {
+    roleRatings: {
       query: RoleRatingsQuery,
       context: { batch: true },
       variables() {
@@ -204,9 +206,9 @@ export default {
           assignment_id: this.assignmentId,
         };
       },
-      update({ pathway_manual_role_ratings: roles }) {
+      update({ pathway_manual_role_ratings: roleRatings }) {
         this.$emit('loaded');
-        return roles;
+        return roleRatings;
       },
     },
   },
@@ -281,7 +283,8 @@ export default {
       "rater_details_removed",
       "raters",
       "raters_info",
-      "rating_set_to_none"
+      "rating_set_to_none",
+      "your_rating"
     ]
   }
 </lang-strings>

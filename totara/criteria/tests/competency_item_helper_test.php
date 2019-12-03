@@ -24,10 +24,8 @@
 use core\orm\collection;
 use core\orm\query\table;
 use criteria_childcompetency\childcompetency;
-use pathway_manual\manual;
-use totara_competency\entities\competency_achievement as competency_achievement_entity;
+use pathway_manual\models\roles\manager;
 use totara_competency\entities\scale;
-use totara_competency\hook\competency_achievement_updated;
 use totara_criteria\competency_item_helper;
 use totara_criteria\criterion;
 use totara_criteria\entities\criteria_item as item_entity;
@@ -121,7 +119,7 @@ class totara_criteria_competency_item_helper_testcase extends advanced_testcase 
         $this->assertSame(0, $hook_sink->count());
 
         // Now add a pathway to the child that will allow the user to become proficient
-        $child_pw2 = $competency_generator->create_manual($child->id, [manual::ROLE_MANAGER]);
+        $child_pw2 = $competency_generator->create_manual($child->id, [manager::class]);
 
         $hook_sink->clear();
         competency_item_helper::configuration_changed($child->id);
