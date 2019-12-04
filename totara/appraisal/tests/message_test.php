@@ -770,13 +770,8 @@ class appraisal_message_test extends appraisal_testcase {
 
         // Check that both emails have the same content.
         // Remove multipart boundary because that's the only expected difference between the two messages.
-        preg_match('|\R--(.{0,69})\R|', $emails[0]->body, $matches);
-        $boundary = $matches[1];
-        $body_0 = str_replace($boundary, '', $emails[0]->body);
-
-        preg_match('|\R--(.{0,69})\R|', $emails[1]->body, $matches);
-        $boundary = $matches[1];
-        $body_1 = str_replace($boundary, '', $emails[1]->body);
+        $body_0 = preg_replace('|\R--(.{0,69})\R|', '', $emails[0]->body);
+        $body_1 = preg_replace('|\R--(.{0,69})\R|', '', $emails[1]->body);
 
         $this->assertContains('Test alert body text', $body_0);
 
