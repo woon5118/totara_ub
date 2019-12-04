@@ -23,6 +23,7 @@
 
 namespace criteria_othercompetency;
 
+use totara_competency\entities\competency as competency_entity;
 use totara_criteria\criterion;
 
 /**
@@ -108,6 +109,15 @@ class othercompetency extends criterion {
      */
     public function export_edit_items(): array {
         $items = [];
+
+        foreach ($this->get_item_ids() as $competency_id) {
+            $competency = new competency_entity($competency_id);
+            $items[] = [
+                'type' => $this->get_items_type(),
+                'id' => $competency_id,
+                'name' => format_string($competency->fullname),
+            ];
+        }
 
         return $items;
     }

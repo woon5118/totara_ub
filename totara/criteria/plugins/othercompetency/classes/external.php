@@ -18,14 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Marco Song <marco.song@totaralearning.com>
- * @package totara_criteria
+ * @package criteria_othercompetency
  */
 
 namespace criteria_othercompetency;
 
 use totara_core\advanced_feature;
-
-defined('MOODLE_INTERNAL') || die;
 
 class external extends \external_api {
 

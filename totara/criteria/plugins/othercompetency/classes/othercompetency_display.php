@@ -23,6 +23,7 @@
 
 namespace criteria_othercompetency;
 
+use totara_competency\entities\competency as competency_entity;
 use totara_criteria\criterion_display;
 
 /**
@@ -48,6 +49,11 @@ class othercompetency_display extends criterion_display {
      */
     protected function get_display_configuration_items(): array {
         $items = [];
+
+        foreach ($this->criterion->get_item_ids() as $competency_id) {
+            $competency = new competency_entity($competency_id);
+            $items[] = $competency->fullname;
+        }
 
         return $items;
     }

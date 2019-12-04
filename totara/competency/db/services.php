@@ -240,6 +240,16 @@ $competencies = [
         'ajax'          => true,
         'capabilities'  => 'totara/competency:view_assignments',
     ],
+
+    'totara_competency_get_frameworks' => [
+        'classname' => \totara_competency\external::class,
+        'methodname'    => 'get_frameworks',
+        'description'   => 'List all frameworks',
+        'type'          => 'read',
+        'loginrequired' => true,
+        'ajax'          => true,
+        'capabilities'  => 'totara/competency:view_assignments',
+    ],
 ];
 
 $functions = array_merge($functions, $assignments, $competencies);

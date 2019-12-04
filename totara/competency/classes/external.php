@@ -26,6 +26,7 @@ namespace totara_competency;
 
 use core\format;
 use totara_competency\entities\competency;
+use totara_competency\entities\competency_framework;
 use totara_competency\entities\course;
 use totara_competency\entities\scale;
 use totara_core\advanced_feature;
@@ -536,6 +537,31 @@ class external extends \external_api {
 
     public static function get_overall_aggregation_returns() {
         return new \external_value(PARAM_ALPHANUMEXT, 'Aggregation type');
+    }
+
+    public static function get_frameworks() {
+        advanced_feature::require('competencies');
+
+        $items = competency_framework::repository()
+            ->select(['id', 'fullname'])
+            ->get()
+            ->map(function (competency_framework $framework) {
+                return [
+                    'id' => $framework->id,
+                    'fullname' => format_string($framework->fullname),
+                ];
+            })
+            ->to_array();
+
+        return ['items' => $items];
+    }
+
+    public static function get_frameworks_parameters() {
+        return new \external_function_parameters([]);
+    }
+
+    public static function get_frameworks_returns() {
+        return null;
     }
 
 }

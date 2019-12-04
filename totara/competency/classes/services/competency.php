@@ -71,6 +71,11 @@ class competency extends \external_api {
                             'one or more competency type ids',
                             VALUE_OPTIONAL
                         ),
+                        'ids' => new external_multiple_structure(
+                            new external_value(PARAM_INT, 'ids', VALUE_OPTIONAL),
+                            'ids to filter by',
+                            VALUE_OPTIONAL
+                        ),
                     ],
                     VALUE_OPTIONAL,
                     []

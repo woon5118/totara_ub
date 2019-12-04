@@ -21,9 +21,15 @@
  * @package criteria_othercompetency
  */
 
-$string['pluginname'] = 'Proficiency in other competencies';
 $string['addcompetencies'] = "Add competencies";
+$string['allframeworks'] = 'All frameworks';
 $string['competencies'] = 'Competencies';
-$string['selectcompetencies'] = "Select competencies";
-$string['error:nocompetencies'] = 'No competencies selected';
+$string['competency'] = 'competency';
 $string['error:competencyerror'] = 'One or more competencies have errors';
+$string['error:nocompetencies'] = 'No competencies selected';
+$string['hierarchy_list:competency:all'] = 'All competencies';
+$string['hierarchy_list:competency:all_in_framework'] = 'All competencies in framework';
+$string['hierarchy_list:competency:select'] = 'Select competencies';
+$string['othercompetencies'] = 'Proficiency in other competencies';
+$string['pluginname'] = 'Proficiency in other competencies';
+$string['selectcompetencies'] = "Select competencies";

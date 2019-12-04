@@ -31,10 +31,10 @@
     Data attributes required for JS:
         * data-core-autoinitialise: State of this JS auto initilise
         * data-core-autoinitialise-amd: AMD to be linked to template
-        * data-tw-criterionOtherCompetency: Target for course completion criterion
+        * data-tw-criterionOtherCompetency: Target for competency criterion
         * data-tw-criterionOtherCompetency-detail: Target for detail section
-        * data-tw-criterionOtherCompetency-courses: Target for the courses section
-        * data-tw-criterionOtherCompetency-addCourses: Trigger for showing course adder
+        * data-tw-criterionOtherCompetency-competencies: Target for the competencies section
+        * data-tw-criterionOtherCompetency-addCompetencies: Trigger for showing competency adder
         * data-tw-criterionOtherCompetency-error: Targets for error sections
         * data-tw-criterionOtherCompetency-aggregation: Target for aggregation section
         * data-tw-criterionOtherCompetency-aggregationMethod: int Section for the specific aggregation method
@@ -44,8 +44,8 @@
 
     Context variables required for this template:
         * key
-        * courses
-        * nocourses
+        * competencies
+        * nocompetencies
 
 }}
 
@@ -71,9 +71,9 @@
                     {{#flex_icon}}notification-warning{{/flex_icon}}
                     {{#str}}error:nocompetencies, criteria_othercompetency{{/str}}
                 </span>
-                <span class="tw-criterion-warning {{^courseerror}}tw-criterion-hidden{{/courseerror}}" data-tw-criterionOtherCompetency-error="invalidcourse">
+                <span class="tw-criterion-warning {{^nocompetencies}}tw-criterion-hidden{{/nocompetencies}}" data-tw-criterionOtherCompetency-error="invalidcompetency">
                     {{#flex_icon}}notification-warning{{/flex_icon}}
-                    {{#str}}error:courseerror, criteria_othercompetency{{/str}}
+                    {{#str}}error:nocompetencies, criteria_othercompetency{{/str}}
                 </span>
             </div>
         </div>

@@ -20,8 +20,8 @@
  * @package criteria_othercompetency
  */
 
-define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_list', 'totara_core/loader_manager'],
-    function(templates, notification, ajax, ModalList, Loader) {
+define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_list', 'totara_core/loader_manager','totara_competency/list_framework_hierarchy_events'],
+    function(templates, notification,ajax, ModalList, Loader,HierarchyEvents) {
 
         /**
          * Class constructor for CriterionOtherCompetency.
@@ -50,9 +50,12 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
 
             // Saving items from the basket - therefore not stored in criterion
             this.criterionKey = ''; // Unique key to use in bubbled events
+            this.competencies = []; // other competencies to complete
+            this.competencyAdder = null; // Initialized Adder for other competencies
 
             this.endpoints = {
                 detail: 'criteria_othercompetency_get_detail',
+                competencies: 'totara_competency_competency_index',
             };
 
             this.domClasses = {
@@ -63,6 +66,72 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
         }
 
         CriterionOtherCompetency.prototype = {
+            /**
+             * Add event listeners for CriterionOtherCompetency
+             */
+            events: function() {
+                var that = this;
+
+                this.widget.addEventListener('click', function(e) {
+                    if (!e.target) {
+                        return;
+                    }
+
+                    // Add competencies link clicked
+                    if (e.target.closest('[data-tw-criterionOtherCompetency-addCompetencies]')) {
+                        e.preventDefault();
+                        that.addCompetencies();
+
+                        // Item remove link clicked
+                    } else if (e.target.closest('[data-tw-criterionOtherCompetency-item-remove]')) {
+                        e.preventDefault();
+
+                        var competencyNode = e.target.closest('[data-tw-criterionOtherCompetency-item-value]'),
+                            competencyId;
+
+                        if (!competencyNode) {
+                            return;
+                        }
+
+                        competencyId = competencyNode.getAttribute('data-tw-criterionOtherCompetency-item-value');
+                        that.removeCompetency(competencyId);
+                    }
+                });
+
+                this.widget.addEventListener('change', function(e) {
+                    if (!e.target) {
+                        return;
+                    }
+
+                    // Aggregation method changed
+                    if (e.target.closest('[data-tw-criterionOtherCompetency-aggregationMethod-changed]')) {
+                        e.preventDefault();
+
+                        var newMethod = e.target.closest('[data-tw-criterionOtherCompetency-aggregationMethod-changed]').value;
+
+                        if (that.criterion.aggregation.method != newMethod) {
+                            that.setAggregationMethod(newMethod);
+
+                            that.triggerEvent('update', {criterion: that.criterion});
+                            that.triggerEvent('dirty', {});
+                        }
+
+                        // Aggregation count changed
+                    } else if (e.target.closest('[data-tw-criterionOtherCompetency-aggregationCount-changed]')) {
+                        e.preventDefault();
+
+                        var newCount = e.target.closest('[data-tw-criterionOtherCompetency-aggregationCount-changed]').value;
+
+                        if (that.criterion.aggregation.reqitems != newCount) {
+                            that.setAggregationCount(newCount);
+
+                            that.triggerEvent('update', {criterion: that.criterion});
+                            that.triggerEvent('dirty', {});
+                        }
+                    }
+                });
+            },
+
             /**
              * Set parent
              * @param {node} parent
@@ -117,7 +186,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
                         that.setAggregationMethod(instance.aggregation.method);
                         that.setAggregationCount(instance.aggregation.reqitems);
 
-                        Promise.all([]).then(function() {
+                        Promise.all([that.setCompetencies(instance.items), that.initCompetencyAdder()]).then(function() {
                             that.triggerEvent('update', {criterion: that.criterion});
                             resolve();
                         });
@@ -168,6 +237,46 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
             },
 
             /**
+             * Set and display the competencies to be completed
+             *
+             * @param {Object} competencies Array of competencies
+             * @return {Promise}
+             */
+            setCompetencies: function(competencies) {
+                var that = this,
+                    competenciesTarget = this.widget.querySelector('[data-tw-criterionOtherCompetency-competencies]'),
+                    competenciesPromiseArr = [],
+                    templateData = {};
+
+                return new Promise(function(resolve) {
+                    // We want to index the items with the ids for easy adder results processing
+                    that.competencies = [];
+                    that.criterion.itemids = [];
+
+                    if (competencies.length == 0 || !competenciesTarget) {
+                        that.showHideNoCompetencies();
+                        resolve();
+                    } else {
+                        for (var a = 0; a < competencies.length; a++) {
+                            that.competencies[competencies[a].id] = competencies[a];
+                            that.criterion.itemids.push(competencies[a].id);
+                            templateData = {item_parent: 'criterionOtherCompetency', value: competencies[a].id, text: competencies[a].name};
+                            competenciesPromiseArr.push(templates.renderAppend('totara_criteria/partial_item', templateData, competenciesTarget));
+                        }
+
+                        Promise.all(competenciesPromiseArr).then(function() {
+                            that.showHideNoCompetencies();
+                            resolve();
+                        }).catch(function(e) {
+                            e.fileName = that.filename;
+                            e.name = 'Error showing competencies';
+                            notification.exception(e);
+                        });
+                    }
+                });
+            },
+
+            /**
              * Create an empty othercompetency criterion instance with the key
              *
              * @param {int} key
@@ -179,7 +288,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
                     resolve({
                         results: {
                             id: 0,
-                            itemids: [],
+                            items: [],
                             aggregation: {
                                 method: 1,
                                 reqitems: 1
@@ -187,6 +296,196 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
                         }
                     });
                 });
+            },
+
+            /**
+             * Initialise the competency adder
+             *
+             * @return {Promise}
+             */
+            initCompetencyAdder: function() {
+                var that = this;
+
+                return new Promise(function(resolve) {
+                    HierarchyEvents.init().then(function(eventData) {
+                        var adderData = {
+                            // externalBasket: that.baskets.positions,
+                            key: 'competencies',
+                            crumbtrail: {
+                                service: 'totara_competency_competency_show',
+                                stringList: [
+                                    {
+                                        component: 'criteria_othercompetency',
+                                        key: 'hierarchy_list:competency:all',
+                                    },
+                                    {
+                                        component: 'criteria_othercompetency',
+                                        key: 'hierarchy_list:competency:all_in_framework',
+                                    }
+                                ]
+                            },
+                            events: eventData,
+                            expandable: {
+                                args: {include: {crumbs: 1}},
+                                service: 'totara_competency_competency_show',
+                                template: 'totara_competency/hierarchy_expanded',
+                            },
+                            levelToggle: true,
+                            list: {
+                                map: {
+                                    cols: [{
+                                        dataPath: 'fullname',
+                                        expandedViewTrigger: true,
+                                        headerString: {
+                                            component: 'criteria_othercompetency',
+                                            key: 'selectcompetencies',
+                                        },
+                                    }],
+                                    extraRowData: [{
+                                        key: 'framework',
+                                        dataPath: 'frameworkid'
+                                    }],
+                                    hasExpandedView: true,
+                                    hasHierarchy: true,
+                                },
+                                service: 'totara_competency_competency_index',
+                            },
+                            onSaved: function (modal, items, selectionData) {
+                                that.updateCompetencies(selectionData);
+                            },
+                            primaryDropDown: {
+                                filterKey: 'framework',
+                                placeholderString: [{
+                                    component: 'criteria_othercompetency',
+                                    key: 'allframeworks'
+                                }],
+                                service: 'totara_competency_get_frameworks',
+                                serviceArgs: {},
+                                serviceLabelKey: 'fullname'
+                            },
+                            primarySearch: {
+                                filterKey: 'text',
+                                placeholderString: [{
+                                    component: 'totara_core',
+                                    key: 'search'
+                                }]
+                            },
+                            title: [{
+                                component: 'criteria_othercompetency',
+                                key: 'hierarchy_list:competency:select',
+                            }],
+                        };
+
+                        ModalList.adder(adderData).then(function(modal) {
+                            that.competencyAdder = modal;
+                            resolve(modal);
+                        });
+                    });
+                });
+            },
+
+            /**
+             * Open the adder to add competencies
+             */
+            addCompetencies: function() {
+                var that = this;
+
+                if (!this.competencyAdder) {
+                    this.initCompetencyAdder().then(function() {
+                        that.competencyAdder.show(that.criterion.itemids);
+                    }).catch(function(e) {
+                        e.fileName = that.filename;
+                        e.name = 'Error initialsing the competency adder';
+                        notification.exception(e);
+                    });
+                } else {
+                    this.competencyAdder.show(this.criterion.itemids);
+                }
+            },
+
+            /**
+             * Update the displayed competencies
+             *
+             * @param  {[Object]} items Selected competencies
+             */
+            updateCompetencies: function(competencies) {
+                var that = this,
+                    competenciesTarget = that.widget.querySelector('[data-tw-criterionOtherCompetency-competencies]'),
+                    id,
+                    fullname,
+                    competenciesPromiseArr = [],
+                    templateData = {};
+
+                for (var a = 0; a < competencies.length; a++) {
+                    id = competencies[a].id;
+                    fullname = competencies[a].fullname;
+
+                    if (!this.competencies[id]) {
+                        this.competencies[id] = {
+                            id: id,
+                            name: fullname};
+                        this.criterion.itemids.push(id);
+
+                        templateData = {item_parent: 'criterionOtherCompetency', value: id, text: fullname};
+                        competenciesPromiseArr.push(templates.renderAppend('totara_criteria/partial_item', templateData, competenciesTarget));
+                    }
+                }
+
+                if (competenciesPromiseArr.length > 0) {
+                    Promise.all(competenciesPromiseArr).then(function() {
+                        that.showHideNoCompetencies();
+
+                        that.triggerEvent('update', {criterion: that.criterion});
+                        that.triggerEvent('dirty', {});
+                    }).catch(function(e) {
+                        e.fileName = that.filename;
+                        e.name = 'Showing competencies';
+                        notification.exception(e);
+                    });
+                }
+            },
+
+
+            removeCompetency: function(id) {
+                id = parseInt(id);
+
+                var that = this,
+                    competencyTarget = that.widget.querySelector('[data-tw-criterionOtherCompetency-item-value="' + id + '"]'),
+                    idIndex = this.criterion.itemids.indexOf(id);
+
+                if (this.competencies[id]) {
+                    delete this.competencies[id];
+                    if (idIndex >= 0) {
+                        this.criterion.itemids.splice(idIndex, 1);
+                    }
+
+                    if (competencyTarget) {
+                        competencyTarget.remove();
+                    }
+                }
+
+                // Show nocompetencies warning
+                that.showHideNoCompetencies();
+
+                that.triggerEvent('update', {criterion: that.criterion});
+                that.triggerEvent('dirty', {});
+            },
+
+            /**
+             * Show or hide the No Criteria warning depending on the number of items
+             */
+            showHideNoCompetencies: function() {
+                var target = this.widget.querySelector('[data-tw-criterionOtherCompetency-error="nocompetencies"]');
+                if (!target) {
+                    return;
+                }
+
+                if (this.criterion.itemids.length > 0) {
+                    // Hide the warning
+                    target.classList.add(this.domClasses.hidden);
+                } else {
+                    target.classList.remove(this.domClasses.hidden);
+                }
             },
 
             /**
@@ -218,6 +517,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
             return new Promise(function(resolve) {
                 var wgt = new CriterionOtherCompetency();
                 wgt.setParent(parent);
+                wgt.events();
                 wgt.loader = Loader.init(parent);
                 wgt.loader.show();
                 resolve(wgt);

@@ -22,6 +22,9 @@
 
 
 global $CFG;
+
+use totara_competency\external;
+
 require_once($CFG->dirroot . '/lib/externallib.php');
 
 /**
@@ -88,6 +91,29 @@ class pathway_competency_services_testcase extends advanced_testcase {
 
         $this->assertEquals(false, $error);
         // $this->assertEquals(1, $result);
+    }
+
+    public function test_totara_competency_get_frameworks() {
+        /** @var totara_competency_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+
+        $frameworks = [
+            $generator->create_framework(null, '<span>Framework 1</span>'),
+            $generator->create_framework(null, '<span>Framework 2</span>'),
+            $generator->create_framework(null, '<span>Framework 3</span>'),
+        ];
+
+        $returned_frameworks = external::get_frameworks();
+
+        $expected_data = [];
+        foreach ($frameworks as $framework) {
+            $expected_data[] = [
+                'id'       => $framework->id,
+                'fullname' => format_string($framework->fullname),
+            ];
+        }
+
+        $this->assertEqualsCanonicalizing($expected_data, $returned_frameworks['items']);
     }
 
 }

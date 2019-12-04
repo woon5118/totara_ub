@@ -21,7 +21,6 @@
  * @package criteria_othercompetency
  */
 
-defined('MOODLE_INTERNAL') || die();
 
 $plugin->version  = 2019111100;       // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2016120505;       // Requires this Moodle version.
