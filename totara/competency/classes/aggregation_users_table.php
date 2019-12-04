@@ -114,16 +114,9 @@ class aggregation_users_table {
     }
 
     /**
-     * Make sure any temporary table is dropped when this object gets destroyed
-     */
-    public function __destruct() {
-        $this->drop_temp_table();
-    }
-
-    /**
      * Drop temporary table
      */
-    private function drop_temp_table() {
+    public function drop_temp_table() {
         if (!$this->is_temporary) {
             return;
         }
@@ -133,7 +126,9 @@ class aggregation_users_table {
         require_once($CFG->dirroot . '/lib/ddllib.php');
 
         $dbman = $DB->get_manager();
-        $dbman->drop_table(new xmldb_table($this->table_name));
+        if ($dbman->table_exists($this->table_name)) {
+            $dbman->drop_table(new xmldb_table($this->table_name));
+        }
     }
 
     /**

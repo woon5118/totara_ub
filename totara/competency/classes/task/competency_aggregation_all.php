@@ -59,6 +59,9 @@ class competency_aggregation_all extends scheduled_task {
 
         $task = new aggregation_task($table, true);
         $task->execute($this->aggregation_time);
+
+        // Explicitly trigger dropping the temporary table
+        $table->drop_temp_table();
     }
 
     private function fill_temp_table(aggregation_users_table $table) {
