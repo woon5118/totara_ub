@@ -24,8 +24,8 @@
 namespace criteria_onactivate;
 
 use coding_exception;
-use totara_criteria\assignment_item_evaluator;
 use totara_criteria\criterion;
+use totara_criteria\evaluators\assignment_item_evaluator;
 
 /**
  * Class containing information of course completion criteria instances

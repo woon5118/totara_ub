@@ -24,8 +24,8 @@
 namespace criteria_childcompetency;
 
 use coding_exception;
-use totara_criteria\competency_item_evaluator;
 use totara_criteria\criterion;
+use totara_criteria\evaluators\competency_item_evaluator;
 
 /**
  * Class containing information of child competency criteria

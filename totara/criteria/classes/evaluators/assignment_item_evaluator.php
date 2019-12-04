@@ -22,8 +22,10 @@
  * @package totara_criteria
  */
 
-namespace totara_criteria;
+namespace totara_criteria\evaluators;
 
+
+use totara_criteria\criterion;
 
 class assignment_item_evaluator extends item_evaluator {
 

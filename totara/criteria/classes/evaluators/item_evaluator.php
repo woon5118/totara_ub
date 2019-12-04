@@ -22,7 +22,9 @@
  * @package totara_criteria
  */
 
-namespace totara_criteria;
+namespace totara_criteria\evaluators;
+
+use totara_criteria\criterion;
 
 /**
  * Class item_evaluator

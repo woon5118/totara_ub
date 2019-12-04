@@ -25,8 +25,8 @@ namespace criteria_linkedcourses;
 
 use coding_exception;
 use totara_competency\linked_courses;
-use totara_criteria\course_item_evaluator;
 use totara_criteria\criterion;
+use totara_criteria\evaluators\course_item_evaluator;
 
 global $CFG;
 

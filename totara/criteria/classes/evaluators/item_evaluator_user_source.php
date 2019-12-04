@@ -21,7 +21,7 @@
  * @package totara_criteria
  */
 
-namespace totara_criteria;
+namespace totara_criteria\evaluators;
 
 use totara_competency\aggregation_users_table;
 

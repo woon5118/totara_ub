@@ -21,7 +21,9 @@
  * @package totara_criteria
  */
 
-namespace totara_criteria;
+namespace totara_criteria\evaluators;
+
+use totara_criteria\criterion;
 
 use totara_core\advanced_feature;
 

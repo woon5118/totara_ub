@@ -23,7 +23,7 @@
 
 use totara_competency\aggregation_users_table;
 use totara_criteria\criterion;
-use totara_criteria\item_evaluator_user_source;
+use totara_criteria\evaluators\item_evaluator_user_source;
 
 class totara_criteria_item_evaluator_user_source_testcase extends advanced_testcase {
 

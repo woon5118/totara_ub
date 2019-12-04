@@ -29,8 +29,8 @@ use totara_competency\pathway;
 use totara_competency\pathway_evaluator;
 use totara_competency\pathway_evaluator_user_source;
 use totara_criteria\criterion;
-use totara_criteria\item_evaluator;
-use totara_criteria\item_evaluator_user_source;
+use totara_criteria\evaluators\item_evaluator;
+use totara_criteria\evaluators\item_evaluator_user_source;
 
 class criteria_group_evaluator extends pathway_evaluator {
 

@@ -23,8 +23,8 @@
 
 namespace criteria_coursecompletion;
 
-use totara_criteria\course_item_evaluator;
 use totara_criteria\criterion;
+use totara_criteria\evaluators\course_item_evaluator;
 
 /**
  * Class containing information of course completion criteria instances

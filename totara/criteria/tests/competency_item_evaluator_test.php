@@ -24,10 +24,9 @@
 
 use totara_competency\aggregation_users_table;
 use totara_competency\entities\competency_achievement;
-use totara_criteria\competency_item_evaluator;
 use totara_criteria\criterion;
-use totara_criteria\entities\criterion_item;
-use totara_criteria\item_evaluator_user_source;
+use totara_criteria\evaluators\competency_item_evaluator;
+use totara_criteria\evaluators\item_evaluator_user_source;
 
 class totara_criteria_competency_item_evaluator_testcase extends advanced_testcase {
 

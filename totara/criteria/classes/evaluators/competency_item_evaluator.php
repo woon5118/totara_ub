@@ -22,10 +22,11 @@
  * @package totara_criteria
  */
 
-namespace totara_criteria;
+namespace totara_criteria\evaluators;
 
 use totara_competency\entities\competency_achievement;
 use totara_core\advanced_feature;
+use totara_criteria\criterion;
 
 class competency_item_evaluator extends item_evaluator {
 

@@ -23,8 +23,8 @@
 
 use criteria_coursecompletion\coursecompletion;
 use totara_competency\aggregation_users_table;
-use totara_criteria\course_item_evaluator;
-use totara_criteria\item_evaluator_user_source;
+use totara_criteria\evaluators\course_item_evaluator;
+use totara_criteria\evaluators\item_evaluator_user_source;
 
 class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
