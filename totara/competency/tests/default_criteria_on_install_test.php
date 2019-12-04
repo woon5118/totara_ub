@@ -122,7 +122,7 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
         $achievement_configuration->save_aggregation();
 
         // We're adding a learning plan and we should see this does not get added afterwards.
-        set_config('enablelearningplans', TOTARA_SHOWFEATURE);
+        advanced_feature::enable('learningplans');
         $this->add_learning_plan($comp->id);
 
         // Ensure there definitely is aggregation.

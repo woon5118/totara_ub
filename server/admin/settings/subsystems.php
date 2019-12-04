@@ -160,7 +160,7 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablecompetency_assignment',
         new lang_string('enablecompetency_assignment', 'totara_competency'),
         new lang_string('enablecompetency_assignment_desc', 'totara_competency'),
-        TOTARA_SHOWFEATURE));
+        advanced_feature::ENABLED));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enableappraisals',
         new lang_string('enableappraisals', 'totara_appraisal'),
