@@ -16,7 +16,7 @@
         "guzzlehttp/guzzle": "^6.3"
     },
     "require": {
-        "php": ">=7.2.10 <7.4",
+        "php": ">=7.2.10 <7.5",
         "ext-ctype": "*",
         "ext-curl": "*",
         "ext-date": "*",
