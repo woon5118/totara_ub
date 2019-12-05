@@ -572,7 +572,6 @@ class criteria_group extends pathway {
                     // has no group linked or empty groups
                     $builder->or_where('cg.id', null)->or_where('cgc.id', null);
                 })
-                ->group_by('id')
                 ->with('competency')
                 ->get();
 
