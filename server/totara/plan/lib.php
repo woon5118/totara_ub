@@ -1728,7 +1728,15 @@ function totara_plan_comment_add($comment) {
 function plan_mark_competency_default($competencyid, $userid, $component) {
     global $DB, $CFG;
 
-    if (($DB->count_records('comp_record', array('userid' => $userid, 'competencyid' => $competencyid))) > 0) {
+    $has_value = $DB->record_exists(
+        'dp_plan_competency_value',
+        [
+            'user_id' => $userid,
+            'competency_id' => $competencyid
+        ]
+    );
+    // If the user ever had been given a value in the competency skip setting the default
+    if ($has_value) {
         return;
     }
 

@@ -92,7 +92,7 @@ class course_item_evaluator extends item_evaluator {
               LEFT JOIN {course_completions} cc
                      ON cc.course = tci.item_id
                     AND cc.userid = tcir.user_id
-                    AND cc.status IN (:statuscomplete, :statusrpl)
+                    AND cc.timecompleted > 0
                   WHERE tci.criterion_id = :criterionid
                     AND tci.item_type = :itemtype
                     AND tcir.criterion_met = :currentmet
