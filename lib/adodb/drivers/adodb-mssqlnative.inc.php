@@ -1,6 +1,6 @@
 <?php
 /*
-@version   v5.20.14  06-Jan-2019
+@version   v5.20.15  24-Nov-2019
 @copyright (c) 2000-2013 John Lim (jlim#natsoft.com). All rights reserved.
 @copyright (c) 2014      Damien Regad, Mark Newnham and the ADOdb community
   Released under both BSD license and Lesser GPL library license.
@@ -477,20 +477,12 @@ class ADODB_mssqlnative extends ADOConnection {
 		$connectionInfo["Database"]=$argDatabasename;
 		$connectionInfo["UID"]=$argUsername;
 		$connectionInfo["PWD"]=$argPassword;
-
+		
 		foreach ($this->connectionParameters as $parameter=>$value)
 		    $connectionInfo[$parameter] = $value;
-
-		// Totara: Replacing host:port with host,port here as the hostname and port comes from more generic functions
-		// and we don't want to add db specific code there
-		$argHostname = preg_replace('/^(.*):(\d+)$/', '${1},${2}', $argHostname);
-
+		
 		if ($this->debug) ADOConnection::outp("<hr>connecting... hostname: $argHostname params: ".var_export($connectionInfo,true));
 		//if ($this->debug) ADOConnection::outp("<hr>_connectionID before: ".serialize($this->_connectionID));
-
-        // Totara: always use UTF-8 for sql server, both auth_db and enrol_database expect it.
-        $connectionInfo['CharacterSet'] = 'UTF-8';
-
 		if(!($this->_connectionID = sqlsrv_connect($argHostname,$connectionInfo))) {
 			if ($this->debug) ADOConnection::outp( "<hr><b>errors</b>: ".print_r( sqlsrv_errors(), true));
 			return false;

@@ -1,6 +1,6 @@
 <?php
 /*
-@version   v5.20.14  06-Jan-2019
+@version   v5.20.15  24-Nov-2019
 @copyright (c) 2000-2013 John Lim (jlim#natsoft.com). All rights reserved.
 @copyright (c) 2014      Damien Regad, Mark Newnham and the ADOdb community
   Released under both BSD license and Lesser GPL library license.
@@ -23,7 +23,7 @@ if (!defined('ADODB_DIR')) die();
 if (! defined("_ADODB_CSV_LAYER")) {
  define("_ADODB_CSV_LAYER", 1 );
 
-include_once(ADODB_DIR.'/adodb-csvlib.inc.php');
+include_once(ADODB_DIR . '/adodb-csvlib.inc.php');
 
 class ADODB_csv extends ADOConnection {
 	var $databaseType = 'csv';
