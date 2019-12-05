@@ -42,5 +42,5 @@ $string['replacewith'] = 'Change To';
 $string['updatetimezones'] = 'Update timezones';
 
 $string['updatetimezonesuccess'] = 'Timezone {$a->badzone} changed to {$a->replacewith} successfully';
-$string['error:updatetimezone'] = 'An error occured when attempting to change timezone {$a->badzone} to {$a->replacewith}';
+$string['error:updatetimezone'] = 'An error occurred when attempting to change timezone {$a->badzone} to {$a->replacewith}';
 $string['error:unknownzones'] = 'There are unknown timezones set for {$a->numusers} users! The following timezones are set in user profiles but are not valid timezone identifiers:<br />{$a->badzonelist}';

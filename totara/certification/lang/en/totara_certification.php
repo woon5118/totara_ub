@@ -280,7 +280,7 @@ $string['error:unassignedcertifcompletion'] = 'Completion exists for unassigned 
 $string['error:updatinginvalidcompletionrecords'] = 'Call to certif_write_completion with completion records that do not match each other or the existing records';
 $string['error:updatinginvalidcompletionhistoryrecord'] = 'Call to certif_write_completion_history with completion record that does not match the existing record';
 $string['error:useralreadyassigned'] = 'user already assigned for certifid={$a->certifid} userid={$a->userid}';
-$string['error:validationfailureassign'] = 'user assignment validation failure(s) while attemping to assign userid={$a->userid} to certifid={$a->certifid}';
+$string['error:validationfailureassign'] = 'user assignment validation failure(s) while attempting to assign userid={$a->userid} to certifid={$a->certifid}';
 $string['eventcompletionhistoryadded'] = 'Certification completion history added';
 $string['eventcompletionhistorydeleted'] = 'Certification completion history deleted';
 $string['eventcompletionhistoryedited'] = 'Certification completion history edited';
