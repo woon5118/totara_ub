@@ -29,6 +29,7 @@ use context_user;
 use moodle_exception;
 use moodle_url;
 use core\entities\user;
+use pathway_manual\models\roles\self_role;
 use totara_core\advanced_feature;
 use totara_mvc\controller;
 use totara_mvc\view;
@@ -166,4 +167,14 @@ abstract class base extends controller {
             $this->is_for_current_user() ? [] : ['user_id' => $this->user->id]
         );
     }
+
+    /**
+     * Get user profile picture URL
+     */
+    public function get_user_picture_url(): string {
+        $user_picture = new \user_picture((object) $this->user->to_array());
+        $user_picture->size = 1; // Size f1.
+        return $user_picture->get_url($this->page);
+    }
+
 }

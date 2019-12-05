@@ -35,7 +35,7 @@
       </span>
     </div>
     <Table
-      v-if="showContent"
+      v-show="showContent"
       :data="group.competencies"
       :expandable-rows="false"
       class="tui-pathwayManual-frameworkGroup__table"

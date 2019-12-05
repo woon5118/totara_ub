@@ -95,6 +95,11 @@ extend type Mutation {
 
 extend type Query {
   """
+  Get the roles for the current user in relation to another user
+  """
+  pathway_manual_roles(subject_user: core_id!): [pathway_manual_role!]!
+
+  """
   Get most recent ratings for a competency assignment by role
   """
   pathway_manual_role_ratings(

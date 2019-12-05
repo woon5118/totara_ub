@@ -8,10 +8,6 @@ query pathway_manual_user_rateable_competencies(
     role: $role
     filters: $filters
   ) {
-    user {
-      fullname
-      profileimageurl
-    }
     framework_groups {
       framework {
         id

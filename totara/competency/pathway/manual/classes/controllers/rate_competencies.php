@@ -26,7 +26,6 @@ namespace pathway_manual\controllers;
 use pathway_manual\models\roles;
 use pathway_manual\models\roles\manager;
 use pathway_manual\models\roles\role;
-use pathway_manual\models\roles\role_factory;
 use pathway_manual\models\roles\self_role;
 use totara_competency\controllers\profile\base;
 use totara_mvc\tui_view;
@@ -34,15 +33,9 @@ use totara_mvc\tui_view;
 class rate_competencies extends base {
 
     /**
-     * @var role
+     * @var role|null
      */
     private $role;
-
-    public function __construct() {
-        parent::__construct();
-
-        $this->role = $this->get_role();
-    }
 
     /**
      * Set up the page.
@@ -53,12 +46,21 @@ class rate_competencies extends base {
         $page_title = get_string('rate_competencies', 'pathway_manual');
         $this->add_navigation($page_title);
 
-        return tui_view::create('pathway_manual/pages/RateCompetencies', [
-            'user-id' => $this->user->id,
-            'role' => $this->role::get_name(),
+        $vue_props = [
+            'user' => [
+                'id' => $this->user->id,
+                'fullname' => $this->user->fullname,
+                'profileimageurl' => $this->get_user_picture_url(),
+            ],
             'current-user-id' => (int)$this->currently_logged_in_user()->id,
             'go-back-link' => (string)$this->get_profile_url(),
-        ])
+        ];
+
+        if ($this->role) {
+            $vue_props['role'] = $this->role::get_name();
+        }
+
+        return tui_view::create('pathway_manual/pages/RateCompetencies', $vue_props)
             ->set_title($page_title);
     }
 
@@ -71,42 +73,25 @@ class rate_competencies extends base {
         // This is a subpage of competency profile, so make sure we are allowed to view it first.
         parent::authorize();
 
-        if (empty($this->role)) {
-            // The user has no roles, so requiring they have the manager role will print an error message.
-            manager::require_for_user($this->user->id);
-        }
+        $role_param = $this->get_param('role', PARAM_ALPHANUMEXT);
+        if ($role_param) {
+            $specified_role = roles\role_factory::create($role_param);
+            $specified_role::require_for_user($this->user->id);
+            $this->role = $specified_role;
+        } else {
+            $roles = roles::get_current_user_roles($this->user->id);
 
-        $this->role::require_for_user($this->user->id);
+            if (empty($roles)) {
+                // The user has no roles, so requiring they have the self/manager role will print an error message.
+                if ($this->user->is_logged_in()) {
+                    self_role::require_for_user($this->user->id);
+                } else {
+                    manager::require_for_user($this->user->id);
+                }
+            }
+        }
 
         return $this;
-    }
-
-    /**
-     * Get the role that the user wishes to view competencies of.
-     *
-     * @return role|string
-     */
-    private function get_role() {
-        if ($this->user->is_logged_in()) {
-            // If the user is rating themselves, then it is always ROLE_SELF no matter what.
-            return self_role::class;
-        }
-
-        $role_param = optional_param('role', null,PARAM_ALPHA);
-
-        if ($role_param) {
-            return role_factory::create($role_param);
-        }
-
-        $all_user_roles = roles::get_current_user_roles($this->user->id);
-
-        if ($all_user_roles) {
-            // No role specified via params, so get the first role the user has.
-            return reset($all_user_roles);
-        }
-
-        // User has no roles
-        return null;
     }
 
 }

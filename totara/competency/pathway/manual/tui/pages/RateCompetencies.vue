@@ -22,13 +22,13 @@
 
 <template>
   <div>
-    <a :href="backLinkUrl" class="tui-pathwayManual-rateCompetencies__backLink">
+    <a :href="goBackLink" class="tui-pathwayManual-rateCompetencies__backLink">
       {{ $str('back_to_competency_profile', 'totara_competency') }}
     </a>
-    <RateUserCompetencies
-      v-if="userId"
-      :user-id="userId"
-      :role="role"
+    <RateUser
+      v-if="user"
+      :user="user"
+      :specified-role="role"
       :current-user-id="currentUserId"
       :go-back-link="goBackLink"
     />
@@ -36,32 +36,27 @@
 </template>
 
 <script>
-import RateUserCompetencies from 'pathway_manual/containers/RateUserCompetencies';
+import RateUser from 'pathway_manual/components/RateUser';
 
 export default {
-  components: { RateUserCompetencies },
+  components: { RateUser },
 
   props: {
-    userId: {
-      type: Number,
+    user: {
+      required: false,
+      type: Object,
     },
     role: {
+      required: false,
       type: String,
     },
     currentUserId: {
+      required: true,
       type: Number,
     },
     goBackLink: {
       required: true,
       type: String,
-    },
-  },
-
-  computed: {
-    backLinkUrl() {
-      return this.$url('/totara/competency/profile/', {
-        user_id: this.userId,
-      });
     },
   },
 };

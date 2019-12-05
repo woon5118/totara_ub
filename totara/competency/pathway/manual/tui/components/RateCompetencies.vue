@@ -23,80 +23,57 @@
 
 <template>
   <div v-if="isLoaded">
-    <div
-      v-if="isForSelf"
-      class="tui-pathwayManual-rateUserCompetencies__header"
-    >
-      <h2 class="tui-pathwayManual-rateUserCompetencies__header_title">
-        {{ $str('rate_competencies', 'pathway_manual') }}
-      </h2>
-    </div>
-    <div
-      v-else
-      class="tui-pathwayManual-rateUserCompetencies__header tui-pathwayManual-rateUserCompetencies__header--withPhoto"
-    >
-      <UserHeaderWithPhoto
-        :page-title="$str('rate_user', 'pathway_manual', data.user.fullname)"
-        :full-name="data.user.fullname"
-        :photo-url="data.user.profileimageurl"
+    <div class="tui-pathwayManual-rateCompetencies__filters">
+      <UserCompetenciesFilters
+        v-if="filterOptions"
+        :filter-options="filterOptions"
+        :has-ratings="hasSelectedRatings"
+        @update-filters="applyFilters"
       />
-      <div class="tui-pathwayManual-rateUserCompetencies__header_ratingAsRole">
-        {{ $str(`rating_as_${role}`, 'pathway_manual') }}
+    </div>
+    <div v-if="hasRateableCompetencies">
+      <FrameworkGroup
+        v-for="group in data.framework_groups"
+        :key="group.framework.id"
+        :group="group"
+        :role="role"
+        :current-user-id="currentUserId"
+        :expanded="expandFrameworkGroups"
+        @input="updateRatings"
+      />
+      <div class="tui-pathwayManual-rateCompetencies__submitButtons">
+        <ButtonGroup>
+          <Button
+            :styleclass="{ primary: 'true' }"
+            :text="$str('submit')"
+            :disabled="!hasSelectedRatings"
+            type="submit"
+            @click="showSubmitRatingsModal = true"
+          />
+          <Button :text="$str('cancel')" @click="formCancel" />
+        </ButtonGroup>
+        <ConfirmModal
+          :open="showSubmitRatingsModal"
+          :title="
+            $str('modal:submit_ratings_confirmation_title', 'pathway_manual')
+          "
+          @confirm="submitRatings"
+          @cancel="showSubmitRatingsModal = false"
+        >
+          <p>{{ submitRatingsModalMessage }}</p>
+          <p>
+            <strong>{{
+              $str(
+                'modal:submit_ratings_confirmation_question',
+                'pathway_manual'
+              )
+            }}</strong>
+          </p>
+        </ConfirmModal>
       </div>
     </div>
-    <div>
-      <div class="tui-pathwayManual-rateUserCompetencies__filters">
-        <UserCompetenciesFilters
-          v-if="filterOptions"
-          :filter-options="filterOptions"
-          :has-ratings="hasSelectedRatings"
-          @update-filters="applyFilters"
-        />
-      </div>
-      <div v-if="hasRateableCompetencies">
-        <FrameworkGroup
-          v-for="group in data.framework_groups"
-          :key="group.framework.id"
-          :group="group"
-          :role="role"
-          :current-user-id="currentUserId"
-          :expanded="expandFrameworkGroups"
-          @input="updateRatings"
-        />
-        <div class="tui-pathwayManual-rateUserCompetencies__submitButtons">
-          <ButtonGroup>
-            <Button
-              :styleclass="{ primary: 'true' }"
-              :text="$str('submit')"
-              :disabled="!hasSelectedRatings"
-              type="submit"
-              @click="showSubmitRatingsModal = true"
-            />
-            <Button :text="$str('cancel')" @click="formCancel" />
-          </ButtonGroup>
-          <ConfirmModal
-            :open="showSubmitRatingsModal"
-            :title="
-              $str('modal:submit_ratings_confirmation_title', 'pathway_manual')
-            "
-            @confirm="submitRatings"
-            @cancel="showSubmitRatingsModal = false"
-          >
-            <p>{{ submitRatingsModalMessage }}</p>
-            <p>
-              <strong>{{
-                $str(
-                  'modal:submit_ratings_confirmation_question',
-                  'pathway_manual'
-                )
-              }}</strong>
-            </p>
-          </ConfirmModal>
-        </div>
-      </div>
-      <div v-else>
-        <em>{{ $str('filter:no_competencies', 'pathway_manual') }}</em>
-      </div>
+    <div v-else>
+      <em>{{ $str('filter:no_competencies', 'pathway_manual') }}</em>
     </div>
   </div>
 </template>
@@ -107,7 +84,6 @@ import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
 import ConfirmModal from 'pathway_manual/components/ConfirmModal';
 import FrameworkGroup from 'pathway_manual/components/FrameworkGroup';
 import UserCompetenciesFilters from 'pathway_manual/components/UserCompetenciesFilters';
-import UserHeaderWithPhoto from 'pathway_manual/components/UserHeaderWithPhoto';
 
 import CreateManualRatingsMutation from '../../webapi/ajax/create_manual_ratings.graphql';
 import RateableCompetenciesQuery from '../../webapi/ajax/user_rateable_competencies.graphql';
@@ -129,13 +105,12 @@ export default {
     ConfirmModal,
     FrameworkGroup,
     UserCompetenciesFilters,
-    UserHeaderWithPhoto,
   },
 
   props: {
-    userId: {
+    user: {
       required: true,
-      type: Number,
+      type: Object,
     },
     role: {
       required: true,
@@ -154,6 +129,7 @@ export default {
   data() {
     return {
       data: {},
+      selectedFilters: {},
       filterOptions: {},
       showSubmitRatingsModal: false,
       selectedRatings: [],
@@ -162,7 +138,7 @@ export default {
 
   computed: {
     isLoaded() {
-      return this.data.user != null;
+      return this.data.count != null;
     },
 
     hasRateableCompetencies() {
@@ -192,7 +168,7 @@ export default {
 
       let confirmMsgParams = {
         amount: this.numSelectedRatings,
-        subject_user: this.data.user.fullname,
+        subject_user: this.user.fullname,
       };
 
       return this.$str(ratingSummary, 'pathway_manual', confirmMsgParams);
@@ -202,11 +178,7 @@ export default {
   methods: {
     applyFilters(filters) {
       this.selectedRatings = [];
-      this.$apollo.queries.data.refetch({
-        user_id: this.userId,
-        role: this.role,
-        filters: filters,
-      });
+      this.selectedFilters = filters;
     },
 
     formCancel() {
@@ -235,6 +207,8 @@ export default {
       } else {
         window.removeEventListener('beforeunload', this.unloadHandler);
       }
+
+      this.$emit('has-unsaved-ratings', this.hasSelectedRatings);
     },
 
     unloadHandler(e) {
@@ -257,7 +231,7 @@ export default {
           mutation: CreateManualRatingsMutation,
           // Parameters
           variables: {
-            user_id: this.userId,
+            user_id: this.user.id,
             role: this.role,
             ratings: this.selectedRatings,
           },
@@ -284,8 +258,9 @@ export default {
       query: RateableCompetenciesQuery,
       variables() {
         return {
-          user_id: this.userId,
+          user_id: this.user.id,
           role: this.role,
+          filters: this.selectedFilters,
         };
       },
       update({ pathway_manual_user_rateable_competencies: data }) {
@@ -300,26 +275,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-pathwayManual-rateUserCompetencies {
-  &__header {
-    margin-top: var(--tui-gap-1);
-    margin-bottom: var(--tui-gap-4);
-
-    &_title {
-      margin: 0;
-    }
-
-    &_ratingAsRole {
-      margin-top: var(--tui-gap-4);
-      font-weight: bold;
-      font-size: var(--tui-font-size-16);
-    }
-
-    &--withPhoto {
-      margin-top: var(--tui-gap-2);
-    }
-  }
-
+.tui-pathwayManual-rateCompetencies {
   &__filters {
     margin-bottom: var(--tui-gap-5);
   }
@@ -335,11 +291,6 @@ export default {
     "pathway_manual": [
       "filter:no_competencies",
       "number_of_competencies",
-      "rate_competencies",
-      "rate_user",
-      "rate_competencies",
-      "rating_as_appraiser",
-      "rating_as_manager",
       "modal:submit_ratings_confirmation_title",
       "modal:submit_ratings_confirmation_question",
       "modal:submit_ratings_summary_singular_other",
