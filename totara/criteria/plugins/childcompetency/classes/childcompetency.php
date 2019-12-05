@@ -66,7 +66,7 @@ class childcompetency extends criterion {
      * A childcompetency should contain the competency metadata
      * @return string|null Error description
      */
-    protected function validate(): ?string {
+    protected function validate_attributes(): ?string {
         $comp_id = $this->get_competency_id();
         return is_null($comp_id) ? 'Competency id metadata is required in childcompetency criteria' : null;
     }

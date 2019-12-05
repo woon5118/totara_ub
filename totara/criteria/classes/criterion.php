@@ -28,14 +28,19 @@ use coding_exception;
 use core\orm\query\builder;
 use ReflectionClass;
 use stdClass;
-use totara_criteria\entities\criteria_item;
-use totara_criteria\entities\criteria_metadata;
+use totara_criteria\entities\criterion as criterion_entity;
+use totara_criteria\entities\criteria_item as criteria_item_entity;
+use totara_criteria\entities\criteria_metadata as criteria_metadata_entity;
 
 /**
  * Base class for a single criterion.
  */
 
 abstract class criterion {
+
+    /** Status constants */
+    const STATUS_VALID = 0;
+    const STATUS_INVALID = 1;
 
     /** Aggregation constants */
     const AGGREGATE_ALL = 1;
@@ -64,6 +69,9 @@ abstract class criterion {
     /** @var int $last_evaluated */
     private $last_evaluated;
 
+    /** @var int $status */
+    private $status = self::STATUS_VALID;
+
     /**
      * Constructor.
      */
@@ -79,17 +87,17 @@ abstract class criterion {
      * @return criterion $this
      */
     final public static function fetch(int $id): criterion {
-        $criterion = entities\criterion::repository()->find_or_fail($id);
+        $criterion = criterion_entity::repository()->find_or_fail($id);
         return static::fetch_from_entity($criterion);
     }
 
     /**
      * Fetch specific criterion from the database
      *
-     * @param entities\criterion $criterion $criterion
+     * @param criterion_entity $criterion $criterion
      * @return criterion $this
      */
-    final public static function fetch_from_entity(entities\criterion $criterion): criterion {
+    final public static function fetch_from_entity(criterion_entity $criterion): criterion {
         $instance = new static();
 
         if ($criterion->plugin_type != $instance->get_plugin_type()) {
@@ -100,6 +108,7 @@ abstract class criterion {
         $instance->set_aggregation_method($criterion->aggregation_method ?? static::AGGREGATE_ALL);
         $instance->set_aggregation_params($criterion->aggregation_params ?? []);
         $instance->set_last_evaluated($criterion->last_evaluated);
+        $instance->set_status($criterion->status);
 
         $instance->fetch_items($criterion);
         $instance->fetch_metadata($criterion);
@@ -182,6 +191,22 @@ abstract class criterion {
      */
     public function get_aggregation_params(): array {
         return $this->aggregation_params ?? [];
+    }
+
+    /**
+     * Get the number of required aggregation items
+     *
+     * Public scope for testing purposes
+     *
+     * @return int
+     */
+    public function get_aggregation_num_required(): int {
+        if ($this->aggregation_method == static::AGGREGATE_ALL) {
+            return empty($this->get_item_ids()) ? 1 : count($this->get_item_ids());
+        }
+
+        $params = $this->aggregation_params ?? [];
+        return $params['req_items'] ?? 1;
     }
 
     /**
@@ -372,6 +397,27 @@ abstract class criterion {
     }
 
     /**
+     * @return bool
+     */
+    public function is_valid(): bool {
+        return $this->status == self::STATUS_VALID;
+    }
+
+    /**
+     * @param int $status
+     * @return criterion
+     */
+    public function set_status(int $status): criterion {
+        if (!in_array($status, [static::STATUS_VALID, static::STATUS_INVALID])) {
+            throw new coding_exception('Invalid status used');
+        }
+
+        $this->status = $status;
+
+        return $this;
+    }
+
+    /**
      * Does this criterion have associated items
      * Plugins should overwrite if required
      *
@@ -436,9 +482,9 @@ abstract class criterion {
     /**
      * Load the items belonging to this criterion
      *
-     * @param entities\criterion $criterion
+     * @param criterion_entity $criterion
      */
-    private function fetch_items(entities\criterion $criterion) {
+    private function fetch_items(criterion_entity $criterion) {
         $this->item_ids = [];
 
         $rows = $criterion->items;
@@ -451,9 +497,9 @@ abstract class criterion {
     /**
      * Load the metadata of this criterion
      *
-     * @param entities\criterion $criterion
+     * @param criterion_entity $criterion
      */
-    private function fetch_metadata(entities\criterion $criterion) {
+    private function fetch_metadata(criterion_entity $criterion) {
         $this->add_metadata($criterion->metadata);
     }
 
@@ -474,6 +520,7 @@ abstract class criterion {
             'get_aggregation_params',
             'get_item_ids',
             'get_metadata',
+            'is_valid',
         ];
 
         foreach ($tst_methods as $method) {
@@ -490,9 +537,42 @@ abstract class criterion {
      *
      * @return string|null Error description
      */
-    protected function validate(): ?string {
+    protected function validate_attributes(): ?string {
         return null;
     }
+
+    /**
+     * @return string|null Class name of item validator for this criteria type.
+     */
+    public static function get_item_validator_class(): ?string {
+        return null;
+    }
+
+    /**
+     * Validate whether the criterion's items are valid.
+     * Should be overridden by plugin where needed
+     *
+     * @return bool
+     */
+    protected function items_are_valid(): bool {
+        $nitems = count($this->get_item_ids());
+        $validator_class = $this->get_item_validator_class();
+        if ($nitems == 0 || is_null($validator_class)) {
+            return true;
+        }
+
+        $nvalid = 0;
+        $nrequired = $this->get_aggregation_num_required();
+
+        foreach ($this->get_item_ids() as $item_id) {
+            if ($validator_class::validate_item($item_id)) {
+                $nvalid++;
+            }
+        }
+
+        return $nitems == $nvalid && $nvalid >= $nrequired;
+    }
+
 
     /**
      * Save this criterion and all its items
@@ -500,29 +580,31 @@ abstract class criterion {
      * @return $this
      */
     public function save(): criterion {
-        $err_message = $this->validate();
+        $err_message = $this->validate_attributes();
         if (!is_null($err_message)) {
             throw new coding_exception($err_message);
         }
+
+        $exists = (bool) $this->get_id();
+        if (!$exists && empty($this->item_ids)) {
+            $this->update_items();
+        }
+
+        $this->status = $this->items_are_valid() ? static::STATUS_VALID : static::STATUS_INVALID;
 
         if (!$this->is_dirty()) {
             return $this;
         }
 
-        $exists = (bool) $this->get_id();
-
-        $criterion = $exists ? new entities\criterion($this->get_id()) : new entities\criterion();
+        $criterion = $exists ? new criterion_entity($this->get_id()) : new criterion_entity();
         $criterion->plugin_type = $this->get_plugin_type();
         $criterion->aggregation_method = $this->get_aggregation_method();
         $criterion->aggregation_params = json_encode($this->get_aggregation_params());
         $criterion->criterion_modified = time();
+        $criterion->status = $this->status;
         $criterion->save();
 
         $this->set_id($criterion->id);
-
-        if (!$exists && empty($this->item_ids)) {
-            $this->update_items();
-        }
 
         $this->save_items();
         $this->save_metadata();
@@ -534,7 +616,7 @@ abstract class criterion {
      * Save the criterion items
      */
     private function save_items() {
-        $current_items = criteria_item::repository()
+        $current_items = criteria_item_entity::repository()
             ->where('criterion_id', $this->get_id())
             ->get()
             ->all();
@@ -547,7 +629,7 @@ abstract class criterion {
         }
 
         if (!empty($current_items)) {
-            criteria_item::repository()
+            criteria_item_entity::repository()
                 ->where('id', $current_items)
                 ->delete();
         }
@@ -562,7 +644,7 @@ abstract class criterion {
      * Save the metadata of this criterion
      */
     private function save_metadata() {
-        $current_keys = criteria_metadata::repository()
+        $current_keys = criteria_metadata_entity::repository()
             ->where('criterion_id', $this->get_id())
             ->get()
             ->all();
@@ -572,10 +654,10 @@ abstract class criterion {
         if (!empty($this->metadata)) {
             foreach ($this->metadata as $metakey => $metaval) {
                 if (isset($current_keys[$metakey])) {
-                    $metadata = new criteria_metadata($current_keys[$metakey]);
+                    $metadata = new criteria_metadata_entity($current_keys[$metakey]);
                     unset($current_keys[$metakey]);
                 } else {
-                    $metadata = new criteria_metadata();
+                    $metadata = new criteria_metadata_entity();
                 }
                 $metadata->metavalue = $metaval;
                 $metadata->criterion_id = $this->id;
@@ -585,7 +667,7 @@ abstract class criterion {
         }
 
         if (!empty($current_keys)) {
-            criteria_metadata::repository()
+            criteria_metadata_entity::repository()
                 ->where('id', $current_keys)
                 ->delete();
         }
@@ -599,24 +681,22 @@ abstract class criterion {
      */
     private function save_criterion_item(int $item_id): int {
         // Ensure there is only one of each item
-        $criterion = entities\criteria_item::repository()
+        $item = criteria_item_entity::repository()
             ->where('item_type', $this->get_items_type())
             ->where('item_id', $item_id)
             ->where('criterion_id', $this->id)
             ->one();
 
-        if (empty($criterion)) {
-            // TODO: Do we need separate constants for the items?
-
+        if (empty($item)) {
             // Insert the criterion_item
-            $criterion = new entities\criteria_item();
-            $criterion->criterion_id = $this->id;
-            $criterion->item_type = $this->get_items_type();
-            $criterion->item_id = $item_id;
-            $criterion->save();
+            $item = new criteria_item_entity();
+            $item->criterion_id = $this->id;
+            $item->item_type = $this->get_items_type();
+            $item->item_id = $item_id;
+            $item->save();
         }
 
-        return $criterion->id;
+        return $item->id;
     }
 
     /**
@@ -630,7 +710,7 @@ abstract class criterion {
             return $this;
         }
 
-        $criterion = new entities\criterion($this->get_id());
+        $criterion = new criterion_entity($this->get_id());
         $criterion->last_evaluated = $this->get_last_evaluated();
         $criterion->save();
 
@@ -653,7 +733,7 @@ abstract class criterion {
             $this->delete_metadata();
 
             // Delete the actual criterion
-            entities\criterion::repository()
+            criterion_entity::repository()
                 ->where('id', $this->get_id())
                 ->delete();
 
@@ -679,7 +759,7 @@ abstract class criterion {
                   WHERE criterion_id = :criterionid)";
         $DB->execute($sql, ['criterionid' => $this->get_id()]);
 
-        criteria_item::repository()
+        criteria_item_entity::repository()
             ->where('criterion_id', $this->get_id())
             ->delete();
     }
@@ -688,7 +768,7 @@ abstract class criterion {
      * Delete the metadata
      */
     private function delete_metadata() {
-        criteria_metadata::repository()
+        criteria_metadata_entity::repository()
             ->where('criterion_id', $this->get_id())
             ->delete();
     }
@@ -770,7 +850,7 @@ abstract class criterion {
     }
 
     /**
-     * @return string that is class name of item_evaluator for this criteria type. Must use the item_evaluator trait.
+     * @return string that is class name of item_evaluator for this criteria type.
      */
     abstract public static function item_evaluator(): string;
 

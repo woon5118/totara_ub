@@ -23,8 +23,10 @@
 
 namespace criteria_coursecompletion;
 
+use criteria_coursecompletion\validators\coursecompletion_validator;
 use totara_criteria\criterion;
 use totara_criteria\evaluators\course_item_evaluator;
+use totara_criteria\validators\course_item_validator;
 
 /**
  * Class containing information of course completion criteria instances
@@ -70,11 +72,17 @@ class coursecompletion extends criterion {
         return $this;
     }
 
+    /**
+     * @return string|null Class name of item_validator for this criteria type.
+     */
+    public static function get_item_validator_class(): ?string {
+        return course_item_validator::class;
+    }
+
 
     /************************************************************************************
      * Evaluation
      ************************************************************************************/
-
 
     public static function item_evaluator(): string {
         return course_item_evaluator::class;

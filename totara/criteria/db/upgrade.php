@@ -107,5 +107,19 @@ function xmldb_totara_criteria_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019102902, 'totara', 'criteria');
     }
 
+    if ($oldversion < 2019120600) {
+        // Define field status to be added to totara_criteria and totara_criteria_item tables
+        $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0');
+
+        // Conditionally add status to totara_criteria
+        $table = new xmldb_table('totara_criteria');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Competency savepoint reached.
+        upgrade_plugin_savepoint(true, 2019120600, 'totara', 'criteria');
+    }
+
     return true;
 }

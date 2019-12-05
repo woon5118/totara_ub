@@ -23,6 +23,9 @@
  */
 
 use criteria_linkedcourses\linkedcourses;
+use totara_competency\linked_courses;
+use totara_criteria\criterion;
+use totara_criteria\entities\criterion as criterion_entity;
 
 class criteria_linkedcourses_testcase extends advanced_testcase {
 
@@ -293,5 +296,51 @@ class criteria_linkedcourses_testcase extends advanced_testcase {
     }
 
 
-    // TODO: test aggregate
+    /**
+     * Test save with validation of items
+     */
+    public function test_save_with_item_validation() {
+        global $CFG;
+
+        /** @var totara_criteria_generator $criteria_generator */
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+        /** @var totara_competency_generator $competency_generator */
+        $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+
+        // Completion only enabled for every second course
+        $courses = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $courses[$i] = $this->getDataGenerator()->create_course(['enablecompletion' => $i % 2]);
+        }
+
+        $competency = $competency_generator->create_competency();
+
+        $CFG->enablecompletion = true;
+
+        // All valid
+        linked_courses::set_linked_courses($competency->id, [
+            ['id' => $courses[1]->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+            ['id' => $courses[3]->id, 'linktype' => linked_courses::LINKTYPE_OPTIONAL],
+            ['id' => $courses[5]->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+        ]);
+
+        $criterion = $criteria_generator->create_linkedcourses([
+            'aggregation' => ['method' => criterion::AGGREGATE_ANY_N, 'req_items' => 2],
+            'competency' => $competency->id,
+        ]);
+        $this->assertTrue($criterion->is_valid());
+        $on_disk = new criterion_entity($criterion->get_id());
+        $this->assertEquals(criterion::STATUS_VALID, $on_disk->status);
+
+        // Some invalid
+        linked_courses::set_linked_courses($competency->id, [
+            ['id' => 12345, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+            ['id' => $courses[3]->id, 'linktype' => linked_courses::LINKTYPE_OPTIONAL],
+        ]);
+        $on_disk = new criterion_entity($criterion->get_id());
+        $this->assertEquals(criterion::STATUS_INVALID, $on_disk->status);
+        $criterion = linkedcourses::fetch($criterion->get_id());
+        $this->assertFalse($criterion->is_valid());
+    }
+
 }

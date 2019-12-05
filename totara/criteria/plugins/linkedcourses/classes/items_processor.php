@@ -56,7 +56,27 @@ class items_processor {
             ->where('plugin_type', 'linkedcourses')
             ->get();
 
-        if (empty($criteria)) {
+        if (!$criteria->count()) {
+            return;
+        }
+
+        // We only need to determine whether there were any changes once
+        // All linkedcourses criteria on the same competency have the same items
+        $linked_course_ids = linked_courses::get_linked_course_ids($competency_id);
+
+        $current_item_ids = $criteria
+            ->first()
+            ->items
+            ->pluck('item_id');
+
+        $to_add = array_diff($linked_course_ids, $current_item_ids);
+        $to_delete = array_diff($current_item_ids, $linked_course_ids);
+
+        // We need to consider the removed items for reaggregation as well
+        $course_ids = array_merge($linked_course_ids, $to_delete);
+
+        if (empty($to_add) && empty($to_delete)) {
+            // Nothing to do
             return;
         }
 
@@ -67,71 +87,32 @@ class items_processor {
         // We get a configuration dump before we start making changes for a specific competency
         // so that we can dump history if anything did change
         $configuration_dump = achievement_configuration::get_current_configuration_dump($competency_id);
-        $linked_course_ids = linked_courses::get_linked_course_ids($competency_id);
-        $configuration_has_changed = false;
-        $updated_criteria_ids = [];
 
+        // Saving through criteria_linkedcourses instance instead of entity to ensure validation checks are done
         $transaction = $DB->start_delegated_transaction();
 
         $course_ids = [];
         /** @var criterion $criterion */
         foreach ($criteria as $criterion) {
-            // Get the existing items - This is ok for now as all items linked to a specific criterion currently
-            // will have the same item_type
-            $current_item_ids = $criterion->items->pluck('item_id');
-
-            $to_add = array_diff($linked_course_ids, $current_item_ids);
-            $to_delete = array_diff($current_item_ids, $linked_course_ids);
-
-            // This criterion is already up to date so nothing to do here
-            if (empty($to_add) && empty($to_delete)) {
-                continue;
-            }
-
-            $configuration_has_changed = true;
-            $updated_criteria_ids[] = $criterion->id;
-
-            foreach ($to_add as $to_add_id) {
-                $item = new item_entity();
-                $item->criterion_id = $criterion->id;
-                $item->item_type = $item_type;
-                $item->item_id = $to_add_id;
-                $item->save();
-            }
-
-            // This will do a cascade delete on item_records as well
-            if (!empty($to_delete)) {
-                builder::table(item_entity::TABLE)
-                    ->where('criterion_id', $criterion->id)
-                    ->where('item_type', $item_type)
-                    ->where_in('item_id', $to_delete)
-                    ->delete();
-            }
-
-            $criterion->criterion_modified = $now;
-            $criterion->save();
-
-            // We need to consider the removed items for reaggregation as well
-            $course_ids = array_merge($course_ids, $linked_course_ids, $to_delete);
+            $linkedcourses = linkedcourses::fetch_from_entity($criterion);
+            $linkedcourses->set_item_ids($linked_course_ids);
+            $linkedcourses->save();
         }
 
-        if ($configuration_has_changed) {
-            if (advanced_feature::is_enabled('competency_assignment')) {
-                // Queue all users assigned to the competency
-                (new aggregation_users_table())->queue_all_assigned_users_for_aggregation($competency_id);
-            } else {
-                // In this case we only want to queue a subset of users as in learn-only
-                // we do not use the assignments. We rather look at the completions directly.
-                $queue_items = self::get_items_to_queue(array_unique($course_ids), $competency_id);
-                (new aggregation_users_table())->queue_multiple_for_aggregation($queue_items);
-            }
-
-            // Dump the configuration history and log the configuration change
-            $config = new achievement_configuration(new competency_entitiy($competency_id));
-            $config->save_configuration_history($now, $configuration_dump);
-            // Queued already so skip queueing for this one.
-            configuration_change::add_competency_entry($competency_id, configuration_change::CHANGED_CRITERIA, $now, false);
+        if (advanced_feature::is_enabled('competency_assignment')) {
+            // Queue all users assigned to the competency
+            (new aggregation_users_table())->queue_all_assigned_users_for_aggregation($competency_id);
+        } else {
+            // In this case we only want to queue a subset of users as in learn-only
+            // we do not use the assignments. We rather look at the completions directly.
+            $queue_items = self::get_items_to_queue(array_unique($course_ids), $competency_id);
+            (new aggregation_users_table())->queue_multiple_for_aggregation($queue_items);
         }
+
+        // Dump the configuration history and log the configuration change
+        $config = new achievement_configuration(new competency_entitiy($competency_id));
+        $config->save_configuration_history($now, $configuration_dump);
+        configuration_change::add_competency_entry($competency_id, configuration_change::CHANGED_CRITERIA, $now);
 
         $transaction->allow_commit();
     }

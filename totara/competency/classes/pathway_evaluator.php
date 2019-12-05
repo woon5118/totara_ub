@@ -66,8 +66,11 @@ abstract class pathway_evaluator {
         }
 
         // First archive pathway_achievements of users no longer assigned
+        // Archiving achievements of users no longer assigned regardless of the pathway validity - although
+        // the pathway may no longer result in a user receiving a value, the unassigned user is still unassigned
         $this->user_id_source->archive_non_assigned_achievements($this->pathway, $evaluation_time);
-        // And mark newly assigned users as having changes
+
+        // Mark newly assigned users as having changes
         $this->user_id_source->mark_newly_assigned_users($this->pathway);
 
         // Now evaluate achievements for assigned users to mark which ones were changed

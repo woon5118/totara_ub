@@ -85,7 +85,7 @@ class onactivate extends criterion {
      * onactivate criteria should contain the competency metadata
      * @return string|null Error description
      */
-    protected function validate(): ?string {
+    protected function validate_attributes(): ?string {
         return !($this->get_competency_id() > 0) ? 'Competency id metadata is required in onactivate criteria' : null;
     }
 

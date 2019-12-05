@@ -25,6 +25,7 @@
 use criteria_coursecompletion\coursecompletion;
 use criteria_linkedcourses\linkedcourses;
 use totara_criteria\criterion;
+use totara_criteria\entities\criterion as criterion_entity;
 
 class criteria_coursecompletion_testcase extends advanced_testcase {
 
@@ -381,6 +382,51 @@ class criteria_coursecompletion_testcase extends advanced_testcase {
             $actual = coursecompletion::dump_criterion_configuration($id);
             $this->assertEqualsCanonicalizing($expected, $actual);
         }
+    }
+
+    /**
+     * Test save with item validation
+     */
+    public function test_save_with_item_validation() {
+        global $CFG;
+
+        /** @var totara_criteria_generator $criteria_generator */
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        // Completion only enabled for every second course
+        $courses = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $courses[$i] = $this->getDataGenerator()->create_course(['enablecompletion' => $i % 2]);
+        }
+
+        $CFG->enablecompletion = true;
+
+        // Coursecompletion with valid courses
+        $criterion = $criteria_generator->create_coursecompletion([
+            'aggregation' => ['method' => criterion::AGGREGATE_ANY_N, 'req_items' => 2],
+            'courseids' => [$courses[1]->id, $courses[3]->id],
+        ]);
+        $this->assertTrue($criterion->is_valid());
+        $on_disk = new criterion_entity($criterion->get_id());
+        $this->assertEquals(criterion::STATUS_VALID, $on_disk->status);
+
+        // Coursecompletion with invalid courses
+        $criterion = $criteria_generator->create_coursecompletion([
+            'aggregation' => ['method' => criterion::AGGREGATE_ANY_N, 'req_items' => 2],
+            'courseids' => [$courses[1]->id, $courses[2]->id],
+        ]);
+        $this->assertFalse($criterion->is_valid());
+        $on_disk = new criterion_entity($criterion->get_id());
+        $this->assertEquals(criterion::STATUS_INVALID, $on_disk->status);
+
+        // Coursecompletion with valid non-existent course
+        $criterion = $criteria_generator->create_coursecompletion([
+            'aggregation' => ['method' => criterion::AGGREGATE_ANY_N, 'req_items' => 2],
+            'courseids' => [$courses[1]->id, $courses[3]->id, 12345],
+        ]);
+        $this->assertFalse($criterion->is_valid());
+        $on_disk = new criterion_entity($criterion->get_id());
+        $this->assertEquals(criterion::STATUS_INVALID, $on_disk->status);
     }
 
 

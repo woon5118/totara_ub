@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Aleksandr Baishev <aleksandr.baishev@totaralms.com>
+ * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  * @package totara_criteria
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace totara_criteria\validators;
 
-$plugin->version  = 2019110500;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'totara_criteria'; // To check on upgrade, that module sits in correct place
+use totara_criteria\criterion;
+
+/**
+ * Interface for item validators that check the validity of a criterion's items
+ */
+interface criterion_validator_interface {
+
+    // TODO: Not sure we need this ... Keeping it for the moment
+
+    /**
+     * Validate all items linked to the criterion and set the status accordingly
+     * @param criterion $criterion
+     * @return int Criterion status
+     */
+    public static function validate_and_set_status(criterion $criterion): int;
+
+}

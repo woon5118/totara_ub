@@ -27,6 +27,7 @@ use coding_exception;
 use totara_competency\linked_courses;
 use totara_criteria\criterion;
 use totara_criteria\evaluators\course_item_evaluator;
+use totara_criteria\validators\course_item_validator;
 
 global $CFG;
 
@@ -71,7 +72,7 @@ class linkedcourses extends criterion {
      * linkedcourse criteria should contain the competency metadata
      * @return string|null Error description
      */
-    protected function validate(): ?string {
+    protected function validate_attributes(): ?string {
         return !($this->get_competency_id() > 0) ? 'Competency id metadata is required in linkedcourses criteria' : null;
     }
 
@@ -89,6 +90,13 @@ class linkedcourses extends criterion {
         $this->set_item_ids($linked_courses);
 
         return $this;
+    }
+
+    /**
+     * @return string|null Class name of item_validator for this criteria type.
+     */
+    public static function get_item_validator_class(): ?string {
+        return course_item_validator::class;
     }
 
 
