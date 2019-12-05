@@ -297,7 +297,7 @@ YUI.add('moodle-enrol_manual-quickenrolment', function(Y) {
                 y = parseInt(base.get('winHeight'))*0.1;
             }
             base.setXY([x,y]);
-            var zindex = 0;
+            var zindex = 1500; // Totara: upped so that it is displayed above the main navigation
             Y.all('.moodle-has-zindex').each(function() {
                 if (parseInt(this.getComputedStyle('zIndex'), 10) > zindex) {
                     zindex = parseInt(this.getComputedStyle('zIndex'), 10);
