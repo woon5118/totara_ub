@@ -19,6 +19,7 @@
  *
  * @author Brendan Cox <brendan.cox@totaralearning.com>
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package totara_criteria
  */
 
@@ -194,6 +195,229 @@ class criteria_linkedcourses_items_processor_testcase extends advanced_testcase 
         $this->assertEquals(0, $DB->count_records('totara_criteria_item'));
 
         $sink->close();
+    }
+
+    public function test_update_items_criteria_check_queue_perform_no_assignments() {
+        global $DB;
+
+        \totara_core\advanced_feature::enable('competency_assignment');
+
+        // We sink the events to prevent observer interference
+        $sink = $this->redirectEvents();
+
+        /** @var totara_hierarchy_generator $hierarchy_generator */
+        $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $compfw = $hierarchy_generator->create_comp_frame([]);
+        $comp = $hierarchy_generator->create_comp(['frameworkid' => $compfw->id]);
+        $competency = new competency($comp->id);
+
+        $this->set_up_pathway_with_linked_courses_criteria($competency);
+
+        $add = $this->getDataGenerator()->create_course();
+        $keep = $this->getDataGenerator()->create_course();
+        $remove = $this->getDataGenerator()->create_course();
+
+        linked_courses::set_linked_courses(
+            $competency->id,
+            [
+                ['id' => $keep->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+                ['id' => $remove->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+                ['id' => $add->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY]
+            ]
+        );
+
+        $sink->clear();
+
+        items_processor::update_items($competency->id);
+
+        $items = $DB->get_records('totara_criteria_item');
+        $this->assertCount(3, $items);
+        $item_ids = array_column($items, 'item_id');
+        $this->assertEqualsCanonicalizing([$keep->id, $remove->id, $add->id], $item_ids);
+
+        // As no user was assigned nothing is in the queue
+        $queue_table = new \totara_competency\aggregation_users_table();
+        $queue = $DB->get_records($queue_table->get_table_name());
+        $this->assertEmpty($queue);
+    }
+
+    public function test_update_items_criteria_check_queue_perform_with_assignments() {
+        global $DB;
+
+        \totara_core\advanced_feature::enable('competency_assignment');
+
+        // We sink the events to prevent observer interference
+        $sink = $this->redirectEvents();
+
+        /** @var totara_hierarchy_generator $hierarchy_generator */
+        $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $compfw = $hierarchy_generator->create_comp_frame([]);
+        $comp = $hierarchy_generator->create_comp(['frameworkid' => $compfw->id]);
+        $competency = new competency($comp->id);
+
+        /** @var totara_competency_generator $competency_generator */
+        $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+        $assign_generator = $competency_generator->assignment_generator();
+        $user1 = $assign_generator->create_user();
+        $user2 = $assign_generator->create_user();
+        $assign_generator->create_user_assignment($competency->id, $user1->id);
+        $assign_generator->create_user_assignment($competency->id, $user2->id);
+
+        (new \totara_competency\expand_task($DB))->expand_all();
+
+        $this->set_up_pathway_with_linked_courses_criteria($competency);
+
+        $add = $this->getDataGenerator()->create_course();
+        $keep = $this->getDataGenerator()->create_course();
+        $remove = $this->getDataGenerator()->create_course();
+
+        linked_courses::set_linked_courses(
+            $competency->id,
+            [
+                ['id' => $keep->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+                ['id' => $remove->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+                ['id' => $add->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY]
+            ]
+        );
+
+        $sink->clear();
+
+        items_processor::update_items($competency->id);
+
+        $items = $DB->get_records('totara_criteria_item');
+        $this->assertCount(3, $items);
+        $item_ids = array_column($items, 'item_id');
+        $this->assertEqualsCanonicalizing([$keep->id, $remove->id, $add->id], $item_ids);
+
+        // As no user was assigned nothing is in the queue
+        $queue_table = new \totara_competency\aggregation_users_table();
+        $queue = $DB->get_records($queue_table->get_table_name());
+        $this->assertCount(2, $queue);
+
+        $this->assertEquals([$competency->id, $competency->id], array_column($queue, 'competency_id'));
+        $this->assertEqualsCanonicalizing([$user1->id, $user2->id], array_column($queue, 'user_id'));
+    }
+
+    public function test_update_items_criteria_check_queue_learn_only_no_completions() {
+        global $DB;
+
+        \totara_core\advanced_feature::disable('competency_assignment');
+
+        // We sink the events to prevent observer interference
+        $sink = $this->redirectEvents();
+
+        /** @var totara_hierarchy_generator $hierarchy_generator */
+        $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $compfw = $hierarchy_generator->create_comp_frame([]);
+        $comp1 = $hierarchy_generator->create_comp(['frameworkid' => $compfw->id]);
+        $comp2 = $hierarchy_generator->create_comp(['frameworkid' => $compfw->id]);
+        $competency1 = new competency($comp1->id);
+        $competency2 = new competency($comp2->id);
+
+        $this->set_up_pathway_with_linked_courses_criteria($competency1);
+        $this->set_up_pathway_with_linked_courses_criteria($competency2);
+
+        $add = $this->getDataGenerator()->create_course();
+        $keep = $this->getDataGenerator()->create_course();
+        $remove = $this->getDataGenerator()->create_course();
+
+        linked_courses::set_linked_courses(
+            $competency1->id,
+            [
+                ['id' => $keep->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+                ['id' => $remove->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+                ['id' => $add->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY]
+            ]
+        );
+
+        $sink->clear();
+
+        items_processor::update_items($competency1->id);
+
+        $items = $DB->get_records('totara_criteria_item');
+        $this->assertCount(3, $items);
+        $item_ids = array_column($items, 'item_id');
+        $this->assertEqualsCanonicalizing([$keep->id, $remove->id, $add->id], $item_ids);
+
+        // As no user was assigned nothing is in the queue
+        $queue_table = new \totara_competency\aggregation_users_table();
+        $queue = $DB->get_records($queue_table->get_table_name());
+        $this->assertEmpty($queue);
+    }
+
+    public function test_update_items_criteria_check_queue_learn_only_with_completions() {
+        global $DB;
+
+        \totara_core\advanced_feature::disable('competency_assignment');
+
+        $queue_table = new \totara_competency\aggregation_users_table();
+
+        // We sink the events to prevent observer interference
+        $sink = $this->redirectEvents();
+
+        /** @var totara_hierarchy_generator $hierarchy_generator */
+        $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $compfw = $hierarchy_generator->create_comp_frame([]);
+        $comp1 = $hierarchy_generator->create_comp(['frameworkid' => $compfw->id]);
+        $comp2 = $hierarchy_generator->create_comp(['frameworkid' => $compfw->id]);
+        $competency1 = new competency($comp1->id);
+        $competency2 = new competency($comp2->id);
+
+        /** @var totara_competency_generator $competency_generator */
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        $this->set_up_pathway_with_linked_courses_criteria($competency1);
+        $this->set_up_pathway_with_linked_courses_criteria($competency2);
+
+        $add = $this->getDataGenerator()->create_course();
+        $keep = $this->getDataGenerator()->create_course();
+        $remove = $this->getDataGenerator()->create_course();
+
+        $sink->clear();
+
+        linked_courses::set_linked_courses(
+            $competency1->id,
+            [
+                ['id' => $keep->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+                ['id' => $remove->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+            ]
+        );
+
+        items_processor::update_items($competency1->id);
+        // As no user was assigned nothing is in the queue
+        $this->assertCount(0, $DB->get_records($queue_table->get_table_name()));
+
+        $completion = new completion_completion(['course' => $add->id, 'userid' => $user1->id]);
+        $completion->mark_complete();
+        $completion = new completion_completion(['course' => $keep->id, 'userid' => $user1->id]);
+        $completion->mark_complete();
+
+        $completion = new completion_completion(['course' => $remove->id, 'userid' => $user2->id]);
+        $completion->mark_complete();
+
+        linked_courses::set_linked_courses(
+            $competency1->id,
+            [
+                ['id' => $keep->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+                ['id' => $add->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY]
+            ]
+        );
+
+        items_processor::update_items($competency1->id);
+
+        $items = $DB->get_records('totara_criteria_item');
+        $this->assertCount(2, $items);
+        $item_ids = array_column($items, 'item_id');
+        $this->assertEqualsCanonicalizing([$keep->id, $add->id], $item_ids);
+
+        // As no user was assigned nothing is in the queue
+        $queue_table = new \totara_competency\aggregation_users_table();
+        $queue = $DB->get_records($queue_table->get_table_name());
+        $this->assertCount(2, $queue);
+
+        $this->assertEquals([$competency1->id, $competency1->id], array_column($queue, 'competency_id'));
+        $this->assertEqualsCanonicalizing([$user1->id, $user2->id], array_column($queue, 'user_id'));
     }
 
 }

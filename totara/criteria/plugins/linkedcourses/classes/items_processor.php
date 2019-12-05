@@ -149,31 +149,16 @@ class items_processor {
             return [];
         }
 
-        global $DB;
-
-        $queue_items = [];
-
-        [$courses_to_queue_sql, $courses_to_queue_params] = $DB->get_in_or_equal($course_ids, SQL_PARAMS_NAMED);
-
         // We only load users who completed a linked course as this is the only
         // reason a value can change in learn-only
-        $sql = "
-            SELECT cc.userid
-                FROM {comp_criteria} coc
-                JOIN {course_completions} cc ON cc.course = coc.iteminstance
-                WHERE coc.itemtype = :item_type 
-                    AND coc.competencyid = :competency_id 
-                    AND coc.iteminstance {$courses_to_queue_sql}
-                    AND cc.timecompleted > 0
-        ";
+        $user_ids_to_queue = builder::table('course_completions')
+            ->select_raw('DISTINCT userid as userid')
+            ->where('course', $course_ids)
+            ->where('timecompleted', '>', 0)
+            ->get()
+            ->pluck('userid');
 
-        $params = [
-            'competency_id' => $competency_id,
-            'item_type' => 'coursecompletion',
-        ];
-
-        $user_ids_to_queue = $DB->get_fieldset_sql($sql, array_merge($courses_to_queue_params, $params));
-
+        $queue_items = [];
         foreach ($user_ids_to_queue as $user_id) {
             $queue_items[] = [
                 'user_id' => (int) $user_id,
