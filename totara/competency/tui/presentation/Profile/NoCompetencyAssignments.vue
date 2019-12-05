@@ -11,10 +11,10 @@
       />
     </div>
     <div class="tui-NoCompetencyAssignments__search-competencies">
-      <a
+      <ActionLink
         :href="selfAssignmentUrl"
-        class="btn totara_style-btn"
-        v-text="$str('assign_competencies', 'totara_competency')"
+        :text="$str('assign_competencies', 'totara_competency')"
+        :styleclass="{ primary: true }"
       />
     </div>
   </div>
@@ -22,8 +22,10 @@
 
 <script>
 import FlexIcon from 'totara_core/containers/icons/FlexIcon';
+import ActionLink from 'totara_core/presentation/links/ActionLink';
+
 export default {
-  components: { FlexIcon },
+  components: { FlexIcon, ActionLink },
   props: {
     display: {
       required: false,

@@ -6,11 +6,17 @@
       </li>
     </ul>
     <div class="tui-CompetencyProfileHeader__user-details">
-      <img v-if="!isMine" :src="profilePicture" :alt="userName" />
-      <a
+      <Avatar
+        v-if="!isMine"
+        :src="profilePicture"
+        alt="userName"
+        size="medium"
+        class="tui-CompetencyProfileHeader__avatar"
+      />
+      <ActionLink
         :href="selfAssignmentUrl"
-        class="btn totara_style-btn"
-        v-text="$str('assign_competencies', 'totara_competency')"
+        :text="$str('assign_competencies', 'totara_competency')"
+        :styleclass="{ primary: true }"
       />
       <div
         v-if="latestAchievement"
@@ -34,8 +40,11 @@
 <script>
 import FlexIcon from 'totara_core/containers/icons/FlexIcon';
 import AssignmentProgress from 'totara_competency/containers/AssignmentProgress';
+import ActionLink from 'totara_core/presentation/links/ActionLink';
+import Avatar from 'totara_core/presentation/avatar/Avatar';
+
 export default {
-  components: { AssignmentProgress, FlexIcon },
+  components: { AssignmentProgress, FlexIcon, ActionLink, Avatar },
   props: {
     data: {
       required: true,
@@ -91,12 +100,17 @@ export default {
     }
   }
 
+  &__avatar {
+    margin: 0 auto;
+  }
+
   &__user-details {
     display: flex;
     flex-direction: column;
     align-self: start;
     justify-content: center;
     max-width: 300px;
+    margin: 0 auto;
 
     & > :not(:last-child) {
       margin-bottom: 15px;
