@@ -101,11 +101,12 @@ class tool_totara_sync_user_externaldb_check_sanity_testcase extends advanced_te
             $this->dbtable = $CFG->prefix . 'totara_sync_user_source';
         }
 
-        if (!empty($this->dbtype) &&
-            !empty($this->dbhost) &&
+        if (!empty($this->dbhost) &&
             !empty($this->dbname) &&
-            !empty($this->dbuser) &&
-            !empty($this->dbtable)) {
+            !empty($this->dbtable) &&
+            (!empty($this->dbtype) && !empty($this->dbuser)) ||
+            // Only MSSQL allows an empty dbuser.
+            ($this->dbtype == 'sqlsrv' && empty($this->dbuser))) {
             // All necessary config variables are set.
             $this->configexists = true;
             $this->ext_dbconnection = setup_sync_DB($this->dbtype, $this->dbhost, $this->dbname, $this->dbuser, $this->dbpass, array('dbport' => $this->dbport));
