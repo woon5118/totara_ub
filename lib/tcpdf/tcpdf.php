@@ -7788,7 +7788,7 @@ class TCPDF {
 		if ($destroyall AND !$preserve_objcopy) {
 			self::$cleaned_ids[$this->file_id] = true;
 			// remove all temporary files
-			if ($handle = opendir(K_PATH_CACHE)) {
+			if (file_exists(K_PATH_CACHE) && $handle = opendir(K_PATH_CACHE)) { // Totara: phpunit might have removed the files already in tests
 				while ( false !== ( $file_name = readdir( $handle ) ) ) {
 					if (strpos($file_name, '__tcpdf_'.$this->file_id.'_') === 0) {
 						unlink(K_PATH_CACHE.$file_name);
