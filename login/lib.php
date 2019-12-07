@@ -297,8 +297,10 @@ function core_login_get_return_url() {
     // Prepare redirection.
     if (user_not_fully_set_up($USER, true)) {
         $urltogo = $CFG->wwwroot.'/user/edit.php';
-        // We don't delete $SESSION->wantsurl yet, so we get there later.
-
+        // Totara: add original URL as new target, the original URL will get deleted during login test redirect.
+        if (!empty($SESSION->wantsurl) && strpos($SESSION->wantsurl, $CFG->wwwroot . '/user/edit.php') !== 0) {
+            $urltogo .= '?returnurl=' . urlencode($SESSION->wantsurl);
+        }
     } else if (isset($SESSION->wantsurl) and (strpos($SESSION->wantsurl, $CFG->wwwroot) === 0
             or strpos($SESSION->wantsurl, str_replace('http://', 'https://', $CFG->wwwroot)) === 0)) {
         $urltogo = $SESSION->wantsurl;    // Because it's an address in this site.
