@@ -251,7 +251,7 @@ function totara_print_scheduled_reports($showoptions=true, $showaddform=true, $s
  *
  * @deprecated since Totara 13
  */
-define('TOTARA_SHOWFEATURE', advanced_feature::ENABLED);
+define('TOTARA_SHOWFEATURE', 1);
 
 /**
  * TOTARA_HIDEFEATURE has been deprecated, hidden is not supported anymore, use only enabled or disabled
@@ -265,7 +265,7 @@ define('TOTARA_HIDEFEATURE', 2);
  *
  * @deprecated since Totara 13
  */
-define('TOTARA_DISABLEFEATURE', advanced_feature::DISABLED);
+define('TOTARA_DISABLEFEATURE', 3);
 
 /**
  * List of strings which can be used with 'totara_feature_*() functions'.
