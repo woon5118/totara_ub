@@ -70,6 +70,11 @@ class competency_aggregator_user_source {
             return;
         }
 
+        // We rely on the competency being set in the table
+        if ($this->temp_user_table->get_competency_id_value() != $competency_id) {
+            throw new \coding_exception('Competency mismatch detected');
+        }
+
         $temp_table_name = $this->temp_user_table->get_table_name();
         $temp_user_id_column = $this->temp_user_table->get_user_id_column();
         [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('', false, null);
@@ -142,6 +147,11 @@ class competency_aggregator_user_source {
      * @return collection
      */
     public function get_users_to_reaggregate(int $competency_id) {
+        // We rely on the competency being set in the table
+        if ($this->temp_user_table->get_competency_id_value() != $competency_id) {
+            throw new \coding_exception('Competency mismatch detected');
+        }
+
         if (!advanced_feature::is_enabled('competency_assignment')) {
             return $this->get_users_to_reaggregate_legacy($competency_id);
         }
@@ -252,7 +262,6 @@ class competency_aggregator_user_source {
         ";
 
         $params = [
-            'competency_id' => $competency_id,
             'assignment_type' => assignment::TYPE_LEGACY,
             'user_group_type' => user_groups::USER,
         ];

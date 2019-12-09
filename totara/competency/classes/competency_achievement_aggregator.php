@@ -100,6 +100,8 @@ final class competency_achievement_aggregator {
             $aggregation_time = time();
         }
 
+        // Setting the competency id on the source will set it on the table instance
+        // which make sure the competency will be included in all queries for the queueing table
         $this->user_id_source->set_competency_id_value($competency_id);
         $this->user_id_source->archive_non_assigned_achievements($competency_id, $aggregation_time);
         $user_assignment_records = $this->user_id_source->get_users_to_reaggregate($competency_id);
@@ -151,8 +153,6 @@ final class competency_achievement_aggregator {
                     $via->pathway_achievement_id = $pathway_achievement->id;
                     $via->save();
                 }
-
-                $achieved_via_ids = collection::new($user_achievement['achieved_via'])->pluck('id');
 
                 $hook = new hook\competency_achievement_updated($new_comp_achievement);
                 $hook->execute();
