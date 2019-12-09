@@ -39,6 +39,12 @@ require_once($CFG->dirroot . '/totara/competency/tests/integration_aggregation.p
  */
 class totara_competency_integration_aggregation_simple_testcase extends totara_competency_integration_aggregation {
 
+    public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
+        global $CFG;
+        require_once($CFG->dirroot . '/completion/completion_completion.php');
+    }
+
     /**
      * Test aggregation with a single onactivate criterion
      * @dataProvider task_to_execute_data_provider

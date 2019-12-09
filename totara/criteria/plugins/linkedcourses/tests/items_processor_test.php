@@ -31,6 +31,12 @@ use totara_competency\linked_courses;
 
 class criteria_linkedcourses_items_processor_testcase extends advanced_testcase {
 
+    public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
+        global $CFG;
+        require_once($CFG->dirroot . '/completion/completion_completion.php');
+    }
+
     private function set_up_pathway_with_linked_courses_criteria($competency) {
         $linked_course_criterion = new linkedcourses();
         $linked_course_criterion->set_competency_id($competency->id);

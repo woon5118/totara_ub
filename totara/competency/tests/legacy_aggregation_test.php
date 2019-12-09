@@ -48,6 +48,7 @@ class totara_competency_legacy_aggregation_testcase extends advanced_testcase {
 
         global $CFG;
         require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
+        require_once($CFG->dirroot . '/completion/completion_completion.php');
     }
 
     public function test_it_does_not_do_anything_with_perform_enabled() {

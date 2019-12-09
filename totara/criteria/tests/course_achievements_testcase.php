@@ -37,6 +37,12 @@ defined('MOODLE_INTERNAL') || die();
  */
 abstract class totara_criteria_course_achievements_testcase extends advanced_testcase {
 
+    public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
+        global $CFG;
+        require_once($CFG->dirroot . '/completion/completion_completion.php');
+    }
+
     private function get_execution_context(string $type = 'dev', ?string $operation = null) {
         return execution_context::create($type, $operation);
     }

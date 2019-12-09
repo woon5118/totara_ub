@@ -28,6 +28,12 @@ use totara_criteria\item_evaluator_user_source;
 
 class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
+    public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
+        global $CFG;
+        require_once($CFG->dirroot . '/completion/completion_completion.php');
+    }
+
     private function setup_data() {
         $data = new class() {
             /** @var array $users */

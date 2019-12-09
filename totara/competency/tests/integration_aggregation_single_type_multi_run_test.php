@@ -42,6 +42,12 @@ class totara_competency_integration_aggregation_single_type_multi_run_testcase e
         \totara_core\advanced_feature::enable('competency_assignment');
     }
 
+    public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
+        global $CFG;
+        require_once($CFG->dirroot . '/completion/completion_completion.php');
+    }
+
     /**
      * Test aggregation task with a combination of criteria_groups and multiple runs
      * @dataProvider task_to_execute_data_provider

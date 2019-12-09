@@ -331,6 +331,7 @@ class totara_competency_generator extends component_generator_base {
     public function create_course_enrollment_and_completion($course, $user, int $completion_status) {
         global $CFG;
         require_once($CFG->dirroot . '/lib/enrollib.php');
+        require_once($CFG->dirroot . '/completion/completion_completion.php');
 
         if (!is_numeric($course)) {
             $course = $course->id;
