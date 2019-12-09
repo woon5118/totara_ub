@@ -1027,6 +1027,12 @@ class auth_plugin_ldap extends auth_plugin_base {
                             $conditions = array('fieldid' => $field->id, 'userid' => $newuser->id);
                             $id = $DB->get_field('user_info_data', 'id', $conditions);
                             $data = $newprofilefields[$field->shortname];
+                            // Totara: we need to normalise the data coming from LDAP server somehow.
+                            if ($data && $field->datatype === 'datetime') {
+                                $data = self::parse_field_datetime($data);
+                            } else if ($data && $field->datatype === 'date') {
+                                $data = self::parse_field_date($data);
+                            }
                             if ($id) {
                                 $DB->set_field('user_info_data', 'data', $data, array('id' => $id));
                             } else {
@@ -2247,5 +2253,80 @@ class auth_plugin_ldap extends auth_plugin_base {
         }
 
         return $updatekeys;
+    }
+
+    /**
+     * Parse LDAP full date with time including timezone.
+     *
+     * @param mixed $data
+     * @return int|false
+     */
+    public static function parse_field_datetime($data) {
+        if ($data === false) {
+            return false;
+        }
+        if (!$data) {
+            // Profile fields consider 0 a 'no value'.
+            return 0;
+        }
+        if (is_number($data)) {
+            // Already a timestamp.
+            return intval($data);
+        }
+        $data = strval($data);
+
+        // Fix LDAP GeneralizedTime formatting before using PHP date parsing.
+        if (preg_match('/^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)([+--]\d\d\d\d)$/', $data, $matches)) {
+            $data = $matches[1] . '-' .$matches[2] . '-' .$matches[3] . 'T' . $matches[4] . ':' . $matches[5] . $matches[6];
+        }
+
+        try {
+            $d = new DateTime($data);
+            return $d->getTimestamp();
+        } catch (Exception $ex) {
+            debugging('Invalid date format: ' . $data);
+            return false;
+        }
+    }
+
+    /**
+     * Parse LDAP full date used for timezone-less dates without time.
+     *
+     * @param mixed $data
+     * @return int|false
+     */
+    public static function parse_field_date($data) {
+        if ($data === false) {
+            return false;
+        }
+        if (!$data) {
+            // Profile fields consider 0 a 'no value'.
+            return 0;
+        }
+        if (is_number($data)) {
+            // Already a timestamp, just round it to midday in UTC.
+            $d = new DateTime('@' . $data);
+            $d->setTime(12, 0, 0);
+            return $d->getTimestamp();
+        }
+        $data = strval($data);
+
+        // Fix LDAP GeneralizedTime formatting before using PHP date parsing.
+        if (preg_match('/^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)([+--]\d\d\d\d)$/', $data, $matches)) {
+            $data = $matches[1] . '-' .$matches[2] . '-' .$matches[3] . 'T' . $matches[4] . ':' . $matches[5] . $matches[6];
+        }
+
+        try {
+            $d = new DateTime($data);
+            $datetime = $d->format('Y-m-d');
+            $datetime = explode('-', $datetime);
+            $d = new DateTime('@' . time());
+            $d->setDate($datetime[0], $datetime[1], $datetime[2]);
+            $d->setTime(12, 0, 0);
+            return $d->getTimestamp();
+        } catch (Exception $ex) {
+            debugging('Invalid date format: ' . $data);
+            return false;
+        }
     }
 } // End of the class
