@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`presentation/buttons/OkCancelGroup.vue Checks snapshot 1`] = `
+<div
+  class="tui-formBtnGroup"
+>
+  <button
+    class="tui-formBtn tui-formBtn--prim"
+    type="button"
+  >
+    
+  fff
+  
+    <!---->
+  </button>
+   
+  <button
+    class="tui-formBtn"
+    type="button"
+  >
+    
+  fff
+  
+    <!---->
+  </button>
+</div>
+`;

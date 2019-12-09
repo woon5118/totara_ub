@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`presentation/form/Button.vue Checks snapshot 1`] = `
+<button
+  class="tui-formBtn tui-formBtn--prim tui-formBtn--small"
+  type="button"
+>
+  
+  btn text
+  
+  <!---->
+</button>
+`;

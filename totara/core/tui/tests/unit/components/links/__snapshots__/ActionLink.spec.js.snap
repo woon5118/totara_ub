@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ActionLink.vue matches snapshot 1`] = `
+<a
+  class="tui-actionLink tui-actionLink--prim tui-actionLink--small"
+  href="https://www.google.com/"
+>
+  
+  Text
+
+</a>
+`;
+
+exports[`ActionLink.vue matches snapshot 2`] = `
+<a
+  class="tui-actionLink tui-actionLink--prim tui-actionLink--small"
+>
+  
+  Text
+
+</a>
+`;
