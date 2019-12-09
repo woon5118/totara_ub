@@ -19,6 +19,7 @@
  *
  * @author Brendan Cox <brendan.cox@totaralearning.com>
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package pathway_criteria_group
  */
 
@@ -27,12 +28,27 @@ use pathway_criteria_group\aggregation_helper;
 use pathway_criteria_group\criteria_group;
 use totara_competency\entities\scale_value;
 use totara_competency\expand_task;
-use totara_competency\models\assignment_actions;
+use totara_competency\linked_courses;
+use totara_core\advanced_feature;
 
 class pathway_criteria_group_aggregation_helper_testcase extends advanced_testcase {
 
-    private function setup_data() {
+    /**
+     * @param bool $assignments_enabled
+     * @return object instance of anonymous class
+     */
+    private function setup_data(bool $assignments_enabled) {
+        if ($assignments_enabled) {
+            advanced_feature::enable('competency_assignment');
+        } else {
+            advanced_feature::disable('competency_assignment');
+        }
+
         global $DB;
+
+        // If assignments are not enabled some of the data needs to be set up differently,
+        // see comments further down below
+        $assignments_enabled = advanced_feature::is_enabled('competency_assignment');
 
         $data = new class {
             public $competency_data = [];
@@ -44,7 +60,7 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
         // Redirect the events during setup
         $sink = $this->redirectEvents();
 
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 6; $i++) {
             $data->users[$i] = $this->getDataGenerator()->create_user();
             $data->courses[$i] = $this->getDataGenerator()->create_course();
         }
@@ -82,11 +98,11 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
             ],
             'Comp B' => [
                 'user_keys' => [1, 3],
-                'course_keys' => [1, 2],
+                'course_keys' => [2, 3],
             ],
             'Comp C' => [
                 'user_keys' => [3],
-                'course_keys' => [3],
+                'course_keys' => [4],
             ],
             'Comp D' => [
                 'user_keys' => [1, 2, 3],
@@ -97,6 +113,7 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
         foreach ($to_create as $competency_name => $competency_values) {
             $competency = $competency_generator->create_competency($competency_name, $framework->id);
             $criteria_ids = [];
+            $linked_courses = [];
 
             // Each coursecompletion criterion is created in its own pathway
             foreach ($competency_values['course_keys'] as $course_idx) {
@@ -111,12 +128,33 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
                 $pathway->save();
 
                 $criteria_ids[$course_idx] = $criterion->get_id();
+
+                $linked_courses[] = [
+                    'id' => $data->courses[$course_idx]->id,
+                    'linktype' => linked_courses::LINKTYPE_MANDATORY
+                ];
+            }
+
+            // We do need the courses linked for learn-only aggregation to pick it up
+            // as in learn-only there are no assignments just completions of courses linked to a competency
+            if (!$assignments_enabled) {
+                linked_courses::set_linked_courses($competency->id, $linked_courses);
             }
 
             foreach ($competency_values['user_keys'] as $user_idx) {
-                $assignment = $assignment_generator->create_user_assignment($competency->id, $data->users[$user_idx]->id);
-                $model = new assignment_actions();
-                $model->activate([$assignment->id]);
+                // Only create assignments if assignments feature is turned on
+                // Otherwise create completion records for the courses
+                if ($assignments_enabled) {
+                    $assignment_generator->create_user_assignment($competency->id, $data->users[$user_idx]->id);
+                } else {
+                    foreach ($competency_values['course_keys'] as $course_idx) {
+                        $completion = new completion_completion([
+                            'course' => $data->courses[$course_idx]->id,
+                            'userid' => $data->users[$user_idx]->id
+                        ]);
+                        $completion->mark_complete();
+                    }
+                }
             }
 
             $data->competency_data[$competency_name] = [
@@ -125,18 +163,32 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
             ];
         }
 
-        $expand_task = new expand_task($DB);
-        $expand_task->expand_all();
+        if ($assignments_enabled) {
+            $expand_task = new expand_task($DB);
+            $expand_task->expand_all();
+        }
         $sink->close();
 
         return $data;
     }
 
-    /** Test no criteria_ids provided */
-    public function test_mark_for_reaggregate_from_criteria_empty_list() {
+    public function assignments_enabled_dataprovider(): array {
+        return [
+            [ true ],
+            [ false ]
+        ];
+    }
+
+    /**
+     * Test no criteria_ids provided
+     *
+     * @dataProvider assignments_enabled_dataprovider
+     * @param bool $assignments_enabled
+     */
+    public function test_mark_from_criteria_empty_list(bool $assignments_enabled) {
         global $DB;
 
-        $data = $this->setup_data();
+        $data = $this->setup_data($assignments_enabled);
         $this->assertSame(0, $DB->count_records('totara_competency_aggregation_queue', []));
 
         // No criteria_ids
@@ -146,11 +198,11 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
 
     /**
      * Test single competency, single criterion
+     *
+     * @dataProvider assignments_enabled_dataprovider
      */
-    public function test_mark_for_reaggregate_from_criteria_single_competency_single_criterion_assigned_user() {
-        global $DB;
-
-        $data = $this->setup_data();
+    public function test_mark_from_criteria_single_competency_single_criterion_assigned_user(bool $assignments_enabled) {
+        $data = $this->setup_data($assignments_enabled);
 
         $criteria_ids = $data->competency_data['Comp A']['criteria_ids'];
         aggregation_helper::mark_for_reaggregate_from_criteria([$data->users[1]->id => $criteria_ids]);
@@ -165,11 +217,12 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
 
     /**
      * Test single criterion, user not assigned
+     *
+     * @dataProvider assignments_enabled_dataprovider
+     * @param bool $assignments_enabled
      */
-    public function test_mark_for_reaggregate_from_criteria_single_criterion_not_assigned_user() {
-        global $DB;
-
-        $data = $this->setup_data();
+    public function test_mark_from_criteria_single_criterion_not_assigned_user(bool $assignments_enabled) {
+        $data = $this->setup_data($assignments_enabled);
 
         $criteria_ids = $data->competency_data['Comp A']['criteria_ids'];
         aggregation_helper::mark_for_reaggregate_from_criteria([$data->users[3]->id => $criteria_ids]);
@@ -179,11 +232,12 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
 
     /**
      * Test single competency, multiple criteria, user assigned
+     *
+     * @dataProvider assignments_enabled_dataprovider
+     * @param bool $assignments_enabled
      */
-    public function test_mark_for_reaggregate_from_criteria_single_competencies_multiple_criteria_assigned_user() {
-        global $DB;
-
-        $data = $this->setup_data();
+    public function test_mark_from_criteria_single_competencies_multiple_criteria_assigned_user(bool $assignments_enabled) {
+        $data = $this->setup_data($assignments_enabled);
 
         $criteria_ids = $data->competency_data['Comp B']['criteria_ids'];
         aggregation_helper::mark_for_reaggregate_from_criteria([$data->users[1]->id => $criteria_ids]);
@@ -199,11 +253,12 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
 
     /**
      * Test single competency, multiple criteria, user not assigned
+     *
+     * @dataProvider assignments_enabled_dataprovider
+     * @param bool $assignments_enabled
      */
-    public function test_mark_for_reaggregate_from_criteria_single_competencies_multiple_criteria_not_assigned_user() {
-        global $DB;
-
-        $data = $this->setup_data();
+    public function test_mark_from_criteria_single_competencies_multiple_criteria_not_assigned_user(bool $assignments_enabled) {
+        $data = $this->setup_data($assignments_enabled);
 
         $criteria_ids = $data->competency_data['Comp B']['criteria_ids'];
         aggregation_helper::mark_for_reaggregate_from_criteria([$data->users[2]->id => $criteria_ids]);
@@ -213,13 +268,15 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
 
     /**
      * Test multiple competencies, multiple criteria, user assigned in some
+     *
+     * @dataProvider assignments_enabled_dataprovider
+     * @param bool $assignments_enabled
      */
-    public function test_mark_for_reaggregate_from_criteria_multiple_competencies_multiple_criteria() {
-        global $DB;
+    public function test_mark_from_criteria_multiple_competencies_multiple_criteria(bool $assignments_enabled) {
+        $data = $this->setup_data($assignments_enabled);
 
-        $data = $this->setup_data();
-
-        $criteria_ids = array_merge($data->competency_data['Comp A']['criteria_ids'],
+        $criteria_ids = array_merge(
+            $data->competency_data['Comp A']['criteria_ids'],
             $data->competency_data['Comp B']['criteria_ids'],
             $data->competency_data['Comp C']['criteria_ids']
         );
@@ -239,18 +296,21 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
 
     /**
      * Test multiple competencies, multiple criteria, all assigned users
+     *
+     * @dataProvider assignments_enabled_dataprovider
+     * @param bool $assignments_enabled
      */
-    public function test_mark_for_reaggregate_from_criteria_multiple_competencies_multiple_criteria_all_users() {
-        global $DB;
-
-        $data = $this->setup_data();
+    public function test_mark_from_criteria_multiple_competencies_multiple_criteria_all_users(bool $assignments_enabled) {
+        $data = $this->setup_data($assignments_enabled);
 
         $user_criteria_ids = [
-            $data->users[1]->id => array_merge($data->competency_data['Comp A']['criteria_ids'],
+            $data->users[1]->id => array_merge(
+                $data->competency_data['Comp A']['criteria_ids'],
                 $data->competency_data['Comp B']['criteria_ids']
             ),
             $data->users[2]->id => $data->competency_data['Comp A']['criteria_ids'],
-            $data->users[3]->id => array_merge($data->competency_data['Comp B']['criteria_ids'],
+            $data->users[3]->id => array_merge(
+                $data->competency_data['Comp B']['criteria_ids'],
                 $data->competency_data['Comp C']['criteria_ids']
             ),
         ];
