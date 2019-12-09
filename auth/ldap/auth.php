@@ -707,7 +707,7 @@ class auth_plugin_ldap extends auth_plugin_base {
 
             do {
                 if ($ldap_pagedresults) {
-                    ldap_control_paged_result($ldapconnection, $this->config->pagesize, true, $ldap_cookie);
+                    @ldap_control_paged_result($ldapconnection, $this->config->pagesize, true, $ldap_cookie);
                 }
                 if ($this->config->search_sub) {
                     // Use ldap_search to find first user from subtree.
@@ -720,7 +720,7 @@ class auth_plugin_ldap extends auth_plugin_base {
                     continue;
                 }
                 if ($ldap_pagedresults) {
-                    ldap_control_paged_result_response($ldapconnection, $ldap_result, $ldap_cookie);
+                    @ldap_control_paged_result_response($ldapconnection, $ldap_result, $ldap_cookie);
                 }
                 if ($entry = @ldap_first_entry($ldapconnection, $ldap_result)) {
                     do {
@@ -1622,7 +1622,7 @@ class auth_plugin_ldap extends auth_plugin_base {
 
             do {
                 if ($ldap_pagedresults) {
-                    ldap_control_paged_result($ldapconnection, $this->config->pagesize, true, $ldap_cookie);
+                    @ldap_control_paged_result($ldapconnection, $this->config->pagesize, true, $ldap_cookie);
                 }
                 if ($this->config->search_sub) {
                     // Use ldap_search to find first user from subtree.
@@ -1635,7 +1635,7 @@ class auth_plugin_ldap extends auth_plugin_base {
                     continue;
                 }
                 if ($ldap_pagedresults) {
-                    ldap_control_paged_result_response($ldapconnection, $ldap_result, $ldap_cookie);
+                    @ldap_control_paged_result_response($ldapconnection, $ldap_result, $ldap_cookie);
                 }
                 $users = ldap_get_entries_moodle($ldapconnection, $ldap_result);
                 // Add found users to list.

@@ -388,7 +388,7 @@ class enrol_ldap_plugin extends enrol_plugin {
                 $flat_records = array();
                 do {
                     if ($ldap_pagedresults) {
-                        ldap_control_paged_result($this->ldapconnection, $this->config->pagesize, true, $ldap_cookie);
+                        @ldap_control_paged_result($this->ldapconnection, $this->config->pagesize, true, $ldap_cookie);
                     }
 
                     if ($this->config->course_search_sub) {
@@ -409,7 +409,7 @@ class enrol_ldap_plugin extends enrol_plugin {
                     }
 
                     if ($ldap_pagedresults) {
-                        ldap_control_paged_result_response($this->ldapconnection, $ldap_result, $ldap_cookie);
+                        @ldap_control_paged_result_response($this->ldapconnection, $ldap_result, $ldap_cookie);
                     }
 
                     // Check and push results
@@ -772,7 +772,7 @@ class enrol_ldap_plugin extends enrol_plugin {
             $flat_records = array();
             do {
                 if ($ldap_pagedresults) {
-                    ldap_control_paged_result($this->ldapconnection, $this->config->pagesize, true, $ldap_cookie);
+                    @ldap_control_paged_result($this->ldapconnection, $this->config->pagesize, true, $ldap_cookie);
                 }
 
                 if ($this->get_config('course_search_sub')) {
@@ -794,7 +794,7 @@ class enrol_ldap_plugin extends enrol_plugin {
                 }
 
                 if ($ldap_pagedresults) {
-                    ldap_control_paged_result_response($this->ldapconnection, $ldap_result, $ldap_cookie);
+                    @ldap_control_paged_result_response($this->ldapconnection, $ldap_result, $ldap_cookie);
                 }
 
                 // Check and push results. ldap_get_entries() already
