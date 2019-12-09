@@ -22,16 +22,20 @@
  */
 
 use core\orm\collection;
+use core\orm\query\builder;
 use criteria_childcompetency\childcompetency;
 use criteria_coursecompletion\coursecompletion;
 use criteria_linkedcourses\linkedcourses;
 use pathway_criteria_group\criteria_group;
 use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
 use totara_competency\achievement_configuration;
+use totara_competency\aggregation_users_table;
 use totara_competency\entities\competency as competency_entity;
+use totara_competency\entities\configuration_change;
 use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\entities\scale as scale_entity;
 use totara_competency\legacy_aggregation;
+use totara_competency\linked_courses;
 use totara_competency\pathway;
 use totara_core\advanced_feature;
 use totara_criteria\criterion;
@@ -132,6 +136,75 @@ class totara_competency_legacy_aggregation_testcase extends advanced_testcase {
         $this->assert_not_has_criteria($data->competency->id);
         // The control competency's criteria should still be there
         $this->assert_has_criteria($data->control_competency->id, criterion::AGGREGATE_ANY_N);
+    }
+
+    public function test_changing_aggregation_method_queues_for_aggregation() {
+        advanced_feature::disable('competency_assignment');
+
+        $data = $this->create_data();
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+
+        $course1 = $this->getDataGenerator()->create_course();
+        $course2 = $this->getDataGenerator()->create_course();
+        $course3 = $this->getDataGenerator()->create_course();
+
+        $completion = new completion_completion(['course' => $course1->id, 'userid' => $user1->id]);
+        $completion->mark_complete();
+        $completion = new completion_completion(['course' => $course2->id, 'userid' => $user2->id]);
+        $completion->mark_complete();
+        $completion = new completion_completion(['course' => $course3->id, 'userid' => $user3->id]);
+        $completion->mark_complete();
+
+        linked_courses::set_linked_courses(
+            $data->competency->id,
+            [
+                [
+                    'id' => $course1->id,
+                    'linktype' => linked_courses::LINKTYPE_MANDATORY,
+                ],
+                [
+                    'id' => $course2->id,
+                    'linktype' => linked_courses::LINKTYPE_MANDATORY,
+                ],
+            ]
+        );
+
+        // No criteria exist at the beginning
+        $this->assert_not_has_criteria($data->competency->id);
+        $this->assert_has_criteria($data->control_competency->id, criterion::AGGREGATE_ANY_N);
+
+        // Set it to off
+        $data->competency->aggregationmethod = competency::AGGREGATION_METHOD_ALL;
+        $data->competency->save();
+
+        $this->assertFalse(
+            configuration_change::repository()
+                ->where('comp_id', $data->competency->id)
+                ->where('change_type', configuration_change::CHANGED_COMPETENCY_AGGREGATION)
+                ->exists()
+        );
+
+        $aggregation = new legacy_aggregation($data->competency);
+        $aggregation->apply();
+
+        $this->assert_has_criteria($data->competency->id, criterion::AGGREGATE_ALL);
+        $this->assert_has_criteria($data->control_competency->id, criterion::AGGREGATE_ANY_N);
+
+        $source_table = new aggregation_users_table();
+        $queue_entries = builder::table($source_table->get_table_name())->get();
+        $this->assertCount(2, $queue_entries);
+        $this->assertEquals([$data->competency->id], array_unique($queue_entries->pluck('competency_id')));
+        $this->assertEqualsCanonicalizing([$user1->id, $user2->id], $queue_entries->pluck('user_id'));
+
+        $this->assertTrue(
+            configuration_change::repository()
+                ->where('comp_id', $data->competency->id)
+                ->where('change_type', configuration_change::CHANGED_COMPETENCY_AGGREGATION)
+                ->exists()
+        );
     }
 
     public function test_setting_aggregation_to_off_in_combination_with_multiple_criteria() {
