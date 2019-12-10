@@ -1070,37 +1070,70 @@ class program {
     /**
      * Sets the time that a program is due for a learner
      *
-     * This function bypasses error checks. This function is provided to provide backwards compatibility, so should not be
-     * used for new functionality. Instead, use prog_load_completion() and prog_write_completion().
+     * For certifications, the timedue is only updated if there is no indication of existing completions.
      *
      * @param int $userid The user's ID
      * @param int $timedue Timestamp indicating the date that the program is due to be completed by the user
-     * @param string $message If provided, will override the default program completion log message "Due date set to".
+     * @param string $message If provided, will override the default program completion log message "Due date set in set_timedue".
      *                        Since Totara 2.9.20, 9.8, 10.
      * @return bool Success
      */
     public function set_timedue($userid, $timedue, $message = '') {
         global $DB;
-        if ($completion = $DB->get_record('prog_completion', array('programid' => $this->id, 'userid' => $userid, 'coursesetid' => 0))) {
-            $todb = new stdClass();
-            $todb->id = $completion->id;
-            $todb->timedue = $timedue;
-            $result = $DB->update_record('prog_completion', $todb);
 
-            if (empty($message)) {
-                $message = 'Due date set to';
+        if (empty($message)) {
+            $message = 'Due date set in set_timedue';
+        }
+
+        if ($this->is_certif()) {
+            list($certif_completion, $prog_completion) = certif_load_completion($this->id, $userid, false);
+
+            if (empty($prog_completion)) {
+                return false;
             }
 
-            // Record the change in the program completion log.
-            prog_log_completion(
-                $this->id,
-                $userid,
-                $message . ': ' . prog_format_log_date($timedue)
-            );
+            $completion_state = certif_get_completion_state($certif_completion);
 
-            return $result;
+            if ($completion_state != CERTIFCOMPLETIONSTATE_ASSIGNED) {
+                return false;
+            }
+
+            // We also need to check history records
+            // Check to see if a certification completion history record exists which is marked as "unassigned".
+            $sql = "SELECT *
+                FROM {certif_completion_history}
+                WHERE certifid = :certifid
+                AND userid = :userid
+                AND unassigned = 1
+                ORDER BY timeexpires DESC";
+            $params = ['certifid' => $this->certifid, 'userid' => $userid];
+            $certif_completion_history = $DB->get_record_sql($sql, $params, IGNORE_MULTIPLE); // Just the latest.
+
+            if (!empty($certif_completion_history)) {
+                $history_completion_state = certif_get_completion_state($certif_completion_history);
+
+                if ($history_completion_state != CERTIFCOMPLETIONSTATE_ASSIGNED) {
+                    return false;
+                }
+            }
+
+            // We know that the certif is newly assigned and there are no 'unassigned' history records that
+            // indicate previous completions.
+            $prog_completion->timedue = $timedue;
+            certif_write_completion($certif_completion, $prog_completion, $message);
+
+            return true;
         } else {
-            return false;
+            $prog_completion = prog_load_completion($this->id, $userid, false);
+
+            if (empty($prog_completion)) {
+                return false;
+            }
+
+            $prog_completion->timedue = $timedue;
+            prog_write_completion($prog_completion, $message);
+
+            return true;
         }
     }
 
