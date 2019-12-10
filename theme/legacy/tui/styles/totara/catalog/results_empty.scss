@@ -21,22 +21,16 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @package   theme_legacy
 
-// Variables
-$catalogResultsEmpty-spacing_medium: $totara_style-spacing_medium !default;
-$catalogResultsEmpty-spacing_x_small: $totara_style-spacing_x_small !default;
-// Breakpoint
-$catalogResultsEmpty-screen_sm_min: $totara_style-screen_sm_min !default;
-
 .tw-catalogResultsEmpty {
   &_text {
-    margin: 0 $catalogResultsEmpty-spacing_x_small;
+    margin: 0 var(--tui-gap-1);
   }
 }
 
-@media (min-width: $catalogResultsEmpty-screen_sm_min) {
+@media (min-width: $tui-screen-sm) {
   .tw-catalogResultsEmpty {
     &_text {
-      margin: 0 $catalogResultsEmpty-spacing_medium;
+      margin: 0 var(--tui-gap-4);
     }
   }
 }

@@ -21,11 +21,8 @@
 // @author    Riana Rossouw <riana.rossouw@totaralearning.com>
 // @package   theme_legacy
 
-$tool-sitepolicy-border-color: #a9a9a9 !default; // Dark gray.
-$totara_form-disabled-bg: #dde1e5 !default;
-
 .policybox {
-  border: 2px solid $tool-sitepolicy-border-color;
+  border: 2px solid var(--tui-color-neutral-5);
   margin: 20px auto;
   width: 100%;
   padding: 5px;
@@ -34,7 +31,7 @@ $totara_form-disabled-bg: #dde1e5 !default;
 }
 
 .primarypolicybox {
-  background-color: $totara_form-disabled-bg;
+  background-color: var(--tui-color-neutral-3);
   height: 25em;
   overflow: auto;
   resize: vertical;

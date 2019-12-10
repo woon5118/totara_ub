@@ -46,7 +46,7 @@
   .header-button-group {
     @extend .pull-right;
     .btn {
-      @extend .btn-default;
+      @include bs-btn-default();
     }
   }
 

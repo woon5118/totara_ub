@@ -21,33 +21,26 @@
 // @author    Andrew McGhie <andrew.mcghie@totaralearning.com>
 // @package   theme_legacy
 
-$padding-icon-item: 8px !default;
-$width-icon-item: 55px !default;
-$icon-size: 25px !default;
-$margin-icon-item: 3px !default;
-
 .modal-body {
   .icon-picker-icons {
-    font-size: $icon-size;
-    line-height: $icon-size * 1.5;
+    font-size: $featuredLinks-icon-selector-item-size;
+    line-height: $featuredLinks-icon-selector-item-size * 1.5;
     height: calc(100vh - 300px);
     overflow-y: auto;
 
     .icon-picker-item {
       display: inline-block;
-
-      border: 2px solid $gray-light;
-      border-radius: $border-radius-small;
-
+      border: var(--tui-border-width-thin) solid var(--tui-color-state);
+      border-radius: $featuredLinks-icon-selector-item-border-radius;
       cursor: pointer;
-
-      width: $width-icon-item;
-
-      padding: $padding-icon-item;
-      margin: $margin-icon-item;
+      width: $featuredLinks-icon-selector-item-width;
+      padding: $featuredLinks-icon-selector-item-padding;
+      margin: $featuredLinks-icon-selector-item-margin;
+      text-align: center;
 
       &.selected {
-        border-color: $brand-primary;
+        border-color: var(--tui-color-state-active);
+        box-shadow: var(--tui-shadow-2);
       }
     }
   }
@@ -55,19 +48,19 @@ $margin-icon-item: 3px !default;
 
 .tf_element {
   .icon-picker-delete-icon {
-    color: $state-danger-text;
+    color: var(--tui-color-prompt-alert);
     text-decoration: underline;
     cursor: pointer;
     margin-right: 16px;
   }
   .icon-picker-icon-display {
-    font-size: $icon-size;
+    font-size: $featuredLinks-icon-selector-item-size;
     img {
-      height: $icon-size;
-      width: $icon-size;
+      height: $featuredLinks-icon-selector-item-size;
+      width: $featuredLinks-icon-selector-item-size;
     }
     .icon-picker-invalid {
-      font-size: $font-size-base;
+      font-size: var(--tui-font-size-14);
     }
   }
 }

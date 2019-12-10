@@ -21,25 +21,16 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @package   theme_legacy
 
-// Variables
-// Colour
-$selectRegionPrimary-color_neutral_4: $totara_style-color_neutral_4 !default;
-// Size
-$selectRegionPrimary-screen_sm_min: $totara_style-screen_sm_min !default;
-// Spacing
-$selectRegionPrimary-spacing_small: $totara_style-spacing_small !default;
-$selectRegionPrimary-spacing_medium: $totara_style-spacing_medium !default;
-
 .tw-selectRegionPrimary {
   &__selector {
     min-width: 0;
 
     &::after {
-      border-bottom: 1px solid $selectRegionPrimary-color_neutral_4;
+      border-bottom: 1px solid $selectRegionPrimary-border-color;
       content: '';
       display: block;
-      margin: 0 0 $selectRegionPrimary-spacing_medium;
-      padding: $selectRegionPrimary-spacing_medium 0 0;
+      margin: 0 0 $selectRegionPrimary-spacing-medium;
+      padding: $selectRegionPrimary-spacing-medium 0 0;
     }
 
     &:last-of-type {
@@ -50,7 +41,7 @@ $selectRegionPrimary-spacing_medium: $totara_style-spacing_medium !default;
   }
 }
 
-@media (min-width: $selectRegionPrimary-screen_sm_min) {
+@media (min-width: $totara-style-screen-sm-min) {
   .tw-selectRegionPrimary {
     display: flex;
 

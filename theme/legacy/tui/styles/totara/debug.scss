@@ -60,9 +60,9 @@
 
     .cachesused {
       // Variables, as basis at least is going to invert these.
-      $cache-stat-bg: lighten($gray-base, 97%); // #f7f7f7;
-      $cache-stat-border: lighten($gray-base, 93.5%); // #eee;
-      $cache-stat-heading-text: $text-color;
+      $cache-stat-bg: var(--tui-color-neutral-1);
+      $cache-stat-border: var(--tui-color-neutral-5);
+      $cache-stat-heading-text: var(--tui-color-neutral-7);
 
       margin-top: 1em;
 
@@ -81,7 +81,7 @@
         display: inline-block;
         vertical-align: top;
         background-color: $cache-stat-bg;
-        border: 1px solid $cache-stat-border; // #eee;
+        border: 1px solid var(--tui-color-neutral-5);
         border-radius: $border-radius-small;
       }
       .cache-definition-stats-heading {
@@ -117,7 +117,7 @@
 // End of original bootstrap theme code.
 
 #page-footer .performanceinfo .cachesused {
-  $cache-stat-bg: lighten($gray-base, 3%); // #f7f7f7;
-  $cache-stat-border: lighten($gray-base, 6.5%); // #eee;
-  $cache-stat-heading-text: lighten($gray-base, 93.5%); // #eee;
+  $cache-stat-bg: var(--tui-color-neutral-1);
+  $cache-stat-border: var(--tui-color-neutral-5);
+  $cache-stat-heading-text: var(--tui-color-neutral-7);
 }

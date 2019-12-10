@@ -21,27 +21,13 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @package   theme_legacy
 
-// Size
-$catalog_details-spacing_large: $totara_style-spacing_large !default;
-$catalog_details-spacing_medium: $totara_style-spacing_medium !default;
-$catalog_details-spacing_small: $totara_style-spacing_small !default;
-$catalog_details-spacing_x_small: $totara_style-spacing_x_small !default;
-// Colours
-$catalog_details-color_neutral_1: $totara_style-color_neutral_1 !default;
-$catalog_details-color_neutral_5: $totara_style-color_neutral_5 !default;
-// Shadows
-$catalog_details-shadow_2: $totara_style-shadow_2 !default;
-// Break points
-$catalog_details-screen_sm_min: $totara_style-screen_sm_min !default;
-$catalog_details-screen_md_min: $totara_style-screen_md_min !default;
-
 .tw-catalogDetails {
   height: 0;
 
   &__arrow {
     bottom: -1.5px;
     display: none;
-    margin: $catalog_details-spacing_medium auto 0;
+    margin: var(--tui-gap-4) auto 0;
     position: relative;
 
     &::before,
@@ -56,15 +42,15 @@ $catalog_details-screen_md_min: $totara_style-screen_md_min !default;
     }
 
     &::before {
-      border-bottom-color: $catalog_details-color_neutral_5;
-      border-width: 1.7rem;
-      margin-left: -1.7rem;
+      border-bottom-color: var(--tui-catalog-details-border-color);
+      border-width: calc(var(--tui-gap-4) + 0.1rem);
+      margin-left: calc((var(--tui-gap-4) + 0.1rem) * -1);
     }
 
     &::after {
-      border-bottom-color: $catalog_details-color_neutral_1;
-      border-width: $catalog_details-spacing_medium;
-      margin-left: -$catalog_details-spacing_medium;
+      border-bottom-color: var(--tui-catalog-details-bg-color);
+      border-width: var(--tui-gap-4);
+      margin-left: calc(var(--tui-gap-4) * -1);
     }
   }
 
@@ -79,31 +65,31 @@ $catalog_details-screen_md_min: $totara_style-screen_md_min !default;
   }
 
   &__content {
-    background: $catalog_details-color_neutral_1;
-    border: 1px solid $catalog_details-color_neutral_5;
-    box-shadow: $catalog_details-shadow_2;
+    background: var(--tui-catalog-details-bg-color);
+    border: 1px solid var(--tui-catalog-details-border-color);
+    box-shadow: var(--tui-shadow-3);
     display: none;
     height: 100%;
     overflow-x: hidden;
     overflow-y: scroll;
-    padding: $catalog_details-spacing_medium;
+    padding: var(--tui-gap-4);
     position: relative;
   }
 
   &__title {
     @include totara-style-heading-medium();
-    margin: $catalog_details-spacing_small 0 $catalog_details-spacing_medium;
+    margin: var(--tui-gap-2) 0 var(--tui-gap-4);
   }
 
   &__close {
     float: right;
-    font-size: 2rem;
-    margin-bottom: $catalog_details-spacing_x_small;
+    font-size: var(--tui-font-size-20);
+    margin-bottom: var(--tui-gap-1);
   }
 
   &__manageLink {
     display: inline-block;
-    margin-bottom: $catalog_details-spacing_medium;
+    margin-bottom: var(--tui-gap-4);
   }
 
   &__detail {
@@ -122,15 +108,15 @@ $catalog_details-screen_md_min: $totara_style-screen_md_min !default;
   }
 
   &__contentBlock {
-    margin-bottom: $catalog_details-spacing_medium;
+    margin-bottom: var(--tui-gap-4);
   }
 
   &__textarea_group {
     &_item {
       @include totara-style-body-x-small();
-      color: $catalog_item_narrow-color_neutral_6;
+      color: var(--tui-catalog-details-additional-text-color);
       height: 1.63em; // line height
-      margin: 0 0 $catalog_item_narrow-spacing_small;
+      margin: 0 0 var(--tui-gap-2);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -140,7 +126,7 @@ $catalog_details-screen_md_min: $totara_style-screen_md_min !default;
       }
 
       &:last-of-type {
-        margin: 0 0 $catalog_item_narrow-spacing_medium;
+        margin: 0 0 var(--tui-gap-4);
       }
     }
   }
@@ -148,16 +134,16 @@ $catalog_details-screen_md_min: $totara_style-screen_md_min !default;
   &__iconRow {
     height: 24px;
     line-height: 24px;
-    margin: $catalog_item_wide-spacing_medium 0 $catalog_item_wide-spacing_small;
+    margin: var(--tui-gap-4) 0 var(--tui-gap-2);
     overflow: hidden;
 
     > .flex-icon {
-      font-size: 1.3em;
+      font-size: var(--tui-font-size-13);
     }
 
     > .flex-icon,
     &_icon {
-      margin-right: $catalog_item_narrow-spacing_small;
+      margin-right: var(--tui-gap-2);
       max-height: 25px;
       width: 25px;
     }
@@ -172,8 +158,8 @@ $catalog_details-screen_md_min: $totara_style-screen_md_min !default;
   .tw-catalogDetails {
     display: block;
     height: 300px;
-    margin-bottom: $catalog_item_narrow-spacing_x_small;
-    margin-top: 2rem;
+    margin-bottom: var(--tui-gap-1);
+    margin-top: var(--tui-gap-5);
 
     &__arrow,
     &__content {
@@ -185,7 +171,7 @@ $catalog_details-screen_md_min: $totara_style-screen_md_min !default;
   }
 }
 
-@media (min-width: $catalog_details-screen_sm_min) {
+@media (min-width: $tui-screen-sm) {
   .tw-catalogDetails {
     &__arrow {
       z-index: 4;
@@ -194,7 +180,7 @@ $catalog_details-screen_md_min: $totara_style-screen_md_min !default;
     &__placement {
       height: inherit;
       left: 0;
-      padding: 0 $catalog_details-spacing_medium;
+      padding: 0 var(--tui-gap-4);
       position: absolute;
       top: inherit;
       width: 100%;
@@ -223,11 +209,11 @@ $catalog_details-screen_md_min: $totara_style-screen_md_min !default;
   }
 }
 
-@media (min-width: $catalog_details-screen_md_min) {
+@media (min-width: $tui-screen-md) {
   .tw-catalogDetails {
     &__detail {
       &_body {
-        padding-right: $catalog_details-spacing_large;
+        padding-right: var(--tui-gap-6);
       }
     }
   }

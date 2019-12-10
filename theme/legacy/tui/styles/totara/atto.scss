@@ -23,11 +23,11 @@
 
 .editor_atto_notification {
   &.atto_warning {
-    color: $totara_style-color_warning;
+    color: var(--tui-color-prompt-warning);
   }
 
   &.atto_info {
-    color: $totara_style-color_info;
+    color: var(--tui-color-secondary);
   }
 }
 

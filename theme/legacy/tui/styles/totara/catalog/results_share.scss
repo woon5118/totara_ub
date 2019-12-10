@@ -21,35 +21,18 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @package   theme_legacy
 
-// Colours
-$catalogResultsShare-color_neutral_1: $totara_style-color_neutral_1 !default;
-$catalogResultsShare-color_neutral_2: $totara_style-color_neutral_2 !default;
-$catalogResultsShare-color_neutral_5: $totara_style-color_neutral_5 !default;
-$catalogResultsShare-color_neutral_7: $totara_style-color_neutral_7 !default;
-$catalogResultsShare-color_theme_1: $totara_style-color_theme_1 !default;
-// Shadows
-$catalogResultsShare-shadow_1: $totara_style-shadow_1 !default;
-// Spacing
-$catalogResultsShare-spacing_x_small: $totara_style-spacing_x_small !default;
-$catalogResultsShare-spacing_small: $totara_style-spacing_small !default;
-$catalogResultsShare-spacing_medium: $totara_style-spacing_medium !default;
-// Font Size
-$catalogResultsShare-btn_font_size: $totara_style-font_heading_label_small_size !default;
 // Breakpoint
 $catalogResultsShare-screen_xsm_min: 500px !default;
-$catalogResultsShare-screen_sm_min: $totara_style-screen_sm_min !default;
 
 .tw-catalogResultsShare {
   margin: auto 0 auto auto;
   position: relative;
 
   &__btn {
-    border: 1px solid $catalogResultsShare-color_neutral_5;
-    border-radius: 3px;
-    color: $catalogResultsShare-color_theme_1;
-    font-size: $catalogResultsShare-btn_font_size;
-    padding: $catalogResultsShare-spacing_small;
-    transition: background-color 0.2s ease;
+    border: 1px solid;
+    @include bs-btn-default();
+    font-size: var(--tui-font-size-13);
+    padding: var(--tui-gap-2);
     white-space: nowrap;
 
     .flex-icon {
@@ -60,8 +43,6 @@ $catalogResultsShare-screen_sm_min: $totara_style-screen_sm_min !default;
     &:active,
     &:focus,
     &:hover {
-      background: $catalogResultsShare-color_neutral_2;
-      color: $catalogResultsShare-color_neutral_7;
       outline: 0;
       text-decoration: none;
     }
@@ -87,24 +68,25 @@ $catalogResultsShare-screen_sm_min: $totara_style-screen_sm_min !default;
     }
 
     &::before {
-      border-top-color: $catalog_details-color_neutral_5;
-      border-width: 1.7rem;
-      margin-left: -1.7rem;
+      border-top-color: var(--tui-catalog-share-border-color);
+      border-width: calc(var(--tui-gap-4) + 0.1rem);
+      margin-left: calc((var(--tui-gap-4) + 0.1rem) * -1);
     }
 
     &::after {
-      border-top-color: $catalog_details-color_neutral_1;
-      border-width: $catalog_details-spacing_medium;
-      margin-left: -$catalog_details-spacing_medium;
+      border-top-color: var(--tui-catalog-share-bg-color);
+      border-width: var(--tui-gap-4);
+      margin-left: calc(var(--tui-gap-4) * -1);
     }
   }
 
   &__expanded {
-    background: $catalogResultsShare-color_neutral_1;
+    background: var(--tui-catalog-share-bg-color);
     bottom: 4.5rem;
-    box-shadow: $catalogResultsShare-shadow_1;
+    border: 1px solid var(--tui-catalog-share-border-color);
+    box-shadow: var(--tui-shadow-2);
     display: none;
-    padding: $catalogResultsShare-spacing_medium;
+    padding: var(--tui-gap-4);
     position: absolute;
     right: 0;
     width: 300px;
@@ -116,30 +98,25 @@ $catalogResultsShare-screen_sm_min: $totara_style-screen_sm_min !default;
     }
 
     &_btn {
-      background: $catalogResultsShare-color_theme_1;
-      border: 1px solid $catalogResultsShare-color_neutral_5;
-      border-radius: 3px;
-      color: $catalogResultsShare-color_neutral_1;
+      border: 1px solid;
+      @extend .btn;
+      @include bs-btn-primary();
       display: inline-block;
       font-weight: bold;
-      padding: $catalogResultsShare-spacing_small
-        $catalogResultsShare-spacing_medium;
+      padding: var(--tui-gap-2) var(--tui-gap-4);
       text-align: center;
-      transition: background-color 0.2s ease;
       width: 100%;
 
       &:active,
       &:focus,
       &:hover {
-        background: darken($catalogResultsShare-color_theme_1, 5%);
-        color: $catalogResultsShare-color_neutral_1;
         text-decoration: none;
       }
     }
 
     &_close {
       float: right;
-      padding: $catalogResultsShare-spacing_small;
+      padding: var(--tui-gap-2);
       position: absolute;
       right: 0;
       top: 0;
@@ -150,7 +127,7 @@ $catalogResultsShare-screen_sm_min: $totara_style-screen_sm_min !default;
     }
 
     &_input {
-      margin: $catalogResultsShare-spacing_x_small 0;
+      margin: var(--tui-gap-1) 0;
       width: 100%;
     }
   }
@@ -164,7 +141,7 @@ $catalogResultsShare-screen_sm_min: $totara_style-screen_sm_min !default;
 /*!rtl:begin:ignore*/
 @media (min-width: $catalogResultsShare-screen_xsm_min) {
   .tw-catalogResultsShare {
-    margin-right: $totara_style-spacing_x_small;
+    margin-right: var(--tui-gap-1);
 
     &__expanded {
       margin-left: 50%;
@@ -175,7 +152,7 @@ $catalogResultsShare-screen_sm_min: $totara_style-screen_sm_min !default;
 }
 /*!rtl:end:ignore*/
 
-@media (min-width: $catalogResultsShare-screen_sm_min) {
+@media (min-width: $tui-screen-sm) {
   .tw-catalogResultsShare {
     margin: auto 0;
   }

@@ -466,20 +466,20 @@ input[type='checkbox'] {
     padding: 0.2em;
     margin: 0;
     cursor: pointer;
-    color: $text-color;
+    color: var(--tui-color-text);
   }
   li:hover {
-    background-color: lighten($dropdown-link-active-bg, 15%);
+    background-color: $dropdown-link-active-bg;
     color: $dropdown-link-active-color;
   }
   li[aria-selected='true'] {
-    background-color: darken($navbar-default-bg, 5%);
+    background-color: var(--tui-color-neutral-2);
     color: $gray;
   }
 }
 
 .form-autocomplete-downarrow {
-  color: $text-color;
+  color: var(--tui-color-text);
   position: relative;
   left: -1.5em;
   cursor: pointer;
@@ -769,7 +769,7 @@ textarea#id_approval_termsandconds {
       position: inherit;
 
       &[readonly] {
-        background-color: $totara_form-disabled-bg;
+        background-color: var(--tui-form-input-bg-color-disabled);
         opacity: 1; // iOS fix for unreadable disabled content; see https://github.com/twbs/bootstrap/issues/11655
       }
     }

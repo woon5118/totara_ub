@@ -21,18 +21,10 @@
 // @author    Matthias Bonk <matthias.bonk@totaralearning.com>
 // @package   theme_legacy
 
-// Size
-$catalog_multiple_select-spacing_small: $totara_style-spacing_small !default;
-$catalog_multiple_select-spacing_x_small: $totara_style-spacing_x_small !default;
-// Colours
-$catalog_multiple_select-color_neutral_4: $totara_style-color_neutral_4 !default;
-// Breakpoint
-$catalog_multiple_select-screen_md_min: $totara_style-screen_md_min !default;
-
 .totara_catalog-multiple_select {
   legend {
     border: none;
-    font-size: 14px;
+    font-size: var(--tui-font-size-14);
     font-weight: bold;
     margin: 0;
   }
@@ -46,10 +38,8 @@ $catalog_multiple_select-screen_md_min: $totara_style-screen_md_min !default;
   }
 
   li {
-    border-bottom: 1px solid $catalog_multiple_select-color_neutral_4;
-    padding: $catalog_multiple_select-spacing_small 0
-      $catalog_multiple_select-spacing_small
-      $catalog_multiple_select-spacing_x_small;
+    border-bottom: 1px solid var(--tui-color-neutral-5);
+    padding: var(--tui-gap-2) 0 var(--tui-gap-2) var(--tui-gap-1);
 
     &:first-child {
       padding-top: 0;
@@ -68,7 +58,7 @@ $catalog_multiple_select-screen_md_min: $totara_style-screen_md_min !default;
   }
 }
 
-@media (min-width: $catalog_multiple_select-screen_md_min) {
+@media (min-width: $tui-screen-md) {
   .totara_catalog-multiple_select {
     legend {
       float: left;
@@ -83,7 +73,7 @@ $catalog_multiple_select-screen_md_min: $totara_style-screen_md_min !default;
     &__addicon {
       clear: left;
       float: left;
-      margin: $catalog_multiple_select-spacing_small 0 0 25%;
+      margin: var(--tui-gap-2) 0 0 25%;
 
       .totara_catalog-multiple_select__noitems & {
         clear: none;

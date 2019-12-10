@@ -18,21 +18,34 @@
 //
 // @copyright 2019 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-// @author    Kevin Hottinger <kevin.hottinger$totaralearning.com>
+// @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @package   theme_legacy
 
 .totaraNav--list_item_expanded {
+  > .navExpand--list_item_link {
+    background: var(--tui-nav-tab-expand-bg-color-selected);
+
+    &:focus {
+      background: var(--tui-nav-tab-expand-bg-color-selected);
+    }
+
+    &:focus:hover,
+    &:hover {
+      background: var(--tui-nav-tab-expand-bg-color-focus);
+    }
+  }
+
   > .navExpand--list {
     display: block;
   }
 }
 
 .navExpand--list {
-  background: $totaranav_prim-color_background;
-  display: none;
-  margin: 0;
-  min-width: 200px;
   z-index: 3;
+  display: none;
+  min-width: 200px;
+  margin: 0;
+  background: var(--tui-nav-tab-expand-bg-color);
 
   &_item_label {
     display: inline-block;
@@ -41,72 +54,68 @@
   }
 
   &_item_link {
-    color: $totaranav_prim-color_font;
     display: flex;
-    padding: $totaranav-spacing_small $totaranav-spacing_medium
-      $totaranav-spacing_small $totaranav-spacing_x_large;
+    padding: var(--tui-gap-2) var(--tui-gap-4) var(--tui-gap-2) var(--tui-gap-8);
+    color: var(--tui-nav-tab-expand-text-color);
 
     &:focus,
     &:hover {
-      background: $totaranav_prim-color_background_active;
-      color: $totaranav_prim-color_font;
+      color: var(--tui-nav-tab-expand-text-color-focus);
       text-decoration: none;
+      background: var(--tui-nav-tab-expand-bg-color-focus);
     }
   }
 }
 
+// Nest third layer of items on mobile
 .navExpand--listThird {
   .navExpand--list_item_link {
-    padding-left: $totaranav-spacing_xxx_large;
+    padding-left: var(--tui-gap-12);
   }
 }
 
-@media (min-width: $totaranav-screen_md_min) {
-  .totaraNav--list_item_expanded {
-    > a.totaraNav_prim--list_item_link {
-      background: $totaranav_prim-color_background_expanded;
-    }
-  }
-
+@media (min-width: $tui-screen-md) {
   .navExpand--listSecond {
-    box-shadow: 0 3px 6px 0 $totaranav_prim-color_background_expanded;
     position: absolute;
+    border: var(--tui-border-width-thin) solid var(--tui-nav-tab-expand-border-color);
+    box-shadow: var(--tui-shadow-2);
 
-    &::before {
-      border-top: 1px solid $totaranav_prim-color_font;
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
+    .navExpand--list_item {
+      // Display sub tab top borders on desktop only
+      &_link {
+        padding: var(--tui-gap-2) var(--tui-gap-4);
+        border-top: var(--tui-border-width-thin) solid var(--tui-nav-tab-expand-border-color);
+      }
     }
 
-    .navExpand--list_item_link {
-      padding: $totaranav-spacing_small $totaranav-spacing_medium;
+    // Prevent double border on first item
+    > .navExpand--list_item:first-child {
+      .navExpand--list_item_link {
+        border-top-color: transparent;
+      }
     }
   }
 
+  // Nest third layer of items on desktop
   .navExpand--listThird {
     .navExpand--list_item_link {
-      padding-left: $totaranav-spacing_xx_large;
+      padding-left: var(--tui-gap-10);
     }
   }
 
   // Sub expanded navigation colours
   .totaraNav_sub {
     .navExpand--list {
-      background: $totaranav_sub-color_background;
+      background: var(--tui-nav-tab-expand-bg-color);
 
       &_item_label {
         padding-left: 0;
       }
 
       &_item_link {
-        color: $totaranav_sub-color_font;
-
         &:focus,
         &:hover {
-          background: $totaranav_sub-color_background_active;
+          background: var(--tui-nav-tab-expand-bg-color-focus);
         }
       }
     }

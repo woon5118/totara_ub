@@ -27,7 +27,7 @@
 
 .popover {
   box-shadow: 0 6px 6px 0 rgba(0, 0, 0, 0.2), 0 10px 20px 0 rgba(0, 0, 0, 0.2);
-  color: $text-color;
+  color: var(--tui-color-text);
 }
 
 /*!rtl:begin:ignore*/

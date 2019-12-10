@@ -108,14 +108,14 @@ div.totara-dialog td.select #browse-tab {
 
 #icon-selectable .ui-selected,
 #icon-selectable .ui-selecting {
-  background: #fff;
-  border: 2px solid #087bb1;
+  background: var(--tui-color-neutral-1);
+  border: 2px solid var(--tui-color-state-active);
   padding: 0;
 }
 
 #icon-selectable li {
-  border: 1px solid #ddd;
-  background: #fff;
+  border: 1px solid var(--tui-color-state);
+  background: var(--tui-color-neutral-1);
   margin: 3px;
   padding: 1px;
   float: left;
@@ -188,9 +188,9 @@ div.totara-dialog td.select #browse-tab {
   li.ui-state-active,
   li.ui-state-default {
     a {
-      border-top: 1px solid $nav-tabs-border-color;
-      border-left: 1px solid $nav-tabs-border-color;
-      border-right: 1px solid $nav-tabs-border-color;
+      border-top: 1px solid var(--tui-tabs-border-color);
+      border-left: 1px solid var(--tui-tabs-border-color);
+      border-right: 1px solid var(--tui-tabs-border-color);
       border-bottom: none;
       border-top-left-radius: $border-radius-base;
       border-top-right-radius: $border-radius-base;
@@ -198,16 +198,16 @@ div.totara-dialog td.select #browse-tab {
   }
   li.ui-state-default {
     a {
-      border-bottom: 1px solid $nav-tabs-border-color;
+      border-bottom: 1px solid var(--tui-tabs-border-color);
     }
   }
   li.ui-tabs-active,
   li.ui-state-active a {
-    background-color: $nav-tabs-background-color;
-    border-top: 1px solid $nav-tabs-border-active;
+    background-color: var(--tui-color-neutral-1);
+    border-top: 1px solid var(--tui-color-primary);
     border-top-right-radius: $border-radius-base;
     border-top-left-radius: $border-radius-base;
     border-bottom: none;
-    box-shadow: 0 -1px $nav-tabs-border-active;
+    box-shadow: 0 -1px var(--tui-color-primary);
   }
 }

@@ -23,9 +23,9 @@
 
 // List item
 .tf_wizard_progress_bar_item {
-  background: $wizard-bar-background;
-  border-bottom: 1px solid $wizard-bar-border-color;
-  border-top: 1px solid $wizard-bar-border-color;
+  background: $wizardBar-item-bg-color;
+  border-bottom: 1px solid $wizardBar-item-border-color;
+  border-top: 1px solid $wizardBar-item-border-color;
   display: inline-block;
   margin-bottom: 5px;
   position: relative;
@@ -33,35 +33,35 @@
 
   // First list item
   &:first-child {
-    border-left: 1px solid $wizard-bar-border-color;
+    border-left: 1px solid $wizardBar-item-border-color;
 
     .tf_wizard_progress_bar_item_link {
-      padding-left: $wizard-bar-item-firstlink-padding-lft;
+      padding-left: $wizardBar-item-firstlink-padding-lft;
     }
   }
 
   // Last list item
   &:last-child {
-    border-right: 1px solid $wizard-bar-border-color;
+    border-right: 1px solid $wizardBar-item-border-color;
 
     .tf_wizard_progress_bar_item_link {
-      padding-right: $wizard-bar-item-lastlink-padding-rgt;
+      padding-right: $wizardBar-item-lastlink-padding-rgt;
     }
   }
 }
 
 // List item links
 .tf_wizard_progress_bar_item_link {
-  color: $wizard-bar-font-color;
+  color: $wizardBar-item-text-color;
   display: block;
-  padding: $wizard-bar-item-link-padding-top $wizard-bar-item-link-padding-rgt
-    $wizard-bar-item-link-padding-btm $wizard-bar-item-link-padding-lft;
+  padding: $wizardBar-item-link-padding-top $wizardBar-item-link-padding-rgt
+    $wizardBar-item-link-padding-btm $wizardBar-item-link-padding-lft;
   position: relative;
 
   &:hover,
   &:focus,
   &:active {
-    color: $wizard-bar-font-color;
+    color: $wizardBar-item-text-color;
     text-decoration: none;
   }
 }

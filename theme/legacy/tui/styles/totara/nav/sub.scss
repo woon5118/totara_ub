@@ -18,12 +18,13 @@
 //
 // @copyright 2019 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-// @author    Kevin Hottinger <kevin.hottinger$totaralearning.com>
+// @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @package   theme_legacy
 
 .totaraNav_sub {
-  background: $totaranav_sub-color_background;
   display: none;
+  background: var(--tui-nav-sub-bg-color);
+  border-top: var(--tui-border-width-thin) solid var(--tui-nav-sub-border-color);
 
   &--list {
     margin: 0;
@@ -31,21 +32,29 @@
     &_item {
       display: inline-block;
 
+      &_label {
+        font-size: var(--tui-font-size-16);
+      }
+
       &_link {
-        color: $totaranav_sub-color_font;
         display: flex;
-        padding: $totaranav-spacing_x_small $totaranav-spacing_medium;
+        padding: var(--tui-gap-2) var(--tui-gap-4);
+        color: var(--tui-nav-sub-tab-text-color);
+        background: var(--tui-nav-sub-tab-bg-color);
+        border: var(--tui-border-width-thick) solid var(--tui-nav-sub-tab-border-color);
 
         &:focus,
         &:hover {
-          background: $totaranav_sub-color_background_active;
+          color: var(--tui-nav-sub-tab-text-color-focus);
           text-decoration: none;
+          background: var(--tui-nav-sub-tab-bg-color-focus);
+          border-color: var(--tui-nav-sub-tab-border-color-focus);
         }
       }
 
       &_externalLink &_link,
       &_hasChildren &_link {
-        padding-right: $totaranav-spacing_small;
+        padding-right: var(--tui-gap-2);
       }
 
       &_hasChildren &_link {
@@ -55,26 +64,34 @@
       }
 
       &_selected &_link {
-        background: $totaranav_sub-color_background_selected;
+        font-weight: bold;
+        background: var(--tui-nav-sub-tab-bg-color-selected);
+        border-color: var(--tui-nav-sub-tab-border-color-selected);
+
+        &:focus,
+        &:hover {
+          background: var(--tui-nav-sub-tab-bg-color-selected);
+          border-color: var(--tui-nav-sub-tab-border-color-selected);
+        }
       }
     }
   }
 
   .totaraNav--expand_indent {
     display: none;
-    min-width: 1.2em;
     order: 2;
+    min-width: 1.2em;
     text-align: right;
   }
 
   .totaraNav--list_item_expanded {
     > a {
-      background: $totaranav_sub-color_background_active;
+      background: var(--tui-nav-sub-tab-expand-bg-color-selected);
     }
   }
 }
 
-@media (min-width: $totaranav-screen_md_min) {
+@media (min-width: $tui-screen-md) {
   .totaraNav_sub {
     display: block;
   }

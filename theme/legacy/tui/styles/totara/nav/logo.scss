@@ -18,7 +18,7 @@
 //
 // @copyright 2019 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-// @author    Kevin Hottinger <kevin.hottinger$totaralearning.com>
+// @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @package   theme_legacy
 
 .totaraNav_prim .masthead_logo {
@@ -28,8 +28,8 @@
   vertical-align: top;
 
   &--header {
-    font-size: $totaranav-font_size;
-    margin: $totaranav-spacing_small;
+    margin: var(--tui-gap-2);
+    font-size: var(--tui-font-size-14);
 
     &_img {
       height: 1.5em;
@@ -37,22 +37,26 @@
   }
 }
 
-@media (min-width: $totaranav-screen_sm_min) {
+@media (min-width: $tui-screen-sm) {
   .totaraNav_prim .masthead_logo {
     flex-basis: auto;
     flex-grow: 0;
     height: 100%;
 
     &--header {
-      margin: 0 $totaranav-spacing_small;
+      margin: 0 var(--tui-gap-2);
+
+      &_img {
+        height: 2.8rem;
+      }
     }
   }
 }
 
-@media (min-width: $totaranav-screen_md_min) {
+@media (min-width: $tui-screen-md) {
   .totaraNav_prim .masthead_logo {
     &--header {
-      margin: 0 $totaranav-spacing_medium;
+      margin: 0 var(--tui-gap-4) 0 0;
     }
   }
 }
@@ -61,6 +65,6 @@
 .ie11 {
   .masthead_logo--header_link {
     display: block;
-    height: 1.5rem;
+    height: 2.8rem;
   }
 }

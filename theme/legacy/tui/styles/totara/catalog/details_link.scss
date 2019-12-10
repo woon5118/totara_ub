@@ -21,24 +21,13 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @package   theme_legacy
 
-// Size
-$catalogDetailsLink-spacing_medium: $totara_style-spacing_medium !default;
-$catalogDetailsLink-spacing_small: $totara_style-spacing_small !default;
-// Colours
-$catalogDetailsLink-color_neutral_1: $totara_style-color_neutral_1 !default;
-$catalogDetailsLink-color_neutral_2: $totara_style-color_neutral_2 !default;
-$catalogDetailsLink-color_neutral_4: $totara_style-color_neutral_4 !default;
-$catalogDetailsLink-color_theme_1: $totara_style-color_theme_1 !default;
-// Break points
-$catalogDetailsLink-screen_sm_min: $totara_style-screen_sm_min !default;
-
 .tw-catalogDetailsLink {
-  background: $catalogDetailsLink-color_neutral_2;
-  border: 1px solid $catalogDetailsLink-color_neutral_4;
+  background: var(--tui-catalog-details-goto-bg-color);
+  border: 1px solid var(--tui-catalog-details-goto-border-color);
   border-radius: 5px;
   clear: both;
-  margin-bottom: 2.8rem;
-  padding: $catalogDetailsLink-spacing_medium;
+  margin-bottom: var(--tui-gap-7);
+  padding: var(--tui-gap-4);
   width: 100%;
 
   &__option {
@@ -59,30 +48,25 @@ $catalogDetailsLink-screen_sm_min: $totara_style-screen_sm_min !default;
     }
 
     &_btn {
-      background: $catalogDetailsLink-color_theme_1;
+      @include bs-btn-primary();
       border-radius: 3px;
-      color: $catalogDetailsLink-color_neutral_1;
       display: inline-block;
       font-weight: bold;
-      margin-top: $catalogDetailsLink-spacing_small;
-      padding: $catalogDetailsLink-spacing_small
-        $catalogDetailsLink-spacing_medium;
+      margin-top: var(--tui-gap-2);
+      padding: var(--tui-gap-2) var(--tui-gap-4);
       text-align: center;
-      transition: background-color 0.2s ease;
       width: 100%;
 
       &:active,
       &:focus,
       &:hover {
-        background: darken($catalogDetailsLink-color_theme_1, 5%);
-        color: $catalogDetailsLink-color_neutral_1;
         text-decoration: none;
       }
     }
   }
 }
 
-@media (min-width: $catalogDetailsLink-screen_sm_min) {
+@media (min-width: $tui-screen-sm) {
   .tw-catalogDetailsLink {
     &__option {
       &_btn {

@@ -43,6 +43,7 @@ defined('MOODLE_INTERNAL') || die();
             </div>
         </div>
         <div class="row">
+            <div class="tool_usertours-resettourcontainer"><?php // Reset user tour container ?></div>
             <?php echo $OUTPUT->standard_footer_html(); ?>
         </div>
     </div>

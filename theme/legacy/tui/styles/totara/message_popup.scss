@@ -22,13 +22,13 @@
 
 /** The message area **/
 @mixin setSelectedContact() {
-  background-color: #4f94cd;
-  color: #fff;
+  background-color: var(--tui-color-neutral-4);
+  color: var(--tui-color-state-active);
   border: none;
 
   .information {
     .lastmessage {
-      color: #fff;
+      color: var(--tui-color-state-active);
     }
   }
   .picture {
@@ -42,11 +42,11 @@
   .status {
     .online-text {
       display: none;
-      color: #7d7;
+      color: var(--tui-color-prompt-success);
     }
 
     .offline-text {
-      color: #ff6961;
+      color: var(--tui-color-prompt-alert);
     }
 
     &.online {
@@ -59,13 +59,8 @@
     }
   }
 
-  a,
-  .btn.btn-link {
-    color: #4f94cd;
-  }
-
   .messaging-area {
-    border: 1px solid #e3e3e3;
+    border: 1px solid var(--tui-color-neutral-5);
     clear: both;
     border-radius: 4px;
 
@@ -81,7 +76,7 @@
     }
 
     .contacts-area {
-      border-right: 1px solid #e3e3e3;
+      border-right: 1px solid var(--tui-color-neutral-5);
       height: 600px;
       @media (max-height: 670px) {
         height: 500px;
@@ -97,7 +92,7 @@
         text-align: center;
         box-sizing: border-box;
         line-height: 50px;
-        background-color: #fff;
+        background-color: var(--tui-color-neutral-1);
         transition: background-color linear 0.2s;
 
         input {
@@ -106,7 +101,7 @@
           margin-bottom: 10px;
           vertical-align: middle;
           padding: 4px 6px;
-          background-color: #f5f5f5;
+          background-color: var(--tui-color-neutral-3);
           border: 0;
           width: 90%;
           box-shadow: none;
@@ -118,11 +113,11 @@
         }
 
         &.searching {
-          background-color: #f5f5f5;
+          background-color:var(--tui-color-neutral-3);
           transition: background-color linear 0.2s;
 
           input {
-            background-color: #fff;
+            background-color: var(--tui-color-neutral-1);
             transition: background-color linear 0.2s;
           }
         }
@@ -154,8 +149,7 @@
           text-align: center;
 
           &:hover {
-            background-color: #4f94cd;
-            color: #fff;
+            color: var(--tui-color-neutral-1);
             border: none;
             cursor: pointer;
           }
@@ -180,14 +174,14 @@
         .contact {
           height: 66px;
           cursor: pointer;
-          border-bottom: 1px solid #e3e3e3;
+          border-bottom: 1px solid var(--tui-color-neutral-5);
           box-sizing: border-box;
 
           &.unread {
-            background-color: #f1f1f1;
+            background-color: var(--tui-color-neutral-5);
 
             .picture {
-              border-color: #f1f1f1;
+              border-color: var(--tui-color-neutral-5);
             }
 
             .information {
@@ -203,7 +197,8 @@
 
           &:hover {
             @include setSelectedContact();
-            background-color: #79b5e6;
+            color: var(--tui-color-state-hover);
+            background-color: var(--tui-color-state-highlight);
           }
 
           &.selected {
@@ -214,7 +209,7 @@
             line-height: 66px;
             text-align: center;
             height: 66px;
-            border-bottom: 1px solid #fff;
+            border-bottom: 1px solid var(--tui-color-neutral-1);
             width: 25%;
             float: left;
             display: inline-block;
@@ -250,7 +245,7 @@
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
-              color: #a1a1a1;
+              color: var( --tui-color-neutral-6);
               padding-right: 10px;
             }
           }
@@ -264,26 +259,23 @@
         }
       }
 
-      @mixin setSelectedTab() {
-        color: #4f94cd;
-      }
-
       .tabs {
-        border-top: 1px solid #e3e3e3;
+        border-top: 1px solid var(--tui-color-neutral-5);
         height: 50px;
         box-sizing: border-box;
 
         .tab {
           cursor: pointer;
           height: 100%;
-          background-color: #f5f5f5;
+          background-color: var(--tui-color-neutral-3);
+          color: var(--tui-color-state);
           margin: 0;
           width: 50%;
           text-align: center;
           float: left;
 
           &:hover {
-            @include setSelectedTab();
+            color: var(--tui-color-state-hover);
           }
 
           .tabimage {
@@ -297,7 +289,7 @@
         }
 
         .tab.selected {
-          @include setSelectedTab();
+          color: var(--tui-color-state-active);
         }
       }
     }
@@ -406,13 +398,13 @@
           padding-top: 80px;
 
           .separator {
-            border-bottom: 1px solid #e3e3e3;
+            border-bottom: 1px solid var(--tui-color-neutral-5);
             margin-bottom: 20px;
             padding-bottom: 5px;
 
             a {
               &.danger {
-                color: #ff6961;
+                color: var(--tui-color-prompt-alert);
               }
             }
           }
@@ -424,7 +416,7 @@
         font-weight: bold;
         line-height: 50px;
         box-sizing: border-box;
-        border-bottom: 1px solid #e3e3e3;
+        border-bottom: 1px solid var(--tui-color-neutral-5);
         text-align: center;
         position: relative;
 
@@ -479,7 +471,7 @@
         .blocktime {
           clear: both;
           text-align: center;
-          color: #a1a1a1;
+          color: var(--tui-color-neutral-6);
           font-size: 12px;
           margin: 5px 0;
         }
@@ -492,7 +484,7 @@
           }
 
           .content {
-            border: 1px solid #e3e3e3;
+            border: 1px solid var(--tui-color-neutral-5);
             padding: 10px;
             margin-bottom: 5px;
             font-size: 12px;
@@ -511,7 +503,7 @@
 
             .timesent {
               font-size: 10px;
-              color: #a1a1a1;
+              color: var(--tui-color-neutral-6);
               float: right;
             }
           }
@@ -536,22 +528,21 @@
         width: 100%;
         line-height: 28px;
         text-align: center;
-        border-top: 1px solid #e3e3e3;
+        border-top: 1px solid var(--tui-color-neutral-5);
         box-sizing: border-box;
-        background-color: #fff;
+        background-color: var(--tui-color-neutral-1);
         transition: background-color linear 0.2s;
 
         .delete-confirmation {
           display: none;
 
           .btn.btn-link.confirm {
-            border: 1px solid #4f94cd;
+            border: 1px solid;
             border-radius: 4px;
+            @include bs-btn-default();
 
             &:hover {
-              background-color: #4f94cd;
-              color: #fff;
-              text-shadow: none;
+              text-decoration: none;
             }
           }
         }
@@ -570,7 +561,7 @@
               border: none;
               box-shadow: none;
               box-sizing: border-box;
-              background-color: #f5f5f5;
+              background-color: var(--tui-color-neutral-3);
               transition: background-color linear 0.2s;
 
               &:focus {
@@ -586,13 +577,13 @@
         }
 
         &.messaging {
-          background-color: #f5f5f5;
+          background-color: var(--tui-color-neutral-3);
           transition: background-color linear 0.2s;
 
           .message-box {
             .message-text-container {
               textarea {
-                background-color: #fff;
+                background-color: var(--tui-color-neutral-1);
                 transition: background-color linear 0.2s;
               }
             }
@@ -637,12 +628,12 @@
 
             &[aria-checked='true'] {
               .content {
-                background-color: #4f94cd;
-                border-color: #4f94cd;
-                color: #fff;
+                background-color: var(--tui-color-state-active);
+                border-color: var(--tui-color-state-active);
+                color: var(--tui-color-neutral-1);
 
                 .timesent {
-                  color: #fff;
+                  color: var(--tui-color-neutral-1);
                 }
               }
             }
@@ -650,11 +641,11 @@
             &[aria-checked='false'] {
               .content {
                 &:hover {
-                  background-color: #79b5e6;
-                  color: #fff;
+                  background-color: var(--tui-color-state-hover);
+                  color: var(--tui-color-neutral-1);
 
                   .timesent {
-                    color: #fff;
+                    color: var(--tui-color-neutral-1);
                   }
                 }
               }
@@ -688,7 +679,7 @@
     vertical-align: bottom;
   }
   .preference-table {
-    border: 1px solid #ddd;
+    border: 1px solid var(--tui-color-neutral-5);
 
     thead {
       th {
@@ -712,11 +703,11 @@
           text-align: center;
         }
         &:nth-child(even) {
-          background-color: #f7f7f7;
+          background-color: var(--tui-color-neutral-2);
         }
       }
       th:nth-child(even) {
-        background-color: #f7f7f7;
+        background-color: var(--tui-color-neutral-2);
       }
     }
     .preference-row {
@@ -739,7 +730,7 @@
         vertical-align: middle;
 
         input[type='checkbox']:checked + .preference-state-status-container {
-          background-color: #5cb85c;
+          background-color: var(--tui-color-prompt-success);
 
           .on-text {
             display: inline-block;
@@ -754,8 +745,8 @@
           line-height: 30px;
           text-align: center;
           border-radius: 4px;
-          background-color: #d9534f;
-          color: #fff;
+          background-color: var(--tui-color-prompt-error);
+          color: var(--tui-color-neutral-1);
           cursor: pointer;
 
           .loading-icon {
@@ -881,7 +872,7 @@
   box-sizing: border-box;
   border-radius: 4px;
   margin-bottom: 30px;
-  border: 1px solid #e3e3e3;
+  border: 1px solid var(--tui-color-neutral-5);
 
   .control-area {
     box-sizing: border-box;
@@ -890,7 +881,7 @@
     height: 100%;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
-    border-right: 1px solid #e3e3e3;
+    border-right: 1px solid var(--tui-color-neutral-5);
 
     .content {
       position: relative;
@@ -941,7 +932,7 @@
     .header {
       height: 50px;
       box-sizing: border-box;
-      border-bottom: 1px solid #e3e3e3;
+      border-bottom: 1px solid var(--tui-color-neutral-5);
       padding: 5px;
 
       .image-container {
@@ -966,7 +957,7 @@
         font-size: 10px;
         line-height: 10px;
         margin: 0;
-        color: #666;
+        color: var(--tui-color-neutral-6);
         margin-left: 30px;
       }
 
@@ -1108,20 +1099,21 @@
             &.selected {
               background-color: inherit;
               color: inherit;
-              border-bottom: 1px solid #e3e3e3;
+              border-bottom: 1px solid var(--tui-color-neutral-5);
 
               &:hover {
                 @include setSelectedContact();
-                background-color: #79b5e6;
+                color: var(--tui-color-state-hover);
+                background-color: var(--tui-color-state-highlight);
               }
 
               .picture {
-                border-bottom: 1px solid #fff;
+                border-bottom: 1px solid var(--tui-color-neutral-1);
               }
 
               .information {
                 .lastmessage {
-                  color: #a1a1a1;
+                  color: var(--tui-color-neutral-6);
                 }
               }
             }
@@ -1169,8 +1161,8 @@
         height: 50px;
         line-height: 50px;
         box-sizing: border-box;
-        border-right: 1px solid #e3e3e3;
-        border-bottom: 1px solid #e3e3e3;
+        border-right: 1px solid var(--tui-color-neutral-5);
+        border-bottom: 1px solid var(--tui-color-neutral-5);
       }
 
       .header {

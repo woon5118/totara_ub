@@ -7,3 +7,14 @@ This file describes API changes for 'theme_legacy'.
 * Updated tool_usertours/tourstep template
 * Upgraded Bootstrap to 3.4.1
 * Deprecated CSS file totara-menu was dropped
+
+=== BTNS ===
+=== Buttons have been switched over to new mixins to help with consistency between legacy & ventura
+* Switched the buttons in the following files from using local colour variables to common global colours
+* /totara/login.scss Login page button
+* /totaracatalog/details_link
+* /totaracatalog/manage_btns
+* /totara/catalog/results_share.scss
+* /totara/add_block_popover_content.scss
+
+* course.scss pagination yui button colours switched

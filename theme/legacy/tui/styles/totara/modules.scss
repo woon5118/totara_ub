@@ -192,12 +192,12 @@ select {
 
 .breadcrumb-button .singlebutton {
   float: left;
-  margin-left: $totara_style-spacing_x_small;
+  margin-left: var(--tui-gap-1);
 }
 
 .breadcrumb-button .singleselect {
   float: left;
-  margin-left: $totara_style-spacing_x_small;
+  margin-left: var(--tui-gap-1);
 
   .addtomenu option:last-child {
     font-style: italic;
@@ -261,7 +261,7 @@ div#dock {
   }
 
   .mod_choice__remove-choice-link {
-    padding-left: $totara_style-spacing_medium;
+    padding-left: var(--tui-gap-4);
   }
 }
 
@@ -364,7 +364,7 @@ div#dock {
   background-color: green;
   text-align: right;
   vertical-align: middle;
-  color: #fff;
+  color: var(--tui-color-neutral-1);
 }
 
 .path-mod-lesson .resourcecontent {
@@ -406,7 +406,7 @@ div#dock {
 }
 
 .mod_lesson__student-response {
-  margin-bottom: $totara_style-spacing_medium;
+  margin-bottom: var(--tui-gap-4);
 }
 
 // Wiki

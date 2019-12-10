@@ -22,25 +22,12 @@
 // @package   theme_legacy
 
 // Variables
-// Colours
-$catalog-color_neutral_2: $totara_style-color_neutral_2 !default;
-$catalog-color_neutral_4: $totara_style-color_neutral_4 !default;
-$catalog-color_neutral_8: $totara_style-color_neutral_8 !default;
-// Size
-$catalog-spacing_large: $totara_style-spacing_large !default;
-$catalog-spacing_medium: $totara_style-spacing_medium !default;
-$catalog-spacing_small: $totara_style-spacing_small !default;
-$catalog-spacing_x_small: $totara_style-spacing_x_small !default;
-// Font Size
-$catalog-primaryFilter-size: $totara_style-size_18 !default;
 // Breakpoint
 $catalog-screen_xsm_min: 500px !default;
-$catalog-screen_sm_min: $totara_style-screen_sm_min !default;
-$catalog-screen_xl_min: $totara_style-screen_xl_min !default;
 
 #region-main div[role='main'] h2.tw-catalog__title {
   float: left;
-  margin-top: 0.4rem;
+  margin-top: var(--tui-gap-1);
 }
 
 .tw-catalog {
@@ -55,11 +42,11 @@ $catalog-screen_xl_min: $totara_style-screen_xl_min !default;
   }
 
   &__primaryFilter {
-    border-bottom: 1px solid $catalog-color_neutral_4;
-    border-top: 1px solid $catalog-color_neutral_4;
-    font-size: $catalog-primaryFilter-size;
-    margin: $catalog-spacing_medium 0;
-    padding: $catalog-spacing_medium 0;
+    border-bottom: 1px solid var(--tui-catalog-primfilter-border-color);
+    border-top: 1px solid var(--tui-catalog-primfilter-border-color);
+    font-size: var(--tui-font-size-18);
+    margin: var(--tui-gap-4) 0;
+    padding: var(--tui-gap-4) 0;
   }
 
   &__results {
@@ -72,12 +59,12 @@ $catalog-screen_xl_min: $totara_style-screen_xl_min !default;
     &_overview {
       display: flex;
       flex-wrap: wrap;
-      padding: $catalog-spacing_medium 0;
+      padding: var(--tui-gap-4) 0;
 
       &_row {
         display: flex;
         height: 100%;
-        margin-bottom: $catalog-spacing_large;
+        margin-bottom: var(--tui-gap-6);
         width: 100%;
       }
     }
@@ -89,7 +76,7 @@ $catalog-screen_xl_min: $totara_style-screen_xl_min !default;
 
   .tw-catalogResultsCount {
     height: 100%;
-    margin: auto $catalog-spacing_medium auto $catalog-spacing_x_small;
+    margin: auto var(--tui-gap-4) auto var(--tui-gap-1);
     vertical-align: top;
 
     &__text {
@@ -102,10 +89,10 @@ $catalog-screen_xl_min: $totara_style-screen_xl_min !default;
     margin-top: 5rem;
 
     pre {
-      background: $catalog-color_neutral_2;
-      border: 1px solid $catalog-color_neutral_8;
-      font-size: $totara_style-size_12;
-      padding: $catalog-spacing_medium;
+      background: var(--tui-color-neutral-2);
+      border: 1px solid var(--tui-color-neutral-7);
+      font-size: var(--tui-font-size-12);
+      padding: var(--tui-gap-4);
     }
 
     span {
@@ -129,7 +116,7 @@ $catalog-screen_xl_min: $totara_style-screen_xl_min !default;
           &:last-of-type {
             margin: auto 0 auto auto;
             max-width: 325px;
-            padding-left: $catalog-spacing_x_small;
+            padding-left: var(--tui-gap-1);
           }
 
           &_narrow {
@@ -142,25 +129,25 @@ $catalog-screen_xl_min: $totara_style-screen_xl_min !default;
   }
 }
 
-@media (min-width: $catalog-screen_sm_min) {
+@media (min-width: $tui-screen-sm) {
   .tw-catalog {
     &__primaryFilter {
-      padding: $catalog-spacing_medium $catalog-spacing_small;
+      padding: var(--tui-gap-4) var(--tui-gap-2);
     }
 
     &__results {
       &_overview {
-        padding: 1px $catalog-spacing_medium $catalog-spacing_small 0;
+        padding: 1px var(--tui-gap-4) var(--tui-gap-2) 0;
       }
     }
 
     .tw-catalogResultsCount {
-      margin-left: $catalog-spacing_medium;
+      margin-left: var(--tui-gap-4);
     }
   }
 }
 
-@media (min-width: $catalog-screen_xl_min) {
+@media (min-width: $tui-screen-xl) {
   .tw-catalog {
     &__aside {
       width: percentage((2 / 12));

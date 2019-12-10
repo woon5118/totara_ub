@@ -40,5 +40,29 @@
 }
 
 .cohortdeletedparam {
-  color: #953539;
+  color: var(--tui-color-prompt-alert);
+}
+
+#cohort_delete_detail #cohort_delete_changes {
+  width: 100%;
+}
+
+#cohort_delete_footnote {
+  padding: var(--tui-gap-1);
+}
+
+#page-cohort-delete #modal-content {
+  padding: var(--tui-gap-4);
+}
+
+#page-cohort-delete #modal-footer {
+  padding-top: var(--tui-gap-4);
+
+  .singlebutton div {
+    margin: 0;
+  }
+
+  #delete-button {
+    margin-right: 0;
+  }
 }

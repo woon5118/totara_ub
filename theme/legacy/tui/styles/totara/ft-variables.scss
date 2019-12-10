@@ -21,13 +21,6 @@
 // @author    Petr Skoda <petr.skoda@totaralms.com>
 // @package   theme_legacy
 
-$ft-var-default-color: #333 !default;
-$ft-var-success-color: #79ae3d !default;
-$ft-var-warning-color: #f09014 !default;
-$ft-var-danger-color: #cf232b !default;
-$ft-var-info-color: #499bc9 !default;
-$ft-var-disabled-color: #bbb !default;
-
 // icon pixel sizes
 $ft-size-100: $fa-font-size-base !default; // 14px
 $ft-size-200: ceil(($fa-font-size-base * 1.14)) !default; // 16px

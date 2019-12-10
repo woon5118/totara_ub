@@ -31,7 +31,7 @@
 // Extends the Bootstrap 3 badges classes so that state
 // can be applied by class (rather than only inherited).
 .badge-primary {
-  background-color: $brand-primary;
+  background-color: var(--tui-color-primary);
 }
 
 .badge-success {
@@ -48,14 +48,6 @@
 
 .badge-danger {
   background-color: $brand-danger;
-}
-
-.btn-secondary {
-  @include button-variant(
-    $btn-secondary-color,
-    $btn-secondary-bg,
-    $btn-secondary-border
-  );
 }
 
 // Standard horizontal DL.
@@ -133,18 +125,17 @@
     > a {
       margin-right: 0;
       border-radius: 0;
-      color: $nav-tabs-link-color;
-      border-color: $nav-tabs-border-color;
+      border-color: var(--tui-tabs-border-color);
       border-right-color: transparent;
-      background-color: lighten($nav-tabs-link-bg, 5%);
+      background-color: var(--tui-color-neutral-3);
       &:hover {
-        border-color: $nav-tabs-border-color transparent $nav-tabs-border-color
-          $nav-tabs-border-color;
+        border-color: var(--tui-tabs-border-color) transparent var(--tui-tabs-border-color)
+          var(--tui-tabs-border-color);
       }
     }
 
     &:last-child > a {
-      border-right-color: $nav-tabs-border-color;
+      border-right-color: var(--tui-tabs-border-color);
     }
 
     &.active {
@@ -156,24 +147,22 @@
 
     // Active state, and its :hover to override normal :hover
     &.active > a {
-      background-color: #fff;
-      border-right-color: $nav-tabs-border-color;
-      border-left-color: $nav-tabs-border-color;
+      background-color: var(--tui-color-neutral-1);
+      border-right-color: var(--tui-tabs-border-color);
+      border-left-color: var(--tui-tabs-border-color);
       &,
       &:hover,
       &:focus {
-        color: $nav-tabs-link-color;
-        background-color: $nav-tabs-active-link-hover-bg;
-        border-top-color: lighten($brand-primary, 10%);
-        box-shadow: 0 -2px lighten($brand-primary, 10%),
-          -3px 0 rgba(0, 0, 0, 0.03);
+        background-color: var(--tui-color-neutral-1);
+        border-top-color: var(--tui-color-primary);
+        box-shadow: 0 -2px var(--tui-color-primary), -3px 0 rgba(0, 0, 0, 0.03);
       }
     }
     &.active:first-child > a {
       &,
       &:hover,
       &:focus {
-        box-shadow: 0 -2px lighten($brand-primary, 10%);
+        box-shadow: 0 -2px var(--tui-color-primary), -3px 0 rgba(0, 0, 0, 0.03);
       }
     }
     &.disabled {
@@ -181,23 +170,20 @@
         &,
         &:hover,
         &:focus {
-          // Colours used here are a one-off treatment
-          // specifically for Basis nav-tabs with .disabled
-          // therefore we do not add variables for them.
-          color: #949494; // AA compliant on white background.
-          background-color: #fff;
-          border-top-color: #e5e9ec;
+          color: var(--tui-color-neutral-5);
+          background-color: var(--tui-color-neutral-1);
+          border-top-color: var(--tui-color-neutral-4);
         }
       }
       & + .disabled,
       &:first-child {
         > a {
-          border-left-color: #e5e9ec;
+          border-left-color: var(--tui-color-neutral-4);
         }
       }
       &:last-child {
         > a {
-          border-right-color: #e5e9ec;
+          border-right-color: var(--tui-color-neutral-4);
         }
       }
     }
@@ -227,7 +213,7 @@
 .alert-icon {
   vertical-align: middle;
   padding: $alert-padding ($alert-padding * 0.6);
-  color: #fff;
+  color: var(--tui-color-neutral-1);
   .alert-info & {
     background: $brand-info;
   }
@@ -254,7 +240,7 @@
       floor(($padding-small-vertical * 1.5))
       ceil(($padding-small-vertical * 1.5));
     height: 1.3em;
-    color: #fff;
+    color: var(--tui-color-neutral-1);
   }
 
   .alert-info & {
@@ -262,7 +248,7 @@
     &:active:focus,
     &:active:hover {
       // Same as .btn active state.
-      background-color: darken($btn-info-bg, 10%);
+      background-color: $brand-info;
     }
   }
   .alert-success & {
@@ -270,7 +256,7 @@
     &:active:focus,
     &:active:hover {
       // Same as .btn active state.
-      background-color: darken($btn-success-bg, 10%);
+      background-color: $brand-success;
     }
   }
   .alert-warning & {
@@ -278,7 +264,7 @@
     &:active:focus,
     &:active:hover {
       // Same as .btn active state.
-      background-color: darken($btn-warning-bg, 10%);
+      background-color: $brand-warning;
     }
   }
   .alert-danger & {
@@ -286,7 +272,7 @@
     &:active:focus,
     &:active:hover {
       // Same as .btn active state.
-      background-color: darken($btn-danger-bg, 10%);
+      background-color: $brand-danger;
     }
   }
 }
@@ -302,7 +288,7 @@ blockquote {
   border-left-width: 1px;
   color: $gray-light;
   cite {
-    color: $text-color;
+    color: var(--tui-color-text);
     &::before {
       content: '\2013\00a0\00a0';
     }
@@ -328,7 +314,7 @@ pre code {
   line-height: $line-height-base;
   word-break: break-all;
   word-wrap: break-word;
-  background-color: #f5f5f5;
+  background-color: var(--tui-color-neutral-3);
   border: 1px solid $pre-border-color;
   border-radius: $border-radius-base;
 }
@@ -337,7 +323,7 @@ pre code {
 // Badges.
 //
 .badge-primary {
-  background-color: darken($brand-primary, 10%);
+  background-color: var(--tui-color-secondary);
 }
 
 abbr[title],

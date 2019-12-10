@@ -21,16 +21,9 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @package   theme_legacy
 
-// Variables
-// Colours
-$catalogOverlay-color_neutral_1: $totara_style-color_neutral_1 !default;
-$catalogOverlay-color_neutral_7: $totara_style-color_neutral_7 !default;
-// Size
-$catalogOverlay-spacing_medium: $totara_style-spacing_medium !default;
-
 .tw-catalog__overlay {
   &::after {
-    background: $catalogOverlay-color_neutral_1;
+    background: var(--tui-color-neutral-1);
     content: '';
     display: block;
     height: 100%;
@@ -44,8 +37,8 @@ $catalogOverlay-spacing_medium: $totara_style-spacing_medium !default;
 }
 
 .tw-catalog__overlay_text {
-  color: $catalogOverlay-color_neutral_7;
-  margin: $catalogOverlay-spacing_medium 0;
+  color: var(--tui-color-neutral-7);
+  margin: var(--tui-gap-4) 0;
   position: absolute;
   text-align: center;
   top: 0;

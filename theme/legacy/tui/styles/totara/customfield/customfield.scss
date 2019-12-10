@@ -22,13 +22,12 @@
 // @package   theme_legacy
 
 $padding-small-horizontal: 10px !default;
-$customfield-gray-light: #ccc !default;
 
 .mapaddresslookup .location_map {
   display: block;
   width: 70%;
   height: 300px;
-  background: $customfield-gray-light;
+  background: var(--tui-color-neutral-5);
   margin-top: 10px;
 }
 

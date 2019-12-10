@@ -236,7 +236,7 @@
 
     .messagehistory {
       .messagehistory {
-        border-top: 1px solid $nav-tabs-border-color;
+        border-top: 1px solid var(--tui-color-neutral-5);
         clear: both;
         .mdl-left {
           @include make-row();
@@ -279,7 +279,7 @@
         }
       }
       .messagehistorytype {
-        color: #fff;
+        color: var(--tui-color-neutral-1);
         //@include nav-tabs;
         border: 0;
         .hiddenelement {
@@ -287,9 +287,7 @@
         }
 
         span.visible {
-          color: $text-color;
-          // LESS -> SCSS conversion change
-          // Moved the previous extended CSS directly here, due to nested call
+          color: var(--tui-color-state);
           position: relative;
           display: block;
           padding: $nav-link-padding;
@@ -302,21 +300,19 @@
 
           &:hover {
             border-color: $nav-tabs-link-hover-border-color
-              $nav-tabs-link-hover-border-color $nav-tabs-border-color;
+              $nav-tabs-link-hover-border-color var(--tui-color-neutral-5);
           }
           &:hover,
           &:focus {
             text-decoration: none;
-            color: $nav-tabs-active-link-hover-color;
+            color: var(--tui-color-state-hover);
             cursor: default;
-            background-color: $nav-tabs-active-link-hover-bg;
-            border: 1px solid $nav-tabs-active-link-hover-border-color;
+            background-color: var(--tui-color-neutral-1);
+            border: 1px solid var(--tui-color-neutral-1);
             border-bottom-color: transparent;
           }
         }
         a.visible {
-          // LESS -> SCSS conversion change
-          // Moved the previous extended CSS directly here, due to nested call
           position: relative;
           display: block;
           padding: $nav-link-padding;
@@ -330,11 +326,11 @@
           &:hover,
           &:focus {
             text-decoration: none;
-            background-color: $nav-link-hover-bg;
+            background-color: var(--tui-color-neutral-3);
           }
           &:hover {
             border-color: $nav-tabs-link-hover-border-color
-              $nav-tabs-link-hover-border-color $nav-tabs-border-color;
+              $nav-tabs-link-hover-border-color var(--tui-color-neutral-5);
           }
         }
       }
@@ -386,10 +382,10 @@
   }
   #usermessage {
     @extend .popover-content;
-    border: 1px dotted $popover-border-color;
+    border: 1px dotted var(--tui-color-border);
     border-radius: $border-radius-base;
     margin-top: 5px;
-    background-color: (lighten($popover-bg, 10%));
+    background-color: var(--tui-color-neutral-2);
   }
   #newmessagelinks {
     margin: 5px 14px;
@@ -435,7 +431,7 @@
     vertical-align: middle;
     text-align: center;
     > div {
-      background: #eee;
+      background: var(--tui-color-neutral-4);
       padding: 5px;
       font-size: 12px;
     }

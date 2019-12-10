@@ -47,10 +47,10 @@ body {
     left: auto;
     width: auto;
     max-width: 560px;
-    background-color: #fff;
+    background-color: var(--tui-color-neutral-1);
     box-shadow: 0 19px 38px 0 rgba(0, 0, 0, 0.3),
       0 15px 12px 0 rgba(0, 0, 0, 0.22);
-    border: solid 1px #d8d8d8;
+    border: solid 1px var(--tui-color-neutral-5);
     border-radius: $modal-border-radius;
     padding: $modal-outer-padding;
 
@@ -69,7 +69,7 @@ body {
       .close {
         float: right;
         font-size: 20px;
-        color: #b6bccb;
+        color: var(--tui-color-state);
         text-shadow: none;
         opacity: 1;
       }

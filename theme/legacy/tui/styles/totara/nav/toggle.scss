@@ -18,20 +18,21 @@
 //
 // @copyright 2019 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-// @author    Kevin Hottinger <kevin.hottinger$totaralearning.com>
+// @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @package   theme_legacy
 
 .totaraNav_prim--toggleNav {
   &_target {
-    color: $totaranav_prim-color_font;
     display: block;
+    padding: var(--tui-gap-1) var(--tui-gap-2);
+    color: var(--tui-nav-tab-text-color);
     font-size: 1.33em;
-    padding: $totaranav-spacing_x_small $totaranav-spacing_small;
+    background: var(--tui-nav-tab-bg-color);
 
     &:focus,
     &:hover {
-      background: $totaranav_prim-color_background_active;
-      color: $totaranav_prim-color_font;
+      color: var(--tui-nav-tab-text-color-focus);
+      background: var(--tui-nav-tab-bg-color-focus);
     }
 
     .flex-icon {
@@ -40,7 +41,7 @@
   }
 }
 
-@media (min-width: $totaranav-screen_md_min) {
+@media (min-width: $tui-screen-md) {
   .totaraNav_prim--toggleNav {
     display: none;
   }

@@ -81,8 +81,12 @@ input[type='button'],
 input[type='submit'],
 input[type='reset'] {
   @extend .btn;
-  @extend .btn-default;
+  @include bs-btn-default();
   @extend .btn-lineup;
+
+  &.btn-link {
+    box-shadow: none;
+  }
 }
 
 input.form-submit,
@@ -90,14 +94,14 @@ input#id_submitbutton,
 input#id_submitbutton2,
 .path-admin .buttons input[type='submit'],
 td.submit input {
-  @extend .btn-primary;
+  @include bs-btn-primary();
 }
 
 // override .btn-primary
 #notice .singlebutton + .singlebutton input,
 .submit.buttons input[name='cancel'] {
   @extend .btn;
-  @extend .btn-default;
+  @include bs-btn-default();
 }
 
 #notice .singlebutton + .singlebutton input,

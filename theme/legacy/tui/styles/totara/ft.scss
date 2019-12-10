@@ -156,7 +156,7 @@
 
 // icon colours
 .ft-state-default {
-  color: $ft-var-default-color !important;
+  color: var(--tui-color-text) !important;
 }
 
 .ft-state-success {

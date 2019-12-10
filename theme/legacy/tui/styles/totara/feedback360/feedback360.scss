@@ -80,7 +80,7 @@ ul.feedback360-quest-list a.feedback360-quest-list-name {
 }
 
 ul.feedback360-quest-list li {
-  background-color: #ffffff;
+  background-color: var(--tui-color-neutral-1);
   -webkit-transition: background-color 250ms linear;
   -moz-transition: background-color 250ms linear;
   -ms-transition: background-color 250ms linear;
@@ -89,7 +89,7 @@ ul.feedback360-quest-list li {
 }
 
 ul.feedback360-quest-list li:hover {
-  background-color: #f5f5f5;
+  background-color: var(--tui-color-neutral-2);
   -webkit-transition: background-color 100ms linear;
   -moz-transition: background-color 100ms linear;
   -ms-transition: background-color 100ms linear;
@@ -98,7 +98,7 @@ ul.feedback360-quest-list li:hover {
 }
 
 ul.feedback360-quest-list li.selected {
-  background-color: #e6e6e6;
+  background-color: var(--tui-color-neutral-4);
   -webkit-transition: background-color 100ms linear;
   -moz-transition: background-color 100ms linear;
   -ms-transition: background-color 100ms linear;

@@ -21,17 +21,8 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @package   theme_legacy
 
-// Variables
-// Colours
-$selectRegionPanel-color_neutral_2: $totara_style-color_neutral_2 !default;
-// Spacing
-$selectRegionPanel-spacing_small: $totara_style-spacing_small !default;
-$selectRegionPanel-spacing_x_small: $totara_style-spacing_x_small !default;
-// Breakpoints
-$selectRegionPanel-screen_sm_min: $totara_style-screen_sm_min !default;
-
 .tw-selectRegionPanel {
-  padding: $selectRegionPanel-spacing_small 0;
+  padding: $selectRegionPanel-spacing-small 0;
 
   &__content_hidden {
     display: none;
@@ -51,7 +42,7 @@ $selectRegionPanel-screen_sm_min: $totara_style-screen_sm_min !default;
       &_link {
         max-width: 100%;
         overflow: hidden;
-        padding: $selectRegionPanel-spacing_small;
+        padding: $selectRegionPanel-spacing-small;
         vertical-align: sub;
       }
     }
@@ -61,10 +52,10 @@ $selectRegionPanel-screen_sm_min: $totara_style-screen_sm_min !default;
     }
 
     &_text {
-      @include totara_style-heading-label-medium();
-      margin: 0 0 $selectRegionPanel-spacing_small;
+      @include totara-style-heading-label-medium();
+      margin: 0 0 $selectRegionPanel-spacing-small;
       min-width: 0;
-      padding: 0 $selectRegionPanel-spacing_x_small;
+      padding: 0 $selectRegionPanel-spacing-x-small;
       word-wrap: break-word;
     }
   }
@@ -77,30 +68,30 @@ $selectRegionPanel-screen_sm_min: $totara_style-screen_sm_min !default;
 
     &_show {
       max-height: 1000px;
-      padding-bottom: $selectRegionPanel-spacing_small;
+      padding-bottom: $selectRegionPanel-spacing-small;
     }
   }
 
   &__selector {
-    padding: $selectRegionPanel-spacing_small 0;
+    padding: $selectRegionPanel-spacing-small 0;
 
     &_header {
       @include totara-style-heading-label-small();
-      margin: 0 $selectRegionPanel-spacing_x_small
-        $selectRegionPanel-spacing_x_small;
+      margin: 0 $selectRegionPanel-spacing-x-small
+        $selectRegionPanel-spacing-x-small;
     }
   }
 }
 
-@media (min-width: $selectRegionPanel-screen_sm_min) {
+@media (min-width: $totara-style-screen-sm-min) {
   .tw-selectRegionPanel {
-    padding: $selectRegionPanel-spacing_small;
+    padding: $selectRegionPanel-spacing-small;
 
     &__hiddenOnSmall {
       display: block;
       max-height: none;
       overflow: initial;
-      padding-bottom: $selectRegionPanel-spacing_small;
+      padding-bottom: $selectRegionPanel-spacing-small;
     }
 
     &__heading {
@@ -109,14 +100,14 @@ $selectRegionPanel-screen_sm_min: $totara_style-screen_sm_min !default;
       }
 
       &_text {
-        padding: 0 $selectRegionPanel-spacing_small;
+        padding: 0 $selectRegionPanel-spacing-small;
       }
     }
 
     &__selector {
       &_header {
-        margin: 0 $selectRegionPanel-spacing_small
-          $selectRegionPanel-spacing_x_small;
+        margin: 0 $selectRegionPanel-spacing-small
+          $selectRegionPanel-spacing-x-small;
       }
     }
   }

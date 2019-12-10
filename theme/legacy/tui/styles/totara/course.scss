@@ -228,7 +228,7 @@
     background-color: $state-info-bg;
   }
   .section-summary {
-    border: 1px solid #ddd;
+    border: 1px solid var(--tui-color-neutral-5);
     margin-top: 5px;
     list-style: none;
     .section-title {
@@ -284,7 +284,7 @@
   }
   ul {
     li.section.main {
-      border-bottom: 2px solid #eee;
+      border-bottom: 2px solid var(--tui-color-neutral-4);
       margin-top: 0;
       .left,
       .right {
@@ -408,8 +408,8 @@ input.titleeditor {
 }
 
 .dndupload-preview {
-  color: #909090;
-  border: 1px dashed #909090;
+  color: var(--tui-color-neutral-6);
+  border: 1px dashed var(--tui-color-neutral-6);
   list-style: none;
   margin-top: 0.2em;
   padding: 0.3em;
@@ -455,7 +455,7 @@ input.titleeditor {
     padding-left: 0;
 
     .singlebutton input[type='submit'] {
-      @extend .btn-default;
+      @include bs-btn-default();
     }
   }
 }
@@ -590,7 +590,7 @@ input.titleeditor {
 .course_category_tree {
   .courses {
     & > .paging.paging-morelink:hover {
-      background-color: #eee;
+      background-color: var(--tui-color-neutral-3);
     }
   }
   .category {
@@ -673,7 +673,7 @@ input.titleeditor {
 #page-course-index-category {
   .generalbox.info {
     margin-bottom: 15px;
-    border: 1px dotted #ddd;
+    border: 1px dotted var(--tui-color-neutral-5);
     border-radius: 4px;
     padding: 5px;
   }
@@ -919,10 +919,10 @@ input.titleeditor {
         }
       }
       .without-actions {
-        color: $text-color;
+        color: var(--tui-color-text);
       }
       .idnumber {
-        color: $text-color;
+        color: var(--tui-color-text);
         margin-right: 2em;
       }
     }
@@ -968,7 +968,7 @@ input.titleeditor {
       .categoryname {
         display: inline-block;
         margin-left: 1em;
-        color: $text-color;
+        color: var(--tui-color-text);
       }
       .coursename {
         display: inline-block;
@@ -1012,7 +1012,7 @@ input.titleeditor {
       }
     }
     .course-count {
-      color: $text-color;
+      color: var(--tui-color-text);
       margin-right: 2rem;
       min-width: 3.5em;
       display: inline-block;
@@ -1063,14 +1063,14 @@ input.titleeditor {
   .listing-pagination {
     text-align: center;
     .yui3-button {
-      background-color: $btn-default-bg;
-      color: $btn-default-color;
+      background-color: var(--tui-btn-bg-color);
+      color: var(--tui-btn-text-color);
       border: 0;
       margin: 0.4rem 0.2rem 0.45rem;
       font-size: 10.4px;
       &.active-page {
-        background-color: $btn-primary-bg;
-        color: $btn-primary-color;
+        background-color: var(--tui-btn-prim-bg-color);
+        color: var(--tui-btn-prim-text-color);
       }
     }
   }
@@ -1162,8 +1162,8 @@ input.titleeditor {
     #category-listing > div,
     #course-listing > div,
     #course-detail > div {
-      border: 1px solid #e1e1e8;
-      background-color: #fff;
+      border: 1px solid var(--tui-color-neutral-5);
+      background-color: var(--tui-color-neutral-1);
     }
     #course-detail {
       width: 100%;
@@ -1186,8 +1186,8 @@ input.titleeditor {
     #category-listing > div,
     #course-listing > div,
     #course-detail > div {
-      border: 1px solid #e1e1e8;
-      background-color: #fff;
+      border: 1px solid var(--tui-color-neutral-5);
+      background-color: var(--tui-color-neutral-1);
     }
   }
 }
@@ -1259,7 +1259,7 @@ input.titleeditor {
 }
 
 #coursesearch {
-  margin-bottom: $totara_style-spacing_medium;
+  margin-bottom: var(--tui-gap-4);
 }
 
 // Completely hide a text box that manages access restrictions json
@@ -1272,5 +1272,12 @@ input.titleeditor {
 
   .info {
     font-weight: bold;
+  }
+}
+
+
+#page-course-completion {
+  .criteria_course_value {
+    max-width: 100%;
   }
 }

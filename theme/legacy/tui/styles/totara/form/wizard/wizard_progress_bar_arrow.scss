@@ -25,8 +25,8 @@
 .tf_wizard_progress_bar_arrow {
   &::after,
   &::before {
-    border-left: 1.21em solid $wizard-bar-background;
-    border-right: 1px solid $wizard-bar-arrow-color;
+    border-left: 1.21em solid $wizardBar-item-bg-color;
+    border-right: 1px solid $wizardBar-item-arrow-color;
     content: ' ';
     pointer-events: none;
     position: absolute;
@@ -37,14 +37,14 @@
   &::after {
     height: 49.5%;
     top: 50%;
-    transform: skew(-$wizard-bar-arrow-angle);
+    transform: skew(-$wizardBar-item-arrow-angle);
     z-index: -2;
   }
 
   &::before {
     height: 51%;
     top: 0;
-    transform: skew($wizard-bar-arrow-angle);
+    transform: skew($wizardBar-item-arrow-angle);
     z-index: -1;
   }
 }

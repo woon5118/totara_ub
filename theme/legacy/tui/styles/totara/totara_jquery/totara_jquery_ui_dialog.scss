@@ -1105,6 +1105,7 @@ button.ui-button-icons-only {
   line-height: 1.4;
 }
 .ui-button-text-only .ui-button-text {
+  @include bs-btn-default();
   padding: 0.4em 1em;
 }
 .ui-button-icon-only .ui-button-text,

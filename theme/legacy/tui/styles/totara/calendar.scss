@@ -26,19 +26,19 @@
 
 // Calendar event background colours defined.
 .calendar_event_course {
-  background-color: $calendar-event-course-color;
+  background-color: $calendar-event-course-bg-color;
 }
 
 .calendar_event_global {
-  background-color: $calendar-event-global-color;
+  background-color: $calendar-event-global-bg-color;
 }
 
 .calendar_event_group {
-  background-color: $calendar-event-group-color;
+  background-color: $calendar-event-group-bg-color;
 }
 
 .calendar_event_user {
-  background-color: $calendar-event-user-color;
+  background-color: $calendar-event-user-bg-color;
 }
 
 // Calendar restyling.
@@ -128,33 +128,33 @@
       border-style: solid;
     }
     .calendar_event_course {
-      border-color: $calendar-event-course-color;
+      border-color: $calendar-event-course-border-color;
     }
     .calendar_event_global {
-      border-color: $calendar-event-global-color;
+      border-color: $calendar-event-global-border-color;
     }
     .calendar_event_group {
-      border-color: $calendar-event-group-color;
+      border-color: $calendar-event-group-border-color;
     }
     .calendar_event_user {
-      border-color: $calendar-event-user-color;
+      border-color: $calendar-event-user-border-color
     }
     .calendar-event-panel {
-      background-color: $gray-lighter;
-      border: 2px solid $gray-lighter;
+      background-color: $calendar-event-panel-bg-color;
+      border: 2px solid $calendar-event-panel-border-color;
       .yui3-overlay-content {
         padding: 19px;
-        background-color: lighten($well-bg, 3%);
-        border: 1px solid darken($well-bg, 7%);
-        border-radius: $border-radius-base;
+        background-color: $calendar-event-panel-bg-color;
+        border: 1px solid $calendar-event-panel-border-color;
+        border-radius: $calendar-border-radius;
         @include box-shadow(inset 0 1px 1px rgba(0, 0, 0, 0.05));
       }
     }
     .calendar-controls {
       .current {
-        font-family: $headings-font-family;
-        font-weight: $headings-font-weight;
-        color: $headings-color;
+        font-family: inherit;
+        font-weight: 500;
+        color: inherit;
         font-size: 25px;
         line-height: 1.2;
       }
@@ -184,16 +184,15 @@
         position: relative;
         padding: 19px;
         margin-bottom: 20px;
-        background-color: lighten($well-bg, 3%);
-        border: 1px solid darken($well-bg, 7%);
-        border-radius: $border-radius-base;
+        border: 1px solid $calendar-event-list-border-color;
+        border-radius: $calendar-border-radius;
         @include box-shadow(inset 0 1px 1px rgba(0, 0, 0, 0.05));
         .picture {
           vertical-align: text-top;
         }
         .topic {
           .name {
-            font-size: $font-size-large;
+            font-size: var(--tui-font-size-18);
             font-weight: 200;
             line-height: 24px;
             float: left;
@@ -210,7 +209,7 @@
           width: 22px;
         }
         .description {
-          background-color: #fff;
+          background-color: $calendar-event-list-desc-bg-color;
           padding: 5px;
           .commands {
             position: absolute;
@@ -302,19 +301,22 @@
 .block.block_calendar_month {
   th,
   td {
-    border: 1px solid #ddd;
+    border: 1px solid $calendar-month-border-color;
   }
   .content {
     padding: 11px 0 0 0;
   }
   td.today {
-    background-color: $brand-primary;
-    color: #fff;
+    background-color: $calendar-month-today-bg-color;
+    color: $calendar-month-today-text-color;
     a {
-      color: #fff;
+      color: $calendar-month-today-text-color;
     }
     .calendar-event-panel {
-      color: $text-color;
+      color: var(--tui-color-text);
+    }
+    .popover-content a {
+      color: var(--tui-color-state);
     }
   }
   td {
@@ -334,7 +336,7 @@
       text-align: center;
     }
     td .weekend {
-      color: $text-muted;
+      color: $calendar-weekend-text-color;
     }
     th {
       vertical-align: top;
@@ -346,13 +348,13 @@
     }
   }
   .calendar-event-panel {
-    background-color: $gray-lighter;
-    border: 1px solid $gray-lighter;
+    background-color: $calendar-event-panel-bg-color;
+    border: 1px solid $calendar-event-panel-border-color;
     .yui3-overlay-content {
       padding: 19px;
-      background-color: lighten($well-bg, 3%);
-      border: 1px solid darken($well-bg, 7%);
-      border-radius: $border-radius-base;
+      background-color: $calendar-event-panel-bg-color;
+      border: 1px solid $calendar-event-panel-border-color;
+      border-radius: $calendar-border-radius;
       @include box-shadow(inset 0 1px 1px rgba(0, 0, 0, 0.05));
       h2 {
         &.eventtitle {

@@ -21,17 +21,6 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @package   theme_legacy
 
-// Size
-$grid-spacing_medium: $totara_style-spacing_medium !default;
-$grid-spacing_small: $totara_style-spacing_small !default;
-$grid-spacing_x_small: $totara_style-spacing_x_small !default;
-// Breakpoints
-$grid-screen_xsm_min: 500px !default;
-$grid-screen_sm_min: $totara_style-screen_sm_min !default;
-$grid-screen_md_min: $totara_style-screen_md_min !default;
-$grid-screen_lg_min: $totara_style-screen_lg_min !default;
-$grid-screen_xl_min: $totara_style-screen_xl_min !default;
-
 .tw-grid {
   display: flex;
   flex-wrap: wrap;
@@ -39,11 +28,15 @@ $grid-screen_xl_min: $totara_style-screen_xl_min !default;
   &__item {
     flex-basis: 100%;
     min-width: 0;
-    padding: $grid-spacing_x_small;
+    padding: $grid-spacing-x-small;
+
+    [tabindex] {
+      cursor: pointer;
+    }
   }
 }
 
-@media (min-width: $grid-screen_xsm_min) {
+@media (min-width: $grid-screen-xsm-min) {
   .tw-grid {
     &__item {
       &--multi-column {
@@ -53,24 +46,24 @@ $grid-screen_xl_min: $totara_style-screen_xl_min !default;
   }
 }
 
-@media (min-width: $grid-screen_sm_min) {
+@media (min-width: $totara-style-screen-sm-min) {
   .tw-grid {
-    padding: $grid-spacing_small;
+    padding: $grid-spacing-small;
 
     &__item {
       &--single-column {
-        padding: 0 $grid-spacing_small;
+        padding: 0 $grid-spacing-small;
       }
 
       &--multi-column {
         flex-basis: 50%;
-        padding: $grid-spacing_small;
+        padding: $grid-spacing-small;
       }
     }
   }
 }
 
-@media (min-width: $grid-screen_md_min) {
+@media (min-width: $totara-style-screen-md-min) {
   .tw-grid {
     &__item {
       &--multi-column {
@@ -80,7 +73,7 @@ $grid-screen_xl_min: $totara_style-screen_xl_min !default;
   }
 }
 
-@media (min-width: $grid-screen_lg_min) {
+@media (min-width: $totara-style-screen-lg-min) {
   .tw-grid {
     &__item {
       &--multi-column {
@@ -90,7 +83,7 @@ $grid-screen_xl_min: $totara_style-screen_xl_min !default;
   }
 }
 
-@media (min-width: $grid-screen_xl_min) {
+@media (min-width: $totara-style-screen-xl-min) {
   .tw-grid {
     &__item {
       &--multi-column {

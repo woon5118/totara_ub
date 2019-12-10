@@ -18,16 +18,16 @@
 //
 // @copyright 2019 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-// @author    Kevin Hottinger <kevin.hottinger$totaralearning.com>
+// @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @package   theme_legacy
 
 .totaraNav_prim--side {
-  color: $totaranav_prim-color_font;
   display: flex;
   flex-shrink: 0;
   height: 100%;
   margin: auto 0 auto auto;
-  padding: 0 0 0 $totaranav-spacing_small;
+  padding: 0 0 0 var(--tui-gap-2);
+  color: var(--tui-nav-side-text-color);
 
   &__separator {
     display: none;
@@ -37,13 +37,13 @@
     padding: 0;
 
     .select {
-      margin: 0 $totaranav-spacing_small 0 0;
+      margin: 0 var(--tui-gap-2) 0 0;
     }
   }
 
   .popover-region {
-    margin: auto $totaranav-spacing_x_small;
     position: initial;
+    margin: auto var(--tui-gap-1);
 
     .ie11 & {
       //TL-20522: IE11 doesn't support the initial value, so we have to explicitly set it to the (usual) default
@@ -55,21 +55,21 @@
     }
 
     .nav-link {
-      line-height: 1.5;
-      padding: $totaranav-spacing_small;
       position: relative;
       width: auto;
+      padding: var(--tui-gap-2);
+      line-height: 1.5;
 
       &:hover {
-        background: $totaranav_prim-color_background_active;
+        color: var(--tui-nav-side-text-color-focus)
       }
     }
 
     .popover-region-container {
-      color: $totara_style-color_neutral_7;
-      left: 0;
       top: auto;
+      left: 0;
       width: 100%;
+      color: var(--tui-nav-side-popover-text-color);
     }
 
     .popover-region-toggle::before,
@@ -79,6 +79,7 @@
   }
 
   .usermenu {
+    height: 100%;
     margin: auto 0;
     padding: 0;
 
@@ -87,13 +88,10 @@
     }
 
     .moodle-actionmenu ul {
-      line-height: 1.5;
-      vertical-align: top;
-
       .toggle-display .userbutton .avatars {
-        margin: auto $totaranav-spacing_x_small;
-        padding: 0 $totaranav-spacing_x_small;
         position: relative;
+        margin: auto var(--tui-gap-1);
+        padding: 0 var(--tui-gap-1);
       }
     }
 
@@ -102,12 +100,12 @@
     }
 
     .toggle-display {
-      color: $totaranav_prim-color_font;
-      padding: $totaranav-spacing_x_small;
+      padding: var(--tui-gap-1);
+      color: var(--tui-nav-side-text-color);
       text-decoration: none;
 
       &:hover {
-        background: $totaranav_prim-color_background_active;
+        color: var(--tui-nav-side-text-color-focus);
       }
     }
 
@@ -120,8 +118,8 @@
     }
 
     .userpicture {
-      height: 2rem;
       width: auto;
+      height: 2rem;
     }
 
     .usertext {
@@ -134,14 +132,14 @@
 .userloggedinas {
   .totaraNav_prim--side {
     .avatar.current {
-      left: 1.8rem;
-      margin: 0;
       position: absolute;
       top: 1rem;
+      left: 1.8rem;
+      margin: 0;
 
       .userpicture {
-        height: 1.5rem;
         width: auto;
+        height: 1.5rem;
       }
     }
 
@@ -157,7 +155,7 @@
   }
 }
 
-@media (min-width: $totaranav-screen_sm_min) {
+@media (min-width: $tui-screen-sm) {
   .totaraNav_prim--side {
     .popover-region {
       .popover-region-container {
@@ -178,24 +176,23 @@
   }
 }
 
-@media (min-width: $totaranav-screen_md_min) {
+@media (min-width: $tui-screen-md) {
   .totaraNav_prim--side {
     position: relative;
 
     &__separator {
+      position: relative;
       display: block;
       flex: 0 0 0;
-      position: relative;
-
-      padding: 0 0 0 $totaranav-spacing_small;
+      padding: 0 0 0 var(--tui-gap-2);
 
       &::before {
-        border-left: 1px solid $totaranav_prim-color_background_expanded;
-        content: '';
-        height: 50%;
-        left: 0;
         position: absolute;
         top: 25%;
+        left: 0;
+        height: 50%;
+        border-left: 1px solid var(--tui-nav-side-seperator-color);
+        content: '';
       }
     }
 

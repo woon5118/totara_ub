@@ -20,34 +20,6 @@
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 // @package   theme_legacy
 
-$bg-default: #fff !default;
-$color-default: #333 !default;
-
-$bg-light: #f5f5f5 !default;
-$bg: #e8e8e8 !default;
-
-$padding-small-vertical: 5px !default;
-
-// Program set complete.
-$bg-set-complete: #83cc36 !default;
-$border-color-complete: #5cb85c !default;
-$color-complete: #3c763d !default;
-
-$border-color-unavailable: #d9534f !default;
-$color-unavailable: #a94442 !default;
-
-$padding-vertical: 4px !default;
-$padding-horizontal: 10px !default;
-$padding-large: 15px !default;
-
-$item-border: #ddd !default;
-
-$border-radius-default: 4px !default;
-$border-radius-large: 8px !default;
-
-$font-size-small: 12px !default;
-$font-size-title: 16px !default;
-
 .block_current_learning {
   .panel-heading .btn-group {
     margin-left: 20px;
@@ -60,12 +32,12 @@ $font-size-title: 16px !default;
     }
 
     a {
-      color: $color-default;
+      color: $current-learning-text-color;
     }
 
     //.block_current_learning-item div:first-child {
     .block_current_learning-row-item {
-      font-size: $font-size-title;
+      font-size: $current-learning-title-text-size;
       line-height: 28px;
       margin: 0;
       padding: 0 0 0 26px;
@@ -88,12 +60,12 @@ $font-size-title: 16px !default;
 
       > .expand-collapse-icon-wrap {
         padding: 0.3em;
-        border-radius: $border-radius-default;
+        border-radius: $current-learning-border-radius;
         margin: 0 0 0 -1.8em;
         text-align: center;
 
         &:hover {
-          background-color: #ddd;
+          background-color: var(--tui-color-neutral-4);
           cursor: pointer;
         }
         .collapsed-icon {
@@ -139,16 +111,16 @@ $font-size-title: 16px !default;
       margin: 0;
 
       li {
-        border-bottom: 1px solid $item-border;
-        padding: $padding-vertical $padding-horizontal;
+        border-bottom: 1px solid var(--tui-color-border);
+        padding: $current-learning-padding-vertical $current-learning-padding-horizontal;
       }
       li:nth-of-type(even) {
-        background-color: $bg-light;
+        background-color: $current-learning-bg-color-light;
       }
     }
   }
   .panel-footer {
-    background-color: $bg-default;
+    background-color: $current-learning-bg-color-default;
     overflow: hidden;
 
     .count {
@@ -164,17 +136,17 @@ $font-size-title: 16px !default;
 
   // Message displayed when the user has no current learning.
   .current_learning-no-content {
-    padding: $padding-large;
+    padding: $current-learning-empty-padding;
     text-align: center;
     margin-bottom: 0;
   }
 
   ul li:nth-of-type(even) .current_learning-set {
-    background-color: $bg-default;
+    background-color: $current-learning-bg-color-default;
   }
 
   ul li:nth-of-type(even) .current_learning-course {
-    background-color: $bg;
+    background-color: $current-learning-bg-color;
   }
 }
 
@@ -185,7 +157,7 @@ $font-size-title: 16px !default;
     font-size: 30px;
     line-height: 40px;
     height: 40px;
-    color: #aaa;
+    color: var(--tui-color-neutral-5);
     margin: 0;
 
     .fa-caret-down {
@@ -200,32 +172,32 @@ $font-size-title: 16px !default;
     }
   }
   .current_learning-set {
-    padding: $padding-large-vertical $padding-horizontal;
-    background-color: $bg;
-    border-radius: $border-radius-large;
+    padding: $padding-large-vertical $current-learning-padding-horizontal;
+    background-color: $current-learning-bg-color;
+    border-radius: $current-learning-border-radius-large;
     h4 {
       &:not(:first-child) {
-        padding-top: $padding-small-vertical;
+        padding-top: $current-learning-set-header-padding;
       }
       span {
-        color: #888;
-        font-size: $font-size-small;
+        color: var(--tui-color-neutral-7);
+        font-size: $current-learning-text-size-small;
       }
     }
     .points {
-      color: #777777;
+      color: var(--tui-color-neutral-7);
       display: inline-block;
       min-width: 10px;
       padding: 2px 7px;
-      font-size: $font-size-small;
+      font-size: $current-learning-text-size-small;
       font-weight: 700;
       line-height: 1;
       text-align: center;
       white-space: nowrap;
       vertical-align: middle;
-      background-color: $bg-light;
+      background-color: $current-learning-bg-color-light;
       border-radius: 10px;
-      border: 1px solid darken($bg-light, 10%);
+      border: 1px solid $current-learning-bg-color-lightish;
     }
   }
   .current_learning-set-stamp {
@@ -240,42 +212,42 @@ $font-size-title: 16px !default;
 
     p {
       padding: 4px 10px;
-      background-color: $bg;
-      border-radius: $border-radius-default;
+      background-color: $current-learning-bg-color;
+      border-radius: $current-learning-border-radius;
       margin: 0;
       display: inline-block;
-      font-size: $font-size-small;
+      font-size: $current-learning-text-size-small;
     }
 
     .status-complete {
-      background-color: $bg-default;
-      border: 2px solid $border-color-complete;
+      background-color: $current-learning-bg-color-default;
+      border: 2px solid $current-learning-border-color-complete;
       font-weight: bold;
-      color: $color-complete;
+      color: $current-learning-text-color-complete;
 
       .flex-icon {
-        color: $bg-set-complete;
+        color: $current-learning-bg-color-default;
       }
     }
 
     .status-unavailable {
-      background-color: $bg-default;
-      border: 2px solid $border-color-unavailable;
+      background-color: $current-learning-bg-color-default;
+      border: 2px solid $current-learning-border-color-unavailable;
       font-weight: bold;
-      color: $color-unavailable;
+      color: $current-learning-text-color-unavailable;
     }
   }
 }
 
 // Course user learning items appearing at the top level and within programs.
 .block_current_learning .current_learning-course {
-  padding: $padding-vertical;
-  background-color: $bg-default;
-  border-radius: $border-radius-large;
+  padding: $current-learning-padding-vertical;
+  background-color: $current-learning-bg-color-default;
+  border-radius: $current-learning-border-radius-large;
   clear: both;
   display: inline-block;
   width: 100%;
-  margin-top: $padding-vertical;
+  margin-top: $current-learning-padding-vertical;
 
   &:first-child {
     margin-top: 0;

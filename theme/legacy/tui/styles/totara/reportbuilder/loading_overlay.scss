@@ -1,7 +1,7 @@
 //
 // This file is part of Totara Learn
 //
-// Copyright (C) 2019 onwards Totara Learning Solutions LTD
+// Copyright (C) 2020 onwards Totara Learning Solutions LTD
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,26 +16,32 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-// @copyright 2019 onwards Totara Learning Solutions LTD
+// @copyright 2020 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+// @author    Brian Barnes <brian.barnes@totaralearning.com>
 // @package   theme_legacy
 
-.totara_core__InlineEdit {
-  position: relative;
-
-  &--tooltip {
+.totara_reportbuilder__overlay {
+  &::after {
+    background: var(--tui-color-neutral-7);
+    content: '';
+    display: block;
+    height: 100%;
+    left: 0;
+    opacity: .9;
     position: absolute;
-    font-size: $inlineEdit-tooltip-text-size;
-    color: $inlineEdit-tooltip-text-color;
-    padding: $inlineEdit-tooltip-padding;
-    background-color: $inlineEdit-tooltip-bg-color;
-    border: 1px solid $inlineEdit-tooltip-border-color;
-    transform: translateY(-100%);
-
-    &--error {
-      color: $inlineEdit-tooltip-text-color-error;
-      background-color: $inlineEdit-tooltip-bg-color-error;
-      border: 1px solid $inlineEdit-tooltip-border-color;
-    }
+    top: 0;
+    width: 100%;
+    z-index: 4;
   }
+}
+
+.totara_reportbuilder__overlay_text {
+  color: var(--tui-color-neutral-7);
+  margin: var(--tui-gap-4) 0;
+  position: absolute;
+  text-align: center;
+  top: 0;
+  width: 100%;
+  z-index: 5;
 }

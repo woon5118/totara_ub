@@ -176,12 +176,12 @@
 
   .feedback_form {
     input[type='submit'] {
-      @extend .btn-primary;
+      @include bs-btn-primary();
     }
   }
   #id_save_item,
   #id_update_item {
-    @extend .btn-primary;
+    @include bs-btn-primary();
   }
 
   .fitem_fgroup {
@@ -255,7 +255,7 @@
 }
 #page-mod-feedback-edit {
   input[type='submit'] {
-    @extend .btn-primary;
+    @include bs-btn-primary();
   }
 }
 

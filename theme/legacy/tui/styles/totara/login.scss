@@ -74,8 +74,8 @@
     margin: 10px 0 0;
   }
   .desc {
-    line-height: $totara_style-font_line_height_large;
-    color: $text-color;
+    line-height: $totara-style-font-line-height-large;
+    color: var(--tui-color-text);
     clear: both;
   }
 
@@ -95,10 +95,9 @@
   }
 
   #loginbtn {
+    @include bs-btn-primary();
     width: 100%;
-    color: #fff;
     font-weight: bold;
-    background-color: $totara_style-color_theme_1;
   }
 
   .potentialidplist {

@@ -98,7 +98,7 @@ body {
     padding: ($grid-gutter-width / 2 - 8);
     position: relative;
     &::after {
-      border: 2px dotted $totara_style-color_neutral_5;
+      border: 2px dotted var(--tui-color-neutral-5);
       content: '';
       height: 100%;
       left: 0;
@@ -200,7 +200,7 @@ body {
 @media (max-width: $screen-md) {
   .has-region-side-pre #region-main,
   .has-region-side-post #region-main {
-    border-bottom: 1px solid $block-border-color;
+    border-bottom: 1px solid var(--tui-color-neutral-5);
     margin-bottom: 1em;
     padding-bottom: 4em;
 
@@ -360,7 +360,7 @@ a.autolink.glossary:hover {
     background-color: #ffee69;
     border: 1px solid #a6982b;
     border-top-color: #d4c237;
-    color: #000;
+    color: var(--tui-color-neutral-7);
     left: 0;
     padding: 2px 5px;
     position: relative;
@@ -752,7 +752,7 @@ a.skip:active {
 }
 
 .comment-paging .curpage {
-  border: 1px solid #ccc;
+  border: 1px solid var(--tui-color-neutral-5);
 }
 
 .comment-message .picture {
@@ -778,7 +778,7 @@ a.skip:active {
 }
 
 .comment-delete-confirm {
-  background: #eee;
+  background: var(--tui-color-neutral-4);
   padding: 2px;
   width: 5em;
   text-align: center;
@@ -839,7 +839,7 @@ a.skip:active {
 */
 #webservice-doc-generator td {
   text-align: left;
-  border: 0 solid black;
+  border: 0 solid var(--tui-color-neutral-5);
 }
 
 /**
@@ -850,7 +850,7 @@ a.skip:active {
 }
 
 .smartselect .smartselect_mask {
-  background-color: #fff;
+  background-color: var(--tui-color-neutral-1);
 }
 
 .smartselect ul {
@@ -872,8 +872,8 @@ a.skip:active {
 
 .smartselect .smartselect_menu,
 .smartselect .smartselect_submenu {
-  border: 1px solid #000;
-  background-color: #fff;
+  border: 1px solid var(--tui-color-neutral-5);
+  background-color: var(--tui-color-neutral-1);
   display: none;
 }
 
@@ -888,7 +888,7 @@ a.skip:active {
 }
 
 .smartselect .smartselect_menu_content ul li a {
-  color: #333;
+  color: var(--tui-color-neutral-7);
   text-decoration: none;
 }
 
@@ -948,7 +948,7 @@ a.skip:active {
 }
 
 .corelightbox {
-  background-color: #ccc;
+  background-color: var(--tui-color-neutral-4);
   position: absolute;
   top: 0;
   left: 0;
@@ -1098,7 +1098,7 @@ audio.mediaplugin_html5audio {
 
 /* Moodle Dialogue Settings (moodle-core-dialogue)  */
 .moodle-dialogue-base .moodle-dialogue-lightbox {
-  background-color: #aaa;
+  background-color: var(--tui-color-neutral-5);
 }
 
 .moodle-dialogue-base .hidden,
@@ -1134,16 +1134,16 @@ audio.mediaplugin_html5audio {
   background: none;
   border: none;
   z-index: 600;
-  outline: #000 dotted 0;
+  outline: var(--tui-color-neutral-7) dotted 0;
 }
 
 .moodle-dialogue-base .moodle-dialogue-wrap {
   margin-top: -3px;
   margin-left: -3px;
-  background-color: #fff;
-  border: 1px solid #ccc;
+  background-color: var(--tui-color-neutral-1);
+  border: 1px solid var(--tui-color-neutral-5);
   border-radius: 10px;
-  box-shadow: 5px 5px 20px 0 #666;
+  box-shadow: 5px 5px 20px 0 var(--tui-color-neutral-6);
 }
 
 .moodle-dialogue-base .moodle-dialogue-wrap .moodle-dialogue-hd,
@@ -1153,14 +1153,14 @@ audio.mediaplugin_html5audio {
   font-size: 12px;
   font-weight: normal;
   letter-spacing: 1px;
-  color: #333;
+  color: var(--tui-color-neutral-7);
   text-align: center;
-  text-shadow: 1px 1px 1px #fff;
+  text-shadow: 1px 1px 1px var(--tui-color-neutral-1);
   border-radius: 10px 10px 0 0;
-  border-bottom: 1px solid #bbb;
-  background: #ccc;
+  border-bottom: 1px solid var(--tui-color-neutral-5);
+  background: var(--tui-color-neutral-4);
   min-height: 22px;
-  @include gradient-vertical(#fff, #ccc);
+  background-image: linear-gradient(to bottom, var(--tui-color-neutral-1) 0%, var(--tui-color-neutral-5) 100%);
   filter: none;
 }
 
@@ -1196,13 +1196,13 @@ audio.mediaplugin_html5audio {
 .moodle-dialogue-base .moodle-dialogue .moodle-dialogue-bd {
   padding: 1em;
   line-height: 2em;
-  color: #555;
+  color: var(--tui-color-neutral-6);
   font-size: 12px;
 }
 
 .moodle-dialogue-base .moodle-dialogue-wrap .moodle-dialogue-content {
   padding: 0;
-  background: #fff;
+  background: var(--tui-color-neutral-1);
 }
 
 .moodle-dialogue-base .moodle-dialogue-fullscreen .moodle-dialogue-hd {
@@ -1250,14 +1250,14 @@ audio.mediaplugin_html5audio {
 }
 
 .moodle-dialogue-exception .param-stacktrace label {
-  background-color: #eee;
-  border: 1px solid #ccc;
+  background-color: var(--tui-color-neutral-3);
+  border: 1px solid var(--tui-color-neutral-5);
   border-bottom-width: 0;
 }
 
 .moodle-dialogue-exception .param-stacktrace pre {
-  border: 1px solid #ccc;
-  background-color: #fff;
+  border: 1px solid var(--tui-color-neutral-5);
+  background-color: var(--tui-color-neutral-1);
 }
 
 .moodle-dialogue-exception .param-stacktrace .stacktrace-file {
@@ -1271,9 +1271,9 @@ audio.mediaplugin_html5audio {
 }
 
 .moodle-dialogue-exception .param-stacktrace .stacktrace-call {
-  color: #333;
+  color: var(--tui-color-neutral-7);
   font-size: 90%;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--tui-color-neutral-3);
 }
 
 .moodle-dialogue-base
@@ -1283,7 +1283,7 @@ audio.mediaplugin_html5audio {
   padding: 0;
   margin: 0.7em 1em;
   text-align: right;
-  background-color: #fff;
+  background-color: var(--tui-color-neutral-1);
   font-size: 12px;
 }
 
@@ -1342,7 +1342,7 @@ audio.mediaplugin_html5audio {
   height: 100%;
   top: 0;
   left: 0;
-  background-color: white;
+  background-color: var(--tui-color-neutral-1);
   text-align: center;
   padding: 10% 0;
 }
@@ -1378,7 +1378,7 @@ audio.mediaplugin_html5audio {
 
 .chooserdialogue .moodle-dialogue-wrap .moodle-dialogue-bd {
   padding: 0;
-  background: #f2f2f2;
+  background: var(--tui-color-neutral-2);
   @include border-bottom-radius(10px);
 }
 
@@ -1396,7 +1396,7 @@ audio.mediaplugin_html5audio {
 /* Various settings for the options area */
 .choosercontainer #chooseform .options {
   position: relative;
-  border-bottom: 1px solid #bbb;
+  border-bottom: 1px solid var(--tui-color-neutral-5);
 }
 
 /* Only set these options if we're showing the js container */
@@ -1404,7 +1404,7 @@ audio.mediaplugin_html5audio {
   overflow-x: hidden;
   overflow-y: auto;
   max-width: 20.3em;
-  box-shadow: inset 0 0 30px 0 #ccc;
+  box-shadow: inset 0 0 30px 0 var(--tui-color-neutral-5);
 }
 
 /* Settings for option rows and option subtypes */
@@ -1440,7 +1440,7 @@ audio.mediaplugin_html5audio {
 .choosercontainer #chooseform .option label {
   display: block;
   padding: 0.3em 0 0.1em 0;
-  border-bottom: 1px solid #fff;
+  border-bottom: 1px solid var(--tui-color-neutral-1);
 }
 
 .choosercontainer #chooseform .nonoption {
@@ -1483,7 +1483,7 @@ audio.mediaplugin_html5audio {
 
 .choosercontainer #chooseform .selected {
   background-color: $body-bg;
-  box-shadow: 0 0 10px 0 #ccc;
+  box-shadow: 0 0 10px 0 var(--tui-color-neutral-5);
 }
 
 .section-modchooser-link img.smallicon {
@@ -1508,8 +1508,8 @@ audio.mediaplugin_html5audio {
   position: relative;
   margin: 15px 0;
   padding: 1px 19px 14px;
-  background-color: white;
-  border: 1px solid #ddd;
+  background-color: var(--tui-color-neutral-1);
+  border: 1px solid var(--tui-color-neutral-5);
   border-radius: 4px;
 }
 
@@ -1521,9 +1521,9 @@ audio.mediaplugin_html5audio {
   padding: 3px 7px;
   font-size: 12px;
   font-weight: bold;
-  background-color: whiteSmoke;
-  border: 1px solid #ddd;
-  color: #9da0a4;
+  background-color: var(--tui-color-neutral-1);
+  border: 1px solid var(--tui-color-neutral-5);
+  color: var(--tui-color-neutral-6);
   border-radius: 4px 0 4px 0;
 }
 
@@ -1536,10 +1536,10 @@ audio.mediaplugin_html5audio {
 .formlistingrow {
   cursor: pointer;
   border-bottom: 1px solid;
-  border-color: #e1e1e8;
-  border-left: 1px solid #e1e1e8;
-  border-right: 1px solid #e1e1e8;
-  background-color: #f7f7f9;
+  border-color: var(--tui-color-neutral-5);
+  border-left: 1px solid var(--tui-color-neutral-5);
+  border-right: 1px solid var(--tui-color-neutral-5);
+  background-color: var(--tui-color-neutral-3);
   border-radius: 0 0 4px 4px;
   padding: 6px;
   top: 50%;
@@ -1838,13 +1838,13 @@ a.btn.disabled:hover,
 a.btn.disabled {
   font-style: normal;
   &.btn-default {
-    color: $btn-default-color;
+    color: var(--tui-btn-text-color);
   }
   &.btn-primary {
-    color: $btn-primary-color;
+    color: var(--tui-btn-prim-text-color);
   }
   &.btn-secondary {
-    color: $btn-secondary-color;
+    color: var(--tui-btn-text-color);
   }
   &.btn-success {
     color: $btn-success-color;
@@ -1900,7 +1900,7 @@ h6 [data-flex-icon='help'] {
 
 .link-as-button {
   @extend .btn;
-  @extend .btn-default;
+  @include bs-btn-default();
 }
 
 // Behat sees the new sr-only stuff as visible,
@@ -1952,7 +1952,7 @@ body.behat-site {
       color: $state-info-text;
       text-decoration: none;
       z-index: 9999;
-      box-shadow: 2px 2px 5px 1px #ccc;
+      box-shadow: 2px 2px 5px 1px var(--tui-color-neutral-5);
       border: 1px solid $state-info-border;
     }
   }
@@ -2133,7 +2133,7 @@ a.comments-icon-none {
 }
 
 .comment-paging .curpage {
-  border: 1px solid #ccc;
+  border: 1px solid var(--tui-color-neutral-5);
 }
 
 .comment-userpicture {

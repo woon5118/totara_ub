@@ -78,7 +78,7 @@
 
 /** Help text that appears below OR/THEN **/
 .nextsetoperator .nextsethelp {
-  color: #777777;
+  color: var(--tui-color-neutral-6);
   clear: both;
   width: auto;
 }
@@ -103,7 +103,7 @@
   margin: 15px 0px;
 }
 div.nextsetoperator-group-and {
-  border: 1px solid black;
+  border: 1px solid var(--tui-color-neutral-7);
   padding: 15px;
   -webkit-border-radius: 5px;
   border-radius: 5px;
@@ -145,7 +145,7 @@ div.nextsetoperator-group-and {
 
 .display-program {
   padding: 0 10px;
-  border: 1px solid #000000;
+  border: 1px solid var(--tui-color-neutral-7);
   border-radius: 5px;
 }
 
@@ -237,13 +237,13 @@ div.nextsetoperator-group-and {
 .path-totara-program fieldset .setbuttons input.movedown[disabled],
 .path-totara-program fieldset .messagebuttons input.movedown[disabled] {
   background-image: url([[pix:t/disable_down]]);
-  color: #bdbdc8;
+  color: var(--tui-color-neutral-5);
 }
 
 .path-totara-program fieldset .setbuttons input.moveup[disabled],
 .path-totara-program fieldset .messagebuttons input.moveup[disabled] {
   background-image: url([[pix:t/disable_up]]);
-  color: #bdbdc8;
+  color: var(--tui-color-neutral-5);
 }
 
 /**
@@ -326,7 +326,7 @@ div.nextsetoperator-group-and {
 
 #assignment_categories .assignment_category td,
 #assignment_categories .assignment_category th {
-  border-left: 1px solid #2e2e2e;
+  border-left: 1px solid var(--tui-color-neutral-5);
 }
 .dir-ltr #assignment_categories .assignment_category td:first-child,
 .dir-ltr #assignment_categories .assignment_category th:first-child {
@@ -398,7 +398,7 @@ div.nextsetoperator-group-and {
   &__content {
     clear: both;
     display: flex;
-    margin-top: $totara_style-spacing_medium;
+    margin-top: var(--tui-gap-4);
   }
 
   &__filters {
@@ -416,11 +416,11 @@ div.nextsetoperator-group-and {
       width: 100%;
 
       thead tr {
-        border-bottom: 1px solid $totara_style-color_neutral_5;
+        border-bottom: 1px solid var(--tui-color-neutral-5);
       }
 
       tr {
-        border-bottom: 1px solid $totara_style-color_neutral_3;
+        border-bottom: 1px solid var(--tui-color-neutral-3);
       }
 
       &__row-type {
@@ -429,7 +429,7 @@ div.nextsetoperator-group-and {
       }
 
       tr:nth-child(even) {
-        background-color: $totara_style-color_neutral_2;
+        background-color: var(--tui-color-neutral-2);
       }
 
       label {
@@ -440,7 +440,7 @@ div.nextsetoperator-group-and {
     &-too-many,
     &-no-results {
       text-align: center;
-      color: $brand-info;
+      color: var(--tui-color-secondary);
 
       .flex-icon {
         font-size: $font-size-h3;
@@ -479,7 +479,7 @@ div.nextsetoperator-group-and {
   margin-top: 10px;
   padding-top: 10px;
   margin-bottom: 15px;
-  background-color: #f0f0f0;
+  background-color: var(--tui-color-neutral-2);
 }
 
 #program-exceptions .exceptionactions input#applyactionbutton {
@@ -643,21 +643,21 @@ div.nextsetoperator-group-and {
   }
 
   #program-assignments .totara-item-group {
-    background-color: $gray-lighter;
-    border: 1px solid $gray-light;
+    background-color: var(--tui-color-neutral-2);
+    border: 1px solid var(--tui-color-neutral-5);
     border-radius: $border-radius-large;
     padding: $padding-small-vertical $padding-small-horizontal;
     margin-right: 5%;
   }
 
   .course_list .totara-item-group {
-    border-bottom: 1px solid $gray-light;
+    border-bottom: 1px solid var(--tui-color-neutral-5);
     padding: $padding-small-vertical $padding-small-horizontal;
     margin-right: 5%;
   }
 
   .course_list li:first-child .totara-item-group {
-    border-top: 1px solid $gray-light;
+    border-top: 1px solid var(--tui-color-neutral-5);
   }
 
   .course_list li:first-child .upitem,

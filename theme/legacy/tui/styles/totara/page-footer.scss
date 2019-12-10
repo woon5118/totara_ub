@@ -26,17 +26,18 @@
 #page-footer {
   margin-top: $line-height-computed;
   padding: 0;
-  border-top: $basis-border-thick solid $brand-primary;
-  background-color: $totara-menu-bg;
-  color: #fff;
+  background-color: var(--tui-color-neutral-3);
+  border: transparent;
 
-  a:link,
-  a:visited,
-  a:hover,
-  a:active {
-    color: #fff;
-    text-decoration: none;
-    border-bottom: none;
+  .page-footer-main-content {
+    a:link,
+    a:visited,
+    a:hover,
+    a:active {
+
+      text-decoration: none;
+      border-bottom: none;
+    }
   }
 }
 
@@ -54,7 +55,7 @@
 .page-footer-poweredby {
   display: block;
   padding: $padding-base-vertical 0;
-  background-color: $brand-primary;
+  background-color: var(--tui-color-background);
 }
 
 .page-footer-loggedin-info {
@@ -63,11 +64,6 @@
 
 #page-footer .row:nth-child(2) .logininfo {
   margin-top: $line-height-computed;
-}
-
-#page-footer .logininfo .btn {
-  @extend .btn;
-  @extend .btn-xs;
 }
 
 .page-footer-nav {

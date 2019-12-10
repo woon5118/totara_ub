@@ -24,29 +24,22 @@
 @import 'theme_legacy/totara/form/passwordunmask';
 @import 'theme_legacy/totara/form/wizard/wizard';
 
-$totara_form-text-color: rgba(85, 85, 85, 1) !default;
-$totara_form-disabled-bg: #dde1e5 !default;
-$totara_form-placeholder-colour: var(--tui-color-neutral-5) !default;
-
 .totara_form {
-  $totara_form-bottom-space-element: 30px !default;
-  $totara_form-bottom-space-other: 20px !default;
-
   // This error-container is displayed at the top of the form.
   > .totara_form-error-container {
-    background-color: #f2dede;
-    color: #a94442;
+    background-color: $totara-form-error-top-bg-color;
+    color: $totara-form-error-top-text-color;
     padding: 15px;
-    margin-bottom: $totara_form-bottom-space-other;
-    border: 1px solid #ebccd1;
+    margin-bottom: $totara-form-bottom-space-other;
+    border: 1px solid $totara-form-error-top-border-color;
     border-radius: 4px;
   }
   // This error-container is displayed above the input.
   .tf_element .totara_form-error-container > .validation-error {
-    background-color: #bb4247;
+    background-color: $totara-form-error-above-bg-color;
     display: inline-block;
     padding: 0.2em 0.6em 0.3em;
-    color: #fff;
+    color: $totara-form-error-above-text-color;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
@@ -55,7 +48,7 @@ $totara_form-placeholder-colour: var(--tui-color-neutral-5) !default;
   }
 
   .totara_form-required_note {
-    margin-bottom: $totara_form-bottom-space-other;
+    margin-bottom: $totara-form-bottom-space-other;
   }
 
   // Equivalent to "row" in bootstrap.
@@ -63,7 +56,7 @@ $totara_form-placeholder-colour: var(--tui-color-neutral-5) !default;
     overflow: hidden;
     clear: right;
     border: none;
-    margin-bottom: $totara_form-bottom-space-element;
+    margin-bottom: $totara-form-bottom-space-element;
   }
 
   // Equivalent to "col-md-3" in bootstrap.
@@ -109,7 +102,7 @@ $totara_form-placeholder-colour: var(--tui-color-neutral-5) !default;
   .totara_form_element_filemanager object {
     height: 160px;
     width: 600px;
-    border: 1px solid #000;
+    border: 1px solid var(--tui-color-border);
   }
 
   .totara_form_element_checkboxes,
@@ -119,7 +112,7 @@ $totara_form-placeholder-colour: var(--tui-color-neutral-5) !default;
       label {
         padding-right: 2rem;
         padding-left: 0;
-        color: $totara_form-text-color;
+        color: $totara-form-input-text-color;
       }
 
       .tf_loading {
@@ -150,7 +143,7 @@ $totara_form-placeholder-colour: var(--tui-color-neutral-5) !default;
   .totara_form_group_section legend {
     a,
     a:hover {
-      color: #333;
+      color: var(--tui-color-text);
       text-decoration: none;
     }
   }
@@ -168,10 +161,10 @@ $totara_form-placeholder-colour: var(--tui-color-neutral-5) !default;
     padding: 6px 12px;
     font-size: 14px;
     line-height: 1.42857143;
-    color: $totara_form-text-color;
-    background-color: #fff;
+    color: $totara-form-input-text-color;
+    background-color: $totara-form-input-bg-color;
     background-image: none;
-    border: 1px solid #ccc;
+    border: 1px solid $totara-form-input-border-color;
     border-radius: 4px;
     -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
@@ -183,7 +176,7 @@ $totara_form-placeholder-colour: var(--tui-color-neutral-5) !default;
 
     &[disabled],
     &[readonly] {
-      background-color: $totara_form-disabled-bg;
+      background-color: $totara-form-input-bg-color-disabled;
       opacity: 1; // iOS fix for unreadable disabled content; see https://github.com/twbs/bootstrap/issues/11655
     }
   }
@@ -207,7 +200,7 @@ $totara_form-placeholder-colour: var(--tui-color-neutral-5) !default;
     display: inline;
 
     &::placeholder {
-      color: $totara_form-placeholder-colour;
+      color: $totara-form-input-text-color-placeholder;
     }
   }
   textarea {
@@ -217,7 +210,7 @@ $totara_form-placeholder-colour: var(--tui-color-neutral-5) !default;
   [data-element-frozen='1'] {
     .filemanager-container,
     .filepicker-filelist {
-      background-color: #f6f6f6;
+      background-color: var(--tui-color-neutral-2);
     }
     .fp-iconview .fp-thumbnail {
       border-width: 0;
@@ -230,7 +223,7 @@ $totara_form-placeholder-colour: var(--tui-color-neutral-5) !default;
 
 // Required asterisk in both Totara forms and Moodle forms.
 .form-required.flex-icon {
-  color: #bb4247;
+  color: $totara-form-icon-color-required;
   font-size: 50%;
   vertical-align: text-top;
 }

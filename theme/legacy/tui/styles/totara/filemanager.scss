@@ -29,13 +29,17 @@
 .filepicker,
 .file-picker {
   font-size: 11px;
+
+  .modtype_folder &,
+  #page-mod-folder-view & {
+    font-size: var(--tui-font-size-14);
+  }
 }
 
 .filemanager a,
 .file-picker a,
 .filemanager a:hover,
 .file-picker a:hover {
-  color: #555;
   text-decoration: none;
 }
 
@@ -72,34 +76,34 @@
 
 #filesskin .yui3-panel-content {
   padding-bottom: 20px;
-  background: #f2f2f2;
+  background: var(--tui-color-neutral-2);
   border-radius: 8px;
-  border: 1px solid #fff;
+  border: 1px solid var(--tui-color-neutral-1);
   display: inline-block;
-  box-shadow: 5px 5px 20px 0 #666;
+  box-shadow: 5px 5px 20px 0 var(--tui-color-neutral-5);
 }
 
 #filesskin .yui3-widget-hd {
   border-radius: 10px 10px 0 0;
-  border-bottom: 1px solid #bbb;
+  border-bottom: 1px solid var(--tui-color-neutral-5);
   padding: 5px;
   text-align: center;
   font-size: 12px;
-  color: #333;
+  color: var(--tui-color-neutral-7);
   letter-spacing: 1px;
-  text-shadow: 1px 1px 1px #fff;
+  text-shadow: 1px 1px 1px var(--tui-color-neutral-1);
   filter: dropshadow(color=#fff, offx=1, offy=1);
-  @include gradient-vertical(#fff, #ccc);
+  background-image: linear-gradient(to bottom, var(--tui-color-neutral-1) 0%, var(--tui-color-neutral-5) 100%);
 }
 
 .fp-panel-button {
-  background: #fff;
+  background: var(--tui-color-neutral-1);
   padding: 3px 20px 2px 20px;
   text-align: center;
   margin: 10px;
   border-radius: 10px;
   display: inline-block;
-  box-shadow: 2px 2px 3px 0.1px #999;
+  box-shadow: 2px 2px 3px 0.1px var(--tui-color-neutral-6);
 }
 
 .moodle-dialogue h3 {
@@ -115,9 +119,9 @@
 // File Picker layout
 #filesskin .file-picker.fp-generallayout {
   width: 859px;
-  background: #fff;
+  background: var(--tui-color-neutral-1);
   border-radius: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--tui-color-neutral-5);
   position: relative;
 }
 
@@ -127,7 +131,7 @@
   display: inline-block;
   float: left;
   height: 490px;
-  border-right: 1px solid #bbb;
+  border-right: 1px solid var(--tui-color-neutral-5);
 }
 
 .file-picker .fp-repo-items {
@@ -137,8 +141,8 @@
 }
 
 .file-picker .fp-navbar {
-  background: #f2f2f2;
-  border-bottom: 1px solid #bbb;
+  background: var(--tui-color-neutral-2);
+  border-bottom: 1px solid var(--tui-color-neutral-5);
   min-height: 40px;
   overflow: hidden;
 }
@@ -148,7 +152,7 @@
 }
 
 .file-picker .fp-content {
-  background: #fff;
+  background: var(--tui-color-neutral-1);
   clear: none;
   overflow: auto;
   height: 452px;
@@ -185,7 +189,7 @@
 }
 
 .file-picker .fp-list .fp-repo.active {
-  background: #f2f2f2;
+  background: var(--tui-color-neutral-2);
 }
 
 .file-picker .fp-list .fp-repo-icon {
@@ -224,27 +228,27 @@
 }
 
 .fp-toolbar .fp-tb-search input {
-  background: #fff url('[[pix:a/search]]') no-repeat 7px 7px;
+  background: var(--tui-color-neutral-1) url('[[pix:a/search]]') no-repeat 7px 7px;
   padding: 2px 6px 1px 27px;
   width: 200px;
   height: 27px;
-  border: 1px solid #bbb;
+  border: 1px solid var(--tui-color-neutral-5);
 }
 
 .fp-viewbar {
   float: right;
   height: 30px;
-  border: 1px solid #ccc;
-  border-bottom: 1px solid #b3b3b3;
+  border: 1px solid var(--tui-color-neutral-5);
+  border-bottom: 1px solid var(--tui-color-neutral-5);
   border-radius: 4px;
   box-sizing: unset;
-  background: white;
+  background: var(--tui-color-neutral-1);
 }
 
 .fp-viewbar a {
   width: 30px;
   height: 30px;
-  border-right: 1px solid #ccc;
+  border-right: 1px solid var(--tui-color-neutral-5);
   display: block;
   float: left;
 }
@@ -255,14 +259,12 @@
 
 .fp-viewbar a.checked:hover,
 .fp-viewbar a:hover {
-  background-image: radial-gradient(ellipse at center, #fff 60%, #dfdfdf 100%);
-  background-color: #ebebeb;
+  background-color: var(--tui-color-neutral-3);
 }
 
 .fp-viewbar a.checked,
 .fp-viewbar a:active {
-  background-image: radial-gradient(ellipse at center, #fff 40%, #dfdfdf 100%);
-  background-color: #dfdfdf;
+  background-color: var(--tui-color-neutral-4);
 }
 
 .fp-viewbar a.fp-vb-icons {
@@ -320,21 +322,21 @@
   min-height: 110px;
   line-height: 110px;
   text-align: center;
-  border: 1px solid #fff;
+  border: 1px solid var(--tui-color-neutral-1);
   display: block;
 }
 
 .fp-iconview .fp-thumbnail img {
-  border: 1px solid #ddd;
+  border: 1px solid var(--tui-color-neutral-5);
   padding: 3px;
   vertical-align: middle;
-  box-shadow: 1px 1px 2px 0 #ccc;
+  box-shadow: 1px 1px 2px 0 var(--tui-color-neutral-5);
 }
 
 .fp-iconview .fp-thumbnail:hover {
-  background: #fff;
-  border: 1px solid #ddd;
-  box-shadow: inset 0 0 10px 0 #ccc;
+  background: var(--tui-color-neutral-1);
+  border: 1px solid var(--tui-color-neutral-5);
+  box-shadow: inset 0 0 10px 0 var(--tui-color-neutral-5);
 }
 
 .fp-iconview .fp-filename-field {
@@ -350,7 +352,7 @@
 }
 
 .fp-iconview .fp-filename-field .fp-filename {
-  background: #fff;
+  background: var(--tui-color-neutral-1);
   padding-top: 5px;
   padding-bottom: 12px;
   min-width: 112px;
@@ -366,25 +368,25 @@
 
 // Table view (File Picker only)
 .file-picker .yui3-datatable table {
-  border: 0 solid #bbb;
+  border: 0 solid var(--tui-color-neutral-5);
   width: 100%;
 }
 
 #filesskin .file-picker .yui3-datatable-header {
-  background: #fff;
-  border-bottom: 1px solid #ccc;
-  border-left: 0 solid #fff;
-  color: #555;
+  background: var(--tui-color-neutral-1);
+  border-bottom: 1px solid var(--tui-color-neutral-5);
+  border-left: 0 solid var(--tui-color-neutral-1);
+  color: var(--tui-color-neutral-7);
 }
 
 #filesskin .file-picker .yui3-datatable-odd .yui3-datatable-cell {
-  background-color: #f6f6f6;
-  border-left: 0 solid #f6f6f6;
+  background-color: var(--tui-color-neutral-3);
+  border-left: 0 solid var(--tui-color-neutral-3);
 }
 
 #filesskin .file-picker .yui3-datatable-even .yui3-datatable-cell {
-  background-color: #fff;
-  border-left: 0 solid #fff;
+  background-color: var(--tui-color-neutral-1);
+  border-left: 0 solid var(--tui-color-neutral-1);
 }
 
 // Tree view (File Manager only)
@@ -548,7 +550,7 @@ a.ygtvspacer:hover {
 
 .file-picker .ygtvfocus,
 .filemanager .ygtvfocus {
-  background-color: #eee;
+  background-color: var(--tui-color-neutral-4);
 }
 
 .fp-filename-icon {
@@ -700,8 +702,8 @@ a.ygtvspacer:hover {
 .fp-select .fp-hr {
   clear: both;
   height: 1px;
-  background-color: #fff;
-  border-bottom: 1px solid #bbb;
+  background-color: var(--tui-color-neutral-1);
+  border-bottom: 1px solid var(--tui-color-neutral-5);
   width: auto;
   margin: 10px 0;
 }
@@ -735,13 +737,13 @@ a.ygtvspacer:hover {
   line-height: 110px;
   text-align: center;
   margin: 10px 20px 0 0;
-  background: #fff;
-  border: 1px solid #ddd;
-  box-shadow: inset 0 0 10px 0 #ccc;
+  background: var(--tui-color-neutral-1);
+  border: 1px solid var(--tui-color-neutral-5);
+  box-shadow: inset 0 0 10px 0 var(--tui-color-neutral-5);
 }
 
 .fp-select .fp-thumbnail img {
-  border: 1px solid #ddd;
+  border: 1px solid var(--tui-color-neutral-5);
   padding: 3px;
   vertical-align: middle;
   margin: 10px;
@@ -829,8 +831,8 @@ a.ygtvspacer:hover {
 }
 
 .filemanager .fp-navbar {
-  background: #f2f2f2;
-  border: 1px solid #bbb;
+  background: var(--tui-color-neutral-2);
+  border: 1px solid var(--tui-color-neutral-5);
   border-bottom: none;
 }
 
@@ -840,7 +842,7 @@ a.ygtvspacer:hover {
 }
 
 .fp-pathbar {
-  border-top: 1px solid #bbb;
+  border-top: 1px solid var(--tui-color-neutral-5);
   padding: 5px 8px 1px;
   min-height: 20px;
 }
@@ -856,20 +858,18 @@ a.ygtvspacer:hover {
 .fp-toolbar .fp-tb-manage,
 .fp-toolbar .fp-tb-logout,
 .fp-toolbar .fp-tb-refresh {
-  border: 1px solid #ccc;
-  border-bottom: 1px solid #b3b3b3;
+  border: 1px solid var(--tui-color-neutral-5);
+  border-bottom: 1px solid var(--tui-color-neutral-5);
   border-radius: 4px;
-  background: white;
+  background: var(--tui-color-neutral-1);
 }
 
 .fp-toolbar a:hover {
-  background-image: radial-gradient(ellipse at center, #fff 60%, #dfdfdf 100%);
-  background-color: #ebebeb;
+  background-color: var(--tui-color-neutral-2);
 }
 
 .fp-toolbar a:active {
-  background-image: radial-gradient(ellipse at center, #fff 40%, #dfdfdf 100%);
-  background-color: #dfdfdf;
+  background-color: var(--tui-color-neutral-3);
 }
 
 .fp-btn-add a,
@@ -901,10 +901,10 @@ a.ygtvspacer:hover {
 
 .filepicker-filelist,
 .filemanager-container {
-  background: #fff;
+  background: var(--tui-color-neutral-1);
   clear: both;
   overflow: auto;
-  border: 1px solid #bbb;
+  border: 1px solid var(--tui-color-neutral-5);
   min-height: 140px;
   position: relative;
 }
@@ -922,7 +922,7 @@ a.ygtvspacer:hover {
 
 .fitem.disabled .filepicker-filelist,
 .fitem.disabled .filemanager-container {
-  background-color: #ebebe4;
+  background-color: var(--tui-color-neutral-4);
 }
 
 .fitem.disabled .fp-btn-choose {
@@ -981,26 +981,26 @@ a.ygtvspacer:hover {
 
 // Table view (File Manager only)
 .filemanager .yui3-datatable table {
-  border: 0 solid #bbb;
+  border: 0 solid var(--tui-color-neutral-5);
   width: 100%;
 }
 
 /* stylelint-disable */
 .filemanager .yui3-datatable-header {
-  background: #fff !important;
-  border-bottom: 1px solid #ccc !important;
-  border-left: 0 solid #fff !important;
-  color: #555 !important;
+  background: var(--tui-color-neutral-1) !important;
+  border-bottom: 1px solid var(--tui-color-neutral-5) !important;
+  border-left: 0 solid var(--tui-color-neutral-1) !important;
+  color: var(--tui-color-neutral-7) !important;
 }
 
 .filemanager .yui3-datatable-odd .yui3-datatable-cell {
-  background-color: #f6f6f6 !important;
-  border-left: 0 solid #f6f6f6;
+  background-color: var(--tui-color-neutral-3) !important;
+  border-left: 0 solid var(--tui-color-neutral-5);
 }
 
 .filemanager .yui3-datatable-even .yui3-datatable-cell {
-  background-color: #fff !important;
-  border-left: 0 solid #fff;
+  background-color: var(--tui-color-neutral-1) !important;
+  border-left: 0 solid var(--tui-color-neutral-1);
 }
 /* stylelint-enable */
 
@@ -1054,34 +1054,34 @@ a.ygtvspacer:hover {
   bottom: 10px;
   left: 10px;
   right: 10px;
-  border: 2px dashed #bbb;
+  border: 2px dashed var(--tui-color-neutral-5);
   padding-top: 85px;
   text-align: center;
 }
 
 .filepicker-filelist .dndupload-target,
 .filemanager-container .dndupload-target {
-  background: #fff;
+  background: var(--tui-color-neutral-1);
   position: absolute;
   top: 10px;
   bottom: 10px;
   left: 10px;
   right: 10px;
-  border: 2px dashed #fb7979;
+  border: 2px dashed var(--tui-color-state);
   padding-top: 85px;
   text-align: center;
-  box-shadow: 0 0 0 10px #fff;
+  box-shadow: 0 0 0 10px var(--tui-color-neutral-1);
 }
 
 .filepicker-filelist.dndupload-over .dndupload-target,
 .filemanager-container.dndupload-over .dndupload-target {
-  background: #fff;
+  background: var(--tui-color-neutral-1);
   position: absolute;
   top: 10px;
   bottom: 10px;
   left: 10px;
   right: 10px;
-  border: 2px dashed #6c8cd3;
+  border: 2px dashed var(--tui-color-state-focus);
   padding-top: 85px;
   text-align: center;
 }
@@ -1120,7 +1120,7 @@ a.ygtvspacer:hover {
 }
 
 .dndupload-arrow {
-  color: $brand-primary;
+  color: var(--tui-color-state);
   padding-top: $padding-large-vertical * 3;
   width: 100%;
   position: absolute;
@@ -1235,8 +1235,8 @@ a.ygtvspacer:hover {
 }
 
 .filemanager.fp-select .fp-reflist .fp-value {
-  background: #f9f9f9;
-  border: 1px solid #bbb;
+  background: var(--tui-color-neutral-3);
+  border: 1px solid var(--tui-color-neutral-5);
   padding: 8px 7px;
   margin: 0;
   max-width: 265px;
@@ -1340,4 +1340,31 @@ a.ygtvspacer:hover {
 .filemanager-toolbar .flex-icon {
   font-size: 18px;
   padding: 5px 6px;
+}
+
+/* improve display when a learner is viewing a folder activity */
+.modtype_folder,
+#page-mod-folder-view {
+  .fp-filename-icon {
+    margin-top: 0;
+    margin-bottom: var(--tui-gap-1);
+  }
+
+  .fp-icon {
+    display: inline-block;
+    float: none;
+    margin-right: var(--tui-gap-1);
+    margin-top: 0;
+  }
+
+  .ygtvtm,
+  .ygtvlm,
+  .ygtvtp,
+  .ygtvlp,
+  .ygtvtmh,
+  .ygtvlmh,
+  .ygtvtph,
+  .ygtvlph {
+    background-position-y: 6px;
+  }
 }
