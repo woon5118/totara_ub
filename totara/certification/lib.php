@@ -2722,9 +2722,13 @@ function certif_get_completion_error_solution($problemkey, $programid = 0, $user
     switch ($problemkey) {
         case 'error:statewindowopen-timeexpirestimeduedifferent':
             $url = clone($baseurl);
-            $url->param('fixkey', 'fixcertwindowopenduedatedifferentmistachexpiry');
+            $url->param('fixkey', 'fixcertwindowopenduedatedifferentmismatchexpiry');
             $html = get_string('error:info_fixduedatemismatchexpiry', 'totara_certification') . '<br>' .
                 html_writer::link($url, get_string('clicktofixcompletions', 'totara_program'));
+            $url2 = clone($baseurl);
+            $url2->param('fixkey', 'fixcertmismatchedexpiryduedatefromassignment');
+            $html .= '<br>' . get_string('error:info_fixmismatchedexpiredtimeduefromassignment', 'totara_certification') . '<br>' .
+                html_writer::link($url2, get_string('clicktofixcompletions', 'totara_program'));
             break;
         case 'error:statewindowopen-timedueempty|error:statewindowopen-timeexpirestimeduedifferent':
             $url = clone($baseurl);
@@ -2734,9 +2738,13 @@ function certif_get_completion_error_solution($problemkey, $programid = 0, $user
             break;
         case 'error:statecertified-timeexpirestimeduedifferent':
             $url = clone($baseurl);
-            $url->param('fixkey', 'fixcertcertifiedduedatedifferentmistachexpiry');
+            $url->param('fixkey', 'fixcertcertifiedduedatedifferentmismatchexpiry');
             $html = get_string('error:info_fixduedatemismatchexpiry', 'totara_certification') . '<br>' .
                 html_writer::link($url, get_string('clicktofixcompletions', 'totara_program'));
+            $url2 = clone($baseurl);
+            $url2->param('fixkey', 'fixcertmismatchedexpiryduedatefromassignment');
+            $html = '<br>' . get_string('error:info_fixmismatchedexpiredtimeduefromassignment', 'totara_certification') . '<br>' .
+                html_writer::link($url2, get_string('clicktofixcompletions', 'totara_program'));
             break;
         case 'error:statecertified-timedueempty|error:statecertified-timeexpirestimeduedifferent':
             $url = clone($baseurl);
@@ -3012,6 +3020,11 @@ function certif_fix_completions($fixkey, $programid = 0, $userid = 0) {
                     }
                 }
                 break;
+            case 'fixcertmismatchedexpiryduedatefromassignment':
+                if ($problemkey == 'error:statewindowopen-timeexpirestimeduedifferent' || $problemkey == 'error:statecertified-timeexpirestimeduedifferent') {
+                    $result = certif_fix_completion_expiry_to_due_date($certcompletion, $progcompletion);
+                }
+                break;
         }
 
         // Nothing happened, so no need to update or log.
@@ -3238,20 +3251,14 @@ function certif_write_completion_history($certcomplhistory, $message = '') {
 /**
  * Fixes program completion records that should have the same due date as the corresponding certification completion expiry date.
  *
- * This should only be used when $programcompletion->timedue is empty! Otherwise, use certif_fix_extension_didnt_update_due_date.
- *
  * @param stdClass $certcompletion a record from certif_completion to be fixed
  * @param stdClass $progcompletion a corresponding record from prog_completion to be fixed
  * @return string message for transaction log
  */
 function certif_fix_completion_expiry_to_due_date(&$certcompletion, &$progcompletion) {
-    if ($progcompletion->timedue > 0) {
-        throw new coding_exception("Tried to apply certif_fix_completion_expiry_to_due_date to a record which has a program time due");
-    }
-
     $progcompletion->timedue = $certcompletion->timeexpires;
 
-    return 'Automated fix \'certif_fix_completion_due_date\' was applied<br>' .
+    return 'Automated fix \'certif_fix_completion_expiry_to_due_date\' was applied<br>' .
         '<ul><li>\'Expiry date\' was copied to \'Due date\'</li></ul>';
 }
 
@@ -3265,16 +3272,10 @@ function certif_fix_completion_expiry_to_due_date(&$certcompletion, &$progcomple
  * @return string message for transaction log
  */
 function certif_fix_extension_didnt_update_due_date(&$certcompletion, &$progcompletion) {
-    if ($progcompletion->timedue <= 0) {
-        throw new coding_exception("Tried to apply certif_fix_extension_didnt_update_due_date to a record which has an empty program time due");
-    }
-
-    $certcompletion->baselinetimeexpires = $progcompletion->timedue;
-    $progcompletion->timedue = $certcompletion->timeexpires;
+    $certcompletion->timeexpires = $progcompletion->timedue;
 
     return 'Automated fix \'certif_fix_extension_didnt_update_due_date\' was applied<br>' .
-        '<ul><li>\'Due date was\' was copied to \'Baseline expiry date\'</li></ul>
-         <ul><li>\'Expiry date\' was copied to \'Due date\'</li></ul>';
+        '<ul><li>\'Due date was\' was copied to \'Expiry date\'</li></ul>';
 }
 
 /**
