@@ -153,7 +153,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 'bookedby',
                 'LEFT',
                 '{user}',
-                'bookedby.id = CASE WHEN base.bookedby = 0 THEN base.userid ELSE base.bookedby END',
+                'bookedby.id = CASE WHEN base.bookedby = 0 OR base.bookedby IS NULL THEN base.userid ELSE base.bookedby END',
                 REPORT_BUILDER_RELATION_MANY_TO_ONE
             ),
         );
