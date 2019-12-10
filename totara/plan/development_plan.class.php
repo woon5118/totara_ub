@@ -266,38 +266,37 @@ class development_plan {
      *
      * @param array $component
      * @param string $action
-     * @return void
+     * @return string|bool
      */
     public function get_component_setting($component, $action) {
-        // we need the know the template to get settings
+        // We need the know the template to get settings.
         if (!$this->templateid) {
             return false;
         }
         $role = $this->role;
-        $templateid = $this->templateid;
 
-        // only load settings when first needed
+        // Only load settings when first needed.
         if (!isset($this->settings)) {
             $this->initialize_settings();
         }
 
-        // return false the setting if it exists
+        // Return the setting if it exists.
         if (array_key_exists($component.'_'.$action, $this->settings)) {
             return $this->settings[$component.'_'.$action];
         }
 
-        // return the role specific setting if it exists
+        // Return the role specific setting if it exists.
         if (array_key_exists($component.'_'.$action.'_'.$role, $this->settings)) {
             return $this->settings[$component.'_'.$action.'_'.$role];
         }
 
-        // return null if nothing set
-        print_error('error:settingdoesnotexist', 'totara_plan', '', (object)array('component' => $component, 'action' => $action));
+        // Return false if nothing set.
+        return false;
     }
 
 
     /**
-     * Get a component setting
+     * Get a component setting for role
      *
      * @param array $component
      * @param string $action
@@ -305,28 +304,28 @@ class development_plan {
      * @return int|false Value of setting
      */
     public function get_component_setting_for_role($component, $action, $role) {
-        // we need the know the template to get settings
+        // We need the know the template to get settings.
         if (!$this->templateid) {
             return false;
         }
-        $templateid = $this->templateid;
 
-        // only load settings when first needed
+        // Only load settings when first needed.
         if (!isset($this->settings)) {
             $this->initialize_settings();
         }
 
-        // return false the setting if it exists
+        // Return the setting if it exists.
         if (array_key_exists($component.'_'.$action, $this->settings)) {
             return $this->settings[$component.'_'.$action];
         }
 
-        // return the role specific setting if it exists
+        // Return the role specific setting if it exists.
         if (array_key_exists($component.'_'.$action.'_'.$role, $this->settings)) {
             return $this->settings[$component.'_'.$action.'_'.$role];
         }
 
-        print_error('error:settingdoesnotexist', 'totara_plan', '', (object)array('component' => $component, 'action' => $action));
+        // Return false if nothing set.
+        return false;
     }
 
 
@@ -334,7 +333,7 @@ class development_plan {
      * Get a setting for an action
      *
      * @param string $action
-     * @return string
+     * @return string|false
      */
     function get_setting($action) {
         return $this->get_component_setting('plan', $action);
