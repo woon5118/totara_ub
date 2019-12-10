@@ -1534,6 +1534,9 @@ function reset_certifcomponent_completions($certifcompletion, $courses=null) {
         // Call course/lib.php functions.
         archive_course_completion($userid, $courseid);
         archive_course_activities($userid, $courseid, $certifcompletion->windowopens);
+
+        // Purge any leftovers.
+        archive_course_purge_gradebook($userid, $courseid);
     }
 
     // Remove mesages for prog&user so we can resend them.
@@ -1932,6 +1935,9 @@ function certif_archive_courses_completion(array $courseids, int $userid, int $a
         // Call course/lib.php functions.
         archive_course_completion($userid, $courseid);
         archive_course_activities($userid, $courseid, $archivedate);
+
+        // Purge any leftovers.
+        archive_course_purge_gradebook($userid, $courseid);
     }
 }
 

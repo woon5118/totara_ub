@@ -7829,8 +7829,7 @@ function forum_archive_completion($userid, $courseid, $windowopens = NULL) {
                 AND forum = :forumid";
         $DB->execute($sql, $params);
 
-        // Reset the grades
-        forum_update_grades($forum, $userid, true);
+        // NOTE: grades are deleted automatically during archiving, no need to do it here.
 
         // Set completion to incomplete
         // Reset viewed

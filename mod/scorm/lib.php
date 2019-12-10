@@ -1653,11 +1653,8 @@ function scorm_archive_completion($userid, $courseid, $windowopens = NULL) {
     $scorms = $DB->get_records_sql($sql, array('courseid' => $courseid, 'userid' => $userid));
     foreach ($scorms as $scorm) {
         $DB->delete_records('scorm_scoes_track', array('userid' => $userid, 'scormid' => $scorm->id));
-        // Resets the grades and completion to incomplete.
-        $grade = new stdClass();
-        $grade->userid   = $userid;
-        $grade->rawgrade = null;
-        scorm_grade_item_update($scorm, $grade);
+
+        // NOTE: grades are deleted automatically during archiving, no need to do it here.
 
         // Reset viewed.
         $course_module = get_coursemodule_from_instance('scorm', $scorm->id, $courseid);

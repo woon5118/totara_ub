@@ -3578,6 +3578,7 @@ function compare_activities_by_time_asc($a, $b) {
  */
 function archive_course_activities($userid, $courseid, $windowopens = NULL) {
     global $DB, $CFG;
+    require_once($CFG->libdir . '/gradelib.php');
 
     if (!isset($windowopens)) {
         $windowopens = time();
@@ -3592,12 +3593,6 @@ function archive_course_activities($userid, $courseid, $windowopens = NULL) {
         // Set up course completion.
         $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
         $completion = new completion_info($course);
-
-        // Create the reset grade.
-        $grade = new stdClass();
-        $grade->userid     = $userid;
-        $grade->overridden = 0; // Needed to be able to reset overridden grades.
-        $grade->rawgrade   = null;
 
         foreach ($modules as $mod) {
             $modfile = $CFG->dirroot . '/mod/' . $mod->name . '/lib.php';
@@ -3615,24 +3610,23 @@ function archive_course_activities($userid, $courseid, $windowopens = NULL) {
                     }
                 }
 
-                // Reset grades.
-                $updateitemfunc = $mod->name . '_grade_item_update';
-                if (function_exists($updateitemfunc)) {
-                    $sql = "SELECT a.*,
-                                    cm.idnumber as cmidnumber,
-                                    m.name as modname
-                            FROM {" . $mod->name . "} a
-                            JOIN {course_modules} cm ON cm.instance = a.id AND cm.course = :courseid
-                            JOIN {modules} m ON m.id = cm.module AND m.name = :modname";
-                    $params = array('modname' => $mod->name, 'courseid' => $courseid);
-
-                    if ($modinstances = $DB->get_records_sql($sql, $params)) {
-                        foreach ($modinstances as $modinstance) {
-                            $updateitemfunc($modinstance, $grade);
-                        }
+                // Delete grades if activity supports grading.
+                if (plugin_supports('mod', $mod->name, FEATURE_GRADE_HAS_GRADE, 0)) {
+                    // This is not the best way to use internal gradebook APIs, but there do not seem to be other good options,
+                    // if anything goes wrong we do a final gradebook purge at the end of archiving anyway.
+                    $sql = "SELECT gg.*
+                              FROM {grade_grades} gg
+                              JOIN {grade_items} gi ON gi.id = gg.itemid
+                             WHERE gi.courseid = :courseid AND gg.userid = :userid AND gi.itemtype = :itemtype AND gi.itemmodule = :itemmodule";
+                    $params = ['userid' => $userid, 'courseid' => $courseid, 'itemtype' => 'mod', 'itemmodule' => $mod->name];
+                    $grades = $DB->get_records_sql($sql, $params);
+                    foreach ($grades as $grade) {
+                        $g = new grade_grade($grade, false);
+                        $g->delete('coursearchive');
                     }
                 }
 
+                // Purge activity completions.
                 $cms = get_all_instances_in_course($mod->name, $course, $userid, true);
                 foreach ($cms as $cm) {
                     // Get all instances doesn't return the completion columns.
@@ -3652,6 +3646,58 @@ function archive_course_activities($userid, $courseid, $windowopens = NULL) {
             }
         }
     }
+    return true;
+}
+
+/**
+ * Purge all grades and outcomes of given user from course
+ * and if user is enrolled then pre-create empty grade records.
+ *
+ * @param int $userid
+ * @param int $courseid
+ * @return bool success
+ */
+function archive_course_purge_gradebook(int $userid, int $courseid) {
+    global $CFG, $DB;
+    require_once($CFG->libdir . '/gradelib.php');
+
+    $context = context_course::instance($courseid);
+
+    $sql = "SELECT gg.*
+              FROM {grade_grades} gg
+              JOIN {grade_items} gi ON gi.id = gg.itemid
+             WHERE gi.courseid = :courseid AND gg.userid = :userid";
+    $params = ['userid' => $userid, 'courseid' => $courseid];
+    $grades = $DB->get_records_sql($sql, $params);
+    foreach ($grades as $grade) {
+        $g = new grade_grade($grade, false);
+        $g->delete('coursearchive');
+    }
+    unset($grades);
+
+    // Make 100% sure that no grades were recreated during the delete operation above
+    // and recreate empty grade records to keep full BC.
+    $trans = $DB->start_delegated_transaction();
+
+    $gradeitems = $DB->get_records('grade_items', ['courseid' => $courseid], "itemtype DESC, id DESC"); // Any reproducible order should be fine here.
+    if ($gradeitems) {
+        list($select, $params) = $DB->get_in_or_equal(array_keys($gradeitems), SQL_PARAMS_NAMED);
+        $params['userid'] = $userid;
+        $DB->delete_records_select('grade_grades', "userid = :userid AND itemid $select", $params);
+
+        if (is_enrolled($context, $userid)) {
+            // Pre-create empty grade records using the same logic
+            // and source as in grade formula calculation method.
+            foreach ($gradeitems as $gradeitem) {
+                $grade = new grade_grade(['itemid' => $gradeitem->id, 'userid' => $userid], false);
+                $grade->grade_item = new grade_item($gradeitem, false);
+                $grade->insert('system');
+            }
+        }
+    }
+
+    $trans->allow_commit();
+
     return true;
 }
 
@@ -3685,8 +3731,6 @@ function archive_course_completion($userid, $courseid) {
 
     require_once($CFG->libdir . '/completionlib.php');
     require_once($CFG->libdir . '/gradelib.php');
-    require_once($CFG->libdir . '/grade/grade_item.php');
-    require_once($CFG->libdir . '/grade/grade_grade.php');
     require_once($CFG->dirroot . '/completion/completion_completion.php');
 
     $status = array(COMPLETION_STATUS_COMPLETE, COMPLETION_STATUS_COMPLETEVIARPL);
@@ -3710,16 +3754,6 @@ function archive_course_completion($userid, $courseid) {
     } else if ($course_item = grade_item::fetch_course_item($courseid)) {
         $grade = new grade_grade(array('itemid' => $course_item->id, 'userid' => $userid));
         $history->grade = $grade->finalgrade;
-
-        // Reset course grade record (unrelated to the completion record) if it was overridden.
-        // Although, course grade records don't trigger course completion on their own, they do
-        // appear in the grade report which might confuse users, so we might as well reset it.
-        if (isset($grade->id) && isset($grade->overridden)) {
-            $grade->overridden = 0;
-            $grade->rawgrade = null;
-            $grade->finalgrade = null;
-            $grade->update();
-        }
     }
 
     // Copy

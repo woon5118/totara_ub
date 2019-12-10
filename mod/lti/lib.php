@@ -647,10 +647,7 @@ function lti_archive_completion(int $userid, int $courseid, int $windowopens = n
     if ($submissions = $DB->get_records_sql($sql, $params)) {
         $now = time();
 
-        // Create the reset grade.
-        $grade = new stdClass();
-        $grade->userid = $userid;
-        $grade->rawgrade = null;
+        // NOTE: grades are deleted automatically during archiving, no need to do it here.
 
         foreach ($submissions as $submission) {
             $cm = get_coursemodule_from_instance('lti', $submission->ltiid, $course->id);
@@ -666,11 +663,6 @@ function lti_archive_completion(int $userid, int $courseid, int $windowopens = n
 
             // Delete LTI submission records.
             $DB->delete_records('lti_submission', ['userid' => $userid, 'ltiid' => $submission->ltiid]);
-
-            // Reset grades.
-            $lti = $DB->get_record('lti', ['id' => $submission->ltiid]);
-            $lti->cmidnumber = $cm->id;
-            lti_grade_item_update($lti, $grade);
 
             // Reset viewed.
             $completion->set_module_viewed_reset($cm, $userid);

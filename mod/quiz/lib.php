@@ -1959,8 +1959,8 @@ function quiz_archive_completion($userid, $courseid, $windowopens = NULL) {
                     quiz_delete_override($quiz, $override->id);
                 }
             }
-            // Reset grades - this will delete the quiz grades and grade grades because there are no attempts.
-            quiz_save_best_grade($quiz, $userid);
+
+            // NOTE: grades are deleted automatically during archiving, no need to do it here.
 
             // Reset completion.
             $course_module = get_coursemodule_from_instance('quiz', $quiz->id, $courseid);

@@ -1651,13 +1651,10 @@ function assign_archive_completion($userid, $courseid, $windowopens = NULL) {
     if ($submissions = $DB->get_records_sql($sql, $params)) {
         $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 
+        // NOTE: grades are deleted automatically during archiving, no need to do it here.
+
         // Create the course completion info.
         $completion = new completion_info($course);
-
-        // Create the reset grade.
-        $grade = new stdClass();
-        $grade->userid = $userid;
-        $grade->rawgrade = null;
 
         foreach ($submissions as $submission) {
             $cm = get_coursemodule_from_instance('assign', $submission->assignid, $course->id);
@@ -1667,12 +1664,6 @@ function assign_archive_completion($userid, $courseid, $windowopens = NULL) {
             $assignment = new assign($context, $cm, $course);
             $assignment->delete_user_submission($userid);
             $assignment->unlock_submission($userid);
-
-            // Reset grade.
-            $assign = $DB->get_record('assign', array('id' => $submission->assignid));
-            $assign->cmidnumber = $cm->id;
-            $assign->courseid = $courseid;
-            assign_grade_item_update($assign, $grade);
 
             // Reset viewed.
             $completion->set_module_viewed_reset($cm, $userid);

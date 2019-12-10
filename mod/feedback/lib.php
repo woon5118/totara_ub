@@ -3356,8 +3356,6 @@ function feedback_can_view_analysis($feedback, $context, $courseid = false) {
 function feedback_archive_completion($userid, $courseid, $windowopens = NULL) {
     global $DB, $CFG;
 
-    require_once($CFG->libdir.'/gradelib.php');
-
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
     $completion = new completion_info($course);
 

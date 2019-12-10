@@ -1166,8 +1166,7 @@ function facetoface_archive_completion($userid, $courseid, $windowopens = NULL) 
         // period. Luckily, window period cannot be more than the active period, so the window cannot open before timefinish.
         $DB->execute($sql, $params);
 
-        // Reset the grades.
-        facetoface_update_grades($facetoface, $userid, true);
+        // NOTE: grades are deleted automatically during archiving, no need to do it here.
 
         // Set completion to incomplete.
         // Reset viewed.
