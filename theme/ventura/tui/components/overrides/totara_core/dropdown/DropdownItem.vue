@@ -21,13 +21,9 @@
 -->
 
 <style lang="scss">
-:root {
-  --tui-dropdown-item-margin: 0.1rem;
-}
-
 .tui-dropdownItem {
   width: 100%;
-  margin: var(--tui-dropdown-item-margin) 0;
+  margin: 0.1rem 0;
   padding: var(--tui-gap-2) var(--tui-gap-4);
   overflow: hidden;
   color: var(--tui-dropdown-item-text-color);

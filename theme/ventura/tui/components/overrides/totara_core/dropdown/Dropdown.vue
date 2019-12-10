@@ -21,11 +21,6 @@
 -->
 
 <style lang="scss">
-:root {
-  --tui-dropdown-content-padding-1: 0.1rem;
-  --tui-dropdown-content-padding-2: 0.2rem;
-}
-
 .tui-dropdown {
   position: relative;
 
@@ -47,8 +42,7 @@
   &__content {
     display: flex;
     flex-direction: column;
-    padding: var(--tui-dropdown-content-padding-1)
-      var(--tui-dropdown-content-padding-2);
+    padding: 0.1rem 0.2rem;
     &--separator > * + * {
       border-top: 1px solid var(--tui-dropdown-menu-border-color);
     }

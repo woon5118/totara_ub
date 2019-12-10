@@ -170,6 +170,13 @@ export default {
       if (event.target !== this.$refs.dropdownMenu) {
         if (this.cancelOptions.indexOf('outside') < 0) return;
         if (!this.$refs.trigger || !this.$refs.trigger.contains(event.target)) {
+          if (!this.closeOnClick) {
+            // not close after click when we set the closeOnClick prop to false
+            if (this.$refs.dropdownMenu.contains(event.target)) {
+              return;
+            }
+          }
+
           // return focus to the trigger if a dropdown item has focus.
           // check where the focus is to avoid returning focus to the trigger if
           // clicking on the item has placed focus elsewhere (e.g. a modal)

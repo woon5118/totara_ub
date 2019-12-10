@@ -466,6 +466,7 @@ $string['myprofile'] = 'My Profile';
 $string['myrecordoflearning'] = 'My Record of Learning';
 $string['mysqlneedsinnodb'] = 'The current database engine "{$a}" may not be compatible with Totara, it is strongly recommended to use InnoDB or XtraDB engine.';
 $string['myteaminstructionaltext'] = 'Choose a team member from the table on the right.';
+$string['n_more'] = '{$a} more';
 $string['noassessors'] = 'No assessors found';
 $string['nogroupassignments'] = 'No groups assigned';
 $string['none'] = 'None';
