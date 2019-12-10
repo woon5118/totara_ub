@@ -23,103 +23,94 @@
 
 use core\orm\collection;
 use core\orm\query\builder;
-use core\webapi\execution_context;
+use core\webapi\query_resolver;
 use criteria_childcompetency\webapi\resolver\query\achievements;
 use totara_competency\entities\assignment;
+use totara_competency\entities\assignment_availability;
+use totara_competency\entities\competency;
 use totara_competency\entities\competency_assignment_user_log;
 use totara_competency\expand_task;
 use totara_competency\user_groups;
-use totara_competency\entities\assignment_availability;
 use totara_criteria\criterion;
-use totara_criteria\criterion_not_found_exception;
-use totara_competency\entities\competency;
 
-class criteria_childcompetency_webapi_query_achievements_testcase extends advanced_testcase {
+global $CFG;
+require_once $CFG->dirroot . '/totara/criteria/tests/competency_achievements_testcase.php';
 
-     /**
-      * Test configuration display - aggregate all
-      */
-    public function test_it_allows_to_view_own_child_competency_achievements() {
+/**
+ * Tests the query to fetch data for child competency achievements
+ */
+class criteria_childcompetency_webapi_query_achievements_testcase extends totara_criteria_competency_achievements_testcase {
+    /**
+     * @return string|query_resolver
+     */
+    protected function get_resolver_classname(): string {
+        return achievements::class;
+    }
 
-        $data = $this->create_data();
-
+    /**
+     * Test configuration display - aggregate all.
+     */
+    public function test_it_allows_to_view_own_child_competency_achievements_by_default() {
         // Logging in...
-        $this->setUser($data['user']);
+        $this->setUser($this->data['user']);
 
         // Righto, let's assert what we need.
-        $result = achievements::resolve([
-            'instance_id' => $data['criterion']->get_id(),
-            'user_id' => $data['user']->id,
-            'assignment_id' => $data['assignment']->id,
-        ], $this->get_execution_context());
+        $args = [
+            'instance_id'   => $this->data['criterion']->get_id(),
+            'user_id'       => $this->data['user']->id,
+        ];
+        $result = $this->execute_resolver($args);
 
         /** @var collection $items */
-        $items = $result['items'] ?? null;
+        $items = $result['items'];
 
         $this->assertEquals(criterion::AGGREGATE_ALL, $result['aggregation_method']);
         $this->assertEquals(1, $result['required_items']);
         $this->assertInstanceOf(collection::class, $items);
 
         $this->assertEqualsCanonicalizing(
-            [$data['competencies'][1]->id, $data['competencies'][2]->id, $data['competencies'][3]->id],
+            [$this->data['competencies'][1]->id, $this->data['competencies'][2]->id, $this->data['competencies'][3]->id],
             $items->pluck('id')
         );
 
         // Now let's assert that it returns correct achievement values
 
         // Competency 1
-        $this->assertEquals($data['proficient_value']->id, $items->item($data['competencies'][1]->id)['value']->id);
+        $this->assertEquals($this->data['proficient_value']->id, $items->item($this->data['competencies'][1]->id)['value']->id);
 
         // Competency 2
-        $this->assertNull($items->item($data['competencies'][2]->id)['value']);
+        $this->assertNull($items->item($this->data['competencies'][2]->id)['value']);
 
         // Competency 3
-        $this->assertNull($items->item($data['competencies'][3]->id)['value']);
-
-        // Now let's take away the capability and check that there is an error
-        assign_capability('totara/competency:view_own_profile',
-            CAP_PROHIBIT,
-            $data['role']->id,
-            context_user::instance($data['user']->id),
-            true
-        );
-
-        $this->expectException(moodle_exception::class);
-        $this->expectExceptionMessage('Sorry, but you do not currently have permissions to do that (View own competency profile)');
-        achievements::resolve([
-            'instance_id' => $data['criterion']->get_id(),
-            'user_id' => $data['user']->id,
-            'assignment_id' => $data['assignment']->id,
-        ], $this->get_execution_context());
+        $this->assertNull($items->item($this->data['competencies'][3]->id)['value']);
     }
-     /**
-      * Test configuration display - aggregate all
-      */
-    public function test_it_allows_to_view_other_child_competency_achievements() {
 
-        $data = $this->create_data();
+    /**
+     * Test configuration display - aggregate all.
+     */
+    public function test_it_allows_to_view_other_child_competency_achievements() {
 
         $logged_user = $this->getDataGenerator()->create_user();
 
-        $this->getDataGenerator()->role_assign($data['role']->id, $logged_user->id);
+        $this->getDataGenerator()->role_assign($this->data['role']->id, $logged_user->id);
         assign_capability(
             'totara/competency:view_other_profile',
             CAP_ALLOW,
-            $data['role']->id,
-            context_user::instance($data['user']->id)
+            $this->data['role']->id,
+            context_user::instance($this->data['user']->id)
         );
 
         $this->setUser($logged_user);
 
         // Righto, let's assert what we need.
-        $result = achievements::resolve([
-            'instance_id' => $data['criterion']->get_id(),
-            'user_id' => $data['user']->id,
-            'assignment_id' => $data['assignment']->id,
-        ], $this->get_execution_context());
+        $args = [
+            'instance_id'   => $this->data['criterion']->get_id(),
+            'user_id'       => $this->data['user']->id,
+        ];
+        $result = $this->execute_resolver($args);
 
         /** @var collection $items */
-        $items = $result['items'] ?? null;
+        $items = $result['items'];
 
         $this->assertEquals(criterion::AGGREGATE_ALL, $result['aggregation_method']);
         $this->assertEquals(1, $result['required_items']);
@@ -127,76 +118,76 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends advanc
 
 
         $this->assertEqualsCanonicalizing(
-            [$data['competencies'][1]->id, $data['competencies'][2]->id, $data['competencies'][3]->id],
+            [$this->data['competencies'][1]->id, $this->data['competencies'][2]->id, $this->data['competencies'][3]->id],
             $items->pluck('id')
         );
 
         // Now let's assert that it returns correct achievement values
 
         // Competency 1
-        $this->assertEquals($data['proficient_value']->id, $items->item($data['competencies'][1]->id)['value']->id);
+        $this->assertEquals($this->data['proficient_value']->id, $items->item($this->data['competencies'][1]->id)['value']->id);
 
         // Competency 2
-        $this->assertNull($items->item($data['competencies'][2]->id)['value']);
+        $this->assertNull($items->item($this->data['competencies'][2]->id)['value']);
 
         // Competency 3
-        $this->assertNull($items->item($data['competencies'][3]->id)['value']);
+        $this->assertNull($items->item($this->data['competencies'][3]->id)['value']);
 
         // Now let's take away the capability and check that there is an error
-        assign_capability('totara/competency:view_other_profile',
+        assign_capability(
+            'totara/competency:view_other_profile',
             CAP_PROHIBIT,
-            $data['role']->id,
-            context_user::instance($data['user']->id),
+            $this->data['role']->id,
+            context_user::instance($this->data['user']->id),
             true
         );
 
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Sorry, but you do not currently have permissions to do that (View profile of other users)');
-        achievements::resolve([
-            'instance_id' => $data['criterion']->get_id(),
-            'user_id' => $data['user']->id,
-            'assignment_id' => $data['assignment']->id,
-        ], $this->get_execution_context());
+        $this->execute_resolver($args);
     }
 
+    /**
+     * Test the assigned status and self assignable of child competency is returned correctly.
+     */
     public function test_it_returns_whether_child_competency_has_been_assigned() {
         // Redirecting events to ensure observers don't interfere with the test
         $sink = $this->redirectEvents();
 
-        $data = $this->create_data();
-
         // Logging in...
-        $this->setUser($data['user']);
+        $this->setUser($this->data['user']);
 
         // Let's create a competency with no assignment...
-        $na_competency = $this->competency_generator()->create_competency(
+        $na_competency = $this->competency_generator->create_competency(
             null,
-            $data['competencies'][0]->frameworkid,
-            ['parentid' => $data['competencies'][0]->id]
+            $this->data['competencies'][0]->frameworkid,
+            ['parentid' => $this->data['competencies'][0]->id]
         ); // No value
 
         // Archived competency
-        $archived_competency = $this->competency_generator()->create_competency(
+        $archived_competency = $this->competency_generator->create_competency(
             null,
-            $data['competencies'][0]->frameworkid,
-            ['parentid' => $data['competencies'][0]->id]
+            $this->data['competencies'][0]->frameworkid,
+            ['parentid' => $this->data['competencies'][0]->id]
         );
-        $archived_assignment = $this->competency_generator()
+        $archived_assignment = $this->competency_generator
             ->assignment_generator()
-            ->create_assignment([
-                'user_group_type' => user_groups::USER,
-                'user_group_id' => $data['user']->id,
-                'competency_id' => $archived_competency->id,
-                'archived' => assignment::STATUS_ARCHIVED,
-            ]);
+            ->create_assignment(
+                [
+                    'user_group_type' => user_groups::USER,
+                    'user_group_id'   => $this->data['user']->id,
+                    'competency_id'   => $archived_competency->id,
+                    'archived'        => assignment::STATUS_ARCHIVED,
+                ]
+            );
 
         // Let's make some competencies self-assignable
-        $comp = new competency($data['competencies'][2]->id);
+        $comp = new competency($this->data['competencies'][2]->id);
         $comp->availability()->save((new assignment_availability())->set_attribute('availability', 1));
         $comp->availability()->save((new assignment_availability())->set_attribute('availability', 2));
 
         // Let's make some competencies self-assignable
-        $comp = new competency($data['competencies'][3]->id);
+        $comp = new competency($this->data['competencies'][3]->id);
         $comp->availability()->save((new assignment_availability())->set_attribute('availability', 2));
 
         // Let's make some competencies self-assignable
@@ -205,32 +196,34 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends advanc
 
         // Fake log entry
         builder::table('totara_competency_assignment_user_logs')
-            ->insert([
-                'assignment_id' => $archived_assignment->id,
-                'user_id' => $data['user']->id,
-                'action' => competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED,
-                'created_at' => time(),
-            ]);
+            ->insert(
+                [
+                    'assignment_id' => $archived_assignment->id,
+                    'user_id'       => $this->data['user']->id,
+                    'action'        => competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED,
+                    'created_at'    => time(),
+                ]
+            );
 
         (new expand_task(builder::get_db()))->expand_all();
 
         // Righto, let's assert what we need.
-        $result = achievements::resolve([
-            'instance_id' => $data['criterion']->get_id(),
-            'user_id' => $data['user']->id,
-            'assignment_id' => $data['assignment']->id,
-        ], $this->get_execution_context());
+        $args = [
+            'instance_id'   => $this->data['criterion']->get_id(),
+            'user_id'       => $this->data['user']->id,
+        ];
+        $result = $this->execute_resolver($args);
 
         /** @var collection $items */
         $items = $result['items'] ?? null;
 
         $this->assertEqualsCanonicalizing(
             [
-                $data['competencies'][1]->id,
-                $data['competencies'][2]->id,
-                $data['competencies'][3]->id,
+                $this->data['competencies'][1]->id,
+                $this->data['competencies'][2]->id,
+                $this->data['competencies'][3]->id,
                 $na_competency->id,
-                $archived_competency->id
+                $archived_competency->id,
             ],
             $items->pluck('id')
         );
@@ -238,19 +231,19 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends advanc
         // Now let's assert that it returns correct achievement values
 
         // Competency 1
-        $this->assertEquals($data['proficient_value']->id, $items->item($data['competencies'][1]->id)['value']->id);
-        $this->assertFalse($items->item($data['competencies'][1]->id)['self_assignable']);
-        $this->assertTrue($items->item($data['competencies'][1]->id)['assigned']);
+        $this->assertEquals($this->data['proficient_value']->id, $items->item($this->data['competencies'][1]->id)['value']->id);
+        $this->assertFalse($items->item($this->data['competencies'][1]->id)['self_assignable']);
+        $this->assertTrue($items->item($this->data['competencies'][1]->id)['assigned']);
 
         // Competency 2
-        $this->assertNull($items->item($data['competencies'][2]->id)['value']);
-        $this->assertTrue($items->item($data['competencies'][2]->id)['self_assignable']);
-        $this->assertTrue($items->item($data['competencies'][2]->id)['assigned']);
+        $this->assertNull($items->item($this->data['competencies'][2]->id)['value']);
+        $this->assertTrue($items->item($this->data['competencies'][2]->id)['self_assignable']);
+        $this->assertTrue($items->item($this->data['competencies'][2]->id)['assigned']);
 
         // Competency 3
-        $this->assertNull($items->item($data['competencies'][3]->id)['value']);
-        $this->assertFalse($items->item($data['competencies'][3]->id)['self_assignable']);
-        $this->assertTrue($items->item($data['competencies'][3]->id)['assigned']);
+        $this->assertNull($items->item($this->data['competencies'][3]->id)['value']);
+        $this->assertFalse($items->item($this->data['competencies'][3]->id)['self_assignable']);
+        $this->assertTrue($items->item($this->data['competencies'][3]->id)['assigned']);
 
         // Competency 4
         $this->assertNull($items->item($na_competency->id)['value']);
@@ -265,76 +258,48 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends advanc
         $sink->close();
     }
 
-
-    public function test_it_works_with_no_competencies() {
-
-        $data = $this->create_data();
-
-        // Logging in...
-        $this->setUser($data['user']);
-
-        // Righto, let's assert what we need.
-        $result = achievements::resolve([
-            'instance_id' => $data['criterion']->get_id(),
-            'user_id' => $data['user']->id,
-            'assignment_id' => $data['assignments'][2]->id,
-        ], $this->get_execution_context());
-
-        /** @var collection $items */
-        $items = $result['items'] ?? null;
-
-        $this->assertEquals(criterion::AGGREGATE_ALL, $result['aggregation_method']);
-        $this->assertEquals(1, $result['required_items']);
-        $this->assertInstanceOf(collection::class, $items);
-
-        $this->assertEmpty($items);
-    }
-
-    public function test_it_throws_you_not_found_exception_for_criterion() {
-        $data = $this->create_data();
+    /**
+     * Test competencies displays the same order as admin set
+     */
+    public function test_it_return_competencies_in_correct_order() {
+        /** @var criterion $criterion */
+        $criterion = $this->data['criterion'];
 
         // Logging in...
-        $this->setUser($data['user']);
+        $this->setUser($this->data['user']);
 
-        $this->expectException(criterion_not_found_exception::class);
+        /** @var competency[] $competencies */
+        $competencies = $this->data['competencies'];
 
-        achievements::resolve([
-            'instance_id' => 0,
-            'user_id' => $GLOBALS['USER']->id,
-            'assignment_id' => $data['assignment']->id,
-        ], $this->get_execution_context());
+        $competencies[1]->sortthread = '01.03';
+        $competencies[1]->save();
+
+        $competencies[2]->sortthread = '01.02';
+        $competencies[2]->save();
+
+        $competencies[3]->sortthread = '01.01';
+        $competencies[3]->save();
+
+        $expected_competencies_order = [
+            $competencies[3]->id,
+            $competencies[2]->id,
+            $competencies[1]->id,
+        ];
+
+        $args = [
+            'instance_id'   => $criterion->get_id(),
+            'user_id'       => $this->data['user']->id,
+        ];
+        $result = $this->execute_resolver($args);
+
+        $actual_competencies_order = array_column($result['items']->to_array(), 'competency');
+
+        $this->assertEquals($expected_competencies_order, array_column($actual_competencies_order, 'id'));
     }
 
-    public function test_it_throws_you_not_found_exception_for_assignment() {
-        $data = $this->create_data();
+    protected function create_data() {
+        [$user, $role] = parent::create_data();
 
-        // Logging in...
-        $this->setUser($data['user']);
-
-        $this->expectException(criterion_not_found_exception::class);
-
-        achievements::resolve([
-            'instance_id' => $data['criterion']->get_id(),
-            'user_id' => $GLOBALS['USER']->id,
-            'assignment_id' => -1,
-        ], $this->get_execution_context());
-    }
-
-    public function test_it_requires_login() {
-        $data = $this->create_data();
-
-        // Logging in...
-
-        $this->expectException(require_login_exception::class);
-
-        achievements::resolve([
-            'instance_id' => $data['criterion']->get_id(),
-            'user_id' => $GLOBALS['USER']->id,
-            'assignment_id' => $data['assignment']->id,
-        ], $this->get_execution_context());
-    }
-
-    private function create_data() {
         $competencies = [];
         $assignments = [];
 
@@ -342,77 +307,84 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends advanc
         // Create another competency
         // Create child competency
         // Create another child competency
-
-        $competencies[] = $this->competency_generator()->create_competency();
+        $competencies[] = $this->competency_generator->create_competency();
 
         // These 3 we're looking for
-        $competencies[] = $this->competency_generator()->create_competency(
+        $competencies[] = $this->competency_generator->create_competency(
             null,
             $competencies[0]->frameworkid,
             ['parentid' => $competencies[0]->id]
         ); // Achieved
-        $competencies[] = $this->competency_generator()->create_competency(
+        $competencies[] = $this->competency_generator->create_competency(
             null,
             $competencies[0]->frameworkid,
             ['parentid' => $competencies[0]->id]
         ); // Not achieved
-        $competencies[] = $this->competency_generator()->create_competency(
+        $competencies[] = $this->competency_generator->create_competency(
             null,
             $competencies[0]->frameworkid,
             ['parentid' => $competencies[0]->id]
         ); // No value
 
-        $competencies[] = $this->competency_generator()->create_competency(
+        $competencies[] = $this->competency_generator->create_competency(
             null,
             $competencies[0]->frameworkid,
             ['parentid' => $competencies[1]->id]
         );
-        $competencies[] = $this->competency_generator()->create_competency();
+        $competencies[] = $this->competency_generator->create_competency();
 
         // Create child competency criterion
-        $criterion = $this->generator()->create_childcompetency([
-            'aggregation' => [
-                'method' => criterion::AGGREGATE_ALL,
-            ],
-            'competency' => $competencies[0]->id,
-        ]);
+        $criterion = $this->generator()->create_childcompetency(
+            [
+                'aggregation' => [
+                    'method' => criterion::AGGREGATE_ALL,
+                ],
+                'competency'  => $competencies[0]->id,
+            ]
+        );
 
-
-        $user = $this->getDataGenerator()->create_user();
-
-        $role = builder::table('role')
-            ->where('shortname', 'student')
-            ->one();
-
-        $this->getDataGenerator()->role_assign($role->id, $user->id);
-
-        // Assign capability
-        assign_capability('totara/competency:view_own_profile', CAP_ALLOW, $role->id, context_user::instance($user->id));
+        // Create child competency criterion with no competency
+        $criterion_with_no_competency = $this->generator()->create_childcompetency(
+            [
+                'aggregation' => [
+                    'method' => criterion::AGGREGATE_ALL,
+                ],
+                'competency'  => $competencies[2]->id,
+            ]
+        );
 
         // This is the main user assignment for a parent competency
-        $assignment = $this->competency_generator()->assignment_generator()->create_assignment([
-            'user_group_type' => user_groups::USER,
-            'user_group_id' => $user->id,
-            'competency_id' => $competencies[0]->id,
-        ]);
+        $assignment = $this->competency_generator->assignment_generator()->create_assignment(
+            [
+                'user_group_type' => user_groups::USER,
+                'user_group_id'   => $user->id,
+                'competency_id'   => $competencies[0]->id,
+            ]
+        );
 
-        $assignments[] = $this->competency_generator()->assignment_generator()->create_assignment([
-            'user_group_type' => user_groups::USER,
-            'user_group_id' => $user->id,
-            'competency_id' => $competencies[1]->id,
-        ]);
+        $assignments[] = $this->competency_generator->assignment_generator()->create_assignment(
+            [
+                'user_group_type' => user_groups::USER,
+                'user_group_id'   => $user->id,
+                'competency_id'   => $competencies[1]->id,
+            ]
+        );
 
-        $assignments[] = $this->competency_generator()->assignment_generator()->create_assignment([
-            'user_group_type' => user_groups::USER,
-            'user_group_id' => $user->id,
-            'competency_id' => $competencies[2]->id,
-        ]);
+        $assignments[] = $this->competency_generator->assignment_generator()->create_assignment(
+            [
+                'user_group_type' => user_groups::USER,
+                'user_group_id'   => $user->id,
+                'competency_id'   => $competencies[2]->id,
+            ]
+        );
 
-        $assignments[] = $this->competency_generator()->assignment_generator()->create_assignment([
-            'user_group_type' => user_groups::USER,
-            'user_group_id' => $user->id,
-            'competency_id' => $competencies[3]->id,
-        ]);
+        $assignments[] = $this->competency_generator->assignment_generator()->create_assignment(
+            [
+                'user_group_type' => user_groups::USER,
+                'user_group_id'   => $user->id,
+                'competency_id'   => $competencies[3]->id,
+            ]
+        );
 
         $proficient_value = builder::table('comp_scale_values')
             ->join('comp_scale_assignments', 'scaleid', 'scaleid')
@@ -433,54 +405,15 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends advanc
         $this->create_achievement_record($assignments[1], $user->id, $not_proficient_value);
 
         return [
-            'criterion' => $criterion,
-            'competencies' => $competencies,
-            'assignments' => $assignments,
-            'assignment' => $assignment,
-            'proficient_value' => $proficient_value,
-            'not_proficient_value' => $not_proficient_value,
-            'role' => $role,
-            'user' => $user,
+            'criterion'                    => $criterion,
+            'criterion_with_no_competency' => $criterion_with_no_competency,
+            'competencies'                 => $competencies,
+            'assignments'                  => $assignments,
+            'assignment'                   => $assignment,
+            'proficient_value'             => $proficient_value,
+            'not_proficient_value'         => $not_proficient_value,
+            'role'                         => $role,
+            'user'                         => $user,
         ];
-    }
-
-    protected function create_achievement_record($assignment, $user_id, $scale_value, $attributes = []) {
-        $attributes = array_merge([
-            'assignment_id' => $assignment->id,
-            'status' => 0,
-            'proficient' => $scale_value->proficient,
-            'user_id' => $user_id,
-            'competency_id' => $assignment->competency_id,
-            'scale_value_id' => $scale_value->id,
-            'time_created' => time(),
-            'time_status' => time(),
-            'time_proficient' => time(),
-            'time_scale_value' => time(),
-            'last_aggregated' => time(),
-        ], $attributes);
-
-        return builder::get_db()->insert_record('totara_competency_achievement', (object) $attributes);
-    }
-
-    /**
-     * Get criteria data generator
-     *
-     * @return totara_criteria_generator
-     */
-    protected function generator() {
-        return $this->getDataGenerator()->get_plugin_generator('totara_criteria');
-    }
-
-    /**
-     * Get criteria data generator
-     *
-     * @return totara_competency_generator
-     */
-    protected function competency_generator() {
-        return $this->getDataGenerator()->get_plugin_generator('totara_competency');
-    }
-
-    private function get_execution_context(string $type = 'dev', ?string $operation = null) {
-        return execution_context::create($type, $operation);
     }
 }

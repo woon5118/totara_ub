@@ -37,14 +37,23 @@ define([], function() {
             return new Filters();
         }
         this.filters = {};
+        this.defaults = {};
     }
 
     /**
      * Clears all filters
      */
     Filters.prototype.clearFilters = function() {
-        this.filters = {};
+        this.filters = this.defaults;
         this.onFiltersUpdate();
+    };
+
+    /**
+     * Sets default filters
+     */
+    Filters.prototype.setDefaults = function(filters) {
+        this.defaults = filters;
+        this.filters = filters;
     };
 
     /**

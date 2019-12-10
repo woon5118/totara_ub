@@ -26,11 +26,13 @@ namespace totara_competency\services;
 
 use context_system;
 use core\format;
+use external_api;
 use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use totara_competency\entities;
+use totara_competency\entities\competency_repository;
 use totara_core\advanced_feature;
 use totara_core\formatter\field\string_field_formatter;
 use totara_core\formatter\field\text_field_formatter;
@@ -40,7 +42,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/lib/externallib.php');
 
-class competency extends \external_api {
+class competency extends external_api {
 
     /**
      * @return external_function_parameters
@@ -57,6 +59,9 @@ class competency extends \external_api {
                             VALUE_OPTIONAL
                         ),
                         'framework' => new external_value(PARAM_INT, 'competency framework id', VALUE_OPTIONAL, null),
+                        'excluded_competency_id' => new external_value(
+                            PARAM_INT, 'filter out a competency from list by competency_id', VALUE_OPTIONAL, 0
+                        ),
                         'assignment_status' => new external_multiple_structure(
                             new external_value(PARAM_INT, 'unassigned (0), assigned (1)', VALUE_OPTIONAL),
                             'filter for assigned/unassigned competencies',
@@ -114,6 +119,9 @@ class competency extends \external_api {
         $repository = entities\competency::repository();
         $competencies = $repository
             ->select('*')
+            ->when(!empty($filters['excluded_competency_id']), function (competency_repository $repository) use ($filters) {
+                $repository->where('id', '!=', $filters['excluded_competency_id']);
+            })
             ->with_assignments_count()
             ->with_children_count()
             ->set_filters($filters)

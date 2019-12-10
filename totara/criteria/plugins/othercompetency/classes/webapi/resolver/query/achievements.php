@@ -17,41 +17,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
  * @author Marco Song <marco.song@totaralearning.com>
- * @package criteria_childcompetency
+ * @package criteria_othercompetency
  */
 
-namespace criteria_childcompetency\webapi\resolver\query;
+namespace criteria_othercompetency\webapi\resolver\query;
 
 use core\orm\collection;
 use core\orm\entity\repository;
-use criteria_childcompetency\childcompetency;
+use criteria_othercompetency\othercompetency;
 use totara_competency\entities\competency;
 use totara_criteria\criterion;
 use totara_criteria\webapi\resolver\query\competency_achievements;
 
 /**
- * Fetches all achievments for the childcompetency criteria type
+ * Fetches all achievments for the othercompetency criteria type
  */
 class achievements extends competency_achievements {
 
     protected static function fetch_criterion(int $criterion_id): criterion {
-        return childcompetency::fetch($criterion_id);
+        return othercompetency::fetch($criterion_id);
     }
 
-    /**
-     * get competencies together with related achievements and availabilities
-     *
-     * @param criterion $completion_criteria
-     * @param int       $user_id
-     *
-     * @return collection
-     */
     protected static function get_competencies(criterion $completion_criteria, int $user_id): collection {
         return competency::repository()
-            ->where('parentid', $completion_criteria->get_competency_id())
-            ->with('availability')
+            ->where_in('id', $completion_criteria->get_item_ids())
             ->with(
                 [
                     'achievement' => function (repository $repository) use ($user_id) {
@@ -61,7 +51,7 @@ class achievements extends competency_achievements {
                     },
                 ]
             )
-            ->order_by('sortthread')
+            ->order_by('framework_hierarchy')
             ->get();
     }
 }

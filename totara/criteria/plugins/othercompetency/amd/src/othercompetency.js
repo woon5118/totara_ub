@@ -348,6 +348,9 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
                                     hasExpandedView: true,
                                     hasHierarchy: true,
                                 },
+                                defaultFilters: {
+                                    'excluded_competency_id': document.querySelector('[data-comp-id]').getAttribute('data-comp-id')
+                                },
                                 service: 'totara_competency_competency_index',
                             },
                             onSaved: function (modal, items, selectionData) {
@@ -368,7 +371,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
                                 placeholderString: [{
                                     component: 'totara_core',
                                     key: 'search'
-                                }]
+                                }],
                             },
                             title: [{
                                 component: 'criteria_othercompetency',

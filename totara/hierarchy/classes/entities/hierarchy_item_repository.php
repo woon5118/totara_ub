@@ -23,17 +23,18 @@
 
 namespace totara_hierarchy\entities;
 
-use core\orm\query\subquery;
-use totara_competency\entities\filters\path;
-use core\orm\entity\traits\has_visible_filter;
+use coding_exception;
 use core\orm\entity\filter\basket;
-use core\orm\entity\filter\hierarchy_item_visible;
-use core\orm\entity\repository;
-use core\orm\query\field;
 use core\orm\entity\filter\equal;
+use core\orm\entity\filter\hierarchy_item_visible;
 use core\orm\entity\filter\in;
 use core\orm\entity\filter\like;
+use core\orm\entity\repository;
+use core\orm\entity\traits\has_visible_filter;
 use core\orm\query\builder;
+use core\orm\query\field;
+use core\orm\query\subquery;
+use totara_competency\entities\filters\path;
 
 abstract class hierarchy_item_repository extends repository {
 
@@ -106,21 +107,14 @@ abstract class hierarchy_item_repository extends repository {
             $column = 'sortthread';
         }
 
-        $allowed_order_columnns = [
-            'id',
-            'fullname',
-            'shortname',
-            'description',
-            'idnumber',
-            'frameworkid',
-            'path',
-            'sortthread',
-            'timecreated',
-            'timemodified',
-            'usermodified'
+        $disallowed_order_columns = [
+            'contextid',
+            'descriptionformat',
+            'scaleconfiguration',
+            'taxonomies',
         ];
-        if (!in_array($column, $allowed_order_columnns)) {
-            $column = 'sortthread';
+        if (in_array($column, $disallowed_order_columns)) {
+            throw new coding_exception('Not allowed to sort by column ' . $column);
         }
 
         parent::order_by($column, $direction);

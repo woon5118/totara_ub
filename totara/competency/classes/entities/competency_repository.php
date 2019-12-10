@@ -110,7 +110,13 @@ class competency_repository extends hierarchy_item_repository {
                     ->order_by('id');
                 break;
             case 'framework_hierarchy':
-                return $this->order_by('frameworkid')
+                if (!$this->has_join(competency_framework::TABLE)) {
+                    $this->join([competency_framework::TABLE, 'framework'], 'frameworkid', 'id');
+                }
+                $framework_alias = $this->get_join(competency_framework::TABLE)->get_table()->get_alias();
+
+                return $this
+                    ->order_by($framework_alias . '.sortorder')
                     ->order_by('sortthread')
                     ->order_by('id');
                 break;

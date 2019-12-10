@@ -187,7 +187,9 @@ class external extends \external_api {
                         'aggregation' => new \external_single_structure(
                             [
                                 'method' => new \external_value(PARAM_INT, 'Aggregation method'),
-                                'reqitems' => new \external_value(PARAM_INT, 'Number or items required for fulfillment'),
+                                'reqitems' => new \external_value(
+                                    PARAM_INT, 'Number or items required for fulfillment', VALUE_OPTIONAL, 1
+                                ),
                             ],
                             'Aggregation detail',
                             VALUE_OPTIONAL

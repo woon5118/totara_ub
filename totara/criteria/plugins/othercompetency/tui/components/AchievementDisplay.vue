@@ -16,22 +16,22 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
-  @package criteria_childcompetency
+  @author Marco Song <marco.song@totaralearning.com>
+  @package criteria_othercompetency
 -->
 
 <template>
   <CompetencyAchievementDisplay
     :achievements="achievements"
-    :no-competency-msg="$str('no_competencies', 'criteria_childcompetency')"
+    :no-competency-msg="$str('no_competencies', 'criteria_othercompetency')"
     :user-id="userId"
     @self-assigned="$apollo.queries.achievements.refetch()"
   />
 </template>
 
 <script>
-  import AchievementsQuery from '../../webapi/ajax/achievements.graphql';
   import CompetencyAchievementDisplay from 'totara_criteria/components/CompetencyAchievementDisplay';
+  import AchievementsQuery from '../../webapi/ajax/achievements.graphql';
 
   export default {
   components: { CompetencyAchievementDisplay },
@@ -51,7 +51,7 @@
     },
   },
 
-  data: function() {
+  data() {
     return {
       achievements: {
         items: [],
@@ -70,7 +70,7 @@
           assignment_id: this.assignmentId,
         };
       },
-      update({ criteria_childcompetency_achievements: achievements }) {
+      update({ criteria_othercompetency_achievements: achievements }) {
         this.$emit('loaded');
         return achievements;
       },
@@ -83,9 +83,8 @@
 
 <lang-strings>
   {
-    "criteria_childcompetency": [
+    "criteria_othercompetency": [
       "no_competencies"
     ]
   }
-
 </lang-strings>

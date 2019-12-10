@@ -189,6 +189,18 @@ function(Filters, List, Selectors, Loader) {
             that.filters = new Filters();
             that.filterEvents(that.filters);
 
+            if (data.list.defaultFilters) {
+                that.filters.setDefaults(data.list.defaultFilters);
+                if (data.list.serviceArgs && data.list.serviceArgs.filters) {
+                    data.list.serviceArgs.filters = Object.assign(data.list.serviceArgs.filters, data.list.defaultFilters);
+                } else {
+                    if (!data.list.serviceArgs) {
+                        data.list.serviceArgs = {};
+                    }
+                    data.list.serviceArgs.filters = data.list.defaultFilters;
+                }
+            }
+
             that.list = List.init(parent, data.list);
             that.listEvents(that.list);
 

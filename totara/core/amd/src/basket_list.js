@@ -351,6 +351,18 @@ function(ajax, Filters, BasketManager, Crumb, List, Selectors, Loader, SimpleBas
             that.filters = new Filters();
             that.filterEvents(that.filters);
 
+            if (data.list.defaultFilters) {
+                that.filters.setDefaults(data.list.defaultFilters);
+                if (data.list.serviceArgs && data.list.serviceArgs.filters) {
+                    data.list.serviceArgs.filters = Object.assign(data.list.serviceArgs.filters, data.list.defaultFilters);
+                } else {
+                    if (!data.list.serviceArgs) {
+                        data.list.serviceArgs = {};
+                    }
+                    data.list.serviceArgs.filters = data.list.defaultFilters;
+                }
+            }
+
             var basket = null;
             // Either we use the basket provided
             // or we create a new basket depending on the type passed

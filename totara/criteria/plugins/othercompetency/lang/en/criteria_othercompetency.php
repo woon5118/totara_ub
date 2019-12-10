@@ -30,6 +30,7 @@ $string['error:nocompetencies'] = 'No competencies selected';
 $string['hierarchy_list:competency:all'] = 'All competencies';
 $string['hierarchy_list:competency:all_in_framework'] = 'All competencies in framework';
 $string['hierarchy_list:competency:select'] = 'Select competencies';
+$string['no_competencies'] = 'There are no other competencies available to view';
 $string['othercompetencies'] = 'Proficiency in other competencies';
 $string['pluginname'] = 'Proficiency in other competencies';
 $string['selectcompetencies'] = "Select competencies";

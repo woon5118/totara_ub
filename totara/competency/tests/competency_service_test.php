@@ -22,9 +22,9 @@
  * @category test
  */
 
+use core\entities\user;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency;
-use core\entities\user;
 use totara_competency\user_groups;
 use totara_core\basket\session_basket;
 
@@ -683,6 +683,36 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
         $this->assertEmpty(array_intersect(array_column($first, 'id'), array_column($second, 'id')));
         $this->assertEmpty(array_intersect(array_column($first, 'id'), array_column($fourth, 'id')));
         $this->assertEmpty(array_intersect(array_column($second, 'id'), array_column($fourth, 'id')));
+    }
+
+    public function test_index_service_filters_out_competencies_by_id() {
+        $data = $this->generate_competencies();
+        //normal situation will return all competencies
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
+            'filters' => [],
+            'page' => 0,
+            'order' => 'fullname',
+            'direction' => 'asc'
+        ]);
+        $result = $res['data'] ?? null;
+        $this->assertWebserviceSuccess($res);
+        $this->assertEquals(11, $result['total']);
+
+        //index service will filter out a certain competency if provide a competency_id
+        $first_comp_id = $data['comps'][0]->id;
+        $res = $this->call_webservice_api('totara_competency_competency_index', [
+            'filters' => [ 'excluded_competency_id' => $first_comp_id ],
+            'page' => 0,
+            'order' => 'fullname',
+            'direction' => 'asc'
+        ]);
+        $result = $res['data'] ?? null;
+        $this->assertWebserviceSuccess($res);
+        $this->assertEquals(10, $result['total']);
+
+        //assert first competency is not in list
+        $comp_ids = array_column($result['items'],'id');
+        $this->assertNotContains($first_comp_id,$comp_ids);
     }
 
     public function test_it_loads_individual_competency() {
