@@ -2773,7 +2773,11 @@ Feel free to browse, list of users is below, their password is 12345.
         'dt_star-wars_storm-trooper' => [['self', 'dt', 'star-wars_1']],
         'jt_binary_literate' => [['self', 'jt', 'low-scale_0']],
         'jt_complex_consultant' => [['self', 'jt', 'overboard-scale_2']],
-        'ut_binary_literate' => [['self', 'ut', 'low-scale_1'], ['manager', 'jm', 'low-scale_0']],
+        'ut_binary_literate' => [
+            ['self', 'ut', 'low-scale_1'],
+            ['manager', 'jm', 'low-scale_0'],
+            ['manager', 'ss', 'low-scale_0', timestamp('2019-08-11')]
+        ],
         'ut_binary_doer' => [['self', 'ut', 'low-scale_0'], ['manager', 'jm', 'low-scale_0']],
         'ut_complex_consultant' => [['self', 'ut', 'overboard-scale_5'], ['manager', 'jm', 'overboard-scale_1']],
         'ut_complex_nurse' => [['manager', 'jm', 'overboard-scale_2']],
@@ -2790,7 +2794,11 @@ Feel free to browse, list of users is below, their password is 12345.
         'ut_4-value_mad-preacher' => [['manager', 'jm', '4-value-scale_3']],
         'ut_star-wars_lightsaber' => [['manager', 'jm', 'star-wars_4']],
         'ut_star-wars_storm-trooper' => [['self', 'ut', 'star-wars_3'], ['manager', 'jm', 'star-wars_4']],
-        'sj_binary_literate' => [['self', 'sj', 'low-scale_1'], ['manager', 'jm', 'low-scale_1']],
+        'sj_binary_literate' => [
+            ['self', 'sj', 'low-scale_1'],
+            ['manager', 'jm', 'low-scale_1', timestamp('2019-11-02')],
+            ['manager', 'ss', 'low-scale_1']
+        ],
         'sj_binary_doer' => [['self', 'sj', 'low-scale_1'], ['manager', 'jm', 'low-scale_1']],
         'sj_complex_consultant' => [['self', 'sj', 'overboard-scale_2'], ['manager', 'jm', 'overboard-scale_4']],
         'sj_complex_nurse' => [['manager', 'jm', 'overboard-scale_2']],
@@ -4087,12 +4095,16 @@ function create_manual_rating_pathways($pathways) {
  * @param array $data
  */
 function create_manual_ratings($manual_ratings, $data) {
+    $time = time();
+
     foreach ($manual_ratings as $key => $values) {
         [$user, $fw, $comp] = explode('_', $key);
         $user = get_user($user, $data);
         $comp = get_competency($fw, $comp, $data);
 
-        $placeholder_comment = multilang("Placeholder Comment: Wow, this person definitely possesses this scale value, no doubt about it!");
+        $placeholder_comment = multilang(
+            "Placeholder Comment: Wow, this person definitely possesses this scale value, no doubt about it!"
+        );
 
         foreach ($values as $rating) {
             [$scale, $index] = explode('_', $rating[2]);
@@ -4105,8 +4117,8 @@ function create_manual_ratings($manual_ratings, $data) {
                 'assigned_by' => get_user($rating[1], $data)->id,
                 'assigned_by_role' => $rating[0],
                 'scale_value_id' => $scale_value_id,
-                'date_assigned' => time(),
-                'comment' => $rating[3] ?? $placeholder_comment,
+                'date_assigned' => $rating[3] ?? $time,
+                'comment' => $rating[4] ?? $placeholder_comment,
             ]))->save();
         }
     }
@@ -4385,6 +4397,16 @@ function multilang(string $string): string {
         $multilang_string .= "<span lang=\"{$lang_code}\" class=\"multilang\">({$lang_name}) $string</span>";
     }
     return $multilang_string;
+}
+
+/**
+ * Get the proper timestamp for a date formatted in YYYY-MM-DD.
+ *
+ * @param string $date
+ * @return int timestamp
+ */
+function timestamp(string $date): int {
+    return (new DateTime($date))->getTimestamp();
 }
 
 /**

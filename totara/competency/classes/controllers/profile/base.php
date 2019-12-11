@@ -167,14 +167,4 @@ abstract class base extends controller {
             $this->is_for_current_user() ? [] : ['user_id' => $this->user->id]
         );
     }
-
-    /**
-     * Get user profile picture URL
-     */
-    public function get_user_picture_url(): string {
-        $user_picture = new \user_picture((object) $this->user->to_array());
-        $user_picture->size = 1; // Size f1.
-        return $user_picture->get_url($this->page);
-    }
-
 }

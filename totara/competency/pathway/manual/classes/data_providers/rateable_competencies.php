@@ -24,9 +24,8 @@
 namespace pathway_manual\data_providers;
 
 use core\orm\collection;
-use core\orm\query\builder;
+use core\orm\entity\repository;
 use core\orm\query\field;
-use pathway_manual\entities\pathway_manual;
 use pathway_manual\entities\role;
 use pathway_manual\manual;
 use pathway_manual\models\roles\role_factory;
@@ -42,98 +41,15 @@ use totara_competency\entities\pathway;
  *
  * @package pathway_manual\data_providers
  */
-class rateable_competencies {
-
-    /**
-     * Array of filters to apply when fetching the data
-     *
-     * @var array
-     */
-    protected $filters = [];
-
-    /**
-     * Return whether data has been fetched
-     *
-     * @var bool
-     */
-    protected $fetched = false;
-
-    /**
-     * @var collection
-     */
-    protected $items;
-
-    /**
-     * Get the names of the filters that we want to display options of.
-     *
-     * @return string[]
-     */
-    protected static function get_enabled_filter_options(): array {
-        return [];
-    }
-
-    /**
-     * Get the filter options available for the filters enabled.
-     *
-     * @return array[] Array of filter name => filter options array
-     */
-    protected function fetch_filter_options() {
-        if (!$this->fetched) {
-            $this->fetch();
-        }
-
-        $filter_options = [];
-
-        foreach (static::get_enabled_filter_options() as $filter) {
-            if (method_exists($this, 'get_' . $filter . '_filter_options')) {
-                $filter_options[$filter] = $this->{'get_' . $filter . '_filter_options'}();
-            } else {
-                throw new \coding_exception("Filtering by '{$filter}' is currently not supported");
-            }
-        }
-
-        return $filter_options;
-    }
-
-    /**
-     * Add filters for this provider.
-     *
-     * @param array $filters
-     * @return $this
-     */
-    public function add_filters(array $filters) {
-        $this->filters = array_merge($this->filters, $filters);
-
-        return $this;
-    }
-
-    /**
-     * Apply filters to a given repository.
-     *
-     * @param competency_repository $repository Repository to apply filters
-     * @return $this
-     */
-    protected function apply_filters(competency_repository $repository) {
-        foreach ($this->filters as $key => $value) {
-            if (is_null($value)) {
-                continue;
-            } else if (method_exists($this, 'filter_by_' . $key)) {
-                $this->{'filter_by_' . $key}($repository, $value);
-            } else {
-                throw new \coding_exception("Filtering by '{$key}' is currently not supported");
-            }
-        }
-
-        return $this;
-    }
+class rateable_competencies extends provider {
 
     /**
      * Only get competencies that the user is assigned to.
      *
-     * @param competency_repository $repository
+     * @param repository $repository
      * @param int $user_id
      */
-    private function filter_by_user_id(competency_repository $repository, int $user_id) {
+    protected function filter_by_user_id(repository $repository, int $user_id) {
         $assigned = competency_assignment_user::repository()
             ->where('user_id', $user_id)
             ->where_field('competency_id', new field('id', $repository->get_builder()));
@@ -144,17 +60,19 @@ class rateable_competencies {
     /**
      * Only get competencies that have the specified pathway roles enabled.
      *
-     * @param competency_repository $repository
+     * @param repository $repository
      * @param string[] $roles
      */
-    private function filter_by_roles(competency_repository $repository, array $roles) {
+    protected function filter_by_roles(repository $repository, array $roles) {
         role_factory::roles_exist($roles, true);
 
         $roles = role::repository()
-            ->join([pathway_manual::TABLE, 'manual'], 'path_manual_id', 'manual.id')
-            ->join([pathway::TABLE, 'pathway'], 'manual.id', 'pathway.path_instance_id')
-            ->where_field('pathway.comp_id', new field('id', $repository->get_builder()))
-            ->where_in('role', $roles);
+            ->select('id')
+            ->join([pathway::TABLE, 'path'], 'path_manual_id', 'path_instance_id')
+            ->where('path.path_type', 'manual')
+            ->where('path.status', manual::PATHWAY_STATUS_ACTIVE)
+            ->where('role', $roles)
+            ->where_field('path.comp_id', new field('id', $repository->get_builder()));
 
         $repository->where_exists($roles->get_builder());
     }
@@ -164,7 +82,7 @@ class rateable_competencies {
      *
      * @return competency_repository
      */
-    protected function build_query(): competency_repository {
+    protected function build_query(): repository {
         $repository = competency::repository();
 
         $this->apply_filters($repository);
@@ -175,18 +93,13 @@ class rateable_competencies {
     /**
      * Run the query with any added filters and store the result.
      *
-     * @return $this
+     * @return collection
      */
-    public function fetch() {
-        if (!$this->fetched) {
-            $this->items = $this->build_query()
-                ->order_by('fullname')
-                ->get();
-
-            $this->fetched = true;
-        }
-
-        return $this;
+    protected function fetch_from_query(): collection {
+        return $this
+            ->build_query()
+            ->order_by('fullname')
+            ->get();
     }
 
     /**
@@ -194,16 +107,12 @@ class rateable_competencies {
      *
      * @return competency[]
      */
-    public function get_competencies(): array {
-        if (!$this->fetched) {
-            $this->fetch();
-        }
-
-        return $this->items->all();
+    public function get() {
+        return $this->fetch()->items->all();
     }
 
     /**
-     * Get the number of competencies available.
+     * Count the number of items.
      *
      * @return int
      */

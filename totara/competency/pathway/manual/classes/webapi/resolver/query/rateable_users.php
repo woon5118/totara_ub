@@ -23,40 +23,29 @@
 
 namespace pathway_manual\webapi\resolver\query;
 
-use context_user;
-use core\entities\user;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
-use pathway_manual\data_providers\user_rateable_competencies as user_rateable_competencies_provider;
-use pathway_manual\models\roles\role;
+use pathway_manual\data_providers\rateable_users as rateable_users_provider;
+use pathway_manual\models\rateable_user;
 use pathway_manual\models\roles\role_factory;
-use pathway_manual\models\user_competencies;
 
-class user_rateable_competencies implements query_resolver {
+class rateable_users implements query_resolver {
 
     /**
      * @param array $args
      * @param execution_context $ec
-     * @return user_competencies
+     * @return rateable_user[]
      */
     public static function resolve(array $args, execution_context $ec) {
         require_login(null, false, null, false, true);
 
-        $user_id = $args['user_id'];
         $role = role_factory::create($args['role']);
         $filters = $args['filters'] ?? [];
 
         // Capabilities are checked inside the data provider.
-        $data_provider = user_rateable_competencies_provider::for_user_and_role($user_id, $role);
-
-        if (empty($filters)) {
-            // If no filters are specified then we load what available filter options there are too.
-            return $data_provider->get_with_filter_options();
-        } else {
-            return $data_provider
-                ->add_filters($filters)
-                ->get();
-        }
+        return rateable_users_provider::for_role($role)
+            ->add_filters($filters)
+            ->get();
     }
 
 }

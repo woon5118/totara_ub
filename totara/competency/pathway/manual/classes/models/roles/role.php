@@ -24,6 +24,8 @@
 namespace pathway_manual\models\roles;
 
 use core\entities\user;
+use core\orm\entity\repository;
+use core\orm\query\builder;
 
 /**
  * A role that is available for a competency.
@@ -81,15 +83,52 @@ abstract class role {
     abstract public static function has_for_user(int $subject_user): bool;
 
     /**
+     * Does the current user have this role for any user across the system?
+     *
+     * @return bool
+     */
+    abstract public static function has_for_any(): bool;
+
+    /**
+     * The capability required to rate.
+     *
+     * @return string
+     */
+    abstract protected static function get_capability_name(): ?string;
+
+    /**
+     * Does the current user have the capability to do this?
+     *
+     * @param int $subject_user
+     * @return bool
+     */
+    final public static function has_capability(int $subject_user): bool {
+        return is_null(static::get_capability_name()) // Empty capability name means there is no extra capability needed.
+            || has_capability(static::get_capability_name(), \context_user::instance($subject_user));
+    }
+
+    /**
+     * Require that the current user has the capability to do this.
+     *
+     * @param int $subject_user
+     * @throws \required_capability_exception
+     */
+    final public static function require_capability(int $subject_user) {
+        if (!is_null(static::get_capability_name())) {
+            require_capability(static::get_capability_name(), \context_user::instance($subject_user));
+        }
+    }
+
+    /**
      * Throw an exception if the user doesn't have this role for the specified user.
      *
      * @param int $subject_user
      * @throws \moodle_exception
      */
-    public static function require_for_user(int $subject_user): void {
+    final public static function require_for_user(int $subject_user): void {
         if (!static::has_for_user($subject_user)) {
             throw new \moodle_exception(
-                'error:user_lacks_role',
+                'error:user_lacks_role_for_user',
                 'pathway_manual',
                 new \moodle_url('/totara/competency/profile', ['user_id' => $subject_user]),
                 ['user' => (new user($subject_user))->fullname, 'role' => strtolower(static::get_display_name())]
@@ -108,5 +147,12 @@ abstract class role {
         }
         return static::has_for_user($this->subject_user);
     }
+
+    /**
+     * Filter a repository to users that report to the current user with this role.
+     *
+     * @param builder|repository $builder
+     */
+    abstract public static function apply_role_restriction_to_builder($builder);
 
 }

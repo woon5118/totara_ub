@@ -37,6 +37,11 @@ require_once(__DIR__ . '/pathway_manual_base_test.php');
 
 class pathway_manual_data_provider_user_rateable_competencies_testcase extends pathway_manual_base_testcase {
 
+    protected function setUp() {
+        parent::setUp();
+        $this->setUser($this->user1->id);
+    }
+
     /**
      * Test that only competencies that the user has an active assignment for are returned.
      */

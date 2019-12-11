@@ -141,7 +141,7 @@ export default {
     },
 
     getAddRatingUrl(roleRating) {
-      return this.$url('/totara/competency/profile/rate-competencies', {
+      return this.$url('/totara/competency/rate_competencies.php', {
         user_id: this.userId,
         role: roleRating.role.name,
         assignment_id: this.assignmentId,

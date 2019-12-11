@@ -17,11 +17,12 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
-  @package totara_competency
+  @package pathway_manual
 -->
 
 <template>
   <FilterBar
+    v-if="hasAnyFilters"
     v-model="selectedFilters"
     :styleclass="{
       lastItemRight: true,
@@ -106,6 +107,14 @@ export default {
   },
 
   computed: {
+    hasAnyFilters() {
+      return (
+        this.filterOptions.assignment_reason != null ||
+        this.filterOptions.competency_type != null ||
+        this.filterOptions.rating_history
+      );
+    },
+
     assignmentReasonFilterOptions() {
       let filters = this.filterOptions.assignment_reason;
 
@@ -148,7 +157,7 @@ export default {
         },
         {
           id: -1,
-          label: this.$str('filter:never_rated', 'pathway_manual'),
+          label: this.$str('never_rated', 'pathway_manual'),
         },
         {
           id: 1,
@@ -159,6 +168,10 @@ export default {
   },
 
   mounted() {
+    if (this.filterOptions.assignment_reason == null) {
+      return;
+    }
+
     this.assignmentKeys = {};
     let assignmentReason = this.filterOptions.assignment_reason;
     for (let i = 0; i < assignmentReason.length; i++) {
@@ -211,13 +224,13 @@ export default {
       "all"
     ],
     "pathway_manual": [
-      "filter:never_rated",
       "filter:previously_rated",
       "filter:rating_history",
       "filter:reason_assigned",
       "filter:update_selection",
       "modal:confirm_update_filters_body",
-      "modal:confirm_update_filters_title"
+      "modal:confirm_update_filters_title",
+      "never_rated"
     ],
     "totara_competency": [
       "filter:competency_type"

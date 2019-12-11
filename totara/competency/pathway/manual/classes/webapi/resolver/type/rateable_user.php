@@ -25,27 +25,29 @@ namespace pathway_manual\webapi\resolver\type;
 
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use pathway_manual\models\rateable_competency as competency;
+use pathway_manual\models\rateable_user as rateable_user_model;
 
-class rateable_competency implements type_resolver {
+class rateable_user implements type_resolver {
 
     /**
-     * Resolves fields for a rateable competency.
+     * Resolves fields for a rateable user.
      *
      * @param string $field
-     * @param competency $competency
+     * @param rateable_user_model $rateable_user
      * @param array $args
      * @param execution_context $ec
      * @return mixed
      */
-    public static function resolve(string $field, $competency, array $args, execution_context $ec) {
+    public static function resolve(string $field, $rateable_user, array $args, execution_context $ec) {
         require_login(null, false, null, false, true);
 
         switch ($field) {
-            case 'competency':
-                return $competency->get_entity();
+            case 'user':
+                return (object) $rateable_user->get_user()->to_array();
+            case 'competency_count':
+                return $rateable_user->get_competency_count();
             case 'latest_rating':
-                return $competency->get_role_rating()->get_latest_rating();
+                return $rateable_user->get_latest_rating();
             default:
                 throw new \coding_exception('Unknown field', $field);
         }

@@ -22,8 +22,8 @@
 -->
 
 <template>
-  <div v-if="isLoaded">
-    <div class="tui-pathwayManual-rateCompetencies__filters">
+  <div v-if="isLoaded" class="tui-pathwayManual-rateUserCompetencies">
+    <div class="tui-pathwayManual-rateUserCompetencies__filters">
       <UserCompetenciesFilters
         v-if="filterOptions"
         :filter-options="filterOptions"
@@ -43,7 +43,7 @@
         @update-rating="updateRating"
         @delete-rating="deleteRating"
       />
-      <div class="tui-pathwayManual-rateCompetencies__submitButtons">
+      <div class="tui-pathwayManual-rateUserCompetencies__submitButtons">
         <ButtonGroup>
           <Button
             :styleclass="{ primary: 'true' }"
@@ -52,7 +52,7 @@
             type="submit"
             @click="showSubmitRatingsModal = true"
           />
-          <Button :text="$str('cancel')" @click="formCancel" />
+          <Button :text="$str('cancel')" @click="$emit('go-back')" />
         </ButtonGroup>
         <ConfirmModal
           :open="showSubmitRatingsModal"
@@ -90,9 +90,8 @@ import UserCompetenciesFilters from 'pathway_manual/components/UserCompetenciesF
 import CreateManualRatingsMutation from '../../webapi/ajax/create_manual_ratings.graphql';
 import RateableCompetenciesQuery from '../../webapi/ajax/user_rateable_competencies.graphql';
 
+import { ROLE_SELF } from 'pathway_manual/components/RoleSelector';
 import { NONE_OPTION_VALUE } from 'pathway_manual/components/RatingPopover';
-
-const ROLE_SELF = 'self';
 
 /**
  * If there are more than this amount of competencies available to rate,
@@ -124,10 +123,6 @@ export default {
       required: true,
       type: Number,
     },
-    goBackLink: {
-      required: true,
-      type: String,
-    },
     assignmentId: {
       required: false,
       type: Number,
@@ -149,6 +144,7 @@ export default {
       showSubmitRatingsModal: false,
       selectedRatings: [],
       noneOptionValue: NONE_OPTION_VALUE,
+      roleSelf: ROLE_SELF,
     };
   },
 
@@ -162,7 +158,7 @@ export default {
     },
 
     isForSelf() {
-      return this.role === ROLE_SELF;
+      return this.role === this.roleSelf;
     },
 
     expandFrameworkGroups() {
@@ -195,10 +191,6 @@ export default {
     applyFilters(filters) {
       this.selectedRatings = [];
       this.selectedFilters = filters;
-    },
-
-    formCancel() {
-      window.location.href = this.goBackLink;
     },
 
     updateRating(ratingData) {
@@ -287,7 +279,7 @@ export default {
         })
         .then(data => {
           if (data.data && data.data.pathway_manual_create_manual_ratings) {
-            window.location.href = this.goBackLink;
+            this.$emit('go-back');
           } else {
             // TODO Handle this case.
             alert('Something went wrong. Saving failed.');
@@ -323,7 +315,9 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-pathwayManual-rateCompetencies {
+.tui-pathwayManual-rateUserCompetencies {
+  margin-top: var(--tui-gap-4);
+
   &__filters {
     margin-bottom: var(--tui-gap-5);
   }
@@ -338,7 +332,6 @@ export default {
   {
     "pathway_manual": [
       "filter:no_competencies",
-      "number_of_competencies",
       "modal:submit_ratings_confirmation_title",
       "modal:submit_ratings_confirmation_question",
       "modal:submit_ratings_summary_singular_other",

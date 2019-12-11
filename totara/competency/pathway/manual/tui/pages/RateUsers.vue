@@ -17,53 +17,54 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
-  @package totara_competency
+  @package pathway_manual
 -->
 
 <template>
-  <div class="tui-pathwayManual-userHeaderWithPhoto">
-    <Avatar :src="photoUrl" :alt="fullName" size="medium" />
-    <h2 class="tui-pathwayManual-userHeaderWithPhoto__title">
-      {{ pageTitle }}
-    </h2>
+  <div>
+    <RateHeader />
+    <RoleSelector
+      :specified-role="specifiedRole"
+      :has-default-selected="true"
+      @role-selected="roleSelected"
+    />
+    <RateUsersList v-if="role" :role="role" :current-user-id="currentUserId" />
   </div>
 </template>
 
 <script>
-import Avatar from 'totara_core/components/avatar/Avatar';
+import RateHeader from 'pathway_manual/components/RateHeader';
+import RateUsersList from 'pathway_manual/components/RateUsersList';
+import RoleSelector from 'pathway_manual/components/RoleSelector';
 
 export default {
-  components: { Avatar },
+  components: {
+    RateHeader,
+    RateUsersList,
+    RoleSelector,
+  },
+
   props: {
-    pageTitle: {
-      required: true,
+    specifiedRole: {
+      required: false,
       type: String,
     },
-    photoUrl: {
+    currentUserId: {
       required: true,
-      type: String,
+      type: Number,
     },
-    fullName: {
-      required: true,
-      type: String,
+  },
+
+  data() {
+    return {
+      role: this.specifiedRole,
+    };
+  },
+
+  methods: {
+    roleSelected(role) {
+      this.role = role;
     },
   },
 };
 </script>
-
-<style lang="scss">
-.tui-pathwayManual-userHeaderWithPhoto {
-  display: table-row;
-
-  &__photoContainer,
-  &__title {
-    display: table-cell;
-  }
-
-  &__title {
-    margin: 0;
-    padding-left: 1.5rem;
-    vertical-align: middle;
-  }
-}
-</style>

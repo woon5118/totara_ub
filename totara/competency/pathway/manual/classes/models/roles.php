@@ -95,6 +95,17 @@ class roles {
     }
 
     /**
+     * Get all the roles the current user has for any user across the system.
+     *
+     * @return role[]
+     */
+    public static function get_current_user_roles_for_any(): array {
+        return array_filter(role_factory::create_all(), function (role $role) {
+            return $role::has_for_any();
+        });
+    }
+
+    /**
      * Check if the given role is in the list of roles specified.
      *
      * @param role|string $role

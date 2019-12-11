@@ -21,8 +21,6 @@
  * @package totara_competency
  */
 
-use pathway_manual\controllers\rate_competencies;
+require_once(__DIR__ . '/../../config.php');
 
-require_once(__DIR__ . '/../../../../config.php');
-
-(new rate_competencies())->process();
+(new pathway_manual\controllers\rate_users())->process();

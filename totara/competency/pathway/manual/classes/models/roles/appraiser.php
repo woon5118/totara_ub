@@ -23,7 +23,10 @@
 
 namespace pathway_manual\models\roles;
 
-use totara_job\job_assignment;
+use core\entities\user;
+use core\orm\entity\repository;
+use core\orm\query\builder;
+use totara_job\entities\job_assignment;
 
 class appraiser extends role {
 
@@ -52,14 +55,43 @@ class appraiser extends role {
      * @return bool
      */
     public static function has_for_user(int $subject_user): bool {
-        global $USER;
-        $job_assignments = job_assignment::get_all($subject_user);
-        foreach ($job_assignments as $job_assignment) {
-            if ($job_assignment->appraiserid == $USER->id) {
-                return true;
-            }
+        return job_assignment::repository()
+            ->where('userid', $subject_user)
+            ->where('appraiserid', user::logged_in()->id)
+            ->exists();
+    }
+
+    /**
+     * Is the current user the appraiser for any users?
+     *
+     * @return bool
+     */
+    public static function has_for_any(): bool {
+        return job_assignment::repository()
+            ->where('appraiserid', user::logged_in()->id)
+            ->exists();
+    }
+
+    /**
+     * The capability system does not support appraisers, so there is no capability.
+     *
+     * @return string
+     */
+    protected static function get_capability_name(): ?string {
+        return null;
+    }
+
+    /**
+     * Filter a repository to just users that the current user is the appraiser of.
+     *
+     * @param builder|repository $builder
+     */
+    public static function apply_role_restriction_to_builder($builder) {
+        if (!$builder->has_join(job_assignment::TABLE, 'appraised_ja')) {
+            $builder->join([job_assignment::TABLE, 'appraised_ja'], 'id', 'userid');
         }
-        return false;
+
+        $builder->where('appraised_ja.appraiserid', user::logged_in()->id);
     }
 
 }

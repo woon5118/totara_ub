@@ -23,6 +23,10 @@
 
 namespace pathway_manual\models\roles;
 
+use core\entities\user;
+use core\orm\entity\repository;
+use core\orm\query\builder;
+use totara_job\entities\job_assignment as job_assignment_entity;
 use totara_job\job_assignment;
 
 class manager extends role {
@@ -52,7 +56,42 @@ class manager extends role {
      * @return bool
      */
     public static function has_for_user(int $subject_user): bool {
-        return has_capability('totara/competency:rate_other_competencies', \context_user::instance($subject_user));
+        return job_assignment::is_managing(user::logged_in()->id, $subject_user);
+    }
+
+    /**
+     * Is the current user the manager for any users?
+     *
+     * @return bool
+     */
+    public static function has_for_any(): bool {
+        return job_assignment::has_staff(user::logged_in()->id);
+    }
+
+    /**
+     * The capability required to rate the user they are managing.
+     *
+     * @return string
+     */
+    protected static function get_capability_name(): string {
+        return 'totara/competency:rate_other_competencies';
+    }
+
+    /**
+     * Filter a repository to just users that the current user is the manager of.
+     *
+     * @param builder|repository $builder
+     */
+    public static function apply_role_restriction_to_builder($builder) {
+        if (!$builder->has_join(job_assignment_entity::TABLE, 'staff_ja')) {
+            $builder->join([job_assignment_entity::TABLE, 'staff_ja'], 'id', 'userid');
+        }
+
+        if (!$builder->has_join(job_assignment_entity::TABLE, 'manager_ja')) {
+            $builder->join([job_assignment_entity::TABLE, 'manager_ja'], 'staff_ja.managerjaid', 'id');
+        }
+
+        $builder->where('manager_ja.userid', user::logged_in()->id);
     }
 
 }

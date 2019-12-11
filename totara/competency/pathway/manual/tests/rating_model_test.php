@@ -27,6 +27,7 @@ use pathway_manual\models\rating as rating_model;
 use pathway_manual\models\roles\appraiser;
 use pathway_manual\models\roles\manager;
 use pathway_manual\models\roles\self_role;
+use totara_job\job_assignment;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -90,6 +91,8 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
         $this->setUser($this->user1->id);
 
         $user_role_id = $DB->get_record('role', ['shortname' => 'user'])->id;
+        $manager_ja = job_assignment::create_default($this->user1->id);
+        job_assignment::create(['userid' => $this->user2->id, 'managerjaid' => $manager_ja->id, 'idnumber' => 1]);
         assign_capability(
             'totara/competency:rate_other_competencies',
             CAP_ALLOW,

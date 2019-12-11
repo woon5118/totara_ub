@@ -131,12 +131,7 @@ class rating {
      * Validate that the logged in user can rate for the given user and role.
      */
     private function require_can_rate_user() {
-        // Check capability.
-        $capability = $this->subject_user->is_logged_in()
-            ? 'totara/competency:rate_own_competencies'
-            : 'totara/competency:rate_other_competencies';
-        require_capability($capability, context_user::instance($this->subject_user->id));
-
+        $this->role::require_capability($this->subject_user->id);
         $this->role::require_for_user($this->subject_user->id);
     }
 

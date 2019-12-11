@@ -23,6 +23,7 @@
 
 namespace pathway_manual\models\roles;
 
+use coding_exception;
 use core\entities\user;
 
 class self_role extends role {
@@ -61,11 +62,34 @@ class self_role extends role {
      * @return bool
      */
     public static function has_for_user(int $subject_user): bool {
-        if ($subject_user != user::logged_in()->id) {
+        if (is_null(user::logged_in())) {
+            // Not logged in
             return false;
         }
 
-        return has_capability('totara/competency:rate_own_competencies', \context_user::instance($subject_user));
+        return $subject_user == user::logged_in()->id;
+    }
+
+    /**
+     * The user can only have the self role in relation to themselves, and no other users, so this is always false.
+     *
+     * @return bool
+     */
+    public static function has_for_any(): bool {
+        return false;
+    }
+
+    /**
+     * The capability required to rate themselves.
+     *
+     * @return string
+     */
+    protected static function get_capability_name(): string {
+        return 'totara/competency:rate_own_competencies';
+    }
+
+    public static function apply_role_restriction_to_builder($builder) {
+        throw new coding_exception('There is no logical reason to use ' . __FUNCTION__ . '() on ' . __CLASS__ . '!');
     }
 
 }

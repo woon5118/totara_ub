@@ -1,7 +1,7 @@
 query pathway_manual_user_rateable_competencies(
   $user_id: core_id!
   $role: String!
-  $filters: pathway_manual_rateable_competencies_filters
+  $filters: pathway_manual_user_rateable_competencies_filters
 ) {
   pathway_manual_user_rateable_competencies(
     user_id: $user_id
@@ -24,12 +24,13 @@ query pathway_manual_user_rateable_competencies(
           id
           display_name
         }
-        last_rating {
+        latest_rating {
           rater {
             id
             fullname
           }
           date: timestamp(format: DATE)
+          date_iso8601: timestamp(format: ISO8601)
           comment
           scale_value {
             id

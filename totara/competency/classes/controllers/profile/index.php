@@ -43,7 +43,7 @@ class index extends base {
             'is-mine' => $this->is_for_current_user(),
             'base-url' => (string) $this->get_base_url(),
             'can-assign' => $this->can_assign(),
-            'can-rate-competencies' => user_competencies::can_rate_competencies($this->user, $this->context),
+            'can-rate-competencies' => user_competencies::can_rate_competencies($this->user->id, $this->context),
         ];
 
         return tui_view::create('totara_competency/pages/CompetencyProfile', $props)

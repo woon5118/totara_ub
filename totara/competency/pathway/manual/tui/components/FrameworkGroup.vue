@@ -17,7 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
-  @package totara_competency
+  @package pathway_manual
 -->
 
 <template>
@@ -42,48 +42,28 @@
     >
       <template v-slot:header-row>
         <HeaderCell size="11">
-          <strong>{{ $str('competency', 'totara_hierarchy') }}</strong>
+          {{ columnHeaders[0] }}
         </HeaderCell>
         <HeaderCell size="8">
           <div class="tui-pathwayManual__frameworkGroup_table_block">
-            <strong>{{ $str('last_rating_given', 'pathway_manual') }}</strong>
-            <div
-              class="tui-pathwayManual__frameworkGroup_table_help"
-              @mouseover="showRatingTooltip = true"
-              @mouseleave="showRatingTooltip = false"
-            >
-              <FlexIcon icon="info" size="200" />
-              <Tooltip :display="showRatingTooltip">
-                <span v-if="isForSelf">
-                  {{ $str('last_rating_given_self_tooltip', 'pathway_manual') }}
-                </span>
-                <span v-else>
-                  {{
-                    $str('last_rating_given_other_tooltip', 'pathway_manual')
-                  }}
-                </span>
-              </Tooltip>
-            </div>
+            {{ columnHeaders[1] }}
+            <LastRatingHelp :is-for-self="isForSelf" />
           </div>
         </HeaderCell>
         <HeaderCell
           size="3"
           class="tui-pathwayManual__frameworkGroup_table_block"
         >
-          <div class="tui-pathwayManual__frameworkGroup_table_block">
-            <strong>{{ $str('new_rating', 'pathway_manual') }}</strong>
-            <div
-              class="tui-pathwayManual__frameworkGroup_table_help"
-              @mouseover="showScaleTooltip = true"
-              @mouseleave="showScaleTooltip = false"
+          <div class="tui-pathwayManual__frameworkGroup_table__block">
+            {{ columnHeaders[2] }}
+            <ScalePopover
+              :scale="group"
+              :show-descriptions="true"
+              position="right"
+              class="tui-pathwayManual-frameworkGroup__table_help"
             >
               <FlexIcon icon="info" size="200" />
-              <ScaleTooltip
-                :scale="group"
-                :display="showScaleTooltip"
-                :show-descriptions="true"
-              />
-            </div>
+            </ScalePopover>
           </div>
         </HeaderCell>
         <HeaderCell
@@ -92,23 +72,16 @@
         />
       </template>
       <template v-slot:row="{ row }">
-        <Cell size="11">
+        <Cell size="11" :column-header="columnHeaders[0]">
           {{ row.competency.display_name }}
         </Cell>
-        <Cell size="8">
-          <span v-if="row.last_rating">
-            <span v-if="row.last_rating.scale_value">
-              {{ row.last_rating.scale_value.name }}
-            </span>
-            <span v-else>
-              {{ $str('rating_set_to_none', 'pathway_manual') }}
-            </span>
-            <br />
-            {{ row.last_rating.date }}<br />
-            {{ getRater(row.last_rating.rater) }}
-          </span>
+        <Cell size="8" :column-header="columnHeaders[1]">
+          <LastRatingBlock
+            :latest-rating="row.latest_rating"
+            :current-user-id="currentUserId"
+          />
         </Cell>
-        <Cell size="3">
+        <Cell size="3" :column-header="columnHeaders[2]">
           <span
             v-if="hasNoneRating(row.competency.id)"
             class="tui-pathwayManual__frameworkGroup_table_noneRating"
@@ -146,10 +119,11 @@
 import Cell from 'totara_core/components/datatable/Cell';
 import FlexIcon from 'totara_core/components/icons/FlexIcon';
 import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-import ScaleTooltip from 'totara_competency/components/ScaleTooltip';
+import LastRatingBlock from 'pathway_manual/components/LastRatingBlock';
+import LastRatingHelp from 'pathway_manual/components/LastRatingHelp';
 import RatingInput from 'pathway_manual/components/RatingInput';
+import ScalePopover from 'totara_competency/components/ScalePopover';
 import Table from 'totara_core/components/datatable/Table';
-import Tooltip from 'totara_competency/components/Tooltip';
 
 import { NONE_OPTION_VALUE } from 'pathway_manual/components/RatingPopover';
 
@@ -160,10 +134,11 @@ export default {
     Cell,
     FlexIcon,
     HeaderCell,
-    ScaleTooltip,
+    LastRatingBlock,
+    LastRatingHelp,
     RatingInput,
+    ScalePopover,
     Table,
-    Tooltip,
   },
 
   props: {
@@ -199,6 +174,14 @@ export default {
   },
 
   computed: {
+    columnHeaders() {
+      return [
+        this.$str('competency', 'totara_hierarchy'),
+        this.$str('last_rating_given', 'pathway_manual'),
+        this.$str('new_rating', 'pathway_manual'),
+      ];
+    },
+
     isForSelf() {
       return this.role === ROLE_SELF;
     },
@@ -221,17 +204,6 @@ export default {
   methods: {
     toggleOpen() {
       this.showContent = !this.showContent;
-    },
-
-    getRater(rater) {
-      if (rater) {
-        // Only display the rater's name if it's not the current user.
-        return parseInt(rater.id) === this.currentUserId
-          ? ''
-          : '(' + rater.fullname + ')';
-      } else {
-        return this.$str('rater_details_removed', 'pathway_manual');
-      }
     },
 
     updateRating(compId, ratingData) {
@@ -320,6 +292,15 @@ export default {
 
     &_help {
       display: inline;
+      & .flex-icon {
+        cursor: pointer;
+      }
+    }
+
+    &_flex {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
     }
 
     &_noneRating {

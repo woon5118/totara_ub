@@ -22,7 +22,6 @@
  */
 
 use core\orm\query\builder;
-use pathway_manual\manual;
 use pathway_manual\models\roles\appraiser;
 use pathway_manual\models\roles\manager;
 use pathway_manual\models\roles\self_role;
@@ -37,7 +36,8 @@ require_once(__DIR__ . '/pathway_manual_base_test.php');
 class pathway_manual_model_user_competencies_testcase extends pathway_manual_base_testcase {
 
     /**
-     * Test that can_rate_competencies() checks if there are any competencies the current user is allowed to rate for themselves.
+     * Test that can_rate_competencies_for_user() checks if there are any competencies the current user
+     * is allowed to rate for themselves.
      */
     public function test_can_rate_competencies_self() {
         $role = builder::table('role')->where('shortname', 'user')->one()->id;
@@ -55,19 +55,19 @@ class pathway_manual_model_user_competencies_testcase extends pathway_manual_bas
         $manual = $this->generator->create_manual($this->competency1, [self_role::class]);
 
         // Has capability, has the role and has at least one assigned competency
-        $this->assertTrue(user_competencies::can_rate_competencies($this->user1, $context));
+        $this->assertTrue(user_competencies::can_rate_competencies($this->user1->id, $context));
 
         unassign_capability('totara/competency:rate_own_competencies', $role);
 
         // No longer has capability
-        $this->assertFalse(user_competencies::can_rate_competencies($this->user1, $context));
+        $this->assertFalse(user_competencies::can_rate_competencies($this->user1->id, $context));
 
         assign_capability('totara/competency:rate_own_competencies', CAP_ALLOW, $role, $context->id);
         $assignment = assignment::load_by_id($assignment->id);
         $assignment->archive();
 
         // No longer has any assigned competencies
-        $this->assertFalse(user_competencies::can_rate_competencies($this->user1, $context));
+        $this->assertFalse(user_competencies::can_rate_competencies($this->user1->id, $context));
 
         $this->generator->assignment_generator()->create_assignment([
             'user_group_type' => user_groups::USER,
@@ -78,11 +78,12 @@ class pathway_manual_model_user_competencies_testcase extends pathway_manual_bas
         $manual->delete();
 
         // No longer has any 'self' manual rating pathways
-        $this->assertFalse(user_competencies::can_rate_competencies($this->user1, $context));
+        $this->assertFalse(user_competencies::can_rate_competencies($this->user1->id, $context));
     }
 
     /**
-     * Test that can_rate_competencies() checks if there are any competencies the current user is allowed to rate for someone else.
+     * Test that can_rate_competencies_for_user() and can_rate_competencies_for_any()
+     * checks if there are any competencies the current user is allowed to rate for someone else.
      */
     public function test_can_rate_competencies_other() {
         $role = builder::table('role')->where('shortname', 'staffmanager')->one()->id;
@@ -104,19 +105,19 @@ class pathway_manual_model_user_competencies_testcase extends pathway_manual_bas
         $this->generator->create_manual($this->competency1, [appraiser::class]);
 
         // Has capability, has the role and has at least one assigned competency
-        $this->assertTrue(user_competencies::can_rate_competencies($this->user1, $context));
+        $this->assertTrue(user_competencies::can_rate_competencies($this->user1->id, $context));
 
         unassign_capability('totara/competency:rate_other_competencies', $role);
 
         // No longer has capability
-        $this->assertFalse(user_competencies::can_rate_competencies($this->user1, $context));
+        $this->assertFalse(user_competencies::can_rate_competencies($this->user1->id, $context));
 
         assign_capability('totara/competency:rate_other_competencies', CAP_ALLOW, $role, $context->id);
         $assignment = assignment::load_by_id($assignment->id);
         $assignment->archive();
 
         // No longer has any assigned competencies
-        $this->assertFalse(user_competencies::can_rate_competencies($this->user1, $context));
+        $this->assertFalse(user_competencies::can_rate_competencies($this->user1->id, $context));
 
         $this->generator->assignment_generator()->create_assignment([
             'user_group_type' => user_groups::USER,
@@ -127,12 +128,12 @@ class pathway_manual_model_user_competencies_testcase extends pathway_manual_bas
         $manual_manager->delete();
 
         // No longer has any 'manager' manual rating pathways
-        $this->assertFalse(user_competencies::can_rate_competencies($this->user1, $context));
+        $this->assertFalse(user_competencies::can_rate_competencies($this->user1->id, $context));
 
         job_assignment::create(['userid' => $this->user1->id, 'appraiserid' => $this->user2->id, 'idnumber' => 2]);
 
         // Is now an appraiser
-        $this->assertTrue(user_competencies::can_rate_competencies($this->user1, $context));
+        $this->assertTrue(user_competencies::can_rate_competencies($this->user1->id, $context));
     }
 
 }

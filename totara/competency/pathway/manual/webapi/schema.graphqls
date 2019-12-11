@@ -33,7 +33,7 @@ A competency that can be rated
 """
 type pathway_manual_rateable_competency {
   competency: totara_competency_competency! # The actual competency
-  last_rating: pathway_manual_rating # Last rating made
+  latest_rating: pathway_manual_rating # Last rating made
 }
 
 """
@@ -44,6 +44,15 @@ type pathway_manual_framework_group {
   values: [totara_competency_scale_value!]! # The actual scale
   competencies: [pathway_manual_rateable_competency]! # Rateable competencies
   count: Int! # Number of rateable competencies
+}
+
+"""
+A user that can be manually rated
+"""
+type pathway_manual_rateable_user {
+  user: core_user!
+  competency_count: Int!
+  latest_rating: pathway_manual_rating
 }
 
 """
@@ -66,9 +75,16 @@ type pathway_manual_user_competencies_filter_options {
 }
 
 """
-Filters that have been chosen to filter by.
+Filters that have been chosen to filter by for rateable users.
 """
-input pathway_manual_rateable_competencies_filters {
+input pathway_manual_rateable_users_filters {
+  user_full_name: String
+}
+
+"""
+Filters that have been chosen to filter by for rateable competencies.
+"""
+input pathway_manual_user_rateable_competencies_filters {
   assignment_reason: [core_id!]
   rating_history: Boolean
   competency_type: core_id
@@ -96,9 +112,9 @@ extend type Mutation {
 
 extend type Query {
   """
-  Get the roles for the current user in relation to another user
+  Get all roles for the current user, and optionally in relation to another user
   """
-  pathway_manual_roles(subject_user: core_id!): [pathway_manual_role!]!
+  pathway_manual_roles(subject_user: core_id): [pathway_manual_role]!
 
   """
   Get most recent ratings for a competency assignment by role
@@ -109,11 +125,19 @@ extend type Query {
   ): [pathway_manual_role_rating]
 
   """
+  Get users that the logged in user is able to manually rate for a role
+  """
+  pathway_manual_rateable_users(
+    role: String!
+    filters: pathway_manual_rateable_users_filters
+  ): [pathway_manual_rateable_user]!
+
+  """
   Get all rateable competencies for a user by role
   """
   pathway_manual_user_rateable_competencies(
     user_id: core_id!
     role: String!
-    filters: pathway_manual_rateable_competencies_filters
+    filters: pathway_manual_user_rateable_competencies_filters
   ): pathway_manual_user_competencies!
 }

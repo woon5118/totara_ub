@@ -23,7 +23,6 @@
 
 use core\orm\query\builder;
 use core\webapi\execution_context;
-use pathway_manual\manual;
 use pathway_manual\models\framework_group;
 use pathway_manual\models\rateable_competency;
 use pathway_manual\models\roles\manager;
@@ -111,6 +110,8 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
      * Make sure correct capabilities are enforced when querying for another user as a manager.
      */
     public function test_capability_manager() {
+        $this->generator->create_manual($this->competency1, [manager::class]);
+
         $manager_ja = job_assignment::create_default($this->user2->id);
         job_assignment::create(['userid' => $this->user1->id, 'managerjaid' => $manager_ja->id, 'idnumber' => 1]);
 
@@ -121,8 +122,10 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
             $this->execution_context()
         );
 
-        $role = builder::table('role')->where('shortname', 'staffmanager')->one()->id;
-        unassign_capability('totara/competency:rate_other_competencies', $role);
+        $manager_role = builder::table('role')->where('shortname', 'staffmanager')->one()->id;
+        $self_role = builder::table('role')->where('shortname', 'user')->one()->id;
+        unassign_capability('totara/competency:rate_other_competencies', $manager_role);
+        unassign_capability('totara/competency:rate_own_competencies', $self_role);
 
         $this->expectException(required_capability_exception::class);
         user_rateable_competencies::resolve(
@@ -192,7 +195,7 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
         $returned_competency = $returned_competencies[0];
 
         rateable_competency_type::resolve('competency', $returned_competency, [], $this->execution_context());
-        rateable_competency_type::resolve('last_rating', $returned_competency, [], $this->execution_context());
+        rateable_competency_type::resolve('latest_rating', $returned_competency, [], $this->execution_context());
     }
 
     /**
@@ -209,7 +212,7 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
 
         // No rating exists.
         $last_rating = rateable_competency_type::resolve(
-            'last_rating',
+            'latest_rating',
             $rateable_competency_role_self,
             [],
             $this->execution_context()
@@ -232,7 +235,7 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
         );
 
         $last_rating = rateable_competency_type::resolve(
-            'last_rating',
+            'latest_rating',
             $rateable_competency_role_self,
             [],
             $this->execution_context()
@@ -240,7 +243,7 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
         $this->assertEquals($rating_self, $last_rating);
 
         $last_rating = rateable_competency_type::resolve(
-            'last_rating',
+            'latest_rating',
             $rateable_competency_role_manager,
             [],
             $this->execution_context()

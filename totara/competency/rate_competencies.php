@@ -18,31 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
- * @package pathway_manual
+ * @package totara_competency
  */
 
-namespace pathway_manual\webapi\resolver\query;
+require_once(__DIR__ . '/../../config.php');
 
-use core\webapi\execution_context;
-use core\webapi\query_resolver;
-use pathway_manual\models\roles\role;
-use pathway_manual\models\roles as roles_helper;
-
-class roles implements query_resolver {
-
-    /**
-     * @param array $args
-     * @param execution_context $ec
-     * @return role[]
-     */
-    public static function resolve(array $args, execution_context $ec) {
-        require_login(null, false, null, false, true);
-
-        if (isset($args['subject_user'])) {
-            return roles_helper::get_current_user_roles($args['subject_user']);
-        } else {
-            return roles_helper::get_current_user_roles_for_any();
-        }
-    }
-
-}
+(new pathway_manual\controllers\rate_competencies())->process();

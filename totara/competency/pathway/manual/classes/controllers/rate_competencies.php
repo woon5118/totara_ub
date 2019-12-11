@@ -23,19 +23,43 @@
 
 namespace pathway_manual\controllers;
 
+use context;
+use context_user;
+use core\entities\user;
+use moodle_url;
 use pathway_manual\models\roles;
 use pathway_manual\models\roles\manager;
 use pathway_manual\models\roles\role;
 use pathway_manual\models\roles\self_role;
-use totara_competency\controllers\profile\base;
+use totara_mvc\controller;
 use totara_mvc\tui_view;
+use totara_mvc\view;
 
-class rate_competencies extends base {
+class rate_competencies extends controller {
+
+    use has_role;
 
     /**
-     * @var role|null
+     * User id passed through the attribute
+     *
+     * @var user
      */
-    private $role;
+    protected $user;
+
+    /**
+     * @return context_user
+     */
+    protected function setup_context(): context {
+        return context_user::instance($this->user->id);
+    }
+
+    public function __construct() {
+        require_login();
+        $user_id = $this->get_param('user_id', PARAM_INT);
+        $this->user = $user_id ? new user($user_id) : user::logged_in();
+
+        parent::__construct();
+    }
 
     /**
      * Set up the page.
@@ -43,59 +67,105 @@ class rate_competencies extends base {
      * @return tui_view
      */
     public function action() {
-        $page_title = get_string('rate_competencies', 'pathway_manual');
-        $this->add_navigation($page_title);
-
         $vue_props = [
             'user' => [
-                'id' => $this->user->id,
+                'id' => (int) $this->user->id,
                 'fullname' => $this->user->fullname,
                 'profileimageurl' => $this->get_user_picture_url(),
             ],
-            'current-user-id' => (int)$this->currently_logged_in_user()->id,
-            'go-back-link' => (string)$this->get_profile_url(),
+            'current-user-id' => (int) $this->currently_logged_in_user()->id,
+            'return-url' => $this->get_return_url()->out(),
         ];
 
         if ($this->role) {
-            $vue_props['role'] = $this->role::get_name();
+            $vue_props['specified-role'] = $this->role::get_name();
+        } else if ($this->user->is_logged_in()) {
+            $vue_props['specified-role'] = self_role::get_name();
         }
 
         if ($assignment_id = $this->get_param('assignment_id', PARAM_INT)) {
             $vue_props['assignment-id'] = $assignment_id;
         }
 
-        return tui_view::create('pathway_manual/pages/RateCompetencies', $vue_props)
-            ->set_title($page_title);
+        $view = tui_view::create('pathway_manual/pages/RateCompetencies', $vue_props);
+        $this->apply_page_navigation($view);
+        return $view;
     }
 
     /**
-     * Validate that the logged in user has permission to view this page.
+     * Get all the roles available.
      *
-     * @return self
+     * @return role[]
      */
-    protected function authorize() {
-        // This is a subpage of competency profile, so make sure we are allowed to view it first.
-        parent::authorize();
+    protected function get_roles(): array {
+        return roles::get_current_user_roles($this->user->id);
+    }
 
-        $role_param = $this->get_param('role', PARAM_ALPHANUMEXT);
-        if ($role_param) {
-            $specified_role = roles\role_factory::create($role_param);
-            $specified_role::require_for_user($this->user->id);
-            $this->role = $specified_role;
+    /**
+     * Throw an exception because the current user doesn't have the required roles to view this page.
+     *
+     * @throws \moodle_exception
+     */
+    protected function user_lacks_role() {
+        // The user has no roles, so requiring they have the self/manager role will print an error message.
+        if ($this->user->is_logged_in()) {
+            self_role::require_for_user($this->user->id);
         } else {
-            $roles = roles::get_current_user_roles($this->user->id);
+            manager::require_for_user($this->user->id);
+        }
+    }
 
-            if (empty($roles)) {
-                // The user has no roles, so requiring they have the self/manager role will print an error message.
-                if ($this->user->is_logged_in()) {
-                    self_role::require_for_user($this->user->id);
-                } else {
-                    manager::require_for_user($this->user->id);
-                }
-            }
+    /**
+     * Get user profile picture URL
+     */
+    private function get_user_picture_url(): string {
+        $user_picture = new \user_picture((object) $this->user->to_array());
+        $user_picture->size = 1; // Size f1.
+        return $user_picture->get_url($this->page);
+    }
+
+    /**
+     * Get the URL to return to when leaving the page.
+     *
+     * @return moodle_url
+     */
+    private function get_return_url(): moodle_url {
+        if ($this->user->is_logged_in()) {
+            $capability = 'totara/competency:view_own_profile';
+        } else {
+            $capability = 'totara/competency:view_other_profile';
         }
 
-        return $this;
+        if (has_capability($capability, $this->context)) {
+            $url = '/totara/competency/profile/';
+        } else {
+            $url = '/totara/competency/rate_users.php';
+        }
+
+        return new moodle_url($url, ['user_id' => $this->user->id]);
+    }
+
+    /**
+     * Add page navigation information (page title, url) to the navbar and to the page view.
+     *
+     * @param view $view
+     */
+    private function apply_page_navigation(view $view) {
+        $parent_page_url = new \moodle_url('/totara/competency/rate_users.php');
+        $page_url = new \moodle_url('/totara/competency/rate_competencies.php', ['user_id' => $this->user->id]);
+
+        $parent_page_title = get_string('rate_competencies', 'pathway_manual');
+
+        if ($this->user->is_logged_in()) {
+            $page_title = $parent_page_title;
+        } else {
+            $page_title = get_string('rate_user', 'pathway_manual', $this->user->fullname);
+            $this->page->navbar->add($parent_page_title, $parent_page_url);
+        }
+
+        $this->page->navbar->add($page_title);
+
+        $view->set_title($page_title)->set_url($page_url);
     }
 
 }

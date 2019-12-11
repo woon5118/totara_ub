@@ -21,6 +21,7 @@
  * @package pathway_manual
  */
 
+use core\entities\user;
 use pathway_manual\models\roles;
 use pathway_manual\models\roles\appraiser;
 use pathway_manual\models\roles\manager;
@@ -330,6 +331,9 @@ class pathway_manual_roles_testcase extends advanced_testcase {
 
         $this->setUser($user1);
 
+        // Always false.
+        $this->assertFalse(self_role::has_for_any());
+
         $this->assertTrue(self_role::has_for_user($user1->id));
         $this->assertTrue((new self_role())->set_subject_user($user1->id)->has_role());
         $this->assertFalse(self_role::has_for_user($user2->id));
@@ -353,6 +357,7 @@ class pathway_manual_roles_testcase extends advanced_testcase {
         $this->setUser($manager);
 
         // Manager user is not the manager of the staff user yet
+        $this->assertFalse(manager::has_for_any());
         $this->assertFalse(manager::has_for_user($staff->id));
         $this->assertFalse((new manager())->set_subject_user($staff->id)->has_role());
         $this->assertFalse(manager::has_for_user($manager->id));
@@ -366,6 +371,7 @@ class pathway_manual_roles_testcase extends advanced_testcase {
         ]);
 
         // Manager user is now the manager of the staff user
+        $this->assertTrue(manager::has_for_any());
         $this->assertTrue(manager::has_for_user($staff->id));
         $this->assertTrue((new manager())->set_subject_user($staff->id)->has_role());
         $this->assertFalse(manager::has_for_user($manager->id));
@@ -374,6 +380,7 @@ class pathway_manual_roles_testcase extends advanced_testcase {
         $this->setUser($staff);
 
         // Staff user is not a manager
+        $this->assertFalse(manager::has_for_any());
         $this->assertFalse(manager::has_for_user($staff->id));
         $this->assertFalse((new manager())->set_subject_user($staff->id)->has_role());
         $this->assertFalse(manager::has_for_user($manager->id));
@@ -414,6 +421,94 @@ class pathway_manual_roles_testcase extends advanced_testcase {
         $this->assertFalse((new appraiser())->set_subject_user($staff->id)->has_role());
         $this->assertFalse(appraiser::has_for_user($appraiser->id));
         $this->assertFalse((new appraiser())->set_subject_user($appraiser->id)->has_role());
+    }
+
+    public function test_apply_role_restriction_to_builder_for_manager() {
+        // Delete all other users created outside of this test so we have predictable results
+        user::repository()->delete();
+
+        $high_manager = $this->getDataGenerator()->create_user();
+        $middle_manager = $this->getDataGenerator()->create_user();
+        $staff = $this->getDataGenerator()->create_user();
+        $not_staff = $this->getDataGenerator()->create_user();
+
+        // $high_manager is manager of $middle_manager
+        $middle_ja = job_assignment::create([
+            'userid' => $middle_manager->id,
+            'idnumber' => '1',
+            'managerjaid' => job_assignment::create_default($high_manager->id)->id,
+        ]);
+
+        // $middle_manager is manager of $staff
+        job_assignment::create([
+            'userid' => $staff->id,
+            'idnumber' => '2',
+            'managerjaid' => $middle_ja->id,
+        ]);
+
+        $user_repository = user::repository();
+        $this->assertEquals(4, $user_repository->count());
+
+        // Only $middle_manager is being managed by $high_manager
+        $this->setUser($high_manager);
+        manager::apply_role_restriction_to_builder($user_repository);
+        $results = $user_repository->get()->all();
+        $this->assertCount(1, $results);
+        $this->assertEquals($middle_manager->id, $results[0]->id);
+
+        // Only $staff is being managed by $middle_manager
+        $user_repository = user::repository();
+        $this->setUser($middle_manager);
+        manager::apply_role_restriction_to_builder($user_repository);
+        $results = $user_repository->get()->all();
+        $this->assertCount(1, $results);
+        $this->assertEquals($staff->id, $results[0]->id);
+
+        // $staff has no direct reports
+        $user_repository = user::repository();
+        $this->setUser($staff);
+        manager::apply_role_restriction_to_builder($user_repository);
+        $results = $user_repository->get()->all();
+        $this->assertCount(0, $results);
+    }
+
+    public function test_apply_role_restriction_to_builder_for_appraiser() {
+        // Delete all other users created outside of this test so we have predictable results
+        user::repository()->delete();
+
+        $appraiser1 = $this->getDataGenerator()->create_user();
+        $appraised1 = $this->getDataGenerator()->create_user();
+        $appraiser2 = $this->getDataGenerator()->create_user();
+        $appraised2 = $this->getDataGenerator()->create_user();
+
+        // $appraiser1 is appraiser of $appraised1
+        job_assignment::create([
+            'userid' => $appraised1->id,
+            'idnumber' => '1',
+            'appraiserid' => $appraiser1->id,
+        ]);
+        // $appraiser2 is appraiser of $appraised2
+        job_assignment::create([
+            'userid' => $appraised2->id,
+            'idnumber' => '1',
+            'appraiserid' => $appraiser2->id,
+        ]);
+
+        // Only $appraised1 is being appraised by $appraiser1
+        $user_repository = user::repository();
+        $this->setUser($appraiser1);
+        appraiser::apply_role_restriction_to_builder($user_repository);
+        $results = $user_repository->get()->all();
+        $this->assertCount(1, $results);
+        $this->assertEquals($appraised1->id, $results[0]->id);
+
+        // Only $appraised2 is being appraised by $appraiser2
+        $user_repository = user::repository();
+        $this->setUser($appraiser2);
+        appraiser::apply_role_restriction_to_builder($user_repository);
+        $results = $user_repository->get()->all();
+        $this->assertCount(1, $results);
+        $this->assertEquals($appraised2->id, $results[0]->id);
     }
 
 }

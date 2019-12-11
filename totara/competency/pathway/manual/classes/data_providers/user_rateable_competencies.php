@@ -24,10 +24,9 @@
 namespace pathway_manual\data_providers;
 
 use core\entities\user;
-use core\orm\query\builder;
+use core\orm\collection;
 use core\orm\query\field;
 use pathway_manual\entities\rating;
-use pathway_manual\manual;
 use pathway_manual\models\rateable_competency;
 use pathway_manual\models\roles\role;
 use pathway_manual\models\roles\role_factory;
@@ -74,6 +73,8 @@ class user_rateable_competencies extends rateable_competencies {
             $role = role_factory::create($role);
         }
         $role->set_subject_user($user->id);
+        $role::require_capability($user->id);
+        $role::require_for_user($user->id);
 
         $provider = new static();
         $provider->user = $user;
@@ -219,19 +220,13 @@ class user_rateable_competencies extends rateable_competencies {
     /**
      * Run the query with any added filters and store the result.
      *
-     * @return $this
+     * @return collection
      */
-    public function fetch() {
-        if (!$this->fetched) {
-            $this->items = $this->build_query()
-                ->with('framework.scale.sorted_values_high_to_low')
-                ->order_by('fullname')
-                ->get();
-
-            $this->fetched = true;
-        }
-
-        return $this;
+    public function fetch_from_query(): collection {
+        return $this->build_query()
+            ->with('framework.scale.sorted_values_high_to_low')
+            ->order_by('fullname')
+            ->get();
     }
 
     /**
@@ -240,11 +235,9 @@ class user_rateable_competencies extends rateable_competencies {
      * @return rateable_competency[]
      */
     public function get_competencies(): array {
-        if (!$this->fetched) {
-            $this->fetch();
-        }
-
-        return $this->items
+        return $this
+            ->fetch()
+            ->items
             ->map(function (competency $competency) {
                 return new rateable_competency($competency, $this->user, $this->role);
             })
@@ -256,7 +249,7 @@ class user_rateable_competencies extends rateable_competencies {
      *
      * @return user_competencies
      */
-    public function get(): user_competencies {
+    public function get() {
         return new user_competencies($this->user, $this->role, $this->get_competencies());
     }
 
@@ -266,8 +259,11 @@ class user_rateable_competencies extends rateable_competencies {
      * @return user_competencies
      */
     public function get_with_filter_options(): user_competencies {
-        return $this->get()
-            ->set_filter_options($this->fetch_filter_options());
+        return $this
+            ->get()
+            ->set_filter_options(
+                $this->fetch_filter_options()
+            );
     }
 
 }

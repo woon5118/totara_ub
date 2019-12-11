@@ -162,7 +162,7 @@ export default {
         return null;
       }
 
-      return this.$url('/totara/competency/profile/rate-competencies/', {
+      return this.$url('/totara/competency/rate_competencies.php', {
         user_id: this.userId,
       });
     },

@@ -22,32 +22,44 @@
 
 <template>
   <div>
-    <a :href="goBackLink" class="tui-pathwayManual-rateCompetencies__backLink">
-      {{ $str('back_to_competency_profile', 'totara_competency') }}
-    </a>
-    <RateUser
-      v-if="user"
+    <RateHeader :user="user" :is-for-another-user="isForAnotherUser" />
+    <RoleSelector
+      v-if="isForAnotherUser"
+      :user-id="user.id"
+      :specified-role="specifiedRole"
+      :show-warning="hasUnsavedRatings"
+      @role-selected="roleSelected"
+    />
+    <RateUserCompetencies
+      v-if="role"
       :user="user"
-      :specified-role="role"
+      :role="role"
       :current-user-id="currentUserId"
       :assignment-id="assignmentId"
-      :go-back-link="goBackLink"
+      @has-unsaved-ratings="has => (hasUnsavedRatings = has)"
+      @go-back="goBack"
     />
   </div>
 </template>
 
 <script>
-import RateUser from 'pathway_manual/components/RateUser';
+import RateHeader from 'pathway_manual/components/RateHeader';
+import RateUserCompetencies from 'pathway_manual/components/RateUserCompetencies';
+import RoleSelector from 'pathway_manual/components/RoleSelector';
 
 export default {
-  components: { RateUser },
+  components: {
+    RateHeader,
+    RateUserCompetencies,
+    RoleSelector,
+  },
 
   props: {
     user: {
-      required: false,
+      required: true,
       type: Object,
     },
-    role: {
+    specifiedRole: {
       required: false,
       type: String,
     },
@@ -55,13 +67,41 @@ export default {
       required: true,
       type: Number,
     },
+    returnUrl: {
+      required: true,
+      type: String,
+    },
     assignmentId: {
       required: false,
       type: Number,
     },
-    goBackLink: {
-      required: true,
-      type: String,
+  },
+
+  data() {
+    return {
+      role: this.specifiedRole,
+      hasUnsavedRatings: false,
+    };
+  },
+
+  computed: {
+    hasRole() {
+      return this.role != null;
+    },
+
+    isForAnotherUser() {
+      return this.user.id !== this.currentUserId;
+    },
+  },
+
+  methods: {
+    roleSelected(selectedRole) {
+      this.hasUnsavedRatings = false;
+      this.role = selectedRole;
+    },
+
+    goBack() {
+      window.location = this.returnUrl;
     },
   },
 };
@@ -69,10 +109,12 @@ export default {
 
 <style lang="scss">
 .tui-pathwayManual-rateCompetencies {
+  margin-bottom: var(--tui-gap-4);
+
   &__backLink {
     display: inline-block;
     align-self: start;
-    padding-bottom: var(--tui-gap-1);
+    padding-bottom: var(--tui-gap-2);
   }
 }
 </style>
