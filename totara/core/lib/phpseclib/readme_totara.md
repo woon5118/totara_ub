@@ -10,3 +10,4 @@ Our changes:
  * Removed bootstrap.php
  * Convert continue within switch statement to break for PHP 7.3 compatibility
    * totara/core/lib/phpseclib/File/X509.php
+ * TL-23378 lib: fix phpseclib compatibility with PHP 7.4
