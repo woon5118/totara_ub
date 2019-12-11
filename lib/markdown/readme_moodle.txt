@@ -7,4 +7,7 @@ Procedure:
   note that we require the php files manually for performance reasons
 * run phpunit tests
 
+Changes
+ * TL-23371 PHP 7.4 compatibility fixes
+
 Petr Skoda
