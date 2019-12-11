@@ -21,6 +21,7 @@
  * @package totara_competency
  */
 
+use pathway_learning_plan\learning_plan;
 use pathway_manual\manual;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\configuration_change;
@@ -29,6 +30,7 @@ use totara_competency\entities\pathway_achievement as pathway_achievement_entity
 use totara_competency\expand_task;
 use totara_competency\linked_courses;
 use totara_competency\pathway;
+use totara_core\advanced_feature;
 
 global $CFG;
 require_once($CFG->dirroot . '/totara/competency/tests/integration_aggregation.php');
@@ -635,9 +637,226 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
     }
 
     /**
+     * Test aggregation with a single linkedcourses criterion - LEARN ONLY
+     *
+     * @dataProvider task_to_execute_data_provider
+     * @param string $task_to_execute
+     */
+    public function test_aggregation_single_linkedcourses_learn_only(string $task_to_execute) {
+        advanced_feature::disable('competency_assignment');
+
+        // In this case we want to skip events otherwise we'll start iwith the default pathways
+        $sink = $this->redirectEvents();
+
+        $data = $this->setup_data();
+
+        $sink->close();
+
+        $pathways = [];
+        for ($i = 1; $i <= 2; $i++) {
+            $criterion = $data->criteria_generator->create_linkedcourses(['competency' => $data->competencies[$i]->id]);
+            $pathways[$i] = $data->competency_generator->create_criteria_group(
+                $data->competencies[$i],
+                [$criterion],
+                $data->scalevalues[3]->id
+            );
+        }
+
+        // Link courses to competencies
+        linked_courses::set_linked_courses(
+            $data->competencies[1]->id,
+            [
+                ['id' => $data->courses[1]->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+                ['id' => $data->courses[2]->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+            ]
+        );
+
+        linked_courses::set_linked_courses(
+            $data->competencies[2]->id,
+            [
+                ['id' => $data->courses[3]->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+                ['id' => $data->courses[4]->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+            ]
+        );
+
+        // Mark users' completion of course
+        $completed = [
+            1 => [1, 3],
+            2 => [1, 2],
+            3 => [4],
+            4 => [4, 5],
+        ];
+        foreach ($completed as $course_idx => $user_idxs) {
+            foreach ($user_idxs as $user_idx) {
+                $completion = new completion_completion(['course' => $data->courses[$course_idx]->id,
+                    'userid' => $data->users[$user_idx]->id
+                ]);
+                $completion->mark_complete();
+            }
+        }
+
+        $this->waitForSecond();
+
+        // Now run the task
+        (new $task_to_execute())->execute();
+
+        // Because course3 is linked to 2 different pathways 2 different criteria items are created with the same item_id
+        // That results in 2 item_records for each user on the same item_id (note that the criterion_item_ids are different)
+        $this->verify_item_records([
+            ['item_id' => $data->courses[1]->id, 'user_id' => $data->users[1]->id, 'criterion_met' => 1],
+            ['item_id' => $data->courses[1]->id, 'user_id' => $data->users[2]->id, 'criterion_met' => 0],
+            ['item_id' => $data->courses[1]->id, 'user_id' => $data->users[3]->id, 'criterion_met' => 1],
+            ['item_id' => $data->courses[2]->id, 'user_id' => $data->users[1]->id, 'criterion_met' => 1],
+            ['item_id' => $data->courses[2]->id, 'user_id' => $data->users[2]->id, 'criterion_met' => 1],
+            ['item_id' => $data->courses[2]->id, 'user_id' => $data->users[3]->id, 'criterion_met' => 0],
+            ['item_id' => $data->courses[3]->id, 'user_id' => $data->users[4]->id, 'criterion_met' => 1],
+            ['item_id' => $data->courses[3]->id, 'user_id' => $data->users[5]->id, 'criterion_met' => 0],
+            ['item_id' => $data->courses[4]->id, 'user_id' => $data->users[4]->id, 'criterion_met' => 1],
+            ['item_id' => $data->courses[4]->id, 'user_id' => $data->users[5]->id, 'criterion_met' => 1],
+        ]);
+
+        $expected_pathway_achievements = [
+            '1-1' => [
+                'pathway_id' => $pathways[1]->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[3]->id,
+                'related_info' => ['linkedcourses'],
+            ],
+            '1-2' => [
+                'pathway_id' => $pathways[1]->get_id(),
+                'user_id' => $data->users[2]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => null,
+                'related_info' => [],
+            ],
+            '1-3' => [
+                'pathway_id' => $pathways[1]->get_id(),
+                'user_id' => $data->users[3]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => null,
+                'related_info' => [],
+            ],
+            '2-1' => [
+                'pathway_id' => $pathways[2]->get_id(),
+                'user_id' => $data->users[4]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[3]->id,
+                'related_info' => ['linkedcourses'],
+            ],
+            '2-2' => [
+                'pathway_id' => $pathways[2]->get_id(),
+                'user_id' => $data->users[5]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => null,
+                'related_info' => [],
+            ],
+        ];
+
+        // As the all task queues all users related to the parent competency
+        // a few more achievement records are created. This is expected as
+        // with learn the user is implicitily assigned to the parent and
+        // the all task queues more than the actions above
+        if ($task_to_execute == 'totara_competency\task\competency_aggregation_all') {
+            $expected_pathway_achievements = array_merge(
+                $expected_pathway_achievements,
+                [
+                    '1-4' => [
+                        'pathway_id' => $pathways[1]->get_id(),
+                        'user_id' => $data->users[4]->id,
+                        'status' => pathway_achievement_entity::STATUS_CURRENT,
+                        'scale_value_id' => null,
+                        'related_info' => [],
+                    ],
+                    '1-5' => [
+                        'pathway_id' => $pathways[1]->get_id(),
+                        'user_id' => $data->users[5]->id,
+                        'status' => pathway_achievement_entity::STATUS_CURRENT,
+                        'scale_value_id' => null,
+                        'related_info' => [],
+                    ]
+                ]
+            );
+        }
+
+        $pw_achievement_records = $this->verify_pathway_achievements($expected_pathway_achievements);
+
+        $expected_competency_achievements = [
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[3]->id,
+                'proficient' => 0,
+                'via' => [$pw_achievement_records['1-1']],
+            ],
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[2]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => null,
+                'proficient' => 0,
+                'via' => [],
+            ],
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[3]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => null,
+                'proficient' => 0,
+                'via' => [],
+            ],
+            [
+                'competency_id' => $data->competencies[2]->id,
+                'user_id' => $data->users[4]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[3]->id,
+                'proficient' => 0,
+                'via' => [$pw_achievement_records['2-1']],
+            ],
+            [
+                'competency_id' => $data->competencies[2]->id,
+                'user_id' => $data->users[5]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => null,
+                'proficient' => 0,
+                'via' => [],
+            ],
+        ];
+
+        if ($task_to_execute == 'totara_competency\task\competency_aggregation_all') {
+            $expected_competency_achievements = array_merge(
+                $expected_competency_achievements,
+                [
+                    [
+                        'competency_id' => $data->competencies[1]->id,
+                        'user_id' => $data->users[4]->id,
+                        'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                        'scale_value_id' => null,
+                        'proficient' => 0,
+                        'via' => [],
+                    ],
+                    [
+                        'competency_id' => $data->competencies[1]->id,
+                        'user_id' => $data->users[5]->id,
+                        'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                        'scale_value_id' => null,
+                        'proficient' => 0,
+                        'via' => [],
+                    ],
+                ]
+            );
+        }
+
+        $this->verify_competency_achievements($expected_competency_achievements);
+    }
+
+    /**
      * Test aggregation with childcompetency criteria.
      * The child competency uses coursecompletion criteria
+     *
      * @dataProvider task_to_execute_data_provider
+     * @param string $task_to_execute
      */
     public function test_aggregation_coursecompletion_to_childcompetency(string $task_to_execute) {
         $data = $this->setup_data();
@@ -768,6 +987,213 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
     }
 
     /**
+     * Test aggregation with childcompetency criteria.
+     * The child competency uses coursecompletion criteria
+     *
+     * @dataProvider task_to_execute_data_provider
+     * @param string $task_to_execute
+     */
+    public function test_aggregation_coursecompletion_to_childcompetency_learn_only(string $task_to_execute) {
+        advanced_feature::disable('competency_assignment');
+
+        $sink = $this->redirectEvents();
+        $data = $this->setup_data();
+        $sink->close();
+
+        $pathways = [];
+
+        // The child competency ...
+        $criterion = $data->criteria_generator->create_linkedcourses(['competency' => $data->competencies[2]->id]);
+        $pathways['child'] = $data->competency_generator->create_criteria_group(
+            $data->competencies[2],
+            [$criterion],
+            $data->scalevalues[2]->id
+        );
+
+        // Link courses to competencies
+        linked_courses::set_linked_courses(
+            $data->competencies[2]->id,
+            [
+                ['id' => $data->courses[1]->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+            ]
+        );
+
+        // The parent competency ...
+        $criterion = $data->criteria_generator->create_childcompetency(['competency' => $data->competencies[1]->id]);
+        $pathways['parent'] = $data->competency_generator->create_criteria_group($data->competencies[1],
+            [$criterion],
+            $data->scalevalues[4]->id
+        );
+
+        // Mark course completions
+        foreach ([2, 3] as $user_idx) {
+            $completion = new completion_completion(['course' => $data->courses[1]->id, 'userid' => $data->users[$user_idx]->id]);
+            $completion->mark_complete();
+        }
+
+        // Now run the task
+        (new $task_to_execute())->execute();
+
+        $expected_item_records = [
+            ['item_id' => $data->courses[1]->id, 'user_id' => $data->users[2]->id, 'criterion_met' => 1],
+            ['item_id' => $data->courses[1]->id, 'user_id' => $data->users[3]->id, 'criterion_met' => 1],
+        ];
+
+        // The normal queue task requires two runs to get to the same result as the all task
+        if ($task_to_execute == 'totara_competency\task\competency_aggregation_all') {
+            $expected_item_records = array_merge(
+                $expected_item_records,
+                [
+                    ['item_id' => $data->competencies[2]->id, 'user_id' => $data->users[2]->id, 'criterion_met' => 1],
+                    ['item_id' => $data->competencies[2]->id, 'user_id' => $data->users[3]->id, 'criterion_met' => 1],
+                ]
+            );
+        }
+
+        $this->verify_item_records($expected_item_records);
+
+        $expected_pathway_achievements = [
+            'child-2' => [
+                'pathway_id' => $pathways['child']->get_id(),
+                'user_id' => $data->users[2]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[2]->id,
+                'related_info' => ['linkedcourses'],
+            ],
+            'child-3' => [
+                'pathway_id' => $pathways['child']->get_id(),
+                'user_id' => $data->users[3]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[2]->id,
+                'related_info' => ['linkedcourses'],
+            ],
+        ];
+
+        if ($task_to_execute == 'totara_competency\task\competency_aggregation_all') {
+            $expected_pathway_achievements = array_merge(
+                $expected_pathway_achievements,
+                [
+                    'parent-2' => [
+                        'pathway_id' => $pathways['parent']->get_id(),
+                        'user_id' => $data->users[2]->id,
+                        'status' => pathway_achievement_entity::STATUS_CURRENT,
+                        'scale_value_id' => $data->scalevalues[4]->id,
+                        'related_info' => ['childcompetency'],
+                    ],
+                    'parent-3' => [
+                        'pathway_id' => $pathways['parent']->get_id(),
+                        'user_id' => $data->users[3]->id,
+                        'status' => pathway_achievement_entity::STATUS_CURRENT,
+                        'scale_value_id' => $data->scalevalues[4]->id,
+                        'related_info' => ['childcompetency'],
+                    ],
+                ]
+            );
+        }
+
+        $pw_achievement_records = $this->verify_pathway_achievements($expected_pathway_achievements);
+
+        $expected_competency_achievements = [
+            [
+                'competency_id' => $data->competencies[2]->id,
+                'user_id' => $data->users[2]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[2]->id,
+                'proficient' => 1,
+                'via' => [$pw_achievement_records['child-2']],
+            ],
+            [
+                'competency_id' => $data->competencies[2]->id,
+                'user_id' => $data->users[3]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[2]->id,
+                'proficient' => 1,
+                'via' => [$pw_achievement_records['child-3']],
+            ],
+        ];
+
+        if ($task_to_execute == 'totara_competency\task\competency_aggregation_all') {
+            $expected_competency_achievements = array_merge(
+                $expected_competency_achievements,
+                [
+                    [
+                        'competency_id' => $data->competencies[1]->id,
+                        'user_id' => $data->users[2]->id,
+                        'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                        'scale_value_id' => $data->scalevalues[4]->id,
+                        'proficient' => 0,
+                        'via' => [$pw_achievement_records['parent-2']],
+                    ],
+                    [
+                        'competency_id' => $data->competencies[1]->id,
+                        'user_id' => $data->users[3]->id,
+                        'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                        'scale_value_id' => $data->scalevalues[4]->id,
+                        'proficient' => 0,
+                        'via' => [$pw_achievement_records['parent-3']],
+                    ],
+                ]
+            );
+        }
+
+        $this->verify_competency_achievements($expected_competency_achievements);
+
+        // If it's not the all task we do need to run the task again
+        // to catch make sure the parent gets reaggregated as well
+        if ($task_to_execute == 'totara_competency\task\competency_aggregation_queue') {
+            $this->waitForSecond();
+
+            (new $task_to_execute())->execute();
+
+            $expected_pathway_achievements = array_merge(
+                $expected_pathway_achievements,
+                [
+                    'parent-2' => [
+                        'pathway_id' => $pathways['parent']->get_id(),
+                        'user_id' => $data->users[2]->id,
+                        'status' => pathway_achievement_entity::STATUS_CURRENT,
+                        'scale_value_id' => $data->scalevalues[4]->id,
+                        'related_info' => ['childcompetency'],
+                    ],
+                    'parent-3' => [
+                        'pathway_id' => $pathways['parent']->get_id(),
+                        'user_id' => $data->users[3]->id,
+                        'status' => pathway_achievement_entity::STATUS_CURRENT,
+                        'scale_value_id' => $data->scalevalues[4]->id,
+                        'related_info' => ['childcompetency'],
+                    ],
+                ]
+            );
+
+            $pw_achievement_records = $this->verify_pathway_achievements($expected_pathway_achievements);
+
+            $expected_competency_achievements = array_merge(
+                $expected_competency_achievements,
+                [
+                    [
+                        'competency_id' => $data->competencies[1]->id,
+                        'user_id' => $data->users[2]->id,
+                        'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                        'scale_value_id' => $data->scalevalues[4]->id,
+                        'proficient' => 0,
+                        'via' => [$pw_achievement_records['parent-2']],
+                    ],
+                    [
+                        'competency_id' => $data->competencies[1]->id,
+                        'user_id' => $data->users[3]->id,
+                        'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                        'scale_value_id' => $data->scalevalues[4]->id,
+                        'proficient' => 0,
+                        'via' => [$pw_achievement_records['parent-3']],
+                    ],
+                ]
+            );
+
+            $this->verify_competency_achievements($expected_competency_achievements);
+        }
+    }
+
+    /**
      * Test aggregation with manual pathway.
      * @dataProvider task_to_execute_data_provider
      */
@@ -857,6 +1283,7 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
 
     /**
      * Test aggregation with learning_plan pathway.
+     *
      * @dataProvider task_to_execute_data_provider
      */
     public function test_aggregation_single_learning_plan(string $task_to_execute) {
@@ -979,6 +1406,138 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
     }
 
     /**
+     * Test aggregation with learning_plan pathway.
+     *
+     * @dataProvider task_to_execute_data_provider
+     * @param string $task_to_execute
+     */
+    public function test_aggregation_single_learning_plan_learn_only(string $task_to_execute) {
+        advanced_feature::disable('competency_assignment');
+
+        $sink = $this->redirectEvents();
+        $data = $this->setup_data();
+        $sink->close();
+
+        /** @var learning_plan[] $pathways */
+        $pathways = [];
+        $pathways[1] = $data->competency_generator->create_learning_plan_pathway($data->competencies[1]);
+        $pathways[2] = $data->competency_generator->create_learning_plan_pathway($data->competencies[2]);
+
+        // Create learning plans
+        $data->competency_generator->create_learning_plan_with_competencies(
+            $data->users[1]->id,
+            [$data->competencies[1]->id => null, $data->competencies[2]->id => $data->scalevalues[3]->id]
+        );
+        $data->competency_generator->create_learning_plan_with_competencies(
+            $data->users[2]->id,
+            [$data->competencies[1]->id => $data->scalevalues[2]->id]
+        );
+        $data->competency_generator->create_learning_plan_with_competencies(
+            $data->users[3]->id,
+            [$data->competencies[1]->id => $data->scalevalues[4]->id]
+        );
+        $data->competency_generator->create_learning_plan_with_competencies(
+            $data->users[4]->id,
+            [$data->competencies[2]->id => null]
+        );
+
+        // Now run the task
+        (new $task_to_execute())->execute();
+
+        $this->verify_item_records([]);
+
+        $expected_pathway_achievements = [
+            '1-2' => [
+                'pathway_id' => $pathways[1]->get_id(),
+                'user_id' => $data->users[2]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[2]->id,
+                'related_info' => [],
+            ],
+            '1-3' => [
+                'pathway_id' => $pathways[1]->get_id(),
+                'user_id' => $data->users[3]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[4]->id,
+                'related_info' => [],
+            ],
+            '2-1' => [
+                'pathway_id' => $pathways[2]->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[3]->id,
+                'related_info' => [],
+            ],
+        ];
+
+        // As the all task queues all users related to the parent competency
+        // a few more achievement records are created. This is expected as
+        // with learn the user is implicitily assigned to the parent and
+        // the all task queues more than the actions above
+        if ($task_to_execute == 'totara_competency\task\competency_aggregation_all') {
+            $expected_pathway_achievements = array_merge(
+                $expected_pathway_achievements,
+                [
+                    '1-1' => [
+                        'pathway_id' => $pathways[1]->get_id(),
+                        'user_id' => $data->users[1]->id,
+                        'status' => pathway_achievement_entity::STATUS_CURRENT,
+                        'scale_value_id' => null,
+                        'related_info' => [],
+                    ],
+                ]
+            );
+        }
+
+        $pw_achievement_records = $this->verify_pathway_achievements($expected_pathway_achievements);
+
+        $expected_competency_achievements = [
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[2]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[2]->id,
+                'proficient' => 1,
+                'via' => [$pw_achievement_records['1-2']],
+            ],
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[3]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[4]->id,
+                'proficient' => 0,
+                'via' => [$pw_achievement_records['1-3']],
+            ],
+            [
+                'competency_id' => $data->competencies[2]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[3]->id,
+                'proficient' => 0,
+                'via' => [$pw_achievement_records['2-1']],
+            ],
+        ];
+
+        if ($task_to_execute == 'totara_competency\task\competency_aggregation_all') {
+            $expected_competency_achievements = array_merge(
+                $expected_competency_achievements,
+                [
+                    [
+                        'competency_id' => $data->competencies[1]->id,
+                        'user_id' => $data->users[1]->id,
+                        'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                        'scale_value_id' => null,
+                        'proficient' => 0,
+                        'via' => [],
+                    ],
+                ]
+            );
+        }
+
+        $this->verify_competency_achievements($expected_competency_achievements);
+    }
+
+    /**
      * Test aggregation when the user is assigned twice to the same competency
      * @dataProvider task_to_execute_data_provider
      */
@@ -995,10 +1554,12 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
         cohort_add_member($cohort2->id, $data->users[1]->id);
         cohort_add_member($cohort2->id, $data->users[3]->id);
 
+        /** @var totara_competency_generator $competency_generator */
+        $competency_generator = $data->competency_generator;
         // Now assign both audiences to the competency
         $assignments = [
-            1 => $this->assign_generator->create_cohort_assignment($data->competencies[1]->id, $cohort1->id),
-            2 => $this->assign_generator->create_cohort_assignment($data->competencies[1]->id, $cohort2->id),
+            1 => $competency_generator->assignment_generator()->create_cohort_assignment($data->competencies[1]->id, $cohort1->id),
+            2 => $competency_generator->assignment_generator()->create_cohort_assignment($data->competencies[1]->id, $cohort2->id),
         ];
 
         $expand_task = new expand_task($DB);

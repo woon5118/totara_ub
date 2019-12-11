@@ -87,8 +87,6 @@ class totara_competency_integration_aggregation extends advanced_testcase {
             public $competency_generator;
             /** @var totara_criteria_generator $criteria_generator */
             public $criteria_generator;
-            /** @var totara_competency_assignment_generator $assign_generator */
-            public $assign_generator;
 
         };
 
