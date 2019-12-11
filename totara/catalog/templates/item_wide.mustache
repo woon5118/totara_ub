@@ -103,7 +103,7 @@
         }]
     }
 }}
-<a href="#" class="tw-catalogItemWide" title="{{{title}}}"
+<div class="tw-catalogItemWide" tabindex="0"
     data-tw-grid-item-toggle="">
 
     <div class="tw-catalogItemWide__content_left">
@@ -179,7 +179,7 @@
             <div class="tw-catalogItemWide__textarea_group">
                 {{#text_placeholders}}
                 <div class="tw-catalogItemWide__textarea_group_item{{^data_exists}} tw-catalogItemWide__empty{{/data_exists}}">
-                    {{#show_label}}{{label}}: {{/show_label}}{{#data_exists}}{{data}}{{/data_exists}}
+                    {{#show_label}}{{label}}: {{/show_label}}{{#data_exists}}{{{data}}}{{/data_exists}}
                 </div>
                 {{/text_placeholders}}
             </div>
@@ -195,7 +195,7 @@
             {{/icon_placeholders_enabled}}
         </div>
     </div>
-</a>
+</div>
 
 <div class="tw-catalogDetails">
     <div class="tw-catalogDetails__arrow"></div>

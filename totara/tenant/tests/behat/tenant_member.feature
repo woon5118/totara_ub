@@ -86,21 +86,21 @@ Feature: Tenant member access without tenant isolation
     And I should not see "Course 3B"
 
     When I click on "Find Learning" in the totara menu
-    And I click on "Course 0A" "link"
+    And I click on "Course 0A" "text"
     And I click on "Go to course" "link"
     Then I should see "Topic 1"
 
     When I click on "Find Learning" in the totara menu
-    And I click on "Course 0B" "link"
+    And I click on "Course 0B" "text"
     And I click on "Go to course" "link"
     Then I should see "You can not enrol yourself in this course."
 
     When I click on "Find Learning" in the totara menu
-    And I click on "Course 1A" "link"
+    And I click on "Course 1A" "text"
     And I click on "Go to course" "link"
     Then I should see "Topic 1"
 
     When I click on "Find Learning" in the totara menu
-    And I click on "Course 1B" "link"
+    And I click on "Course 1B" "text"
     And I click on "Go to course" "link"
     Then I should see "You can not enrol yourself in this course."

@@ -32,7 +32,7 @@ Feature: Event Name Site Logs report filter
 
     And I log in as "student1"
     And I click on "Find Learning" in the totara menu
-    And I click on "Course 1" "link"
+    And I click on "Course 1" "text"
     And I click on "Enrol" "link"
     And I click on "Enrol me" "button"
     Then I should see "Topic 1"
@@ -40,7 +40,7 @@ Feature: Event Name Site Logs report filter
 
     And I log in as "student2"
     And I click on "Find Learning" in the totara menu
-    And I click on "Course 1" "link"
+    And I click on "Course 1" "text"
     And I click on "Enrol" "link"
     And I click on "Enrol me" "button"
     Then I should see "Topic 1"

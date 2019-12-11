@@ -48,6 +48,13 @@ define([], function() {
         events: function() {
             var that = this;
 
+            this.widget.addEventListener('keypress', function(e) {
+                if (e.target.closest('[data-tw-grid-item-toggle]') && !e.target.closest('[data-tw-catalogdetails]')) {
+                    e.target.dispatchEvent(new MouseEvent('click', e));
+                    e.preventDefault();
+                }
+            });
+
             this.widget.addEventListener('click', function(e) {
                 if (!e.target) {
                     return;

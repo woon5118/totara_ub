@@ -132,7 +132,7 @@ Feature: Tenant role assignments
     And I should not see "moodle@example.com"
 
     When I click on "Find Learning" in the totara menu
-    And I click on "Course 0" "link"
+    And I click on "Course 0" "text"
     And I click on "Go to course" "link"
     And I navigate to "Other users" node in "Course administration > Users"
     And I press "Assign roles"
@@ -148,7 +148,7 @@ Feature: Tenant role assignments
     And I should see "moodle@example.com"
 
     When I click on "Find Learning" in the totara menu
-    And I click on "Course 1" "link"
+    And I click on "Course 1" "text"
     And I click on "Go to course" "link"
     And I navigate to "Other users" node in "Course administration > Users"
     And I press "Assign roles"
@@ -162,7 +162,7 @@ Feature: Tenant role assignments
     And I should not see "moodle@example.com"
 
     When I click on "Find Learning" in the totara menu
-    And I click on "Course 2" "link"
+    And I click on "Course 2" "text"
     And I click on "Go to course" "link"
     And I navigate to "Other users" node in "Course administration > Users"
     And I press "Assign roles"
@@ -267,7 +267,7 @@ Feature: Tenant role assignments
     And I should not see "moodle@example.com"
 
     When I click on "Find Learning" in the totara menu
-    And I click on "Course 0" "link"
+    And I click on "Course 0" "text"
     And I click on "Go to course" "link"
     And I navigate to "Other users" node in "Course administration > Users"
     And I press "Assign roles"
@@ -283,7 +283,7 @@ Feature: Tenant role assignments
     And I should see "moodle@example.com"
 
     When I click on "Find Learning" in the totara menu
-    And I click on "Course 1" "link"
+    And I click on "Course 1" "text"
     And I click on "Go to course" "link"
     And I navigate to "Other users" node in "Course administration > Users"
     And I press "Assign roles"
@@ -297,7 +297,7 @@ Feature: Tenant role assignments
     And I should not see "moodle@example.com"
 
     When I click on "Find Learning" in the totara menu
-    And I click on "Course 2" "link"
+    And I click on "Course 2" "text"
     And I click on "Go to course" "link"
     And I navigate to "Other users" node in "Course administration > Users"
     And I press "Assign roles"

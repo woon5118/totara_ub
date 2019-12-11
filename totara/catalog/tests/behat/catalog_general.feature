@@ -149,7 +149,7 @@ Feature: Test file for catalog
     # When enable featured learning, it will be sorted by featured learning (default)
     When I click on "Find Learning" in the totara menu
     Then "Bye Bye Park Shin Hye" "text" should appear before "Bilbo Baggin's Secret Agents" "text"
-    Then "Featured" "text" should exist in the "a[title='Bye Bye Park Shin Hye']" "css_element"
+    And I should see "Featured" in the "//*[@data-tw-grid-item][contains(.,'Bye Bye Park Shin Hye')]" "xpath_element"
 
   # Visibility
   Scenario: Learner is not able to see the hidden course

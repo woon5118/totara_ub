@@ -54,7 +54,7 @@ Feature: Course catalog item and details content
 
     # Changing the custom field input for program
     And I click on "Find Learning" in the totara menu
-    And I follow "program1"
+    And I click on "program1" "text"
     And I follow "Edit program details"
     And I follow "Details"
     And I follow "Custom fields"
@@ -63,22 +63,22 @@ Feature: Course catalog item and details content
 
     # Checking whether those texts are appearing in catalog page
     When I click on "Find Learning" in the totara menu
-    Then "sarang kim" "text" should exist in the "a[title='course1']" "css_element"
-    And "This is course input test" "text" should exist in the "a[title='course1']" "css_element"
-    And "This is program input test" "text" should exist in the "a[title='program1']" "css_element"
+    Then I should see "sarang kim" in the "//*[@data-tw-grid-item][contains(.,'course1')]" "xpath_element"
+    And I should see "This is course input test" in the "//*[@data-tw-grid-item][contains(.,'course1')]" "xpath_element"
+    And I should see "This is program input test" in the "//*[@data-tw-grid-item][contains(.,'program1')]" "xpath_element"
 
     # As admin, i should not be able to see progress bar here
     And I should not see "0%"
     And I should not see "100%"
 
     # Viewing course details
-    When I follow "course1"
-    And I should see "sarang kim" exactly "2" times
-    And I should see "This is course input test" exactly "2" times
+    When I click on "course1" "text"
+    And I should see "sarang kim" in the "[data-tw-grid-item-active] [data-tw-catalogdetails]" "css_element"
+    And I should see "This is course input test" in the "[data-tw-grid-item-active] [data-tw-catalogdetails]" "css_element"
 
     # Viewing program details
-    When I follow "program1"
-    And I should see "This is program input test" exactly "2" times
+    When I click on "program1" "text"
+    And I should see "This is program input test" in the "[data-tw-grid-item-active] [data-tw-catalogdetails]" "css_element"
     And I am on "course1" course homepage with editing mode on
     And I add the "Self completion" block
     And I navigate to "Course completion" node in "Course administration"
@@ -107,7 +107,7 @@ Feature: Course catalog item and details content
   Scenario: User without enrolment should still get a link to course page
     When I log in as "notenrold"
     And I click on "Find Learning" in the totara menu
-    And I follow "course1"
+    And I click on "course1" "text"
     Then I should see "You are not enrolled in this course"
 
     When I follow "Go to course"

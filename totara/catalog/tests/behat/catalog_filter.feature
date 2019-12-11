@@ -30,7 +30,7 @@ Feature: Course catalog filters and featured learning
 
     # Editing the custom field for program
     And I click on "Find Learning" in the totara menu
-    And I follow "program1"
+    And I click on "program1" "text"
     And I follow "Edit program details"
     And I follow "Details"
     And I follow "Custom fields"
@@ -38,7 +38,7 @@ Feature: Course catalog filters and featured learning
     And I click on "Save changes" "button"
 
     And I click on "Find Learning" in the totara menu
-    And I follow "cert1"
+    And I click on "cert1" "text"
     And I follow "Edit certification details"
     And I follow "Details"
     And I follow "Custom fields"
@@ -97,8 +97,8 @@ Feature: Course catalog filters and featured learning
     # Since bouth course1 and program1 has the value of red for the customfield. Therefore, these
     # learning items should have the flag of `Featured`
     When I click on "Find Learning" in the totara menu
-    Then "Featured" "text" should exist in the "a[title='program1']" "css_element"
-    And "Featured" "text" should exist in the "a[title='course1']" "css_element"
+    Then I should see "Featured" in the "//*[@data-tw-grid-item][contains(.,'program1')]" "xpath_element"
+    And I should see "Featured" in the "//*[@data-tw-grid-item][contains(.,'course1')]" "xpath_element"
     And I follow "Configure catalogue"
     And I follow "General"
     And I set the following Totara form fields to these values:
@@ -107,7 +107,7 @@ Feature: Course catalog filters and featured learning
     And I click on "Save" "button"
     And I click on "Find Learning" in the totara menu
     And I should see "5 items"
-    And "Featured" "text" should exist in the "a[title='program1']" "css_element"
-    And "Featured" "text" should exist in the "a[title='cert1']" "css_element"
-    And "Featured" "text" should exist in the "a[title='course1']" "css_element"
-    And "Featured" "text" should exist in the "a[title='course3']" "css_element"
+    And I should see "Featured" in the "//*[@data-tw-grid-item][contains(.,'program1')]" "xpath_element"
+    And I should see "Featured" in the "//*[@data-tw-grid-item][contains(.,'cert1')]" "xpath_element"
+    And I should see "Featured" in the "//*[@data-tw-grid-item][contains(.,'course1')]" "xpath_element"
+    And I should see "Featured" in the "//*[@data-tw-grid-item][contains(.,'course3')]" "xpath_element"

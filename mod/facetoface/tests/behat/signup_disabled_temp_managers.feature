@@ -29,7 +29,7 @@ Feature: Test suitable job assignment for session sign-up
     And I click on "id_s__facetoface_selectjobassignmentonsignupglobal" "checkbox"
     And I press "Save changes"
     And I click on "Find Learning" in the totara menu
-    And I follow "Course 1"
+    And I click on "Course 1" "text"
     And I follow "Go to course"
     And I follow "Test seminar name"
     And I follow "Add event"
@@ -56,7 +56,7 @@ Feature: Test suitable job assignment for session sign-up
     And I log out
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
-    And I follow "Course 1"
+    And I click on "Course 1" "text"
     And I follow "Go to course"
     And I follow "Test seminar name"
     And I click on "Event info" "link" in the "1 January 2020" "table_row"

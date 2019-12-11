@@ -40,7 +40,7 @@ Feature: Tenant manual enrolment
   Scenario: Regular teacher manually enrolling without tenant isolation
     Given I log in as "teacher0"
     And I click on "Find Learning" in the totara menu
-    And I click on "Course 0" "link"
+    And I click on "Course 0" "text"
     And I click on "Go to course" "link"
 
     When I navigate to "Enrolled users" node in "Course administration > Users"
@@ -73,7 +73,7 @@ Feature: Tenant manual enrolment
     Given tenant support is enabled with full tenant isolation
     And I log in as "teacher0"
     And I click on "Find Learning" in the totara menu
-    And I click on "Course 0" "link"
+    And I click on "Course 0" "text"
     And I click on "Go to course" "link"
 
     When I navigate to "Enrolled users" node in "Course administration > Users"
@@ -105,7 +105,7 @@ Feature: Tenant manual enrolment
   Scenario: Tenant member teacher manually enrolling without tenant isolation
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
-    And I click on "Course 1" "link"
+    And I click on "Course 1" "text"
     And I click on "Go to course" "link"
 
     When I navigate to "Enrolled users" node in "Course administration > Users"
@@ -138,7 +138,7 @@ Feature: Tenant manual enrolment
     Given tenant support is enabled with full tenant isolation
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
-    And I click on "Course 1" "link"
+    And I click on "Course 1" "text"
     And I click on "Go to course" "link"
 
     When I navigate to "Enrolled users" node in "Course administration > Users"
@@ -170,7 +170,7 @@ Feature: Tenant manual enrolment
   Scenario: Tenant manager manually enrolling without tenant isolation
     Given I log in as "manager1"
     And I click on "Find Learning" in the totara menu
-    And I click on "Course 1" "link"
+    And I click on "Course 1" "text"
     And I click on "Go to course" "link"
 
     When I navigate to "Enrolled users" node in "Course administration > Users"
@@ -201,7 +201,7 @@ Feature: Tenant manual enrolment
     Given tenant support is enabled with full tenant isolation
     And I log in as "manager1"
     And I click on "Find Learning" in the totara menu
-    And I click on "Course 1" "link"
+    And I click on "Course 1" "text"
     And I click on "Go to course" "link"
 
     When I navigate to "Enrolled users" node in "Course administration > Users"

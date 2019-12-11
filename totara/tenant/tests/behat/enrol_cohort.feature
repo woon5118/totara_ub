@@ -38,7 +38,7 @@ Feature: Tenant cohort enrolment
   Scenario: Tenant manager adding audience sync without tenant isolation
     Given I log in as "manager1"
     And I click on "Find Learning" in the totara menu
-    And I click on "Course 1" "link"
+    And I click on "Course 1" "text"
     And I click on "Go to course" "link"
 
     When I navigate to "Enrolment methods" node in "Course administration > Users"
@@ -61,7 +61,7 @@ Feature: Tenant cohort enrolment
     Given tenant support is enabled with full tenant isolation
     And I log in as "manager1"
     And I click on "Find Learning" in the totara menu
-    And I click on "Course 1" "link"
+    And I click on "Course 1" "text"
     And I click on "Go to course" "link"
 
     When I navigate to "Enrolment methods" node in "Course administration > Users"

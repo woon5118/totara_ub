@@ -135,7 +135,7 @@ Feature: Course enrolment through programs
     Then I should see "Course 1"
     And I should see "Course 2"
 
-    When I follow "Course 1"
+    When I click on "Course 1" "text"
     Then I should see "You are not enrolled in this course"
 
     When I am on "Course 2" course homepage
@@ -182,7 +182,7 @@ Feature: Course enrolment through programs
     Then I should see "Course 1"
     And I should see "Course 2"
 
-    When I follow "Course 1"
+    When I click on "Course 1" "text"
     Then I should see "You are not enrolled in this course"
 
     When I am on "Course 2" course homepage
@@ -229,7 +229,7 @@ Feature: Course enrolment through programs
     Then I should see "Course 1"
     And I should see "Course 2"
 
-    When I follow "Course 1"
+    When I click on "Course 1" "text"
     Then I should see "You are not enrolled in this course"
 
     When I am on "Course 2" course homepage
@@ -259,9 +259,9 @@ Feature: Course enrolment through programs
     Then I should see "Course 1"
     And I should see "Course 2"
 
-    When I follow "Course 1"
+    When I click on "Course 1" "text"
     Then I should see "You are not enrolled in this course"
-    When I follow "Course 2"
+    When I click on "Course 2" "text"
     Then I should see "You are not enrolled in this course"
     And I log out
 
