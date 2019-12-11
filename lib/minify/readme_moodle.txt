@@ -11,3 +11,7 @@ replace /src/ subdirectory in /lib/minify/matthiasmullie-pathconverter/
 3) update /lib/thirdpartylibs.xml
 
 4/ run: php totara/core/dev/fix_file_permissions.php --fix
+
+
+Local changes:
+ * TL-23372 lib: fix minify compatibility with PHP 7.4
