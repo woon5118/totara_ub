@@ -53,10 +53,7 @@ Feature: Assign a temporary manager to a user via the job assignment page
     And I click on "OK" "button" in the "Choose temporary manager" "totaradialogue"
     And I wait "1" seconds
     Then I should see "Manager Two - Design Manager"
-    When I press "Add job assignment"
-    Then I should see "An expiry date for the temporary manager needs to be set"
     When I set the following fields to these values:
-      | tempmanagerexpirydate[enabled] | 1      |
       | tempmanagerexpirydate[day]     | 15     |
       | tempmanagerexpirydate[month]   | August |
       | tempmanagerexpirydate[year]    | 2010   |
@@ -68,7 +65,6 @@ Feature: Assign a temporary manager to a user via the job assignment page
     And I click on "Designer" "link"
     Then I should see "Manager Two - Design Manager"
     And the following fields match these values:
-      | tempmanagerexpirydate[enabled] | 1      |
       | tempmanagerexpirydate[day]     | 15     |
       | tempmanagerexpirydate[month]   | August |
       | tempmanagerexpirydate[year]    | 2030   |
@@ -95,7 +91,6 @@ Feature: Assign a temporary manager to a user via the job assignment page
     And I wait "1" seconds
     Then I should see "Manager Two - Design Manager"
     When I set the following fields to these values:
-      | tempmanagerexpirydate[enabled] | 1      |
       | tempmanagerexpirydate[day]     | 15     |
       | tempmanagerexpirydate[month]   | August |
       | tempmanagerexpirydate[year]    | 2030   |
@@ -103,7 +98,6 @@ Feature: Assign a temporary manager to a user via the job assignment page
     And I click on "Designer" "link"
     Then I should see "Manager Two - Design Manager"
     And the following fields match these values:
-      | tempmanagerexpirydate[enabled] | 1      |
       | tempmanagerexpirydate[day]     | 15     |
       | tempmanagerexpirydate[month]   | August |
       | tempmanagerexpirydate[year]    | 2030   |
@@ -158,7 +152,6 @@ Feature: Assign a temporary manager to a user via the job assignment page
     And I wait "1" seconds
     Then I should see "Manager One - create empty job assignment"
     When I set the following fields to these values:
-      | tempmanagerexpirydate[enabled] | 1      |
       | tempmanagerexpirydate[day]     | 15     |
       | tempmanagerexpirydate[month]   | August |
       | tempmanagerexpirydate[year]    | 2030   |
@@ -204,7 +197,6 @@ Feature: Assign a temporary manager to a user via the job assignment page
     And I wait "1" seconds
     Then I should see "Manager One - Development Manager"
     When I set the following fields to these values:
-      | tempmanagerexpirydate[enabled] | 1      |
       | tempmanagerexpirydate[day]     | 15     |
       | tempmanagerexpirydate[month]   | August |
       | tempmanagerexpirydate[year]    | 2030   |
@@ -212,7 +204,6 @@ Feature: Assign a temporary manager to a user via the job assignment page
     And I click on "Designer" "link"
     Then I should see "Manager One - Development Manager"
     And the following fields match these values:
-      | tempmanagerexpirydate[enabled] | 1      |
       | tempmanagerexpirydate[day]     | 15     |
       | tempmanagerexpirydate[month]   | August |
       | tempmanagerexpirydate[year]    | 2030   |
@@ -276,7 +267,6 @@ Feature: Assign a temporary manager to a user via the job assignment page
     And I wait "1" seconds
     Then I should see "Manager One - create empty job assignment"
     When I set the following fields to these values:
-      | tempmanagerexpirydate[enabled] | 1      |
       | tempmanagerexpirydate[day]     | 15     |
       | tempmanagerexpirydate[month]   | August |
       | tempmanagerexpirydate[year]    | 2030   |
@@ -284,7 +274,6 @@ Feature: Assign a temporary manager to a user via the job assignment page
     And I click on "Illustrator" "link"
     Then I should see "Manager One - Unnamed job assignment (ID: 2)"
     And the following fields match these values:
-      | tempmanagerexpirydate[enabled] | 1      |
       | tempmanagerexpirydate[day]     | 15     |
       | tempmanagerexpirydate[month]   | August |
       | tempmanagerexpirydate[year]    | 2030   |
@@ -305,7 +294,6 @@ Feature: Assign a temporary manager to a user via the job assignment page
     And I wait "1" seconds
     Then I should see "Manager Two - Design Manager"
     When I set the following fields to these values:
-      | tempmanagerexpirydate[enabled] | 1      |
       | tempmanagerexpirydate[day]     | 15     |
       | tempmanagerexpirydate[month]   | August |
       | tempmanagerexpirydate[year]    | 2030   |

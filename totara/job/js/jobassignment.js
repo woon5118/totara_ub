@@ -157,6 +157,9 @@ totaraAssignManagerDialog = function(name, titleString, findUrl, useridKey, jaid
 
         var text_element = $('#'+self.text_element_id);
         text_element.html(customdata.displaystring);
+        if ($("#id_tempmanagerexpirydate_enabled").is(":checked") === false && name == 'tempmanager') {
+            $("#id_tempmanagerexpirydate_enabled").trigger("click");
+        }
         if (self.deletable) {
             self.setup_delete();
             // setup_delete() covers clearing the manageridjaid on delete, but we also need to ensure
@@ -165,7 +168,7 @@ totaraAssignManagerDialog = function(name, titleString, findUrl, useridKey, jaid
             deletebutton.click(function() {
                 $('input[name="' + useridKey + '"]').val('');
                 $('input[name="' + jaidKey + '"]').val('');
-                if ($("#id_tempmanagerexpirydate_enabled").is(":checked")) {
+                if ($("#id_tempmanagerexpirydate_enabled").is(":checked") && name == 'tempmanager') {
                     $("#id_tempmanagerexpirydate_enabled").trigger("click");
                 }
             });
@@ -184,7 +187,7 @@ totaraAssignManagerDialog = function(name, titleString, findUrl, useridKey, jaid
             deletebutton.click(function () {
                 $('input[name="' + useridKey + '"]').val('');
                 $('input[name="' + jaidKey + '"]').val('');
-                if ($("#id_tempmanagerexpirydate_enabled").is(":checked")) {
+                if ($("#id_tempmanagerexpirydate_enabled").is(":checked") && name == 'tempmanager') {
                     $("#id_tempmanagerexpirydate_enabled").trigger("click");
                 }
             });
