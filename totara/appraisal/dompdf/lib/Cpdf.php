@@ -2595,7 +2595,7 @@ EOT;
                                     $cidtogid[$c * 2 + 1] = chr($glyph & 0xFF);
                                 }
 
-                                if ($c != hexdec($n)) {
+                                if ($c != @hexdec($n)) { // Totara: ignore any bugs to pass PHP 7.4 tests
                                     $data['codeToName'][$c] = $n;
                                 }
                                 $data['C'][$c] = $width;

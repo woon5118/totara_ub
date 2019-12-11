@@ -14,6 +14,7 @@ Description of dompdf import
         - More information about backwards compatibility issues:
             - https://phpunit.de/announcements/phpunit-6.html
             - https://phpunit.de/announcements/phpunit-7.html
+    - TL-23377 appraisal: fix dompdf compatibility with PHP 7.4
 
 3. Bump up version in totara/appraisal/thirdpartylibs.xml
 
