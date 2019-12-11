@@ -36,6 +36,9 @@ Here are the files that we have added.
 
     This should not ever be used directly. The wrapper above uses it automatically.
 
+Local changes:
+ * TL-23367 PHP 7.4 compatibility fixes
+
 
 Information
 -----------
