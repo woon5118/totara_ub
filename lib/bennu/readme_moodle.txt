@@ -26,3 +26,4 @@ Changelog
 7/ added timestamp_to_date function to support zero duration events (16 Sept 2015)
 8/ replaced deprecated create_function() that was abused to do eval
 9/ Updated \iCalendar_event::invariant_holds() to allow for same dtstart and dtend timestamps (13 July 2017)
+10/ TL-23366 PHP 7.4 compatibility fixes
