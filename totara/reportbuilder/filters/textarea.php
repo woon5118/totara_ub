@@ -85,7 +85,7 @@ class rb_filter_textarea extends rb_filter_type {
         $field    = $this->name;
         $operator = $field . '_op';
         $value = (isset($formdata->$field)) ? $formdata->$field : '';
-        if (array_key_exists($operator, $formdata)) {
+        if (property_exists($formdata, $operator)) {
             if ($value == '') {
                 // no data - no change except for empty filter
                 return false;

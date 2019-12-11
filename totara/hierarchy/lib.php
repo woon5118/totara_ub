@@ -1632,7 +1632,7 @@ class hierarchy {
             $buttons[] = $OUTPUT->action_icon(new moodle_url('item/delete.php', array_merge($params, array('id' => $record->id))),
                     new pix_icon('t/delete', $str_delete));
         }
-        return implode($buttons, '');
+        return implode('', $buttons);
     }
 
     /**

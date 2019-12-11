@@ -300,7 +300,7 @@ if ($templates) {
             $buttons[] = $spacer;
         }
 
-        $tablerow[] = implode($buttons, '');
+        $tablerow[] = implode('', $buttons);
 
         $table->add_data($tablerow);
     }

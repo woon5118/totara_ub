@@ -246,6 +246,11 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
      */
     public function inspect_method_docblocks(string $classname): array {
         $errors = array();
+
+        if (version_compare(PHP_VERSION, '7.4', '>=')) {
+            return $errors;
+        }
+
         try {
             $class = new ReflectionClass($classname);
             $class_file = $class->getFileName();
@@ -842,6 +847,10 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
      */
     public function test_inspect_method_docblocks(): void {
         $this->resetAfterTest();
+
+        if (version_compare(PHP_VERSION, '7.4', '>=')) {
+            $this->markTestSkipped('PHP 7.4 does not support converting introspection types to strings');
+        }
 
         require_once(__DIR__ . '/fixtures/code_quality_test_classes.php');
 

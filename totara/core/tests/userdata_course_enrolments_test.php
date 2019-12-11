@@ -47,6 +47,8 @@ class totara_core_userdata_course_enrolments_testcase extends advanced_testcase 
         $category1 = $this->getDataGenerator()->create_category();
         $category2 = $this->getDataGenerator()->create_category();
 
+        $cohort = $this->getDataGenerator()->create_cohort();
+
         $course1 = $this->getDataGenerator()->create_course(['category' => $category1->id]);
         $course2 = $this->getDataGenerator()->create_course(['category' => $category2->id]);
         $course3 = $this->getDataGenerator()->create_course(['category' => $category2->id]);
@@ -66,9 +68,20 @@ class totara_core_userdata_course_enrolments_testcase extends advanced_testcase 
         // Add instance of the plugin to the courses if none is added by default.
         $plugin = enrol_get_plugin($pluginname);
         if (!$DB->record_exists('enrol', ['enrol' => $pluginname])) {
-            $plugin->add_instance($course1);
-            $plugin->add_instance($course2);
-            $plugin->add_instance($course3);
+            if ($pluginname === 'cohort') {
+                $plugin->add_instance($course1, ['customint1' => $cohort->id]);
+                $plugin->add_instance($course2, ['customint1' => $cohort->id]);
+                $plugin->add_instance($course3, ['customint1' => $cohort->id]);
+            } else if ($pluginname === 'meta') {
+                // This makes no sense, but let the tests pass...
+                $plugin->add_instance($course1, ['customint1' => SITEID]);
+                $plugin->add_instance($course2, ['customint1' => SITEID]);
+                $plugin->add_instance($course3, ['customint1' => SITEID]);
+            } else {
+                $plugin->add_instance($course1);
+                $plugin->add_instance($course2);
+                $plugin->add_instance($course3);
+            }
         }
 
         // Users 1 and 2 are assigned with the default role, which will be learner.
@@ -85,7 +98,7 @@ class totara_core_userdata_course_enrolments_testcase extends advanced_testcase 
         // User 3 gets a second enrolment for course 3.
         if ($pluginname === 'manual') {
             $plugin = enrol_get_plugin('cohort');
-            $plugin->add_instance($course3);
+            $plugin->add_instance($course3, ['customint1' => $cohort->id]);
             $this->getDataGenerator()->enrol_user($user3->id, $course3->id, 'manager', 'cohort');
         } else {
             $this->getDataGenerator()->enrol_user($user3->id, $course3->id, 'manager', 'manual');

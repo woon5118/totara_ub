@@ -289,7 +289,7 @@ if ($values) {
             $buttons[] = $spacer;
         }
 
-        $row[] = implode($buttons, '');
+        $row[] = implode('', $buttons);
 
         $table->data[] = $row;
     }

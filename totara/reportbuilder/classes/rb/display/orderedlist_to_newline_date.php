@@ -55,7 +55,7 @@ class orderedlist_to_newline_date extends base {
             }
         }
 
-        return implode($output, "\n");
+        return implode("\n", $output);
     }
 
     /**

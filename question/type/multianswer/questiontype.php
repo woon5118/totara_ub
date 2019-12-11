@@ -61,6 +61,12 @@ class qtype_multianswer extends question_type {
         // First all possible questions from sequence are nulled
         // then filled with the data if available in  $wrappedquestions.
         foreach ($sequence as $seq) {
+            if (!isset($question->options)) {
+                $question->options = new stdClass();
+            }
+            if (!isset($question->options->questions)) {
+                $question->options->questions = [];
+            }
             $question->options->questions[$seq] = '';
         }
 

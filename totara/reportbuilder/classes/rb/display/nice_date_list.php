@@ -50,7 +50,7 @@ class nice_date_list extends base {
         // Note that because this function handles multiple dates in a single cell,
         // the content should not be converted for Excel oor Open Office - it should be
         // handled as plain text.
-        return implode($items, "\n");
+        return implode("\n", $items);
     }
 
     public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {

@@ -62,7 +62,7 @@ class delimitedlist_datetime_in_timezone extends base {
             }
         }
 
-        return implode($output, "\n");
+        return implode("\n", $output);
     }
 
     /**

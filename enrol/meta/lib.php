@@ -142,7 +142,9 @@ class enrol_meta_plugin extends enrol_plugin {
         require_once("$CFG->dirroot/enrol/meta/locallib.php");
 
         // Support creating multiple at once.
-        if (is_array($fields['customint1'])) {
+        if (!isset($fields['customint1'])) {
+            $courses = array(null); // Totara: Prevent errors.
+        } else if (is_array($fields['customint1'])) {
             $courses = array_unique($fields['customint1']);
         } else {
             $courses = array($fields['customint1']);

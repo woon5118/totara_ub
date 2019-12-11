@@ -41,10 +41,10 @@ abstract class qtype_ddmarker_shape {
 
     }
     public function inside_width_height($widthheight) {
-        foreach ($this->outlying_coords_to_test() as $coordsxy) {
-            if ($coordsxy[0] > $widthheight[0] || $coordsxy[1] > $widthheight[1]) {
-                return false;
-            }
+        // TL-23263 code from Moodle is totally busted, we need to test this properly!
+        $coordsxy = $this->outlying_coords_to_test();
+        if ($coordsxy[0] > $widthheight[0] || $coordsxy[1] > $widthheight[1]) {
+            return false;
         }
         return true;
     }

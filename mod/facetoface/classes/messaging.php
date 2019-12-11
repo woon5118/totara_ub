@@ -171,7 +171,7 @@ final class messaging {
             $USERNAME = fullname($user);
             $MAILTO   = $user->email;
 
-            return implode([
+            return implode("\r\n", [
                 "BEGIN:VEVENT",
                 "ORGANIZER;CN={$ORGANISEREMAIL}:MAILTO:{$ORGANISEREMAIL}",
                 "DTSTART:{$DTSTART}",
@@ -188,7 +188,7 @@ final class messaging {
                 "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE={$ROLE};PARTSTAT=NEEDS-ACTION;",
                 " RSVP=FALSE;CN={$USERNAME};LANGUAGE=en:MAILTO:{$MAILTO}",
                 "END:VEVENT",
-            ], "\r\n");
+            ]);
         };
 
         $VEVENTS = [];

@@ -1495,9 +1495,10 @@ class report_builder_toolbar_search_form extends moodleform {
     public function definition_after_data() {
         $mform =& $this->_form;
 
-        $toolbarsearchtext = $this->_customdata['toolbarsearchtext'];
-
-        $mform->setDefault('toolbarsearchtext', $toolbarsearchtext);
+        if (isset($this->_customdata['toolbarsearchtext'])) {
+            $toolbarsearchtext = $this->_customdata['toolbarsearchtext'];
+            $mform->setDefault('toolbarsearchtext', $toolbarsearchtext);
+        }
     }
 }
 

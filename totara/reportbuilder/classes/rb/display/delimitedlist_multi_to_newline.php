@@ -55,11 +55,11 @@ class delimitedlist_multi_to_newline extends base {
                 foreach ($item as $option) {
                     $inline[] = format_string($option->option);
                 }
-                $output[] = implode($inline, ', ');
+                $output[] = implode(', ', $inline);
             }
         }
 
-        return implode($output, "\n");
+        return implode("\n", $output);
     }
 
     /**

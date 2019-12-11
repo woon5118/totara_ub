@@ -410,7 +410,7 @@ trait base_deprecated_t12_trait {
             }
         }
 
-        return implode($output, "\n");
+        return implode("\n", $output);
     }
 
     /**
@@ -518,7 +518,7 @@ trait base_deprecated_t12_trait {
                 $items[$key] = '-';
             }
         }
-        return implode($items, "\n");
+        return implode("\n", $items);
     }
 
     /**
@@ -543,7 +543,7 @@ trait base_deprecated_t12_trait {
                 $output[] = format_string($item);
             }
         }
-        return implode($output, "\n");
+        return implode("\n", $output);
     }
 
     /**
@@ -569,10 +569,10 @@ trait base_deprecated_t12_trait {
                 foreach ($item as $option) {
                     $inline[] = format_string($option->option);
                 }
-                $output[] = implode($inline, ', ');
+                $output[] = implode(', ', $inline);
             }
         }
-        return implode($output, "\n");
+        return implode("\n", $output);
     }
 
     /**
@@ -599,7 +599,7 @@ trait base_deprecated_t12_trait {
                 $output[] = html_writer::link($item->url, $text, $target);
             }
         }
-        return implode($output, "\n");
+        return implode("\n", $output);
     }
 
     /**
@@ -662,7 +662,7 @@ trait base_deprecated_t12_trait {
                 $output[] = customfield_file::display_item_data($item, $extradata);
             }
         }
-        return implode($output, "\n");
+        return implode("\n", $output);
     }
 
     /**
@@ -688,7 +688,7 @@ trait base_deprecated_t12_trait {
                 $output[] = $location;
             }
         }
-        return implode($output, "\n");
+        return implode("\n", $output);
     }
 
     /**
@@ -711,7 +711,7 @@ trait base_deprecated_t12_trait {
                     userdate($item, get_string('strfdateshortmonth', 'langconfig')) : '';
             }
         }
-        return implode($items, "\n");
+        return implode("\n", $items);
     }
 
     /**
@@ -734,7 +734,7 @@ trait base_deprecated_t12_trait {
                 $output[] = userdate($item, get_string('strfdateshortmonth', 'langconfig'));
             }
         }
-        return implode($output, "\n");
+        return implode("\n", $output);
     }
 
     /**
@@ -757,7 +757,7 @@ trait base_deprecated_t12_trait {
                 $output[] = userdate($item, get_string('strfdateshortmonth', 'langconfig'));
             }
         }
-        return implode($output, "\n");
+        return implode("\n", $output);
     }
 
     /**
@@ -1382,7 +1382,7 @@ trait base_deprecated_t12_trait {
                 $output[] = get_string('no');
             }
         }
-        return implode($output, "\n");
+        return implode("\n", $output);
     }
 
     /**
@@ -1498,7 +1498,7 @@ trait base_deprecated_t12_trait {
             }
         }
 
-        return implode($output, "\n");
+        return implode("\n", $output);
     }
 
     /**

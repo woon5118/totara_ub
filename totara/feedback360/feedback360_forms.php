@@ -450,13 +450,13 @@ class request_select_users extends moodleform {
             }
 
             $existingval = html_writer::start_tag('div', array('id' => 'system_assignments', 'class' => 'replacement_box')) .
-                    implode($existing, '') .
+                    implode('', $existing) .
                     html_writer::end_tag('div') .
                     html_writer::empty_tag('input', $addusersparams);
 
             $mform->getElement('system_assignments')->setValue($existingval);
-            $mform->getElement('systemold')->setValue(implode($existingids, ','));
-            $mform->getElement('systemnew')->setValue(implode($existingids, ','));
+            $mform->getElement('systemold')->setValue(implode(',', $existingids));
+            $mform->getElement('systemnew')->setValue(implode(',', $existingids));
         } else {
             $emptydiv = html_writer::start_tag('div', array('id' => 'system_assignments', 'class' => 'replacement_box')) .
                     html_writer::end_tag('div') .
@@ -474,7 +474,7 @@ class request_select_users extends moodleform {
                     $existing[] = $OUTPUT->container(fullname($user), 'user_record', "system_user_{$u}");
                 }
                 $existingval = html_writer::start_tag('div', array('id' => 'system_assignments', 'class' => 'replacement_box')) .
-                        implode($existing, '') . html_writer::end_tag('div');
+                        implode('', $existing) . html_writer::end_tag('div');
 
                 $mform->getElement('system_assignments')->setValue($existingval);
             }
@@ -495,8 +495,8 @@ class request_select_users extends moodleform {
                 $existing[] = $renderer->external_user_record($email, $userform, $resp, $data['anonymous']);
             }
 
-            $mform->getElement('emailold')->setValue(implode($data['emailexisting'], ','));
-            $mform->getElement('existing_external')->setValue(implode($existing, ''));
+            $mform->getElement('emailold')->setValue(implode(',', $data['emailexisting']));
+            $mform->getElement('existing_external')->setValue(implode('', $existing));
         }
 
         if (!empty($data['duedate'])) {
@@ -562,11 +562,11 @@ class request_select_users extends moodleform {
             }
 
             if (!empty($formaterror)) {
-                $errors['emailnew'] = get_string('error:emailformat', 'totara_feedback360') . implode($formaterror, "- ");
+                $errors['emailnew'] = get_string('error:emailformat', 'totara_feedback360') . implode("- ", $formaterror);
             }
 
             if (!empty($duplicateerror)) {
-                $errors['emailnew'] = get_string('error:emailduplicate', 'totara_feedback360') . implode($duplicateerror, "- ");
+                $errors['emailnew'] = get_string('error:emailduplicate', 'totara_feedback360') . implode("- ", $duplicateerror);
             }
         }
 

@@ -225,7 +225,7 @@ foreach ($notification_templates as $note_templ) {
         );
     }
 
-    $row[] = implode($buttons, '');
+    $row[] = implode('', $buttons);
 
     $table->add_data($row, $rowclass);
 }

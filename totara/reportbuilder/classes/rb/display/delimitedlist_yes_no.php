@@ -56,7 +56,7 @@ class delimitedlist_yes_no extends base {
             }
         }
 
-        return implode($output, "\n");
+        return implode("\n", $output);
     }
 
     /**

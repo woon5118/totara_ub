@@ -181,7 +181,12 @@ class rb_filter_select extends rb_filter_type {
     function get_sql_filter($data) {
         global $DB;
 
-        $value = explode(',', $data['value']);
+        if (is_int($data)) {
+            // TL-23263: Invalid test most likely, this should get fixed soon...
+            $value = [''];
+        } else {
+            $value = explode(',', $data['value']);
+        }
         $query = $this->get_field();
         $simplemode = $this->options['simplemode'];
 

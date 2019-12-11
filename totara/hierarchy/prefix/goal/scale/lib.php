@@ -215,7 +215,7 @@ function goal_scale_display_table($scales) {
                             array('title' => $strdelete));
                     }
                 }
-                $line[] = implode($buttons, '');
+                $line[] = implode('', $buttons);
             }
 
             $table->data[] = $line;

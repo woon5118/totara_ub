@@ -62,7 +62,7 @@ class delimitedlist_orgfiles_to_newline extends base {
             }
         }
 
-        return implode($output, "\n");
+        return implode("\n", $output);
     }
 
     /**

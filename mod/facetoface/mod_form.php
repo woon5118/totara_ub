@@ -458,7 +458,8 @@ class mod_facetoface_mod_form extends moodleform_mod {
 
         // The 'completionpass' may not exist when activity completion is disabled.
         if ($mform->elementExists('completionpass')) {
-            $completionpass = (int)$mform->getElementValue('completionpass')[0];
+            $value = $mform->getElementValue('completionpass');
+            $completionpass = isset($value) ? (int)$value[0] : null;
             $completionusegrade = $mform->getElement('completionusegrade');
             /** @var MoodleQuickForm_checkbox $completionusegrade */
             if ($completionpass == \mod_facetoface\seminar::COMPLETION_PASS_ANY) {

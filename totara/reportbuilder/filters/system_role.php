@@ -128,10 +128,10 @@ class rb_filter_system_role extends rb_filter_type {
         $valid = array ();
 
         // Validate the form data and check that the values are valid.
-        if (isset($value) && array_key_exists($field, $formdata) && in_array($value, array_keys($this->get_custom_options()))) {
+        if (isset($value) && property_exists($formdata, $field) && in_array($value, array_keys($this->get_custom_options()))) {
             $valid['value'] = $value;
         }
-        if (isset($value_operator) && array_key_exists($field_operator, $formdata) && in_array($value_operator, array_keys($this->get_operator_options()))) {
+        if (isset($value_operator) && property_exists($formdata, $field_operator) && in_array($value_operator, array_keys($this->get_operator_options()))) {
             $valid['operator'] = $value_operator;
         }
         if ($valid) {

@@ -299,7 +299,7 @@ class question_userinfo extends question_base{
             }
         }
 
-        $text = implode($todisplay, ', ');
+        $text = implode(', ', $todisplay);
         return (strlen($text) > 40) ? substr($text, 0, 30) . '...' : $text;
     }
 

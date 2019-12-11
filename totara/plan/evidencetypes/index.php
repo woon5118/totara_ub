@@ -165,7 +165,7 @@ if (!empty($deleteid)) {
         } else {
             $buttons[] = $OUTPUT->spacer(array('width' => 11, 'height' => 11));
         }
-        $line[] = implode($buttons, ' ');
+        $line[] = implode(' ', $buttons);
 
         $table->data[] = $line;
     }

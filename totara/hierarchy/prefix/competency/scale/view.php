@@ -392,7 +392,7 @@ if ($values) {
                 $buttons[] = $OUTPUT->spacer(array('height' => 11, 'width' => 11));
             }
 
-            $row[] = implode($buttons, '');
+            $row[] = implode('', $buttons);
         }
 
         $table->data[] = $row;

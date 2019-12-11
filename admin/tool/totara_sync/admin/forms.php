@@ -444,8 +444,7 @@ class totara_sync_config_form extends moodleform {
         );
         $mform->setDefault('cronenable', 1);
 
-        $complexscheduling = $this->_customdata['complexscheduling'];
-        if (!$complexscheduling) {
+        if (empty($this->_customdata['complexscheduling'])) {
             $mform->addElement('scheduler', 'schedulegroup', get_string('scheduleserver', 'tool_totara_sync'));
             $mform->disabledIf('schedulegroup', 'cronenable', 1);
         } else if (has_capability('moodle/site:config', context_system::instance())) {

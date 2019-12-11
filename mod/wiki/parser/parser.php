@@ -42,12 +42,14 @@ class wiki_parser_proxy {
     public static function get_section(&$string, $type, $section, $all_content = false) {
         if(self::create_parser_instance($type)) {
             $content = self::$parsers[$type]->get_section($section, $string, true);
-            
+            if ($content === false) { // Totara: make sure nothing went wrong
+                return false;
+            }
             if($all_content) {
             	return $content;
             }
             else {
-            	return $content[1];
+                return is_array($content) ? $content[1] : null;
         	}
         }
         else {

@@ -1110,7 +1110,7 @@ class edit_renderer extends \plugin_renderer_base {
         foreach ($usablecontexts as $context) {
             $pcontexts[] = $context->id;
         }
-        $contextslist = join($pcontexts, ', ');
+        $contextslist = join(', ', $pcontexts);
 
         $categories = get_categories_for_contexts($contextslist);
 

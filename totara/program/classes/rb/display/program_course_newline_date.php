@@ -68,7 +68,7 @@ class program_course_newline_date extends program_course_base {
             $output = self::resort($programid, $output, $reference);
         }
 
-        return implode($output, "\n");
+        return implode("\n", $output);
     }
 
     /**

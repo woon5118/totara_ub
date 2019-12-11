@@ -292,7 +292,7 @@ class completion_criteria_activity extends completion_criteria {
             }
         }
 
-        $details['requirement'] = implode($details['requirement'], ', ');
+        $details['requirement'] = implode(', ', $details['requirement']);
 
         // Build status.
         $details['status'] = array();
@@ -338,7 +338,7 @@ class completion_criteria_activity extends completion_criteria {
             }
         }
 
-        $details['status'] = implode($details['status'], ', ');
+        $details['status'] = implode(', ', $details['status']);
         if (!$details['status']) {
             $details['status'] = get_string('completion-n', 'completion');
         }

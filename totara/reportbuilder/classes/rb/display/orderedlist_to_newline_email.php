@@ -61,7 +61,7 @@ class orderedlist_to_newline_email extends base {
             }
         }
 
-        return implode($output, "\n");
+        return implode("\n", $output);
     }
 
     /**

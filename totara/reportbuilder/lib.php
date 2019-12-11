@@ -4344,7 +4344,7 @@ class reportbuilder {
         } else {
             $baseid = ($this->grouped) ? "min(base.id) AS id" : "base.id";
             array_unshift($fields, $baseid);
-            $selectsql = "SELECT " . implode($fields, ",\n     ") . " \n";
+            $selectsql = "SELECT " . implode(",\n     ", $fields) . " \n";
 
         }
         $joinssql = (count($joins) > 0) ? $this->get_join_sql($joins) : '';

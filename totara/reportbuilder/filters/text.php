@@ -91,7 +91,7 @@ class rb_filter_text extends rb_filter_type {
         $field    = $this->name;
         $operator = $field . '_op';
         $value = (isset($formdata->$field)) ? $formdata->$field : '';
-        if (array_key_exists($operator, $formdata)) {
+        if (property_exists($formdata, $operator)) {
             if ($formdata->$operator != self::RB_FILTER_ISEMPTY && $formdata->$operator != self::RB_FILTER_ISNOTEMPTY && $value == '') {
                 // No data - no change except for empty and not empty filters.
                 return false;

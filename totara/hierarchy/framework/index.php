@@ -187,7 +187,7 @@ if ($frameworks) {
         }
 
         if ($buttons) {
-            $row[] = implode($buttons, '');
+            $row[] = implode('', $buttons);
         }
 
         $table->data[] = $row;

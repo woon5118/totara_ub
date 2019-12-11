@@ -163,9 +163,9 @@ class quiz_statistics_question_stats_testcase extends basic_testcase {
         $items = preg_split('!,!', $line);
         while (!is_null($key = key($items))) {
             if ($items[$key] != '') {
-                if ($start = ($items[$key]{0} == '"')) {
+                if ($start = ($items[$key][0] == '"')) {
                     $items[$key] = substr($items[$key], 1);
-                    while (!$end = ($items[$key]{strlen($items[$key])-1} == '"')) {
+                    while (!$end = ($items[$key][strlen($items[$key])-1] == '"')) {
                         $item = $items[$key];
                         $k = $key;
                         unset($items[$key]);

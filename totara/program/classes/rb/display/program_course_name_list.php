@@ -70,7 +70,7 @@ class program_course_name_list extends program_course_base {
             $items = self::resort($programid, $items, $reference);
         }
 
-        return implode($items, "\n");
+        return implode("\n", $items);
     }
 
     /**

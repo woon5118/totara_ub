@@ -75,7 +75,7 @@ class rb_filter_url extends rb_filter_type {
     public function check_data($formdata) {
         $field    = $this->name;
         $operator = $field . '_op';
-        if (array_key_exists($operator, $formdata)) {
+        if (property_exists($formdata, $operator)) {
             if ($formdata->$operator != self::RB_FILTER_ISEMPTY && $formdata->$operator != self::RB_FILTER_ISNOTEMPTY) {
                 // No data - no change except for empty and not empty filters.
                 return false;

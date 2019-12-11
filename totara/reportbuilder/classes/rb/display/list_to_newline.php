@@ -52,7 +52,7 @@ class list_to_newline extends base {
             }
         }
 
-        return implode($items, "\n");
+        return implode("\n", $items);
     }
 
     /**

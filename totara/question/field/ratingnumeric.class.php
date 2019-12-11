@@ -107,8 +107,8 @@ class question_ratingnumeric extends question_base{
     }
 
     public function define_get(stdClass $toform) {
-        $toform->rangefrom = $this->param1['rangefrom'];
-        $toform->rangeto = $this->param1['rangeto'];
+        $toform->rangefrom = $this->param1['rangefrom'] ?? null;
+        $toform->rangeto = $this->param1['rangeto'] ?? null;
         if (isset($this->defaultdata) && $this->defaultdata != null) {
             $toform->defaultvalue = $this->defaultdata;
             $toform->setdefault = 1;

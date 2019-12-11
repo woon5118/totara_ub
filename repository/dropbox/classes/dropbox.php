@@ -182,6 +182,10 @@ class dropbox extends \oauth2_client {
      * @throws  moodle_exception
      */
     protected function check_and_handle_api_errors($data) {
+        if (PHPUNIT_TEST && !isset($this->info)) {
+            // Totara: somebody is making invalid mocking request, ignore it to fix problems in PHP 7.4
+            return;
+        }
         if ($this->info['http_code'] == 200) {
             // Dropbox only returns errors on non-200 response codes.
             return;

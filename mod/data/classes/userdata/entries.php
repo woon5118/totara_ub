@@ -161,7 +161,7 @@ class entries extends \totara_userdata\userdata\item {
                 }
 
                 // If we have some multi field/column content combine it into an array.
-                if (implode($content, '')) {
+                if (implode('', $content)) {
                     array_unshift($content, $data['content']);
                 } else {
                     $content = $data['content'];

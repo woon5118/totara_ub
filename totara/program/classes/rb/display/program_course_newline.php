@@ -70,7 +70,7 @@ class program_course_newline extends program_course_base {
             $newitems = self::resort($programid, $newitems, $reference);
         }
 
-        $output = implode($newitems, "\n");
+        $output = implode("\n", $newitems);
 
         if ($format !== 'html') {
             $output = static::to_plaintext($output);

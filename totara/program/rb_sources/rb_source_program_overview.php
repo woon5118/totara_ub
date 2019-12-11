@@ -800,7 +800,7 @@ class rb_source_program_overview extends rb_base_source {
                 $output[] = get_string('coursecompletion_notyetstarted', 'rb_source_program_overview');
             }
         }
-        return implode($output, "\n");
+        return implode("\n", $output);
     }
 
     /**
@@ -828,7 +828,7 @@ class rb_source_program_overview extends rb_base_source {
             }
         }
 
-        return implode($output, "\n");
+        return implode("\n", $output);
     }
 
     /**
@@ -851,7 +851,7 @@ class rb_source_program_overview extends rb_base_source {
              $items[$key] = html_writer::link($url, format_string($coursename));
          }
 
-        return implode($items, "\n");
+        return implode("\n", $items);
     }
 
     // Source specific filter display methods.

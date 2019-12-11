@@ -220,6 +220,7 @@ class MoodleQuickForm_filetypes extends MoodleQuickForm_group {
      * @return string|null Validation error message or null.
      */
     public function validateSubmitValue($value) {
+        $value = $value ?? ['filetypes' => null];
 
         if (!$this->allowall) {
             // Assert that there is an actual list provided.
@@ -247,6 +248,6 @@ class MoodleQuickForm_filetypes extends MoodleQuickForm_group {
             }
         }
 
-        return;
+        return null;
     }
 }

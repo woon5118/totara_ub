@@ -242,7 +242,7 @@ class scheduled_reports_new_form extends moodleform {
                 $audiencesrecords[] = $renderer->schedule_email_setting($audience, 'audiences');
                 $audienceids[] = $audience->id;
             }
-            $divcontainer = html_writer::div(implode($audiencesrecords, ''), 'list-audiences');
+            $divcontainer = html_writer::div(implode('', $audiencesrecords), 'list-audiences');
             $mform->getElement('audiences_group')->getElements()[0]->setValue($divcontainer);
             $mform->getElement('audiences')->setValue(implode(',', $audienceids));
         }
@@ -255,7 +255,7 @@ class scheduled_reports_new_form extends moodleform {
                 $systemusers[] = $renderer->schedule_email_setting($user, 'systemusers');
                 $userids[] = $user->id;
             }
-            $divcontainer = html_writer::div(implode($systemusers, ''), 'list-systemusers');
+            $divcontainer = html_writer::div(implode('', $systemusers), 'list-systemusers');
 
             $mform->getElement('systemusers_list_group')->getElements()[0]->setValue($divcontainer);
             $mform->getElement('systemusers')->setValue(implode(',', $userids));
@@ -270,7 +270,7 @@ class scheduled_reports_new_form extends moodleform {
                 $external->name = $extuser;
                 $externalemails[] = $renderer->schedule_email_setting($external, 'externalemails');
             }
-            $divcontainer = html_writer::div(implode($externalemails, ''), 'list-externalemails');
+            $divcontainer = html_writer::div(implode('', $externalemails), 'list-externalemails');
             $mform->getElement('externalemailsgrp')->getElements()[0]->setValue($divcontainer);
             $mform->getElement('externalemails')->setValue(implode(',', $extusers));
         }

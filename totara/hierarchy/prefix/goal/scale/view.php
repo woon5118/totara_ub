@@ -315,7 +315,7 @@ if ($values) {
                 $buttons[] = $OUTPUT->spacer(array('height' => 11, 'width' => 11));
             }
 
-            $row[] = implode($buttons, '');
+            $row[] = implode('', $buttons);
         } else {
             // Show the default and complete values as uneditble values.
             // It is the default value.
