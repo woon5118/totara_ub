@@ -225,7 +225,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
     public function test_cancellation_send_delete_session() {
 
-        $session = $this->f2f_generate_data();
+        $session = $this->generate_data();
 
         // Call facetoface_delete_session function for session1.
         $emailsink = $this->redirectMessages();
@@ -240,7 +240,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
     public function test_cancellation_nonesend_delete_session() {
 
-        $session = $this->f2f_generate_data(false);
+        $session = $this->generate_data(false);
 
         // Call facetoface_delete_session function for session1.
         $emailsink = $this->redirectMessages();
@@ -258,7 +258,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
      * @param bool $future, time status: future or past, to test cancellation notifications
      * @return \stdClass $session
      */
-    private function f2f_generate_data($future = true) {
+    private function generate_data($future = true) {
         global $DB;
 
         $this->setAdminUser();
@@ -1461,8 +1461,8 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
      */
     public function test_notification_duplicates() {
         global $DB;
-        $sessionok = $this->f2f_generate_data(false);
-        $sessionbad = $session = $this->f2f_generate_data(true);
+        $sessionok = $this->generate_data(false);
+        $sessionbad = $session = $this->generate_data(true);
 
         // Make duplicate.
         $duplicate = $DB->get_record('facetoface_notification', array(
@@ -1514,7 +1514,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $this->assertEquals(count($allbefore), count($allafter));
     }
 
-    public function f2fsession_generate_data($future = true) {
+    private function session_generate_data($future = true) {
         global $DB;
 
         $this->resetAfterTest(true);
@@ -1571,7 +1571,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     public function test_booking_confirmation_default() {
 
         // Default test Manager copy is enable and suppressccmanager is disabled.
-        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
 
         $emailsink = $this->redirectMessages();
         signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
@@ -1595,7 +1595,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $emailsink = $this->redirectMessages();
 
         // Only send to user.
-        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
         $new_signup = \mod_facetoface\signup::create($student1->id, $seminarevent);
         $new_signup->set_skipusernotification(false);
         $new_signup->set_skipmanagernotification();
@@ -1618,7 +1618,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $new_signup = null;
 
         // Send to neither user, nor manager.
-        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
         $new_signup = \mod_facetoface\signup::create($student1->id, $seminarevent);
         $new_signup->set_skipusernotification();
         $new_signup->set_skipmanagernotification();
@@ -1633,7 +1633,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     public function test_booking_confirmation_suppress_ccmanager() {
 
         // Test Manager copy is enable and suppressccmanager is enabled(do not send a copy to manager).
-        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
 
         $emailsink = $this->redirectMessages();
         $signup = \mod_facetoface\signup::create($student1->id, $seminarevent);
@@ -1649,14 +1649,14 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     public function test_booking_confirmation_no_ccmanager() {
 
         // Test Manager copy is disabled and suppressccmanager is disbaled.
-        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
 
         $params = array(
             'facetofaceid'  => $facetoface->id,
             'type'          => MDL_F2F_NOTIFICATION_AUTO,
             'conditiontype' => MDL_F2F_CONDITION_BOOKING_CONFIRMATION
         );
-        $this->update_f2f_notification($params, 0);
+        $this->update_notification($params, 0);
 
         $emailsink = $this->redirectMessages();
         signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
@@ -1670,7 +1670,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     public function test_booking_confirmation_no_ccmanager_and_suppress_ccmanager() {
 
         // Test Manager copy is disabled and suppressccmanager is disbaled.
-        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
 
         $suppressccmanager = true;
 
@@ -1679,7 +1679,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
             'type'          => MDL_F2F_NOTIFICATION_AUTO,
             'conditiontype' => MDL_F2F_CONDITION_BOOKING_CONFIRMATION
         );
-        $this->update_f2f_notification($params, 0);
+        $this->update_notification($params, 0);
 
         $data = array();
         if ($suppressccmanager) {
@@ -1697,7 +1697,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     public function test_booking_cancellation_default() {
 
         // Default test Manager copy is enable and suppressccmanager is disabled.
-        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
 
         $emailsink = $this->redirectMessages();
         $signup = signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
@@ -1721,7 +1721,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     public function test_booking_cancellation_suppress_ccmanager() {
 
         // Test Manager copy is enable and suppressccmanager is enabled.
-        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
 
         $suppressccmanager = true;
         $emailsink = $this->redirectMessages();
@@ -1750,7 +1750,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     public function test_booking_cancellation_only_ccmanager() {
 
         // Test Manager copy is disabled and suppressccmanager is disbaled.
-        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
 
         $emailsink = $this->redirectMessages();
         $signup = signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
@@ -1763,7 +1763,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
             'conditiontype' => MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION
         );
 
-        $this->update_f2f_notification($params, 1);
+        $this->update_notification($params, 1);
         $emailsink = $this->redirectMessages();
 
         if (signup_helper::can_user_cancel($signup)) {
@@ -1785,7 +1785,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     public function test_booking_cancellation_no_ccmanager() {
 
         // Test Manager copy is disabled and suppressccmanager is disbaled.
-        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
 
         $emailsink = $this->redirectMessages();
         $signup = signup_helper::signup(\mod_facetoface\signup::create($student1->id, $seminarevent));
@@ -1798,7 +1798,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
             'conditiontype' => MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION
         );
 
-        $this->update_f2f_notification($params, 0);
+        $this->update_notification($params, 0);
 
         $emailsink = $this->redirectMessages();
         if (signup_helper::can_user_cancel($signup)) {
@@ -1816,7 +1816,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     public function test_booking_cancellation_no_ccmanager_and_suppress_ccmanager() {
 
         // Test Manager copy is disabled and suppressccmanager is disbaled.
-        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->f2fsession_generate_data();
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
 
         $suppressccmanager = true;
         $emailsink = $this->redirectMessages();
@@ -1830,7 +1830,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
             'type'          => MDL_F2F_NOTIFICATION_AUTO,
             'conditiontype' => MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION
         );
-        $this->update_f2f_notification($params, 0);
+        $this->update_notification($params, 0);
 
         $emailsink = $this->redirectMessages();
 
@@ -1849,7 +1849,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $this->assertCount(1, $emails, 'Wrong booking cancellation for Test Manager copy is disabled and suppressccmanager is disbaled.');
     }
 
-    private function update_f2f_notification($params, $ccmanager) {
+    private function update_notification($params, $ccmanager) {
         global $DB;
 
         $notification = new facetoface_notification($params);
@@ -1865,7 +1865,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         global $DB;
 
         $emailsink = $this->redirectMessages();
-        list($sessiondate, $student1, $student2, $student3) = $this->f2fsession_generate_timezone(99);
+        list($sessiondate, $student1, $student2, $student3) = $this->session_generate_timezone(99);
         $this->execute_adhoc_tasks();
         $emailsink->close();
 
@@ -1941,7 +1941,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $test->timezone = 'America/New_York';
 
         $emailsink = $this->redirectMessages();
-        list($sessiondate, $student1, $student2, $student3) = $this->f2fsession_generate_timezone($test->timezone);
+        list($sessiondate, $student1, $student2, $student3) = $this->session_generate_timezone($test->timezone);
         $this->execute_adhoc_tasks();
         $emailsink->close();
 
@@ -2105,7 +2105,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         }
     }
 
-    private function f2fsession_generate_timezone($sessiontimezone) {
+    private function session_generate_timezone($sessiontimezone) {
         global $DB, $CFG;
 
         $this->setAdminUser();
@@ -2483,6 +2483,113 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $this->assertSame($teacher1->email, $message1->to);
         $this->assertStringStartsWith('Seminar event trainer unassigned', $message1->subject);
         $this->assertEquals(1, 1);
+    }
+
+    /**
+     * Test normal cost and discount cost with default settings
+     */
+    public function test_normalcost_discountcost_default_with_discountcode() {
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
+
+        $emailsink = $this->redirectMessages();
+        $signup = \mod_facetoface\signup::create($student1->id, $seminarevent);
+        $signup->set_discountcode('XMAS');
+        signup_helper::signup($signup);
+
+        $this->execute_adhoc_tasks();
+        $emailsink->close();
+
+        $emails = $emailsink->get_messages();
+        $this->assertContains('Cost:', current($emails)->fullmessagehtml);
+        // Test normal cost
+        $this->assertNotContains('$100', current($emails)->fullmessagehtml);
+        // Test discount cost
+        $this->assertContains('$NZ20', current($emails)->fullmessagehtml);
+    }
+
+    /**
+     * Test normal cost and discount cost with default settings
+     */
+    public function test_normalcost_discountcost_default_without_discountcode() {
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
+
+        $emailsink = $this->redirectMessages();
+        $signup = \mod_facetoface\signup::create($student1->id, $seminarevent);
+        signup_helper::signup($signup);
+
+        $this->execute_adhoc_tasks();
+        $emailsink->close();
+
+        $emails = $emailsink->get_messages();
+        $this->assertContains('Cost:', current($emails)->fullmessagehtml);
+        // Test normal cost
+        $this->assertContains('$100', current($emails)->fullmessagehtml);
+        // Test discount cost
+        $this->assertNotContains('$NZ20', current($emails)->fullmessagehtml);
+    }
+
+    /**
+     * Test normal cost and discount cost with disabled settings
+     */
+    public function test_normalcost_discountcost_both_disabled() {
+
+        set_config('facetoface_hidecost', true);
+        set_config('facetoface_hidediscount', true);
+
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
+
+        $emailsink = $this->redirectMessages();
+        $signup = \mod_facetoface\signup::create($student1->id, $seminarevent);
+        $signup->set_discountcode('XMAS');
+        signup_helper::signup($signup);
+
+        $this->execute_adhoc_tasks();
+        $emailsink->close();
+
+        $emails = $emailsink->get_messages();
+        $this->assertContains('Cost:', current($emails)->fullmessagehtml);
+        // Test normal cost
+        $this->assertNotContains('$100', current($emails)->fullmessagehtml);
+        // Test discount cost
+        $this->assertNotContains('$NZ20', current($emails)->fullmessagehtml);
+
+        $emailsink = $this->redirectMessages();
+        $signup = \mod_facetoface\signup::create($student2->id, $seminarevent);
+        signup_helper::signup($signup);
+
+        $this->execute_adhoc_tasks();
+        $emailsink->close();
+
+        $emails = $emailsink->get_messages();
+        $this->assertContains('Cost:', current($emails)->fullmessagehtml);
+        // Test normal cost
+        $this->assertNotContains('$100', current($emails)->fullmessagehtml);
+        // Test discount cost
+        $this->assertNotContains('$NZ20', current($emails)->fullmessagehtml);
+    }
+
+    /**
+     * Test normal cost and with disabled discount cost
+     */
+    public function test_normalcost_discountcost_disabled_discountcode() {
+
+        set_config('facetoface_hidediscount', true);
+
+        list($seminarevent, $facetoface, $course, $student1, $student2, $teacher1, $manager) = $this->session_generate_data();
+
+        $emailsink = $this->redirectMessages();
+        $signup = \mod_facetoface\signup::create($student1->id, $seminarevent);
+        $signup->set_discountcode('XMAS');
+        signup_helper::signup($signup);
+        $this->execute_adhoc_tasks();
+        $emailsink->close();
+
+        $emails = $emailsink->get_messages();
+        $this->assertContains('Cost:', current($emails)->fullmessagehtml);
+        // Test normal cost
+        $this->assertContains('$100', current($emails)->fullmessagehtml);
+        // Test discount cost
+        $this->assertNotContains('$NZ20', current($emails)->fullmessagehtml);
     }
 
     private function create_facetoface() {

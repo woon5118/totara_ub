@@ -576,11 +576,23 @@ final class signup implements seminar_iterator_item {
      * @return string
      */
     public function get_cost(): string {
-        if (!empty($this->discountcode)) {
-            return format_string($this->seminarevent->get_discountcost());
-        } else {
-            return format_string($this->seminarevent->get_normalcost());
+
+        $cost = '';
+        $hidecostconfig = get_config(null, 'facetoface_hidecost');
+        $hidediscountconfig = get_config(null, 'facetoface_hidediscount');
+
+        if ($hidecostconfig && $hidediscountconfig) {
+            return $cost;
         }
+
+        if (!empty($this->discountcode) && !$hidediscountconfig) {
+            $cost = format_string($this->seminarevent->get_discountcost());
+        } else {
+            if (!$hidecostconfig) {
+                $cost = format_string($this->seminarevent->get_normalcost());
+            }
+        }
+        return $cost;
     }
 
     /**

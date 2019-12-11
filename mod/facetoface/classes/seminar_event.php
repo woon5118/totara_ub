@@ -71,13 +71,13 @@ final class seminar_event implements seminar_iterator_item {
      */
     private $details = '';
     /**
-     * @var int {facetoface_sessions}.normalcost
+     * @var string {facetoface_sessions}.normalcost
      */
-    private $normalcost = 0;
+    private $normalcost = '';
     /**
-     * @var int {facetoface_sessions}.discountcost
+     * @var string {facetoface_sessions}.discountcost
      */
-    private $discountcost = 0;
+    private $discountcost = '';
     /**
      * @var int {facetoface_sessions}.allowcancellations
      */
@@ -802,7 +802,7 @@ final class seminar_event implements seminar_iterator_item {
     public function is_discountcost(): bool {
         return !get_config(null, 'facetoface_hidecost')
             && !get_config(null, 'facetoface_hidediscount')
-            && $this->get_discountcost() > 0;
+            && !empty($this->get_discountcost());
     }
 
 

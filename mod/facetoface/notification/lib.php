@@ -1530,7 +1530,8 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
         $booked = $helper->count_attendees_with_codes($statuscodes);
     } catch (dml_missing_record_exception $e) {
         // Session has been deleted. Before refactoring, facetoface_cost() used to return the normal cost by default.
-        if (!empty($data->normalcost)) {
+        $hidecostconfig = get_config(null, 'facetoface_hidecost');
+        if (!empty($data->normalcost) && !$hidecostconfig) {
             $cost = $data->normalcost;
         } else {
             $cost = '';

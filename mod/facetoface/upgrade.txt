@@ -3,6 +3,10 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* seminar_event:get_normalcost() now returns string instead of int.
+* The first argument to seminar_event:set_normalcost() was an int, it has been changed to string
+* seminar_event:get_discountcost() now returns string instead of int.
+* The first argument to seminar_event:set_discountcost() was an int, it has been changed to string
 * seminar_event_helper::delete_seminarevent() has been changed to trigger the session_deleted event
 * Added array $conditions as 4th optional parameter to totara\customfield\fieldlib::customfield_validation_filedata() function
 * A new default column 'Event Attendance' is added to the event reports
