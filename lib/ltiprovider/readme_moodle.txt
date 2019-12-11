@@ -13,6 +13,8 @@ These changes can be reverted once the following pull requests have been integra
 * https://github.com/IMSGlobal/LTI-Tool-Provider-Library-PHP/pull/47
 * https://github.com/IMSGlobal/LTI-Tool-Provider-Library-PHP/pull/48
 
+* TL-23370 PHP 7.4 compatibility fixes
+
 It is recommended by upstream to install depdencies via composer - but the composer installation is bundled
 with an autoloader so it's better to do it manually.
 
