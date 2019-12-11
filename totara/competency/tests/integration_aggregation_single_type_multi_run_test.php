@@ -37,17 +37,6 @@ require_once($CFG->dirroot . '/totara/competency/tests/integration_aggregation.p
  */
 class totara_competency_integration_aggregation_single_type_multi_run_testcase extends totara_competency_integration_aggregation {
 
-    protected function setUp() {
-        parent::setUp();
-        \totara_core\advanced_feature::enable('competency_assignment');
-    }
-
-    public static function setUpBeforeClass() {
-        parent::setUpBeforeClass();
-        global $CFG;
-        require_once($CFG->dirroot . '/completion/completion_completion.php');
-    }
-
     /**
      * Test aggregation task with a combination of criteria_groups and multiple runs
      * @dataProvider task_to_execute_data_provider
@@ -84,7 +73,7 @@ class totara_competency_integration_aggregation_single_type_multi_run_testcase e
             ['user_id' => $data->users[2]->id, 'competency_id' => $data->competencies[1]->id],
             ['user_id' => $data->users[3]->id, 'competency_id' => $data->competencies[1]->id],
         ];
-        $data->assign_users_to_competencies($to_assign);
+        $this->assign_users_to_competencies($to_assign);
 
         $this->manual_multi_run_1($data, $task_to_execute);
         $this->manual_multi_run_2($data, $task_to_execute);
@@ -140,15 +129,11 @@ class totara_competency_integration_aggregation_single_type_multi_run_testcase e
             ['user_id' => $data->users[1]->id, 'competency_id' => $data->competencies[2]->id],
             ['user_id' => $data->users[4]->id, 'competency_id' => $data->competencies[2]->id],
         ];
-        $data->assign_users_to_competencies($to_assign);
+        $this->assign_users_to_competencies($to_assign);
 
         $this->learning_plan_multi_run_1($data, $task_to_execute);
         $this->learning_plan_multi_run_2($data, $task_to_execute);
-        $this->learning_plan_multi_run_3($data, $task_to_execute);
     }
-
-
-
 
     /**
      * Setup data and return created criteria and pathways
@@ -285,7 +270,7 @@ class totara_competency_integration_aggregation_single_type_multi_run_testcase e
             ['user_id' => $data->users[1]->id, 'competency_id' => $data->competencies[5]->id],
             ['user_id' => $data->users[2]->id, 'competency_id' => $data->competencies[5]->id],
         ];
-        $data->assign_users_to_competencies($to_assign);
+        $this->assign_users_to_competencies($to_assign);
 
         $data->criteria = $criteria;
         $data->pathways = $pathways;
@@ -1678,154 +1663,6 @@ class totara_competency_integration_aggregation_single_type_multi_run_testcase e
             $data->scalevalues[1]->id,
             (object)['manual' => true]
         );
-
-        $this->waitForSecond();
-
-        // Now run the task
-        (new $task_to_execute())->execute();
-
-        $this->verify_item_records([]);
-
-        $pw_achievement_records = $this->verify_pathway_achievements([
-            'run2-1-1' => [
-                'pathway_id' => $data->pathways['1']->get_id(),
-                'user_id' => $data->users[1]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
-                'scale_value_id' => null,
-                'related_info' => [],
-            ],
-            'run1-1-1' => [
-                'pathway_id' => $data->pathways['1']->get_id(),
-                'user_id' => $data->users[1]->id,
-                'status' => pathway_achievement::STATUS_ARCHIVED,
-                'scale_value_id' => $data->scalevalues[3]->id,
-                'related_info' => [],
-            ],
-            'run1-1-2' => [
-                'pathway_id' => $data->pathways[1]->get_id(),
-                'user_id' => $data->users[2]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
-                'scale_value_id' => $data->scalevalues[3]->id,
-                'related_info' => [],
-            ],
-            'run2-1-3' => [
-                'pathway_id' => $data->pathways[1]->get_id(),
-                'user_id' => $data->users[3]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
-                'scale_value_id' => $data->scalevalues[1]->id,
-                'related_info' => [],
-            ],
-            'run1-1-3' => [
-                'pathway_id' => $data->pathways[1]->get_id(),
-                'user_id' => $data->users[3]->id,
-                'status' => pathway_achievement::STATUS_ARCHIVED,
-                'scale_value_id' => $data->scalevalues[3]->id,
-                'related_info' => [],
-            ],
-
-            'run1-2-1' => [
-                'pathway_id' => $data->pathways[2]->get_id(),
-                'user_id' => $data->users[1]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
-                'scale_value_id' => $data->scalevalues[5]->id,
-                'related_info' => [],
-            ],
-            'run1-2-4' => [
-                'pathway_id' => $data->pathways[2]->get_id(),
-                'user_id' => $data->users[4]->id,
-                'status' => pathway_achievement::STATUS_CURRENT,
-                'scale_value_id' => $data->scalevalues[5]->id,
-                'related_info' => [],
-            ],
-        ]);
-
-        $this->verify_competency_achievements([
-            [
-                'competency_id' => $data->competencies[1]->id,
-                'user_id' => $data->users[1]->id,
-                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
-                'scale_value_id' => null,
-                'proficient' => 0,
-                'via' => [],
-            ],
-            [
-                'competency_id' => $data->competencies[1]->id,
-                'user_id' => $data->users[1]->id,
-                'status' => competency_achievement::SUPERSEDED,
-                'scale_value_id' => $data->scalevalues[3]->id,
-                'proficient' => 0,
-                'via' => [
-                    $pw_achievement_records['run1-1-1'],
-                ],
-            ],
-            [
-                'competency_id' => $data->competencies[1]->id,
-                'user_id' => $data->users[2]->id,
-                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
-                'scale_value_id' => $data->scalevalues[3]->id,
-                'proficient' => 0,
-                'via' => [
-                    $pw_achievement_records['run1-1-2'],
-                ],
-            ],
-            [
-                'competency_id' => $data->competencies[1]->id,
-                'user_id' => $data->users[3]->id,
-                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
-                'scale_value_id' => $data->scalevalues[1]->id,
-                'proficient' => 1,
-                'via' => [
-                    $pw_achievement_records['run2-1-3'],
-                ],
-            ],
-            [
-                'competency_id' => $data->competencies[1]->id,
-                'user_id' => $data->users[3]->id,
-                'status' => competency_achievement::SUPERSEDED,
-                'scale_value_id' => $data->scalevalues[3]->id,
-                'proficient' => 0,
-                'via' => [
-                    $pw_achievement_records['run1-1-3'],
-                ],
-            ],
-            [
-                'competency_id' => $data->competencies[2]->id,
-                'user_id' => $data->users[1]->id,
-                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
-                'scale_value_id' => $data->scalevalues[5]->id,
-                'proficient' => 0,
-                'via' => [
-                    $pw_achievement_records['run1-2-1'],
-                ],
-            ],
-            [
-                'competency_id' => $data->competencies[2]->id,
-                'user_id' => $data->users[4]->id,
-                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
-                'scale_value_id' => $data->scalevalues[5]->id,
-                'proficient' => 0,
-                'via' => [
-                    $pw_achievement_records['run1-2-4'],
-                ],
-            ],
-        ]);
-    }
-
-    /**
-     * @param $data
-     * @param string $task_to_execute
-     */
-    private function learning_plan_multi_run_3($data, string $task_to_execute) {
-        /*
-            Remove user1's plans
-        */
-
-        $this->markTestIncomplete("At the moment the ratings given for a user is not deleted when the user's learning plan is deleted");
-
-        $data->learning_plans['1-1']['dplan']->delete();
-        unset($data->learning_plans['1-1']);
-        $data->learning_plans['1-2']['dplan']->delete();
-        unset($data->learning_plans['1-2']);
 
         $this->waitForSecond();
 

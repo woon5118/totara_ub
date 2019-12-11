@@ -26,7 +26,7 @@ use totara_competency\entities\competency;
 use totara_competency\entities\scale;
 use totara_competency\entities\scale_value;
 use totara_competency\expand_task;
-use totara_competency\models\assignment_actions;
+use totara_core\advanced_feature;
 use totara_job\job_assignment;
 
 /**
@@ -42,13 +42,29 @@ class totara_competency_integration_aggregation extends advanced_testcase {
     private $num_users = 10;
     private $num_courses = 10;
 
+    protected $assignments;
+
+    public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
+        global $CFG;
+        require_once($CFG->dirroot . '/completion/completion_completion.php');
+    }
+
+    protected function setUp() {
+        parent::setUp();
+        advanced_feature::enable('competency_assignment');
+
+        // if (!PHPUNIT_LONGTEST) {
+        //     $this->markTestSkipped('PHPUNIT_LONGTEST is not defined');
+        // }
+    }
+
+    protected function tearDown() {
+        parent::tearDown();
+        $this->assignments = null;
+    }
+
     protected function setup_data() {
-
-//        if (!PHPUNIT_LONGTEST) {
-//            // we do not want to DDOS their server, right?
-//            $this->markTestSkipped('PHPUNIT_LONGTEST is not defined');
-//        }
-
         $this->setAdminUser();
 
         $data = new class() {
@@ -74,45 +90,12 @@ class totara_competency_integration_aggregation extends advanced_testcase {
             /** @var totara_competency_assignment_generator $assign_generator */
             public $assign_generator;
 
-            public function assign_users_to_competencies(array $to_assign): array {
-                global $DB;
-
-                $assignment_ids = [];
-                foreach ($to_assign as $user_comp) {
-                    $key = implode('_', [$user_comp['competency_id'], $user_comp['user_id']]);
-                    $this->assignments[$key] = $this->assign_generator->create_user_assignment($user_comp['competency_id'], $user_comp['user_id']);
-                    $assignment_ids[] = $this->assignments[$key]->id;
-                }
-
-                $model = new assignment_actions();
-                $model->activate($assignment_ids);
-
-                $expand_task = new expand_task($DB);
-                $expand_task->expand_all();
-
-                return $assignment_ids;
-            }
-
-            public function unassign_users_from_competencies(array $to_unassign) {
-                global $DB;
-
-                foreach ($to_unassign as $user_comp) {
-                    $key = implode('_', [$user_comp['competency_id'], $user_comp['user_id']]);
-                    if (!isset($this->assignments[$key])) {
-                        throw new \coding_exception('Unknown competency/user assignment combination');
-                    }
-
-                    $this->assignments[$key]->force_delete();
-                    unset($this->assignments[$key]);
-                }
-            }
         };
 
         $data->generator = $this->getDataGenerator();
         $data->hierarchy_generator = $data->generator->get_plugin_generator('totara_hierarchy');
         $data->competency_generator = $data->generator->get_plugin_generator('totara_competency');
         $data->criteria_generator = $data->generator->get_plugin_generator('totara_criteria');
-        $data->assign_generator = $data->competency_generator->assignment_generator();
 
         $data->scale = $data->hierarchy_generator->create_scale(
             'comp',
@@ -195,6 +178,37 @@ class totara_competency_integration_aggregation extends advanced_testcase {
         return $data;
     }
 
+    protected function assign_users_to_competencies(array $to_assign): array {
+        global $DB;
+
+        $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+        $assign_generator = $competency_generator->assignment_generator();
+
+        $assignment_ids = [];
+        foreach ($to_assign as $user_comp) {
+            $key = implode('_', [$user_comp['competency_id'], $user_comp['user_id']]);
+            $this->assignments[$key] = $assign_generator->create_user_assignment($user_comp['competency_id'], $user_comp['user_id']);
+            $assignment_ids[] = $this->assignments[$key]->id;
+        }
+
+        $expand_task = new expand_task($DB);
+        $expand_task->expand_all();
+
+        return $assignment_ids;
+    }
+
+    protected function unassign_users_from_competencies(array $to_unassign) {
+        foreach ($to_unassign as $user_comp) {
+            $key = implode('_', [$user_comp['competency_id'], $user_comp['user_id']]);
+            if (!isset($this->assignments[$key])) {
+                throw new \coding_exception('Unknown competency/user assignment combination');
+            }
+
+            $this->assignments[$key]->force_delete();
+            unset($this->assignments[$key]);
+        }
+    }
+
     /**
      * Data provider for all tests. Define which task to execute
      */
@@ -229,14 +243,13 @@ class totara_competency_integration_aggregation extends advanced_testcase {
                 $to_assign[] = ['user_id' => $user->id, 'competency_id' => $competency->id];
             }
         }
-        $data->assign_users_to_competencies($to_assign);
+        $this->assign_users_to_competencies($to_assign);
         $this->waitForSecond();
 
         (new $task_to_execute())->execute();
         $this->verify_item_records([]);
         $this->verify_pathway_achievements([]);
         $this->verify_competency_achievements([]);
-
     }
 
 

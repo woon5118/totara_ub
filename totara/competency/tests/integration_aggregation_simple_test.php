@@ -39,12 +39,6 @@ require_once($CFG->dirroot . '/totara/competency/tests/integration_aggregation.p
  */
 class totara_competency_integration_aggregation_simple_testcase extends totara_competency_integration_aggregation {
 
-    public static function setUpBeforeClass() {
-        parent::setUpBeforeClass();
-        global $CFG;
-        require_once($CFG->dirroot . '/completion/completion_completion.php');
-    }
-
     /**
      * Test aggregation with a single onactivate criterion
      * @dataProvider task_to_execute_data_provider
@@ -74,8 +68,7 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
             $to_assign[] = ['user_id' => $data->users[$user_idx]->id, 'competency_id' => $data->competencies[$user_idx]->id];
             $to_assign[] = ['user_id' => $data->users[$user_idx]->id, 'competency_id' => $data->competencies[$user_idx + 1]->id];
         }
-        $data->assign_users_to_competencies($to_assign);
-        $this->waitForSecond();
+        $this->assign_users_to_competencies($to_assign);
 
         (new $task_to_execute())->execute();
         $this->verify_item_records([
@@ -161,8 +154,7 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
             $to_assign[] = ['user_id' => $data->users[$user_idx]->id, 'competency_id' => $data->competencies[$user_idx]->id];
             $to_assign[] = ['user_id' => $data->users[$user_idx]->id, 'competency_id' => $data->competencies[$user_idx + 1]->id];
         }
-        $data->assign_users_to_competencies($to_assign);
-        $this->waitForSecond();
+        $this->assign_users_to_competencies($to_assign);
 
         (new $task_to_execute())->execute();
 
@@ -229,8 +221,6 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
                 'via' => [$pw_achievement_records['2-2']],
             ],
         ]);
-
-        $this->waitForSecond();
 
         (new $task_to_execute())->execute();
 
@@ -320,8 +310,7 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
         );
 
         // Now assign one user to competencies with criteria and some to competencies without criteria
-        $data->assign_users_to_competencies([['user_id' => $data->users[1]->id, 'competency_id' => $data->competencies[1]->id]]);
-        $this->waitForSecond();
+        $this->assign_users_to_competencies([['user_id' => $data->users[1]->id, 'competency_id' => $data->competencies[1]->id]]);
 
         // Complete course for one user
         $completion = new completion_completion(['course' => $data->courses[1]->id, 'userid' => $data->users[1]->id]);
@@ -369,8 +358,6 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
         $current_pathway = new pathway_entity($pathway1->get_id());
 
         $this->assertEquals(pathway::PATHWAY_STATUS_ARCHIVED, $current_pathway->status);
-
-        $this->waitForSecond();
 
         (new $task_to_execute())->execute();
 
@@ -436,14 +423,13 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
             $to_assign[] = ['user_id' => $data->users[$user_idx]->id, 'competency_id' => $data->competencies[1]->id];
             $to_assign[] = ['user_id' => $data->users[$user_idx]->id, 'competency_id' => $data->competencies[2]->id];
         }
-        $data->assign_users_to_competencies($to_assign);
+        $this->assign_users_to_competencies($to_assign);
 
         // Mark users 1 and 3 to have completed the course
         foreach ([1, 3] as $user_idx) {
             $completion = new completion_completion(['course' => $data->courses[1]->id, 'userid' => $data->users[$user_idx]->id]);
             $completion->mark_complete();
         }
-        $this->waitForSecond();
 
         // Now run the task
         (new $task_to_execute())->execute();
@@ -546,7 +532,7 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
             ['user_id' => $data->users[1]->id, 'competency_id' => $data->competencies[2]->id],
             ['user_id' => $data->users[3]->id, 'competency_id' => $data->competencies[2]->id],
         ];
-        $data->assign_users_to_competencies($to_assign);
+        $this->assign_users_to_competencies($to_assign);
 
         // Mark users' completion of course
         $completed = [
@@ -563,7 +549,6 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
                 $completion->mark_complete();
             }
         }
-        $this->waitForSecond();
 
         // Now run the task
         (new $task_to_execute())->execute();
@@ -681,14 +666,13 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
             ['user_id' => $data->users[1]->id, 'competency_id' => $data->competencies[1]->id],
             ['user_id' => $data->users[2]->id, 'competency_id' => $data->competencies[1]->id],
         ];
-        $data->assign_users_to_competencies($to_assign);
+        $this->assign_users_to_competencies($to_assign);
 
         // Mark course completions
         foreach ([2, 3] as $user_idx) {
             $completion = new completion_completion(['course' => $data->courses[1]->id, 'userid' => $data->users[$user_idx]->id]);
             $completion->mark_complete();
         }
-        $this->waitForSecond();
 
         // Now run the task
         (new $task_to_execute())->execute();
@@ -799,7 +783,7 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
             ['user_id' => $data->users[2]->id, 'competency_id' => $data->competencies[1]->id],
             ['user_id' => $data->users[3]->id, 'competency_id' => $data->competencies[1]->id],
         ];
-        $data->assign_users_to_competencies($to_assign);
+        $this->assign_users_to_competencies($to_assign);
 
         $ratings = [];
         // Manager gives rating
@@ -813,7 +797,6 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
             manual::ROLE_MANAGER,
             $data->scalevalues[4]->id
         );
-        $this->waitForSecond();
 
         // Now run the task
         (new $task_to_execute())->execute();
@@ -892,7 +875,7 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
             ['user_id' => $data->users[1]->id, 'competency_id' => $data->competencies[2]->id],
             ['user_id' => $data->users[4]->id, 'competency_id' => $data->competencies[2]->id],
         ];
-        $data->assign_users_to_competencies($to_assign);
+        $this->assign_users_to_competencies($to_assign);
 
         // Create learning plans
         $data->competency_generator->create_learning_plan_with_competencies($data->users[1]->id,
@@ -907,8 +890,6 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
         $data->competency_generator->create_learning_plan_with_competencies($data->users[4]->id,
             [$data->competencies[2]->id => null]
         );
-
-        $this->waitForSecond();
 
         // Now run the task
         (new $task_to_execute())->execute();
@@ -1016,13 +997,12 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
 
         // Now assign both audiences to the competency
         $assignments = [
-            1 => $data->assign_generator->create_cohort_assignment($data->competencies[1]->id, $cohort1->id),
-            2 => $data->assign_generator->create_cohort_assignment($data->competencies[1]->id, $cohort2->id),
+            1 => $this->assign_generator->create_cohort_assignment($data->competencies[1]->id, $cohort1->id),
+            2 => $this->assign_generator->create_cohort_assignment($data->competencies[1]->id, $cohort2->id),
         ];
 
         $expand_task = new expand_task($DB);
         $expand_task->expand_all();
-        $this->waitForSecond();
 
         // Ensure that although there are assignments, we don't create achievements as there are no criteria
 
@@ -1046,7 +1026,6 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
             configuration_change::CHANGED_CRITERIA,
             time()
         );
-        $this->waitForSecond();
 
         // Run the task
         (new $task_to_execute())->execute();
