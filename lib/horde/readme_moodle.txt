@@ -9,6 +9,7 @@ Description of import of Horde libraries
   in your path to Horde (the directory you've cloned the repository):
     /tmp/copyhorde.sh ~/git/ext/horde/
 # lib/horde/framework/Horde/Mail/Rfc822.php fix deprecated continue inside switch
+# TL-23368 PHP 7.4 compatibility fixes
 
 ====
 #!/bin/sh
