@@ -262,6 +262,7 @@ class core_orm_builder_proxied_docblock_testcase extends orm_entity_testcase {
                     !$method->isConstructor() &&
                     !$method->isDestructor() &&
                     !$method->isDeprecated() &&
+                    $method->getName() !== '__clone' &&
                     !$reflection->hasMethod($method->getName());
             }
         );

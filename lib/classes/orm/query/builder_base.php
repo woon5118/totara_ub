@@ -522,6 +522,19 @@ abstract class builder_base {
     }
 
     /**
+     * Clone builder object
+     * Builder is a complex object that doesn't support shallow cloning
+     * We'll explicitly throw an exception now if an attempt of cloning builder has been made
+     * @throws coding_exception
+     */
+    public function __clone() {
+        throw new coding_exception(
+            'Builder is a complex object with multiple references inside,' .
+            'cloning is not supported. Please consider creating a new instance instead of cloning'
+        );
+    }
+
+    /**
      * Update table names from {table} to prefix_table
      * Copied from DML, it's protected there
      *

@@ -427,4 +427,15 @@ class core_orm_builder_testcase extends orm_query_builder_base {
         $this->expectExceptionMessage('The object you map to must be a callable or a valid class name or null to cancel mapping');
         builder::create()->map_to(true);
     }
+
+    public function test_it_does_not_clone_builder() {
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage(
+            'Builder is a complex object with multiple references inside,' .
+            'cloning is not supported. Please consider creating a new instance instead of cloning'
+        );
+
+        $builder = builder::table($this->table_name);
+        $this->assertNotSame($builder, clone $builder);
+    }
 }
