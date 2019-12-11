@@ -7,3 +7,7 @@ Description of HTML Purifier library import into Totara
 * fix permissions via: php totara/core/dev/fix_file_permissions.php --fix
 * verify all git changes make sense
 * add new version to lib/thirdpartylibs.xml
+
+Changes:
+
+* TL-23369 PHP 7.4 compatibility fixes
