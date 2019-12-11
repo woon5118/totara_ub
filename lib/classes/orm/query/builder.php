@@ -1176,7 +1176,6 @@ final class builder extends builder_base implements interacts_with_query, intera
 
     /**
      * Fetch raw records from the database and at the same time returning the count.
-     * This is optimised to run only one query
      *
      * @return array|[array records, int count]
      */
@@ -1188,10 +1187,11 @@ final class builder extends builder_base implements interacts_with_query, intera
         $params = $query_parts[1] ?? null;
         $limit_from = $query_parts[2] ?? 0;
         $limit_to = $query_parts[3] ?? 0;
-        $count = 0;
+
+        $count = $this->count();
 
         $records = $this->map_results(
-            self::get_db()->get_counted_records_sql($sql, $params, $limit_from, $limit_to, $count)
+            self::get_db()->get_records_sql($sql, $params, $limit_from, $limit_to)
         );
 
         return [$records, $count];
@@ -1222,7 +1222,7 @@ final class builder extends builder_base implements interacts_with_query, intera
 
     /**
      * Get a lazy loading collection utilising the recordset
-     * 
+     *
      * @return lazy_collection
      */
     public function get_lazy(): lazy_collection {
