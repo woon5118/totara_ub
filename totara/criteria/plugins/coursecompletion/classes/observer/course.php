@@ -28,11 +28,17 @@ namespace criteria_coursecompletion\observer;
 use coding_exception;
 use core\event\base;
 use core\event\course_completed;
+use core\event\course_deleted;
+use core\event\course_restored;
 use core\orm\collection;
+use core\orm\entity\repository;
+use criteria_coursecompletion\coursecompletion;
 use totara_completioneditor\event\course_completion_edited;
 use totara_completionimport\event\bulk_course_completionimport;
-use totara_criteria\entities\criteria_item;
+use totara_criteria\entities\criteria_item as criteria_item_entity;
+use totara_criteria\entities\criterion as criterion_entity;
 use totara_criteria\hook\criteria_achievement_changed;
+use totara_criteria\hook\criteria_validity_changed;
 
 class course {
 
@@ -114,15 +120,102 @@ class course {
     }
 
     /**
+     * When a course is deleted, we re-evaluate the validity of all criteria.
+     * A validity_changed hook is executed with the ids of all criteria that were affected
+     *
+     * @param course_deleted $event
+     */
+    public static function course_deleted(course_deleted $event) {
+
+        $criteria = self::get_criteria_with_course($event->objectid);
+
+        if (!$criteria->count()) {
+            return;
+        }
+
+        $affected_criteria = [];
+        foreach ($criteria as $criterion_entity) {
+            $criterion = coursecompletion::fetch_from_entity($criterion_entity);
+            if ($criterion->is_valid() != $criterion_entity->isvalid) {
+                $criterion->save();
+                $affected_criteria[] = $criterion_entity->id;
+            }
+        }
+
+        if (!empty($affected_criteria)) {
+            $hook = new criteria_validity_changed($affected_criteria);
+            $hook->execute();
+        }
+    }
+
+    /**
+     * When a course is restored, we update all items with the original course id to restored course id.
+     * Then we re-evaluate the validity of all criteria using this course.
+     * A validity_changed hook is executed with the ids of all criteria that were affected
+     *
+     * @param course_restored $event
+     */
+    public static function course_restored(course_restored $event) {
+        $restored_course_id = $event->courseid;
+        $original_course_id = $event->other['originalcourseid'] ?? $restored_course_id;
+        $criteria = self::get_criteria_with_course($original_course_id, true);
+
+        if (!$criteria->count()) {
+            return;
+        }
+
+        $affected_criteria = [];
+        foreach ($criteria as $criterion_entity) {
+            if ($original_course_id != $restored_course_id) {
+                foreach ($criterion_entity->items as $item) {
+                    if ($item->item_type == 'course' && $item->item_id == $original_course_id) {
+                        $item->item_id = $restored_course_id;
+                        $item->save();
+                    }
+                }
+            }
+
+            $criterion = coursecompletion::fetch_from_entity($criterion_entity);
+            if ($criterion->is_valid() != $criterion_entity->isvalid) {
+                $criterion->save();
+                $affected_criteria[] = $criterion_entity->id;
+            }
+        }
+
+        if (!empty($affected_criteria)) {
+            $hook = new criteria_validity_changed($affected_criteria);
+            $hook->execute();
+        }
+    }
+
+
+    /**
      * Find all criteria items for completion of this course
      *
      * @param int[] $ids
      * @return collection
      */
     private static function get_criteria_items_of_course_ids(array $ids): collection {
-        return criteria_item::repository()
+        return criteria_item_entity::repository()
             ->where('item_type', 'course')
             ->where('item_id', $ids)
+            ->get();
+    }
+
+    /**
+     * Find all criteria that has contains the specified course as item
+     * @param int $course_id
+     * @return collection
+     */
+    private static function get_criteria_with_course(int $course_id, bool $with_items = false): collection {
+        return criterion_entity::repository()
+            ->as('c')
+            ->join([criteria_item_entity::TABLE, 'ci'], 'c.id', 'ci.criterion_id')
+            ->when($with_items, function (repository $repository) {
+                $repository->with('items');
+            })
+            ->where('ci.item_type', 'course')
+            ->where('ci.item_id', $course_id)
             ->get();
     }
 

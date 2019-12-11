@@ -56,6 +56,10 @@ abstract class item_evaluator {
      * @param criterion $criterion
      */
     public function update_completion(criterion $criterion) {
+        if (!$criterion->is_valid()) {
+            return;
+        }
+
         // Getting the time at the start. This is used as last_evaluated time to
         // ensure we don't miss items updating via observers during the marking process
         $now = time();

@@ -38,10 +38,6 @@ use totara_criteria\entities\criteria_metadata as criteria_metadata_entity;
 
 abstract class criterion {
 
-    /** Status constants */
-    const STATUS_VALID = 0;
-    const STATUS_INVALID = 1;
-
     /** Aggregation constants */
     const AGGREGATE_ALL = 1;
     const AGGREGATE_ANY_N = 2;
@@ -69,9 +65,11 @@ abstract class criterion {
     /** @var int $last_evaluated */
     private $last_evaluated;
 
-    /** @var int $status */
-    private $status = self::STATUS_VALID;
+    /** @var bool $isvalid */
+    private $isvalid = false;
 
+    /** @var bool $saved_isvalid */
+    private $saved_isvalid = false;
     /**
      * Constructor.
      */
@@ -108,7 +106,7 @@ abstract class criterion {
         $instance->set_aggregation_method($criterion->aggregation_method ?? static::AGGREGATE_ALL);
         $instance->set_aggregation_params($criterion->aggregation_params ?? []);
         $instance->set_last_evaluated($criterion->last_evaluated);
-        $instance->set_status($criterion->status);
+        $instance->set_saved_isvalid($criterion->isvalid);
 
         $instance->fetch_items($criterion);
         $instance->fetch_metadata($criterion);
@@ -265,6 +263,7 @@ abstract class criterion {
      */
     public function set_item_ids(array $itemids): criterion {
         $this->item_ids = $itemids;
+        $this->isvalid = $this->items_are_valid();
         return $this;
     }
 
@@ -277,7 +276,7 @@ abstract class criterion {
     public function add_items(array $item_ids): criterion {
         $newitems = array_diff($item_ids, $this->item_ids);
         $this->item_ids = array_merge($this->item_ids, $newitems);
-
+        $this->isvalid = $this->items_are_valid();
         return $this;
     }
 
@@ -289,6 +288,7 @@ abstract class criterion {
      */
     public function remove_items(array $item_ids): criterion {
         $this->item_ids = array_diff($this->item_ids, $item_ids);
+        $this->isvalid = $this->items_are_valid();
         return $this;
     }
 
@@ -400,21 +400,42 @@ abstract class criterion {
      * @return bool
      */
     public function is_valid(): bool {
-        return $this->status == self::STATUS_VALID;
+        return $this->isvalid;
     }
 
     /**
-     * @param int $status
+     * @param bool $isvalid
      * @return criterion
      */
-    public function set_status(int $status): criterion {
-        if (!in_array($status, [static::STATUS_VALID, static::STATUS_INVALID])) {
-            throw new coding_exception('Invalid status used');
+    public function set_saved_isvalid(bool $isvalid): criterion {
+        $this->saved_isvalid = $isvalid;
+        return $this;
+    }
+
+    /**
+     * Validate whether the criterion's items are valid.
+     * Should be overridden by plugin where needed
+     *
+     * @return bool
+     */
+    protected function items_are_valid(): bool {
+        $nitems = count($this->get_item_ids());
+
+        $validator_class = static::get_item_validator_class();
+        if (is_null($validator_class)) {
+            return true;
         }
 
-        $this->status = $status;
+        $nvalid = 0;
+        $nrequired = $this->get_aggregation_num_required();
 
-        return $this;
+        foreach ($this->get_item_ids() as $item_id) {
+            if ($validator_class::validate_item($item_id)) {
+                $nvalid++;
+            }
+        }
+
+        return $nitems == $nvalid && $nvalid >= $nrequired;
     }
 
     /**
@@ -492,6 +513,8 @@ abstract class criterion {
             // item_id is the actual item_id, (course_id, etc)
             $this->item_ids[] = $row->item_id;
         }
+
+        $this->isvalid = $this->items_are_valid();
     }
 
     /**
@@ -513,6 +536,10 @@ abstract class criterion {
             return true;
         }
 
+        if ($this->isvalid != $this->saved_isvalid) {
+            return true;
+        }
+
         $existing_crit = self::fetch($this->get_id());
 
         $tst_methods = [
@@ -520,7 +547,6 @@ abstract class criterion {
             'get_aggregation_params',
             'get_item_ids',
             'get_metadata',
-            'is_valid',
         ];
 
         foreach ($tst_methods as $method) {
@@ -549,32 +575,6 @@ abstract class criterion {
     }
 
     /**
-     * Validate whether the criterion's items are valid.
-     * Should be overridden by plugin where needed
-     *
-     * @return bool
-     */
-    protected function items_are_valid(): bool {
-        $nitems = count($this->get_item_ids());
-        $validator_class = $this->get_item_validator_class();
-        if ($nitems == 0 || is_null($validator_class)) {
-            return true;
-        }
-
-        $nvalid = 0;
-        $nrequired = $this->get_aggregation_num_required();
-
-        foreach ($this->get_item_ids() as $item_id) {
-            if ($validator_class::validate_item($item_id)) {
-                $nvalid++;
-            }
-        }
-
-        return $nitems == $nvalid && $nvalid >= $nrequired;
-    }
-
-
-    /**
      * Save this criterion and all its items
      *
      * @return $this
@@ -590,8 +590,6 @@ abstract class criterion {
             $this->update_items();
         }
 
-        $this->status = $this->items_are_valid() ? static::STATUS_VALID : static::STATUS_INVALID;
-
         if (!$this->is_dirty()) {
             return $this;
         }
@@ -601,10 +599,11 @@ abstract class criterion {
         $criterion->aggregation_method = $this->get_aggregation_method();
         $criterion->aggregation_params = json_encode($this->get_aggregation_params());
         $criterion->criterion_modified = time();
-        $criterion->status = $this->status;
+        $criterion->isvalid = $this->isvalid;
         $criterion->save();
 
         $this->set_id($criterion->id);
+        $this->set_saved_isvalid($this->isvalid);
 
         $this->save_items();
         $this->save_metadata();

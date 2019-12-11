@@ -17,13 +17,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Brendan Cox <brendan.cox@totaralearning.com>
  * @author Riana Rossow <riana.rossow@totaralearning.com>
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package criteria_coursecompletion
  */
 
 use core\event\course_completed;
+use core\event\course_deleted;
+use core\event\course_restored;
 use criteria_coursecompletion\observer\course as course_observer;
 use totara_completioneditor\event\course_completion_edited;
 use totara_completionimport\event\bulk_course_completionimport;
@@ -42,5 +43,13 @@ $observers = [
     [
         'eventname' => bulk_course_completionimport::class,
         'callback' => course_observer::class.'::bulk_course_completions_imported',
+    ],
+    [
+        'eventname' => course_deleted::class,
+        'callback' => course_observer::class.'::course_deleted',
+    ],
+    [
+        'eventname' => course_restored::class,
+        'callback' => course_observer::class.'::course_restored',
     ],
 ];

@@ -2166,7 +2166,7 @@ class core_course_courselib_testcase extends advanced_testcase {
      * Test that triggering a course_restored event works as expected.
      */
     public function test_course_restored_event() {
-        global $CFG;
+        global $CFG, $DB;
 
         // Get the necessary files to perform backup and restore.
         require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
@@ -2194,11 +2194,14 @@ class core_course_courselib_testcase extends advanced_testcase {
         $file->extract_to_pathname($fp, $filepath);
         $bc->destroy();
 
+        $DB->delete_records('course', ['id' => $course->id]);
+        $new_course = $this->getDataGenerator()->create_course();
+
         // Now we want to catch the restore course event.
         $sink = $this->redirectEvents();
 
         // Now restore the course to trigger the event.
-        $rc = new restore_controller('test-restore-course-event', $course->id, backup::INTERACTIVE_NO,
+        $rc = new restore_controller('test-restore-course-event', $new_course->id, backup::INTERACTIVE_NO,
             backup::MODE_GENERAL, $userid, backup::TARGET_NEW_COURSE);
         $rc->execute_precheck();
         $rc->execute_plan();
@@ -2213,6 +2216,7 @@ class core_course_courselib_testcase extends advanced_testcase {
         $this->assertEquals('course', $event->objecttable);
         $this->assertEquals($rc->get_courseid(), $event->objectid);
         $this->assertEquals(context_course::instance($rc->get_courseid())->id, $event->contextid);
+        $this->assertEquals($course->id, $event->other['originalcourseid']);
         $this->assertEquals('course_restored', $event->get_legacy_eventname());
         $legacydata = (object) array(
             'courseid' => $rc->get_courseid(),
@@ -2221,7 +2225,7 @@ class core_course_courselib_testcase extends advanced_testcase {
             'target' => $rc->get_target(),
             'mode' => $rc->get_mode(),
             'operation' => $rc->get_operation(),
-            'samesite' => $rc->is_samesite()
+            'samesite' => $rc->is_samesite(),
         );
         $url = new moodle_url('/course/view.php', array('id' => $event->objectid));
         $this->assertEquals($url, $event->get_url());

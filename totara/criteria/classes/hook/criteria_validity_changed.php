@@ -17,26 +17,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * @author Brendan Cox <brendan.cox@totaralearning.com>
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  * @package totara_criteria
  */
 
-namespace totara_criteria\validators;
+namespace totara_criteria\hook;
 
-use totara_criteria\criterion;
+use totara_core\hook\base;
 
 /**
- * Interface for item validators that check the validity of a criterion's items
+ * Hook to be triggered when the validity of a criterion changes
  */
-interface criterion_validator_interface {
+class criteria_validity_changed extends base {
 
-    // TODO: Not sure we need this ... Keeping it for the moment
+    /** @var array */
+    protected $criteria_ids;
 
     /**
-     * Validate all items linked to the criterion and set the status accordingly
-     * @param criterion $criterion
-     * @return int Criterion status
+     * @param array $criteria_ids List of affected criteria ids
      */
-    public static function validate_and_set_status(criterion $criterion): int;
+    public function __construct(array $criteria_ids) {
+        $this->criteria_ids = $criteria_ids;
+    }
 
+    /**
+     * Return a list of affected criteria ids
+     * @return array
+     */
+    public function get_criteria_ids(): array {
+        return $this->criteria_ids;
+    }
 }

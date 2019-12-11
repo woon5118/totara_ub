@@ -32,9 +32,7 @@ use totara_core\hook\base;
  */
 class criteria_achievement_changed extends base {
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $user_criteria_ids;
 
     /**
