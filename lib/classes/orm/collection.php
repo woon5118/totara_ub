@@ -37,7 +37,17 @@ use core\orm\entity\repository;
  */
 class collection extends core_collection {
 
-    public function load(string $relation) {
+    /**
+     * Relations to load
+     *
+     * @param string|array $relation Relations to load
+     * @return $this
+     */
+    public function load($relation) {
+        if (empty($this->items)) {
+            return $this;
+        }
+
         $class = $this->get_entity_class();
 
         /** @var repository $repo */
@@ -46,7 +56,13 @@ class collection extends core_collection {
         return $this;
     }
 
-    public function relation_loaded(string $relation) {
+    /**
+     * Iterate over collection items and check that desired relation has been loaded for all of them
+     *
+     * @param string $relation
+     * @return bool
+     */
+    public function relation_loaded(string $relation): bool {
         $this->sanity_check();
 
         return $this->reduce(function ($previous, entity $entity) use ($relation) {
@@ -65,7 +81,11 @@ class collection extends core_collection {
         return get_class($this->first());
     }
 
-
+    /**
+     * Check that collection consists of the entities of the same type to load relations
+     *
+     * @throws \coding_exception
+     */
     protected function sanity_check() {
         if (empty($this)) {
             return;

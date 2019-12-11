@@ -134,6 +134,7 @@ class core_orm_relation_test extends orm_entity_relation_testcase {
 
         // It does load a relationship
         $this->assertTrue($entity->relation_loaded('reversed_children'));
+        $this->assertTrue(isset($entity->reversed_children));
 
         // It does load it correctly
         $this->assertEquals(
@@ -369,7 +370,7 @@ class core_orm_relation_test extends orm_entity_relation_testcase {
 
         $queries = $this->db()->perf_get_reads();
 
-        $parents->load('children');
+        $parents->load(['children']);
 
         // Only one query has been executed.
         $this->assertEquals($queries + 1, $this->db()->perf_get_reads());

@@ -34,6 +34,7 @@ defined('MOODLE_INTERNAL') || die();
  * @group orm
  */
 class core_orm_collection_testcase extends advanced_testcase {
+
     public function test_it_extends_core_collection() {
         $this->assertTrue(new collection([]) instanceof core_collection);
     }
@@ -52,6 +53,12 @@ class core_orm_collection_testcase extends advanced_testcase {
         $this->expectExceptionMessage('This must be a collection of entities');
 
         $collection->get_entity_class();
+    }
+
+    public function test_it_ignores_empty_collection() {
+        $collection = new collection([]);
+
+        $this->assertSame($collection->load('abracadabra'), $collection);
     }
 
     // To test loading of relations see relation_test::class
