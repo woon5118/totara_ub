@@ -527,6 +527,18 @@ class repository {
     }
 
     /**
+     * Return an instance of the builder
+     * This is required for some functionality that expects a builder object, it's not possible
+     * to just substitute builder object with repository object because repository is not a
+     * descendent of builder, it just relies on it internally, hence exposing underlying builder
+     *
+     * @return builder
+     */
+    public function get_builder(): builder {
+        return $this->builder;
+    }
+
+    /**
      * Create an instance of the related entity from the classname that we have...
      *
      * @return entity

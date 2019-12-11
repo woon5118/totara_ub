@@ -47,6 +47,13 @@ class core_orm_repository_testcase extends orm_entity_testcase {
         $this->assertInstanceOf(orm___my_sample__repository::class, sample_entity::repository());
     }
 
+    public function test_it_returns_you_builder() {
+        $repo = sample_entity::repository();
+
+        $this->assertInstanceOf(builder::class, $repo->get_builder());
+        $this->assertEquals($repo->get_table(), $repo->get_builder()->get_table());
+    }
+
     public function test_it_allows_creating_repositories_for_entities_only() {
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('Expected entity class name');
