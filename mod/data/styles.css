@@ -146,3 +146,17 @@
 #page-mod-data-edit .datatagcontrol {
     padding-left: 10px;
 }
+
+.mod_data__templates {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.mod_data__templates td:first-child {
+    width: 20%;
+    padding: 16px;
+}
+
+.mod_data__templates td:nth-child(2) {
+    width: 80%;
+}

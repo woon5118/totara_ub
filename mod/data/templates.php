@@ -213,7 +213,7 @@ if (!$resettemplate) {
     $data = $DB->get_record('data', array('id'=>$d));
 }
 echo $OUTPUT->box_start('generalbox boxaligncenter boxwidthwide');
-echo '<table cellpadding="4" cellspacing="0" border="0">';
+echo '<table class="mod_data__templates">';
 
 if ($mode == 'listtemplate'){
     // Print the list template header.
