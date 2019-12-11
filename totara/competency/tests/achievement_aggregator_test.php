@@ -33,6 +33,7 @@ use totara_competency\competency_achievement_aggregator;
 use totara_competency\entities\pathway_achievement;
 use totara_competency\expand_task;
 use totara_competency\hook\competency_achievement_updated;
+use totara_competency\linked_courses;
 use totara_competency\models\assignment_actions;
 use totara_competency\overall_aggregation;
 use totara_competency\entities\scale_value;
@@ -41,7 +42,7 @@ use totara_competency\pathway;
 use totara_competency\pathway_evaluator_user_source;
 use pathway_test_pathway\test_pathway_evaluator;
 use aggregation_test_aggregation\test_aggregation;
-
+use totara_competency\user_groups;
 
 /**
  * Class totara_competency_achievement_aggregator_testcase
@@ -49,6 +50,12 @@ use aggregation_test_aggregation\test_aggregation;
  * Tests behaviour of the competency_achievement_aggregator class.
  */
 class totara_competency_achievement_aggregator_testcase extends advanced_testcase {
+
+    protected function setUp() {
+        parent::setUp();
+        // individual tests may disable the feature
+        \totara_core\advanced_feature::enable('competency_assignment');
+    }
 
     /**
      * @param pathway_achievement[] $pathway_achievements
@@ -904,4 +911,153 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         );
         $this->assertEquals($scale_value3->id, $third_comp_record->scale_value_id);
     }
+
+    public function test_aggregation_with_no_preexisting_assignment_on_learn() {
+        \totara_core\advanced_feature::disable('competency_assignment');
+
+        global $CFG;
+
+        /** @var totara_competency_generator $competency_generator */
+        $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+        $competency = $competency_generator->create_competency();
+
+        /** @var scale_value $scale_value */
+        $scale_value = $competency->scale->sorted_values_high_to_low->first();
+
+        $pathway = $competency_generator->create_test_pathway($competency);
+        $pathway->set_test_aggregate_current_value($scale_value);
+
+        $achievement_configuration = new achievement_configuration($competency);
+        $achievement_configuration->set_aggregation_type('test_aggregation');
+
+        $user = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+
+        require_once($CFG->dirroot . '/completion/completion_completion.php');
+
+        $completion = new completion_completion(['course' => $course->id, 'userid' => $user->id]);
+        $completion->mark_complete();
+
+        linked_courses::set_linked_courses(
+            $competency->id,
+            [
+                [
+                    'id' => $course->id,
+                    'linktype' => linked_courses::LINKTYPE_MANDATORY
+                ]
+            ]
+        );
+
+        // No assignment exists
+        $this->assertFalse(assignment::repository()->exists());
+
+        $this->aggregate_pathway($pathway, $user);
+
+        $this->assertEquals(0, competency_achievement::repository()->count());
+
+        $sink = $this->redirectHooks();
+        $aggregator = $this->get_competency_aggregator_for_pathway_and_user($pathway, $user);
+        $pw_achievement = pathway_achievement::get_current($pathway, $user->id);
+        $aggregator->aggregate();
+        $hooks = $sink->get_hooks();
+
+        $achievements = competency_achievement::repository()->get();
+        $this->assertCount(1, $achievements);
+        $achievement = $achievements->shift();
+        $this->assertEquals($scale_value->id, $achievement->scale_value_id);
+
+        $via_records = achievement_via::repository()->get();
+        $this->assertCount(1, $via_records);
+        $via_record = $via_records->shift();
+        $this->assertEquals($pw_achievement->id, $via_record->pathway_achievement_id);
+
+        $hook = reset($hooks);
+        $this->assertInstanceOf(competency_achievement_updated::class, $hook);
+        $sink->close();
+
+        // Now there should be a legacy assignment
+        /** @var assignment $assignment */
+        $assignment = assignment::repository()->one(true);
+        $this->assertEquals(assignment::TYPE_LEGACY, $assignment->type);
+        $this->assertEquals(user_groups::USER, $assignment->user_group_type);
+        $this->assertEquals($user->id, $assignment->user_group_id);
+        $this->assertEquals(assignment::STATUS_ARCHIVED, $assignment->status);
+    }
+
+    public function test_aggregation_with_preexisting_assignment_on_learn() {
+        \totara_core\advanced_feature::disable('competency_assignment');
+
+        global $CFG;
+
+        /** @var totara_competency_generator $competency_generator */
+        $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+        $competency = $competency_generator->create_competency();
+
+        /** @var scale_value $scale_value */
+        $scale_value = $competency->scale->sorted_values_high_to_low->first();
+
+        $pathway = $competency_generator->create_test_pathway($competency);
+        $pathway->set_test_aggregate_current_value($scale_value);
+
+        $achievement_configuration = new achievement_configuration($competency);
+        $achievement_configuration->set_aggregation_type('test_aggregation');
+
+        $user = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+
+        $assignment_generator = $competency_generator->assignment_generator();
+        $assignment1 = $assignment_generator->create_user_assignment(
+            $competency->id,
+            $user->id,
+            [
+                'status' => assignment::STATUS_ARCHIVED,
+                'type' => assignment::TYPE_LEGACY
+            ]
+        );
+
+        require_once($CFG->dirroot . '/completion/completion_completion.php');
+
+        $completion = new completion_completion(['course' => $course->id, 'userid' => $user->id]);
+        $completion->mark_complete();
+
+        linked_courses::set_linked_courses(
+            $competency->id,
+            [
+                [
+                    'id' => $course->id,
+                    'linktype' => linked_courses::LINKTYPE_MANDATORY
+                ]
+            ]
+        );
+
+        $this->aggregate_pathway($pathway, $user);
+
+        $this->assertEquals(0, competency_achievement::repository()->count());
+
+        $sink = $this->redirectHooks();
+        $aggregator = $this->get_competency_aggregator_for_pathway_and_user($pathway, $user);
+        $pw_achievement = pathway_achievement::get_current($pathway, $user->id);
+        $aggregator->aggregate();
+        $hooks = $sink->get_hooks();
+
+        $achievements = competency_achievement::repository()->get();
+        $this->assertCount(1, $achievements);
+        $achievement = $achievements->shift();
+        $this->assertEquals($scale_value->id, $achievement->scale_value_id);
+
+        $via_records = achievement_via::repository()->get();
+        $this->assertCount(1, $via_records);
+        $via_record = $via_records->shift();
+        $this->assertEquals($pw_achievement->id, $via_record->pathway_achievement_id);
+
+        $hook = reset($hooks);
+        $this->assertInstanceOf(competency_achievement_updated::class, $hook);
+        $sink->close();
+
+        // Now there should be a legacy assignment
+        /** @var assignment $assignment */
+        $assignment2 = assignment::repository()->one(true);
+        $this->assertEquals($assignment1->id, $assignment2->id);
+    }
+
 }
