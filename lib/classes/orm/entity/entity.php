@@ -616,17 +616,8 @@ abstract class entity implements \JsonSerializable {
      * @return bool
      */
     public function __isset($name) {
-
-        // Either the attribute is set on attributes or there's a getter method
-        if (
-            !isset($this->attributes[$name]) &&
-            !isset($this->relations[$name]) &&
-            !$this->build_getter_method_name($name)
-        ) {
-            return false;
-        }
-
-        return true;
+        // Either the attribute is set on attributes or there's a getter method or it's a relation
+        return isset($this->attributes[$name]) || isset($this->relations[$name]) || $this->build_getter_method_name($name);
     }
 
     /**
