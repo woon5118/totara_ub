@@ -71,6 +71,7 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
             $record = [
                 'shortname' => $prefix . $i,
                 'fullname' => $prefix . $i,
+                'enablecompletion' => true,
             ];
 
             $data->courses[$i] = $this->getDataGenerator()->create_course($record);
@@ -128,6 +129,7 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $this->assertFalse(empty($instance->get_id()));
         $this->assertFalse(empty($instance->get_path_instance_id()));
         $this->assertTrue($instance->is_active());
+        $this->assertTrue($instance->is_valid());
 
         $pw_id = $instance->get_id();
         $instance_id = $instance->get_path_instance_id();
@@ -651,6 +653,28 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $this->assertFalse($group1_reloaded->is_archived());
         $this->assertTrue($group2_reloaded->is_archived());
         $this->assertNull($group2_reloaded->get_path_instance_id());
+    }
+
+    /**
+     * Test validate
+     */
+    public function test_validate() {
+        $data = $this->setup_data();
+
+        // Valid criteria
+        $instance = new criteria_group();
+        $instance->set_competency($data->comp);
+        $instance->set_scale_value($data->scalevalues[5]);
+        $instance->add_criterion($data->cc[1]);
+        $instance->validate();
+        $this->assertTrue($instance->is_valid());
+
+        // Now with an invalid criterion
+        $data->cc[2]->add_items([1234]);
+        $data->cc[2]->save();
+        $instance->add_criterion($data->cc[2]);
+        $instance->validate();
+        $this->assertFalse($instance->is_valid());
     }
 
 }

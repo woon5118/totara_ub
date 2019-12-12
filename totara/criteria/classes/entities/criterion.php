@@ -36,7 +36,6 @@ use core\orm\entity\relations\has_many;
  * @property string $aggregation_params
  * @property int $criterion_modified
  * @property int $last_evaluated
- * @property int $status
  * @property int $isvalid
  *
  * @property-read collection|criterion_item[] $items

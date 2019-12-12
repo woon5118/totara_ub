@@ -28,4 +28,8 @@ $watchers = [
         'hookname' => \totara_criteria\hook\criteria_achievement_changed::class,
         'callback' => \pathway_criteria_group\watcher\criteria::class.'::achievement_changed',
     ],
+    [
+        'hookname' => \totara_criteria\hook\criteria_validity_changed::class,
+        'callback' => \pathway_criteria_group\watcher\criteria::class.'::validity_changed',
+    ],
 ];

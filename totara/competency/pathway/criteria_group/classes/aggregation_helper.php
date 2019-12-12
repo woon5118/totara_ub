@@ -89,4 +89,49 @@ class aggregation_helper {
         (new aggregation_users_table())->queue_multiple_for_aggregation($to_queue);
     }
 
+    /**
+     * Revalidate all pathways that contain one or more of the affected criteria
+     * Queue all users assigned to affected pathways' competencies for re-aggregation
+     *
+     * @param array $criteria_ids Criteria ids
+     */
+    public static function validate_and_mark_from_criteria(array $criteria_ids) {
+        if (empty($criteria_ids)) {
+            return;
+        }
+
+        $pathways = pathway_entity::repository()
+            ->as('pw')
+            ->join([criteria_group_entity::TABLE, 'cg'], 'pw.path_instance_id', 'cg.id')
+            ->join([criteria_group_criterion_entity::TABLE, 'cgc'], 'cg.id', 'cgc.criteria_group_id')
+            ->where('path_type', 'criteria_group')
+            ->where('cgc.criterion_id', $criteria_ids)
+            ->get();
+
+        if (!$pathways->count()) {
+            return;
+        }
+
+        $affected_competencies = [];
+        foreach ($pathways as $pathway) {
+            $instance = criteria_group::from_entity($pathway);
+            if ($instance->is_active()) {
+                $instance->validate();
+                if ($instance->is_valid() != $pathway->isvalid) {
+                    $instance->save();
+                    $affected_competencies[] = $instance->get_competency()->id;
+                }
+            }
+        }
+
+        if (!empty($affected_competencies)) {
+            $affected_competencies = array_unique($affected_competencies);
+            $aggregation_table = new aggregation_users_table();
+
+            foreach($affected_competencies as $competency_id) {
+                $aggregation_table->queue_all_assigned_users_for_aggregation($competency_id);
+            }
+        }
+    }
+
 }

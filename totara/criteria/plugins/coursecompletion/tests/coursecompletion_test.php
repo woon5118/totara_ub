@@ -408,7 +408,7 @@ class criteria_coursecompletion_testcase extends advanced_testcase {
         ]);
         $this->assertTrue($criterion->is_valid());
         $on_disk = new criterion_entity($criterion->get_id());
-        $this->assertEquals(criterion::STATUS_VALID, $on_disk->status);
+        $this->assertEquals(1, $on_disk->isvalid);
 
         // Coursecompletion with invalid courses
         $criterion = $criteria_generator->create_coursecompletion([
@@ -417,7 +417,7 @@ class criteria_coursecompletion_testcase extends advanced_testcase {
         ]);
         $this->assertFalse($criterion->is_valid());
         $on_disk = new criterion_entity($criterion->get_id());
-        $this->assertEquals(criterion::STATUS_INVALID, $on_disk->status);
+        $this->assertEquals(0, $on_disk->isvalid);
 
         // Coursecompletion with valid non-existent course
         $criterion = $criteria_generator->create_coursecompletion([
@@ -426,7 +426,7 @@ class criteria_coursecompletion_testcase extends advanced_testcase {
         ]);
         $this->assertFalse($criterion->is_valid());
         $on_disk = new criterion_entity($criterion->get_id());
-        $this->assertEquals(criterion::STATUS_INVALID, $on_disk->status);
+        $this->assertEquals(0, $on_disk->isvalid);
     }
 
 

@@ -70,6 +70,10 @@ abstract class criterion {
 
     /** @var bool $saved_isvalid */
     private $saved_isvalid = false;
+
+    /** @var bool $validated - Book keeping to prevent multiple checking of validity */
+    private $validated = false;
+
     /**
      * Constructor.
      */
@@ -106,6 +110,7 @@ abstract class criterion {
         $instance->set_aggregation_method($criterion->aggregation_method ?? static::AGGREGATE_ALL);
         $instance->set_aggregation_params($criterion->aggregation_params ?? []);
         $instance->set_last_evaluated($criterion->last_evaluated);
+        $instance->set_isvalid($criterion->isvalid);
         $instance->set_saved_isvalid($criterion->isvalid);
 
         $instance->fetch_items($criterion);
@@ -263,7 +268,9 @@ abstract class criterion {
      */
     public function set_item_ids(array $itemids): criterion {
         $this->item_ids = $itemids;
-        $this->isvalid = $this->items_are_valid();
+        sort($this->item_ids);
+
+        $this->validated = false;
         return $this;
     }
 
@@ -276,7 +283,9 @@ abstract class criterion {
     public function add_items(array $item_ids): criterion {
         $newitems = array_diff($item_ids, $this->item_ids);
         $this->item_ids = array_merge($this->item_ids, $newitems);
-        $this->isvalid = $this->items_are_valid();
+        sort($this->item_ids);
+
+        $this->validated = false;
         return $this;
     }
 
@@ -288,7 +297,8 @@ abstract class criterion {
      */
     public function remove_items(array $item_ids): criterion {
         $this->item_ids = array_diff($this->item_ids, $item_ids);
-        $this->isvalid = $this->items_are_valid();
+
+        $this->validated = false;
         return $this;
     }
 
@@ -407,6 +417,15 @@ abstract class criterion {
      * @param bool $isvalid
      * @return criterion
      */
+    public function set_isvalid(bool $isvalid): criterion {
+        $this->isvalid = $isvalid;
+        return $this;
+    }
+
+    /**
+     * @param bool $isvalid
+     * @return criterion
+     */
     public function set_saved_isvalid(bool $isvalid): criterion {
         $this->saved_isvalid = $isvalid;
         return $this;
@@ -436,6 +455,18 @@ abstract class criterion {
         }
 
         return $nitems == $nvalid && $nvalid >= $nrequired;
+    }
+
+    /**
+     * Validate the criterion and set isvalid
+     */
+    public function validate() {
+        if ($this->validated) {
+            return;
+        }
+
+        $this->isvalid = $this->items_are_valid();
+        $this->validated = true;
     }
 
     /**
@@ -513,8 +544,9 @@ abstract class criterion {
             // item_id is the actual item_id, (course_id, etc)
             $this->item_ids[] = $row->item_id;
         }
+        sort($this->item_ids);
 
-        $this->isvalid = $this->items_are_valid();
+        $this->validated = false;
     }
 
     /**
@@ -589,6 +621,8 @@ abstract class criterion {
         if (!$exists && empty($this->item_ids)) {
             $this->update_items();
         }
+
+        $this->validate();
 
         if (!$this->is_dirty()) {
             return $this;

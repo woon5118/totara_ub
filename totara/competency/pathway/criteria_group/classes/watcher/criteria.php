@@ -24,7 +24,9 @@
 namespace pathway_criteria_group\watcher;
 
 use pathway_criteria_group\aggregation_helper;
+use pathway_criteria_group\validation_helper;
 use totara_criteria\hook\criteria_achievement_changed;
+use totara_criteria\hook\criteria_validity_changed;
 
 class criteria {
 
@@ -36,4 +38,14 @@ class criteria {
     public static function achievement_changed(criteria_achievement_changed $hook) {
         aggregation_helper::mark_for_reaggregate_from_criteria($hook->get_user_criteria_ids());
     }
+
+    /**
+     * Listen to the criteria_validity_changed event
+     *
+     * @param criteria_validity_changed $hook
+     */
+    public static function validity_changed(criteria_validity_changed $hook) {
+        aggregation_helper::validate_and_mark_from_criteria($hook->get_criteria_ids());
+    }
+
 }

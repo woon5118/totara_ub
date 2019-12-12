@@ -93,7 +93,7 @@ class aggregation_first_aggregation_testcase extends advanced_testcase {
         $scale_value = new scale_value(array_pop($scale_values));
 
         $pathway1_mock = $this->getMockBuilder(pathway::class)
-                         ->setMethods(['aggregate_current_value', 'get_id', 'get_sortorder', 'get_competency'])
+                         ->setMethods(['aggregate_current_value', 'get_id', 'get_sortorder', 'get_competency', 'is_valid'])
                          ->getMockForAbstractClass();
 
         $achievement_detail = $this->getMockForAbstractClass(base_achievement_detail::class);
@@ -102,6 +102,7 @@ class aggregation_first_aggregation_testcase extends advanced_testcase {
         $pathway1_mock->method('get_id')->willReturn($pathway1->get_id());
         $pathway1_mock->method('get_sortorder')->willReturn($pathway1->get_sortorder());
         $pathway1_mock->method('get_competency')->willReturn($competency);
+        $pathway1_mock->method('is_valid')->willReturn(true);
 
         $source_table = new aggregation_users_table();
         $source_table->queue_for_aggregation($user->id, $competency->id);
@@ -139,7 +140,7 @@ class aggregation_first_aggregation_testcase extends advanced_testcase {
 
         $pathway1_mock = $this->getMockBuilder(pathway::class)
             ->disableOriginalConstructor()
-             ->setMethods(['aggregate_current_value', 'get_id', 'get_sortorder', 'get_competency', 'get_path_type'])
+             ->setMethods(['aggregate_current_value', 'get_id', 'get_sortorder', 'get_competency', 'get_path_type', 'is_valid'])
              ->getMockForAbstractClass();
         $achievement_detail1 = $this->getMockForAbstractClass(base_achievement_detail::class);
         $pathway1_mock->method('aggregate_current_value')->willReturn($achievement_detail1);
@@ -147,6 +148,7 @@ class aggregation_first_aggregation_testcase extends advanced_testcase {
         $pathway1_mock->method('get_sortorder')->willReturn($pathway1->get_sortorder());
         $pathway1_mock->method('get_path_type')->willReturn($pathway2->get_path_type());
         $pathway1_mock->method('get_competency')->willReturn($competency);
+        $pathway1_mock->method('is_valid')->willReturn(true);
 
         $source_table = new aggregation_users_table();
         $source_table->queue_for_aggregation($user->id, $competency->id);
@@ -157,7 +159,7 @@ class aggregation_first_aggregation_testcase extends advanced_testcase {
         $scale_value2 = new scale_value(array_pop($scale_values));
         $pathway2_mock = $this->getMockBuilder(pathway::class)
             ->disableOriginalConstructor()
-            ->setMethods(['aggregate_current_value', 'get_id', 'get_sortorder', 'get_competency', 'get_path_type'])
+            ->setMethods(['aggregate_current_value', 'get_id', 'get_sortorder', 'get_competency', 'get_path_type', 'is_valid'])
              ->getMockForAbstractClass();
         $achievement_detail2 = $this->getMockForAbstractClass(base_achievement_detail::class);
         $achievement_detail2->set_scale_value_id($scale_value2->id);
@@ -166,6 +168,7 @@ class aggregation_first_aggregation_testcase extends advanced_testcase {
         $pathway2_mock->method('get_sortorder')->willReturn($pathway2->get_sortorder());
         $pathway2_mock->method('get_path_type')->willReturn($pathway2->get_path_type());
         $pathway2_mock->method('get_competency')->willReturn($competency);
+        $pathway2_mock->method('is_valid')->willReturn(true);
 
         $pathway_evaluator2 = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway2_mock, $pw_user_source]);
         $pathway_evaluator2->aggregate();
@@ -173,7 +176,7 @@ class aggregation_first_aggregation_testcase extends advanced_testcase {
         $scale_value3 = new scale_value(array_pop($scale_values));
         $pathway3_mock = $this->getMockBuilder(pathway::class)
             ->disableOriginalConstructor()
-            ->setMethods(['aggregate_current_value', 'get_id', 'get_sortorder', 'get_competency', 'get_path_type'])
+            ->setMethods(['aggregate_current_value', 'get_id', 'get_sortorder', 'get_competency', 'get_path_type', 'is_valid'])
              ->getMockForAbstractClass();
         $achievement_detail3 = $this->getMockForAbstractClass(base_achievement_detail::class);
         $achievement_detail3->set_scale_value_id($scale_value3->id);
@@ -182,6 +185,7 @@ class aggregation_first_aggregation_testcase extends advanced_testcase {
         $pathway3_mock->method('get_sortorder')->willReturn($pathway3->get_sortorder());
         $pathway3_mock->method('get_path_type')->willReturn($pathway2->get_path_type());
         $pathway3_mock->method('get_competency')->willReturn($competency);
+        $pathway3_mock->method('is_valid')->willReturn(true);
 
         $pathway_evaluator3 = $this->getMockForAbstractClass(pathway_evaluator::class, [$pathway3_mock, $pw_user_source]);
         $pathway_evaluator3->aggregate();

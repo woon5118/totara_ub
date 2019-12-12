@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Brendan Cox <brendan.cox@totaralearning.com>
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package pathway_criteria_group
@@ -26,6 +25,7 @@
 use criteria_coursecompletion\coursecompletion;
 use pathway_criteria_group\aggregation_helper;
 use pathway_criteria_group\criteria_group;
+use totara_competency\entities\course as course_entity;
 use totara_competency\entities\scale_value;
 use totara_competency\expand_task;
 use totara_competency\linked_courses;
@@ -62,7 +62,7 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
 
         for ($i = 1; $i <= 6; $i++) {
             $data->users[$i] = $this->getDataGenerator()->create_user();
-            $data->courses[$i] = $this->getDataGenerator()->create_course();
+            $data->courses[$i] = $this->getDataGenerator()->create_course(['enablecompletion' => true]);
         }
 
         /** @var totara_hierarchy_generator $hierarchy_generator */
@@ -341,6 +341,40 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
         ]);
     }
 
+     /**
+     * Test changes in criteria validity
+     *
+     * @dataProvider assignments_enabled_dataprovider
+     * @param bool $assignments_enabled
+     */
+    public function test_validate_and_mark_from_criteria(bool $assignments_enabled) {
+        $data = $this->setup_data($assignments_enabled);
+
+        // If all stays valid, nothing should be queued
+        $criteria_ids = [
+            $data->competency_data['Comp A']['criteria_ids'][1],
+            $data->competency_data['Comp C']['criteria_ids'][4],
+        ];
+
+        aggregation_helper::validate_and_mark_from_criteria($criteria_ids);
+        $this->verify_queue([]);
+
+        // Now invalidate a criterion
+        $course = new course_entity($data->courses[1]->id);
+        $course->delete();
+
+        aggregation_helper::validate_and_mark_from_criteria($criteria_ids);
+        $this->verify_queue([
+            [
+                'user_id' => $data->users[1]->id,
+                'competency_id' => $data->competency_data['Comp A']['competency_id'],
+            ],
+            [
+                'user_id' => $data->users[2]->id,
+                'competency_id' => $data->competency_data['Comp A']['competency_id'],
+            ],
+        ]);
+    }
 
     private function verify_queue(array $expected_rows) {
         global $DB;

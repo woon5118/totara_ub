@@ -91,7 +91,6 @@ class items_processor {
         // Saving through criteria_linkedcourses instance instead of entity to ensure validation checks are done
         $transaction = $DB->start_delegated_transaction();
 
-        $course_ids = [];
         /** @var criterion $criterion */
         foreach ($criteria as $criterion) {
             $linkedcourses = linkedcourses::fetch_from_entity($criterion);

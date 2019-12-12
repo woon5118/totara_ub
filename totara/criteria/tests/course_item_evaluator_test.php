@@ -57,6 +57,7 @@ class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
         $record = [
             'shortname' => "course1",
             'fullname' => "Course 1",
+            'enablecompletion' => true,
         ];
         $data->course = $this->getDataGenerator()->create_course($record);
 

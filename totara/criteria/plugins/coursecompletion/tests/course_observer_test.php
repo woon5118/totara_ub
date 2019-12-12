@@ -24,7 +24,6 @@
 use core\event\course_completed;
 use core\event\course_deleted;
 use core\event\course_restored;
-use criteria_coursecompletion\coursecompletion;
 use totara_competency\entities\course as course_entity;
 use totara_completionimport\event\bulk_course_completionimport;
 use criteria_coursecompletion\observer\course as course_observer;

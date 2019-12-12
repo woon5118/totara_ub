@@ -63,6 +63,15 @@ abstract class pathway {
     /** @@var int $status  */
     private $status = self::PATHWAY_STATUS_ACTIVE;
 
+    /** @@var bool $isvalid  */
+    protected $isvalid = false;
+
+    /** @var bool $saved_isvalid */
+    private $saved_isvalid = false;
+
+    /** @var bool $validated - Bookkeeping to prevent unnecessary validation */
+    protected $validated = false;
+
     /********************************************************************
      * Instantiation
      ********************************************************************/
@@ -108,6 +117,8 @@ abstract class pathway {
         $pathway->set_sortorder($entity->sortorder);
         $pathway->set_path_instance_id($entity->path_instance_id);
         $pathway->set_status($entity->status);
+        $pathway->set_isvalid($entity->isvalid);
+        $pathway->set_saved_isvalid($entity->isvalid);
 
         $pathway->fetch_configuration();
 
@@ -174,9 +185,10 @@ abstract class pathway {
         }
 
         $this->ensure_sortorder_exists();
+        $this->validate();
 
         // Check whether anything changed
-        if (empty($this->get_id()) || $this->configuration_is_dirty()) {
+        if (empty($this->get_id()) || $this->isvalid != $this->saved_isvalid || $this->configuration_is_dirty()) {
             if ($this->is_active()) {
                 $this->save_configuration();
             }
@@ -185,6 +197,7 @@ abstract class pathway {
             // Only save if certain values change
             if ($old_record->sortorder == $this->get_sortorder()
                 && $old_record->status == $this->get_status()
+                && $old_record->isvalid == $this->is_valid()
                 && $old_record->path_instance_id == $this->get_path_instance_id()
             ) {
                 return $this;
@@ -198,6 +211,7 @@ abstract class pathway {
         $record->path_type = $this->get_path_type();
         $record->path_instance_id = $this->get_path_instance_id();
         $record->status = $this->status;
+        $record->isvalid = $this->isvalid;
         $record->pathway_modified = time();
 
         if ($this->get_id()) {
@@ -206,6 +220,8 @@ abstract class pathway {
         } else {
             $this->id = $DB->insert_record('totara_competency_pathway', $record);
         }
+
+        $this->saved_isvalid = $this->isvalid;
 
         return $this;
     }
@@ -436,6 +452,32 @@ abstract class pathway {
     }
 
     /**
+     * @return bool
+     */
+    public function is_valid(): bool {
+        return $this->isvalid;
+    }
+
+    /**
+     * @param bool $isvalid
+     * @return pathway
+     */
+    public function set_isvalid(bool $isvalid): pathway {
+        $this->isvalid = $isvalid;
+        return $this;
+    }
+
+    /**
+     * @param bool $isvalid
+     * @return pathway
+     */
+    public function set_saved_isvalid(bool $isvalid): pathway {
+        $this->saved_isvalid = $isvalid;
+        return $this;
+    }
+
+
+    /**
      * Get pathway classification (Single or Multi value)
      *
      * @return int
@@ -497,6 +539,30 @@ abstract class pathway {
             throw new \coding_exception('Not detail class found', "No achievement_detail class found for {$this->get_path_type()}");
         }
         return new $detail_class();
+    }
+
+    /**
+     * Validate the pathway configuration and set isvalid accordingly
+     * @return $this
+     */
+    public final function validate(): pathway {
+        if ($this->validated) {
+            return $this;
+        }
+
+        $this->isvalid = $this->configuration_is_valid();
+        $this->validated = true;
+
+        return $this;
+    }
+
+    /**
+     * Validate the configuration
+     * Should be overridden by plugins
+     * @return bool
+     */
+    protected function configuration_is_valid(): bool {
+        return true;
     }
 
 

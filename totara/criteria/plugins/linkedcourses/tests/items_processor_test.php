@@ -23,11 +23,13 @@
  * @package totara_criteria
  */
 
+use totara_competency\aggregation_users_table;
 use totara_competency\entities\competency;
 use criteria_linkedcourses\items_processor;
 use pathway_criteria_group\criteria_group;
 use criteria_linkedcourses\linkedcourses;
 use totara_competency\linked_courses;
+use totara_core\advanced_feature;
 
 class criteria_linkedcourses_items_processor_testcase extends advanced_testcase {
 
@@ -35,6 +37,8 @@ class criteria_linkedcourses_items_processor_testcase extends advanced_testcase 
         parent::setUpBeforeClass();
         global $CFG;
         require_once($CFG->dirroot . '/completion/completion_completion.php');
+
+        set_config('enablecompletion', 1);
     }
 
     private function set_up_pathway_with_linked_courses_criteria($competency) {
@@ -354,9 +358,9 @@ class criteria_linkedcourses_items_processor_testcase extends advanced_testcase 
     public function test_update_items_criteria_check_queue_learn_only_with_completions() {
         global $DB;
 
-        \totara_core\advanced_feature::disable('competency_assignment');
+        advanced_feature::disable('competency_assignment');
 
-        $queue_table = new \totara_competency\aggregation_users_table();
+        $queue_table = new aggregation_users_table();
 
         // We sink the events to prevent observer interference
         $sink = $this->redirectEvents();
@@ -376,9 +380,9 @@ class criteria_linkedcourses_items_processor_testcase extends advanced_testcase 
         $this->set_up_pathway_with_linked_courses_criteria($competency1);
         $this->set_up_pathway_with_linked_courses_criteria($competency2);
 
-        $add = $this->getDataGenerator()->create_course();
-        $keep = $this->getDataGenerator()->create_course();
-        $remove = $this->getDataGenerator()->create_course();
+        $add = $this->getDataGenerator()->create_course(['enablecompletion' => true]);
+        $keep = $this->getDataGenerator()->create_course(['enablecompletion' => true]);
+        $remove = $this->getDataGenerator()->create_course(['enablecompletion' => true]);
 
         $sink->clear();
 

@@ -94,7 +94,7 @@ class aggregation_task {
             $competency_to_aggregate = null;
 
             // Aggregate each archived pathway which still has active pathway achievements
-            // before aggregation the competency itself
+            // before aggregating the competency itself
             $competency = $competencies_with_archived_pws->find('id', $competency_id);
             if ($competency) {
                 $competency_to_aggregate = $competency;
@@ -103,14 +103,14 @@ class aggregation_task {
                     $pathway_entity->relate('competency', $competency);
                     $pathway = pathway_factory::from_entity($pathway_entity);
                     $pathway->archive_pathway_achievements();
-
-                    // Mark all rows for that competency as has_changed
-                    // so that it will be picked up by the competency achievement aggregation
-                    $this->pw_user_id_source->mark_all_users_with_competency($competency->id);
                 }
+
+                // Mark all rows for that competency as has_changed
+                // so that it will be picked up by the competency achievement aggregation
+                $this->pw_user_id_source->mark_all_users_with_competency($competency->id);
             }
 
-            // Aggregate each active pathway before aggregation the competency itself
+            // Aggregate each active pathway before aggregating the competency itself
             $competency = $competencies_with_active_pws->find('id', $competency_id);
             if ($competency) {
                 $competency_to_aggregate = $competency;

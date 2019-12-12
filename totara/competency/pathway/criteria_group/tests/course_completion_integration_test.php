@@ -40,7 +40,7 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
         $assignment_generator = $competency_generator->assignment_generator();
 
         $user1 = $this->getDataGenerator()->create_user();
-        $course1 = $this->getDataGenerator()->create_course();
+        $course1 = $this->getDataGenerator()->create_course(['enablecompletion' => true]);
 
         // Create course completion before setting up the competency and assignment as we want its event
         // to be ignored while we test cron operations.
@@ -109,7 +109,7 @@ class pathway_criteria_group_course_completion_integration_testcase extends adva
         $assignment_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency')->assignment_generator();
 
         $user1 = $this->getDataGenerator()->create_user();
-        $course1 = $this->getDataGenerator()->create_course();
+        $course1 = $this->getDataGenerator()->create_course(['enablecompletion' => true]);
 
         $competency1 = $competency_generator->create_competency();
 

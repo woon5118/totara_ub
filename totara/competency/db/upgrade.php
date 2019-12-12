@@ -382,6 +382,20 @@ function xmldb_totara_competency_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019111500, 'totara', 'competency');
     }
 
+    if ($oldversion < 2019121000) {
+        // Define field status to be added to totara_competency_pathway
+        $table = new xmldb_table('totara_competency_pathway');
+        $field = new xmldb_field('isvalid', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1');
+
+        // Conditionally add the new field
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Competency savepoint reached.
+        upgrade_plugin_savepoint(true, 2019121000, 'totara', 'competency');
+    }
+
 
     return true;
 }

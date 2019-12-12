@@ -136,10 +136,10 @@ class course {
         $affected_criteria = [];
         foreach ($criteria as $criterion_entity) {
             $criterion = coursecompletion::fetch_from_entity($criterion_entity);
-            if ($criterion->is_valid() != $criterion_entity->isvalid) {
-                $criterion->save();
-                $affected_criteria[] = $criterion_entity->id;
-            }
+            // Not checking anything here - this criterion refers to a deleted course -
+            // Calling save to ensure the correct state is persisted to the database
+            $criterion->save();
+            $affected_criteria[] = $criterion_entity->id;
         }
 
         if (!empty($affected_criteria)) {
@@ -176,8 +176,9 @@ class course {
             }
 
             $criterion = coursecompletion::fetch_from_entity($criterion_entity);
+            // Call save to force re-validation
+            $criterion->save();
             if ($criterion->is_valid() != $criterion_entity->isvalid) {
-                $criterion->save();
                 $affected_criteria[] = $criterion_entity->id;
             }
         }

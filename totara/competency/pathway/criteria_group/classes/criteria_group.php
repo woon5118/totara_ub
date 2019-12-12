@@ -28,6 +28,7 @@ use core\orm\collection;
 use core\orm\query\builder;
 use pathway_criteria_group\entities\criteria_group as criteria_group_entity;
 use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
+use pathway_criteria_group\validators\criteria_group_validator;
 use stdClass;
 use totara_competency\base_achievement_detail;
 use totara_competency\entities\pathway as pathway_entity;
@@ -309,8 +310,10 @@ class criteria_group extends pathway {
 
             if (!empty($id)) {
                 $this->critids[] = $id;
+                $this->validated = false;
             }
         }
+
 
         return $this;
     }
@@ -330,6 +333,7 @@ class criteria_group extends pathway {
         }
 
         unset($this->criteria[$key]);
+        $this->validated = false;
         return $this;
     }
 
@@ -359,6 +363,8 @@ class criteria_group extends pathway {
         }
 
         static::$last_key = $last_key;
+        $this->validated = false;
+
         return $this;
     }
 
@@ -376,6 +382,26 @@ class criteria_group extends pathway {
         );
 
         return $result;
+    }
+
+    /**
+     * Validate the pathway configuration
+     * @return bool
+     */
+    public function configuration_is_valid(): bool {
+        if (count($this->get_criteria()) == 0) {
+            return false;
+        }
+
+        foreach ($this->get_criteria() as $criterion) {
+            $criterion->validate();
+            if (!$criterion->is_valid()) {
+                return false;
+            }
+        }
+
+        // TODO: May need to check that the scale_value still exists
+        return true;
     }
 
 

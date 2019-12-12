@@ -70,6 +70,10 @@ abstract class pathway_evaluator {
         // the pathway may no longer result in a user receiving a value, the unassigned user is still unassigned
         $this->user_id_source->archive_non_assigned_achievements($this->pathway, $evaluation_time);
 
+        if (!$this->pathway->is_valid()) {
+            return;
+        }
+
         // Mark newly assigned users as having changes
         $this->user_id_source->mark_newly_assigned_users($this->pathway);
 

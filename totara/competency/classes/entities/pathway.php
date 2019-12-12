@@ -35,6 +35,7 @@ use core\orm\entity\relations\belongs_to;
  * @property int $path_instance_id
  * @property int $status
  * @property int $pathway_modified
+ * @property int $isvalid
  *
  * @property-read competency $competency
  */
