@@ -57,6 +57,7 @@ class achievement {
      * @param int $child_competency_id
      */
     private static function trigger_parent_criteria_achievement_changed(int $user_id, int $child_competency_id) {
+        // TODO performance - check query performance, group by vs. array_unique
         $criteria_ids = item_entity::repository()
             ->select('criterion_id')
             ->where('item_type', 'competency')

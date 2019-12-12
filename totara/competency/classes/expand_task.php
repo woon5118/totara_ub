@@ -51,7 +51,12 @@ class expand_task {
         // clean up all orphaned records (archived or deleted assignments)
         competency_assignment_user_repository::remove_orphaned_records();
 
-        $assignments = assignment::repository()->filter_by_active()->get();
+        $assignments = assignment::repository()
+            ->filter_by_active()
+            ->get_lazy();
+        // TODO performance - maybe load with user assignments relation?
+        //      or even load the related user rows?
+        //      memory usage!!
         foreach ($assignments as $assignment) {
             $this->expand_assignment($assignment);
         }
@@ -88,13 +93,12 @@ class expand_task {
         competency_assignment_user_repository::remove_orphaned_records();
 
         /** @var assignment $assignment */
-        $assignment = assignment::repository()->find($assignment_id);
-        if (!$assignment) {
-            return;
-        }
+        $assignment = assignment::repository()
+            ->where('id', $assignment_id)
+            ->where('status', assignment::STATUS_ACTIVE)
+            ->one();
 
-        // Only expand active assignment
-        if ($assignment->status == assignment::STATUS_ACTIVE) {
+        if ($assignment) {
             $this->expand_assignment($assignment);
         }
     }
@@ -122,6 +126,9 @@ class expand_task {
         $user_ids = $this->get_expanded_users($assignment->user_group_type, $assignment->user_group_id);
 
         foreach ($user_ids as $user_id) {
+            // TODO move unique identifier gegneration out of the entity
+            //      to avoid creating objects for skipped users
+            //      also maybe avoid md5(), just concatenate
             $competency_user = new competency_assignment_user();
             $competency_user->assignment_id = $assignment_id;
             $competency_user->competency_id = $assignment->competency_id;
@@ -131,6 +138,8 @@ class expand_task {
             $added_entries_ids[] = $identifier;
             // If the entry does not exist yet, create it now otherwise just ignore it
             if (!isset($current_entries[$identifier])) {
+                // TODO performance - use insert_records_via_batch()
+                // TODO performance use transaction?
                 $competency_user->save();
                 assignment_user_assigned::create_from_assignment_user($competency_user, $assignment->type)->trigger();
             }
@@ -168,6 +177,7 @@ class expand_task {
      * @return array
      */
     private function get_expanded_users(string $user_group_type, int $user_group_id): array {
+        // TODO performance - just have get_cache_entry, otherwise it's called twice
         if (!$this->has_cache_entry($user_group_type, $user_group_id)) {
             $expanded_records = $this->expand_entity($user_group_type, $user_group_id);
             $this->add_cache_entry($user_group_type, $user_group_id, $expanded_records);
@@ -207,6 +217,7 @@ class expand_task {
         $class_name = assignment_model::get_entity_class_by_user_group_type($type);
         if (is_subclass_of($class_name, expandable::class)) {
             /** @var expandable $entity */
+            // TODO performance - check if that could be loaded via relationship, might require polymorphic relationship
             $entity = new $class_name($target_id);
             if ($entity) {
                 return $entity->expand();
@@ -238,7 +249,9 @@ class expand_task {
         foreach ($records_to_delete as $assignment_user) {
             // Trigger event for all affected entries
             $event = assignment_user_unassigned::create_from_assignment_user($assignment_user);
+            // TODO performance - delete in one query
             $assignment_user->delete();
+            // TODO performance use transaction?
             $event->trigger();
         }
     }
