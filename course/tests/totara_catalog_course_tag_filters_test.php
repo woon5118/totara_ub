@@ -85,8 +85,8 @@ class core_course_totara_catalog_course_tag_filters_testcase extends \advanced_t
                 }
                 $courses_by_tags[$tag->id] = $courses;
 
-                if (!in_array($tag->name, $attached_tags)) {
-                    $attached_tags[] = $tag->name;
+                if (!in_array($tag->rawname, $attached_tags)) {
+                    $attached_tags[] = $tag->rawname;
                 }
             }
         }

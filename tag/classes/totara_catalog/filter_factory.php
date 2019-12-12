@@ -66,7 +66,7 @@ class filter_factory {
         $optionsloader = function () use ($itemtype) {
             global $DB;
 
-            $sql = "SELECT DISTINCT tag.id, tag.name
+            $sql = "SELECT DISTINCT tag.id, tag.rawname AS name
                       FROM {tag_instance} tag_instance
                       JOIN {tag} tag
                         ON tag_instance.tagid = tag.id

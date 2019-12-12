@@ -92,8 +92,8 @@ class totara_certification_totara_catalog_tag_filters_testcase extends \advanced
                 }
                 $certifications_by_tag[$tag->id] = $certifications;
 
-                if (!in_array($tag->name, $attached_tags)) {
-                    $attached_tags[] = $tag->name;
+                if (!in_array($tag->rawname, $attached_tags)) {
+                    $attached_tags[] = $tag->rawname;
                 }
             }
         }

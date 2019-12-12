@@ -99,8 +99,8 @@ class core_tag_totara_catalog_tag_filters_testcase extends \advanced_testcase {
                 }
                 $all_items_by_tag[$tag->id] = $items_for_tag;
 
-                if (!in_array($tag->name, $attached_tags)) {
-                    $attached_tags[] = $tag->name;
+                if (!in_array($tag->rawname, $attached_tags)) {
+                    $attached_tags[] = $tag->rawname;
                 }
             }
         }
@@ -177,8 +177,8 @@ class core_tag_totara_catalog_tag_filters_testcase extends \advanced_testcase {
                 }
                 $all_items_by_tag[$tag->id] = $items_for_tag;
 
-                if (!in_array($tag->name, $attached_tags)) {
-                    $attached_tags[] = $tag->name;
+                if (!in_array($tag->rawname, $attached_tags)) {
+                    $attached_tags[] = $tag->rawname;
                 }
             }
         }
@@ -191,8 +191,8 @@ class core_tag_totara_catalog_tag_filters_testcase extends \advanced_testcase {
 
             $generator->create_program(['fullname' => $fullname]);
 
-            if (!in_array($tag->name, $attached_tags)) {
-                $attached_tags[] = $tag->name;
+            if (!in_array($tag->rawname, $attached_tags)) {
+                $attached_tags[] = $tag->rawname;
             }
         }
 
@@ -257,8 +257,8 @@ class core_tag_totara_catalog_tag_filters_testcase extends \advanced_testcase {
                 }
                 $all_items_by_tag[$tag->id] = $items_for_tag;
 
-                if (!in_array($tag->name, $attached_tags)) {
-                    $attached_tags[] = $tag->name;
+                if (!in_array($tag->rawname, $attached_tags)) {
+                    $attached_tags[] = $tag->rawname;
                 }
             }
         }

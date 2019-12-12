@@ -91,8 +91,8 @@ class totara_program_totara_catalog_tag_filters_testcase extends \advanced_testc
                 }
                 $programs_by_tag[$tag->id] = $programs;
 
-                if (!in_array($tag->name, $attached_tags)) {
-                    $attached_tags[] = $tag->name;
+                if (!in_array($tag->rawname, $attached_tags)) {
+                    $attached_tags[] = $tag->rawname;
                 }
             }
         }
