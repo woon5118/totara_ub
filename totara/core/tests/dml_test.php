@@ -692,6 +692,7 @@ class totara_core_dml_testcase extends database_driver_testcase {
         } else {
             $records = $DB->get_counted_records_sql($sql, array(), 0, 0, $count);
         }
+        $this->assertDebuggingCalled('Counted recordsets are deprecated, use two separate queries instead.');
 
         $this->assertCount(0, $records);
         $this->assertSame(0, $count);
@@ -879,6 +880,9 @@ ORDER BY tt1.groupid";
         $complexassert($sql);
 
         $dbman->drop_table($table);
+
+        // Ignore all counted recordset problems, it is deprecated.
+        $this->resetDebugging();
     }
 
     public function test_reserved_columns() {
@@ -2700,6 +2704,7 @@ ORDER BY tt1.groupid";
         self::assertEquals($context->id, $DB->get_records_sql($sql, $params)[$context->id]->id);
         self::assertEquals($context->id, key($DB->get_records_sql_menu($sql, $params)));
         self::assertEquals($context->id, $DB->get_counted_records_sql($sql, $params, 0, 10, $count)[$context->id]->id);
+        $this->assertDebuggingCalled('Counted recordsets are deprecated, use two separate queries instead.');
         self::assertSame(1, $count);
 
         $rawsql = $DB::sql($sql, $params);
@@ -2709,6 +2714,7 @@ ORDER BY tt1.groupid";
         self::assertEquals($context->id, $DB->get_records_sql($rawsql)[$context->id]->id);
         self::assertEquals($context->id, key($DB->get_records_sql_menu($rawsql)));
         self::assertEquals($context->id, $DB->get_counted_records_sql($rawsql, null, 0, 10, $count)[$context->id]->id);
+        $this->assertDebuggingCalled('Counted recordsets are deprecated, use two separate queries instead.');
         self::assertSame(1, $count);
 
         // Recordset query tests of all rs queries.
@@ -2719,10 +2725,12 @@ ORDER BY tt1.groupid";
         };
         self::assertEquals($context->id, $extract($DB->get_recordset_sql($sql, $params))->id);
         self::assertEquals($context->id, $extract($DB->get_counted_recordset_sql($sql, $params, 0, 10, $count))->id);
+        $this->assertDebuggingCalled('Counted recordsets are deprecated, use two separate queries instead.');
         self::assertSame(1, $count);
 
         self::assertEquals($context->id, $extract($DB->get_recordset_sql($rawsql))->id);
         self::assertEquals($context->id, $extract($DB->get_counted_recordset_sql($rawsql, null, 0, 10, $count))->id);
+        $this->assertDebuggingCalled('Counted recordsets are deprecated, use two separate queries instead.');
         self::assertSame(1, $count);
 
         // Now just test with the expected inserted into the middle.
@@ -2733,9 +2741,11 @@ ORDER BY tt1.groupid";
         self::assertEquals($context->id, $DB->get_records_sql($sql, $params)[$context->id]->id);
         self::assertEquals($context->id, key($DB->get_records_sql_menu($sql, $params)));
         self::assertEquals($context->id, $DB->get_counted_records_sql($sql, $params, 0, 10, $count)[$context->id]->id);
+        $this->assertDebuggingCalled('Counted recordsets are deprecated, use two separate queries instead.');
         self::assertSame(1, $count);
         self::assertEquals($context->id, $extract($DB->get_recordset_sql($sql, $params))->id);
         self::assertEquals($context->id, $extract($DB->get_counted_recordset_sql($sql, $params, 0, 10, $count))->id);
+        $this->assertDebuggingCalled('Counted recordsets are deprecated, use two separate queries instead.');
         self::assertSame(1, $count);
 
         $rawsql = $DB::sql($sql, $params);
@@ -2745,9 +2755,11 @@ ORDER BY tt1.groupid";
         self::assertEquals($context->id, $DB->get_records_sql($rawsql)[$context->id]->id);
         self::assertEquals($context->id, key($DB->get_records_sql_menu($rawsql)));
         self::assertEquals($context->id, $DB->get_counted_records_sql($rawsql, null, 0, 10, $count)[$context->id]->id);
+        $this->assertDebuggingCalled('Counted recordsets are deprecated, use two separate queries instead.');
         self::assertSame(1, $count);
         self::assertEquals($context->id, $extract($DB->get_recordset_sql($rawsql))->id);
         self::assertEquals($context->id, $extract($DB->get_counted_recordset_sql($rawsql, null, 0, 10, $count))->id);
+        $this->assertDebuggingCalled('Counted recordsets are deprecated, use two separate queries instead.');
         self::assertSame(1, $count);
 
         // And finally test with the token at the end.
@@ -2758,9 +2770,11 @@ ORDER BY tt1.groupid";
         self::assertEquals($context->id, $DB->get_records_sql($sql, $params)[$context->id]->id);
         self::assertEquals($context->id, key($DB->get_records_sql_menu($sql, $params)));
         self::assertEquals($context->id, $DB->get_counted_records_sql($sql, $params, 0, 10, $count)[$context->id]->id);
+        $this->assertDebuggingCalled('Counted recordsets are deprecated, use two separate queries instead.');
         self::assertSame(1, $count);
         self::assertEquals($context->id, $extract($DB->get_recordset_sql($sql, $params))->id);
         self::assertEquals($context->id, $extract($DB->get_counted_recordset_sql($sql, $params, 0, 10, $count))->id);
+        $this->assertDebuggingCalled('Counted recordsets are deprecated, use two separate queries instead.');
         self::assertSame(1, $count);
 
         $rawsql = $DB::sql($sql, $params);
@@ -2770,9 +2784,11 @@ ORDER BY tt1.groupid";
         self::assertEquals($context->id, $DB->get_records_sql($rawsql)[$context->id]->id);
         self::assertEquals($context->id, key($DB->get_records_sql_menu($rawsql)));
         self::assertEquals($context->id, $DB->get_counted_records_sql($rawsql, null, 0, 10, $count)[$context->id]->id);
+        $this->assertDebuggingCalled('Counted recordsets are deprecated, use two separate queries instead.');
         self::assertSame(1, $count);
         self::assertEquals($context->id, $extract($DB->get_recordset_sql($rawsql))->id);
         self::assertEquals($context->id, $extract($DB->get_counted_recordset_sql($rawsql, null, 0, 10, $count))->id);
+        $this->assertDebuggingCalled('Counted recordsets are deprecated, use two separate queries instead.');
         self::assertSame(1, $count);
     }
 }

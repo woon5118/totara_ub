@@ -2084,6 +2084,8 @@ class mysqli_native_moodle_database extends moodle_database {
         global $CFG;
         require_once($CFG->libdir.'/dml/counted_recordset.php');
 
+        debugging('Counted recordsets are deprecated, use two separate queries instead.', DEBUG_DEVELOPER);
+
         if ($sql instanceof sql) {
             if (!empty($params)) {
                 debugging('$params parameter is ignored when sql instance supplied', DEBUG_DEVELOPER);
