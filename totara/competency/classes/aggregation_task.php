@@ -185,9 +185,14 @@ class aggregation_task {
             ->with([
                 // We want to get all archived pathway entities in one go, using the relation
                 'pathways' => function (repository $repository) {
+
+                    $achievement_builder = builder::table(pathway_achievement::TABLE)
+                        ->where('status', pathway_achievement::STATUS_CURRENT)
+                        ->where_field('pathway_id', "pw.id");
+
                     $repository
-                        ->join([pathway_achievement::TABLE, 'pwa'], 'id', 'pathway_id')
-                        ->where('pwa.status', pathway_achievement::STATUS_CURRENT)
+                        ->as('pw')
+                        ->where_exists($achievement_builder)
                         ->where('status', pathway::PATHWAY_STATUS_ARCHIVED);
                 }
             ])
