@@ -298,8 +298,6 @@ class performance_testing extends App {
             );
 
             linked_courses::set_linked_courses($item->get_data('id'), $courses);
-
-            $this->create_criteria_set($item);
         }
 
         return $this;

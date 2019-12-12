@@ -73,10 +73,6 @@ class competency_scale extends item {
             throw new \Exception('This scale already has a min proficient value, you can not a value that is not proficient anymore');
         }
 
-        if ($proficient) {
-            $this->has_min_proficient_value = true;
-        }
-
         $props['proficient'] = $proficient;
 
         if (!empty($name)) {
@@ -88,6 +84,10 @@ class competency_scale extends item {
         }
 
         $this->values[] = $value = new scale_value($props);
+
+        if ($proficient && !$this->has_min_proficient_value) {
+            $this->has_min_proficient_value = $value;
+        }
 
         return $this;
     }
@@ -160,6 +160,10 @@ class competency_scale extends item {
         $this->data = new scale($properties);
         $this->data->save();
         $this->save_values();
+
+        $this->data->minproficiencyid = $this->has_min_proficient_value->id;
+        $this->data->defaultid = $this->has_min_proficient_value->id;
+        $this->data->save();
 
         Cache::get()->add($this);
 
