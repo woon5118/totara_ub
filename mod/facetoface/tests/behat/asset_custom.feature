@@ -75,7 +75,7 @@ Feature: Manage custom assets by non-admin user
   Scenario: Confirm images load when viewing added assets
     Given I log in as "admin"
     And I click on "Find Learning" in the totara menu
-    And I follow "Course 1"
+    And I click on "Course 1" "text"
     And I follow "Go to course"
     And I click on "Turn editing on" "button"
     And I add a "Seminar" to section "1" and I fill the form with:
