@@ -77,6 +77,13 @@ class performance_testing extends App {
     protected $scales = [];
 
     /**
+     * Should it create group assignment or user assignments
+     *
+     * @var bool
+     */
+    protected $assign_groups = false;
+
+    /**
      *
      */
     public function generate() {
@@ -89,7 +96,7 @@ class performance_testing extends App {
         //->create_organisation_assignments()
         //->create_position_assignments()
         //->create_audience_assignments()
-            ->create_user_assignments()
+            ->create_assignments()
             ->create_courses()
             ->enrol_users()
             ->create_course_completions()
@@ -106,6 +113,52 @@ class performance_testing extends App {
 
         for ($c = 1; $c <= $size; $c++) {
             $this->users[] = user::new()->save_and_return();
+        }
+
+        return $this;
+    }
+
+    public function assign_groups(bool $assign = true) {
+        $this->assign_groups = $assign;
+
+        return $this;
+    }
+
+    public function create_assignments() {
+        if (!$this->assign_groups) {
+            $this->create_user_assignments();
+        } else {
+            $this->add_audience_members()
+                ->create_audience_assignments();
+        }
+
+        return $this;
+    }
+
+    public function add_audience_members() {
+        $this->output('Adding audience members');
+
+        if (empty($this->users)) {
+            throw new \Exception('You must create users first');
+        }
+
+        $count = 0;
+
+        $current = reset($this->users);
+        $audience = audience::new()->save_and_return();
+        $this->audiences[] = $audience;
+
+        while ($current) {
+            if ($count > 100) {
+                $count = 0;
+                $audience = audience::new()->save_and_return();
+                $this->audiences[] = $audience;
+            }
+
+            $audience->add_member($current);
+
+            $count++;
+            $current = next($this->users);
         }
 
         return $this;
@@ -159,7 +212,7 @@ class performance_testing extends App {
         $size = $this->get_item_size('audiences');
 
         for ($c = 1; $c <= $size; $c++) {
-            $this->users[] = audience::new()->save_and_return();
+            $this->audiences[] = audience::new()->save_and_return();
         }
 
         return $this;
@@ -237,6 +290,19 @@ class performance_testing extends App {
     }
 
     public function create_audience_assignments() {
+        $this->output('Creating audience assignments...');
+
+        if ($this->competency_hierarchy === null) {
+            throw new \Exception('You must create competency hierarchy first');
+        }
+
+        $competencies = $this->get_competencies('assignments');
+
+        foreach ($this->audiences as $audience) {
+            foreach ($competencies as $competency) {
+                static::competency_generator()->assignment_generator()->create_cohort_assignment($competency->get_data('id'), $audience->get_data()->id);
+            }
+        }
 
         return $this;
     }
@@ -248,15 +314,11 @@ class performance_testing extends App {
             throw new \Exception('You must create competency hierarchy first');
         }
 
-        $competencies = $this->competency_hierarchy->get_items();
-
-        $percentage = $this->get_item_size('assignments');
-
-        $competency_ids = array_rand($competencies, $this->get_percentage(count($competencies), $percentage));
+        $competencies = $this->get_competencies('assignments');
 
         foreach ($this->users as $user) {
-            foreach ($competency_ids as $competency_id) {
-                static::competency_generator()->assignment_generator()->create_user_assignment($competencies[$competency_id]->get_data('id'), $user->get_data()->id);
+            foreach ($competencies as $competency) {
+                static::competency_generator()->assignment_generator()->create_user_assignment($competency->get_data('id'), $user->get_data()->id);
             }
         }
 
@@ -413,6 +475,15 @@ class performance_testing extends App {
 
     protected function create_pathways() {
         return $this;
+    }
+
+    protected function get_competencies(string $key = null) {
+        $competencies = $this->competency_hierarchy->get_items();
+        $ids = array_rand($competencies, $this->get_percentage(count($competencies), $key ? $this->get_item_size($key) : 100));
+
+        return array_filter($competencies, function($key) use ($ids) {
+            return in_array($key, $ids);
+        }, ARRAY_FILTER_USE_KEY);
     }
 
     protected function create_child_competency_criterion(competency $competency): ?child_competency {
