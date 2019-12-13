@@ -153,5 +153,40 @@ class totara_criteria_generator extends component_generator_base {
         // Re-read the instance to ensure all default values are also set
         return $instance;
     }
+
+    /**
+     * Create a test criterion
+     *
+     * @return criterion
+     */
+    public function create_test_criterion(string $plugin): criterion {
+        plugin_types::enable_plugin($plugin, 'criteria', 'totara_criteria');
+        $criterion = criterion_factory::create($plugin);
+        $criterion->update_items();
+        return $criterion;
+    }
+
+    /**
+     * Creates a criteria item for a course
+     *
+     * @param stdClass $course
+     * @return int the id of the item just generated
+     */
+    public function create_course_criterion_item(stdClass $course) {
+        global $DB;
+
+        $criterion = new criterion_entity();
+        $criterion->plugin_type = 'test';
+        $criterion->aggregation_method = criterion::AGGREGATE_ALL;
+        $criterion->criterion_modified = time();
+        $criterion->save();
+
+        $record = new stdClass();
+        $record->criterion_id = $criterion->id;
+        $record->item_type = 'course';
+        $record->item_id = $course->id;
+        return $DB->insert_record('totara_criteria_item', $record);
+    }
+
 }
 
