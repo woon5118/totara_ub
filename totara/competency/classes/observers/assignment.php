@@ -48,6 +48,8 @@ class assignment {
         if (!empty($data['objectid']) && isset($data['other']['status'])) {
             if ($data['other']['status'] == entities\assignment::STATUS_ACTIVE) {
                 // trigger expand task for the created assignments
+                // TODO performance - only schedule ad hoc task for non-user assignments,
+                //      otherwise directly create the proper record
                 expand_assignment_task::schedule_for_assignment($data['objectid']);
             }
         }
@@ -82,6 +84,8 @@ class assignment {
         $assignment_id = $data['objectid'];
 
         // trigger expand task for the activated assignment
+        // TODO performance - only schedule ad hoc task for non-user assignments,
+        //      otherwise directly create the proper record
         expand_assignment_task::schedule_for_assignment($assignment_id);
 
         return true;
