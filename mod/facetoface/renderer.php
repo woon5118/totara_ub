@@ -1233,7 +1233,12 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             'backtoeventinfo' => (int)$option->get_backtoeventinfo()
         ];
         $sessiondata = \mod_facetoface\seminar_event_helper::get_sessiondata($seminarevent, null);
-        $actionlinks = $this->create_reserve_links($sessiondata, null, null, $params, $class);
+        if ($seminarevent->is_registration_open()) {
+            $actionlinks = $this->create_reserve_links($sessiondata, null, null, $params, $class);
+        } else {
+            // Registration not open.
+            $actionlinks = [];
+        }
         $viewattendees = has_capability('mod/facetoface:viewattendees', $this->getcontext());
         if ($viewattendees) {
             unset($params['backtoeventinfo']); // Attendees page doesn't understand the backtoeventinfo parameter

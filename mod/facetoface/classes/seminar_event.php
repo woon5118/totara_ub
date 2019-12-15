@@ -994,6 +994,21 @@ final class seminar_event implements seminar_iterator_item {
     }
 
     /**
+     * See if the registration is open.
+     *
+     * @param integer $time Timestamp or 0 for current time
+     * @return boolean
+     */
+    public function is_registration_open(int $time = 0): bool {
+        $time = $time ?: time();
+        $timestart = $this->registrationtimestart;
+        $timefinish = $this->registrationtimefinish;
+        $start = empty($timestart) || $time > $timestart;
+        $finish = empty($timefinish) || $time < $timefinish;
+        return $start && $finish;
+    }
+
+    /**
      * Get event cancelledstatus
      * @return int
      */

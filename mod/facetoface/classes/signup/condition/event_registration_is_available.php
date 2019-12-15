@@ -43,12 +43,7 @@ class event_registration_is_available extends condition {
         }
 
         $now = time();
-        $timestart = $this->signup->get_seminar_event()->get_registrationtimestart();
-        $timefinish = $this->signup->get_seminar_event()->get_registrationtimefinish();
-        $start = empty($timestart) || $now > $timestart;
-        $finish = empty($timefinish) || $now < $timefinish;
-
-        return $start && $finish;
+        return $this->signup->get_seminar_event()->is_registration_open($now);
     }
 
     /**

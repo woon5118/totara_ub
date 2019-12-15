@@ -6,6 +6,7 @@ information provided here is intended especially for developers.
 Note that more recent update comes to the top.
 
 --- Look and feel ---
+* Manager reservation/allocation links are now visible only if the registration is open
 * The column 'Allow booking conflict' is added to the manage rooms embedded report
 * A new default column 'Event Attendance' is added to the event reports
 * Rooms are no longer removed when a session is cancelled for historical records
@@ -146,6 +147,7 @@ Note that more recent update comes to the top.
 * form\event::new_user_roles_added() has been deprecated and will be removed in Totara 14
 
 --- Update in backend code ---
+* event_registration_is_available::pass() changed to use seminar_event::is_registration_open()
 * seminar_event::is_cancellable() has been added; please use this method to see whether the event can be cancelled or not
 * signup_helper::process_attendance() has been changed to trigger the signup_status_updated event whenever signup status is changed
 * signup::switch_state() has been changed to trigger the signup_status_updated event whenever signup status is changed

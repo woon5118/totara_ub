@@ -11,24 +11,29 @@ Feature: Allocate spaces for team in seminar
       | sitemanager1 | Terry1    | Sitemanager1 | sitemanager1@example.com | manager  | system |
       | sitemanager2 | Terry2    | Sitemanager2 | sitemanager2@example.com | manager  | system |
       | teacher1     | Terry3    | Teacher      | teacher@example.com      | learner  | system |
+      | staff1       | Terry4    | Staff        | staff@example.com    | staffmanager | system |
       | student1     | Sam1      | Student1     | student1@example.com     | learner  | system |
       | student2     | Sam2      | Student2     | student2@example.com     | learner  | system |
       | student3     | Sam3      | Student3     | student3@example.com     | learner  | system |
-      | student4     | Sam4      | Student4     | student2@example.com     | learner  | system |
+      | student4     | Sam4      | Student4     | student4@example.com     | learner  | system |
+      | student5     | Sam5      | Student5     | student5@example.com     | learner  | system |
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
     And the following "course enrolments" exist:
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
+      | staff1   | C1     | staffmanager   |
       | student1 | C1     | student        |
       | student2 | C1     | student        |
       | student3 | C1     | student        |
       | student4 | C1     | student        |
+      | student5 | C1     | student        |
     And the following "system role assigns" exist:
       | user         | role         | contextlevel | reference |
       | sitemanager1 | manager      | System       |           |
       | sitemanager2 | manager      | System       | System    |
+      | staff1       | staffmanager | System       |           |
     And the following "position" frameworks exist:
       | fullname      | idnumber |
       | PosHierarchy1 | FW001    |
@@ -41,6 +46,7 @@ Feature: Allocate spaces for team in seminar
       | student2 | POS001   | sitemanager1 |
       | student3 | POS001   | sitemanager2 |
       | student4 | POS001   | sitemanager2 |
+      | student5 | POS001   | staff1       |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -297,3 +303,81 @@ Feature: Allocate spaces for team in seminar
     And I should see "Allocate spaces for team"
     And I should see "Reserve spaces for team"
     And I should see "Manage reservations"
+
+  Scenario: Cannot allocate learners when sign-up is closed
+    When I log in as "staff1"
+    And I am on "Course 1" course homepage
+    And I follow "View all events"
+    And I click on "Go to event" "link" in the "1 February" "table_row"
+    Then I should not see "Sign-up unavailable"
+    And I should see "Booking open"
+    And I should see "Allocate spaces for team"
+    And I should see "Reserve spaces for team"
+    And I log out
+
+    And I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I follow "View all events"
+    And I click on the seminar event action "Edit event" in row "1 February"
+    When I set the following fields to these values:
+      | registrationtimestart[enabled] | 1 |
+      | registrationtimestart[day]     | 18 |
+      | registrationtimestart[month]   | 1 |
+      | registrationtimestart[year]    | ## next year ## Y ## |
+    And I press "Save changes"
+    And I log out
+
+    When I log in as "staff1"
+    And I am on "Course 1" course homepage
+    And I follow "View all events"
+    And I click on "Go to event" "link" in the "1 February" "table_row"
+    Then I should see "Sign-up unavailable"
+    And I should not see "Reserve for another manager"
+    And I should not see "Manage reservations"
+    And I should not see "Allocate spaces for team"
+    And I should not see "Reserve spaces for team"
+    And I log out
+
+    And I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I follow "View all events"
+    And I click on the seminar event action "Edit event" in row "1 February"
+    And I set the following fields to these values:
+      | registrationtimefinish[enabled] | 1 |
+      | registrationtimefinish[day]     | 24 |
+      | registrationtimefinish[month]   | 1 |
+      | registrationtimefinish[year]    | ## next year ## Y ## |
+    And I press "Save changes"
+    And I log out
+
+    When I log in as "staff1"
+    And I am on "Course 1" course homepage
+    And I follow "View all events"
+    And I click on "Go to event" "link" in the "1 February" "table_row"
+    Then I should see "Sign-up unavailable"
+    And I should not see "Reserve for another manager"
+    And I should not see "Manage reservations"
+    And I should not see "Allocate spaces for team"
+    And I should not see "Reserve spaces for team"
+    And I log out
+
+    And I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I follow "View all events"
+    And I click on the seminar event action "Edit event" in row "1 February"
+    And I set the following fields to these values:
+      | registrationtimestart[enabled]  | 0 |
+      | registrationtimefinish[year]    | ## last year ## Y ## |
+    And I press "Save changes"
+    And I log out
+
+    When I log in as "staff1"
+    And I am on "Course 1" course homepage
+    And I follow "View all events"
+    And I click on "Go to event" "link" in the "1 February" "table_row"
+    Then I should see "Sign-up unavailable"
+    And I should not see "Reserve for another manager"
+    And I should not see "Manage reservations"
+    And I should not see "Allocate spaces for team"
+    And I should not see "Reserve spaces for team"
+    And I log out
