@@ -28,7 +28,10 @@ use degeneration\App;
 use degeneration\Cache;
 use degeneration\items\competency;
 use degeneration\items\item;
+use Exception;
+use ReflectionClass;
 use totara_competency\entities\scale_value;
+use totara_competency_generator;
 
 /**
  * Class criterion
@@ -87,7 +90,7 @@ abstract class pathway extends item {
      */
     public function check_prerequisites() {
         if (!$this->competency) {
-            throw new \Exception('Competency is required to create a pathway');
+            throw new Exception('Competency is required to create a pathway');
         }
 
         return $this;
@@ -115,9 +118,9 @@ abstract class pathway extends item {
      *
      * @return string
      */
-     public function get_type(): string {
-         return (new \ReflectionClass($this))->getShortName();
-     }
+    public function get_type(): string {
+        return (new ReflectionClass($this))->getShortName();
+    }
 
     /**
      * Get create criterion method name
@@ -128,7 +131,7 @@ abstract class pathway extends item {
         $method = "create_{$this->get_type()}";
 
         if (!method_exists($this->generator(), $method)) {
-            throw new \Exception('Can not create a given criterion it might very well be that it\'s not supported - ' . $method);
+            throw new Exception('Can not create a given criterion it might very well be that it\'s not supported - ' . $method);
         }
 
         return $method;
@@ -137,7 +140,7 @@ abstract class pathway extends item {
     /**
      * Get competency generator
      *
-     * @return \totara_competency_generator
+     * @return totara_competency_generator
      */
     public function generator() {
         return App::generator()->get_plugin_generator('totara_competency');

@@ -117,7 +117,7 @@ class aggregation_helper {
             $instance = criteria_group::from_entity($pathway);
             if ($instance->is_active()) {
                 $instance->validate();
-                if ($instance->is_valid() != $pathway->isvalid) {
+                if ($instance->is_valid() != $pathway->valid) {
                     $instance->save();
                     $affected_competencies[] = $instance->get_competency()->id;
                 }
@@ -128,7 +128,7 @@ class aggregation_helper {
             $affected_competencies = array_unique($affected_competencies);
             $aggregation_table = new aggregation_users_table();
 
-            foreach($affected_competencies as $competency_id) {
+            foreach ($affected_competencies as $competency_id) {
                 $aggregation_table->queue_all_assigned_users_for_aggregation($competency_id);
             }
         }

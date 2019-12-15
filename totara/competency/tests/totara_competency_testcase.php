@@ -432,7 +432,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
         cohort_remove_member($audience->id, $users->all()[14]->id);
 
         // Re-evaluating
-        $task->expand_all();;
+        $task->expand_all();
 
         // Now let's archive a few assignments and re-evaluate :)
         $assignments->item('user')->filter(function ($assignment) use ($users) {
@@ -445,7 +445,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
         });
 
         // Re-evaluating
-        $task->expand_all();;
+        $task->expand_all();
 
         return [
             'assignments' => $assignments,

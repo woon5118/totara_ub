@@ -24,6 +24,7 @@
 
 namespace pathway_criteria_group;
 
+use coding_exception;
 use core\orm\collection;
 use core\orm\query\builder;
 use pathway_criteria_group\entities\criteria_group as criteria_group_entity;
@@ -139,7 +140,7 @@ class criteria_group extends pathway {
         global $DB;
 
         if (empty($this->get_scale_value()) || empty($this->get_scale_value()->id)) {
-            throw new \coding_exception('A criteria_group pathway requires a valid scale value');
+            throw new coding_exception('A criteria_group pathway requires a valid scale value');
         }
 
         // Not checking is_dirty here as it is checked in parent::save()
@@ -388,7 +389,7 @@ class criteria_group extends pathway {
      * Validate the pathway configuration
      * @return bool
      */
-    public function configuration_is_valid(): bool {
+    public function is_configuration_valid(): bool {
         if (count($this->get_criteria()) == 0) {
             return false;
         }
@@ -400,7 +401,6 @@ class criteria_group extends pathway {
             }
         }
 
-        // TODO: May need to check that the scale_value still exists
         return true;
     }
 

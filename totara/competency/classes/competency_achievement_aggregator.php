@@ -156,7 +156,6 @@ final class competency_achievement_aggregator {
 
                 $hook = new hook\competency_achievement_updated($new_comp_achievement);
                 $hook->execute();
-
             } else {
                 // No change.
                 $previous_comp_achievement->last_aggregated = $aggregation_time;

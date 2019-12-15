@@ -78,6 +78,7 @@ class totara_criteria_criterion_testcase extends advanced_testcase {
         // Add items :-
         $mock_criterion->add_items([1, 2, 3]);
         $this->assertEqualsCanonicalizing([1, 2, 3], $mock_criterion->get_item_ids());
+
         $mock_criterion->add_items([4, 5]);
         $this->assertEqualsCanonicalizing([1, 2, 3, 4, 5], $mock_criterion->get_item_ids());
         $mock_criterion->add_items([2, 6]);
@@ -219,6 +220,8 @@ class totara_criteria_criterion_testcase extends advanced_testcase {
 
         // Test fetch - Not the same object but same information
         $fetched_criterion = $mock_criterion->fetch($row->id);
+        // Ignoring validity
+        $fetched_criterion->validate();
         $this->assertNotSame($mock_criterion, $fetched_criterion);
         $this->assertEquals($mock_criterion, $fetched_criterion);
 

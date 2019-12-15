@@ -39,7 +39,7 @@
         <FIELD NAME="path_instance_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Id of instance containing type specific detail"/>
         <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Pathway status"/>
         <FIELD NAME="pathway_modified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Time when any configuration belonging to this pathway were last updated"/>
-        <FIELD NAME="isvalid" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Is the criteria on this pathway valid"/>
+        <FIELD NAME="valid" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Is the criteria on this pathway valid"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

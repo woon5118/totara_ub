@@ -68,7 +68,7 @@ class criteria_group extends pathway {
      * @return array
      */
     public function get_criteria(): array {
-        return array_map(function(criterion $criterion) {
+        return array_map(function (criterion $criterion) {
             return $criterion->get_data();
         }, $this->criteria);
     }

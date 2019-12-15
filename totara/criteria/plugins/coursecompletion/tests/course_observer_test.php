@@ -221,7 +221,7 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
 
         $nvalid = criterion_entity::repository()
             ->where('id', $criteria_ids)
-            ->where('isvalid', 1)
+            ->where('valid', 1)
             ->count();
         $this->assertEquals(3, $nvalid);
 
@@ -248,7 +248,7 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
         // Verify that the status didn't changed on disk
         $nvalid = criterion_entity::repository()
             ->where('id', $criteria_ids)
-            ->where('isvalid', 1)
+            ->where('valid', 1)
             ->count();
         $this->assertEquals(3, $nvalid);
     }
@@ -266,7 +266,7 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
 
         $nvalid = criterion_entity::repository()
             ->where('id', $criteria_ids)
-            ->where('isvalid', 1)
+            ->where('valid', 1)
             ->count();
         $this->assertEquals(3, $nvalid);
 
@@ -293,13 +293,13 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
         // Verify that the status changed on disk
         $nvalid = criterion_entity::repository()
             ->where('id', $criteria_ids)
-            ->where('isvalid', 1)
+            ->where('valid', 1)
             ->count();
         $this->assertEquals(1, $nvalid);
 
         $ninvalid = criterion_entity::repository()
             ->where('id', $criteria_ids)
-            ->where('isvalid', 0)
+            ->where('valid', 0)
             ->count();
         $this->assertEquals(2, $ninvalid);
     }
@@ -313,7 +313,7 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
         $data = $this->setup_data();
         $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
-        // Delete the course first to ensure the criteria's isvalid attribute is set correctly
+        // Delete the course first to ensure the criteria's valid attribute is set correctly
         $deleted_course_id = $data->courses[3]->id;
         $deleted_course = new course_entity($deleted_course_id);
         $deleted_course->delete();
@@ -327,13 +327,13 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
 
         $nvalid = criterion_entity::repository()
             ->where('id', $criteria_ids)
-            ->where('isvalid', 1)
+            ->where('valid', 1)
             ->count();
         $this->assertEquals(2, $nvalid);
 
         $ninvalid = criterion_entity::repository()
             ->where('id', $criteria_ids)
-            ->where('isvalid', 0)
+            ->where('valid', 0)
             ->count();
         $this->assertEquals(1, $ninvalid);
 
@@ -351,7 +351,7 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
                 'operation' => backup::OPERATION_RESTORE,
                 'samesite' => true,
                 'originalcourseid' => $deleted_course_id,
-             ]
+            ]
         ]);
 
         course_observer::course_restored($cc_event);
@@ -361,13 +361,13 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
         // Verify that the status changed on disk
         $nvalid = criterion_entity::repository()
             ->where('id', $criteria_ids)
-            ->where('isvalid', 1)
+            ->where('valid', 1)
             ->count();
         $this->assertEquals(3, $nvalid);
 
         $ninvalid = criterion_entity::repository()
             ->where('id', $criteria_ids)
-            ->where('isvalid', 0)
+            ->where('valid', 0)
             ->count();
         $this->assertEquals(0, $ninvalid);
     }

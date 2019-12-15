@@ -33,7 +33,6 @@ use totara_core\advanced_feature;
 use totara_criteria\entities\criteria_metadata;
 use totara_criteria\entities\criterion;
 use totara_criteria\entities\criterion as criterion_entity;
-use totara_criteria\entities\criteria_item as item_entity;
 use totara_competency\linked_courses;
 
 class items_processor {
@@ -98,6 +97,11 @@ class items_processor {
             $linkedcourses->save();
         }
 
+        // Not triggering validity_changed here as it will be triggered through saving each criterion.
+        // Although a bulk trigger would be better for performance, we can't avoid calling save on the criterion
+        // as the items also needs to be updated
+
+        // TODO: Reduce dependancy between totara_criteria and totara_competency here
         if (advanced_feature::is_enabled('competency_assignment')) {
             // Queue all users assigned to the competency
             (new aggregation_users_table())->queue_all_assigned_users_for_aggregation($competency_id);

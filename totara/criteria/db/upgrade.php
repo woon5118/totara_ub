@@ -107,10 +107,10 @@ function xmldb_totara_criteria_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019102902, 'totara', 'criteria');
     }
 
-    if ($oldversion < 2019121000) {
+    if ($oldversion < 2019121300) {
         // Define field status to be added to totara_criteria
         $table = new xmldb_table('totara_criteria');
-        $field = new xmldb_field('isvalid', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1');
+        $field = new xmldb_field('valid', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1');
 
         // Conditionally add the field
         if (!$dbman->field_exists($table, $field)) {
@@ -118,7 +118,7 @@ function xmldb_totara_criteria_upgrade($oldversion) {
         }
 
         // Competency savepoint reached.
-        upgrade_plugin_savepoint(true, 2019121000, 'totara', 'criteria');
+        upgrade_plugin_savepoint(true, 2019121300, 'totara', 'criteria');
     }
 
     return true;

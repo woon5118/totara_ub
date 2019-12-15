@@ -12,7 +12,7 @@
         <FIELD NAME="aggregation_params" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Additional parameters required by the aggregation method"/>
         <FIELD NAME="criterion_modified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Time when criterion configuration was last changed"/>
         <FIELD NAME="last_evaluated" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time when user completion of this criterion was last evaluated"/>
-        <FIELD NAME="isvalid" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Is the criterion in a valid state"/>
+        <FIELD NAME="valid" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Is the criterion in a valid state"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

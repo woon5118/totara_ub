@@ -260,7 +260,6 @@ function xmldb_totara_competency_upgrade($oldversion) {
     }
 
     if ($oldversion < 2019111500) {
-
         // Define index ix_sortorder (not unique) to be added to totara_competency_pathway.
         $table = new xmldb_table('totara_competency_pathway');
         $index = new xmldb_index('ix_sortorder', XMLDB_INDEX_NOTUNIQUE, array('sortorder'));
@@ -382,10 +381,10 @@ function xmldb_totara_competency_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019111500, 'totara', 'competency');
     }
 
-    if ($oldversion < 2019121000) {
+    if ($oldversion < 2019121300) {
         // Define field status to be added to totara_competency_pathway
         $table = new xmldb_table('totara_competency_pathway');
-        $field = new xmldb_field('isvalid', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1');
+        $field = new xmldb_field('valid', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1');
 
         // Conditionally add the new field
         if (!$dbman->field_exists($table, $field)) {
@@ -393,7 +392,7 @@ function xmldb_totara_competency_upgrade($oldversion) {
         }
 
         // Competency savepoint reached.
-        upgrade_plugin_savepoint(true, 2019121000, 'totara', 'competency');
+        upgrade_plugin_savepoint(true, 2019121300, 'totara', 'competency');
     }
 
 

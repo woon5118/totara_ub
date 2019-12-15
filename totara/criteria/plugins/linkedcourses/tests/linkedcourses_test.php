@@ -330,7 +330,7 @@ class criteria_linkedcourses_testcase extends advanced_testcase {
         ]);
         $this->assertTrue($criterion->is_valid());
         $on_disk = new criterion_entity($criterion->get_id());
-        $this->assertEquals(1, $on_disk->isvalid);
+        $this->assertEquals(1, $on_disk->valid);
 
         // Some invalid
         linked_courses::set_linked_courses($competency->id, [
@@ -338,7 +338,7 @@ class criteria_linkedcourses_testcase extends advanced_testcase {
             ['id' => $courses[3]->id, 'linktype' => linked_courses::LINKTYPE_OPTIONAL],
         ]);
         $on_disk = new criterion_entity($criterion->get_id());
-        $this->assertEquals(0, $on_disk->isvalid);
+        $this->assertEquals(0, $on_disk->valid);
         $criterion = linkedcourses::fetch($criterion->get_id());
         $this->assertFalse($criterion->is_valid());
     }

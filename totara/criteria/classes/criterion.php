@@ -31,6 +31,7 @@ use stdClass;
 use totara_criteria\entities\criterion as criterion_entity;
 use totara_criteria\entities\criteria_item as criteria_item_entity;
 use totara_criteria\entities\criteria_metadata as criteria_metadata_entity;
+use totara_criteria\hook\criteria_validity_changed;
 
 /**
  * Base class for a single criterion.
@@ -65,11 +66,11 @@ abstract class criterion {
     /** @var int $last_evaluated */
     private $last_evaluated;
 
-    /** @var bool $isvalid */
-    private $isvalid = false;
+    /** @var bool $valid */
+    private $valid = false;
 
-    /** @var bool $saved_isvalid */
-    private $saved_isvalid = false;
+    /** @var bool $saved_valid */
+    private $saved_valid = false;
 
     /** @var bool $validated - Book keeping to prevent multiple checking of validity */
     private $validated = false;
@@ -110,8 +111,8 @@ abstract class criterion {
         $instance->set_aggregation_method($criterion->aggregation_method ?? static::AGGREGATE_ALL);
         $instance->set_aggregation_params($criterion->aggregation_params ?? []);
         $instance->set_last_evaluated($criterion->last_evaluated);
-        $instance->set_isvalid($criterion->isvalid);
-        $instance->set_saved_isvalid($criterion->isvalid);
+        $instance->set_valid($criterion->valid);
+        $instance->set_saved_valid($criterion->valid);
 
         $instance->fetch_items($criterion);
         $instance->fetch_metadata($criterion);
@@ -181,6 +182,7 @@ abstract class criterion {
         }
 
         $this->aggregation_method = $aggregation_method;
+        $this->validated = false;
 
         return $this;
     }
@@ -230,6 +232,7 @@ abstract class criterion {
             $this->aggregation_params = $params;
         }
 
+        $this->validated = false;
         return $this;
     }
 
@@ -410,24 +413,24 @@ abstract class criterion {
      * @return bool
      */
     public function is_valid(): bool {
-        return $this->isvalid;
+        return $this->valid;
     }
 
     /**
-     * @param bool $isvalid
+     * @param bool $valid
      * @return criterion
      */
-    public function set_isvalid(bool $isvalid): criterion {
-        $this->isvalid = $isvalid;
+    public function set_valid(bool $valid): criterion {
+        $this->valid = $valid;
         return $this;
     }
 
     /**
-     * @param bool $isvalid
+     * @param bool $valid
      * @return criterion
      */
-    public function set_saved_isvalid(bool $isvalid): criterion {
-        $this->saved_isvalid = $isvalid;
+    public function set_saved_valid(bool $valid): criterion {
+        $this->saved_valid = $valid;
         return $this;
     }
 
@@ -445,8 +448,12 @@ abstract class criterion {
             return true;
         }
 
-        $nvalid = 0;
         $nrequired = $this->get_aggregation_num_required();
+        if ($nitems < $nrequired) {
+            return false;
+        }
+
+        $nvalid = 0;
 
         foreach ($this->get_item_ids() as $item_id) {
             if ($validator_class::validate_item($item_id)) {
@@ -454,18 +461,23 @@ abstract class criterion {
             }
         }
 
-        return $nitems == $nvalid && $nvalid >= $nrequired;
+        return $nitems == $nvalid;
     }
 
     /**
-     * Validate the criterion and set isvalid
+     * Validate and set the criterion validity
      */
     public function validate() {
         if ($this->validated) {
             return;
         }
 
-        $this->isvalid = $this->items_are_valid();
+        $exists = (bool) $this->get_id();
+        if (!$exists && empty($this->item_ids)) {
+            $this->update_items();
+        }
+
+        $this->valid = $this->items_are_valid();
         $this->validated = true;
     }
 
@@ -568,7 +580,7 @@ abstract class criterion {
             return true;
         }
 
-        if ($this->isvalid != $this->saved_isvalid) {
+        if ($this->valid != $this->saved_valid) {
             return true;
         }
 
@@ -618,10 +630,6 @@ abstract class criterion {
         }
 
         $exists = (bool) $this->get_id();
-        if (!$exists && empty($this->item_ids)) {
-            $this->update_items();
-        }
-
         $this->validate();
 
         if (!$this->is_dirty()) {
@@ -633,14 +641,20 @@ abstract class criterion {
         $criterion->aggregation_method = $this->get_aggregation_method();
         $criterion->aggregation_params = json_encode($this->get_aggregation_params());
         $criterion->criterion_modified = time();
-        $criterion->isvalid = $this->isvalid;
+        $criterion->valid = $this->valid;
         $criterion->save();
 
         $this->set_id($criterion->id);
-        $this->set_saved_isvalid($this->isvalid);
 
         $this->save_items();
         $this->save_metadata();
+
+        // Hook must be triggered after the items are saved
+        if ($exists && $this->valid != $this->saved_valid) {
+            $hook = new criteria_validity_changed([$this->id]);
+            $hook->execute();
+        }
+        $this->set_saved_valid($this->valid);
 
         return $this;
     }
@@ -746,6 +760,26 @@ abstract class criterion {
         $criterion = new criterion_entity($this->get_id());
         $criterion->last_evaluated = $this->get_last_evaluated();
         $criterion->save();
+
+        return $this;
+    }
+
+    /**
+     * Save the valid value of the criterion
+     *
+     * @return $this
+     */
+    public function save_valid(): criterion {
+        // Not doing anything if not saved previously - or last_evaluated not yet set
+        if (empty($this->get_id())) {
+            return $this;
+        }
+
+        $criterion = new criterion_entity($this->get_id());
+        $criterion->valid = $this->valid;
+        $criterion->save();
+
+        $this->saved_valid = $this->valid;
 
         return $this;
     }

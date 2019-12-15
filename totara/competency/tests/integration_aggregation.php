@@ -165,6 +165,7 @@ class totara_competency_integration_aggregation extends advanced_testcase {
             $record = [
                 'shortname' => "Course $i",
                 'fullname' => "Course $i",
+                'enablecompletion' => true,
             ];
 
             $data->courses[$i] = $data->generator->create_course($record);

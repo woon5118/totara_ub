@@ -136,10 +136,14 @@ class course {
         $affected_criteria = [];
         foreach ($criteria as $criterion_entity) {
             $criterion = coursecompletion::fetch_from_entity($criterion_entity);
-            // Not checking anything here - this criterion refers to a deleted course -
-            // Calling save to ensure the correct state is persisted to the database
-            $criterion->save();
-            $affected_criteria[] = $criterion_entity->id;
+            // Not checking anything here - this criterion refers to a deleted course
+            // If already marked as invalid - nothing to do
+            if ($criterion_entity->valid) {
+                $criterion->set_valid(false);
+                $criterion->save_valid();
+
+                $affected_criteria[] = $criterion_entity->id;
+            }
         }
 
         if (!empty($affected_criteria)) {
@@ -166,6 +170,10 @@ class course {
 
         $affected_criteria = [];
         foreach ($criteria as $criterion_entity) {
+            // If only course content is restored, the original and restored course ids are the same
+            // In this case we don't need to update the items
+            // However, if a deleted course is restored, the course id changes.
+            // In this case we need to update all items to refer the restored id
             if ($original_course_id != $restored_course_id) {
                 foreach ($criterion_entity->items as $item) {
                     if ($item->item_type == 'course' && $item->item_id == $original_course_id) {
@@ -176,9 +184,10 @@ class course {
             }
 
             $criterion = coursecompletion::fetch_from_entity($criterion_entity);
-            // Call save to force re-validation
-            $criterion->save();
-            if ($criterion->is_valid() != $criterion_entity->isvalid) {
+            // Validate and save validity
+            $criterion->validate();
+            if ($criterion->is_valid() != $criterion_entity->valid) {
+                $criterion->save_valid();
                 $affected_criteria[] = $criterion_entity->id;
             }
         }

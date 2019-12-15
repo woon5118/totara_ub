@@ -25,6 +25,9 @@
 namespace totara_competency;
 
 
+use coding_exception;
+use ReflectionClass;
+use stdClass;
 use totara_competency\entities\competency;
 use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\entities\pathway_achievement;
@@ -60,14 +63,14 @@ abstract class pathway {
     /** @var int Specific instance id */
     private $path_instance_id;
 
-    /** @@var int $status  */
+    /** @var int $status  */
     private $status = self::PATHWAY_STATUS_ACTIVE;
 
-    /** @@var bool $isvalid  */
-    protected $isvalid = false;
+    /** @var bool $valid  */
+    protected $valid = false;
 
-    /** @var bool $saved_isvalid */
-    private $saved_isvalid = false;
+    /** @var bool $saved_valid */
+    private $saved_valid = false;
 
     /** @var bool $validated - Bookkeeping to prevent unnecessary validation */
     protected $validated = false;
@@ -77,7 +80,7 @@ abstract class pathway {
      ********************************************************************/
 
     final public function __construct() {
-        $reflect = new \ReflectionClass($this);
+        $reflect = new ReflectionClass($this);
         $this->path_type = $reflect->getShortName();
     }
 
@@ -105,11 +108,11 @@ abstract class pathway {
         /** @var pathway $pathway */
         $pathway = new $classname();
         if ($pathway->path_type !== $entity->path_type) {
-            throw new \coding_exception('Path type mismatch');
+            throw new coding_exception('Path type mismatch');
         }
 
         if (!$entity->competency) {
-            throw new \coding_exception('Competency for given pathway not found');
+            throw new coding_exception('Competency for given pathway not found');
         }
 
         $pathway->set_id($entity->id);
@@ -117,8 +120,8 @@ abstract class pathway {
         $pathway->set_sortorder($entity->sortorder);
         $pathway->set_path_instance_id($entity->path_instance_id);
         $pathway->set_status($entity->status);
-        $pathway->set_isvalid($entity->isvalid);
-        $pathway->set_saved_isvalid($entity->isvalid);
+        $pathway->set_valid($entity->valid);
+        $pathway->set_saved_valid($entity->valid);
 
         $pathway->fetch_configuration();
 
@@ -126,14 +129,14 @@ abstract class pathway {
     }
 
     /**
-     * @param \stdClass|pathway_entity $pathway
+     * @param stdClass|pathway_entity $pathway
      * @return string
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     protected static function get_pathway_class($pathway): string {
         $classname = "\\pathway_{$pathway->path_type}\\{$pathway->path_type}";
         if (!class_exists($classname) || !is_subclass_of($classname, pathway::class)) {
-            throw new \coding_exception("Pathway type '{$pathway->path_type}' does not exist or is not enabled.");
+            throw new coding_exception("Pathway type '{$pathway->path_type}' does not exist or is not enabled.");
         }
         return $classname;
     }
@@ -181,14 +184,14 @@ abstract class pathway {
         global $DB;
 
         if (empty($this->get_competency())) {
-            throw new \coding_exception('Unknown Competency');
+            throw new coding_exception('Unknown Competency');
         }
 
         $this->ensure_sortorder_exists();
         $this->validate();
 
         // Check whether anything changed
-        if (empty($this->get_id()) || $this->isvalid != $this->saved_isvalid || $this->configuration_is_dirty()) {
+        if (empty($this->get_id()) || $this->valid != $this->saved_valid || $this->configuration_is_dirty()) {
             if ($this->is_active()) {
                 $this->save_configuration();
             }
@@ -197,7 +200,7 @@ abstract class pathway {
             // Only save if certain values change
             if ($old_record->sortorder == $this->get_sortorder()
                 && $old_record->status == $this->get_status()
-                && $old_record->isvalid == $this->is_valid()
+                && $old_record->valid == $this->is_valid()
                 && $old_record->path_instance_id == $this->get_path_instance_id()
             ) {
                 return $this;
@@ -205,13 +208,13 @@ abstract class pathway {
         }
 
         // If we get here, we have either a new pathway or something changed
-        $record = new \stdClass();
+        $record = new stdClass();
         $record->comp_id = $this->competency->id;
         $record->sortorder = $this->get_sortorder();
         $record->path_type = $this->get_path_type();
         $record->path_instance_id = $this->get_path_instance_id();
         $record->status = $this->status;
-        $record->isvalid = $this->isvalid;
+        $record->valid = $this->valid;
         $record->pathway_modified = time();
 
         if ($this->get_id()) {
@@ -221,7 +224,7 @@ abstract class pathway {
             $this->id = $DB->insert_record('totara_competency_pathway', $record);
         }
 
-        $this->saved_isvalid = $this->isvalid;
+        $this->saved_valid = $this->valid;
 
         return $this;
     }
@@ -444,7 +447,7 @@ abstract class pathway {
         if ($status !== static::PATHWAY_STATUS_ACTIVE
             && $status !== static::PATHWAY_STATUS_ARCHIVED
         ) {
-            throw new \coding_exception('Unknown pathway status');
+            throw new coding_exception('Unknown pathway status');
         }
         $this->status = $status;
 
@@ -455,24 +458,24 @@ abstract class pathway {
      * @return bool
      */
     public function is_valid(): bool {
-        return $this->isvalid;
+        return $this->valid;
     }
 
     /**
-     * @param bool $isvalid
+     * @param bool $valid
      * @return pathway
      */
-    public function set_isvalid(bool $isvalid): pathway {
-        $this->isvalid = $isvalid;
+    public function set_valid(bool $valid): pathway {
+        $this->valid = $valid;
         return $this;
     }
 
     /**
-     * @param bool $isvalid
+     * @param bool $valid
      * @return pathway
      */
-    public function set_saved_isvalid(bool $isvalid): pathway {
-        $this->saved_isvalid = $isvalid;
+    public function set_saved_valid(bool $valid): pathway {
+        $this->saved_valid = $valid;
         return $this;
     }
 
@@ -536,21 +539,21 @@ abstract class pathway {
     public function get_achievement_detail(): base_achievement_detail {
         $detail_class = pathway_factory::get_namespace($this->get_path_type()) . '\\achievement_detail';
         if (!is_subclass_of($detail_class, base_achievement_detail::class)) {
-            throw new \coding_exception('Not detail class found', "No achievement_detail class found for {$this->get_path_type()}");
+            throw new coding_exception('Not detail class found', "No achievement_detail class found for {$this->get_path_type()}");
         }
         return new $detail_class();
     }
 
     /**
-     * Validate the pathway configuration and set isvalid accordingly
+     * Validate and set the pathway configuration validit
      * @return $this
      */
-    public final function validate(): pathway {
+    final public function validate(): pathway {
         if ($this->validated) {
             return $this;
         }
 
-        $this->isvalid = $this->configuration_is_valid();
+        $this->valid = $this->is_configuration_valid();
         $this->validated = true;
 
         return $this;
@@ -561,7 +564,7 @@ abstract class pathway {
      * Should be overridden by plugins
      * @return bool
      */
-    protected function configuration_is_valid(): bool {
+    protected function is_configuration_valid(): bool {
         return true;
     }
 
@@ -622,7 +625,7 @@ abstract class pathway {
      * @return string
      */
     public function get_title(): string {
-        $classname = (new \ReflectionClass($this))->getShortName();
+        $classname = (new ReflectionClass($this))->getShortName();
         return ucfirst(get_string('pluginname', "pathway_{$classname}"));
     }
 
@@ -708,7 +711,7 @@ abstract class pathway {
      * Retrieve the pathway configuration
      *
      * @param int|null $id Instance id
-     * @return \stdClass|null
+     * @return stdClass|null
      */
     public static function dump_pathway_configuration(?int $id = null) {
         return null;

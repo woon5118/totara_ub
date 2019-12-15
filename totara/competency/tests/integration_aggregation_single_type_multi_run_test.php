@@ -62,7 +62,10 @@ class totara_competency_integration_aggregation_single_type_multi_run_testcase e
         $data->pathways = [];
         $data->pathways['manager'] = $data->competency_generator->create_manual($data->competencies[1], [manual::ROLE_MANAGER]);
         $data->pathways['self'] = $data->competency_generator->create_manual($data->competencies[1], [manual::ROLE_SELF]);
-        $data->pathways['manager_self'] = $data->competency_generator->create_manual($data->competencies[1], [manual::ROLE_MANAGER, manual::ROLE_SELF]);
+        $data->pathways['manager_self'] = $data->competency_generator->create_manual(
+            $data->competencies[1],
+            [manual::ROLE_MANAGER, manual::ROLE_SELF]
+        );
 
         /** @var rating[] $ratings */
         $data->ratings = [];
@@ -98,23 +101,28 @@ class totara_competency_integration_aggregation_single_type_multi_run_testcase e
         /** @var totara_plan_generator $plan_generator */
         $data->learning_plans['1-1'] = [
             'dplan' => $data->competency_generator->create_learning_plan_with_competencies($data->users[1]->id,
-                [$data->competencies[1]->id => null]),
+                [$data->competencies[1]->id => null]
+            ),
         ];
         $data->learning_plans['1-2'] = [
             'dplan' => $data->competency_generator->create_learning_plan_with_competencies($data->users[1]->id,
-                [$data->competencies[1]->id => null, $data->competencies[2]->id => null]),
-            ];
+                [$data->competencies[1]->id => null, $data->competencies[2]->id => null]
+            ),
+        ];
         $data->learning_plans['2-1'] = [
             'dplan' => $data->competency_generator->create_learning_plan_with_competencies($data->users[2]->id,
-                [$data->competencies[1]->id => null]),
+                [$data->competencies[1]->id => null]
+            ),
         ];
         $data->learning_plans['3-1'] = [
             'dplan' => $data->competency_generator->create_learning_plan_with_competencies($data->users[3]->id,
-                [$data->competencies[1]->id => null]),
+                [$data->competencies[1]->id => null]
+            ),
         ];
         $data->learning_plans['4-1'] = [
             'dplan' => $data->competency_generator->create_learning_plan_with_competencies($data->users[4]->id,
-                [$data->competencies[2]->id => null]),
+                [$data->competencies[2]->id => null]
+            ),
         ];
 
         foreach ($data->learning_plans as $key => $el) {
@@ -138,7 +146,7 @@ class totara_competency_integration_aggregation_single_type_multi_run_testcase e
     /**
      * Setup data and return created criteria and pathways
      *
-     * @param \stdClass &$data
+     * @param stdClass &$data
      */
     private function setup_criteria_groups_multiple_criteria_multiple_runs_data(&$data) {
         /** @var [criterion] $criteria */
@@ -178,17 +186,23 @@ class totara_competency_integration_aggregation_single_type_multi_run_testcase e
         $criteria['3-5-onactivate'] = $data->criteria_generator->create_onactivate(['competency' => $data->competencies[3]->id]);
 
         $pathways['3-1'] = $data->competency_generator->create_criteria_group($data->competencies[3],
-            [$criteria['3-1-linkedcourses']], $data->scalevalues[1]->id);
+            [$criteria['3-1-linkedcourses']], $data->scalevalues[1]->id
+        );
         $pathways['3-2-1'] = $data->competency_generator->create_criteria_group($data->competencies[3],
-            [$criteria['3-2-1-coursecompletion']], $data->scalevalues[2]->id);
+            [$criteria['3-2-1-coursecompletion']], $data->scalevalues[2]->id
+        );
         $pathways['3-2-2'] = $data->competency_generator->create_criteria_group($data->competencies[3],
-            [$criteria['3-2-2-coursecompletion']], $data->scalevalues[2]->id);
+            [$criteria['3-2-2-coursecompletion']], $data->scalevalues[2]->id
+        );
         $pathways['3-3'] = $data->competency_generator->create_criteria_group($data->competencies[3],
-            [$criteria['3-3-coursecompletion-any']], $data->scalevalues[3]->id);
+            [$criteria['3-3-coursecompletion-any']], $data->scalevalues[3]->id
+        );
         $pathways['3-4'] = $data->competency_generator->create_criteria_group($data->competencies[3],
-            [$criteria['3-4-childcompetency']], $data->scalevalues[4]->id);
+            [$criteria['3-4-childcompetency']], $data->scalevalues[4]->id
+        );
         $pathways['3-5'] = $data->competency_generator->create_criteria_group($data->competencies[3],
-            [$criteria['3-5-onactivate']], $data->scalevalues[5]->id);
+            [$criteria['3-5-onactivate']], $data->scalevalues[5]->id
+        );
 
         // Link courses 1-5 to competency3
         linked_courses::set_linked_courses(
@@ -229,11 +243,14 @@ class totara_competency_integration_aggregation_single_type_multi_run_testcase e
         ]);
 
         $pathways['4-2'] = $data->competency_generator->create_criteria_group($data->competencies[4],
-            [$criteria['4-2-linkedcourses']], $data->scalevalues[2]->id);
+            [$criteria['4-2-linkedcourses']], $data->scalevalues[2]->id
+        );
         $pathways['4-4'] = $data->competency_generator->create_criteria_group($data->competencies[4],
-            [$criteria['4-4-coursecompletion-any-2']], $data->scalevalues[4]->id);
+            [$criteria['4-4-coursecompletion-any-2']], $data->scalevalues[4]->id
+        );
         $pathways['4-5'] = $data->competency_generator->create_criteria_group($data->competencies[4],
-            [$criteria['4-5-coursecompletion-any-1']], $data->scalevalues[5]->id);
+            [$criteria['4-5-coursecompletion-any-1']], $data->scalevalues[5]->id
+        );
 
         // Link courses 4, 6 and 8 to competency4
         linked_courses::set_linked_courses(
@@ -256,10 +273,13 @@ class totara_competency_integration_aggregation_single_type_multi_run_testcase e
         $criteria['5-5-onactivate'] = $data->criteria_generator->create_onactivate(['competency' => $data->competencies[5]->id]);
 
         $pathways['5-1'] = $data->competency_generator->create_criteria_group($data->competencies[5],
-            [$criteria['5-1-coursecompletion-all']], $data->scalevalues[1]->id);
+            [$criteria['5-1-coursecompletion-all']],
+            $data->scalevalues[1]->id
+        );
         $pathways['5-5'] = $data->competency_generator->create_criteria_group($data->competencies[5],
-            [$criteria['5-5-onactivate']], $data->scalevalues[5]->id);
-
+            [$criteria['5-5-onactivate']],
+            $data->scalevalues[5]->id
+        );
 
         // Assign users 1 and 2 to competencies 3, 4 and 5
         $to_assign = [
@@ -279,7 +299,7 @@ class totara_competency_integration_aggregation_single_type_multi_run_testcase e
     /**
      * Execute first criteria_groups_multiple_criteria_multiple run
      *
-     * @param \stdClass $data
+     * @param stdClass $data
      * @param string $task_to_execute
      */
     private function criteria_groups_multiple_criteria_multiple_run_1($data, string $task_to_execute) {
@@ -528,7 +548,7 @@ class totara_competency_integration_aggregation_single_type_multi_run_testcase e
     /**
      * Execute second criteria_groups_multiple_criteria_multiple run
      *
-     * @param \stdClass $data
+     * @param stdClass $data
      * @param string $task_to_execute
      */
     private function criteria_groups_multiple_criteria_multiple_run_2($data, string $task_to_execute) {
@@ -828,7 +848,7 @@ class totara_competency_integration_aggregation_single_type_multi_run_testcase e
     /**
      * Execute third criteria_groups_multiple_criteria_multiple run
      *
-     * @param \stdClass $data
+     * @param stdClass $data
      * @param string $task_to_execute
      */
     private function criteria_groups_multiple_criteria_multiple_run_3($data, string $task_to_execute) {

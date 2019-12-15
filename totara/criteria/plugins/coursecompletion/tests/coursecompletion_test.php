@@ -385,6 +385,65 @@ class criteria_coursecompletion_testcase extends advanced_testcase {
     }
 
     /**
+     * Test validate
+     */
+    public function test_validate() {
+        global $CFG;
+
+        /** @var totara_criteria_generator $criteria_generator */
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        // Completion only enabled for every second course
+        $courses = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $courses[$i] = $this->getDataGenerator()->create_course(['enablecompletion' => $i % 2]);
+        }
+
+        $CFG->enablecompletion = true;
+
+        $criterion = new coursecompletion();
+        // Initial value
+        $this->assertFalse($criterion->is_valid());
+
+        // No items yet
+        $criterion->validate();
+        $this->assertFalse($criterion->is_valid());
+
+        // Add valid course
+        $criterion->set_item_ids([$courses[1]->id]);
+        // Not yet validated
+        $this->assertFalse($criterion->is_valid());
+        // Validated
+        $criterion->validate();
+        $this->assertTrue($criterion->is_valid());
+
+        // Add invalid course
+        $criterion->add_items([$courses[2]->id]);
+        // Not yet validated
+        $this->assertTrue($criterion->is_valid());
+        // Validated
+        $criterion->validate();
+        $this->assertFalse($criterion->is_valid());
+
+        // All valid courses
+        $criterion->set_item_ids([$courses[1]->id, $courses[3]->id]);
+        // Not yet validated
+        $this->assertFalse($criterion->is_valid());
+        // Validated
+        $criterion->validate();
+        $this->assertTrue($criterion->is_valid());
+
+        // Changed aggregation
+        $criterion->set_aggregation_method(criterion::AGGREGATE_ANY_N);
+        $criterion->set_aggregation_params(['req_items' => 3]);
+        // Not yet validated
+        $this->assertTrue($criterion->is_valid());
+        // Validated
+        $criterion->validate();
+        $this->assertFalse($criterion->is_valid());
+    }
+
+    /**
      * Test save with item validation
      */
     public function test_save_with_item_validation() {
@@ -408,7 +467,7 @@ class criteria_coursecompletion_testcase extends advanced_testcase {
         ]);
         $this->assertTrue($criterion->is_valid());
         $on_disk = new criterion_entity($criterion->get_id());
-        $this->assertEquals(1, $on_disk->isvalid);
+        $this->assertEquals(1, $on_disk->valid);
 
         // Coursecompletion with invalid courses
         $criterion = $criteria_generator->create_coursecompletion([
@@ -417,7 +476,7 @@ class criteria_coursecompletion_testcase extends advanced_testcase {
         ]);
         $this->assertFalse($criterion->is_valid());
         $on_disk = new criterion_entity($criterion->get_id());
-        $this->assertEquals(0, $on_disk->isvalid);
+        $this->assertEquals(0, $on_disk->valid);
 
         // Coursecompletion with valid non-existent course
         $criterion = $criteria_generator->create_coursecompletion([
@@ -426,7 +485,7 @@ class criteria_coursecompletion_testcase extends advanced_testcase {
         ]);
         $this->assertFalse($criterion->is_valid());
         $on_disk = new criterion_entity($criterion->get_id());
-        $this->assertEquals(0, $on_disk->isvalid);
+        $this->assertEquals(0, $on_disk->valid);
     }
 
 

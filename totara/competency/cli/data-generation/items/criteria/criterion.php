@@ -27,6 +27,9 @@ namespace degeneration\items\criteria;
 use degeneration\App;
 use degeneration\Cache;
 use degeneration\items\item;
+use Exception;
+use ReflectionClass;
+use totara_criteria_generator;
 
 /**
  * Class criterion
@@ -68,9 +71,9 @@ abstract class criterion extends item {
      *
      * @return string
      */
-     public function get_type(): string {
-         return (new \ReflectionClass($this))->getShortName();
-     }
+    public function get_type(): string {
+        return (new ReflectionClass($this))->getShortName();
+    }
 
     /**
      * Get create criterion method name
@@ -81,7 +84,7 @@ abstract class criterion extends item {
         $method = "create_{$this->get_type()}";
 
         if (!method_exists($this->generator(), $method)) {
-            throw new \Exception('Can not create a given criterion it might very well be that it\'s not supported - ' . $method);
+            throw new Exception('Can not create a given criterion it might very well be that it\'s not supported - ' . $method);
         }
 
         return $method;
@@ -90,7 +93,7 @@ abstract class criterion extends item {
     /**
      * Get competency generator
      *
-     * @return \totara_criteria_generator
+     * @return totara_criteria_generator
      */
     public function generator() {
         return App::generator()->get_plugin_generator('totara_criteria');

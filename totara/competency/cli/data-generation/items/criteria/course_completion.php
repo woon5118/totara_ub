@@ -24,6 +24,7 @@
 namespace degeneration\items\criteria;
 
 use degeneration\items\course;
+use Exception;
 use totara_criteria\criterion as criterion_model;
 
 class course_completion extends criterion {
@@ -92,7 +93,7 @@ class course_completion extends criterion {
      */
     public function get_properties(): array {
 
-        $course_ids = array_map(function(course $course) {
+        $course_ids = array_map(function (course $course) {
             return $course->get_data('id');
         }, $this->courses);
 
@@ -112,7 +113,7 @@ class course_completion extends criterion {
      */
     public function check_prerequisites() {
         if (empty($this->courses)) {
-            throw new \Exception('You must specify at least one course to create a course completion criterion');
+            throw new Exception('You must specify at least one course to create a course completion criterion');
         }
 
         return parent::check_prerequisites();
