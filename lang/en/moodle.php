@@ -389,9 +389,9 @@ $string['coursesummary_help'] = 'The course summary is displayed in the list of 
 $string['coursetitle'] = 'Course: {$a->course}';
 $string['courseupdates'] = 'Course updates';
 $string['coursevisibility'] = 'Course visibility';
-$string['coursevisibility_help'] = 'This setting determines whether the course appears in the list of courses. Apart from users granted the **viewhiddencourse** capability (course creators, editing trainers, trainers, and managers by default), users are not allowed to enter the course, even if enrolled.
+$string['coursevisibility_help'] = 'This setting lets course administrators set up a course as hidden, so they can assign learners to it without anyone being able to see the course. Once ready, they can make it visible to the learners.
 
-This setting allows a course administrator to set up a course as hidden and assign the learners to it, without the learners being able to see the course. The course administrator can then confirm that the details of the course and the set of assigned learners are correct before making the course visible to the learners at the appropriate time.';
+Please note that hidden courses are visible to some privileged users, depending on their roles and capabilities.';
 $string['create'] = 'Create';
 $string['createaccount'] = 'Create my new account';
 $string['createandview'] = 'Create and view';
