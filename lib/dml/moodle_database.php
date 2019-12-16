@@ -2274,10 +2274,12 @@ abstract class moodle_database {
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function record_exists_sql($sql, array $params=null) {
-        $mrs = $this->get_recordset_sql($sql, $params, 0, 1);
-        $return = $mrs->valid();
-        $mrs->close();
-        return $return;
+        if ($sql instanceof sql) {
+            $sql = $sql->prepend('SELECT 1 WHERE EXISTS (')->append(')');
+        } else {
+            $sql = "SELECT 1 WHERE EXISTS ($sql)";
+        }
+        return (bool)$this->get_field_sql($sql, $params);
     }
 
     /**

@@ -1277,6 +1277,27 @@ class mysqli_native_moodle_database extends moodle_database {
     }
 
     /**
+     * Test whether a SQL SELECT statement returns any records.
+     *
+     * This function returns true if the SQL statement executes
+     * without any errors and returns at least one record.
+     *
+     * @param string|sql $sql The SQL statement to execute.
+     * @param array $params array of sql parameters
+     * @return bool true if the SQL executes without errors and returns at least one record.
+     * @throws dml_exception A DML specific exception is thrown for any errors.
+     */
+    public function record_exists_sql($sql, array $params=null) {
+        // MySQL 5.7 and MariaDB 10.3 require the FROM clause.
+        if ($sql instanceof sql) {
+            $sql = $sql->prepend('SELECT 1 FROM DUAL WHERE EXISTS (')->append(')');
+        } else {
+            $sql = "SELECT 1 FROM DUAL WHERE EXISTS ($sql)";
+        }
+        return (bool)$this->get_field_sql($sql, $params);
+    }
+
+    /**
      * Insert new record into database, as fast as possible, no safety checks, lobs not supported.
      * @param string $table name
      * @param mixed $params data record as object or array
