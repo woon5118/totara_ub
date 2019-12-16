@@ -635,9 +635,14 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
     protected static function get_tree($id) {
         global $DB;
         $coursecattreecache = cache::make('core', 'coursecattree');
-        $rv = $coursecattreecache->get($id);
-        if ($rv !== false) {
-            return $rv;
+        // Totara: Get the chunk of the tree.
+        $all = $coursecattreecache->get('all');
+        if ($all !== false) {
+            if (array_key_exists($id, $all)) {
+                return $all[$id];
+            }
+            // Requested non-existing category.
+            return array();
         }
         // Re-build the tree.
         $sql = "SELECT cc.id, cc.parent, cc.visible
@@ -676,7 +681,8 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         }
         // We must add countall to all in case it was the requested ID.
         $all['countall'] = $count;
-        $coursecattreecache->set_many($all);
+        // Totara: Set the chunk of the tree because cache::set_many() is slow.
+        $coursecattreecache->set('all', $all);
         if (array_key_exists($id, $all)) {
             return $all[$id];
         }

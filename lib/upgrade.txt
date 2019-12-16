@@ -93,6 +93,7 @@ information provided here is intended especially for developers.
   - The $chunk and $chunkurl parameters to css_store_css() are no longer used.
   - css_chunk_by_selector_count() has been deprecated and will be removed in a future version.
 * Added IE 11 support for CSS var() and custom properties on :root {} within TUI SCSS.
+* The internal structure of the cache 'core/coursecattree' has been changed; please refer to coursecat::get_tree()
 
 === 12.0 ===
 
