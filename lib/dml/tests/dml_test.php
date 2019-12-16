@@ -1528,6 +1528,10 @@ class core_dml_testcase extends database_driver_testcase {
         $this->assertEquals($inskey1, reset($records)->id);
         $this->assertEquals($inskey4, next($records)->id);
 
+        $unkeyed_records = $DB->get_records_sql_unkeyed("SELECT * FROM {{$tablename}} WHERE course = ?", array(3));
+        $this->assertEquals(array_values($records), $unkeyed_records);
+        $this->assertEquals([0, 1], array_keys($unkeyed_records));
+
         // Awful test, requires debug enabled and sent to browser. Let's do that and restore after test.
         $records = $DB->get_records_sql("SELECT course AS id, course AS course FROM {{$tablename}}", null);
         $this->assertDebuggingCalled();
@@ -1538,16 +1542,35 @@ class core_dml_testcase extends database_driver_testcase {
         $this->assertCount(6, $records);
         set_debugging(DEBUG_DEVELOPER);
 
+        // Let's check that there is no debugging called and all the records returned even if the first column has duplicates
+        $records = $DB->get_records_sql_unkeyed("SELECT course, id FROM {{$tablename}} ORDER BY id ASC", null);
+        $this->assertDebuggingNotCalled();
+        $this->assertCount(7, $records);
+        $this->assertEquals(range(1, 7), array_column($records, 'id'));
+        $this->assertEquals(range(0, 6), array_keys($records));
+        $this->assertEquals([3, 5, 4, 3, 2, 1, 0], array_column($records, 'course'));
+
         // Negative limits = no limits.
         $records = $DB->get_records_sql("SELECT * FROM {{$tablename}} ORDER BY id", null, -1, -1);
+        $this->assertCount(7, $records);
+
+        $records = $DB->get_records_sql_unkeyed("SELECT * FROM {{$tablename}} ORDER BY id", null, -1, -1);
         $this->assertCount(7, $records);
 
         // Zero limits = no limits.
         $records = $DB->get_records_sql("SELECT * FROM {{$tablename}} ORDER BY id", null, 0, 0);
         $this->assertCount(7, $records);
 
+        $records = $DB->get_records_sql_unkeyed("SELECT * FROM {{$tablename}} ORDER BY id", null, 0, 0);
+        $this->assertCount(7, $records);
+
         // Only limitfrom = skips that number of records.
         $records = $DB->get_records_sql("SELECT * FROM {{$tablename}} ORDER BY id", null, 2, 0);
+        $this->assertCount(5, $records);
+        $this->assertEquals($inskey3, reset($records)->id);
+        $this->assertEquals($inskey7, end($records)->id);
+
+        $records = $DB->get_records_sql_unkeyed("SELECT * FROM {{$tablename}} ORDER BY id", null, 2, 0);
         $this->assertCount(5, $records);
         $this->assertEquals($inskey3, reset($records)->id);
         $this->assertEquals($inskey7, end($records)->id);
@@ -1558,8 +1581,18 @@ class core_dml_testcase extends database_driver_testcase {
         $this->assertEquals($inskey1, reset($records)->id);
         $this->assertEquals($inskey3, end($records)->id);
 
+        $records = $DB->get_records_sql_unkeyed("SELECT * FROM {{$tablename}} ORDER BY id", null, 0, 3);
+        $this->assertCount(3, $records);
+        $this->assertEquals($inskey1, reset($records)->id);
+        $this->assertEquals($inskey3, end($records)->id);
+
         // Both limitfrom and limitnum = skips limitfrom records and fetches limitnum ones.
         $records = $DB->get_records_sql("SELECT * FROM {{$tablename}} ORDER BY id", null, 3, 2);
+        $this->assertCount(2, $records);
+        $this->assertEquals($inskey4, reset($records)->id);
+        $this->assertEquals($inskey5, end($records)->id);
+
+        $records = $DB->get_records_sql_unkeyed("SELECT * FROM {{$tablename}} ORDER BY id", null, 3, 2);
         $this->assertCount(2, $records);
         $this->assertEquals($inskey4, reset($records)->id);
         $this->assertEquals($inskey5, end($records)->id);
@@ -1575,7 +1608,18 @@ class core_dml_testcase extends database_driver_testcase {
         $this->assertCount(2, $records);
         $this->assertEquals($inskey6, reset($records)->id);
         $this->assertEquals($inskey5, end($records)->id);
+
+        $records = $DB->get_records_sql_unkeyed($sql, null, 0, 2); // Skip 0, get 2.
+        $this->assertCount(2, $records);
+        $this->assertEquals($inskey6, reset($records)->id);
+        $this->assertEquals($inskey5, end($records)->id);
+
         $records = $DB->get_records_sql($sql, null, 2, 2); // Skip 2, get 2.
+        $this->assertCount(2, $records);
+        $this->assertEquals($inskey3, reset($records)->id);
+        $this->assertEquals($inskey2, end($records)->id);
+
+        $records = $DB->get_records_sql_unkeyed($sql, null, 2, 2); // Skip 2, get 2.
         $this->assertCount(2, $records);
         $this->assertEquals($inskey3, reset($records)->id);
         $this->assertEquals($inskey2, end($records)->id);
@@ -1596,12 +1640,23 @@ class core_dml_testcase extends database_driver_testcase {
         $this->assertSame('5', end($records)->cid);
         $this->assertSame('4', reset($records)->cid);
 
+        $records = $DB->get_records_sql_unkeyed($sql, null, 2, PHP_INT_MAX); // Skip course {3,6}, get {4,5}.
+        $this->assertCount(2, $records);
+        $this->assertSame('5', end($records)->cid);
+        $this->assertSame('4', reset($records)->cid);
+
         // Test 2 tables with aliases and limits with order bys (limit which is highest INT number).
         $records = $DB->get_records_sql($sql, null, PHP_INT_MAX, 2); // Skip all courses.
         $this->assertCount(0, $records);
 
+        $records = $DB->get_records_sql_unkeyed($sql, null, PHP_INT_MAX, 2); // Skip all courses.
+        $this->assertCount(0, $records);
+
         // Test 2 tables with aliases and limits with order bys (limit which s highest INT number).
         $records = $DB->get_records_sql($sql, null, PHP_INT_MAX, PHP_INT_MAX); // Skip all courses.
+        $this->assertCount(0, $records);
+
+        $records = $DB->get_records_sql_unkeyed($sql, null, PHP_INT_MAX, PHP_INT_MAX); // Skip all courses.
         $this->assertCount(0, $records);
 
         // TODO: Test limits in queries having DISTINCT clauses.
@@ -2424,7 +2479,7 @@ class core_dml_testcase extends database_driver_testcase {
         $table = $this->get_test_table();
         $tablename = $table->getName();
 
-        if ($DB->get_dbfamily()) {
+        if ($DB->get_dbfamily() === 'mssql') {
             $this->markTestSkipped('TODO: fix composed nullable indexes in MS SQL driver TL-22803');
         }
 
@@ -6558,7 +6613,7 @@ class moodle_database_for_testing extends moodle_database {
     public function change_database_structure($sql, $tablenames = null) {}
     public function execute($sql, array $params=null) {}
     public function get_recordset_sql($sql, array $params=null, $limitfrom=0, $limitnum=0) {}
-    public function get_records_sql($sql, array $params=null, $limitfrom=0, $limitnum=0) {}
+    protected function get_records_sql_raw($sql, array $params = null, $limit_from = 0, $limit_num = 0, bool $unique_id = true): array { return []; }
     public function get_fieldset_sql($sql, array $params=null) {}
     public function insert_record_raw($table, $params, $returnid=true, $bulk=false, $customsequence=false) {}
     public function insert_record($table, $dataobject, $returnid=true, $bulk=false) {}

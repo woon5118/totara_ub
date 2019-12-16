@@ -1163,7 +1163,6 @@ class oci_native_moodle_database extends moodle_database {
      * Get a number of records as an array of objects using a SQL statement.
      *
      * Return value is like:
-     * @see function get_records.
      *
      * @param string|sql $sql the SQL select query to execute. The first column of this SELECT statement
      *   must be a unique value (usually the 'id' field), as it will be used as the key of the
@@ -1171,10 +1170,11 @@ class oci_native_moodle_database extends moodle_database {
      * @param array $params array of sql parameters
      * @param int $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set).
      * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
+     * @param bool $unique_id Require the first column to be unique and key the array by it, otherwise return an array with sequential keys
      * @return array of objects, or empty array if no records were found
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
-    public function get_records_sql($sql, array $params=null, $limitfrom=0, $limitnum=0) {
+    protected function get_records_sql_raw($sql, array $params=null, $limitfrom=0, $limitnum=0, bool $unique_id = true): array {
 
         list($sql, $params, $type) = $this->fix_sql_params($sql, $params);
 
@@ -1199,12 +1199,7 @@ class oci_native_moodle_database extends moodle_database {
             $row = array_change_key_case($row, CASE_LOWER);
             unset($row['oracle_rownum']);
             array_walk($row, array('oci_native_moodle_database', 'onespace2empty'));
-            $id = reset($row);
-            if (isset($return[$id])) {
-                $colname = key($row);
-                debugging("Did you remember to make the first column something unique in your call to get_records? Duplicate value '$id' found in column '$colname'.", DEBUG_DEVELOPER);
-            }
-            $return[$id] = (object)$row;
+            $this->add_row_to_result($row, $return, $unique_id);
         }
 
         return $return;

@@ -1531,7 +1531,42 @@ abstract class moodle_database {
      * @return array of objects indexed by first column
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
-    public abstract function get_records_sql($sql, array $params=null, $limitfrom=0, $limitnum=0);
+    public function get_records_sql($sql, array $params=null, $limitfrom=0, $limitnum=0) {
+        return $this->get_records_sql_raw($sql, $params, $limitfrom, $limitnum);
+    }
+
+    /**
+     * Get a number of records as an array of objects using a SQL statement. Return the result as an array of sequential keys.
+     *
+     * Return value is like {@link function get_records}.
+     *
+     * @param string|sql $sql the SQL select query to execute.
+     * @param array $params array of sql parameters
+     * @param int $limit_from return a subset of records, starting at this point (optional).
+     * @param int $limit_num return a subset comprising this many records in total (optional, required if $limitfrom is set).
+     * @return array of objects indexed by first column
+     * @throws dml_exception A DML specific exception is thrown for any errors.
+     * @return array
+     */
+    public function get_records_sql_unkeyed($sql, array $params = null, $limit_from = 0, $limit_num = 0): array {
+        return $this->get_records_sql_raw($sql, $params, $limit_from, $limit_num, false);
+    }
+
+    /**
+     * Get a number of records as an array of objects using a SQL statement.
+     *
+     * Return value is like {@link function get_records}.
+     *
+     * @param string|sql $sql the SQL select query to execute.
+     * @param array $params array of sql parameters
+     * @param int $limit_from return a subset of records, starting at this point (optional).
+     * @param int $limit_num return a subset comprising this many records in total (optional, required if $limitfrom is set).
+     * @param bool $unique_id Require the first column to be unique and key the array by it, otherwise return an array with sequential keys
+     * @return array of objects indexed by first column
+     * @throws dml_exception A DML specific exception is thrown for any errors.
+     * @return array
+     */
+    protected abstract function get_records_sql_raw($sql, array $params = null, $limit_from = 0, $limit_num = 0, bool $unique_id = true): array;
 
     /**
      * Do not use.
@@ -3604,5 +3639,26 @@ abstract class moodle_database {
     public function get_optimizer_hint(string $hint, $parameter = null): string {
         // If your database supports hints and you want to support this override this function.
         return '';
+    }
+
+    /**
+     * Add row to the array of result
+     *
+     * @param \stdClass|array $row Row to add
+     * @param array $result Result array to append rows to
+     * @param bool $unique_id Require the first column to be unique and key the array by it, otherwise add a row with sequential keys
+     */
+    protected function add_row_to_result($row, array &$result, bool $unique_id = true) {
+        if (!$unique_id) {
+            $result[] = (object) $row;
+            return;
+        }
+
+        $id = reset($row);
+        if (isset($result[$id])) {
+            $colname = key($row);
+            debugging("Did you remember to make the first column something unique in your call to get_records? Duplicate value '$id' found in column '$colname'.", DEBUG_DEVELOPER);
+        }
+        $result[$id] = (object) $row;
     }
 }

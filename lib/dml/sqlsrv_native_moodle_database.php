@@ -986,24 +986,20 @@ class sqlsrv_native_moodle_database extends moodle_database {
      * @param array $params array of sql parameters
      * @param int $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set).
      * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
+     * @param bool $unique_id Require the first column to be unique and key the array by it, otherwise return an array with sequential keys
      * @return array of objects, or empty array if no records were found
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
-    public function get_records_sql($sql, array $params = null, $limitfrom = 0, $limitnum = 0) {
+    protected function get_records_sql_raw($sql, array $params = null, $limitfrom = 0, $limitnum = 0, bool $unique_id = true): array {
 
         $rs = $this->get_recordset_sql($sql, $params, $limitfrom, $limitnum);
 
         $results = array();
 
         foreach ($rs as $row) {
-            $id = reset($row);
-
-            if (isset($results[$id])) {
-                $colname = key($row);
-                debugging("Did you remember to make the first column something unique in your call to get_records? Duplicate value '$id' found in column '$colname'.", DEBUG_DEVELOPER);
-            }
-            $results[$id] = (object)$row;
+            $this->add_row_to_result($row, $results, $unique_id);
         }
+
         $rs->close();
 
         return $results;

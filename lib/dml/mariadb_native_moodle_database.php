@@ -235,18 +235,19 @@ class mariadb_native_moodle_database extends mysqli_native_moodle_database {
      * @param array|null $params
      * @param int $limitfrom
      * @param int $limitnum
+     * @param bool $unique_id
      * @return array
      */
-    public function get_records_sql($sql, array $params = null, $limitfrom = 0, $limitnum = 0) {
+    protected function get_records_sql_raw($sql, array $params = null, $limitfrom = 0, $limitnum = 0, bool $unique_id = true): array {
         if (!$this->query_requires_environment_modification()) {
             // Get out as quick as we can if hints are not required.
-            return parent::get_records_sql($sql, $params, $limitfrom, $limitnum);
+            return parent::get_records_sql_raw($sql, $params, $limitfrom, $limitnum, $unique_id);
         }
         // Environment modification is required, send it through the query function so that any required
         // modifications are applied.
         $result = $this->query_with_modified_environment(
-            function ($sql, $params) use ($limitfrom, $limitnum) {
-                return parent::get_records_sql($sql, $params, $limitfrom, $limitnum);
+            function ($sql, $params) use ($limitfrom, $limitnum, $unique_id) {
+                return parent::get_records_sql_raw($sql, $params, $limitfrom, $limitnum, $unique_id);
             },
             $sql,
             $params

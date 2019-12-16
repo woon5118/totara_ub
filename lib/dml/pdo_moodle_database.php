@@ -326,18 +326,24 @@ abstract class pdo_moodle_database extends moodle_database {
      * @param array $params array of sql parameters
      * @param int $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set).
      * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
+     * @param bool $unique_id Require the first column to be unique and key the array by it, otherwise return an array with sequential keys
      * @return array of objects, or empty array if no records were found, or false if an error occurred.
      */
-    public function get_records_sql($sql, array $params=null, $limitfrom=0, $limitnum=0) {
+    protected function get_records_sql_raw($sql, array $params=null, $limitfrom=0, $limitnum=0, bool $unique_id = true): array {
         global $CFG;
 
         $rs = $this->get_recordset_sql($sql, $params, $limitfrom, $limitnum);
         if (!$rs->valid()) {
             $rs->close(); // Not going to iterate (but exit), close rs
-            return false;
+            return [];
         }
         $objects = array();
         foreach($rs as $value) {
+            if (!$unique_id) {
+                $objects[] = (object) $value;
+                continue;
+            }
+
             $key = reset($value);
             if ($CFG->debugdeveloper && array_key_exists($key, $objects)) {
                 debugging("Did you remember to make the first column something unique in your call to get_records? Duplicate value '$key' found in column first column of '$sql'.", DEBUG_DEVELOPER);
@@ -346,6 +352,24 @@ abstract class pdo_moodle_database extends moodle_database {
         }
         $rs->close();
         return $objects;
+    }
+
+    /**
+     * Get a number of records as an array of objects.
+     *
+     * Return value is like:
+     * @see function get_records.
+     *
+     * @param string|sql $sql the SQL select query to execute. The first column of this SELECT statement
+     *   must be a unique value (usually the 'id' field), as it will be used as the key of the
+     *   returned array.
+     * @param array $params array of sql parameters
+     * @param int $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set).
+     * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
+     * @return array|false of objects, or empty array if no records were found, or false if an error occurred.
+     */
+    public function get_records_sql($sql, array $params = null, $limitfrom = 0, $limitnum = 0) {
+        return parent::get_records_sql($sql, $params, $limitfrom, $limitnum) ?: false;
     }
 
     /**
