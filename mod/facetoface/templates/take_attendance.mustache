@@ -49,6 +49,8 @@
     * uploadattendanceurl: Upload event attendace and grades
     * disableupload: Disable Upload event button for upcoming/in-progress event attendance
     * showupload: Show Upload and CSV export for Upload for event only
+    * hasarchive: If any attendee has archive record
+    * archivenotification: Dispaly archive notification message if any attendee has archive record
 
     Example context (json):
         There is no example for this template
@@ -57,6 +59,8 @@
         * mod_facetoface/take_attendance_session_picker
         * mod_facetoface/take_attendance_bulk_action
 }}
+
+{{#hasarchive}}{{{archivenotification}}}{{/hasarchive}}
 
 <div class="tw-takeAttendance"
      data-url="{{url}}"

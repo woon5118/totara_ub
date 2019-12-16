@@ -53,6 +53,8 @@ final class event_attendee extends \stdClass {
     public $submissionid = 0;
     /** @var int {facetoface_signups}.id */
     public $signupid = 0;
+    /** @var int {facetoface_signups}.archived */
+    public $archived = 0;
     /** @var int {facetoface_signups}.bookedby */
     public $bookedby;
     /** @var int {facetoface}.id */
@@ -269,5 +271,19 @@ final class event_attendee extends \stdClass {
      */
     public function has_bookedby(): bool {
         return !empty($this->bookedby);
+    }
+
+    /**
+     * @return int
+     */
+    public function get_archived(): int {
+        return (int)$this->archived;
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_archived(): bool {
+        return (bool)$this->get_archived();
     }
 }

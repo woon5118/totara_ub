@@ -26,6 +26,7 @@ namespace mod_facetoface\output;
 defined('MOODLE_INTERNAL') || die();
 
 use core\output\template;
+use core\output\notification;
 use mod_facetoface\attendance\attendance_helper;
 use mod_facetoface\seminar_event;
 use mod_facetoface\seminar_session;
@@ -57,6 +58,8 @@ class take_attendance extends template {
      *                                                       be displayed otherwise, it will not, as this behaviour is for whether
      *                                                       setting of attendance tracking is being set or not.
      *
+     * @param bool                           $hasarchive if any attendee has archive record
+     *
      * @return take_attendance
      */
     public static function create(seminar_event $seminarevent,
@@ -65,9 +68,9 @@ class take_attendance extends template {
                                   array $formattributes,
                                   take_attendance_bulk_action $bulkaction,
                                   int $sessiondateid = 0,
-                                  take_attendance_session_picker $sessionpicker = null): take_attendance {
-        global $USER;
-
+                                  take_attendance_session_picker $sessionpicker = null,
+                                  bool $hasarchive = false): take_attendance {
+        global $USER, $OUTPUT;
 
         $uploadattendanceurl = new \moodle_url(
             '/mod/facetoface/attendees/list/import_attendance.php',
@@ -78,6 +81,11 @@ class take_attendance extends template {
             ['s' => $seminarevent->get_id(), 'sd' => $sessiondateid, 'onlycontent' => '1', 'download' => 'csvforupload']
         );
         $exports = self::get_exports();
+        $notification = $hasarchive ?
+            $OUTPUT->notification(
+                get_string('archivewarning_takeattendance', 'mod_facetoface'),
+                notification::NOTIFY_WARNING
+            ) : '';
         $data = [
             'url' => $url->out(),
             'sessionid' => $seminarevent->get_id(),
@@ -102,7 +110,9 @@ class take_attendance extends template {
             'csvexportforuploadurl' => $csvexportforuploadurl->out(),
             'uploadattendanceurl' => $uploadattendanceurl->out(),
             'disableupload' => !$seminarevent->is_attendance_open(),
-            'showupload' => !(bool)$sessiondateid
+            'showupload' => !(bool)$sessiondateid,
+            'hasarchive' => $hasarchive,
+            'archivenotification' => $notification,
         ];
 
         foreach ($formattributes as $key => $value) {

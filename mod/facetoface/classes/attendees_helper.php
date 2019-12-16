@@ -205,6 +205,7 @@ final class attendees_helper {
             u.email,
             u.deleted,
             u.suspended,
+            su.archived,
             su.jobassignmentid,
             su.bookedby,
             su.id AS submissionid,

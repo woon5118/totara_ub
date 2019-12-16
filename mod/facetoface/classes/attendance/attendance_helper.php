@@ -93,6 +93,7 @@ final class attendance_helper {
             u.suspended,
             su.id AS submissionid,
             su.id AS signupid,
+            su.archived,
             {%extra_select%}
             f.id AS facetofaceid,
             f.course AS course

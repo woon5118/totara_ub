@@ -138,6 +138,9 @@ abstract class content_generator {
      * @return string
      */
     protected function create_checkbox(event_attendee $attendee): string {
+        if ($attendee->is_archived()) {
+            return '';
+        }
         $checkoptionid = 'check_submissionid_' . $attendee->submissionid;
 
         $attributes = [
@@ -168,8 +171,9 @@ abstract class content_generator {
     protected function create_attendance_status(event_attendee $attendee): string {
         global $OUTPUT;
 
+        $disabled = $attendee->is_archived() ? true : $this->disabled;
         return $OUTPUT->render(
-            take_attendance_status_picker::create($attendee, $this->statusoptions, $this->disabled)
+            take_attendance_status_picker::create($attendee, $this->statusoptions, $disabled)
         );
     }
 

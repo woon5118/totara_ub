@@ -62,7 +62,7 @@ require_capability('mod/facetoface:removeattendees', $context);
 
 $pagetitle = get_string('removeattendeestep1', 'mod_facetoface');
 $PAGE->set_context($context);
-$PAGE->set_url('/mod/facetoface/attendees/list/remove.php', array('s' => $s, 'listid' => $listid));
+$PAGE->set_url($currenturl);
 $PAGE->set_cm($cm);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title($seminar->get_name() . ': ' . $pagetitle);
@@ -133,15 +133,14 @@ $userlist = $list->get_user_ids();
 if (!empty($userlist)) {
     // Add selected users to remove attendees list.
     list($userlist_sql, $userlist_params) = $DB->get_in_or_equal($userlist);
-    $userstoadd = $DB->get_records_sql("SELECT u.*, ss.statuscode
-                                    FROM {user} u
-                                    LEFT JOIN {facetoface_signups} su
-                                      ON u.id = su.userid
-                                     AND su.sessionid = {$seminareventid}
-                                    LEFT JOIN {facetoface_signups_status} ss
-                                      ON su.id = ss.signupid
-                                     AND ss.superceded != 1
-                                   WHERE u.id {$userlist_sql}", $userlist_params);
+    $userstoadd = $DB->get_records_sql(
+        "SELECT u.*, ss.statuscode
+           FROM {user} u
+      LEFT JOIN {facetoface_signups} su ON u.id = su.userid AND su.sessionid = {$seminareventid}
+      LEFT JOIN {facetoface_signups_status} ss ON su.id = ss.signupid AND ss.superceded != 1
+          WHERE u.id {$userlist_sql}",
+        $userlist_params
+    );
 }
 
 // Get users waiting approval to add to the "already attending" list as we do not want to add them again
@@ -180,18 +179,15 @@ if (($searchtext !== '') && !empty($attendees)) {
     // This starts with a comma, as there may be no extra fields.
     $useridentityfields = get_extra_user_fields_sql(true, 'u', '', get_all_user_name_fields());
 
-    $attendees = $DB->get_records_sql("
-        SELECT u.id, {$usernamefields} {$useridentityfields}, u.email, ss.statuscode
-        FROM {user} u
-        LEFT JOIN {facetoface_signups} su
-          ON u.id = su.userid
-         AND su.sessionid = {$seminareventid}
-        LEFT JOIN {facetoface_signups_status} ss
-          ON su.id = ss.signupid
-         AND ss.superceded != 1
+    $attendees = $DB->get_records_sql(
+        "SELECT u.id, {$usernamefields} {$useridentityfields}, u.email, ss.statuscode, su.archived
+           FROM {user} u
+      LEFT JOIN {facetoface_signups} su ON u.id = su.userid AND su.sessionid = {$seminareventid}
+      LEFT JOIN {facetoface_signups_status} ss ON su.id = ss.signupid AND ss.superceded != 1
        WHERE {$where}
-       ORDER BY u.lastname ASC, u.firstname ASC", $params);
-
+       ORDER BY u.lastname ASC, u.firstname ASC",
+        $params
+    );
 }
 
 $availableusers = $attendees;
@@ -200,11 +196,22 @@ $usercount = count($availableusers);
 $PAGE->requires->js_call_amd('mod_facetoface/attendees_addremove', 'init', array(array('s' => $s, 'listid' => $listid)));
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading($pagetitle);
-
 if (!empty($notification)) {
     echo $OUTPUT->notification($notification, 'notifynotice');
+} else {
+    // One notification at the time.
+    $hasarchive = false;
+    foreach ($attendees as $attendee) {
+        if ((int)$attendee->archived == 1) {
+            $hasarchive = true;
+            break;
+        }
+    }
+    if ($hasarchive) {
+        echo $OUTPUT->notification(get_string('archivewarning_removeattendees', 'mod_facetoface'), \core\output\notification::NOTIFY_WARNING);
+    }
 }
+echo $OUTPUT->heading($pagetitle);
 
 // Configure selector form.
 $strusertochange = get_string('userstoremove', 'facetoface');

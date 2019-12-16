@@ -234,7 +234,7 @@ if ($usercount <= MAX_USERS_PER_PAGE) {
     $usernamefields = get_all_user_name_fields(true, 'u');
     // This starts with a comma, as there may be no extra fields.
     $useridentityfields = get_extra_user_fields_sql(true, 'u', '', get_all_user_name_fields());
-    $availableusers = $DB->get_recordset_sql("SELECT u.id, {$usernamefields} {$useridentityfields}, u.email, ss.statuscode
+    $availableusers = $DB->get_recordset_sql("SELECT u.id, {$usernamefields} {$useridentityfields}, u.email, ss.statuscode, su.archived
                                         FROM {user} u
                                         LEFT JOIN {facetoface_signups} su
                                           ON u.id = su.userid

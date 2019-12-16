@@ -193,6 +193,16 @@ final class take_attendance_tracking implements attendance_tracking {
         if (empty($this->rows)) {
             return '';
         }
+        $hasarchive = false;
+        foreach ($this->rows as $attendee) {
+            if ($attendee === null) {
+                continue;
+            }
+            if ($attendee->is_archived()) {
+                $hasarchive = true;
+                break;
+            }
+        }
 
         $formurl = clone $this->url;
         $formurl->params(
@@ -219,7 +229,8 @@ final class take_attendance_tracking implements attendance_tracking {
                 $formparams,
                 take_attendance_bulk_action::create($this->disabled),
                 $this->options['selected-sessiondate-id'],
-                $this->create_session_picker()
+                $this->create_session_picker(),
+                $hasarchive
             )
         );
 

@@ -28,7 +28,8 @@ use mod_facetoface\signup\state\{
     not_set,
     state,
     booked,
-    waitlisted
+    waitlisted,
+    user_cancelled
 };
 use mod_facetoface\form\attendees_add_confirm;
 use mod_facetoface\event\attendees_updated;
@@ -529,11 +530,10 @@ final class attendees_list_helper {
                     // Values of multi-select are changed after edit_save_data func.
                     $data = unserialize($clonefromform);
 
-                    $result['result'] = get_string('removedsuccessfully', 'mod_facetoface');
-                    $removed[] = $result;
+                    $removed[]['result'] = get_string('removedsuccessfully', 'mod_facetoface');
                 } else {
-                    $result['result'] = get_string('error:cannotcancel', 'mod_facetoface');
-                    $errors[] = $result;
+                    $failures = $signup->get_failures(user_cancelled::class);
+                    $errors[]['result'] = current($failures);
                 }
             }
         }

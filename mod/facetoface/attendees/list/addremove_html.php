@@ -94,13 +94,14 @@ $idx = 0; // Iterator to put elements on their positions when adding/removing.
                         echo "<optgroup label=\"$strsearchresults (" . $usercount . ")\">\n";
                         foreach ($availableusers as $user) {
                             $idx++;
+                            $disabled = (bool)(int)$user->archived ? 'disabled' : '';
                             $fullname = mod_facetoface\attendees_list_helper::output_user_for_selection($user, $extrafields, true);
                             if ($seminarevent->is_sessions() && ($user->statuscode == \mod_facetoface\signup\state\waitlisted::get_code())) {
                                 $state = \mod_facetoface\signup\state\state::from_code($user->statuscode);
                                 $status = $state::get_string();
                                 echo "<option data-idx=\"$idx\" value=\"$user->id\">".$fullname." - ". $status."</option>\n";
                             } else {
-                                echo "<option data-idx=\"$idx\" value=\"$user->id\">".$fullname."</option>\n";
+                                echo "<option {$disabled} data-idx=\"$idx\" value=\"$user->id\">".$fullname."</option>\n";
                             }
                         }
                     } else {
@@ -120,13 +121,14 @@ $idx = 0; // Iterator to put elements on their positions when adding/removing.
                     if (is_array($availableusers) || $availableusers->valid()) {
                         foreach ($availableusers as $user) {
                             $idx++;
+                            $disabled = (bool)(int)$user->archived ? 'disabled' : '';
                             $fullname = mod_facetoface\attendees_list_helper::output_user_for_selection($user, $extrafields, true);
                             if ($seminarevent->is_sessions() && ($user->statuscode == \mod_facetoface\signup\state\waitlisted::get_code())) {
                                 $state = \mod_facetoface\signup\state\state::from_code($user->statuscode);
                                 $status = $state::get_string();
                                 echo "<option data-idx=\"$idx\" value=\"$user->id\">".$fullname." - ". $status."</option>\n";
                             } else {
-                                echo "<option data-idx=\"$idx\" value=\"$user->id\">".$fullname."</option>\n";
+                                echo "<option {$disabled} data-idx=\"$idx\" value=\"$user->id\">".$fullname."</option>\n";
                             }
                         }
                     } else {
