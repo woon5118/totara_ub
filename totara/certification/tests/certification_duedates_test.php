@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/totara/certification/lib.php');
 
-class totara_certification_duedates_testcase extends advanced_testcase {
+class totara_certification_certification_duedates_testcase extends advanced_testcase {
 
     public function test_adding_new_assignment_when_user_is_assigned() {
         global $DB;

@@ -21,7 +21,14 @@
  * @package totara_certification
  */
 
-class totara_certification_fixes_testcase extends advanced_testcase {
+defined('MOODLE_INTERNAL') || die();
+
+use totara_core\advanced_feature;
+
+global $CFG;
+require_once($CFG->dirroot . '/totara/certification/lib.php');
+
+class totara_certification_certification_fixes_testcase extends advanced_testcase {
 
     private $numtestusers = 5;
     private $numtestcerts = 7;
@@ -34,7 +41,7 @@ class totara_certification_fixes_testcase extends advanced_testcase {
         $data = new \stdClass();
 
         // Turn off programs. This is to test that it doesn't interfere with certification completion.
-        set_config('enableprograms', TOTARA_DISABLEFEATURE);
+        advanced_feature::disable('programs');
 
         $programgenerator = $this->getDataGenerator()->get_plugin_generator('totara_program');
 
@@ -78,6 +85,8 @@ class totara_certification_fixes_testcase extends advanced_testcase {
      * @param int $certificationid
      * @param int $userid
      * @param int completiontime
+     *
+     * @return array
      */
     private function set_certified_state(int $certificationid, int $userid, $completetime) {
         global $DB;
@@ -95,7 +104,7 @@ class totara_certification_fixes_testcase extends advanced_testcase {
         }
 
         foreach ($courses as $course) {
-            $completion = new completion_completion(array('userid' => $usersid, 'course' => $course->id));
+            $completion = new completion_completion(array('userid' => $userid, 'course' => $course->id));
             $completion->mark_complete($completetime);
         }
 
