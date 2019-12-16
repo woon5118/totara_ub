@@ -69,9 +69,9 @@ Feature: Export seminar attendees
     When I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see date "10 February next year" formatted "%d %B %Y" in the "Attendees" "table_row"
+    Then I should see date "10 February next year" formatted "%d %B %Y"
 
-    When I follow "Attendees"
+    When I click on the seminar event action "Attendees" in row "#1"
     Then I should not see "Job assignment"
 
     When I follow "View all events"
@@ -103,9 +103,9 @@ Feature: Export seminar attendees
     When I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see date "10 February next year" formatted "%d %B %Y" in the "Attendees" "table_row"
+    Then I should see date "10 February next year" formatted "%d %B %Y"
 
-    When I follow "Attendees"
+    When I click on the seminar event action "Attendees" in row "#1"
     Then "//th[contains(@class, 'session_positionnameedit')]/a[contains(.,'Job assignment')]" "xpath_element" should exist
     And I should not see "job1" in the "Sam1 Student1" "table_row"
 
@@ -145,9 +145,9 @@ Feature: Export seminar attendees
     When I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see date "10 February next year" formatted "%d %B %Y" in the "Attendees" "table_row"
+    Then I should see date "10 February next year" formatted "%d %B %Y"
 
-    When I follow "Attendees"
+    When I click on the seminar event action "Attendees" in row "#1"
     Then "//th[contains(@class, 'session_positionnameedit')]/a[contains(.,'Job assignment')]" "xpath_element" should exist
     And I should see "job1" in the "Sam1 Student1" "table_row"
 

@@ -150,11 +150,9 @@ Feature: Check room details with all possible custom fields
 
     # View the room.
     And I click on "Room 1" "link"
-    And I switch to "popup" window
 
     # Confirm that all of the room customfields saved.
-    Then I should see "View room"
-    And I should see "Room 1"
+    Then I should see "Room 1"
     # "Yes" for checkbox
     And I should see "Yes"
     And I should see date "2 March next year 10:30" formatted "%A, %d %B %Y, %I:%M %p"

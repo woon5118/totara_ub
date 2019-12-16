@@ -105,7 +105,7 @@ Feature: Seminar event cancellation learner views
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_300: cancelled booking (course view).
-    Given I click on "Attendees" "link" in the "10 February" "table_row"
+    Given I click on the seminar event action "Attendees" in row "10 February"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
     And I press "Add"
@@ -117,7 +117,7 @@ Feature: Seminar event cancellation learner views
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Cancel event" "link" in the "10 February" "table_row"
+    And I click on the seminar event action "Cancel event" in row "10 February"
     And I press "Yes"
 
     When I log out
@@ -137,7 +137,7 @@ Feature: Seminar event cancellation learner views
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_301: cancelled booking (future bookings view).
-    Given I click on "Attendees" "link" in the "10 February" "table_row"
+    Given I click on the seminar event action "Attendees" in row "10 February"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
     And I press "Add"
@@ -149,7 +149,7 @@ Feature: Seminar event cancellation learner views
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Cancel event" "link" in the "10 February" "table_row"
+    And I click on the seminar event action "Cancel event" in row "10 February"
     And I press "Yes"
 
     When I log out
@@ -167,14 +167,14 @@ Feature: Seminar event cancellation learner views
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_302: cancelled booking (past bookings view).
-    Given I click on "Attendees" "link" in the "10 April 2037" "table_row"
+    Given I click on the seminar event action "Attendees" in row "10 April 2037"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com,Learner Three, learner2@example.com,Learner Four, learner2@example.com"
     And I press "Add"
     And I press "Continue"
     And I press "Confirm"
     And I follow "View all events"
-    And I click on "Cancel event" "link" in the "10 April 2037" "table_row"
+    And I click on the seminar event action "Cancel event" in row "10 April 2037"
     And I press "Yes"
 
     # Magic needed here since only a future event can be cancelled and we don't
@@ -198,7 +198,7 @@ Feature: Seminar event cancellation learner views
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_303: remove cancelled sessions from learner views.
-    Given I click on "Attendees" "link" in the "10 February" "table_row"
+    Given I click on the seminar event action "Attendees" in row "10 February"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
     And I press "Add"
@@ -210,7 +210,7 @@ Feature: Seminar event cancellation learner views
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Cancel event" "link" in the "10 February" "table_row"
+    And I click on the seminar event action "Cancel event" in row "10 February"
     And I press "Yes"
 
     When I log out

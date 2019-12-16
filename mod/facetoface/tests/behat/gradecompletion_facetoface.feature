@@ -57,7 +57,7 @@ Feature: Give a grade to a student for a seminar
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I switch to "Take attendance" tab
     And I set the field "Sam1 Student1's attendance" to "Partially attended"
     And I press "Save attendance"

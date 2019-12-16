@@ -52,7 +52,7 @@ Feature: Add - Remove seminar attendees
       | capacity           | 1    |
     And I press "Save changes"
 
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
       | searchtext | Sam1 Student1 |
@@ -89,7 +89,7 @@ Feature: Add - Remove seminar attendees
       | capacity           | 1    |
     And I press "Save changes"
 
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
       | searchtext | Sam1 Student1 |
@@ -122,7 +122,7 @@ Feature: Add - Remove seminar attendees
       | capacity              | 1    |
     And I press "Save changes"
 
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com"
     And I press "Add"
@@ -136,7 +136,8 @@ Feature: Add - Remove seminar attendees
     And I expand all fieldsets
     And I set the field "Manager Approval" to "1"
     And I click on "Save and display" "button"
-    And I follow "Attendees"
+
+    When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam2 Student2, student2@example.com"
     And I press "Add"
@@ -156,7 +157,7 @@ Feature: Add - Remove seminar attendees
       | capacity              | 1    |
     And I press "Save changes"
 
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users via list of IDs"
     # By default user is expected to separate ID's by newline, but comma is also supported.
     And I set the following fields to these values:
@@ -183,7 +184,7 @@ Feature: Add - Remove seminar attendees
       | capacity              | 1    |
     And I press "Save changes"
 
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users via list of IDs"
     # By default user separate ID's by newline, but comma is also supported.
     And I set the following fields to these values:
@@ -210,7 +211,7 @@ Feature: Add - Remove seminar attendees
       | capacity           | 2                |
     And I press "Save changes"
 
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "CSV text file" filemanager
     And I press "Continue"
@@ -249,7 +250,7 @@ Feature: Add - Remove seminar attendees
       | capacity           | 1    |
     And I press "Save changes"
 
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com"
     And I press "Add"
@@ -280,7 +281,7 @@ Feature: Add - Remove seminar attendees
       | capacity           | 1    |
     And I press "Save changes"
 
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com"
     And I press exact "add"
@@ -312,7 +313,7 @@ Feature: Add - Remove seminar attendees
       | capacity           | 2                |
     And I press "Save changes"
 
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_invalid_columns.csv" file to "CSV text file" filemanager
     And I press "Continue"
@@ -334,7 +335,7 @@ Feature: Add - Remove seminar attendees
     And I follow "Add event"
     And I press "Save changes"
 
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com,Sam3 Student3, student3@example.com"
     And I press "Add"
@@ -371,7 +372,7 @@ Feature: Add - Remove seminar attendees
     And I follow "Add event"
     And I press "Save changes"
 
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_with_ja.csv" file to "CSV text file" filemanager
     And I press "Continue"
@@ -392,7 +393,7 @@ Feature: Add - Remove seminar attendees
       | capacity           | 1    |
     And I press "Save changes"
 
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
       | searchtext | Sam |
@@ -443,7 +444,7 @@ Feature: Add - Remove seminar attendees
       | capacity           | 1    |
     And I press "Save changes"
 
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
       | searchtext | Sam |

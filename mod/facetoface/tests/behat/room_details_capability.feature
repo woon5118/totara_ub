@@ -38,7 +38,7 @@ Feature: Check room details capability view for student and manager
     And I wait "1" seconds
     And I press "Save changes"
 
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com"
     And I press "Add"
@@ -52,19 +52,13 @@ Feature: Check room details capability view for student and manager
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I click on "Room 1" "link"
-    When I switch to "popup" window
-    Then I should see "View room"
-    And I should see "Room 1"
+    Then I should see "Room 1"
     And I should see "Building 123"
     And I should not see "Upcoming sessions in this room"
-    #NOTE: do not switch back to main window and instead rely on restart of browser after any switch.
 
   Scenario: Login as a manager and check seminar room details
     When I log in as "admin"
     And I am on "Course 1" course homepage
     When I click on "Room 1" "link"
-    When I switch to "popup" window
-    Then I should see "View room"
-    And I should see "Upcoming sessions in this room"
+    Then I should see "Upcoming sessions in this room"
     And I should see "Seminar TL-9052"
-    #NOTE: do not switch back to main window and instead rely on restart of browser after any switch.

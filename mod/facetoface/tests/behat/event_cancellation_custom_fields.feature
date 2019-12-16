@@ -153,7 +153,7 @@ Feature: Seminar event cancellation custom fields
 
     Given I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Cancel event" "link" in the "10:00 AM - 4:00 PM" "table_row"
+    And I click on the seminar event action "Cancel event" in row "10:00 AM - 4:00 PM"
     And I set the following fields to these values:
       | customfield_cancelcheckbox          | 1                  |
       | customfield_canceldatetime[enabled] | 1                  |
@@ -184,7 +184,7 @@ Feature: Seminar event cancellation custom fields
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_500: filling up custom fields when cancelling events
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I click on "Event details" "link"
     Then I should see "Yes" in the "//dt[contains(., 'cancelcheckbox')]//following-sibling::dd" "xpath_element"
     And I should see date "1 Dec next year" formatted "%d %B %Y" in the "//dt[contains(., 'canceldatetime')]//following-sibling::dd" "xpath_element"

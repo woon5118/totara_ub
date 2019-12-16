@@ -63,13 +63,13 @@ Feature: Seminar activity completion with a delay until after the end of the eve
       | completiondelay               | 0                                                 |
     And I click on "Save and display" "button"
     Then I should not see "\"Require event over for\" must be a whole number between 0 and 999 days."
-    And I should see "All events in seminar 1"
+    And ".mod_facetoface__event-dashboard" "css_element" should exist
     When I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | completiondelay               | 0                                                 |
     And I click on "Save and display" "button"
     Then I should not see "\"Require event over for\" must be a whole number between 0 and 999 days."
-    And I should see "All events in seminar 1"
+    And ".mod_facetoface__event-dashboard" "css_element" should exist
 
   Scenario: Require attendance state for activity completion, delay completion.
     Given I am on "course1" course homepage
@@ -83,7 +83,7 @@ Feature: Seminar activity completion with a delay until after the end of the eve
       | completiondelayenabled        | 1                                                 |
       | completiondelay               | 1                                                 |
     And I click on "Save and display" "button"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
     And I set the following fields to these values:
       | One Uno's attendance    | Fully attended     |
@@ -118,7 +118,7 @@ Feature: Seminar activity completion with a delay until after the end of the eve
     And I should see "Five Cinq, seminar 1: Not completed" in the "Five Cinq" "table_row"
 
     When I follow "seminar 1"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
     And I set the following fields to these values:
       | Two Duex's attendance  | Unable to attend   |
@@ -149,7 +149,7 @@ Feature: Seminar activity completion with a delay until after the end of the eve
       | completiondelayenabled        | 1                                                 |
       | completiondelay               | 1                                                 |
     And I click on "Save and display" "button"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
     And I set the following fields to these values:
       | One Uno's attendance     | Fully attended     |
@@ -188,7 +188,7 @@ Feature: Seminar activity completion with a delay until after the end of the eve
     And I should see "Five Cinq, seminar 1: Not completed" in the "Five Cinq" "table_row"
 
     When I follow "seminar 1"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
     And I set the following fields to these values:
       | Two Duex's event grade  | 30  |
@@ -224,7 +224,7 @@ Feature: Seminar activity completion with a delay until after the end of the eve
       | Seminar - seminar 1 | 1 |
     And I click on "Save changes" "button"
     Then I follow "seminar 1"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
     And I set the following fields to these values:
       | One Uno's attendance    | Fully attended     |
@@ -256,7 +256,7 @@ Feature: Seminar activity completion with a delay until after the end of the eve
     But I should not see "Completed" in the "Five Cinq" "table_row"
 
     When I follow "seminar 1"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
     And I set the following fields to these values:
       | One Uno's event grade    | 100 |
@@ -314,7 +314,7 @@ Feature: Seminar activity completion with a delay until after the end of the eve
     But I should not see "Completed" in the "Five Cinq" "table_row"
 
     When I follow "seminar 1"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
     And I set the following fields to these values:
       | Four Wha's attendance   | Partially attended |

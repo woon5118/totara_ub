@@ -99,14 +99,18 @@ final class seminarevent_dashboard extends template {
             [
                 'heading' => get_string('upcomingsessions', 'mod_facetoface'),
                 'type' => 'upcoming',
-                'legacystateclass' => 'upcomingsessionlist'
             ],
             [
                 'heading' => get_string('previoussessions', 'mod_facetoface'),
                 'type' => 'past',
-                'legacystateclass' => 'previoussessionlist'
             ]
         ];
+
+        // Behat steps are not supposed to look at deprecated CSS class names.
+        if (!defined('BEHAT_SITE_RUNNING')) {
+            $data['tables'][0]['legacystateclass'] = 'upcomingsessionlist';
+            $data['tables'][1]['legacystateclass'] = 'previoussessionlist';
+        }
 
         return new self($data);
     }

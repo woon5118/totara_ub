@@ -145,12 +145,7 @@ class external extends external_api {
         }
 
         $aredefault = $filters->are_default();
-        // if ($aredefault) {
-        //     $title = get_string('allsessionsin', 'mod_facetoface', $seminar->get_name());
-        // } else {
-            $title = get_string('allfilteredsessionsin', 'mod_facetoface', $seminar->get_name());
-        // }
-
+        $title = $seminar->get_name();
         $response = ['cookie' => $cookie, 'title' => $title, 'resetfilter' => $aredefault, 'data' => $data];
 
         if ($debug) {

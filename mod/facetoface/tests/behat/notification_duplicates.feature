@@ -20,7 +20,7 @@ Feature: Check seminar notification duplicates recovery functionality
 
   Scenario: Check that duplicates are detected and can be removed
     Given I reload the page
-    And I should see "All events in Test seminar name"
+    And I should see "Test seminar name" in the ".mod_facetoface__event-dashboard" "css_element"
     And I should not see "Duplicates of auto notifications found"
     When I make duplicates of seminar notification "Seminar booking cancellation"
     And I reload the page
@@ -36,7 +36,7 @@ Feature: Check seminar notification duplicates recovery functionality
     And I should see "Seminar booking cancellation"
     And I should not see "Delete" in the "Seminar booking cancellation" "table_row"
     And I click on "Test seminar name" "link"
-    And I should see "All events in Test seminar name"
+    And I should see "Test seminar name" in the ".mod_facetoface__event-dashboard" "css_element"
     And I should not see "Duplicates of auto notifications found"
 
 

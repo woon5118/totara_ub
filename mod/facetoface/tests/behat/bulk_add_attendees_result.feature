@@ -27,7 +27,7 @@ Feature: Add seminar attendees in bulk and see results
     And I follow "Add event"
     And I press "Save changes"
 
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "CSV text file" filemanager
     And I press "Continue"
@@ -49,7 +49,7 @@ Feature: Add seminar attendees in bulk and see results
     And I follow "Add event"
     And I press "Save changes"
 
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users via list of IDs"
     And I set the field "idfield" to "ID number"
     And I set the field "csvinput" to "I3"
@@ -71,7 +71,7 @@ Feature: Add seminar attendees in bulk and see results
     And I follow "Add event"
     And I press "Save changes"
 
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "CSV text file" filemanager
     And I press "Continue"
@@ -89,7 +89,7 @@ Feature: Add seminar attendees in bulk and see results
     And I follow "Add event"
     And I press "Save changes"
 
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users via list of IDs"
     And I set the field "idfield" to "ID number"
     And I set the field "csvinput" to "I3"
@@ -105,7 +105,7 @@ Feature: Add seminar attendees in bulk and see results
     And I follow "Add event"
     And I press "Save changes"
 
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "John1 Smith1, student1@example.com,John2 Smith2, student2@example.com,John4 Smith4, student4@example.com"
     And I press "Add"

@@ -44,7 +44,7 @@ Feature: Seminar sign-up periods display
       | registrationtimefinish[minute]  | 00            |
       | registrationtimefinish[timezone]| <endzone>     |
     And I press "Save changes"
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "f2f-actions" to "Add users"
     And I set the field "potential users" to "student@example.com"
     And I press exact "add"

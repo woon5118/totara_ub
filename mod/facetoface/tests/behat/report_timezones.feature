@@ -104,7 +104,7 @@ Feature: Seminar timezones in reports
     And I should see "1:00 AM - 2:30 AM" in the "Room 2" "table_row"
     And I should see "Timezone: Australia/Perth" in the "Room 2" "table_row"
     And I should see date "4 Feb +2 years Australia/Perth" formatted "%d %B %Y" in the "Room 2" "table_row"
-    And I click on "Attendees" "link" in the "Room 1" "table_row"
+    And I click on the seminar event action "Attendees" in row "Room 1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "First User, user1@example.com"
     And I press exact "add"
@@ -112,7 +112,7 @@ Feature: Seminar timezones in reports
     And I press "Confirm"
     And I wait until "First User" "text" exists
     And I click on "View all events" "link"
-    And I click on "Attendees" "link" in the "Room 2" "table_row"
+    And I click on the seminar event action "Attendees" in row "Room 2"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Second User, user2@example.com"
     And I press exact "add"

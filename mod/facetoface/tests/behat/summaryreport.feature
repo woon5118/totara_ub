@@ -52,7 +52,7 @@ Feature: Seminar sessions report overview
     And I press "Add"
     And I set the field "newcolumns" to "Approval Type"
     And I press "Add"
-    And I set the field "newcolumns" to "Overall status"
+    And I set the field "newcolumns" to "Event status"
     And I press "Add"
     And I set the field "newcolumns" to "Booking Status"
     And I press "Add"
@@ -75,7 +75,7 @@ Feature: Seminar sessions report overview
     And I click on "Filters" "link"
     And I set the field "newstandardfilter" to "Booking Status"
     And I press "Add"
-    And I set the field "newstandardfilter" to "Overall status"
+    And I set the field "newstandardfilter" to "Event status"
     And I press "Add"
     And I set the field "newstandardfilter" to "Event Learner"
     And I press "Add"
@@ -114,7 +114,7 @@ Feature: Seminar sessions report overview
     And I press "Save changes"
 
   Scenario: Check canceled seminar sessions summary report
-    Given I click on "Cancel event" "link"
+    Given I click on the seminar event action "Cancel event" in row "#1"
     And I press "Yes"
     And I click on "Reports" in the totara menu
     When I click on "Seminar Summary" "link"
@@ -125,7 +125,7 @@ Feature: Seminar sessions report overview
     Given I click on "Reports" in the totara menu
     When I click on "Seminar Summary" "link"
     And I click on "Test seminar name 1" "link" in the "Course 1" "table_row"
-    Then I should see "All events in Test seminar name 1"
+    Then I should see "Test seminar name 1" in the ".mod_facetoface__event-dashboard" "css_element"
 
   Scenario: Check active seminar sessions summary report
     # Prepare 4 sessions in three activities:
@@ -169,7 +169,7 @@ Feature: Seminar sessions report overview
       | normalcost           | 2.22              |
       | discountcost         | 2.10              |
     And I press "Save changes"
-    And I click on the link "Attendees" in row 1
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com"
     And I press exact "add"
@@ -198,7 +198,7 @@ Feature: Seminar sessions report overview
       | normalcost            | 3.33 |
       | discountcost          | 1.50 |
     And I press "Save changes"
-    And I click on the link "Attendees" in row 1
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam3 Student3, student3@example.com"
     And I press exact "add"
@@ -234,7 +234,7 @@ Feature: Seminar sessions report overview
     And I click on "Sam4 Student4" "checkbox"
     And I click on "Sam5 Student5" "checkbox"
     And I press "Save changes"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam6 Student6, student6@example.com"
     And I press exact "add"
@@ -267,7 +267,7 @@ Feature: Seminar sessions report overview
       | capacity           | 2             |
       | normalcost         | 5.55          |
     And I press "Save changes"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam7 Student7, student7@example.com"
     And I press exact "add"
@@ -357,8 +357,8 @@ Feature: Seminar sessions report overview
     And I should see "4.44"
     And I press "Clear"
 
-    When I set the field "Overall status field limiter" to "is equal to"
-    And I set the field "Overall status value" to "Upcoming"
+    When I set the field "Event status field limiter" to "is equal to"
+    And I set the field "Event status value" to "Upcoming"
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then I should see "1.11"
     And I should see "2.22"
@@ -366,8 +366,8 @@ Feature: Seminar sessions report overview
     And I should not see "4.44"
     And I press "Clear"
 
-    When I set the field "Overall status field limiter" to "is equal to"
-    And I set the field "Overall status value" to "Event in progress"
+    When I set the field "Event status field limiter" to "is equal to"
+    And I set the field "Event status value" to "Event in progress"
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then I should see "2.22"
     And I should not see "1.11"
@@ -375,16 +375,16 @@ Feature: Seminar sessions report overview
     And I should not see "4.44"
     And I press "Clear"
 
-    When I set the field "Overall status field limiter" to "is equal to"
-    And I set the field "Overall status value" to "Event over"
+    When I set the field "Event status field limiter" to "is equal to"
+    And I set the field "Event status value" to "Event over"
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then I should see "4.44"
     And I should not see "1.11"
     And I should not see "2.22"
     And I should not see "3.33"
 
-    When I set the field "Overall status field limiter" to "isn't equal to"
-    And I set the field "Overall status value" to "Upcoming"
+    When I set the field "Event status field limiter" to "isn't equal to"
+    And I set the field "Event status value" to "Upcoming"
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then I should not see "1.11"
     And I should not see "3.33"
@@ -392,8 +392,8 @@ Feature: Seminar sessions report overview
     And I should see "4.44"
     And I press "Clear"
 
-    When I set the field "Overall status field limiter" to "isn't equal to"
-    And I set the field "Overall status value" to "Upcoming"
+    When I set the field "Event status field limiter" to "isn't equal to"
+    And I set the field "Event status value" to "Upcoming"
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     Then I should not see "1.11"
     And I should not see "3.33"
@@ -402,8 +402,8 @@ Feature: Seminar sessions report overview
     And I press "Clear"
 
 
-    When I set the field "Overall status field limiter" to "isn't equal to"
-    And I set the field "Overall status value" to "Upcoming"
+    When I set the field "Event status field limiter" to "isn't equal to"
+    And I set the field "Event status value" to "Upcoming"
     And I set the field "Booking Status field limiter" to "is equal to"
     And I set the field "Booking Status value" to "Overbooked"
     And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"

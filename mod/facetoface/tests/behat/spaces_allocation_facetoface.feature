@@ -113,7 +113,7 @@ Feature: Allocate spaces for team in seminar
     And I set the field "Available team members" to "Sam1 Student1"
     When I press "Add"
     And I press "View all events"
-    Then I should see "1 / 3" in the "1 January 2020" "table_row"
+    Then I should see "1 / 3" in the "1 February" "table_row"
     And I press the "back" button in the browser
     When I follow "Allocate spaces for team"
     Then the "Allocated team members" select box should contain "Sam1 Student1"
@@ -122,7 +122,7 @@ Feature: Allocate spaces for team in seminar
     And I set the field "Allocated team members" to "Sam1 Student1"
     And I press "Remove"
     And I press "View all events"
-    Then I should see "1 / 3" in the "1 January 2020" "table_row"
+    Then I should see "1 / 3" in the "1 February" "table_row"
     And I press the "back" button in the browser
     But I follow "Allocate spaces for team"
     And the "Allocated team members" select box should not contain "Sam1 Student1"
@@ -137,7 +137,7 @@ Feature: Allocate spaces for team in seminar
     And I set the field "Available team members" to "Sam1 Student1"
     When I press "Add"
     And I press "View all events"
-    Then I should see "1 / 3" in the "1 January 2020" "table_row"
+    Then I should see "1 / 3" in the "1 February" "table_row"
     And I press the "back" button in the browser
     When I follow "Allocate spaces for team"
     Then the "Allocated team members" select box should contain "Sam1 Student1"
@@ -146,7 +146,7 @@ Feature: Allocate spaces for team in seminar
     And I set the field "Allocated team members" to "Sam1 Student1"
     And I press "Remove"
     And I press "View all events"
-    Then I should see "0 / 3" in the "1 January 2020" "table_row"
+    Then I should see "0 / 3" in the "1 February" "table_row"
     And I press the "back" button in the browser
     And I follow "Allocate spaces for team"
     And the "Available team members" select box should contain "Sam1 Student1"

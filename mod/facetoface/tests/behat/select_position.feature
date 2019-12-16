@@ -107,12 +107,12 @@ Feature: Add a seminar with select position
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I should see "Position2"
     And I log out
     And I log in as "admin"
     And I am on "Course 1" course homepage
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I should see "Position2"
     And I click on ".attendee-edit-job-assignment" "css_element"
     And I set the following fields to these values:
@@ -198,7 +198,7 @@ Feature: Add a seminar with select position
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Position2"
     And I log out
 

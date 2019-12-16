@@ -36,7 +36,7 @@ Feature: Take attendance tracking general
   Scenario: Take attendance tracking for event when mark attendance tracking is set for end time
     Given I am on "course1" course homepage
     And I follow "seminar 1"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     When I follow "Take attendance"
     Then I should see "2 session(s) (1 upcoming; 1 over)"
     And the "and mark as" "select" should be disabled
@@ -53,7 +53,7 @@ Feature: Take attendance tracking general
   Scenario: Take attendance tracking for session when mark attendance tracking is set for end time
     Given I am on "course1" course homepage
     And I follow "seminar 1"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
     And I set the field "Take attendance:" to "1"
     And I set the field "bolo bala's attendance" to "Partially attended"
@@ -78,7 +78,7 @@ Feature: Take attendance tracking general
     And I follow "Edit settings"
     And I set the field "Event attendance" to "2"
     And I click on "Save and display" "button"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
     And I set the field "bolo bala's attendance" to "Partially attended"
     When I click on "Save attendance" "button"
@@ -96,7 +96,7 @@ Feature: Take attendance tracking general
       | Event attendance            | 2 |
       | Session attendance tracking | 0 |
     And I click on "Save and display" "button"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     When I follow "Take attendance"
     Then I should not see "2 session(s) (1 upcoming; 1 over)"
     And "Take attendance" "field" should not exist

@@ -58,7 +58,7 @@ Feature: Clone pre-defined rooms in seminar
     And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I press "Save changes"
 
-    And I click on "Copy" "link"
+    And I click on the seminar event action "Copy event" in row "#1"
     When I click on "Select rooms" "link"
     Then I should see "Room 1, That house, 123 here street (Capacity: 5) (Room unavailable)" in the "Choose rooms" "totaradialogue"
     And I click on "Cancel" "button" in the "Choose rooms" "totaradialogue"

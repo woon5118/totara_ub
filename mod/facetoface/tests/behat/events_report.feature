@@ -53,7 +53,7 @@ Feature: Check the seminar events and sessions reports display correctly
     #
     When I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Edit event" "link"
+    And I click on the seminar event action "Edit event" in row "#1"
     And I click on "Add a new session" "button"
     And I click to edit the seminar event date at position 2
     And I set the following fields to these values:
@@ -129,7 +129,7 @@ Feature: Check the seminar events and sessions reports display correctly
     # Set the sessions display timezone to America/Toronto.
     When I follow "Course 1"
     And I follow "View all events"
-    And I click on "Edit event" "link"
+    And I click on the seminar event action "Edit event" in row "#1"
     And I click on "Edit session" "link"
     And I set the field "sessiontimezone" to "America/Toronto"
     And I click on "OK" "button" in the "Select date" "totaradialogue"

@@ -66,6 +66,18 @@ class behat_totara_data_generators extends behat_base {
                 'datagenerator' => 'global_asset_for_behat',
                 'required' => array('name')
             ),
+            'custom assets' => array(
+                'datagenerator' => 'custom_asset_for_behat',
+                'required' => array('name')
+            ),
+            'global facilitators' => array(
+                'datagenerator' => 'global_facilitator_for_behat',
+                'required' => array('name')
+            ),
+            'custom facilitators' => array(
+                'datagenerator' => 'custom_facilitator_for_behat',
+                'required' => array('name')
+            ),
             'seminars' => array(
                 'datagenerator' => 'instance_for_behat',
                 'required' => array('course', 'name')

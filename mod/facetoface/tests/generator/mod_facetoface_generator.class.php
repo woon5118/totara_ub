@@ -676,8 +676,28 @@ class mod_facetoface_generator extends testing_module_generator {
      * @param array $record
      */
     public function create_global_asset_for_behat(array $record) {
-        $record['custom'] = 0;
-        $this->add_asset($record);
+        $this->add_site_wide_asset($record);
+    }
+
+    /**
+     * @param array $record
+     */
+    public function create_custom_asset_for_behat(array $record) {
+        $this->add_custom_asset($record);
+    }
+
+    /**
+     * @param array $record
+     */
+    public function create_global_facilitator_for_behat(array $record) {
+        $this->add_site_wide_facilitator($record);
+    }
+
+    /**
+     * @param array $record
+     */
+    public function create_custom_facilitator_for_behat(array $record) {
+        $this->add_custom_facilitator($record);
     }
 
     /**

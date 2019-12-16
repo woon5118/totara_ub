@@ -67,7 +67,7 @@ Feature: Seminar event cancellation calendar views
     And I click on "Teacher One" "checkbox"
     And I press "Save changes"
 
-    Given I click on "Attendees" "link" in the "0 / 29" "table_row"
+    Given I click on the seminar event action "Attendees" in row "0 / 29"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com"
     And I press "Add"
@@ -90,7 +90,7 @@ Feature: Seminar event cancellation calendar views
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Cancel event" "link" in the "1 / 29" "table_row"
+    And I click on the seminar event action "Cancel event" in row "1 / 29"
     And I press "Yes"
 
     When I log out
@@ -99,8 +99,8 @@ Feature: Seminar event cancellation calendar views
     And I follow "View all events"
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
     And I should see "Cancelled" in the "10:00 AM - 4:00 PM" "table_row"
-    And I should not see "Go to event"
-    And ".mod_facetoface__sessionlist__action__links" "css_element" should not exist
+    And "Go to event" "link" should not exist in the ".mod_facetoface__event-dashboard" "css_element"
+    And "Actions" "button" should not exist in the ".mod_facetoface__event-dashboard" "css_element"
 
     When I click on "Dashboard" in the totara menu
     And I click on "Go to calendar" "link"
@@ -125,7 +125,7 @@ Feature: Seminar event cancellation calendar views
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Cancel event" "link" in the "1 / 29" "table_row"
+    And I click on the seminar event action "Cancel event" in row "1 / 29"
     And I press "Yes"
 
     When I log out
@@ -134,8 +134,8 @@ Feature: Seminar event cancellation calendar views
     And I follow "View all events"
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
     And I should see "Cancelled" in the "10:00 AM - 4:00 PM" "table_row"
-    And I should not see "Go to event"
-    And ".mod_facetoface__sessionlist__action__links" "css_element" should exist
+    And "Go to event" "link" should not exist in the ".mod_facetoface__event-dashboard" "css_element"
+    But "Actions" "button" should exist in the ".mod_facetoface__event-dashboard" "css_element"
 
     When I click on "Dashboard" in the totara menu
     And I click on "Go to calendar" "link"
@@ -152,7 +152,7 @@ Feature: Seminar event cancellation calendar views
     And I set the following fields to these values:
       | Description | Test Seminar Lorem ipsum dolor sit amet |
     And I press "Save and display"
-    And I click on "Cancel event" "link" in the "1 / 29" "table_row"
+    And I click on the seminar event action "Cancel event" in row "1 / 29"
     And I press "Yes"
     And I log out
 
@@ -161,8 +161,8 @@ Feature: Seminar event cancellation calendar views
     And I follow "View all events"
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
     And I should see "Cancelled" in the "10:00 AM - 4:00 PM" "table_row"
-    And I should not see "Go to event"
-    And ".mod_facetoface__sessionlist__action__links" "css_element" should exist
+    And "Go to event" "link" should not exist in the ".mod_facetoface__event-dashboard" "css_element"
+    But "Actions" "button" should exist in the ".mod_facetoface__event-dashboard" "css_element"
 
     When I click on "Dashboard" in the totara menu
     And I click on "Go to calendar" "link"

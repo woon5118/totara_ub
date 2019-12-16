@@ -138,8 +138,8 @@ Feature: Take attendance for a seminar with multiple sessions
     # Complete older session.
     Then I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I set the field "Room:" to "earlier session"
-    And I click on "Attendees" "link"
+    And I set the field "roomid" to "earlier session"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "first1 last1, user1@example.com"
     And I press exact "add"
@@ -169,8 +169,8 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log in as "admin"
     And I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I set the field "Room:" to "later session"
-    And I click on "Attendees" "link"
+    And I set the field "roomid" to "later session"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "first1 last1, user1@example.com"
     And I press exact "add"
@@ -202,8 +202,8 @@ Feature: Take attendance for a seminar with multiple sessions
     # Complete newer session.
     Then I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I set the field "Room:" to "later session"
-    And I click on "Attendees" "link"
+    And I set the field "roomid" to "later session"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "first1 last1, user1@example.com"
     And I press exact "add"
@@ -236,8 +236,8 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log in as "admin"
     And I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I set the field "Room:" to "earlier session"
-    And I click on "Attendees" "link"
+    And I set the field "roomid" to "earlier session"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "first1 last1, user1@example.com"
     And I press exact "add"
@@ -268,8 +268,8 @@ Feature: Take attendance for a seminar with multiple sessions
     # Complete newer session.
     Then I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I set the field "Room:" to "later session"
-    And I click on "Attendees" "link"
+    And I set the field "roomid" to "later session"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "first1 last1, user1@example.com"
     And I press exact "add"
@@ -293,8 +293,8 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log in as "admin"
     And I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I set the field "Room:" to "earlier session"
-    And I click on "Attendees" "link"
+    And I set the field "roomid" to "earlier session"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "first1 last1, user1@example.com"
     And I press exact "add"
@@ -339,8 +339,8 @@ Feature: Take attendance for a seminar with multiple sessions
     # Complete older session.
     Then I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I set the field "Room:" to "earlier session"
-    And I click on "Attendees" "link"
+    And I set the field "roomid" to "earlier session"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "first1 last1, user1@example.com"
     And I press exact "add"
@@ -364,8 +364,8 @@ Feature: Take attendance for a seminar with multiple sessions
     And I log in as "admin"
     And I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I set the field "Room:" to "later session"
-    And I click on "Attendees" "link"
+    And I set the field "roomid" to "later session"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "first1 last1, user1@example.com"
     And I press exact "add"
@@ -422,8 +422,8 @@ Feature: Take attendance for a seminar with multiple sessions
       | taker | course1 | teacher |
     And I am on "course1" course homepage
     And I click on "View all events" "link"
-    And I set the field "Room:" to "earlier session"
-    And I click on "Attendees" "link"
+    And I set the field "roomid" to "earlier session"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "first1 last1, user1@example.com"
     And I press exact "add"
@@ -434,8 +434,8 @@ Feature: Take attendance for a seminar with multiple sessions
     When I log in as "taker"
     And I am on "course1" course homepage
     And I click on "seminar1" "link"
-    And I set the field "Room:" to "earlier session"
-    And I click on "Attendees" "link"
+    And I set the field "roomid" to "earlier session"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I switch to "Take attendance" tab
     And I set the field "first1 last1's attendance" to "Fully attended"
     And I press "Save attendance"

@@ -17,7 +17,7 @@ Feature: I can slide seminar session dates
       | Room 2 | 20       |             |
       | Room 3 | 30       |             |
     And the following "seminar sessions" exist in "mod_facetoface" plugin:
-      | eventdetails |  room  |          start          |          finish          |
+      | eventdetails | rooms  |          start          |          finish          |
       | Event 1      | Room 1 |  1st Dec next year 9:00 |  1st Dec next year 10:00 |
       | Event 1      | Room 2 |  7th Dec next year 9:00 |  7th Dec next year 10:00 |
       | Event 1      | Room 3 | 14th Dec next year 9:00 | 14th Dec next year 10:00 |

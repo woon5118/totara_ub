@@ -60,7 +60,7 @@ Feature: Cancellation for session
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on the link "Attendees" in row 1
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Cancellations"
     And I should see "Show cancellation reason"
     And I click on "a.attendee-cancellation-note" "css_element"
@@ -77,7 +77,7 @@ Feature: Cancellation for session
     And I log in as "teacher2"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on the link "Attendees" in row 1
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Cancellations"
     And I should not see "Show cancellation reason"
     And I am on homepage
@@ -134,7 +134,7 @@ Feature: Cancellation for session
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Edit event" "link"
+    And I click on the seminar event action "Edit event" in row "#1"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |

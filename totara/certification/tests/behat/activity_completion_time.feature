@@ -70,7 +70,7 @@ Feature: Certification completion date is based on course completion time
       | timefinish[minute] | 0                |
     And I press "OK"
     And I press "Save changes"
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com"
     And I press exact "add"
@@ -80,7 +80,7 @@ Feature: Certification completion date is based on course completion time
 
     # Move event back in time.
     And I follow "View all events"
-    And I click on "Edit" "link" in the ".lastrow" "css_element"
+    And I click on the seminar event action "Edit event" in row "#1"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
@@ -97,13 +97,13 @@ Feature: Certification completion date is based on course completion time
     And I press "OK"
     And I press "Save changes"
 
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I click on "Take attendance" "link"
     And I set the field "Learner One's attendance" to "Fully attended"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
     When I press "View all events"
-    And I click on "Edit" "link" in the ".lastrow" "css_element"
+    And I click on the seminar event action "Edit event" in row "#1"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |

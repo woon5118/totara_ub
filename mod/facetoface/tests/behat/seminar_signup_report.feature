@@ -26,7 +26,7 @@ Feature: Users that are in waitlist of seminar's event should be displayed in th
     And I follow "Add event"
     And I click on "Delete" "link"
     And I click on "Save changes" "button"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "kian bomba"
     And I click on "Add" "button"

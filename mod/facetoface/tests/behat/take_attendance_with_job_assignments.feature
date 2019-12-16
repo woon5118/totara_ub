@@ -85,7 +85,7 @@ Feature: Take seminar attendance with job assignment on signup
     When I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Edit event" "link" in the "10 February" "table_row"
+    And I click on the seminar event action "Edit event" in row "10 February"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[year]    | 2016 |
@@ -94,9 +94,8 @@ Feature: Take seminar attendance with job assignment on signup
     Then I should see "10 February 2016"
 
     When I press "Save changes"
-    Then I should see "Attendees" in the "10 February 2016" "table_row"
 
-    When I follow "Attendees"
+    When I click on the seminar event action "Attendees" in row "10 February 2016"
     Then I should not see "Job assignment"
 
     When I follow "Take attendance"
@@ -142,7 +141,7 @@ Feature: Take seminar attendance with job assignment on signup
     When I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Edit event" "link" in the "10 February" "table_row"
+    And I click on the seminar event action "Edit event" in row "10 February"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[year]    | 2016 |
@@ -151,9 +150,8 @@ Feature: Take seminar attendance with job assignment on signup
     Then I should see "10 February 2016"
 
     When I press "Save changes"
-    Then I should see "Attendees" in the "10 February 2016" "table_row"
 
-    When I follow "Attendees"
+    When I click on the seminar event action "Attendees" in row "10 February 2016"
     Then "//th[contains(@class, 'session_positionnameedit')]/a[contains(.,'Job assignment')]" "xpath_element" should exist
     And I should not see "job1" in the "Sam1 Student1" "table_row"
 
@@ -208,7 +206,7 @@ Feature: Take seminar attendance with job assignment on signup
     When I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Edit event" "link" in the "10 February" "table_row"
+    And I click on the seminar event action "Edit event" in row "10 February"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[year]    | 2016 |
@@ -217,9 +215,8 @@ Feature: Take seminar attendance with job assignment on signup
     Then I should see "10 February 2016"
 
     When I press "Save changes"
-    Then I should see "Attendees" in the "10 February 2016" "table_row"
 
-    When I follow "Attendees"
+    When I click on the seminar event action "Attendees" in row "10 February 2016"
     Then "//th[contains(@class, 'session_positionnameedit')]/a[contains(.,'Job assignment')]" "xpath_element" should exist
     And I should see "job1" in the "Sam1 Student1" "table_row"
     And "//tr[td[contains(.,'Sam1 Student1')]]//a[contains(@class,'attendee-edit-job-assignment')]" "xpath_element" should exist
@@ -243,31 +240,29 @@ Feature: Take seminar attendance with job assignment on signup
     When I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Sign-up"
+    And I click on the link "Go to event" in row 1
     Then I should see "Select a job assignment"
     And the "Select a job assignment" select box should contain "job3"
 
     When I press "Sign-up"
-    Then I should see "Event info"
+    Then I should see "Your request was accepted"
 
-    When I follow "Event info"
-    Then I should see "Job assignment"
+    And I should see "Job assignment"
     And I should see "job3"
     And I log out
 
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Sign-up"
+    And I click on the link "Go to event" in row 1
     Then I should see "Select a job assignment"
     And the "Select a job assignment" select box should contain "job1"
     And the "Select a job assignment" select box should contain "job2"
 
     When I select "job2" from the "Select a job assignment" singleselect
     And I press "Sign-up"
-    Then I should see "Event info"
+    And I should see "Your request was accepted"
 
-    When I follow "Event info"
     Then I should see "Job assignment"
     And I should see "job2"
     And I log out

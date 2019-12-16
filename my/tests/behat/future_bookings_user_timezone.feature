@@ -58,7 +58,7 @@ Feature: My Future Bookings seminar sessions report overview
     And I press "OK"
     And I press "Save changes"
 
-    And I click on "Attendees" "link" in the "Australia/Perth" "table_row"
+    And I click on the seminar event action "Attendees" in row "Australia/Perth"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Alice Smith, alice.smith@example.com"
     And I press "Add"
@@ -67,7 +67,7 @@ Feature: My Future Bookings seminar sessions report overview
     And I wait until "Alice Smith" "text" exists
     And I click on "View all events" "link"
 
-    And I click on "Attendees" "link" in the "Europe/Prague" "table_row"
+    And I click on the seminar event action "Attendees" in row "Europe/Prague"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Alice Smith, alice.smith@example.com"
     And I press "Add"

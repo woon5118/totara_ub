@@ -30,7 +30,7 @@ Feature: Viewing distinct attendees
     And I log in as "admin"
     And I am on "course1" course homepage
     And I follow "seminar 1"
-    When I follow "Attendees"
+    When I click on the seminar event action "Attendees" in row "#1"
     # Scenario: VDA: Attendees tab
     Then I should see "User One" exactly "1" times
     And I should see "User Two" exactly "1" times

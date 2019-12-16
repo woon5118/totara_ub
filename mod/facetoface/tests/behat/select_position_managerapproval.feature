@@ -72,13 +72,13 @@ Feature: Seminar Select position with Manager approval
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I should not see "Approval required" in the ".tabtree" "css_element"
     And I log out
     And I log in as "teacher2"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I switch to "Approval required" tab
     And I click on "input[value='2']" "css_element" in the "Sam1 Student1" "table_row"
     And I press "Update requests"

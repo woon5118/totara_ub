@@ -34,7 +34,7 @@ Feature: The sign-up status is not changing when the approval type is changed
     And I follow "f2f one"
     And I follow "Add event"
     And I click on "Save changes" "button"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "4 potential users" to "learner1@example.com"
     And I press "Add"
@@ -47,7 +47,7 @@ Feature: The sign-up status is not changing when the approval type is changed
     And I expand all fieldsets
     And I set the field "Manager Approval" to "1"
     And I click on "Save and display" "button"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     When I follow "Approval required"
     Then I should see "Sa Rang Kim"
     And I should see "Min Young Park"

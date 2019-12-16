@@ -45,7 +45,7 @@ Feature: Add seminar attendees without signup capability
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "menuf2f-actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com"
     And I press "Add"

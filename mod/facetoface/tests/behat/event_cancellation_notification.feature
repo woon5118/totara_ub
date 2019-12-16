@@ -87,7 +87,7 @@ Feature: Seminar event cancellation notifications
     And I click on "Manager Four" "checkbox"
     And I press "Save changes"
 
-    Given I click on "Attendees" "link"
+    Given I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
     And I press "Add"
@@ -111,9 +111,9 @@ Feature: Seminar event cancellation notifications
     And I should see date "10 Feb next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "2 / 2" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "Booking full" in the "2 / 2" "table_row"
-    And "Cancel event" "link" should exist in the "2 / 2" "table_row"
+    And I should see the seminar event action "Cancel event" in row "2 / 2"
 
-    When I click on "Cancel event" "link" in the "2 / 2" "table_row"
+    When I click on the seminar event action "Cancel event" in row "2 / 2"
     Then I should see "Cancelling event in Test Seminar"
     And I should see date "10 Feb next year" formatted "%d %B %Y, 9:00 AM - 3:00 PMTimezone: Pacific/Auckland"
     And I press "Yes"
@@ -121,7 +121,7 @@ Feature: Seminar event cancellation notifications
     And I should see date "10 Feb next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "3 / 2 (Overbooked)" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "Cancelled" in the "9:00 AM - 3:00 PM" "table_row"
-    And "Cancel event" "link" should not exist in the "9:00 AM - 3:00 PM" "table_row"
+    And I should not see the seminar event action "Cancel event" in row "9:00 AM - 3:00 PM"
     And I run all adhoc tasks
 
     When I log out
@@ -189,7 +189,7 @@ Feature: Seminar event cancellation notifications
   Scenario: mod_facetoface_cancel_201: people notified of cancelled event with multiple future dates.
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I click on "Edit event" "link" in the "10 February" "table_row"
+    And I click on the seminar event action "Edit event" in row "10 February"
     And I press "Add a new session"
     And I follow "show-selectdate1-dialog"
     And I set the following fields to these values:
@@ -218,9 +218,9 @@ Feature: Seminar event cancellation notifications
     And I should see "Timezone: Pacific/Auckland" in the "10:00 AM - 4:00 PM" "table_row"
     And I should see date "11 Mar +2 years" formatted "%d %B %Y" in the "10:00 AM - 4:00 PM" "table_row"
     And I should see "Booking full" in the "9:00 AM - 3:00 PM" "table_row"
-    And "Cancel event" "link" should exist in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see the seminar event action "Cancel event" in row "9:00 AM - 3:00 PM"
 
-    When I click on "Cancel event" "link" in the "Booking full" "table_row"
+    When I click on the seminar event action "Cancel event" in row "Booking full"
     And I press "Yes"
     Then I should see "Timezone: Pacific/Auckland" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see date "10 Feb next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
@@ -228,7 +228,7 @@ Feature: Seminar event cancellation notifications
     And I should see date "11 Mar +2 years" formatted "%d %B %Y" in the "10:00 AM - 4:00 PM" "table_row"
     And I should see "3 / 2 (Overbooked)" in the "10:00 AM - 4:00 PM" "table_row"
     And I should see "Cancelled" in the "10:00 AM - 4:00 PM" "table_row"
-    And "Cancel event" "link" should not exist in the "10:00 AM - 4:00 PM" "table_row"
+    And I should not see the seminar event action "Cancel event" in row "10:00 AM - 4:00 PM"
     And I run all adhoc tasks
 
     When I log out
@@ -305,8 +305,8 @@ Feature: Seminar event cancellation notifications
     And I should see date "10 Feb next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "2 / 2" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "Booking full" in the "9:00 AM - 3:00 PM" "table_row"
-    And "Cancel event" "link" should exist in the "9:00 AM - 3:00 PM" "table_row"
-    And I click on "Cancel event" "link" in the "9:00 AM - 3:00 PM" "table_row"
+    And I should see the seminar event action "Cancel event" in row "9:00 AM - 3:00 PM"
+    And I click on the seminar event action "Cancel event" in row "9:00 AM - 3:00 PM"
     And I should see "Cancelling event in Test Seminar"
     And I should see date "10 Feb next year" formatted "%d %B %Y, 9:00 AM - 3:00 PMTimezone: Pacific/Auckland"
     And I press "Yes"
@@ -326,7 +326,7 @@ Feature: Seminar event cancellation notifications
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Delete event" "link" in the "10 February" "table_row"
+    And I click on the seminar event action "Delete event" in row "10 February"
     And I press "Continue"
 
     When I log out
@@ -355,7 +355,7 @@ Feature: Seminar event cancellation notifications
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Cancel event" "link" in the "10 February" "table_row"
+    And I click on the seminar event action "Cancel event" in row "10 February"
     And I press "Yes"
     And I run all adhoc tasks
 
@@ -402,7 +402,7 @@ Feature: Seminar event cancellation notifications
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Cancel event" "link" in the "10 February" "table_row"
+    And I click on the seminar event action "Cancel event" in row "10 February"
     And I press "Yes"
     And I run all adhoc tasks
 

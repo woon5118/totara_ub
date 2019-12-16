@@ -58,6 +58,7 @@ Feature: Reserve and allocate spaces by staff manager with job assignment
       | timefinish[minute] | 0                |
     And I press "OK"
     And I press "Save changes"
+    And I click on the link "Go to event" in row 1
     And I click on "Reserve for another manager" "link"
     And I set the following fields to these values:
        | managerid | 3 |
@@ -68,15 +69,16 @@ Feature: Reserve and allocate spaces by staff manager with job assignment
     Given I log in as "staffmanager"
     And I am on "Course 1" course homepage
     And I follow "Seminar 23071"
-    And I click on the link "Reserve spaces for team" in row 1
+    And I click on the link "Go to event" in row 1
+    And I click on "Reserve spaces for team" "link"
     And I set the following fields to these values:
       | reserve | 1 |
     And I press "Update"
-    And I click on the link "Allocate spaces for team" in row 1
-    And I set the field "Potential allocations" to "Sam1 Student1"
+    And I click on "Allocate spaces for team" "link"
+    And I set the field "Available team members" to "Sam1 Student1"
     When I press "Add"
     Then I should see "Allocate spaces for team (1/1)"
-    And I click on the link "Allocate spaces for team" in row 1
-    And I set the field "Current allocations" to "Sam1 Student1"
+    And I click on "Allocate spaces for team" "link"
+    And I set the field "Allocated team members" to "Sam1 Student1"
     When I press "Remove"
     Then I should see "Allocate spaces for team (0/1)"

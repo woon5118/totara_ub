@@ -59,7 +59,7 @@ Feature: Seminar Signup Role Approval after creating an event
     When I log in as "admin"
     And I am on "Classroom Connect Course" course homepage
     And I follow "View all events"
-    And I click on "Edit event" "link"
+    And I click on the seminar event action "Edit event" in row "#1"
     And I click on "Freddy Fred" "checkbox" in the "#id_trainerroles" "css_element"
     And I press "Save changes"
     Then I should see "Booking open"

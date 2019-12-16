@@ -85,7 +85,7 @@ Feature: Seminar event cancellation trainer can be reassigned
     Given I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test Seminar"
-    And I follow "Cancel event"
+    And I click on the seminar event action "Cancel event" in row "#1"
     And I press "Yes"
     And I follow "Add event"
     And I follow "show-selectdate0-dialog"
@@ -106,5 +106,5 @@ Feature: Seminar event cancellation trainer can be reassigned
     And I press "OK"
     And I click on "Teacher One" "checkbox"
     When I press "Save changes"
-    Then I should see "All events in Test Seminar"
+    Then I should see "Test Seminar" in the ".mod_facetoface__event-dashboard" "css_element"
     And I log out

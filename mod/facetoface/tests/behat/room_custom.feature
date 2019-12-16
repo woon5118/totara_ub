@@ -41,10 +41,10 @@ Feature: Manage custom rooms by admin and non-admin user
     And I press "Save changes"
 
     And I navigate to "Rooms" node in "Site administration > Seminars"
-    And I should see "There are no records in this report"
+    And I should see "There are no records that match your selected criteria"
     And "#facetoface_rooms" "css_element" should not exist
     And I press the "back" button in the browser
-    And I click on "Edit event" "link"
+    And I click on the seminar event action "Edit event" in row "#1"
 
     # Edit
     When I click on "Edit room" "link"
@@ -58,10 +58,10 @@ Feature: Manage custom rooms by admin and non-admin user
     And I press "Save changes"
 
     And I navigate to "Rooms" node in "Site administration > Seminars"
-    And I should see "There are no records in this report"
+    And I should see "There are no records that match your selected criteria"
     And "#facetoface_rooms" "css_element" should not exist
     And I press the "back" button in the browser
-    And I click on "Edit event" "link"
+    And I click on the seminar event action "Edit event" in row "#1"
 
     # Publish a custom room i.e. make it a site-wide room
     When I click on "Edit room" "link"
@@ -74,13 +74,13 @@ Feature: Manage custom rooms by admin and non-admin user
     And I click on "//*[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element" in the "Edit room" "totaradialogue"
     # Lets save the form until user does not change the mind
 #    And I press "Save changes"
-#    When I click on "Edit event" "link"
+#    When I click on the seminar event action "Edit event" in row "#1"
     Then I should see "Room published"
     And I should not see "Edit room" in the "Room published" "table_row"
     # No need to submit a form here; the room is published as soon as the totaradialogue is closed
 
     And I navigate to "Rooms" node in "Site administration > Seminars"
-    And I should not see "There are no records in this report"
+    And I should not see "There are no records that match your selected criteria"
     And I should not see "Room created"
     And I should not see "Room edited"
     And the "facetoface_rooms" table should contain the following:
@@ -109,7 +109,7 @@ Feature: Manage custom rooms by admin and non-admin user
     # No need to submit a form here; the room is published as soon as the totaradialogue is closed
 
     And I navigate to "Rooms" node in "Site administration > Seminars"
-    And I should not see "There are no records in this report"
+    And I should not see "There are no records that match your selected criteria"
     And I should not see "Room created"
     And I should not see "Room edited"
     And the "facetoface_rooms" table should contain the following:

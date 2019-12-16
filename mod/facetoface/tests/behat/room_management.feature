@@ -90,7 +90,7 @@ Feature: Manage pre-defined rooms
     And I wait "1" seconds
     And I press "Save changes"
 
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "menuf2f-actions" to "Add users"
     And I set the field "potential users" to "User One, user1@example.invalid, User Two, user2@example.invalid, User Three, user3@example.invalid,User Four, user4@example.invalid,User Five, user5@example.invalid"
     And I press "Add"

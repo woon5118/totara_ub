@@ -48,8 +48,7 @@ Feature: Check room actions are performed by users with the right permissions
     Given I log in as "trainer1"
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    And I click on "Actions" "button" in the "Upcoming" "table_row"
-    And I click on "Edit event" "link" in the "Upcoming" "table_row"
+    And I click on the seminar event action "Edit event" in row "Upcoming"
     When I click on "Select rooms" "link"
     Then I should see "Browse" in the "Choose rooms" "totaradialogue"
     And I should see "Search" in the "Choose rooms" "totaradialogue"
@@ -73,8 +72,7 @@ Feature: Check room actions are performed by users with the right permissions
     And I log in as "trainer1"
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    And I click on "Actions" "button" in the "Upcoming" "table_row"
-    And I click on "Edit event" "link" in the "Upcoming" "table_row"
+    And I click on the seminar event action "Edit event" in row "Upcoming"
     When I click on "Select rooms" "link"
     Then I should see "Browse" in the "Choose rooms" "totaradialogue"
     And I should see "Search" in the "Choose rooms" "totaradialogue"
@@ -87,8 +85,7 @@ Feature: Check room actions are performed by users with the right permissions
     Given I log in as "trainer2"
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    And I click on "Actions" "button" in the "Upcoming" "table_row"
-    And I click on "Edit event" "link" in the "Upcoming" "table_row"
+    And I click on the seminar event action "Edit event" in row "Upcoming"
     When I click on "Select rooms" "link"
     Then I should see "Browse" in the "Choose rooms" "totaradialogue"
     And I should see "Search" in the "Choose rooms" "totaradialogue"
@@ -112,8 +109,7 @@ Feature: Check room actions are performed by users with the right permissions
     And I log in as "trainer2"
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    And I click on "Actions" "button" in the "Upcoming" "table_row"
-    And I click on "Edit event" "link" in the "Upcoming" "table_row"
+    And I click on the seminar event action "Edit event" in row "Upcoming"
     When I click on "Select rooms" "link"
     Then I should see "Browse" in the "Choose rooms" "totaradialogue"
     And I should see "Search" in the "Choose rooms" "totaradialogue"
@@ -126,8 +122,7 @@ Feature: Check room actions are performed by users with the right permissions
     Given I log in as "manager"
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    And I click on "Actions" "button" in the "Upcoming" "table_row"
-    And I click on "Edit event" "link" in the "Upcoming" "table_row"
+    And I click on the seminar event action "Edit event" in row "Upcoming"
     When I click on "Select rooms" "link"
     Then I should see "Browse" in the "Choose rooms" "totaradialogue"
     And I should see "Search" in the "Choose rooms" "totaradialogue"
@@ -151,8 +146,7 @@ Feature: Check room actions are performed by users with the right permissions
 
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    And I click on "Actions" "button" in the "Upcoming" "table_row"
-    And I click on "Edit event" "link" in the "Upcoming" "table_row"
+    And I click on the seminar event action "Edit event" in row "Upcoming"
     When I click on "Select rooms" "link"
     Then I should see "Browse" in the "Choose rooms" "totaradialogue"
     And I should see "Search" in the "Choose rooms" "totaradialogue"
@@ -172,8 +166,7 @@ Feature: Check room actions are performed by users with the right permissions
 
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    And I click on "Actions" "button" in the "Upcoming" "table_row"
-    And I click on "Edit event" "link" in the "Upcoming" "table_row"
+    And I click on the seminar event action "Edit event" in row "Upcoming"
     When I click on "Select rooms" "link"
     Then I should see "Browse" in the "Choose rooms" "totaradialogue"
     And I should see "Search" in the "Choose rooms" "totaradialogue"

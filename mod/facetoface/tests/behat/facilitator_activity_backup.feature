@@ -40,13 +40,13 @@ Feature: Test facilitator conflicts through backup/restore
     And I am on "Course 1" course homepage
     And I follow "seminar 1"
 
-    And I follow "Edit event"
+    And I click on the seminar event action "Edit event" in row "#1"
     And I click on "Select facilitator" "link"
     And I click on "facilitator 1" "text" in the "Choose facilitators" "totaradialogue"
     And I click on "OK" "button" in the "Choose facilitators" "totaradialogue"
     And I press "Save changes"
 
-    And I follow "Edit event"
+    And I click on the seminar event action "Edit event" in row "#1"
     And I click on "Select facilitator" "link"
     And I click on "facilitator 2" "text" in the "Choose facilitators" "totaradialogue"
     And I click on "OK" "button" in the "Choose facilitators" "totaradialogue"

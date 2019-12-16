@@ -624,7 +624,7 @@ final class session_list_table extends html_table {
      * @return html_table_cell
      */
     private function table_cell_actions(seminar_event $seminarevent, render_session_list_config $config, int $datescount = 0): html_table_cell {
-        $params = ['s' => $seminarevent->get_id(), 'backtoallsessions' => 1];
+        $params = ['s' => $seminarevent->get_id(), 'backtoallsessions' => (int)(bool)$config->returntoallsessions];
 
         $builder = seminarevent_dashboard_action::builder();
 

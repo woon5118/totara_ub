@@ -58,7 +58,7 @@ Feature: Seminar event cancellation reporting
     And I press "OK"
     And I press "Save changes"
 
-    Given I click on "Attendees" "link"
+    Given I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
     And I press "Add"
@@ -84,12 +84,12 @@ Feature: Seminar event cancellation reporting
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Cancel event" "link" in the "10:00 AM - 4:00 PM" "table_row"
+    And I click on the seminar event action "Cancel event" in row "10:00 AM - 4:00 PM"
     And I press "Yes"
 
 
   # ----------------------------------------------------------------------------
-  Scenario: mod_facetoface_cancel_700: viewing “seminars: event attendees report”
+  Scenario: mod_facetoface_cancel_700: viewing "seminars: event attendees report"
     When I navigate to "Manage embedded reports" node in "Site administration > Reports"
     And I set the field "report-name" to "Seminars: Event attendees"
     And I press "id_submitgroupstandard_addfilter"

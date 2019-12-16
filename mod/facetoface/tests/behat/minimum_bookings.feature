@@ -61,7 +61,7 @@ Feature: Minimum Seminar bookings
     And I click on "OK" "button"
     And I wait "1" seconds
     And I click on "Save changes" "button"
-    And I click on "Edit" "link" in the "29 December" "table_row"
+    And I click on the seminar event action "Edit event" in row "29 December"
     Then the field "Minimum bookings" matches value "2"
 
   Scenario Outline: Confirm notifications are sent out once cutoff has been reached
@@ -82,7 +82,7 @@ Feature: Minimum Seminar bookings
     And I press "Save changes"
     Given I am on "Course 1" course homepage
     And I follow "View all events"
-    And I should see "All events in test activity"
+    And I should see "test activity" in the ".mod_facetoface__event-dashboard" "css_element"
     And I run the scheduled task "mod_facetoface\task\send_notifications_task"
     And I run all adhoc tasks
     # Confirm that the alert was sent.

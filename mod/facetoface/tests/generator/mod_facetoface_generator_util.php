@@ -126,6 +126,10 @@ final class mod_facetoface_generator_util {
         $rc->sessiontimezone = isset($record['sessiontimezone']) ? $record['sessiontimezone'] : 99;
         $rc->id = $DB->insert_record('facetoface_sessions_dates', $rc);
 
+        if (isset($record['room']) && !isset($record['rooms'])) {
+            throw new coding_exception('The room field is no longer supported. Please replace it with rooms.');
+        }
+
         if (isset($record['rooms'])) {
             // Start processing on rooms if there are any provided.
             $rooms = explode(",", $record['rooms']);

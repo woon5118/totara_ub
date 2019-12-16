@@ -25,6 +25,8 @@
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
 use Behat\Gherkin\Node\TableNode as TableNode;
+use Behat\Mink\Exception\ElementNotFoundException;
+use Behat\Mink\Exception\ExpectationException;
 
 /**
  * Contains functions used by behat to test functionality.
@@ -192,6 +194,91 @@ class behat_facetoface extends behat_base {
     }
 
     /**
+     * Get the xpaths for an action menu item.
+     *
+     * @param string $action
+     * @param string $row
+     * @return array of [xpath_dropdown, xpath_menuitem]
+     */
+    private static function resolve_xpaths_for_action(string $action, string $row): array {
+        $tablexpath = '//table[contains(@class, \'mod_facetoface__sessionlist__table\')]';
+        if (preg_match('/^#(\d+)$/', $row, $matches)) {
+            // This a row index. e.g. #1
+            $rowxpath = $tablexpath.'//tbody//tr['.$matches[1].']';
+        } else {
+            $rowxpath = $tablexpath.'//tbody//tr[contains(., '.behat_context_helper::escape($row).')]';
+        }
+        $label = get_string('moreactions', 'mod_facetoface');
+        $ddxpath = $rowxpath.'//button[@aria-label='.behat_context_helper::escape($label).']';
+        $menuxpath = $rowxpath.'//a[@role="menuitem" and contains(., '.behat_context_helper::escape($action).')]';
+        return [$ddxpath, $menuxpath];
+    }
+
+    /**
+     * Click on an action menu item that is located in a table row.
+     *
+     * @Given /^I click on the seminar event action "([^"]*)" in row "([^"]*)"$/
+     * @param string $action the text of an action menu item.
+     * @param string $row the row text, or the row number in the format #1
+     */
+    public function i_click_on_the_seminar_event_action_in_row(string $action, string $row) {
+        \behat_hooks::set_step_readonly(false);
+        [$ddxpath, $menuxpath] = self::resolve_xpaths_for_action($action, $row);
+        $ddnode = $this->find(
+            'xpath',
+            $ddxpath,
+            new ExpectationException("Could not find a meatballs button in the row \"{$row}\"", $this->getSession())
+        );
+        $ddnode->click();
+        $this->wait_for_pending_js();
+        $menunode = $this->find(
+            'xpath',
+            $menuxpath,
+            new ExpectationException("The menu item \"{$action}\" is not presented in the row \"{$row}\"", $this->getSession())
+        );
+        $menunode->click();
+    }
+
+    /**
+     * Checks the provided action menu item should exist in a table row.
+     *
+     * @Given /^I should see the seminar event action "([^"]*)" in row "([^"]*)"$/
+     * @param string $action the text of an action menu item.
+     * @param string $row the row text, or the row number in the format #1
+     */
+    public function i_should_see_the_seminar_event_action_in_row(string $action, string $row) {
+        \behat_hooks::set_step_readonly(true);
+        [$ddxpath, $menuxpath] = self::resolve_xpaths_for_action($action, $row);
+        $this->find(
+            'xpath',
+            $menuxpath,
+            new ExpectationException("The menu item \"{$action}\" is not presented in the row \"{$row}\"", $this->getSession())
+        );
+    }
+
+    /**
+     * Checks the provided action menu item should not exist in a table row.
+     *
+     * @Given /^I should not see the seminar event action "([^"]*)" in row "([^"]*)"$/
+     * @param string $action the text of an action menu item.
+     * @param string $row the row text, or the row number in the format #1
+     */
+    public function i_should_not_see_the_seminar_event_action_in_row(string $action, string $row) {
+        try {
+            $this->i_should_see_the_seminar_event_action_in_row($action, $row);
+            // Throw exception if found.
+        } catch (ExpectationException $e) {
+            if (strpos($e->getMessage(), "The menu item \"{$action}\" is not presented in the row \"{$row}\"") !== false) {
+                // Passed.
+                return;
+            }
+            // Rethrow any unexpected exception.
+            throw $e;
+        }
+        throw new ExpectationException("The menu item \"{$action}\" is presented in the row \"{$row}\"", $this->getSession());
+    }
+
+    /**
      * Use magic to alter facetoface cut off to value which is not allowed in UI so that we do not have to wait in tests.
      *
      * @Given /^I use magic to set Seminar "([^"]*)" to send capacity notification two days ahead$/
@@ -316,17 +403,7 @@ class behat_facetoface extends behat_base {
      * @param int $row
      */
     public function i_click_to_edit_the_facetoface_session_in_row($term, $row) {
-        \behat_hooks::set_step_readonly(false);
-        $summaryliteral = behat_context_helper::escape(get_string('sessionslist', 'facetoface'));
-        $titleliteral = behat_context_helper::escape(get_string('editsession', 'facetoface'));
-        $xpath = "//table[@summary={$summaryliteral}]/tbody/tr[{$row}]//a/span[@title={$titleliteral}]/parent::a";
-        /** @var \Behat\Mink\Element\NodeElement[] $nodes */
-        $nodes = $this->find_all('xpath', $xpath);
-        if (empty($nodes) || count($nodes) > 1) {
-            throw new \Behat\Mink\Exception\ExpectationException('Unable to find the edit session link on row '.$row, $this->getSession());
-        }
-        $node = reset($nodes);
-        $node->click();
+        $this->i_click_on_the_seminar_event_action_in_row(get_string('editsession', 'mod_facetoface'), '#'.$row);
     }
 
     /**

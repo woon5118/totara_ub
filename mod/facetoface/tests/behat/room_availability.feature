@@ -79,7 +79,7 @@ Feature: Seminar room availability
     And I press "Add a new session"
     # The UI is not usable much here, we just save this and go back and the last added session will be listed first.
     And I press "Save changes"
-    And I click on "Edit event" "link" in the "0 / 10" "table_row"
+    And I click on the seminar event action "Edit event" in row "0 / 10"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -102,7 +102,7 @@ Feature: Seminar room availability
     And I press "Add a new session"
     # The UI is not usable much here, we just save this and go back and the last added session will be listed first.
     And I press "Save changes"
-    And I click on "Edit event" "link" in the "0 / 10" "table_row"
+    And I click on the seminar event action "Edit event" in row "0 / 10"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -223,7 +223,7 @@ Feature: Seminar room availability
     When I click on "Cancel" "button" in the "Choose rooms" "totaradialogue"
     And I press "Cancel"
 
-    And I click on "Edit event" "link" in the "0 / 20" "table_row"
+    And I click on the seminar event action "Edit event" in row "0 / 20"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -303,7 +303,7 @@ Feature: Seminar room availability
     And I click on "Cancel" "button" in the "Choose rooms" "totaradialogue"
     And I press "Cancel"
 
-    When I click on "Edit event" "link" in the "0 / 20" "table_row"
+    When I click on the seminar event action "Edit event" in row "0 / 20"
     And I click on "Select rooms" "link"
     And I should see "Room 1 (Capacity: 10)"
     And I should see "Room 2 (Capacity: 10)"
@@ -312,7 +312,7 @@ Feature: Seminar room availability
     And I press "Add a new session"
     # The UI is not usable much here, we just save this and go back and the last added session will be listed first.
     And I press "Save changes"
-    And I click on "Edit event" "link" in the "0 / 20" "table_row"
+    And I click on the seminar event action "Edit event" in row "0 / 20"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -366,7 +366,7 @@ Feature: Seminar room availability
     When  I press "Add a new session"
     # The UI is not usable much here, we just save this and go back and the last added session will be listed first.
     And I press "Save changes"
-    And I click on "Edit event" "link" in the "0 / 30" "table_row"
+    And I click on the seminar event action "Edit event" in row "0 / 30"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -421,7 +421,7 @@ Feature: Seminar room availability
     And I press "Save changes"
     And I should not see "Zimmer 2" in the "0 / 40" "table_row"
 
-    When I click on "Edit event" "link" in the "0 / 40" "table_row"
+    When I click on the seminar event action "Edit event" in row "0 / 40"
     And I click on "Select rooms" "link"
     Then I should see "Zimmer 1 (Capacity: 30) (Room unavailable) (Seminar: Test Seminar 1)"
     And I should see "Zimmer 2 (Capacity: 40) (Seminar: Test Seminar 1)"
@@ -526,7 +526,7 @@ Feature: Seminar room availability
 
     When I am on "Course 1" course homepage
     And I follow "Test Seminar 1"
-    And I click on "Edit event" "link" in the "0 / 30" "table_row"
+    And I click on the seminar event action "Edit event" in row "0 / 30"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -599,7 +599,7 @@ Feature: Seminar room availability
     Then I should see "Zimmer 1" in the "0 / 40" "table_row"
     And I should see "Zimmer 1" in the "0 / 50" "table_row"
 
-    When I click on "Edit event" "link" in the "0 / 50" "table_row"
+    When I click on the seminar event action "Edit event" in row "0 / 50"
     And I click on "Edit room" "link" in the "Zimmer 1" "table_row"
     And I set the following fields to these values:
       | Allow room booking conflicts | 0 |
@@ -620,7 +620,7 @@ Feature: Seminar room availability
       | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
-    When I click on "Edit event" "link" in the "0 / 50" "table_row"
+    When I click on the seminar event action "Edit event" in row "0 / 50"
     And I click on "Edit room" "link" in the "Zimmer 1" "table_row"
     And I set the following fields to these values:
       | Allow room booking conflicts | 0 |

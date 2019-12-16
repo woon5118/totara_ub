@@ -59,7 +59,7 @@ Feature: Check attendees actions are performed by users with the right permissio
       | timefinish[minute] | 0                |
     And I press "OK"
     And I press "Save changes"
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com,Sam3 Student3, student3@example.com"
     And I press "Add"
@@ -73,7 +73,7 @@ Feature: Check attendees actions are performed by users with the right permissio
 
     # Move event back in time.
     And I follow "View all events"
-    And I click on "Edit" "link" in the ".lastrow" "css_element"
+    And I click on the seminar event action "Edit event" in row "#1"
     And I click on "Edit session" "link"
     And I fill seminar session with relative date in form data:
       | sessiontimezone    | Pacific/Auckland |
@@ -96,7 +96,7 @@ Feature: Check attendees actions are performed by users with the right permissio
     Given I log in as "trainer1"
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Attendees" in the "div.tabtree" "css_element"
     And I should see "Wait-list" in the "div.tabtree" "css_element"
     And I should see "Cancellations" in the "div.tabtree" "css_element"
@@ -111,7 +111,7 @@ Feature: Check attendees actions are performed by users with the right permissio
     When I log in as "trainer1"
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Attendees" in the "div.tabtree" "css_element"
     And I should see "Wait-list" in the "div.tabtree" "css_element"
     And I should see "Cancellations" in the "div.tabtree" "css_element"
@@ -131,7 +131,7 @@ Feature: Check attendees actions are performed by users with the right permissio
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Remove users"
     And I set the field "Current attendees" to "Sam1 Student1, student1@example.com"
     And I press "Remove"
@@ -142,7 +142,7 @@ Feature: Check attendees actions are performed by users with the right permissio
     And I log in as "trainer1"
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Attendees" in the "div.tabtree" "css_element"
     And I should see "Wait-list" in the "div.tabtree" "css_element"
     And I should see "Take attendance" in the "div.tabtree" "css_element"
@@ -156,7 +156,8 @@ Feature: Check attendees actions are performed by users with the right permissio
     When I log in as "trainer1"
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    Then "Attendees" "link" should not exist
+    Then I should not see the seminar event action "Attendees" in row "#1"
+
     When I visit the attendees page for session "1" with action "takeattendance"
     And I should see "Cancellations" in the "div.tabtree" "css_element"
     And I should see "Take attendance" in the "div.tabtree" "css_element"
@@ -234,7 +235,7 @@ Feature: Check attendees actions are performed by users with the right permissio
     When I log in as "trainer1"
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Attendees" in the "div.tabtree" "css_element"
     And I should see "Wait-list" in the "div.tabtree" "css_element"
     And I should see "Cancellations" in the "div.tabtree" "css_element"

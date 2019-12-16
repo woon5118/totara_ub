@@ -25,7 +25,7 @@ Feature: User with permission remove seminar's message recipients is able to per
     And I follow "Seminar1"
     And I follow "Add event"
     And I press "Save changes"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "4 potential users" to "Kian Bomba, kian.bomba@example.com"
     And I press "Add"
@@ -41,7 +41,7 @@ Feature: User with permission remove seminar's message recipients is able to per
     And I log in as "userone"
     And I am on "Course101" course homepage
     And I follow "Seminar1"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Message users"
     And I set the field "Booked - 2 user(s)" to "1"
     And I follow "Recipients"
@@ -59,7 +59,7 @@ Feature: User with permission remove seminar's message recipients is able to per
     And I log in as "userone"
     And I am on "Course101" course homepage
     And I follow "Seminar1"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Message users"
     And I set the field "Booked - 2 user(s)" to "1"
     When I follow "Recipients"
@@ -86,7 +86,7 @@ Feature: User with permission remove seminar's message recipients is able to per
     And I log in as "userone"
     And I am on "Course101" course homepage
     And I follow "Seminar1"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Message users"
     And I set the field "Booked - 2 user(s)" to "1"
     When I follow "Recipients"
@@ -104,7 +104,7 @@ Feature: User with permission remove seminar's message recipients is able to per
     When I log in as "admin"
     And I am on "Course101" course homepage
     And I follow "Seminar1"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Message users"
     And I set the field "Booked - 2 user(s)" to "1"
     And I follow "Recipients"

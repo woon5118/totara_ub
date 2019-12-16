@@ -30,117 +30,117 @@ Feature: Return to previous page after actions in seminar
 
   Scenario: Course page - Seminar edit session actions return to original page
     Given I am on "Course 1" course homepage
-    When I click on "Edit" "link" in the "Booking open" "table_row"
+    When I click on the seminar event action "Edit event" in row "Booking open"
     And I click on "Cancel" "button"
     Then I should see "View all events"
-    And I should not see "All events in"
+    And ".mod_facetoface__event-dashboard" "css_element" should not exist
 
     Given I am on "Course 1" course homepage
-    When I click on "Edit" "link" in the "Booking open" "table_row"
+    When I click on the seminar event action "Edit event" in row "Booking open"
     And I click on "Save changes" "button"
     Then I should see "View all events"
-    And I should not see "All events in"
+    And ".mod_facetoface__event-dashboard" "css_element" should not exist
 
   Scenario: Sessions page - Seminar edit session actions return to original page
     Given I am on "Course 1" course homepage
     And I follow "View all events"
-    When I click on "Edit" "link" in the "Booking open" "table_row"
+    When I click on the seminar event action "Edit event" in row "Booking open"
     And I click on "Cancel" "button"
-    Then I should see "All events in"
+    Then ".mod_facetoface__event-dashboard" "css_element" should exist
     And I should not see "View all events"
 
     Given I am on "Course 1" course homepage
     And I follow "View all events"
-    When I click on "Edit" "link" in the "Booking open" "table_row"
+    When I click on the seminar event action "Edit event" in row "Booking open"
     And I click on "Save changes" "button"
-    Then I should see "All events in"
+    Then ".mod_facetoface__event-dashboard" "css_element" should exist
     And I should not see "View all events"
 
   Scenario: Course page - Seminar cancel session actions return to original page
     Given I am on "Course 1" course homepage
-    When I click on "Cancel event" "link" in the "Booking open" "table_row"
+    When I click on the seminar event action "Cancel event" in row "Booking open"
     And I click on "No" "button"
     Then I should see "View all events"
-    And I should not see "All events in"
+    And ".mod_facetoface__event-dashboard" "css_element" should not exist
 
     Given I am on "Course 1" course homepage
-    When I click on "Cancel event" "link" in the "Booking open" "table_row"
+    When I click on the seminar event action "Cancel event" in row "Booking open"
     And I click on "Yes" "button"
     Then I should see "View all events"
-    And I should not see "All events in"
+    And ".mod_facetoface__event-dashboard" "css_element" should not exist
     And I should see "Event cancelled"
 
   Scenario: Sessions page - Seminar cancel session actions return to original page
     Given I am on "Course 1" course homepage
     And I follow "View all events"
-    When I click on "Cancel event" "link" in the "Booking open" "table_row"
+    When I click on the seminar event action "Cancel event" in row "Booking open"
     And I click on "No" "button"
-    Then I should see "All events in"
+    Then ".mod_facetoface__event-dashboard" "css_element" should exist
     And I should not see "View all events"
 
     Given I am on "Course 1" course homepage
     And I follow "View all events"
-    When I click on "Cancel event" "link" in the "Booking open" "table_row"
+    When I click on the seminar event action "Cancel event" in row "Booking open"
     And I click on "Yes" "button"
-    Then I should see "All events in"
+    Then ".mod_facetoface__event-dashboard" "css_element" should exist
     And I should not see "View all events"
     And I should see "Event cancelled"
 
   Scenario: Course page - Seminar clone session actions return to original page
     Given I am on "Course 1" course homepage
-    When I click on "Copy" "link" in the "Booking open" "table_row"
+    When I click on the seminar event action "Copy event" in row "Booking open"
     And I click on "Cancel" "button"
     Then I should see "View all events"
-    And I should not see "All events in"
+    And ".mod_facetoface__event-dashboard" "css_element" should not exist
 
     Given I am on "Course 1" course homepage
-    When I click on "Copy" "link" in the "Booking open" "table_row"
+    When I click on the seminar event action "Copy event" in row "Booking open"
     And I click on "Save changes" "button"
     Then I should see "View all events"
-    And I should not see "All events in"
+    And ".mod_facetoface__event-dashboard" "css_element" should not exist
 
   Scenario: Sessions page - Seminar clone session actions return to original page
     Given I am on "Course 1" course homepage
     And I follow "View all events"
-    When I click on "Copy" "link" in the "Booking open" "table_row"
+    When I click on the seminar event action "Copy event" in row "Booking open"
     And I click on "Cancel" "button"
-    Then I should see "All events in"
+    Then ".mod_facetoface__event-dashboard" "css_element" should exist
     And I should not see "View all events"
 
     Given I am on "Course 1" course homepage
     And I follow "View all events"
-    When I click on "Copy" "link" in the "Booking open" "table_row"
+    When I click on the seminar event action "Copy event" in row "Booking open"
     And I click on "Save changes" "button"
-    Then I should see "All events in"
+    Then ".mod_facetoface__event-dashboard" "css_element" should exist
     And I should not see "View all events"
 
   Scenario: Course page - Seminar delete session actions return to original page
     Given I am on "Course 1" course homepage
-    When I click on "Delete" "link" in the "Booking open" "table_row"
+    When I click on the seminar event action "Delete event" in row "Booking open"
     And I click on "Cancel" "button"
     Then I should see "View all events"
-    And I should not see "All events in"
+    And ".mod_facetoface__event-dashboard" "css_element" should not exist
 
     Given I am on "Course 1" course homepage
-    When I click on "Delete" "link" in the "Booking open" "table_row"
+    When I click on the seminar event action "Delete event" in row "Booking open"
     And I click on "Continue" "button"
     Then I should see "View all events"
-    And I should not see "All events in"
+    And ".mod_facetoface__event-dashboard" "css_element" should not exist
     And I should not see "Booking open"
 
   Scenario: Sessions page - Seminar delete session actions return to original page
     Given I am on "Course 1" course homepage
     And I follow "View all events"
-    When I click on "Delete" "link" in the "Booking open" "table_row"
+    When I click on the seminar event action "Delete event" in row "Booking open"
     And I click on "Cancel" "button"
-    Then I should see "All events in"
+    Then ".mod_facetoface__event-dashboard" "css_element" should exist
     And I should not see "View all events"
 
     Given I am on "Course 1" course homepage
     And I follow "View all events"
-    When I click on "Delete" "link" in the "Booking open" "table_row"
+    When I click on the seminar event action "Delete event" in row "Booking open"
     And I click on "Continue" "button"
-    Then I should see "All events in"
+    Then ".mod_facetoface__event-dashboard" "css_element" should exist
     And I should not see "View all events"
     And I should not see "Booking open"
 
@@ -150,13 +150,13 @@ Feature: Return to previous page after actions in seminar
     # Course page -> Go to event -> All events -> Event dashboard
     When I click on "Go to event" "link" in the "Booking open" "table_row"
     And I click on "All events" "link" in the ".mod_facetoface__navigation" "css_element"
-    Then I should see "All events in"
+    Then ".mod_facetoface__event-dashboard" "css_element" should exist
     And I should not see "View all events"
 
     # Course page -> Go to event -> View all events -> Event dashboard
     When I click on "Go to event" "link" in the "Booking open" "table_row"
     And I click on "View all events" "button"
-    Then I should see "All events in"
+    Then ".mod_facetoface__event-dashboard" "css_element" should exist
     And I should not see "View all events"
 
     # Course page -> Go to event -> Sign-up -> Event page
@@ -167,19 +167,19 @@ Feature: Return to previous page after actions in seminar
     # ... Booked ...
     Given I am on "Course 1" course homepage
     # Course page -> Go to event -> All events -> Event dashboard
-    When I click on "Go to event" "link" in the "Booked" "table_row"
+    When I click on "Go to event" "link" in the "(Booked)" "table_row"
     And I click on "All events" "link" in the ".mod_facetoface__navigation" "css_element"
-    Then I should see "All events in"
+    Then ".mod_facetoface__event-dashboard" "css_element" should exist
     And I should not see "View all events"
 
     # Course page -> Go to event -> View all events -> Event dashboard
-    When I click on "Go to event" "link" in the "Booked" "table_row"
+    When I click on "Go to event" "link" in the "(Booked)" "table_row"
     And I click on "View all events" "button"
-    Then I should see "All events in"
+    Then ".mod_facetoface__event-dashboard" "css_element" should exist
     And I should not see "View all events"
 
     # Course page -> Go to event -> Cancel booking -> Cancel booking -> Event page
-    When I click on "Go to event" "link" in the "Booked" "table_row"
+    When I click on "Go to event" "link" in the "(Booked)" "table_row"
     And I click on "Cancel booking" "link"
     And I wait "1" seconds
     And I press "Cancel booking"
@@ -192,13 +192,13 @@ Feature: Return to previous page after actions in seminar
     # Event dashboard -> Go to event -> All events -> Event dashboard
     When I click on "Go to event" "link" in the "Booking open" "table_row"
     And I click on "All events" "link" in the ".mod_facetoface__navigation" "css_element"
-    Then I should see "All events in"
+    Then ".mod_facetoface__event-dashboard" "css_element" should exist
     And I should not see "View all events"
 
     # Event dashboard -> Go to event -> View all events -> Event dashboard
     When I click on "Go to event" "link" in the "Booking open" "table_row"
     And I click on "View all events" "button"
-    Then I should see "All events in"
+    Then ".mod_facetoface__event-dashboard" "css_element" should exist
     And I should not see "View all events"
 
     # Event dashboard -> Go to event -> Sign-up -> Event page
@@ -209,19 +209,19 @@ Feature: Return to previous page after actions in seminar
     # ... Booked ...
     Given I am on "Course 1" course homepage
     # Event dashboard -> Go to event -> All events -> Event dashboard
-    When I click on "Go to event" "link" in the "Booked" "table_row"
+    When I click on "Go to event" "link" in the "(Booked)" "table_row"
     And I click on "All events" "link" in the ".mod_facetoface__navigation" "css_element"
-    Then I should see "All events in"
+    Then ".mod_facetoface__event-dashboard" "css_element" should exist
     And I should not see "View all events"
 
     # Event dashboard -> Go to event -> View all events -> Event dashboard
     When I click on "Go to event" "link" in the "Booking open" "table_row"
     And I click on "View all events" "button"
-    Then I should see "All events in"
+    Then ".mod_facetoface__event-dashboard" "css_element" should exist
     And I should not see "View all events"
 
     # Event dashboard -> Go to event -> Cancel booking -> Cancel booking -> Event page
-    When I click on "Go to event" "link" in the "Booked" "table_row"
+    When I click on "Go to event" "link" in the "(Booked)" "table_row"
     And I click on "Cancel booking" "link"
     And I wait "1" seconds
     And I press "Cancel booking"
@@ -229,16 +229,16 @@ Feature: Return to previous page after actions in seminar
 
   Scenario: Seminar attendees back link return to original page - top level only
     Given I am on "Course 1" course homepage
-    When I click on "Attendees" "link" in the "Booking open" "table_row"
+    When I click on the seminar event action "Attendees" in row "Booking open"
     And I click on "View all events" "link"
     Then I should see "View all events"
-    And I should not see "All events in"
+    And ".mod_facetoface__event-dashboard" "css_element" should not exist
 
     Given I am on "Course 1" course homepage
     And I follow "View all events"
-    When I click on "Attendees" "link" in the "Booking open" "table_row"
+    When I click on the seminar event action "Attendees" in row "Booking open"
     And I click on "View all events" "link"
-    Then I should see "All events in"
+    Then ".mod_facetoface__event-dashboard" "css_element" should exist
     And I should not see "View all events"
 
   Scenario Outline: Event page - manager actions return to original page
@@ -274,7 +274,7 @@ Feature: Return to previous page after actions in seminar
     When I follow "Allocate spaces for team"
     And I click on "View all events" "button"
     Then ".mod_facetoface__navigation" "css_element" should not exist
-    And I <visibility> see "All events in"
+    And ".mod_facetoface__event-dashboard" "css_element" <visibility> exist
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
 
     # Event page -> Allocate spaces for team -> Add -> Event page
@@ -298,7 +298,7 @@ Feature: Return to previous page after actions in seminar
     When I follow "Reserve spaces for team"
     And I click on "View all events" "button"
     Then ".mod_facetoface__navigation" "css_element" should not exist
-    And I <visibility> see "All events in"
+    And ".mod_facetoface__event-dashboard" "css_element" <visibility> exist
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
 
     # Event page -> Reserve spaces for team -> Update -> Event page
@@ -316,7 +316,7 @@ Feature: Return to previous page after actions in seminar
     When I follow "Manage reservations"
     And I click on "View all events" "button"
     Then ".mod_facetoface__navigation" "css_element" should not exist
-    And I <visibility> see "All events in"
+    And ".mod_facetoface__event-dashboard" "css_element" <visibility> exist
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
 
     # Event page -> Manage reservations -> Delete -> Cancel -> Go back -> Event page
@@ -332,7 +332,7 @@ Feature: Return to previous page after actions in seminar
     And I press "Cancel"
     And I click on "View all events" "button"
     Then ".mod_facetoface__navigation" "css_element" should not exist
-    And I <visibility> see "All events in"
+    And ".mod_facetoface__event-dashboard" "css_element" <visibility> exist
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
 
     # Event page -> Manage reservations -> Delete -> Continue -> Event page

@@ -112,5 +112,5 @@ Feature: Search pre-defined assets in seminar
     And I click on "OK" "button" in the "Choose assets" "totaradialogue"
     Then I should see "Basset Asset"
     When I press "Save changes"
-    And I click on "Edit event" "link"
+    And I click on the seminar event action "Edit event" in row "#1"
     Then I should see "Basset Asset" in the "//div[@id='fitem_id_sessiondates']" "xpath_element"

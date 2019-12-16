@@ -67,7 +67,7 @@ Feature: Seminar availability based on activity completion
     And I should not see "Go to event"
 
     When I click on "Not completed: Certificate 1. Select to mark as complete." "link"
-    And I click on "Go to event" "link" in the "1 January 2020" "table_row"
+    And I click on "Go to event" "link" in the "1 January" "table_row"
     Then I should see "Sign-up" in the ".mod_facetoface__eventinfo__sidebar__signup" "css_element"
     And I log out
 
@@ -75,7 +75,7 @@ Feature: Seminar availability based on activity completion
     Given I log in as "teacher1"
     And I click on "Courses" in the totara menu
     And I follow "Course 1"
-    And I click on "Edit event" "link" in the "0 / 10" "table_row"
+    And I click on the seminar event action "Edit event" in row "0 / 10"
     And I click on "Delete" "link" in the "1 January" "table_row"
     And I press "Save changes"
     And I log out
@@ -110,7 +110,7 @@ Feature: Seminar availability based on activity completion
     When I log in as "student1"
     And I click on "Courses" in the totara menu
     And I follow "Course 1"
-    And I click on "Go to event" "link" in the "1 January 2020" "table_row"
+    And I click on "Go to event" "link" in the "1 January" "table_row"
     Then I should see "Sign-up" in the ".mod_facetoface__eventinfo__sidebar__signup" "css_element"
     And I log out
 
@@ -134,7 +134,7 @@ Feature: Seminar availability based on activity completion
     And I set the field "Value to compare against" to "student1@example.com"
     And I set the field "Method of comparison" to "is equal to"
     And I press "Save and display"
-    And I click on "Edit event" "link" in the "0 / 10" "table_row"
+    And I click on the seminar event action "Edit event" in row "0 / 10"
     And I click on "Delete" "link" in the "1 January" "table_row"
     And I press "Save changes"
     And I log out

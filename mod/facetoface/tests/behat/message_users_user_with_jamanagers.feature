@@ -31,7 +31,7 @@ Feature: Assign a manager to a user via the job assignment page and send message
     And I follow "Add event"
     And I press "Save changes"
 
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
       | searchtext | User One |
@@ -62,7 +62,7 @@ Feature: Assign a manager to a user via the job assignment page and send message
     And I follow "Add event"
     And I press "Save changes"
 
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
       | searchtext | User |

@@ -37,24 +37,23 @@ Feature: Sign up status
     # Create a session with status full and then cancel it.
     Given I follow "Add event"
     And I click on "Edit session" "link"
-    And I fill seminar session with relative date in form data:
-      | sessiontimezone    | Pacific/Auckland |
-      | timestart[day]     | +1               |
-      | timestart[month]   | 0                |
-      | timestart[year]    | 0                |
+    And I set the following fields to these values:
+      | timestart[day]     | 1                |
+      | timestart[month]   | 1                |
+      | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 0                |
       | timestart[minute]  | 0                |
-      | timefinish[day]    | +1               |
-      | timefinish[month]  | 0                |
-      | timefinish[year]   | 0                |
-      | timefinish[hour]   | +1               |
+      | timefinish[day]    | 1                |
+      | timefinish[month]  | 2                |
+      | timefinish[year]   | ## next year ## Y ## |
+      | timefinish[hour]   | 1                |
       | timefinish[minute] | 0                |
     And I press "OK"
     And I set the following fields to these values:
       | capacity           | 1                |
     And I press "Save changes"
 
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
       | searchtext | Sam |
@@ -70,14 +69,14 @@ Feature: Sign up status
     When I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Booking full"
-    And I should not see "Cancelled"
+    Then I should see "Booking full" in the "1 January" "table_row"
+    And I should not see "Cancelled" in the "1 January" "table_row"
     And I log out
 
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Cancel event" "link" in the "1 / 1" "table_row"
+    And I click on the seminar event action "Cancel event" in row "1 January"
     And I should see "Are you sure you want to cancel this event?"
     And I press "Yes"
     And I should see "Event cancelled" in the ".alert-success" "css_element"
@@ -86,7 +85,7 @@ Feature: Sign up status
     When I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Cancelled"
+    Then I should see "Cancelled" in the "1 January" "table_row"
     And I log out
 
   Scenario: Cancelled users who cannot sign-up should be given Event info option and no any other option that cannot perform
@@ -98,7 +97,7 @@ Feature: Sign up status
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Sign-up"
+    And I click on the link "Go to event" in row 1
     And I press "Sign-up"
     And I log out
     And I log in as "admin"
@@ -111,7 +110,7 @@ Feature: Sign up status
     And I click on "Admin User" "link" in the "Select activity level approvers" "totaradialogue"
     And I click on "Save" "button" in the "Select activity level approvers" "totaradialogue"
     And I click on "Save and display" "button"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Remove users"
     And I set the field "Current attendees" to "Sam1 Student1, student1@example.com"
     And I press "Remove"
@@ -121,7 +120,7 @@ Feature: Sign up status
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Go to event"
+    And I click on the link "Go to event" in row 1
     And I should see "Sign-up unavailable"
     And I should see "Manager and Administrative approval"
 
@@ -148,21 +147,21 @@ Feature: Sign up status
 
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    Then I <signupavailable> see "Go to event" in the "Wait-listed" "table_row"
+    And I click on "Go to event" "link" in the "Wait-listed" "table_row"
+    Then "submitbutton" "button" <signupavailable> exist
 
     When I follow "View all events"
-    Then I should see "<bookingstatus>"
-    And I should see date "30 July, <startyear>" formatted "<signupperiodstartformat>"
-    And I should see date "30 July, <endyear>" formatted "<signupperiodendformat>"
-    And I should see "<signupperiodzone>"
-    And I should see "Wait-listed"
-    And I should not see "Cancelled"
+    Then I should see "<bookingstatus>" in the "Wait-listed" "table_row"
+    And I should see date "30 July, <startyear>" formatted "<signupperiodstartformat>" in the "Wait-listed" "table_row"
+    And I should see date "30 July, <endyear>" formatted "<signupperiodendformat>" in the "Wait-listed" "table_row"
+    And I should see "<signupperiodzone>" in the "Wait-listed" "table_row"
+    And I should not see "Cancelled" in the "Wait-listed" "table_row"
     And I log out
 
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Cancel event" "link" in the "Wait-listed" "table_row"
+    And I click on the seminar event action "Cancel event" in row "Wait-listed"
     And I should see "Are you sure you want to cancel this event?"
     And I press "Yes"
     And I should see "Event cancelled" in the ".alert-success" "css_element"
@@ -171,8 +170,8 @@ Feature: Sign up status
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Cancelled"
-    And I should not see "Wait-listed"
+    Then I should see "Cancelled" in the "10" "table_row"
+    And I should not see "Wait-listed" in the "10" "table_row"
     And I log out
 
     Examples:

@@ -73,7 +73,7 @@ Feature: Seminar Signup Manager Approval
 
     And I log in as "sally"
     And I am on "Classroom Connect Course" course homepage
-    And I follow "Go to event"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager Approval"
     And I press "Request approval"
     Then I should see "Your request was sent to your manager for approval."
@@ -141,6 +141,7 @@ Feature: Seminar Signup Manager Approval
     And I should see "Manager Approval"
     And I should see "Cassy Cas"
     And I press "Request approval"
+    Then I should see "Your request was sent to your manager for approval."
     And I run all adhoc tasks
     And I log out
 
@@ -186,6 +187,7 @@ Feature: Seminar Signup Manager Approval
     And I click on "OK" "button" in the "Select manager" "totaradialogue"
 
     And I press "Request approval"
+    Then I should see "Your request was sent to your manager for approval."
     And I run all adhoc tasks
     And I log out
 
@@ -219,12 +221,13 @@ Feature: Seminar Signup Manager Approval
     And I should see "Manager Approval"
     And I should see "Cassy Cas"
     And I press "Request approval"
+    Then I should see "Your request was sent to your manager for approval."
     And I run all adhoc tasks
     And I log out
     When I log in as "trainer"
     And I am on "Classroom Connect Course" course homepage
     And I follow "View all events"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     Then I should not see "Approval required" in the ".tabtree" "css_element"
 
     And I log out
@@ -236,7 +239,7 @@ Feature: Seminar Signup Manager Approval
     When I log in as "trainer"
     And I am on "Classroom Connect Course" course homepage
     And I follow "View all events"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Approval required"
     And I click on "input[value='2']" "css_element" in the "Jimmy Jim" "table_row"
     And I press "Update requests"
@@ -251,7 +254,7 @@ Feature: Seminar Signup Manager Approval
 
     And I log in as "jimmy"
     And I am on "Classroom Connect Course" course homepage
-    And I follow "Go to event"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager Approval"
     But I should see "You don't have permission to signup to this seminar event"
     And I should not see "Request approval"
@@ -261,15 +264,16 @@ Feature: Seminar Signup Manager Approval
     And I log in as "jimmy"
     And I am on "Classroom Connect Course" course homepage
     And I should see "Request approval"
-    And I follow "Request approval"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager Approval"
     And I should see "Cassy Cas"
     And I press "Request approval"
+    Then I should see "Your request was sent to your manager for approval."
     And I run all adhoc tasks
     And I log out
     And I log in as "admin"
     And I am on "Classroom Connect Course" course homepage
-    And I click on "Delete event" "link"
+    And I click on the seminar event action "Delete event" in row "#1"
     And I press "Continue"
     And I run all adhoc tasks
     And I log out

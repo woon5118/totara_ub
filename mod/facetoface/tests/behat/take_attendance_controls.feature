@@ -62,27 +62,11 @@ Feature: Take attendance tracking time controls
     Given I am on "course1" course homepage
     When I follow "seminar1"
 
-  Scenario: Session attendance tracking - Disabled
-    Then I should not see "Attendance tracking" in the ".upcomingsessionlist" "css_element"
-    And I should not see "Attendance tracking" in the ".previoussessionlist" "css_element"
-
   Scenario: Session attendance tracking - End of session
     And I follow "Edit settings"
     And I set the following fields to these values:
       | Session attendance tracking | 4 |
     And I click on "Save and display" "button"
-
-    Then I should see "Attendance tracking" in the ".upcomingsessionlist" "css_element"
-    And I should see "Attendance tracking" in the ".previoussessionlist" "css_element"
-    And I should not see "Will open at session start time" in the ".upcomingsessionlist" "css_element"
-    And I should not see "Will open at session start time" in the ".previoussessionlist" "css_element"
-
-    And I should see "Will open at session end time" in the ", 12:00 AM" "table_row"
-    And I should see "Will open at session end time" in the ", 2:00 AM" "table_row"
-    And I should see "Will open at session end time" in the ", 4:00 AM" "table_row"
-    And I should see "Will open at session end time" in the ", 6:00 AM" "table_row"
-    And I should see "Will open at session end time" in the ", 10:00 AM" "table_row"
-    And I should see "Will open at session end time" in the ", 2:00 PM" "table_row"
 
     When I click on "Take attendance" "link" in the ", 8:00 AM" "table_row"
     Then the ", 10:00 AM" "option" should be disabled
@@ -100,11 +84,11 @@ Feature: Take attendance tracking time controls
     Then the ", 4:00 PM" "option" should be enabled
     And I press the "back" button in the browser
 
-    When I click on "Attendees" "link" in the ", 12:00 AM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 12:00 AM"
     Then I should see the "Take attendance" tab is disabled
     And I press the "back" button in the browser
 
-    When I click on "Attendees" "link" in the ", 4:00 AM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 4:00 AM"
     Then I should see the "Take attendance" tab is disabled
     And I press the "back" button in the browser
 
@@ -113,16 +97,6 @@ Feature: Take attendance tracking time controls
     And I set the following fields to these values:
       | Session attendance tracking | 5 |
     And I click on "Save and display" "button"
-
-    Then I should see "Attendance tracking" in the ".upcomingsessionlist" "css_element"
-    And I should see "Attendance tracking" in the ".previoussessionlist" "css_element"
-    And I should not see "Will open at session end time" in the ".upcomingsessionlist" "css_element"
-    And I should not see "Will open at session end time" in the ".previoussessionlist" "css_element"
-
-    And I should see "Will open at session start time" in the ", 12:00 AM" "table_row"
-    And I should see "Will open at session start time" in the ", 2:00 AM" "table_row"
-    And I should see "Will open at session start time" in the ", 6:00 AM" "table_row"
-    And I should see "Will open at session start time" in the ", 10:00 AM" "table_row"
 
     When I click on "Take attendance" "link" in the ", 4:00 AM" "table_row"
     Then the ", 6:00 AM" "option" should be disabled
@@ -148,7 +122,7 @@ Feature: Take attendance tracking time controls
     Then the ", 4:00 PM" "option" should be enabled
     And I press the "back" button in the browser
 
-    When I click on "Attendees" "link" in the ", 12:00 AM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 12:00 AM"
     Then I should see the "Take attendance" tab is disabled
     And I press the "back" button in the browser
 
@@ -157,13 +131,6 @@ Feature: Take attendance tracking time controls
     And I set the following fields to these values:
       | Session attendance tracking | 2 |
     And I click on "Save and display" "button"
-
-    Then I should see "Attendance tracking" in the ".upcomingsessionlist" "css_element"
-    And I should see "Attendance tracking" in the ".previoussessionlist" "css_element"
-    And I should not see "Will open at session start time" in the ".upcomingsessionlist" "css_element"
-    And I should not see "Will open at session start time" in the ".previoussessionlist" "css_element"
-    And I should not see "Will open at session end time" in the ".upcomingsessionlist" "css_element"
-    And I should not see "Will open at session end time" in the ".previoussessionlist" "css_element"
 
     When I click on "Take attendance" "link" in the ", 12:00 AM" "table_row"
     Then the ", 2:00 AM" "option" should be enabled
@@ -211,23 +178,23 @@ Feature: Take attendance tracking time controls
       | Event attendance – mark at | 0 |
     And I click on "Save and display" "button"
 
-    When I click on "Attendees" "link" in the ", 12:00 AM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 12:00 AM"
     Then I should see the "Take attendance" tab is disabled
     And I press the "back" button in the browser
 
-    When I click on "Attendees" "link" in the ", 4:00 AM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 4:00 AM"
     Then I should see the "Take attendance" tab is disabled
     And I press the "back" button in the browser
 
-    When I click on "Attendees" "link" in the ", 8:00 AM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 8:00 AM"
     Then I should see the "Take attendance" tab is disabled
     And I press the "back" button in the browser
 
-    When I click on "Attendees" "link" in the ", 12:00 PM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 12:00 PM"
     Then I should see the "Take attendance" tab is disabled
     And I press the "back" button in the browser
 
-    When I click on "Attendees" "link" in the ", 4:00 PM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 4:00 PM"
     And I switch to "Take attendance" tab
     Then the "User Five's attendance" "select" should be enabled
     And I press the "back" button in the browser
@@ -239,29 +206,29 @@ Feature: Take attendance tracking time controls
       | Event attendance – mark at | 1 |
     And I click on "Save and display" "button"
 
-    When I click on "Attendees" "link" in the ", 12:00 AM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 12:00 AM"
     Then I should see the "Take attendance" tab is disabled
     And I press the "back" button in the browser
 
-    When I click on "Attendees" "link" in the ", 4:00 AM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 4:00 AM"
     And I switch to "Take attendance" tab
     Then the "User Two's attendance" "select" should be enabled
     And I press the "back" button in the browser
     And I press the "back" button in the browser
 
-    When I click on "Attendees" "link" in the ", 8:00 AM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 8:00 AM"
     And I switch to "Take attendance" tab
     Then the "User Three's attendance" "select" should be enabled
     And I press the "back" button in the browser
     And I press the "back" button in the browser
 
-    When I click on "Attendees" "link" in the ", 12:00 PM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 12:00 PM"
     And I switch to "Take attendance" tab
     Then the "User Four's attendance" "select" should be enabled
     And I press the "back" button in the browser
     And I press the "back" button in the browser
 
-    When I click on "Attendees" "link" in the ", 4:00 PM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 4:00 PM"
     And I switch to "Take attendance" tab
     Then the "User Five's attendance" "select" should be enabled
     And I press the "back" button in the browser
@@ -273,25 +240,25 @@ Feature: Take attendance tracking time controls
       | Event attendance – mark at | 3 |
     And I click on "Save and display" "button"
 
-    When I click on "Attendees" "link" in the ", 12:00 AM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 12:00 AM"
     Then I should see the "Take attendance" tab is disabled
     And I press the "back" button in the browser
 
-    When I click on "Attendees" "link" in the ", 4:00 AM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 4:00 AM"
     Then I should see the "Take attendance" tab is disabled
     And I press the "back" button in the browser
 
-    When I click on "Attendees" "link" in the ", 8:00 AM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 8:00 AM"
     Then I should see the "Take attendance" tab is disabled
     And I press the "back" button in the browser
 
-    When I click on "Attendees" "link" in the ", 12:00 PM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 12:00 PM"
     And I switch to "Take attendance" tab
     Then the "User Four's attendance" "select" should be enabled
     And I press the "back" button in the browser
     And I press the "back" button in the browser
 
-    When I click on "Attendees" "link" in the ", 4:00 PM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 4:00 PM"
     And I switch to "Take attendance" tab
     Then the "User Five's attendance" "select" should be enabled
     And I press the "back" button in the browser
@@ -303,31 +270,31 @@ Feature: Take attendance tracking time controls
       | Event attendance – mark at | 2 |
     And I click on "Save and display" "button"
 
-    When I click on "Attendees" "link" in the ", 12:00 AM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 12:00 AM"
     And I switch to "Take attendance" tab
     Then the "User One's attendance" "select" should be enabled
     And I press the "back" button in the browser
     And I press the "back" button in the browser
 
-    When I click on "Attendees" "link" in the ", 4:00 AM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 4:00 AM"
     And I switch to "Take attendance" tab
     Then the "User Two's attendance" "select" should be enabled
     And I press the "back" button in the browser
     And I press the "back" button in the browser
 
-    When I click on "Attendees" "link" in the ", 8:00 AM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 8:00 AM"
     And I switch to "Take attendance" tab
     Then the "User Three's attendance" "select" should be enabled
     And I press the "back" button in the browser
     And I press the "back" button in the browser
 
-    When I click on "Attendees" "link" in the ", 12:00 PM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 12:00 PM"
     And I switch to "Take attendance" tab
     Then the "User Four's attendance" "select" should be enabled
     And I press the "back" button in the browser
     And I press the "back" button in the browser
 
-    When I click on "Attendees" "link" in the ", 4:00 PM" "table_row"
+    When I click on the seminar event action "Attendees" in row ", 4:00 PM"
     And I switch to "Take attendance" tab
     Then the "User Five's attendance" "select" should be enabled
     And I press the "back" button in the browser

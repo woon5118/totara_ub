@@ -86,7 +86,7 @@ Feature: Sign up to a seminar
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And "Sam1 Student1" row "English content" column of "facetoface_sessions" table should contain "Sample value"
     When I click on ".attendee-add-note" "css_element"
     And I wait "1" seconds
@@ -110,7 +110,8 @@ Feature: Sign up to a seminar
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I should not see "Go to event"
+    And I click on the link "Go to event" in row 1
+    Then I should see "Sign-up unavailable"
 
   Scenario: Sign up to a session and unable to sign up to a full session for within the activity
     When I log in as "student1"
@@ -125,7 +126,8 @@ Feature: Sign up to a seminar
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I should not see "Go to event"
+    And I click on the link "Go to event" in row 1
+    Then I should see "Sign-up unavailable"
 
   Scenario: Sign up with note and manage it by Editing Teacher
     When I log in as "student1"
@@ -139,7 +141,7 @@ Feature: Sign up to a seminar
 
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     When I click on "Edit" "link" in the "Sam1" "table_row"
     Then I should see "Sam1 Student1 - update note"
 
@@ -401,7 +403,7 @@ Feature: Sign up to a seminar
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     Then "Sam1 Student1" row "Signup URL" column of "facetoface_sessions" table should contain "http://example.org"
     And "Sam1 Student1" row "Signup checkbox" column of "facetoface_sessions" table should contain "Yes"
     And "Sam1 Student1" row "Signup file" column of "facetoface_sessions" table should contain "test.jpg"
@@ -416,7 +418,7 @@ Feature: Sign up to a seminar
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Go to event"
+    And I click on the link "Go to event" in row 1
     And I follow "Cancel booking"
     And I wait "1" seconds
     And I set the following fields to these values:
@@ -452,7 +454,7 @@ Feature: Sign up to a seminar
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Cancellations"
     And I follow "Show cancellation reason"
     Then I should see date "15 October next year" formatted "%d %B %Y" in the "//div[@aria-hidden='false' and @class='moodle-dialogue-base']" "xpath_element"
@@ -509,7 +511,7 @@ Feature: Sign up to a seminar
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "menuf2f-actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com,Sam3 Student3, student3@example.com"
     And I press "Add"

@@ -26,26 +26,30 @@ Feature: Filter session by event time
   Scenario: Check filter sessions by event time
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "Wait-listed" in the ".upcomingsessionlist tr:nth-child(2)" "css_element"
+    Then I should see "Wait-listed" in the "#mod_facetoface_upcoming_events_table tr:nth-child(2)" "css_element"
     And I should see "Upcoming" in the "1 January 2050" "table_row"
     And I should see "Session over" in the "1 January 1999" "table_row"
 
-    When I set the field "Event:" to "Upcoming"
-    Then I should see "Wait-listed" in the ".upcomingsessionlist tr:nth-child(2)" "css_element"
-    And I should see "Upcoming" in the "1 January 2050" "table_row"
+    When I set the field "eventtime" to "Upcoming only"
+    Then I should see "Upcoming" in the "1 January 2050" "table_row"
+    And I should not see "Wait-listed" in the ".mod_facetoface__sessionlist" "css_element"
     And I should not see "Session over" in the ".mod_facetoface__sessionlist" "css_element"
 
-    When I set the field "Event:" to "In progress"
-    Then I should see "No results" in the ".mod_facetoface__sessionlist--empty" "css_element"
-    And ".mod_facetoface__sessionlist" "css_element" should not exist
+    When I set the field "eventtime" to "In progress"
+    Then I should see "No results" exactly "2" times
 
-    When I set the field "Event:" to "Over"
+    When I set the field "eventtime" to "Past only"
     Then I should see "Session over" in the "1 January 1999" "table_row"
     And I should not see "Wait-listed" in the ".mod_facetoface__sessionlist" "css_element"
     And I should not see "Upcoming" in the ".mod_facetoface__sessionlist" "css_element"
 
-    When I set the field "Event:" to "All"
-    Then I should see "Wait-listed" in the ".upcomingsessionlist tr:nth-child(2)" "css_element"
+    When I set the field "eventtime" to "Wait-listed"
+    Then I should see "Wait-listed" in the "0 / 10" "table_row"
+    And I should not see "Upcoming" in the ".mod_facetoface__sessionlist" "css_element"
+    And I should not see "Session over" in the ".mod_facetoface__sessionlist" "css_element"
+
+    When I set the field "eventtime" to "All"
+    Then I should see "Wait-listed" in the "#mod_facetoface_upcoming_events_table tr:nth-child(2)" "css_element"
     And I should see "Upcoming" in the "1 January 2050" "table_row"
     And I should see "Session over" in the "1 January 1999" "table_row"
 
@@ -53,16 +57,16 @@ Feature: Filter session by event time
     And I am on "Course 1" course homepage
     And I follow "View all events"
 
-    When I click on "Cancel event" "link" in the "Wait-listed" "table_row"
+    When I click on the seminar event action "Cancel event" in row "Wait-listed"
     And I click on "Yes" "button"
-    Then I should see "Cancelled" in the ".previoussessionlist tr:nth-child(2) .mod_facetoface__sessionlist__event-status__event" "css_element"
-    And I click on "Cancel event" "link" in the "1 January 2050" "table_row"
+    Then I should see "Cancelled" in the "#mod_facetoface_past_events_table tr:nth-child(2) .mod_facetoface__sessionlist__event-status__event" "css_element"
+    And I click on the seminar event action "Cancel event" in row "1 January 2050"
     And I click on "Yes" "button"
     Then I should see "Cancelled" in the "1 January 2050" "table_row"
 
-    And "Event:" "select" should not exist
-    And I should see "No results" in the ".mod_facetoface__sessionlist--empty" "css_element"
+    And I should see "No results" in the ".mod_facetoface__sessions--upcoming" "css_element"
+    But I should not see "No results" in the ".mod_facetoface__sessions--past" "css_element"
 
-    And I should see "Cancelled" in the ".previoussessionlist tr:nth-child(2) .mod_facetoface__sessionlist__event-status__event" "css_element"
+    And I should see "Cancelled" in the "#mod_facetoface_past_events_table tr:nth-child(2) .mod_facetoface__sessionlist__event-status__event" "css_element"
     And I should see "Cancelled" in the "1 January 2050" "table_row"
     And I should not see "Upcoming" in the ".mod_facetoface__sessionlist" "css_element"

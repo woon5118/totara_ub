@@ -57,7 +57,7 @@ Feature: Take attendance for seminar sessions
       | timefinish[minute] | -30              |
     And I press "OK"
     And I press "Save changes"
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com,Sam3 Student3, student3@example.com, Sam4 Student4, student4@example.com"
     And I press "Add"
@@ -73,7 +73,7 @@ Feature: Take attendance for seminar sessions
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I switch to "Take attendance" tab
     And I set the field "Sam1 Student1's attendance" to "Fully attended"
     And I press "Save attendance"
@@ -96,7 +96,7 @@ Feature: Take attendance for seminar sessions
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I click on "Take attendance" "link"
     And I click on "Select Sam1 Student1" "checkbox"
     And I click on "Select Sam2 Student2" "checkbox"
@@ -120,7 +120,7 @@ Feature: Take attendance for seminar sessions
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I switch to "Take attendance" tab
     And I set the field "Sam1 Student1's attendance" to "Fully attended"
     And I press "Save attendance"

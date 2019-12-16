@@ -71,7 +71,7 @@ Feature: Seminar Event Registration Closure
       | registrationtimefinish[hour]    | 09   |
       | registrationtimefinish[minute]  | 00   |
     And I press "Save changes"
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sally Sal, sally@example.com, Jelly Jel, jelly@example.com, Minny Min, minny@example.com"
     And I press "Add"
@@ -84,7 +84,7 @@ Feature: Seminar Event Registration Closure
     And I log in as "manager"
     And I am on "Course 1" course homepage
     And I click on "Test facetoface name" "link"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Approval required"
     And I set the field "Approve Jelly Jel for this event" to "1"
     And I press "Update requests"
@@ -107,7 +107,7 @@ Feature: Seminar Event Registration Closure
 
     When I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    And I click on "Edit event" "link" in the "1 January" "table_row"
+    And I click on the seminar event action "Edit event" in row "1 January"
     And I set the following fields to these values:
       | registrationtimefinish[day]     | 1    |
       | registrationtimefinish[month]   | 1    |

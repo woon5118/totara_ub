@@ -42,7 +42,7 @@ Feature: Hide elements on the page based on sessions available
     And I press "OK"
     And I press "Save changes"
     And ".mod_facetoface__filter" "css_element" should exist
-    And "Event:" "select" should not exist
+    And "eventtime" "select" should not exist
     And "Export format" "select" should exist
 
   Scenario: Adding one past event and one future event should display the export form and event time filter
@@ -80,5 +80,5 @@ Feature: Hide elements on the page based on sessions available
       | timefinish[minute] | 0                |
     And I press "OK"
     And I press "Save changes"
-    And "Event:" "select" should exist
+    And "eventtime" "select" should exist
     And "Export format" "select" should exist

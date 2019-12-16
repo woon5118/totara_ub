@@ -56,7 +56,7 @@ Feature: Seminar Approval required
       | Enable waitlist    | 1    |
     And I press "Save changes"
 
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com,Sam3 Student3, student3@example.com,Sam4 Student4, student4@example.com"
     And I press "Add"
@@ -89,7 +89,7 @@ Feature: Seminar Approval required
     And I click on "#id_approvaloptions_approval_none" "css_element"
     And I press "Save and display"
 
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Sam1 Student1" in the "#facetoface_sessions" "css_element"
     And I should see "Sam2 Student2" in the "#facetoface_sessions" "css_element"
 
@@ -124,7 +124,7 @@ Feature: Seminar Approval required
       | Enable waitlist    | 1    |
     And I press "Save changes"
 
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com,Sam3 Student3, student3@example.com,Sam4 Student4, student4@example.com,Sam5 Student5, student5@example.com,Sam6 Student6, student6@example.com"
     And I press "Add"
@@ -153,7 +153,7 @@ Feature: Seminar Approval required
     And I click on "#id_approvaloptions_approval_none" "css_element"
     And I press "Save and display"
 
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Sam1 Student1" in the "#facetoface_sessions" "css_element"
     And I should see "Sam2 Student2" in the "#facetoface_sessions" "css_element"
     And I should see "Sam3 Student3" in the "#facetoface_sessions" "css_element"

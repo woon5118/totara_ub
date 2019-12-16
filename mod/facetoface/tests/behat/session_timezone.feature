@@ -111,7 +111,7 @@ Feature: Seminar session date with timezone management
     Then I should see "Timezone: Pacific/Auckland" in the "Room 1" "table_row"
     And I should see "5:00 PM - 6:00 PM" in the "Room 2" "table_row"
     And I should see "Timezone: Australia/Perth" in the "Room 2" "table_row"
-    When I click on "Edit" "link" in the "Room 1" "table_row"
+    When I click on the seminar event action "Edit event" in row "Room 1"
     And I click on "Edit session" "link"
     Then I set the following fields to these values:
       | sessiontimezone      | Pacific/Auckland |
@@ -129,7 +129,7 @@ Feature: Seminar session date with timezone management
       | timefinish[timezone] | Pacific/Auckland |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
-    When I click on "Edit" "link" in the "Room 1" "table_row"
+    When I click on the seminar event action "Edit event" in row "Room 1"
     And I click on "Edit session" "link" in the ".f2fmanagedates .lastrow" "css_element"
     Then I set the following fields to these values:
       | sessiontimezone      | User timezone    |

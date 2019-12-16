@@ -53,7 +53,7 @@ Feature: Seminar event cancellation basic
     And I press "OK"
     And I press "Save changes"
 
-    Given I click on "Attendees" "link"
+    Given I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
     And I press "Add"
@@ -70,7 +70,7 @@ Feature: Seminar event cancellation basic
     And I should see "2 / 39" in the "10 February" "table_row"
     And I should see "Booking open" in the "10 February" "table_row"
 
-    When I click on "Cancel event" "link" in the "10 February" "table_row"
+    When I click on the seminar event action "Cancel event" in row "10 February"
     Then I should see "Cancelling event in Test Seminar"
     And I should see date "10 February next year" formatted "%d %B %Y, 9:00 AM - 3:00 PMTimezone: Pacific/Auckland"
 
@@ -80,17 +80,17 @@ Feature: Seminar event cancellation basic
     And I should see "2 / 39" in the "10 February" "table_row"
     And I should see "Booking open" in the "10 February" "table_row"
 
-    When I click on "Cancel event" "link" in the "10 February" "table_row"
+    When I click on the seminar event action "Cancel event" in row "10 February"
     And I press "Yes"
     Then I should see date "10 February next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "Timezone: Pacific/Auckland" in the "10 February" "table_row"
     And I should see "2 / 39" in the "10 February" "table_row"
     And I should see "Cancelled" in the "10 February" "table_row"
     And I should not see "Go to event" in the "10 February" "table_row"
-    And "Cancel event" "link" should not exist in the "10 February" "table_row"
-    And "Copy event" "link" should exist in the "10 February" "table_row"
-    And "Delete event" "link" should exist in the "10 February" "table_row"
-    And "Edit event" "link" should not exist in the "10 February" "table_row"
+    And I should not see the seminar event action "Cancel event" in row "10 February"
+    And I should see the seminar event action "Copy event" in row "10 February"
+    And I should see the seminar event action "Delete event" in row "10 February"
+    And I should not see the seminar event action "Edit event" in row "10 February"
 
     And I navigate to "Events report" node in "Site administration > Seminars"
     And I should see "N/A" in the ".session_bookingstatus div span" "css_element"
@@ -104,10 +104,10 @@ Feature: Seminar event cancellation basic
     And I should see date "10 February next year" formatted "%d %B %Y" in the "2 / 39" "table_row"
     And I should see date "10 February next year" formatted "%d %B %Y" in the "Cancelled" "table_row"
     And I should not see "Go to event" in the "10 February" "table_row"
-    And "Cancel event" "link" should not exist in the "10 February" "table_row"
-    And "Copy event" "link" should exist in the "10 February" "table_row"
-    And "Delete event" "link" should exist in the "10 February" "table_row"
-    And "Edit event" "link" should not exist in the "10 February" "table_row"
+    And I should not see the seminar event action "Cancel event" in row "10 February"
+    And I should see the seminar event action "Copy event" in row "10 February"
+    And I should see the seminar event action "Delete event" in row "10 February"
+    And I should not see the seminar event action "Edit event" in row "10 February"
 
 
   # ----------------------------------------------------------------------------
@@ -151,7 +151,7 @@ Feature: Seminar event cancellation basic
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
 
-    Given I click on "Attendees" "link"
+    Given I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
     And I press "Add"
@@ -166,7 +166,7 @@ Feature: Seminar event cancellation basic
     And I should see "2 / 39" in the "10 February" "table_row"
     And I should see "Booking open" in the "10 February" "table_row"
 
-    When I click on "Cancel event" "link" in the "10 February" "table_row"
+    When I click on the seminar event action "Cancel event" in row "10 February"
     And I press "Yes"
     Then I should see date "10 February next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "Timezone: Pacific/Auckland" in the "10 February" "table_row"
@@ -175,10 +175,10 @@ Feature: Seminar event cancellation basic
     And I should see "2 / 39" in the "11 March" "table_row"
     And I should see "Cancelled" in the "11 March" "table_row"
     And I should not see "Go to event" in the "11 March" "table_row"
-    And "Cancel event" "link" should not exist in the "11 March" "table_row"
-    And "Copy event" "link" should exist in the "11 March" "table_row"
-    And "Delete event" "link" should exist in the "11 March" "table_row"
-    And "Edit event" "link" should not exist in the "11 March" "table_row"
+    And I should not see the seminar event action "Cancel event" in row "11 March"
+    And I should see the seminar event action "Copy event" in row "11 March"
+    And I should see the seminar event action "Delete event" in row "11 March"
+    And I should not see the seminar event action "Edit event" in row "11 March"
 
 
   # ----------------------------------------------------------------------------
@@ -225,7 +225,7 @@ Feature: Seminar event cancellation basic
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
 
-    Given I click on "Attendees" "link"
+    Given I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
     And I press "Add"
@@ -243,10 +243,10 @@ Feature: Seminar event cancellation basic
     And I should see "Timezone: Pacific/Auckland" in the "10:00 AM - 4:00 PM" "table_row"
     And I should see "2 / 39" in the "10:00 AM - 4:00 PM" "table_row"
     And I should see "In progress" in the "10:00 AM - 4:00 PM" "table_row"
-    And "Cancel event" "link" should not exist in the "10:00 AM - 4:00 PM" "table_row"
-    And "Edit event" "link" should exist in the "10:00 AM - 4:00 PM" "table_row"
-    And "Copy event" "link" should exist in the "10:00 AM - 4:00 PM" "table_row"
-    And "Delete event" "link" should exist in the "10:00 AM - 4:00 PM" "table_row"
+    And I should not see the seminar event action "Cancel event" in row "10:00 AM - 4:00 PM"
+    And I should see the seminar event action "Edit event" in row "10:00 AM - 4:00 PM"
+    And I should see the seminar event action "Copy event" in row "10:00 AM - 4:00 PM"
+    And I should see the seminar event action "Delete event" in row "10:00 AM - 4:00 PM"
 
     When I log out
     And I log in as "teacher1"
@@ -258,10 +258,10 @@ Feature: Seminar event cancellation basic
     And I should see "Timezone: Pacific/Auckland" in the "10:00 AM - 4:00 PM" "table_row"
     And I should see "2 / 39" in the "10:00 AM - 4:00 PM" "table_row"
     And I should see "In progress" in the "10:00 AM - 4:00 PM" "table_row"
-    And "Cancel event" "link" should not exist in the "10:00 AM - 4:00 PM" "table_row"
-    And "Edit event" "link" should exist in the "10:00 AM - 4:00 PM" "table_row"
-    And "Copy event" "link" should exist in the "10:00 AM - 4:00 PM" "table_row"
-    And "Delete event" "link" should exist in the "10:00 AM - 4:00 PM" "table_row"
+    And I should not see the seminar event action "Cancel event" in row "10:00 AM - 4:00 PM"
+    And I should see the seminar event action "Edit event" in row "10:00 AM - 4:00 PM"
+    And I should see the seminar event action "Copy event" in row "10:00 AM - 4:00 PM"
+    And I should see the seminar event action "Delete event" in row "10:00 AM - 4:00 PM"
 
 
   # ----------------------------------------------------------------------------
@@ -308,7 +308,7 @@ Feature: Seminar event cancellation basic
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
 
-    Given I click on "Attendees" "link"
+    Given I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
     And I press "Add"
@@ -322,10 +322,10 @@ Feature: Seminar event cancellation basic
     And I should see "Timezone: Pacific/Auckland" in the "12:05 AM - 11:55 PM" "table_row"
     And I should see "2 / 39" in the "12:05 AM - 11:55 PM" "table_row"
     And I should see "In progress" in the "12:05 AM - 11:55 PM" "table_row"
-    And "Cancel event" "link" should not exist in the "12:05 AM - 11:55 PM" "table_row"
-    And "Edit event" "link" should exist in the "12:05 AM - 11:55 PM" "table_row"
-    And "Copy event" "link" should exist in the "12:05 AM - 11:55 PM" "table_row"
-    And "Delete event" "link" should exist in the "12:05 AM - 11:55 PM" "table_row"
+    And I should not see the seminar event action "Cancel event" in row "12:05 AM - 11:55 PM"
+    And I should see the seminar event action "Edit event" in row "12:05 AM - 11:55 PM"
+    And I should see the seminar event action "Copy event" in row "12:05 AM - 11:55 PM"
+    And I should see the seminar event action "Delete event" in row "12:05 AM - 11:55 PM"
 
     When I log out
     And I log in as "admin"
@@ -337,10 +337,10 @@ Feature: Seminar event cancellation basic
     And I should see "Timezone: Pacific/Auckland" in the "12:05 AM - 11:55 PM" "table_row"
     And I should see "2 / 39" in the "12:05 AM - 11:55 PM" "table_row"
     And I should see "In progress" in the "12:05 AM - 11:55 PM" "table_row"
-    And "Cancel event" "link" should not exist in the "12:05 AM - 11:55 PM" "table_row"
-    And "Edit event" "link" should exist in the "12:05 AM - 11:55 PM" "table_row"
-    And "Copy event" "link" should exist in the "12:05 AM - 11:55 PM" "table_row"
-    And "Delete event" "link" should exist in the "12:05 AM - 11:55 PM" "table_row"
+    And I should not see the seminar event action "Cancel event" in row "12:05 AM - 11:55 PM"
+    And I should see the seminar event action "Edit event" in row "12:05 AM - 11:55 PM"
+    And I should see the seminar event action "Copy event" in row "12:05 AM - 11:55 PM"
+    And I should see the seminar event action "Delete event" in row "12:05 AM - 11:55 PM"
 
 
   # ----------------------------------------------------------------------------
@@ -366,7 +366,7 @@ Feature: Seminar event cancellation basic
     And I press "OK"
     And I press "Save changes"
 
-    Given I click on "Attendees" "link"
+    Given I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
     And I press "Add"
@@ -377,16 +377,16 @@ Feature: Seminar event cancellation basic
     Then I should see date "0 day Australia/Perth" formatted "%d %B %Y"
     And I should see "Booking open"
     And I should see "2 / 39" in the "Booking open" "table_row"
-    And "Cancel event" "link" should exist in the "2 / 39" "table_row"
+    And I should see the seminar event action "Cancel event" in row "2 / 39"
 
-    When I click on "Cancel event" "link" in the "2 / 39" "table_row"
+    When I click on the seminar event action "Cancel event" in row "2 / 39"
     And I press "Yes"
     Then I should see "2 / 39" in the "Cancelled" "table_row"
     And I should not see "Go to event" in the "Cancelled" "table_row"
-    And "Cancel event" "link" should not exist in the "Cancelled" "table_row"
-    And "Edit event" "link" should not exist in the "Cancelled" "table_row"
-    And "Copy event" "link" should exist in the "Cancelled" "table_row"
-    And "Delete event" "link" should exist in the "Cancelled" "table_row"
+    And I should not see the seminar event action "Cancel event" in row "Cancelled"
+    And I should not see the seminar event action "Edit event" in row "Cancelled"
+    And I should see the seminar event action "Copy event" in row "Cancelled"
+    And I should see the seminar event action "Delete event" in row "Cancelled"
 
 
   # ----------------------------------------------------------------------------
@@ -416,10 +416,10 @@ Feature: Seminar event cancellation basic
     And I should not see "Event in progress"
     And I should see "In progress"
     And I should see "0 / 39" in the "In progress" "table_row"
-    And "Cancel event" "link" should not exist in the "In progress" "table_row"
-    And "Edit event" "link" should exist in the "In progress" "table_row"
-    And "Copy event" "link" should exist in the "In progress" "table_row"
-    And "Delete event" "link" should exist in the "In progress" "table_row"
+    And I should not see the seminar event action "Cancel event" in row "In progress"
+    And I should see the seminar event action "Edit event" in row "In progress"
+    And I should see the seminar event action "Copy event" in row "In progress"
+    And I should see the seminar event action "Delete event" in row "In progress"
 
 
   # ----------------------------------------------------------------------------
@@ -445,15 +445,15 @@ Feature: Seminar event cancellation basic
     And I press "OK"
     And I press "Save changes"
 
-    When I click on "Cancel event" "link" in the "Booking open" "table_row"
+    When I click on the seminar event action "Cancel event" in row "Booking open"
     And I press "Yes"
     Then I should see date "10 day Pacific/Auckland" formatted "%d %B %Y"
     And I should see "Cancelled" in the "0 / 39" "table_row"
     And I should not see "Go to event" in the "Cancelled" "table_row"
-    And "Cancel event" "link" should not exist in the "Cancelled" "table_row"
-    And "Copy event" "link" should exist in the "Cancelled" "table_row"
-    And "Delete event" "link" should exist in the "Cancelled" "table_row"
-    And "Edit event" "link" should not exist in the "Cancelled" "table_row"
+    And I should not see the seminar event action "Cancel event" in row "Cancelled"
+    And I should see the seminar event action "Copy event" in row "Cancelled"
+    And I should see the seminar event action "Delete event" in row "Cancelled"
+    And I should not see the seminar event action "Edit event" in row "Cancelled"
 
 
   # ----------------------------------------------------------------------------
@@ -491,7 +491,7 @@ Feature: Seminar event cancellation basic
     And I press "OK"
     And I press "Save changes"
 
-    When I click on "Cancel event" "link" in the "0 / 30" "table_row"
+    When I click on the seminar event action "Cancel event" in row "0 / 30"
     And I should see "Cancelling event in"
     And I should see "Are you sure you want to cancel this event?"
     And I press "Yes"
@@ -500,7 +500,7 @@ Feature: Seminar event cancellation basic
     And I should not see "Edit event" in the "0 / 30" "table_row"
     And I should see "Booking open" in the "0 / 20" "table_row"
 
-    When I click on "Delete event" "link" in the "0 / 30" "table_row"
+    When I click on the seminar event action "Delete event" in row "0 / 30"
     And I should see "Deleting event in"
     And I press "Continue"
     Then I should not see "0 / 30"
@@ -542,7 +542,7 @@ Feature: Seminar event cancellation basic
     And I press "OK"
     And I press "Save changes"
 
-    When I click on "Cancel event" "link" in the "0 / 30" "table_row"
+    When I click on the seminar event action "Cancel event" in row "0 / 30"
     And I should see "Cancelling event in"
     And I should see "Are you sure you want to cancel this event?"
     And I press "Yes"
@@ -551,7 +551,7 @@ Feature: Seminar event cancellation basic
     And I should not see "Edit event" in the "0 / 30" "table_row"
     And I should see "Booking open" in the "0 / 20" "table_row"
 
-    When I click on "Copy event" "link" in the "0 / 30" "table_row"
+    When I click on the seminar event action "Copy event" in row "0 / 30"
     And I set the field "Maximum bookings" to "99"
     And I press "Save changes"
     Then I should see "Cancelled" in the "0 / 30" "table_row"

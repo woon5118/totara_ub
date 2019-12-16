@@ -111,7 +111,7 @@ Feature: Seminar event cancellation status
 #   Manager adding Learners 3 and 4 as attendees, approving Learner 1 and declining request for Learner 2
     Given I log in as "manager1"
     And I am on "Course 1" course homepage
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner Three, learner3@example.com,Learner Four, learner4@example.com"
     And I press "Add"
@@ -187,13 +187,13 @@ Feature: Seminar event cancellation status
     Given I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test Seminar"
-    When I click on "Cancel event" "link" in the "3 / 10" "table_row"
+    When I click on the seminar event action "Cancel event" in row "3 / 10"
     And I should see "Cancelling event in"
     And I should see "Are you sure you want to cancel this event?"
     And I press "Yes"
     Then I should see "Event cancelled" in the ".alert-success" "css_element"
-    When I click on "Attendees" "link" in the "3 / 10" "table_row"
-    And I click on "Cancellations" "link"
+    When I click on the seminar event action "Attendees" in row "3 / 10"
+    And I should see "Cancellations" in the "li.active" "css_element"
     Then I should see "Event Cancelled" in the "Learner One" "table_row"
     And I should see "Event Cancelled" in the "Learner Three" "table_row"
     And I should see "Event Cancelled" in the "Learner Four" "table_row"
@@ -216,7 +216,7 @@ Feature: Seminar event cancellation status
 
     Given I log in as "manager1"
     And I am on "Course 1" course homepage
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Five, learner5@example.com"
     And I press "Add"
@@ -238,7 +238,7 @@ Feature: Seminar event cancellation status
 
     When I log in as "manager1"
     And I am on "Course 1" course homepage
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Learner One" in the "#facetoface_sessions" "css_element"
     And I should see "Learner Three" in the "#facetoface_sessions" "css_element"
     And I should not see "Learner Two" in the "#facetoface_sessions" "css_element"
@@ -252,13 +252,13 @@ Feature: Seminar event cancellation status
     When I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test Seminar"
-    When I click on "Cancel event" "link"
+    When I click on the seminar event action "Cancel event" in row "#1"
     And I should see "Cancelling event in"
     And I should see "Are you sure you want to cancel this event?"
     And I press "Yes"
     Then I should see "Event cancelled" in the ".alert-success" "css_element"
-    When I click on "Attendees" "link"
-    And I click on "Cancellations" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
+    And I should see "Cancellations" in the "li.active" "css_element"
     Then I should see "Event Cancelled" in the "Learner One" "table_row"
     And I should see "Event Cancelled" in the "Learner Three" "table_row"
     And I should see "User Cancelled" in the "Learner Five" "table_row"

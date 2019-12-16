@@ -50,7 +50,7 @@ Feature: Users can auto-enrol themself in courses where seminar direct enrolment
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Lorem ipsum dolor sit amet" in the "Student 1" "table_row"
 
   Scenario: Seminar direct enrolment disabled
@@ -113,6 +113,6 @@ Feature: Users can auto-enrol themself in courses where seminar direct enrolment
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Lorem ipsum dolor sit amet" in the "Student 1" "table_row"
     And I should see "Some other text data" in the "Student 1" "table_row"

@@ -46,7 +46,7 @@ defined('MOODLE_INTERNAL') || die();
  * @property    string  $currenturl             $PAGE->url
  * @property    int     $currenttime            current timestamp
  * @property    array   $reserveinfo            NOT USED
- * @property    bool    $returntoallsessions    NOT USED
+ * @property    bool    $returntoallsessions    backtoallsessions parameter
  * @property    int     $userid                 NOT USED
  */
 final class render_session_list_config {

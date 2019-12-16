@@ -110,7 +110,7 @@ Feature: All customfields column generator
       | capacity           | 10    |
     And I press "Save changes"
 
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com"
     And I press "add"

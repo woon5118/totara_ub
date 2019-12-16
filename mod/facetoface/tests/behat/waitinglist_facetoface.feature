@@ -71,7 +71,7 @@ Feature: Seminar Manager approval of waiting list
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Sam1 Student1"
     And I follow "Wait-list"
     Then I should see "Sam2 Student2"
@@ -84,7 +84,7 @@ Feature: Seminar Manager approval of waiting list
     And I set the field "menuf2f-actions" to "Remove from waitlist"
     And I should see "Successfully updated attendance"
     Then I should not see "Sam3 Student3"
-    And I follow "Attendees"
+    And I switch to "Attendees" tab
     Then I should see "Sam2 Student2"
     And I follow "Cancellations"
     Then I should see "Sam3 Student3"

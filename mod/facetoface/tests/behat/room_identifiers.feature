@@ -81,7 +81,7 @@ Feature: Check seminar room identifiers setting
     And I should not see "Some Building 2" in the ".mod_facetoface__sessionlist" "css_element"
     And I should see "Room 3" in the ".mod_facetoface__sessionlist" "css_element"
     And I should not see "321 Main Street" in the ".mod_facetoface__sessionlist" "css_element"
-    When I set the field "Room:" to "Room 1, Some Building 1, 123 Main Street"
+    When I set the field "roomid" to "Room 1, Some Building 1, 123 Main Street"
     Then I should not see "Room 2" in the ".mod_facetoface__sessionlist" "css_element"
     And I log out
     And I log in as "admin"
@@ -98,7 +98,7 @@ Feature: Check seminar room identifiers setting
     And I should see "Some Building 2" in the ".mod_facetoface__sessionlist" "css_element"
     And I should see "Room 3" in the ".mod_facetoface__sessionlist" "css_element"
     And I should not see "321 Main Street" in the ".mod_facetoface__sessionlist" "css_element"
-    When I set the field "Room:" to "Room 1, Some Building 1, 123 Main Street"
+    When I set the field "roomid" to "Room 1, Some Building 1, 123 Main Street"
     Then I should not see "Room 2" in the ".mod_facetoface__sessionlist" "css_element"
     And I log out
     And I log in as "admin"
@@ -115,5 +115,5 @@ Feature: Check seminar room identifiers setting
     And I should see "Some Building 2" in the ".mod_facetoface__sessionlist" "css_element"
     And I should see "Room 3" in the ".mod_facetoface__sessionlist" "css_element"
     And I should see "321 Main Street" in the ".mod_facetoface__sessionlist" "css_element"
-    When I set the field "Room:" to "Room 1, Some Building 1, 123 Main Street"
+    When I set the field "roomid" to "Room 1, Some Building 1, 123 Main Street"
     Then I should not see "Room 2" in the ".mod_facetoface__sessionlist" "css_element"

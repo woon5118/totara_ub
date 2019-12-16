@@ -36,13 +36,13 @@ Feature: Test deletion of a Seminar event
     When I press "Save changes"
     Then a seminar custom asset called "Projector" should exist
 
-    When I click on "Delete event" "link"
+    When I click on the seminar event action "Delete event" in row "#1"
     Then I should see "Deleting event in Test seminar name"
     And I should see "Are you completely sure you want to delete this event and all sign-ups and attendance for this event?"
 
     When I press "Continue"
-    Then I should see "All events in Test seminar name"
-    And I should see "No results"
+    Then I should see "Test seminar name" in the ".mod_facetoface__event-dashboard" "css_element"
+    And I should see "No results" in the ".mod_facetoface__event-dashboard" "css_element"
     And a seminar custom asset called "Projector" should not exist
 
   # Tests that it is possible to delete a room with custom event and that the room is cleaned up.
@@ -72,12 +72,12 @@ Feature: Test deletion of a Seminar event
     Then I should see "Room 1"
     And a seminar custom room called "Room 1" should exist
 
-    When I click on "Delete event" "link"
+    When I click on the seminar event action "Delete event" in row "#1"
     Then I should see "Deleting event in Test seminar name"
     And I should see "Room 1"
     And I should see "Are you completely sure you want to delete this event and all sign-ups and attendance for this event?"
 
     When I press "Continue"
-    Then I should see "All events in Test seminar name"
-    And I should see "No results"
+    Then I should see "Test seminar name" in the ".mod_facetoface__event-dashboard" "css_element"
+    And I should see "No results" in the ".mod_facetoface__event-dashboard" "css_element"
     And a seminar custom room called "Room 1" should not exist

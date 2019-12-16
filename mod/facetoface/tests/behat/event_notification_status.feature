@@ -36,7 +36,7 @@ Feature: Seminar event notification must not be available for user after it has 
     And I press "Save"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Boris Nikolaevich, boris@example.com"
     And I press exact "add"
@@ -70,7 +70,7 @@ Feature: Seminar event notification must not be available for user after it has 
     And I press "Save"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Boris Nikolaevich, boris@example.com"
     And I press exact "add"

@@ -46,7 +46,7 @@ Feature: Download a seminar signin sheet
       | timefinish[minute] | 0    |
     And I press "OK"
     And I press "Save changes"
-    And I click on the link "Attendees" in row 1
+    And I click on the seminar event action "Attendees" in row "#1"
     And I should not see "Download sign-in sheet"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
@@ -87,7 +87,7 @@ Feature: Download a seminar signin sheet
     And I press "OK"
     And I press "Add a new session"
     And I press "Save changes"
-    And I click on "Edit event" "link" in the "0 / 10" "table_row"
+    And I click on the seminar event action "Edit event" in row "0 / 10"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 9    |
@@ -102,7 +102,7 @@ Feature: Download a seminar signin sheet
       | timefinish[minute] | 0    |
     And I press "OK"
     And I press "Save changes"
-    And I click on the link "Attendees" in row 1
+    And I click on the seminar event action "Attendees" in row "#1"
     And I should not see "Download sign-in sheet"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
@@ -143,7 +143,7 @@ Feature: Download a seminar signin sheet
     And I press "OK"
     And I press "Add a new session"
     And I press "Save changes"
-    And I click on "Edit event" "link" in the "0 / 10" "table_row"
+    And I click on the seminar event action "Edit event" in row "0 / 10"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 9    |
@@ -158,7 +158,7 @@ Feature: Download a seminar signin sheet
       | timefinish[minute] | 0    |
     And I press "OK"
     And I press "Save changes"
-    And I click on the link "Attendees" in row 1
+    And I click on the seminar event action "Attendees" in row "#1"
     And I should not see "Download sign-in sheet"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
@@ -186,7 +186,7 @@ Feature: Download a seminar signin sheet
     And I follow "Add event"
     And I click on "Delete" "link" in the "Select rooms" "table_row"
     And I press "Save changes"
-    And I click on the link "Attendees" in row 1
+    And I click on the seminar event action "Attendees" in row "#1"
     And I should not see "Download sign-in sheet"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"

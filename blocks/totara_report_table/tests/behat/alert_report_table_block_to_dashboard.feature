@@ -47,7 +47,7 @@ Feature: Only Alerts Report table block on dashboard
       | capacity           | 1    |
     And I press "Save changes"
 
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
       | searchtext | Sam1 Student1 |

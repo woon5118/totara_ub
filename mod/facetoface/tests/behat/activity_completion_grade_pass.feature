@@ -143,7 +143,7 @@ Feature: Seminar activity completion with passing grade
 
     And I am on "course1" course homepage
     And I follow "seminar 1"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
 
     And I set the field "One Uno's attendance" to "Fully attended"
@@ -174,7 +174,7 @@ Feature: Seminar activity completion with passing grade
     # Re-take attendance
     When I am on "course1" course homepage
     And I follow "seminar 1"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
     And I set the field "One Uno's event grade" to "100"
     And I set the field "Two Duex's event grade" to ""
@@ -219,7 +219,7 @@ Feature: Seminar activity completion with passing grade
 
     And I am on "course1" course homepage
     And I follow "seminar 1"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
 
     And I set the field "One Uno's attendance" to "Fully attended"
@@ -250,7 +250,7 @@ Feature: Seminar activity completion with passing grade
     # Re-take attendance
     When I am on "course1" course homepage
     And I follow "seminar 1"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
     And I set the field "One Uno's event grade" to "100"
     And I set the field "Two Duex's event grade" to ""
@@ -295,7 +295,7 @@ Feature: Seminar activity completion with passing grade
 
     And I am on "course1" course homepage
     And I follow "seminar 1"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
 
     And I set the field "One Uno's attendance" to "Not set"
@@ -320,7 +320,7 @@ Feature: Seminar activity completion with passing grade
     # Re-take attendance
     When I am on "course1" course homepage
     And I follow "seminar 1"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
 
     And I set the field "One Uno's attendance" to "No show"
@@ -366,7 +366,7 @@ Feature: Seminar activity completion with passing grade
 
     And I am on "course1" course homepage
     And I follow "seminar 1"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
 
     And I set the field "One Uno's attendance" to "Not set"
@@ -391,7 +391,7 @@ Feature: Seminar activity completion with passing grade
     # Re-take attendance
     When I am on "course1" course homepage
     And I follow "seminar 1"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
 
     And I set the field "One Uno's attendance" to "No show"
@@ -439,7 +439,7 @@ Feature: Seminar activity completion with passing grade
 
     And I am on "course1" course homepage
     And I follow "seminar 1"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
 
     And I set the field "One Uno's attendance" to "Fully attended"
@@ -470,7 +470,7 @@ Feature: Seminar activity completion with passing grade
     # Re-take attendance
     When I am on "course1" course homepage
     And I follow "seminar 1"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
     And I set the field "One Uno's event grade" to "55"
     And I set the field "Two Duex's event grade" to ""
@@ -515,7 +515,7 @@ Feature: Seminar activity completion with passing grade
 
     And I am on "course1" course homepage
     And I follow "seminar 1"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
 
     And I set the field "One Uno's attendance" to "Fully attended"
@@ -546,7 +546,7 @@ Feature: Seminar activity completion with passing grade
     # Re-take attendance
     When I am on "course1" course homepage
     And I follow "seminar 1"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
     And I set the field "One Uno's event grade" to "55"
     And I set the field "Two Duex's event grade" to ""
@@ -591,7 +591,7 @@ Feature: Seminar activity completion with passing grade
 
     And I am on "course1" course homepage
     And I follow "seminar 1"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
 
     And I set the field "One Uno's attendance" to "Not set"
@@ -616,7 +616,7 @@ Feature: Seminar activity completion with passing grade
     # Re-take attendance
     When I am on "course1" course homepage
     And I follow "seminar 1"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
 
     And I set the field "One Uno's attendance" to "Partially attended"
@@ -662,7 +662,7 @@ Feature: Seminar activity completion with passing grade
 
     And I am on "course1" course homepage
     And I follow "seminar 1"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
 
     And I set the field "One Uno's attendance" to "Not set"
@@ -687,7 +687,7 @@ Feature: Seminar activity completion with passing grade
     # Re-take attendance
     When I am on "course1" course homepage
     And I follow "seminar 1"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
 
     And I set the field "One Uno's attendance" to "Partially attended"

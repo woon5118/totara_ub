@@ -91,7 +91,7 @@ Feature: Seminar Manager signup approval changes
     And I log in as "admin"
     And I am on "Classroom Connect Course" course homepage
     And I follow "Test seminar name"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Wait-list"
     And I press "Edit this report"
     And I switch to "Columns" tab
@@ -103,7 +103,7 @@ Feature: Seminar Manager signup approval changes
     When I log in as "teacher"
     And I am on "Classroom Connect Course" course homepage
     And I follow "Test seminar name"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Booked" in the "Jimmy Jim" "table_row"
 
     When I follow "Wait-list"

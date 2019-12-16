@@ -8,8 +8,8 @@ Feature: Users are forced to get manager approval where required
       | teacher1 | Teacher   | 1        | teacher1@example.com |
       | student1 | Student   | 1        | student1@example.com |
     And the following "courses" exist:
-      | fullname | shortname | format |
-      | Course 1 | C1        | topics |
+      | fullname | shortname | format | summary |
+      | Course 1 | C1        | topics |         |
     And the following "course enrolments" exist:
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
@@ -61,7 +61,7 @@ Feature: Users are forced to get manager approval where required
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Approval required"
     Then I should see "Student 1"
     And I log out
@@ -71,14 +71,14 @@ Feature: Users are forced to get manager approval where required
     Then I should see "manager request already pending"
     And I follow "Withdraw pending request"
     And I press "Confirm"
-    And I click on "Go to event" "link" in the "1 January 2020" "table_row"
+    And I click on the link "Go to event" in row 1
     Then I should see "Request approval"
     And I log out
 
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Cancellations"
     Then I should see "Student 1"
     And I log out
@@ -92,7 +92,7 @@ Feature: Users are forced to get manager approval where required
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Approval required"
     And I click on "input[value='2']" "css_element" in the "Student 1" "table_row"
     And I press "Update requests"

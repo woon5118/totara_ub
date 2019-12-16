@@ -76,11 +76,11 @@ Feature: Seminar actions in upcoming block are correct
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     And I follow "Test seminar"
-    And I click on "Edit event" "link"
+    And I click on the seminar event action "Edit event" in row "#1"
     And I set the following fields to these values:
       | Maximum bookings | 15 |
     And I press "Save changes"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     Then I should not see "Sam1 Student1"
     And I follow "Wait-list"
     And I should see "Sam1 Student1"

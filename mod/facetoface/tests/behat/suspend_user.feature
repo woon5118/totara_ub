@@ -53,7 +53,7 @@ Feature: Suspend user in different session times
       | Maximum bookings | 1 |
     And I press "Save changes"
 
-    When I click on "Attendees" "link" in the "January" "table_row"
+    When I click on the seminar event action "Attendees" in row "January"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com"
     And I press "Add"
@@ -70,7 +70,7 @@ Feature: Suspend user in different session times
       | Maximum bookings | 2 |
     And I press "Save changes"
 
-    When I click on "Attendees" "link" in the "Wait-listed" "table_row"
+    When I click on the seminar event action "Attendees" in row "Wait-listed"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com"
     And I press "Add"
@@ -100,7 +100,7 @@ Feature: Suspend user in different session times
       | Maximum bookings | 2 |
     And I press "Save changes"
 
-    When I click on "Attendees" "link" in the "February" "table_row"
+    When I click on the seminar event action "Attendees" in row "February"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com"
     And I press "Add"
@@ -129,7 +129,7 @@ Feature: Suspend user in different session times
       | Maximum bookings | 2 |
     And I press "Save changes"
 
-    When I click on "Attendees" "link" in the "March" "table_row"
+    When I click on the seminar event action "Attendees" in row "March"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com"
     And I press "Add"
@@ -149,24 +149,24 @@ Feature: Suspend user in different session times
     And I follow "Test seminar name"
 
     # Check the result
-    When I click on "Attendees" "link" in the "January" "table_row"
+    When I click on the seminar event action "Attendees" in row "January"
     Then I should not see "Sam1 Student1"
     And I should see "Sam2 Student2"
 
     And I click on "View all events" "link"
 
-    When I click on "Attendees" "link" in the "Wait-listed" "table_row"
+    When I click on the seminar event action "Attendees" in row "Wait-listed"
     And I follow "Wait-list"
     Then I should not see "Sam1 Student1"
     And I should see "Sam2 Student2"
 
     And I click on "View all events" "link"
-    When I click on "Attendees" "link" in the "February" "table_row"
+    When I click on the seminar event action "Attendees" in row "February"
     Then I should see "Sam1 Student1"
     And I should see "Sam2 Student2"
 
     And I click on "View all events" "link"
 
-    When I click on "Attendees" "link" in the "March" "table_row"
+    When I click on the seminar event action "Attendees" in row "March"
     Then I should see "Sam1 Student1"
     And I should see "Sam2 Student2"

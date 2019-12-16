@@ -104,7 +104,7 @@ Feature: Reserve spaces for team in seminar
 
     Given I log in as "sitemanager1"
     And I am on "Course 1" course homepage
-    When I click on "Attendees" "link" in the "Upcoming" "table_row"
+    When I click on the seminar event action "Attendees" in row "Upcoming"
     Then I should see "Sam1 Student1"
     And I should see "Sam3 Student3"
     And I should not see "Sam2 Student2"

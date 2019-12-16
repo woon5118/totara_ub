@@ -80,7 +80,7 @@ Feature: Add seminar attendees from csv file with custom fields
     And I follow "Add event"
     And I press "Save changes"
 
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_customfields.csv" file to "CSV text file" filemanager
     And I press "Continue"
@@ -120,7 +120,7 @@ Feature: Add seminar attendees from csv file with custom fields
     And I follow "Add event"
     And I press "Save changes"
 
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_customfields_columns.csv" file to "CSV text file" filemanager
     And I press "Continue"
@@ -137,7 +137,7 @@ Feature: Add seminar attendees from csv file with custom fields
     And I follow "Add event"
     And I press "Save changes"
 
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_customfields_invalid_columns2.csv" file to "CSV text file" filemanager
     When I press "Continue"
@@ -161,7 +161,7 @@ Feature: Add seminar attendees from csv file with custom fields
     And I follow "Add event"
     And I press "Save changes"
 
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_required_customfields.csv" file to "CSV text file" filemanager
     And I press "Continue"
@@ -181,7 +181,7 @@ Feature: Add seminar attendees from csv file with custom fields
     And I follow "Add event"
     And I press "Save changes"
 
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_customfields_hidden.csv" file to "CSV text file" filemanager
     And I press "Continue"

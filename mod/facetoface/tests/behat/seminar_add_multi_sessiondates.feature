@@ -35,13 +35,13 @@ Feature: Seminar with multi session dates compatible with room selection and new
       | timefinish[year]  | 0                |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Save changes" "button"
-    And I follow "Edit event"
+    And I click on the seminar event action "Edit event" in row "#1"
     And I click on "Add a new session" "button"
     And I click on the link "Select rooms" in row 2
     And I follow "room 2"
     And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
     And I click on "Save changes" "button"
-    And I follow "Edit event"
+    And I click on the seminar event action "Edit event" in row "#1"
     When I click on the link "Select rooms" in row 1
     Then I should see "room 1"
     And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
@@ -58,5 +58,5 @@ Feature: Seminar with multi session dates compatible with room selection and new
     And I follow "Add event"
     And I follow "Delete"
     And I click on "Save changes" "button"
-    When I follow "Edit event"
+    When I click on the seminar event action "Edit event" in row "#1"
     Then I should see "This event has no sessions."

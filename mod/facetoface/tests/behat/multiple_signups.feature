@@ -60,7 +60,7 @@ Feature: Multi signup restrictions
 
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    When I click on "Attendees" "link" in the "1 January" "table_row"
+    When I click on the seminar event action "Attendees" in row "1 January"
     And I switch to "Take attendance" tab
     And I set the field "Student One's attendance" to "Fully attended"
     And I set the field "Student Two's attendance" to "Partially attended"
@@ -114,7 +114,9 @@ Feature: Multi signup restrictions
     And I should not see "Cancel booking" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
     And I press the "back" button in the browser
 
-    And I should not see "Go to event" in the "2 February" "table_row"
+    When I click on "Go to event" "link" in the "2 February" "table_row"
+    Then I should see "Sign-up unavailable" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
+    And I press the "back" button in the browser
 
     When I click on "Go to event" "link" in the "3 March" "table_row"
     Then I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"

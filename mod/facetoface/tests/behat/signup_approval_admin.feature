@@ -186,7 +186,7 @@ Feature: Seminar Signup Admin Approval
     And I am on "Classroom Connect Course" course homepage
     And I follow "Classroom Connect Activity"
     # Add users
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sammy Sam, sammy@example.com,Timmy Tim, timmy@example.com,Jimmy Jim, jimmy@example.com"
     And I press "Add"
@@ -261,7 +261,7 @@ Feature: Seminar Signup Admin Approval
     # Add user to the event
     And I am on "Classroom Connect Course" course homepage
     And I follow "Classroom Connect Activity"
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sammy Sam, sammy@example.com"
     And I press "Add"
@@ -290,7 +290,7 @@ Feature: Seminar Signup Admin Approval
     When I log in as "admin"
     And I am on "Classroom Connect Course" course homepage
     And I follow "Classroom Connect Activity"
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     Then the following should exist in the "facetoface_sessions" table:
         | Name      | Status | Approver name |
         | Sammy Sam | Booked | Larry Lar     |

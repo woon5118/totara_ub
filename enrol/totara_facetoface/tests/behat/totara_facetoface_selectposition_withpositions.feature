@@ -72,7 +72,7 @@ Feature: Users can enrol themself in courses with selected position where semina
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I should see "Position2"
 
   Scenario: Add and configure a seminar activity with a single session and position asked for but not mandated then
@@ -89,5 +89,5 @@ Feature: Users can enrol themself in courses with selected position where semina
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I should see "Position2"

@@ -110,9 +110,9 @@ Feature: Check previous and upcomings sections are right populated
     Given I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    Then I should see "In progress" in the ".upcomingsessionlist" "css_element"
-    And I should see "1 January 2037" in the ".upcomingsessionlist" "css_element"
-    And I should see "1 January 1999" in the ".previoussessionlist" "css_element"
+    Then I should see "In progress" in the "mod_facetoface_upcoming_events_table" "table"
+    And I should see "1 January 2037" in the "mod_facetoface_upcoming_events_table" "table"
+    And I should see "1 January 1999" in the "mod_facetoface_past_events_table" "table"
 
     When I follow "C1"
     Then I should see "In progress"
@@ -153,6 +153,6 @@ Feature: Check previous and upcomings sections are right populated
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     When I follow "Event details"
     Then I should see "In progress"

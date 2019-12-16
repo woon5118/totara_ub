@@ -56,7 +56,7 @@ Feature: Use facetoface session roles
 
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Edit event"
+    And I click on the seminar event action "Edit event" in row "#1"
     And I set the field "Student1 Midsam1 Sam1" to "1"
     And I set the field "Student3 Sam3" to "1"
     And I press "Save changes"
@@ -110,13 +110,13 @@ Feature: Use facetoface session roles
 
     # Add overlapping roles
     And I am on "Course 1" course homepage
-    And I follow "Edit event"
+    And I click on the seminar event action "Edit event" in row "#1"
     And I set the field "Teacher1 Midter1 Terry1" to "1"
     And I set the field with xpath "(//label[contains(.,'Teacher1')])[2]/preceding::input[1]" to "1"
     And I set the field "Student1 Midsam1 Sam1" to "1"
     And I set the field "Student2 Sam2" to "1"
     And I press "Save changes"
-    When I follow "Attendees"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I follow "Event details"
     Then I should see "Teacher1 Midter1 Terry1" exactly "2" times
     And I should see "Student1 Midsam1 Sam1"
@@ -124,10 +124,10 @@ Feature: Use facetoface session roles
 
     # Remove one overlapping role
     When I follow "seminar 1"
-    And I follow "Edit event"
+    And I click on the seminar event action "Edit event" in row "#1"
     And I set the field with xpath "(//label[contains(.,'Teacher1')])[2]/preceding::input[1]" to "0"
     And I press "Save changes"
-    When I follow "Attendees"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I follow "Event details"
     Then I should see "Teacher1 Midter1 Terry1" exactly "1" times
     And I should see "Student1 Midsam1 Sam1"
@@ -135,7 +135,7 @@ Feature: Use facetoface session roles
 
     # Remove other overlapping role, and trigger a notification (TL-21049)
     When I follow "seminar 1"
-    And I follow "Edit event"
+    And I click on the seminar event action "Edit event" in row "#1"
     And I follow "Edit session"
     And I fill seminar session with relative date in form data:
       | timestart[day]    | +1               |
@@ -143,7 +143,7 @@ Feature: Use facetoface session roles
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the field "Teacher1 Midter1 Terry1" to "0"
     And I press "Save changes"
-    When I follow "Attendees"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I follow "Event details"
     Then I should not see "Teacher1 Midter1 Terry1"
     And I should see "Student1 Midsam1 Sam1"

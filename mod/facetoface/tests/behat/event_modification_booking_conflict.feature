@@ -41,7 +41,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
     And I set the following fields to these values:
       | capacity           | 5    |
     And I press "Save changes"
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
       | searchtext | Sam |
@@ -66,7 +66,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
     And I set the following fields to these values:
       | capacity                  | 5   |
     And I press "Save changes"
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
       | searchtext | Sam |
@@ -80,7 +80,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
     Then I should see "Sam2 Student2"
     Then I should see "Sam3 Student3"
     And I follow "Test seminar2"
-    And I click on "Edit event" "link"
+    And I click on the seminar event action "Edit event" in row "#1"
     And I click on "Add a new session" "button"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
@@ -129,7 +129,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
     And I set the following fields to these values:
       | capacity                  | 5   |
     And I press "Save changes"
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
       | searchtext | Sam |
@@ -142,7 +142,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
     Then I should see "Sam2 Student2"
     Then I should see "Sam3 Student3"
     And I follow "Test seminar2"
-    And I click on "Edit event" "link"
+    And I click on the seminar event action "Edit event" in row "#1"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -206,7 +206,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
     And I set the following fields to these values:
       | capacity                  | 5   |
     And I press "Save changes"
-    And I click on "Edit event" "link"
+    And I click on the seminar event action "Edit event" in row "#1"
     And I click on "Add a new session" "button"
     And I click on "Edit session" "link"
     And I set the following fields to these values:

@@ -317,7 +317,7 @@ Feature: Activity completed via RPL
 
     # Make sure update to seminar #5 does not cascade update activities completed via RPL
     When I follow "Sem 5"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I switch to "Take attendance" tab
     And I set the field "Stu Dent's attendance" to "No show"
     And I press "Save attendance"
@@ -337,28 +337,28 @@ Feature: Activity completed via RPL
     And I press the "back" button in the browser
 
     When I follow "Sem 4"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I switch to "Take attendance" tab
     And I set the field "Stu Dent's attendance" to "No show"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
 
     When I follow "Sem 3"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I switch to "Take attendance" tab
     And I set the field "Stu Dent's attendance" to "No show"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
 
     When I follow "Sem 2"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I switch to "Take attendance" tab
     And I set the field "Stu Dent's attendance" to "No show"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
 
     When I follow "Sem 1"
-    And I follow "Attendees"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I switch to "Take attendance" tab
     And I set the field "Stu Dent's attendance" to "No show"
     And I press "Save attendance"

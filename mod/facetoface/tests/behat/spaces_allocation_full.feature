@@ -45,7 +45,7 @@ Feature: Allocate spaces in full events
     And I set the following fields to these values:
       | capacity           | 1    |
     And I press "Save changes"
-    And I click on "Attendees" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com"
     And I click on "Add" "button" in the ".mod_facetoface-addremove" "css_element"
@@ -67,7 +67,7 @@ Feature: Allocate spaces in full events
     # Confirm that user really was not added.
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Sam1 Student1"
     And I should not see "Sam2 Student2"
 
@@ -76,7 +76,7 @@ Feature: Allocate spaces in full events
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
-    And I click on "Edit event" "link"
+    And I click on the seminar event action "Edit event" in row "#1"
     And I set the following fields to these values:
       | Enable waitlist   | 1 |
     And I press "Save changes"
@@ -95,7 +95,7 @@ Feature: Allocate spaces in full events
     # Confirm that user was added to waitlist
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    When I click on "Attendees" "link"
+    When I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Sam1 Student1"
     And I should not see "Sam2 Student2"
     And I switch to "Wait-list" tab

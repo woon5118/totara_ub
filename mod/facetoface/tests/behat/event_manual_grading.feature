@@ -45,7 +45,7 @@ Feature: Event manual grading
     And I expand all fieldsets
     And I set the field "Manual event grading" to "0"
     And I click on "Save and display" "button"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     When I follow "Take attendance"
     Then "One Uno's event grade" "select" should not exist
     And "Two Duex's event grade" "select" should not exist
@@ -76,7 +76,7 @@ Feature: Event manual grading
   Scenario: Take attendance and leave event grades as blank
     Given I am on "course1" course homepage
     And I follow "seminar 1"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     When I follow "Take attendance"
     Then the following fields match these values:
       | One Uno's event grade    | |
@@ -121,7 +121,7 @@ Feature: Event manual grading
   Scenario: Take attendance and manually fill event grades
     Given I am on "course1" course homepage
     And I follow "seminar 1"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
 
     When I set the following fields to these values:
@@ -160,7 +160,7 @@ Feature: Event manual grading
   Scenario: Take attendance and manually fill invalid event grades
     Given I am on "course1" course homepage
     And I follow "seminar 1"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
 
     And I set the field "One Uno's event grade" to "forty-two"
@@ -185,7 +185,7 @@ Feature: Event manual grading
   Scenario: Take attendance via CSV file with valid and invalid data
     Given I am on "course1" course homepage
     And I follow "seminar 1"
-    And I follow "Attendee"
+    And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Take attendance"
     And I follow "Upload event attendance"
 

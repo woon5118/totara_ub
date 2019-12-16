@@ -54,7 +54,7 @@ Feature: Seminar event cancellation rebooking
       | Maximum bookings | 39 |
     And I press "Save changes"
 
-    Given I click on "Attendees" "link"
+    Given I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
     And I press "Add"
@@ -96,7 +96,7 @@ Feature: Seminar event cancellation rebooking
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_600: Mass rebooking after a cancelled event
-    Given I click on "Attendees" "link" in the "11 March" "table_row"
+    Given I click on the seminar event action "Attendees" in row "11 March"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
     And I press "Add"
@@ -111,7 +111,7 @@ Feature: Seminar event cancellation rebooking
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Cancel event" "link" in the "10 February" "table_row"
+    And I click on the seminar event action "Cancel event" in row "10 February"
     And I press "Yes"
 
     Given I log out
@@ -121,7 +121,7 @@ Feature: Seminar event cancellation rebooking
     Then I should see "Booking open" in the "11 March" "table_row"
     And I should see "Cancelled" in the "10 February" "table_row"
 
-    When I click on "Attendees" "link" in the "11 March" "table_row"
+    When I click on the seminar event action "Attendees" in row "11 March"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
     And I press "Add"
@@ -136,7 +136,7 @@ Feature: Seminar event cancellation rebooking
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "View all events"
-    And I click on "Cancel event" "link" in the "10 February" "table_row"
+    And I click on the seminar event action "Cancel event" in row "10 February"
     And I press "Yes"
 
     Given I log out
@@ -149,8 +149,10 @@ Feature: Seminar event cancellation rebooking
 
     When I click on "Go to event" "link" in the "11 March" "table_row"
     And I press "Sign-up"
+    Then I should see "Your request was accepted"
+    And I follow "View all events"
     Then I should see "Booked" in the "11 March" "table_row"
-    Then I should see "18" in the "11 March" "table_row"
+    And I should see "18" in the "11 March" "table_row"
 
     Given I log out
     And I log in as "learner2"
@@ -162,8 +164,10 @@ Feature: Seminar event cancellation rebooking
 
     When I click on "Go to event" "link" in the "11 March" "table_row"
     And I press "Sign-up"
+    Then I should see "Your request was accepted"
+    And I follow "View all events"
     Then I should see "Booked" in the "11 March" "table_row"
-    Then I should see "17" in the "11 March" "table_row"
+    And I should see "17" in the "11 March" "table_row"
 
     Given I log out
     And I log in as "learner3"
@@ -175,5 +179,7 @@ Feature: Seminar event cancellation rebooking
 
     When I click on "Go to event" "link" in the "11 March" "table_row"
     And I press "Sign-up"
+    Then I should see "Your request was accepted"
+    And I follow "View all events"
     Then I should see "Booked" in the "11 March" "table_row"
-    Then I should see "16" in the "11 March" "table_row"
+    And I should see "16" in the "11 March" "table_row"

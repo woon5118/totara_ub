@@ -34,7 +34,7 @@ Feature: Viewing take attendance page with multiple seminar sessions
   Scenario: Viewing session attendance
     Given I am on "c101" course homepage
     And I follow "seminar1"
-    And I click on "Attendee" "link" in the "Over" "table_row"
+    And I click on the seminar event action "Attendees" in row "Over"
     And I follow "Take attendance"
     And the field "kian bomba's attendance" matches value "Not set"
 

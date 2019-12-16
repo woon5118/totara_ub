@@ -106,4 +106,5 @@ Feature: Users can auto-enrol themselves in courses where enrolment via plugins 
     And I click on ".rb-display-expand" "css_element"
     And I click on "Go to event" "link" in the "1 January" "table_row"
     And I press "Sign-up"
-    Then I should see "Topic 1"
+    Then I should see "Your request was accepted"
+    And I should see "Topic 1"
