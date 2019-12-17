@@ -3404,6 +3404,7 @@ Feel free to browse, list of users is below, their password is 12345.
     set_theme_to_ventura();
 
     create_info_block($data);
+    create_competency_block();
 }
 
 /**
@@ -4323,6 +4324,38 @@ function create_info_block($data) {
     ];
 
     builder::table('block_instances')->insert($object);
+}
+
+/**
+ * Create a block visible on the site index and totara dashboard for links to competency pages such as bulk manual rating
+ */
+function create_competency_block() {
+    $competency_block = [
+        'blockname' => 'totara_competency',
+        'parentcontextid' => context_system::instance()->id,
+        'showinsubcontexts' => 0,
+        'requiredbytheme' => 0,
+        'defaultregion' => 'side-pre',
+        'defaultweight' => -10,
+        'configdata' => '',
+        'common_config' => null,
+        'timecreated' => time(),
+        'timemodified' => time(),
+    ];
+
+    $pages_visible = [
+        'site-index',
+        'totara-dashboard-1',
+        'totara-dashboard-2',
+        'totara-dashboard-3',
+        'totara-dashboard-4',
+    ];
+
+    foreach ($pages_visible as $page) {
+        builder::table('block_instances')->insert(array_merge($competency_block, [
+            'pagetypepattern' => $page,
+        ]));
+    }
 }
 
 /**

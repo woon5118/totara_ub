@@ -1,0 +1,42 @@
+{{!
+   This file is part of Totara Learn
+
+   Copyright (C) 2019 onwards Totara Learning
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See  the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program. If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_totara_competency/content
+
+    This template generates a totara competency block
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Example context (json):
+    {
+      "has_staff": true,
+      "rate_competencies_url": true,
+    }
+}}
+
+{{#has_staff}}
+    <a href="{{rate_competencies_url}}" class="action-icon">
+        {{#flex_icon}}totara_competency|proficient{{/flex_icon}}
+        <span>{{#str}}rate_competencies, pathway_manual{{/str}}</span>
+    </a>
+{{/has_staff}}
