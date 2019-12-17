@@ -340,6 +340,18 @@ function enrol_get_shared_courses($user1, $user2, $preloadcontexts = false, $che
     $params['user1']   = $user1;
     $params['user2']   = $user2;
 
+    if ($checkexistsonly) {
+        $sql = "SELECT 1
+                  FROM {course} c
+                  JOIN {enrol} e1 ON (c.id = e1.courseid AND e1.status = :enabled1 AND e1.enrol $plugins1)
+                  JOIN {user_enrolments} ue1 ON (ue1.enrolid = e1.id AND ue1.status = :active1 AND ue1.userid = :user1)
+                  JOIN {enrol} e2 ON (c.id = e2.courseid AND e2.status = :enabled2 AND e2.enrol $plugins2)
+                  JOIN {user_enrolments} ue2 ON (ue2.enrolid = e2.id AND ue2.status = :active2 AND ue2.userid = :user2)
+                  $tenantjoin
+                 WHERE c.visible = 1";
+        return $DB->record_exists_sql($sql, $params);
+    }
+
     $ctxselect = '';
     $ctxjoin = '';
     if ($preloadcontexts) {
@@ -362,16 +374,11 @@ function enrol_get_shared_courses($user1, $user2, $preloadcontexts = false, $che
               ) ec ON ec.id = c.id
               $ctxjoin
           ORDER BY c.id";
-
-    if ($checkexistsonly) {
-        return $DB->record_exists_sql($sql, $params);
-    } else {
-        $courses = $DB->get_records_sql($sql, $params);
-        if ($preloadcontexts) {
-            array_map('context_helper::preload_from_record', $courses);
-        }
-        return $courses;
+    $courses = $DB->get_records_sql($sql, $params);
+    if ($preloadcontexts) {
+        array_map('context_helper::preload_from_record', $courses);
     }
+    return $courses;
 }
 
 /**
