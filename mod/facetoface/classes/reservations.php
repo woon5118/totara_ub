@@ -583,6 +583,10 @@ final class reservations {
 
                 $signupinstance = new signup($signup->id);
                 $signupinstance->delete();
+                if (!$testing) {
+                    mtrace("Update attendees status regarding new event settings for seminar event: {$signup->sessionid}");
+                }
+                signup_helper::update_attendees(new seminar_event($signup->sessionid));
             }
             $signups->close();
 
