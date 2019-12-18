@@ -10,7 +10,12 @@
     />
     <List :data="log" :columns="columns">
       <template v-slot:column-date="props">
-        <Date :data="props.row" />
+        <Popover :triggers="['hover', 'focus']">
+          <template v-slot:trigger>
+            <span>{{ props.row.date }}</span>
+          </template>
+          <span>{{ props.row.datetime }}</span>
+        </Popover>
       </template>
       <template v-slot:column-description="props">
         <Description :data="props.row" />
@@ -34,8 +39,8 @@
 const ACTION_TRACKING_START = 'tracking_started';
 const ACTION_TRACKING_END = 'tracking_ended';
 
+import Popover from 'totara_core/components/popover/Popover';
 import List from 'totara_competency/components/List';
-import Date from './Date';
 import ProficientStatus from './ProficientStatus';
 import Description from './Description';
 import AssignmentFilter from './AssignmentFilter';
@@ -43,7 +48,13 @@ import AssignmentFilter from './AssignmentFilter';
 import ActivityLogQuery from '../../../webapi/ajax/activity_log.graphql';
 
 export default {
-  components: { Description, ProficientStatus, Date, List, AssignmentFilter },
+  components: {
+    Popover,
+    Description,
+    ProficientStatus,
+    List,
+    AssignmentFilter,
+  },
   props: {
     userId: {
       required: true,

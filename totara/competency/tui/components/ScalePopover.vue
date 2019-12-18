@@ -17,22 +17,25 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
-  @package pathway_manual
+  @package totara_competency
 -->
 
 <template>
-  <Tooltip v-if="scale" :display="display">
-    <div class="tui-totaraCompetency-scaleTooltip__title">
+  <Popover v-if="scale" :triggers="triggers" :position="position">
+    <template v-slot:trigger class="tui-totaraCompetency-scalePopover__inline">
+      <slot />
+    </template>
+    <div class="tui-totaraCompetency-scalePopover__title">
       {{ $str('rating_scale', 'totara_competency') }}
     </div>
-    <div class="tui-totaraCompetency-scaleTooltip__table">
+    <div class="tui-totaraCompetency-scalePopover__table">
       <div
         v-for="scaleValue in scaleValues"
         :key="scaleValue.id"
-        class="tui-totaraCompetency-scaleTooltip__table_row"
+        class="tui-totaraCompetency-scalePopover__table_row"
       >
         <div
-          class="tui-totaraCompetency-scaleTooltip__table_cell tui-totaraCompetency-scaleTooltip__table_cell--icon"
+          class="tui-totaraCompetency-scalePopover__table_cell tui-totaraCompetency-scalePopover__table_cell--icon"
         >
           <FlexIcon
             v-if="isMinProficientValue(scaleValue)"
@@ -42,36 +45,32 @@
         </div>
         <div
           v-if="showDescription(scaleValue.description)"
-          class="tui-totaraCompetency-scaleTooltip__table_cell tui-totaraCompetency-scaleTooltip--withDescription"
+          class="tui-totaraCompetency-scalePopover__table_cell tui-totaraCompetency-scalePopover--withDescription"
         >
           <div>{{ scaleValue.name }}</div>
           <div
-            class="tui-totaraCompetency-scaleTooltip--withDescription_description"
+            class="tui-totaraCompetency-scalePopover--withDescription_description"
             v-html="scaleValue.description"
           />
         </div>
-        <div v-else class="tui-totaraCompetency-scaleTooltip__table_cell">
+        <div v-else class="tui-totaraCompetency-scalePopover__table_cell">
           {{ scaleValue.name }}
         </div>
       </div>
     </div>
-  </Tooltip>
+  </Popover>
 </template>
 
 <script>
 import FlexIcon from 'totara_core/components/icons/FlexIcon';
-import Tooltip from 'totara_competency/components/Tooltip';
+import Popover from 'totara_core/components/popover/Popover';
 
 export default {
-  components: { FlexIcon, Tooltip },
+  components: { Popover, FlexIcon },
   props: {
     scale: {
       required: true,
       type: Object,
-    },
-    display: {
-      required: true,
-      type: Boolean,
     },
     showDescriptions: {
       type: Boolean,
@@ -80,6 +79,14 @@ export default {
     reverseValues: {
       type: Boolean,
       default: false,
+    },
+    triggers: {
+      type: Array,
+      default: () => ['click'],
+    },
+    position: {
+      type: String,
+      default: 'bottom',
     },
   },
 
@@ -116,7 +123,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-totaraCompetency-scaleTooltip {
+.tui-totaraCompetency-scalePopover {
   &__title {
     margin-bottom: var(--tui-gap-1);
     font-weight: bold;
@@ -138,10 +145,12 @@ export default {
   &--withDescription {
     padding-bottom: var(--tui-gap-2);
     &_description {
-      max-width: 350px;
       padding-top: var(--tui-gap-1);
       padding-left: var(--tui-gap-2);
     }
+  }
+  &__inline {
+    display: inline;
   }
 }
 </style>

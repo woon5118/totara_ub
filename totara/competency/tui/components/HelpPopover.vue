@@ -16,57 +16,61 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
   @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
   @package totara_competency
 -->
 
 <template>
-  <ScalePopover
-    v-if="scale"
-    :scale="scale"
-    :reverse-values="true"
-    :triggers="['hover', 'focus', 'click']"
+  <Popover
+    :triggers="['click']"
+    :position="position"
+    class="tui-totaraCompetency-helpPopover"
   >
-    <div class="tui-MyRatingCell__inline">
-      <span class="tui-MyRatingCell__link-alike">{{ value.name }}</span>
+    <template v-slot:trigger>
+      <span class="tui-totaraCompetency-helpPopover__icon">
+        <FlexIcon icon="info" size="200" :title="$str('help')" />
+      </span>
+    </template>
+    <div>
+      <slot />
     </div>
-  </ScalePopover>
+  </Popover>
 </template>
 
 <script>
-import ScalePopover from 'totara_competency/components/ScalePopover';
+import FlexIcon from 'totara_core/components/icons/FlexIcon';
+import Popover from 'totara_core/components/popover/Popover';
 
 export default {
-  components: { ScalePopover },
-  props: {
-    value: {
-      required: true,
-      type: Object,
-    },
-    scales: {
-      required: true,
-      type: Array,
-    },
+  components: {
+    FlexIcon,
+    Popover,
   },
 
-  computed: {
-    scale() {
-      return this.scales.find(({ id }) => id === this.value.scale_id);
+  props: {
+    position: {
+      type: String,
+      default: 'top',
     },
   },
 };
 </script>
-<style lang="scss">
-.tui-MyRatingCell__ {
-  &inline {
-    display: inline-block;
-  }
 
-  &link-alike {
-    text-decoration: underline;
-    text-decoration-style: dashed;
-    cursor: pointer;
+<style lang="scss">
+.tui-totaraCompetency-helpPopover {
+  display: inline;
+  &__icon {
+    & .flex-icon {
+      cursor: pointer;
+    }
   }
 }
 </style>
+
+<lang-strings>
+  {
+    "moodle": [
+      "help"
+    ]
+  }
+</lang-strings>

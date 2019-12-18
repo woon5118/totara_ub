@@ -25,24 +25,17 @@
     <div class="tui-totaraCompetency-achievementDisplayHeader_title">
       {{ title }}
     </div>
-    <div
-      v-if="helpText"
-      class="tui-totaraCompetency-achievementDisplayHeader_help"
-      @mouseover="showTooltip = true"
-      @mouseleave="showTooltip = false"
-    >
-      <FlexIcon icon="info" size="200" />
-      <Tooltip :display="showTooltip">{{ helpText }}</Tooltip>
-    </div>
+    <HelpPopover v-if="helpText">
+      {{ helpText }}
+    </HelpPopover>
   </div>
 </template>
 
 <script>
-import FlexIcon from 'totara_core/components/icons/FlexIcon';
-import Tooltip from 'totara_competency/components/Tooltip';
+import HelpPopover from 'totara_competency/components/HelpPopover';
 
 export default {
-  components: { FlexIcon, Tooltip },
+  components: { HelpPopover },
 
   props: {
     title: {
