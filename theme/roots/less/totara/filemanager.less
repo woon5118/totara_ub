@@ -25,6 +25,11 @@
 .filepicker,
 .file-picker {
     font-size: 11px;
+
+    .modtype_folder &,
+    #page-mod-folder-view & {
+        font-size: @totara_style-font_body_medium_size;
+    }
 }
 
 .filemanager a,
@@ -1336,4 +1341,31 @@ a.ygtvspacer:hover {
 .filemanager-toolbar .flex-icon {
     font-size: 18px;
     padding: 5px 6px;
+}
+
+/* improve display when a learner is viewing a folder activity */
+.modtype_folder,
+#page-mod-folder-view {
+    .fp-filename-icon {
+        margin-top: 0;
+        margin-bottom: @totara_style-spacing_small;
+    }
+
+    .fp-icon {
+        display: inline-block;
+        float: none;
+        margin-right: @totara_style-spacing_x_small;
+        margin-top: 0;
+    }
+
+    .ygtvtm,
+    .ygtvlm,
+    .ygtvtp,
+    .ygtvlp,
+    .ygtvtmh,
+    .ygtvlmh,
+    .ygtvtph,
+    .ygtvlph {
+        background-position-y: 6px;
+    }
 }
