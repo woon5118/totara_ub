@@ -27,7 +27,7 @@ const componentMap = require('../generated/component_map.json');
 const defaultFolder = 'js';
 
 // vue mapped folders
-const vueFolders = ['containers', 'presentation', 'pages'];
+const vueFolders = ['components', 'containers', 'presentation', 'pages'];
 
 // all mapped folders
 const subfolders = [].concat(vueFolders);

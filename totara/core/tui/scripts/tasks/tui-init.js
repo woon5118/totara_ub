@@ -123,19 +123,13 @@ write(
 };`
 );
 
-[
-  'js',
-  'pages',
-  'containers',
-  'presentation',
-  'tests',
-  'styles',
-  'tests/unit',
-].forEach(subdir => {
-  const fullSubdir = path.join(fullTuiDir, subdir);
-  if (!fs.existsSync(fullSubdir)) {
-    fs.mkdirSync(fullSubdir);
+['js', 'pages', 'components', 'tests', 'styles', 'tests/unit'].forEach(
+  subdir => {
+    const fullSubdir = path.join(fullTuiDir, subdir);
+    if (!fs.existsSync(fullSubdir)) {
+      fs.mkdirSync(fullSubdir);
+    }
   }
-});
+);
 
 console.log('Done!');

@@ -3,10 +3,31 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "theme_legacy/*": ["./theme/legacy/tui/js/*"],
+      "theme_legacy/components/*": ["./theme/legacy/tui/components/*"],
+      "theme_legacy/containers/*": ["./theme/legacy/tui/containers/*"],
+      "theme_legacy/presentation/*": ["./theme/legacy/tui/presentation/*"],
+      "theme_legacy/pages/*": ["./theme/legacy/tui/pages/*"],
+      "theme_roots/*": ["./theme/roots/tui/js/*"],
+      "theme_roots/components/*": ["./theme/roots/tui/components/*"],
+      "theme_roots/containers/*": ["./theme/roots/tui/containers/*"],
+      "theme_roots/presentation/*": ["./theme/roots/tui/presentation/*"],
+      "theme_roots/pages/*": ["./theme/roots/tui/pages/*"],
+      "theme_ventura/*": ["./theme/ventura/tui/js/*"],
+      "theme_ventura/components/*": ["./theme/ventura/tui/components/*"],
+      "theme_ventura/containers/*": ["./theme/ventura/tui/containers/*"],
+      "theme_ventura/presentation/*": ["./theme/ventura/tui/presentation/*"],
+      "theme_ventura/pages/*": ["./theme/ventura/tui/pages/*"],
       "totara_core/*": ["./totara/core/tui/js/*"],
+      "totara_core/components/*": ["./totara/core/tui/components/*"],
       "totara_core/containers/*": ["./totara/core/tui/containers/*"],
       "totara_core/presentation/*": ["./totara/core/tui/presentation/*"],
-      "totara_core/pages/*": ["./totara/core/tui/pages/*"]
+      "totara_core/pages/*": ["./totara/core/tui/pages/*"],
+      "totara_samples/*": ["./totara/samples/tui/js/*"],
+      "totara_samples/components/*": ["./totara/samples/tui/components/*"],
+      "totara_samples/containers/*": ["./totara/samples/tui/containers/*"],
+      "totara_samples/presentation/*": ["./totara/samples/tui/presentation/*"],
+      "totara_samples/pages/*": ["./totara/samples/tui/pages/*"]
     }
   },
   "include": ["**/tui/**/*"],
