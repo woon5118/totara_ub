@@ -22,8 +22,11 @@
 
 <template>
   <div class="tui-samples">
-    <Grid>
-      <GridItem :units="4">
+    <Layout>
+      <template v-slot:page-title>
+        {{ $str('pluginname', 'totara_samples') }}
+      </template>
+      <template v-slot:left>
         <FilterSidePanel title="Filter results">
           <SearchFilter
             v-model="filter"
@@ -60,11 +63,11 @@
             </div>
           </div>
         </FilterSidePanel>
-      </GridItem>
-      <GridItem :grows="true">
+      </template>
+      <template v-slot:right>
         <component :is="component" />
-      </GridItem>
-    </Grid>
+      </template>
+    </Layout>
   </div>
 </template>
 
@@ -72,8 +75,7 @@
 import { memoize, unique, formatParams } from 'totara_core/util';
 import Card from 'totara_core/components/card/Card';
 import FilterSidePanel from 'totara_core/components/filters/FilterSidePanel';
-import Grid from 'totara_core/components/grid/Grid';
-import GridItem from 'totara_core/components/grid/GridItem';
+import Layout from 'totara_core/components/layouts/LayoutTwoColumn';
 import MultiSelect from 'totara_core/components/filters/MultiSelectFilter';
 import SearchFilter from 'totara_core/components/filters/SearchFilter';
 import SelectFilter from 'totara_core/components/filters/SelectFilter';
@@ -102,11 +104,10 @@ export default {
   components: {
     Card,
     FilterSidePanel,
-    Grid,
-    GridItem,
     MultiSelect,
     SearchFilter,
     SelectFilter,
+    Layout,
   },
 
   data() {
@@ -277,6 +278,14 @@ export default {
   },
 };
 </script>
+
+<lang-strings>
+{
+  "totara_samples": [
+    "pluginname"
+  ]
+}
+</lang-strings>
 
 <style lang="scss">
 .tui-samples {

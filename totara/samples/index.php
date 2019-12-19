@@ -46,7 +46,6 @@ $PAGE->set_title('Samples');
 $PAGE->requires->tui_bundle('totara_samples');
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('pluginname', 'totara_samples'));
 
 echo $OUTPUT->render(new totara_core\output\tui_component('totara_samples/pages/Samples'));
 
