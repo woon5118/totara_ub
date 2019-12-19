@@ -1080,7 +1080,6 @@ class mssql_sql_generator extends sql_generator {
                        BEGIN
                        SET NOCOUNT ON;
                        UPDATE ss_tables_{$prefix} SET modifications = 1 WHERE tablename = '{$prefix}{$tablename}' AND modifications = 0;
-                       SET NOCOUNT OFF;
                        END;";
         }
         if ($sqls) {
