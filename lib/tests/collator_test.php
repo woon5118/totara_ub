@@ -34,50 +34,13 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class core_collator_testcase extends advanced_testcase {
-
-    /**
-     * @var string The initial lang, stored because we change it during testing
-     */
-    protected $initiallang = null;
-
-    /**
-     * @var string The last error that has occurred
-     */
-    protected $error = null;
-
     /**
      * Prepares things for this test case.
      */
     protected function setUp() {
         global $SESSION;
-        if (isset($SESSION->lang)) {
-            $this->initiallang = $SESSION->lang;
-        }
-        $SESSION->lang = 'en'; // Make sure we test en language to get consistent results, hopefully all systems have this locale.
-        if (extension_loaded('intl')) {
-            $this->error = 'Collation aware sorting not supported';
-        } else {
-            $this->error = 'Collation aware sorting not supported, PHP extension "intl" is not available.';
-        }
         parent::setUp();
-    }
-
-    /**
-     * Cleans things up after this test case has run.
-     */
-    protected function tearDown() {
-        global $SESSION;
-        if ($this->initiallang !== null) {
-            $SESSION->lang = $this->initiallang;
-            $this->initiallang = null;
-        } else {
-            unset($SESSION->lang);
-        }
-        $this->error = null;
-        $this->publicname = null;
-        $this->protectedname = null;
-        $this->privatename = null;
-        parent::tearDown();
+        $SESSION->lang = 'en'; // Make sure we test en language to get consistent results, hopefully all systems have this locale.
     }
 
     /**
@@ -116,8 +79,8 @@ class core_collator_testcase extends advanced_testcase {
 
         $arr = array('b' => '1.1.1', 1 => '1.2', 0 => '1.20.2');
         $result = core_collator::asort($arr, core_collator::SORT_NATURAL);
-        $this->assertSame(array_values($arr), array('1.1.1', '1.2', '1.20.2'));
-        $this->assertSame(array_keys($arr), array('b', 1, 0));
+        $this->assertSame(array('1.1.1', '1.2', '1.20.2'), array_values($arr));
+        $this->assertSame(array('b', 1, 0), array_keys($arr));
         $this->assertTrue($result);
 
         $arr = array('b' => '-1', 1 => 1000, 0 => -1.2, 3 => 1, 4 => false);
@@ -140,14 +103,86 @@ class core_collator_testcase extends advanced_testcase {
 
         $arr = array('a' => 'áb', 'b' => 'ab', 1 => 'aa', 0=>'cc', 'x' => 'Áb');
         $result = core_collator::asort($arr);
-        $this->assertSame(array('aa', 'ab', 'áb', 'Áb', 'cc'), array_values($arr), $this->error);
-        $this->assertSame(array(1, 'b', 'a', 'x', 0), array_keys($arr), $this->error);
+        $this->assertSame(array('aa', 'ab', 'áb', 'Áb', 'cc'), array_values($arr));
+        $this->assertSame(array(1, 'b', 'a', 'x', 0), array_keys($arr));
         $this->assertTrue($result);
 
         $a = array(2=>'b', 1=>'c');
         $c =& $a;
         $b =& $a;
         core_collator::asort($b);
+        $this->assertSame($a, $b);
+        $this->assertSame($c, $b);
+    }
+
+    /**
+     * Tests the static asort method in reversed order.
+     */
+    public function test_asort_reversed() {
+        $arr = array('b' => 'ab', 1 => 'aa', 0 => 'cc');
+        $result = core_collator::asort($arr, core_collator::REVERSED);
+        $this->assertSame(array_reverse(['aa', 'ab', 'cc']), array_values($arr));
+        $this->assertSame(array_reverse([1, 'b', 0]), array_keys($arr));
+        $this->assertTrue($result);
+
+        $arr = array('b' => 'ab', 1 => 'aa', 0 => 'cc');
+        $result = core_collator::asort($arr, core_collator::SORT_STRING | core_collator::REVERSED);
+        $this->assertSame(array_reverse(['aa', 'ab', 'cc']), array_values($arr));
+        $this->assertSame(array_reverse([1, 'b', 0]), array_keys($arr));
+        $this->assertTrue($result);
+
+        $arr = array('b' => 'aac', 1 => 'Aac', 0 => 'cc');
+        $result = core_collator::asort($arr, (core_collator::SORT_STRING | core_collator::CASE_SENSITIVE | core_collator::REVERSED));
+        $this->assertSame(array_reverse(['Aac', 'aac', 'cc']), array_values($arr));
+        $this->assertSame(array_reverse([1, 'b', 0]), array_keys($arr));
+        $this->assertTrue($result);
+
+        $arr = array('b' => 'a1', 1 => 'a10', 0 => 'a3b');
+        $result = core_collator::asort($arr, core_collator::REVERSED);
+        $this->assertSame(array_reverse(['a1', 'a10', 'a3b']), array_values($arr));
+        $this->assertSame(array_reverse(['b', 1, 0]), array_keys($arr));
+        $this->assertTrue($result);
+
+        $arr = array('b' => 'a1', 1 => 'a10', 0 => 'a3b');
+        $result = core_collator::asort($arr, core_collator::SORT_NATURAL | core_collator::REVERSED);
+        $this->assertSame(array_reverse(['a1', 'a3b', 'a10']), array_values($arr));
+        $this->assertSame(array_reverse(['b', 0, 1]), array_keys($arr));
+        $this->assertTrue($result);
+
+        $arr = array('b' => '1.1.1', 1 => '1.2', 0 => '1.20.2');
+        $result = core_collator::asort($arr, core_collator::SORT_NATURAL | core_collator::REVERSED);
+        $this->assertSame(array_reverse(['1.1.1', '1.2', '1.20.2']), array_values($arr));
+        $this->assertSame(array_reverse(['b', 1, 0]), array_keys($arr));
+        $this->assertTrue($result);
+
+        $arr = array('b' => '-1', 1 => 1000, 0 => -1.2, 3 => 1, 4 => false);
+        $result = core_collator::asort($arr, core_collator::SORT_NUMERIC | core_collator::REVERSED);
+        $this->assertSame(array_reverse([-1.2, '-1', false, 1, 1000]), array_values($arr));
+        $this->assertSame(array_reverse([0, 'b', 4, 3, 1]), array_keys($arr));
+        $this->assertTrue($result);
+
+        $arr = array('b' => array(1), 1 => array(2, 3), 0 => 1);
+        $result = core_collator::asort($arr, core_collator::SORT_REGULAR | core_collator::REVERSED);
+        $this->assertSame(array_reverse([1, array(1), array(2, 3)]), array_values($arr));
+        $this->assertSame(array_reverse([0, 'b', 1]), array_keys($arr));
+        $this->assertTrue($result);
+
+        // Test sorting of array of arrays - first element should be used for actual comparison.
+        $arr = array(0=>array('bb', 'z'), 1=>array('ab', 'a'), 2=>array('zz', 'x'));
+        $result = core_collator::asort($arr, core_collator::SORT_REGULAR | core_collator::REVERSED);
+        $this->assertSame(array_reverse([1, 0, 2]), array_keys($arr));
+        $this->assertTrue($result);
+
+        $arr = array('a' => 'áb', 'b' => 'ab', 1 => 'aa', 0=>'cc', 'x' => 'Áb');
+        $result = core_collator::asort($arr, core_collator::REVERSED);
+        $this->assertSame(array_reverse(['aa', 'ab', 'áb', 'Áb', 'cc']), array_values($arr));
+        $this->assertSame(array_reverse([1, 'b', 'a', 'x', 0]), array_keys($arr));
+        $this->assertTrue($result);
+
+        $a = array(2=>'b', 1=>'c');
+        $c =& $a;
+        $b =& $a;
+        core_collator::asort($b, core_collator::REVERSED);
         $this->assertSame($a, $b);
         $this->assertSame($c, $b);
     }
@@ -178,6 +213,31 @@ class core_collator_testcase extends advanced_testcase {
     }
 
     /**
+     * Tests the static asort_objects_by_method method in reversed order.
+     */
+    public function test_asort_objects_by_method_reversed() {
+        $objects = array(
+            'b' => new string_test_class('ab'),
+            1 => new string_test_class('aa'),
+            0 => new string_test_class('cc')
+        );
+        $result = core_collator::asort_objects_by_method($objects, 'get_protected_name', core_collator::REVERSED);
+        $this->assertSame(array_reverse([1, 'b', 0]), array_keys($objects));
+        $this->assertSame(array_reverse(['aa', 'ab', 'cc']), $this->get_ordered_names($objects, 'get_protected_name'));
+        $this->assertTrue($result);
+
+        $objects = array(
+            'b' => new string_test_class('a20'),
+            1 => new string_test_class('a1'),
+            0 => new string_test_class('a100')
+        );
+        $result = core_collator::asort_objects_by_method($objects, 'get_protected_name', core_collator::SORT_NATURAL | core_collator::REVERSED);
+        $this->assertSame(array_reverse([1, 'b', 0]), array_keys($objects));
+        $this->assertSame(array_reverse(['a1', 'a20', 'a100']), $this->get_ordered_names($objects, 'get_protected_name'));
+        $this->assertTrue($result);
+    }
+
+    /**
      * Tests the static asort_objects_by_method method.
      */
     public function test_asort_objects_by_property() {
@@ -199,6 +259,31 @@ class core_collator_testcase extends advanced_testcase {
         $result = core_collator::asort_objects_by_property($objects, 'publicname', core_collator::SORT_NATURAL);
         $this->assertSame(array(1, 'b', 0), array_keys($objects));
         $this->assertSame(array('a1', 'a20', 'a100'), $this->get_ordered_names($objects, 'publicname'));
+        $this->assertTrue($result);
+    }
+
+    /**
+     * Tests the static asort_objects_by_method method in reversed order.
+     */
+    public function test_asort_objects_by_property_reversed() {
+        $objects = array(
+            'b' => new string_test_class('ab'),
+            1 => new string_test_class('aa'),
+            0 => new string_test_class('cc')
+        );
+        $result = core_collator::asort_objects_by_property($objects, 'publicname', core_collator::REVERSED);
+        $this->assertSame(array_reverse([1, 'b', 0]), array_keys($objects));
+        $this->assertSame(array_reverse(['aa', 'ab', 'cc']), $this->get_ordered_names($objects, 'publicname'));
+        $this->assertTrue($result);
+
+        $objects = array(
+            'b' => new string_test_class('a20'),
+            1 => new string_test_class('a1'),
+            0 => new string_test_class('a100')
+        );
+        $result = core_collator::asort_objects_by_property($objects, 'publicname', core_collator::SORT_NATURAL | core_collator::REVERSED);
+        $this->assertSame(array_reverse([1, 'b', 0]), array_keys($objects));
+        $this->assertSame(array_reverse(['a1', 'a20', 'a100']), $this->get_ordered_names($objects, 'publicname'));
         $this->assertTrue($result);
     }
 
@@ -283,6 +368,31 @@ class core_collator_testcase extends advanced_testcase {
         $c =& $a;
         $b =& $a;
         core_collator::ksort($b);
+        $this->assertSame($a, $b);
+        $this->assertSame($c, $b);
+    }
+
+    /**
+     * Tests the static ksort method in reversed order.
+     */
+    public function test_ksort_reversed() {
+        $arr = array('b' => 'ab', 1 => 'aa', 0 => 'cc');
+        $result = core_collator::ksort($arr, core_collator::REVERSED);
+        $this->assertSame(array_reverse([0, 1, 'b']), array_keys($arr));
+        $this->assertSame(array_reverse(['cc', 'aa', 'ab']), array_values($arr));
+        $this->assertTrue($result);
+
+        $obj = new stdClass();
+        $arr = array('1.1.1'=>array(), '1.2'=>$obj, '1.20.2'=>null);
+        $result = core_collator::ksort($arr, core_collator::SORT_NATURAL | core_collator::REVERSED);
+        $this->assertSame(array_reverse(['1.1.1', '1.2', '1.20.2']), array_keys($arr));
+        $this->assertSame(array_reverse([array(), $obj, null]), array_values($arr));
+        $this->assertTrue($result);
+
+        $a = array(2=>'b', 1=>'c');
+        $c =& $a;
+        $b =& $a;
+        core_collator::ksort($b, core_collator::REVERSED);
         $this->assertSame($a, $b);
         $this->assertSame($c, $b);
     }

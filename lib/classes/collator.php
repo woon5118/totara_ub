@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class core_collator {
     /** @const compare items using general PHP comparison, equivalent to Collator::SORT_REGULAR, this may bot be locale aware! */
-    const SORT_REGULAR = 0;
+    const SORT_REGULAR = 128; // Totara: this had to be changed from 0 to a valid bit mask bit
 
     /** @const compare items as strings, equivalent to Collator::SORT_STRING */
     const SORT_STRING = 1;
@@ -48,6 +48,9 @@ class core_collator {
 
     /** @const do not ignore case when sorting, use bitwise "|" with SORT_NATURAL or SORT_STRING, equivalent to Collator::UPPER_FIRST */
     const CASE_SENSITIVE = 64;
+
+    /** @const reverse sort order, use bitwise operator "|" when combining with other SORT_ flags */
+    const REVERSED = 2048;
 
     /** @var Collator|false|null **/
     protected static $collator = null;
@@ -169,6 +172,7 @@ class core_collator {
      * @param array $arr array to be sorted (reference)
      * @param int $sortflag One of core_collator::SORT_NUMERIC, core_collator::SORT_STRING, core_collator::SORT_NATURAL, core_collator::SORT_REGULAR
      *      optionally "|" core_collator::CASE_SENSITIVE
+     *      optionally "|" core_collator::REVERSED
      * @return bool True on success
      */
     public static function asort(array &$arr, $sortflag = core_collator::SORT_STRING) {
@@ -176,6 +180,16 @@ class core_collator {
             // nothing to do
             return true;
         }
+
+        if (!$sortflag) {
+            // BC hack, regular used to be 0.
+            $sortflag = self::SORT_REGULAR;
+        }
+        if ($sortflag == self::REVERSED) {
+            $sortflag = (core_collator::SORT_STRING | self::REVERSED);
+        }
+        $reversed = (bool)($sortflag & self::REVERSED);
+        $sortflag = ($sortflag & ~self::REVERSED);
 
         $original = null;
 
@@ -209,7 +223,11 @@ class core_collator {
             } else {
                 self::$collator->setAttribute(Collator::CASE_FIRST, Collator::OFF);
             }
+
             $result = self::$collator->asort($arr, $flag);
+            if ($result && $reversed) {
+                $arr = array_reverse($arr, true);
+            }
             if ($original) {
                 self::restore_array($arr, $original);
             }
@@ -219,10 +237,18 @@ class core_collator {
         // try some fallback that works at least for English
 
         if ($sortflag == core_collator::SORT_NUMERIC) {
-            return asort($arr, SORT_NUMERIC);
+            if ($reversed) {
+                return arsort($arr, SORT_NUMERIC);
+            } else {
+                return asort($arr, SORT_NUMERIC);
+            }
 
         } else if ($sortflag == core_collator::SORT_REGULAR) {
-            return asort($arr, SORT_REGULAR);
+            if ($reversed) {
+                return arsort($arr, SORT_REGULAR);
+            } else {
+                return asort($arr, SORT_REGULAR);
+            }
         }
 
         if (!$casesensitive) {
@@ -234,9 +260,16 @@ class core_collator {
 
         if ($sortflag == core_collator::SORT_NATURAL) {
             $result = natsort($arr);
+            if ($result && $reversed) {
+                $arr = array_reverse($arr, true);
+            }
 
         } else {
-            $result = asort($arr, SORT_LOCALE_STRING);
+            if ($reversed) {
+                $result = arsort($arr, SORT_LOCALE_STRING);
+            } else {
+                $result = asort($arr, SORT_LOCALE_STRING);
+            }
         }
 
         if ($original) {
@@ -253,9 +286,18 @@ class core_collator {
      * @param string $property The property to use for comparison
      * @param int $sortflag One of core_collator::SORT_NUMERIC, core_collator::SORT_STRING, core_collator::SORT_NATURAL, core_collator::SORT_REGULAR
      *      optionally "|" core_collator::CASE_SENSITIVE
+     *      optionally "|" core_collator::REVERSED
      * @return bool True on success
      */
     public static function asort_objects_by_property(array &$objects, $property, $sortflag = core_collator::SORT_STRING) {
+        if (!$sortflag) {
+            // BC hack, regular used to be 0.
+            $sortflag = self::SORT_REGULAR;
+        }
+        if ($sortflag == self::REVERSED) {
+            $sortflag = (core_collator::SORT_STRING | self::REVERSED);
+        }
+
         $original = $objects;
         foreach ($objects as $key => $object) {
             $objects[$key] = $object->$property;
@@ -272,9 +314,18 @@ class core_collator {
      * @param string $method The method to call to generate a value for comparison
      * @param int $sortflag One of core_collator::SORT_NUMERIC, core_collator::SORT_STRING, core_collator::SORT_NATURAL, core_collator::SORT_REGULAR
      *      optionally "|" core_collator::CASE_SENSITIVE
+     *      optionally "|" core_collator::REVERSED
      * @return bool True on success
      */
     public static function asort_objects_by_method(array &$objects, $method, $sortflag = core_collator::SORT_STRING) {
+        if (!$sortflag) {
+            // BC hack, regular used to be 0.
+            $sortflag = self::SORT_REGULAR;
+        }
+        if ($sortflag == self::REVERSED) {
+            $sortflag = (core_collator::SORT_STRING | self::REVERSED);
+        }
+
         $original = $objects;
         foreach ($objects as $key => $object) {
             $objects[$key] = $object->{$method}();
@@ -312,9 +363,18 @@ class core_collator {
      *          core_collator::SORT_NATURAL,
      *          core_collator::SORT_REGULAR
      *      optionally "|" core_collator::CASE_SENSITIVE
+     *      optionally "|" core_collator::REVERSED
      * @return bool True on success
      */
     public static function asort_array_of_arrays_by_key(array &$array, $key, $sortflag = core_collator::SORT_STRING) {
+        if (!$sortflag) {
+            // BC hack, regular used to be 0.
+            $sortflag = self::SORT_REGULAR;
+        }
+        if ($sortflag == self::REVERSED) {
+            $sortflag = (core_collator::SORT_STRING | self::REVERSED);
+        }
+
         $original = $array;
         foreach ($array as $initkey => $item) {
             $array[$initkey] = $item[$key];
@@ -330,9 +390,18 @@ class core_collator {
      * @param array $arr array to be sorted (reference)
      * @param int $sortflag One of core_collator::SORT_NUMERIC, core_collator::SORT_STRING, core_collator::SORT_NATURAL, core_collator::SORT_REGULAR
      *      optionally "|" core_collator::CASE_SENSITIVE
+     *      optionally "|" core_collator::REVERSED
      * @return bool True on success
      */
     public static function ksort(array &$arr, $sortflag = core_collator::SORT_STRING) {
+        if (!$sortflag) {
+            // BC hack, regular used to be 0.
+            $sortflag = self::SORT_REGULAR;
+        }
+        if ($sortflag == self::REVERSED) {
+            $sortflag = (core_collator::SORT_STRING | self::REVERSED);
+        }
+
         $keys = array_keys($arr);
         if (!self::asort($keys, $sortflag)) {
             return false;
