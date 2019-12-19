@@ -5,7 +5,11 @@
       :key="key + item.name + item.overall_progress"
       class="tui-CompetencyCharts__chart"
     >
-      <IndividualAssignmentProgress :assignment-progress="item" />
+      <IndividualAssignmentProgress
+        :assignment-progress="item"
+        :user-id="userId"
+        :is-current-user="isCurrentUser"
+      />
     </div>
   </div>
 </template>
@@ -22,6 +26,14 @@ export default {
     data: {
       required: true,
       type: Object,
+    },
+    userId: {
+      type: Number,
+      required: true,
+    },
+    isCurrentUser: {
+      type: Boolean,
+      required: true,
     },
   },
 };

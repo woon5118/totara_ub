@@ -35,7 +35,11 @@
         <transition name="tui-CompetencyProfile__transition-fade">
           <div v-if="activeTab === 'charts'">
             <!-- Available charts -->
-            <CompetencyCharts :data="data" />
+            <CompetencyCharts
+              :data="data"
+              :user-id="userId"
+              :is-current-user="isMine"
+            />
           </div>
         </transition>
         <transition name="tui-CompetencyProfile__transition-fade">

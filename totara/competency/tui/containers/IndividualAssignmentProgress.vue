@@ -4,11 +4,283 @@
     :data="data"
     :options="options"
     :header="assignmentProgress.name"
+    @click="chartClicked"
+    @hover="chartHovered"
   />
 </template>
 
 <script>
 import ChartJs from 'totara_core/presentation/chartjs/ChartJs';
+import theme from 'totara_core/theme';
+
+let rotate = (x, y, angle) => {
+  return {
+    x: x * Math.cos(angle) - y * Math.sin(angle),
+    y: x * Math.sin(angle) + y * Math.cos(angle),
+  };
+};
+
+let insideRect = (x, y, x1, y1, x2, y2, x3, y3, x4, y4) => {
+  let a1 = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+  let a2 = Math.sqrt(Math.pow(x2 - x3, 2) + Math.pow(y2 - y3, 2));
+  let a3 = Math.sqrt(Math.pow(x3 - x4, 2) + Math.pow(y3 - y4, 2));
+  let a4 = Math.sqrt(Math.pow(x4 - x1, 2) + Math.pow(y4 - y1, 2));
+
+  let b1 = Math.sqrt(Math.pow(x1 - x, 2) + Math.pow(y1 - y, 2));
+  let b2 = Math.sqrt(Math.pow(x2 - x, 2) + Math.pow(y2 - y, 2));
+  let b3 = Math.sqrt(Math.pow(x3 - x, 2) + Math.pow(y3 - y, 2));
+  let b4 = Math.sqrt(Math.pow(x4 - x, 2) + Math.pow(y4 - y, 2));
+
+  let u1 = (a1 + b1 + b2) / 2;
+  let u2 = (a2 + b2 + b3) / 2;
+  let u3 = (a3 + b3 + b4) / 2;
+  let u4 = (a4 + b4 + b1) / 2;
+
+  let A1 = Math.sqrt(u1 * (u1 - a1) * (u1 - b1) * (u1 - b2));
+  let A2 = Math.sqrt(u2 * (u2 - a2) * (u2 - b2) * (u2 - b3));
+  let A3 = Math.sqrt(u3 * (u3 - a3) * (u3 - b3) * (u3 - b4));
+  let A4 = Math.sqrt(u4 * (u4 - a4) * (u4 - b4) * (u4 - b1));
+
+  return Math.round(A1 + A2 + A3 + A4) === Math.round(a1 * a2);
+};
+
+let getLabelSize = function(context, label) {
+  let labelText = label.label;
+  let width = 0;
+
+  context.font = label.font.fontString;
+
+  if (labelText !== undefined && `${labelText}`.trim() !== '') {
+    // ChartJS uses cache for it, should we too?
+    width = context.measureText(labelText).width;
+  }
+
+  return {
+    width,
+    height: label.font.lineHeight,
+  };
+};
+
+// This should return competency id or null
+let getCompetencyByClickArea = (event, thisChart, Chart, component) => {
+  // Position of click relative to canvas.
+  let mouseX = event.offsetX;
+  let mouseY = event.offsetY;
+  let helpers = Chart.helpers;
+  let context = thisChart.ctx;
+
+  if (thisChart.config.type === 'bar') {
+    // Let's check for clicks on the bar itself
+    let elements = thisChart.getElementsAtEvent(event);
+
+    if (elements.length > 0) {
+      let index = elements[0]._index;
+
+      if (typeof component.data.competencies[index] !== 'undefined') {
+        return component.data.competencies[index];
+      }
+
+      return null;
+    }
+
+    let scale = thisChart.scales['x-axis-0'];
+
+    let padding = 4;
+
+    let progressItem = null;
+
+    scale._computeLabelItems().forEach(item => {
+      let x = item.x;
+      let y = item.y;
+      let angle = item.rotation;
+
+      // Let's check whether we need to account for rotation
+      // It's float, so let's do a sloppy comparison
+      let rotated = Math.abs(angle) >= 0.001;
+
+      // Get label size
+      let { width, height } = getLabelSize(context, item);
+
+      if (width === 0) {
+        return;
+      }
+
+      // Append padding to increase click-box around it
+      width += padding;
+      height += padding;
+
+      // We need default values
+      let x1 = -width;
+      let x2 = 0;
+      let x3 = x2;
+      let x4 = x1;
+
+      let y1 = height / -2;
+      let y2 = height / -2;
+      let y3 = height / 2;
+      let y4 = height / 2;
+
+      let new1 = { x: width / -2, y: -padding / 2 };
+      let new2 = { x: width / 2, y: -padding / 2 };
+      let new3 = { x: new2.x, y: height - padding / 2 };
+      let new4 = { x: new1.x, y: height - padding / 2 };
+
+      if (rotated) {
+        // We calculate box around objects differently for things that have been rotated and haven't
+        new1 = rotate(x1, y1, angle);
+        new2 = rotate(x2, y2, angle);
+        new3 = rotate(x3, y3, angle);
+        new4 = rotate(x4, y4, angle);
+      }
+
+      let inside = insideRect(
+        mouseX,
+        mouseY,
+        x + new1.x,
+        y + new1.y,
+        x + new2.x,
+        y + new2.y,
+        x + new3.x,
+        y + new3.y,
+        x + new4.x,
+        y + new4.y
+      );
+
+      if (inside) {
+        // If we are inside click-box we'll draw a red square around for debugging purposes
+        if (component.debug) {
+          context.save();
+          context.strokeStyle = 'red';
+          context.lineWidth = 1;
+
+          context.beginPath();
+          context.moveTo(x + new1.x, y + new1.y);
+          context.lineTo(x + new2.x, y + new2.y);
+          context.lineTo(x + new3.x, y + new3.y);
+          context.lineTo(x + new4.x, y + new4.y);
+          context.lineTo(x + new1.x, y + new1.y);
+          context.stroke();
+
+          context.restore();
+
+          console.log('SCIENCE, B!');
+        }
+
+        // Now let's try to figure out where we've clicked.
+        let currentItem = component.assignmentProgress.items.find(
+          pi => pi.competency.fullname === item.label
+        );
+
+        if (currentItem) {
+          progressItem = currentItem;
+        }
+      } else {
+        component.debug && console.log('OUTSIDE');
+      }
+    });
+
+    if (progressItem) {
+      return progressItem.competency.id;
+    }
+
+    return null;
+  }
+
+  let scale = thisChart.scale;
+  let opts = scale.options;
+  let tickOpts = opts.ticks;
+
+  let labelPadding = 5; // number pixels to expand label bounding box by
+
+  // get the label render position
+  // calcs taken from drawPointLabels() in scale.radialLinear.js
+  let tickBackdropHeight =
+    tickOpts.display && opts.display
+      ? helpers.valueOrDefault(
+          tickOpts.fontSize,
+          Chart.defaults.global.defaultFontSize
+        ) + 5
+      : 0;
+  let outerDistance = scale.getDistanceFromCenterForValue(
+    opts.ticks.reverse ? scale.min : scale.max
+  );
+  for (let i = 0; i < scale.pointLabels.length; i++) {
+    // Extra spacing for top value due to axis labels
+    let extra = i === 0 ? tickBackdropHeight / 2 : 0;
+    let pointLabelPosition = scale.getPointPosition(
+      i,
+      outerDistance + extra + 5
+    );
+
+    // get label size info.
+    // TODO fix width=0 calc in Brave?
+    // https://github.com/brave/brave-browser/issues/1738
+    let plSize = scale._pointLabelSizes[i];
+
+    // get label textAlign info
+    let angleRadians = scale.getIndexAngle(i);
+    let angle = helpers.toDegrees(angleRadians);
+    let textAlign = 'right';
+    if (angle === 0 || angle === 180) {
+      textAlign = 'center';
+    } else if (angle < 180) {
+      textAlign = 'left';
+    }
+
+    // get label vertical offset info
+    // also from drawPointLabels() calcs
+    let verticalTextOffset = 0;
+    if (angle === 90 || angle === 270) {
+      verticalTextOffset = plSize.h / 2;
+    } else if (angle > 270 || angle < 90) {
+      verticalTextOffset = plSize.h;
+    }
+
+    // Calculate bounding box based on textAlign
+    let labelTop = pointLabelPosition.y - verticalTextOffset - labelPadding;
+    let labelHeight = 2 * labelPadding + plSize.h;
+    let labelBottom = labelTop + labelHeight;
+
+    let labelWidth = plSize.w + 2 * labelPadding;
+    let labelLeft;
+    switch (textAlign) {
+      case 'center':
+        labelLeft = pointLabelPosition.x - labelWidth / 2;
+        break;
+      case 'left':
+        labelLeft = pointLabelPosition.x - labelPadding;
+
+        break;
+      case 'right':
+        labelLeft = pointLabelPosition.x - labelWidth + labelPadding;
+        break;
+      default:
+        console.log('ERROR: unknown textAlign ' + textAlign);
+    }
+    let labelRight = labelLeft + labelWidth;
+
+    // Render a rectangle for testing purposes
+    if (component.debug) {
+      context.save();
+      context.strokeStyle = 'red';
+      context.lineWidth = 1;
+      context.strokeRect(labelLeft, labelTop, labelWidth, labelHeight);
+      context.restore();
+    }
+
+    // compare to the current click
+    if (
+      mouseX >= labelLeft &&
+      mouseX <= labelRight &&
+      mouseY <= labelBottom &&
+      mouseY >= labelTop
+    ) {
+      return component.data['competencies'][i];
+    }
+  }
+
+  return null;
+};
 
 /**
  *  To get line chart working properly there is trickery involved.
@@ -19,7 +291,7 @@ import ChartJs from 'totara_core/presentation/chartjs/ChartJs';
  *  our appended and prepended columns, to do so we have to specify min & max ticks matching first and
  *  last label.
  *
- *  To complicate stuff more we are appending chart with the empty data to prevent it from looking
+ *  To complicate stuff more we are appending chart with the empty data sets to prevent it from looking
  *  giant when displaying data for one or two competencies. To do so we are manually appending dataset
  *  with empty values BEFORE wrapping it with data from the comments above, that requires adjusting max
  *  tick manually to our fake one.
@@ -30,6 +302,18 @@ export default {
     assignmentProgress: {
       required: true,
       type: Object,
+    },
+    userId: {
+      type: Number,
+      required: true,
+    },
+    isCurrentUser: {
+      type: Boolean,
+      required: true,
+    },
+    debug: {
+      type: Boolean,
+      default: false,
     },
   },
 
@@ -59,6 +343,7 @@ export default {
         options.scale = {
           pointLabels: {
             fontSize: 12,
+            fontColor: theme.getVar('tui-color-state'),
           },
           ticks: {
             beginAtZero: true,
@@ -103,6 +388,7 @@ export default {
                 min,
                 max,
                 fontSize: 12,
+                fontColor: theme.getVar('tui-color-state'),
               },
             },
           ],
@@ -133,6 +419,7 @@ export default {
     data: function() {
       let data = {
         labels: [],
+        competencies: [],
         datasets: [
           {
             label: this.$str('my_rating', 'totara_competency'), // TODO String
@@ -162,6 +449,7 @@ export default {
 
       this.assignmentProgress.items.forEach(
         function(item) {
+          data.competencies.push(item.competency.id);
           data.labels.push(this.shorten(item.competency.fullname, 50));
           data.datasets[0].data.push(item.my_value.percentage);
           data.datasets[1].data.push(item.min_value.percentage);
@@ -188,6 +476,7 @@ export default {
             for (let i = this.assignmentProgress.items.length; i <= 3; i++) {
               data.datasets[0].data.push(null);
               data.datasets[1].data.push(last);
+              data.competencies.push(null);
 
               if (i === 3) {
                 data.labels.push('   ');
@@ -204,9 +493,11 @@ export default {
 
           data.datasets[0].data.push(null);
           data.datasets[0].data.unshift(null);
-
           data.datasets[1].data.unshift(first);
           data.datasets[1].data.push(last);
+
+          data.competencies.push(null);
+          data.competencies.unshift(null);
 
           data.labels.unshift('');
           data.labels.push('');
@@ -225,6 +516,34 @@ export default {
   },
 
   methods: {
+    competencyLink(id) {
+      let link = `/totara/competency/profile/details/?competency_id=${id}`;
+
+      if (!this.isMine) {
+        link += `&user_id=${this.userId}`;
+      }
+
+      return link;
+    },
+
+    chartHovered(event, context, thisChart, Chart) {
+      requestAnimationFrame(() => {
+        if (getCompetencyByClickArea(event, thisChart, Chart, this)) {
+          event.target.style.cursor = 'pointer';
+        } else {
+          event.target.style.cursor = 'auto';
+        }
+      });
+    },
+
+    chartClicked(event, context, thisChart, Chart) {
+      let id = getCompetencyByClickArea(event, thisChart, Chart, this);
+
+      if (id) {
+        window.location.href = this.competencyLink(id);
+      }
+    },
+
     shorten: function(str, maxLen, separator = ' ') {
       if (str.length <= maxLen) return str;
       return str.substr(0, str.lastIndexOf(separator, maxLen));
