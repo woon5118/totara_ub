@@ -1390,11 +1390,20 @@ class core_dml_testcase extends database_driver_testcase {
         $this->assertEquals(5, $records[3]->course);
         $this->assertEquals(2, $records[4]->course);
 
+        $unkeyed_records = $DB->get_records_unkeyed($tablename);
+        $this->assertEquals(array_values($records), $unkeyed_records);
+        $this->assertEquals(range(0,3), array_keys($unkeyed_records));
+
         // Records matching certain conditions.
         $records = $DB->get_records($tablename, array('course' => 3));
         $this->assertCount(2, $records);
         $this->assertEquals(3, $records[1]->course);
         $this->assertEquals(3, $records[2]->course);
+
+
+        $unkeyed_records = $DB->get_records_unkeyed($tablename, array('course' => 3));
+        $this->assertEquals(array_values($records), $unkeyed_records);
+        $this->assertEquals(range(0,1), array_keys($unkeyed_records));
 
         // All records sorted by course.
         $records = $DB->get_records($tablename, null, 'course');
@@ -1408,10 +1417,19 @@ class core_dml_testcase extends database_driver_testcase {
         $current_record = next($records);
         $this->assertEquals(3, $current_record->id);
 
+        $unkeyed_records = $DB->get_records_unkeyed($tablename, null, 'course');
+        $this->assertEquals([4, 1, 2, 3], array_column($unkeyed_records, 'id'));
+
         // All records, but get only one field.
         $records = $DB->get_records($tablename, null, '', 'id');
         $this->assertFalse(isset($records[1]->course));
         $this->assertTrue(isset($records[1]->id));
+        $this->assertCount(4, $records);
+
+
+        $unkeyed_records = $DB->get_records_unkeyed($tablename, null, '', 'id');
+        $this->assertFalse(isset($unkeyed_records[0]->course));
+        $this->assertTrue(isset($unkeyed_records[0]->id));
         $this->assertCount(4, $records);
 
         // Booleans into params.
@@ -1420,10 +1438,23 @@ class core_dml_testcase extends database_driver_testcase {
         $records = $DB->get_records($tablename, array('course' => false));
         $this->assertCount(0, $records);
 
+        $records = $DB->get_records_unkeyed($tablename, array('course' => true));
+        $this->assertCount(0, $records);
+        $records = $DB->get_records_unkeyed($tablename, array('course' => false));
+        $this->assertCount(0, $records);
+
         // Test for exception throwing on text conditions being compared. (MDL-24863, unwanted auto conversion of param to int).
         $conditions = array('onetext' => '1');
         try {
             $records = $DB->get_records($tablename, $conditions);
+            $this->fail('An Exception is missing, expected due to equating of text fields');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf('dml_exception', $e);
+            $this->assertSame('textconditionsnotallowed', $e->errorcode);
+        }
+
+        try {
+            $records = $DB->get_records_unkeyed($tablename, $conditions);
             $this->fail('An Exception is missing, expected due to equating of text fields');
         } catch (moodle_exception $e) {
             $this->assertInstanceOf('dml_exception', $e);
@@ -1441,7 +1472,23 @@ class core_dml_testcase extends database_driver_testcase {
         }
 
         try {
+            $records = $DB->get_records_unkeyed('xxxx', array('id' => 0));
+            $this->fail('An Exception is missing, expected due to query against non-existing table');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf('dml_exception', $e);
+            $this->assertSame('ddltablenotexist', $e->errorcode);
+        }
+
+        try {
             $records = $DB->get_records('xxxx', array('id' => '1'));
+            $this->fail('An Exception is missing, expected due to query against non-existing table');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf('dml_exception', $e);
+            $this->assertSame('ddltablenotexist', $e->errorcode);
+        }
+
+        try {
+            $records = $DB->get_records_unkeyed('xxxx', array('id' => '1'));
             $this->fail('An Exception is missing, expected due to query against non-existing table');
         } catch (moodle_exception $e) {
             $this->assertInstanceOf('dml_exception', $e);
@@ -1457,7 +1504,47 @@ class core_dml_testcase extends database_driver_testcase {
             $this->assertSame('ddlfieldnotexist', $e->errorcode);
         }
 
+        try {
+            $records = $DB->get_records_unkeyed($tablename, array('xxxx' => 0));
+            $this->fail('An Exception is missing, expected due to query against non-existing column');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf('dml_exception', $e);
+            $this->assertSame('ddlfieldnotexist', $e->errorcode);
+        }
+
         // Note: delegate limits testing to test_get_records_sql().
+    }
+
+    public function test_get_records_select() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $table = $this->get_test_table();
+        $tablename = $table->getName();
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('course', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $dbman->create_table($table);
+
+        $DB->insert_record($tablename, array('course' => 3));
+        $DB->insert_record($tablename, array('course' => 3));
+        $DB->insert_record($tablename, array('course' => 5));
+        $DB->insert_record($tablename, array('course' => 2));
+
+        $records = $DB->get_records_select($tablename, '1 = 1');
+        $this->assertEquals($DB->get_records($tablename), $records);
+
+        $unkeyed_records = $DB->get_records_select_unkeyed($tablename, '1 = 1');
+        $this->assertEquals($DB->get_records_unkeyed($tablename), $unkeyed_records);
+
+        $records = $DB->get_records_select($tablename, 'course = ?', [3]);
+        $this->assertEquals($DB->get_records($tablename, ['course' => 3]), $records);
+
+        $unkeyed_records = $DB->get_records_select_unkeyed($tablename, 'course = ?', [3]);
+        $this->assertEquals($DB->get_records_unkeyed($tablename, ['course' => 3]), $unkeyed_records);
+
+
     }
 
     public function test_get_records_list() {

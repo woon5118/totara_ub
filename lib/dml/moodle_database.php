@@ -1459,6 +1459,29 @@ abstract class moodle_database {
     }
 
     /**
+     * Get a number of records as an array of objects where all the given conditions met.
+     *
+     * If the query succeeds and returns at least one record, the
+     * return value is an array of objects, one object for each
+     * record found. The array key is the value from the first
+     * column of the result set. The object associated with that key
+     * has a member variable for each column of the results.
+     *
+     * @param string $table the table to query.
+     * @param array $conditions optional array $fieldname => requestedvalue with AND in between
+     * @param string $sort an order to sort the results in (optional, a valid SQL ORDER BY parameter).
+     * @param string $fields a comma separated list of fields to return (optional, by default all fields are returned).
+     * @param int $limit_from return a subset of records, starting at this point (optional).
+     * @param int $limit_num return a subset comprising this many records in total (optional, required if $limitfrom is set).
+     * @return array An array of Objects indexed by first column.
+     * @throws dml_exception A DML specific exception is thrown for any errors.
+     */
+    public function get_records_unkeyed($table, array $conditions = null, $sort = '', $fields = '*', $limit_from = 0, $limit_num = 0) {
+        list($select, $params) = $this->where_clause($table, $conditions);
+        return $this->get_records_select_unkeyed($table, $select, $params, $sort, $fields, $limit_from, $limit_num);
+    }
+
+    /**
      * Get a number of records as an array of objects where one field match one list of values.
      *
      * Return value is like {@link function get_records}.
@@ -1498,23 +1521,26 @@ abstract class moodle_database {
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function get_records_select($table, $select, array $params=null, $sort='', $fields='*', $limitfrom=0, $limitnum=0) {
-        if ($select instanceof sql) {
-            $sql = self::sql("SELECT $fields FROM {{$table}}");
-            $sql = $sql->append($select->prepend("WHERE"));
-            if ($sort) {
-                $sql = $sql->append("ORDER BY $sort");
-            }
-        } else {
-            if ($select) {
-                $select = "WHERE $select";
-            }
-            if ($sort) {
-                $sort = " ORDER BY $sort";
-            }
-            $sql = "SELECT $fields FROM {{$table}} $select $sort";
-        }
+        return $this->get_records_sql($this->prepare_sql_records_select($table, $select, $sort, $fields), $params, $limitfrom, $limitnum);
+    }
 
-        return $this->get_records_sql($sql, $params, $limitfrom, $limitnum);
+    /**
+     * Get a number of records as an array of objects which match a particular WHERE clause.
+     *
+     * Return value is like {@link function get_records}.
+     *
+     * @param string $table The table to query.
+     * @param string|sql $select A fragment of SQL to be used in a where clause in the SQL call.
+     * @param array $params An array of sql parameters
+     * @param string $sort An order to sort the results in (optional, a valid SQL ORDER BY parameter).
+     * @param string $fields A comma separated list of fields to return
+     * @param int $limit_from return a subset of records, starting at this point (optional).
+     * @param int $limit_num return a subset comprising this many records in total (optional, required if $limitfrom is set).
+     * @return array of objects indexed by first column
+     * @throws dml_exception A DML specific exception is thrown for any errors.
+     */
+    public function get_records_select_unkeyed($table, $select, array $params = null, $sort = '', $fields = '*', $limit_from = 0, $limit_num = 0) {
+        return $this->get_records_sql_unkeyed($this->prepare_sql_records_select($table, $select, $sort, $fields), $params, $limit_from, $limit_num);
     }
 
     /**
@@ -3660,5 +3686,36 @@ abstract class moodle_database {
             debugging("Did you remember to make the first column something unique in your call to get_records? Duplicate value '$id' found in column '$colname'.", DEBUG_DEVELOPER);
         }
         $result[$id] = (object) $row;
+    }
+
+    /**
+     * Get a number of records as an array of objects which match a particular WHERE clause.
+     *
+     * Return value is like {@link function get_records}.
+     *
+     * @param string $table The table to query.
+     * @param string|sql $select A fragment of SQL to be used in a where clause in the SQL call.
+     * @param string $sort An order to sort the results in (optional, a valid SQL ORDER BY parameter).
+     * @param string $fields A comma separated list of fields to return
+     * @return string|sql sql
+     */
+    protected function prepare_sql_records_select($table, $select, $sort = '', $fields = '*') {
+        if ($select instanceof sql) {
+            $sql = self::sql("SELECT $fields FROM {{$table}}");
+            $sql = $sql->append($select->prepend("WHERE"));
+            if ($sort) {
+                $sql = $sql->append("ORDER BY $sort");
+            }
+        } else {
+            if ($select) {
+                $select = "WHERE $select";
+            }
+            if ($sort) {
+                $sort = " ORDER BY $sort";
+            }
+            $sql = "SELECT $fields FROM {{$table}} $select $sort";
+        }
+
+        return $sql;
     }
 }
