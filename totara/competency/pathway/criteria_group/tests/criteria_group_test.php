@@ -28,8 +28,9 @@ use pathway_criteria_group\criteria_group;
 use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
 use totara_competency\entities\competency;
 use totara_competency\entities\scale;
-use totara_competency\entities\scale_value;
+use totara_competency\hook\competency_validity_changed;
 use totara_criteria\criterion;
+use totara_criteria\hook\criteria_validity_changed;
 
 class pathway_criteria_group_testcase extends \advanced_testcase {
 
@@ -37,18 +38,20 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         global $DB;
 
         $data = new class() {
-            public $comp;
+            public $competency;
             public $courses;
             public $cc = [];
             public $scale;
+            public $framework;
             public $scalevalues = [];
         };
 
-        $hierarchygenerator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        /** @var totara_competency_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
-        $data->scale = $hierarchygenerator->create_scale(
-            'comp',
-            ['name' => 'Test scale', 'description' => 'Test scale'],
+        $scale = $generator->create_scale(
+            'Test scale',
+            'Test scale',
             [
                 5 => ['name' => 'No clue', 'proficient' => 0, 'sortorder' => 5, 'default' => 1],
                 4 => ['name' => 'Learning', 'proficient' => 0, 'sortorder' => 4, 'default' => 0],
@@ -57,14 +60,14 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
                 1 => ['name' => 'Arrived', 'proficient' => 1, 'sortorder' => 1, 'default' => 0],
             ]
         );
-        $rows = $DB->get_records('comp_scale_values', ['scaleid' => $data->scale->id], 'sortorder');
-        foreach ($rows as $row) {
-            $data->scalevalues[$row->sortorder] = new scale_value($row->id);
-        }
+        $data->scale = new scale($scale->id);
+        $data->scalevalues = $data->scale
+            ->sorted_values_high_to_low
+            ->key_by('sortorder')
+            ->all(true);
 
-        $framework = $hierarchygenerator->create_comp_frame(['scale' => $data->scale->id]);
-        $comp = $hierarchygenerator->create_comp(['frameworkid' => $framework->id]);
-        $data->comp = new competency($comp->id);
+        $data->framework = $generator->create_framework($data->scale);
+        $data->competency = $generator->create_competency('Comp A', $data->framework);
 
         $prefix = 'Course ';
         for ($i = 1; $i <= 5; $i++) {
@@ -81,19 +84,21 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         //      1 - Course 1 AND Course 2
         //      2 - Course 1 OR Course 3 OR Course 5
         //      3 - Course 4 AND Course 5
-        $crit_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
-        $data->cc[1] = $crit_generator->create_coursecompletion([
+
+        /** @var totara_criteria_generator $criteria_generator */
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+        $data->cc[1] = $criteria_generator->create_coursecompletion([
             'aggregation' => criterion::AGGREGATE_ALL,
             'courseids' => [$data->courses[1]->id, $data->courses[2]->id],
         ]);
 
-        $data->cc[2] = $crit_generator->create_coursecompletion([
+        $data->cc[2] = $criteria_generator->create_coursecompletion([
             'aggregation' => criterion::AGGREGATE_ANY_N,
             'req_items' => 1,
             'courseids' => [$data->courses[1]->id, $data->courses[3]->id, $data->courses[5]->id],
         ]);
 
-        $data->cc[3] = $crit_generator->create_coursecompletion([
+        $data->cc[3] = $criteria_generator->create_coursecompletion([
             'aggregation' => criterion::AGGREGATE_ALL,
             'courseids' => [$data->courses[4]->id, $data->courses[5]->id],
         ]);
@@ -108,11 +113,10 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
      * Test save new
      */
     public function test_save_new() {
-
         $data = $this->setup_data();
 
         $instance = new criteria_group();
-        $instance->set_competency($data->comp);
+        $instance->set_competency($data->competency);
         $instance->add_criterion($data->cc[1]);
         $instance->add_criterion($data->cc[2]);
         $instance->set_scale_value($data->scalevalues[5]);
@@ -145,17 +149,17 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $this->validate_criteria_ids($instance_id, [$data->cc[1]->get_id(), $data->cc[2]->get_id()]);
     }
 
-
     /**
      * Test saving when changing existing instances
      */
     public function test_saving_on_change() {
         global $DB;
 
+        $sink = $this->redirectHooks();
         $data = $this->setup_data();
 
         $instance = new criteria_group();
-        $instance->set_competency($data->comp);
+        $instance->set_competency($data->competency);
         $instance->set_scale_value($data->scalevalues[5]);
         $instance->add_criterion($data->cc[1]);
         $instance->save();
@@ -175,6 +179,7 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
 
         // Sleeping 1 second to ensure timestamps are different
         $this->waitForSecond();
+        $sink->clear();
 
         // Save without changes
         $instance->save();
@@ -190,6 +195,9 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $this->assertEquals($pw_row, $updated_pw_row);
         $updated_critgrp_row = $DB->get_record('pathway_criteria_group', ['id' => $instance_id]);
         $this->assertEquals($critgrp_row, $updated_critgrp_row);
+
+        // Nothing changed - no hook triggered
+        $this->assertSame(0, $sink->count());
 
         // Sleeping to ensure timestamps are different
         $this->waitForSecond();
@@ -277,7 +285,7 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $data = $this->setup_data();
 
         $instance = new criteria_group();
-        $instance->set_competency($data->comp);
+        $instance->set_competency($data->competency);
         $instance->set_scale_value($data->scalevalues[5]);
         $instance->add_criterion($data->cc[1]);
         $instance->add_criterion($data->cc[2]);
@@ -365,7 +373,7 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $data = $this->setup_data();
 
         $instance = new criteria_group();
-        $instance->set_competency($data->comp);
+        $instance->set_competency($data->competency);
         $instance->set_scale_value($data->scalevalues[5]);
         $instance->add_criterion($data->cc[1]);
         $instance->add_criterion($data->cc[2]);
@@ -417,7 +425,7 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $data = $this->setup_data();
 
         $instance = new criteria_group();
-        $instance->set_competency($data->comp);
+        $instance->set_competency($data->competency);
         $instance->set_scale_value($data->scalevalues[5]);
         $instance->add_criterion($data->cc[1]);
         $instance->add_criterion($data->cc[2]);
@@ -433,43 +441,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
 
         $actual = criteria_group::dump_pathway_configuration($instance->get_path_instance_id());
         $this->assertEqualsCanonicalizing($expected, $actual);
-    }
-
-
-    /**
-     * Validate the number of rows in the specified tables
-     *
-     * @param array $totest Test definition. Each array element is an array containing
-     *                      the table name, query conditions and expected number of rows
-     */
-    private function validate_num_rows(array $totest) {
-        global $DB;
-
-        foreach ($totest as $el) {
-            if (count($el) < 3) {
-                throw new coding_exception('validate_num_rows require 3 array elements for each table to test');
-            }
-
-            $rows = $DB->get_records($el[0], $el[1]);
-            $this->assertSame((int)$el[2], count($rows));
-        }
-    }
-
-    /**
-     * Validate that the expected criteria is linked to the the group
-     *
-     * @param int $instance_id Criteria group instance id
-     * @param array $expected_criterion_ids Array of expected criterion ids
-     */
-    private function validate_criteria_ids(int $instance_id, array $expected_criterion_ids) {
-        global $DB;
-
-        $rows = $DB->get_records('pathway_criteria_group_criterion', ['criteria_group_id' => $instance_id]);
-
-        $this->assertSame(count($expected_criterion_ids), count($rows));
-        while ($row = array_pop($rows)) {
-            $this->assertTrue(in_array($row->criterion_id, $expected_criterion_ids));
-        }
     }
 
     /**
@@ -656,14 +627,14 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
     }
 
     /**
-     * Test validate
+     * Test validate with some criteria
      */
     public function test_validate() {
         $data = $this->setup_data();
 
         // Valid criteria
         $instance = new criteria_group();
-        $instance->set_competency($data->comp);
+        $instance->set_competency($data->competency);
         $instance->set_scale_value($data->scalevalues[5]);
         $instance->add_criterion($data->cc[1]);
         $instance->validate();
@@ -675,6 +646,128 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $instance->add_criterion($data->cc[2]);
         $instance->validate();
         $this->assertFalse($instance->is_valid());
+    }
+
+    /**
+     * Test triggering of competency_validy_changed hook
+     */
+    public function test_competency_validity_hook() {
+        $sink = $this->redirectHooks();
+
+        $data = $this->setup_data();
+        $sink->clear();
+
+        // New valid pw not leading to proficiency
+        $pw1 = new criteria_group();
+        $pw1->set_competency($data->competency);
+        $pw1->set_scale_value($data->scalevalues[5]);
+        $pw1->add_criterion($data->cc[1]);
+        $pw1->save();
+        $this->assertSame(0, $sink->count());
+
+        // Change pw validity
+        $criteria = $pw1->get_criteria();
+        $keys = array_keys($criteria);
+        $pw1->remove_criterion($keys[0]);
+        $pw1->save();
+        // No change in competency validity as pw doesn't result in proficient value
+        $this->assertSame(0, $sink->count());
+
+        // New valid pw leading to proficiency
+        $pw2 = new criteria_group();
+        $pw2->set_competency($data->competency);
+        $pw2->set_scale_value($data->scalevalues[1]);
+        $pw2->add_criterion($data->cc[2]);
+        $pw2->save();
+
+        $hooks = $sink->get_hooks();
+        $this->assertSame(1, count($hooks));
+        /** @var competency_validity_changed $hook */
+        $hook = reset($hooks);
+        $this->assertTrue($hook instanceof competency_validity_changed);
+        $this->assertEqualsCanonicalizing([$data->competency->id], $hook->get_competency_ids());
+        $sink->clear();
+
+        // Add valid criteria
+        $pw2->add_criterion($data->cc[3]);
+        $pw2->save();
+        // No change in validity = no hook
+        $this->assertSame(0, $sink->count());
+
+        // New invalid pw
+        $data->cc[3]->add_items([1234]);
+        $data->cc[3]->save();
+        // Clear sink to avoid criteria_validity_changed
+        $sink->clear();
+
+        $pw3 = new criteria_group();
+        $pw3->set_competency($data->competency);
+        $pw3->set_scale_value($data->scalevalues[1]);
+        $pw3->add_criterion($data->cc[3]);
+        $pw3->save();
+        // Invalid pathway means user can't become proficient through it, therefore has no effect on competency validity
+        $this->assertSame(0, $sink->count());
+
+        // Now change the invalid pathway's criteria so that it becomes proficient
+        $data->cc[3]->remove_items([1234]);
+        $data->cc[3]->save();
+        // This should trigger criteria_validity_changed which will re-validate the pathway
+        // Simulating it in this test by re-initialising pw3 (to reset validated attribute) and calling save
+        $hooks = $sink->get_hooks();
+        $this->assertSame(1, count($hooks));
+        /** @var criteria_validity_changed $hook */
+        $hook = reset($hooks);
+        $this->assertTrue($hook instanceof criteria_validity_changed);
+        $this->assertEqualsCanonicalizing([$data->cc[3]->get_id()], $hook->get_criteria_ids());
+        $sink->clear();
+
+        $pw3 = criteria_group::fetch($pw3->get_id());
+        $pw3->save();
+        $hooks = $sink->get_hooks();
+        $this->assertSame(1, count($hooks));
+        /** @var competency_validity_changed $hook */
+        $hook = reset($hooks);
+        $this->assertTrue($hook instanceof competency_validity_changed);
+        $this->assertEqualsCanonicalizing([$data->competency->id], $hook->get_competency_ids());
+
+        $sink->close();
+    }
+
+
+    /**
+     * Validate the number of rows in the specified tables
+     *
+     * @param array $totest Test definition. Each array element is an array containing
+     *                      the table name, query conditions and expected number of rows
+     */
+    private function validate_num_rows(array $totest) {
+        global $DB;
+
+        foreach ($totest as $el) {
+            if (count($el) < 3) {
+                throw new coding_exception('validate_num_rows require 3 array elements for each table to test');
+            }
+
+            $rows = $DB->get_records($el[0], $el[1]);
+            $this->assertSame((int)$el[2], count($rows));
+        }
+    }
+
+    /**
+     * Validate that the expected criteria is linked to the the group
+     *
+     * @param int $instance_id Criteria group instance id
+     * @param array $expected_criterion_ids Array of expected criterion ids
+     */
+    private function validate_criteria_ids(int $instance_id, array $expected_criterion_ids) {
+        global $DB;
+
+        $rows = $DB->get_records('pathway_criteria_group_criterion', ['criteria_group_id' => $instance_id]);
+
+        $this->assertSame(count($expected_criterion_ids), count($rows));
+        while ($row = array_pop($rows)) {
+            $this->assertTrue(in_array($row->criterion_id, $expected_criterion_ids));
+        }
     }
 
 }

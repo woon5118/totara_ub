@@ -25,8 +25,6 @@ use core\orm\collection;
 use core\orm\query\table;
 use criteria_childcompetency\childcompetency;
 use totara_competency\entities\competency as competency_entity;
-use totara_competency\entities\competency_achievement as competency_achievement_entity;
-use totara_competency\hook\competency_achievement_updated;
 use totara_criteria\criterion;
 use totara_criteria\entities\criteria_item as item_entity;
 use totara_criteria\entities\criteria_item_record as item_record_entity;

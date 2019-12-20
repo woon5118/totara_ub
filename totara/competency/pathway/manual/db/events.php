@@ -21,9 +21,12 @@
  * @package pathway_manual
  */
 
+use hierarchy_competency\event\competency_deleted;
+use pathway_manual\observers\competency;
+
 $observers = [
     [
-        'eventname' => \hierarchy_competency\event\competency_deleted::class,
-        'callback' => \pathway_manual\observers\competency::class.'::deleted',
+        'eventname' => competency_deleted::class,
+        'callback' => competency::class.'::deleted',
     ],
 ];

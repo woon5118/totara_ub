@@ -22,6 +22,7 @@
  */
 
 use criteria_childcompetency\childcompetency;
+use pathway_criteria_group\criteria_group;
 use totara_criteria\criterion;
 
 class criteria_childcompetency_testcase extends advanced_testcase {
@@ -176,6 +177,40 @@ class criteria_childcompetency_testcase extends advanced_testcase {
         }
     }
 
+    /**
+     * Test validate when childcompetency criteria is added later
+     */
+    public function test_validate_parent_criteria_first() {
+        /** @var totara_criteria_generator $criterion_generator */
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
-    // TODO: test aggregate
+        /** @var totara_competency_generator $competency_generator */
+        $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+
+        $course = $this->getDataGenerator()->create_course(['enablecompletion' => true]);
+
+        $parent_comp = $competency_generator->create_competency('Parent competency');
+        $child_comp = $competency_generator->create_competency('Child competency', null, ['parentid' => $parent_comp->id]);
+
+        // The parent competency first - This should result in parent being invalid
+        $criterion = $criteria_generator->create_childcompetency(['competency' => $parent_comp->id]);
+        $parent_pw = $competency_generator->create_criteria_group($parent_comp->id,
+            [$criterion],
+            $parent_comp->scale->default_value
+        );
+        $this->assertFalse($parent_pw->is_valid());
+
+        // Now add criteria to the child competency ... parent validity should also be updated as the child is valid
+        $criterion = $criteria_generator->create_coursecompletion(['courseids' => [$course->id]]);
+        $child_pw = $competency_generator->create_criteria_group($child_comp,
+            [$criterion],
+            $child_comp->scale->min_proficient_value
+        );
+        $this->assertTrue($child_pw->is_valid());
+
+        // Re-initialize parent
+        $parent_pw = criteria_group::fetch($parent_pw->get_id());
+        $this->assertTrue($parent_pw->is_valid());
+    }
+
 }

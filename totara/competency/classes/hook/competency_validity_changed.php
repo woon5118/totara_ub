@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2018 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,21 +18,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package criteria_linkedcourses
+ * @package totara_competency
  */
 
-/**
- * This lists event observers.
- */
+namespace totara_competency\hook;
 
-use criteria_linkedcourses\observer\linked_courses;
-use totara_competency\event\linked_courses_updated;
+use totara_core\hook\base;
 
-defined('MOODLE_INTERNAL') || die();
+class competency_validity_changed extends base {
 
-$observers = [
-    [
-        'eventname' => linked_courses_updated::class,
-        'callback'  => linked_courses::class.'::linked_courses_updated'
-    ],
-];
+    /** @var int[] */
+    protected $competency_ids;
+
+    /**
+     * @param int[] $competency_id
+     */
+    public function __construct(array $competency_ids) {
+        $this->competency_ids = $competency_ids;
+    }
+
+    public function get_competency_ids(): array {
+        return $this->competency_ids;
+    }
+
+}

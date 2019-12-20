@@ -25,7 +25,9 @@
 namespace criteria_childcompetency\watcher;
 
 use totara_competency\hook\competency_achievement_updated;
+use totara_criteria\criterion;
 use totara_criteria\entities\criteria_item as item_entity;
+use totara_criteria\entities\criterion as criterion_entity;
 use totara_criteria\hook\criteria_achievement_changed;
 
 class achievement {
@@ -45,8 +47,11 @@ class achievement {
         $user_id = $achievement['user_id'];
 
         $criteria_ids = item_entity::repository()
-            ->where('item_type', 'competency')
-            ->where('item_id', $child_competency_id)
+            ->as('tci')
+            ->join([criterion_entity::TABLE, 'tc'], 'tci.criterion_id', 'tc.id')
+            ->where('tci.item_type', 'competency')
+            ->where('tci.item_id', $child_competency_id)
+            ->where('tc.plugin_type', 'childcompetency')
             ->get()
             ->pluck('criterion_id');
 

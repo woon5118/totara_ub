@@ -21,11 +21,20 @@
  * @package criteria_childcompetency
  */
 
+use criteria_childcompetency\watcher\achievement;
+use criteria_childcompetency\watcher\competency;
+use totara_competency\hook\competency_achievement_updated;
+use totara_competency\hook\competency_validity_changed;
+
 defined('MOODLE_INTERNAL') || die();
 
 $watchers = [
     [
-        'hookname' => \totara_competency\hook\competency_achievement_updated::class,
-        'callback' => \criteria_childcompetency\watcher\achievement::class.'::updated',
+        'hookname' => competency_achievement_updated::class,
+        'callback' => achievement::class.'::updated',
+    ],
+    [
+        'hookname' => competency_validity_changed::class,
+        'callback' => competency::class.'::validity_changed',
     ],
 ];

@@ -30,6 +30,7 @@ use totara_competency\entities\competency;
 use totara_competency\entities\configuration_change;
 use totara_competency\entities\configuration_history;
 use totara_competency\entities\scale_aggregation;
+use totara_competency\hook\competency_validity_changed;
 
 /**
  * Class containing all relvant configuration information for a specific competency
@@ -145,15 +146,19 @@ class achievement_configuration {
         //       Will sort it out when the graphQL queries and mutators for the UI is finalised
         $this->save_configuration_history($action_time);
 
+        $validity_changed = false;
         foreach ($pathways as $pathway) {
             try {
                 $pw = pathway_factory::fetch($pathway['type'], $pathway['id']);
+                if ($pw->get_scale_value()->proficient) {
+                    $validity_changed = true;
+                }
             } catch (\Exception $e) {
                 // Ignore non-existent pathways
                 continue;
             }
 
-            $pw->delete();
+            $pw->delete(false);
         }
 
         configuration_change::add_competency_entry(
@@ -161,6 +166,12 @@ class achievement_configuration {
             configuration_change::CHANGED_CRITERIA,
             $action_time
         );
+
+        if ($validity_changed) {
+            $hook = new competency_validity_changed([$this->competency->id]);
+            $hook->execute();
+        }
+
         $transaction->allow_commit();
     }
 
@@ -184,7 +195,7 @@ class achievement_configuration {
         $pathways = achievement_criteria::get_default_pathways($this->get_competency()->scale, $this->get_competency()->id);
         foreach ($pathways as $pw) {
             $pw->set_competency($this->competency);
-            $pw->save();
+            $pw->save(false);
         }
 
         // TODO: Should we maybe not log this if no action_time is provided to cater for the case
@@ -194,6 +205,10 @@ class achievement_configuration {
             configuration_change::CHANGED_CRITERIA,
             $action_time
         );
+
+        $hook = new competency_validity_changed([$this->competency->id]);
+        $hook->execute();
+
         $transaction->allow_commit();
 
         return $this;
@@ -330,6 +345,34 @@ class achievement_configuration {
         }
 
         return json_encode($dumpobj);
+    }
+
+    /**
+     * Determine whether the user can become proficient through this configuration
+     * @return bool
+     */
+    public function user_can_become_proficient(): bool {
+        if (!$this->is_aggregation_type_enabled()) {
+            return false;
+        }
+
+        $pathways = $this->get_active_pathways();
+        foreach ($pathways as $pathway) {
+            if ($pathway->leads_to_proficiency()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check whether the used aggregation type plugin is enabled
+     * @return bool
+     */
+    private function is_aggregation_type_enabled(): bool {
+        $enabledtypes = plugin_types::get_enabled_plugins('aggregation', 'totara_competency');
+        return in_array($this->get_aggregation_type(), $enabledtypes);
     }
 
 }

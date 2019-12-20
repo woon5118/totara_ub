@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2018 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,15 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
- * @package criteria_coursecompletion
+ * @package totara_criteria
  */
 
-use criteria_coursecompletion\coursecompletion;
-use criteria_linkedcourses\linkedcourses;
-use totara_competency\linked_courses;
-use totara_criteria\criterion;
-use totara_criteria\entities\criterion as criterion_entity;
-use totara_criteria\entities\criterion_item as criterion_item_entity;
 use totara_criteria\validators\course_item_validator;
 
 class totara_criteria_course_item_validator_testcase extends advanced_testcase {

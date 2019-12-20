@@ -28,6 +28,7 @@ use pathway_criteria_group\criteria_group;
 use totara_competency\entities\course as course_entity;
 use totara_competency\entities\scale_value;
 use totara_competency\expand_task;
+use totara_competency\hook\competency_validity_changed;
 use totara_competency\linked_courses;
 use totara_core\advanced_feature;
 
@@ -350,6 +351,8 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
     public function test_validate_and_mark_from_criteria(bool $assignments_enabled) {
         $data = $this->setup_data($assignments_enabled);
 
+        $hook_sink = $this->redirectHooks();
+
         // If all stays valid, nothing should be queued
         $criteria_ids = [
             $data->competency_data['Comp A']['criteria_ids'][1],
@@ -358,10 +361,13 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
 
         aggregation_helper::validate_and_mark_from_criteria($criteria_ids);
         $this->verify_queue([]);
+        $this->assertSame(0, $hook_sink->count());
 
         // Now invalidate a criterion
         $course = new course_entity($data->courses[1]->id);
         $course->delete();
+
+        $hook_sink->clear();
 
         aggregation_helper::validate_and_mark_from_criteria($criteria_ids);
         $this->verify_queue([
@@ -374,6 +380,14 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
                 'competency_id' => $data->competency_data['Comp A']['competency_id'],
             ],
         ]);
+
+        $hooks = $hook_sink->get_hooks();
+        $this->assertSame(1, count($hooks));
+        $hook = reset($hooks);
+        $this->assertInstanceOf(competency_validity_changed::class, $hook);
+        $this->assertEqualsCanonicalizing([$data->competency_data['Comp A']['competency_id']], $hook->get_competency_ids());
+
+        $hook_sink->close();
     }
 
     private function verify_queue(array $expected_rows) {

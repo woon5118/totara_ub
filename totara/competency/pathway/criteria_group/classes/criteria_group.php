@@ -147,7 +147,7 @@ class criteria_group extends pathway {
         // We will only get here if something changed
 
         // If there are no criteria - delete this pathway
-        if (count($this->get_criteria()) == 0) {
+        if ($this->get_id() && count($this->get_criteria()) == 0) {
             // It's already archived, don't do anything in this case
             if (!$this->is_active()) {
                 return $this;
@@ -156,7 +156,7 @@ class criteria_group extends pathway {
             $this->save_criteria();
 
             // Now delete the pathway
-            return $this->delete();
+            return $this->delete(true);
         }
 
         // Create new criteria_group instance
@@ -218,6 +218,7 @@ class criteria_group extends pathway {
         }
 
         // Delete removed criteria
+        // TODO: Whenever criteria are used in other modules, we should no longer delete the actual criteria, just the pathway_criteria_group_criterion
         if (!empty($critrows)) {
             foreach ($critrows as $id => $type) {
                 $criterion = criterion_factory::fetch($type, $id);
@@ -282,6 +283,7 @@ class criteria_group extends pathway {
      */
     public function set_scale_value(scale_value $scale_value): pathway {
         $this->scale_value = $scale_value;
+        $this->validated = false;
         return $this;
     }
 
@@ -603,7 +605,7 @@ class criteria_group extends pathway {
 
             foreach ($empty_pathways as $empty_pathway) {
                 $pathway = pathway_factory::from_entity($empty_pathway);
-                $pathway->delete();
+                $pathway->delete(false);
             }
         });
     }

@@ -1,11 +1,4 @@
 <?php
-
-use pathway_manual\manual;
-use totara_competency\achievement_configuration;
-use totara_competency\achievement_criteria;
-use totara_competency\entities\competency;
-use totara_competency\entities\configuration_change;
-use totara_criteria\criterion;
 /*
  * This file is part of Totara Learn
  *
@@ -24,10 +17,18 @@ use totara_criteria\criterion;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Brendan Cox <brendan.cox@totaralearning.com>
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  * @package totara_competency
  */
+
+use criteria_coursecompletion\coursecompletion;
+use pathway_manual\manual;
+use totara_competency\achievement_configuration;
+use totara_competency\achievement_criteria;
+use totara_competency\entities\competency;
+use totara_competency\entities\configuration_change;
+use totara_competency\entities\scale;
+use totara_criteria\criterion;
 
 class totara_competency_achievement_configuration_testcase extends advanced_testcase {
 
@@ -35,16 +36,19 @@ class totara_competency_achievement_configuration_testcase extends advanced_test
         global $DB;
 
         $data = new class() {
+            /** @var competency $comp */
             public $comp;
+            /** @var achievement_configuration $config */
             public $config;
+            /** @var \stdClass[] $courses */
             public $courses;
+            /** @var coursecompletion[] $cc */
             public $cc;
         };
 
         /** @var totara_hierarchy_generator $hierarchy_generator */
-        $generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
-        $data->comp = $generator->create_competency();
-
+        $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+        $data->comp = $competency_generator->create_competency();
         $data->config = new achievement_configuration($data->comp);
 
         // Some courses
@@ -52,6 +56,7 @@ class totara_competency_achievement_configuration_testcase extends advanced_test
             $record = [
                 'shortname' => "Course $i",
                 'fullname' => "Course $i",
+                'enablecompletion' => true,
             ];
 
             $data->courses[$i] = $this->getDataGenerator()->create_course($record);
@@ -60,13 +65,15 @@ class totara_competency_achievement_configuration_testcase extends advanced_test
         // Create 2 coursecompletion criteria
         //      - Course 1 AND Course 2
         //      - Course 1 OR Course 3 OR Course 5
-        $crit_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
-        $data->cc[1] = $crit_generator->create_coursecompletion([
+
+        /** @var totara_criteria_generator $criteria_generator */
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+        $data->cc[1] = $criteria_generator->create_coursecompletion([
             'aggregation' => criterion::AGGREGATE_ALL,
             'courseids' => [$data->courses[1]->id, $data->courses[2]->id],
         ]);
 
-        $data->cc[2] = $crit_generator->create_coursecompletion([
+        $data->cc[2] = $criteria_generator->create_coursecompletion([
             'aggregation' => [
                 'method' => criterion::AGGREGATE_ANY_N,
                 'req_items' => 1,
@@ -238,5 +245,50 @@ class totara_competency_achievement_configuration_testcase extends advanced_test
 
         // Should also be logged
         $this->assertSame(1, $DB->count_records('totara_competency_configuration_change'));
+    }
+
+    /**
+     * Test user_can_become_proficient through single value pathways
+     */
+    public function test_user_can_become_proficient() {
+        $data = $this->setup_data();
+
+        /** totara_competency_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+
+        /** @var achievement_configuration $config */
+        $config = $data->config;
+
+        // Initially no pathways
+        $this->assertFalse($config->user_can_become_proficient());
+
+        // Now we add a pathway which doesn't lead to a proficient value
+        $pw1 = $generator->create_criteria_group($data->comp, $data->cc[1], $data->comp->scale->default_value, 1);
+
+        // We need to re-initialize the configuration as the pathways have changed
+        // We also need to refresh the competency-pathway relationship
+        // TODO: v2 - adding/removing/saving etc. of pathways should be handled through the configuration in a similar way
+        //            as criteria are handled through criteria_group
+        $data->comp->load_relation('active_pathways');
+        $config = new achievement_configuration($data->comp);
+        $this->assertFalse($config->user_can_become_proficient());
+
+
+        // Add a second pathway that leads to a proficient value
+        $pw2 = $generator->create_criteria_group($data->comp, $data->cc[2], $data->comp->scale->min_proficient_value, 2);
+        $data->comp->load_relation('active_pathways');
+        $config = new achievement_configuration($data->comp);
+        $this->assertTrue($config->user_can_become_proficient());
+
+        // Now we remove pw2 and add a manual pw. User can still become proficient
+        $pw2->delete();
+        $data->comp->load_relation('active_pathways');
+        $config = new achievement_configuration($data->comp);
+        $this->assertFalse($config->user_can_become_proficient());
+
+        $pw3 = $generator->create_manual($data->comp, [manual::ROLE_MANAGER], 3);
+        $data->comp->load_relation('active_pathways');
+        $config = new achievement_configuration($data->comp);
+        $this->assertTrue($config->user_can_become_proficient());
     }
 }

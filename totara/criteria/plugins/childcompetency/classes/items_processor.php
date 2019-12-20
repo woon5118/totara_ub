@@ -24,12 +24,12 @@
 
 namespace criteria_childcompetency;
 
-use core\orm\query\builder;
 use totara_competency\achievement_configuration;
 use totara_competency\entities\configuration_change;
 use totara_competency\entities\competency as competency_entity;
+use totara_criteria\entities\criteria_metadata as criteria_metadata_entity;
 use totara_criteria\entities\criterion as criterion_entity;
-use totara_criteria\entities\criteria_item as item_entity;
+use totara_criteria\hook\criteria_validity_changed;
 
 class items_processor {
 
@@ -48,12 +48,33 @@ class items_processor {
 
         // Get all childcompetency criteria linked to the competency.
         $criteria = criterion_entity::repository()
-            ->set_filter('competency', $competency_id)
+            ->join([criteria_metadata_entity::TABLE, 'cm'], 'id', 'criterion_id')
+            ->where('cm.metakey', childcompetency::METADATA_COMPETENCY_KEY)
+            ->where('cm.metavalue', $competency_id)
+            ->with('items')
             ->where('plugin_type', 'childcompetency')
             ->get();
 
-        if (empty($criteria)) {
-            // Nothing to do
+        if (!$criteria->count()) {
+            return;
+        }
+
+        // We only need to determine whether there were any changes once
+        // All childcompetency criteria on the same competency will point to the same item ids
+        $child_competency_ids = competency_entity::repository()
+            ->where('parentid', $competency_id)
+            ->get()
+            ->pluck('id');
+
+        $current_item_ids = $criteria
+            ->first()
+            ->items
+            ->pluck('item_id');
+
+        $to_add = array_diff($child_competency_ids, $current_item_ids);
+        $to_delete = array_diff($current_item_ids, $child_competency_ids);
+
+        if (empty($to_add) && empty($to_delete)) {
             return;
         }
 
@@ -64,57 +85,28 @@ class items_processor {
         // We get a configuration dump before we start making changes for the specific competency
         // so that we can dump history if anything did change
         $competency_dump = achievement_configuration::get_current_configuration_dump($competency_id);
-        $child_competency_ids = competency_entity::repository()
-            ->where('parentid', $competency_id)
-            ->get()
-            ->pluck('id');
-        $configuration_has_changed = false;
-        $updated_criteria_ids = [];
 
+        // Saving through criteria_childcompetency instance instead of entity to ensure validation checks are done
         $transaction = $DB->start_delegated_transaction();
 
+        $affected_criteria = [];
         foreach ($criteria as $criterion) {
-            // Get the existing items - This is ok for now as all items linked to a specific criterion currently
-            // will have the same item_type
-            $current_item_ids = $criterion->items
-                ->pluck('item_id');
-
-            $to_add = array_diff($child_competency_ids, $current_item_ids);
-            $to_delete = array_diff($current_item_ids, $child_competency_ids);
-
-            if (empty($to_add) && empty($to_delete)) {
-                break 1;
+            $childcompetency = childcompetency::fetch_from_entity($criterion);
+            $childcompetency->set_item_ids($child_competency_ids);
+            $childcompetency->save();
+            if ($childcompetency->is_valid() != $criterion->valid) {
+                $affected_criteria[] = $criterion->id;
             }
-
-            $updated_criteria_ids[] = $criterion->id;
-            $configuration_has_changed = true;
-
-            foreach ($to_add as $to_add_id) {
-                $item = new item_entity();
-                $item->criterion_id = $criterion->id;
-                $item->item_type = $item_type;
-                $item->item_id = $to_add_id;
-                $item->save();
-            }
-
-            // This will do a cascade delete on item_records as well
-            if (!empty($to_delete)) {
-                builder::table(item_entity::TABLE)
-                    ->where('criterion_id', $criterion->id)
-                    ->where('item_type', $item_type)
-                    ->where_in('item_id', $to_delete)
-                    ->delete();
-            }
-
-            $criterion->criterion_modified = $now;
-            $criterion->save();
         }
 
-        // Now write competency history and change logs
-        if ($configuration_has_changed) {
-            $config = new achievement_configuration(new competency_entity($competency_id));
-            $config->save_configuration_history($now, $competency_dump);
-            configuration_change::add_competency_entry($competency_id, configuration_change::CHANGED_CRITERIA, $now);
+        // Dump the configuration history and log the configuration change
+        $config = new achievement_configuration(new competency_entity($competency_id));
+        $config->save_configuration_history($now, $competency_dump);
+        configuration_change::add_competency_entry($competency_id, configuration_change::CHANGED_CRITERIA, $now);
+
+        if (!empty($affected_criteria)) {
+            $hook = new criteria_validity_changed($affected_criteria);
+            $hook->execute();
         }
 
         $transaction->allow_commit();

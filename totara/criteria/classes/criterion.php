@@ -620,10 +620,10 @@ abstract class criterion {
 
     /**
      * Save this criterion and all its items
-     *
+     * @param bool $execute_hook
      * @return $this
      */
-    public function save(): criterion {
+    public function save(bool $execute_hook = true): criterion {
         $err_message = $this->validate_attributes();
         if (!is_null($err_message)) {
             throw new coding_exception($err_message);
@@ -650,10 +650,11 @@ abstract class criterion {
         $this->save_metadata();
 
         // Hook must be triggered after the items are saved
-        if ($exists && $this->valid != $this->saved_valid) {
+        if ($execute_hook && $exists && $this->valid != $this->saved_valid) {
             $hook = new criteria_validity_changed([$this->id]);
             $hook->execute();
         }
+
         $this->set_saved_valid($this->valid);
 
         return $this;

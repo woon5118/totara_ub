@@ -32,6 +32,7 @@ use totara_competency\entities\competency;
 use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\scale_value;
+use totara_competency\hook\competency_validity_changed;
 
 /**
  * Base class for pathway plugins
@@ -177,10 +178,10 @@ abstract class pathway {
 
     /**
      * Save the pathway
-     *
+     * bool $execute_hook
      * @return $this
      */
-    final public function save(): pathway {
+    final public function save(bool $execute_hook = true): pathway {
         global $DB;
 
         if (empty($this->get_competency())) {
@@ -191,7 +192,8 @@ abstract class pathway {
         $this->validate();
 
         // Check whether anything changed
-        if (empty($this->get_id()) || $this->valid != $this->saved_valid || $this->configuration_is_dirty()) {
+        $exists = !empty($this->get_id());
+        if (!$exists || $this->valid != $this->saved_valid || $this->configuration_is_dirty()) {
             if ($this->is_active()) {
                 $this->save_configuration();
             }
@@ -224,6 +226,16 @@ abstract class pathway {
             $this->id = $DB->insert_record('totara_competency_pathway', $record);
         }
 
+        $scale_value = $this->get_scale_value();
+        if ($execute_hook
+            && ((!$exists && $this->leads_to_proficiency())
+                || ($exists && $this->get_classification() == static::PATHWAY_MULTI_VALUE)
+                || ($exists && $scale_value->proficient && $this->valid != $this->saved_valid))
+        ) {
+            $hook = new competency_validity_changed([$this->competency->id]);
+            $hook->execute();
+        }
+
         $this->saved_valid = $this->valid;
 
         return $this;
@@ -243,10 +255,10 @@ abstract class pathway {
 
     /**
      * Archive the pathway
-     *
+     * @param bool $execute_hook
      * @return $this
      */
-    final private function archive(): pathway {
+    final private function archive(bool $execute_hook = true): pathway {
         if (empty($this->get_id())) {
             return $this;
         }
@@ -259,7 +271,15 @@ abstract class pathway {
         // IMPORTANT: We deliberately do not archive pathway_achievements here
         // so that our aggregation task picks all archived pathways up which
         // still have active pathway_achievements
-        $this->save();
+        $this->save(false);
+
+        if ($execute_hook
+            && ($this->get_classification() == static::PATHWAY_MULTI_VALUE
+                || $this->get_scale_value()->proficient)
+        ) {
+            $hook = new competency_validity_changed([$this->competency->id]);
+            $hook->execute();
+        }
 
         return $this;
     }
@@ -279,12 +299,12 @@ abstract class pathway {
 
     /**
      * 'Delete' the pathway and all its associated configuration
-     *
+     * @param bool $execute_hook
      * @return $this
      */
-    final public function delete() {
+    final public function delete(bool $execute_hook = true) {
         if ($this->is_active()) {
-            return $this->archive();
+            return $this->archive($execute_hook);
         }
 
         return $this;
@@ -311,11 +331,32 @@ abstract class pathway {
 
                 pathway_achievement::repository()
                     ->where('pathway_id', $pathway->id)
-                    ->delete();
+                    ->delete(false);
             }
 
             $pathways->delete();
         });
+    }
+
+    /**
+     * Save the valid value of the pathway
+     *
+     * @return $this
+     */
+    public function save_valid(): pathway {
+        // Not doing anything if not saved previously
+        if (empty($this->id)) {
+            return $this;
+        }
+
+        /** @var pathway_entity $pathway */
+        $pathway = new pathway_entity($this->id);
+        $pathway->valid = $this->valid;
+        $pathway->save();
+
+        $this->saved_valid = $this->valid;
+
+        return $this;
     }
 
 
@@ -566,6 +607,28 @@ abstract class pathway {
      */
     protected function is_configuration_valid(): bool {
         return true;
+    }
+
+    /**
+     * Can satisfying this pathway's criteria lead to proficiency
+     * @return bool
+     */
+    public function leads_to_proficiency(): bool {
+        if (!$this->is_active() || !$this->is_valid()) {
+            return false;
+        }
+
+        if ($this->get_classification() == self::PATHWAY_MULTI_VALUE) {
+            return true;
+        }
+
+        $scale_value = $this->get_scale_value();
+        if (is_null($scale_value)) {
+            debugging('A single value pathway without a scale value exists in the single_value pathway.');
+            return false;
+        }
+
+        return (bool)$scale_value->proficient;
     }
 
 

@@ -26,6 +26,7 @@ namespace criteria_childcompetency;
 use coding_exception;
 use totara_criteria\criterion;
 use totara_criteria\evaluators\competency_item_evaluator;
+use totara_criteria\validators\competency_item_validator;
 
 /**
  * Class containing information of child competency criteria
@@ -87,6 +88,13 @@ class childcompetency extends criterion {
         $this->set_item_ids($child_competencies);
 
         return $this;
+    }
+
+    /**
+     * @return string|null Class name of item_validator for this criteria type.
+     */
+    public static function get_item_validator_class(): ?string {
+        return competency_item_validator::class;
     }
 
 

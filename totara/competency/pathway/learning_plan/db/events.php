@@ -21,11 +21,14 @@
  * @package pathway_learning_plan
  */
 
+use pathway_learning_plan\observer\totara_plan;
+use totara_plan\event\competency_value_set;
+
 defined('MOODLE_INTERNAL') || die();
 
 $observers = [
     [
-        'eventname' => '\totara_plan\event\competency_value_set',
-        'callback' => pathway_learning_plan\observer\totara_plan::class.'::competency_value_set',
+        'eventname' => competency_value_set::class,
+        'callback' => totara_plan::class.'::competency_value_set',
     ],
 ];

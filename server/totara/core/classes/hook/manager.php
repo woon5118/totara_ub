@@ -90,13 +90,13 @@ abstract class manager {
 
         self::init_all_watchers();
 
-        $hookname = get_class($hook);
-        if (!isset(self::$allwatchers[$hookname])) {
+        if (PHPUNIT_TEST and \phpunit_util::is_redirecting_hooks()) {
+            \phpunit_util::hook_executed($hook);
             return;
         }
 
-        if (PHPUNIT_TEST and \phpunit_util::is_redirecting_hooks()) {
-            \phpunit_util::hook_executed($hook);
+        $hookname = get_class($hook);
+        if (!isset(self::$allwatchers[$hookname])) {
             return;
         }
 

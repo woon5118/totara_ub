@@ -28,9 +28,9 @@ use totara_competency\aggregation_users_table;
 use totara_competency\entities\pathway as pathway_entity;
 use pathway_criteria_group\entities\criteria_group as criteria_group_entity;
 use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
-use totara_competency\entities\competency_assignment_user as competency_assignment_user_entity;
+use totara_competency\hook\competency_configuration_updated;
+use totara_competency\hook\competency_validity_changed;
 use totara_competency\pathway;
-use totara_core\advanced_feature;
 
 class aggregation_helper {
 
@@ -118,7 +118,7 @@ class aggregation_helper {
             if ($instance->is_active()) {
                 $instance->validate();
                 if ($instance->is_valid() != $pathway->valid) {
-                    $instance->save();
+                    $instance->save_valid();
                     $affected_competencies[] = $instance->get_competency()->id;
                 }
             }
@@ -131,6 +131,9 @@ class aggregation_helper {
             foreach ($affected_competencies as $competency_id) {
                 $aggregation_table->queue_all_assigned_users_for_aggregation($competency_id);
             }
+
+            $hook = new competency_validity_changed($affected_competencies);
+            $hook->execute();
         }
     }
 

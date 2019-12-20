@@ -34,6 +34,7 @@ use totara_criteria\entities\criteria_metadata;
 use totara_criteria\entities\criterion;
 use totara_criteria\entities\criterion as criterion_entity;
 use totara_competency\linked_courses;
+use totara_criteria\hook\criteria_validity_changed;
 
 class items_processor {
 
@@ -71,13 +72,13 @@ class items_processor {
         $to_add = array_diff($linked_course_ids, $current_item_ids);
         $to_delete = array_diff($current_item_ids, $linked_course_ids);
 
-        // We need to consider the removed items for reaggregation as well
-        $course_ids = array_merge($linked_course_ids, $to_delete);
-
         if (empty($to_add) && empty($to_delete)) {
             // Nothing to do
             return;
         }
+
+        // We need to consider the removed items for reaggregation as well
+        $course_ids = array_merge($linked_course_ids, $to_delete);
 
         // We use the same action time for all updates to ensure that we only log changes once
         // for competencies with more than one linkedcourses criteria
@@ -90,16 +91,18 @@ class items_processor {
         // Saving through criteria_linkedcourses instance instead of entity to ensure validation checks are done
         $transaction = $DB->start_delegated_transaction();
 
+        $affected_criteria = [];
+
         /** @var criterion $criterion */
         foreach ($criteria as $criterion) {
             $linkedcourses = linkedcourses::fetch_from_entity($criterion);
             $linkedcourses->set_item_ids($linked_course_ids);
-            $linkedcourses->save();
-        }
+            $linkedcourses->save(false);
 
-        // Not triggering validity_changed here as it will be triggered through saving each criterion.
-        // Although a bulk trigger would be better for performance, we can't avoid calling save on the criterion
-        // as the items also needs to be updated
+            if ($linkedcourses->is_valid() != $criterion->valid) {
+                $affected_criteria[] = $criterion->id;
+            }
+        }
 
         // TODO: Reduce dependancy between totara_criteria and totara_competency here
         if (advanced_feature::is_enabled('competency_assignment')) {
@@ -116,6 +119,11 @@ class items_processor {
         $config = new achievement_configuration(new competency_entitiy($competency_id));
         $config->save_configuration_history($now, $configuration_dump);
         configuration_change::add_competency_entry($competency_id, configuration_change::CHANGED_CRITERIA, $now);
+
+        if (!empty($affected_criteria)) {
+            $hook = new criteria_validity_changed($affected_criteria);
+            $hook->execute();
+        }
 
         $transaction->allow_commit();
     }

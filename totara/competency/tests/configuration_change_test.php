@@ -63,6 +63,36 @@ class totara_competency_configuration_change_testcase extends advanced_testcase 
         );
     }
 
+    public function test_add_competency_entry_no_queue() {
+        $scale1 = $this->create_scale();
+        $comp1 = $this->create_competency($scale1->id);
+
+        $this->assertEquals(0, configuration_change::repository()->count());
+
+        $test_time = time();
+        configuration_change::add_competency_entry($comp1->id, configuration_change::CHANGED_AGGREGATION, $test_time, false);
+
+        $configuration_changes = configuration_change::repository()->get();
+        $this->assertEquals(1, $configuration_changes->count());
+        $configuration_change = $configuration_changes->first();
+        $this->assertEquals($comp1->id, $configuration_change->comp_id);
+        $this->assertEquals(configuration_change::CHANGED_AGGREGATION, $configuration_change->change_type);
+        $this->assertEmpty($configuration_change->related_info);
+        $this->assertEquals($test_time, $configuration_change->time_changed);
+
+        // No logging when using the same action_time
+        configuration_change::add_competency_entry($comp1->id, configuration_change::CHANGED_AGGREGATION, $test_time, false);
+
+        $configuration_changes = configuration_change::repository()->get();
+        $this->assertEquals(1, $configuration_changes->count());
+        $configuration_change = $configuration_changes->first();
+        $this->assertEquals($comp1->id, $configuration_change->comp_id);
+        $this->assertEquals(configuration_change::CHANGED_AGGREGATION, $configuration_change->change_type);
+        $this->assertEmpty($configuration_change->related_info);
+        $this->assertEquals($test_time, $configuration_change->time_changed);
+    }
+
+
     protected function create_scale() {
         /** @var totara_hierarchy_generator $hierarchy_generator */
         $hierarchy_generator = $this->generator()->hierarchy_generator();

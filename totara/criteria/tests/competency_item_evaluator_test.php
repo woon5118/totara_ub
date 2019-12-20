@@ -53,6 +53,9 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
         $record = ['criterion_id' => $data->criterion->get_id(), 'item_type' => 'competency', 'item_id' => 11];
         $DB->insert_record('totara_criteria_item', $record);
 
+        $data->criterion->set_valid(true);
+        $data->criterion->save_valid();
+
         $data->source_table = new aggregation_users_table();
         return $data;
     }
