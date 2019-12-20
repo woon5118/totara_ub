@@ -25,29 +25,26 @@
 namespace criteria_childcompetency\watcher;
 
 use criteria_childcompetency\childcompetency;
-use totara_competency\hook\competency_configuration_changed;
+use totara_competency\hook\competency_validity_changed;
 use totara_criteria\entities\criteria_item as item_entity;
 use totara_criteria\entities\criterion as criterion_entity;
 use totara_criteria\hook\criteria_validity_changed;
 
 class competency {
 
-    /**
-     * @paramcompetency_configuration_changed $hook
-     * @throws \coding_exception
-     */
-    public static function configuration_changed(competency_configuration_changed $hook) {
-        $competency_id = $hook->get_competency_id();
+    public static function validity_changed(competency_validity_changed $hook) {
+        global $DB;
 
         // Find parents with childcompetency criteria
         // Re-validate them and trigger criteria_validity_changed for applicable criteria
 
+        $competency_ids = $hook->get_competency_ids();
         $criteria = criterion_entity::repository()
             ->as('tc')
             ->join([item_entity::TABLE, 'tci'], 'tc.id', 'tci.criterion_id')
             ->where('tc.plugin_type', 'childcompetency')
             ->where('tci.item_type', 'competency')
-            ->where('tci.item_id', $competency_id)
+            ->where('tci.item_id', $competency_ids)
             ->get();
 
         $affected_criteria = [];

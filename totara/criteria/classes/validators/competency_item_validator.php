@@ -38,7 +38,7 @@ use totara_competency\entities\course as course_entity;
 class competency_item_validator implements criteria_item_validator_interface {
 
     /**
-     * Validate a single competency item's validity
+     * Validate a single course item's validity
      * @param int $item_id
      * @return bool
      */

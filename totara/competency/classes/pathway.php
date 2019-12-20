@@ -32,7 +32,7 @@ use totara_competency\entities\competency;
 use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\scale_value;
-use totara_competency\hook\competency_configuration_changed;
+use totara_competency\hook\competency_validity_changed;
 
 /**
  * Base class for pathway plugins
@@ -222,17 +222,21 @@ abstract class pathway {
         if ($this->get_id()) {
             $record->id = $this->get_id();
             $DB->update_record('totara_competency_pathway', $record);
-
         } else {
             $this->id = $DB->insert_record('totara_competency_pathway', $record);
         }
 
-        $this->saved_valid = $this->valid;
-
-        if ($execute_hook) {
-            $hook = new competency_configuration_changed($this->competency->id);
+        $scale_value = $this->get_scale_value();
+        if ($execute_hook
+            && ((!$exists && $this->leads_to_proficiency())
+                || ($exists && $this->get_classification() == static::PATHWAY_MULTI_VALUE)
+                || ($exists && $scale_value->proficient && $this->valid != $this->saved_valid))
+        ) {
+            $hook = new competency_validity_changed([$this->competency->id]);
             $hook->execute();
         }
+
+        $this->saved_valid = $this->valid;
 
         return $this;
     }
@@ -267,7 +271,15 @@ abstract class pathway {
         // IMPORTANT: We deliberately do not archive pathway_achievements here
         // so that our aggregation task picks all archived pathways up which
         // still have active pathway_achievements
-        $this->save($execute_hook);
+        $this->save(false);
+
+        if ($execute_hook
+            && ($this->get_classification() == static::PATHWAY_MULTI_VALUE
+                || $this->get_scale_value()->proficient)
+        ) {
+            $hook = new competency_validity_changed([$this->competency->id]);
+            $hook->execute();
+        }
 
         return $this;
     }
@@ -292,11 +304,7 @@ abstract class pathway {
      */
     final public function delete(bool $execute_hook = true) {
         if ($this->is_active()) {
-            if ($execute_hook) {
-                $hook = new competency_configuration_changed($this->competency->id);
-                $hook->execute();
-            }
-            return $this->archive(false);
+            return $this->archive($execute_hook);
         }
 
         return $this;
@@ -512,14 +520,6 @@ abstract class pathway {
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function is_validated(): bool {
-        return $this->validated;
-    }
-
-
 
     /**
      * Get pathway classification (Single or Multi value)
@@ -590,7 +590,7 @@ abstract class pathway {
      * @return $this
      */
     final public function validate(): pathway {
-        if ($this->is_validated()) {
+        if ($this->validated) {
             return $this;
         }
 
@@ -796,4 +796,5 @@ abstract class pathway {
      * @return base_achievement_detail as implemented by the pathway plugin in question
      */
     abstract public function aggregate_current_value(int $user_id): base_achievement_detail;
+
 }

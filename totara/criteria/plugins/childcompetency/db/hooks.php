@@ -18,14 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  * @package criteria_childcompetency
  */
 
 use criteria_childcompetency\watcher\achievement;
 use criteria_childcompetency\watcher\competency;
 use totara_competency\hook\competency_achievement_updated;
-use totara_competency\hook\competency_configuration_changed;
+use totara_competency\hook\competency_validity_changed;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -35,8 +34,8 @@ $watchers = [
         'callback' => achievement::class.'::updated',
     ],
     [
-        'hookname' => competency_configuration_changed::class,
-        'callback' => competency::class.'::configuration_changed',
+        'hookname' => competency_validity_changed::class,
+        'callback' => competency::class.'::validity_changed',
     ],
     [
         'hookname' => \totara_competency\hook\competency_achievement_updated_bulk::class,

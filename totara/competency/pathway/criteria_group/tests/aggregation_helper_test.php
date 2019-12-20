@@ -28,6 +28,7 @@ use pathway_criteria_group\criteria_group;
 use totara_competency\entities\course as course_entity;
 use totara_competency\entities\scale_value;
 use totara_competency\expand_task;
+use totara_competency\hook\competency_validity_changed;
 use totara_competency\linked_courses;
 use totara_core\advanced_feature;
 
@@ -380,7 +381,12 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
             ],
         ]);
 
-        $this->assertSame(0, $hook_sink->count());
+        $hooks = $hook_sink->get_hooks();
+        $this->assertSame(1, count($hooks));
+        $hook = reset($hooks);
+        $this->assertInstanceOf(competency_validity_changed::class, $hook);
+        $this->assertEqualsCanonicalizing([$data->competency_data['Comp A']['competency_id']], $hook->get_competency_ids());
+
         $hook_sink->close();
     }
 

@@ -100,17 +100,9 @@ class items_processor {
         }
 
         // Dump the configuration history and log the configuration change
-        // TODO: Is it correct to save a configuration change here? Suggested - trigger a 'criteria_configuration_changed hook
-        //       to be picked up by criteria_group (TL-23545)
-        //       Also - to sort out the history - save history everytime something changes -> thus the last saved history
-        //       entry is the current configuration (TL-23546)
         $config = new achievement_configuration(new competency_entity($competency_id));
         $config->save_configuration_history($now, $competency_dump);
-        configuration_change::add_competency_entry(
-            $competency_id,
-            configuration_change::CHANGED_CRITERIA,
-            $now,
-            true);
+        configuration_change::add_competency_entry($competency_id, configuration_change::CHANGED_CRITERIA, $now);
 
         if (!empty($affected_criteria)) {
             $hook = new criteria_validity_changed($affected_criteria);

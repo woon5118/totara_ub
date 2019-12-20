@@ -70,7 +70,7 @@ class totara_competency_configuration_change_testcase extends advanced_testcase 
         $this->assertEquals(0, configuration_change::repository()->count());
 
         $test_time = time();
-        configuration_change::add_competency_entry($comp1->id, configuration_change::CHANGED_AGGREGATION, $test_time);
+        configuration_change::add_competency_entry($comp1->id, configuration_change::CHANGED_AGGREGATION, $test_time, false);
 
         $configuration_changes = configuration_change::repository()->get();
         $this->assertEquals(1, $configuration_changes->count());
@@ -81,7 +81,7 @@ class totara_competency_configuration_change_testcase extends advanced_testcase 
         $this->assertEquals($test_time, $configuration_change->time_changed);
 
         // No logging when using the same action_time
-        configuration_change::add_competency_entry($comp1->id, configuration_change::CHANGED_AGGREGATION, $test_time);
+        configuration_change::add_competency_entry($comp1->id, configuration_change::CHANGED_AGGREGATION, $test_time, false);
 
         $configuration_changes = configuration_change::repository()->get();
         $this->assertEquals(1, $configuration_changes->count());
