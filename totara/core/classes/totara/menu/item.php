@@ -233,12 +233,14 @@ class item {
      */
     public function get_title() {
         if ($this->custom) {
-            return format_string($this->title);
+            // Always use the system context, otherwise the menu may change as you navigate around the site.
+            return format_string($this->title, true, ['context' => \context_system::instance()]);
         }
         if (!$this->customtitle) {
             $this->title = $this->get_default_title();
         }
-        return format_string($this->title);
+        // Always use the system context, otherwise the menu may change as you navigate around the site.
+        return format_string($this->title, true, ['context' => \context_system::instance()]);
     }
 
     /**
