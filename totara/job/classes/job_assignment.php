@@ -738,8 +738,9 @@ class job_assignment {
             }
 
             // Check that it is unique for this user.
-            if ($data['idnumber'] != $this->idnumber &&
-                $DB->record_exists('job_assignment', array('userid' => $this->userid, 'idnumber' => $data['idnumber']))) {
+            $sql = "SELECT 'x' FROM {job_assignment} WHERE userid = :userid AND idnumber = :idnumber AND id <> :id";
+            $params = ['userid' => $this->userid, 'idnumber' => $data['idnumber'], 'id' => $this->id];
+            if ($data['idnumber'] != $this->idnumber && $DB->record_exists_sql($sql, $params)) {
                 throw new \coding_exception('Tried to update job assignment to an idnumber which is not unique for this user');
             }
         }
