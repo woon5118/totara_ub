@@ -219,6 +219,7 @@ class manual extends pathway {
             }
             $this->roles[$role] = $role;
         }
+        $this->validated = false;
 
         return $this;
     }
@@ -252,6 +253,15 @@ class manual extends pathway {
 
         return [$result];
     }
+
+    /**
+     * Validate the configuration
+     * @return bool
+     */
+    protected function is_configuration_valid(): bool {
+        return !empty($this->roles);
+    }
+
 
 
     /*******************************************************************************************************
