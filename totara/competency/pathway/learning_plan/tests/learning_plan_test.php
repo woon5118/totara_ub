@@ -33,6 +33,7 @@ use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\scale_value;
 use pathway_learning_plan\learning_plan;
 use totara_competency\entities\competency;
+use totara_core\advanced_feature;
 
 class pathway_learning_plan_learning_plan_testcase extends advanced_testcase {
 
@@ -160,6 +161,24 @@ class pathway_learning_plan_learning_plan_testcase extends advanced_testcase {
         $this->assertCount(1, $achievements);
         $this->assertEquals($great->id, $achievements->first()->scale_value_id);
     }
+
+    /**
+     * Test validate
+     */
+    public function test_validate() {
+        advanced_feature::enable('learningplans');
+
+        // Enabled
+        $learning_plan = new learning_plan();
+        $learning_plan->validate();
+        $this->assertTrue($learning_plan->is_valid());
+
+        // Disabled
+        advanced_feature::disable('learningplans');
+        $learning_plan->validate();
+        $this->assertFalse($learning_plan->is_valid());
+    }
+
 
     private function run_aggregation_task() {
         (new aggregation_task(new aggregation_users_table(), false))->execute();

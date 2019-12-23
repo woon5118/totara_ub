@@ -27,6 +27,7 @@ namespace pathway_learning_plan;
 
 use totara_competency\base_achievement_detail;
 use totara_competency\pathway;
+use totara_core\advanced_feature;
 
 class learning_plan extends pathway {
 
@@ -59,6 +60,24 @@ class learning_plan extends pathway {
     protected function delete_configuration(): void {
         // Do nothing.
     }
+
+    /**
+     * @return bool
+     */
+    public function is_validated(): bool {
+        // As there is currently no event/hook when configuration settings are enabled/disabled, we
+        // always return false here to re-validate learning plan pathways' validity
+        return false;
+    }
+
+    /**
+     * Validate the configuration
+     * @return bool
+     */
+    protected function is_configuration_valid(): bool {
+        return advanced_feature::is_enabled('learningplans');
+    }
+
 
     /**
      * Get the current value from the learning plan and aggregate the pathway with it
