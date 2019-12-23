@@ -5,7 +5,8 @@ Feature: Test persistent login feature
     Given I am on a totara site
 
     When I use magic for persistent login to open the login page
-    And I should see "You are not logged in."
+    And I should not see "You are not logged in"
+    And I should not see "You are logged in"
     And I set the field "Username" to "admin"
     And I set the field "Password" to "admin"
     And I set the field "Remember username" to "1"
@@ -13,7 +14,8 @@ Feature: Test persistent login feature
     And I should see "Admin User"
     And I use magic for persistent login to simulate session timeout
     And I use magic for persistent login to open the login page
-    Then I should see "You are not logged in."
+    Then I should not see "You are not logged in"
+    And I should not see "You are logged in"
 
   Scenario: Test persistent login setting can be enabled and works from login page
     Given I am on a totara site
@@ -23,17 +25,20 @@ Feature: Test persistent login feature
     And I log out
 
     When I use magic for persistent login to open the login page
-    And I should see "You are not logged in."
+    And I should not see "You are not logged in"
+    And I should not see "You are logged in"
     And I set the field "Username" to "admin"
     And I set the field "Password" to "admin"
     And I press "Log in"
     And I should see "Admin User"
     And I use magic for persistent login to simulate session timeout
     And I use magic for persistent login to open the login page
-    Then I should see "You are not logged in."
+    Then I should not see "You are not logged in"
+    And I should not see "You are logged in"
 
     When I use magic for persistent login to open the login page
-    And I should see "You are not logged in."
+    And I should not see "You are not logged in"
+    And I should not see "You are logged in"
     And I set the field "Username" to "admin"
     And I set the field "Password" to "admin"
     And I set the field "Remember my login" to "1"
@@ -47,7 +52,8 @@ Feature: Test persistent login feature
     And I use magic for persistent login to open the login page
     And I should see "You are already logged in as Admin User, you need to log out before logging in as different user."
     And I press "Log out"
-    Then I should see "You are not logged in."
+    Then I should not see "You are not logged in"
+    And I should not see "You are logged in"
 
   Scenario: Test persistent login setting can be enabled and works from login block
     Given I am on a totara site
@@ -85,7 +91,8 @@ Feature: Test persistent login feature
     And I use magic for persistent login to open the login page
     And I should see "You are already logged in as Admin User, you need to log out before logging in as different user."
     And I press "Log out"
-    Then I should see "You are not logged in."
+    Then I should not see "You are not logged in"
+    And I should not see "You are logged in"
 
   Scenario: Test persistent login cookie is deleted during login-as
     Given I am on a totara site
@@ -97,7 +104,8 @@ Feature: Test persistent login feature
       | Persistent login | 1 |
     And I log out
     And I use magic for persistent login to open the login page
-    And I should see "You are not logged in."
+    And I should not see "You are not logged in"
+    And I should not see "You are logged in"
     And I set the field "Username" to "admin"
     And I set the field "Password" to "admin"
     And I set the field "Remember my login" to "1"
@@ -109,7 +117,8 @@ Feature: Test persistent login feature
     And I should see "You are logged in as user one"
     When I use magic for persistent login to simulate session timeout
     And I use magic for persistent login to open the login page
-    Then I should see "You are not logged in."
+    Then I should not see "You are not logged in"
+    And I should not see "You are logged in"
 
   Scenario: Test persistent login cookie is deleted when changing own password
     Given I am on a totara site
@@ -121,7 +130,8 @@ Feature: Test persistent login feature
       | Persistent login | 1 |
     And I log out
     And I use magic for persistent login to open the login page
-    And I should see "You are not logged in."
+    And I should not see "You are not logged in"
+    And I should not see "You are logged in"
     And I set the field "Username" to "user1"
     And I set the field "Password" to "user1"
     And I set the field "Remember my login" to "1"
@@ -129,7 +139,8 @@ Feature: Test persistent login feature
     And I should see "Prvni Uzivatel"
     And I use magic for persistent login to purge cookies
     And I use magic for persistent login to open the login page
-    And I should see "You are not logged in."
+    And I should not see "You are not logged in"
+    And I should not see "You are logged in"
     And I set the field "Username" to "user1"
     And I set the field "Password" to "user1"
     And I set the field "Remember my login" to "1"
@@ -160,7 +171,8 @@ Feature: Test persistent login feature
       | Persistent login | 1 |
     And I log out
     And I use magic for persistent login to open the login page
-    And I should see "You are not logged in."
+    And I should not see "You are not logged in"
+    And I should not see "You are logged in"
     And I set the field "Username" to "user1"
     And I set the field "Password" to "user1"
     And I set the field "Remember my login" to "1"
@@ -175,7 +187,8 @@ Feature: Test persistent login feature
     When I press "Update profile"
     And I log out
     And I use magic for persistent login to open the login page
-    And I should see "You are not logged in."
+    And I should not see "You are not logged in"
+    And I should not see "You are logged in"
     And I set the field "Username" to "user1"
     And I set the field "Password" to "Userpass-1"
     And I set the field "Remember my login" to "1"

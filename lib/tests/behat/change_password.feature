@@ -47,7 +47,8 @@ Feature: User can change their password
     When I press "Continue"
     And I log out
     Then I should see "Log in"
-    And I should see "You are not logged in"
+    And I should not see "You are not logged in"
+    And I should not see "You are logged in"
 
     When I set the following fields to these values:
     | Username | learner |
@@ -73,7 +74,8 @@ Feature: User can change their password
 
     When I log out
     Then I should see "Log in"
-    And I should see "You are not logged in"
+    And I should not see "You are not logged in"
+    And I should not see "You are logged in"
 
     When I set the following fields to these values:
       | Username | learner |
@@ -91,7 +93,8 @@ Feature: User can change their password
     When I press "Continue"
     And I log out
     Then I should see "Log in"
-    And I should see "You are not logged in"
+    And I should not see "You are not logged in"
+    And I should not see "You are logged in"
 
     When I set the following fields to these values:
       | Username | learner |

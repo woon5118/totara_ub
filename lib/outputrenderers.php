@@ -585,7 +585,7 @@ class core_renderer extends renderer_base {
 
         $loginpage = $this->is_login_page();
         $loginurl = get_login_url();
-
+        $loggedinas = '';
         if (empty($course->id)) {
             // $course->id is not defined during installation
             return '';
