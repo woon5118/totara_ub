@@ -65,8 +65,7 @@ class learning_plan extends pathway {
      * @return bool
      */
     public function is_validated(): bool {
-        // As there is currently no event/hook when configuration settings are enabled/disabled, we
-        // always return false here to re-validate learning plan pathways' validity
+        // We need to check the system status everytime
         return false;
     }
 

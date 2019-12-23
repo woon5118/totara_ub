@@ -24,6 +24,8 @@
 namespace totara_core;
 
 use coding_exception;
+use totara_core\hook\advanced_feature_disabled;
+use totara_core\hook\advanced_feature_enabled;
 
 class advanced_feature {
 
@@ -73,7 +75,14 @@ class advanced_feature {
             throw new coding_exception("'{$feature}' not supported by Totara feature checking code.");
         }
 
+        if (self::check($feature, self::ENABLED)) {
+            return;
+        }
+
         set_config("enable{$feature}", self::ENABLED);
+
+        $hook = new advanced_feature_enabled($feature);
+        $hook->execute();
     }
 
     /**
@@ -87,7 +96,14 @@ class advanced_feature {
             throw new coding_exception("'{$feature}' not supported by Totara feature checking code.");
         }
 
+        if (self::check($feature, self::DISABLED)) {
+            return;
+        }
+
         set_config("enable{$feature}", self::DISABLED);
+
+        $hook = new advanced_feature_disabled($feature);
+        $hook->execute();
     }
 
     /**

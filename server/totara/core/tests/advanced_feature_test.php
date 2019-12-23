@@ -22,6 +22,8 @@
  */
 
 use totara_core\advanced_feature;
+use totara_core\hook\advanced_feature_disabled;
+use totara_core\hook\advanced_feature_enabled;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -147,6 +149,8 @@ class totara_core_advanced_feature_testcase extends advanced_testcase {
     }
 
     public function test_enable_disable() {
+        $sink = $this->redirectHooks();
+
         set_config('enablepositions', advanced_feature::DISABLED);
         $this->assertTrue(advanced_feature::is_disabled('positions'));
         $this->assertFalse(advanced_feature::is_enabled('positions'));
@@ -155,9 +159,23 @@ class totara_core_advanced_feature_testcase extends advanced_testcase {
         $this->assertFalse(advanced_feature::is_disabled('positions'));
         $this->assertTrue(advanced_feature::is_enabled('positions'));
 
+        $hooks = $sink->get_hooks();
+        $this->assertSame(1, count($hooks));
+        $hook = reset($hooks);
+        $this->assertTrue ($hook instanceof advanced_feature_enabled);
+        $this->assertEquals('positions', $hook->get_feature());
+        $sink->clear();
+
         advanced_feature::disable('positions');
         $this->assertTrue(advanced_feature::is_disabled('positions'));
         $this->assertFalse(advanced_feature::is_enabled('positions'));
+
+        $hooks = $sink->get_hooks();
+        $this->assertSame(1, count($hooks));
+        $hook = reset($hooks);
+        $this->assertTrue ($hook instanceof advanced_feature_disabled);
+        $this->assertEquals('positions', $hook->get_feature());
+        $sink->close();
     }
 
     public function test_enable_unknown_feature() {

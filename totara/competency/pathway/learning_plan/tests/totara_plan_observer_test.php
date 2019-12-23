@@ -41,7 +41,7 @@ class pathway_learning_plan_totara_plan_observer_testcase extends advanced_testc
         $data = $this->setup_data();
 
         // No learning plan pathway being set up for competency here.
-        // Let's just make sure none is being added by default:Ø
+        // Let's just make sure none is being added by default:
         $this->assertFalse(pathway::repository()->where('path_type', 'learning_plan')->exists());
 
         $lp_pathway = new learning_plan();
