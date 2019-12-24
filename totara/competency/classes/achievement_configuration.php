@@ -30,7 +30,8 @@ use totara_competency\entities\competency;
 use totara_competency\entities\configuration_change;
 use totara_competency\entities\configuration_history;
 use totara_competency\entities\scale_aggregation;
-use totara_competency\hook\competency_validity_changed;
+use totara_competency\hook\pathways_created;
+use totara_competency\hook\pathways_deleted;
 
 /**
  * Class containing all relvant configuration information for a specific competency
@@ -146,30 +147,30 @@ class achievement_configuration {
         //       Will sort it out when the graphQL queries and mutators for the UI is finalised
         $this->save_configuration_history($action_time);
 
-        $validity_changed = false;
+        $pathway_ids = [];
         foreach ($pathways as $pathway) {
             try {
                 $pw = pathway_factory::fetch($pathway['type'], $pathway['id']);
-                if ($pw->get_scale_value()->proficient) {
-                    $validity_changed = true;
-                }
             } catch (\Exception $e) {
                 // Ignore non-existent pathways
                 continue;
             }
 
+            $pathway_ids[] = $pathway['id'];
             $pw->delete(false);
         }
 
-        configuration_change::add_competency_entry(
-            $this->competency->id,
-            configuration_change::CHANGED_CRITERIA,
-            $action_time
-        );
-
-        if ($validity_changed) {
-            $hook = new competency_validity_changed([$this->competency->id]);
+        if (!empty($pathway_ids)) {
+            $hook = new pathways_deleted($this->competency->id, $pathway_ids);
             $hook->execute();
+
+            // Assigned users will be queued through competency's watcher of pathways_deleted
+            configuration_change::add_competency_entry(
+                $this->competency->id,
+                configuration_change::CHANGED_CRITERIA,
+                $action_time,
+                false
+            );
         }
 
         $transaction->allow_commit();
@@ -192,22 +193,26 @@ class achievement_configuration {
 
         $transaction = $DB->start_delegated_transaction();
 
+        $pathway_ids = [];
         $pathways = achievement_criteria::get_default_pathways($this->get_competency()->scale, $this->get_competency()->id);
         foreach ($pathways as $pw) {
             $pw->set_competency($this->competency);
             $pw->save(false);
+            $pathway_ids[] = $pw->get_id();
         }
 
-        // TODO: Should we maybe not log this if no action_time is provided to cater for the case
-        //       when this is called for new competencies??
-        configuration_change::add_competency_entry(
-            $this->competency->id,
-            configuration_change::CHANGED_CRITERIA,
-            $action_time
-        );
+        if (!empty($pathway_ids)) {
+            $hook = new pathways_created($this->competency->id, $pathway_ids);
 
-        $hook = new competency_validity_changed([$this->competency->id]);
-        $hook->execute();
+            // TODO: Should we maybe not log this if no action_time is provided to cater for the case
+            //       when this is called for new competencies??
+            configuration_change::add_competency_entry(
+                $this->competency->id,
+                configuration_change::CHANGED_CRITERIA,
+                $action_time,
+                false
+            );
+        }
 
         $transaction->allow_commit();
 

@@ -25,26 +25,36 @@
 namespace criteria_childcompetency\watcher;
 
 use criteria_childcompetency\childcompetency;
-use totara_competency\hook\competency_validity_changed;
+use totara_competency\hook\pathways_created;
+use totara_competency\hook\pathways_updated;
+use totara_competency\hook\pathways_deleted;
+use totara_core\hook\base;
 use totara_criteria\entities\criteria_item as item_entity;
 use totara_criteria\entities\criterion as criterion_entity;
 use totara_criteria\hook\criteria_validity_changed;
 
 class competency {
 
-    public static function validity_changed(competency_validity_changed $hook) {
-        global $DB;
+    /**
+     * @param pathways_created|pathways_updated|pathways_deleted $hook
+     * @throws \coding_exception
+     */
+    public static function pathway_configuration_changed(base $hook) {
+        if (!$hook instanceof pathways_created && !$hook instanceof pathways_updated && !$hook instanceof pathways_deleted) {
+            throw new coding_exception('Expected pathways_created, pathways_updated or pathways_deleted hook');
+        }
+
+        $competency_id = $hook->get_competency_id();
 
         // Find parents with childcompetency criteria
         // Re-validate them and trigger criteria_validity_changed for applicable criteria
 
-        $competency_ids = $hook->get_competency_ids();
         $criteria = criterion_entity::repository()
             ->as('tc')
             ->join([item_entity::TABLE, 'tci'], 'tc.id', 'tci.criterion_id')
             ->where('tc.plugin_type', 'childcompetency')
             ->where('tci.item_type', 'competency')
-            ->where('tci.item_id', $competency_ids)
+            ->where('tci.item_id', $competency_id)
             ->get();
 
         $affected_criteria = [];

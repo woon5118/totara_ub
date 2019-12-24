@@ -28,9 +28,10 @@ use pathway_criteria_group\criteria_group;
 use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
 use totara_competency\entities\competency;
 use totara_competency\entities\scale;
-use totara_competency\hook\competency_validity_changed;
+use totara_competency\hook\pathways_created;
+use totara_competency\hook\pathways_deleted;
+use totara_competency\hook\pathways_updated;
 use totara_criteria\criterion;
-use totara_criteria\hook\criteria_validity_changed;
 
 class pathway_criteria_group_testcase extends \advanced_testcase {
 
@@ -128,6 +129,8 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
             ['pathway_criteria_group_criterion', [], 0],
         ]);
 
+        $sink = $this->redirectHooks();
+
         // Save
         $instance->save();
         $this->assertFalse(empty($instance->get_id()));
@@ -138,6 +141,14 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $pw_id = $instance->get_id();
         $instance_id = $instance->get_path_instance_id();
 
+        $hooks = $sink->get_hooks();
+        $this->assertSame(1, count($hooks));
+        /** @var pathways_created $hook */
+        $hook = reset($hooks);
+        $this->assertTrue($hook instanceof pathways_created);
+        $this->assertEquals($data->competency->id, $hook->get_competency_id());
+        $this->assertEqualsCanonicalizing([$pw_id], $hook->get_pathway_ids());
+
         // Check the saved data
         $this->validate_num_rows([
             ['totara_competency_pathway', ['id' => $pw_id], 1],
@@ -147,6 +158,8 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
 
         // Two criteria
         $this->validate_criteria_ids($instance_id, [$data->cc[1]->get_id(), $data->cc[2]->get_id()]);
+
+        $sink->close();
     }
 
     /**
@@ -217,7 +230,7 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         ]);
         $this->validate_criteria_ids($instance_id, [$data->cc[1]->get_id(), $data->cc[2]->get_id()]);
 
-        // pathway_emodifieds should have changed
+        // pathway_modifieds should have changed
         $updated_pw_row = $DB->get_record('totara_competency_pathway', ['id' => $pw_id]);
         $this->assertNotEquals($pw_row->pathway_modified, $updated_pw_row->pathway_modified);
         // Check other attributes
@@ -228,6 +241,15 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $updated_critgrp_row = $DB->get_record('pathway_criteria_group', ['id' => $instance_id]);
         $this->assertEquals($critgrp_row, $updated_critgrp_row);
 
+        // Configuration changed - expecting hook
+        $hooks = $sink->get_hooks();
+        $this->assertSame(1, count($hooks));
+        /** @var pathways_updated $hook */
+        $hook = reset($hooks);
+        $this->assertTrue($hook instanceof pathways_updated);
+        $this->assertEquals($data->competency->id, $hook->get_competency_id());
+        $this->assertEqualsCanonicalizing([$instance->get_id()], $hook->get_pathway_ids());
+        $sink->clear();
 
         // Add one criterion, remove another
         $instance->replace_criteria([$data->cc[2], $data->cc[3]]);
@@ -246,6 +268,13 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
 
         $updated_critgrp_row = $DB->get_record('pathway_criteria_group', ['id' => $instance_id]);
         $this->assertEquals($critgrp_row, $updated_critgrp_row);
+
+        $hooks = $sink->get_hooks();
+        $this->assertSame(1, count($hooks));
+        /** @var pathways_updated $hook */
+        $hook = reset($hooks);
+        $this->assertTrue($hook instanceof pathways_updated);
+        $sink->clear();
 
 
         // Change criterion items in an existing criterion
@@ -273,6 +302,13 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
 
         $updated_critgrp_row = $DB->get_record('pathway_criteria_group', ['id' => $instance_id]);
         $this->assertEquals($critgrp_row, $updated_critgrp_row);
+
+        $hooks = $sink->get_hooks();
+        $this->assertSame(1, count($hooks));
+        /** @var pathways_updated $hook */
+        $hook = reset($hooks);
+        $this->assertTrue($hook instanceof pathways_updated);
+        $sink->close();
     }
 
 
@@ -370,6 +406,8 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
     public function test_delete() {
         global $DB;
 
+        $sink = $this->redirectHooks();
+
         $data = $this->setup_data();
 
         $instance = new criteria_group();
@@ -398,6 +436,8 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         // Sleeping to ensure timestamps are different
         $this->waitForSecond();
 
+        $sink->clear();
+
         $instance->delete();
         $this->validate_num_rows([
             ['totara_competency_pathway', [], 1],
@@ -414,6 +454,16 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         // pathway_modified should be updated
         $updated_pw_row = $DB->get_record('totara_competency_pathway', ['id' => $pw_id]);
         $this->assertNotEquals($pw_row->pathway_modified, $updated_pw_row->pathway_modified);
+
+        $hooks = $sink->get_hooks();
+        $this->assertSame(1, count($hooks));
+        /** @var pathways_deleted $hook */
+        $hook = reset($hooks);
+        $this->assertTrue($hook instanceof pathways_deleted);
+        $this->assertEquals($data->competency->id, $hook->get_competency_id());
+        $this->assertEqualsCanonicalizing([$instance->get_id()], $hook->get_pathway_ids());
+        $sink->close();
+
     }
 
     /**
@@ -646,91 +696,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $instance->add_criterion($data->cc[2]);
         $instance->validate();
         $this->assertFalse($instance->is_valid());
-    }
-
-    /**
-     * Test triggering of competency_validy_changed hook
-     */
-    public function test_competency_validity_hook() {
-        $sink = $this->redirectHooks();
-
-        $data = $this->setup_data();
-        $sink->clear();
-
-        // New valid pw not leading to proficiency
-        $pw1 = new criteria_group();
-        $pw1->set_competency($data->competency);
-        $pw1->set_scale_value($data->scalevalues[5]);
-        $pw1->add_criterion($data->cc[1]);
-        $pw1->save();
-        $this->assertSame(0, $sink->count());
-
-        // Change pw validity
-        $criteria = $pw1->get_criteria();
-        $keys = array_keys($criteria);
-        $pw1->remove_criterion($keys[0]);
-        $pw1->save();
-        // No change in competency validity as pw doesn't result in proficient value
-        $this->assertSame(0, $sink->count());
-
-        // New valid pw leading to proficiency
-        $pw2 = new criteria_group();
-        $pw2->set_competency($data->competency);
-        $pw2->set_scale_value($data->scalevalues[1]);
-        $pw2->add_criterion($data->cc[2]);
-        $pw2->save();
-
-        $hooks = $sink->get_hooks();
-        $this->assertSame(1, count($hooks));
-        /** @var competency_validity_changed $hook */
-        $hook = reset($hooks);
-        $this->assertTrue($hook instanceof competency_validity_changed);
-        $this->assertEqualsCanonicalizing([$data->competency->id], $hook->get_competency_ids());
-        $sink->clear();
-
-        // Add valid criteria
-        $pw2->add_criterion($data->cc[3]);
-        $pw2->save();
-        // No change in validity = no hook
-        $this->assertSame(0, $sink->count());
-
-        // New invalid pw
-        $data->cc[3]->add_items([1234]);
-        $data->cc[3]->save();
-        // Clear sink to avoid criteria_validity_changed
-        $sink->clear();
-
-        $pw3 = new criteria_group();
-        $pw3->set_competency($data->competency);
-        $pw3->set_scale_value($data->scalevalues[1]);
-        $pw3->add_criterion($data->cc[3]);
-        $pw3->save();
-        // Invalid pathway means user can't become proficient through it, therefore has no effect on competency validity
-        $this->assertSame(0, $sink->count());
-
-        // Now change the invalid pathway's criteria so that it becomes proficient
-        $data->cc[3]->remove_items([1234]);
-        $data->cc[3]->save();
-        // This should trigger criteria_validity_changed which will re-validate the pathway
-        // Simulating it in this test by re-initialising pw3 (to reset validated attribute) and calling save
-        $hooks = $sink->get_hooks();
-        $this->assertSame(1, count($hooks));
-        /** @var criteria_validity_changed $hook */
-        $hook = reset($hooks);
-        $this->assertTrue($hook instanceof criteria_validity_changed);
-        $this->assertEqualsCanonicalizing([$data->cc[3]->get_id()], $hook->get_criteria_ids());
-        $sink->clear();
-
-        $pw3 = criteria_group::fetch($pw3->get_id());
-        $pw3->save();
-        $hooks = $sink->get_hooks();
-        $this->assertSame(1, count($hooks));
-        /** @var competency_validity_changed $hook */
-        $hook = reset($hooks);
-        $this->assertTrue($hook instanceof competency_validity_changed);
-        $this->assertEqualsCanonicalizing([$data->competency->id], $hook->get_competency_ids());
-
-        $sink->close();
     }
 
 
