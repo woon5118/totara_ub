@@ -222,6 +222,7 @@ class totara_competency_achievement_configuration_testcase extends advanced_test
 
         $data = $this->setup_data();
         $competency = $data->comp;
+        /** @var achievement_configuration $config */
         $config = $data->config;
 
         /** @var totara_competency_generator $competency_generator */

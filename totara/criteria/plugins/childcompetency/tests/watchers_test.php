@@ -29,7 +29,7 @@ use totara_competency\entities\competency as competency_entity;
 use totara_competency\entities\competency_achievement as competency_achievement_entity;
 use totara_competency\entities\scale;
 use totara_competency\hook\competency_achievement_updated;
-use totara_competency\hook\competency_validity_changed;
+use totara_competency\hook\pathways_created;
 use totara_criteria\criterion;
 use totara_criteria\entities\criteria_item as item_entity;
 use totara_criteria\entities\criteria_item_record as item_record_entity;
@@ -107,9 +107,12 @@ class criteria_childcompetency_watchers_testcase extends advanced_testcase {
     }
 
     /**
-     * Test watcher when the validity of one or more competency change
+     * Test watcher when the a competency's configuration change
      */
-    public function test_competency_validity_changed() {
+    public function test_competency_configuration_changed() {
+        $event_sink = $this->redirectEvents();
+        $hook_sink = $this->redirectHooks();
+
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
         /** @var totara_criteria_generator $criteria_generator */
@@ -130,32 +133,37 @@ class criteria_childcompetency_watchers_testcase extends advanced_testcase {
         $parent_pw = $competency_generator->create_criteria_group($parent, [$parent_criterion], $non_proficient_scalevalue);
         $this->assertFalse($parent_pw->is_valid());
 
-        $event_sink = $this->redirectEvents();
-        $hook_sink = $this->redirectHooks();
+        $hook_sink->clear();
 
         // First add a non-proficient pw to child
         $child_criterion = $criteria_generator->create_coursecompletion(['courseids' => [$course1->id]]);
         $child_pw = $competency_generator->create_criteria_group($child, [$child_criterion], $non_proficient_scalevalue);
-        $this->assertSame(0, $hook_sink->count());
+        $hooks = $hook_sink->get_hooks();
+        $this->assertSame(1, count($hooks));
+        /** @var pathways_created $hook */
+        $hook = reset($hooks);
+        $this->assertTrue($hook instanceof pathways_created);
+        $this->assertEquals($child->id, $hook->get_competency_id());
+        $this->assertEqualsCanonicalizing([$child_pw->get_id()], $hook->get_pathway_ids());
+        $hook_sink->clear();
 
-        // Check that if we (incorrectly) call the watcher manually, it will not result in any further actions
-        $hook = new competency_validity_changed([$child->id]);
-        competency_wathcer::validity_changed($hook);
+        // Child competency - not proficient - should not result in validity change
+        competency_wathcer::pathway_configuration_changed($hook);
         $this->assertSame(0, $hook_sink->count());
 
         // Now add a pathway to the child that will allow the user to become proficient
         $child_criterion2 = $criteria_generator->create_coursecompletion(['courseids' => [$course2->id]]);
         $child_pw2 = $competency_generator->create_criteria_group($child, [$child_criterion2], $proficient_scalevalue);
 
+        /** @var pathways_created $hooks */
         $hooks = $hook_sink->get_hooks();
         $this->assertSame(1, count($hooks));
         $hook = reset($hooks);
-        $this->assertTrue($hook instanceof competency_validity_changed);
-        $this->assertEqualsCanonicalizing([$child->id], $hook->get_competency_ids());
-
-        // Execute the watcher code and ensure that it will trigger the expected hook
+        $this->assertTrue($hook instanceof pathways_created);
         $hook_sink->clear();
-        competency_wathcer::validity_changed($hook);
+
+        // Child competency now proficient - expect parent validity change
+        competency_wathcer::pathway_configuration_changed($hook);
 
         $hooks = $hook_sink->get_hooks();
         $this->assertSame(1, count($hooks));

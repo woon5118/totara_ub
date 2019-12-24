@@ -29,11 +29,12 @@ use totara_competency\entities\competency_achievement;
 use totara_competency\entities\pathway;
 use totara_competency\entities\scale_value;
 use totara_competency\expand_task;
+use totara_core\advanced_feature;
 
 class pathway_learning_plan_totara_plan_observer_testcase extends advanced_testcase {
 
     public function test_event_for_competency_with_lp_pathway() {
-        \totara_core\advanced_feature::enable('competency_assignment');
+        advanced_feature::enable('competency_assignment');
 
         $this->setAdminUser();
 
@@ -62,7 +63,9 @@ class pathway_learning_plan_totara_plan_observer_testcase extends advanced_testc
             ->where($source_table->get_competency_id_column(), $data->competency->id)
             ->where($source_table->get_process_key_column(), null);
 
-        $this->assertFalse($builder->exists());
+        // All assigned users are queued for aggregation
+        $this->assertTrue($builder->exists());
+        $source_table->truncate();
 
         $development_plan = new development_plan($data->plan->id);
         /** @var dp_competency_component $component */
@@ -70,15 +73,12 @@ class pathway_learning_plan_totara_plan_observer_testcase extends advanced_testc
         $component->set_value($data->competency->id, $data->user->id, $great->id, new stdClass());
 
         // Verify that a row was inserted in the aggregation queue
-        $source_table = new aggregation_users_table();
-
         $builder = builder::table($source_table->get_table_name())
             ->where($source_table->get_user_id_column(), $data->user->id)
             ->where($source_table->get_competency_id_column(), $data->competency->id)
             ->where($source_table->get_process_key_column(), null);
 
         $this->assertTrue($builder->exists());
-
         $source_table->truncate();
 
         $this->assertFalse($builder->exists());
@@ -89,7 +89,7 @@ class pathway_learning_plan_totara_plan_observer_testcase extends advanced_testc
         $component->set_value($data->competency->id, $data->user->id, $good->id, new stdClass());
 
         // As the user is still assigned to the competency
-        $this->assertFalse($builder->exists());
+        $this->assertTrue($builder->exists());
     }
 
     public function test_event_for_competency_without_lp_pathway() {

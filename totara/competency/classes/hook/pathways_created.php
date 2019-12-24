@@ -18,34 +18,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
- * @package totara_criteria
+ * @package totara_competency
  */
 
-namespace totara_criteria\validators;
+namespace totara_competency\hook;
 
-global $CFG;
-require_once($CFG->dirroot . '/lib/completionlib.php');
+use totara_competency\pathway;
+use totara_core\hook\base;
 
-use completion_info;
-use totara_competency\achievement_configuration;
-use totara_competency\entities\competency;
-use totara_competency\entities\course as course_entity;
+class pathways_created extends base {
 
+    /** @var int */
+    protected $competency_id;
 
-/**
- * Validator for competency items
- */
-class competency_item_validator implements criteria_item_validator_interface {
+    /** @var int[] */
+    protected $pathway_ids;
 
     /**
-     * Validate a single competency item's validity
-     * @param int $item_id
-     * @return bool
+     * @param int $competency_id;
+     * @param array $pathway_ids
      */
-    public static function validate_item(int $item_id): bool {
-        $competency = new competency($item_id);
-        $config = new achievement_configuration($competency);
-        return $config->user_can_become_proficient();
+    public function __construct(int $competency_id, array $pathway_ids) {
+        $this->competency_id = $competency_id;
+        $this->pathway_ids = $pathway_ids;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_competency_id(): int {
+        return $this->competency_id;
+    }
+
+    /**
+     * @return int[]
+     */
+    public function get_pathway_ids(): array {
+        return $this->pathway_ids;
     }
 
 }

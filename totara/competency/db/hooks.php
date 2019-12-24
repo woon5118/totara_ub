@@ -17,35 +17,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  * @package criteria_childcompetency
  */
 
-use criteria_childcompetency\watcher\achievement;
-use criteria_childcompetency\watcher\competency;
-use totara_competency\hook\competency_achievement_updated;
 use totara_competency\hook\pathways_created;
 use totara_competency\hook\pathways_deleted;
 use totara_competency\hook\pathways_updated;
+use totara_competency\watcher\pathway as pathway_watcher;
 
 defined('MOODLE_INTERNAL') || die();
 
 $watchers = [
     [
-        'hookname' => competency_achievement_updated::class,
-        'callback' => achievement::class.'::updated',
-    ],
-    [
         'hookname' => pathways_created::class,
-        'callback' => competency::class.'::pathway_configuration_changed',
+        'callback' => pathway_watcher::class.'::pathway_configuration_changed',
     ],
     [
         'hookname' => pathways_updated::class,
-        'callback' => competency::class.'::pathway_configuration_changed',
+        'callback' => pathway_watcher::class.'::pathway_configuration_changed',
     ],
     [
         'hookname' => pathways_deleted::class,
-        'callback' => competency::class.'::pathway_configuration_changed',
+        'callback' => pathway_watcher::class.'::pathway_configuration_changed',
     ],
 ];
