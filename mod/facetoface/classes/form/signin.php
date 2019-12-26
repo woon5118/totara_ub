@@ -55,12 +55,14 @@ class signin extends \moodleform {
         $mform->setType('sessiondateid', PARAM_INT);
         $mform->setDefault('sessiondateid', 0);
 
-        $select[] = get_string('selectfileformat', 'mod_facetoface');
+        $select = ['none' => get_string('selectfileformat', 'mod_facetoface')] + $select;
         $group[] = $mform->createElement('select', 'docformat', get_string('exportformat', 'totara_core'), $select);
         $mform->setType('docformat', PARAM_PLUGIN);
-        $mform->setDefault('docformat', 0);
+        $mform->setDefault('docformat', 'none');
 
         $group[] = $mform->createElement('submit', 'download', get_string('download', 'mod_facetoface'));
-        $mform->addGroup($group, 'downloadgroup', get_string('downloadsigninsheet', 'mod_facetoface'), [' '], false);
+        $mform->addGroup($group, 'downloadgroup', get_string('downloadsigninsheet', 'mod_facetoface'), null, false);
+        $mform->disabledIf('download', 'sessiondateid', 'eq', '0');
+        $mform->disabledIf('download', 'docformat', 'eq', 'none');
     }
 }
