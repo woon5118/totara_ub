@@ -133,6 +133,7 @@ class core_authlib_testcase extends advanced_testcase {
         $user1 = $this->getDataGenerator()->create_user(array('username'=>'username1', 'password'=>'password1', 'email'=>'email1@example.com'));
         $user2 = $this->getDataGenerator()->create_user(array('username'=>'username2', 'password'=>'password2', 'email'=>'email2@example.com', 'suspended'=>1));
         $user3 = $this->getDataGenerator()->create_user(array('username'=>'username3', 'password'=>'password3', 'email'=>'email2@example.com', 'auth'=>'nologin'));
+        $user5 = $this->getDataGenerator()->create_user(array('username'=>'username5', 'password'=>'password5 ', 'email'=>'email5@example.com'));
 
         // Normal login.
         $sink = $this->redirectEvents();
@@ -142,6 +143,31 @@ class core_authlib_testcase extends advanced_testcase {
         $this->assertEmpty($events);
         $this->assertInstanceOf('stdClass', $result);
         $this->assertEquals($user1->id, $result->id);
+
+        // Totara: Normal login with extra space.
+        $sink = $this->redirectEvents();
+        $result = authenticate_user_login('username1', 'password1 ');
+        $events = $sink->get_events();
+        $sink->close();
+        $this->assertEmpty($events);
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertEquals($user1->id, $result->id);
+
+        $sink = $this->redirectEvents();
+        $result = authenticate_user_login('username5', 'password5 ');
+        $events = $sink->get_events();
+        $sink->close();
+        $this->assertEmpty($events);
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertEquals($user5->id, $result->id);
+
+        $sink = $this->redirectEvents();
+        $result = authenticate_user_login('username5', 'password5  ');
+        $events = $sink->get_events();
+        $sink->close();
+        $this->assertEmpty($events);
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertEquals($user5->id, $result->id);
 
         // Normal login with reason.
         $reason = null;
@@ -199,6 +225,16 @@ class core_authlib_testcase extends advanced_testcase {
         $this->assertSame($eventdata['other']['username'], 'username1');
         $this->assertSame($eventdata['other']['reason'], AUTH_LOGIN_FAILED);
         $this->assertEventContextNotUsed($event);
+
+        // Totara: two trailing spaces are not ok.
+        $reason = null;
+        $result = authenticate_user_login('username1', 'password1  ', false, $reason);
+        $this->assertFalse($result);
+        $this->assertEquals(AUTH_LOGIN_FAILED, $reason);
+        $reason = null;
+        $result = authenticate_user_login('username5', 'password5   ', false, $reason);
+        $this->assertFalse($result);
+        $this->assertEquals(AUTH_LOGIN_FAILED, $reason);
 
         $reason = null;
         // Capture failed login event.
@@ -260,24 +296,31 @@ class core_authlib_testcase extends advanced_testcase {
         set_config('lockoutthreshold', 3);
 
         $reason = null;
+        $this->assertSame(null, get_user_preferences('login_failed_count', null, $user1->id));
         $result = authenticate_user_login('username1', 'nopass', false, $reason);
+        $this->assertSame('1', get_user_preferences('login_failed_count', null, $user1->id));
         $this->assertFalse($result);
         $this->assertEquals(AUTH_LOGIN_FAILED, $reason);
         $result = authenticate_user_login('username1', 'nopass', false, $reason);
+        $this->assertSame('2', get_user_preferences('login_failed_count', null, $user1->id));
         $this->assertFalse($result);
         $this->assertEquals(AUTH_LOGIN_FAILED, $reason);
         $sink = $this->redirectEmails();
-        $result = authenticate_user_login('username1', 'nopass', false, $reason);
+        // Totara: test for extra space must be counted as 1 attempt.
+        $result = authenticate_user_login('username1', 'nopass ', false, $reason);
+        $this->assertSame('3', get_user_preferences('login_failed_count', null, $user1->id));
         $this->assertCount(1, $sink->get_messages());
         $sink->close();
         $this->assertFalse($result);
         $this->assertEquals(AUTH_LOGIN_FAILED, $reason);
 
         $result = authenticate_user_login('username1', 'password1', false, $reason);
+        $this->assertSame('3', get_user_preferences('login_failed_count', null, $user1->id));
         $this->assertFalse($result);
         $this->assertEquals(AUTH_LOGIN_LOCKOUT, $reason);
 
         $result = authenticate_user_login('username1', 'password1', true, $reason);
+        $this->assertSame(null, get_user_preferences('login_failed_count', null, $user1->id));
         $this->assertInstanceOf('stdClass', $result);
         $this->assertEquals(AUTH_LOGIN_OK, $reason);
 

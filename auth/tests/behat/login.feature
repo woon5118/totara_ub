@@ -41,3 +41,18 @@ Feature: Authentication
     Given I log in as "admin"
     When I log out
     Then I should see "You are not logged in" in the ".login" "css_element"
+
+  @javascript
+  Scenario: Test regular user can log in with username and password containing trailing space
+    Given I am on a totara site
+    And the following "users" exist:
+      | username | password | firstname | lastname | email          |
+      | user1    | pass1    | Prvni     | Uzivatel | u1@example.com |
+
+    When I use magic for persistent login to open the login page
+    And I should not see "You are not logged in"
+    And I should not see "You are logged in"
+    And I set the field "Username" to "user1"
+    And I set the field "Password" to "pass1 "
+    And I press "Log in"
+    Then I should see "Prvni Uzivatel"

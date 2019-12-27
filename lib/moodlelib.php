@@ -4788,7 +4788,18 @@ function authenticate_user_login($username, $password, $ignorelockout=false, &$f
 
         // On auth fail fall through to the next plugin.
         if (!$authplugin->user_login($username, $password)) {
-            continue;
+            if ($user->id && substr($password, -1) === ' ') {
+                // Totara: Retry without extra space at the end, it is common when copy/pasting passwords,
+                //         this should not be considered a security problem.
+                $altpassword = substr($password, 0, strlen($password) - 1);
+                if ($authplugin->user_login($username, $altpassword)) {
+                    $password = $altpassword;
+                } else {
+                    continue;
+                }
+            } else {
+                continue;
+            }
         }
 
         // Successful authentication.
