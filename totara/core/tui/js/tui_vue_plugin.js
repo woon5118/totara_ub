@@ -20,6 +20,7 @@
  * @package totara_core
  */
 import { uniqueId, url } from './util';
+import { trapFocusOnTab } from './dom/focus';
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -68,6 +69,26 @@ export default {
     if (typeof window !== 'undefined') {
       Vue.prototype.$window = window;
     }
+
+    // trap focus inside the specified element
+    const trapFocusHandlers = new WeakMap();
+    Vue.directive('trap-focus', {
+      inserted(el) {
+        const handler = e => {
+          if (e.key == 'Tab') {
+            trapFocusOnTab(el, e);
+          }
+        };
+        document.addEventListener('keydown', handler);
+        trapFocusHandlers.set(el, handler);
+      },
+
+      unbind(el) {
+        const handler = trapFocusHandlers.get(el);
+        document.removeEventListener('keydown', handler);
+        trapFocusHandlers.delete(el);
+      },
+    });
 
     // toggle class if inner node has focus
     const focusHandlers = new WeakMap();
