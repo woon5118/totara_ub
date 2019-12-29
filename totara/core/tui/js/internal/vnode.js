@@ -26,6 +26,7 @@ const DATA_KEYS = [
   'class',
   'staticClass',
   'style',
+  'staticStyle',
   'attrs',
   'props',
   'domProps',
@@ -62,7 +63,7 @@ function extractData(vnode, isComp) {
  *
  * @param {VNode} vnode
  */
-export function cloneVNode(vnode) {
+export function cloneVNode(vnode, { cloneChildren = false } = {}) {
   // use the context that the original vnode was created in.
   const h = vnode.context && vnode.context.$createElement;
   const isComp = !!vnode.componentOptions;
@@ -75,7 +76,11 @@ export function cloneVNode(vnode) {
 
   const tag = isComp ? vnode.componentOptions.Ctor : vnode.tag;
 
-  const childNodes = children ? children.map(c => cloneVNode(c)) : undefined;
+  const childNodes = cloneChildren
+    ? children
+      ? children.map(c => cloneVNode(c))
+      : undefined
+    : children;
 
   const cloned = h(tag, data, childNodes);
 
@@ -91,9 +96,9 @@ export function cloneVNode(vnode) {
  *
  * @param {Function|Function[]} val
  */
-function normalizeListeners(val) {
+function normalizeListenerValue(val) {
   if (val.fns) {
-    return normalizeListeners(val.fns);
+    return normalizeListenerValue(val.fns);
   }
   return Array.isArray(val) ? val : [val];
 }
@@ -104,6 +109,27 @@ function normalizeListeners(val) {
  * @param {Function|Function[]} a
  * @param {Function|Function[]} b
  */
+function mergeListenerValues(a, b) {
+  return normalizeListenerValue(a).concat(normalizeListenerValue(b));
+}
+
+/**
+ * Merge two listeners objects.
+ *
+ * @param {?Object} a
+ * @param {?Object} b
+ * @return {Object}
+ */
 export function mergeListeners(a, b) {
-  return normalizeListeners(a).concat(normalizeListeners(b));
+  let final = a ? Object.assign({}, a) : {};
+  if (b) {
+    for (var key in b) {
+      if (final[key]) {
+        final[key] = mergeListenerValues(final[key], b[key]);
+      } else {
+        final[key] = b[key];
+      }
+    }
+  }
+  return final;
 }
