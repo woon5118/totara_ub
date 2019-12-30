@@ -10,6 +10,8 @@
 </template>
 
 <script>
+/* global M */
+
 import ChartJs from 'totara_core/presentation/chartjs/ChartJs';
 import theme from 'totara_core/theme';
 
@@ -517,7 +519,7 @@ export default {
 
   methods: {
     competencyLink(id) {
-      let link = `/totara/competency/profile/details/?competency_id=${id}`;
+      let link = `${M.cfg.wwwroot}/totara/competency/profile/details/?competency_id=${id}`;
 
       if (!this.isMine) {
         link += `&user_id=${this.userId}`;
