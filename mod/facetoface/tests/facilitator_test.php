@@ -1193,6 +1193,168 @@ class mod_facetoface_facilitator_testcase extends advanced_testcase {
         }
     }
 
+    /**
+     * This method is used to set up the following facilitator_list unit tests.
+     *
+     * @return array [$facilitators, $seminarevent]
+     */
+    protected function set_up_facilitator_list_tests() {
+        $now = time();
+
+        $sitewidefacilitator1 = $this->facetoface_generator->add_site_wide_facilitator(array('name' => 'Site facilitator 1', 'allowconflicts' => 0, 'hidden' => 0));
+        $sitewidefacilitator2 = $this->facetoface_generator->add_internal_facilitator(array('name' => 'Site facilitator 2', 'allowconflicts' => 0, 'hidden' => 0));
+        $sitewidefacilitator3 = $this->facetoface_generator->add_internal_facilitator(array('name' => 'Site facilitator 3', 'allowconflicts' => 0, 'hidden' => 0));
+        $sitewidefacilitator4 = $this->facetoface_generator->add_site_wide_facilitator(array('name' => 'Site facilitator 4', 'allowconflicts' => 0, 'hidden' => 0));
+
+        $facilitators = [$sitewidefacilitator1->id, $sitewidefacilitator2->id, $sitewidefacilitator3->id, $sitewidefacilitator4->id];
+
+        $course = $this->getDataGenerator()->create_course();
+        $facetoface1 = $this->facetoface_generator->create_instance(array('course' => $course->id));
+
+        // Session 1 has an internal (3) and external (1)
+        // Session 2 has both internal (2, 3)
+        // Session 3 has external (1)
+        // No sessions have (4)
+        $sessiondates = array();
+        $sessiondates[] = $this->prepare_date($now + (DAYSECS * 1), $now + (DAYSECS * 2), $sitewidefacilitator3->id, $sitewidefacilitator1->id);
+        $sessiondates[] = $this->prepare_date($now + (DAYSECS * 2), $now + (DAYSECS * 3), $sitewidefacilitator2->id, $sitewidefacilitator3->id);
+        $sessiondates[] = $this->prepare_date($now + (DAYSECS * 3), $now + (DAYSECS * 4), $sitewidefacilitator1->id);
+        $sessionid = $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
+        $seminarevent = new seminar_event($sessionid);
+
+        return [$facilitators, $seminarevent];
+    }
+
+    /**
+     * Test facilitator_list::from_seminarevent()
+     */
+    public function test_facetoface_facilitator_list_from_seminarevent() {
+        list($facilitatorids, $seminarevent) = $this->set_up_facilitator_list_tests();
+
+        // The fourth facilitator is not assigned, so unset.
+        $unassigned = $facilitatorids[3];
+        unset($facilitatorids[3]);
+
+        $facilitator_list = facilitator_list::from_seminarevent($seminarevent->get_id());
+        $this->assertCount(count($facilitatorids), $facilitator_list);
+
+        // Check to see that the list has the expected facilitators.
+        foreach($facilitatorids as $id) {
+            $this->assertTrue($facilitator_list->contains($id));
+        }
+
+        // Check to see that it doesn't have the unassigned facilitator (logically redundant).
+        $this->assertFalse($facilitator_list->contains($unassigned));
+
+        // Sanity check the first facilitator.
+        $facilitator = $facilitator_list->get($facilitatorids[0]);
+        $this->assertEquals('Site facilitator 1', $facilitator->get_name());
+
+        // Now get internal facilitators only.
+        // Remove the external facilitator from our expected ids.
+        $external = $facilitatorids[0];
+        unset($facilitatorids[0]);
+
+        $internal_facilitator_list = facilitator_list::from_seminarevent($seminarevent->get_id(), true);
+        $this->assertCount(count($facilitatorids), $internal_facilitator_list);
+
+        // Check to see that the list has the expected facilitators.
+        foreach($facilitatorids as $id) {
+            $this->assertTrue($internal_facilitator_list->contains($id));
+        }
+
+        // Check to see that it doesn't have the unassigned or external facilitators (logically redundant).
+        $this->assertFalse($internal_facilitator_list->contains($unassigned));
+        $this->assertFalse($internal_facilitator_list->contains($external));
+
+        // Sanity check the first internal facilitator.
+        $facilitator = $internal_facilitator_list->get($facilitatorids[1]);
+        $this->assertEquals('Site facilitator 2', $facilitator->get_name());
+    }
+
+    /**
+     * Test facilitator_list::from_session()
+     */
+    public function test_facetoface_facilitator_list_from_session() {
+        list($facilitatorids, $seminarevent) = $this->set_up_facilitator_list_tests();
+
+        // The first and fourth facilitators will not be assigned, so unset.
+        $external = $facilitatorids[0];
+        $unassigned = $facilitatorids[3];
+        unset($facilitatorids[0]);
+        unset($facilitatorids[3]);
+
+        // Get the second session from the event.
+        $seminar_sessions = $seminarevent->get_sessions();
+        $seminar_sessions->next();
+        $session = $seminar_sessions->current();
+
+        $facilitator_list = facilitator_list::from_session($session->get_id());
+
+        $this->assertCount(count($facilitatorids), $facilitator_list);
+
+        // Check to see that the list has the expected facilitators.
+        foreach($facilitatorids as $id) {
+            $this->assertTrue($facilitator_list->contains($id));
+        }
+
+        // Check to see that it doesn't have the external and unassigned facilitators (logically redundant).
+        $this->assertFalse($facilitator_list->contains($external));
+        $this->assertFalse($facilitator_list->contains($unassigned));
+
+        // Sanity check the first facilitator.
+        $facilitator = $facilitator_list->get($facilitatorids[1]);
+        $this->assertEquals('Site facilitator 2', $facilitator->get_name());
+
+        // Now get internal facilitators only from the next (aka first) session of the event. (Session list is in reverse chronological order.)
+        $seminar_sessions->next();
+        $session = $seminar_sessions->current();
+
+        // Internal facilitator (2) is not assigned to this session.
+        $unassigned_internal = $facilitatorids[1];
+        unset($facilitatorids[1]);
+
+        $internal_facilitator_list = facilitator_list::from_session($session->get_id(), true);
+        $this->assertCount(count($facilitatorids), $internal_facilitator_list);
+
+        // Check to see that the list has the expected facilitators.
+        foreach($facilitatorids as $id) {
+            $this->assertTrue($internal_facilitator_list->contains($id));
+        }
+
+        // Check to see that it doesn't have the unassigned or external facilitators (logically redundant).
+        $this->assertFalse($internal_facilitator_list->contains($external));
+        $this->assertFalse($internal_facilitator_list->contains($unassigned));
+        $this->assertFalse($internal_facilitator_list->contains($unassigned_internal));
+
+        // Sanity check the first internal facilitator.
+        $facilitator = $internal_facilitator_list->get($facilitatorids[2]);
+        $this->assertEquals('Site facilitator 3', $facilitator->get_name());
+    }
+
+    /**
+     * Test facilitator_list::to_ids()
+     */
+    public function test_facetoface_facilitator_list_to_ids() {
+        list($facilitators, $seminarevent) = $this->set_up_facilitator_list_tests();
+
+        $facilitator_list = facilitator_list::from_seminarevent($seminarevent->get_id());
+
+        // Ids are expected to be in ascending order.
+        $expected = [$facilitators[0] => $facilitators[0], $facilitators[1] => $facilitators[1], $facilitators[2] => $facilitators[2]];
+        $this->assertEquals($expected, $facilitator_list->get_ids());
+    }
+
+    /**
+     * Prepare a sessiondate object for the generator, from timestamps and 0 or more facilitator ids
+     *
+     * @param int $timestart
+     * @param int $timeend
+     * @param null|int $facilitatorid1
+     * @param null|int $facilitatorid2
+     * @param null|int $facilitatorid3
+     * @return stdClass
+     */
     protected function prepare_date($timestart, $timeend, $facilitatorid1 = null, $facilitatorid2 = null, $facilitatorid3 = null) {
         $facilitatorids = array();
         if ($facilitatorid1) {

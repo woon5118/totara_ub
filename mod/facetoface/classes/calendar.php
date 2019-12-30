@@ -28,6 +28,9 @@ use mod_facetoface\signup\state\{
     waitlisted
 };
 
+/**
+ * Class calendar implements the calendar event handling interface for seminar events.
+ */
 final class calendar {
 
     /**
@@ -39,10 +42,8 @@ final class calendar {
      * @param string   $eventtype    Optional param for user calendar (booking/session)
      * @return bool
      */
-    public static function add_seminar_event(\mod_facetoface\seminar_event $seminarevent, $calendartype = 'none', $userid = 0, $eventtype = 'session') {
-        global $PAGE, $DB;
-
-        $seminar = new \mod_facetoface\seminar($seminarevent->get_facetoface());
+    public static function add_seminar_event(seminar_event $seminarevent, string $calendartype = 'none', int $userid = 0, string $eventtype = 'session'): bool {
+        $seminar = new seminar($seminarevent->get_facetoface());
 
         if (empty($seminarevent->get_mintimestart())) {
             return true; //date unkown, can't add to calendar
@@ -52,16 +53,8 @@ final class calendar {
             return true; //facetoface calendar settings prevent calendar
         }
 
+        // Generate link to append to the description.
         $description = '';
-        if (!empty($seminar->get_intro())) {
-            $description .= \html_writer::tag('p', clean_param($seminar->get_intro(), PARAM_CLEANHTML));
-        }
-        /**
-         * @var \mod_facetoface_renderer $seminarrenderer
-         */
-        $seminarrenderer = $PAGE->get_renderer('mod_facetoface');
-        $description .= $seminarrenderer->render_seminar_event($seminarevent, false, true);
-
         $linkurl = new \moodle_url('/mod/facetoface/signup.php', array('s' => $seminarevent->get_id()));
         $linktext = get_string('signupforthissession', 'facetoface');
 
@@ -81,6 +74,76 @@ final class calendar {
             return true;
         }
 
+        // Remove all calendar events related to current session and user before adding new event to avoid duplication.
+        self::remove_seminar_event($seminarevent, $courseid, $userid);
+
+        // Ready to add standard events.
+        return self::add_event_internal($seminarevent, $courseid, $userid, true, $eventtype, '', $description);
+    }
+
+    /**
+     * Generate a new set of calendar events for the facilitator of one or more sessions in a seminar event.
+     *
+     * @param seminar_event $seminarevent
+     * @param facilitator_user $facilitator
+     * @return void
+     */
+    public static function add_facilitator_event(seminar_event $seminarevent, facilitator_user $facilitator): void {
+        global $PAGE, $DB;
+
+        // Is there a date for this seminar (should be since facilitator, but good to check)?
+        if (empty($seminarevent->get_mintimestart())) {
+            return;
+        }
+
+        // Remove all calendar events related to current session and user before adding new event to avoid duplication.
+        self::remove_facilitator_event($seminarevent, $facilitator->get_userid());
+
+        // Limit the sessions list to just the ones this facilitator cares about.
+        $seminarevent->facilitator_sessions_only($facilitator->get_id());
+
+        // Include description?
+        $linkurl = new \moodle_url('/mod/facetoface/attendees/view.php', array('s' => $seminarevent->get_id()));
+        $introduction = get_string("calendareventdescriptionfacilitator", 'facetoface', $linkurl->out());
+
+        // Ready to add standard events.
+        self::add_event_internal($seminarevent, 0, $facilitator->get_userid(), false, 'facilitator', $introduction, '');
+
+        // load all sessions again
+        $seminarevent->get_sessions(true);
+    }
+
+    /**
+     * Perform the parts of add_seminar_event() and add_facilitator_event() which are similar.
+     *
+     * @param seminar_event $seminarevent
+     * @param int $courseid
+     * @param int $userid
+     * @param bool $usemodule whether to include the seminar module instance as part of the event
+     * @param string $eventtype
+     * @param string $prepend markup that goes before the rendered description
+     * @param string $postpend markup that goes after the rendered description
+     * @return bool
+     */
+    private static function add_event_internal(seminar_event $seminarevent, int $courseid, int $userid, bool $usemodule, string $eventtype, string $prepend = '', string $postpend = ''): bool {
+        global $PAGE, $DB;
+
+        // Start description with prepend.
+        $description = $prepend;
+
+        $seminar = new \mod_facetoface\seminar($seminarevent->get_facetoface());
+        if (!empty($seminar->get_intro())) {
+            $description .= \html_writer::tag('p', clean_param($seminar->get_intro(), PARAM_CLEANHTML));
+        }
+
+        // Use the facetoface seminar event renderer to build the description.
+        $seminarrenderer = $PAGE->get_renderer('mod_facetoface');
+        $description .= $seminarrenderer->render_seminar_event($seminarevent, false, true);
+
+        // Add append text to description.
+        $description .= $postpend;
+
+        // Maximum event name is 256 chars, which may be shorter than seminar name.
         $shortname = $seminar->get_shortname();
         if (empty($shortname)) {
             // Calendar-related constants
@@ -91,13 +154,22 @@ final class calendar {
             $shortname = shorten_text($seminar->get_name(), CALENDAR_MAX_NAME_LENGTH);
         }
 
-        // Remove all calendar events related to current session and user before adding new event to avoid duplication.
-        self::remove_seminar_event($seminarevent, $courseid, $userid);
+        // Link event to seminar activity or not?
+        if ($usemodule) {
+            $instance = $seminar->get_id();
+            $modulename = 'facetoface';
+        } else {
+            $instance = 0;
+            $modulename = '';
+        }
+
+        // Truncate eventtype if necessary, full event type is limited to 20 characters in DB.
+        if (strlen($eventtype) > 10) {
+            $eventtype = substr($eventtype, 0, 10);
+        }
+        $eventtype = "facetoface{$eventtype}";
 
         $result = true;
-        /**
-         * @var seminar_session $date
-         */
         foreach ($seminarevent->get_sessions() as $date) {
             $newevent = new \stdClass();
             $newevent->name = $shortname;
@@ -107,9 +179,9 @@ final class calendar {
             $newevent->groupid = 0;
             $newevent->userid = $userid;
             $newevent->uuid = "{$seminarevent->get_id()}";
-            $newevent->instance = $seminar->get_id();
-            $newevent->modulename = 'facetoface';
-            $newevent->eventtype = "facetoface{$eventtype}";
+            $newevent->instance = $instance;
+            $newevent->modulename = $modulename;
+            $newevent->eventtype = $eventtype;
             $newevent->timestart = $date->get_timestart();
             $newevent->timeduration = $date->get_timefinish() - $date->get_timestart();
             $newevent->visible = 1;
@@ -127,7 +199,7 @@ final class calendar {
      * @param seminar_event $seminarevent
      * @return bool
      */
-    public static function update_entries(\mod_facetoface\seminar_event $seminarevent) {
+    public static function update_entries(seminar_event $seminarevent): bool {
         global $USER;
 
         // Do not re-create calendars as they already removed from cancelled session.
@@ -141,9 +213,19 @@ final class calendar {
         // Remove from all calendars.
         self::delete_user_events($seminarevent, 'booking');
         self::delete_user_events($seminarevent, 'session');
+        self::remove_facilitator_event($seminarevent, 0);
         self::remove_seminar_event($seminarevent, $seminar->get_course());
         self::remove_seminar_event($seminarevent, SITEID);
 
+        // If there are internal facilitators, add to facilitators' user calendars
+        $internal_facilitators = facilitator_list::from_seminarevent($seminarevent->get_id(), true);
+        if ($internal_facilitators->count()) {
+            foreach ($internal_facilitators as $facilitator_user) {
+                self::add_facilitator_event($seminarevent, $facilitator_user);
+            }
+        }
+
+        // If no other events need to be created, return here.
         if ($seminar->get_showoncalendar() == 0 && $seminar->get_usercalentry() == 0) {
             return true;
         }
@@ -154,6 +236,7 @@ final class calendar {
             $statuscodes = [booked::get_code(), waitlisted::get_code()];
             $users = $helper->get_attendees_with_codes($statuscodes);
 
+            // This adds the seminar events to the current user's personal calendar, which is arbitrary and should be reconsidered.
             if (!in_array($USER->id, array_keys($users))) {
                 self::add_seminar_event($seminarevent, 'user', $USER->id, 'session');
             }
@@ -174,14 +257,19 @@ final class calendar {
     }
 
     /**
-     *Delete all user level calendar events for a seminar event
+     * Delete all user level calendar events for a seminar event
      *
      * @param seminar_event $seminarevent Record from the facetoface_sessions table
      * @param string $eventtype Type of the event (booking or session)
      * @return array An array of user events
      */
-    public static function delete_user_events(\mod_facetoface\seminar_event $seminarevent, $eventtype) {
+    public static function delete_user_events(seminar_event $seminarevent, string $eventtype): array {
         global $DB;
+
+        // Truncate eventtype if necessary
+        if (strlen($eventtype) > 10) {
+            $eventtype = substr($eventtype, 0, 10);
+        }
 
         // Without uuid(sessionid) param, this function deletes all events(seminar with multiple events) except the last one,
         // meaning the last event (running the update calendar) will delete all previous events created just now.
@@ -223,7 +311,7 @@ final class calendar {
      * @param int $userid   ID of the user
      * @return bool
      */
-    public static function remove_seminar_event(\mod_facetoface\seminar_event $seminarevent, $courseid = 0, $userid = 0) {
+    public static function remove_seminar_event(seminar_event $seminarevent, int $courseid = 0, int $userid = 0): bool {
         global $DB;
 
         $params = array($seminarevent->get_facetoface(), $userid, $courseid, $seminarevent->get_id());
@@ -233,6 +321,27 @@ final class calendar {
                                                 userid = ? AND
                                                 courseid = ? AND
                                                 uuid = ?", $params);
+    }
+
+    /**
+     * Remove all entries in the course calendar which relate to this facilitator event.
+     *
+     * @param seminar_event $seminarevent Record from the facetoface_sessions table
+     * @param int $userid   ID of the user, or 0 to remove all facilitator events for this seminar event
+     * @return bool
+     */
+    public static function remove_facilitator_event(seminar_event $seminarevent, int $userid = 0): bool {
+        global $DB;
+
+        if ( $userid ) {
+            $select = "eventtype = 'facetofacefacilitato' AND userid = ? AND uuid = ?";
+            $params = array($userid, $seminarevent->get_id());
+        } else {
+            $select = "eventtype = 'facetofacefacilitato' AND uuid = ?";
+            $params = array($seminarevent->get_id());
+        }
+
+        return $DB->delete_records_select('event', $select, $params);
     }
 
     /**
@@ -254,7 +363,7 @@ final class calendar {
      *
      * @return boolean true if the removal succeeded.
      */
-    public static function remove_all_entries(\mod_facetoface\seminar_event $seminarevent, $courseid = null, $userid = null) {
+    public static function remove_all_entries(seminar_event $seminarevent, int $courseid = null, int $userid = null): bool {
         global $DB;
 
         $initial = new \stdClass();
@@ -293,7 +402,7 @@ final class calendar {
      *
      * @return array Array of objects if any filter is found, empty array otherwise
      */
-    public static function get_customfield_filters() {
+    public static function get_customfield_filters(): array {
         global $DB;
 
         $sessfields = array();

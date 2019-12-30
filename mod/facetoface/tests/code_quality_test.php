@@ -27,10 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 // NOTE: Declare one by one instead of bulky `use \mod_facetoface\{seminar, signup}` to possibly avoid merge conflict
 
 // Model classes
-use mod_facetoface\asset;
-use mod_facetoface\facilitator;
-use mod_facetoface\facilitator_user;
-use mod_facetoface\room;
 use mod_facetoface\seminar;
 use mod_facetoface\seminar_attachment_item;
 use mod_facetoface\seminar_event;
@@ -67,6 +63,15 @@ use mod_facetoface\query\query_helper;
 use mod_facetoface\query\event\filter_factory;
 use mod_facetoface\internal\mod_facetoface_renderer_deprecated;
 
+use mod_facetoface\calendar;
+
+// Asset / Facilitator / Room classes
+use mod_facetoface\asset;
+use mod_facetoface\facilitator;
+use mod_facetoface\facilitator_user;
+use mod_facetoface\facilitator_list;
+use mod_facetoface\room;
+
 // Renderer class - mod_facetoface_renderer
 require_once(__DIR__ . '/../renderer.php');
 
@@ -88,7 +93,6 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
         // self test
         mod_facetoface_code_quality_testcase::class,
 
-        facilitator_user::class,
         seminar::class,
         seminar_event::class,
         seminar_session::class,
@@ -113,6 +117,14 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
         external::class,
         query_helper::class,
         filter_factory::class,
+
+        calendar::class,
+
+        asset::class,
+        facilitator::class,
+        facilitator_user::class,
+        facilitator_list::class,
+        room::class,
     ];
 
     /** @var string[] */

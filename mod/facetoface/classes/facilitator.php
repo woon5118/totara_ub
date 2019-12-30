@@ -146,6 +146,7 @@ final class facilitator implements seminar_iterator_item, seminar_attachment_ite
 
     /**
      * Store facilitator into database
+     * @return void
      */
     public function save(): void {
         global $USER;
@@ -161,6 +162,7 @@ final class facilitator implements seminar_iterator_item, seminar_attachment_ite
 
     /**
      * Remove facilitator from database
+     * @return void
      */
     public function delete(): void {
         global $DB;

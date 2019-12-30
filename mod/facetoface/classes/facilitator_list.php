@@ -26,7 +26,7 @@ namespace mod_facetoface;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class facilitator_list represents seminar facilitators
+ * Class facilitator_list represents a list of seminar facilitator_users
  */
 final class facilitator_list  implements \Iterator {
 
@@ -175,16 +175,22 @@ final class facilitator_list  implements \Iterator {
      * Get all facilitators for a seminar event
      * NOTE: using in public for learners
      * @param int $seminareventid
+     * @param bool $internal_only if true only internal (user-assigned) facilitators will be returned
      * @return facilitator_list
      */
-    public static function from_seminarevent(int $seminareventid): facilitator_list {
+    public static function from_seminarevent(int $seminareventid, bool $internal_only = false): facilitator_list {
         global $DB;
+
+        $user_join = 'LEFT';
+        if ($internal_only) {
+            $user_join = 'INNER';
+        }
 
         $usernamefields = get_all_user_name_fields(true, 'u');
 
         $sql = "SELECT ff.*, {$usernamefields}
                   FROM {facetoface_facilitator} ff
-             LEFT JOIN {user} u ON u.id = ff.userid
+     {$user_join} JOIN {user} u ON u.id = ff.userid AND u.deleted = 0 AND u.suspended = 0
             INNER JOIN {facetoface_facilitator_dates} ffd ON ffd.facilitatorid = ff.id
             INNER JOIN {facetoface_sessions_dates} fsd ON fsd.id = ffd.sessionsdateid
             INNER JOIN {facetoface_sessions} fs ON fs.id = fsd.sessionid
@@ -202,16 +208,22 @@ final class facilitator_list  implements \Iterator {
      * Get facilitators by seminar session dates
      * NOTE: using in public for learners
      * @param int $sessionid
+     * @param bool $internal_only if true only internal (user-assigned) facilitators will be returned
      * @return facilitator_list
      */
-    public static function from_session(int $sessionid): facilitator_list {
+    public static function from_session(int $sessionid, bool $internal_only = false): facilitator_list {
         global $DB;
+
+        $user_join = 'LEFT';
+        if ($internal_only) {
+            $user_join = 'INNER';
+        }
 
         $usernamefields = get_all_user_name_fields(true, 'u');
 
         $sql = "SELECT ff.*, {$usernamefields}
                   FROM {facetoface_facilitator} ff
-             LEFT JOIN {user} u ON u.id = ff.userid
+     {$user_join} JOIN {user} u ON u.id = ff.userid AND u.deleted = 0 AND u.suspended = 0
             INNER JOIN {facetoface_facilitator_dates} ffd ON ffd.facilitatorid = ff.id
             INNER JOIN {facetoface_sessions_dates} fsd ON fsd.id = ffd.sessionsdateid
                  WHERE ff.hidden = 0 AND fsd.id = :sessionid
@@ -223,5 +235,19 @@ final class facilitator_list  implements \Iterator {
             $list->add($facilitator);
         }
         return $list;
+    }
+
+    /**
+     * Returns the ids of facilitators in this list (if any) in ascending order
+     *
+     * @return array of id => id pairs
+     */
+    public function get_ids(): array {
+        $ids = array();
+        foreach($this as $item) {
+            $ids[$item->get_id()] = $item->get_id();
+        }
+        asort($ids);
+        return $ids;
     }
 }

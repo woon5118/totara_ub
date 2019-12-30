@@ -451,6 +451,29 @@ class mod_facetoface_generator extends testing_module_generator {
     }
 
     /**
+     * Add an internal (site wide only) facilitator.
+     * @param stdClass|array $record
+     * @return stdClass
+     */
+    public function add_internal_facilitator($record = null, stdClass $user = null) {
+        if (empty($record)) {
+            $record = new \stdClass();
+        } else {
+            $record = (object)$record;
+        }
+        if (empty($user)) {
+            $user = $this->datagenerator->create_user();
+        }
+
+        $record->custom = 0;
+        $record->userid = $user->id;
+        if (empty($record->name)) {
+            $record->name = 'Facilitator ' . $user->firstname . ' ' . $user->lastname;
+        }
+        return $this->add_facilitator($record);
+    }
+
+    /**
      * Resets this generator instance.
      */
     public function reset() {

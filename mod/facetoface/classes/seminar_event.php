@@ -1223,4 +1223,25 @@ final class seminar_event implements seminar_iterator_item {
         debugging('seminar_event::find() function has been deprecated, please use seminar_event::seek()', DEBUG_DEVELOPER);
         return self::seek($eventid);
     }
+
+    /**
+     * Limits session list to those with a particular facilitator assigned.
+     *
+     * @param int $facilitatorid
+     * @return void
+     */
+    public function facilitator_sessions_only(int $facilitatorid): void {
+        $all_sessions = $this->get_sessions(true);
+        $facilitator_sessions = new seminar_session_list();
+        foreach ($all_sessions as $id => $date) {
+            $facilitators = facilitator_list::from_session($id);
+            if ($facilitators->count()) {
+                $ids = $facilitators->get_ids();
+                if (in_array($facilitatorid, $ids)) {
+                    $facilitator_sessions->add($date);
+                }
+            }
+        }
+        $this->sessions = $facilitator_sessions;
+    }
 }

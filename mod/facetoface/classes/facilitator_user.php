@@ -30,7 +30,9 @@ use mod_facetoface\facilitator;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * facilitator_user class
+ * Class facilitator_user combines a facilitator instance with a formatted user fullname if the facilitator is internal.
+ *
+ * @package mod_facetoface
  */
 class facilitator_user {
 
@@ -103,7 +105,7 @@ class facilitator_user {
     /**
      * Get user(not facilitator) full name link to user profile or not
      * depends from capabilities
-     * @param boolean $link
+     * @param bool $link
      * @return string
      */
     public function get_fullname_link(bool $link = true): string {

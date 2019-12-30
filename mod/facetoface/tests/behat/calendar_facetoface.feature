@@ -64,7 +64,7 @@ Feature: Seminar calendar publishing to course, site, and user calendars
       | kbomba | event 6      |
     And I log in as "admin"
 
-  Scenario: Normal visibility, check calendar event view
+  Scenario: Normal visibility, seminars set to site calendar, check calendar event view
     Given I click on "Dashboard" in the totara menu
     When I follow "Go to calendar"
     Then I should see "OTL Seminar" exactly "1" times
@@ -83,6 +83,9 @@ Feature: Seminar calendar publishing to course, site, and user calendars
     And I should see "ON Seminar"
     And I should not see "ON Hidden Seminar"
     And I should not see "HN Seminar"
+    When I follow "Hide global events"
+    Then I should not see "OTL Seminar"
+    And I should not see "ON Seminar"
     And I log out
 
     When I log in as "tedison"
@@ -94,7 +97,155 @@ Feature: Seminar calendar publishing to course, site, and user calendars
     And I should not see "ON Hidden Seminar"
     And I should not see "HN Seminar"
 
-  Scenario: Audience based visibility, check calendar event view
+  Scenario: Normal visibility, seminars set to course calendar, check calendar event view
+    Given I am on "OTL Course" course homepage
+    And I follow "OTL Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+    | showoncalendar |   1 |
+    And I click on "Save and return to course" "button"
+    And I am on "OTL Hidden Course" course homepage
+    And I follow "OTL Hidden Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   1 |
+    And I click on "Save and return to course" "button"
+    And I am on "HTL Course" course homepage
+    And I follow "HTL Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   1 |
+    And I click on "Save and return to course" "button"
+    And I am on "ON Course" course homepage
+    And I follow "ON Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   1 |
+    And I click on "Save and return to course" "button"
+    And I am on "ON Hidden Course" course homepage
+    And I follow "ON Hidden Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   1 |
+    And I click on "Save and return to course" "button"
+    And I am on "HN Course" course homepage
+    And I follow "HN Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   1 |
+    And I click on "Save and return to course" "button"
+
+    Given I click on "Dashboard" in the totara menu
+    When I follow "Go to calendar"
+    Then I should not see "OTL Seminar"
+    And I should not see "OTL Hidden Seminar"
+    And I should not see "HTL Seminar"
+    And I should not see "ON Seminar"
+    And I should not see "ON Hidden Seminar"
+    And I should not see "HN Seminar"
+    And I log out
+
+    When I log in as "kbomba"
+    And I follow "Go to calendar"
+    Then I should see "OTL Seminar" exactly "1" times
+    And I should not see "OTL Hidden Seminar"
+    And I should not see "HTL Seminar"
+    And I should see "ON Seminar"
+    And I should not see "ON Hidden Seminar"
+    And I should not see "HN Seminar"
+    When I follow "Hide course events"
+    Then I should not see "OTL Seminar"
+    And I should not see "ON Seminar"
+    And I log out
+
+    When I log in as "tedison"
+    And I follow "Go to calendar"
+    Then I should not see "OTL Seminar"
+    And I should not see "OTL Hidden Seminar"
+    And I should not see "HTL Seminar"
+    And I should not see "ON Seminar"
+    And I should not see "ON Hidden Seminar"
+    And I should not see "HN Seminar"
+
+  # TODO: TL-23555 will fix this broken test
+  Scenario: Normal visibility, seminars set to user calendar only, check calendar event view
+    Given I skip the scenario until issue "TL-23555" lands
+    Given I am on "OTL Course" course homepage
+    And I follow "OTL Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   0 |
+      | usercalentry   |   1 |
+    And I click on "Save and return to course" "button"
+    And I am on "OTL Hidden Course" course homepage
+    And I follow "OTL Hidden Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   0 |
+      | usercalentry   |   1 |
+    And I click on "Save and return to course" "button"
+    And I am on "HTL Course" course homepage
+    And I follow "HTL Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   0 |
+      | usercalentry   |   1 |
+    And I click on "Save and return to course" "button"
+    And I am on "ON Course" course homepage
+    And I follow "ON Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   0 |
+      | usercalentry   |   1 |
+    And I click on "Save and return to course" "button"
+    And I am on "ON Hidden Course" course homepage
+    And I follow "ON Hidden Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   0 |
+      | usercalentry   |   1 |
+    And I click on "Save and return to course" "button"
+    And I am on "HN Course" course homepage
+    And I follow "HN Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   0 |
+      | usercalentry   |   1 |
+    And I click on "Save and return to course" "button"
+
+    Given I click on "Dashboard" in the totara menu
+    When I follow "Go to calendar"
+    Then I should see "OTL Seminar" exactly "1" times
+    And I should see "OTL Hidden Seminar"
+    And I should see "HTL Seminar"
+    And I should see "ON Seminar"
+    And I should see "ON Hidden Seminar"
+    And I should see "HN Seminar"
+    And I log out
+
+    When I log in as "kbomba"
+    And I follow "Go to calendar"
+    Then I should see "OTL Seminar" exactly "1" times
+    And I should not see "OTL Hidden Seminar"
+    And I should not see "HTL Seminar"
+    And I should see "ON Seminar"
+    And I should not see "ON Hidden Seminar"
+    And I should not see "HN Seminar"
+    When I follow "Hide user events"
+    Then I should not see "OTL Seminar"
+    And I should not see "ON Seminar"
+    And I log out
+
+    When I log in as "tedison"
+    And I follow "Go to calendar"
+    Then I should not see "OTL Seminar"
+    And I should not see "OTL Hidden Seminar"
+    And I should not see "HTL Seminar"
+    And I should not see "ON Seminar"
+    And I should not see "ON Hidden Seminar"
+    And I should not see "HN Seminar"
+
+  Scenario: Audience based visibility, seminars set to site calendar, check calendar event view
     And I set the following administration settings values:
       | audiencevisibility | 1 |
     And I am on "OTL Hidden Course" course homepage
@@ -121,6 +272,10 @@ Feature: Seminar calendar publishing to course, site, and user calendars
     And I should see "ON Seminar"
     And I should not see "ON Hidden Seminar"
     And I should not see "HN Seminar"
+    When I follow "Hide global events"
+    Then I should not see "OTL Seminar"
+    And I should not see "HTL Seminar"
+    And I should not see "ON Seminar"
     And I log out
 
     When I log in as "tedison"
@@ -130,4 +285,170 @@ Feature: Seminar calendar publishing to course, site, and user calendars
     And I should not see "HTL Seminar"
     And I should see "ON Seminar"
     And I should see "ON Hidden Seminar"
+    And I should not see "HN Seminar"
+
+  Scenario: Audience based visibility, seminars set to site calendar, check calendar event view
+    And I set the following administration settings values:
+      | audiencevisibility | 1 |
+    And I am on "OTL Hidden Course" course homepage
+    And I follow "Edit settings"
+    And I click on "Add visible audiences" "button"
+    And I click on "Inventors" "link" in the "course-cohorts-visible-dialog" "totaradialogue"
+    And I click on "OK" "button" in the "course-cohorts-visible-dialog" "totaradialogue"
+    And I wait "1" seconds
+    And I press "Save and display"
+    And I am on "ON Hidden Course" course homepage
+    And I follow "Edit settings"
+    And I click on "Add visible audiences" "button"
+    And I click on "Inventors" "link" in the "course-cohorts-visible-dialog" "totaradialogue"
+    And I click on "OK" "button" in the "course-cohorts-visible-dialog" "totaradialogue"
+    And I wait "1" seconds
+    And I press "Save and display"
+
+    Given I am on "OTL Course" course homepage
+    And I follow "OTL Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   1 |
+    And I click on "Save and return to course" "button"
+    And I am on "OTL Hidden Course" course homepage
+    And I follow "OTL Hidden Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   1 |
+    And I click on "Save and return to course" "button"
+    And I am on "HTL Course" course homepage
+    And I follow "HTL Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   1 |
+    And I click on "Save and return to course" "button"
+    And I am on "ON Course" course homepage
+    And I follow "ON Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   1 |
+    And I click on "Save and return to course" "button"
+    And I am on "ON Hidden Course" course homepage
+    And I follow "ON Hidden Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   1 |
+    And I click on "Save and return to course" "button"
+    And I am on "HN Course" course homepage
+    And I follow "HN Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   1 |
+    And I click on "Save and return to course" "button"
+    And I log out
+
+    When I log in as "kbomba"
+    And I follow "Go to calendar"
+    Then I should see "OTL Seminar" exactly "1" times
+    And I should not see "OTL Hidden Seminar"
+    And I should see "HTL Seminar"
+    And I should see "ON Seminar"
+    And I should not see "ON Hidden Seminar"
+    And I should not see "HN Seminar"
+    When I follow "Hide course events"
+    Then I should not see "OTL Seminar"
+    And I should not see "HTL Seminar"
+    And I should not see "ON Seminar"
+    And I log out
+
+    When I log in as "tedison"
+    And I follow "Go to calendar"
+    Then I should not see "OTL Seminar"
+    And I should not see "OTL Hidden Seminar"
+    And I should not see "HTL Seminar"
+    And I should not see "ON Seminar"
+    And I should not see "ON Hidden Seminar"
+    And I should not see "HN Seminar"
+
+  # TODO: TL-23555 will fix this broken test
+  Scenario: Audience based visibility, seminars set to user calendar, check calendar event view
+    Given I skip the scenario until issue "TL-23555" lands
+    And I set the following administration settings values:
+      | audiencevisibility | 1 |
+    And I am on "OTL Hidden Course" course homepage
+    And I follow "Edit settings"
+    And I click on "Add visible audiences" "button"
+    And I click on "Inventors" "link" in the "course-cohorts-visible-dialog" "totaradialogue"
+    And I click on "OK" "button" in the "course-cohorts-visible-dialog" "totaradialogue"
+    And I wait "1" seconds
+    And I press "Save and display"
+    And I am on "ON Hidden Course" course homepage
+    And I follow "Edit settings"
+    And I click on "Add visible audiences" "button"
+    And I click on "Inventors" "link" in the "course-cohorts-visible-dialog" "totaradialogue"
+    And I click on "OK" "button" in the "course-cohorts-visible-dialog" "totaradialogue"
+    And I wait "1" seconds
+    And I press "Save and display"
+
+    Given I am on "OTL Course" course homepage
+    And I follow "OTL Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   0 |
+      | usercalentry   |   1 |
+    And I click on "Save and return to course" "button"
+    And I am on "OTL Hidden Course" course homepage
+    And I follow "OTL Hidden Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   0 |
+      | usercalentry   |   1 |
+    And I click on "Save and return to course" "button"
+    And I am on "HTL Course" course homepage
+    And I follow "HTL Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   0 |
+      | usercalentry   |   1 |
+    And I click on "Save and return to course" "button"
+    And I am on "ON Course" course homepage
+    And I follow "ON Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   0 |
+      | usercalentry   |   1 |
+    And I click on "Save and return to course" "button"
+    And I am on "ON Hidden Course" course homepage
+    And I follow "ON Hidden Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   0 |
+      | usercalentry   |   1 |
+    And I click on "Save and return to course" "button"
+    And I am on "HN Course" course homepage
+    And I follow "HN Seminar"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
+      | showoncalendar |   0 |
+      | usercalentry   |   1 |
+    And I click on "Save and return to course" "button"
+    And I log out
+
+    When I log in as "kbomba"
+    And I follow "Go to calendar"
+    Then I should see "OTL Seminar" exactly "1" times
+    And I should not see "OTL Hidden Seminar"
+    And I should see "HTL Seminar"
+    And I should see "ON Seminar"
+    And I should not see "ON Hidden Seminar"
+    And I should not see "HN Seminar"
+    When I follow "Hide user events"
+    Then I should not see "OTL Seminar"
+    And I should not see "HTL Seminar"
+    And I should not see "ON Seminar"
+    And I log out
+
+    When I log in as "tedison"
+    And I follow "Go to calendar"
+    Then I should not see "OTL Seminar"
+    And I should not see "OTL Hidden Seminar"
+    And I should not see "HTL Seminar"
+    And I should not see "ON Seminar"
+    And I should not see "ON Hidden Seminar"
     And I should not see "HN Seminar"

@@ -486,4 +486,71 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
         $this->assertEquals($rooms[1], $session_1_rooms->current()->get_id());
         $this->assertEquals($rooms[2], $session_2_rooms->current()->get_id());
     }
+
+    /**
+     * Testcase for facilitator_sessions_only() method to limit sessions on an event to those with a particular facilitator
+     */
+    public function test_facetoface_facilitator_sessions_only() {
+        $this->facetoface_generator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+
+        $now = time();
+        $starttimes = [$now + (DAYSECS * 1), $now + (DAYSECS * 2), $now + (DAYSECS * 3), $now + (DAYSECS * 4)];
+        $endtimes = [$now + (DAYSECS * 2), $now + (DAYSECS * 3), $now + (DAYSECS * 4), $now + (DAYSECS * 5)];
+
+        $sitewidefacilitator1 = $this->facetoface_generator->add_site_wide_facilitator(array('name' => 'Site facilitator 1', 'allowconflicts' => 0, 'hidden' => 0));
+        $sitewidefacilitator2 = $this->facetoface_generator->add_site_wide_facilitator(array('name' => 'Site facilitator 2', 'allowconflicts' => 0, 'hidden' => 0));
+
+        $course = $this->getDataGenerator()->create_course();
+        $facetoface1 = $this->facetoface_generator->create_instance(array('course' => $course->id));
+
+        $sessiondates = array();
+        $sessiondates[] = $this->prepare_sessiondate($starttimes[0], $endtimes[0]);
+        $sessiondates[] = $this->prepare_sessiondate($starttimes[1], $endtimes[1], $sitewidefacilitator2->id, $sitewidefacilitator1->id);
+        $sessiondates[] = $this->prepare_sessiondate($starttimes[2], $endtimes[2], $sitewidefacilitator1->id);
+        $sessiondates[] = $this->prepare_sessiondate($starttimes[3], $endtimes[3], $sitewidefacilitator2->id);
+        $sessionid1 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
+        $seminarevent1 = new seminar_event($sessionid1);
+
+        $all_sessions = $seminarevent1->get_sessions();
+        $this->assertCount(4, $all_sessions);
+
+        $seminarevent1->facilitator_sessions_only($sitewidefacilitator1->id);
+        $facilitator_sessions = $seminarevent1->get_sessions();
+        $this->assertCount(2, $facilitator_sessions);
+
+        // Note that seminar session list is ordered by timestart DESC.
+        $session3 = $facilitator_sessions->current();
+        $this->assertEquals($starttimes[2], $session3->get_timestart());
+        $this->assertEquals($endtimes[2], $session3->get_timefinish());
+
+        $facilitator_sessions->next();
+        $session2 = $facilitator_sessions->current();
+        $this->assertEquals($starttimes[1], $session2->get_timestart());
+        $this->assertEquals($endtimes[1], $session2->get_timefinish());
+    }
+
+    /**
+     * Prepare a sessiondate object for the generator, from timestamps and 0 or more facilitator ids
+     *
+     * @param int $timestart
+     * @param int $timeend
+     * @param null|int $facilitatorid1
+     * @param null|int $facilitatorid2
+     * @return stdClass
+     */
+    protected function prepare_sessiondate($timestart, $timeend, $facilitatorid1 = null, $facilitatorid2 = null) {
+        $facilitatorids = array();
+        if ($facilitatorid1) {
+            $facilitatorids[] = $facilitatorid1;
+        }
+        if ($facilitatorid2) {
+            $facilitatorids[] = $facilitatorid2;
+        }
+        $sessiondate = new stdClass();
+        $sessiondate->timestart = (string)$timestart;
+        $sessiondate->timefinish = (string)$timeend;
+        $sessiondate->sessiontimezone = '99';
+        $sessiondate->facilitatorids = $facilitatorids;
+        return $sessiondate;
+    }
 }
