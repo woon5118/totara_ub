@@ -52,6 +52,6 @@
     {{#action}}{{> mod_facetoface/seminarevent_actionbar }}{{/action}}
     {{#title}}<h3 class="mod_facetoface__eventinfo__content__eventdetail__heading">{{#collapsible}}<a href="#" role="button" class="f2f-expanded" aria-expanded="true" aria-controls="{{sectionsid}}" data-f2f-section-id="{{sectionsid}}">{{/collapsible}}{{title}}{{#collapsible}}</a>{{/collapsible}}</h3>{{/title}}
     <div class="mod_facetoface__eventinfo__content__eventdetail__sections" id="{{sectionsid}}">
-        {{#sections}}{{> mod_facetoface/seminarevent_detail_section }}{{/sections}}
+        {{#sections}}{{#context}}{{> &&template }}{{/context}}{{/sections}}
     </div>
 </article>

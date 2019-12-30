@@ -45,7 +45,6 @@ use mod_facetoface\dashboard\render_session_list_config;
 use mod_facetoface\dashboard\render_session_option;
 use mod_facetoface\dashboard\filters\event_time_filter;
 use mod_facetoface\dashboard\filters\room_filter;
-
 use mod_facetoface\output\session_time;
 use mod_facetoface\output\show_previous_events;
 
@@ -58,6 +57,7 @@ use mod_facetoface\output\event_page_navigation;
 use mod_facetoface\output\seminarevent_actionbar;
 use mod_facetoface\output\seminarevent_detail;
 use mod_facetoface\output\seminarevent_detail_section;
+use mod_facetoface\output\seminarevent_detail_session_list;
 use mod_facetoface\output\seminarevent_information;
 use mod_facetoface\output\session_list_table;
 
@@ -2308,7 +2308,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             ->set_displaysignupinfo(!$hidesignup)
             ->set_displayassets(false)
             ->set_displayrooms(false)
-            ->set_displayassetsinsessions(true);
+            ->set_displayassetsinsessions(!$calendaroutput);
 
         $signup = signup::create($USER->id, $seminarevent);
 
@@ -2547,9 +2547,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $sessiondata = seminar_event_helper::get_sessiondata($signup->get_seminar_event(), $signup);
         $details = [
             $this->get_seminar_event_details_eventinfo($sessiondata, $signup, $option),
-            $this->get_seminar_event_details_sessions($sessiondata, $signup, $option),
-            $this->get_seminar_event_details_rooms($sessiondata, $signup, $option),
-            $this->get_seminar_event_details_assets($sessiondata, $signup, $option),
+            $this->get_seminar_event_details_sessions($sessiondata, $signup, $option)
         ];
 
         return array_map(
@@ -2741,6 +2739,42 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     }
 
     /**
+     * @param seminar_event $seminarevent
+     * @param boolean $isbookedsession
+     * @param integer $signupcount
+     * @return array
+     *
+     * @todo Refactor this function in TL-23387
+     */
+    private function table_row_status_classes(seminar_event $seminarevent, bool $isbookedsession, int $signupcount): array {
+        $classes = [];
+        if (!$seminarevent->is_sessions()) {
+            $classes[] = 'waitlisted';
+        }
+        $time = 0;
+        if ($seminarevent->is_first_started($time)) {
+            $classes[] = 'started';
+        }
+        if ($seminarevent->is_over($time)) {
+            $classes[] = 'over';
+        }
+        if ($seminarevent->get_cancelledstatus()) {
+            $classes[] = 'cancelled';
+        }
+        if ($isbookedsession) {
+            $classes[] = 'userbooked';
+        }
+        $sessionfull = ($signupcount >= $seminarevent->get_capacity());
+        if ($sessionfull && !$seminarevent->get_allowoverbook()) {
+            $classes[] = 'fullybooked';
+        }
+        if (!signup_helper::is_signup_open($seminarevent, $signupcount)) {
+            $classes[] = 'closed';
+        }
+        return $classes;
+    }
+
+    /**
      * Render event session information in seminar event details.
      *
      * @param session_data $session
@@ -2756,16 +2790,19 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             ->set_id('f2f-sessions')
             ->set_collapsible(true, html_writer::random_id('f2fsection'));
 
-        if ($seminarevent->get_mintimestart()) {
-            /** @var \mod_facetoface\seminar_session $date */
-            foreach ($seminarevent->get_sessions() as $date) {
-                $section = seminarevent_detail_section::builder('session');
+        $includedeleted = has_capability('totara/core:seedeletedusers', $this->getcontext());
+        $signupcount = attendees_helper::count_signups($seminarevent, $includedeleted);
+        $sessionbuilder = seminarevent_detail_session_list::builder('sessions');
+        $sessionbuilder->set_states($this->table_row_status_classes($seminarevent, (bool)$session->bookedsession, $signupcount));
 
+        $dates = clone $seminarevent->get_sessions();
+        if (!$dates->is_empty()) {
+            $backurl = $option->get_backurl();
+
+            /** @var \mod_facetoface\seminar_session $date */
+            foreach ($dates as $date) {
                 // Session status.
-                $status = \mod_facetoface\seminar_session_helper::get_status($session, $date->to_record());
-                if ($status !== false) {
-                    $section->add_detail(get_string('eventsessionstatus', 'mod_facetoface'), $status);
-                }
+                $status = \mod_facetoface\seminar_session_helper::get_status_from($seminarevent, $date);
 
                 // Session dates.
                 $sessiontime = \mod_facetoface\output\session_time::to_html(
@@ -2773,102 +2810,68 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                     $date->get_timefinish(),
                     $date->get_sessiontimezone()
                 );
-                $section->add_detail_unsafe(get_string('eventinfo:details:sessiondate', 'mod_facetoface'), $sessiontime);
-                $section->add_detail(get_string('duration', 'mod_facetoface'), format_time((int)$date->get_timestart() - (int)$date->get_timefinish()));
+
+                // TODO: refactor this and output/session_list_table.php after TL-21518 is merged
+                $time = time();
+                $states = [];
+                if ($date->get_timestart() <= $time) {
+                    $states[] = 'started';
+                }
+                if ($date->get_timefinish() < $time) {
+                    $states[] = 'over';
+                }
 
                 $rooms = \mod_facetoface\room_list::from_session($date->get_id());
+                $roomoutputs = [];
                 if (!$rooms->is_empty()) {
-                    $roomoutputs = [];
                     // Display room information
-                    $backurl = $option->get_backurl();
                     /** @var \mod_facetoface\room $room */
                     foreach ($rooms as $room) {
                         $joinnow = false;
                         if ((bool)$room->get_url()) {
                             $joinnow = \mod_facetoface\room_helper::show_joinnow($seminarevent, $date, $signup);
+                            if ($joinnow && !in_array('joinnow', $states)) {
+                                $states[] = 'joinnow';
+                            }
                         }
                         $roomoutputs[] = $this->get_room_details_html($room, $backurl, $joinnow);
                     }
-                    $roomoutput = $this->render_unordered_list($roomoutputs, '', $class, 'rooms', 'room');
-                    $section->add_detail_unsafe(get_string('rooms', 'mod_facetoface'), $roomoutput);
                 }
 
                 $facilitators = \mod_facetoface\facilitator_list::from_session($date->get_id());
+                $facilitatoroutput = [];
                 if (!$facilitators->is_empty()) {
+                    // Display facilitator information
                     $facilitatoroutput = [];
                     $backurl = $option->get_backurl();
                     /** @var facilitator_user[] $facilitators */
                     foreach ($facilitators as $facilitator) {
                         $facilitatoroutput[] = $this->get_facilitator_details_html($facilitator, $backurl);
                     }
-                    $facilitatoroutput = $this->render_unordered_list($facilitatoroutput, '', $class, 'facilitators', 'facilitator');
-                    $section->add_detail_unsafe(get_string('facilitators', 'mod_facetoface'), $facilitatoroutput);
                 }
 
+                $assetoutputs = [];
                 if ($option->get_displayassetsinsessions()) {
                     $assets = \mod_facetoface\asset_list::from_session($date->get_id());
                 } else {
                     $assets = new \mod_facetoface\asset_list();
                 }
                 if (!$assets->is_empty()) {
-                    $assetoutputs = [];
                     // Display asset information
-                    $backurl = $option->get_backurl();
                     foreach ($assets as $asset) {
                         $assetoutputs[] = $this->get_asset_details_html($asset, $backurl);
                     }
-                    $assetoutput = $this->render_unordered_list($assetoutputs, '', $class, 'assets', 'asset');
-                    $section->add_detail_unsafe(get_string('assets', 'mod_facetoface'), $assetoutput);
                 }
-                $builder->add_section($section);
+                $sessionbuilder->add_session($status, $sessiontime, $states, array(), $assetoutputs, $roomoutputs, $facilitatoroutput);
             }
         } else {
-            $builder->add_section(
-                seminarevent_detail_section::builder()
-                    ->add_detail_unsafe(
-                        get_string('sessiondate', 'mod_facetoface'),
-                        html_writer::tag('em', get_string('wait-listed', 'facetoface'))
-                    )
-            );
+            $sessionbuilder->add_session(get_string('wait-listed', 'facetoface'), '', [], [], [], [], []);
         }
 
+        $builder->add_section_template($sessionbuilder->build());
         $output = $builder->build();
 
         return $output;
-    }
-
-    /**
-     * Render rooms in seminar event details.
-     *
-     * @param session_data $session
-     * @param signup $signup
-     * @param render_event_info_option $option
-     * @return seminarevent_detail|null
-     */
-    protected function get_seminar_event_details_rooms(session_data $session, signup $signup, render_event_info_option $option): ?seminarevent_detail {
-        if (!$option->get_displayrooms()) {
-            return null;
-        }
-
-        // TODO: TL-21511
-        return null;
-    }
-
-    /**
-     * Render assets in seminar event details.
-     *
-     * @param session_data $session
-     * @param signup $signup
-     * @param render_event_info_option $option
-     * @return seminarevent_detail|null
-     */
-    protected function get_seminar_event_details_assets(session_data $session, signup $signup, render_event_info_option $option): ?seminarevent_detail {
-        if (!$option->get_displayassets()) {
-            return null;
-        }
-
-        // TODO: TL-21511
-        return null;
     }
 
     /**

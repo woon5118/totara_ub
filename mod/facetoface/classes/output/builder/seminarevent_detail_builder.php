@@ -27,6 +27,7 @@ namespace mod_facetoface\output\builder;
 defined('MOODLE_INTERNAL') || die();
 
 use coding_exception;
+use core\output\template;
 use mod_facetoface\output\seminarevent_detail;
 use mod_facetoface\output\seminarevent_actionbar;
 use mod_facetoface\output\seminarevent_detail_section;
@@ -85,12 +86,30 @@ final class seminarevent_detail_builder {
      */
     public function add_section($section): self {
         if ($section instanceof seminarevent_detail_section_builder) {
-            $this->sections[] = $section->build()->get_template_data();
+            $data = $section->build()->get_template_data();
         } else if ($section instanceof seminarevent_detail_section) {
-            $this->sections[] = $section->get_template_data();
+            $data = $section->get_template_data();
         } else {
             throw new coding_exception('$section must be seminarevent_detail_section or seminarevent_detail_section_builder');
         }
+        $this->sections[] = [
+            'template' => 'mod_facetoface/seminarevent_detail_section',
+            'context' => $data
+        ];
+        return $this;
+    }
+
+    /**
+     * Add a section from any template instance.
+     *
+     * @param template $template
+     * @return self
+     */
+    public function add_section_template(template $template): self {
+        $this->sections[] = [
+            'template' => $template->get_template_name(),
+            'context' => $template->get_template_data()
+        ];
         return $this;
     }
 

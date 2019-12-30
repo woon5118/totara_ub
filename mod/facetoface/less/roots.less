@@ -564,13 +564,93 @@ select.menuf2f-select {
         &__facilitator {
             margin-bottom: @totara_style-spacing_small;
         }
+
+        &__sessions {
+            display: flex;
+            flex-direction: column;
+            margin-top: @totara_style-spacing_small;
+
+            // TODO: refactor in TL-23387
+            // Simulate dimmed_text of T12
+            &:not(.userbooked) {
+                &.started,
+                &.cancelled,
+                &.fullybooked,
+                &.closed {
+                    .text-muted;
+                }
+            }
+
+            .row() {
+                display: flex;
+                justify-content: space-around;
+                text-align: left;
+            }
+
+            .cell() {
+                padding: @totara_style-size_4;
+            }
+
+            &__rowheader {
+                .row();
+                border-bottom: 2px solid @mod_facetoface-border-colour;
+                font-weight: bold;
+            }
+
+            &__row {
+                .row();
+                border-bottom: 1px solid @mod_facetoface-border-colour;
+
+                &:last-child {
+                    border-bottom-width: 0;
+                }
+            }
+
+            &__cellheader {
+                .cell();
+                display: none;
+                font-weight: bold;
+            }
+
+            &__cell {
+                .cell();
+
+                &--status {
+                    flex: 1;
+                }
+                &--date {
+                    flex: 3;
+                }
+                &--rooms {
+                    flex: 2;
+                }
+                &--facilitators {
+                    flex: 2;
+                }
+                &--assets {
+                    flex: 2;
+                }
+                &--actions {
+                    flex: 1;
+                }
+            }
+
+            &__row > &__cell {
+                background: @table-bg-accent;
+            }
+        }
     }
 
     // Put "Add event", "Edit event" et al on the right side of the heading text.
     &__action-dashboard,
-    &__action-editevent,
-    &__action-eventinfo {
+    &__action-eventinfo,
+    &__action-eventdetail {
         float: right;
+    }
+    // For some reason, "Edit event" needs a different method.
+    &__action-editevent {
+        position: absolute;
+        right: floor((@grid-gutter-width / 2));
     }
     &__sessionlist {
         clear: right;
@@ -921,6 +1001,39 @@ select.menuf2f-select {
 
 @media only screen and (max-width: @mod_facetoface-breakpoint_mobile) {
     .mod_facetoface {
+        &__event_details {
+            &__sessions {
+                &__rowheader {
+                    display: none;
+                }
+
+                &__cellheader {
+                    display: block;
+                }
+
+                &__row {
+                    flex-direction: row;
+                    flex-wrap: wrap;
+                }
+
+                &__cellheader {
+                    width: 8em;
+
+                    &--date {
+                        visibility: hidden;
+                    }
+                }
+
+                &__cell {
+                    width: ~"calc(100% - 8em)";
+
+                    &--status, &--date, &--rooms, &--facilitators, &--assets, &--actions {
+                        flex: auto;
+                    }
+                }
+            }
+        }
+
         &__navigation {
             padding-left:  ceil((@grid-gutter-width / 3));
             padding-right: floor((@grid-gutter-width / 3));
