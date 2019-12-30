@@ -1468,12 +1468,12 @@ abstract class moodle_database {
      * has a member variable for each column of the results.
      *
      * @param string $table the table to query.
-     * @param array $conditions optional array $fieldname => requestedvalue with AND in between
+     * @param array $conditions optional array $field => $value with AND in between
      * @param string $sort an order to sort the results in (optional, a valid SQL ORDER BY parameter).
      * @param string $fields a comma separated list of fields to return (optional, by default all fields are returned).
      * @param int $limit_from return a subset of records, starting at this point (optional).
-     * @param int $limit_num return a subset comprising this many records in total (optional, required if $limitfrom is set).
-     * @return array An array of Objects indexed by first column.
+     * @param int $limit_num return a subset comprising this many records in total (optional, required if $limit_from is set).
+     * @return array An array of objects
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function get_records_unkeyed($table, array $conditions = null, $sort = '', $fields = '*', $limit_from = 0, $limit_num = 0) {
@@ -1536,7 +1536,7 @@ abstract class moodle_database {
      * @param string $fields A comma separated list of fields to return
      * @param int $limit_from return a subset of records, starting at this point (optional).
      * @param int $limit_num return a subset comprising this many records in total (optional, required if $limitfrom is set).
-     * @return array of objects indexed by first column
+     * @return array An array of objects
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function get_records_select_unkeyed($table, $select, array $params = null, $sort = '', $fields = '*', $limit_from = 0, $limit_num = 0) {
@@ -1569,8 +1569,8 @@ abstract class moodle_database {
      * @param string|sql $sql the SQL select query to execute.
      * @param array $params array of sql parameters
      * @param int $limit_from return a subset of records, starting at this point (optional).
-     * @param int $limit_num return a subset comprising this many records in total (optional, required if $limitfrom is set).
-     * @return array of objects indexed by first column
+     * @param int $limit_num return a subset comprising this many records in total (optional, required if $limit_from is set).
+     * @return array An array of objects
      * @throws dml_exception A DML specific exception is thrown for any errors.
      * @return array
      */
@@ -1588,11 +1588,11 @@ abstract class moodle_database {
      * @param int $limit_from return a subset of records, starting at this point (optional).
      * @param int $limit_num return a subset comprising this many records in total (optional, required if $limitfrom is set).
      * @param bool $unique_id Require the first column to be unique and key the array by it, otherwise return an array with sequential keys
-     * @return array of objects indexed by first column
+     * @return array An array of objects
      * @throws dml_exception A DML specific exception is thrown for any errors.
      * @return array
      */
-    protected abstract function get_records_sql_raw($sql, array $params = null, $limit_from = 0, $limit_num = 0, bool $unique_id = true): array;
+    abstract protected function get_records_sql_raw($sql, array $params = null, $limit_from = 0, $limit_num = 0, bool $unique_id = true): array;
 
     /**
      * Do not use.

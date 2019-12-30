@@ -1543,8 +1543,6 @@ class core_dml_testcase extends database_driver_testcase {
 
         $unkeyed_records = $DB->get_records_select_unkeyed($tablename, 'course = ?', [3]);
         $this->assertEquals($DB->get_records_unkeyed($tablename, ['course' => 3]), $unkeyed_records);
-
-
     }
 
     public function test_get_records_list() {
