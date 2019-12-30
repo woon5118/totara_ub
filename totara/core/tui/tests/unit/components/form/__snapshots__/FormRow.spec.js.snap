@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`presentation/form/FormRow.vue Checks snapshot 1`] = `
+<div
+  class="tui-formRow"
+>
+  <div
+    class="tui-formRow__desc"
+  >
+    <!---->
+     
+    <!---->
+  </div>
+   
+  <div
+    class="tui-formRow__action"
+  />
+</div>
+`;

@@ -18,18 +18,29 @@
 //
 // @copyright 2019 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-// @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
+// @author    Simon Chester <simon.chester@totaralearning.com>
 // @package   theme_ventura
 
-// Import all common theme variables
-@import 'theme_ventura/variables/tui_sizes';
-@import 'theme_ventura/variables/tui_spacing';
-@import 'theme_ventura/variables/tui_borders';
-@import 'theme_ventura/variables/tui_colors';
-@import 'theme_ventura/variables/tui_bootstrap_colors';
-@import 'theme_ventura/variables/tui_shadows';
-@import 'theme_ventura/variables/tui_breakpoints';
-@import 'theme_ventura/variables/tui_animations';
-@import 'theme_ventura/variables/tui_mixins';
-@import 'theme_ventura/variables/tui_forms';
-@import 'theme_ventura/variables/tui_typography';
+// use map-merge to override
+$totara_style_transitions: (
+  'form': (
+    function: linear,
+    duration: 0s,
+  ),
+  'modal': (
+    function: ease-out,
+    duration: 0.15s,
+  ),
+);
+
+@function transition($type, $property) {
+  $tv: map-get($totara_style_transitions, $type);
+  @return $property map-get($tv, 'function') map-get($tv, 'duration');
+}
+
+:root {
+  --tui-transition-form-function: linear;
+  --tui-transition-form-duration: 0s;
+  --tui-transition-modal-function: ease-out;
+  --tui-transition-modal-duration: 0.15s;
+}

@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`presentation/form/HelpIcon.vue Checks snapshot 1`] = `
+<a
+  class="tui-formHelpIcon"
+  href="#"
+>
+  <flexicon-stub
+    alt="fff"
+    icon="help"
+    title="help text"
+  />
+   
+  <div
+    class="tui-formHelpIcon__desc"
+    id="example"
+  >
+    
+    help text
+  
+  </div>
+</a>
+`;

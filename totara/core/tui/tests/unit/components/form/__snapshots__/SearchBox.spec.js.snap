@@ -1,0 +1,50 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`presentation/form/SearchBox.vue matches snapshot 1`] = `
+<div
+  class="tui-searchBox"
+>
+  <label
+    class="tui-formLabel tui-formLabel--hidden"
+    for="tempid"
+  >
+    
+  label
+  
+    <!---->
+  </label>
+   
+  <input
+    aria-label="label"
+    class="tui-formInput"
+    id="tempid"
+    placeholder="tempstring"
+    type="search"
+  />
+   
+  <button
+    aria-label="label"
+    class="tui-iconBtn tui-iconBtn--small tui-iconBtn--transparent"
+    type="button"
+  >
+    <span
+      class="tui-iconBtn__wrap"
+    >
+      <span
+        class="tui-iconBtn__label"
+      >
+        <span
+          aria-hidden="true"
+          class="tui-iconBtn__icon"
+        >
+          <searchicon-stub />
+        </span>
+         
+        <!---->
+      </span>
+       
+      <!---->
+    </span>
+  </button>
+</div>
+`;

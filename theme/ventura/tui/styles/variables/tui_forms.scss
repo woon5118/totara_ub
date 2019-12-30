@@ -21,15 +21,26 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @package   theme_ventura
 
-// Import all common theme variables
-@import 'theme_ventura/variables/tui_sizes';
-@import 'theme_ventura/variables/tui_spacing';
-@import 'theme_ventura/variables/tui_borders';
-@import 'theme_ventura/variables/tui_colors';
-@import 'theme_ventura/variables/tui_bootstrap_colors';
-@import 'theme_ventura/variables/tui_shadows';
-@import 'theme_ventura/variables/tui_breakpoints';
-@import 'theme_ventura/variables/tui_animations';
-@import 'theme_ventura/variables/tui_mixins';
-@import 'theme_ventura/variables/tui_forms';
-@import 'theme_ventura/variables/tui_typography';
+// This contains the common variable set for form elements,
+// allowing form elements to be consistent modified
+
+:root {
+  // Height of single line form elements (including padding & border)
+  --tui-form-input-height: 3rem;
+  // Height of large single line form elements (including padding & border)
+  --tui-form-input-height-large: 4rem;
+  // Inner font size of form elements
+  --tui-form-input-font-size: var(--tui-font-size-15);
+  // Inner font size of form elements
+  --tui-form-input-font-size-sm: var(--tui-font-size-13);
+  // Border size of input elements
+  --tui-form-input-border-size: 0.1rem;
+  // Vertical padding of single line form elements,
+  // the calculation splits the remaining available space to meet the target height
+  --tui-form-input-v-padding: calc(
+    (
+        var(--tui-form-input-height) - var(--tui-form-input-font-size) -
+          (var(--tui-form-input-border-size) * 2)
+      ) / 2
+  );
+}

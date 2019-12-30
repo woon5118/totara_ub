@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`presentation/form/Input.vue Checks snapshot 1`] = `
+<input
+  class="tui-formInput"
+  spellcheck="false"
+  type="text"
+/>
+`;

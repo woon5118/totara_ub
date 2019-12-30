@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`presentation/form/InputUrl.vue Checks snapshot 1`] = `
+<input-stub
+  styleclass="[object Object]"
+  type="url"
+/>
+`;

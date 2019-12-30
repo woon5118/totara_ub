@@ -1,4 +1,3 @@
-<?php
 /*
  * This file is part of Totara Learn
  *
@@ -18,8 +17,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Chester <simon.chester@totaralearning.com>
- * @package totara_samples
+ * @package totara_core
  */
 
-$string['pluginname'] = 'Totara samples';
-$string['number'] = 'Number';
+import { shallowMount } from '@vue/test-utils';
+import Select from 'totara_core/components/form/Select';
+
+describe('presentation/form/Select.vue', () => {
+  let handleInput, wrapper;
+  beforeAll(() => {
+    handleInput = jest.fn();
+    wrapper = shallowMount(Select, {
+      propsData: {
+        options: [
+          'abc',
+          { id: 'def', label: 'ghi' },
+          {
+            label: 'capitals',
+            options: ['ABC', { id: 'DEF', label: 'GHI' }],
+          },
+        ],
+      },
+      listeners: {
+        input: handleInput,
+      },
+    });
+  });
+
+  it('matches snapshot', () => {
+    expect(wrapper.element).toMatchSnapshot();
+  });
+});

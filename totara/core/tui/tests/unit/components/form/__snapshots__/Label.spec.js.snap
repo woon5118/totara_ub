@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`presentation/form/Label.vue Checks snapshot 1`] = `
+<label
+  class="tui-formLabel"
+>
+  
+  example
+
+</label>
+`;

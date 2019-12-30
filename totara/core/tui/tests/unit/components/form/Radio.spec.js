@@ -1,4 +1,3 @@
-<?php
 /*
  * This file is part of Totara Learn
  *
@@ -18,8 +17,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Chester <simon.chester@totaralearning.com>
- * @package totara_samples
+ * @package totara_core
  */
 
-$string['pluginname'] = 'Totara samples';
-$string['number'] = 'Number';
+import { mount } from '@vue/test-utils';
+import component from 'totara_core/components/form/Radio.vue';
+
+let wrapper;
+const selectHandler = jest.fn();
+
+const passthroughProps = {
+  id: 'a',
+  autocomplete: true,
+  autofocus: true,
+  checked: false,
+  disabled: true,
+  name: 'n',
+  readonly: true,
+  required: true,
+  value: 'v',
+};
+
+describe('presentation/form/Radio.vue', () => {
+  beforeAll(() => {
+    wrapper = mount(component, {
+      propsData: Object.assign({ label: 'Some radio' }, passthroughProps),
+      listeners: {
+        select: selectHandler,
+      },
+    });
+    selectHandler.mockClear();
+  });
+
+  it('checks snapshot', () => {
+    expect(wrapper.element).toMatchSnapshot();
+  });
+});

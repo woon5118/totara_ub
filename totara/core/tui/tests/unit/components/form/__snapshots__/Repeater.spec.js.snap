@@ -1,0 +1,53 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`presentation/form/Repeater.vue matches snapshot 1`] = `
+<div
+  arialabel="Repeater btn"
+  class="tui-repeater tui-repeater--start tui-repeater--vertical"
+>
+  <div
+    class="tui-repeater__row tui-repeater__row--vertical-center"
+  >
+     
+    <buttonicon-stub
+      arialabel="Add"
+      styleclass="[object Object]"
+      type="button"
+    >
+      <deleteicon-stub />
+    </buttonicon-stub>
+  </div>
+  <div
+    class="tui-repeater__row tui-repeater__row--vertical-center"
+  >
+     
+    <buttonicon-stub
+      arialabel="Add"
+      styleclass="[object Object]"
+      type="button"
+    >
+      <deleteicon-stub />
+    </buttonicon-stub>
+  </div>
+  <div
+    class="tui-repeater__row tui-repeater__row--vertical-center"
+  >
+     
+    <buttonicon-stub
+      arialabel="Add"
+      styleclass="[object Object]"
+      type="button"
+    >
+      <deleteicon-stub />
+    </buttonicon-stub>
+  </div>
+   
+  <buttonicon-stub
+    arialabel="Add"
+    styleclass="[object Object]"
+    type="button"
+  >
+    <addicon-stub />
+  </buttonicon-stub>
+</div>
+`;

@@ -1,0 +1,44 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`presentation/form/Select.vue matches snapshot 1`] = `
+<div
+  class="tui-select"
+>
+  <select
+    class="tui-select__input"
+  >
+    <option
+      value="abc"
+    >
+      
+        abc
+      
+    </option>
+    <option
+      value="def"
+    >
+      
+        ghi
+      
+    </option>
+    <optgroup
+      label="capitals"
+    >
+      <option
+        value="ABC"
+      >
+        
+          ABC
+        
+      </option>
+      <option
+        value="DEF"
+      >
+        
+          GHI
+        
+      </option>
+    </optgroup>
+  </select>
+</div>
+`;

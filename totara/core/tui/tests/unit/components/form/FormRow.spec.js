@@ -1,4 +1,3 @@
-<?php
 /*
  * This file is part of Totara Learn
  *
@@ -17,9 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Chester <simon.chester@totaralearning.com>
- * @package totara_samples
+ * @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+ * @package totara_core
  */
 
-$string['pluginname'] = 'Totara samples';
-$string['number'] = 'Number';
+import { shallowMount } from '@vue/test-utils';
+import component from 'totara_core/components/form/FormRow.vue';
+let wrapper;
+
+describe('presentation/form/FormRow.vue', () => {
+  beforeAll(() => {
+    wrapper = shallowMount(component, {
+      propsData: { id: 'example' },
+      mocks: {
+        $id: x => 'id' + x,
+      },
+    });
+  });
+
+  it('Checks snapshot', () => {
+    expect(wrapper.element).toMatchSnapshot();
+  });
+});
