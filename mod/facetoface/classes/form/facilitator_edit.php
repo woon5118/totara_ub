@@ -95,7 +95,7 @@ class facilitator_edit extends \moodleform {
                 facilitator_type::INTERNAL => get_string('facilitatorinternal', 'mod_facetoface'),
                 facilitator_type::EXTERNAL => get_string('facilitatorexternal', 'mod_facetoface'),
             ];
-            $username[] =& $mform->createElement('select', 'facilitatortype', null, $typeoptions);
+            $username[] =& $mform->createElement('select', 'facilitatortype', get_string('facilitatortype_label', 'mod_facetoface'), $typeoptions);
             $username[] =& $mform->createElement('button', 'facilitatorselector', get_string('selectuserwithdot', 'mod_facetoface'),
                 ['id' => 'show-facilitator-dialog']);
             $username[] =& $mform->createElement('static', 'facilitatortitle', null, $span);

@@ -61,6 +61,10 @@ body.path-mod-facetoface div#fgroup_id_recipients input[id*="id_booked_type"] {
     }
 }
 
+.path-calendar .maincalendar .eventlist .event .mod_facetoface__calendar-event.description {
+    background-color: transparent;
+}
+
 .mod_facetoface-addremove button {
     min-width: 100px;
 }
@@ -259,6 +263,25 @@ select.menuf2f-select {
         }
     }
 
+    .seminar-event-state() {
+        // Simulate dimmed_text in T12
+        &:not(.userbooked) {
+            &.started,
+            &.cancelled,
+            &.fullybooked,
+            &.closed {
+                .text-muted;
+            }
+        }
+        // Un-commenting the following CSS rule brings back the old style.
+        // Simulate highlight in T12
+        // &.userbooked {
+        //     &:not(.over):not(.cancelled) {
+        //         .highlight;
+        //     }
+        // }
+    }
+
     &__list-items {
         .no-list-style();
     }
@@ -351,10 +374,8 @@ select.menuf2f-select {
             visibility: hidden;
         }
 
-        &--active {
-            .mod_facetoface__filter__link {
-                visibility: visible;
-            }
+        &--active &__link {
+            visibility: visible;
         }
     }
 
@@ -449,15 +470,7 @@ select.menuf2f-select {
                     border-top: 2px solid @table-border-color;
                 }
 
-                // Simulate dimmed_text of T12
-                &:not(.userbooked) {
-                    &.started,
-                    &.cancelled,
-                    &.fullybooked,
-                    &.closed {
-                        .text-muted;
-                    }
-                }
+                .seminar-event-state();
             }
         }
 
@@ -582,16 +595,7 @@ select.menuf2f-select {
             flex-direction: column;
             margin-top: @totara_style-spacing_small;
 
-            // TODO: refactor in TL-23387
-            // Simulate dimmed_text of T12
-            &:not(.userbooked) {
-                &.started,
-                &.cancelled,
-                &.fullybooked,
-                &.closed {
-                    .text-muted;
-                }
-            }
+            .seminar-event-state();
 
             .row() {
                 display: flex;
@@ -1183,10 +1187,10 @@ a.mod_facetoface__action_goback {
     margin: 0 0 3px 5px;
 }
 
-.mod_facetoface__grade.input-group {
+.mod_facetoface__grade {
     display: flex;
 
-    input.form-control {
+    &__input {
         width: 6em;
 
         &:focus::placeholder {
@@ -1258,13 +1262,10 @@ a.mod_facetoface__action_goback {
     dl > dd {
         margin-bottom: @totara_style-spacing_small;
     }
-    div.ui-widget {
-        font-family: @headings-font-family;
-    }
-    div.ui-dialog {
-        div.ui-dialog-titlebar {
+    .ui-dialog {
+        .ui-dialog-titlebar {
             padding: 13px 17px;
-            span.ui-dialog-title {
+            .ui-dialog-title {
                 margin: 0;
                 span.title {
                     h2 {
@@ -1281,62 +1282,72 @@ a.mod_facetoface__action_goback {
                     }
                 }
             }
-            button.ui-dialog-titlebar-close {
-                right: -1px;
-                top: -1px;
-                width: 2.4em;
+        }
+        .ui-dialog-content {
+            .tabtree {
                 margin: 0;
+            }
+            .ui-tabs .ui-tabs-nav {
+                // Override Bootstrap & jQuery UI.
                 padding: 0;
-                span.ui-button-text {
-                    padding: 0;
+                > li {
+                    border: 0;
+                    margin: 0;
+                }
+                .ui-tabs-active > a {
+                    @nav-tabs-link-color: @gray-light;
+                    // Taken from theme/basis/less/bootswatch/bootswatch.less
+                    background-color: #fff;
+                    border-right-color: @nav-tabs-border-color;
+                    border-left-color: @nav-tabs-border-color;
+                    &,
+                    &:hover,
+                    &:focus {
+                        color: @nav-tabs-link-color;
+                        background-color: @nav-tabs-active-link-hover-bg;
+                        border-top-color: lighten(@brand-primary, 10%);
+                        box-shadow:
+                            0 -2px lighten(@brand-primary, 10%),
+                            -3px 0 rgba(0, 0, 0, 0.03);
+                    }
+                }
+                .ui-tabs-active:first-child > a {
+                    &,
+                    &:hover,
+                    &:focus {
+                        box-shadow: 0 -2px lighten(@brand-primary, 10%);
+                    }
+                }
+            }
+            .ui-tabs-panel {
+                [id^="item_"] {
+                    margin-left: 2px;
+                }
+            }
+            #search-tab .mform {
+                .fitem {
+                    margin-bottom: @totara_style-spacing_x_small;
+                }
+                .fitemtitle {
+                    display: none;
+                }
+                .felement {
+                    padding-right:@totara_style-spacing_x_small ;
                 }
             }
         }
-        div.ui-dialog-content {
-            div.select {
-                div#dialog-tabs {
-                    div.tabtree {
-                        margin: 0;
-                        ul.nav-tabs {
-                            padding: 0;
-                            li {
-                                border: 0;
-                                margin: 0;
-                            }
-                            li.ui-tabs-active a {
-                                color: #6e6e6e;
-                                background-color: #fff;
-                                border-top-color: #4bc3c4;
-                                box-shadow: 0 -1px #4bc3c4, -1px 0 transparent;
-                                border-bottom: 1px solid white;
-                            }
-                        }
-                    }
-                    div#search-tab {
-                        div#fitem_id_query {
-                            margin-bottom: 0;
-                            div.fitemtitle {
-                                padding: 5px 0 0 0;
-                            }
-                            div.ftext {
-                                padding-right: 0;
-                            }
-                        }
-                        div#fitem_id_dialogsearchsubmitbutton {
-                            margin-bottom: 0;
-                        }
-                    }
-                    div#browse-tab,
-                    div#search-tab {
-                        ul.treeview li {
-                            font-size: @totara_style-size_13;
-                            span {
-                                margin-left: 2px;
-                            }
-                        }
-                    }
-                }
-            }
+    }
+    .ui-dialog-content .mform {
+        .fitem {
+            margin-left: 0;
+            margin-right: 0;
+        }
+        .fitemtitle,
+        .felement {
+            padding-left: 0;
+        }
+        .felement {
+            padding-right: 0;
         }
     }
 }

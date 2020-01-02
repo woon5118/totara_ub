@@ -28,6 +28,8 @@ use mod_facetoface\seminar;
 use mod_facetoface\query\event\query;
 use mod_facetoface\query\event\filter\facilitator_filter as query_facilitator_filter;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Provide the facilitator name filter.
  */

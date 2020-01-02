@@ -133,13 +133,8 @@ final class mod_facetoface_generator_util {
         if (isset($record['rooms'])) {
             // Start processing on rooms if there are any provided.
             $rooms = explode(",", $record['rooms']);
-            array_walk(
-                $rooms,
-                function (string &$room): void {
-                    trim($room);
-                }
-            );
             foreach ($rooms as $room) {
+                $room = trim($room);
                 $frd = new \stdClass();
                 $frd->sessionsdateid = $rc->id;
                 // Expecting room to be existing in the storage, with the given name from the step.

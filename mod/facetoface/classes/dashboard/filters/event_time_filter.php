@@ -23,18 +23,13 @@
 
 namespace mod_facetoface\dashboard\filters;
 
-use Closure;
 use context;
-use core\orm\query\builder;
-use core\orm\query\properties;
-use core\orm\query\sql\query as sql_query;
-use core\orm\query\sql\where;
 use mod_facetoface\seminar;
 use mod_facetoface\event_time;
-use mod_facetoface\query\query_helper;
 use mod_facetoface\query\event\query;
 use mod_facetoface\query\event\filter\event_time_filter as query_event_time_filter;
-use mod_facetoface\query\event\filter_factory;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Provide the event timeline filter.
@@ -125,7 +120,6 @@ final class event_time_filter implements filter {
 
     /**
      * @inheritDoc
-     * @todo Use query builfer
      */
     public static function is_visible(seminar $seminar, context $context, ?int $userid): bool {
         global $DB;
@@ -154,9 +148,9 @@ final class event_time_filter implements filter {
          WHERE s.facetoface = :f2f';
 
         $params = [
-            'et1' => event_time::UPCOMING,
+            'et1' => event_time::FUTURE,
             'et2' => event_time::INPROGRESS,
-            'et3' => event_time::OVER,
+            'et3' => event_time::PAST,
             'et4' => event_time::WAITLISTED,
             'et5' => event_time::CANCELLED,
             't1' => $time,

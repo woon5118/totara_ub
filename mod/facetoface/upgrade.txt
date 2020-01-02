@@ -19,6 +19,8 @@ information provided here is intended especially for developers.
   * mod/facetoface:managesitewideasset
   * mod/facetoface:manageadhocfacilitator
   * mod/facetoface:managesitewidefacilitator
+* Deprecated renderer functions have been moved out to the mod_facetoface_renderer_deprecated trait
+* Removed Bootstrap CSS classes from event_grade_input.mustache
 * All action links/icons but the "Go to event" button have been moved to the "..." button
 * Seminar session list is now rendered through AJAX request implemented by mod_facetoface\external and seminarevent_dashboard.js
 * Seminar session list now provides a CSS class for each table cell; custom fields are prefixed by 'cf-'

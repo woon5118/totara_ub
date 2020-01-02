@@ -27,16 +27,9 @@ global $CFG;
 use mod_facetoface\seminar;
 use mod_facetoface\seminar_event;
 use mod_facetoface\seminar_event_helper;
-use mod_facetoface\seminar_session;
-use mod_facetoface\seminar_session_list;
 use mod_facetoface\signup;
-use mod_facetoface\signup_helper;
-use mod_facetoface\attendance\attendance_helper;
-use mod_facetoface\signup\condition\event_taking_attendance;
-use mod_facetoface\signup\state\booked;
-use mod_facetoface\signup\state\fully_attended;
-use mod_facetoface\signup\state\not_set;
 use mod_facetoface\room_helper;
+use mod_facetoface\signup_status;
 
 require_once($CFG->dirroot . '/lib/phpunit/classes/advanced_testcase.php');
 
@@ -48,16 +41,21 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
     /** @var mod_facetoface_generator */
     private $facetoface_generator;
 
+    /** @var totara_customfield_generator */
+    protected $customfield_generator;
+
     public function setUp() {
         parent::setUp();
 
         $this->data_generator = $this->getDataGenerator();
         $this->facetoface_generator = $this->data_generator->get_plugin_generator('mod_facetoface');
+        $this->customfield_generator = $this->getDataGenerator()->get_plugin_generator('totara_customfield');
     }
 
     protected function tearDown() {
         $this->data_generator = null;
         $this->facetoface_generator = null;
+        $this->customfield_generator = null;
         parent::tearDown();
     }
 
@@ -359,5 +357,141 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         $this->assertContains('December', $rows[4]->textContent);
         $this->assertContains('Wait-listed', $rows[5]->textContent);
         $this->assertContains('September', $rows[6]->textContent);
+    }
+
+    /**
+     * Ensure debugging() is called at least once with the expected message.
+     *
+     * @param string $expected_message
+     */
+    public function assert_debugging_called(string $expected_message) {
+        $debugging = $this->getDebuggingMessages();
+        $this->resetDebugging();
+        $this->assertNotCount(0, $debugging, 'debugging() was not called.');
+        $filtered = array_filter($debugging, function ($debug) use ($expected_message) {
+            return strpos($debug->message, $expected_message) !== false;
+        });
+        $this->assertNotCount(0, $filtered, print_r($debugging, true));
+    }
+
+    /**
+     * Ensure deprecated renderer functions are still working.
+     */
+    public function test_deprecated_functions() {
+        $course = $this->getDataGenerator()->create_course();
+        $this->getDataGenerator()->enrol_user(2, $course->id);
+        $f2f = $this->facetoface_generator->create_instance(['course' => $course->id, 'sessionattendance' => seminar::SESSION_ATTENDANCE_UNRESTRICTED, 'attendancetime' => seminar::EVENT_ATTENDANCE_UNRESTRICTED]);
+        $room1 = $this->facetoface_generator->add_custom_room(['name' => 'room 1', 'allowconflicts' => 1]);
+        $room2 = $this->facetoface_generator->add_custom_room(['name' => 'room 2', 'allowconflicts' => 1]);
+        $cfids = [];
+        $cfids = array_merge($cfids, $this->customfield_generator->create_text('facetoface_session', ['event_text']));
+        $cfids = array_merge($cfids, $this->customfield_generator->create_datetime('facetoface_session', ['event_date' => []]));
+        $cfids = array_merge($cfids, $this->customfield_generator->create_multiselect('facetoface_session', ['event_multi' => ['opt1', 'opt2']]));
+        $cfids = array_merge($cfids, $this->customfield_generator->create_location('facetoface_session', ['event_location' => []]));
+        $sessionid = $this->facetoface_generator->add_session([
+            'facetoface' => $f2f->id,
+            'sessiondates' => [
+                $this->prepare_date(time() + 3333, time() + 5555, $room1->id),
+                $this->prepare_date(time() + 7777, time() + 9999, $room2->id),
+            ],
+            'capacity' => 10,
+            'allowoverbook' => 1,
+            'registrationtimestart' => time() + 1111,
+            'registrationtimefinish' => time() + 6666,
+        ]);
+        $seminar = new seminar($f2f->id);
+        $seminarevent = new seminar_event($sessionid);
+        $signup = signup::create(2, $seminarevent)->save();
+        signup_status::create($signup, new \mod_facetoface\signup\state\booked($signup))->save();
+        $sessiondata = seminar_event_helper::get_sessiondata($seminarevent, null);
+        $cd = $sessiondata->cntdates;
+        $date1 = reset($sessiondata->sessiondates);
+        $date2 = next($sessiondata->sessiondates);
+        $this->customfield_generator->set_text($sessiondata, $cfids['event_text'], 'value1', 'facetofacesession', 'facetoface_session');
+        $this->customfield_generator->set_datetime($sessiondata, $cfids['event_date'], 2121212121, 'facetofacesession', 'facetoface_session');
+        $this->customfield_generator->set_multiselect($sessiondata, $cfids['event_multi'], ['opt2'], 'facetofacesession', 'facetoface_session');
+        $this->customfield_generator->set_location_address($sessiondata, $cfids['event_location'], '6925 Hollywood Boulevard', 'facetofacesession', 'facetoface_session');
+        $customfields = customfield_get_fields_definition('facetoface_session', array('hidden' => 0));
+        $renderer = $this->create_f2f_renderer();
+
+        $this->assertNotEmpty($renderer->print_session_list_table([$sessiondata], true, true, true, array(), 'foo', false, true, seminar::SESSION_ATTENDANCE_UNRESTRICTED, seminar::EVENT_ATTENDANCE_UNRESTRICTED, true, true));
+        $this->assert_debugging_called('mod_facetoface_renderer::print_session_list_table() is deprecated');
+
+        $this->assertNotEmpty($renderer->print_session_list($seminar, $room1->id));
+        $this->assert_debugging_called('mod_facetoface_renderer::print_session_list() is deprecated');
+
+        $this->assertNotEmpty($renderer->render_session_list($seminar, new \mod_facetoface\dashboard\filter_list(), new \mod_facetoface\dashboard\render_session_option()));
+        $this->assert_debugging_called('mod_facetoface_renderer::render_session_list() is deprecated');
+
+        $call = function ($method, $args) use (&$renderer) {
+            $rm = new ReflectionMethod($renderer, $method);
+            $rm->setAccessible(true);
+            return $rm->invokeArgs($renderer, $args);
+        };
+
+        $this->assertCount(count($customfields), $call('session_customfield_table_cells', [$sessiondata, $customfields]));
+        $this->assert_debugging_called('mod_facetoface_renderer::session_customfield_table_cells() is deprecated');
+
+        $this->assertInstanceOf(html_table_cell::class, $call('session_capacity_table_cell', [$seminarevent, true, 1, $cd]));
+        $this->assert_debugging_called('mod_facetoface_renderer::session_capacity_table_cell() is deprecated');
+
+        $this->assertInstanceOf(\mod_facetoface\output\attendance_tracking_table_cell::class, $call('attendance_tracking_table_cell', [$sessiondata, $date1, seminar::SESSION_ATTENDANCE_UNRESTRICTED]));
+        $this->assert_debugging_called('mod_facetoface_renderer::attendance_tracking_table_cell() is deprecated');
+
+        $this->assertInstanceOf(html_table_cell::class, $call('session_status_table_cell', [$sessiondata, $date1, 0]));
+        $this->assert_debugging_called('mod_facetoface_renderer::session_status_table_cell() is deprecated');
+
+        $this->assertInstanceOf(html_table_cell::class, $call('event_status_table_cell', [$sessiondata, 1, $cd, null]));
+        $this->assert_debugging_called('mod_facetoface_renderer::event_status_table_cell() is deprecated');
+
+        $this->assertNotEmpty($renderer->event_status_attendance_taking_html($sessiondata, null));
+        $this->assert_debugging_called('mod_facetoface_renderer::event_status_attendance_taking_html() is deprecated');
+
+        $this->assertInstanceOf(html_table_cell::class, $call('session_resgistrationperiod_table_cell', [$seminarevent, $cd, null]));
+        $this->assert_debugging_called('mod_facetoface_renderer::session_resgistrationperiod_table_cell() is deprecated');
+
+        $this->assertInstanceOf(html_table_cell::class, $call('session_options_table_cell', [$seminarevent, true, true, '<a>reserve</a>', '<a>sign-up</a>', $cd]));
+        $this->assert_debugging_called('mod_facetoface_renderer::session_options_table_cell() is deprecated');
+
+        $this->assertNotEmpty($call('get_regdates_tooltip_info', [$seminarevent, true]));
+        $this->assert_debugging_called('mod_facetoface_renderer::get_regdates_tooltip_info() is deprecated');
+
+        $this->assertNotEmpty($call('session_options_reserve_link', [$seminarevent, 1, ['allocate' => 1, 'maxallocate' => 2, 'reserve' => 3, 'maxreserve' => 4, 'reserveother' => 1, 'reservepastdeadline' => 0]]));
+        $this->assert_debugging_called('mod_facetoface_renderer::session_options_reserve_link() is deprecated');
+
+        $this->assertNotEmpty($call('session_options_signup_link', [$seminarevent, 0, true]));
+        $this->assert_debugging_called('mod_facetoface_renderer::session_options_signup_link() is deprecated');
+
+        ob_start();
+        $renderer->print_action_bar($seminar);
+        $this->assertNotEmpty(ob_get_contents());
+        $this->assert_debugging_called('The method mod_facetoface_renderer::print_action_bar() has been deprecated');
+        ob_end_clean();
+
+        ob_start();
+        $roomid = 0;
+        $eventtime = \mod_facetoface\event_time::ALL;
+        $renderer->print_filter_bar($seminar, $roomid, $eventtime);
+        $this->assertNotEmpty(ob_get_contents());
+        $this->assert_debugging_called('The method mod_facetoface_renderer::print_filter_bar() has been deprecated');
+        ob_end_clean();
+
+        $roomid = 0;
+        $this->assertCount(3, $call('get_filter_by_room', [$seminar, &$roomid]));
+        $this->assert_debugging_called('The method mod_facetoface_renderer::get_filter_by_room() has been deprecated');
+
+        $eventtime = \mod_facetoface\event_time::ALL;
+        $this->assertNotCount(0, $call('get_filter_by_event_time', [&$seminar, &$eventtime]));
+        $this->assert_debugging_called('The method mod_facetoface_renderer::get_filter_by_event_time() has been deprecated');
+
+        ob_start();
+        $this->assertSame(0, $renderer->filter_by_room($seminar, 0));
+        $this->assertNotEmpty(ob_get_contents());
+        $this->assert_debugging_called('The method mod_facetoface_renderer::filter_by_room() has been deprecated');
+        ob_end_clean();
+
+        $renderer->set_signup_link('lorem ipsum');
+        $this->assert_debugging_called('mod_facetoface_renderer::set_signup_link() is deprecated');
+        $this->assertSame('lorem ipsum', $renderer->get_signup_link($seminarevent));
     }
 }

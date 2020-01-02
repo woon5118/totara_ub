@@ -212,17 +212,6 @@ define(['core/ajax', 'core/templates', 'core/notification', 'mod_facetoface/semi
             this.el = element;
             this.resetlink = element.querySelector('.mod_facetoface__filter__link');
             this.filters = Array.prototype.slice.apply(element.querySelectorAll('select'));
-            // Polyfill that we won't need after rebasing.
-            if (typeof this.filters.includes !== 'function') {
-                this.filters.includes = function(el) {
-                    for (var i = 0, len = this.length; i < len; i++) {
-                        if (this[i] === el) {
-                            return true;
-                        }
-                    }
-                    return false;
-                };
-            }
 
             // Add only parameters known to the filter bar.
             this.filterparams = new SearchParams();

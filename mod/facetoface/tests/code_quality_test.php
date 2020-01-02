@@ -65,6 +65,7 @@ use mod_facetoface\traits\crud_mapper;
 use mod_facetoface\external;
 use mod_facetoface\query\query_helper;
 use mod_facetoface\query\event\filter_factory;
+use mod_facetoface\internal\mod_facetoface_renderer_deprecated;
 
 // Renderer class - mod_facetoface_renderer
 require_once(__DIR__ . '/../renderer.php');
@@ -108,6 +109,7 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
         crud_mapper::class,
 
         mod_facetoface_renderer::class,
+        mod_facetoface_renderer_deprecated::class,
         external::class,
         query_helper::class,
         filter_factory::class,

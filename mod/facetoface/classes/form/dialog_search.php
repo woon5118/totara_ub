@@ -58,7 +58,7 @@ class dialog_search extends \moodleform {
 
         // Create actual form elements query box
         $searcharray = array();
-        $searcharray[] =& $mform->addElement('text', 'query', null, 'maxlength="254"');
+        $searcharray[] =& $mform->addElement('text', 'query', get_string('searchlabel', 'mod_facetoface'), 'maxlength="254"');
         $mform->setType('query', PARAM_TEXT);
         $mform->setDefault('query', $this->_customdata['query']);
         // Show search button and close markup

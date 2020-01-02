@@ -28,6 +28,8 @@ use mod_facetoface\seminar;
 use mod_facetoface\query\event\query;
 use mod_facetoface\query\event\filter\past_event_filter as query_past_event_filter;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Provide the ability to cut off past events by time period.
  * NOTE: this filter is not visible on the filter bar.

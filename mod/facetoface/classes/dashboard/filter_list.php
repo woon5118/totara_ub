@@ -33,6 +33,8 @@ use mod_facetoface\query\event\filter\event_times_filter;
 use mod_facetoface\query\event\sortorder\future_sortorder;
 use mod_facetoface\query\event\sortorder\past_sortorder;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Provide filter management on the event dashboard.
  */

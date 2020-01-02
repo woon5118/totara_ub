@@ -23,6 +23,8 @@
 
 namespace mod_facetoface;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * A set of render options that is passed to mod_facetoface_renderer::render_seminar_event_details()
  */

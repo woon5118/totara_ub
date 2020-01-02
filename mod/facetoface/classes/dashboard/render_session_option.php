@@ -25,6 +25,8 @@ namespace mod_facetoface\dashboard;
 
 use mod_facetoface\event_time;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * A set of render options that is passed to mod_facetoface_renderer::render_session_list()
  */

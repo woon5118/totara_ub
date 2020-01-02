@@ -973,21 +973,18 @@ function facetoface_supports($feature) {
 function facetoface_extend_settings_navigation(settings_navigation $settings, navigation_node $facetofacenode) {
     global $PAGE, $DB;
 
-    $mode = optional_param('mode', '', PARAM_ALPHA);
-    $hook = optional_param('hook', 'ALL', PARAM_CLEAN);
-
-    $context = context_module::instance($PAGE->cm->id);
-    if (has_capability('moodle/course:manageactivities', $context)) {
+    $modcontext = context_module::instance($PAGE->cm->id);
+    if (has_capability('moodle/course:manageactivities', $modcontext)) {
         $facetofacenode->add(get_string('notifications', 'facetoface'), new moodle_url('/mod/facetoface/notification/index.php', array('update' => $PAGE->cm->id)), navigation_node::TYPE_SETTING);
     }
 
     $facetoface = $DB->get_record('facetoface', array('id' => $PAGE->cm->instance), '*', MUST_EXIST);
-    if ($facetoface->declareinterest && has_capability('mod/facetoface:viewinterestreport', $context)) {
+    if ($facetoface->declareinterest && has_capability('mod/facetoface:viewinterestreport', $modcontext)) {
         $facetofacenode->add(get_string('declareinterestreport', 'facetoface'), new moodle_url('/mod/facetoface/reports/interests.php', array('facetofaceid' => $PAGE->cm->instance)), navigation_node::TYPE_SETTING);
     }
 
-    $context = context_system::instance();
-    if (has_capability('mod/facetoface:managesitewideassets', $context)) {
+    $syscontext = context_system::instance();
+    if (has_capability('mod/facetoface:managesitewideassets', $syscontext)) {
         $facetofacenode->add(
             get_string('assets', 'mod_facetoface'),
             new moodle_url('/mod/facetoface/asset/manage.php', ['published' => 0]),
@@ -995,7 +992,7 @@ function facetoface_extend_settings_navigation(settings_navigation $settings, na
         );
     }
 
-    if (has_capability('mod/facetoface:managesitewidefacilitators', $context)) {
+    if (has_capability('mod/facetoface:managesitewidefacilitators', $syscontext)) {
         $facetofacenode->add(
             get_string('facilitators', 'mod_facetoface'),
             new moodle_url('/mod/facetoface/facilitator/manage.php', ['published' => 0]),
@@ -1003,7 +1000,7 @@ function facetoface_extend_settings_navigation(settings_navigation $settings, na
         );
     }
 
-    if (has_capability('mod/facetoface:managesitewiderooms', $context)) {
+    if (has_capability('mod/facetoface:managesitewiderooms', $syscontext)) {
         $facetofacenode->add(
             get_string('rooms', 'mod_facetoface'),
             new moodle_url('/mod/facetoface/room/manage.php', ['published' => 0]),

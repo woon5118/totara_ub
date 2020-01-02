@@ -28,6 +28,8 @@ use mod_facetoface\seminar;
 use mod_facetoface\query\event\query;
 use mod_facetoface\query\event\filter\room_filter as query_room_filter;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Provide the room name filter.
  */

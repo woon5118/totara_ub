@@ -142,10 +142,6 @@ final class query implements event_query {
 
         [$sql, $params] = sql_query::from_builder($builder)->build();
 
-        // !!!!!!!!!!!!!!!! DEBUG: SHOULD BE REMOVED !!!!!!!!!!!!!!!!
-        // echo query_helper::highlight($sql, $params);
-        // !!!!!!!!!!!!!!!! DEBUG: SHOULD BE REMOVED !!!!!!!!!!!!!!!!
-
         return new statement($sql, $params);
     }
 }

@@ -28,6 +28,8 @@ use mod_facetoface\seminar;
 use mod_facetoface\query\event\query;
 use mod_facetoface\query\event\filter\booking_filter as query_booking_filter;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Provide the booking status filter.
  */

@@ -23,6 +23,8 @@
 
 namespace mod_facetoface;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Interface for a session attachment item that exposes getter methods.
  */

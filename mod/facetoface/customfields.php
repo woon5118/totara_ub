@@ -38,11 +38,11 @@ $PAGE->set_context($contextsystem);
 $availableprefixes = [
     'facetofaceasset',
     'facetofacecancellation',
+    'facetofacefacilitator',
     'facetofaceroom',
     'facetofacesession',
     'facetofacesessioncancel',
     'facetofacesignup',
-    'facetofacefacilitator',
 ];
 if (!in_array($prefix, $availableprefixes)) {
     // Just a coding exception, this should never happen. If it does then stop hacking it.

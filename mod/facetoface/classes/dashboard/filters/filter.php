@@ -27,6 +27,8 @@ use context;
 use mod_facetoface\seminar;
 use mod_facetoface\query\event\query;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * A filter interface for seminar event dashboard.
  */

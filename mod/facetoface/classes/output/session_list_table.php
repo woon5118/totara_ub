@@ -187,6 +187,9 @@ final class session_list_table extends html_table {
      * @return void
      */
     private function initialise(array $sessions, render_session_list_config $config): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/facetoface/renderer.php');
+
         // If we want the minimal table, no customfield columns are shown.
         $customfields = array();
         if (!$config->minimal) {
@@ -213,8 +216,7 @@ final class session_list_table extends html_table {
             $isbookedsession = (!empty($session->bookedsession) && ($session->id == $session->bookedsession->sessionid));
             $signupcount = attendees_helper::count_signups($seminarevent, $includedeleted);
 
-            $baserowclasses = [self::SESSION_LIST_CSS.'table__sessionrow'];
-            $baserowclasses += $this->table_row_status_classes($seminarevent, $isbookedsession, $signupcount);
+            $baserowclasses = array_merge([self::SESSION_LIST_CSS.'table__sessionrow'], mod_facetoface_renderer::table_row_status_classes($seminarevent, $isbookedsession, $signupcount, $config->currenttime));
 
             if (!$seminarevent->is_sessions()) {
                 $sessionrowclasses = $baserowclasses;
@@ -612,8 +614,7 @@ final class session_list_table extends html_table {
                 }
             }
             // Let's manually combine two cells, shall we?
-            $renderer = $this->get_renderer();
-            $status = $renderer->render_unordered_list($contents);
+            $status = mod_facetoface_renderer::render_unordered_list($contents);
         }
         return static::create_table_cell($status, 1, 'session-status');
     }
@@ -675,42 +676,6 @@ final class session_list_table extends html_table {
 
         $html = $renderer->render($builder->build());
         return static::create_table_cell($html, $datescount, 'actions');
-    }
-
-    /**
-     * Return CSS classes for the seminar event.
-     *
-     * @param seminar_event $seminarevent
-     * @param boolean $isbookedsession
-     * @param integer $signupcount
-     * @return array
-     */
-    private function table_row_status_classes(seminar_event $seminarevent, bool $isbookedsession, int $signupcount): array {
-        $classes = [];
-        if (!$seminarevent->is_sessions()) {
-            $classes[] = 'waitlisted';
-        }
-        $time = 0;
-        if ($seminarevent->is_first_started($time)) {
-            $classes[] = 'started';
-        }
-        if ($seminarevent->is_over($time)) {
-            $classes[] = 'over';
-        }
-        if ($seminarevent->get_cancelledstatus()) {
-            $classes[] = 'cancelled';
-        }
-        if ($isbookedsession) {
-            $classes[] = 'userbooked';
-        }
-        $sessionfull = ($signupcount >= $seminarevent->get_capacity());
-        if ($sessionfull && !$seminarevent->get_allowoverbook()) {
-            $classes[] = 'fullybooked';
-        }
-        if (!signup_helper::is_signup_open($seminarevent, $signupcount)) {
-            $classes[] = 'closed';
-        }
-        return $classes;
     }
 
     /**

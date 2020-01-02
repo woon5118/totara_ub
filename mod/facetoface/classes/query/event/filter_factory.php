@@ -237,6 +237,7 @@ final class filter_factory {
      */
     private static function signup_current_subquery(string $type = 'inner'): builder {
         $builder = self::signup_status_subquery($type);
+        // TODO: remove logic to exclude archived signups in TL-23021
         self::signup_not_archived($builder);
         self::signup_not_superseded($builder);
         return $builder;
@@ -312,6 +313,7 @@ final class filter_factory {
         $subquery = builder::table('facetoface_signups', 'su')
             ->join(['facetoface_signups_status', 'sus'], 'id', '=', 'signupid', 'inner')
             ->select('sessionid');
+        // TODO: remove logic to exclude archived signups in TL-23021
         self::signup_not_archived($subquery);
         self::signup_not_superseded($subquery);
         if ($callback !== null) {
