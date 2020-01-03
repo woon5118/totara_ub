@@ -611,22 +611,45 @@ abstract class totara_sync_element {
                     /** @var string|totara_sync_source $sourceclass */
                     $sourceclass::add_source_settings_structure($root, $elementname);
                 }
+            }
+        }
+    }
 
-                $create = empty($root->locate('uploadsyncfiles'));
-                $create = $create && has_capability('tool/totara_sync:upload' . $elementname, $context);
-                $create = $create && static::has_file_access_been_configured();
-                if ($create) {
-                    $sourceclass = get_config('totara_sync', 'source_' . $elementname);
-                    if (in_array($sourceclass, $sourcesclasses) && $sourceclass::can_upload_files()) {
-                        /** @var totara_sync_element $element */
-                        $element = new $elements[$elementname]();
-                        if ($element->get_fileaccess() == FILE_ACCESS_UPLOAD) {
-                            self::add_setting_page_uploadsyncfiles($root);
-                        }
+    /**
+     * Determine if the upload files admin node should be added
+     * to the admin nav tree
+     *
+     * @return bool
+     */
+    final public static function needs_upload_admin_node(): bool {
+        $elementname = static::NAME;
+        $context = \context_system::instance();
+
+        $elements = tool_totara_sync_get_element_classes();
+        if (!isset($elements[$elementname])) {
+            debugging('Invalid element name provided', DEBUG_DEVELOPER);
+            return false;
+        }
+
+        $sourcesclasses = self::get_source_classes($elementname);
+        if (!empty($sourcesclasses)) {
+            $create = has_capability('tool/totara_sync:upload' . $elementname, $context);
+            $create = $create && static::has_file_access_been_configured();
+
+            if ($create) {
+                $sourceclass = get_config('totara_sync', 'source_' . $elementname);
+                if (in_array($sourceclass, $sourcesclasses) && $sourceclass::can_upload_files()) {
+                    /** @var totara_sync_element $element */
+                    $element = new $elements[$elementname]();
+                    $isenabled = $element->is_enabled();
+                    if ($isenabled && $element->get_fileaccess() == FILE_ACCESS_UPLOAD) {
+                        return true;
                     }
                 }
             }
         }
+
+        return false;
     }
 
     /**
@@ -658,25 +681,5 @@ abstract class totara_sync_element {
             $classes[$source] = $class;
         }
         return $classes;
-    }
-
-    /**
-     * Adds the upload files settings page if it does not already exist.
-     *
-     * @param admin_root $root
-     */
-    final protected static function add_setting_page_uploadsyncfiles(admin_root $root) {
-        if ($root->locate('uploadsyncfiles')) {
-            return;
-        }
-        $root->add(
-            'syncsources',
-            new admin_externalpage(
-                'uploadsyncfiles',
-                get_string('uploadsyncfiles', 'tool_totara_sync'),
-                new moodle_url('/admin/tool/totara_sync/admin/uploadsourcefiles.php'),
-                'tool/totara_sync:manage'
-            )
-        );
     }
 }

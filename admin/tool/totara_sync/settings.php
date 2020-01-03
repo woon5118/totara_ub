@@ -45,6 +45,8 @@ if (has_capability('tool/totara_sync:manage', $systemcontext)) {
             )
         );
     }
+
+    $adduploadlink = false;
     foreach (tool_totara_sync_get_element_classes() as $class) {
         /** @var string|totara_sync_element $class */
         if (!method_exists($class, 'add_element_settings_structure')) {
@@ -52,7 +54,22 @@ if (has_capability('tool/totara_sync:manage', $systemcontext)) {
             continue;
         }
         $class::add_element_settings_structure($ADMIN);
+
+        $adduploadlink = $adduploadlink || $class::needs_upload_admin_node();
     }
+
+    if ($adduploadlink) {
+        $ADMIN->add(
+            'syncsources',
+            new admin_externalpage(
+                'uploadsyncfiles',
+                get_string('uploadsyncfiles', 'tool_totara_sync'),
+                new moodle_url('/admin/tool/totara_sync/admin/uploadsourcefiles.php'),
+                'tool/totara_sync:manage'
+            )
+        );
+    }
+
     if (has_capability('tool/totara_sync:runsync', $systemcontext)) {
         $ADMIN->add(
             'tool_totara_sync',
