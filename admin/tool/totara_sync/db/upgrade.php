@@ -315,5 +315,27 @@ function xmldb_tool_totara_sync_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018082200, 'tool', 'totara_sync');
     }
 
+    if ($oldversion < 2020010100) {
+        global $CFG;
+
+        require_once($CFG->dirroot . '/admin/tool/totara_sync/lib.php');
+
+        $elements = totara_sync_get_elements(true);
+
+        foreach ($elements as $el) {
+            $name = $el->get_name();
+            $settingvalue = get_config('totara_sync_element_' . $name, 'fileaccessusedefaults');
+
+            // Only update if the setting has never been set
+            if ($el->is_enabled() && $settingvalue === false) {
+                set_config('fileaccessusedefaults', true, 'totara_sync_element_' . $name);
+                set_config('scheduleusedefaults', true, 'totara_sync_element_' . $name);
+                set_config('notificationusedefaults', true, 'totara_sync_element_' . $name);
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2020010100, 'tool', 'totara_sync');
+    }
+
     return true;
 }

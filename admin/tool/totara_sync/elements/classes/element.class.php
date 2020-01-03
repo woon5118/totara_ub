@@ -542,7 +542,7 @@ abstract class totara_sync_element {
         $usedefault = get_config(static::class, 'fileaccessusedefaults');
         $default = get_config('totara_sync', 'fileaccess');
         $element = get_config(static::class, 'fileaccess');
-        return ((!empty($usedefault) && !empty($default)) || $element !== false);
+        return ((!empty($usedefault) && isset($default)) || $element !== false);
     }
 
     /**
