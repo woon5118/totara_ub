@@ -79,13 +79,8 @@ abstract class builder_base {
      * @param bool $nested
      */
     public function __construct(properties $properties = null, bool $nested = false) {
-        if (is_null($properties)) {
-            $properties = new properties();
-        }
-
-        $properties->nested = $nested;
-
-        $this->properties = $properties;
+        $this->properties = $properties ?? new properties();
+        $this->properties->nested = $nested;
     }
 
     /**

@@ -156,11 +156,11 @@ abstract class entity implements \JsonSerializable {
             // All those formats can be casted to an array
             case $id instanceof stdClass:
             case is_array($id):
-            case is_null($id):
+            case $id === null:
                 $attributes = (array) $id;
                 // Auto-detect whether the entity exists if the exists attribute is not explicitly passed.
                 // If id is present among attributes and > 0 then we mark model as exists.
-                if (is_null($exists)) {
+                if ($exists === null) {
                     $this->exists = isset($attributes['id']) && intval($attributes['id']) > 0;
                 } else {
                     $this->exists = $exists;
@@ -209,7 +209,9 @@ abstract class entity implements \JsonSerializable {
             return;
         }
 
-        if ($this->db_column_exists($attribute)) {
+        global $CFG;
+        // For performance reasons we validate the column only in debug mode
+        if (!$CFG->debugdeveloper || $this->db_column_exists($attribute)) {
             return;
         }
 
@@ -274,7 +276,10 @@ abstract class entity implements \JsonSerializable {
      */
     final public static function repository(): repository {
         $repository_name = static::repository_class_name();
-        if (!class_exists($repository_name)) {
+        // Checking if the repository class exists using class_exists() with autoloading will have a
+        // performance impact as it always checks the PSR classes. Therefore we use our own class_exists
+        // method which will have less of an impact in this case
+        if (!\core_component::class_exists($repository_name, false) && !class_exists($repository_name, false)) {
             $repository_name = repository::class;
         } else if (!is_subclass_of($repository_name, repository::class)) {
             throw new coding_exception('Custom repositories must extend the repository class.');
@@ -389,10 +394,11 @@ abstract class entity implements \JsonSerializable {
      * Mark attribute as dirty
      *
      * @param string $attribute
+     * @param mixed $value
      * @return $this
      */
-    protected function set_dirty(string $attribute) {
-        $this->dirty[$attribute] = $this->get_attribute($attribute);
+    protected function set_dirty(string $attribute, $value) {
+        $this->dirty[$attribute] = $value;
 
         return $this;
     }
@@ -464,7 +470,9 @@ abstract class entity implements \JsonSerializable {
             return $this->get_relation($name);
         }
 
-        if (!$this->db_column_exists($name)) {
+        global $CFG;
+        // For performance reasons we validate the column only in debug mode
+        if ($CFG->debugdeveloper && !$this->db_column_exists($name)) {
             debugging("Unknown attribute '{$name}' of entity " . static::class);
         }
 
@@ -527,7 +535,7 @@ abstract class entity implements \JsonSerializable {
             $this->validate_attribute_for_insert($name);
         }
         $this->attributes[$name] = $value;
-        return $this->set_dirty($name);
+        return $this->set_dirty($name, $value);
     }
 
     /**
@@ -570,7 +578,11 @@ abstract class entity implements \JsonSerializable {
      * @return string|null
      */
     private function build_setter_method_name(string $name): ?string {
-        return $this->build_method_name('set', $name);
+        $method_name = "set_{$name}_attribute";
+        if (method_exists($this, $method_name)) {
+            return $method_name;
+        }
+        return null;
     }
 
     /**
@@ -580,19 +592,7 @@ abstract class entity implements \JsonSerializable {
      * @return string|null
      */
     private function build_getter_method_name(string $name): ?string {
-        return $this->build_method_name('get', $name);
-    }
-
-    /**
-     * Returns the get_*_attribute or set_*_attribute method name.
-     *
-     * @param string $prefix
-     * @param string $name
-     * @return string|null
-     */
-    private function build_method_name(string $prefix, string $name): ?string {
-        $name = strtolower($name);
-        $method_name = "{$prefix}_{$name}_attribute";
+        $method_name = "get_{$name}_attribute";
         if (method_exists($this, $method_name)) {
             return $method_name;
         }
