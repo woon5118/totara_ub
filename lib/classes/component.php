@@ -139,6 +139,28 @@ class core_component {
     }
 
     /**
+     * Check if a class exists in our class map or in the psr classes. This can be used as an alternative to the
+     * class_exists() function provided by PHP. It does check if the requested class exists in our class map or is part
+     * of the PSR0 and PSR4 namespaces we support.
+     *
+     * In some cases this method performs better than using class_exists() with autoloading as you can opt out
+     * of the more costly PSR class loader.
+     *
+     * @param string $classname
+     * @param bool $include_psr defaults to false, use with care as going through psr classes might have a performance impact
+     * @return bool
+     */
+    public static function class_exists(string $classname, bool $include_psr = false): bool {
+        $exists = isset(self::$classmap[$classname]);
+
+        if (!$exists && $include_psr) {
+            $exists = self::psr_classloader($classname) !== false;
+        }
+
+        return $exists;
+    }
+
+    /**
      * Return the path to a class from our defined PSR-0 or PSR-4 standard namespaces on
      * demand. Only returns paths to files that exist.
      *

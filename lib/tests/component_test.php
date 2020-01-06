@@ -895,4 +895,26 @@ class core_component_testcase extends advanced_testcase {
         $this->assertEquals($componentslist['mod']['mod_forum'], $CFG->dirroot . '/mod/forum');
         $this->assertEquals($componentslist['tool']['tool_usertours'], $CFG->dirroot . '/' . $CFG->admin . '/tool/usertours');
     }
+
+    /**
+     * Test class exists
+     */
+    public function test_class_exists() {
+        $this->assertTrue(core_component::class_exists(\core_component::class));
+        $this->assertFalse(core_component::class_exists('idontexist'));
+
+        $psr0namespaces = new ReflectionProperty('core_component', 'psr0namespaces');
+        $psr0namespaces->setAccessible(true);
+        $psr0namespaces->setValue(null, ['psr0' => 'lib/tests/fixtures/component/psr0']);
+
+        $psr4namespaces = new ReflectionProperty('core_component', 'psr4namespaces');
+        $psr4namespaces->setAccessible(true);
+        $psr4namespaces->setValue(null, ['psr4' => 'lib/tests/fixtures/component/psr4']);
+
+        $this->assertFalse(core_component::class_exists('psr0_subnamespace_example'));
+        $this->assertTrue(core_component::class_exists('psr0_subnamespace_example', true));
+
+        $this->assertFalse(core_component::class_exists('psr4\subnamespace\example'));
+        $this->assertTrue(core_component::class_exists('psr4\subnamespace\example', true));
+    }
 }
