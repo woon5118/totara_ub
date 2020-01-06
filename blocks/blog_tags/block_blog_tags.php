@@ -161,8 +161,11 @@ class block_blog_tags extends block_base {
             }
 
         /// Now we sort the tag display order
-            $CFG->tagsort = $this->config->sort;
-            usort($etags, "block_blog_tags_sort");
+            if ($this->config->sort === 'id') {
+                core_collator::asort_objects_by_property($etags, 'id', core_collator::SORT_NUMERIC);
+            } else if ($this->config->sort === 'name') {
+                core_collator::asort_objects_by_property($etags, 'name', core_collator::SORT_NATURAL);
+            }
 
         /// Finally we create the output
         /// Accessibility: markup as a list.
@@ -198,8 +201,17 @@ class block_blog_tags extends block_base {
     }
 }
 
+/**
+ * @deprecated since Totara 13.
+ * @param $a
+ * @param $b
+ *
+ * @return int
+ */
 function block_blog_tags_sort($a, $b) {
     global $CFG;
+
+    debugging(__FUNCTION__ . ' has been deprecated and should no longer be used', DEBUG_DEVELOPER);
 
     if (empty($CFG->tagsort)) {
         return 0;
@@ -208,8 +220,10 @@ function block_blog_tags_sort($a, $b) {
     }
 
     if (is_numeric($a->$tagsort)) {
-        // TODO: review sorting logic TL-23365
-        return (($a->$tagsort == $b->$tagsort) ? 0 : ($a->$tagsort > $b->$tagsort)) ? 1 : -1;
+        if ($a->$tagsort == $b->$tagsort) {
+            return 0;
+        }
+        return ($a->$tagsort > $b->$tagsort) ? 1 : -1;
     } elseif (is_string($a->$tagsort)) {
         return strcmp($a->$tagsort, $b->$tagsort); //TODO: this is not compatible with UTF-8!!
     } else {

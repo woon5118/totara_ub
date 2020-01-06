@@ -3508,8 +3508,10 @@ function tag_cloud_sort($a, $b) {
     }
 
     if (is_numeric($a->$tagsort)) {
-        // TODO: review sorting logic TL-23365
-        return (($a->$tagsort == $b->$tagsort) ? 0 : ($a->$tagsort > $b->$tagsort)) ? 1 : -1;
+        if ($a->$tagsort == $b->$tagsort) {
+            return 0;
+        }
+        return ($a->$tagsort > $b->$tagsort) ? 1 : -1;
     } elseif (is_string($a->$tagsort)) {
         return strcmp($a->$tagsort, $b->$tagsort);
     } else {

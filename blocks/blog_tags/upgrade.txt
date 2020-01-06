@@ -1,0 +1,6 @@
+This files describes API changes in /blocks/blog_tags,
+information provided here is intended especially for developers.
+
+=== 13.0 ===
+
+* block_blog_tags_sort function has been deprecated and should no longer be used.

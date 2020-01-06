@@ -1158,4 +1158,36 @@ class core_tag_taglib_testcase extends advanced_testcase {
         $this->assertEquals($expectedtags, $DB->get_records('tag', [], 'id'));
         $this->assertEquals($expectedtaginstances, $DB->get_records('tag_instance', [], 'id'));
     }
+
+    /**
+     * Test the logic of {@see collection::cloud_sort()} used to sort the tags in the cloud.
+     */
+    public function test_collection_cloud_sort() {
+        $tag1 = new stdClass();
+        $tag1->name = 'XXX';
+        $tag1->sortorder = 10;
+
+        $tag2 = new stdClass();
+        $tag2->name = 'SSS';
+        $tag2->sortorder = 15;
+
+        $tag3 = new stdClass();
+        $tag3->name = 'AAA';
+        $tag3->sortorder = 1;
+
+        $tags = [$tag1, $tag2, $tag3];
+
+        core_tag_collection::$cloudsortfield = 'name';
+        usort($tags, 'core_tag_collection::cloud_sort');
+        $this->assertSame([$tag3, $tag2, $tag1], $tags);
+
+        $tag4 = new stdClass();
+        $tag4->name = 'CCC';
+        $tag4->sortorder = 3;
+        $tags[] = $tag4;
+
+        core_tag_collection::$cloudsortfield = 'sortorder';
+        usort($tags, 'core_tag_collection::cloud_sort');
+        $this->assertSame([$tag3, $tag4, $tag1, $tag2], $tags);
+    }
 }
