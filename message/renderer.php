@@ -161,7 +161,7 @@ class core_message_renderer extends plugin_renderer_base {
                         $preference = $processor->name.'_provider_'.$preferencebase;
                         if ($providerdisabled) {
                             $select = MESSAGE_DISALLOWED;
-                        } else if (property_Exists($preferences, $preference)) {
+                        } else if (property_exists($preferences, $preference)) {
                             $select = $preferences->{$preference};
                         }
                         // dropdown menu
