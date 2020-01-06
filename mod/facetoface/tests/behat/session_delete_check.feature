@@ -4,7 +4,7 @@ Feature: Confirm overlapping sessions can be removed
   As a user
   I need to be able to remove overlapping times
 
-  Scenario Outline:
+  Scenario Outline: Test removing overlapping sessions
     Given I am on a totara site
     And the following "courses" exist:
       | fullname | shortname | category |

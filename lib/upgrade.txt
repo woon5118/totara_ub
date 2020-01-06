@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* Node.js minimum supported version has changed to Node.js 12, please use the latest NPM available
 * core_collator now supports reversed order with core_collator::REVERSED flag, the value of core_collator::SORT_REGULAR
   constant was changed to 128
 * core_renderer::login_info and core_renderer::user_menu are updated to remove the main menu items from the site policy page.
