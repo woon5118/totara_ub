@@ -69,4 +69,25 @@ class totara_catalog_dataformatter_textarea_testcase extends dataformatter_test_
 
         $this->assert_exceptions($df, $test_params);
     }
+
+    public function test_textarea_not_adding_line_breaks() {
+        $context = context_system::instance();
+
+        $df = new textarea('textfield', 'contextidfield', 'componentfield', 'fieldareafield', 'itemidfield');
+        $this->assertSame([formatter::TYPE_PLACEHOLDER_RICH_TEXT], $df->get_suitable_types());
+
+        $text = "wwwwww\r\nwwwwwwww\r\nwww\r\nwww";
+        $html = '<p>'.$text.'</p>';
+        $test_params = [
+            'text' => $html,
+            'contextid' => $context->id,
+            'component' => 'totara_catalog',
+            'filearea' => 'testarea',
+            'itemid' => 123,
+        ];
+        $result = $df->get_formatted_value($test_params, $context);
+        $this->assertContains($text, $result);
+
+        $this->assert_exceptions($df, $test_params);
+    }
 }

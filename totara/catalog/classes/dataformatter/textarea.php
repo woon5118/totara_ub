@@ -95,7 +95,7 @@ class textarea extends formatter {
                 $data['itemid']
             ),
             FORMAT_MOODLE,
-            ['context' => $context]
+            ['context' => $context, 'newlines' => false]
         );
     }
 }
