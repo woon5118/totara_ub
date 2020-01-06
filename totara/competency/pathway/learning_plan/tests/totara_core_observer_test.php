@@ -24,15 +24,20 @@
 
 use pathway_learning_plan\observer\totara_core;
 use totara_competency\entities\pathway as pathway_entity;
+use core\event\admin_settings_changed;
 use totara_competency\hook\competency_validity_changed;
 use totara_core\advanced_feature;
-use totara_core\hook\advanced_feature_disabled;
-use totara_core\hook\advanced_feature_enabled;
+
+global $CFG;
+require_once($CFG->dirroot.'/lib/adminlib.php');
 
 class pathway_learning_plan_totara_core_observer_testcase extends advanced_testcase {
 
     public function test_learning_plans_enabled() {
-        $sink = $this->redirectHooks();
+        global $CFG;
+
+        $event_sink = $this->redirectEvents();
+        $hook_sink = $this->redirectHooks();
         advanced_feature::enable('learningplans');
 
         /** @var totara_competency_generator $generator */
@@ -53,14 +58,22 @@ class pathway_learning_plan_totara_core_observer_testcase extends advanced_testc
             ->where('valid', 1)
             ->count();
         $this->assertSame(3, $on_disk);
-        $sink->clear();
 
         // First disable something else
-        /** @var advanced_feature_disabled $hook */
-        $hook = new advanced_feature_disabled('whatever');
-        totara_core::feature_disabled($hook);
+        $event = admin_settings_changed::create(
+            [
+                'context' => context_system::instance(),
+                'other' =>
+                 [
+                     'olddata' => ['whatever' => advanced_feature::DISABLED]
+                 ]
+            ]
+        );
 
-        $this->assertSame(0, $sink->count());
+        $hook_sink->clear();
+        totara_core::admin_settings_changed($event);
+
+        $this->assertSame(0, $hook_sink->count());
         $on_disk = pathway_entity::repository()
             ->where('path_type', 'learning_plan')
             ->where('valid', 1)
@@ -68,10 +81,22 @@ class pathway_learning_plan_totara_core_observer_testcase extends advanced_testc
         $this->assertSame(3, $on_disk);
 
         // Now disable learningplans
-        $hook = new advanced_feature_disabled('learningplans');
-        totara_core::feature_disabled($hook);
+        // We need to disable the setting as well as generate the event to simulate what actually happens
+        advanced_feature::disable('learningplans');
+        $event = admin_settings_changed::create(
+            [
+                'context' => context_system::instance(),
+                'other' =>
+                 [
+                     'olddata' => ['s__enablelearningplans' => advanced_feature::ENABLED]
+                 ]
+            ]
+        );
 
-        $hooks = $sink->get_hooks();
+        $hook_sink->clear();
+        totara_core::admin_settings_changed($event);
+
+        $hooks = $hook_sink->get_hooks();
         $this->assertSame(1, count($hooks));
 
         /** @var competency_validity_changed $triggered_hook */
@@ -90,14 +115,24 @@ class pathway_learning_plan_totara_core_observer_testcase extends advanced_testc
             ->where('valid', 0)
             ->count();
         $this->assertSame(3, $on_disk);
-        $sink->clear();
 
 
         // And enable it again
-        $hook = new advanced_feature_enabled('learningplans');
-        totara_core::feature_enabled($hook);
+        advanced_feature::enable('learningplans');
+        $event = admin_settings_changed::create(
+            [
+                'context' => context_system::instance(),
+                'other' =>
+                 [
+                     'olddata' => ['s__enablelearningplans' => advanced_feature::DISABLED]
+                 ]
+            ]
+        );
 
-        $hooks = $sink->get_hooks();
+        $hook_sink->clear();
+        totara_core::admin_settings_changed($event);
+
+        $hooks = $hook_sink->get_hooks();
         $this->assertSame(1, count($hooks));
 
         /** @var competency_validity_changed $triggered_hook */
@@ -117,7 +152,30 @@ class pathway_learning_plan_totara_core_observer_testcase extends advanced_testc
             ->count();
         $this->assertSame(0, $on_disk);
 
-        $sink->close();
+
+        // Check nothing happens if the setting is set to the same value
+        $event = admin_settings_changed::create(
+            [
+                'context' => context_system::instance(),
+                'other' =>
+                 [
+                     'olddata' => ['s__enablelearningplans' => advanced_feature::ENABLED]
+                 ]
+            ]
+        );
+
+        $hook_sink->clear();
+        totara_core::admin_settings_changed($event);
+
+        $this->assertSame(0, $hook_sink->count());
+        $on_disk = pathway_entity::repository()
+            ->where('path_type', 'learning_plan')
+            ->where('valid', 1)
+            ->count();
+        $this->assertSame(3, $on_disk);
+
+        $event_sink->close();
+        $hook_sink->close();
     }
 
 }

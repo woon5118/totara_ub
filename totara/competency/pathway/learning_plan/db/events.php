@@ -21,10 +21,9 @@
  * @package pathway_learning_plan
  */
 
+use core\event\admin_settings_changed;
 use pathway_learning_plan\observer\totara_core;
 use pathway_learning_plan\observer\totara_plan;
-use totara_core\hook\advanced_feature_disabled;
-use totara_core\hook\advanced_feature_enabled;
 use totara_plan\event\competency_value_set;
 
 defined('MOODLE_INTERNAL') || die();
@@ -35,11 +34,7 @@ $observers = [
         'callback' => totara_plan::class.'::competency_value_set',
     ],
     [
-        'eventname' => advanced_feature_enabled::class,
-        'callback' => totara_core::class.'::feature_enabled',
-    ],
-    [
-        'eventname' => advanced_feature_disabled::class,
-        'callback' => totara_core::class.'::feature_disabled',
+        'eventname' => admin_settings_changed::class,
+        'callback' => totara_core::class.'::admin_settings_changed',
     ],
 ];

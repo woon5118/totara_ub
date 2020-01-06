@@ -23,53 +23,42 @@
 
 namespace pathway_learning_plan\observer;
 
+use core\event\admin_settings_changed;
 use core\orm\query\builder;
 use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\hook\competency_validity_changed;
 use totara_competency\pathway;
-use totara_core\hook\advanced_feature_disabled;
-use totara_core\hook\advanced_feature_enabled;
+use totara_core\advanced_feature;
+
 
 class totara_core {
 
-    public static function feature_enabled(advanced_feature_enabled $event) {
-        if ($event->get_feature() != 'learningplans') {
+    public static function admin_settings_changed(admin_settings_changed $event) {
+        $data = $event->get_data();
+        if (!isset($data['other']['olddata']['s__enablelearningplans'])) {
             return;
         }
 
-        $affected_competency_ids = static::get_competencies();
+        if (advanced_feature::check('learningplans', (int)$data['other']['olddata']['s__enablelearningplans'])) {
+            return;
+        }
+
+        $affected_competency_ids = static::get_competencies_with_learning_plan_pathways();
         if (empty($affected_competency_ids)) {
             return;
         }
 
-        // All learning_plan pathways are now valid
-        static::update_pathway_validity(true);
+        static::update_pathway_validity(advanced_feature::is_enabled('learningplans'));
 
         $hook = new competency_validity_changed($affected_competency_ids);
         $hook->execute();
     }
 
-    public static function feature_disabled(advanced_feature_disabled $event) {
-        if ($event->get_feature() != 'learningplans') {
-            return;
-        }
-
-        $affected_competency_ids = static::get_competencies();
-        if (empty($affected_competency_ids)) {
-            return;
-        }
-
-        // All learning_plan pathways are now invalid
-        static::update_pathway_validity(false);
-
-        $hook = new competency_validity_changed($affected_competency_ids);
-        $hook->execute();
-    }
 
     /**
      * @return int[]
      */
-    private static function get_competencies(): array {
+    private static function get_competencies_with_learning_plan_pathways(): array {
         return pathway_entity::repository()
             ->as('pw')
             ->select_raw('DISTINCT pw.comp_id AS comp_id')
