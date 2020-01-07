@@ -146,6 +146,9 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
     private static function add_inherited_classes(array &$tested_classes, string $namespace, ?string $baseclass, string $relpath): void {
         $classes = \core_component::get_namespace_classes($namespace, $baseclass, 'mod_facetoface');
         $tested_classes = array_unique(array_merge($tested_classes, $classes));
+        if ($baseclass !== null && !in_array($baseclass, $tested_classes)) {
+            $tested_classes[] = $baseclass;
+        }
     }
 
     /**
@@ -245,11 +248,10 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
      * @return array list of errors found
      */
     public function inspect_method_docblocks(string $classname): array {
+        $to_names = function ($e) {
+            return $e->getName();
+        };
         $errors = array();
-
-        if (version_compare(PHP_VERSION, '7.4', '>=')) {
-            return $errors;
-        }
 
         try {
             $class = new ReflectionClass($classname);
@@ -267,9 +269,10 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
                     // does this method override a method in the parent class with same arguments/return values?
                     try {
                         $prototype = $method->getPrototype();
-                        $prototype_parameters = $prototype->getParameters();
-                        if ($prototype_parameters != $parameters) {
-                            $errors[] = "No method docblock for {$method->class}::{$method->getName()}(), which extends {$prototype->getDeclaringClass()}::{$prototype->getName()}() but has different parameters";
+                        $parameter_names = array_map($to_names, $parameters);
+                        $prototype_parameter_names = array_map($to_names, $prototype->getParameters());
+                        if ($prototype_parameter_names != $parameter_names) {
+                            $errors[] = "No method docblock for {$method->class}::{$method->getName()}(), which extends {$prototype->getDeclaringClass()->getName()}::{$prototype->getName()}() but has different parameters";
                         }
                     } catch (\ReflectionException $e) {
                         // There is a ReflectionException thrown if the method does not have a prototype.
@@ -319,7 +322,7 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
                                 $errors[] = "Method {$method->class}::{$method->getName()}() docblock missing @param declaration for \${$parameter->getName()}";
                             }
                         } else if ($parameter->hasType()) {
-                            $error = self::check_mismatched_typehint($param_type, (string)$parameter->getType());
+                            $error = self::check_mismatched_typehint($param_type, self::get_type_string($parameter->getType()));
                             if (is_string($error)) {
                                 $errors[] = "Method {$method->class}::{$method->getName()}() docblock has incorrect @param type for \${$parameter->getName()}: '{$error}' expected";
                             } else if ($error === false) {
@@ -331,7 +334,7 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
                     $return_type = self::extract_return_type($docblock);
                     if ($return_type === false) {
                         if ($inherited_doc == false && self::is_magic_method($method) == false) {
-                            if ($method->hasReturnType() && (string)$method->getReturnType() === 'void') {
+                            if ($method->hasReturnType() && self::get_type_string($method->getReturnType()) === 'void') {
                                 // CITE: the @return tag MAY be omitted here, in which case @return void is implied.
                                 // https://docs.phpdoc.org/references/phpdoc/tags/return.html
                                 // Because looking for all `return` statements in a method is too much work, here is our rule:
@@ -354,7 +357,7 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
                     // Try to catch frequent mistakes of @return types.
                     // For example, the return type hint is signup while the @return type is bool.
                     if ($method->hasReturnType()) {
-                        $error = self::check_mismatched_typehint($return_type, (string)$method->getReturnType());
+                        $error = self::check_mismatched_typehint($return_type, self::get_type_string($method->getReturnType()));
                         if (is_string($error)) {
                             $errors[] = "Method {$method->class}::{$method->getName()}() docblock has incorrect @return type: '{$error}' expected";
                         } else if ($error === false) {
@@ -697,6 +700,19 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
     }
 
     /**
+     * Get the type name as string if possible.
+     *
+     * @param \ReflectionType|null $type
+     * @return string|null
+     */
+    private static function get_type_string(?\ReflectionType $type): ?string {
+        if ($type instanceof \ReflectionNamedType) {
+            return $type->getName();
+        }
+        return null;
+    }
+
+    /**
      * Recursively scan source files for for carriage return characters
      *
      * @param string $directory Path to directory to scan
@@ -742,8 +758,6 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
      * @return void
      */
     public function test_core_seminar_classes(): void {
-        $this->resetAfterTest();
-
         if ($this->disabled_code_inspector) {
             $this->markTestIncomplete('Code inspection is temporarily disabled.');
         }
@@ -771,7 +785,6 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
      * @return void
      */
     public function test_line_endings_in_source_files(): void {
-        $this->resetAfterTest();
         global $CFG;
 
         $source_directory = $CFG->dirroot . '/mod/facetoface';
@@ -790,8 +803,6 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
      * Self-test inspect_class_docblock().
      */
     public function test_inspect_class_docblock(): void {
-        $this->resetAfterTest();
-
         require_once(__DIR__ . '/fixtures/code_quality_test_classes.php');
 
         $errors = $this->inspect_class_docblock(mod_facetoface\tests\docblock\class_has_no_docblock::class);
@@ -814,8 +825,6 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
      * Self-test inspect_property_docblocks().
      */
     public function test_inspect_property_docblocks(): void {
-        $this->resetAfterTest();
-
         require_once(__DIR__ . '/fixtures/code_quality_test_classes.php');
 
         $errors = $this->inspect_property_docblocks(mod_facetoface\tests\docblock\prop_has_no_docblock::class);
@@ -846,17 +855,14 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
      * Self-test inspect_method_docblocks().
      */
     public function test_inspect_method_docblocks(): void {
-        $this->resetAfterTest();
-
-        if (version_compare(PHP_VERSION, '7.4', '>=')) {
-            $this->markTestSkipped('PHP 7.4 does not support converting introspection types to strings');
-        }
-
         require_once(__DIR__ . '/fixtures/code_quality_test_classes.php');
 
         $errors = $this->inspect_method_docblocks(mod_facetoface\tests\docblock\method_has_no_docblock::class);
         $this->assertCount(2, $errors);
         $this->assertSame('No method docblock for mod_facetoface\tests\docblock\method_has_no_docblock::foo()', $errors[1]);
+        $errors = $this->inspect_method_docblocks(mod_facetoface\tests\docblock\method_has_no_docblock_but_different_param_name::class);
+        $this->assertCount(2, $errors);
+        $this->assertSame('No method docblock for mod_facetoface\tests\docblock\method_has_no_docblock_but_different_param_name::foo(), which extends mod_facetoface\tests\docblock\method_docblock_base::foo() but has different parameters', $errors[1]);
         $errors = $this->inspect_method_docblocks(mod_facetoface\tests\docblock\method_docblock_has_only_stars1::class);
         $this->assertCount(2, $errors);
         $this->assertSame('Empty docblock for mod_facetoface\tests\docblock\method_docblock_has_only_stars1::foo()', $errors[1]);
@@ -924,8 +930,6 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
      * Self-test inspect_method_parameter_hints().
      */
     public function test_inspect_method_parameter_hints(): void {
-        $this->resetAfterTest();
-
         require_once(__DIR__ . '/fixtures/code_quality_test_classes.php');
 
         // NOTE: inspect_method_parameter_hints() reports nothing about param_has_no_docblock1 even though its method does not have a docblock.
@@ -945,8 +949,6 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
      * Self-test inspect_method_return_hints().
      */
     public function test_inspect_method_return_hints(): void {
-        $this->resetAfterTest();
-
         require_once(__DIR__ . '/fixtures/code_quality_test_classes.php');
 
         $errors = $this->inspect_method_return_hints(mod_facetoface\tests\docblock\return_missing_type_hint::class);

@@ -84,7 +84,7 @@ abstract class state {
 
     /**
      * Assess possibility to switch to any of the given classes
-     * @param string[] $desiredstates
+     * @param string ...$desiredstates
      * @return bool
      */
     final public function can_switch(string ...$desiredstates) : bool {
@@ -100,7 +100,7 @@ abstract class state {
     /**
      * Change current state to one of listed states if possible. State must be listed in order of preference.
      *
-     * @param string[] $desiredstateclasses target state.
+     * @param string ...$desiredstateclasses target state.
      * @return state first possible of $desiredstates
      * @throws signup_exception If not possbile to move
      */

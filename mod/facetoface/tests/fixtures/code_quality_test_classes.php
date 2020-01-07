@@ -106,9 +106,26 @@ class prop_docblock_is_ok2 {
     public $foo;
 }
 
+abstract class method_docblock_base {
+    /**
+     * Return something.
+     * @param integer $bar
+     * @return integer
+     */
+    public function foo(int $bar): int {
+        return $bar <=> rand(-100, 100);
+    }
+}
+
 class method_has_no_docblock {
     public function foo() {
         // No method docblock for method_has_no_docblock::foo()
+    }
+}
+
+class method_has_no_docblock_but_different_param_name extends method_docblock_base {
+    public function foo(int $boo): int {
+        return 0;
     }
 }
 
@@ -369,17 +386,6 @@ class method_docblock_is_ok {
     public function waldo(): bool {
         // Note: This is not valid, but also not easy to catch an error.
         return false;
-    }
-}
-
-abstract class method_docblock_base {
-    /**
-     * Return something.
-     * @param integer $bar
-     * @return integer
-     */
-    public function foo(int $bar): int {
-        return $bar <=> rand(-100, 100);
     }
 }
 

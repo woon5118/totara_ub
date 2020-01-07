@@ -100,15 +100,15 @@ interface filter {
     /**
      * Get the default value of this filter.
      *
-     * @return void
+     * @return mixed
      */
     public static function get_default_value();
 
     /**
      * See if the filter can be visible to the current context.
      *
-     * @param seminar
-     * @param context
+     * @param seminar $seminar
+     * @param context $context
      * @param integer|null $userid  A user ID or null to use the current user
      * @return boolean
      */
