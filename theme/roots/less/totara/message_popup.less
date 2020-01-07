@@ -47,6 +47,12 @@
         clear: both;
         border-radius: 4px;
 
+        &:after {
+            display: block;
+            clear: both;
+            content: ' ';
+        }
+
         img {
             max-width: 100%;
         }
@@ -58,24 +64,14 @@
                 height: 500px;
             }
             width: 280px;
-            display: inline-block;
+            display: flex;
+            flex-direction: column;
             box-sizing: border-box;
-
-            &.searchfilter {
-
-                .searchtextarea {
-                    height: 80px;
-                }
-
-                .searcharea {
-                    height: 470px;
-                }
-            }
+            float: left;
 
             .searchtextarea {
                 padding: 5px;
                 text-align: center;
-                height: 50px;
                 box-sizing: border-box;
                 line-height: 50px;
                 background-color: #fff;
@@ -113,12 +109,11 @@
                     cursor: pointer;
 
                     .searchfilter {
-                        float: left;
+                        display: inline;
                     }
 
                     .searchfilterdelete {
-                        float: left;
-                        margin-left: 5px;
+                        display: inline;
                     }
                 }
             }
@@ -151,10 +146,7 @@
             }
 
             .contacts {
-                height: 500px;
-                @media (max-height: 670px) {
-                    height: 400px;
-                }
+                flex-grow: 1;
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
 
