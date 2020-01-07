@@ -175,7 +175,11 @@ if (!$envstatus) {
         list($info, $report) = $error;
         echo "!! $info !!\n$report\n\n";
     }
-    exit(1);
+    // Totara: allow bypass of env checks for testing purposes only.
+    $bypass = (defined('UNSUPPORTED_ENVIRONMENT_CHECK_BYPASS') && UNSUPPORTED_ENVIRONMENT_CHECK_BYPASS);
+    if (!$bypass) {
+        exit(1);
+    }
 }
 
 // Test plugin dependencies.
@@ -185,7 +189,7 @@ if (!core_plugin_manager::instance()->all_plugins_ok($version, $failed)) {
     cli_error(get_string('pluginschecktodo', 'admin'));
 }
 
-install_cli_database($options, true);
+install_cli_database($options, true, false);
 
 echo get_string('cliinstallfinished', 'install')."\n";
 exit(0); // 0 means success

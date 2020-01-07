@@ -803,7 +803,11 @@ if (!$envstatus) {
         list($info, $report) = $error;
         echo "!! $info !!\n$report\n\n";
     }
-    exit(1);
+    // Totara: allow bypass of env checks for testing purposes only.
+    $bypass = (defined('UNSUPPORTED_ENVIRONMENT_CHECK_BYPASS') && UNSUPPORTED_ENVIRONMENT_CHECK_BYPASS);
+    if (!$bypass) {
+        exit(1);
+    }
 }
 
 // Test plugin dependencies.
@@ -814,7 +818,7 @@ if (!core_plugin_manager::instance()->all_plugins_ok($version, $failed)) {
 }
 
 if (!$options['skip-database']) {
-    install_cli_database($options, $interactive);
+    install_cli_database($options, $interactive, false);
 } else {
     echo get_string('cliskipdatabase', 'install')."\n";
 }

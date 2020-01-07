@@ -432,9 +432,10 @@ function install_print_footer($config, $reload=false) {
  *
  * @param array $options adminpass is mandatory
  * @param bool $interactive
+ * @param bool $checkenvironment
  * @return void
  */
-function install_cli_database(array $options, $interactive) {
+function install_cli_database(array $options, $interactive, $checkenvironment = true) {
     global $CFG, $DB;
     require_once($CFG->libdir.'/environmentlib.php');
     require_once($CFG->libdir.'/upgradelib.php');
@@ -470,16 +471,22 @@ function install_cli_database(array $options, $interactive) {
         cli_error('Missing required admin password');
     }
 
-    // test environment first
-    list($envstatus, $environment_results) = check_totara_environment();
-    if (!$envstatus) {
-        $errors = environment_get_errors($environment_results);
-        cli_heading(get_string('environment', 'admin'));
-        foreach ($errors as $error) {
-            list($info, $report) = $error;
-            echo "!! $info !!\n$report\n\n";
+    // Test environment first if not done yet.
+    if ($checkenvironment) {
+        list($envstatus, $environment_results) = check_totara_environment();
+        if (!$envstatus) {
+            $errors = environment_get_errors($environment_results);
+            cli_heading(get_string('environment', 'admin'));
+            foreach ($errors as $error) {
+                list($info, $report) = $error;
+                echo "!! $info !!\n$report\n\n";
+            }
+            // Totara: allow bypass of env checks for testing purposes only.
+            $bypass = (defined('UNSUPPORTED_ENVIRONMENT_CHECK_BYPASS') && UNSUPPORTED_ENVIRONMENT_CHECK_BYPASS);
+            if (!$bypass) {
+                exit(1);
+            }
         }
-        exit(1);
     }
 
     if (!$DB->setup_is_unicodedb()) {

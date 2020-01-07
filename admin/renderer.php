@@ -100,10 +100,15 @@ class core_admin_renderer extends plugin_renderer_base {
 
         $output .= $this->environment_check_table($envstatus, $environment_results);
 
-        if (!$envstatus) {
+        // Totara: allow bypass of env checks for testing purposes only.
+        $bypass = (defined('UNSUPPORTED_ENVIRONMENT_CHECK_BYPASS') && UNSUPPORTED_ENVIRONMENT_CHECK_BYPASS);
+
+        if (!$envstatus && !$bypass) {
             $output .= $this->upgrade_reload(new moodle_url($this->page->url, array('agreelicense' => 1, 'lang' => $CFG->lang)));
         } else {
-            $output .= $this->notification(get_string('environmentok', 'admin'), 'notifysuccess');
+            if ($envstatus) {
+                $output .= $this->notification(get_string('environmentok', 'admin'), 'notifysuccess');
+            }
             $output .= $this->continue_button(new moodle_url($this->page->url, array(
                 'agreelicense' => 1, 'confirmrelease' => 1, 'lang' => $CFG->lang)));
         }
@@ -176,11 +181,16 @@ class core_admin_renderer extends plugin_renderer_base {
         $output .= $this->release_notes_link();
         $output .= $this->environment_check_table($envstatus, $environment_results);
 
-        if (!$envstatus) {
+        // Totara: allow bypass of env checks for testing purposes only.
+        $bypass = (defined('UNSUPPORTED_ENVIRONMENT_CHECK_BYPASS') && UNSUPPORTED_ENVIRONMENT_CHECK_BYPASS);
+
+        if (!$envstatus && !$bypass) {
             $output .= $this->upgrade_reload(new moodle_url($this->page->url, array('confirmupgrade' => 1, 'cache' => 0)));
 
         } else {
-            $output .= $this->notification(get_string('environmentok', 'admin'), 'notifysuccess');
+            if ($envstatus) {
+                $output .= $this->notification(get_string('environmentok', 'admin'), 'notifysuccess');
+            }
 
             if (empty($CFG->skiplangupgrade) and current_language() !== 'en') {
                 $output .= $this->box(get_string('langpackwillbeupdated', 'admin'), 'generalbox', 'notice');
