@@ -13,7 +13,3 @@ mv src /path/to/moodle/lib/mustache/
 mv LICENSE /path/to/moodle/lib/mustache/
 
 3) Add dynamic partial support from TL-9430
-
-4) Fix the autoloader registration again TL-23143
-
-5/ TL-23373 lib: fix mustache PHP 7.4 compatibility
