@@ -181,8 +181,8 @@ class rb_filter_select extends rb_filter_type {
     function get_sql_filter($data) {
         global $DB;
 
-        if (is_int($data)) {
-            // TL-23263: Invalid test most likely, this should get fixed soon...
+        if (!is_array($data)) {
+            debugging('Invalid sql filter data: ' . var_export($data, true), DEBUG_DEVELOPER);
             $value = [''];
         } else {
             $value = explode(',', $data['value']);

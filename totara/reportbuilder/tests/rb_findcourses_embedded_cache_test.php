@@ -318,7 +318,7 @@ class totara_reportbuilder_rb_findcourses_embedded_cache_testcase extends report
                     'after' => mktime(0, 0, 0, date("n"), date('j')-1, date('Y')), 'before' => 0,
                     'daysafter' => 0, 'daysbefore' => 0),
             'course_category-id' => array('operator' => 0, 'value' => '1'),
-            'course-visible' => 1,
+            'course-visible' => array('value' => '1'),
             'course-shortname' => array('operator' => 0, 'value' => 'big'),
             'course-mods' => array('operator' => 2, 'value' => array('chat' => 1, 'url' => 1)),
             'course-idnumber' => array('operator' => 0, 'value' => '101'),
