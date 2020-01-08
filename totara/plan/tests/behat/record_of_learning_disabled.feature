@@ -1,4 +1,4 @@
-@totara @totara_plan @totara_rol @javascript @totara_core_menu
+@totara @totara_plan @totara_rol @totara_core_menu
 Feature: Check Record of Learning feature visibility
   In order to control access to RoL
   As an admin
@@ -24,3 +24,18 @@ Feature: Check Record of Learning feature visibility
     And I should see "Feature disabled" in the "Record of Learning" "table_row"
     And I should not see "Record of Learning" in the totara menu
 
+  Scenario: Verify Record of Learning can still be loaded if teams are disabled
+    Given I am on a totara site
+    And the following "users" exist:
+      | username | firstname | lastname | email          |
+      | user     | test      | user     | test@test.test |
+    When I log in as "admin"
+
+    # '3' = 'Disable'
+    And I set the following administration settings values:
+      | Enable Team | 3 |
+
+    And I navigate to "Manage users" node in "Site administration > Users"
+    And I click on "test user" "link"
+    And I click on "Record of Learning" "link" in the ".userprofile" "css_element"
+    Then I should see "0 records shown"

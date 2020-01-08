@@ -49,23 +49,19 @@ $PAGE->set_context($context);
 $PAGE->set_pagelayout('report');
 $PAGE->set_url('/totara/plan/record/evidence/index.php', array('userid' => $userid, 'format' => $format));
 
+$menunavitem = '';
+$url = null;
 if ($USER->id == $userid) {
     $strheading = get_string('recordoflearning', 'totara_core');
     $usertype = 'learner';
     $menuitem = '\totara_plan\totara\menu\recordoflearning';
-    $menunavitem = '';
-    $url = null;
 } else {
     $strheading = get_string('recordoflearningforname', 'totara_core', fullname($user, true));
     $usertype = 'manager';
+    $menuitem = '\totara_core\totara\menu\myteam';
     if (advanced_feature::is_enabled('myteam')) {
-        $menuitem = '\totara_core\totara\menu\myteam';
         $menunavitem = 'team';
         $url = new moodle_url('/my/teammembers.php');
-    } else {
-        $menuitem = null;
-        $menunavitem = '';
-        $url = null;
     }
 }
 
