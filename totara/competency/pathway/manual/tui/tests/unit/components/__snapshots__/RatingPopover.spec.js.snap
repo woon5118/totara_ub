@@ -1,0 +1,58 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/RatingPopover.vue Checks snapshot 1`] = `
+<popover-stub
+  position="bottom-right"
+  triggers="click"
+>
+   
+  <span
+    class="tui-pathwayManual-ratingInput__heading"
+  >
+    
+    fff
+  
+  </span>
+   
+  <radiogroup-stub
+    value="1"
+  >
+    <radio-stub
+      label="Competent"
+      name="scaleRadio321"
+      value="123"
+    >
+      
+        Competent
+      
+    </radio-stub>
+     
+    <hr
+      class="tui-pathwayManual-ratingInput__radioDivider"
+    />
+     
+    <radio-stub
+      name="scaleRadio321"
+      value="-1"
+    >
+      
+        fff
+      
+    </radio-stub>
+  </radiogroup-stub>
+   
+  <br />
+   
+  <span
+    class="tui-pathwayManual-ratingInput__heading"
+  >
+    
+    fff
+  
+  </span>
+   
+  <textarea
+    class="tui-pathwayManual-ratingInput__textarea"
+  />
+</popover-stub>
+`;

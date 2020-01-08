@@ -1,7 +1,7 @@
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Matthias Bonk <matthias.bonk@totaralearning.com>
- * @package totara_core
+ * @package pathway_manual
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'pathway_manual/components/RatingComment';
+import component from 'pathway_manual/components/RatingPopover';
 let wrapper;
 
 const props = {
-  hasRating: true,
-  attachedComment: 'Test comment',
+  scale: {
+    values: [
+      {
+        id: '123',
+        name: 'Competent',
+      },
+    ],
+  },
+  compId: '321',
+  scaleValueId: '1',
+  comment: 'Test comment',
 };
 const mocks = {
   $str: function() {
@@ -34,57 +43,43 @@ const mocks = {
   },
 };
 
-describe('components/RatingComment.vue', () => {
+describe('components/RatingPopover.vue', () => {
   it('Checks snapshot', () => {
     wrapper = shallowMount(component, { mocks: mocks, propsData: props });
     expect(wrapper.element).toMatchSnapshot();
   });
 
-  it('Checks attachedComment with and without content', () => {
-    wrapper = shallowMount(component, { mocks: mocks, propsData: props });
-    expect(wrapper.vm.inputComment).toEqual('Test comment');
-    expect(wrapper.vm.commentIcon).toEqual('pathway_manual|comment-filled');
-
-    wrapper = shallowMount(component, {
-      mocks: mocks,
-      propsData: {
-        hasRating: true,
-        attachedComment: '',
-      },
-    });
-    expect(wrapper.vm.inputComment).toEqual('');
-    expect(wrapper.vm.commentIcon).toEqual('pathway_manual|comment');
-  });
-
-  it('Checks updateComment method', () => {
+  it('Checks updateRating method', () => {
     const vueHandler = jest.fn();
     const closeFn = jest.fn();
     const wrapper = shallowMount(component, {
       mocks: mocks,
       propsData: props,
       listeners: {
-        'update-comment': vueHandler,
+        'update-rating': vueHandler,
       },
     });
-    wrapper.vm.updateComment('  test abc  ', closeFn);
+    wrapper.vm.updateRating('321', '  test abc  ', closeFn);
     expect(vueHandler).toHaveBeenCalled();
-    expect(vueHandler.mock.calls[0][0]).toBe('test abc');
+    expect(vueHandler.mock.calls[0][0]).toEqual({
+      scale_value_id: '321',
+      comment: 'test abc',
+    });
     expect(closeFn).toHaveBeenCalled();
   });
 
-  it('Checks deleteComment method', () => {
+  it('Checks deleteRating method', () => {
     const vueHandler = jest.fn();
     const closeFn = jest.fn();
     const wrapper = shallowMount(component, {
       mocks: mocks,
       propsData: props,
       listeners: {
-        'update-comment': vueHandler,
+        'delete-rating': vueHandler,
       },
     });
-    wrapper.vm.deleteComment(closeFn);
+    wrapper.vm.deleteRating(closeFn);
     expect(vueHandler).toHaveBeenCalled();
-    expect(vueHandler.mock.calls[0][0]).toBe('');
     expect(closeFn).toHaveBeenCalled();
   });
 });

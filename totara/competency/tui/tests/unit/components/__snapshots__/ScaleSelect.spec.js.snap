@@ -1,8 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`components/ScaleSelect.vue Checks snapshot 1`] = `
-<select-stub
-  id="comp_999"
-  options="[object Object],[object Object],[object Object],[object Object],[object Object]"
-/>
-`;

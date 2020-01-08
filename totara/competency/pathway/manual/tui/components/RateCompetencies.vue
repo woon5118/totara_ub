@@ -40,8 +40,8 @@
         :current-user-id="currentUserId"
         :selected-ratings="selectedRatings"
         :expanded="expandFrameworkGroups"
-        @input="updateRating"
-        @update-comment="updateComment"
+        @update-rating="updateRating"
+        @delete-rating="deleteRating"
       />
       <div class="tui-pathwayManual-rateCompetencies__submitButtons">
         <ButtonGroup>
@@ -64,12 +64,12 @@
         >
           <p>{{ submitRatingsModalMessage }}</p>
           <p>
-            <strong>{{
+            {{
               $str(
                 'modal:submit_ratings_confirmation_question',
                 'pathway_manual'
               )
-            }}</strong>
+            }}
           </p>
         </ConfirmModal>
       </div>
@@ -90,10 +90,7 @@ import UserCompetenciesFilters from 'pathway_manual/components/UserCompetenciesF
 import CreateManualRatingsMutation from '../../webapi/ajax/create_manual_ratings.graphql';
 import RateableCompetenciesQuery from '../../webapi/ajax/user_rateable_competencies.graphql';
 
-import {
-  NONE_OPTION_VALUE,
-  EMPTY_OPTION_VALUE,
-} from 'totara_competency/components/ScaleSelect';
+import { NONE_OPTION_VALUE } from 'pathway_manual/components/RatingPopover';
 
 const ROLE_SELF = 'self';
 
@@ -152,7 +149,6 @@ export default {
       showSubmitRatingsModal: false,
       selectedRatings: [],
       noneOptionValue: NONE_OPTION_VALUE,
-      emptyOptionValue: EMPTY_OPTION_VALUE,
     };
   },
 
@@ -205,27 +201,32 @@ export default {
       window.location.href = this.goBackLink;
     },
 
-    updateRating(rating) {
-      if (parseInt(rating.scale_value_id) === this.emptyOptionValue) {
-        // Empty option: Remove rating from array.
-        this.selectedRatings = this.selectedRatings.filter(
-          previousRating => previousRating.comp_id !== rating.comp_id
-        );
+    updateRating(ratingData) {
+      let previousRating = this.selectedRatings.find(
+        ratingObj => ratingObj.comp_id === ratingData.comp_id
+      );
+
+      if (previousRating) {
+        // Was already rated: update value.
+        previousRating.scale_value_id = ratingData.scale_value_id;
+        previousRating.comment = ratingData.comment;
       } else {
-        let previousRating = this.selectedRatings.find(
-          ratingObj => ratingObj.comp_id === rating.comp_id
-        );
-        if (previousRating) {
-          // Was already rated: update value.
-          previousRating.scale_value_id = rating.scale_value_id;
-        } else {
-          // Wasn't in list yet: add to array.
-          rating.comment =
-            typeof rating.comment === 'undefined' ? '' : rating.comment;
-          this.selectedRatings.push(rating);
-        }
+        // Wasn't in list yet: add to array.
+        this.selectedRatings.push(ratingData);
       }
 
+      this.updateUnloadHandler();
+    },
+
+    deleteRating(compId) {
+      this.selectedRatings = this.selectedRatings.filter(
+        previousRating => previousRating.comp_id !== compId
+      );
+
+      this.updateUnloadHandler();
+    },
+
+    updateUnloadHandler() {
       // Warn user about leaving the page when having unsaved selections.
       if (this.hasSelectedRatings) {
         window.addEventListener('beforeunload', this.unloadHandler);
@@ -258,13 +259,7 @@ export default {
 
     // Get rating data for sending to GQL mutation.
     getRatingsForSaving() {
-      // Throw out invalid elements.
-      let ratings = this.selectedRatings.filter(
-        rating =>
-          typeof rating.comp_id !== 'undefined' &&
-          rating.scale_value_id !== this.emptyOptionValue
-      );
-      return ratings.map(rating => ({
+      return this.selectedRatings.map(rating => ({
         comp_id: rating.comp_id,
         // Map "None" to null.
         scale_value_id:

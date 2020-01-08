@@ -1,8 +1,7 @@
-<?php
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,12 +20,25 @@
  * @package pathway_manual
  */
 
-/* Developer documentation is in /pix/flex_icons.php file. */
+import { shallowMount } from '@vue/test-utils';
+import component from 'pathway_manual/components/RatingInput';
+let wrapper;
 
-$icons = [
-    'pathway_manual|comment-filled' => [
-        'data' => [
-            'classes' => 'fa-comment',
-        ],
-    ],
-];
+const props = {
+  scale: {},
+  scaleValueId: '1',
+  compId: '123',
+  comment: 'Test comment',
+};
+const mocks = {
+  $str: function() {
+    return 'fff';
+  },
+};
+
+describe('components/RatingInput.vue', () => {
+  it('Checks snapshot', () => {
+    wrapper = shallowMount(component, { mocks: mocks, propsData: props });
+    expect(wrapper.element).toMatchSnapshot();
+  });
+});

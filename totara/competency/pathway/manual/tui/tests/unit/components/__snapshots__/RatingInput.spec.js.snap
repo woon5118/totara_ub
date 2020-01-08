@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/RatingInput.vue Checks snapshot 1`] = `
+<span
+  class="tui-pathwayManual-ratingInput__editButton"
+>
+  <ratingpopover-stub
+    comment="Test comment"
+    compid="123"
+    scale="[object Object]"
+    scalevalueid="1"
+  />
+</span>
+`;
