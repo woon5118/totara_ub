@@ -165,6 +165,7 @@ trait report_trait {
                 'displayfunc' => 'user_icon_link',
                 'defaultheading' => get_string('userfullname', 'totara_reportbuilder'),
                 'extrafields' => array_merge(array('id' => "$join.id",
+                                                   'deleted' => "{$join}.deleted",
                                                    'picture' => "$join.picture",
                                                    'imagealt' => "$join.imagealt",
                                                    'email' => "$join.email"),

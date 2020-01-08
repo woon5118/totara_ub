@@ -43,13 +43,14 @@ class user_icon extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        global $OUTPUT;
+        global $OUTPUT, $PAGE;
 
         $extrafields = self::get_extrafields_row($row, $column);
         $isexport = ($format !== 'html');
 
         // Process obsolete calls to this display function.
         if (isset($extrafields->userpic_picture)) {
+            debugging('Invalid extra fields detected in report source for user_icon display method .', DEBUG_DEVELOPER);
             $picuser = new \stdClass();
             $picuser->id = $value;
             $picuser->picture = $extrafields->userpic_picture;
@@ -64,12 +65,26 @@ class user_icon extends base {
             $extrafields = $picuser;
         }
 
-        // Don't show picture in spreadsheet.
-        if ($isexport) {
+        $userid = $extrafields->id;
+        if ($isexport || $userid == 0) {
             return fullname($extrafields);
-        } else {
-            return $OUTPUT->user_picture($extrafields, array('courseid' => 1));
         }
+
+        if (CLI_SCRIPT && !PHPUNIT_TEST) {
+            $course = null;
+            $courseid = SITEID;
+        } else {
+            $course = $PAGE->course;
+            $courseid = $course->id;
+        }
+
+        $link = false;
+        $url = user_get_profile_url($userid, $course);
+        if ($url) {
+            $link = true;
+        }
+
+        return $OUTPUT->user_picture($extrafields, ['courseid' => $courseid, 'link' => $link]);
     }
 
     /**

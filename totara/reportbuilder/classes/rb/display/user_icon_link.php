@@ -43,38 +43,44 @@ class user_icon_link extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        global $OUTPUT;
+        global $OUTPUT, $PAGE, $DB;
 
+        // Extra fields expected are fields from totara_get_all_user_name_fields_join() and totara_get_all_user_name_fields_join()
         $extrafields = self::get_extrafields_row($row, $column);
+        $isexport = ($format !== 'html');
 
-        if ($extrafields->id == 0) {
+        if (isset($extrafields->user_id)) {
+            debugging('Invalid extra fields detected in report source for user_icon_link display method .', DEBUG_DEVELOPER);
+            // Some ancient legacy stuff.
+            return clean_string($value);
+        }
+
+        $fullname = fullname($extrafields);
+        if (empty($fullname)) {
             return '';
         }
 
-        // Don't show picture in spreadsheet.
-        $isexport = ($format !== 'html');
-        if ($isexport) {
-            return fullname($extrafields);
+        $userid = $extrafields->id;
+        if ($isexport || $userid == 0) {
+            return $fullname;
         }
 
-        // Process obsolete calls to this display function.
-        if (isset($extrafields->userpic_picture)) {
-            $picuser = new \stdClass();
-            $picuser->id = $extrafields->user_id;
-            $picuser->picture = $extrafields->userpic_picture;
-            $picuser->imagealt = $extrafields->userpic_imagealt;
-            $picuser->firstname = $extrafields->userpic_firstname;
-            $picuser->firstnamephonetic = $extrafields->userpic_firstnamephonetic;
-            $picuser->middlename = $extrafields->userpic_middlename;
-            $picuser->lastname = $extrafields->userpic_lastname;
-            $picuser->lastnamephonetic = $extrafields->userpic_lastnamephonetic;
-            $picuser->alternatename = $extrafields->userpic_alternatename;
-            $picuser->email = $extrafields->userpic_email;
-            $extrafields = $picuser;
+        if (CLI_SCRIPT && !PHPUNIT_TEST) {
+            $course = null;
+            $courseid = SITEID;
+        } else {
+            $course = $PAGE->course;
+            $courseid = $course->id;
         }
 
-        $url = new \moodle_url('/user/view.php', array('id' => $extrafields->id));
-        return $OUTPUT->user_picture($extrafields, array('courseid' => 1)) . "&nbsp;" . \html_writer::link($url, $value);
+        $link = false;
+        $url = user_get_profile_url($userid, $course);
+        if ($url) {
+            $fullname = \html_writer::link($url, $fullname);
+            $link = true;
+        }
+
+        return $OUTPUT->user_picture($extrafields, ['courseid' => $courseid, 'link' => $link]) . "&nbsp;" . $fullname;
     }
 
     /**

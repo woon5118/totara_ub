@@ -240,6 +240,8 @@ class rb_source_user extends rb_base_source {
         $this->add_core_user_columns($columnoptions, 'base');
         $this->add_totara_job_columns($columnoptions);
 
+        $allnamefields = totara_get_all_user_name_fields_join('base');
+
         // A column to display a user's profile picture
         $columnoptions[] = new rb_column_option(
                         'user',
@@ -250,17 +252,13 @@ class rb_source_user extends rb_base_source {
                             'displayfunc' => 'user_icon',
                             'noexport' => true,
                             'defaultheading' => get_string('picture', 'rb_source_user'),
-                            'extrafields' => array(
-                                'userpic_picture' => 'base.picture',
-                                'userpic_firstname' => 'base.firstname',
-                                'userpic_firstnamephonetic' => 'base.firstnamephonetic',
-                                'userpic_middlename' => 'base.middlename',
-                                'userpic_lastname' => 'base.lastname',
-                                'userpic_lastnamephonetic' => 'base.lastnamephonetic',
-                                'userpic_alternatename' => 'base.alternatename',
-                                'userpic_imagealt' => 'base.imagealt',
-                                'userpic_email' => 'base.email'
-                            )
+                            'extrafields' => array_merge(array(
+                                'id' => "base.id",
+                                'deleted' => "base.deleted",
+                                'picture' => "base.picture",
+                                'imagealt' => "base.imagealt",
+                                'email' => "base.email"),
+                                $allnamefields),
                         )
         );
 

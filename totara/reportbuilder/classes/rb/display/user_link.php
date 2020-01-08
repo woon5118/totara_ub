@@ -49,18 +49,19 @@ class user_link extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        global $USER, $PAGE, $DB;
+        global $PAGE, $DB;
 
         // Extra fields expected are fields from totara_get_all_user_name_fields_join() and totara_get_all_user_name_fields_join()
         $extrafields = self::get_extrafields_row($row, $column);
         $isexport = ($format !== 'html');
 
         if (isset($extrafields->user_id)) {
-            $fullname = $value;
-        } else {
-            $fullname = fullname($extrafields);
+            debugging('Invalid extra fields detected in report source for user_link display method .', DEBUG_DEVELOPER);
+            // Some ancient legacy stuff.
+            return clean_string($value);
         }
 
+        $fullname = fullname($extrafields);
         if (empty($fullname)) {
             return '';
         }
