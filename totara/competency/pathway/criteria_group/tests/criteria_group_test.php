@@ -458,7 +458,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $this->assertTrue($hook instanceof competency_configuration_changed);
         $this->assertEquals($data->competency->id, $hook->get_competency_id());
         $sink->close();
-
     }
 
     /**

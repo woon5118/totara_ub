@@ -113,13 +113,12 @@ class course_item_helper_testcase extends advanced_testcase {
          * user5 - completes course 4
          */
         course_item_helper::course_completions_updated([
-                $data->users[1]->id => [$data->courses[1]->id],
-                $data->users[2]->id => [$data->courses[1]->id, $data->courses[2]->id],
-                $data->users[3]->id => [$data->courses[3]->id],
-                $data->users[4]->id => [$data->courses[3]->id, $data->courses[4]->id],
-                $data->users[5]->id => [$data->courses[4]->id],
-            ]
-        );
+            $data->users[1]->id => [$data->courses[1]->id],
+            $data->users[2]->id => [$data->courses[1]->id, $data->courses[2]->id],
+            $data->users[3]->id => [$data->courses[3]->id],
+            $data->users[4]->id => [$data->courses[3]->id, $data->courses[4]->id],
+            $data->users[5]->id => [$data->courses[4]->id],
+        ]);
         $this->verify_achievement_changed_hook($hook_sink, [
             $data->users[1]->id => [$criteria[1]->get_id(), $criteria[2]->get_id()],
             $data->users[2]->id => [$criteria[1]->get_id(), $criteria[2]->get_id(), $criteria[3]->get_id()],

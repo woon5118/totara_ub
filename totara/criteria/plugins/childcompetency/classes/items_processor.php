@@ -110,7 +110,8 @@ class items_processor {
             $competency_id,
             configuration_change::CHANGED_CRITERIA,
             $now,
-            true);
+            true
+        );
 
         if (!empty($affected_criteria)) {
             $hook = new criteria_validity_changed($affected_criteria);

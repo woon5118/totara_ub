@@ -121,7 +121,8 @@ class items_processor {
         configuration_change::add_competency_entry(
             $competency_id,
             configuration_change::CHANGED_CRITERIA,
-            $now, true);
+            $now, true
+        );
 
         if (!empty($affected_criteria)) {
             $hook = new criteria_validity_changed($affected_criteria);

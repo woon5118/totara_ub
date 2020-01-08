@@ -222,7 +222,6 @@ abstract class pathway {
         if ($this->get_id()) {
             $record->id = $this->get_id();
             $DB->update_record('totara_competency_pathway', $record);
-
         } else {
             $this->id = $DB->insert_record('totara_competency_pathway', $record);
         }

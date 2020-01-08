@@ -165,7 +165,8 @@ class criteria_linkedcourses_course_observer_testcase extends advanced_testcase 
 
         course_observer::course_completion_changed($cc_event);
         $this->verify_achievement_changed_hook($hook_sink,
-            [$data->users[1]->id => [$data->criteria[1]->get_id(), $data->criteria[2]->get_id()]]);
+            [$data->users[1]->id => [$data->criteria[1]->get_id(), $data->criteria[2]->get_id()]]
+        );
 
         $event_sink->close();
         $hook_sink->close();

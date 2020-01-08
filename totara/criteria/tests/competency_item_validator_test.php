@@ -40,7 +40,7 @@ class totara_criteria_competency_item_validator_testcase extends advanced_testca
         /** @var totara_criteria_generator $criteria_generator */
         $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
-        $course = $this->getDataGenerator()->create_course(['enablecompletion'=> true]);
+        $course = $this->getDataGenerator()->create_course(['enablecompletion' => true]);
         $criterion = $criteria_generator->create_coursecompletion(['courseids' => [$course->id]]);
 
         // Competency without criteria
