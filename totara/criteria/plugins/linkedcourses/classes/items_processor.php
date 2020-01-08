@@ -118,7 +118,10 @@ class items_processor {
         // Dump the configuration history and log the configuration change
         $config = new achievement_configuration(new competency_entitiy($competency_id));
         $config->save_configuration_history($now, $configuration_dump);
-        configuration_change::add_competency_entry($competency_id, configuration_change::CHANGED_CRITERIA, $now);
+        configuration_change::add_competency_entry(
+            $competency_id,
+            configuration_change::CHANGED_CRITERIA,
+            $now, true);
 
         if (!empty($affected_criteria)) {
             $hook = new criteria_validity_changed($affected_criteria);

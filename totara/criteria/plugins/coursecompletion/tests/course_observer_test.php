@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
- * @package totara_criteria
+ * @package criteria_coursecompletion
  */
 
 use core\event\course_completed;

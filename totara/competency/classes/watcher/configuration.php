@@ -23,25 +23,16 @@
 
 namespace totara_competency\watcher;
 
-
-use coding_exception;
 use totara_competency\aggregation_users_table;
-use totara_competency\hook\pathways_created;
-use totara_competency\hook\pathways_deleted;
-use totara_competency\hook\pathways_updated;
-use totara_core\hook\base;
+use totara_competency\hook\competency_configuration_changed;
 
-class pathway {
+class configuration {
 
     /**
-     * @param pathways_created|pathways_updated|pathways_deleted $hook
+     * @param competency_configuration_changed
      * @throws \coding_exception
      */
-    public static function pathway_configuration_changed(base $hook) {
-        if (!$hook instanceof pathways_created && !$hook instanceof pathways_updated && !$hook instanceof pathways_deleted) {
-            throw new coding_exception('Expected pathways_created, pathways_updated or pathways_deleted hook');
-        }
-
+    public static function configuration_changed(competency_configuration_changed $hook) {
         $competency_id = $hook->get_competency_id();
         (new aggregation_users_table())->queue_all_assigned_users_for_aggregation($competency_id);
     }

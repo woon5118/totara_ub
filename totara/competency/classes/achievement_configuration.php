@@ -30,8 +30,7 @@ use totara_competency\entities\competency;
 use totara_competency\entities\configuration_change;
 use totara_competency\entities\configuration_history;
 use totara_competency\entities\scale_aggregation;
-use totara_competency\hook\pathways_created;
-use totara_competency\hook\pathways_deleted;
+use totara_competency\hook\competency_configuration_changed;
 
 /**
  * Class containing all relvant configuration information for a specific competency
@@ -161,15 +160,14 @@ class achievement_configuration {
         }
 
         if (!empty($pathway_ids)) {
-            $hook = new pathways_deleted($this->competency->id, $pathway_ids);
+            $hook = new competency_configuration_changed($this->competency->id);
             $hook->execute();
 
             // Assigned users will be queued through competency's watcher of pathways_deleted
             configuration_change::add_competency_entry(
                 $this->competency->id,
                 configuration_change::CHANGED_CRITERIA,
-                $action_time,
-                false
+                $action_time
             );
         }
 
@@ -202,15 +200,15 @@ class achievement_configuration {
         }
 
         if (!empty($pathway_ids)) {
-            $hook = new pathways_created($this->competency->id, $pathway_ids);
+            $hook = new competency_configuration_changed($this->competency->id, $pathway_ids);
+            $hook->execute();
 
             // TODO: Should we maybe not log this if no action_time is provided to cater for the case
             //       when this is called for new competencies??
             configuration_change::add_competency_entry(
                 $this->competency->id,
                 configuration_change::CHANGED_CRITERIA,
-                $action_time,
-                false
+                $action_time
             );
         }
 
@@ -251,6 +249,9 @@ class achievement_configuration {
             $aggregation->type = $type;
             $aggregation->timemodified = time();
             $aggregation->save();
+
+            $hook = new competency_configuration_changed($this->competency->id);
+            $hook->execute();
 
             configuration_change::add_competency_entry(
                 $this->competency->id,

@@ -23,38 +23,22 @@
 
 namespace totara_competency\hook;
 
-use totara_competency\entities\pathway as pathway_entity;
 use totara_core\hook\base;
 
-class pathways_updated extends base {
-
-    /** @var int */
-    protected $competency_id;
+class competency_validity_changed extends base {
 
     /** @var int[] */
-    protected $pathway_ids;
+    protected $competency_ids;
 
     /**
-     * @param int $competency_id;
-     * @param array $pathway_ids
+     * @param int[] $competency_id
      */
-    public function __construct(int $competency_id, array $pathway_ids) {
-        $this->competency_id = $competency_id;
-        $this->pathway_ids = $pathway_ids;
+    public function __construct(array $competency_ids) {
+        $this->competency_ids = $competency_ids;
     }
 
-    /**
-     * @return int
-     */
-    public function get_competency_id(): int {
-        return $this->competency_id;
-    }
-
-    /**
-     * @return int[]
-     */
-    public function get_pathway_ids(): array {
-        return $this->pathway_ids;
+    public function get_competency_ids(): array {
+        return $this->competency_ids;
     }
 
 }

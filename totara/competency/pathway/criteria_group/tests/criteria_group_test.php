@@ -28,9 +28,7 @@ use pathway_criteria_group\criteria_group;
 use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
 use totara_competency\entities\competency;
 use totara_competency\entities\scale;
-use totara_competency\hook\pathways_created;
-use totara_competency\hook\pathways_deleted;
-use totara_competency\hook\pathways_updated;
+use totara_competency\hook\competency_configuration_changed;
 use totara_criteria\criterion;
 
 class pathway_criteria_group_testcase extends \advanced_testcase {
@@ -143,11 +141,10 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
 
         $hooks = $sink->get_hooks();
         $this->assertSame(1, count($hooks));
-        /** @var pathways_created $hook */
+        /** @var competency_configuration_changed $hook */
         $hook = reset($hooks);
-        $this->assertTrue($hook instanceof pathways_created);
+        $this->assertTrue($hook instanceof competency_configuration_changed);
         $this->assertEquals($data->competency->id, $hook->get_competency_id());
-        $this->assertEqualsCanonicalizing([$pw_id], $hook->get_pathway_ids());
 
         // Check the saved data
         $this->validate_num_rows([
@@ -244,11 +241,10 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         // Configuration changed - expecting hook
         $hooks = $sink->get_hooks();
         $this->assertSame(1, count($hooks));
-        /** @var pathways_updated $hook */
+        /** @var competency_configuration_changed $hook */
         $hook = reset($hooks);
-        $this->assertTrue($hook instanceof pathways_updated);
+        $this->assertTrue($hook instanceof competency_configuration_changed);
         $this->assertEquals($data->competency->id, $hook->get_competency_id());
-        $this->assertEqualsCanonicalizing([$instance->get_id()], $hook->get_pathway_ids());
         $sink->clear();
 
         // Add one criterion, remove another
@@ -271,9 +267,9 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
 
         $hooks = $sink->get_hooks();
         $this->assertSame(1, count($hooks));
-        /** @var pathways_updated $hook */
+        /** @var competency_configuration_changed $hook */
         $hook = reset($hooks);
-        $this->assertTrue($hook instanceof pathways_updated);
+        $this->assertTrue($hook instanceof competency_configuration_changed);
         $sink->clear();
 
 
@@ -305,9 +301,9 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
 
         $hooks = $sink->get_hooks();
         $this->assertSame(1, count($hooks));
-        /** @var pathways_updated $hook */
+        /** @var competency_configuration_changed $hook */
         $hook = reset($hooks);
-        $this->assertTrue($hook instanceof pathways_updated);
+        $this->assertTrue($hook instanceof competency_configuration_changed);
         $sink->close();
     }
 
@@ -457,11 +453,10 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
 
         $hooks = $sink->get_hooks();
         $this->assertSame(1, count($hooks));
-        /** @var pathways_deleted $hook */
+        /** @var competency_configuration_changed $hook */
         $hook = reset($hooks);
-        $this->assertTrue($hook instanceof pathways_deleted);
+        $this->assertTrue($hook instanceof competency_configuration_changed);
         $this->assertEquals($data->competency->id, $hook->get_competency_id());
-        $this->assertEqualsCanonicalizing([$instance->get_id()], $hook->get_pathway_ids());
         $sink->close();
 
     }

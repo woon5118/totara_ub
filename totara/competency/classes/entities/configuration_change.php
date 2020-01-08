@@ -37,7 +37,7 @@ class configuration_change extends entity {
         int $competency_id,
         string $change_type,
         ?int $action_time = null,
-        bool $queue = true
+        bool $queue = false
     ): configuration_change {
         $valid_types = [
             self::CHANGED_AGGREGATION,

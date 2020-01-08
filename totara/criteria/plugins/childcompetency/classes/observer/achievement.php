@@ -28,6 +28,7 @@ use totara_competency\event\assignment_user_archived;
 use totara_competency\event\assignment_user_assigned;
 use totara_competency\event\assignment_user_unassigned;
 use totara_criteria\entities\criteria_item as item_entity;
+use totara_criteria\entities\criterion as criterion_entity;
 use totara_criteria\hook\criteria_achievement_changed;
 
 class achievement {
@@ -57,14 +58,11 @@ class achievement {
      * @param int $child_competency_id
      */
     private static function trigger_parent_criteria_achievement_changed(int $user_id, int $child_competency_id) {
-        // TODO performance - check query performance, group by vs. array_unique
-        $criteria_ids = item_entity::repository()
-            ->select('criterion_id')
-            ->where('item_type', 'competency')
-            ->where('item_id', $child_competency_id)
-            ->group_by('criterion_id')
+        $criteria_ids = criterion_entity::repository()
+            ->from_item_ids('competency', $child_competency_id)
+            ->where('plugin_type', 'childcompetency')
             ->get()
-            ->pluck('criterion_id');
+            ->pluck('id');
 
         if (!empty($criteria_ids)) {
             $hook = new criteria_achievement_changed([$user_id => $criteria_ids]);

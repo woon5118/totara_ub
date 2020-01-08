@@ -38,4 +38,21 @@ class criterion_repository extends repository {
             'competency' => new criterion_competency(),
         ];
     }
+
+    /**
+     * Return all criteria that contains one or more of the requested items
+     *
+     * @param string $item_type
+     * @param int|array $item_ids
+     * @return $this
+     */
+    public function from_item_ids(string $item_type, $item_ids): repository {
+        if (!$this->has_join(criterion_item::TABLE, 'criterion_item')) {
+            $this->join(criterion_item::TABLE, 'id', 'criterion_id');
+        }
+        $join_alias = $this->get_join(criterion_item::TABLE)->get_table()->get_alias();
+
+        return $this->where("{$join_alias}.item_type", $item_type)
+            ->where("{$join_alias}.item_id", $item_ids);
+    }
 }

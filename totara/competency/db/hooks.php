@@ -21,24 +21,14 @@
  * @package criteria_childcompetency
  */
 
-use totara_competency\hook\pathways_created;
-use totara_competency\hook\pathways_deleted;
-use totara_competency\hook\pathways_updated;
-use totara_competency\watcher\pathway as pathway_watcher;
+use totara_competency\hook\competency_configuration_changed;
+use totara_competency\watcher\configuration as configuration_watcher;
 
 defined('MOODLE_INTERNAL') || die();
 
 $watchers = [
     [
-        'hookname' => pathways_created::class,
-        'callback' => pathway_watcher::class.'::pathway_configuration_changed',
-    ],
-    [
-        'hookname' => pathways_updated::class,
-        'callback' => pathway_watcher::class.'::pathway_configuration_changed',
-    ],
-    [
-        'hookname' => pathways_deleted::class,
-        'callback' => pathway_watcher::class.'::pathway_configuration_changed',
+        'hookname' => competency_configuration_changed::class,
+        'callback' => configuration_watcher::class.'::configuration_changed',
     ],
 ];
