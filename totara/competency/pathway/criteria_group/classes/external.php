@@ -219,7 +219,7 @@ class external extends \external_api {
         // TODO: Should this maybe be moved to the pathway / criteria_group instance
         // If there are no criteria linked to this pathway anymore, delete the pathway
         if (empty($criteria)) {
-            $pathway->delete(true);
+            $pathway->delete();
 
             // TODO: This is now needed as we have no endpoint resulting in a call to pathway_delete.
             //       Ultimately we want all logging and history dumping to happen only in achievement_configuration

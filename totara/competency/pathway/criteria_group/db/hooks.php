@@ -21,7 +21,7 @@
  * @package pathway_criteria_group
  */
 
-use pathway_criteria_group\watcher\criteria;
+use pathway_criteria_group\watcher\criteria as criteria_watcher;
 use totara_criteria\hook\criteria_achievement_changed;
 use totara_criteria\hook\criteria_validity_changed;
 
@@ -30,10 +30,10 @@ defined('MOODLE_INTERNAL') || die();
 $watchers = [
     [
         'hookname' => criteria_achievement_changed::class,
-        'callback' => criteria::class.'::achievement_changed',
+        'callback' => criteria_watcher::class.'::achievement_changed',
     ],
     [
         'hookname' => criteria_validity_changed::class,
-        'callback' => criteria::class.'::validity_changed',
+        'callback' => criteria_watcher::class.'::validity_changed',
     ],
 ];

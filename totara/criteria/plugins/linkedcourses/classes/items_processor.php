@@ -128,11 +128,6 @@ class items_processor {
             $hook->execute();
         }
 
-        if (!empty($affected_criteria)) {
-            $hook = new criteria_validity_changed($affected_criteria);
-            $hook->execute();
-        }
-
         $transaction->allow_commit();
     }
 

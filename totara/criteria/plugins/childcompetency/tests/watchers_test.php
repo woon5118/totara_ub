@@ -29,7 +29,7 @@ use totara_competency\entities\competency as competency_entity;
 use totara_competency\entities\competency_achievement as competency_achievement_entity;
 use totara_competency\entities\scale;
 use totara_competency\hook\competency_achievement_updated;
-use totara_competency\hook\pathways_created;
+use totara_competency\hook\competency_configuration_changed;
 use totara_criteria\criterion;
 use totara_criteria\entities\criteria_item as item_entity;
 use totara_criteria\entities\criteria_item_record as item_record_entity;
@@ -142,13 +142,12 @@ class criteria_childcompetency_watchers_testcase extends advanced_testcase {
         $this->assertSame(1, count($hooks));
         /** @var pathways_created $hook */
         $hook = reset($hooks);
-        $this->assertTrue($hook instanceof pathways_created);
+        $this->assertTrue($hook instanceof competency_configuration_changed);
         $this->assertEquals($child->id, $hook->get_competency_id());
-        $this->assertEqualsCanonicalizing([$child_pw->get_id()], $hook->get_pathway_ids());
         $hook_sink->clear();
 
         // Child competency - not proficient - should not result in validity change
-        competency_wathcer::pathway_configuration_changed($hook);
+        competency_wathcer::configuration_changed($hook);
         $this->assertSame(0, $hook_sink->count());
 
         // Now add a pathway to the child that will allow the user to become proficient
@@ -159,11 +158,11 @@ class criteria_childcompetency_watchers_testcase extends advanced_testcase {
         $hooks = $hook_sink->get_hooks();
         $this->assertSame(1, count($hooks));
         $hook = reset($hooks);
-        $this->assertTrue($hook instanceof pathways_created);
+        $this->assertTrue($hook instanceof competency_configuration_changed);
         $hook_sink->clear();
 
         // Child competency now proficient - expect parent validity change
-        competency_wathcer::pathway_configuration_changed($hook);
+        competency_wathcer::configuration_changed($hook);
 
         $hooks = $hook_sink->get_hooks();
         $this->assertSame(1, count($hooks));

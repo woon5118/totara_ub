@@ -32,9 +32,7 @@ use totara_competency\entities\competency;
 use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\scale_value;
-use totara_competency\hook\pathways_created;
-use totara_competency\hook\pathways_deleted;
-use totara_competency\hook\pathways_updated;
+use totara_competency\hook\competency_configuration_changed;
 
 /**
  * Base class for pathway plugins
@@ -225,20 +223,16 @@ abstract class pathway {
             $record->id = $this->get_id();
             $DB->update_record('totara_competency_pathway', $record);
 
-            if ($execute_hook) {
-                $hook = new pathways_updated($this->competency->id, [$this->id]);
-                $hook->execute();
-            }
         } else {
             $this->id = $DB->insert_record('totara_competency_pathway', $record);
-
-            if ($execute_hook) {
-                $hook = new pathways_created($this->competency->id, [$this->id]);
-                $hook->execute();
-            }
         }
 
         $this->saved_valid = $this->valid;
+
+        if ($execute_hook) {
+            $hook = new competency_configuration_changed($this->competency->id);
+            $hook->execute();
+        }
 
         return $this;
     }
@@ -299,7 +293,7 @@ abstract class pathway {
     final public function delete(bool $execute_hook = true) {
         if ($this->is_active()) {
             if ($execute_hook) {
-                $hook = new pathways_deleted($this->competency->id, [$this->id]);
+                $hook = new competency_configuration_changed($this->competency->id);
                 $hook->execute();
             }
             return $this->archive(false);
@@ -518,6 +512,14 @@ abstract class pathway {
         return $this;
     }
 
+    /**
+     * @return bool
+     */
+    public function is_validated(): bool {
+        return $this->validated;
+    }
+
+
 
     /**
      * Get pathway classification (Single or Multi value)
@@ -588,7 +590,7 @@ abstract class pathway {
      * @return $this
      */
     final public function validate(): pathway {
-        if ($this->validated) {
+        if ($this->is_validated()) {
             return $this;
         }
 
