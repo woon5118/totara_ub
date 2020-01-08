@@ -17,13 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Brendan Cox <brendan.cox@totaralearning.com>
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
- * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package criteria_coursecompletion
+ * @package criteria_linkedcourses
  */
 
-namespace criteria_coursecompletion\observer;
+namespace criteria_linkedcourses\observer;
 
 use coding_exception;
 use core\event\base;
@@ -45,7 +43,7 @@ class course {
             throw new coding_exception('Expected course_completed or course_completion_edited event');
         }
 
-        course_item_helper::course_completions_updated([$event->relateduserid => [$event->courseid]], 'coursecompletion');
+        course_item_helper::course_completions_updated([$event->relateduserid => [$event->courseid]], 'linkedcourses');
     }
 
     /**
@@ -66,7 +64,7 @@ class course {
             $user_courses[$user_id][] = $course_id;
         }
 
-        course_item_helper::course_completions_updated($user_courses, 'coursecompletion');
+        course_item_helper::course_completions_updated($user_courses, 'linkedcourses');
     }
 
     /**
@@ -76,7 +74,7 @@ class course {
      * @param course_deleted $event
      */
     public static function course_deleted(course_deleted $event) {
-        course_item_helper::course_deleted($event->objectid, 'coursecompletion');
+        course_item_helper::course_deleted($event->objectid, 'linkedcourses');
     }
 
     /**
@@ -89,7 +87,7 @@ class course {
     public static function course_restored(course_restored $event) {
         $restored_course_id = $event->courseid;
         $original_course_id = $event->other['originalcourseid'] ?? $restored_course_id;
-        course_item_helper::course_restored($original_course_id, $restored_course_id, 'coursecompletion');
+        course_item_helper::course_restored($original_course_id, $restored_course_id, 'linkedcourses');
     }
 
 }
