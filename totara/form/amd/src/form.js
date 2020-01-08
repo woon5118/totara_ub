@@ -855,6 +855,11 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
          */
         this.node = config.el;
 
+        var that = this;
+        require(['core/form_duplicate_prevent'], function(fdp) {
+            fdp.init(that.node);
+        });
+
         /**
          * The id of the form.
          *
