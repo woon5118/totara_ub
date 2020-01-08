@@ -33,6 +33,9 @@ define('TCI_CSV_SEPARATOR', 'comma'); // Default for fgetcsv() although the nami
 define('TCI_CSV_DATE_FORMAT', 'Y-m-d'); // Default date format.
 define('TCI_CSV_ENCODING', 'UTF8'); // Default file encoding.
 
+define('TCI_CSV_GRADE_POINT', 0); //CSV Grade column as points
+define('TCI_CSV_GRADE_PERCENT', 1); // CSV Grade column as percent
+
 /**
  * From 9.0. On upgrade, setting was copied from overrideactivecertification setting, value 0.
  * Imported completion records should be written directly to history, regardless of the state the user is in.
@@ -52,6 +55,18 @@ const COMPLETION_IMPORT_COMPLETE_INCOMPLETE = 2;
  * user's current completion date, otherwise they go into history.
  */
 const COMPLETION_IMPORT_OVERRIDE_IF_NEWER = 1;
+
+/**
+ * From 13.0.
+ * Imported completion records should never mark the user complete.
+ */
+const COMPLETION_IMPORT_NEVER_OVERRIDE = 0;
+
+/**
+ * From 13.0.
+ * Imported completion records should always mark the user complete.
+ */
+const COMPLETION_IMPORT_ALWAYS_OVERRIDE = 3;
 
 /**
  * Returns a 3 character prefix for a temporary file name
@@ -414,6 +429,48 @@ function import_data_checks($importname, $importtime) {
 }
 
 /**
+ * Adjust data imported from the csv file
+ * This function must be called after import_data_checks()
+ *
+ * @global object $DB
+ * @param string $importname name of import
+ * @param int $importtime time of this import
+ * @since Totara 12.14
+ */
+function import_data_adjustments($importname, $importtime) {
+    global $DB, $CFG;
+
+    require_once($CFG->libdir.'/gradelib.php'); // Used for conversion from grade to point
+
+    list($sqlwhere, $stdparams) = get_importsqlwhere($importtime, '');
+
+    $tablename = get_tablename($importname);
+    $columnnames = get_columnnames($importname);
+    $pluginname = 'totara_completionimport_' . $importname;
+    $csvgradeunit = get_default_config($pluginname, 'csvgradeunit', TCI_CSV_GRADE_POINT);
+
+    // The grade field of the totara_compl_import_course table is always point
+    // while the rplgrade field of the course_completions is always percent.
+    if ($csvgradeunit == TCI_CSV_GRADE_PERCENT && in_array($importname, ['course']) && in_array('grade', $columnnames)) {
+        $cache = [];
+        $recs = $DB->get_records_sql(
+            "SELECT id, grade, courseid
+             FROM {{$tablename}}
+             {$sqlwhere}
+             AND courseid != 0
+             AND ". $DB->sql_isnotempty($tablename, 'grade', true, false), $stdparams);
+        foreach ($recs as $rec) {
+            $gradeitem = ($cache[$rec->courseid] = $cache[$rec->courseid] ?? $gradeitem = grade_item::fetch_course_item($rec->courseid));
+            if ($gradeitem !== false) {
+                // Convert percentage to point.
+                $grade = $gradeitem->grademin + (0.01 * grade_floatval($rec->grade) * ($gradeitem->grademax - $gradeitem->grademin));
+                $DB->set_field($tablename, 'grade', $grade, ['id' => $rec->id]);
+            }
+        }
+    }
+}
+
+/**
  * Applies case insensitive matching.
  *
  * Please note this function does not do what you expect.
@@ -469,16 +526,16 @@ function totara_completionimport_apply_case_insensitive_mapping($importname, $im
                 // First try to find the course/certification shortname in course/prog table.
                 $tblname = $importname == 'course' ? $importname : 'prog';
                 $idnumber_like = $DB->sql_like('idnumber', ':' . $idnumber_param, false, false);
-                $sql = "SELECT shortname 
-                          FROM {{$tblname}} 
+                $sql = "SELECT shortname
+                          FROM {{$tblname}}
                          WHERE {$idnumber_like}";
                 $record = $DB->get_record_sql($sql, [$idnumber_param => $idnumber], IGNORE_MULTIPLE);
                 if ($record) {
                     $value = $record->shortname;
                 } else {
                     // No records exists, match the shortname from the first record.
-                    $sql = "SELECT {$shortnamefield} 
-                              FROM {{$tablename}} 
+                    $sql = "SELECT {$shortnamefield}
+                              FROM {{$tablename}}
                                    {$where}";
                     $record = $DB->get_record_sql($sql, $params, IGNORE_MULTIPLE);
                     $value = $record->{$shortnamefield};
@@ -802,6 +859,7 @@ function import_course($importname, $importtime) {
     global $DB, $CFG, $USER;
 
     require_once($CFG->libdir . '/enrollib.php'); // Used for enroling users on courses.
+    require_once($CFG->libdir.'/gradelib.php'); // Used for conversion from point to grade
 
     $errors = array();
     $updateids = array();
@@ -816,7 +874,7 @@ function import_course($importname, $importtime) {
     $coursecompletionlogs = array();
 
     $pluginname = 'totara_completionimport_' . $importname;
-    $overridecurrentcompletion = get_default_config($pluginname, 'overrideactive' . $importname, false);
+    $overridecurrentcompletion = get_default_config($pluginname, 'overrideactive' . $importname, COMPLETION_IMPORT_NEVER_OVERRIDE);
 
     list($sqlwhere, $params) = get_importsqlwhere($importtime);
     $params['enrolname'] = 'manual';
@@ -852,6 +910,7 @@ function import_course($importname, $importtime) {
         $enrolid = 0;
         $currentuser = 0;
         $currentcourse = 0;
+        $cache = [];
 
         foreach ($courses as $course) {
             if (empty($enrolid) || ($enrolid != $course->enrolid) || (($enrolcount % BATCH_INSERT_MAX_ROW_COUNT) == 0)) {
@@ -956,10 +1015,25 @@ function import_course($importname, $importtime) {
                     $timestarted = $timecompleted;
                 }
             }
+
+            // The grade field of the totara_compl_import_course table is always point
+            // while the rplgrade field of the course_completions is always percent.
+            $grade_point = $course->grade;
+            $grade_percent = $grade_point; // Nothing is doable for evidence.
+            if (!empty($course->courseid)) {
+                $gradeitem = ($cache[$course->courseid] = $cache[$course->courseid] ?? $gradeitem = grade_item::fetch_course_item($course->courseid));
+                if ($gradeitem !== false) {
+                    // Convert point to percentage.
+                    $grade_percent = ((grade_floatval($grade_point) - $gradeitem->grademin) * 100) / ($gradeitem->grademax - $gradeitem->grademin);
+                } else {
+                    // Nothing is doable for a non-existent course.
+                }
+            }
+
             // Create completion record.
             $completion = new stdClass();
-            $completion->rpl = get_string('rpl', 'totara_completionimport', $course->grade);
-            $completion->rplgrade = $course->grade;
+            $completion->rpl = get_string('rpl', 'totara_completionimport', $grade_percent);
+            $completion->rplgrade = $grade_percent; // Completion record requires grade as percent.
             $completion->status = COMPLETION_STATUS_COMPLETEVIARPL;
             $completion->timeenrolled = $timeenrolled;
             $completion->timestarted = $timestarted;
@@ -990,20 +1064,38 @@ function import_course($importname, $importtime) {
                     $coursecompletionlogs[] = \core_completion\helper::make_log_record($completion->course, $completion->userid,
                         \core_completion\helper::get_course_completion_log_description($completion,
                             "Current completion created during import due to no existing record"), $USER->id);
-                } else if ($completion->timecompleted >= $course->currenttimecompleted && $overridecurrentcompletion) {
+                } else if ($overridecurrentcompletion == COMPLETION_IMPORT_NEVER_OVERRIDE) {
+                    if ($completion->timecompleted != $course->currenttimecompleted) {
+                        // As long as the timecompleted doesn't match the currenttimecompleted put it in history.
+                        $historyrecord = $completion;
+                    } else {
+                        $coursecompletionlogs[] = \core_completion\helper::make_log_record($completion->course, $completion->userid,
+                            \core_completion\helper::get_course_completion_log_description($completion,
+                                "Record not processed during import due to existing current completion with the same time completed"), $USER->id);
+                    }
+                } else if ($overridecurrentcompletion == COMPLETION_IMPORT_ALWAYS_OVERRIDE) {
                     $deletedcompletions[] = $course->coursecompletionid;
                     $completions[$priorkey] = $completion;
                     $stats[$priorkey] = $stat;
                     $coursecompletionlogs[] = \core_completion\helper::make_log_record($completion->course, $completion->userid,
                         \core_completion\helper::get_course_completion_log_description($completion,
-                            "Current completion deleted and created during import due to newer or same time completed and override setting enabled"), $USER->id);
-                } else if ($completion->timecompleted != $course->currenttimecompleted) {
-                    // As long as the timecompleted doesn't match the currenttimecompleted put it in history.
-                    $historyrecord = $completion;
-                } else {
-                    $coursecompletionlogs[] = \core_completion\helper::make_log_record($completion->course, $completion->userid,
-                        \core_completion\helper::get_course_completion_log_description($completion,
-                            "Record not processed during import due to existing current completion with the same time completed"), $USER->id);
+                            "Current completion deleted and created during import due to override always setting enabled"), $USER->id);
+                } else { // COMPLETION_IMPORT_OVERRIDE_IF_NEWER
+                    if ($completion->timecompleted > $course->currenttimecompleted) {
+                        $deletedcompletions[] = $course->coursecompletionid;
+                        $completions[$priorkey] = $completion;
+                        $stats[$priorkey] = $stat;
+                        $coursecompletionlogs[] = \core_completion\helper::make_log_record($completion->course, $completion->userid,
+                            \core_completion\helper::get_course_completion_log_description($completion,
+                                "Current completion deleted and created during import due to newer completed and override if more recent setting enabled"), $USER->id);
+                    } else if ($completion->timecompleted != $course->currenttimecompleted) {
+                        // As long as the timecompleted doesn't match the currenttimecompleted put it in history.
+                        $historyrecord = $completion;
+                    } else {
+                        $coursecompletionlogs[] = \core_completion\helper::make_log_record($completion->course, $completion->userid,
+                            \core_completion\helper::get_course_completion_log_description($completion,
+                                "Record not processed during import due to existing current completion with the same time completed"), $USER->id);
+                    }
                 }
             } else {
                 $historyrecord = $completion;
@@ -1016,7 +1108,7 @@ function import_course($importname, $importtime) {
                 $history->courseid = $historyrecord->course;
                 $history->userid = $historyrecord->userid;
                 $history->timecompleted = $historyrecord->timecompleted;
-                $history->grade = $historyrecord->rplgrade;
+                $history->grade = $grade_point; // Historical record requires grade as point.
                 if (!array_key_exists($priorhistorykey, $completion_history)) {
                     $params = array(
                         'courseid' => $history->courseid,
@@ -1740,11 +1832,12 @@ function get_config_data($filesource, $importname) {
     $data->csvdelimiter = get_default_config($pluginname, 'csvdelimiter', TCI_CSV_DELIMITER);
     $data->csvseparator = get_default_config($pluginname, 'csvseparator', TCI_CSV_SEPARATOR);
     $data->csvencoding = get_default_config($pluginname, 'csvencoding', TCI_CSV_ENCODING);
+    $data->csvgradeunit = get_default_config($pluginname, 'csvgradeunit', TCI_CSV_GRADE_POINT);
     if ($importname == 'certification') {
         $data->importactioncertification = get_default_config($pluginname, 'importactioncertification', COMPLETION_IMPORT_TO_HISTORY);
     } else {
         $overridesetting = 'overrideactive' . $importname;
-        $data->$overridesetting = get_default_config($pluginname, 'overrideactive' . $importname, 0);
+        $data->$overridesetting = get_default_config($pluginname, $overridesetting, COMPLETION_IMPORT_NEVER_OVERRIDE);
     }
     $forcecaseinsensitive = 'forcecaseinsensitive' . $importname;
     $data->$forcecaseinsensitive = get_default_config($pluginname, 'forcecaseinsensitive' . $importname, 0);
@@ -1796,8 +1889,9 @@ function set_config_data($data, $importname) {
     if ($importname == 'certification') {
         set_config('importactioncertification', $data->importactioncertification, $pluginname);
     } else {
+        set_config('csvgradeunit', $data->csvgradeunit, $pluginname);
         $overridesetting = 'overrideactive' . $importname;
-        set_config('overrideactive' . $importname, $data->$overridesetting, $pluginname);
+        set_config($overridesetting, $data->$overridesetting, $pluginname);
     }
     $forcecaseinsensitive = 'forcecaseinsensitive' . $importname;
     set_config('forcecaseinsensitive' . $importname, $data->$forcecaseinsensitive, $pluginname);

@@ -80,9 +80,9 @@ Feature: Verify course completion data with custom fields can be successfully up
   Scenario: Verify a successful course evidence upload expecting default custom field values to be used and visible in the ROL.
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_evidence_custom_fields_1.csv" file to "Choose course file to upload" filemanager
+    And I upload "totara/completionimport/tests/behat/fixtures/course_evidence_custom_fields_1.csv" file to "Course CSV file to upload" filemanager
     And I set the field "Upload course Default evidence type" to "0"
-    And I click on "Upload" "button" in the "#mform1" "css_element"
+    And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
     Then I should see "CSV import completed"
     And I should see "1 Records created as evidence"
     And I should see "1 Records in total"
@@ -122,9 +122,9 @@ Feature: Verify course completion data with custom fields can be successfully up
     And I press "Save changes"
 
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_evidence_custom_fields_1.csv" file to "Choose course file to upload" filemanager
+    And I upload "totara/completionimport/tests/behat/fixtures/course_evidence_custom_fields_1.csv" file to "Course CSV file to upload" filemanager
     And I set the field "Upload course Default evidence type" to "0"
-    And I click on "Upload" "button" in the "#mform1" "css_element"
+    And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
     Then I should see "CSV import completed"
     And I should see "1 Records created as evidence"
     And I should see "1 Records in total"
@@ -141,9 +141,9 @@ Feature: Verify course completion data with custom fields can be successfully up
   Scenario: Verify a successful course evidence upload overriding default values and visible in the ROL.
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_evidence_custom_fields_2.csv" file to "Choose course file to upload" filemanager
+    And I upload "totara/completionimport/tests/behat/fixtures/course_evidence_custom_fields_2.csv" file to "Course CSV file to upload" filemanager
     And I set the field "Upload course Default evidence type" to "0"
-    And I click on "Upload" "button" in the "#mform1" "css_element"
+    And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
     Then I should see "CSV import completed"
     And I should see "1 Records created as evidence"
     And I should see "1 Records in total"
@@ -163,7 +163,7 @@ Feature: Verify course completion data with custom fields can be successfully up
   Scenario: Verify a course evidence upload fails with an invalid field.
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/course_evidence_custom_fields_3.csv" file to "Choose course file to upload" filemanager
-    And I click on "Upload" "button" in the "#mform1" "css_element"
+    And I upload "totara/completionimport/tests/behat/fixtures/course_evidence_custom_fields_3.csv" file to "Course CSV file to upload" filemanager
+    And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
     Then I should see "Unknown column 'customfield_invalidfield"
     Then I should see "No records were imported"

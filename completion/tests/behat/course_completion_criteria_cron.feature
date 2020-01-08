@@ -41,8 +41,8 @@ Feature: Make sure course completion depending on completion of other course is 
     # Import course completion for the dependent course.
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I set the field "Override current course completions" to "1"
-    And I upload "completion/tests/fixtures/completion_criteria_course_cron.csv" file to "Choose course file to upload" filemanager
-    And I click on "Upload" "button" in the "#mform1" "css_element"
+    And I upload "completion/tests/fixtures/completion_criteria_course_cron.csv" file to "Course CSV file to upload" filemanager
+    And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
     Then I should see "CSV import completed"
     And I should see "1 Records successfully imported as courses"
     # Check that the resulting course is NOT marked complete.

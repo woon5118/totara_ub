@@ -13,10 +13,10 @@ Feature: Certification history can be imported as long as records are considered
       | Certification One | cert1     | 1        |
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_history_similar_records.csv" file to "Choose certification file to upload" filemanager
+    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_history_similar_records.csv" file to "Certification CSV file to upload" filemanager
     And I set the field "Upload certification Default evidence type" to "0"
     And I set the field "Upload certification Import action" to "Save to history"
-    And I click on "Upload" "button" in the "#mform2" "css_element"
+    And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
     Then I should see "CSV import completed"
     And I should see "2 Records successfully imported as certifications"
 
@@ -85,10 +85,10 @@ Feature: Certification history can be imported as long as records are considered
       | Certification One | cert1     | 1        |
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_history_matching_records.csv" file to "Choose certification file to upload" filemanager
+    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_history_matching_records.csv" file to "Certification CSV file to upload" filemanager
     And I set the field "Upload certification Default evidence type" to "0"
     And I set the field "Upload certification Import action" to "Save to history"
-    And I click on "Upload" "button" in the "#mform2" "css_element"
+    And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
     Then I should see "CSV import completed"
 
     When I navigate to "Manage users" node in "Site administration > Users"

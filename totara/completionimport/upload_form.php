@@ -43,18 +43,24 @@ class upload_form extends moodleform {
             case 'course':
                 $upload_label = 'choosecoursefile';
                 $upload_field = 'course_uploadfile';
+                $header_label = 'uploadcourse';
                 $field_aria_label = 'coursefieldarialabel';
                 break;
             case 'certification':
                 $upload_label = 'choosecertificationfile';
                 $upload_field = 'certification_uploadfile';
+                $header_label = 'uploadcertification';
                 $field_aria_label = 'certificationfieldarialabel';
                 break;
             default:
                 $upload_label = 'choosefile';
                 $upload_field = 'uploadfile';
+                $header_label = 'uploadfile';
                 $field_aria_label = 'fieldarialabel';
         }
+
+        // Prepend a reasonable CSS class to 'mform'.
+        $mform->updateAttributes(['class' => "totara_completionimport__{$header_label}_form " . $mform->getAttribute('class')]);
 
         $upload_label = get_string($upload_label, 'totara_completionimport');
 
@@ -62,6 +68,44 @@ class upload_form extends moodleform {
         $mform->setType('id', PARAM_INT);
         $mform->addElement('hidden', 'filesource');
         $mform->setType('filesource', PARAM_INT);
+
+        if ($data->showheader ?? false) {
+            $mform->addElement('header', 'uploadheader', get_string($header_label, 'totara_completionimport'));
+        }
+
+        if ($data->showdescription ?? false) {
+            // Get any evidence custom fields.
+            $evidence_customfields = get_evidence_customfields();
+            $uploadintro = '';
+            $uploadcustomfieldsintro = '';
+
+            if ($data->importname == 'course') {
+                $columnnames = implode(',', get_columnnames('course'));
+                $uploadintro = get_string('uploadcourseintro', 'totara_completionimport', $columnnames);
+
+                // If any available evidence custom fields, show them as a option.
+                if ($evidence_customfields) {
+                    $columnnames = implode(',', $evidence_customfields);
+                    $uploadcustomfieldsintro = get_string('uploadcoursecustomfieldsintro', 'totara_completionimport', $columnnames);
+                }
+            } else if ($data->importname == 'certification') {
+                $columnnames = implode(',', get_columnnames('certification'));
+                $uploadintro = get_string('uploadcertificationintro', 'totara_completionimport', $columnnames);
+
+                // If any available evidence custom fields, show them as a option.
+                if ($evidence_customfields) {
+                    $columnnames = implode(',', $evidence_customfields);
+                    $uploadcustomfieldsintro = get_string('uploadcoursecustomfieldsintro', 'totara_completionimport', $columnnames);
+                }
+            }
+
+            if ($uploadintro !== '') {
+                $mform->addElement('html', \html_writer::tag('p', format_text($uploadintro, FORMAT_MOODLE, ['para' => false])));
+            }
+            if ($uploadcustomfieldsintro !== '') {
+                $mform->addElement('html', \html_writer::tag('p', format_text($uploadcustomfieldsintro, FORMAT_MOODLE, ['para' => false])));
+            }
+        }
 
         if ($data->filesource == TCI_SOURCE_EXTERNAL) {
             $sourcefilegroup = array();
@@ -120,6 +164,17 @@ class upload_form extends moodleform {
             array('aria-label' => get_string($field_aria_label, 'totara_completionimport', get_string('csvdateformat', 'totara_completionimport'))));
         $mform->setType('csvdateformat', PARAM_TEXT);
 
+        if (in_array($data->importname, ['course'])) {
+            $selectoptions = [
+                TCI_CSV_GRADE_POINT => get_string('csvgradeunit_point', 'totara_completionimport'),
+                TCI_CSV_GRADE_PERCENT => get_string('csvgradeunit_percent', 'totara_completionimport'),
+            ];
+            $gradeunitstr = get_string('csvgradeunit', 'totara_completionimport');
+            $mform->addElement('select', 'csvgradeunit', $gradeunitstr, $selectoptions,
+                array('aria-label' => get_string($field_aria_label, 'totara_completionimport', get_string('csvgradeunit', 'totara_completionimport'))));
+            $mform->setDefault('csvgradeunit', TCI_CSV_GRADE_POINT);
+        }
+
         // Function get_delimiter_list() actually returns the list of separators as in "comma *separated* values".
         $separators = csv_import_reader::get_delimiter_list();
         $mform->addElement('select', 'csvseparator', get_string('csvseparator', 'totara_completionimport'), $separators,
@@ -155,9 +210,16 @@ class upload_form extends moodleform {
             $mform->setType('importactioncertification', PARAM_INT);
             $mform->addHelpButton('importactioncertification', 'importactioncertification', 'totara_completionimport');
         } else {
-            $overrideactivestr = get_string('overrideactive' . $data->importname, 'totara_completionimport');
-            $mform->addElement('advcheckbox', 'overrideactive' . $data->importname, $overrideactivestr, '',
+            $selectoptions = [
+                COMPLETION_IMPORT_NEVER_OVERRIDE => get_string('overrideactivecourse_no', 'totara_completionimport'),
+                COMPLETION_IMPORT_ALWAYS_OVERRIDE => get_string('overrideactivecourse_yes', 'totara_completionimport'),
+                COMPLETION_IMPORT_OVERRIDE_IF_NEWER => get_string('overrideactivecourse_renew', 'totara_completionimport')
+            ];
+            $overrideactivesetting = 'overrideactive' . $data->importname;
+            $overrideactivestr = get_string($overrideactivesetting, 'totara_completionimport');
+            $mform->addElement('select', $overrideactivesetting, $overrideactivestr, $selectoptions,
                 array('aria-label' => get_string($field_aria_label, 'totara_completionimport', get_string('overrideactive'.$data->importname, 'totara_completionimport'))));
+            $mform->addHelpButton($overrideactivesetting, $overrideactivesetting, 'totara_completionimport');
         }
 
         $mform->addElement('advcheckbox', 'forcecaseinsensitive'.$data->importname, get_string('caseinsensitive'.$data->importname, 'totara_completionimport'), '',
@@ -165,7 +227,12 @@ class upload_form extends moodleform {
         $mform->addHelpButton('forcecaseinsensitive'.$data->importname, 'caseinsensitive'.$data->importname, 'totara_completionimport');
         $mform->setAdvanced('forcecaseinsensitive'.$data->importname);
 
-        $this->add_action_buttons(false, get_string('upload'));
+        if ($this->showheader ?? false) {
+            // Manually add the upload button because add_action_buttons() closes the fieldset.
+            $mform->addElement('submit', 'submitbutton', get_string('submit', 'totara_completionimport'));
+        } else {
+            $this->add_action_buttons(false, get_string('submit', 'totara_completionimport'));
+        }
 
         $this->set_data($data);
     }

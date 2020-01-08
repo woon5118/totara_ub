@@ -90,6 +90,7 @@ class csv_import {
         }
         $DB->insert_records_via_batch($tablename, $import);
         import_data_checks($importname, $importtime);
+        import_data_adjustments($importname, $importtime);
 
         // Start transaction, we are dealing with live data now...
         $transaction = $DB->start_delegated_transaction();

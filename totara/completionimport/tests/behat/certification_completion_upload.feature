@@ -14,10 +14,10 @@ Feature: Verify certification completion data can be successfully uploaded.
   Scenario: Verify a successful simple certification completion upload.
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_1.csv" file to "Choose certification file to upload" filemanager
+    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_1.csv" file to "Certification CSV file to upload" filemanager
     And I set the field "Upload certification Default evidence type" to "0"
     And I set the field "Upload certification Import action" to "Certify uncertified users"
-    And I click on "Upload" "button" in the "#mform2" "css_element"
+    And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
     Then I should see "CSV import completed"
     And I should see "1 Records successfully imported as certifications"
     And I should see "1 Records created as evidence"
@@ -55,12 +55,12 @@ Feature: Verify certification completion data can be successfully uploaded.
     Then I should see "CUSTOM - Description"
 
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_1.csv" file to "Choose certification file to upload" filemanager
+    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_1.csv" file to "Certification CSV file to upload" filemanager
     And I set the field "Upload certification Default evidence type" to "0"
     And I set the field "Upload certification Evidence field for completion date" to "CUSTOM - Date completed"
     And I set the field "Upload certification Evidence field for the description" to "CUSTOM - Description"
     And I set the field "Upload certification Import action" to "Certify uncertified users"
-    And I click on "Upload" "button" in the "#mform2" "css_element"
+    And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
     Then I should see "CSV import completed"
     And I should see "1 Records successfully imported as certifications"
     And I should see "1 Records created as evidence"
@@ -83,12 +83,12 @@ Feature: Verify certification completion data can be successfully uploaded.
   Scenario: Verify a successful simple certification completion upload without specifying custom fields to store evidence.
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_1.csv" file to "Choose certification file to upload" filemanager
+    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_1.csv" file to "Certification CSV file to upload" filemanager
     And I set the field "Upload certification Default evidence type" to "0"
     And I set the field "Upload certification Evidence field for completion date" to "Select an evidence completion date field"
     And I set the field "Upload certification Evidence field for the description" to "Select an evidence description field"
     And I set the field "Upload certification Import action" to "Certify uncertified users"
-    And I click on "Upload" "button" in the "#mform2" "css_element"
+    And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
     Then I should see "CSV import completed"
     And I should see "1 Records successfully imported as certifications"
     And I should see "1 Records created as evidence"
@@ -109,10 +109,10 @@ Feature: Verify certification completion data can be successfully uploaded.
   Scenario: Verify a successful certification completion upload specifying that no evidence should be created.
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_1.csv" file to "Choose certification file to upload" filemanager
+    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_1.csv" file to "Certification CSV file to upload" filemanager
     And I set the field "Upload certification Default evidence type" to "-1"
     And I set the field "Upload certification Import action" to "Certify uncertified users"
-    And I click on "Upload" "button" in the "#mform2" "css_element"
+    And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
     Then I should see "CSV import completed"
     And I should see "1 Records with data errors - these were ignored"
     And I should see "1 Records successfully imported as certifications"
@@ -131,9 +131,9 @@ Feature: Verify certification completion data can be successfully uploaded.
   Scenario: Verify a certification completion import csv with incorrect columns shows an error
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
-    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_badcolumns.csv" file to "Choose certification file to upload" filemanager
+    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_badcolumns.csv" file to "Certification CSV file to upload" filemanager
     And I set the field "Upload certification Import action" to "Certify uncertified users"
-    And I click on "Upload" "button" in the "#mform2" "css_element"
+    And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
     Then I should see "There were errors while importing the certifications"
     And I should see "Unknown column 'badcolumn'"
     And I should see "Missing required column 'duedate'"

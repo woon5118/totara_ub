@@ -52,9 +52,9 @@ $string['certificationexpired'] = 'Import certification expired, skipping import
 $string['certificationfieldarialabel'] = 'Upload certification {$a}';
 $string['certificationloglifetime'] = 'Keep certification completion upload logs for';
 $string['certificationloglifetime_desc'] = 'This specifies the length of time to keep certification completion upload logs. Logs that are older than this will be automatically deleted.';
-$string['choosefile'] = 'Choose file to upload';
-$string['choosecoursefile'] = 'Choose course file to upload';
-$string['choosecertificationfile'] = 'Choose certification file to upload';
+$string['choosefile'] = 'File to upload';
+$string['choosecoursefile'] = 'Course CSV file to upload';
+$string['choosecertificationfile'] = 'Certification CSV file to upload';
 $string['clearembeddedfilters'] = 'Click here to remove embedded filters';
 $string['cleancertificationcompletionuploadlogstask'] = 'Cleanup certification completion upload logs';
 $string['cleancoursecompletionuploadlogstask'] = 'Cleanup course completion upload logs';
@@ -74,6 +74,9 @@ $string['creategenericevidence'] = 'Create generic evidence';
 $string['csvdateformat'] = 'CSV Date format';
 $string['csvdelimiter'] = 'CSV Text Delimited with';
 $string['csvencoding'] = 'CSV File encoding';
+$string['csvgradeunit'] = 'CSV Grade format';
+$string['csvgradeunit_percent'] = 'Percentage';
+$string['csvgradeunit_point'] = 'Real';
 $string['csvimportdone'] = 'CSV import completed';
 $string['csvimportfailed'] = 'Failed to import the CSV file';
 $string['csvseparator'] = 'CSV Values separated by';
@@ -100,19 +103,19 @@ $string['evidence_shortname_course'] = 'Completed course : {$a}';
 $string['evidence_idnumber_certification'] = 'Completed certification ID : {$a}';
 $string['evidence_idnumber_course'] = 'Completed course ID : {$a}';
 $string['evidencedescriptionfield'] = 'Evidence field for the description';
-$string['evidencedescriptionfield_help'] = 'Any courses or certificates that can\'t be found will be added as evidence in the record of learning.
+$string['evidencedescriptionfield_help'] = 'Any courses or certificates that can\'t be found will be added as evidence in the evidence bank.
 
 Please choose a text evidence custom field to store a description of the created evidence.
 
-If the CVS file has a column specifying the custom field directly, this value will be used instead.';
+If the CSV file has a column specifying the custom field directly, this value will be used instead.';
 $string['evidencedatefield'] = 'Evidence field for completion date';
-$string['evidencedatefield_help'] = 'Any courses or certificates that can\'t be found will be added as evidence in the record of learning.
+$string['evidencedatefield_help'] = 'Any courses or certificates that can\'t be found will be added as evidence in the evidence bank.
 
 Please choose a date/time evidence custom field to store the completiondate value.
 
-If the CVS file has a column specifying the custom field directly, this value will be used instead.';
+If the CSV file has a column specifying the custom field directly, this value will be used instead.';
 $string['evidencetype'] = 'Default evidence type';
-$string['evidencetype_help'] = 'Any courses or certificates that can\'t be found can be added as evidence in the record of learning.
+$string['evidencetype_help'] = 'Any courses or certificates that can\'t be found can be added as evidence in the evidence bank.
 
 If you do not want any evidence to be created by this import, select \'Do not create evidence\'.
 
@@ -120,7 +123,7 @@ Otherwise, please choose the default evidence type you wish to use.';
 $string['fieldarialabel'] = '{$a}';
 $string['fieldcountmismatch'] = 'Field count mismatch';
 $string['fileisinuse'] = 'File is currently being used elsewhere : {$a}';
-$string['sourcefile'] = 'Source file name';
+$string['sourcefile'] = 'CSV file name';
 $string['sourcefile_help'] = 'Please enter the file name and full path name to a file on the server.
 
 eg: /var/sitedata/csvimport/course.csv
@@ -128,7 +131,7 @@ eg: /var/sitedata/csvimport/course.csv
 This option allows you to upload a file externally via FTP rather than using a form via HTTP.
 
 Please note the original file will be moved and deleted during the import process.';
-$string['sourcefilerequired'] = 'Source file name is required';
+$string['sourcefilerequired'] = 'CSV file name is required';
 $string['importactioncertification'] = 'Import action';
 $string['importactioncertification_help'] = 'Choose which action should occur with the imported records.
 
@@ -173,7 +176,7 @@ $string['importtotal'] = '{$a} Records in total';
 $string['invalidcompletiondate'] = 'Invalid completion date';
 $string['invalidfilenames'] = 'These are invalid filenames and will be ignored : {$a}';
 $string['invalidfilesource'] = 'Invalid file source setting {$a}';
-$string['missingfields'] = 'These fields are missing, please check the source csv files :';
+$string['missingfields'] = 'These fields are missing, please check the source CSV files :';
 $string['missingrequiredcolumn'] = 'Missing required column \'{$a->columnname}\'';
 $string['nomanualenrol'] = 'Course needs to have manual enrol';
 $string['nousername'] = 'No user name';
@@ -183,7 +186,27 @@ $string['nomatchingcourse'] = 'No matching course';
 $string['nothingtoimport'] = 'No pending files to import';
 $string['overrideactivecertification'] = 'Override active certifications';
 $string['overrideactivecourse'] = 'Override current course completions';
+$string['overrideactivecourse_help'] = 'Choose which action should occur with the imported records.
+
+**Never**:
+
+* If completion times match existing records, do nothing.
+* Otherwise, add to historic completion records.
+
+**Always**:
+
+* Override existing records.
+
+**If more recent**:
+
+* If completion times are more recent than existing records, override them.
+* If completion times match existing records, do nothing.
+* If completion times are older than existing records, add to historic completion records.';
+$string['overrideactivecourse_no'] = 'Never';
+$string['overrideactivecourse_renew'] = 'If more recent';
+$string['overrideactivecourse_yes'] = 'Always';
 $string['pluginname'] = 'Completion History Import';
+$string['pluginheading'] = 'Upload Completion Records';
 $string['report_certification'] = 'Certification import report';
 $string['report_course'] = 'Course import report';
 $string['resetimport'] = 'Reset report data';
@@ -198,39 +221,33 @@ $string['runimport'] = 'Run the import';
 $string['selectanevidencedatefield'] = 'Select an evidence completion date field';
 $string['selectanevidencedescriptionfield'] = 'Select an evidence description field';
 $string['settings'] = 'Settings';
-$string['sourcefile_beginwith'] = 'The source file name must include the full path to the file and begin with {$a}';
+$string['sourcefile_beginwith'] = 'The CSV file name must include the full path to the file and begin with {$a}';
 $string['sourcefile_noconfig'] = 'Additional configuration settings are required to specify a file location on the server. Please contact your system administrator.';
-$string['sourcefile_validation'] = 'Source file name does not begin with the required path';
+$string['sourcefile_validation'] = 'CSV file name does not begin with the required path';
+$string['submit'] = 'Save';
 $string['timeuploaded'] = 'Time uploaded';
 $string['unknowncolumn'] = 'Unknown column \'{$a->columnname}\'';
 $string['unreadablefile'] = 'File is unreadable : {$a}';
-$string['uploadcertification'] = 'Upload certification csv';
-$string['uploadcertificationintro'] = 'This will import historical records from a csv file as certifications.
-Any certifications that do not exist in the current system will be created as evidence in the record of learning.
+$string['uploadcertification'] = 'Certification';
+$string['uploadcertificationintro'] = 'This will import historical records from a CSV file as certifications.
+Any certifications that do not exist in the current system will be created as evidence in the evidence bank.
 
-The csv file should contain the following columns in the first line of the file
-
+The CSV file must contain the following columns:
 {$a}
 
-Note: The duedate field should indicate what the due date was at the time of completion, not when the completion is due to expire. The column must be provided in the csv file, but can be left empty. When recertification is set to "Use certification expiry date" or "Use fixed expiry date", then the expiry date will be calculated using the uploaded duedate field. If it is empty or if the recertification is set to "Use certification completion date", then only the completion date will be used to calculate the expiry date
-';
-$string['uploadcourse'] = 'Upload course csv';
-$string['uploadcourseintro'] = 'This will import historical completion records from a csv file and enrol users onto the specified courses.
-Any courses that do not exist in the current system will be created as evidence in the record of learning.
+Note: The duedate field should indicate what the due date was at the time of completion, not when the completion is due to expire. The column must be provided, but can be left empty. When recertification is set to "Use certification expiry date" or "Use fixed expiry date", then the expiry date will be calculated using the uploaded duedate field. If it is empty or if the recertification is set to "Use certification completion date", then only the completion date will be used to calculate the expiry date';
+$string['uploadcourse'] = 'Course Completion';
+$string['uploadcourseintro'] = 'This will import historical completion records from a CSV file and enrol users onto the specified courses.
+Any courses that do not exist in the current system will be created as evidence in the evidence bank.
 
-The csv file should contain the following columns in the first line of the file
-
-{$a}
-';
-$string['uploadcoursecustomfieldsintro'] = '
-Additional columns below can also be included in the CSV to allow custom field data to be uploaded for evidence
-
-{$a}
-';
+The CSV file must contain the following columns:
+{$a}';
+$string['uploadcoursecustomfieldsintro'] = 'Additional columns below can also be included to allow custom field data in evidence:
+{$a}';
 $string['uploadfilerequired'] = 'Please select a file to upload';
 $string['uploadsuccess'] = 'Uploaded files successfully';
-$string['uploadvia_directory'] = 'Alternatively upload csv files via a directory on the server';
-$string['uploadvia_form'] = 'Alternatively upload csv files via a form';
+$string['uploadvia_directory'] = 'Alternatively upload CSV files via a directory on the server';
+$string['uploadvia_form'] = 'Alternatively upload CSV files via a form';
 $string['usernamenotfound'] = 'User name not found';
 $string['validfilenames'] = 'Please note, these are the only valid file names, anything else will be ignored :';
 $string['viewingwithembeddedfilters'] = 'Currently viewing records with embedded filters';
