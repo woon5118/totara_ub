@@ -41,10 +41,11 @@ abstract class qtype_ddmarker_shape {
 
     }
     public function inside_width_height($widthheight) {
-        // TL-23263 code from Moodle is totally busted, we need to test this properly!
-        $coordsxy = $this->outlying_coords_to_test();
-        if ($coordsxy[0] > $widthheight[0] || $coordsxy[1] > $widthheight[1]) {
-            return false;
+        foreach ($this->outlying_coords_to_test() as $coordsxy) {
+            if ($coordsxy[0] < 0 || $coordsxy[0] > $widthheight[0] ||
+                    $coordsxy[1] < 0 || $coordsxy[1] > $widthheight[1]) {
+                return false;
+            }
         }
         return true;
     }
@@ -235,7 +236,7 @@ class qtype_ddmarker_shape_rectangle extends qtype_ddmarker_shape {
 
     }
     protected function outlying_coords_to_test() {
-        return array($this->xleft + $this->width, $this->ytop + $this->height);
+        return [[$this->xleft, $this->ytop], [$this->xleft + $this->width, $this->ytop + $this->height]];
     }
     public function is_point_in_shape($xy) {
         return $this->is_point_in_bounding_box($xy, array($this->xleft, $this->ytop),
@@ -295,7 +296,8 @@ class qtype_ddmarker_shape_circle extends qtype_ddmarker_shape {
     }
 
     protected function outlying_coords_to_test() {
-        return array($this->xcentre + $this->radius, $this->ycentre + $this->radius);
+        return [[$this->xcentre - $this->radius, $this->ycentre - $this->radius],
+                [$this->xcentre + $this->radius, $this->ycentre + $this->radius]];
     }
 
     public function is_point_in_shape($xy) {
