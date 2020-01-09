@@ -23,6 +23,7 @@
  */
 
 use core\event\cohort_deleted;
+use core\event\course_deleted;
 use core\event\user_deleted;
 use hierarchy_competency\event\competency_created;
 use hierarchy_competency\event\competency_deleted;
@@ -43,6 +44,7 @@ use totara_competency\observers\assignment_aggregation;
 use totara_competency\observers\audience_deleted as audience_deleted_observer;
 use totara_competency\observers\competency as competency_observer;
 use totara_competency\observers\competency_deleted as competency_deleted_observer;
+use totara_competency\observers\course;
 use totara_competency\observers\organisation_deleted as organisation_deleted_observer;
 use totara_competency\observers\position_deleted as position_deleted_observer;
 use totara_competency\observers\scale as scale_observer;
@@ -139,5 +141,9 @@ $observers = [
     [
         'eventname' => assignment_user_archived::class,
         'callback' => assignment_aggregation::class.'::user_archived',
+    ],
+    [
+        'eventname' => course_deleted::class,
+        'callback' => course::class.'::deleted',
     ],
 ];

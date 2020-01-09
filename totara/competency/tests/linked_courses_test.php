@@ -22,6 +22,7 @@
  * @package totara_criteria
  */
 
+use hierarchy_competency\event\evidence_deleted;
 use totara_competency\event\linked_courses_updated;
 use totara_competency\linked_courses;
 
@@ -165,6 +166,140 @@ class totara_competency_linked_courses_testcase extends advanced_testcase {
         $event = array_shift($events);
         $this->assertInstanceOf(linked_courses_updated::class, $event);
         $this->assertEquals($comp1->id, $event->get_data()['objectid']);
+    }
+
+    /**
+     * @param array $courses_to_update
+     * @dataProvider courses_data_provider
+     */
+    public function test_set_linked_courses_updates_linked_course_count_of_competency(array $courses_to_update): void {
+        /** @var totara_hierarchy_generator $hierarchy_generator */
+        $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $compfw = $hierarchy_generator->create_comp_frame([]);
+        $comp1 = $hierarchy_generator->create_comp(['frameworkid' => $compfw->id]);
+
+        $count_before = $this->get_linked_course_count($comp1->id);
+        $this->assertEquals(0, $count_before);
+
+        $courses = array_map(static function (object $course) {
+            return ['id' => $course->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY];
+        }, $courses_to_update);
+
+        linked_courses::set_linked_courses($comp1->id, $courses);
+
+        $count_after = $this->get_linked_course_count($comp1->id);
+        $this->assertCount($count_after, $courses_to_update);
+    }
+
+    public function courses_data_provider(): array {
+        $existing_course_1 = self::getDataGenerator()->create_course();
+        $existing_course_2 = self::getDataGenerator()->create_course();
+
+        return [
+            'Update all' => [[$existing_course_1, $existing_course_2]],
+            'Remove all' => [[]],
+        ];
+    }
+
+    public function test_remove_course(): void {
+        [$course_id, [$competency1, $competency2]] = $this->link_course_to_multiple_competencies();
+        [$other_course_id, [$other_competency1, $other_competency2]] = $this->link_course_to_multiple_competencies();
+
+        // Precondition check, check count is originally correct.
+        $before_removal1 = Linked_courses::get_linked_courses($competency1->id);
+        $this->assertCount(1, $before_removal1);
+
+        $before_removal2 = Linked_courses::get_linked_courses($competency2->id);
+        $this->assertCount(1, $before_removal2);
+
+        linked_courses::remove_course($course_id);
+
+        $after_removal1 = Linked_courses::get_linked_courses($competency1->id);
+        $this->assertCount(0, $after_removal1);
+
+        $after_removal2 = Linked_courses::get_linked_courses($competency2->id);
+        $this->assertCount(0, $after_removal2);
+
+        // Check the other/unrelated courses and competencies are not touched by the removal of the course
+        $other_before_removal1 = Linked_courses::get_linked_courses($other_competency1->id);
+        $this->assertCount(1, $other_before_removal1);
+
+        $other_before_removal2 = Linked_courses::get_linked_courses($other_competency2->id);
+        $this->assertCount(1, $other_before_removal2);
+    }
+
+    public function test_remove_course_updates_competency_count(): void {
+        [$course_id, [$competency1, $competency2]] = $this->link_course_to_multiple_competencies();
+
+        $count_before1 = $this->get_linked_course_count($competency1->id);
+        $this->assertEquals(1, $count_before1);
+
+        $count_before2 = $this->get_linked_course_count($competency2->id);
+        $this->assertEquals(1, $count_before2);
+
+        linked_courses::remove_course($course_id);
+
+        $count_after1 = $this->get_linked_course_count($competency1->id);
+        $this->assertEquals(0, $count_after1);
+
+        $count_after2 = $this->get_linked_course_count($competency2->id);
+        $this->assertEquals(0, $count_after2);
+    }
+
+    public function test_remove_course_fires_events(): void {
+        [$course_id, [$competency1, $competency2]] = $this->link_course_to_multiple_competencies();
+        $competency_course_ids = array_keys($this->get_competency_criteria_by_course($course_id));
+
+        $sink = $this->redirectEvents();
+        linked_courses::remove_course($course_id);
+
+        $events = $sink->get_events();
+
+        $this->assertCount(4, $events);
+
+        // Check new courses updated events are fired
+        $courses_updated_events = array_filter($events, static function (core\event\base $event) {
+            return $event instanceof linked_courses_updated;
+        });
+
+        $this->assertEqualsCanonicalizing([$competency1->id, $competency2->id], array_column($courses_updated_events, 'objectid'), 'The events should contain the competency ids');
+
+        // Check legacy evidence deleted events are fired (for backwards compatibility
+        $evidence_deleted_events = array_filter($events, static function (core\event\base $event) {
+            return $event instanceof evidence_deleted;
+        });
+
+        $this->assertEqualsCanonicalizing($competency_course_ids, array_column($evidence_deleted_events, 'objectid'), 'The events should contain the competency_criteria ids');
+    }
+
+    private function link_course_to_multiple_competencies(): array {
+        $course = self::getDataGenerator()->create_course();
+
+        /** @var totara_hierarchy_generator $hierarchy_generator */
+        $hierarchy_generator = self::getDataGenerator()->get_plugin_generator('totara_hierarchy');
+
+        $compfw1 = $hierarchy_generator->create_comp_frame([]);
+        $competency1 = $hierarchy_generator->create_comp(['frameworkid' => $compfw1->id]);
+
+        $compfw2 = $hierarchy_generator->create_comp_frame([]);
+        $competency2 = $hierarchy_generator->create_comp(['frameworkid' => $compfw2->id]);
+
+        linked_courses::set_linked_courses($competency1->id, [['id' => $course->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY]]);
+        linked_courses::set_linked_courses($competency2->id, [['id' => $course->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY]]);
+
+        return [$course->id, [$competency1, $competency2]];
+    }
+
+    private function get_linked_course_count(int $competency_id): int {
+        global $DB;
+
+        return $DB->count_records('comp_criteria', ['itemtype' => 'coursecompletion', 'competencyid' => $competency_id]);
+    }
+
+    private function get_competency_criteria_by_course(int $course_id): array {
+        global $DB;
+
+        return $DB->get_records('comp_criteria', ['itemtype' => 'coursecompletion', 'iteminstance' => $course_id]);
     }
 
 }

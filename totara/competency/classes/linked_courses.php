@@ -25,6 +25,8 @@
 namespace totara_competency;
 
 use criteria_linkedcourses\task\update_linked_course_items_adhoc;
+use hierarchy_competency\event\evidence_deleted;
+use stdClass;
 use totara_competency\event\linked_courses_updated;
 
 /**
@@ -44,7 +46,7 @@ class linked_courses {
      * Permissions checks, e.g. ensuring the user can see each course, must be done externally.
      *
      * @param int $competency_id
-     * @return \stdClass[] keyed by course id.
+     * @return stdClass[] keyed by course id.
      */
     public static function get_linked_courses($competency_id) {
         global $DB;
@@ -139,7 +141,7 @@ class linked_courses {
                     $to_update[$course['id']] = $linked_courses_record;
                 }
             } else {
-                $comp_criteria = new \stdClass();
+                $comp_criteria = new stdClass();
                 $comp_criteria->competencyid = $competency_id;
                 $comp_criteria->itemtype = 'coursecompletion';
                 $comp_criteria->iteminstance = $course['id'];
@@ -167,9 +169,76 @@ class linked_courses {
         foreach ($linked_courses_records as $linked_courses_record) {
             $delete_ids[] = $linked_courses_record->id;
         }
+
         $DB->delete_records_list('comp_criteria', 'id', $delete_ids);
+
+        static::update_competency_linked_course_count($competency_id, count($courses));
 
         $event = linked_courses_updated::create_from_competency($competency_id);
         $event->trigger();
+    }
+
+    /**
+     * Remove a single linked course, update course count and trigger events.
+     *
+     * @param int $course_id
+     */
+    public static function remove_course(int $course_id): void {
+        global $DB;
+
+        $competency_criteria = static::get_competency_criteria_by_course($course_id);
+
+        $delete_ids = array_keys($competency_criteria);
+
+        $DB->delete_records_list('comp_criteria', 'id', $delete_ids);
+
+        foreach ($competency_criteria as $competency_criterion) {
+            static::update_competency_linked_course_count($competency_criterion->competencyid);
+
+            linked_courses_updated::create_from_competency($competency_criterion->competencyid)->trigger();
+
+            // This event is triggered for 3rd party backwards compatibility with the hierarchy plugin
+            evidence_deleted::create_from_instance($competency_criterion)->trigger();
+        }
+    }
+
+    /**
+     * Update the pre-calculated "Linked courses" count field ("evidencecount" in the database).
+     *
+     * @param int $competency_id
+     * @param int $course_count If not supplied it will be calculated from the database
+     */
+    private static function update_competency_linked_course_count(int $competency_id, int $course_count = null): void {
+        global $DB;
+
+        if ($course_count === null) {
+            $course_count = static::get_linked_course_count($competency_id);
+        }
+
+        $DB->update_record('comp', ['id' => $competency_id, 'evidencecount' => $course_count]);
+    }
+
+    /**
+     * Calculates the linked course count (rather than simply getting the pre-calculated field)
+     *
+     * @param int $competency_id
+     * @return int
+     */
+    private static function get_linked_course_count(int $competency_id): int {
+        global $DB;
+
+        return $DB->count_records('comp_criteria', ['itemtype' => 'coursecompletion', 'competencyid' => $competency_id]);
+    }
+
+    /**
+     * Get all comp_criteria rows linked to a particular course
+     *
+     * @param int $course_id
+     * @return array
+     */
+    private static function get_competency_criteria_by_course(int $course_id): array {
+        global $DB;
+
+        return $DB->get_records('comp_criteria', ['itemtype' => 'coursecompletion', 'iteminstance' => $course_id]);
     }
 }
