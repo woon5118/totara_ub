@@ -1499,7 +1499,8 @@ class development_plan {
 
             // Get permission for manager
             $manager_canview = $this->get_component_setting_for_role('plan', 'view', 'manager') == DP_PERMISSION_ALLOW;
-            $manager_canapprove = $this->get_component_setting_for_role('plan', 'approve', 'manager') == DP_PERMISSION_ALLOW;
+            $manager_canapprove = $this->get_component_setting_for_role('plan', 'approve', 'manager') == DP_PERMISSION_ALLOW ||
+                                  $this->get_component_setting_for_role('plan', 'approve', 'manager') == DP_PERMISSION_APPROVE;
 
             $stringmanager = get_string_manager();
 
