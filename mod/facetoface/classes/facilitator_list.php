@@ -244,7 +244,7 @@ final class facilitator_list  implements \Iterator {
      */
     public function get_ids(): array {
         $ids = array();
-        foreach($this as $item) {
+        foreach ($this as $item) {
             $ids[$item->get_id()] = $item->get_id();
         }
         asort($ids);

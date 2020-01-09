@@ -65,6 +65,9 @@ final class render_event_info_option {
     /** @var string|null */
     private $pageurl = null;
 
+    /** @var int */
+    private $singlesession = 0;
+
     /**
      * @return boolean
      */
@@ -266,5 +269,21 @@ final class render_event_info_option {
      */
     public function get_current_url(): string {
         return $this->get_pageurl() ?: $this->get_backurl();
+    }
+
+    /**
+     * @return int
+     */
+    public function get_singlesession(): int {
+        return $this->singlesession;
+    }
+
+    /**
+     * @param int $value
+     * @return self
+     */
+    public function set_singlesession(int $value): self {
+        $this->singlesession = $value;
+        return $this;
     }
 }

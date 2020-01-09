@@ -293,7 +293,7 @@ class core_calendar_renderer extends plugin_renderer_base {
         $eventdetailshtml = '';
         $eventdetailsclasses = '';
 
-        if ($event->modulename == 'facetoface') {
+        if ($event->modulename == 'facetoface' || $event->eventtype == 'facetofacefacilitato') {
             // This fixed the Google Map for any location custom fields.
             $eventdetailshtml .= $this->facetoface_print_calendar_session($event);
             $eventdetailsclasses .= 'mod_facetoface__calendar-event ';
@@ -696,13 +696,30 @@ class core_calendar_renderer extends plugin_renderer_base {
         $seminarevent = new \mod_facetoface\seminar_event($event->uuid);
         $seminar = new \mod_facetoface\seminar($seminarevent->get_facetoface());
 
-        if (empty($seminar->get_showoncalendar()) && empty($seminar->get_usercalentry())) {
+        if (empty($seminar->get_showoncalendar()) && empty($seminar->get_usercalentry()) && $event->eventtype != 'facetofacefacilitato') {
             return '';
+        }
+
+        // Single session if possible.
+        $singlesession = 0;
+        foreach ($seminarevent->get_sessions() as $date) {
+            /* @var \mod_facetoface\seminar_session $date */
+            if ($date->get_timestart() == $event->timestart) {
+                $singlesession = $date->get_id();
+            }
+        }
+
+        // Start output with eventtype description if user calendar
+        $output = '';
+        if ($event->userid && $event->eventtype == 'facetofacefacilitato') {
+            $linkurl = new \moodle_url('/mod/facetoface/signup.php', array('s' => $seminarevent->get_id()));
+            $eventtype = substr($event->eventtype, strlen('facetoface'));
+            $output = get_string("calendareventdescription{$eventtype}", 'facetoface', $linkurl->out());
         }
 
         /** @var mod_facetoface_renderer $seminarrenderer */
         $seminarrenderer = $PAGE->get_renderer('mod_facetoface');
-        $output = $seminarrenderer->render_seminar_event($seminarevent, false, true);
+        $output .= $seminarrenderer->render_seminar_event($seminarevent, false, true, false, 'mod_facetoface__event_details', $singlesession);
 
         $signup = \mod_facetoface\signup::create($USER->id, $seminarevent);
         if ($seminar->get_usercalentry() && \mod_facetoface\signup_helper::is_booked($signup)) {
@@ -716,7 +733,7 @@ class core_calendar_renderer extends plugin_renderer_base {
                 $output .= get_string('signupforthissession', 'mod_facetoface', $linkurl->out());
             }
         } else {
-            $output = '';
+            $output .= '';
         }
 
         return $output;

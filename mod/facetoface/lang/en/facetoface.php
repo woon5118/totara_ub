@@ -337,7 +337,7 @@ $string['bulkaddsourceusername'] = 'username';
 $string['bulkremoveattendeeserror'] = 'Bulk remove users errors';
 $string['bulkremoveattendeessuccess'] = 'Bulk remove users success';
 $string['calendareventdescriptionbooking'] = 'You are booked for this <a href="{$a}">Seminar event</a>.';
-$string['calendareventdescriptionfacilitator'] = 'You are facilitator for this <a href="{$a}">Seminar event</a>.';
+$string['calendareventdescriptionfacilitato'] = 'You are a facilitator on this <a href="{$a}">Seminar event</a> session.';
 $string['calendareventdescriptionsession'] = 'You have created this <a href="{$a}">Seminar event</a>.';
 $string['calendaroptions'] = 'Calendar options';
 $string['cancelattendance'] = 'Cancel changes';

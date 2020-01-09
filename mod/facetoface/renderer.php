@@ -1107,13 +1107,14 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Print the details of a session
+     * Print the details of a seminar event
      *
      * @param \mod_facetoface\seminar_event $seminarevent  Record from facetoface_sessions
      * @param boolean $showcapacity   Show the capacity (true) or only the seats available (false)
      * @param boolean $calendaroutput Whether the output should be formatted for a calendar event
      * @param boolean $hidesignup     Hide any messages relating to signing up
      * @param string  $class          Custom css class for dl
+     * @param int     $sessionid      Limit session list to a single session, useful for calendar events & notifications
      * @return string html markup
      */
     public function render_seminar_event(
@@ -1121,7 +1122,8 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         bool $showcapacity,
         bool $calendaroutput = false,
         bool $hidesignup = false,
-        string $class = 'mod_facetoface__event_details'
+        string $class = 'mod_facetoface__event_details',
+        int $sessionid = 0
     ): string {
         global $USER;
 
@@ -1135,7 +1137,8 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             ->set_displaysignupinfo(!$hidesignup)
             ->set_displayassets(false)
             ->set_displayrooms(false)
-            ->set_displayassetsinsessions(!$calendaroutput);
+            ->set_displayassetsinsessions(!$calendaroutput)
+            ->set_singlesession($sessionid);
 
         $signup = signup::create($USER->id, $seminarevent);
 
@@ -1401,10 +1404,14 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     protected function get_seminar_event_details_eventinfo(session_data $session, signup $signup, render_event_info_option $option): ?seminarevent_detail {
         global $USER;
 
-        $builder = seminarevent_detail::builder('eventinfo')
-            ->set_title(get_string('eventinfo:eventinfo', 'mod_facetoface'))
-            ->set_id('f2f-eventinfo')
-            ->set_collapsible(true, html_writer::random_id('f2fsection'));
+        if (!$option->get_calendaroutput()) {
+            $builder = seminarevent_detail::builder('eventinfo')
+                ->set_title(get_string('eventinfo:eventinfo', 'mod_facetoface'))
+                ->set_id('f2f-eventinfo')
+                ->set_collapsible(true, html_writer::random_id('f2fsection'));
+        } else {
+            $builder = seminarevent_detail::builder('eventinfo')->set_id('f2f-eventinfo');
+        }
 
         if ($option->get_displayediteventlink() && has_capability('mod/facetoface:editevents', $this->getcontext())) {
             $builder->set_actionbar(
@@ -1616,10 +1623,15 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     protected function get_seminar_event_details_sessions(session_data $session, signup $signup, render_event_info_option $option): ?seminarevent_detail {
         $class = 'mod_facetoface__event_details';
         $seminarevent = (new seminar_event())->from_record_with_dates($session, false);
-        $builder = seminarevent_detail::builder('sessions')
-            ->set_title(get_string('eventinfo:sessions', 'mod_facetoface'))
-            ->set_id('f2f-sessions')
-            ->set_collapsible(true, html_writer::random_id('f2fsection'));
+
+        if (!$option->get_calendaroutput()) {
+            $builder = seminarevent_detail::builder('sessions')
+                ->set_title(get_string('eventinfo:sessions', 'mod_facetoface'))
+                ->set_id('f2f-sessions')
+                ->set_collapsible(true, html_writer::random_id('f2fsection'));
+        } else {
+            $builder = seminarevent_detail::builder('sessions')->set_id('f2f-sessions');
+        }
 
         $includedeleted = has_capability('totara/core:seedeletedusers', $this->getcontext());
         $signupcount = attendees_helper::count_signups($seminarevent, $includedeleted);
@@ -1632,6 +1644,11 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
             /** @var \mod_facetoface\seminar_session $date */
             foreach ($dates as $date) {
+
+                if ($option->get_singlesession() && $option->get_singlesession() != $date->get_id()) {
+                    continue;
+                }
+
                 // Session status.
                 $status = \mod_facetoface\seminar_session_helper::get_status_from($seminarevent, $date);
 
@@ -1694,6 +1711,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                         $assetoutputs[] = $this->get_asset_details_html($asset, $backurl);
                     }
                 }
+
                 $sessionbuilder->add_session($status, $sessiontime, $states, array(), $assetoutputs, $roomoutputs, $facilitatoroutput);
             }
         } else {

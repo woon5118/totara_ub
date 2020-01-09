@@ -1239,7 +1239,7 @@ class mod_facetoface_facilitator_testcase extends advanced_testcase {
         $this->assertCount(count($facilitatorids), $facilitator_list);
 
         // Check to see that the list has the expected facilitators.
-        foreach($facilitatorids as $id) {
+        foreach ($facilitatorids as $id) {
             $this->assertTrue($facilitator_list->contains($id));
         }
 
@@ -1259,7 +1259,7 @@ class mod_facetoface_facilitator_testcase extends advanced_testcase {
         $this->assertCount(count($facilitatorids), $internal_facilitator_list);
 
         // Check to see that the list has the expected facilitators.
-        foreach($facilitatorids as $id) {
+        foreach ($facilitatorids as $id) {
             $this->assertTrue($internal_facilitator_list->contains($id));
         }
 
@@ -1294,7 +1294,7 @@ class mod_facetoface_facilitator_testcase extends advanced_testcase {
         $this->assertCount(count($facilitatorids), $facilitator_list);
 
         // Check to see that the list has the expected facilitators.
-        foreach($facilitatorids as $id) {
+        foreach ($facilitatorids as $id) {
             $this->assertTrue($facilitator_list->contains($id));
         }
 
@@ -1318,7 +1318,7 @@ class mod_facetoface_facilitator_testcase extends advanced_testcase {
         $this->assertCount(count($facilitatorids), $internal_facilitator_list);
 
         // Check to see that the list has the expected facilitators.
-        foreach($facilitatorids as $id) {
+        foreach ($facilitatorids as $id) {
             $this->assertTrue($internal_facilitator_list->contains($id));
         }
 

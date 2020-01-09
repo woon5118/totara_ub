@@ -104,7 +104,7 @@ final class calendar {
 
         // Include description?
         $linkurl = new \moodle_url('/mod/facetoface/attendees/view.php', array('s' => $seminarevent->get_id()));
-        $introduction = get_string("calendareventdescriptionfacilitator", 'facetoface', $linkurl->out());
+        $introduction = get_string("calendareventdescriptionfacilitato", 'facetoface', $linkurl->out());
 
         // Ready to add standard events.
         self::add_event_internal($seminarevent, 0, $facilitator->get_userid(), false, 'facilitator', $introduction, '');
@@ -138,10 +138,6 @@ final class calendar {
 
         // Use the facetoface seminar event renderer to build the description.
         $seminarrenderer = $PAGE->get_renderer('mod_facetoface');
-        $description .= $seminarrenderer->render_seminar_event($seminarevent, false, true);
-
-        // Add append text to description.
-        $description .= $postpend;
 
         // Maximum event name is 256 chars, which may be shorter than seminar name.
         $shortname = $seminar->get_shortname();
@@ -170,10 +166,15 @@ final class calendar {
         $eventtype = "facetoface{$eventtype}";
 
         $result = true;
-        foreach ($seminarevent->get_sessions() as $date) {
+        $sessiondates = clone $seminarevent->get_sessions();
+        foreach ($sessiondates as $date) {
+            // Render each session separately as a single session.
+            $session_description = $description . $seminarrenderer->render_seminar_event($seminarevent, false, true, false, 'mod_facetoface__event_details', $date->get_id());
+            $session_description .= $postpend;
+
             $newevent = new \stdClass();
             $newevent->name = $shortname;
-            $newevent->description = $description;
+            $newevent->description = $session_description;
             $newevent->format = FORMAT_HTML;
             $newevent->courseid = $courseid;
             $newevent->groupid = 0;
@@ -333,7 +334,7 @@ final class calendar {
     public static function remove_facilitator_event(seminar_event $seminarevent, int $userid = 0): bool {
         global $DB;
 
-        if ( $userid ) {
+        if ($userid) {
             $select = "eventtype = 'facetofacefacilitato' AND userid = ? AND uuid = ?";
             $params = array($userid, $seminarevent->get_id());
         } else {
