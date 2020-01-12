@@ -40,7 +40,7 @@
           />
           <div class="tui-pathwayManual-achievementDisplay__role_info">
             <div class="tui-pathwayManual-achievementDisplay__role_info_name">
-              {{ getRoleName(roleRating) }}
+              {{ roleRating.role_display_name }}
             </div>
             <a
               v-if="roleRating.role.has_role"
@@ -138,18 +138,6 @@ export default {
 
     isSelf(roleRating) {
       return roleRating.role.name === 'self';
-    },
-
-    getRoleName(roleRating) {
-      if (this.isSelf(roleRating)) {
-        if (roleRating.role.has_role) {
-          return this.$str('your_rating', 'pathway_manual');
-        } else {
-          return this.getUserName(roleRating);
-        }
-      }
-
-      return roleRating.role.display_name;
     },
 
     getAddRatingUrl(roleRating) {

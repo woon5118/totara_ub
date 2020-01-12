@@ -8,10 +8,10 @@ query pathway_manual_role_ratings(
   ) {
     role {
       name
-      display_name
       has_role
     }
     default_profile_picture
+    role_display_name
     latest_rating {
       rater {
         fullname

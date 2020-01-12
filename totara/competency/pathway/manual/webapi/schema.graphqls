@@ -25,6 +25,7 @@ type pathway_manual_role_rating {
   role: pathway_manual_role! # The role
   latest_rating: pathway_manual_rating
   default_profile_picture: String # Picture url to use if there is no rating
+  role_display_name: String # Custom role name text
 }
 
 """

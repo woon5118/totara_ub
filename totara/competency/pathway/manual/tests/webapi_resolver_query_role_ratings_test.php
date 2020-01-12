@@ -25,6 +25,7 @@
 use core\orm\query\builder;
 use core\webapi\execution_context;
 use pathway_manual\models\role_rating;
+use pathway_manual\models\roles\manager;
 use pathway_manual\models\roles\self_role;
 use pathway_manual\webapi\resolver\query\role_ratings;
 use pathway_manual\webapi\resolver\type\role;
@@ -193,6 +194,32 @@ class pathway_manual_webapi_resolver_query_role_ratings_testcase extends pathway
         foreach ($expected_return_values as $field => $expected_value) {
             $this->assertEquals($expected_value, role::resolve($field, $role, [], execution_context::create('dev', null)));
         }
+    }
+
+    public function test_role_display_name() {
+        $role_ratings = $this->resolve();
+        $self_rating = $role_ratings[0];
+        $manager_rating = $role_ratings[1];
+
+        // When we are looking at ratings for our own competency, then the role name should be "Your rating" (if self)
+        $this->setUser($this->user1->id);
+        $role_display_name = role_rating_type::resolve(
+            'role_display_name', $self_rating, [], execution_context::create('dev', null)
+        );
+        $this->assertEquals('Your rating', $role_display_name);
+
+        // When we are looking at ratings for someone else's competency, then the role name should be their full name (if self)
+        $this->setAdminUser();
+        $role_display_name = role_rating_type::resolve(
+            'role_display_name', $self_rating, [], execution_context::create('dev', null)
+        );
+        $this->assertEquals($this->user1->fullname, $role_display_name);
+
+        // When we are looking at ratings for someone else's competency, then we should see the name of the role if it isn't self
+        $role_display_name = role_rating_type::resolve(
+            'role_display_name', $manager_rating, [], execution_context::create('dev', null)
+        );
+        $this->assertEquals(manager::get_display_name(), $role_display_name);
     }
 
 }

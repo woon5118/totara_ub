@@ -87,6 +87,24 @@ class role_rating {
     }
 
     /**
+     * Get the role name for display purposes.
+     * This is necessary in order to display custom role text for the 'self' role.
+     *
+     * @return string
+     */
+    public function get_role_display_name(): string {
+        if ($this->role instanceof self_role) {
+            if ($this->user->is_logged_in()) {
+                return get_string('your_rating', 'pathway_manual');
+            } else {
+                return $this->user->fullname;
+            }
+        }
+
+        return $this->role::get_display_name();
+    }
+
+    /**
      * Get the most recent rating made by a user with this role.
      *
      * @return rating|entity|null
