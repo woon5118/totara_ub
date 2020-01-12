@@ -1139,6 +1139,11 @@ class core_plugin_manager {
     public static function is_deleted_standard_plugin($type, $name) {
         // TOTARA: Do not include plugins that were removed during upgrades to Totara 9 or Moodle 3.0 and earlier.
         $plugins = array(
+            // Moodle 3.5.x premigration removals.
+            'ltiservice_gradebookservices',
+            'atto_recordrtc',
+            'search_simpledb',
+
             // Totara 13 removals.
             'block_community',
             'block_messages',
@@ -1466,7 +1471,7 @@ class core_plugin_manager {
                 'phpunit', 'profiling', 'recyclebin', 'replace', 'spamcleaner', 'task', 'templatelibrary',
                 'uploadcourse', 'uploaduser', 'unsuproles', 'usertours', 'xmldb'
                 // Totara:
-                , 'totara_sync', 'totara_timezonefix', 'sitepolicy'
+                , 'totara_sync', 'totara_timezonefix', 'sitepolicy', 'premigration',
             ),
 
             // Totara:

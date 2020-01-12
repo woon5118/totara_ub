@@ -738,7 +738,9 @@ if (!empty($CFG->version)) {
         if ($CFG->version < MOODLE_MIGRATION_VERSION) {
             throw new Exception('You cannot migrate to this Totara version from Moodle ' . $CFG->release . '. Please upgrade to Moodle ' . MOODLE_MIGRATION_RELEASE . ' first.');
         } else if ($CFG->version > MOODLE_MIGRATION_VERSION) {
-            throw new Exception('Migration to this version of Totara is possible only from Moodle ' . MOODLE_MIGRATION_RELEASE . '.');
+            if (!defined('MOODLE_PREMIGRATION_SCRIPT') || !MOODLE_PREMIGRATION_SCRIPT) {
+                throw new Exception('Totara pre-migration step is required before migrating from Moodle ' . $CFG->release . ', see MOODLEUPGRADE.txt file for more details.');
+            }
         }
     } else {
         if ($CFG->version < 2015111606) {

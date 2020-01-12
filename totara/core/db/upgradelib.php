@@ -359,6 +359,11 @@ function totara_core_upgrade_delete_moodle_plugins() {
     // NOTE: this should match \core_plugin_manager::is_deleted_standard_plugin() data.
 
     $deleteplugins = array(
+        // Moodle 3.5.x premigration removals.
+        'ltiservice_gradebookservices',
+        'atto_recordrtc',
+        'search_simpledb',
+
         // Totara 13 removals.
         'block_community',
         'gradeexport_fusion',
@@ -595,7 +600,7 @@ function totara_core_upgrade_context_tables() {
         }
 
         $table = new xmldb_table('user');
-        $field = new xmldb_field('tenantid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'totarasync');
+        $field = new xmldb_field('tenantid', XMLDB_TYPE_INTEGER, '10', null, null, null, null); // Do not use totarasync here, it may not exist yet.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
             $key = new xmldb_key('tenantid', XMLDB_KEY_FOREIGN, array('tenantid'), 'tenant', array('id'), 'restrict');

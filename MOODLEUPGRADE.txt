@@ -1,7 +1,7 @@
 UPGRADING A MOODLE SITE TO TOTARA
 =================================
 
-These instructions detail the process for upgrading a Moodle site to Totara.
+These instructions detail the process for migrating a Moodle site to Totara 13.
 
 Totara migration requirements:
 
@@ -10,68 +10,54 @@ Totara migration requirements:
 * MSSQL only: Database user requires additional permissions: ALTER SETTINGS(SERVER), full text search must be enabled.
 * all other requirements listed in INSTALL.txt
 
-NOTE: Additional plugins, custom themes or customised Moodle code are likely to
-    cause conflicts in the upgrade process.
-    Review possible conflicts before upgrading to prevent site stability issues.
+If you are using higher Moodle release you need to execute a pre-migration
+step to transform the database to Moodle 3.4.9 format, the list of supported
+releases is updated regularly.
 
-    You can migrate to this Totara release only from one exact Moodle release
-    specified above. If you are using lower Moodle version you must upgrade to
-    the required Moodle release first.
+Releases supported in pre-migration script:
 
-    If the Moodle site you are upgrading from used oauth2 authentication plugin
-    users created via this plugin will not be able to access the site after the
-    upgrade. These accounts may be converted to manual accounts and users issued
-    with a new passwords using password reset. If you require assistance to convert
-    oauth2 users to manual accounts please contact Totara Support.
+* Moodle 3.5.10 (Build: 20200113)
 
-    For more information see https://help.totaralearning.com/display/latest/Upgrading+from+Moodle
 
-1.  Check the live logs to check if any users are currently using the site.
-    The site will be offline while the upgrades are performed.
-    Reports -> Live Logs
+For more information see https://help.totaralearning.com/display/latest/Upgrading+from+Moodle
 
-2.  Enable maintenance mode in Moodle.
-    Server -> Maintenance Mode
 
-3.  Backup the Moodle database.
+Migration steps:
 
-4.  Backup the moodledata directory.
+1.  Prevent external access to web server to guarantee regular users
+    cannot access server during the migration process.
 
-5.  Backup the Moodle source code directory.
+2.  Backup the Moodle database.
 
-6a. If your Moodle site is not customised you can replace your moodle code
-    folder with the new moodle code folder and copy your old config.php file
-    to the new folder.
+3.  Backup the moodledata directory.
 
-6b. If you have customised moodle you will need to merge your existing Moodle
-    source code and new Totara code. This is best accomplished using a version
-    control tool like GIT or SVN. You will need to:
-    - Reuse the existing Moodle's config.php file
-    - Ensure any themes are updated to work with Totara
-    - Include any existing modules and filters remain in the code
-    - Resolve any merge conflicts caused by existing local customisations
+4.  Backup the Moodle source code directory.
 
-7.  Navigate to admin/index.php using a web browser and perform the install process.
+5.  Verify that the full site backup can be restored on another server.
+    It is recommended to test the migration on a restored copy of server first.
 
-8.  Click Yes on the Upgrade page.
+6.  If Moodle version is lower than 3.4.9 then upgrade to Moodle 3.4.9 release.
 
-9. Confirm the server status checks.
+7.  Make a list of all add-ons and customisations and confirm they are
+    compatible with Totara.
 
-10. Confirm the plugin status checks.
+8.  Replace Moodle source code with the latest Totara 13 source code,
+    keep the original config.php file only. Do not apply any customisations
+    or add-ons yet.
 
-11. Proceed with the initial database upgrades.
+9.  If Moodle version is higher than 3.4.9 then make sure Moodle was upgraded
+    to one of the releases supported by pre-migration script listed above.
 
-12. Edit the New Admin Settings page if required.
+10. If necessary execute the pre-migration script admin/tool/premigration/cli/util.php
+    from command line to transform the database to Moodle 3.4.9 format.
 
-13. Continue the database upgrades.
+11. Perform a standard upgrade via command line or web interface.
 
-14. Check for Warnings or Errors on the upgrade review page.
+12. Re-enable external web access.
 
-15. Edit the New Site Settings page if required.
+13. Apply local customisations and add any plugins, make sure they are compatible
+    with Totara.
 
-16. Test the site functionality. The site should now be displayed with the
-    Totara logos and theme.
+14. Test the site functionality.
 
-17. Disable server maintenance mode.
-
-18. Congratulations, your site is now running Totara.
+15. Congratulations, your site is now running Totara.

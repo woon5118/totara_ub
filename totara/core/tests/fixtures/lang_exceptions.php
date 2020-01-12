@@ -55,6 +55,7 @@ $exceptions = array(
     'enrol_ldap' => array('autocreate'),
     'mod_facetoface' => array('mincapacity_help'),
     'auth_ldap' => array('auth_ntlmsso_enabled'),
+    'tool_premigration' => array('pluginname'),
     'tool_usertours' => true, // Not implemented yet
 
 );
