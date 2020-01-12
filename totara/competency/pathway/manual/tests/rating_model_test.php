@@ -22,12 +22,11 @@
  * @category test
  */
 
-use pathway_manual\manual;
+use pathway_manual\entities\rating as rating_entity;
 use pathway_manual\models\rating as rating_model;
 use pathway_manual\models\roles\appraiser;
 use pathway_manual\models\roles\manager;
 use pathway_manual\models\roles\self_role;
-use totara_job\job_assignment;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -299,4 +298,37 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
             $non_existent_competency_id => $this->get_scale_value_id('21'),
         ]);
     }
+
+    public function test_empty_comments_are_not_saved() {
+        $this->setUser($this->user2->id);
+        $this->set_as_rating_manager($this->user1->id, $this->user2->id);
+        $this->generator->create_manual($this->competency1, [manager::class]);
+
+        $scale_value = $this->competency1->scale->values->first();
+
+        $rating_model = rating_model::for_user_and_role($this->user1->id, manager::class);
+
+        // Create empty string comment, which should not be saved.
+        $rating_model->create($this->competency1->id, $scale_value->id, '');
+        /** @var rating_entity $rating */
+        $rating = rating_entity::repository()
+            ->order_by('id', 'desc')
+            ->first();
+        $this->assertNull($rating->comment);
+
+        // Create another empty string comment, which should not be saved.
+        $rating_model->create($this->competency1->id, $scale_value->id, '   ');
+        $rating = rating_entity::repository()
+            ->order_by('id', 'desc')
+            ->first();
+        $this->assertNull($rating->comment);
+
+        // Create a comment which does have text, which should be saved.
+        $rating_model->create($this->competency1->id, $scale_value->id, '  Hello!  ');
+        $rating = rating_entity::repository()
+            ->order_by('id', 'desc')
+            ->first();
+        $this->assertEquals('Hello!', $rating->comment);
+    }
+
 }

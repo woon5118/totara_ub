@@ -76,12 +76,12 @@ class rating {
      *
      * @param int $competency_id
      * @param int|null $scale_value_id
-     * @param string $comment
+     * @param string|null $comment
      */
     public function create(
         int $competency_id,
         ?int $scale_value_id,
-        string $comment = ''
+        string $comment = null
     ) {
         $this->create_multiple([
             ['comp_id' => $competency_id, 'scale_value_id' => $scale_value_id, 'comment' => $comment]
@@ -110,8 +110,14 @@ class rating {
         builder::get_db()->transaction(function () use ($ratings, $rating_record) {
             $queue_data = [];
             foreach ($ratings as $rating) {
+                $rating['comment'] = trim($rating['comment']);
+                if (strlen($rating['comment']) === 0) {
+                    $rating['comment'] = null;
+                }
+
                 $rating_entity = new rating_entity(array_merge($rating_record, $rating));
                 $rating_entity->save();
+
                 $queue_data[] = [
                     'user_id' => $rating_record['user_id'],
                     'competency_id' => $rating['comp_id']
