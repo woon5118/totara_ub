@@ -87,9 +87,11 @@ Note that more recent update comes to the top.
 * Converted styles.css to less
 
 --- JavaScript ---
-* Seminar session list is now rendered through AJAX request performed by seminarevent_dashboard.js
+* When filters are changed, seminar session list is now rendered through AJAX request by seminarevent_dashboard.js
 
 --- Mustache ---
+* seminarevent_dashboard mustache updated; portion of template has been moved out to seminarevent_dashboard_sessions
+* seminarevent_filterbar mustache added togglelabel parameter
 * event_grade_input mustache removed Bootstrap CSS classes
 * seminarevent_filterbar mustache added noscript parameter
 * seminarevent_filterbar mustache added icon, filters.show_tooltips and links parameters

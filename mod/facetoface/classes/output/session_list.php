@@ -25,8 +25,7 @@ namespace mod_facetoface\output;
 
 use stdClass;
 use context;
-use templatable;
-use \core\output\template;
+use core\output\template;
 use mod_facetoface\dashboard\filter_list;
 use mod_facetoface\dashboard\render_session_list_config;
 use mod_facetoface\dashboard\render_session_option;
@@ -43,7 +42,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * The seminar event list.
  */
-final class session_list implements templatable {
+final class session_list extends template {
 
     /** @var array */
     private $reservation;
@@ -113,22 +112,24 @@ final class session_list implements templatable {
     }
 
     /**
-     * Get the template data.
+     * Export data for template.
      *
-     * @param renderer_base $output
-     * @return array optionally containing [reservation, table]
-     *                  - reservation is a raw HTML string about reservation information
-     *                  - table contains 'data' (template data) and 'template' (template name)
+     * @return array of [reservation, table => [template, context]]
+     *                  - reservation: raw HTML string about reservation information (optional)
+     *                  - table: session table data (optional)
+     *                  - table.template: template name to render the session table
+     *                  - table.context: template data to render the session table
      */
-    public function export_for_template(renderer_base $output): array {
+    public function get_template_data() {
+        global $OUTPUT;
         $data = [];
-        if (!empty($this->reservation)) {
-            $data['reservation'] = $this->reservation;
-        }
         if (!empty($this->sessiontable)) {
+            if (!empty($this->reservation)) {
+                $data['reservation'] = $this->reservation;
+            }
             $data['table'] = [
                 'template' => session_list_table::TEMPLATE_NAME,
-                'data' => $this->sessiontable->export_for_template($output)
+                'context' => $this->sessiontable->export_for_template($OUTPUT)
             ];
         }
         return $data;

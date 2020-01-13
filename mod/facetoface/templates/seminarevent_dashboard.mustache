@@ -35,10 +35,8 @@
     * declareinterest: the output of renderer::declare_interest()
     * filters: the template data for seminarevent_filterbar; be sure to enable "noscript"
     * actions: the template data for seminarevent_actionbar
-    * tables: array of table data
+    * tables: array of the template data for seminarevent_dashboard_sessions
     * tables.heading: the heading text
-    * tables.type: the string passed to the render_session_list AJAX request
-    * tables.legacystateclass: please do not use
 
     Example content (json):
     {
@@ -80,13 +78,7 @@
     {{#tables}}
         <section>
             <h3>{{heading}}</h3>
-            <div class="mod_facetoface__sessions mod_facetoface__sessions--{{type}} loading">
-                <div class="mod_facetoface__sessions__spinner" role="presentation">{{#flex_icon}}loading{{/flex_icon}}</div>
-                <div class="mod_facetoface__sessions__debug" aria-hidden="true"></div>
-                <div class="mod_facetoface__sessionlist__appendix"></div>
-                <div class="mod_facetoface__sessions__empty mod_facetoface__sessionlist--empty" aria-hidden="true">{{#str}} noresults, mod_facetoface {{/str}}</div>
-                <div class="mod_facetoface__sessionlist {{legacystateclass}}"></div>
-            </div>
+            {{> mod_facetoface/seminarevent_dashboard_sessions }}
         </section>
     {{/tables}}
 

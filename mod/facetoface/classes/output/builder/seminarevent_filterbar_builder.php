@@ -48,6 +48,11 @@ class seminarevent_filterbar_builder {
     private $noscript = false;
 
     /**
+     * @var string[]
+     */
+    private $togglelabel;
+
+    /**
      * @var \pix_icon|null
      */
     private $icon = null;
@@ -96,6 +101,21 @@ class seminarevent_filterbar_builder {
      */
     public function set_noscript(bool $noscript): seminarevent_filterbar_builder {
         $this->noscript = $noscript;
+        return $this;
+    }
+
+    /**
+     * Set the text of the toggle button.
+     *
+     * @param string $hiddentext the text displayed when the filter bar is closed
+     * @param string $showntext the text displayed when the filter bar is open
+     * @return seminarevent_filterbar_builder
+     */
+    public function set_toggle_button(string $hiddentext, string $showntext): seminarevent_filterbar_builder {
+        $this->togglelabel = [
+            'hidden' => $hiddentext,
+            'shown' => $showntext
+        ];
         return $this;
     }
 
@@ -160,6 +180,7 @@ class seminarevent_filterbar_builder {
      * @return seminarevent_filterbar
      */
     public function build(): seminarevent_filterbar {
+        global $OUTPUT;
         $params = [];
         foreach ($this->params as $name => $value) {
             if (array_key_exists($name, $this->filters)) {
@@ -198,13 +219,13 @@ class seminarevent_filterbar_builder {
             'formid' => $this->id,
             'method' => $this->method,
             'noscript' => $this->noscript,
+            'togglelabel' => $this->togglelabel,
             'params' => $params,
             'filters' => $filters,
             'links' => $this->links,
         ];
 
         if ($this->icon) {
-            global $OUTPUT;
             $iconattr = array(
                 'template' => $this->icon->get_template(),
                 'context' => $this->icon->export_for_template($OUTPUT),

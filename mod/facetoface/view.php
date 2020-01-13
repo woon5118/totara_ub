@@ -34,6 +34,9 @@ require_once($CFG->dirroot . '/totara/customfield/field/location/field.class.php
 
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID
 $f = optional_param(filter_list::PARAM_FILTER_F2FID, 0, PARAM_INT); // facetoface ID
+// Only admins can see debug information.
+$debug = optional_param('debug', false, PARAM_BOOL) && is_siteadmin();
+
 $filters = filter_list::from_query_params();
 
 if ($id) {
@@ -97,7 +100,10 @@ if (empty($cm->visible) and !has_capability('mod/facetoface:viewemptyactivities'
     notice(get_string('activityiscurrentlyhidden'));
 }
 
-echo $f2f_renderer->render(seminarevent_dashboard::create($seminar, $context, $cm, $course));
+echo $f2f_renderer->render_from_template(
+    seminarevent_dashboard::TEMPLATE_NAME,
+    seminarevent_dashboard::create($seminar, $context, $cm, $course, $filters, $debug)->export_for_template($f2f_renderer)
+);
 
 echo $OUTPUT->footer($course);
 

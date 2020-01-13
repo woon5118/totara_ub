@@ -34,6 +34,7 @@ use external_value;
 use mod_facetoface\dashboard\filter_list;
 use mod_facetoface\dashboard\filters\filter;
 use mod_facetoface\dashboard\render_session_option;
+use mod_facetoface\output\seminarevent_dashboard_sessions;
 use mod_facetoface\output\session_list;
 use mod_facetoface\output\show_previous_events;
 use mod_facetoface\query\query_helper;
@@ -116,48 +117,17 @@ class external extends external_api {
         // This line assumes that the AJAX is requested from only the event dashboard page.
         $PAGE->set_url($filters->to_url($seminar, '/mod/facetoface/view.php'));
 
-        /** @var mod_facetoface_renderer $f2f_renderer */
-        $f2f_renderer = $PAGE->get_renderer('mod_facetoface');
-        $f2f_renderer->setcontext($context);
-
-        if ($type == 'upcoming') {
-            // Upcoming events.
-            $option = (new render_session_option())
-                ->set_displayreservation(true)
-                ->set_eventascendingorder(true)
-                ->set_sessionascendingorder(true)
-                ->set_eventtimes([event_time::FUTURE, event_time::INPROGRESS, event_time::WAITLISTED]);
-            $data = session_list::create($seminar, $filters, $option, $context, 'mod_facetoface_upcoming_events_table')->export_for_template($f2f_renderer);
-        } else if ($type == 'past') {
-            // Past events.
-            $option = (new render_session_option())
-                ->set_displayreservation(false)
-                ->set_displaysignupperiod(false)
-                ->set_eventascendingorder(false)
-                ->set_sessionascendingorder(false)
-                ->set_eventtimes([event_time::PAST, event_time::CANCELLED]);
-            $data = session_list::create($seminar, $filters, $option, $context, 'mod_facetoface_past_events_table')->export_for_template($f2f_renderer);
-            if ($seminar->has_events()) {
-                $data['pastlink'] = $f2f_renderer->render(show_previous_events::create($seminar, $filters, 'previoussessionheading'));
-            }
-        } else {
-            throw new coding_exception('Unknown $type specified: '.$type);
-        }
+        $template = seminarevent_dashboard_sessions::create($seminar, $filters, $context, $type, $debug);
+        $data = $template->get_template_data();
 
         $aredefault = $filters->are_default();
         $title = $seminar->get_name();
-        $response = ['cookie' => $cookie, 'title' => $title, 'resetfilter' => $aredefault, 'data' => $data];
-
-        if ($debug) {
-            $response['debug'] = [];
-            $stmt = $filters->to_query_with_option($seminar, $context, null, $option)->get_statement();
-            $response['debug'] = [
-                'option' => $option->to_object(),
-                'query' => query_helper::highlight($stmt->get_sql(), $stmt->get_parameters()),
-            ];
-        }
-
-        return $response;
+        return [
+            'cookie' => $cookie,
+            'title' => $title,
+            'resetfilter' => $aredefault,
+            'data' => $data
+        ];
     }
 
     /**
@@ -166,6 +136,7 @@ class external extends external_api {
      * @return external_description|null
      */
     public static function render_session_list_returns(): ?external_description {
+        // It's not possible to define variable structures in this function.
         return null;
     }
 }

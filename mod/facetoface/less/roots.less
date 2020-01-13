@@ -21,6 +21,7 @@
 @mod_facetoface-spacing-small: @totara_style-spacing_small;
 
 @mod_facetoface-breakpoint_mobile: @totara_style-screen_sm_min;
+@mod_facetoface-filter-label-font-size: @totara_style-size_11;
 @mod_facetoface-navbar-font-size: @totara_style-size_14;
 @mod_facetoface-navbar-font-height: @totara_style-size_14;
 @mod_facetoface-navbar-height: @mod_facetoface-navbar-font-height * 2;
@@ -305,27 +306,38 @@ select.menuf2f-select {
     // +++ Filters +++ //
     // Note: do NOT use the 'ch' unit unless we can drop IE11
     &__filter {
-        @filter-spacing-medium: @totara_style-spacing_medium;
-        @filter-spacing-small: @totara_style-spacing_small;
+        @filter-margin-outer: @totara_style-spacing_medium;
+        @filter-spacing-item-x: @totara_style-spacing_small;
+        @filter-spacing-item-y: @totara_style-spacing_small;
+        @filter-spacing-item-narrow-x: (@totara_style-spacing_x_small + @totara_style-spacing_small) / 2;
 
         .flex-wrap-vertical-center();
 
         border: 1px @mod_facetoface-border-colour solid;
         border-radius: @border-radius-default;
-        margin: @filter-spacing-medium 0;
-        padding: 0 @filter-spacing-small;
+        margin: @filter-margin-outer 0;
+        padding: @filter-spacing-item-y @filter-spacing-item-x 0;
 
         .flex-icon {
             font-size: @ft-size-400;
-            margin-top: @filter-spacing-small;
+            margin-bottom: @filter-spacing-item-y;
         }
 
         .child() {
+            align-items: center;
             display: flex;
-            flex-wrap: wrap;
-            flex-direction: column;
-            margin: 0 @filter-spacing-small 0 @filter-spacing-small;
+            margin: 0 @filter-spacing-item-x @filter-spacing-item-y;
             max-width: 100%;
+        }
+
+        &__toggle {
+            display: none;
+        }
+
+        &__toggle-button {
+            &__label {
+                display: none;
+            }
         }
 
         &__item {
@@ -335,15 +347,13 @@ select.menuf2f-select {
                 margin: 0;
                 // Override Moodle form
                 font: inherit;
-                font-size: @totara_style-size_11;
-                line-height: @totara_style-size_16;
-                padding: 0 0 @totara_style-size_1;
+                padding: 0 @filter-spacing-item-narrow-x @totara_style-size_1 0;
             }
 
             &__select {
                 // Override Moodle form
                 font-size: inherit;
-                margin-bottom: @totara_style-size_base;
+                margin-bottom: 0;
                 max-width: 100%;
                 padding-top: 0;
                 padding-bottom: 0;
@@ -386,7 +396,7 @@ select.menuf2f-select {
         }
 
         &__link {
-            .child();
+            margin: 0 0 @filter-spacing-item-y @filter-spacing-item-x;
             visibility: hidden;
         }
 
@@ -398,35 +408,20 @@ select.menuf2f-select {
     // Container of upcoming and/or past event list
     &__sessions {
         &__spinner {
+            display: none;
             font-size: 2em;
         }
 
-        &__spinner,
-        &__debug,
-        &__empty {
+        &.loading &__spinner {
+            display: block;
+        }
+
+        &.loading &__debug,
+        &.loading &__empty,
+        &.loading .mod_facetoface__sessionlist__reservation,
+        &.loading .mod_facetoface__sessionlist__pastlink,
+        &.loading .mod_facetoface__sessionlist {
             display: none;
-        }
-
-        &.loading {
-            .mod_facetoface__sessions__spinner {
-                display: block;
-            }
-            .mod_facetoface__sessionlist__appendix,
-            .mod_facetoface__sessionlist {
-                display: none;
-            }
-        }
-
-        &.empty {
-            .mod_facetoface__sessions__empty {
-                display: block;
-            }
-        }
-
-        &.debug {
-            .mod_facetoface__sessions__debug {
-                display: block;
-            }
         }
     }
 
@@ -488,6 +483,10 @@ select.menuf2f-select {
 
                 .seminar-event-state();
             }
+        }
+
+        &__roomdetails {
+            display: block;
         }
 
         &__eventtime {
@@ -1048,6 +1047,107 @@ select.menuf2f-select {
 
 @media only screen and (max-width: @mod_facetoface-breakpoint_mobile) {
     .mod_facetoface {
+        &__filter {
+            @filter-spacing-medium: @totara_style-spacing_medium;
+            @filter-spacing-small: @totara_style-spacing_small;
+
+            flex-direction: column;
+            flex-wrap: nowrap;
+            padding: 0;
+
+            &__item {
+                display: none;
+            }
+
+            &__toggle:checked ~ &__item {
+                display: flex;
+            }
+
+            &__toggle-button {
+                align-items: center;
+                display: flex;
+                text-align: center;
+                -moz-user-select: none;
+                -webkit-user-select: none;
+                user-select: none;
+                width: 100%;
+
+                > .flex-icon {
+                    display: none;
+                }
+
+                &__label {
+                    .force-link-color();
+
+                    display: block;
+                    flex: 1;
+                    font: inherit;
+                    margin-bottom: 0;
+                    padding: @filter-spacing-small 0;
+
+                    &__hidden {
+                        display: block;
+                    }
+
+                    &__shown {
+                        display: none;
+                    }
+                }
+            }
+
+            &__toggle:checked ~ &__toggle-button &__toggle-button__label__hidden {
+                display: none;
+            }
+
+            &__toggle:checked ~ &__toggle-button &__toggle-button__label__shown {
+                display: block;
+            }
+
+            &__item {
+                // Note: do NOT use the 'ch' unit unless we can drop IE11
+                @label-width: @mod_facetoface-filter-label-font-size * 8;
+
+                align-items: center;
+                flex-direction: row;
+                margin: 0 0 @filter-spacing-small;
+                padding: 0 @filter-spacing-small;
+                width: 100%;
+
+                &__eventtime,
+                &__room,
+                &__facilitator,
+                &__book,
+                &__advanced {
+                    &__select {
+                        max-width: initial;
+                        min-width: initial;
+                        width: ~"calc(100% - " @label-width ~")";
+                    }
+                }
+
+                &__label {
+                    width: @label-width;
+                }
+
+                &__select {
+                    flex: 1 1 auto;
+                    margin-bottom: 0;
+                }
+            }
+
+            &__link {
+                display: none;
+                margin: 0;
+                padding: @filter-spacing-medium 0;
+                text-align: center;
+                width: 100%;
+            }
+
+            &--active &__toggle:checked ~ &__link {
+                display: block;
+            }
+        }
+
         &__event_details {
             &__sessions {
                 &__rowheader {

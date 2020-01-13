@@ -30,6 +30,9 @@
     * method: get or post
     * formid: string id of the form
     * noscript: do not load script
+    * togglelabel: label text of the toggle button for mobile view
+    * togglelabel.hidden: label text when the filter bar is hidden
+    * togglelabel.shown: label text when the filter bar is shown
     * params: array containing key/value pairs as input elements of type hidden
     * params.name: name attribute
     * params.value: value attribute
@@ -51,6 +54,10 @@
     {
         "method" : "get",
         "formid" : "id-123456",
+        "togglelabel": {
+            "hidden": "Show filter",
+            "shown": "Hide filter"
+        },
         "icon": {
             "template": "core/flex_icon",
             "context": {
@@ -137,7 +144,11 @@
 }}
 
 <form method="{{method}}" class="mod_facetoface__filter" id="mod_facetoface__filter_{{formid}}"{{^noscript}} data-core-autoinitialise-amd="mod_facetoface/seminarevent_filterbar" data-core-autoinitialise="true"{{/noscript}}>
-    {{#icon}}{{#context}}{{> &&template }}{{/context}}{{/icon}}
+    {{#togglelabel}}<input type="checkbox" aria-hidden="true" class="mod_facetoface__filter__toggle" autocomplete="off" id="f2f-filter-toggle-{{formid}}">{{/togglelabel}}
+    <div class="mod_facetoface__filter__toggle-button">
+        {{#icon}}{{#context}}{{> &&template }}{{/context}}{{/icon}}
+        {{#togglelabel}}<label role="button" for="f2f-filter-toggle-{{formid}}" class="mod_facetoface__filter__toggle-button__label"><span class="mod_facetoface__filter__toggle-button__label__hidden">{{hidden}}</span><span class="mod_facetoface__filter__toggle-button__label__shown">{{shown}}</span></label>{{/togglelabel}}
+    </div>
     {{#params}}
         <input type="hidden" name="{{name}}" value="{{value}}">
     {{/params}}

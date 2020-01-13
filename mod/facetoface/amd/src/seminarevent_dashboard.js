@@ -381,7 +381,6 @@ define(['core/ajax', 'core/templates', 'core/notification', 'mod_facetoface/semi
                 }
                 root.addEventListener('click', that._onClick.bind(that));
                 root.addEventListener('scroll', that._onScroll.bind(that), true);
-                that.update(true, true);
                 that.initDone = true;
                 done();
             }, 0);
@@ -484,44 +483,20 @@ define(['core/ajax', 'core/templates', 'core/notification', 'mod_facetoface/semi
             var that = this;
             var root = this.el;
             var parent = root.querySelector('.mod_facetoface__sessions--' + type);
-            var appendix = parent.querySelector('.mod_facetoface__sessionlist__appendix');
-            var sessionlist = parent.querySelector('.mod_facetoface__sessionlist');
-            var debug = parent.querySelector('.mod_facetoface__sessions__debug');
-            var empty = parent.querySelector('.mod_facetoface__sessions__empty');
-
-            empty.setAttribute('aria-hidden', 'true');
             parent.classList.add('loading');
-            parent.classList.remove('empty'); // need to remove one by one for IE11
-            parent.classList.remove('debug');
-            appendix.innerHTML = '';
-            sessionlist.innerHTML = '';
-            debug.innerHTML = '';
 
             var doneOuter = jsPending('update', type, cookie);
             this.fetch(type, cookie, params).then(function(json) {
                 if (that.requestCookie === json.cookie) {
                     var title = root.querySelector('.mod_facetoface__event-dashboard__title');
                     title.textContent = json.title;
-                    if ('table' in json.data) {
-                        var table = json.data.table;
-                        var doneInner = jsPending('update-table', type, cookie);
-                        templates.render(table.template, table.data).done(function(html, js) {
-                            sessionlist.innerHTML = html;
-                            parent.classList.remove('loading');
-                            templates.runTemplateJS(js);
-                            doneInner();
-                        });
-                    } else {
+                    var doneInner = jsPending('update-table', type, cookie);
+                    templates.render('mod_facetoface/seminarevent_dashboard_sessions', json.data).done(function(html, js) {
+                        parent.outerHTML = html;
                         parent.classList.remove('loading');
-                        empty.setAttribute('aria-hidden', 'false');
-                        parent.classList.add('empty');
-                    }
-                    if ('debug' in json && 'query' in json.debug) {
-                        debug.innerHTML = json.debug.query;
-                        parent.classList.add('debug');
-                    }
-                    // The reservation information and the past event link are mutually exclusive at the moment.
-                    appendix.innerHTML = json.data.reservation || json.data.pastlink || '';
+                        templates.runTemplateJS(js);
+                        doneInner();
+                    });
                     doneOuter();
                 } else {
                     doneOuter();

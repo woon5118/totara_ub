@@ -275,4 +275,13 @@ class filter_list {
         }
         return new moodle_url($baseurl, $params);
     }
+
+    /**
+     * Convert to an object for debugging purposes.
+     *
+     * @return \stdClass
+     */
+    public function to_object(): \stdClass {
+        return (object)get_object_vars($this);
+    }
 }

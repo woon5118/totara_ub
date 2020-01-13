@@ -83,6 +83,7 @@ class seminarevent_actionbar_builder {
      * @return seminarevent_actionbar_builder
      */
     public function add_commandlink(string $name, $url, $textoricon, bool $primary = false, bool $disabled = false): seminarevent_actionbar_builder {
+        global $OUTPUT;
         if ($url instanceof \moodle_url) {
             $url = $url->out(false);
         }
@@ -93,7 +94,6 @@ class seminarevent_actionbar_builder {
             'disabled' => $disabled,
         ];
         if ($textoricon instanceof \pix_icon) {
-            global $OUTPUT;
             $iconattr = array(
                 'template' => $textoricon->get_template(),
                 'context' => $textoricon->export_for_template($OUTPUT),
