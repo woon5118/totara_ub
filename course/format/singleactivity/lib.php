@@ -217,6 +217,8 @@ class format_singleactivity extends format_base {
 
         if (!$this->course && $submitvalues = $mform->getSubmitValues()) {
             $this->categoryid = $submitvalues['category'];
+        } else if (!$this->course) { // Totara: Set category for new courses as activity type field depends on that.
+            $this->categoryid = $mform->getElementValue('category')[0];
         }
 
         $elements = parent::create_edit_form_elements($mform, $forsection);
