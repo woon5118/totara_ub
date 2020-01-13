@@ -30,6 +30,7 @@
       :user="user"
       :specified-role="role"
       :current-user-id="currentUserId"
+      :assignment-id="assignmentId"
       :go-back-link="goBackLink"
     />
   </div>
@@ -52,6 +53,10 @@ export default {
     },
     currentUserId: {
       required: true,
+      type: Number,
+    },
+    assignmentId: {
+      required: false,
       type: Number,
     },
     goBackLink: {

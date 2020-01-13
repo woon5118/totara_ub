@@ -60,6 +60,10 @@ class rate_competencies extends base {
             $vue_props['role'] = $this->role::get_name();
         }
 
+        if ($assignment_id = $this->get_param('assignment_id', PARAM_INT)) {
+            $vue_props['assignment-id'] = $assignment_id;
+        }
+
         return tui_view::create('pathway_manual/pages/RateCompetencies', $vue_props)
             ->set_title($page_title);
     }

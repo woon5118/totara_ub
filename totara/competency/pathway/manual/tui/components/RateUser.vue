@@ -39,12 +39,15 @@
         />
       </div>
       <div
-        v-if="roleSpecified"
+        v-if="roleSpecified && !isForSelf"
         class="tui-pathwayManual-rateUser__ratingAsRole"
       >
         {{ $str(`rating_as_${roleSpecified}`, 'pathway_manual') }}
       </div>
-      <div v-else class="tui-pathwayManual-rateUser__ratingAsRole">
+      <div
+        v-else-if="!isForSelf"
+        class="tui-pathwayManual-rateUser__ratingAsRole"
+      >
         <span>{{ $str('rating_as_a', 'pathway_manual') }}</span>
         <span class="tui-pathwayManual-rateUser__selectRole">
           <Select
@@ -71,6 +74,7 @@
       :user="user"
       :role="role"
       :current-user-id="currentUserId"
+      :assignment-id="assignmentId"
       :go-back-link="goBackLink"
       @has-unsaved-ratings="has => (hasUnsavedRatings = has)"
     />
@@ -104,6 +108,10 @@ export default {
     },
     currentUserId: {
       required: true,
+      type: Number,
+    },
+    assignmentId: {
+      required: false,
       type: Number,
     },
     goBackLink: {

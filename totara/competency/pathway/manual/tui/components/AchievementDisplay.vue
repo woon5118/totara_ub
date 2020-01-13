@@ -141,8 +141,11 @@ export default {
     },
 
     getAddRatingUrl(roleRating) {
-      // TODO: Return url for making manual ratings in TL-22969
-      return '#' + roleRating.role.name;
+      return this.$url('/totara/competency/profile/rate-competencies', {
+        user_id: this.userId,
+        role: roleRating.role.name,
+        assignment_id: this.assignmentId,
+      });
     },
 
     getProfilePhotoUrl(roleRating) {

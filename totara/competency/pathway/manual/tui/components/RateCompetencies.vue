@@ -131,13 +131,24 @@ export default {
       required: true,
       type: String,
     },
+    assignmentId: {
+      required: false,
+      type: Number,
+    },
   },
 
   data() {
+    let selectedFilters = {};
+    if (this.assignmentId != null) {
+      selectedFilters = {
+        assignment_reason: [this.assignmentId],
+      };
+    }
+
     return {
       data: {},
-      selectedFilters: {},
-      filterOptions: {},
+      selectedFilters: selectedFilters,
+      filterOptions: null,
       showSubmitRatingsModal: false,
       selectedRatings: [],
       noneOptionValue: NONE_OPTION_VALUE,
