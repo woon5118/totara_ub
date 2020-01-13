@@ -23,10 +23,18 @@
 <template>
   <div class="tui-samplesCode">
     <Collapsible v-model="expanded" label="Code example">
-      <h5>Template</h5>
-      <pre class="tui-samplesCode__box"><slot name="template" /></pre>
-      <h5>Script</h5>
-      <pre class="tui-samplesCode__box"><slot name="script" /></pre>
+      <template v-if="$slots.template">
+        <h5>Template</h5>
+        <pre class="tui-samplesCode__box"><slot name="template" /></pre>
+      </template>
+      <template v-if="$slots.script">
+        <h5>Script</h5>
+        <pre class="tui-samplesCode__box"><slot name="script" /></pre>
+      </template>
+      <template v-if="$slots.style">
+        <h5>Style</h5>
+        <pre class="tui-samplesCode__box"><slot name="style" /></pre>
+      </template>
     </Collapsible>
   </div>
 </template>
