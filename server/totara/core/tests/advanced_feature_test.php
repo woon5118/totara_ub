@@ -22,8 +22,6 @@
  */
 
 use totara_core\advanced_feature;
-use totara_core\hook\advanced_feature_disabled;
-use totara_core\hook\advanced_feature_enabled;
 
 defined('MOODLE_INTERNAL') || die();
 
