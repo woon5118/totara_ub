@@ -128,8 +128,8 @@ class behat_totara_reportbuilder extends behat_base {
         $valuesearch = behat_context_helper::escape($value);
         // Find the table.
         $xpath  = "//table[contains(concat(' ', normalize-space(@class), ' '), ' reportbuilder-table ')]";
-        // Find the row
-        $xpath .= "//td/*[contains(text(),{$rowsearch})]//ancestor::tr";
+        // Find the row - the text can be either directly in TD or in child element
+        $xpath .= "//td[contains(text(),{$rowsearch}) or .//*[contains(text(),{$rowsearch})]]//ancestor::tr";
         // Find the column
         $xpath .= "/td[contains(concat(' ', normalize-space(@class), ' '), ' {$column} ')]";
         // Find the row
