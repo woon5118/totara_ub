@@ -292,11 +292,7 @@ abstract class pathway {
      */
     final public function delete(bool $execute_hook = true) {
         if ($this->is_active()) {
-            if ($execute_hook) {
-                $hook = new competency_configuration_changed($this->competency->id);
-                $hook->execute();
-            }
-            return $this->archive(false);
+            $this->archive();
         }
 
         return $this;
