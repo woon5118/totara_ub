@@ -37,38 +37,36 @@ require_once($CFG->libdir . '/clilib.php');
 
 list($options, $params) = cli_get_params(['domagic' => false]);
 
-if (empty($options['domagic'])) {
-    cli_error('Invalid dev script use');
-}
-
 define('DEV_MIGRATION_TAG', 'v3.4.9');
-define('DEV_RELEASE_TAG', 'v3.5.10'); // NOTE: edit when creating premigration files for later releases.
 
+$releases = util::get_supported_releases();
 
-$versions = util::load_release_versions(DEV_RELEASE_TAG);
-$targetversions = util::load_release_versions(DEV_MIGRATION_TAG);
-$backported = util::get_backported_plugins();
+foreach ($releases as $release) {
+    $versions = util::load_release_versions($release['tag']);
+    $targetversions = util::load_release_versions(DEV_MIGRATION_TAG);
+    $backported = util::get_backported_plugins();
 
-foreach ($versions['plugins'] as $component => $info) {
-    if (!$info['has_upgrade'] && !isset($backported[$component])) {
-        continue;
+    foreach ($versions['plugins'] as $component => $info) {
+        if (!$info['has_upgrade'] && !isset($backported[$component])) {
+            continue;
+        }
+        if (!isset($targetversions['plugins'][$component])) {
+            continue;
+        }
+        $plugindir = $CFG->dirroot . $info['relative_path'];
+        if (!file_exists($plugindir . '/version.php')) {
+            continue;
+        }
+        if (file_exists($plugindir . '/db/premigrate.php')) {
+            continue;
+        }
+        if (!file_exists($plugindir . '/db')) {
+            mkdir($plugindir . '/db');
+        }
+        $content = dev_get_premigrate_file($info['type'], $info['name'], $info['version'], $targetversions['plugins'][$component]['version']);
+        file_put_contents($plugindir . '/db/premigrate.php', $content);
+        cli_writeln($info['relative_path'] . '/db/premigrate.php');
     }
-    if (!isset($targetversions['plugins'][$component])) {
-        continue;
-    }
-    $plugindir = $CFG->dirroot . $info['relative_path'];
-    if (!file_exists($plugindir . '/version.php')) {
-        continue;
-    }
-    if (file_exists($plugindir . '/db/premigrate.php')) {
-        continue;
-    }
-    if (!file_exists($plugindir . '/db')) {
-        mkdir($plugindir . '/db');
-    }
-    $content = dev_get_premigrate_file($info['type'], $info['name'], $info['version'], $targetversions['plugins'][$component]['version']);
-    file_put_contents($plugindir . '/db/premigrate.php', $content);
-    cli_writeln($info['relative_path'] . '/db/premigrate.php');
 }
 
 die;

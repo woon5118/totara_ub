@@ -30,9 +30,11 @@ function xmldb_editor_atto_premigrate() {
 
     $version = premigrate_get_plugin_version('editor', 'atto');
 
-    if ($version > 2018051401) {
+    if ($version > 2018120300) {
         throw new coding_exception("Invalid plugin (editor_atto) version ($version) for pre-migration");
     }
+
+    // Moodle 3.6 pre-migration line.
 
     // NOTE: nothing to do
 

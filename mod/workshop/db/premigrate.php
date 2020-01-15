@@ -18,36 +18,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Petr Skoda <petr.skoda@totaralearning.com>
- * @package qtype_essay
+ * @package mod_workshop
  */
 
 /**
  * Transforms plugin data to Moodle data format supported in migration.
  */
-function xmldb_qtype_essay_premigrate() {
+function xmldb_mod_workshop_premigrate() {
     global $DB;
     $dbman = $DB->get_manager();
 
-    $version = premigrate_get_plugin_version('qtype', 'essay');
+    $version = premigrate_get_plugin_version('mod', 'workshop');
 
     if ($version > 2018120300) {
-        throw new coding_exception("Invalid plugin (qtype_essay) version ($version) for pre-migration");
+        throw new coding_exception("Invalid plugin (mod_workshop) version ($version) for pre-migration");
     }
 
-    // Moodle 3.6 pre-migration line.
+    if ($version >= 2018062600) {
+        $table = new xmldb_table('workshop');
+        $field = new xmldb_field('nattachments', XMLDB_TYPE_INTEGER, '3', null, null, null, '0');
+        $dbman->change_field_default($table, $field);
 
-    if ($version >= 2018021800) {
-        $table = new xmldb_table('qtype_essay_options');
-        $field = new xmldb_field('filetypeslist', XMLDB_TYPE_TEXT, null, null, null, null, null, 'responsetemplateformat');
+        $table = new xmldb_table('workshop');
+        $field = new xmldb_field('submissiontypefile', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1');
         if ($dbman->field_exists($table, $field)) {
             $dbman->drop_field($table, $field);
         }
 
-        $version = premigrate_plugin_savepoint(2018021700, 'qtype', 'essay');
+        $table = new xmldb_table('workshop');
+        $field = new xmldb_field('submissiontypetext', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $version = premigrate_plugin_savepoint(2018062500, 'mod', 'workshop');
     }
 
+    // Moodle 3.6 pre-migration line.
+
     // Plugin is ready for migration from Moodle 3.4.9 to Totara 13.
-    if ($version > 2017111300) {
-        $version = premigrate_plugin_savepoint(2017111300, 'qtype', 'essay');
+    if ($version > 2017111301) {
+        $version = premigrate_plugin_savepoint(2017111301, 'mod', 'workshop');
     }
 }

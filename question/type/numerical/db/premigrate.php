@@ -30,9 +30,11 @@ function xmldb_qtype_numerical_premigrate() {
 
     $version = premigrate_get_plugin_version('qtype', 'numerical');
 
-    if ($version > 2018051400) {
+    if ($version > 2018120300) {
         throw new coding_exception("Invalid plugin (qtype_numerical) version ($version) for pre-migration");
     }
+
+    // Moodle 3.6 pre-migration line.
 
     if ($version >= 2017121000) {
         $table = new xmldb_table('question_numerical_units');

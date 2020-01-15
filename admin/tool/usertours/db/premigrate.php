@@ -18,28 +18,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Petr Skoda <petr.skoda@totaralearning.com>
- * @package enrol_paypal
+ * @package tool_usertours
  */
 
 /**
  * Transforms plugin data to Moodle data format supported in migration.
  */
-function xmldb_enrol_paypal_premigrate() {
+function xmldb_tool_usertours_premigrate() {
     global $DB;
     $dbman = $DB->get_manager();
 
-    $version = premigrate_get_plugin_version('enrol', 'paypal');
+    $version = premigrate_get_plugin_version('tool', 'usertours');
 
-    if ($version > 2018120300) {
-        throw new coding_exception("Invalid plugin (enrol_paypal) version ($version) for pre-migration");
+    if ($version > 2018120301) {
+        throw new coding_exception("Invalid plugin (tool_usertours) version ($version) for pre-migration");
     }
 
     // Moodle 3.6 pre-migration line.
 
-    // NOTE: the upgrade steps in 3.5.9 are the same as in 3.4.9
-
     // Plugin is ready for migration from Moodle 3.4.9 to Totara 13.
-    if ($version > 2017111305) {
-        $version = premigrate_plugin_savepoint(2017111305, 'enrol', 'paypal');
+    if ($version > 2017111300) {
+        $version = premigrate_plugin_savepoint(2017111300, 'tool', 'usertours');
     }
 }

@@ -359,6 +359,13 @@ function totara_core_upgrade_delete_moodle_plugins() {
     // NOTE: this should match \core_plugin_manager::is_deleted_standard_plugin() data.
 
     $deleteplugins = array(
+        // Moodle 3.6.x premigration removals.
+        'repository_nextcloud',
+        'block_recentlyaccessedcourses',
+        'block_recentlyaccesseditems',
+        'block_starredcourses',
+        'block_timeline',
+
         // Moodle 3.5.x premigration removals.
         'ltiservice_gradebookservices',
         'atto_recordrtc',

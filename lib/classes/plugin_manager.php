@@ -1139,6 +1139,13 @@ class core_plugin_manager {
     public static function is_deleted_standard_plugin($type, $name) {
         // TOTARA: Do not include plugins that were removed during upgrades to Totara 9 or Moodle 3.0 and earlier.
         $plugins = array(
+            // Moodle 3.6.x premigration removals.
+            'repository_nextcloud',
+            'block_recentlyaccessedcourses',
+            'block_recentlyaccesseditems',
+            'block_starredcourses',
+            'block_timeline',
+
             // Moodle 3.5.x premigration removals.
             'ltiservice_gradebookservices',
             'atto_recordrtc',

@@ -32,6 +32,166 @@ function xmldb_core_premigrate() {
 
     $version = $CFG->version;
 
+    if ($version >= 2018111301.00) {
+        $table = new xmldb_table('context');
+        $field = new xmldb_field('locked', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'depth');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $version = premigrate_main_savepoint(2018111300.00);
+    }
+
+    if ($version >= 2018110500.01) {
+        $tablebadge = new xmldb_table('badge');
+        $fieldversion = new xmldb_field('version', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'nextcron');
+        $fieldlanguage = new xmldb_field('language', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'version');
+        $fieldimageauthorname = new xmldb_field('imageauthorname', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'language');
+        $fieldimageauthoremail = new xmldb_field('imageauthoremail', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'imageauthorname');
+        $fieldimageauthorurl = new xmldb_field('imageauthorurl', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'imageauthoremail');
+        $fieldimagecaption = new xmldb_field('imagecaption', XMLDB_TYPE_TEXT, null, null, null, null, null, 'imageauthorurl');
+        if ($dbman->field_exists($tablebadge, $fieldversion)) {
+            $dbman->drop_field($tablebadge, $fieldversion);
+        }
+        if ($dbman->field_exists($tablebadge, $fieldlanguage)) {
+            $dbman->drop_field($tablebadge, $fieldlanguage);
+        }
+        if ($dbman->field_exists($tablebadge, $fieldimageauthorname)) {
+            $dbman->drop_field($tablebadge, $fieldimageauthorname);
+        }
+        if ($dbman->field_exists($tablebadge, $fieldimageauthoremail)) {
+            $dbman->drop_field($tablebadge, $fieldimageauthoremail);
+        }
+        if ($dbman->field_exists($tablebadge, $fieldimageauthorurl)) {
+            $dbman->drop_field($tablebadge, $fieldimageauthorurl);
+        }
+        if ($dbman->field_exists($tablebadge, $fieldimagecaption)) {
+            $dbman->drop_field($tablebadge, $fieldimagecaption);
+        }
+
+        $table = new xmldb_table('badge_endorsement');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $table = new xmldb_table('badge_related');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $table = new xmldb_table('badge_competencies');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $version = premigrate_main_savepoint(2018110500.00);
+    }
+
+    if ($version >= 2018101800.00) {
+        $table = new xmldb_table('favourite');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $version = premigrate_main_savepoint(2018101700.00);
+    }
+
+    if ($version >= 2018092800.01) {
+        $table = new xmldb_table('message_contacts');
+        $field = new xmldb_field('blocked', XMLDB_TYPE_INTEGER, 1, null, XMLDB_NOTNULL, null, 0);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $version = premigrate_main_savepoint(2018092800.00);
+    }
+
+    if ($version >= 2018092800.00) {
+        $table = new xmldb_table('message_contacts');
+        $field = new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $table = new xmldb_table('message_contacts');
+        $index = new xmldb_index('userid-contactid', XMLDB_INDEX_UNIQUE, ['userid', 'contactid']);
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        $table = new xmldb_table('message_contacts');
+        $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+        $dbman->drop_key($table, $key);
+
+        $table = new xmldb_table('message_contacts');
+        $field = new xmldb_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'id');
+        $dbman->change_field_default($table, $field);
+
+        $key = new xmldb_key('contactid', XMLDB_KEY_FOREIGN, ['contactid'], 'user', ['id']);
+        $dbman->drop_key($table, $key);
+
+        $table = new xmldb_table('message_contacts');
+        $field = new xmldb_field('contactid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'userid');
+        $dbman->change_field_default($table, $field);
+
+        $table = new xmldb_table('message_contacts');
+        $index = new xmldb_index('userid-contactid', XMLDB_INDEX_UNIQUE, ['userid', 'contactid']);
+        $dbman->add_index($table, $index);
+
+        $table = new xmldb_table('message_contact_requests');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $table = new xmldb_table('message_users_blocked');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $version = premigrate_main_savepoint(2018092700.00);
+    }
+
+    if ($version >= 2018092100.04) {
+        $table = new xmldb_table('question_categories');
+        $index = new xmldb_index('contextididnumber', XMLDB_INDEX_UNIQUE, array('contextid', 'idnumber'));
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        $table = new xmldb_table('question_categories');
+        $field = new xmldb_field('idnumber', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $table = new xmldb_table('question');
+        $index = new xmldb_index('categoryidnumber', XMLDB_INDEX_UNIQUE, array('category', 'idnumber'));
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        $table = new xmldb_table('question');
+        $field = new xmldb_field('idnumber', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $version = premigrate_main_savepoint(2018092100.00);
+    }
+
+    if ($version >= 2018062800.03) {
+        $table = new xmldb_table('event');
+        $field = new xmldb_field('location', XMLDB_TYPE_TEXT, null, null, null, null, null, 'priority');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Main savepoint reached.
+        $version = premigrate_main_savepoint(2018062800.02);
+    }
+
+    // Moodle 3.6 pre-migration line.
+
     if ($version >= 2018040500.01) {
         $table = new xmldb_table('cohort');
         $field = new xmldb_field('theme', XMLDB_TYPE_CHAR, '50', null, null, null, null, 'timemodified');

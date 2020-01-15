@@ -30,9 +30,11 @@ function xmldb_message_popup_premigrate() {
 
     $version = premigrate_get_plugin_version('message', 'popup');
 
-    if ($version > 2018051400) {
+    if ($version > 2018120300) {
         throw new coding_exception("Invalid plugin (message_popup) version ($version) for pre-migration");
     }
+
+    // Moodle 3.6 pre-migration line.
 
     if ($version >= 2018032800) {
         $table = new xmldb_table('message_popup_notifications');

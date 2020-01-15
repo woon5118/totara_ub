@@ -17,6 +17,7 @@ releases is updated regularly.
 Releases supported in pre-migration script:
 
 * Moodle 3.5.10 (Build: 20200113)
+* Moodle 3.6.8 (Build: 20200113)
 
 
 For more information see https://help.totaralearning.com/display/latest/Upgrading+from+Moodle

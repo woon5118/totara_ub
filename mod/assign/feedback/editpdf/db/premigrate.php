@@ -30,9 +30,11 @@ function xmldb_assignfeedback_editpdf_premigrate() {
 
     $version = premigrate_get_plugin_version('assignfeedback', 'editpdf');
 
-    if ($version > 2018051401) {
+    if ($version > 2018120300) {
         throw new coding_exception("Invalid plugin (assignfeedback_editpdf) version ($version) for pre-migration");
     }
+
+    // Moodle 3.6 pre-migration line.
 
     // Reverse 2018051401 changes from MDL-63891.
     if ($version >= 2018051401) {

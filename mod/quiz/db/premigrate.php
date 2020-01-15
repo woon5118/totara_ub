@@ -30,9 +30,11 @@ function xmldb_mod_quiz_premigrate() {
 
     $version = premigrate_get_plugin_version('mod', 'quiz');
 
-    if ($version > 2018051400) {
+    if ($version > 2018120301) {
         throw new coding_exception("Invalid plugin (mod_quiz) version ($version) for pre-migration");
     }
+
+    // Moodle 3.6 pre-migration line.
 
     if ($version >= 2018040800) {
         $table = new xmldb_table('quiz_slot_tags');
