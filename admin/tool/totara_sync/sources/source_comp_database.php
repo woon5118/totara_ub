@@ -37,6 +37,8 @@ require_once($CFG->dirroot.'/admin/tool/totara_sync/sources/databaselib.php');
  */
 class totara_sync_source_comp_database extends totara_sync_source_comp {
 
+    public const USES_FILES = false;
+
     /**
      * Add form elements specific to competencies.
      *

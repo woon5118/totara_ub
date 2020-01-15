@@ -30,6 +30,8 @@ require_once($CFG->dirroot.'/admin/tool/totara_sync/sources/databaselib.php');
 class totara_sync_source_jobassignment_database extends totara_sync_source_jobassignment {
     use \tool_totara_sync\internal\source\database_trait;
 
+    public const USES_FILES = false;
+
     public function config_form(&$mform) {
         $this->config_form_add_database_details($mform);
         parent::config_form($mform);

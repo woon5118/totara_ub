@@ -30,6 +30,8 @@ require_once($CFG->dirroot.'/admin/tool/totara_sync/elements/user.php');
 class totara_sync_source_user_database extends totara_sync_source_user {
     use \tool_totara_sync\internal\source\database_trait;
 
+    public const USES_FILES = false;
+
     function config_form(&$mform) {
         global $PAGE, $OUTPUT;
 

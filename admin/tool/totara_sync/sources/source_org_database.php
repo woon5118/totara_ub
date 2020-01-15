@@ -29,6 +29,8 @@ require_once($CFG->dirroot.'/admin/tool/totara_sync/sources/databaselib.php');
 class totara_sync_source_org_database extends totara_sync_source_org {
     use \tool_totara_sync\internal\source\database_trait;
 
+    public const USES_FILES = false;
+
     function config_form(&$mform) {
         global $PAGE, $OUTPUT;
 
