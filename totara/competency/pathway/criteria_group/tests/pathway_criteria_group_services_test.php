@@ -168,8 +168,58 @@ class pathway_criteria_group_services_testcase extends advanced_testcase {
                             'metakey' => "competency_id",
                             'metavalue' => $data->comp->id,
                         ],
+                    ],
+                    'type' => "linkedcourses",
+                ],
+            ],
+            'scalevalue' => $data->scalevalues[5]->id,
+            'sortorder' => 1,
+            'actiontime' => time(),
+        ];
+
+        $res = \external_api::call_external_function(
+            'pathway_criteria_group_create',
+            $params
+        );
+
+        $result = $res['data'] ?? null;
+        $error = $res['error'] ?? null;
+
+        $this->assertEquals(false, $error);
+        $this->assertTrue(is_numeric($result));
+
+        // Assert that the new pathway is created and change is logged
+        $this->assertEquals(1, $DB->count_records('totara_competency_pathway'));
+        $this->assertEquals(1, $DB->count_records('pathway_criteria_group'));
+        $this->assertEquals(1, $DB->count_records('pathway_criteria_group_criterion', ['criterion_type' => 'linkedcourses']));
+        $this->assertEquals(1, $DB->count_records('totara_criteria', ['plugin_type' => 'linkedcourses']));
+        $this->assertEquals(1, $DB->count_records('totara_competency_configuration_change'));
+    }
+
+    public function test_pathway_criteria_group_create_linkedcourses_update_with_coursecompletion() {
+        global $DB;
+
+        $data = $this->setup_data();
+
+        // Ensure we have no pathways before the API call
+        $this->assertEquals(0, $DB->count_records('totara_competency_pathway'));
+        $this->assertEquals(0, $DB->count_records('pathway_criteria_group'));
+        $this->assertEquals(0, $DB->count_records('pathway_criteria_group_criterion'));
+        $this->assertEquals(0, $DB->count_records('totara_criteria'));
+        $this->assertEquals(0, $DB->count_records('totara_competency_configuration_change'));
+
+        $params = [
+            'comp_id' => $data->comp->id,
+            'criteria' => [
+                [
+                    'aggregation' => [
+                        'reqitems' => 1,
+                        'method' => '1',
+                    ],
+                    'id' => 0,
+                    'metadata' => [
                         [
-                            'metakey' => "compid",
+                            'metakey' => "competency_id",
                             'metavalue' => $data->comp->id,
                         ],
                     ],

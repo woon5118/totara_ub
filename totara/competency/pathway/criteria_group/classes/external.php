@@ -123,10 +123,10 @@ class external extends \external_api {
         $criterion_array = [];
 
         foreach ($criteria as $crit) {
-            $criterion = criterion_factory::create($crit['type']);
-
-            if (!empty($crit['id'])) {
-                $criterion->set_id($crit['id']);
+            if (empty($crit['id'])) {
+                $criterion = criterion_factory::create($crit['type']);
+            } else {
+                $criterion = criterion_factory::fetch($crit['type'], $crit['id']);
             }
 
             if (!empty($crit['itemids'])) {
@@ -135,7 +135,7 @@ class external extends \external_api {
 
             if (!empty($crit['aggregation'])) {
                 $criterion->set_aggregation_method($crit['aggregation']['method']);
-                $criterion->set_aggregation_params(['req_items' => $crit['aggregation']['reqitems']]);
+                $criterion->set_aggregation_params(['req_items' => $crit['aggregation']['reqitems'] ?? 1]);
             }
 
             if (!empty($crit['metadata'])) {
@@ -234,10 +234,10 @@ class external extends \external_api {
         $criterion_array = [];
 
         foreach ($criteria as $crit) {
-            $criterion = criterion_factory::create($crit['type']);
-
-            if (!empty($crit['id'])) {
-                $criterion->set_id($crit['id']);
+            if (empty($crit['id'])) {
+                $criterion = criterion_factory::create($crit['type']);
+            } else {
+                $criterion = criterion_factory::fetch($crit['type'], $crit['id']);
             }
 
             if (!empty($crit['itemids'])) {
@@ -246,7 +246,7 @@ class external extends \external_api {
 
             if (!empty($crit['aggregation'])) {
                 $criterion->set_aggregation_method($crit['aggregation']['method']);
-                $criterion->set_aggregation_params(['req_items' => $crit['aggregation']['reqitems']]);
+                $criterion->set_aggregation_params(['req_items' => $crit['aggregation']['reqitems'] ?? 1]);
             }
             $criterion_array[] = $criterion;
 

@@ -23,7 +23,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="pathcritgrpcrit_fk_crigrpid" TYPE="foreign" FIELDS="criteria_group_id" REFTABLE="pathway_criteria_group" REFFIELDS="id"/>
+        <KEY NAME="pathcritgrpcrit_fk_crigrpid" TYPE="foreign" FIELDS="criteria_group_id" REFTABLE="pathway_criteria_group" REFFIELDS="id" ONDELETE="cascade"/>
       </KEYS>
     </TABLE>
   </TABLES>
