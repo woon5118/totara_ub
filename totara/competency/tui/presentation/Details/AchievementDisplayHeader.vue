@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import FlexIcon from 'totara_core/containers/icons/FlexIcon';
+import FlexIcon from 'totara_core/components/icons/FlexIcon';
 import Tooltip from 'totara_competency/containers/Tooltip';
 
 export default {

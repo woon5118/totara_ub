@@ -25,7 +25,7 @@
 
 <script>
 import List from 'totara_competency/containers/List';
-import FlexIcon from 'totara_core/containers/icons/FlexIcon';
+import FlexIcon from 'totara_core/components/icons/FlexIcon';
 import MyRatingCell from './../MyRatingCell';
 
 let columns = [

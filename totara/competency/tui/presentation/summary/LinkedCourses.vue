@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import FlexIcon from 'totara_core/containers/icons/FlexIcon';
+import FlexIcon from 'totara_core/components/icons/FlexIcon';
 
 import LinkedCoursesQuery from 'totara_competency/graphql/linked_courses';
 

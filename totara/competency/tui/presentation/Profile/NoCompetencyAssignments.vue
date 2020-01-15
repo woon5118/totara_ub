@@ -21,8 +21,8 @@
 </template>
 
 <script>
-import FlexIcon from 'totara_core/containers/icons/FlexIcon';
-import ActionLink from 'totara_core/presentation/links/ActionLink';
+import FlexIcon from 'totara_core/components/icons/FlexIcon';
+import ActionLink from 'totara_core/components/links/ActionLink';
 
 export default {
   components: { FlexIcon, ActionLink },

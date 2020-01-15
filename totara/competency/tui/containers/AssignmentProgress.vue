@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import PercentageDoughnut from 'totara_core/presentation/chartjs/PercentageDoughnut';
+import PercentageDoughnut from 'totara_core/components/chartjs/PercentageDoughnut';
 
 export default {
   components: { PercentageDoughnut },

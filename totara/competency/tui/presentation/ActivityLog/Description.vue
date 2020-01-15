@@ -13,7 +13,7 @@ const ACTION_TRACKING_START = 'tracking_started';
 const ACTION_TRACKING_END = 'tracking_ended';
 const TYPE_SYSTEM = 'system';
 
-import FlexIcon from 'totara_core/containers/icons/FlexIcon';
+import FlexIcon from 'totara_core/components/icons/FlexIcon';
 export default {
   components: { FlexIcon },
   props: {

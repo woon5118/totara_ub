@@ -79,7 +79,7 @@
 </template>
 
 <script>
-import FlexIcon from 'totara_core/containers/icons/FlexIcon';
+import FlexIcon from 'totara_core/components/icons/FlexIcon';
 
 import ScaleDetailsQuery from '../../../webapi/ajax/scale.graphql';
 

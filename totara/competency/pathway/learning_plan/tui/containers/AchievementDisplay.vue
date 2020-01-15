@@ -92,8 +92,8 @@
 
 <script>
 import AchievementDisplayHeader from 'totara_competency/presentation/Details/AchievementDisplayHeader';
-import Cell from 'totara_core/presentation/datatable/Cell';
-import Table from 'totara_core/presentation/datatable/Table';
+import Cell from 'totara_core/components/datatable/Cell';
+import Table from 'totara_core/components/datatable/Table';
 
 import CompetencyPlansQuery from '../../webapi/ajax/competency_plans.graphql';
 

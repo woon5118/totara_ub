@@ -12,7 +12,7 @@
 <script>
 /* global M */
 
-import ChartJs from 'totara_core/presentation/chartjs/ChartJs';
+import ChartJs from 'totara_core/components/chartjs/ChartJs';
 import theme from 'totara_core/theme';
 
 let rotate = (x, y, angle) => {

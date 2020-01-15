@@ -38,10 +38,10 @@
 </template>
 
 <script>
-import FlexIcon from 'totara_core/containers/icons/FlexIcon';
+import FlexIcon from 'totara_core/components/icons/FlexIcon';
 import AssignmentProgress from 'totara_competency/containers/AssignmentProgress';
-import ActionLink from 'totara_core/presentation/links/ActionLink';
-import Avatar from 'totara_core/presentation/avatar/Avatar';
+import ActionLink from 'totara_core/components/links/ActionLink';
+import Avatar from 'totara_core/components/avatar/Avatar';
 
 export default {
   components: { AssignmentProgress, FlexIcon, ActionLink, Avatar },

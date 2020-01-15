@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import FlexIcon from 'totara_core/containers/icons/FlexIcon';
+import FlexIcon from 'totara_core/components/icons/FlexIcon';
 import ProgressAssignmentFilters from '../presentation/ProgressAssignmentFilters';
 import CompetencyList from '../presentation/Profile/CompetencyList/List';
 import CompetencyCharts from '../presentation/Profile/CompetencyCharts';

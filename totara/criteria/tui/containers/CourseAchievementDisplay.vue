@@ -94,10 +94,10 @@
 </template>
 
 <script>
-import Cell from 'totara_core/presentation/datatable/Cell';
-import CheckIcon from 'totara_core/presentation/icons/common/CheckSuccess';
-import HeaderCell from 'totara_core/presentation/datatable/HeaderCell';
-import Table from 'totara_core/presentation/datatable/Table';
+import Cell from 'totara_core/components/datatable/Cell';
+import CheckIcon from 'totara_core/components/icons/common/CheckSuccess';
+import HeaderCell from 'totara_core/components/datatable/HeaderCell';
+import Table from 'totara_core/components/datatable/Table';
 
 export default {
   components: { Cell, CheckIcon, HeaderCell, Table },

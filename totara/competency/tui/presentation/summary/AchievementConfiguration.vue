@@ -109,8 +109,8 @@
 
 <script>
 // Import components
-import Label from 'totara_core/presentation/form/Label';
-import FlexIcon from 'totara_core/containers/icons/FlexIcon';
+import Label from 'totara_core/components/form/Label';
+import FlexIcon from 'totara_core/components/icons/FlexIcon';
 import Divider from 'totara_competency/presentation/common/Divider';
 
 // Import queries

@@ -107,10 +107,10 @@
 <script>
 import CreateUserAssignmentMutation from '../../../../../competency/webapi/ajax/create_user_assignments.graphql';
 import AchievementsQuery from '../../webapi/ajax/achievements.graphql';
-import HeaderCell from 'totara_core/presentation/datatable/HeaderCell';
-import Cell from 'totara_core/presentation/datatable/Cell';
-import CheckSuccess from 'totara_core/presentation/icons/common/CheckSuccess';
-import Table from 'totara_core/presentation/datatable/Table';
+import HeaderCell from 'totara_core/components/datatable/HeaderCell';
+import Cell from 'totara_core/components/datatable/Cell';
+import CheckSuccess from 'totara_core/components/icons/common/CheckSuccess';
+import Table from 'totara_core/components/datatable/Table';
 
 export default {
   components: { CheckSuccess, Cell, HeaderCell, Table },

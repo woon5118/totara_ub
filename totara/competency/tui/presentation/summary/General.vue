@@ -136,7 +136,7 @@
 const ASSIGNMENT_CREATE_SELF = 1;
 const ASSIGNMENT_CREATE_OTHER = 2;
 
-import FlexIcon from 'totara_core/containers/icons/FlexIcon';
+import FlexIcon from 'totara_core/components/icons/FlexIcon';
 
 import CompetencyQuery from 'totara_competency/graphql/competency';
 
