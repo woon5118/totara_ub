@@ -50,8 +50,8 @@
 </template>
 
 <script>
-import Details from '../presentation/Details/Details';
-import ActivityLog from '../presentation/ActivityLog/ActivityLog';
+import Details from 'totara_competency/components/Details/Details';
+import ActivityLog from 'totara_competency/components/ActivityLog/ActivityLog';
 
 import CompetencyDetailsQuery from '../../webapi/ajax/competency_details.graphql';
 

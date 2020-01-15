@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import IndividualAssignmentProgress from 'totara_competency/containers/IndividualAssignmentProgress';
+import IndividualAssignmentProgress from 'totara_competency/components/IndividualAssignmentProgress';
 
 export default {
   components: {

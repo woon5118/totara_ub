@@ -42,7 +42,7 @@
 
 <script>
 import ScaleAchievementsQuery from '../../../webapi/ajax/scale_achievements.graphql';
-import Divider from 'totara_competency/presentation/common/Divider';
+import Divider from 'totara_competency/components/common/Divider';
 
 export default {
   components: { Divider },
@@ -109,7 +109,7 @@ export default {
             items: [],
           };
           achievement.items.forEach(item => {
-            let compPath = `pathway_${item.pathway_type}/containers/AchievementDisplay`;
+            let compPath = `pathway_${item.pathway_type}/components/AchievementDisplay`;
             numberOfItems += 1;
 
             newAchievement.items.push({

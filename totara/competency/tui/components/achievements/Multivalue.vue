@@ -55,7 +55,7 @@ export default {
   },
 
   mounted: function() {
-    let compPath = `pathway_${this.type}/containers/AchievementDisplay`;
+    let compPath = `pathway_${this.type}/components/AchievementDisplay`;
     this.component = tui.asyncComponent(compPath);
   },
 

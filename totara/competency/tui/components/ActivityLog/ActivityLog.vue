@@ -34,7 +34,7 @@
 const ACTION_TRACKING_START = 'tracking_started';
 const ACTION_TRACKING_END = 'tracking_ended';
 
-import List from 'totara_competency/containers/List';
+import List from 'totara_competency/components/List';
 import Date from './Date';
 import ProficientStatus from './ProficientStatus';
 import Description from './Description';

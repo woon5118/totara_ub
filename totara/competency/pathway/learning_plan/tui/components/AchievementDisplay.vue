@@ -91,7 +91,7 @@
 </template>
 
 <script>
-import AchievementDisplayHeader from 'totara_competency/presentation/Details/AchievementDisplayHeader';
+import AchievementDisplayHeader from 'totara_competency/components/Details/AchievementDisplayHeader';
 import Cell from 'totara_core/components/datatable/Cell';
 import Table from 'totara_core/components/datatable/Table';
 

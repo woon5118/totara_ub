@@ -40,9 +40,9 @@
 </template>
 
 <script>
-import General from 'totara_competency/presentation/summary/General';
-import LinkedCourses from 'totara_competency/presentation/summary/LinkedCourses';
-import AchievementConfiguration from 'totara_competency/presentation/summary/AchievementConfiguration';
+import General from 'totara_competency/components/summary/General';
+import LinkedCourses from 'totara_competency/components/summary/LinkedCourses';
+import AchievementConfiguration from 'totara_competency/components/summary/AchievementConfiguration';
 
 export default {
   components: {

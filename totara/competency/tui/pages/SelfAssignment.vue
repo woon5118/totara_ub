@@ -157,7 +157,7 @@
 import SelfAssignableCompetenciesQuery from '../../webapi/ajax/self_assignable_competencies.graphql';
 import CreateUserAssignmentMutation from '../../webapi/ajax/create_user_assignments.graphql';
 import FlexIcon from 'totara_core/components/icons/FlexIcon';
-import Preloader from 'totara_competency/presentation/Preloader';
+import Preloader from 'totara_competency/components/Preloader';
 
 const initial_cursor = window.btoa(
   JSON.stringify({

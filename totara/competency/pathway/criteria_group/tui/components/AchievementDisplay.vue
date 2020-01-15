@@ -17,53 +17,56 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
-  @package totara_competency
+  @package pathway_criteria_group
 -->
 
 <template>
-  <div>
-    <div
-      v-for="(component, id) in achievements"
-      :key="id"
-      class="tui-totaraCompetency-achievementPathDisplay__group"
-    >
-      <component
-        :is="component.component"
-        v-bind="component.props"
-        @loaded="itemLoaded"
+  <div class="tui-pathwayCriteriaGroup-achievement__group">
+    <div v-for="(component, id) in achievements" :key="id">
+      <div class="tui-pathwayCriteriaGroup-achievement__group__criteria">
+        <component
+          :is="component.component"
+          v-bind="component.props"
+          @loaded="itemLoaded"
+        />
+      </div>
+      <Divider
+        v-if="!isLastItem(id, achievements)"
+        :label="$str('and', 'totara_competency')"
       />
     </div>
   </div>
 </template>
 
 <script>
-import AchievementPathsQuery from '../../webapi/ajax/achievement_paths.graphql';
+import CriteriaGroupAchievementsQuery from '../../webapi/ajax/achievements.graphql';
+import Divider from 'totara_competency/components/common/Divider';
 
 export default {
-  components: {},
+  components: { Divider },
   props: {
+    instanceId: {
+      required: true,
+      type: Number,
+    },
     userId: {
       required: true,
       type: Number,
     },
-    assignment: {
+    assignmentId: {
       required: true,
-      type: Object,
+      type: Number,
     },
   },
 
   data: function() {
     return {
       achievements: [],
-      itemsLoaded: null,
+      itemsLoaded: 0,
     };
   },
 
   computed: {
-    assignmentId() {
-      return parseInt(this.assignment.id);
-    },
-
     numberOfItems() {
       return this.achievements.length;
     },
@@ -80,25 +83,24 @@ export default {
 
   apollo: {
     achievements: {
-      query: AchievementPathsQuery,
+      query: CriteriaGroupAchievementsQuery,
       context: { batch: true },
       variables() {
         return {
-          assignment_id: this.assignmentId,
+          instance_id: this.instanceId,
         };
       },
-      update({ totara_competency_achievement_paths: paths }) {
+      update({ pathway_criteria_group_achievements: achievements }) {
         let newAchievementComponents = [];
-        paths.forEach(path => {
-          let componentName = this.capitalizeFirstLetter(path.class);
-          let compPath = `totara_competency/containers/achievements/${componentName}`;
+        achievements.forEach(achievement => {
+          let compPath = `criteria_${achievement.type}/components/AchievementDisplay`;
 
           newAchievementComponents.push({
             component: tui.asyncComponent(compPath),
             props: {
               userId: this.userId,
               assignmentId: this.assignmentId,
-              type: path.type,
+              instanceId: parseInt(achievement.instance_id),
             },
           });
         });
@@ -114,9 +116,10 @@ export default {
   },
 
   methods: {
-    capitalizeFirstLetter(string) {
-      return string.charAt(0).toUpperCase() + string.toLowerCase().slice(1);
+    isLastItem(id, items) {
+      return id === items.length - 1;
     },
+
     itemLoaded() {
       this.itemsLoaded += 1;
     },
@@ -125,12 +128,27 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-totaraCompetency-achievementPathDisplay {
+.tui-pathwayCriteriaGroup-achievement {
   &__group {
     margin: 1em;
     padding: 1em;
-    border: 1px solid black;
+    border: 1px dashed grey;
     border-radius: 6px;
+
+    &__criteria {
+      margin: 1em;
+      padding: 1em;
+      border: 1px solid black;
+      border-radius: 6px;
+    }
   }
 }
 </style>
+
+<lang-strings>
+  {
+    "totara_competency" : [
+      "and"
+    ]
+  }
+</lang-strings>

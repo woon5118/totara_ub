@@ -43,8 +43,8 @@
 import Tab from './Tab';
 import Tabs from './Tabs';
 import ScaleDetail from './ScaleDetail';
-import AchievementDisplay from 'totara_competency/containers/AchievementDisplay';
-import Preloader from 'totara_competency/presentation/Preloader';
+import AchievementDisplay from 'totara_competency/components/AchievementDisplay';
+import Preloader from 'totara_competency/components/Preloader';
 
 export default {
   components: { ScaleDetail, AchievementDisplay, Tab, Tabs, Preloader },

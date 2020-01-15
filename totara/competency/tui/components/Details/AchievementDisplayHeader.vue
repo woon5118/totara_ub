@@ -39,7 +39,7 @@
 
 <script>
 import FlexIcon from 'totara_core/components/icons/FlexIcon';
-import Tooltip from 'totara_competency/containers/Tooltip';
+import Tooltip from 'totara_competency/components/Tooltip';
 
 export default {
   components: { FlexIcon, Tooltip },

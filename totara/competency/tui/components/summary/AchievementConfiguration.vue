@@ -111,7 +111,7 @@
 // Import components
 import Label from 'totara_core/components/form/Label';
 import FlexIcon from 'totara_core/components/icons/FlexIcon';
-import Divider from 'totara_competency/presentation/common/Divider';
+import Divider from 'totara_competency/components/common/Divider';
 
 // Import queries
 import achievementConfigurationQuery from 'totara_competency/graphql/achievement_criteria';
