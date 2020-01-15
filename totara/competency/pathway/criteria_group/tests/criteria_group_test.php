@@ -28,7 +28,6 @@ use pathway_criteria_group\criteria_group;
 use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
 use totara_competency\entities\competency;
 use totara_competency\entities\scale;
-use totara_competency\hook\competency_configuration_changed;
 use totara_criteria\criterion;
 
 class pathway_criteria_group_testcase extends \advanced_testcase {
@@ -127,8 +126,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
             ['pathway_criteria_group_criterion', [], 0],
         ]);
 
-        $sink = $this->redirectHooks();
-
         // Save
         $instance->save();
         $this->assertFalse(empty($instance->get_id()));
@@ -139,13 +136,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $pw_id = $instance->get_id();
         $instance_id = $instance->get_path_instance_id();
 
-        $hooks = $sink->get_hooks();
-        $this->assertSame(1, count($hooks));
-        /** @var competency_configuration_changed $hook */
-        $hook = reset($hooks);
-        $this->assertTrue($hook instanceof competency_configuration_changed);
-        $this->assertEquals($data->competency->id, $hook->get_competency_id());
-
         // Check the saved data
         $this->validate_num_rows([
             ['totara_competency_pathway', ['id' => $pw_id], 1],
@@ -155,8 +145,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
 
         // Two criteria
         $this->validate_criteria_ids($instance_id, [$data->cc[1]->get_id(), $data->cc[2]->get_id()]);
-
-        $sink->close();
     }
 
     /**
@@ -165,7 +153,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
     public function test_saving_on_change() {
         global $DB;
 
-        $sink = $this->redirectHooks();
         $data = $this->setup_data();
 
         $instance = new criteria_group();
@@ -189,7 +176,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
 
         // Sleeping 1 second to ensure timestamps are different
         $this->waitForSecond();
-        $sink->clear();
 
         // Save without changes
         $instance->save();
@@ -205,9 +191,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $this->assertEquals($pw_row, $updated_pw_row);
         $updated_critgrp_row = $DB->get_record('pathway_criteria_group', ['id' => $instance_id]);
         $this->assertEquals($critgrp_row, $updated_critgrp_row);
-
-        // Nothing changed - no hook triggered
-        $this->assertSame(0, $sink->count());
 
         // Sleeping to ensure timestamps are different
         $this->waitForSecond();
@@ -238,15 +221,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $updated_critgrp_row = $DB->get_record('pathway_criteria_group', ['id' => $instance_id]);
         $this->assertEquals($critgrp_row, $updated_critgrp_row);
 
-        // Configuration changed - expecting hook
-        $hooks = $sink->get_hooks();
-        $this->assertSame(1, count($hooks));
-        /** @var competency_configuration_changed $hook */
-        $hook = reset($hooks);
-        $this->assertTrue($hook instanceof competency_configuration_changed);
-        $this->assertEquals($data->competency->id, $hook->get_competency_id());
-        $sink->clear();
-
         // Add one criterion, remove another
         $instance->replace_criteria([$data->cc[2], $data->cc[3]]);
         $instance->save();
@@ -264,14 +238,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
 
         $updated_critgrp_row = $DB->get_record('pathway_criteria_group', ['id' => $instance_id]);
         $this->assertEquals($critgrp_row, $updated_critgrp_row);
-
-        $hooks = $sink->get_hooks();
-        $this->assertSame(1, count($hooks));
-        /** @var competency_configuration_changed $hook */
-        $hook = reset($hooks);
-        $this->assertTrue($hook instanceof competency_configuration_changed);
-        $sink->clear();
-
 
         // Change criterion items in an existing criterion
         $criteria = $instance->get_criteria();
@@ -298,13 +264,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
 
         $updated_critgrp_row = $DB->get_record('pathway_criteria_group', ['id' => $instance_id]);
         $this->assertEquals($critgrp_row, $updated_critgrp_row);
-
-        $hooks = $sink->get_hooks();
-        $this->assertSame(1, count($hooks));
-        /** @var competency_configuration_changed $hook */
-        $hook = reset($hooks);
-        $this->assertTrue($hook instanceof competency_configuration_changed);
-        $sink->close();
     }
 
 
@@ -402,8 +361,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
     public function test_delete() {
         global $DB;
 
-        $sink = $this->redirectHooks();
-
         $data = $this->setup_data();
 
         $instance = new criteria_group();
@@ -432,8 +389,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         // Sleeping to ensure timestamps are different
         $this->waitForSecond();
 
-        $sink->clear();
-
         $instance->delete();
         $this->validate_num_rows([
             ['totara_competency_pathway', [], 1],
@@ -450,14 +405,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         // pathway_modified should be updated
         $updated_pw_row = $DB->get_record('totara_competency_pathway', ['id' => $pw_id]);
         $this->assertNotEquals($pw_row->pathway_modified, $updated_pw_row->pathway_modified);
-
-        $hooks = $sink->get_hooks();
-        $this->assertSame(1, count($hooks));
-        /** @var competency_configuration_changed $hook */
-        $hook = reset($hooks);
-        $this->assertTrue($hook instanceof competency_configuration_changed);
-        $this->assertEquals($data->competency->id, $hook->get_competency_id());
-        $sink->close();
     }
 
     /**

@@ -133,18 +133,17 @@ class criteria_childcompetency_watchers_testcase extends advanced_testcase {
         $parent_pw = $competency_generator->create_criteria_group($parent, [$parent_criterion], $non_proficient_scalevalue);
         $this->assertFalse($parent_pw->is_valid());
 
-        $hook_sink->clear();
 
         // First add a non-proficient pw to child
         $child_criterion = $criteria_generator->create_coursecompletion(['courseids' => [$course1->id]]);
         $child_pw = $competency_generator->create_criteria_group($child, [$child_criterion], $non_proficient_scalevalue);
-        $hooks = $hook_sink->get_hooks();
-        $this->assertSame(1, count($hooks));
-        /** @var pathways_created $hook */
-        $hook = reset($hooks);
-        $this->assertTrue($hook instanceof competency_configuration_changed);
-        $this->assertEquals($child->id, $hook->get_competency_id());
+
         $hook_sink->clear();
+
+        // competency_configuration_changed is triggered from the webapi
+        // Manually triggering it here to simulate changes through the api
+        /** @var competency_configuration_changed $hook */
+        $hook = new competency_configuration_changed($child->id);
 
         // Child competency - not proficient - should not result in validity change
         competency_wathcer::configuration_changed($hook);
@@ -154,14 +153,9 @@ class criteria_childcompetency_watchers_testcase extends advanced_testcase {
         $child_criterion2 = $criteria_generator->create_coursecompletion(['courseids' => [$course2->id]]);
         $child_pw2 = $competency_generator->create_criteria_group($child, [$child_criterion2], $proficient_scalevalue);
 
-        /** @var pathways_created $hooks */
-        $hooks = $hook_sink->get_hooks();
-        $this->assertSame(1, count($hooks));
-        $hook = reset($hooks);
-        $this->assertTrue($hook instanceof competency_configuration_changed);
         $hook_sink->clear();
-
         // Child competency now proficient - expect parent validity change
+        $hook = new competency_configuration_changed($child->id);
         competency_wathcer::configuration_changed($hook);
 
         $hooks = $hook_sink->get_hooks();

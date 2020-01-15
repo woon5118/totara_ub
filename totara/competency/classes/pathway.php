@@ -32,7 +32,6 @@ use totara_competency\entities\competency;
 use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\scale_value;
-use totara_competency\hook\competency_configuration_changed;
 
 /**
  * Base class for pathway plugins
@@ -178,10 +177,9 @@ abstract class pathway {
 
     /**
      * Save the pathway
-     * bool $execute_hook
      * @return $this
      */
-    final public function save(bool $execute_hook = true): pathway {
+    final public function save(): pathway {
         global $DB;
 
         if (empty($this->get_competency())) {
@@ -228,11 +226,6 @@ abstract class pathway {
 
         $this->saved_valid = $this->valid;
 
-        if ($execute_hook) {
-            $hook = new competency_configuration_changed($this->competency->id);
-            $hook->execute();
-        }
-
         return $this;
     }
 
@@ -250,10 +243,9 @@ abstract class pathway {
 
     /**
      * Archive the pathway
-     * @param bool $execute_hook
      * @return $this
      */
-    final private function archive(bool $execute_hook = true): pathway {
+    final private function archive(): pathway {
         if (empty($this->get_id())) {
             return $this;
         }
@@ -266,7 +258,7 @@ abstract class pathway {
         // IMPORTANT: We deliberately do not archive pathway_achievements here
         // so that our aggregation task picks all archived pathways up which
         // still have active pathway_achievements
-        $this->save($execute_hook);
+        $this->save();
 
         return $this;
     }
@@ -286,10 +278,9 @@ abstract class pathway {
 
     /**
      * 'Delete' the pathway and all its associated configuration
-     * @param bool $execute_hook
      * @return $this
      */
-    final public function delete(bool $execute_hook = true) {
+    final public function delete() {
         if ($this->is_active()) {
             $this->archive();
         }

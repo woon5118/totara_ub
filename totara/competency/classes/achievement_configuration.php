@@ -30,7 +30,6 @@ use totara_competency\entities\competency;
 use totara_competency\entities\configuration_change;
 use totara_competency\entities\configuration_history;
 use totara_competency\entities\scale_aggregation;
-use totara_competency\hook\competency_configuration_changed;
 
 /**
  * Class containing all relvant configuration information for a specific competency
@@ -156,13 +155,10 @@ class achievement_configuration {
             }
 
             $pathway_ids[] = $pathway['id'];
-            $pw->delete(false);
+            $pw->delete();
         }
 
         if (!empty($pathway_ids)) {
-            $hook = new competency_configuration_changed($this->competency->id);
-            $hook->execute();
-
             // Assigned users will be queued through competency's watcher of pathways_deleted
             configuration_change::add_competency_entry(
                 $this->competency->id,
@@ -195,14 +191,11 @@ class achievement_configuration {
         $pathways = achievement_criteria::get_default_pathways($this->get_competency()->scale, $this->get_competency()->id);
         foreach ($pathways as $pw) {
             $pw->set_competency($this->competency);
-            $pw->save(false);
+            $pw->save();
             $pathway_ids[] = $pw->get_id();
         }
 
         if (!empty($pathway_ids)) {
-            $hook = new competency_configuration_changed($this->competency->id, $pathway_ids);
-            $hook->execute();
-
             // TODO: Should we maybe not log this if no action_time is provided to cater for the case
             //       when this is called for new competencies??
             configuration_change::add_competency_entry(
@@ -249,9 +242,6 @@ class achievement_configuration {
             $aggregation->type = $type;
             $aggregation->timemodified = time();
             $aggregation->save();
-
-            $hook = new competency_configuration_changed($this->competency->id);
-            $hook->execute();
 
             configuration_change::add_competency_entry(
                 $this->competency->id,

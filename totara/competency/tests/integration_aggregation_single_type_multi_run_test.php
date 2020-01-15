@@ -25,6 +25,7 @@ use pathway_learning_plan\learning_plan;
 use pathway_manual\manual;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\pathway_achievement;
+use totara_competency\hook\competency_configuration_changed;
 use totara_competency\linked_courses;
 use totara_criteria\criterion;
 
@@ -92,8 +93,7 @@ class totara_competency_integration_aggregation_single_type_multi_run_testcase e
         /** @var learning_plan[] $pathways */
         $data->pathways = [];
         $data->pathways[1] = $data->competency_generator->create_learning_plan_pathway($data->competencies[1]);
-        $data->pathways[2] = $data->competency_generator->create_learning_plan_pathway($data->competencies[2
-        ]);
+        $data->pathways[2] = $data->competency_generator->create_learning_plan_pathway($data->competencies[2]);
 
         // Create learning plans
         $data->learning_plans = [];
@@ -294,6 +294,16 @@ class totara_competency_integration_aggregation_single_type_multi_run_testcase e
 
         $data->criteria = $criteria;
         $data->pathways = $pathways;
+
+        // Criteria configuration is done through the webapi which triggers the competency_configuration_changed hook
+        // Simulating this here to ensure childcompetency watchers are triggered
+        /** @var competency_configuration_changed $hook */
+        $hook = new competency_configuration_changed($data->competencies[3]->id);
+        $hook->execute();
+        $hook = new competency_configuration_changed($data->competencies[4]->id);
+        $hook->execute();
+        $hook = new competency_configuration_changed($data->competencies[5]->id);
+        $hook->execute();
     }
 
     /**

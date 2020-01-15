@@ -5,6 +5,7 @@ namespace totara_competency\entities;
 use core\orm\entity\entity;
 use core\orm\query\builder;
 use totara_competency\aggregation_users_table;
+use totara_competency\hook\competency_configuration_changed;
 
 /**
  * @property-read int $id ID
@@ -76,6 +77,10 @@ class configuration_change extends entity {
         $entry->change_type = $change_type;
         $entry->time_changed = $action_time ?? time();
         $entry->save();
+
+        // TODO: Not sure whether this is needed for CHANGED_COMPETENCY_AGGREGATION
+        $hook = new competency_configuration_changed($competency_id);
+        $hook->execute();
 
         return $entry;
     }

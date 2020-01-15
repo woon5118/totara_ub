@@ -29,6 +29,7 @@ use totara_competency\entities\competency_achievement;
 use totara_competency\entities\pathway;
 use totara_competency\entities\scale_value;
 use totara_competency\expand_task;
+use totara_competency\hook\competency_configuration_changed;
 use totara_core\advanced_feature;
 
 class pathway_learning_plan_totara_plan_observer_testcase extends advanced_testcase {
@@ -41,12 +42,18 @@ class pathway_learning_plan_totara_plan_observer_testcase extends advanced_testc
         $data = $this->setup_data();
 
         // No learning plan pathway being set up for competency here.
-        // Let's just make sure none is being added by default:
+        // Let's just make sure none is being added by default
         $this->assertFalse(pathway::repository()->where('path_type', 'learning_plan')->exists());
 
         $lp_pathway = new learning_plan();
         $lp_pathway->set_competency($data->competency);
         $lp_pathway->save();
+
+        // Pathways are usually created through the API which results in the competency_configuration_changed hook being triggered
+        // Simulating it here
+        /** @var competency_configuration_changed $hook */
+        $hook = new competency_configuration_changed($data->competency->id);
+        $hook->execute();
 
         $great = scale_value::repository()->where('name', '=', 'Great')->one();
         $good = scale_value::repository()->where('name', '=', 'Good')->one();
@@ -85,6 +92,12 @@ class pathway_learning_plan_totara_plan_observer_testcase extends advanced_testc
 
         // Part 2 of this test (as we have data set up already): account for pathways being archived.
         $lp_pathway->delete();
+
+        // Pathways are usually deleted through the API which results in the competency_configuration_changed hook being triggered
+        // Simulating it here
+        /** @var competency_configuration_changed $hook */
+        $hook = new competency_configuration_changed($data->competency->id);
+        $hook->execute();
 
         $component->set_value($data->competency->id, $data->user->id, $good->id, new stdClass());
 

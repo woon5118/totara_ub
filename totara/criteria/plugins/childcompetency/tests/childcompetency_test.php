@@ -23,6 +23,7 @@
 
 use criteria_childcompetency\childcompetency;
 use pathway_criteria_group\criteria_group;
+use totara_competency\hook\competency_configuration_changed;
 use totara_criteria\criterion;
 
 class criteria_childcompetency_testcase extends advanced_testcase {
@@ -198,7 +199,15 @@ class criteria_childcompetency_testcase extends advanced_testcase {
             [$criterion],
             $parent_comp->scale->default_value
         );
+
+        // Configuration changes are done throught the webapi which triggers the competency_configuration_changed hook.
+        // Simulating the triggering of this hook here as we are not using the API
+        /** @var competency_configuration_changed $hook */
+        $hook = new competency_configuration_changed($parent_comp->id);
+        $hook->execute();
+
         $this->assertFalse($parent_pw->is_valid());
+
 
         // Now add criteria to the child competency ... parent validity should also be updated as the child is valid
         $criterion = $criteria_generator->create_coursecompletion(['courseids' => [$course->id]]);
@@ -206,6 +215,11 @@ class criteria_childcompetency_testcase extends advanced_testcase {
             [$criterion],
             $child_comp->scale->min_proficient_value
         );
+
+        /** @var competency_configuration_changed $hook */
+        $hook = new competency_configuration_changed($child_comp->id);
+        $hook->execute();
+
         $this->assertTrue($child_pw->is_valid());
 
         // Re-initialize parent
