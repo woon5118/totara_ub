@@ -54,12 +54,4 @@ $observers = [
         'eventname' => bulk_course_completionimport::class,
         'callback' => course_observer::class.'::bulk_course_completions_imported',
     ],
-    [
-        'eventname' => course_deleted::class,
-        'callback' => course_observer::class.'::course_deleted',
-    ],
-    [
-        'eventname' => course_restored::class,
-        'callback' => course_observer::class.'::course_restored',
-    ],
 ];

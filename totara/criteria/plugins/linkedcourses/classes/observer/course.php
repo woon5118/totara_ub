@@ -67,27 +67,4 @@ class course {
         course_item_helper::course_completions_updated($user_courses, 'linkedcourses');
     }
 
-    /**
-     * When a course is deleted, we re-evaluate the validity of all criteria.
-     * A validity_changed hook is executed with the ids of all criteria that were affected
-     *
-     * @param course_deleted $event
-     */
-    public static function course_deleted(course_deleted $event) {
-        course_item_helper::course_deleted($event->objectid, 'linkedcourses');
-    }
-
-    /**
-     * When a course is restored, we update all items with the original course id to restored course id.
-     * Then we re-evaluate the validity of all criteria using this course.
-     * A validity_changed hook is executed with the ids of all criteria that were affected
-     *
-     * @param course_restored $event
-     */
-    public static function course_restored(course_restored $event) {
-        $restored_course_id = $event->courseid;
-        $original_course_id = $event->other['originalcourseid'] ?? $restored_course_id;
-        course_item_helper::course_restored($original_course_id, $restored_course_id, 'linkedcourses');
-    }
-
 }
