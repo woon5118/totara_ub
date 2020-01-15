@@ -30,7 +30,7 @@ Feature: Allow students to manually mark an activity as complete
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I click on "Not completed: Test forum name. Select to mark as complete." "link"
+    And I set the field "Manual completion of Test forum name" to "1"
     Then the "Test forum name" "forum" activity with "manual" completion should be marked as complete
     And I log out
     And I log in as "teacher1"

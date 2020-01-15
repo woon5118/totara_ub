@@ -503,7 +503,6 @@ class core_course_renderer extends plugin_renderer_base {
                 );
                 $output = $this->render(new \core\output\flex_icon('completion-manual-y', $data));
             } else if ($completion == COMPLETION_TRACKING_MANUAL) {
-                $imgtitle = get_string('completion-title-' . $completionicon, 'completion', $formattedname);
                 $newstate =
                     $completiondata->completionstate == COMPLETION_COMPLETE
                     ? COMPLETION_INCOMPLETE
@@ -535,12 +534,16 @@ class core_course_renderer extends plugin_renderer_base {
                 $output .= html_writer::end_tag('div');
                 $output .= html_writer::end_tag('form');
 
-                // Now to add the font icon
-                $data = array(
-                    'alt' => $imgalt,
-                    'title' => $imgtitle
-                );
-                $output .= html_writer::link('#', $this->render(new \core\output\flex_icon('completion-' . $completionicon, $data)), array('class' =>'completion-icon'));
+                // Now to add the self completion checkbox
+                $data = [
+                    'type' => 'checkbox',
+                    'aria-label' => get_string('completion-manual', 'completion', $formattedname),
+                    'class' => 'completion-icon',
+                ];
+                if ($completiondata->completionstate == COMPLETION_COMPLETE) {
+                    $data['checked'] = 'checked';
+                }
+                $output .= html_writer::empty_tag('input', $data);
 
             } else {
                 // In auto mode, the icon is just an image.

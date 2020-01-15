@@ -102,16 +102,16 @@ Feature: Verify standard and audience-based visibility in record of learning cou
     # Complete Course 1.
     And I click on "Record of Learning" in the totara menu
     And I follow "Course 1"
-    And I follow "Completion label 1"
-    And I follow "Completion label 2"
+    And I set the field "Manual completion of Completion label 1" to "1"
+    And I set the field "Manual completion of Completion label 2" to "1"
     # Only start Course 2 but don't complete it.
     And I click on "Record of Learning" in the totara menu
     And I follow "Course 2"
-    And I follow "Completion label 1"
+    And I set the field "Manual completion of Completion label 1" to "1"
     # Only start Course 3 but don't complete it.
     And I click on "Record of Learning" in the totara menu
     And I follow "Course 3"
-    And I follow "Completion label 1"
+    And I set the field "Manual completion of Completion label 1" to "1"
     And I log out
     Then I should see "Log in"
 

@@ -45,7 +45,7 @@ Feature: Restrict sections availability through completion or grade conditions
     And I am on "Course 1" course homepage
     Then I should see "Not available unless: The activity Test label is marked complete"
     And I should not see "Test page name"
-    And I click on "Not completed: Test label. Select to mark as complete." "link"
+    And I set the field "Manual completion of Test label" to "1"
     And I should see "Test page name"
     And I should not see "Not available unless: The activity Test label is marked complete"
 

@@ -54,7 +54,7 @@ Feature: availability_time_since_completion
 
     # Mark page 1 complete
     And I should see "Assignment 1"
-    When I click on "Not completed: Assignment 1. Select to mark as complete." "link"
+    When I set the field "Manual completion of Assignment 1" to "1"
 
     # Page 1 should still not be available, the time has not elapsed.
     Then I should not see "Page 1" in the "region-main" "region"
@@ -100,7 +100,7 @@ Feature: availability_time_since_completion
 
     # Mark page 1 complete
     And I should see "Assignment 1"
-    When I click on "Not completed: Assignment 1. Select to mark as complete." "link"
+    When I set the field "Manual completion of Assignment 1" to "1"
 
     # Page 1 should still be available, the time has not elapsed.
     Then I should see "Page 1" in the "region-main" "region"

@@ -10,6 +10,7 @@ information provided here is intended especially for developers.
    completion tracking is manual and the activity is completed via RPL
  * core_course_management_renderer::category_listitem() has been updated to delay-render action menu items
  * core_course\management\helper::get_category_listitem_actions() added a second argument $onlyfastactions
+ * core_course_renderer::course_section_cm_completion has been updated changing the self completion icon to a checkbox
 
 === 12.0 ===
 

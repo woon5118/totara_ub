@@ -52,5 +52,5 @@ Feature: availability_completion
     Then I should not see "Page 2" in the "region-main" "region"
 
     # Mark page 1 complete
-    When I click on "Not completed: Page 1. Select to mark as complete." "link"
+    When I set the field "Manual completion of Page 1" to "1"
     Then I should see "Page 2" in the "region-main" "region"

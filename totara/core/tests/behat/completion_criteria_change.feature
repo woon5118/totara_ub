@@ -77,17 +77,17 @@ Feature: Test reaggregating completion data when changing course completion sett
     Then I log out
     And I log in as "user1"
     And I am on "Course 1" course homepage
-    And I click on "Not completed: Assignment 1. Select to mark as complete." "link"
+    And I set the field "Manual completion of Assignment 1" to "1"
     And I click on "Complete course" "link"
     And I press "Yes"
     And I should see "You have already completed this course"
     And I am on "Course 2" course homepage
-    And I click on "Not completed: Assignment 2. Select to mark as complete." "link"
+    And I set the field "Manual completion of Assignment 2" to "1"
     And I click on "Complete course" "link"
     And I press "Yes"
     And I should see "You have already completed this course"
     And I am on "Course 3" course homepage
-    And I click on "Not completed: Assignment 3. Select to mark as complete." "link"
+    And I set the field "Manual completion of Assignment 3" to "1"
     # Confirm the status of the courses for user1.
     And I click on "Record of Learning" in the totara menu
     Then the following should exist in the "plan_courses" table:
@@ -99,11 +99,11 @@ Feature: Test reaggregating completion data when changing course completion sett
     Then I log out
     And I log in as "user2"
     And I am on "Course 1" course homepage
-    And I click on "Not completed: Assignment 1. Select to mark as complete." "link"
+    And I set the field "Manual completion of Assignment 1" to "1"
     And I am on "Course 2" course homepage
-    And I click on "Not completed: Assignment 2. Select to mark as complete." "link"
+    And I set the field "Manual completion of Assignment 2" to "1"
     And I am on "Course 3" course homepage
-    And I click on "Not completed: Assignment 3. Select to mark as complete." "link"
+    And I set the field "Manual completion of Assignment 3" to "1"
     # Confirm the status of the courses for user2.
     When I click on "Record of Learning" in the totara menu
     Then the following should exist in the "plan_courses" table:

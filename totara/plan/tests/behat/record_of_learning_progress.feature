@@ -109,32 +109,40 @@ Feature: Ensure progress is shown in Record of Learning
     When I log in as "learner1"
     # course1 - 100%
     And I am on "Course 1" course homepage
-    And I click on "Not completed: course1 label1. Select to mark as complete." "link"
-    And I click on "Not completed: course1 label2. Select to mark as complete." "link"
-    And I click on "Not completed: course1 label3. Select to mark as complete." "link"
-    Then I should see "Completed: course1 label1. Select to mark as not complete."
-    And I should see "Completed: course1 label2. Select to mark as not complete."
-    And I should see "Completed: course1 label3. Select to mark as not complete."
+    And I set the following fields to these values:
+      | Manual completion of course1 label1 | 1 |
+      | Manual completion of course1 label2 | 1 |
+      | Manual completion of course1 label3 | 1 |
+    And I set the following fields to these values:
+      | Manual completion of course1 label1 | 0 |
+      | Manual completion of course1 label2 | 0 |
+      | Manual completion of course1 label3 | 0 |
+    Then the following fields match these values:
+      | Manual completion of course1 label1 | 0 |
+      | Manual completion of course1 label2 | 0 |
+      | Manual completion of course1 label3 | 0 |
 
     # course2 - 33%
     When I am on "Course 2" course homepage
-    And I click on "Not completed: course2 label1. Select to mark as complete." "link"
-    Then I should see "Completed: course2 label1. Select to mark as not complete."
+    And I set the field "Manual completion of course2 label1" to "1"
+    Then the field "Manual completion of course2 label1" matches value "1"
 
     # course3 - 66%
     When I am on "Course 3" course homepage
-    And I click on "Not completed: course3 label1. Select to mark as complete." "link"
-    And I click on "Not completed: course3 label2. Select to mark as complete." "link"
-    Then I should see "Completed: course3 label1. Select to mark as not complete."
-    And I should see "Completed: course3 label2. Select to mark as not complete."
+    And I set the following fields to these values:
+      | Manual completion of course3 label1 | 1 |
+      | Manual completion of course3 label2 | 1 |
+    Then the following fields match these values:
+      | Manual completion of course3 label1 | 1 |
+      | Manual completion of course3 label2 | 1 |
 
     # course4 - 0%
     When I am on "Course 4" course homepage
 
     # course5 - 33%
     When I am on "Course 5" course homepage
-    And I click on "Not completed: course5 label1. Select to mark as complete." "link"
-    Then I should see "Completed: course5 label1. Select to mark as not complete."
+    And I set the field "Manual completion of course5 label1" to "1"
+    Then the field "Manual completion of course5 label1" matches value "1"
     And I log out
 
   @javascript

@@ -30,7 +30,7 @@ Feature: Seminar availability based on activity completion
 
     # Create a Seminar activity and add restriction so it won't be available until the Certificate is marked as completed
     And I add a "Seminar" to section "1"
-    And I set the following fields to these values:
+    And I set the following fields to these values
       | Name             | Test seminar 1 |
       | Description      | Test seminar 1 |
     And I expand all fieldsets
@@ -66,7 +66,7 @@ Feature: Seminar availability based on activity completion
     And I should not see "Sign-up"
     And I should not see "Go to event"
 
-    When I click on "Not completed: Certificate 1. Select to mark as complete." "link"
+    When I set the field "Manual completion of Certificate 1" to "1"
     And I click on "Go to event" "link" in the "1 January" "table_row"
     Then I should see "Sign-up" in the ".mod_facetoface__eventinfo__sidebar__signup" "css_element"
     And I log out
@@ -87,7 +87,7 @@ Feature: Seminar availability based on activity completion
     And I should not see "Join waitlist"
     And I should not see "Go to event"
 
-    When I click on "Not completed: Certificate 1. Select to mark as complete." "link"
+    When I set the field "Manual completion of Certificate 1" to "1"
     And I click on "Go to event" "link" in the "Wait-listed" "table_row"
     Then I should see "Join waitlist" in the ".mod_facetoface__eventinfo__sidebar__signup" "css_element"
     And I log out

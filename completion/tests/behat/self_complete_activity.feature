@@ -29,12 +29,12 @@ Feature: User can self complete an activity from within an activity
     And I follow "Activity Name"
     And I set the "I have completed this activity" Totara form field to "1"
     And I follow "c1"
-    Then I should see "Completed: Activity Name. Select to mark as not complete."
+    Then the field "Manual completion of Activity Name" matches value "1"
 
     When I follow "Activity Name"
     And I set the "I have completed this activity" Totara form field to "0"
     And I follow "c1"
-    Then I should see "Not completed: Activity Name. Select to mark as complete."
+    Then the field "Manual completion of Activity Name" matches value "0"
 
     Examples:
       | activity      | name            | req1            | reqvalue        |
@@ -76,12 +76,12 @@ Feature: User can self complete an activity from within an activity
     And I follow "Pictured"
     And I set the "I have completed this activity" Totara form field to "1"
     And I follow "c1"
-    Then I should see "Completed: Pictured. Select to mark as not complete."
+    Then the field "Manual completion of Pictured" matches value "1"
 
     When I follow "Pictured"
     And I set the "I have completed this activity" Totara form field to "0"
     And I follow "c1"
-    Then I should see "Not completed: Pictured. Select to mark as complete."
+    Then the field "Manual completion of Pictured" matches value "0"
 
     Examples:
       | type      |
@@ -106,12 +106,12 @@ Feature: User can self complete an activity from within an activity
     And I follow "Book Book"
     And I set the "I have completed this activity" Totara form field to "1"
     And I follow "c1"
-    Then I should see "Completed: Book Book. Select to mark as not complete."
+    Then the field "Manual completion of Book Book" matches value "1"
 
     When I follow "Book Book"
     And I set the "I have completed this activity" Totara form field to "0"
     And I follow "c1"
-    Then I should see "Not completed: Book Book. Select to mark as complete."
+    Then the field "Manual completion of Book Book" matches value "0"
 
   @_file_upload
   Scenario: Confirm the SCORM activity has self completion available inside itself
@@ -130,12 +130,12 @@ Feature: User can self complete an activity from within an activity
     And I follow "SCORMed"
     And I set the "I have completed this activity" Totara form field to "1"
     And I follow "c1"
-    Then I should see "Completed: SCORMed. Select to mark as not complete."
+    Then the field "Manual completion of SCORMed" matches value "1"
 
     When I follow "SCORMed"
     And I set the "I have completed this activity" Totara form field to "0"
     And I follow "c1"
-    Then I should see "Not completed: SCORMed. Select to mark as complete."
+    Then the field "Manual completion of SCORMed" matches value "0"
 
   @_file_upload
   Scenario: Confirm the IMS activity has self completion available inside itself
@@ -153,12 +153,12 @@ Feature: User can self complete an activity from within an activity
     And I follow "This is IMS"
     And I set the "I have completed this activity" Totara form field to "1"
     And I follow "c1"
-    Then I should see "Completed: This is IMS. Select to mark as not complete."
+    Then the field "Manual completion of This is IMS" matches value "1"
 
     When I follow "This is IMS"
     And I set the "I have completed this activity" Totara form field to "0"
     And I follow "c1"
-    Then I should see "Not completed: This is IMS. Select to mark as complete."
+    Then the field "Manual completion of This is IMS" matches value "0"
 
   Scenario: Confirm self completion form is not displayed when other completion options are used
     And I log in as "admin"

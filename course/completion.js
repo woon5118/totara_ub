@@ -15,36 +15,9 @@ M.core_completion.init = function(Y) {
 
         if (o.responseText != 'OK') {
             alert('An error occurred when attempting to save your tick mark.\n\n('+o.responseText+'.)'); //TODO: localize
-
         } else {
-            require(['core/templates', 'core/str'], function(templates, stringlib) {
-                var current = args.state.get('value');
-                var modulename = args.modulename.get('value'),
-                    altstr,
-                    titlestr,
-                    icon;
-                if (current == 1) {
-                    args.state.set('value', 0);
-                    altstr = {component: 'completion', key:'completion-alt-manual-y', param: modulename};
-                    titlestr = {component: 'completion', key:'completion-title-manual-y', param: modulename};
-                    icon = 'completion-manual-y';
-                } else {
-                    args.state.set('value', 1);
-                    altstr = {component: 'completion', key:'completion-alt-manual-n', param: modulename};
-                    titlestr = {component: 'completion', key:'completion-title-manual-n', param: modulename};
-                    icon = 'completion-manual-n';
-                }
-                stringlib.get_strings([altstr, titlestr]).then(function (strings) {
-                    altstr = strings[0];
-                    titlestr = strings[1];
-
-                    return templates.renderIcon(icon, {alt: altstr, title: titlestr});
-                }).then(function (html) {
-                    var completionicon = args.modulename.ancestor('form').ancestor().one('.completion-icon');
-                    completionicon.set('data-loading', 'false');
-                    completionicon.setContent(html);
-                });
-            });
+            var completionicon = args.modulename.ancestor('form').ancestor().one('.completion-icon');
+            completionicon.set('disabled', null);
         }
 
         args.ajax.remove();
@@ -112,23 +85,17 @@ M.core_completion.init = function(Y) {
 
     Y.all('.activity .completion-icon').each(function (element) {
         var form = element.get('parentNode').one('form.togglecompletion');
-        element.on('click', function (e) {
+        element.on('change', function(e) {
+            var newVal = element.get('checked') ? 1 : 0;
             e.preventDefault();
-            element.set('data-loading', 'true');
+
+            form.one('[name="completionstate"]').set('value', newVal);
+            element.set('disabled', 'true');
 
             if (form.hasClass('preventjs')) {
                 form.submit();
             } else {
                 form.simulate('submit');
-                require(['core/templates', 'core/str'], function(templates, stringlib) {
-                    stringlib.get_string('loading', 'admin').then(function(loading) {
-                        return templates.renderIcon('loading', {alt: loading});
-                    }).then(function(html) {
-                        if (element.get('data-loading') === 'true') {
-                            element.setContent(html);
-                        }
-                    });
-                });
             }
         });
     });

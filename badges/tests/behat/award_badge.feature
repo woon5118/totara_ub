@@ -159,7 +159,7 @@ Feature: Award badges
     And I click on "Course 1" "link" in the "region-main" "region"
     Then I should not see "badges"
     And I am on "Course 1" course homepage
-    And I click on "Not completed: Test assignment name. Select to mark as complete." "link"
+    And I set the field "Manual completion of Test assignment name" to "1"
     And I follow "Profile" in the user menu
     And I click on "Course 1" "link" in the "region-main" "region"
     Then I should see "Course Badge"
@@ -230,7 +230,7 @@ Feature: Award badges
     And I click on "Course 1" "link" in the "region-main" "region"
     Then I should not see "badges"
     And I am on "Course 1" course homepage
-    And I click on "Not completed: Test assignment name. Select to mark as complete." "link"
+    And I set the field "Manual completion of Test assignment name" to "1"
     And I log out
     # Completion cron won't mark the whole course completed unless the
     # individual criteria was marked completed more than a second ago. So

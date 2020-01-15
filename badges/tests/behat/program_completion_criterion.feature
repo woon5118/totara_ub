@@ -101,7 +101,7 @@ Feature: Verify badge issue based on program completion criterion.
 
     Given I log in as "learner1"
     When I am on "Course 1" course homepage
-    And I click on "Not completed: Click to complete course. Select to mark as complete." "link"
+    And I set the field "Manual completion of Click to complete course" to "1"
     And I follow "Profile" in the user menu
     Then I should see "Program Badge"
     And I log out
@@ -134,7 +134,7 @@ Feature: Verify badge issue based on program completion criterion.
     # to complete the program and receive the badge.
     When I log in as "learner1"
     And I am on "Course 1" course homepage
-    And I click on "Not completed: Click to complete course. Select to mark as complete." "link"
+    And I set the field "Manual completion of Click to complete course" to "1"
     And I follow "Profile" in the user menu
     # The bagde has been issued
     Then I should see "Program Badge"

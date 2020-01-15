@@ -142,7 +142,8 @@ class behat_completion extends behat_base {
      */
     public function activity_marked_as_complete($activityname, $activitytype, $completiontype) {
         if ($completiontype == "manual") {
-            $imgalttext = get_string("completion-alt-manual-y", 'core_completion', $activityname);
+            $this->execute('behat_forms::the_field_matches_value', [get_string('completion-manual', 'completion', $activityname), 1]);
+            return;
         } else {
             $imgalttext = get_string("completion-alt-auto-y", 'core_completion', $activityname);
         }
@@ -163,7 +164,8 @@ class behat_completion extends behat_base {
      */
     public function activity_marked_as_not_complete($activityname, $activitytype, $completiontype) {
         if ($completiontype == "manual") {
-            $imgalttext = get_string("completion-alt-manual-n", 'core_completion', $activityname);
+            $this->execute('behat_forms::the_field_matches_value', [get_string('completion-manual', 'completion', $activityname), 0]);
+            return;
         } else {
             $imgalttext = get_string("completion-alt-auto-n", 'core_completion', $activityname);
         }

@@ -58,3 +58,5 @@ coursetagging,core_tag
 coursetagginghelp,core_tag
 taskcreatecontexts,core_admin
 security_question,core_auth
+completion-title-manual-n,core_completion
+completion-title-manual-y,core_completion

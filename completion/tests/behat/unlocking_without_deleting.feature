@@ -45,8 +45,8 @@ Feature: Unlocking without deleting course completion data
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I click on "Not completed: Test forum name. Select to mark as complete." "link"
-    And I click on "Not completed: Test label. Select to mark as complete." "link"
+    And I set the field "Manual completion of Test forum name" to "1"
+    And I set the field "Manual completion of Test label" to "1"
     And I trigger cron
     And I am on "Course 1" course homepage
     And I should see "Status: Complete"
@@ -112,8 +112,8 @@ Feature: Unlocking without deleting course completion data
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I click on "Not completed: Test forum name. Select to mark as complete." "link"
-    And I click on "Not completed: Test label. Select to mark as complete." "link"
+    And I set the field "Manual completion of Test forum name" to "1"
+    And I set the field "Manual completion of Test label" to "1"
     And I trigger cron
     And I am on "Course 1" course homepage
     And I should see "Status: Complete"
@@ -184,8 +184,8 @@ Feature: Unlocking without deleting course completion data
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I click on "Not completed: Test forum name. Select to mark as complete." "link"
-    And I click on "Not completed: Test label. Select to mark as complete." "link"
+    And I set the field "Manual completion of Test forum name" to "1"
+    And I set the field "Manual completion of Test label" to "1"
     And I trigger cron
     And I am on "Course 1" course homepage
     And I should see "Status: Complete"
@@ -272,7 +272,7 @@ Feature: Unlocking without deleting course completion data
     # Log in and complete the forum as student1
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I click on "Not completed: Test forum name. Select to mark as complete." "link"
+    And I set the field "Manual completion of Test forum name" to "1"
     And I trigger cron
     And I am on "Course 1" course homepage
     And I should see "Status: Complete"
@@ -287,7 +287,7 @@ Feature: Unlocking without deleting course completion data
      | Message | This is my first post |
     And I press "Post to forum"
     And I follow "Course 1"
-    And I click on "Not completed: Test forum name. Select to mark as complete." "link"
+    And I set the field "Manual completion of Test forum name" to "1"
     And I trigger cron
     And I am on "Course 1" course homepage
     And I should see "Status: Complete"
@@ -355,7 +355,7 @@ Feature: Unlocking without deleting course completion data
     # Log in and complete the forum as student1
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I click on "Not completed: Test forum name. Select to mark as complete." "link"
+    And I set the field "Manual completion of Test forum name" to "1"
     And I trigger cron
     And I am on "Course 1" course homepage
     And I should see "Status: Complete"
@@ -370,7 +370,7 @@ Feature: Unlocking without deleting course completion data
       | Message | This is my first post |
     And I press "Post to forum"
     And I follow "Course 1"
-    And I click on "Not completed: Test forum name. Select to mark as complete." "link"
+    And I set the field "Manual completion of Test forum name" to "1"
     And I trigger cron
     And I am on "Course 1" course homepage
     And I should see "Status: Complete"

@@ -310,16 +310,16 @@ Feature: Test Current Learning block
     When I log in as "learner1"
     # Complete some activities
     And I am on "Course 1" course homepage
-    And I click on "Not completed: course1 label1. Select to mark as complete." "link"
-    Then I should see "Completed: course1 label1. Select to mark as not complete."
+    And I set the field "Manual completion of course1 label1" to "1"
+    Then the field "course1 label1" matches value "1"
 
     When I am on "Course 2" course homepage
-    And I click on "Not completed: course2 label1. Select to mark as complete." "link"
-    Then I should see "Completed: course2 label1. Select to mark as not complete."
+    And I set the field "Manual completion of course2 label1" to "1"
+    Then the field "course2 label1" matches value "1"
 
     When I am on "Course 3" course homepage
-    And I click on "Not completed: course3 label1. Select to mark as complete." "link"
-    Then I should see "Completed: course3 label1. Select to mark as not complete."
+    And I set the field "Manual completion of course3 label1" to "1"
+    Then the field "course3 label1" matches value "1"
 
     # Not completing anything in course4
     # Can't complete activities in course5 - completion tracking not enabled
