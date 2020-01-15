@@ -3398,6 +3398,8 @@ Feel free to browse, list of users is below, their password is 12345.
         create_achievement_record(...$achievement);
     }
 
+    set_theme_to_ventura();
+
     create_info_block($data);
 }
 
@@ -4318,6 +4320,16 @@ function create_info_block($data) {
     ];
 
     builder::table('block_instances')->insert($object);
+}
+
+/**
+ * Set the site-wide theme to ventura.
+ * This is necessary in order to display some tui components correctly.
+ */
+function set_theme_to_ventura() {
+    $device_theme = core_useragent::get_device_type_cfg_var_name('default');
+    $ventura_theme = theme_config::load('ventura');
+    set_config($device_theme, $ventura_theme->name);
 }
 
 /**
