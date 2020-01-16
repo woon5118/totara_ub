@@ -88,6 +88,17 @@ class assignment_repository extends repository {
     }
 
     /**
+     * Return only assignments marked for expansion
+     *
+     * @return $this
+     */
+    public function filter_by_expand(): self {
+        $this->where('expand', true);
+
+        return $this;
+    }
+
+    /**
      * Return only draft assignments
      *
      * @return $this

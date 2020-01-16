@@ -395,6 +395,19 @@ function xmldb_totara_competency_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019121300, 'totara', 'competency');
     }
 
+    if ($oldversion < 2020011600) {
+        // Define field expand to be added to totara_competency_assignments.
+        $table = new xmldb_table('totara_competency_assignments');
+        $field = new xmldb_field('expand', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'archived_at');
+
+        // Conditionally launch add field expand.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Competency savepoint reached.
+        upgrade_plugin_savepoint(true, 2020011600, 'totara', 'competency');
+    }
 
     return true;
 }

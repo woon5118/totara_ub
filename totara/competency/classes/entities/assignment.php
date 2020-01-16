@@ -45,6 +45,7 @@ use core\entities\user;
  * @property int $created_at Created at timestamp
  * @property int $updated_at Updated at timestamp
  * @property int $archived_at Archived at timestamp
+ * @property bool $expand Flag whether to expand assignment on next expand task run
  *
  * @property-read string $status_name Textual representation of status int
  * @property-read competency_achievement $current_achievement Current achievement
@@ -214,4 +215,24 @@ class assignment extends entity {
         }
         return $name;
     }
+
+    /**
+     * Accessor to convert expand flag to boolean
+     *
+     * @param $value
+     * @return bool
+     */
+    public function get_expand_attribute($value): bool {
+        return (bool)$value;
+    }
+
+    /**
+     * Mutator to convert boolean to integer flag
+     *
+     * @param bool $value
+     */
+    public function set_expand_attribute($value) {
+        $this->set_attribute_raw('expand', (int) $value);
+    }
+
 }
