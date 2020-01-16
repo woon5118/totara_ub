@@ -31,9 +31,13 @@ if ($ADMIN->fulltree) {
 
     $settings->add(new admin_setting_heading('enrol_database_exdbheader', get_string('settingsheaderdb', 'enrol_database'), ''));
 
-    $options = array('', "access","ado_access", "ado", "ado_mssql", "borland_ibase", "csv", "db2", "fbsql", "firebird", "ibase", "informix72", "informix", "mssql", "mssql_n", "mssqlnative", "mysql", "mysqli", "mysqlt", "oci805", "oci8", "oci8po", "odbc", "odbc_mssql", "odbc_oracle", "oracle", "postgres64", "postgres7", "postgres", "proxy", "sqlanywhere", "sybase", "vfp");
-    $options = array_combine($options, $options);
-    $settings->add(new admin_setting_configselect('enrol_database/dbtype', get_string('dbtype', 'enrol_database'), get_string('dbtype_desc', 'enrol_database'), '', $options));
+    // Type.
+    $dboptions = array('' => get_string('none')); // Totara: we must have 'None' option to 'unconfigure' the plugin.
+    $dbtypes = array('access', 'csv', 'db2', 'ibase', 'mssqlnative', 'mysqli', 'oci8', 'odbc', 'pdo', 'postgres9');
+    foreach ($dbtypes as $dbtype) {
+        $dboptions[$dbtype] = $dbtype;
+    }
+    $settings->add(new admin_setting_configselect('enrol_database/dbtype', get_string('dbtype', 'enrol_database'), get_string('dbtype_desc', 'enrol_database'), '', $dboptions));
 
     $settings->add(new admin_setting_configtext('enrol_database/dbhost', get_string('dbhost', 'enrol_database'), get_string('dbhost_desc', 'enrol_database'), 'localhost'));
 

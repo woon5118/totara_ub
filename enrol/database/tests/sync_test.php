@@ -75,12 +75,12 @@ class enrol_database_sync_testcase extends advanced_testcase {
                 break;
 
             case 'oracle':
-                set_config('dbtype', 'oci8po', 'enrol_database');
+                set_config('dbtype', 'oci8', 'enrol_database');
                 set_config('dbsybasequoting', '1', 'enrol_database');
                 break;
 
             case 'postgres':
-                set_config('dbtype', 'postgres7', 'enrol_database');
+                set_config('dbtype', 'postgres9', 'enrol_database');
                 $setupsql = "SET NAMES 'UTF-8'";
                 if (!empty($CFG->dboptions['dbschema'])) {
                     $setupsql .= "; SET search_path = '".$CFG->dboptions['dbschema']."'";
