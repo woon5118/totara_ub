@@ -1514,7 +1514,27 @@ class goal extends hierarchy {
                     GOAL_ASSIGNMENT_ADMIN => false,
                 );
             } else {
-                return false;
+                // No permissions at all for goals.
+                $permissions['can_view_personal'] = false;
+                $permissions['can_edit_personal'] = false;
+                $permissions['can_view_company'] = false;
+                $permissions['can_edit_company'] = false;
+                $permissions['can_edit'] = array(
+                    GOAL_ASSIGNMENT_INDIVIDUAL => false,
+                    GOAL_ASSIGNMENT_SELF => false,
+                    GOAL_ASSIGNMENT_MANAGER => false,
+                    GOAL_ASSIGNMENT_ADMIN => false,
+                );
+                // No inherited hierarchy permissions either.
+                foreach ($permissions as $key => $value) {
+                    if (is_array($value)) {
+                        foreach ($value as $k => $v) {
+                            $permissions[$key][$k] = false;
+                        }
+                    } else {
+                        $permissions[$key] = false;
+                    }
+                }
             }
         }
 

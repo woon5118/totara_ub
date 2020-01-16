@@ -146,13 +146,29 @@ class hierarchy_goal_permission_testcase extends advanced_testcase {
 
         $goal = new goal();
         $permissions = $goal->get_permissions(null, $data->user3->id);
-        $this->assertFalse($permissions);
+        $this->assertFalse($permissions['can_view_personal']);
+        $this->assertFalse($permissions['can_edit_personal']);
+        $this->assertFalse($permissions['can_view_company']);
+        $this->assertFalse($permissions['can_edit_company']);
+        $can_edit = $permissions['can_edit'];
+        $this->assertFalse($can_edit[GOAL_ASSIGNMENT_INDIVIDUAL]);
+        $this->assertFalse($can_edit[GOAL_ASSIGNMENT_SELF]);
+        $this->assertFalse($can_edit[GOAL_ASSIGNMENT_MANAGER]);
+        $this->assertFalse($can_edit[GOAL_ASSIGNMENT_ADMIN]);
 
         $this->setUser($data->user2);
 
         $goal = new goal();
         $permissions = $goal->get_permissions(null, $data->user3->id);
-        $this->assertFalse($permissions);
+        $this->assertFalse($permissions['can_view_personal']);
+        $this->assertFalse($permissions['can_edit_personal']);
+        $this->assertFalse($permissions['can_view_company']);
+        $this->assertFalse($permissions['can_edit_company']);
+        $can_edit = $permissions['can_edit'];
+        $this->assertFalse($can_edit[GOAL_ASSIGNMENT_INDIVIDUAL]);
+        $this->assertFalse($can_edit[GOAL_ASSIGNMENT_SELF]);
+        $this->assertFalse($can_edit[GOAL_ASSIGNMENT_MANAGER]);
+        $this->assertFalse($can_edit[GOAL_ASSIGNMENT_ADMIN]);
 
         $this->setUser($data->user3);
 
