@@ -578,8 +578,10 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
                 $f2fsessionarray = array_slice($f2fsessionarray, 0, $display, true);
                 $output .= html_writer::tag('h4', format_string($seminar->get_name()));
                 $f2frenderer->setcontext($contextmodule);
+                $output .= html_writer::start_div('no-overflow');
                 $output .= $f2frenderer->print_session_list_table($f2fsessionarray, $viewattendees, $editevents,
                     $displaytimezones, $reserveinfo, null, true, false);
+                $output .= html_writer::end_div();
             }
         }
 
