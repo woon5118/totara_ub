@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`collapsibleGroupToggle matches snapshot 1`] = `
+<div
+  class="tui-collapsibleGroupToggle"
+  label="hello"
+>
+  <buttonicon-stub
+    ariaexpanded="false"
+    arialabel="fff"
+    class="tui-collapsibleGroupToggle__button"
+    styleclass="[object Object]"
+    text="fff"
+    type="button"
+  >
+    <expandicon-stub
+      size="200"
+    />
+  </buttonicon-stub>
+</div>
+`;

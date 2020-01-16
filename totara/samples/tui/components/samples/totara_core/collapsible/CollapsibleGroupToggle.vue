@@ -1,0 +1,145 @@
+<!--
+  This file is part of Totara Learn
+
+  Copyright (C) 2019 onwards Totara Learning Solutions LTD
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+  @package totara_samples
+-->
+
+<template>
+  <div>
+    collapsible group toggle, for expanding or collasping multiple regions at
+    once.
+
+    <SamplesExample>
+      <CollapsibleGroupToggle v-model="expanded" />
+
+      <Collapsible v-model="expanded.first" label="ABC">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua. Nisi est sit amet
+        facilisis magna etiam tempor orci eu. Imperdiet sed euismod nisi porta.
+        Odio ut enim blandit volutpat maecenas volutpat blandit aliquam etiam.
+        Justo eget magna fermentum iaculis eu non diam phasellus. Aenean et
+        tortor at risus. Velit aliquet sagittis id consectetur purus ut. In hac
+        habitasse platea dictumst quisque sagittis. Morbi tempus iaculis urna id
+        volutpat. Lacinia at quis risus sed vulputate odio ut enim blandit.
+        Velit dignissim sodales ut eu sem. Eu mi bibendum neque egestas congue
+        quisque egestas. Dapibus ultrices in iaculis nunc sed augue lacus
+        viverra. Vel turpis nunc eget lorem. Mollis nunc sed id semper risus in.
+        Donec ac odio tempor orci. Id semper risus in hendrerit gravida rutrum
+        quisque. Aenean euismod elementum nisi quis eleifend quam.
+      </Collapsible>
+
+      <Collapsible v-model="expanded.second" label="DEF">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua. Duis ut diam quam
+        nulla porttitor massa id neque. Cursus risus at ultrices mi tempus
+        imperdiet nulla.
+      </Collapsible>
+
+      <Collapsible v-model="expanded.third" label="GHI">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua. Duis ut diam quam
+        nulla porttitor massa id neque. Cursus risus at ultrices mi tempus
+        imperdiet nulla.
+      </Collapsible>
+    </SamplesExample>
+
+    <SamplesPropCtl>
+      <FormRow label="First expanded">
+        <RadioGroup v-model="expanded.first" :horizontal="true">
+          <Radio :value="true">True</Radio>
+          <Radio :value="false">False</Radio>
+        </RadioGroup>
+      </FormRow>
+      <FormRow label="Second expanded">
+        <RadioGroup v-model="expanded.second" :horizontal="true">
+          <Radio :value="true">True</Radio>
+          <Radio :value="false">False</Radio>
+        </RadioGroup>
+      </FormRow>
+      <FormRow label="Third expanded">
+        <RadioGroup v-model="expanded.third" :horizontal="true">
+          <Radio :value="true">True</Radio>
+          <Radio :value="false">False</Radio>
+        </RadioGroup>
+      </FormRow>
+    </SamplesPropCtl>
+
+    <SamplesCode>
+      <template v-slot:template>{{ codeTemplate }}</template>
+      <template v-slot:script>{{ codeScript }}</template>
+    </SamplesCode>
+  </div>
+</template>
+
+<script>
+import Collapsible from 'totara_core/components/collapsible/Collapsible';
+import CollapsibleGroupToggle from 'totara_core/components/collapsible/CollapsibleGroupToggle';
+import FormRow from 'totara_core/components/form/FormRow';
+import Radio from 'totara_core/components/form/Radio';
+import RadioGroup from 'totara_core/components/form/RadioGroup';
+import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
+
+export default {
+  components: {
+    Collapsible,
+    CollapsibleGroupToggle,
+    FormRow,
+    Radio,
+    RadioGroup,
+    SamplesCode,
+    SamplesExample,
+    SamplesPropCtl,
+  },
+
+  data() {
+    return {
+      expanded: {
+        first: false,
+        second: true,
+        third: false,
+      },
+      label: 'Heading',
+
+      codeTemplate: `<CollapsibleGroupToggle v-model="expanded" />
+<Collapsible v-model="expanded.first" label="ABC">...</Collapsible>
+<Collapsible v-model="expanded.second" label="DEF">...</Collapsible>
+<Collapsible v-model="expanded.third" label="GHI">...</Collapsible>`,
+      codeScript: `import CollapsibleGroupToggle from 'totara_core/components/collapsible/CollapsibleGroupToggle;
+
+export default {
+  components: {
+    CollapsibleGroupToggle,
+  },
+
+  data() {
+    return {
+      expanded: {
+        first: false,
+        second: true,
+        third: false,
+      },
+    },
+  },
+}`,
+    };
+  },
+};
+</script>
