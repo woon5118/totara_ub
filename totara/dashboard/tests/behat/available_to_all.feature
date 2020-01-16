@@ -11,11 +11,11 @@ Feature: Dashboard available for all logged in users
         | learner1 |
         | learner2 |
     And the following "cohorts" exist:
-        | name | idnumber |
-        | Cohort 1 | CH1 |
+        | name     | idnumber |
+        | Cohort 1 | CH1      |
     And the following "cohort members" exist:
-      | user     | cohort |
-      | learner1 | CH1    |
+      | user | cohort |
+      | learner1 | CH1 |
     And the following totara_dashboards exist:
       | name               | locked | published | cohorts |
       | Audience dashboard | 1      | 1         | CH1     |
@@ -41,3 +41,18 @@ Feature: Dashboard available for all logged in users
     And I log out
     And I click on "#guestlogin input[type=submit]" "css_element"
     And I should not see "Dashboard"
+
+  Scenario: Check that guest can access guest dashboard
+    Given I log in as "admin"
+    And the following totara_dashboards exist:
+      | name               | locked | published | cohorts |
+      | Guest dashboard    | 0      | 3         |         |
+    And I set the following administration settings values:
+      | Guest login button | Show |
+    And I log out
+    And I click on "#guestlogin input[type=submit]" "css_element"
+    And I should see "Dashboard"
+    And I click on "Dashboard" in the totara menu
+    And I should see "Guest dashboard"
+    And I should not see "Public dashboard"
+    And I should not see "Audience dashboard"

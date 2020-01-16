@@ -33,10 +33,6 @@ $reset  = optional_param('reset', null, PARAM_BOOL);
 $id =  optional_param('id', 0, PARAM_INT);
 
 require_login(null, false);
-if (isguestuser()) {
-    // No dashboards for guests!
-    redirect(new moodle_url('/'));
-}
 
 // Check Totara Dashboard is enable.
 totara_dashboard::check_feature_enabled();

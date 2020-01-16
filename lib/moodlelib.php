@@ -10410,7 +10410,7 @@ function mnet_get_idp_jump_url($user) {
 function get_home_page() {
     global $CFG, $USER;
 
-    if (!isloggedin() or isguestuser()) {
+    if (!isloggedin()) {
         return HOMEPAGE_SITE;
     }
 

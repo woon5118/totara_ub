@@ -41,12 +41,12 @@ Feature: Perform basic dashboard administration
     And I set the following fields to these values:
       | Name   | Public dashboard |
       | Locked | 0                |
-    And I click on "Available to all logged in users" "radio"
+    And I click on "Available to all users excluding guests" "radio"
     And I press "Create dashboard"
-    And I should see "Available to all logged in users" in the "Public dashboard" "table_row"
+    And I should see "Available to all users excluding guests" in the "Public dashboard" "table_row"
     And I click on "Edit dashboard" "link" in the "Public dashboard" "table_row"
     When I press "Save changes"
-    Then I should see "Available to all logged in users" in the "Public dashboard" "table_row"
+    Then I should see "Available to all users excluding guests" in the "Public dashboard" "table_row"
 
   Scenario: Assign audience to dashboard and then make it public
     Given I log in as "admin"
@@ -70,9 +70,9 @@ Feature: Perform basic dashboard administration
     And I should see "2" in the "Audience dashboard" "table_row"
     # Check saving changes
     And I click on "Edit dashboard" "link" in the "Audience dashboard" "table_row"
-    And I click on "Available to all logged in users" "radio"
+    And I click on "Available to all users excluding guests" "radio"
     When I press "Save changes"
-    Then I should see "Available to all logged in users" in the "Audience dashboard" "table_row"
+    Then I should see "Available to all users excluding guests" in the "Audience dashboard" "table_row"
 
   Scenario: Delete dashboard
     Given I log in as "admin"

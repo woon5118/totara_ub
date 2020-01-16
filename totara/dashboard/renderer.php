@@ -90,12 +90,15 @@ class totara_dashboard_renderer extends plugin_renderer_base {
                 case totara_dashboard::NONE:
                     $row[] = get_string('availablenone', 'totara_dashboard');
                     break;
+                case totara_dashboard::GUEST:
+                    $row[] = get_string('availableall', 'totara_dashboard');
+                    break;
+                case totara_dashboard::ALL:
+                    $row[] = get_string('availableallnoguest', 'totara_dashboard');
+                    break;
                 case totara_dashboard::AUDIENCE:
                     $cnt = count($dashboard->get_cohorts());
                     $row[] = get_string('availableaudiencecnt', 'totara_dashboard', $cnt);
-                    break;
-                case totara_dashboard::ALL:
-                    $row[] = get_string('availableall', 'totara_dashboard');
                     break;
                 default:
                     $row[] = get_string('availableunknown', 'totara_dashboard');

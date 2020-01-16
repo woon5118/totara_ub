@@ -77,7 +77,8 @@ class totara_dashboard_edit_form extends moodleform {
         // Availability.
         $availopts = array();
         $availopts[] = $mform->createElement('radio', 'published', '', get_string('availablenone', 'totara_dashboard'), totara_dashboard::NONE);
-        $availopts[] = $mform->createElement('radio', 'published', '', get_string('availableall', 'totara_dashboard'), totara_dashboard::ALL);
+        $availopts[] = $mform->createElement('radio', 'published', '', get_string('availableall', 'totara_dashboard'), totara_dashboard::GUEST);
+        $availopts[] = $mform->createElement('radio', 'published', '', get_string('availableallnoguest', 'totara_dashboard'), totara_dashboard::ALL);
         $availopts[] = $mform->createElement('radio', 'published', '', get_string('availableaudience', 'totara_dashboard'), totara_dashboard::AUDIENCE);
 
         $mform->addGroup($availopts, 'published', get_string('availability', 'totara_dashboard'), html_writer::empty_tag('br'));
