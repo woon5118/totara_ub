@@ -30,9 +30,11 @@ function xmldb_quiz_overview_premigrate() {
 
     $version = premigrate_get_plugin_version('quiz', 'overview');
 
-    if ($version > 2018120300) {
+    if ($version > 2019052000) {
         throw new coding_exception("Invalid plugin (quiz_overview) version ($version) for pre-migration");
     }
+
+    // Moodle 3.7 pre-migration line.
 
     // Moodle 3.6 pre-migration line.
 

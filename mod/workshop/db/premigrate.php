@@ -30,9 +30,11 @@ function xmldb_mod_workshop_premigrate() {
 
     $version = premigrate_get_plugin_version('mod', 'workshop');
 
-    if ($version > 2018120300) {
+    if ($version > 2019052000) {
         throw new coding_exception("Invalid plugin (mod_workshop) version ($version) for pre-migration");
     }
+
+    // Moodle 3.7 pre-migration line.
 
     if ($version >= 2018062600) {
         $table = new xmldb_table('workshop');

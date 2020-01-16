@@ -773,5 +773,18 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020012301, 'totara', 'core');
     }
 
+    if ($oldversion < 2020012302) {
+        // Define table role_sortorder to be dropped - this table is not used anywhere in code.
+        $table = new xmldb_table('role_sortorder');
+
+        // Conditionally launch drop table for role_sortorder.
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2020012302, 'totara', 'core');
+    }
+
     return true;
 }

@@ -32,6 +32,130 @@ function xmldb_core_premigrate() {
 
     $version = $CFG->version;
 
+    if ($version >= 2019050600.00) {
+        $table = new xmldb_table('badge_backpack');
+        $field = new xmldb_field('apiversion', XMLDB_TYPE_CHAR, '12', null, XMLDB_NOTNULL, null, '1.0');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $table = new xmldb_table('badge_external_backpack');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $table = new xmldb_table('badge_external');
+        $field = new xmldb_field('entityid', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $table = new xmldb_table('badge_external_identifier');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $table = new xmldb_table('badge_backpack');
+        $key = new xmldb_key('externalbackpack', XMLDB_KEY_FOREIGN, ['externalbackpackid'], 'badge_external_backpack', ['id']);
+        $dbman->drop_key($table, $key);
+
+        $table = new xmldb_table('badge_backpack');
+        $field = new xmldb_field('externalbackpackid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'password');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $table = new xmldb_table('badge_backpack');
+        $field = new xmldb_field('backpackurl', XMLDB_TYPE_CHAR, 255, null, XMLDB_NOTNULL, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $version = premigrate_main_savepoint(2019050500.00);
+    }
+
+    if ($version >= 2019042300.03) {
+        $table = new xmldb_table('message');
+        $field = new xmldb_field('customdata', XMLDB_TYPE_TEXT, null, null, null, null, null, 'eventtype');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $version = premigrate_main_savepoint(2019042300.02);
+    }
+
+    if ($version >= 2019041000.02) {
+        $table = new xmldb_table('messages');
+        $field = new xmldb_field('fullmessagetrust', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'timecreated');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $version = premigrate_main_savepoint(2019041000.01);
+    }
+
+    if ($version >= 2019040600.04) {
+        $table = new xmldb_table('backup_controllers');
+        $field = new xmldb_field('progress', XMLDB_TYPE_NUMBER, '15, 14', null, XMLDB_NOTNULL, null, '0', 'timemodified');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $version = premigrate_main_savepoint(2019040600.03);
+    }
+
+    if ($version >= 2019032900.00) {
+        $table = new xmldb_table('badge_alignment');
+        if ($dbman->table_exists($table)) {
+            if ($dbman->table_exists('badge_competencies')) {
+                $dbman->drop_table($table);
+            } else {
+                $dbman->rename_table($table, 'badge_competencies');
+            }
+        }
+
+        $version = premigrate_main_savepoint(2019032800.00);
+    }
+
+    if ($version >= 2019030800.00) {
+        $table = new xmldb_table('message_conversation_actions');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $version = premigrate_main_savepoint(2019030700.00);
+    }
+
+    if ($version >= 2019011801.00) {
+        $table = new xmldb_table('customfield_category');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $table = new xmldb_table('customfield_field');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $table = new xmldb_table('customfield_data');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $version = premigrate_main_savepoint(2019011800.00);
+    }
+
+    if ($version >= 2019011500.00) {
+        $table = new xmldb_table('task_log');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $version = premigrate_main_savepoint(2019011400.00);
+    }
+
+    // Moodle 3.7 pre-migration line.
+
     if ($version >= 2018111301.00) {
         $table = new xmldb_table('context');
         $field = new xmldb_field('locked', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'depth');

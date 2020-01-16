@@ -18,26 +18,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Petr Skoda <petr.skoda@totaralearning.com>
- * @package auth_oauth2
+ * @package message_email
  */
 
 /**
  * Transforms plugin data to Moodle data format supported in migration.
  */
-function xmldb_auth_oauth2_premigrate() {
+function xmldb_message_email_premigrate() {
     global $DB;
     $dbman = $DB->get_manager();
 
-    $version = premigrate_get_plugin_version('auth', 'oauth2');
+    $version = premigrate_get_plugin_version('message', 'email');
 
-    if ($version > 2019052001) {
-        throw new coding_exception("Invalid plugin (auth_oauth2) version ($version) for pre-migration");
+    if ($version > 2019052000) {
+        throw new coding_exception("Invalid plugin (message_email) version ($version) for pre-migration");
+    }
+
+    if ($version >= 2019032500) {
+        $table = new xmldb_table('message_email_messages');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $version = premigrate_plugin_savepoint(2019032400, 'message', 'email');
     }
 
     // Moodle 3.7 pre-migration line.
 
-    // OAuth was backported from Moodle 3.6
-    if ($version > 2018120301) {
-        $version = premigrate_plugin_savepoint(2018120301, 'auth', 'oauth2');
+    // Plugin is ready for migration from Moodle 3.4.9 to Totara 13.
+    if ($version > 2017111300) {
+        $version = premigrate_plugin_savepoint(2017111300, 'message', 'email');
     }
 }

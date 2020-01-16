@@ -411,5 +411,12 @@ function xmldb_totara_core_install() {
         $dbman->create_table($table);
     }
 
+    // Define table role_sortorder to be dropped - this table is not used anywhere in code.
+    $table = new xmldb_table('role_sortorder');
+    // Conditionally launch drop table for role_sortorder.
+    if ($dbman->table_exists($table)) {
+        $dbman->drop_table($table);
+    }
+
     return true;
 }

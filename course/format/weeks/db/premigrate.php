@@ -30,9 +30,11 @@ function xmldb_format_weeks_premigrate() {
 
     $version = premigrate_get_plugin_version('format', 'weeks');
 
-    if ($version > 2018120300) {
+    if ($version > 2019052000) {
         throw new coding_exception("Invalid plugin (format_weeks) version ($version) for pre-migration");
     }
+
+    // Moodle 3.7 pre-migration line.
 
     // Moodle 3.6 pre-migration line.
 

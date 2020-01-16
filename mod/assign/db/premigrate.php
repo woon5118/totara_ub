@@ -18,26 +18,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Petr Skoda <petr.skoda@totaralearning.com>
- * @package auth_oauth2
+ * @package mod_assign
  */
 
 /**
  * Transforms plugin data to Moodle data format supported in migration.
  */
-function xmldb_auth_oauth2_premigrate() {
+function xmldb_mod_assign_premigrate() {
     global $DB;
     $dbman = $DB->get_manager();
 
-    $version = premigrate_get_plugin_version('auth', 'oauth2');
+    $version = premigrate_get_plugin_version('mod', 'assign');
 
-    if ($version > 2019052001) {
-        throw new coding_exception("Invalid plugin (auth_oauth2) version ($version) for pre-migration");
+    if ($version > 2019052000) {
+        throw new coding_exception("Invalid plugin (mod_assign) version ($version) for pre-migration");
+    }
+
+    if ($version >= 2018120500) {
+        $table = new xmldb_table('assign');
+        $field = new xmldb_field('hidegrader', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'blindmarking');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $version = premigrate_plugin_savepoint(2018120400, 'mod', 'assign');
     }
 
     // Moodle 3.7 pre-migration line.
 
-    // OAuth was backported from Moodle 3.6
-    if ($version > 2018120301) {
-        $version = premigrate_plugin_savepoint(2018120301, 'auth', 'oauth2');
+    // Moodle 3.6 pre-migration line.
+
+    // Plugin is ready for migration from Moodle 3.4.9 to Totara 13.
+    if ($version > 2017111300) {
+        $version = premigrate_plugin_savepoint(2017111300, 'mod', 'assign');
     }
 }

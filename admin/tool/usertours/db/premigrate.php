@@ -30,9 +30,11 @@ function xmldb_tool_usertours_premigrate() {
 
     $version = premigrate_get_plugin_version('tool', 'usertours');
 
-    if ($version > 2018120301) {
+    if ($version > 2019052000) {
         throw new coding_exception("Invalid plugin (tool_usertours) version ($version) for pre-migration");
     }
+
+    // Moodle 3.7 pre-migration line.
 
     // Moodle 3.6 pre-migration line.
 

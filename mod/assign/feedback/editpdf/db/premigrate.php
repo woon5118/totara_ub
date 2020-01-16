@@ -30,9 +30,21 @@ function xmldb_assignfeedback_editpdf_premigrate() {
 
     $version = premigrate_get_plugin_version('assignfeedback', 'editpdf');
 
-    if ($version > 2018120300) {
+    if ($version > 2019052000) {
         throw new coding_exception("Invalid plugin (assignfeedback_editpdf) version ($version) for pre-migration");
     }
+
+    if ($version >= 2019010800) {
+        // Define table assignfeedback_editpdf_rot to be created.
+        $table = new xmldb_table('assignfeedback_editpdf_rot');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $version = premigrate_plugin_savepoint(2019010700, 'assignfeedback', 'editpdf');
+    }
+
+    // Moodle 3.7 pre-migration line.
 
     // Moodle 3.6 pre-migration line.
 
