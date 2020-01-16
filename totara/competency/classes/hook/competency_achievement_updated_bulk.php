@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2018 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,36 +21,40 @@
  * @package totara_competency
  */
 
-namespace totara_competency\event;
+namespace totara_competency\hook;
 
-defined('MOODLE_INTERNAL') || die();
+use totara_core\hook\base;
 
-class assignment_user_unassigned extends assignment_user {
-
-    /**
-     * Initialise required event data properties.
-     */
-    protected function init() {
-        $this->data['crud'] = 'd';
-        $this->data['edulevel'] = self::LEVEL_OTHER;
-        $this->data['objecttable'] = 'totara_competency_assignments';
-    }
+class competency_achievement_updated_bulk extends base {
 
     /**
-     * Returns localised event name.
-     *
-     * @return string
+     * @var array
      */
-    public static function get_name() {
-        return get_string('event:assignment_user_unassigned', 'totara_competency');
-    }
+    protected $user_ids = [];
 
     /**
-     * Returns non-localised event description with id's for admin use only.
-     *
-     * @return string
+     * @var int
      */
-    public function get_description() {
-        return 'User has been unassigned from a competency';
+    protected $competency_id;
+
+    public function __construct(int $competency_id) {
+        $this->competency_id = $competency_id;
     }
+
+    public function add_user_id(int $user_id, int $proficient) {
+        $this->user_ids[$user_id] = $proficient;
+    }
+
+    public function get_competency_id(): int {
+        return $this->competency_id;
+    }
+
+    public function get_user_ids(): array {
+        return array_keys($this->user_ids);
+    }
+
+    public function get_user_ids_proficient(): array {
+        return $this->user_ids;
+    }
+
 }

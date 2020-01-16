@@ -27,6 +27,7 @@ use core\entities\cohort;
 use core\orm\query\builder;
 use degeneration\App;
 use degeneration\Cache;
+use stdClass;
 use totara_competency\entities\course as course_entity;
 
 class audience extends item {
@@ -85,9 +86,13 @@ class audience extends item {
      * Add user to this audience
      *
      * @param user $user
-     * @return bool
+     * @return stdClass
      */
-    public function add_member(user $user) {
-        return cohort_add_member($this->get_data('id'), $user->get_data()->id);
+    public function add_member(user $user): stdClass {
+        $record = new stdClass();
+        $record->cohortid  = $this->get_data()->id;
+        $record->userid    = $user->get_data()->id;
+        $record->timeadded = time();
+        return $record;
     }
 }

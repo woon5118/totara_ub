@@ -80,6 +80,10 @@ class item_evaluator_user_source {
             $timeevaluated = time();
         }
 
+        $params = [
+            'criterionid' => $criterion_id,
+        ];
+
         $temp_table_name = $this->temp_user_table->get_table_name();
         $temp_user_id_column = $this->temp_user_table->get_user_id_column();
         [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('tmp', false);
@@ -87,20 +91,17 @@ class item_evaluator_user_source {
         // The user table may contain more than one record for a specific user (e.g. a record for each competency that
         // the user is assigned to. Therefore using DISTINCT
         // DML generated an error if the integer values were passed via params. Thus using it directly in the SELECT
-        $sql = "INSERT INTO {totara_criteria_item_record}
-                    (user_id, criterion_item_id, criterion_met, timeevaluated)
-                    SELECT DISTINCT tmp." . $temp_user_id_column . ", tci.id, {$criterion_met}, {$timeevaluated}
-                         FROM {" . $temp_table_name . "} tmp
-                         JOIN {totara_criteria_item} tci
-                           ON tci.criterion_id = :criterionid
-                    LEFT JOIN {totara_criteria_item_record} tcir
-                           ON tcir.criterion_item_id = tci.id
-                          AND tcir.user_id = tmp." . $temp_user_id_column . "
-                        WHERE tcir.id IS NULL";
 
-        $params = [
-            'criterionid' => $criterion_id,
-        ];
+        $sql = "INSERT INTO {totara_criteria_item_record}
+                (user_id, criterion_item_id, criterion_met, timeevaluated)
+                SELECT DISTINCT tmp." . $temp_user_id_column . ", tci.id, {$criterion_met}, {$timeevaluated}
+                     FROM {" . $temp_table_name . "} tmp
+                     JOIN {totara_criteria_item} tci
+                       ON tci.criterion_id = :criterionid
+                LEFT JOIN {totara_criteria_item_record} tcir
+                       ON tcir.criterion_item_id = tci.id
+                      AND tcir.user_id = tmp." . $temp_user_id_column . "
+                    WHERE tcir.id IS NULL";
 
         if (!empty($temp_wh)) {
             $sql .= " AND " . $temp_wh;
@@ -167,30 +168,43 @@ class item_evaluator_user_source {
             $temp_wh .= ' AND ';
         }
 
-        // We are not clearing the 'has_changed' flag so that the end result is a union of users that were updated via any criteria
-        $sql =
-            "UPDATE {" . $temp_table_name . "}
-                SET {$temp_set_sql} 
-              WHERE {$temp_wh}
-                    {$temp_user_id_column} IN (
-                    SELECT DISTINCT tcir.user_id
-                      FROM {totara_criteria_item} tci
-                      JOIN {totara_criteria_item_record} tcir
-                        ON tcir.criterion_item_id = tci.id
-                       AND tcir.timeevaluated > :checkfrom
-                     WHERE tci.criterion_id = :criterionid
-                    )";
+        $sql = "
+            SELECT tcir.user_id
+              FROM {totara_criteria_item} tci
+              JOIN {totara_criteria_item_record} tcir
+                ON tcir.criterion_item_id = tci.id
+               AND tcir.timeevaluated > :checkfrom
+             WHERE tci.criterion_id = :criterionid
+        ";
 
-        $params = array_merge(
+        $user_ids = $DB->get_fieldset_sql(
+            $sql,
             [
                 'criterionid' => $criterion_id,
                 'checkfrom' => $checkfrom,
-            ],
-            $temp_set_params,
-            $temp_wh_params
+            ]
         );
 
-        $DB->execute($sql, $params);
+        if (!empty($user_ids)) {
+            [$user_ids_sql, $user_ids_params] = $DB->get_in_or_equal($user_ids, SQL_PARAMS_NAMED);
+
+            // We are not clearing the 'has_changed' flag so that the end
+            // result is a union of users that were updated via any criteria
+            $sql = "
+                UPDATE {{$temp_table_name}}
+                   SET {$temp_set_sql} 
+                 WHERE {$temp_wh}
+                       {$temp_user_id_column} {$user_ids_sql}
+            ";
+
+            $params = array_merge(
+                $user_ids_params,
+                $temp_set_params,
+                $temp_wh_params
+            );
+
+            $DB->execute($sql, $params);
+        }
     }
 
 }

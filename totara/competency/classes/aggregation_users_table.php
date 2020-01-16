@@ -621,33 +621,18 @@ class aggregation_users_table {
         $assignment_users_table = aggregation_helper::get_assigned_users_sql_table();
 
         $sql =
-            "SELECT DISTINCT tcau.user_id
-               FROM {$assignment_users_table} tcau
-          LEFT JOIN {{$this->get_table_name()}} agg_queue
-                 ON agg_queue.{$this->competency_id_column} = tcau.competency_id
-                AND agg_queue.{$this->user_id_column} = tcau.user_id
-                    {$process_key_wh}
-              WHERE tcau.competency_id = :compid
-                AND agg_queue.id IS NULL";
+            "INSERT INTO {{$this->get_table_name()}} 
+                (user_id, competency_id)
+                SELECT DISTINCT tcau.user_id, tcau.competency_id
+                       FROM {$assignment_users_table} tcau
+                  LEFT JOIN {{$this->get_table_name()}} agg_queue
+                         ON agg_queue.{$this->competency_id_column} = tcau.competency_id
+                        AND agg_queue.{$this->user_id_column} = tcau.user_id
+                            {$process_key_wh}
+                      WHERE tcau.competency_id = :compid
+                        AND agg_queue.id IS NULL";
 
-        $to_add = $DB->get_fieldset_sql($sql, ['compid' => $competency_id]);
-
-        if (!empty($to_add)) {
-            // Add necessary insert columns
-            $to_add = array_map(
-                function ($user_id) use ($competency_id) {
-                    $add_el = (object)$this->get_insert_record($user_id, $competency_id);
-                    if (!empty($this->process_key_column)) {
-                        // We are queuing - ensure process_key is null
-                        $add_el->{$this->process_key_column} = null;
-                    }
-                    return $add_el;
-                },
-                $to_add
-            );
-
-            $DB->insert_records_via_batch($this->table_name, $to_add);
-        }
+        $DB->execute($sql, ['compid' => $competency_id]);
 
         return $this;
     }

@@ -22,26 +22,26 @@
  * @package totara_competency
  */
 
+use aggregation_test_aggregation\test_aggregation;
 use hierarchy_competency\event\scale_min_proficient_value_updated;
+use pathway_test_pathway\test_pathway_evaluator;
+use totara_competency\achievement_configuration;
 use totara_competency\aggregation_users_table;
+use totara_competency\competency_achievement_aggregator;
 use totara_competency\competency_aggregator_user_source;
 use totara_competency\entities\achievement_via;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency;
-use totara_competency\achievement_configuration;
-use totara_competency\competency_achievement_aggregator;
+use totara_competency\entities\competency_achievement;
 use totara_competency\entities\pathway_achievement;
+use totara_competency\entities\scale_value;
 use totara_competency\expand_task;
-use totara_competency\hook\competency_achievement_updated;
+use totara_competency\hook\competency_achievement_updated_bulk;
 use totara_competency\linked_courses;
 use totara_competency\models\assignment_actions;
 use totara_competency\overall_aggregation;
-use totara_competency\entities\scale_value;
-use totara_competency\entities\competency_achievement;
 use totara_competency\pathway;
 use totara_competency\pathway_evaluator_user_source;
-use pathway_test_pathway\test_pathway_evaluator;
-use aggregation_test_aggregation\test_aggregation;
 use totara_competency\user_groups;
 
 /**
@@ -161,7 +161,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $this->assertEquals($pw_achievement->id, $via_record->pathway_achievement_id);
 
         $hook = reset($hooks);
-        $this->assertInstanceOf(competency_achievement_updated::class, $hook);
+        $this->assertInstanceOf(competency_achievement_updated_bulk::class, $hook);
         $sink->close();
     }
 
@@ -227,7 +227,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $this->assertNotEquals($via_record1->pathway_achievement_id, $via_record2->pathway_achievement_id);
 
         $hook = reset($hooks);
-        $this->assertInstanceOf(competency_achievement_updated::class, $hook);
+        $this->assertInstanceOf(competency_achievement_updated_bulk::class, $hook);
         $sink->close();
     }
 
@@ -390,7 +390,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
 
         // The value changed, so a hook was executed.
         $hook = reset($hooks);
-        $this->assertInstanceOf(competency_achievement_updated::class, $hook);
+        $this->assertInstanceOf(competency_achievement_updated_bulk::class, $hook);
         $sink->close();
     }
 
@@ -471,7 +471,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
 
         // The value changed, so a hook was triggered.
         $hook = reset($hooks);
-        $this->assertInstanceOf(competency_achievement_updated::class, $hook);
+        $this->assertInstanceOf(competency_achievement_updated_bulk::class, $hook);
         $sink->close();
     }
 
@@ -529,7 +529,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $this->assertEquals($achievement->id, $via_record->pathway_achievement_id);
 
         $hook = reset($hooks);
-        $this->assertInstanceOf(competency_achievement_updated::class, $hook);
+        $this->assertInstanceOf(competency_achievement_updated_bulk::class, $hook);
 
         // Follow-on scenario. One of the assignments is archived. The status on just that comp_record should reflect that.
 
@@ -767,7 +767,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $this->assertEquals($achievement->id, $via_record->pathway_achievement_id);
 
         $hook = reset($hooks);
-        $this->assertInstanceOf(competency_achievement_updated::class, $hook);
+        $this->assertInstanceOf(competency_achievement_updated_bulk::class, $hook);
         $sink->close();
 
         $disable_assignment_id = array_pop($assignment_ids);
@@ -972,7 +972,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $this->assertEquals($pw_achievement->id, $via_record->pathway_achievement_id);
 
         $hook = reset($hooks);
-        $this->assertInstanceOf(competency_achievement_updated::class, $hook);
+        $this->assertInstanceOf(competency_achievement_updated_bulk::class, $hook);
         $sink->close();
 
         // Now there should be a legacy assignment
@@ -1051,7 +1051,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $this->assertEquals($pw_achievement->id, $via_record->pathway_achievement_id);
 
         $hook = reset($hooks);
-        $this->assertInstanceOf(competency_achievement_updated::class, $hook);
+        $this->assertInstanceOf(competency_achievement_updated_bulk::class, $hook);
         $sink->close();
 
         // Now there should be a legacy assignment

@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2019112800;       // The current module version (Date: YYYYMMDDXX).
+$plugin->version  = 2019112801;       // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2016120505;       // Requires this Moodle version.
 $plugin->component = 'criteria_childcompetency'; // To check on upgrade, that module sits in correct place
 $plugin->tuidependencies = [

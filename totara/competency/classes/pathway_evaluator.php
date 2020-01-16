@@ -24,6 +24,7 @@
 namespace totara_competency;
 
 
+use stdClass;
 use totara_competency\entities\pathway_achievement;
 
 abstract class pathway_evaluator {
@@ -101,28 +102,48 @@ abstract class pathway_evaluator {
      * @param int $evaluation_time
      */
     protected function reaggregate(int $evaluation_time) {
+        global $DB;
+
         /** @var \moodle_recordset $to_reaggregate */
         $to_reaggregate = $this->user_id_source->get_users_to_reaggregate($this->pathway);
 
-        // We do not update has_changed even if this pathway doesn't result in a new value as another pathway may also
-        // have set the flag. Yes, it may mean that we re-aggregate too many users on the higher levels, but at least
-        // we will not skip any that need re-aggregation
-        foreach ($to_reaggregate as $record) {
-            $aggregated_achievement_detail = $this->pathway->aggregate_current_value($record->user_id);
+        $DB->transaction(function () use ($to_reaggregate, $evaluation_time) {
+            global $DB;
 
-            if (!is_null($record->achievement_id)) {
-                $achievement = new pathway_achievement($record->achievement_id);
-                if ($aggregated_achievement_detail->get_scale_value_id() == $record->scale_value_id) {
-                    $achievement->last_aggregated = $evaluation_time;
-                    $achievement->save();
+            // We do not update has_changed even if this pathway doesn't result in a new value as another pathway may also
+            // have set the flag. Yes, it may mean that we re-aggregate too many users on the higher levels, but at least
+            // we will not skip any that need re-aggregation
+            $achievements_to_create = [];
+            foreach ($to_reaggregate as $record) {
+                $aggregated_achievement_detail = $this->pathway->aggregate_current_value($record->user_id);
+
+                if (!is_null($record->achievement_id)) {
+                    $achievement = new pathway_achievement($record->achievement_id);
+                    if ($aggregated_achievement_detail->get_scale_value_id() == $record->scale_value_id) {
+                        $achievement->last_aggregated = $evaluation_time;
+                        $achievement->save();
+                    } else {
+                        $achievement->archive();
+                        $achievements_to_create[] = $this->create_achievement(
+                            $record->user_id,
+                            $evaluation_time,
+                            $aggregated_achievement_detail
+                        );
+                    }
                 } else {
-                    $achievement->archive();
-                    $this->create_achievement($record->user_id, $evaluation_time, $aggregated_achievement_detail);
+                    $achievements_to_create[] = $this->create_achievement(
+                        $record->user_id,
+                        $evaluation_time,
+                        $aggregated_achievement_detail
+                    );
                 }
-            } else {
-                $this->create_achievement($record->user_id, $evaluation_time, $aggregated_achievement_detail);
             }
-        }
+
+            if (!empty($achievements_to_create)) {
+                $DB->insert_records_via_batch('totara_competency_pathway_achievement', $achievements_to_create);
+            }
+        });
+
         $to_reaggregate->close();
     }
 
@@ -132,9 +153,10 @@ abstract class pathway_evaluator {
      * @param int $user_id
      * @param int $evaluation_time
      * @param base_achievement_detail $achievement_detail
+     * @return stdClass
      */
-    private function create_achievement(int $user_id, int $evaluation_time, base_achievement_detail $achievement_detail) {
-        $new_achievement = new pathway_achievement();
+    private function create_achievement(int $user_id, int $evaluation_time, base_achievement_detail $achievement_detail): stdClass {
+        $new_achievement = new stdClass();
         $new_achievement->pathway_id = $this->pathway->get_id();
         $new_achievement->user_id = $user_id;
         $new_achievement->scale_value_id = $achievement_detail->get_scale_value_id();
@@ -142,7 +164,7 @@ abstract class pathway_evaluator {
         $new_achievement->last_aggregated = $evaluation_time;
         $new_achievement->date_achieved = $evaluation_time;
         $new_achievement->related_info = json_encode($achievement_detail->get_related_info());
-        $new_achievement->save();
+        return $new_achievement;
     }
 
 }

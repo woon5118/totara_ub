@@ -33,6 +33,7 @@ use totara_competency\entities\competency;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\settings;
 use core\orm\entity\filter\hierarchy_item_visible;
+use totara_competency\task\expand_assignment_task;
 
 class assignment_actions {
 
@@ -231,12 +232,17 @@ class assignment_actions {
         foreach ($competencies as $competency) {
             foreach ($user_groups as $user_group_type => $ug_ids) {
                 foreach ($ug_ids as $user_group_id) {
-                    $assignment = assignment_model::create($competency->id, $type, $user_group_type, $user_group_id, $status);
+                    $assignment = assignment_model::create($competency->id, $type, $user_group_type, $user_group_id, $status, false);
                     if ($assignment) {
                         $assignments->append($assignment);
                     }
                 }
             }
+        }
+
+        $assignment_ids = $assignments->pluck('id');
+        if (!empty($assignment_ids) && $status == assignment::STATUS_ACTIVE) {
+            expand_assignment_task::schedule_for_assignments($assignment_ids);
         }
 
         return $assignments;

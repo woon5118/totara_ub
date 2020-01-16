@@ -38,26 +38,6 @@ defined('MOODLE_INTERNAL') || die();
 class assignment {
 
     /**
-     * Triggered via assignment_created event.
-     *
-     * @param assignment_created $event
-     * @return bool true on success
-     */
-    public static function created(assignment_created $event) {
-        $data = $event->get_data();
-        if (!empty($data['objectid']) && isset($data['other']['status'])) {
-            if ($data['other']['status'] == entities\assignment::STATUS_ACTIVE) {
-                // trigger expand task for the created assignments
-                // TODO performance - only schedule ad hoc task for non-user assignments,
-                //      otherwise directly create the proper record
-                expand_assignment_task::schedule_for_assignment($data['objectid']);
-            }
-        }
-
-        return true;
-    }
-
-    /**
      * Triggered via assignment_archived event.
      *
      * @param assignment_archived $event

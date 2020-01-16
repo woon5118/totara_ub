@@ -42,7 +42,7 @@ class achievement_configuration {
     /** @var string aggregation_type */
     private $aggregation_type = null;
 
-    /** @var pathway[] These are active pathways t*/
+    /** @var pathway[]|null These are active pathways t*/
     private $active_pathways = null;
 
     /** @var competency */

@@ -25,15 +25,41 @@ namespace totara_competency\event;
 
 defined('MOODLE_INTERNAL') || die();
 
-class assignment_user_unassigned extends assignment_user {
+class assignment_user_assigned_bulk extends assignment_user {
+
+    protected $user_ids = [];
+
+    protected $is_bulk = true;
+
+    public function get_user_id(): ?int {
+        return null;
+    }
+
+    public function get_user_ids(): array {
+        return $this->other['user_ids'];
+    }
 
     /**
      * Initialise required event data properties.
      */
     protected function init() {
-        $this->data['crud'] = 'd';
+        $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_OTHER;
         $this->data['objecttable'] = 'totara_competency_assignments';
+    }
+
+    public static function create_from_assignment_users(int $assignment_id, int $competency_id, array $user_ids = [], ?string $assignment_type = null) {
+        $data = [
+            'objectid' => $assignment_id,
+            'other' => [
+                'user_ids' => $user_ids,
+                'assignment_id' => $assignment_id,
+                'competency_id' => $competency_id,
+                'type' => $assignment_type ?? null,
+            ],
+            'context' => \context_system::instance()
+        ];
+        return static::create($data);
     }
 
     /**
@@ -42,7 +68,7 @@ class assignment_user_unassigned extends assignment_user {
      * @return string
      */
     public static function get_name() {
-        return get_string('event:assignment_user_unassigned', 'totara_competency');
+        return get_string('event:assignment_user_assigned', 'totara_competency');
     }
 
     /**
@@ -51,6 +77,6 @@ class assignment_user_unassigned extends assignment_user {
      * @return string
      */
     public function get_description() {
-        return 'User has been unassigned from a competency';
+        return 'User got assigned to a competency';
     }
 }

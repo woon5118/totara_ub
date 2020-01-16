@@ -24,11 +24,13 @@
 namespace degeneration;
 
 use core\orm\collection;
+use core\orm\query\builder;
 use degeneration\items\audience;
 use degeneration\items\competency;
 use degeneration\items\competency_scale;
 use degeneration\items\course;
 use degeneration\items\course_completion;
+use degeneration\items\course_completion_basic;
 use degeneration\items\criteria\child_competency;
 use degeneration\items\criteria\on_activate;
 use degeneration\items\criteria\course_completion as course_completion_criterion;
@@ -42,6 +44,7 @@ use hierarchy_organisation\entities\organisation_framework;
 use hierarchy_position\entities\position_framework;
 use totara_competency\entities\competency_framework;
 use totara_competency\linked_courses;
+use totara_core\totara\menu\build;
 
 class performance_testing extends App {
 
@@ -81,25 +84,26 @@ class performance_testing extends App {
      *
      * @var bool
      */
-    protected $assign_groups = false;
+    protected $assign_groups = true;
 
     /**
      *
      */
     public function generate() {
         $this->create_users()
-        //->create_organisations()
-        //->create_positions()
-        //->create_audiences()
+            ->create_organisations()
+            ->create_positions()
+            ->create_audiences()
             ->create_scales()
             ->create_competencies()
         //->create_organisation_assignments()
         //->create_position_assignments()
-        //->create_audience_assignments()
+        // ->create_audience_assignments()
             ->create_assignments()
             ->create_courses()
-            ->enrol_users()
-            ->create_course_completions()
+            // ->enrol_users()
+            // ->create_course_completions()
+            ->create_course_completions_basic()
             ->add_linked_courses()
             ->create_criteria()
             ;
@@ -111,9 +115,16 @@ class performance_testing extends App {
 
         $size = $this->get_item_size('users');
 
-        for ($c = 1; $c <= $size; $c++) {
-            $this->users[] = user::new()->save_and_return();
-        }
+        builder::get_db()->transaction(function () use ($size) {
+            $users = [];
+            for ($c = 1; $c <= $size; $c++) {
+                $users[] = (object)user::new()->create_for_bulk();
+            }
+
+            builder::get_db()->insert_records_via_batch('user', $users);
+
+            $this->users = user::load_existing();
+        });
 
         return $this;
     }
@@ -142,45 +153,52 @@ class performance_testing extends App {
             throw new \Exception('You must create users first');
         }
 
-        $count = 0;
+        builder::get_db()->transaction(function () {
+            $count = 0;
 
-        $current = reset($this->users);
-        $audience = audience::new()->save_and_return();
-        $this->audiences[] = $audience;
+            $current = reset($this->users);
+            $audience = audience::new()->save_and_return();
+            $this->audiences[] = $audience;
 
-        while ($current) {
-            if ($count > 100) {
-                $count = 0;
-                $audience = audience::new()->save_and_return();
-                $this->audiences[] = $audience;
+            $members = [];
+            while ($current) {
+                if ($count > 1000) {
+                    $count = 0;
+                    $audience = audience::new()->save_and_return();
+                    $this->audiences[] = $audience;
+                }
+
+                $members[] = $audience->add_member($current);
+
+                $count++;
+                $current = next($this->users);
             }
 
-            $audience->add_member($current);
+            builder::get_db()->insert_records_via_batch('cohort_members', $members);
 
-            $count++;
-            $current = next($this->users);
-        }
-
+        });
         return $this;
     }
 
     public function create_organisations() {
         $this->output('Creating organisations...');
 
-        [$depth, $count] = $this->get_item_size('organisations');
+        builder::get_db()->transaction(function () {
+            [$depth, $count] = $this->get_item_size('organisations');
 
-        if (!$fw = organisation_framework::repository()->order_by('id')->first()) {
-            $fw = (new organisation())->create_framework();
-        }
+            if (!$fw = organisation_framework::repository()->order_by('id')->first()) {
+                $fw = (new organisation())->create_framework();
+            }
 
-        $hierarchy = new hierarchy();
-        $hierarchy->set_type(organisation::class)
-            ->set_variable_count(false)
-            ->set_variable_depth(false)
-            ->set_framework($fw)
-            ->set_depth($depth)
-            ->set_count($count)
-            ->create_hierarchy();
+            $hierarchy = new hierarchy();
+            $hierarchy->set_type(organisation::class)
+                ->set_variable_count(false)
+                ->set_variable_depth(false)
+                ->set_framework($fw)
+                ->set_depth($depth)
+                ->set_count($count)
+                ->create_hierarchy();
+        });
 
         return $this;
     }
@@ -188,20 +206,22 @@ class performance_testing extends App {
     public function create_positions() {
         $this->output('Creating positions...');
 
-        [$depth, $count] = $this->get_item_size('positions');
+        builder::get_db()->transaction(function () {
+            [$depth, $count] = $this->get_item_size('positions');
 
-        if (!$fw = position_framework::repository()->order_by('id')->first()) {
-            $fw = (new position())->create_framework();
-        }
+            if (!$fw = position_framework::repository()->order_by('id')->first()) {
+                $fw = (new position())->create_framework();
+            }
 
-        $hierarchy = new hierarchy();
-        $hierarchy->set_type(position::class)
-            ->set_variable_count(false)
-            ->set_variable_depth(false)
-            ->set_framework($fw)
-            ->set_depth($depth)
-            ->set_count($count)
-            ->create_hierarchy();
+            $hierarchy = new hierarchy();
+            $hierarchy->set_type(position::class)
+                ->set_variable_count(false)
+                ->set_variable_depth(false)
+                ->set_framework($fw)
+                ->set_depth($depth)
+                ->set_count($count)
+                ->create_hierarchy();
+        });
 
         return $this;
     }
@@ -209,11 +229,13 @@ class performance_testing extends App {
     public function create_audiences() {
         $this->output('Creating audiences...');
 
-        $size = $this->get_item_size('audiences');
+        builder::get_db()->transaction(function () {
+            $size = $this->get_item_size('audiences');
 
-        for ($c = 1; $c <= $size; $c++) {
-            $this->audiences[] = audience::new()->save_and_return();
-        }
+            for ($c = 1; $c <= $size; $c++) {
+                $this->audiences[] = audience::new()->save_and_return();
+            }
+        });
 
         return $this;
     }
@@ -221,32 +243,34 @@ class performance_testing extends App {
     public function create_scales() {
         $this->output('Creating competency scales...');
 
-        $simple_scale = new competency_scale();
+        builder::get_db()->transaction(function () {
+            $simple_scale = new competency_scale();
 
-        $simple_scale->add_value(false, 'Incompetent', $simple_incompetent)
-            ->add_value(true, 'Competent', $simple_competent)
-            ->save();
+            $simple_scale->add_value(false, 'Incompetent', $simple_incompetent)
+                ->add_value(true, 'Competent', $simple_competent)
+                ->save();
 
-        $complex_scale = new competency_scale();
+            $complex_scale = new competency_scale();
 
-        $complex_scale->add_value(false, 'Incompetent', $complex_incompetent)
-            ->add_value(false, 'A little less incompetent', $complex_less_competent)
-            ->add_value(true, 'Competent ', $complex_competent)
-            ->add_value(true, 'A little more competent ', $complex_more_competent)
-            ->save();
+            $complex_scale->add_value(false, 'Incompetent', $complex_incompetent)
+                ->add_value(false, 'A little less incompetent', $complex_less_competent)
+                ->add_value(true, 'Competent ', $complex_competent)
+                ->add_value(true, 'A little more competent ', $complex_more_competent)
+                ->save();
 
-        $this->scales = [
-            $simple_scale->get_data('id') => [
-                'incompetent' => $simple_incompetent,
-                'competent' => $simple_competent,
-            ],
-            $complex_scale->get_data('id') => [
-                'incompetent' => $complex_incompetent,
-                'less_incompetent' => $complex_less_competent,
-                'competent' => $complex_competent,
-                'more_competent' => $complex_more_competent,
-            ]
-        ];
+            $this->scales = [
+                $simple_scale->get_data('id') => [
+                    'incompetent' => $simple_incompetent,
+                    'competent' => $simple_competent,
+                ],
+                $complex_scale->get_data('id') => [
+                    'incompetent' => $complex_incompetent,
+                    'less_incompetent' => $complex_less_competent,
+                    'competent' => $complex_competent,
+                    'more_competent' => $complex_more_competent,
+                ]
+            ];
+        });
 
         return $this;
     }
@@ -254,27 +278,34 @@ class performance_testing extends App {
     public function create_competencies() {
         $this->output('Creating competencies...');
 
-        [$depth, $count] = $this->get_item_size('competencies');
+        builder::get_db()->transaction(function () {
+            [$depth, $count] = $this->get_item_size('competencies');
 
-        $this->competency_hierarchy = new hierarchy();
+            $this->competency_hierarchy = new hierarchy();
 
-        $scale_ids = array_keys($this->scales);
+            $scale_ids = array_keys($this->scales);
 
-        foreach ($scale_ids as $scale_id) {
-            $this->competency_hierarchy->set_framework((new competency())->create_framework(['scale' => $scale_id]));
-        }
+            foreach ($scale_ids as $scale_id) {
+                $this->competency_hierarchy->set_framework((new competency())->create_framework(['scale' => $scale_id]));
+            }
 
-        $this->competency_hierarchy->set_type(competency::class)
-            ->set_variable_count(false)
-            ->set_variable_depth(false)
-            ->set_depth($depth)
-            ->set_count($count)
-            ->create_hierarchy();
+            $this->competency_hierarchy->set_type(competency::class)
+                ->set_variable_count(false)
+                ->set_variable_depth(false)
+                ->set_depth($depth)
+                ->set_count($count)
+                ->create_hierarchy();
 
-        // Let's eager load scales
-        collection::new(array_map(function (item $item) {
-            return $item->get_data();
-        }, $this->competency_hierarchy->get_items()))->load('scale');
+            // Let's eager load scales
+            collection::new(
+                array_map(
+                    function (item $item) {
+                        return $item->get_data();
+                    },
+                    $this->competency_hierarchy->get_items()
+                )
+            )->load('scale');
+        });
 
         return $this;
     }
@@ -296,13 +327,17 @@ class performance_testing extends App {
             throw new \Exception('You must create competency hierarchy first');
         }
 
-        $competencies = $this->get_competencies('assignments');
+        builder::get_db()->transaction(function () {
+            $competencies = $this->get_competencies('assignments');
 
-        foreach ($this->audiences as $audience) {
-            foreach ($competencies as $competency) {
-                static::competency_generator()->assignment_generator()->create_cohort_assignment($competency->get_data('id'), $audience->get_data()->id);
+            foreach ($this->audiences as $audience) {
+                foreach ($competencies as $competency) {
+                    static::competency_generator()
+                        ->assignment_generator()
+                        ->create_cohort_assignment($competency->get_data('id'), $audience->get_data()->id);
+                }
             }
-        }
+        });
 
         return $this;
     }
@@ -314,13 +349,17 @@ class performance_testing extends App {
             throw new \Exception('You must create competency hierarchy first');
         }
 
-        $competencies = $this->get_competencies('assignments');
+        builder::get_db()->transaction(function () {
+            $competencies = $this->get_competencies('assignments');
 
-        foreach ($this->users as $user) {
-            foreach ($competencies as $competency) {
-                static::competency_generator()->assignment_generator()->create_user_assignment($competency->get_data('id'), $user->get_data()->id);
+            foreach ($this->users as $user) {
+                foreach ($competencies as $competency) {
+                    static::competency_generator()
+                        ->assignment_generator()
+                        ->create_user_assignment($competency->get_data('id'), $user->get_data()->id);
+                }
             }
-        }
+        });
 
         return $this;
     }
@@ -344,23 +383,26 @@ class performance_testing extends App {
             throw new \Exception('You must create courses and enrol users first');
         }
 
-        $count = $this->get_item_size('courses_per_criterion');
-        $variable = $this->get_item_size('variable_courses_per_criterion');
+        builder::get_db()->transaction(function () {
+            $count = $this->get_item_size('courses_per_criterion');
+            $variable = $this->get_item_size('variable_courses_per_criterion');
 
-        foreach ($this->competency_hierarchy->get_items() as $item) {
+            foreach ($this->competency_hierarchy->get_items() as $item) {
+                $count = $variable ? rand(1, $count) : $count;
 
-            $count = $variable ? rand(1, $count) : $count;
+                $courses = array_map(
+                    function ($id) {
+                        return [
+                            'id' => $this->courses_with_users[$id]->get_data('id'),
+                            'mandatory' => false,
+                        ];
+                    },
+                    array_rand($this->courses_with_users, $count)
+                );
 
-            $courses = array_map(function($id) {
-                return [
-                    'id' => $this->courses_with_users[$id]->get_data('id'),
-                    'mandatory' => false,
-                ];
-            }, array_rand($this->courses_with_users, $count)
-            );
-
-            linked_courses::set_linked_courses($item->get_data('id'), $courses);
-        }
+                linked_courses::set_linked_courses($item->get_data('id'), $courses);
+            }
+        });
 
         return $this;
     }
@@ -377,11 +419,11 @@ class performance_testing extends App {
         $users = array_rand($this->users, $this->get_percentage(count($this->users), $percentage));
         $courses = array_rand($this->courses, $this->get_percentage(count($this->courses), $percentage));
 
-        $this->users_with_courses = array_filter($this->users, function($key) use ($users) {
+        $this->users_with_courses = array_filter($this->users, function ($key) use ($users) {
             return in_array($key, $users);
         }, ARRAY_FILTER_USE_KEY);
 
-        $this->courses_with_users = array_filter($this->courses, function($key) use ($courses) {
+        $this->courses_with_users = array_filter($this->courses, function ($key) use ($courses) {
             return in_array($key, $courses);
         }, ARRAY_FILTER_USE_KEY);
 
@@ -405,15 +447,68 @@ class performance_testing extends App {
         $courses_to_complete = array_rand($this->courses_with_users, $count);
 
         foreach ($courses_to_complete as $course_to_complete) {
-            foreach ($this->courses[$course_to_complete]->get_enrolled_users() as $user) {
+            foreach ($this->courses_with_users[$course_to_complete]->get_enrolled_users() as $user) {
                 $cc = new course_completion();
-                $cc->for($this->courses[$course_to_complete])
+                $cc->for($this->courses_with_users[$course_to_complete])
                     ->by($user)
                     ->save_and_return();
             }
         }
 
         return $this;
+    }
+
+    public function create_course_completions_basic() {
+        $this->output('Creating basic course completions...');
+
+        builder::get_db()->transaction(function () {
+            // We'll be creating completions for courses with users
+            $percentage = $this->get_item_size('completions');
+
+            $count = $this->get_percentage(count($this->courses), $percentage);
+
+            $courses_to_complete = array_rand($this->courses, $count);
+            $this->courses_with_users = $this->courses;
+
+            $completions = [];
+            $count = 0;
+            foreach ($courses_to_complete as $course_to_complete) {
+                // Create completions for all users
+                foreach ($this->users as $user) {
+                    $cc = new course_completion_basic();
+                    $completions[] = $cc->for($this->courses[$course_to_complete])
+                        ->by($user)
+                        ->save_and_return();
+
+                    $count++;
+                    if ($count == BATCH_INSERT_MAX_ROW_COUNT) {
+                        $this->bulk_insert_completions($completions);
+                        $completions = [];
+                        $count = 0;
+                    }
+                }
+            }
+
+            if (!empty($completions)) {
+                $this->bulk_insert_completions($completions);
+            }
+            unset($completions);
+            unset($courses_to_complete);
+        });
+
+        return $this;
+    }
+
+    private function bulk_insert_completions(array $completions) {
+        builder::get_db()->insert_records(
+            'course_completions',
+            array_map(
+                function (item $item) {
+                    return (object)$item->get_data();
+                },
+                $completions
+            )
+        );
     }
 
     public function create_criteria_set(competency $competency) {
@@ -466,9 +561,11 @@ class performance_testing extends App {
             throw new \Exception('You must generate your competency hierarchy first');
         }
 
-        foreach ($this->competency_hierarchy->get_items() as $item) {
-            $this->create_criteria_set($item);
-        }
+        builder::get_db()->transaction(function () {
+            foreach ($this->competency_hierarchy->get_items() as $item) {
+                $this->create_criteria_set($item);
+            }
+        });
 
         return $this;
     }
@@ -481,9 +578,13 @@ class performance_testing extends App {
         $competencies = $this->competency_hierarchy->get_items();
         $ids = array_rand($competencies, $this->get_percentage(count($competencies), $key ? $this->get_item_size($key) : 100));
 
-        return array_filter($competencies, function($key) use ($ids) {
-            return in_array($key, $ids);
-        }, ARRAY_FILTER_USE_KEY);
+        return array_filter(
+            $competencies,
+            function ($key) use ($ids) {
+                return in_array($key, $ids);
+            },
+            ARRAY_FILTER_USE_KEY
+        );
     }
 
     protected function create_child_competency_criterion(competency $competency): ?child_competency {
@@ -544,7 +645,7 @@ class performance_testing extends App {
         return [
             'users' => 100,
             'courses' => 100,
-            'audiences' => 1000,
+            'audiences' => 10,
             'organisations' => [4, 4],
             'positions' => [4, 4],
             'competencies' => [4, 4],
@@ -561,10 +662,10 @@ class performance_testing extends App {
         return [
             'users' => 1000,
             'courses' => 100,
-            'audiences' => 1000,
-            'organisations' => [3, 4],
-            'positions' => [3, 4],
-            'competencies' => [3, 4],
+            'audiences' => 100,
+            'organisations' => [4, 4],
+            'positions' => [4, 4],
+            'competencies' => [4, 4],
             'assignments' => 80,
             'job_assignments' => 50,
             'enrolments' => 80,
@@ -578,7 +679,7 @@ class performance_testing extends App {
         return [
             'users' => 1000,
             'courses' => 100,
-            'audiences' => 1000,
+            'audiences' => 100,
             'organisations' => [4, 4],
             'positions' => [4, 4],
             'competencies' => [4, 4],
@@ -632,7 +733,7 @@ class performance_testing extends App {
             'audiences' => 100,
             'organisations' => [5, 5],
             'positions' => [5, 5],
-            'competencies' => [5, 5],
+            'competencies' => [6, 5],
             'assignments' => 70,
             'job_assignments' => 100,
             'enrolments' => 70,

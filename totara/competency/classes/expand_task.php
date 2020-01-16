@@ -23,13 +23,15 @@
 
 namespace totara_competency;
 
+use core\entities\expandable;
+use core\orm\collection;
+use core\orm\query\builder;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency_assignment_user;
 use totara_competency\entities\competency_assignment_user_repository;
-use totara_competency\event\assignment_user_assigned;
+use totara_competency\event\assignment_user_assigned_bulk;
 use totara_competency\event\assignment_user_unassigned;
 use totara_competency\models\assignment as assignment_model;
-use core\entities\expandable;
 
 class expand_task {
 
@@ -112,61 +114,95 @@ class expand_task {
         // We ignore missing assignments to not cause failing tasks.
         // It can happen that an assignment was deleted before the task is run.
         // On the next run the assignments will be picked up again.
-        if (!$assignment->id) {
+        if (!$assignment->exists()) {
             return;
         }
-        $assignment_id = (int) $assignment->id;
 
         // load all current source targets relations of the assignment
         // to avoid more requests to the database when checking if entry
         // already exists.
-        $current_entries = $this->load_current_entries($assignment_id);
-        $added_entries_ids = [];
+        $current_entries = $this->load_current_entries($assignment->id);
 
+        // TODO performance - it might be possible to do an INSERT SELECT
+        /*
+         * DELETE FROM {totara_competency_assignment_users}
+         * WHERE assignment_id = :assignment_id
+         *      AND user_id NOT IN (
+         *          SELECT ...
+         *      )
+         *
+         * INSERT INTO {totara_competency_assignment_users}
+         *      (assignment_id, user_id, competency_id, created_at, updated_at)
+         * SELECT :assignment_id, user_id, :competency_id, :created_at, :updated_at
+         * FROM (
+         *      SELECT user_id
+         *      FROM ...
+         * )
+         */
         $user_ids = $this->get_expanded_users($assignment->user_group_type, $assignment->user_group_id);
 
-        foreach ($user_ids as $user_id) {
-            // TODO move unique identifier gegneration out of the entity
-            //      to avoid creating objects for skipped users
-            //      also maybe avoid md5(), just concatenate
-            $competency_user = new competency_assignment_user();
-            $competency_user->assignment_id = $assignment_id;
-            $competency_user->competency_id = $assignment->competency_id;
-            $competency_user->user_id = $user_id;
+        $new_user_ids = array_diff($user_ids, $current_entries->pluck('user_id'));
+        if (!empty($new_user_ids)) {
+            builder::get_db()->transaction(function () use ($new_user_ids, $assignment) {
+                $to_create = [];
+                $count = 0;
 
-            $identifier = $competency_user->unique_identifier;
-            $added_entries_ids[] = $identifier;
-            // If the entry does not exist yet, create it now otherwise just ignore it
-            if (!isset($current_entries[$identifier])) {
-                // TODO performance - use insert_records_via_batch()
-                // TODO performance use transaction?
-                $competency_user->save();
-                assignment_user_assigned::create_from_assignment_user($competency_user, $assignment->type)->trigger();
-            }
-            unset($competency_user);
+                foreach ($new_user_ids as $user_id) {
+                    // If the entry does not exist yet, create it now otherwise just ignore it
+                    $competency_user = [
+                        'assignment_id' => $assignment->id,
+                        'competency_id' => $assignment->competency_id,
+                        'user_id' => $user_id,
+                        'created_at' => time(),
+                        'updated_at' => time(),
+                    ];
+
+                    $to_create[] = (object)$competency_user;
+
+                    $count++;
+
+                    // Make sure we inset multiple rows but only to a certain limit
+                    // to limit memory consumption and prevent leaks
+                    if ($count == BATCH_INSERT_MAX_ROW_COUNT) {
+                        $this->assign_bulk($assignment, $to_create);
+                        $to_create = [];
+                        $count = 0;
+                    }
+                }
+
+                // Insert the last batch
+                if (!empty($to_create)) {
+                    $this->assign_bulk($assignment, $to_create);
+                }
+
+            });
         }
 
         // Delete all records which were not processed within this run, means they were removed from the source or targets
-        $this->unassign_users($current_entries, $added_entries_ids);
+        $this->unassign_users($current_entries, $user_ids);
+    }
+
+    private function assign_bulk(assignment $assignment, array $to_create) {
+        builder::get_db()->insert_records('totara_competency_assignment_users', $to_create);
+        $event_user_ids = array_column($to_create, 'user_id');
+        assignment_user_assigned_bulk::create_from_assignment_users(
+            $assignment->id,
+            $assignment->competency_id,
+            $event_user_ids,
+            $assignment->type
+        )->trigger();
     }
 
     /**
      * Load all current entries for the given assignment, key uniquely identifies the source target
      *
      * @param int $assignment_id
-     * @return array|competency_assignment_user[]
+     * @return collection|competency_assignment_user[]
      */
-    private function load_current_entries(int $assignment_id): array {
-        $current_entries = [];
-        /** @var competency_assignment_user[] $competencies_users */
-        $competencies_users = competency_assignment_user::repository()
+    private function load_current_entries(int $assignment_id): collection {
+        return competency_assignment_user::repository()
             ->filter_by_assignment_id($assignment_id)
             ->get();
-        foreach ($competencies_users as $competency_user) {
-            $current_entries[$competency_user->unique_identifier] = $competency_user;
-        }
-
-        return $current_entries;
     }
 
     /**
@@ -177,12 +213,9 @@ class expand_task {
      * @return array
      */
     private function get_expanded_users(string $user_group_type, int $user_group_id): array {
-        // TODO performance - just have get_cache_entry, otherwise it's called twice
-        if (!$this->has_cache_entry($user_group_type, $user_group_id)) {
+        if (!$expanded_records = $this->get_cache_entry($user_group_type, $user_group_id)) {
             $expanded_records = $this->expand_entity($user_group_type, $user_group_id);
             $this->add_cache_entry($user_group_type, $user_group_id, $expanded_records);
-        } else {
-            $expanded_records = $this->get_cache_entry($user_group_type, $user_group_id);
         }
         return $expanded_records;
     }
@@ -230,29 +263,29 @@ class expand_task {
     /**
      * Unassign all records which are not in any user group anymore.
      *
-     * @param array $current_records keys are identifier, values are records
-     * @param array $added_records_identifiers identifiers of the records added during this run
+     * @param collection $current_records keys are identifier, values are entities
+     * @param array $new_user_ids newly determined user ids which should be in the group now
      */
-    private function unassign_users(array $current_records, array $added_records_identifiers) {
-        // Delete all records which were not processed by the previous loop
-        $current_records_identifiers = array_keys($current_records);
-        $delete_records = array_diff($current_records_identifiers, $added_records_identifiers);
-
-        $records_to_delete = [];
-        foreach ($delete_records as $delete_record_identifier) {
-            if (isset($current_records[$delete_record_identifier])) {
-                $records_to_delete[] = $current_records[$delete_record_identifier];
+    private function unassign_users(collection $current_records, array $new_user_ids) {
+        $records_to_delete = $current_records->filter(
+            function (competency_assignment_user $assignment_user) use ($new_user_ids) {
+                return !in_array($assignment_user->user_id, $new_user_ids);
             }
-        }
+        );
 
-        /** @var competency_assignment_user $assignment_user */
-        foreach ($records_to_delete as $assignment_user) {
-            // Trigger event for all affected entries
-            $event = assignment_user_unassigned::create_from_assignment_user($assignment_user);
-            // TODO performance - delete in one query
-            $assignment_user->delete();
-            // TODO performance use transaction?
-            $event->trigger();
+        if ($records_to_delete->count() > 0) {
+            builder::get_db()->transaction(function () use ($records_to_delete) {
+                competency_assignment_user::repository()
+                    ->where('id', $records_to_delete->pluck('id'))
+                    ->delete();
+
+                /** @var competency_assignment_user $assignment_user */
+                foreach ($records_to_delete as $assignment_user) {
+                    // Trigger event for all affected entries
+                    $event = assignment_user_unassigned::create_from_assignment_user($assignment_user);
+                    $event->trigger();
+                }
+            });
         }
     }
 

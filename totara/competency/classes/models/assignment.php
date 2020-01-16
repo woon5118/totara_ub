@@ -40,6 +40,7 @@ use totara_competency\event\assignment_archived;
 use totara_competency\event\assignment_created;
 use totara_competency\event\assignment_deleted;
 use totara_competency\event\assignment_user_archived;
+use totara_competency\task\expand_assignment_task;
 use totara_hierarchy\entities\hierarchy_item;
 use core\entities\user;
 use core\orm\entity\filter\hierarchy_item_visible;
@@ -193,15 +194,16 @@ class assignment {
      * @param string $user_group_type
      * @param int $user_group_id
      * @param int $status
+     * @param bool $queue_expand false to skip creating the expand task
      * @return assignment|null
-     * @throws assignment_create_exception
      */
     public static function create(
         int $competency_id,
         string $type,
         string $user_group_type,
         int $user_group_id,
-        int $status = assignment_entity::STATUS_DRAFT
+        int $status = assignment_entity::STATUS_DRAFT,
+        bool $queue_expand = true
     ): ?self {
         // Validate assignment status
         if (!in_array($status, [assignment_entity::STATUS_DRAFT, assignment_entity::STATUS_ACTIVE], true)) {
@@ -275,6 +277,10 @@ class assignment {
             $assignment->save();
 
             assignment_created::create_from_assignment($assignment)->trigger();
+
+            if ($queue_expand) {
+                expand_assignment_task::schedule_for_assignment($assignment->id);
+            }
 
             return new static($assignment);
         }

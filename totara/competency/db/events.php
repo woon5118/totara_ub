@@ -36,6 +36,7 @@ use totara_competency\event\assignment_created;
 use totara_competency\event\assignment_deleted;
 use totara_competency\event\assignment_user_archived;
 use totara_competency\event\assignment_user_assigned;
+use totara_competency\event\assignment_user_assigned_bulk;
 use totara_competency\event\assignment_user_unassigned;
 use totara_competency\observers\assignment as assignment_observer;
 use totara_competency\observers\assignment_aggregation;
@@ -70,10 +71,6 @@ $observers = [
     ],
     // Assignment events
     [
-        'eventname' => assignment_created::class,
-        'callback'  => assignment_observer::class.'::created'
-    ],
-    [
         'eventname' => assignment_activated::class,
         'callback'  => assignment_observer::class.'::activated'
     ],
@@ -89,6 +86,10 @@ $observers = [
         // TODO if you are introducing another observer for this event, please consider moving logging there
         // to avoid clashes
         'eventname' => assignment_user_assigned::class,
+        'callback'  => user_log_observer::class.'::log'
+    ],
+    [
+        'eventname' => assignment_user_assigned_bulk::class,
         'callback'  => user_log_observer::class.'::log'
     ],
     [
@@ -126,6 +127,10 @@ $observers = [
     [
         'eventname' => assignment_user_assigned::class,
         'callback' => assignment_aggregation::class.'::user_assigned',
+    ],
+    [
+        'eventname' => assignment_user_assigned_bulk::class,
+        'callback' => assignment_aggregation::class.'::user_assigned_bulk',
     ],
     [
         'eventname' => assignment_user_unassigned::class,

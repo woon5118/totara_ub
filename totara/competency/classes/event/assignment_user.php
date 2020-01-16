@@ -30,6 +30,8 @@ use totara_competency\entities\competency_assignment_user;
 
 abstract class assignment_user extends base {
 
+    protected $is_bulk = false;
+
     /**
      * Return related assignment id
      *
@@ -51,9 +53,9 @@ abstract class assignment_user extends base {
     /**
      * Return related assignment type
      *
-     * @return int|null
+     * @return string|null
      */
-    public function get_assignment_type(): ?int {
+    public function get_assignment_type(): ?string {
         return $this->data['other']['type'] ?? null;
     }
 
@@ -66,16 +68,22 @@ abstract class assignment_user extends base {
         return $this->data['relateduserid'] ?? null;
     }
 
+    public function is_bulk(): bool {
+        return $this->is_bulk;
+    }
+
     /**
      * Create instance of event.
      *
-     * @param competency_assignment_user $assignment_user
+     * @param array $assignment_user
      * @param string $assignment_type
-     * @return self
+     * @return self|base
      */
-    public static function create_from_assignment_user(competency_assignment_user $assignment_user, ?string $assignment_type = null) {
+    public static function create_from_array(array $assignment_user, ?string $assignment_type = null) {
+        $assignment_user = (object) $assignment_user;
+
         $data = [
-            'objectid' => $assignment_user->id,
+            'objectid' => $assignment_user->assignment_id,
             'relateduserid' => $assignment_user->user_id,
             'other' => [
                 'assignment_id' => $assignment_user->assignment_id,
@@ -84,10 +92,18 @@ abstract class assignment_user extends base {
             ],
             'context' => \context_system::instance()
         ];
-        /** @var static $event */
-        $event = static::create($data);
-        $event->add_record_snapshot('totara_competency_assignment_users', (object) $assignment_user->get_attributes_raw());
-        return $event;
+        return static::create($data);
+    }
+
+    /**
+     * Create instance of event.
+     *
+     * @param competency_assignment_user $assignment_user
+     * @param string $assignment_type
+     * @return self
+     */
+    public static function create_from_assignment_user(competency_assignment_user $assignment_user, ?string $assignment_type = null) {
+        return self::create_from_array($assignment_user->get_attributes_raw(), $assignment_type);
     }
 
 }

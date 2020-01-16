@@ -47,25 +47,24 @@ class competency_item_evaluator extends item_evaluator {
 
         // Find all item records where the currently indicated 'criterion_met' is wrong
         // Doing it in 2 sets as there can be a huge number of assigned users which may result in very large arrays
-        // TODO: Need to do stress testing here with huge number of assigned users
 
         // First users marked as not having met the criteria, but have satisfied all
         $select_sql = "
             SELECT tcir.id
-              FROM {totara_criteria_item} tci
-              JOIN {totara_criteria_item_record} tcir
+              FROM {totara_criteria_item_record} tcir
+              JOIN {totara_criteria_item} tci
                 ON tcir.criterion_item_id = tci.id
-              JOIN (
-                   SELECT DISTINCT tca.comp_id, tca.user_id
-                     FROM {totara_competency_achievement} tca
-                    WHERE tca.status = :achievementstatus 
-                        AND tca.proficient = :isproficient
-                ) p
-                ON tci.item_id = p.comp_id
-               AND tcir.user_id = p.user_id
              WHERE tci.criterion_id = :criterionid
                AND tci.item_type = :itemtype
                AND tcir.criterion_met = :currentmet
+               AND EXISTS (
+                  SELECT tca.id
+                    FROM {totara_competency_achievement} tca
+                   WHERE tca.status = :achievementstatus 
+                      AND tca.proficient = :isproficient
+                      AND tca.comp_id = tci.item_id 
+                      AND tca.user_id = tcir.user_id
+               )
                ";
 
         $select_params = [
@@ -106,22 +105,22 @@ class competency_item_evaluator extends item_evaluator {
                   FROM {totara_criteria_item} tci
                   JOIN {totara_criteria_item_record} tcir
                     ON tcir.criterion_item_id = tci.id
-             LEFT JOIN (
-                       SELECT tca.comp_id, tca.user_id, MAX(tca.proficient) AS proficient
-                         FROM {totara_competency_achievement} tca
-                        WHERE tca.status = :achievementstatus
-                        GROUP BY tca.comp_id, tca.user_id
-                    ) p
-                    ON tci.item_id = p.comp_id
-                   AND tcir.user_id = p.user_id
                  WHERE tci.criterion_id = :criterionid
                    AND tci.item_type = :itemtype
                    AND tcir.criterion_met = :currentmet
-                   AND (p.proficient IS NULL OR p.proficient = :isproficient)";
+                      AND NOT EXISTS (
+                            SELECT tca.id
+                              FROM {totara_competency_achievement} tca
+                             WHERE tca.status = :achievementstatus
+                                AND tca.proficient = :isproficient
+                                AND tca.comp_id = tci.item_id
+                                AND tca.user_id = tcir.user_id
+                      )
+            ";
 
             $select_params = [
                 'achievementstatus' => competency_achievement::ACTIVE_ASSIGNMENT,
-                'isproficient' => 0,
+                'isproficient' => 1,
                 'criterionid' => $criterion_id,
                 'itemtype' => 'competency',
                 'currentmet' => 1,

@@ -113,15 +113,13 @@ class user_unassigned {
      * @return $this
      */
     protected function log_activity() {
-
         $log = new assignment_user_log(
             $this->event->get_assignment_id(),
-            $this->event->get_user_id(),
             $this->event->get_competency_id(),
             $this->event->get_assignment_type()
         );
 
-        $log->log_unassign_user_group();
+        $log->log_unassign_user_group($this->event->get_user_id());
 
         return $this;
     }

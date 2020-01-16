@@ -25,6 +25,7 @@ namespace totara_competency;
 
 
 use core\orm\collection;
+use core\orm\query\builder;
 use stdClass;
 use totara_competency\entities\achievement_via;
 use totara_competency\entities\assignment;
@@ -106,62 +107,69 @@ final class competency_achievement_aggregator {
         $this->user_id_source->archive_non_assigned_achievements($competency_id, $aggregation_time);
         $user_assignment_records = $this->user_id_source->get_users_to_reaggregate($competency_id);
 
-        foreach ($user_assignment_records as $user_assignment_record) {
-            $user_id = $user_assignment_record->user_id;
-            $user_achievement = $this->get_aggregation_instance()->aggregate_for_user($user_id);
-            $previous_comp_achievement = $user_assignment_record->achievement;
+        builder::get_db()->transaction(function () use ($competency_id, $aggregation_time, $user_assignment_records) {
+            $hook = new hook\competency_achievement_updated_bulk($competency_id);
 
-            $this->ensure_legacy_assignment_exists($competency_id, $user_assignment_record);
+            foreach ($user_assignment_records as $user_assignment_record) {
+                $user_id = $user_assignment_record->user_id;
+                $user_achievement = $this->get_aggregation_instance()->aggregate_for_user($user_id);
+                $previous_comp_achievement = $user_assignment_record->achievement;
 
-            // We don't necessarily have a scale value in this case we store null
-            $scale_value_id = null;
-            $is_proficient = 0;
-            if ($user_achievement['scale_value']) {
-                $scale_value_id = $user_achievement['scale_value']->id;
-                $is_proficient = $user_achievement['scale_value']->proficient;
-            }
+                $this->ensure_legacy_assignment_exists($competency_id, $user_assignment_record);
 
-            // If the scale value changed or the proficiency value then we supersede the old record and create a new one
-            if (is_null($previous_comp_achievement)
-                || $previous_comp_achievement->scale_value_id != $scale_value_id
-                || $previous_comp_achievement->proficient != $is_proficient
-            ) {
-                // New achieved value
-                if (!is_null($previous_comp_achievement)) {
-                    $previous_comp_achievement->status = competency_achievement::SUPERSEDED;
-                    $previous_comp_achievement->time_status = $aggregation_time;
+                // We don't necessarily have a scale value in this case we store null
+                $scale_value_id = null;
+                $is_proficient = 0;
+                if ($user_achievement['scale_value']) {
+                    $scale_value_id = $user_achievement['scale_value']->id;
+                    $is_proficient = $user_achievement['scale_value']->proficient;
+                }
+
+                // If the scale value changed or the proficiency value then we supersede the old record and create a new one
+                if (is_null($previous_comp_achievement)
+                    || $previous_comp_achievement->scale_value_id != $scale_value_id
+                    || $previous_comp_achievement->proficient != $is_proficient
+                ) {
+                    // New achieved value
+                    if (!is_null($previous_comp_achievement)) {
+                        $previous_comp_achievement->status = competency_achievement::SUPERSEDED;
+                        $previous_comp_achievement->time_status = $aggregation_time;
+                        $previous_comp_achievement->save();
+                    }
+
+                    $new_comp_achievement = new competency_achievement();
+                    $new_comp_achievement->comp_id = $competency_id;
+                    $new_comp_achievement->user_id = $user_id;
+                    $new_comp_achievement->assignment_id = $user_assignment_record->assignment_id;
+                    $new_comp_achievement->scale_value_id = $scale_value_id;
+                    $new_comp_achievement->proficient = $is_proficient;
+                    $new_comp_achievement->status = competency_achievement::ACTIVE_ASSIGNMENT;
+                    $new_comp_achievement->time_created = $aggregation_time;
+                    $new_comp_achievement->time_status = $aggregation_time;
+                    $new_comp_achievement->time_proficient = $aggregation_time;
+                    $new_comp_achievement->time_scale_value = $aggregation_time;
+                    $new_comp_achievement->last_aggregated = $aggregation_time;
+                    $new_comp_achievement->save();
+
+                    foreach ($user_achievement['achieved_via'] as $pathway_achievement) {
+                        $via = new achievement_via();
+                        $via->comp_achievement_id = $new_comp_achievement->id;
+                        $via->pathway_achievement_id = $pathway_achievement->id;
+                        $via->save();
+                    }
+
+                    $hook->add_user_id($user_id, $is_proficient);
+                } else {
+                    // No change.
+                    $previous_comp_achievement->last_aggregated = $aggregation_time;
                     $previous_comp_achievement->save();
                 }
-
-                $new_comp_achievement = new competency_achievement();
-                $new_comp_achievement->comp_id = $competency_id;
-                $new_comp_achievement->user_id = $user_id;
-                $new_comp_achievement->assignment_id = $user_assignment_record->assignment_id;
-                $new_comp_achievement->scale_value_id = $scale_value_id;
-                $new_comp_achievement->proficient = $is_proficient;
-                $new_comp_achievement->status = competency_achievement::ACTIVE_ASSIGNMENT;
-                $new_comp_achievement->time_created = $aggregation_time;
-                $new_comp_achievement->time_status = $aggregation_time;
-                $new_comp_achievement->time_proficient = $aggregation_time;
-                $new_comp_achievement->time_scale_value = $aggregation_time;
-                $new_comp_achievement->last_aggregated = $aggregation_time;
-                $new_comp_achievement->save();
-
-                foreach ($user_achievement['achieved_via'] as $pathway_achievement) {
-                    $via = new achievement_via();
-                    $via->comp_achievement_id = $new_comp_achievement->id;
-                    $via->pathway_achievement_id = $pathway_achievement->id;
-                    $via->save();
-                }
-
-                $hook = new hook\competency_achievement_updated($new_comp_achievement);
-                $hook->execute();
-            } else {
-                // No change.
-                $previous_comp_achievement->last_aggregated = $aggregation_time;
-                $previous_comp_achievement->save();
             }
-        }
+
+            if (!empty($hook->get_user_ids())) {
+                $hook->execute();
+            }
+        });
     }
 
     /**

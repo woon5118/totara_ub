@@ -28,6 +28,7 @@ use totara_competency\hook\competency_achievement_updated;
 use totara_criteria\criterion;
 use totara_criteria\entities\criteria_item as item_entity;
 use totara_criteria\entities\criterion as criterion_entity;
+use totara_competency\hook\competency_achievement_updated_bulk;
 use totara_criteria\hook\criteria_achievement_changed;
 
 class achievement {
@@ -59,6 +60,38 @@ class achievement {
 
         if (!empty($criteria_ids)) {
             $hook = new criteria_achievement_changed([$user_id => $criteria_ids]);
+            $hook->execute();
+        }
+    }
+
+    public static function updated_bulk(competency_achievement_updated_bulk $hook) {
+        global $DB;
+
+        // Find all criteria items on this competency's parent (i.e. find all criteria with a 'competency' item
+        // with this competency as item_id) (Not expecting there to be more than 1, but who knows what clients will do)
+        // As the criterion has no knowledge whether this user's satisfaction of the criteria is to be tracked,
+        // it simply generates an criteria_achievement_changed event with the relevant criterion ids and this user's id.
+        // Modules that use these criteria are responsible for initiating the relevant processes to create/update
+        // the item_record(s) for this user
+
+        $child_competency_id = $hook->get_competency_id();
+        $user_ids = $hook->get_user_ids();
+        if (empty($user_ids)) {
+            return;
+        }
+
+        $criteria_ids = item_entity::repository()
+            ->as('tci')
+            ->join([criterion_entity::TABLE, 'tc'], 'tci.criterion_id', 'tc.id')
+            ->where('tci.item_type', 'competency')
+            ->where('tci.item_id', $child_competency_id)
+            ->where('tc.plugin_type', 'childcompetency')
+            ->get()
+            ->pluck('criterion_id');
+
+        if (!empty($criteria_ids)) {
+            $user_criteria_ids = array_fill_keys($user_ids, $criteria_ids);
+            $hook = new criteria_achievement_changed($user_criteria_ids);
             $hook->execute();
         }
     }

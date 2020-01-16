@@ -38,4 +38,8 @@ $watchers = [
         'hookname' => competency_configuration_changed::class,
         'callback' => competency::class.'::configuration_changed',
     ],
+    [
+        'hookname' => \totara_competency\hook\competency_achievement_updated_bulk::class,
+        'callback' => \criteria_childcompetency\watcher\achievement::class.'::updated_bulk',
+    ],
 ];

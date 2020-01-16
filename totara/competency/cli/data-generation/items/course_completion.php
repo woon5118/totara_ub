@@ -27,6 +27,9 @@ use core\orm\query\builder;
 use degeneration\App;
 use totara_competency\entities\course as course_entity;
 
+global $CFG;
+require_once($CFG->dirroot . '/completion/completion_completion.php');
+
 class course_completion extends item {
 
     /**

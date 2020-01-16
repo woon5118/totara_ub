@@ -934,13 +934,17 @@ abstract class criterion {
         global $DB;
 
         $sql = "
-            SELECT i.id, COALESCE(r.criterion_met, 0) as criterion_met
+            SELECT 
+                i.id, 
+                COALESCE((
+                    SELECT r.criterion_met 
+                    FROM {totara_criteria_item_record} r 
+                    WHERE i.id = r.criterion_item_id AND 
+                        r.user_id = :userid
+                ), 0) as criterion_met
             FROM {totara_criteria_item} i
-            LEFT JOIN {totara_criteria_item_record} r 
-                ON i.id = r.criterion_item_id 
-                    AND r.user_id = :userid
             WHERE i.criterion_id = :criterionid 
-                AND i.item_type = :itemtype
+              AND i.item_type = :itemtype
         ";
 
         $params = [

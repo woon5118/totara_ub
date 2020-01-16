@@ -26,6 +26,7 @@ namespace totara_competency\observers;
 use totara_competency\event\assignment_user;
 use totara_competency\event\assignment_user_archived;
 use totara_competency\event\assignment_user_assigned;
+use totara_competency\event\assignment_user_assigned_bulk;
 use totara_competency\event\assignment_user_unassigned;
 use totara_competency\models;
 
@@ -43,22 +44,26 @@ class user_log {
      * @return bool true on success
      */
     public static function log(assignment_user $event) {
-        $data = $event->get_data();
-        $assignment_id = $data['other']['assignment_id'] ?? null;
-        $competency_id = $data['other']['competency_id'] ?? null;
-        $assignment_type = $data['other']['type'] ?? null;
-        $user_id = $data['relateduserid'];
+        $assignment_id = $event->get_assignment_id();
+        $competency_id = $event->get_competency_id();
+        $assignment_type = $event->get_assignment_type();
+        if ($event->is_bulk()) {
+            $user_id = $event->get_user_ids();
+        } else {
+            $user_id = $event->get_user_id();
+        }
 
         if ($assignment_id && $user_id) {
-            $log = new models\assignment_user_log($assignment_id, $user_id, $competency_id, $assignment_type);
+            $log = new models\assignment_user_log($assignment_id, $competency_id, $assignment_type);
             switch (get_class($event)) {
                 case assignment_user_archived::class:
                     // Log this action
-                    $log->log_archive();
+                    $log->log_archive($user_id);
                     break;
                 case assignment_user_assigned::class:
+                case assignment_user_assigned_bulk::class:
                     // Log this action
-                    $log->log_assign();
+                    $log->log_assign($user_id);
                     break;
             }
         }

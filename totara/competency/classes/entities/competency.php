@@ -32,6 +32,7 @@ use totara_competency\user_groups;
 use totara_hierarchy\entities\hierarchy_item;
 
 // Currently only required to re-use the constants
+global $CFG;
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
 
 /**

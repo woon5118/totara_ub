@@ -24,6 +24,7 @@
 namespace block_totara_stats\watcher;
 
 use totara_competency\hook\competency_achievement_updated;
+use totara_competency\hook\competency_achievement_updated_bulk;
 
 class competency {
 
@@ -47,6 +48,28 @@ class competency {
             totara_stats_add_event(time(), $user_id, STATS_EVENT_COMP_ACHIEVED, '', $competency_id);
         } else if ($is_proficient == 0 && $count > 0) {
             totara_stats_remove_event($user_id, STATS_EVENT_COMP_ACHIEVED, $competency_id);
+        }
+    }
+
+    public static function achievement_updated_bulk(competency_achievement_updated_bulk $hook) {
+        global $DB, $CFG;
+        require_once($CFG->dirroot.'/blocks/totara_stats/locallib.php');
+
+        $competency_id = $hook->get_competency_id();
+        $user_ids_proficient = $hook->get_user_ids_proficient();
+
+        foreach ($user_ids_proficient as $user_id => $is_proficient) {
+            $count = $DB->count_records(
+                'block_totara_stats',
+                ['userid' => $user_id, 'eventtype' => STATS_EVENT_COMP_ACHIEVED, 'data2' => $competency_id]
+            );
+
+            // Check the proficiency is set to "proficient" and check for duplicate data.
+            if ($is_proficient && $count == 0) {
+                totara_stats_add_event(time(), $user_id, STATS_EVENT_COMP_ACHIEVED, '', $competency_id);
+            } else if ($is_proficient == 0 && $count > 0) {
+                totara_stats_remove_event($user_id, STATS_EVENT_COMP_ACHIEVED, $competency_id);
+            }
         }
     }
 

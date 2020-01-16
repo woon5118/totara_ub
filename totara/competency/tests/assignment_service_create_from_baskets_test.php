@@ -129,12 +129,11 @@ class totara_competency_assignment_service_create_from_baskets_testcase extends 
 
         // Check that for both assignments a task was scheduled
         $tasks = $DB->get_records('task_adhoc', ['classname' => '\\'.expand_assignment_task::class]);
-        $this->assertCount(2, $tasks);
-        foreach ($tasks as $task) {
-            $task_data = json_decode($task->customdata, true);
-            $this->assertArrayHasKey('assignment_id', $task_data);
-            $this->assertContains($task_data['assignment_id'], $assignment_ids);
-        }
+        $this->assertCount(1, $tasks);
+        $task = array_shift($tasks);
+        $task_data = json_decode($task->customdata, true);
+        $this->assertArrayHasKey('assignment_ids', $task_data);
+        $this->assertEqualsCanonicalizing($assignment_ids, $task_data['assignment_ids']);
     }
 
     public function test_success_notifications_draft_plural() {

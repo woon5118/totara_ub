@@ -24,9 +24,11 @@
 namespace degeneration\items;
 
 use core\entities\user as user_entity;
+use core\orm\entity\entity;
 use core\orm\query\builder;
 use degeneration\App;
 use degeneration\Cache;
+use stdClass;
 
 /**
  * Class user
@@ -85,6 +87,26 @@ class user extends item {
         ];
     }
 
+    public static function load_existing() {
+        $users_loaded = user_entity::repository()
+            ->get_lazy();
+
+        $users = [];
+        foreach ($users_loaded as $user) {
+            $users[] = (new self())->fill($user);
+        }
+
+        return $users;
+    }
+
+    public function fill(entity $entity) {
+        $this->data = $entity;
+
+        Cache::get()->add($this);
+
+        return $this;
+    }
+
     /**
      * Save a user
      *
@@ -103,6 +125,22 @@ class user extends item {
 
         return true;
     }
+
+    /**
+     * Save a user
+     *
+     * @return array
+     */
+    public function create_for_bulk(): array {
+        $properties = [];
+
+        foreach ($this->get_properties() as $key => $property) {
+            $properties[$key] = $this->evaluate_property($property);
+        }
+
+        return App::generator()->create_user($properties, ['noinsert' => true]);
+    }
+
 
     /**
      * Enrol user to a given course

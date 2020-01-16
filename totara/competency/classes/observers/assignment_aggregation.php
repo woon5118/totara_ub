@@ -29,6 +29,7 @@ use totara_competency\entities\competency_achievement;
 use totara_competency\entities\pathway_achievement;
 use totara_competency\event\assignment_user_archived;
 use totara_competency\event\assignment_user_assigned;
+use totara_competency\event\assignment_user_assigned_bulk;
 use totara_competency\event\assignment_user_unassigned;
 
 class assignment_aggregation {
@@ -36,6 +37,24 @@ class assignment_aggregation {
     public static function user_assigned(assignment_user_assigned $event) {
         // Simply mark the user for aggregation
         (new aggregation_users_table())->queue_for_aggregation($event->relateduserid, $event->get_competency_id());
+    }
+
+    public static function user_assigned_bulk(assignment_user_assigned_bulk $event) {
+        $user_ids = $event->get_user_ids();
+        if (empty($user_ids)) {
+            return;
+        }
+
+        $user_ids_to_queue = [];
+        foreach ($user_ids as $user_id) {
+            $user_ids_to_queue[] = [
+                'user_id' => $user_id,
+                'competency_id' => $event->get_competency_id()
+            ];
+        }
+
+        // Simply mark the users for aggregation
+        (new aggregation_users_table())->queue_multiple_for_aggregation($user_ids_to_queue);
     }
 
     public static function user_unassigned(assignment_user_unassigned $event) {

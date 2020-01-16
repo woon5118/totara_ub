@@ -163,33 +163,50 @@ class competency_aggregator_user_source {
 
         // First we get all user assignments for the competency where we have users
         // in the queue table who are marked as having changes
-        $assignment_users = competency_assignment_user::repository()
+        $assignment_users = builder::table(competency_assignment_user::TABLE)
+            ->select(['id', 'user_id', 'assignment_id'])
             ->where('competency_id', $competency_id)
             ->where('user_id', 'in', $subquery)
-            ->get();
+            ->fetch();
+
+        // First we get all user assignments for the competency where we have users
+        // in the queue table who are marked as having changes
+
+        $assignment_users_builder = builder::table(competency_assignment_user::TABLE)
+            ->select('id')
+            ->where('competency_id', $competency_id)
+            ->where('user_id', 'in', $subquery)
+            ->where_field('assignment_id', 'ach.assignment_id')
+            ->where_field('user_id', 'ach.user_id');
 
         // Now for all of the assignments / user combinations query
         // the active achievements. This reduces the number of queries
         // down to only two and avoids the N+1 problem here
         $achievements = competency_achievement::repository()
-            ->where('assignment_id', $assignment_users->pluck('assignment_id'))
-            ->where('user_id', 'in', $assignment_users->pluck('user_id'))
+            ->as('ach')
+            ->where_exists($assignment_users_builder)
             ->where('status', competency_achievement::ACTIVE_ASSIGNMENT)
             ->get();
 
-        // Now combine the two results returning, mapping the achievement to the assignment user record
-        return $assignment_users->map(function (competency_assignment_user $assignment_user) use ($achievements) {
-            $achievement = $achievements->find(function (competency_achievement $achievement) use ($assignment_user) {
-                return $achievement->assignment_id == $assignment_user->assignment_id
-                    && $achievement->user_id == $assignment_user->user_id;
-            });
+        $achievements_keyed = [];
+        // Key for faster search
+        foreach ($achievements as $achievement) {
+            $achievements_keyed[$achievement->user_id.$achievement->assignment_id] = $achievement;
+        }
 
-            return (object) [
+        $result = new collection();
+        // Now combine the two results returning, mapping the achievement to the assignment user record
+        foreach ($assignment_users as $assignment_user) {
+            $achievement = $achievements_keyed[$assignment_user->user_id.$assignment_user->assignment_id] ?? null;
+
+            $result->append((object) [
                 'user_id' => $assignment_user->user_id,
                 'assignment_id' => $assignment_user->assignment_id,
                 'achievement' => $achievement
-            ];
-        });
+            ]);
+        }
+
+        return $result;
     }
 
     /**
