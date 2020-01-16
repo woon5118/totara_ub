@@ -30,9 +30,11 @@ function xmldb_mod_lti_premigrate() {
 
     $version = premigrate_get_plugin_version('mod', 'lti');
 
-    if ($version > 2019052000) {
+    if ($version > 2019111800) {
         throw new coding_exception("Invalid plugin (mod_lti) version ($version) for pre-migration");
     }
+
+    // Moodle 3.8 pre-migration line.
 
     if ($version >= 2019031302) {
         $table = new xmldb_table('lti_tool_settings');

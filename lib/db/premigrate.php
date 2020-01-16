@@ -32,6 +32,47 @@ function xmldb_core_premigrate() {
 
     $version = $CFG->version;
 
+    if ($version >= 2019102500.04) {
+        $table = new xmldb_table('h5p_libraries');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $table = new xmldb_table('h5p_library_dependencies');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $table = new xmldb_table('h5p');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $table = new xmldb_table('h5p_contents_libraries');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $table = new xmldb_table('h5p_libraries_cachedassets');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $version = premigrate_main_savepoint(2019102500.03);
+    }
+
+    if ($version >= 2019072200.00) {
+        $table = new xmldb_table('course');
+        $field = new xmldb_field('relativedatesmode', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'enddate');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $version = premigrate_main_savepoint(2019072100.00);
+    }
+
+    // Moodle 3.8 pre-migration line.
+
     if ($version >= 2019050600.00) {
         $table = new xmldb_table('badge_backpack');
         $field = new xmldb_field('apiversion', XMLDB_TYPE_CHAR, '12', null, XMLDB_NOTNULL, null, '1.0');

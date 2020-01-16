@@ -30,9 +30,11 @@ function xmldb_assignfeedback_editpdf_premigrate() {
 
     $version = premigrate_get_plugin_version('assignfeedback', 'editpdf');
 
-    if ($version > 2019052000) {
+    if ($version > 2019111800) {
         throw new coding_exception("Invalid plugin (assignfeedback_editpdf) version ($version) for pre-migration");
     }
+
+    // Moodle 3.8 pre-migration line.
 
     if ($version >= 2019010800) {
         // Define table assignfeedback_editpdf_rot to be created.

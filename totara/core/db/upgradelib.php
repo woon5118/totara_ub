@@ -359,6 +359,12 @@ function totara_core_upgrade_delete_moodle_plugins() {
     // NOTE: this should match \core_plugin_manager::is_deleted_standard_plugin() data.
 
     $deleteplugins = array(
+        // Moodle 3.8.x premigration removals.
+        'filter_displayh5p',
+        'atto_emojipicker',
+        'atto_h5p',
+        'forumreport_summary',
+
         // Moodle 3.7.x premigration removals.
         'ltiservice_basicoutcomes',
         'dataformat_pdf',

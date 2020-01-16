@@ -30,9 +30,11 @@ function xmldb_qtype_numerical_premigrate() {
 
     $version = premigrate_get_plugin_version('qtype', 'numerical');
 
-    if ($version > 2019052000) {
+    if ($version > 2019111800) {
         throw new coding_exception("Invalid plugin (qtype_numerical) version ($version) for pre-migration");
     }
+
+    // Moodle 3.8 pre-migration line.
 
     // Moodle 3.7 pre-migration line.
 

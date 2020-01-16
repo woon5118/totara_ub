@@ -30,9 +30,11 @@ function xmldb_message_email_premigrate() {
 
     $version = premigrate_get_plugin_version('message', 'email');
 
-    if ($version > 2019052000) {
+    if ($version > 2019111800) {
         throw new coding_exception("Invalid plugin (message_email) version ($version) for pre-migration");
     }
+
+    // Moodle 3.8 pre-migration line.
 
     if ($version >= 2019032500) {
         $table = new xmldb_table('message_email_messages');
