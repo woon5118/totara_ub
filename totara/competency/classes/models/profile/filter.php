@@ -27,6 +27,7 @@ use core\collection;
 use totara_competency\data_providers\assignments;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\entities\assignment as assignment_entity;
+use totara_competency\models\profile\traits\assignment_key;
 
 /**
  * Class filter
@@ -44,6 +45,8 @@ use totara_competency\entities\assignment as assignment_entity;
  * @package totara_competency\models
  */
 class filter {
+
+    use assignment_key;
 
     /**
      *  Filter properties
@@ -87,7 +90,7 @@ class filter {
         $filters = [];
 
         $assignments->map(function (assignment_entity $assignment) use (&$filters) {
-            $key = static::build_key($assignment);
+            $key = static::build_key($assignment, true);
             if (!isset($filters[$key])) {
                 $filters[$key] = new static($assignment, $key);
             }
@@ -114,23 +117,6 @@ class filter {
      */
     public function __isset($name) {
         return array_key_exists($name, $this->attributes);
-    }
-
-    /**
-     * Build a key to group filters by
-     *
-     * @param assignment $assignment
-     * @return string
-     */
-    protected static function build_key(assignment_entity $assignment) {
-        $type = $assignment->type;
-
-        // We are grouping individual admin and manager assignments together...
-        if ($type === assignment_entity::TYPE_OTHER) {
-            $type = assignment_entity::TYPE_ADMIN;
-        }
-
-        return md5("$assignment->status/$type/$assignment->user_group_type/$assignment->user_group_id");
     }
 
     /**

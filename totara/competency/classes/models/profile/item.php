@@ -27,6 +27,7 @@ use core\orm\collection;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\data_providers\assignments;
 use totara_competency\entities\assignment;
+use totara_competency\models\profile\traits\assignment_key;
 
 /**
  * This is a profile progress item model scaffolding, it has the following properties available:
@@ -43,6 +44,8 @@ use totara_competency\entities\assignment;
  * @package totara_competency\models
  */
 class item {
+
+    use assignment_key;
 
     /**
      * @var collection
@@ -134,11 +137,7 @@ class item {
 
         $assignments->map(function (assignment $assignment) use ($progress) {
             $model = assignment_model::load_by_entity($assignment);
-            if (!$progress->item($key = static::build_key(
-                $assignment->type,
-                $assignment->user_group_type,
-                $assignment->user_group_id
-            ))) {
+            if (!$progress->item($key = static::build_key($assignment))) {
                 $progress->set(new static($key, $model->get_progress_name()), $key);
             }
 
@@ -206,15 +205,4 @@ class item {
         return $this;
     }
 
-    /**
-     * Helper function to build a unique progress item hash
-     *
-     * @param $type
-     * @param $user_group_type
-     * @param $user_group_id
-     * @return string
-     */
-    protected static function build_key($type, $user_group_type, $user_group_id) {
-        return md5("$type/$user_group_type/$user_group_id");
-    }
 }
