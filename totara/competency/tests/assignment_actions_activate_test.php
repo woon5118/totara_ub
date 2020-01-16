@@ -59,6 +59,29 @@ class totara_competency_actions_activate_testcase extends totara_competency_assi
         $this->assertEquals(entities\assignment::STATUS_ARCHIVED, $assignment3->status);
     }
 
+    public function test_activating_sets_expand_flag() {
+        ['assignments' => $assignments] = $this->generate_assignments();
+
+        $assignment1 = new entities\assignment($assignments[0]);
+        $assignment1->status = entities\assignment::STATUS_DRAFT;
+        $assignment1->expand = false;
+        $assignment1->save();
+
+        $assignment2 = new entities\assignment($assignments[1]);
+        $assignment2->status = entities\assignment::STATUS_DRAFT;
+        $assignment1->expand = false;
+        $assignment2->save();
+
+        $model = new assignment_actions();
+        $model->activate([$assignment1->id, $assignment2->id]);
+
+        $assignment1->refresh();
+        $assignment2->refresh();
+
+        $this->assertTrue($assignment1->expand);
+        $this->assertTrue($assignment2->expand);
+    }
+
     public function test_activate_single() {
         ['assignments' => $assignments] = $this->generate_assignments();
 

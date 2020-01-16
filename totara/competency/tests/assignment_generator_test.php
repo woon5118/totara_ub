@@ -81,7 +81,8 @@ class totara_competency_assignment_generator_testcase extends advanced_testcase 
             'created_at' => time() - 1000,
             'updated_at' => time() - 500,
             'archived_at' => time() - 500,
-            'type' => 'self'
+            'type' => 'self',
+            'expand' => 0
         ];
 
         $ass = $this->generator()->create_assignment($attributes);

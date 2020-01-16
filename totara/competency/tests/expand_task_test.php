@@ -23,6 +23,7 @@
  */
 
 use totara_competency\entities\assignment;
+use totara_competency\entities\competency_assignment_user;
 use totara_competency\expand_task;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\user_groups;
@@ -55,6 +56,225 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
     protected function tearDown() {
         $this->db = null;
         parent::tearDown();
+    }
+
+    public function test_expand_single_only_marked_assignments() {
+        $test_data = $this->prepare_assignments();
+
+        /** @var assignment_model $draft_assignment */
+        $draft_assignment = $test_data->draft_ind->first();
+        /** @var assignment_model $active_assignment */
+        $active_assignment = $test_data->active_ind->first();
+        /** @var assignment_model $archived_assignment */
+        $archived_assignment = $test_data->archive_ind->first();
+
+        $this->assertEquals(0, $draft_assignment->expand);
+        $this->assertEquals(1, $active_assignment->expand);
+        $this->assertEquals(0, $archived_assignment->expand);
+
+        $this->assertFalse(
+            competency_assignment_user::repository()
+                ->where('assignment_id', $draft_assignment->id)
+                ->exists()
+        );
+        $this->assertFalse(
+            competency_assignment_user::repository()
+                ->where('assignment_id', $active_assignment->id)
+                ->exists()
+        );
+        $this->assertFalse(
+            competency_assignment_user::repository()
+                ->where('assignment_id', $archived_assignment->id)
+                ->exists()
+        );
+
+        $task = new expand_task($this->db);
+
+        // Expanding a draft assignment does not create any users rows
+        $task->expand_single($draft_assignment->id);
+        $this->assertFalse(
+            competency_assignment_user::repository()
+                ->where('assignment_id', $draft_assignment->id)
+                ->exists()
+        );
+
+        // Expanding a archived assignment does not create any users rows
+        $task->expand_single($archived_assignment->id);
+        $this->assertFalse(
+            competency_assignment_user::repository()
+                ->where('assignment_id', $archived_assignment->id)
+                ->exists()
+        );
+
+        $entity = $active_assignment->get_entity();
+        $entity->expand = false;
+        $entity->save();
+
+        // Expanding an active assignment with expand flag set to 0 does not create any users rows
+        $task->expand_single($active_assignment->id);
+        $this->assertFalse(
+            competency_assignment_user::repository()
+                ->where('assignment_id', $active_assignment->id)
+                ->exists()
+        );
+
+        $entity = $active_assignment->get_entity();
+        $entity->expand = true;
+        $entity->save();
+
+        // Expanding an active assignment with expand flag set to 0 does not create any users rows
+        $task->expand_single($active_assignment->id);
+        $this->assertTrue(
+            competency_assignment_user::repository()
+                ->where('assignment_id', $active_assignment->id)
+                ->exists()
+        );
+
+        // Flag got reset
+        $entity->refresh();
+        $this->assertFalse($entity->expand);
+    }
+
+    public function test_expand_multiple_only_marked_assignments() {
+        $test_data = $this->prepare_assignments();
+
+        /** @var assignment_model $draft_assignment */
+        $draft_assignment = $test_data->draft_ind->first();
+        /** @var assignment_model $active_assignment */
+        $active_assignment = $test_data->active_ind->first();
+        /** @var assignment_model $archived_assignment */
+        $archived_assignment = $test_data->archive_ind->first();
+
+        $this->assertEquals(0, $draft_assignment->expand);
+        $this->assertEquals(1, $active_assignment->expand);
+        $this->assertEquals(0, $archived_assignment->expand);
+
+        $this->assertFalse(
+            competency_assignment_user::repository()
+                ->where('assignment_id', $draft_assignment->id)
+                ->exists()
+        );
+        $this->assertFalse(
+            competency_assignment_user::repository()
+                ->where('assignment_id', $active_assignment->id)
+                ->exists()
+        );
+        $this->assertFalse(
+            competency_assignment_user::repository()
+                ->where('assignment_id', $archived_assignment->id)
+                ->exists()
+        );
+
+        $task = new expand_task($this->db);
+
+        $entity = $active_assignment->get_entity();
+        $entity->expand = false;
+        $entity->save();
+
+        // Expanding an active assignment with expand flag set to 0 does not create any users rows
+        $task->expand_multiple([$draft_assignment->id, $archived_assignment->id, $active_assignment->id]);
+        $this->assertFalse(
+            competency_assignment_user::repository()
+                ->where('assignment_id', $draft_assignment->id)
+                ->exists()
+        );
+        $this->assertFalse(
+            competency_assignment_user::repository()
+                ->where('assignment_id', $archived_assignment->id)
+                ->exists()
+        );
+        $this->assertFalse(
+            competency_assignment_user::repository()
+                ->where('assignment_id', $active_assignment->id)
+                ->exists()
+        );
+
+        $entity = $active_assignment->get_entity();
+        $entity->expand = true;
+        $entity->save();
+
+        // Expanding an active assignment with expand flag set to 0 does not create any users rows
+        $task->expand_multiple([$active_assignment->id]);
+        $this->assertTrue(
+            competency_assignment_user::repository()
+                ->where('assignment_id', $active_assignment->id)
+                ->exists()
+        );
+
+        // Flag got reset
+        $entity->refresh();
+        $this->assertFalse($entity->expand);
+    }
+
+    public function test_expand_all_only_marked_assignments() {
+        $test_data = $this->prepare_assignments();
+
+        /** @var assignment_model $draft_assignment */
+        $draft_assignment = $test_data->draft_ind->first();
+        /** @var assignment_model $active_assignment */
+        $active_assignment = $test_data->active_ind->first();
+        /** @var assignment_model $archived_assignment */
+        $archived_assignment = $test_data->archive_ind->first();
+
+        $this->assertEquals(0, $draft_assignment->expand);
+        $this->assertEquals(1, $active_assignment->expand);
+        $this->assertEquals(0, $archived_assignment->expand);
+
+        $this->assertFalse(
+            competency_assignment_user::repository()
+                ->where('assignment_id', $draft_assignment->id)
+                ->exists()
+        );
+        $this->assertFalse(
+            competency_assignment_user::repository()
+                ->where('assignment_id', $active_assignment->id)
+                ->exists()
+        );
+        $this->assertFalse(
+            competency_assignment_user::repository()
+                ->where('assignment_id', $archived_assignment->id)
+                ->exists()
+        );
+
+        $task = new expand_task($this->db);
+
+        $entity = $active_assignment->get_entity();
+        $entity->expand = false;
+        $entity->save();
+
+        // Expanding an active assignment with expand flag set to 0 does not create any users rows
+        $task->expand_all();
+        $this->assertFalse(
+            competency_assignment_user::repository()
+                ->where('assignment_id', $draft_assignment->id)
+                ->exists()
+        );
+        $this->assertFalse(
+            competency_assignment_user::repository()
+                ->where('assignment_id', $archived_assignment->id)
+                ->exists()
+        );
+        $this->assertFalse(
+            competency_assignment_user::repository()
+                ->where('assignment_id', $active_assignment->id)
+                ->exists()
+        );
+
+        $entity = $active_assignment->get_entity();
+        $entity->expand = true;
+        $entity->save();
+
+        // Expanding an active assignment with expand flag set to 0 does not create any users rows
+        $task->expand_all();
+        $this->assertTrue(
+            competency_assignment_user::repository()
+                ->where('assignment_id', $active_assignment->id)
+                ->exists()
+        );
+
+        // Flag got reset
+        $entity->refresh();
+        $this->assertFalse($entity->expand);
     }
 
     public function test_expand_one() {

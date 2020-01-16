@@ -170,6 +170,7 @@ class assignment_user {
                 $assignment->competency_id = $competency_id;
                 $assignment->status = assignment::STATUS_ACTIVE;
                 $assignment->created_by = 0;
+                $assignment->expand = true;
                 $assignment->save();
 
                 // It should be safe here to expand the assignment directly

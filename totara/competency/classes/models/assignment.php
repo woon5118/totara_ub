@@ -25,27 +25,25 @@ namespace totara_competency\models;
 
 use coding_exception;
 use core\entities\cohort;
+use core\entities\user;
 use core\orm\collection;
 use core\orm\entity\entity;
-use core\orm\query\builder;
+use core\orm\entity\filter\hierarchy_item_visible;
 use hierarchy_organisation\entities\organisation;
 use hierarchy_position\entities\position;
 use totara_competency\assignment_create_exception;
 use totara_competency\entities\assignment as assignment_entity;
 use totara_competency\entities\competency;
 use totara_competency\entities\competency_assignment_user;
-use totara_competency\entities\competency_assignment_user_log;
 use totara_competency\event\assignment_activated;
 use totara_competency\event\assignment_archived;
 use totara_competency\event\assignment_created;
 use totara_competency\event\assignment_deleted;
 use totara_competency\event\assignment_user_archived;
-use totara_competency\task\expand_assignment_task;
-use totara_hierarchy\entities\hierarchy_item;
-use core\entities\user;
-use core\orm\entity\filter\hierarchy_item_visible;
-use totara_competency\user_groups;
 use totara_competency\models\profile\proficiency_value;
+use totara_competency\task\expand_assignment_task;
+use totara_competency\user_groups;
+use totara_hierarchy\entities\hierarchy_item;
 
 class assignment {
 
@@ -113,6 +111,7 @@ class assignment {
 
         $this->entity->status = assignment_entity::STATUS_ARCHIVED;
         $this->entity->archived_at = time();
+        $this->entity->expand = false;
         $this->entity->save();
 
         // Delete all user records for those assignments
@@ -181,6 +180,7 @@ class assignment {
         $event = assignment_activated::create_from_assignment($this->entity);
 
         $this->entity->status = assignment_entity::STATUS_ACTIVE;
+        $this->entity->expand = true;
         $this->entity->save();
 
         $event->trigger();
@@ -274,6 +274,8 @@ class assignment {
             $assignment->created_at = time();
             $assignment->updated_at = time();
             $assignment->archived_at = null;
+            // Only active assignments should be expanded
+            $assignment->expand = ($status == assignment_entity::STATUS_ACTIVE);
             $assignment->save();
 
             assignment_created::create_from_assignment($assignment)->trigger();
@@ -622,6 +624,15 @@ class assignment {
         }
 
         return $class_name;
+    }
+
+    /**
+     * Returns true if th assignment is marked for expansion
+     *
+     * @return bool
+     */
+    public function should_expand(): bool {
+        return $this->entity->expand;
     }
 
 }

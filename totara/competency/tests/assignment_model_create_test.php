@@ -63,6 +63,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $this->assertEquals($data->user1->id, $assignment->get_field('created_by'));
         $this->assertGreaterThan(0, $assignment->get_field('created_at'));
         $this->assertGreaterThan(0, $assignment->get_field('updated_at'));
+        $this->assertTrue($assignment->should_expand());
         $this->assertEquals(null, $assignment->get_field('archived_at'));
     }
 
@@ -130,6 +131,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $assignment = assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
         $this->assertInstanceOf(assignment_model::class, $assignment);
         $this->assertEquals($status, $assignment->get_status());
+        $this->assertFalse($assignment->should_expand());
     }
 
     public function test_cannot_create_archived_assignment_for_user() {

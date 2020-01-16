@@ -25,6 +25,7 @@ namespace totara_competency;
 
 use core\entities\expandable;
 use core\orm\collection;
+use core\orm\entity\entity;
 use core\orm\query\builder;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency_assignment_user;
@@ -55,10 +56,9 @@ class expand_task {
 
         $assignments = assignment::repository()
             ->filter_by_active()
+            ->filter_by_expand()
             ->get_lazy();
-        // TODO performance - maybe load with user assignments relation?
-        //      or even load the related user rows?
-        //      memory usage!!
+
         foreach ($assignments as $assignment) {
             $this->expand_assignment($assignment);
         }
@@ -78,6 +78,7 @@ class expand_task {
             $assignments = assignment::repository()
                 ->filter_by_ids($assignment_ids)
                 ->filter_by_active()
+                ->filter_by_expand()
                 ->get();
             foreach ($assignments as $assignment) {
                 $this->expand_assignment($assignment);
@@ -98,6 +99,7 @@ class expand_task {
         $assignment = assignment::repository()
             ->where('id', $assignment_id)
             ->where('status', assignment::STATUS_ACTIVE)
+            ->filter_by_expand()
             ->one();
 
         if ($assignment) {
@@ -117,6 +119,12 @@ class expand_task {
         if (!$assignment->exists()) {
             return;
         }
+
+        // Reset the expand flag early as something could change it in between
+        $assignment->expand = false;
+        $assignment->save();
+
+        $assignment_id = (int) $assignment->id;
 
         // load all current source targets relations of the assignment
         // to avoid more requests to the database when checking if entry
@@ -249,13 +257,19 @@ class expand_task {
     private function expand_entity(string $type, int $target_id): array {
         $class_name = assignment_model::get_entity_class_by_user_group_type($type);
         if (is_subclass_of($class_name, expandable::class)) {
-            /** @var expandable $entity */
-            // TODO performance - check if that could be loaded via relationship, might require polymorphic relationship
-            $entity = new $class_name($target_id);
-            if ($entity) {
-                return $entity->expand();
+            if (!is_subclass_of($class_name, entity::class)) {
+                throw new \coding_exception('Currently only entities can be expanded');
             }
-            return [];
+            // Try to load the user group entity to make sure it's there
+            /** @var expandable $entity */
+            $entity = $class_name::repository()->find($target_id);
+            if (!$entity) {
+                // User group got probably deleted
+                // in this case return empty result which will trigger unassigning
+                // of all users still assigned to that group
+                return [];
+            }
+            return $entity->expand();
         }
         return [$target_id];
     }

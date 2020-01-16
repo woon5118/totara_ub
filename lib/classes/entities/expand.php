@@ -50,6 +50,7 @@ trait expand {
         $expanded = builder::table($this->expand_table)
             ->select($this->expand_select_column)
             ->where($this->expand_query_column, $this->id)
+            ->group_by($this->expand_select_column)
             ->get();
 
         return $expanded->pluck($this->expand_select_column);

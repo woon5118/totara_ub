@@ -99,16 +99,8 @@ class totara_competency_actions_archive_testcase extends totara_competency_assig
         ['assignments' => $assignments] = $this->generate_assignments();
 
         $assignment1 = new assignment($assignments[0]);
-        $assignment1->status = assignment::STATUS_ACTIVE;
-        $assignment1->save();
-
         $assignment2 = new assignment($assignments[1]);
-        $assignment2->status = assignment::STATUS_ACTIVE;
-        $assignment2->save();
-
         $assignment3 = new assignment($assignments[2]);
-        $assignment3->status = assignment::STATUS_ACTIVE;
-        $assignment3->save();
 
         $this->expand();
         $this->assertEquals(3, competency_assignment_user::repository()->count());
@@ -124,9 +116,11 @@ class totara_competency_actions_archive_testcase extends totara_competency_assig
         $this->assertEquals(assignment::STATUS_ARCHIVED, $assignment1->status);
         $this->assertGreaterThan(0, $assignment1->updated_at);
         $this->assertEquals($assignment1->updated_at, $assignment1->archived_at);
+        $this->assertFalse($assignment1->expand);
         $this->assertEquals(assignment::STATUS_ARCHIVED, $assignment2->status);
         $this->assertGreaterThan(0, $assignment2->updated_at);
         $this->assertEquals($assignment2->updated_at, $assignment2->archived_at);
+        $this->assertFalse($assignment2->expand);
         // this one is untouched
         $this->assertEquals(assignment::STATUS_ACTIVE, $assignment3->status);
         $this->assertEquals(0, $assignment3->archived_at);
@@ -177,16 +171,8 @@ class totara_competency_actions_archive_testcase extends totara_competency_assig
         cohort_add_member($cohort->id, $user3->id);
 
         $assignment1 = new assignment($assignments[0]);
-        $assignment1->status = assignment::STATUS_ACTIVE;
-        $assignment1->save();
-
         $assignment2 = new assignment($assignments[1]);
-        $assignment2->status = assignment::STATUS_ACTIVE;
-        $assignment2->save();
-
         $assignment3 = new assignment($assignments[2]);
-        $assignment3->status = assignment::STATUS_ACTIVE;
-        $assignment3->save();
 
         $this->expand();
         $this->assertEquals(6, competency_assignment_user::repository()->count());
@@ -195,9 +181,7 @@ class totara_competency_actions_archive_testcase extends totara_competency_assig
 
         $model = new assignment_actions();
         $affected_ids = $model->archive($expected_ids, true);
-        sort($expected_ids);
-        sort($affected_ids);
-        $this->assertEquals($expected_ids, $affected_ids);
+        $this->assertEqualsCanonicalizing($expected_ids, $affected_ids);
 
         // One user assignment is gone and for the other group ones new system assignments should have been created
         $this->assertEquals(5, competency_assignment_user::repository()->count());
@@ -262,16 +246,8 @@ class totara_competency_actions_archive_testcase extends totara_competency_assig
         cohort_add_member($cohort->id, $user3->id);
 
         $assignment1 = new assignment($assignments[0]);
-        $assignment1->status = assignment::STATUS_ACTIVE;
-        $assignment1->save();
-
         $assignment2 = new assignment($assignments[1]);
-        $assignment2->status = assignment::STATUS_ACTIVE;
-        $assignment2->save();
-
         $assignment3 = new assignment($assignments[2]);
-        $assignment3->status = assignment::STATUS_ACTIVE;
-        $assignment3->save();
 
         $this->expand();
         $this->assertEquals(6, competency_assignment_user::repository()->count());
@@ -303,8 +279,6 @@ class totara_competency_actions_archive_testcase extends totara_competency_assig
         $assignment1->save();
 
         $assignment2 = new assignment($assignments[1]);
-        $assignment2->status = assignment::STATUS_ACTIVE;
-        $assignment2->save();
 
         $assignment3 = new assignment($assignments[2]);
         $assignment3->status = assignment::STATUS_ARCHIVED;
