@@ -42,10 +42,7 @@ if ($ADMIN->fulltree) {
 
     // Type.
     $dboptions = array('' => get_string('none')); // Totara: we must have 'None' option to 'unconfigure' the plugin.
-    $dbtypes = array("access", "ado_access", "ado", "ado_mssql", "borland_ibase", "csv", "db2",
-        "fbsql", "firebird", "ibase", "informix72", "informix", "mssql", "mssql_n", "mssqlnative",
-        "mysql", "mysqli", "mysqlt", "oci805", "oci8", "oci8po", "odbc", "odbc_mssql", "odbc_oracle",
-        "oracle", "pdo", "postgres64", "postgres7", "postgres", "proxy", "sqlanywhere", "sybase", "vfp");
+    $dbtypes = array('access', 'csv', 'db2', 'ibase', 'mssqlnative', 'mysqli', 'oci8', 'odbc', 'pdo', 'postgres9');
     foreach ($dbtypes as $dbtype) {
         $dboptions[$dbtype] = $dbtype;
     }

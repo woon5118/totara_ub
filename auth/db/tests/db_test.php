@@ -77,12 +77,12 @@ class auth_db_db_testcase extends advanced_testcase {
                 break;
 
             case 'oracle':
-                set_config('type', 'oci8po', 'auth_db');
+                set_config('type', 'oci8', 'auth_db');
                 set_config('sybasequoting', '1', 'auth_db');
                 break;
 
             case 'postgres':
-                set_config('type', 'postgres7', 'auth_db');
+                set_config('type', 'postgres9', 'auth_db');
                 $setupsql = "SET NAMES 'UTF-8'";
                 if (!empty($CFG->dboptions['dbschema'])) {
                     $setupsql .= "; SET search_path = '".$CFG->dboptions['dbschema']."'";

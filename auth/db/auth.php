@@ -47,10 +47,6 @@ class auth_plugin_db extends auth_plugin_base {
         }
 
         if (isset($this->config->type)) {
-            // Totara: fix nonexistent driver references.
-            if ($this->config->type === 'mssql' or $this->config->type === 'mssql_n') {
-                $this->config->type = 'mssqlnative';
-            }
             // Totara: MS SQL server driver is compatible with utf-8 only!
             if ($this->config->type === 'mssqlnative') {
                 $this->config->extencoding = 'utf-8';
