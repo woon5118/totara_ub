@@ -308,12 +308,18 @@ if ($fromform = $mform->get_data()) {
         }
     }
 
-    if ($allow_sendtoself && !empty($fromform->sendtoself) && !in_array($USER->id, $systemusers)) {
-        // If the schedule belongs to the current user and seld to self has been selected then
-        // we want to remove that and add the current user to the system users before we save.
-        // NOTE: send to self is only shown to the user who owns the schedule.
-        unset($fromform->sendtoself);
-        array_push($systemusers, $USER->id);
+    if ($allow_sendtoself) {
+        if (!empty($fromform->sendtoself) && !in_array($USER->id, $systemusers)) {
+            // If the schedule belongs to the current user and send to self has been selected then
+            // we want to remove that and add the current user to the system users before we save.
+            // NOTE: send to self is only shown to the user who owns the schedule.
+            unset($fromform->sendtoself);
+            array_push($systemusers, $USER->id);
+        } else if (empty($fromform->sendtoself) && in_array($USER->id, $systemusers)) {
+            // If send to self has been unselected then remove the  current user from system users.
+            $systemkey = array_search($USER->id, $systemusers);
+            unset($systemusers[$systemkey]);
+        }
     }
 
     if (!empty($fromform->otherrecipients)) {
