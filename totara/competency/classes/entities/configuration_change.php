@@ -78,7 +78,6 @@ class configuration_change extends entity {
         $entry->time_changed = $action_time ?? time();
         $entry->save();
 
-        // TODO: Not sure whether this is needed for CHANGED_COMPETENCY_AGGREGATION
         $hook = new competency_configuration_changed($competency_id);
         $hook->execute();
 

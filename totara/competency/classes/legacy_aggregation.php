@@ -82,8 +82,7 @@ class legacy_aggregation {
         configuration_change::add_competency_entry(
             $this->competency->id,
             configuration_change::CHANGED_COMPETENCY_AGGREGATION,
-            time(),
-            true
+            time()
         );
     }
 
