@@ -1532,7 +1532,7 @@ function reset_certifcomponent_completions($certifcompletion, $courses=null) {
 
     foreach ($courseids as $courseid) {
         // Call course/lib.php functions.
-        archive_course_completion($userid, $courseid);
+        archive_course_completion($userid, $courseid, true);
         archive_course_activities($userid, $courseid, $certifcompletion->windowopens);
 
         // Purge any leftovers.
@@ -1933,7 +1933,7 @@ function certif_set_in_progress(int $programid, int $userid, string $message = '
 function certif_archive_courses_completion(array $courseids, int $userid, int $archivedate) {
     foreach ($courseids as $courseid) {
         // Call course/lib.php functions.
-        archive_course_completion($userid, $courseid);
+        archive_course_completion($userid, $courseid, true);
         archive_course_activities($userid, $courseid, $archivedate);
 
         // Purge any leftovers.

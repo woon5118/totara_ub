@@ -2742,12 +2742,19 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
     public function test_certif_archive_courses_completion() {
         global $DB;
 
+        $coursedefaults = array(
+            'enablecompletion' => COMPLETION_ENABLED,
+            'completionstartonenrol' => 1,
+            'completionprogressonview' => 1);
+
         // Set up some users and courses.
         $users = array();
         $courses = array();
+        $courses_inprogress = array();
         for ($i = 1; $i <= 10; $i++) {
             $users[] = $this->getDataGenerator()->create_user();
             $courses[] = $this->getDataGenerator()->create_course();
+            $courses_inprogress[] = $this->getDataGenerator()->create_course($coursedefaults);
         }
 
         // Mark all users complete in all courses.
@@ -2757,31 +2764,47 @@ class totara_certification_lib_testcase extends reportcache_advanced_testcase {
                 $completion = new completion_completion(array('userid' => $user->id, 'course' => $course->id));
                 $completion->mark_complete($now);
             }
+
+            foreach ($courses_inprogress as $pcourse) {
+                $completion = new completion_completion(array('userid' => $user->id, 'course' => $pcourse->id));
+                $completion->mark_inprogress($now);
+            }
         }
 
-        // Check that all users are marked complete in all courses, and no history exists.
-        $records = $DB->get_records('course_completions');
-        $this->assertEquals(100, count($records));
-        foreach ($records as $record) {
+        // Check that all users are marked complete/in-progress in all courses, and no history exists.
+        $records_complete = $DB->get_records('course_completions', array('status' => COMPLETION_STATUS_COMPLETE));
+        $this->assertEquals(100, count($records_complete));
+        foreach ($records_complete as $record) {
             $this->assertEquals($now, $record->timecompleted);
         }
+
+        $records_inprogress = $DB->get_records('course_completions', array('status' => COMPLETION_STATUS_INPROGRESS));
+        $this->assertEquals(100, count($records_inprogress));
+        foreach ($records_inprogress as $record) {
+            $this->assertEquals($now, $record->timestarted);
+        }
+
         $this->assertEquals(0, $DB->count_records('course_completion_history'));
 
         // Reset some courses for a user.
         $testuser = $users[3];
         $testcourseids = array($courses[4]->id, $courses[5]->id, $courses[6]->id);
-        certif_archive_courses_completion($testcourseids, $testuser->id, $now);
+        $testcourseids_inprogress = array($courses_inprogress[2]->id, $courses_inprogress[7]->id);
+        certif_archive_courses_completion(array_merge($testcourseids, $testcourseids_inprogress), $testuser->id, $now);
 
-        // Check that all users are marked complete in all courses, except for the test user and courses.
+        // Check that all users are marked complete/in-progress in all courses, except for the test user and courses.
         $records = $DB->get_records('course_completions');
-        $this->assertEquals(97, count($records));
+        $this->assertEquals(195, count($records));
         foreach ($records as $record) {
-            if ($record->userid == $testuser->id && (in_array($record->course, $testcourseids))) {
+            if ($record->userid == $testuser->id
+                && (in_array($record->course, $testcourseids) || in_array($record->course, $testcourseids_inprogress))) {
                 $this->assertTrue(false);
             } else {
-                $this->assertEquals($now, $record->timecompleted);
+                $this->assertContains($now, array($record->timecompleted, $record->timestarted));
             }
         }
+
+        // Only 3 completed test courses should be added to the history.
         $records = $DB->get_records('course_completion_history');
         $this->assertEquals(3, count($records));
         foreach ($records as $record) {

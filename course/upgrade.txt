@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+ * archive_course_completion() added third optional argument $inprogress
  * core_course_renderer::course_section_cm_completion() has been changed to show an activity complete tickmark when a
    grade item or grade is hidden, rather than a pass/fail tickmark
  * core_course_renderer::course_section_cm_completion() has been changed to show an activity complete tickmark when a

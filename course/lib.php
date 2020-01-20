@@ -3604,7 +3604,7 @@ function archive_course_activities($userid, $courseid, $windowopens = NULL) {
                 if (plugin_supports('mod', $mod->name, FEATURE_ARCHIVE_COMPLETION, 0)) {
                     $modfunction = $mod->name.'_archive_completion';
                     if (!function_exists($modfunction)) {
-                        debugging('feature_archive_completion is supported but is missing the function in the plugin lib file');
+                        debugging('feature_archive_completion is supported but is missing the function in the plugin lib file', DEBUG_DEVELOPER);
                     } else {
                         $modfunction($userid, $courseid, $windowopens);
                     }
@@ -3724,9 +3724,11 @@ function course_change_visibility($courseid, $show = true) {
  * @global object $CFG
  * @param int $userid
  * @param int $courseid
+ * @param bool $inprogress Include completions that are currently in progress
+ *                         Since Totara 13
  * @return bool true if course completions existed, else false
  */
-function archive_course_completion($userid, $courseid) {
+function archive_course_completion($userid, $courseid, $inprogress = false) {
     global $DB, $CFG, $COMPLETION_STATUS;
 
     require_once($CFG->libdir . '/completionlib.php');
@@ -3734,6 +3736,9 @@ function archive_course_completion($userid, $courseid) {
     require_once($CFG->dirroot . '/completion/completion_completion.php');
 
     $status = array(COMPLETION_STATUS_COMPLETE, COMPLETION_STATUS_COMPLETEVIARPL);
+    if ($inprogress) {
+        $status[] = COMPLETION_STATUS_INPROGRESS;
+    }
     list($statussql, $statusparams) = $DB->get_in_or_equal($status, SQL_PARAMS_NAMED, 'status');
     $params = array_merge($statusparams, array('course' => $courseid, 'userid' => $userid));
     $where = "course = :course AND userid = :userid AND status {$statussql}";
@@ -3741,26 +3746,29 @@ function archive_course_completion($userid, $courseid) {
         return false;
     }
 
-    $history = new StdClass();
-    $history->courseid = $courseid;
-    $history->userid = $userid;
-    $history->timecompleted = $course_completion->timecompleted;
-    $history->grade = 0;
-
+    // No point in saving history for non-completed courses.
     $cc = new completion_completion(array('userid' => $userid, 'course' => $courseid));
     $completionstatus = $cc->get_status($course_completion);
-    if ($completionstatus == $COMPLETION_STATUS[COMPLETION_STATUS_COMPLETEVIARPL]) {
-        $history->grade = $cc->rplgrade;
-    } else if ($course_item = grade_item::fetch_course_item($courseid)) {
-        $grade = new grade_grade(array('itemid' => $course_item->id, 'userid' => $userid));
-        $history->grade = $grade->finalgrade;
-    }
+    if ($completionstatus !== $COMPLETION_STATUS[COMPLETION_STATUS_INPROGRESS]) {
+        $history = new stdClass();
+        $history->courseid = $courseid;
+        $history->userid = $userid;
+        $history->timecompleted = $course_completion->timecompleted;
+        $history->grade = 0;
 
-    // Copy
-    $transaction = $DB->start_delegated_transaction();
-    $chid = $DB->insert_record('course_completion_history', $history);
-    \core_completion\helper::log_course_completion_history($chid, 'History created in archive_course_completion');
-    $transaction->allow_commit();
+        if ($completionstatus == $COMPLETION_STATUS[COMPLETION_STATUS_COMPLETEVIARPL]) {
+            $history->grade = $cc->rplgrade;
+        } else if ($course_item = grade_item::fetch_course_item($courseid)) {
+            $grade = new grade_grade(array('itemid' => $course_item->id, 'userid' => $userid));
+            $history->grade = $grade->finalgrade;
+        }
+
+        // Copy record to the history table.
+        $transaction = $DB->start_delegated_transaction();
+        $chid = $DB->insert_record('course_completion_history', $history);
+        \core_completion\helper::log_course_completion_history($chid, 'History created in archive_course_completion');
+        $transaction->allow_commit();
+    }
 
     // Reset course completion.
     $course = $DB->get_record('course', array('id' => $courseid));
