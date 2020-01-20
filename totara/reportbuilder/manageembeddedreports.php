@@ -36,6 +36,8 @@ $pageparams = [
     'debug' => $debug,
 ];
 
+admin_externalpage_setup('rbmanageembeddedreports', '', $pageparams);
+
 // Generate any missing embedded reports when we load this page.
 reportbuilder::generate_embedded_reports();
 
@@ -43,8 +45,6 @@ $config = (new rb_config())->set_sid($sid)->set_embeddata($pageparams);
 if (!$report = reportbuilder::create_embedded('manage_embedded_reports', $config)) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
 }
-
-admin_externalpage_setup('rbmanageembeddedreports', '', $pageparams);
 
 $PAGE->set_button($report->edit_button() . $PAGE->button);
 

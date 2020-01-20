@@ -36,15 +36,15 @@ $pageparams = [
     'debug' => $debug,
 ];
 
+$url = new moodle_url('/totara/reportbuilder/managescheduledreports.php', $pageparams);
+admin_externalpage_setup('rbmanageembeddedreports', '', null, $url);
+
 $shortname = 'manage_scheduled_reports';
 
 $config = (new rb_config())->set_sid($sid)->set_embeddata($pageparams);
 if (!$report = reportbuilder::create_embedded($shortname, $config)) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
 }
-
-$url = new moodle_url('/totara/reportbuilder/managescheduledreports.php', $pageparams);
-admin_externalpage_setup('rbmanageembeddedreports', '', null, $url);
 
 $PAGE->set_button($PAGE->button . $report->edit_button());
 

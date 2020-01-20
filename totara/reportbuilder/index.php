@@ -36,14 +36,14 @@ $pageparams = [
     'debug' => $debug,
 ];
 
+admin_externalpage_setup('rbmanagereports', '', $pageparams);
+
 $shortname = 'manage_user_reports';
 
 $config = (new rb_config())->set_sid($sid)->set_embeddata($pageparams);
 if (!$report = reportbuilder::create_embedded($shortname, $config)) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
 }
-
-admin_externalpage_setup('rbmanagereports', '', $pageparams);
 
 $PAGE->set_button($report->edit_button() . $PAGE->button);
 

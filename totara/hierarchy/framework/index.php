@@ -27,6 +27,7 @@ require_once(__DIR__ . '/../../../config.php');
 require_once("{$CFG->libdir}/adminlib.php");
 require_once("{$CFG->dirroot}/totara/hierarchy/lib.php");
 
+require_login();
 
 ///
 /// Setup / loading data
