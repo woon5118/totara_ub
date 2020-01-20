@@ -32,15 +32,11 @@ class totara_sync_source_pos_database extends totara_sync_source_pos {
     public const USES_FILES = false;
 
     function config_form(&$mform) {
-        global $PAGE, $OUTPUT;
-
         $this->config->import_idnumber = "1";
         $this->config->import_fullname = "1";
         $this->config->import_frameworkidnumber = "1";
         $this->config->import_timemodified = "1";
         $this->config->import_deleted = empty($this->element->config->sourceallrecords) ? "1" : "0";
-
-        $db_table = isset($this->config->{'database_dbtable'}) ? $this->config->{'database_dbtable'} : false;
 
         $this->config_form_add_database_details($mform);
 
@@ -74,6 +70,7 @@ class totara_sync_source_pos_database extends totara_sync_source_pos {
             $database_connection = setup_sync_DB($dbtype, $dbhost, $dbname, $dbuser, $dbpass, array('dbport' => $dbport));
         } catch (Exception $e) {
             $this->addlog(get_string('databaseconnectfail', 'tool_totara_sync'), 'error', 'importdata');
+            return false;
         }
 
         // Get list of fields to be imported

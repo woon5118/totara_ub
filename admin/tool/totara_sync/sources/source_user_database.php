@@ -33,8 +33,6 @@ class totara_sync_source_user_database extends totara_sync_source_user {
     public const USES_FILES = false;
 
     function config_form(&$mform) {
-        global $PAGE, $OUTPUT;
-
         $this->config->import_idnumber = "1";
         $this->config->import_username = "1";
         $this->config->import_timemodified = "1";
@@ -78,6 +76,7 @@ class totara_sync_source_user_database extends totara_sync_source_user {
             $database_connection = setup_sync_DB($dbtype, $dbhost, $dbname, $dbuser, $dbpass, array('dbport' => $dbport));
         } catch (Exception $e) {
             $this->addlog(get_string('databaseconnectfail', 'tool_totara_sync'), 'error', 'importdata');
+            return false;
         }
 
         // Get list of fields to be imported
