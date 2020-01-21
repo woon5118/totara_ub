@@ -45,7 +45,7 @@ $sql = "SELECT c.*, crc.rulesetoperator, crc.status
     FROM {cohort} c
     INNER JOIN {cohort_rule_collections} crc ON c.draftcollectionid = crc.id
     WHERE c.id = ?";
-$cohort = $DB->get_record_sql($sql, array($id), '*', MUST_EXIST);
+$cohort = $DB->get_record_sql($sql, array($id), MUST_EXIST);
 
 $context = context::instance_by_id($cohort->contextid, MUST_EXIST);
 $PAGE->set_context($context);
@@ -213,7 +213,7 @@ if ($formdata = $mform->get_data()) {
 /// Output
 ///
 $strheading = get_string('editrules', 'totara_cohort');
-totara_cohort_navlinks($cohort->id, $cohort->name, $strheading);
+totara_cohort_navlinks($cohort->id, format_string($cohort->name), $strheading);
 echo $OUTPUT->header();
 // Print out a map of what cohort rules should use which handlers,
 // for JS to access
