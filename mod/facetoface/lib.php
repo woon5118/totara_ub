@@ -275,7 +275,10 @@ function facetoface_get_completion_state($course, $cm, $userid, $type) {
 function facetoface_add_instance($facetoface) {
     global $DB;
 
-    $facetoface->timemodified = time();
+    if (!property_exists($facetoface, 'timemodified') || !is_numeric($facetoface->timemodified)) {
+        // Only add field 'timemodified' if the parameter does not provide one.
+        $facetoface->timemodified = time();
+    }
 
     if ($facetoface->id = $DB->insert_record('facetoface', $facetoface)) {
         facetoface_grade_item_update($facetoface);
