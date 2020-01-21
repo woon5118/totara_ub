@@ -24,7 +24,6 @@
 namespace totara_competency;
 
 
-use core\orm\collection;
 use core\orm\query\builder;
 use stdClass;
 use totara_competency\entities\achievement_via;
@@ -101,10 +100,13 @@ final class competency_achievement_aggregator {
             $aggregation_time = time();
         }
 
+
         // Setting the competency id on the source will set it on the table instance
         // which make sure the competency will be included in all queries for the queueing table
-        $this->user_id_source->set_competency_id_value($competency_id);
+        $this->user_id_source->set_competency_id($competency_id);
         $this->user_id_source->archive_non_assigned_achievements($competency_id, $aggregation_time);
+        $this->user_id_source->mark_newly_assigned_users($competency_id);
+
         $user_assignment_records = $this->user_id_source->get_users_to_reaggregate($competency_id);
 
         builder::get_db()->transaction(function () use ($competency_id, $aggregation_time, $user_assignment_records) {

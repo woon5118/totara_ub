@@ -52,7 +52,7 @@ class totara_competency_competency_aggregator_users_source_testcase extends \adv
 
         $table = new aggregation_users_table();
         $source = new competency_aggregator_user_source($table);
-        $source->set_competency_id_value($data->competency->id);
+        $source->set_competency_id($data->competency->id);
 
         // Nothing should be in the queue yet
         $users = $source->get_users_to_reaggregate($data->competency->id);
@@ -169,7 +169,7 @@ class totara_competency_competency_aggregator_users_source_testcase extends \adv
 
         $table = new aggregation_users_table();
         $source = new competency_aggregator_user_source($table);
-        $source->set_competency_id_value($data->competency->id);
+        $source->set_competency_id($data->competency->id);
 
         // Now make sure we have legacy assignments for the users
 

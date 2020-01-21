@@ -1538,6 +1538,167 @@ class totara_competency_integration_aggregation_simple_testcase extends totara_c
     }
 
     /**
+     * Test aggregation with an additional assignment added after the user already got an achievement
+     *
+     * @dataProvider task_to_execute_data_provider
+     * @param string $task_to_execute
+     */
+    public function test_aggregation_adding_additional_assignment(string $task_to_execute) {
+        $data = $this->setup_data();
+
+        // Create a criteria_group on competency 1 and 2 with 1 onactivate criterion on the lowest scale
+        $pathways = [];
+        for ($i = 1; $i <= 2; $i++) {
+            $criterion = $data->criteria_generator->create_onactivate(['competency' => $data->competencies[$i]->id]);
+            $pathways[$i] = $data->competency_generator->create_criteria_group($data->competencies[$i],
+                [$criterion],
+                $data->scalevalues[5]->id
+            );
+        }
+
+        // Now assign some users to competencies with criteria and some to competencies without criteria
+        $to_assign = [];
+        for ($user_idx = 1; $user_idx <= 3; $user_idx++) {
+            $to_assign[] = ['user_id' => $data->users[$user_idx]->id, 'competency_id' => $data->competencies[$user_idx]->id];
+            $to_assign[] = ['user_id' => $data->users[$user_idx]->id, 'competency_id' => $data->competencies[$user_idx + 1]->id];
+        }
+        $this->assign_users_to_competencies($to_assign);
+
+        (new $task_to_execute())->execute();
+        $this->verify_item_records([
+            ['item_id' => $data->competencies[1]->id, 'user_id' => $data->users[1]->id, 'criterion_met' => 1],
+            ['item_id' => $data->competencies[2]->id, 'user_id' => $data->users[1]->id, 'criterion_met' => 1],
+            ['item_id' => $data->competencies[2]->id, 'user_id' => $data->users[2]->id, 'criterion_met' => 1],
+        ]);
+
+        $pw_achievement_records = $this->verify_pathway_achievements([
+            '1-1' => [
+                'pathway_id' => $pathways[1]->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'related_info' => ['onactivate'],
+            ],
+            '2-1' => [
+                'pathway_id' => $pathways[2]->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'related_info' => ['onactivate'],
+            ],
+            '2-2' => [
+                'pathway_id' => $pathways[2]->get_id(),
+                'user_id' => $data->users[2]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'related_info' => ['onactivate'],
+            ],
+        ]);
+
+        $this->verify_competency_achievements([
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'proficient' => 0,
+                'via' => [$pw_achievement_records['1-1']],
+            ],
+            [
+                'competency_id' => $data->competencies[2]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'proficient' => 0,
+                'via' => [$pw_achievement_records['2-1']],
+            ],
+            [
+                'competency_id' => $data->competencies[2]->id,
+                'user_id' => $data->users[2]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'proficient' => 0,
+                'via' => [$pw_achievement_records['2-2']],
+            ],
+        ]);
+
+        // NOW create an additional assignment for a user where he already got an achievement previously.
+        // The user should get a second achievement record for that competency with the same values as the existing one
+
+        $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+        /** @var totara_competency_assignment_generator $assign_generator */
+        $assign_generator = $competency_generator->assignment_generator();
+
+        $assign_generator->create_self_assignment($data->competencies[1]->id, $data->users[1]->id);
+
+        $expand_task = new expand_task($GLOBALS['DB']);
+        $expand_task->expand_all();
+
+        (new $task_to_execute())->execute();
+
+        $pw_achievement_records = $this->verify_pathway_achievements([
+            '1-1' => [
+                'pathway_id' => $pathways[1]->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'related_info' => ['onactivate'],
+            ],
+            '2-1' => [
+                'pathway_id' => $pathways[2]->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'related_info' => ['onactivate'],
+            ],
+            '2-2' => [
+                'pathway_id' => $pathways[2]->get_id(),
+                'user_id' => $data->users[2]->id,
+                'status' => pathway_achievement_entity::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'related_info' => ['onactivate'],
+            ],
+        ]);
+
+        $this->verify_competency_achievements([
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'proficient' => 0,
+                'via' => [$pw_achievement_records['1-1']],
+            ],
+            [
+                'competency_id' => $data->competencies[2]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'proficient' => 0,
+                'via' => [$pw_achievement_records['2-1']],
+            ],
+            [
+                'competency_id' => $data->competencies[2]->id,
+                'user_id' => $data->users[2]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'proficient' => 0,
+                'via' => [$pw_achievement_records['2-2']],
+            ],
+            // The user should now have a seond achievement row for
+            // the new assignment with the same values as the first one
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'proficient' => 0,
+                'via' => [$pw_achievement_records['1-1']],
+            ],
+        ]);
+    }
+
+    /**
      * Test aggregation when the user is assigned twice to the same competency
      * @dataProvider task_to_execute_data_provider
      */

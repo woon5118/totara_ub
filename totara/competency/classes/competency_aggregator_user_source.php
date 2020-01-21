@@ -49,8 +49,12 @@ class competency_aggregator_user_source {
         $this->full_user_set = $full_user_set;
     }
 
-    public function set_competency_id_value(?int $competency_id) {
+    public function set_competency_id(?int $competency_id) {
         $this->temp_user_table->set_comptency_id_value($competency_id);
+    }
+
+    public function get_competency_id(): ?int {
+        return $this->temp_user_table->get_competency_id_value();
     }
 
     /**
@@ -306,6 +310,59 @@ class competency_aggregator_user_source {
                 'achievement' => $achievement
             ];
         });
+    }
+
+    /**
+     * Mark users who don't yet have a achievement record for a competency in any assignment
+     *
+     * @param int $competency_id
+     */
+    public function mark_newly_assigned_users(int $competency_id) {
+        global $DB;
+
+        if ($competency_id != $this->get_competency_id()) {
+            throw new \coding_exception('Competency id mismatch, different competency set in the table instance');
+        }
+
+        // No has_changed column - nothing to do
+        if (empty($this->temp_user_table->get_has_changed_column())) {
+            return;
+        }
+
+        $temp_table_name = $this->temp_user_table->get_table_name();
+        $user_id_column = $this->temp_user_table->get_user_id_column();
+        [$set_haschanged_sql, $set_haschanged_params] = $this->temp_user_table->get_set_has_changed_sql_with_params(1);
+        [$temp_wh, $temp_wh_params] = $this->temp_user_table->get_filter_sql_with_params('', false, null);
+        if (!empty($temp_wh)) {
+            $temp_wh = " AND {$temp_wh}";
+        }
+
+        $params = array_merge(
+            [
+                'competency_id' => $competency_id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+            ],
+            $set_haschanged_params,
+            $temp_wh_params
+        );
+
+        $sql = "
+            UPDATE {{$temp_table_name}}
+                SET {$set_haschanged_sql}
+            WHERE {$user_id_column} IN (
+                SELECT tcau.user_id
+                    FROM {totara_competency_assignment_users} tcau
+                    LEFT JOIN {totara_competency_achievement} tca
+                        ON tcau.assignment_id = tca.assignment_id
+                            AND tcau.user_id = tca.user_id
+                            AND tca.status = :status
+                    WHERE tca.id IS NULL 
+                        AND tcau.competency_id = :competency_id
+            )
+            {$temp_wh}
+        ";
+
+        $DB->execute($sql, $params);
     }
 
 }
