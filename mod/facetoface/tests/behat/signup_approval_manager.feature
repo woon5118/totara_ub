@@ -260,3 +260,26 @@ Feature: Seminar Signup Manager Approval
     And I should see "Manager Approval"
     But I should see "You don't have permission to signup to this seminar event"
     And I should not see "Request approval"
+
+  Scenario: Seminar event is deleted and manager logs in to approve request
+    When I log out
+    And I log in as "jimmy"
+    And I am on "Classroom Connect Course" course homepage
+    And I should see "Request approval"
+    And I follow "Request approval"
+    And I should see "Manager Approval"
+    And I should see "Cassy Cas"
+    And I press "Request approval"
+    And I run all adhoc tasks
+    And I log out
+    And I log in as "admin"
+    And I am on "Classroom Connect Course" course homepage
+    And I click on "Delete event" "link"
+    And I press "Continue"
+    And I run all adhoc tasks
+    And I log out
+    And I log in as "manager"
+    And I click on "Click for more information" "link"
+    Then I should see "(Event has been deleted)"
+    And I should see "Dismiss"
+    And I should not see "Approve"

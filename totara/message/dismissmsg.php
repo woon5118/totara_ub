@@ -55,8 +55,9 @@ if ($eventdata && isset($eventdata->action)) {
     switch ($eventdata->action) {
         case 'facetoface':
             $isfacetoface = true;
-            $seminarevent = new \mod_facetoface\seminar_event($eventdata->data['session']->id);
-            $canbook = ($seminarevent->has_capacity() || $seminarevent->get_allowoverbook());
+            // Note that seminarevent may not exist if it has been deleted in the meantime.
+            $seminarevent = \mod_facetoface\seminar_event::seek($eventdata->data['session']->id);
+            $canbook = ($seminarevent->get_id() && ($seminarevent->has_capacity() || $seminarevent->get_allowoverbook()));
             break;
         case 'prog_extension':
             require_once($CFG->dirroot . '/totara/program/lib.php');
