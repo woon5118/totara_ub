@@ -190,8 +190,8 @@ Feature: A teacher can set one of 3 possible options for tracking read forum pos
     And I am on "Course 1" course homepage
     Then I should see "1 unread post"
     And I follow "Test forum name"
-    And I should see "1" in the "//table[@class='forumheaderlist']/tbody/tr[1]/td[count(//thead//tr/th[text()='Unread']/preceding-sibling::*)+2]" "xpath_element"
+    And "Test post subject" row "UnreadMark all posts in this forum read." column of "forumheaderlist" table should contain "1"
     And I follow "Test post subject"
     And I should see "Test post message. Simply dummy text to mark post as read if they are displayed in full"
     And I follow "Test forum name"
-    And I should see "0" in the "//table[@class='forumheaderlist']/tbody/tr[1]/td[count(//thead//tr/th[text()='Unread']/preceding-sibling::*)+2]" "xpath_element"
+    And "Test post subject" row "UnreadMark all posts in this forum read." column of "forumheaderlist" table should contain "0"
