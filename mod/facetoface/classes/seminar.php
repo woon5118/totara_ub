@@ -927,9 +927,28 @@ final class seminar implements seminar_iterator_item {
     }
 
     /**
+     * Users can declare interest has 3 options:
+     * - Never
+     * - Always
+     * - When no upcoming events are available for booking
+     * if Never: declareinterest value is 0 and interestonlyiffull value is 0
+     * if Always: declareinterest value is 1 and interestonlyiffull value is 0
+     * if When no upcoming events are available for booking: declareinterest value is 1 and interestonlyiffull value is 1
+     * @see mod_form.php for more information
      * @return int
      */
     public function get_declareinterest(): int {
+        if ($this->get_interestonlyiffull() == 0 && (int)$this->declareinterest == 0) {
+            // 'Never' option.
+            return 0;
+        } else if ($this->get_interestonlyiffull() == 0 && (int)$this->declareinterest == 1) {
+            // 'Always' option.
+            return 1;
+        } else if ($this->get_interestonlyiffull() == 1 && (int)$this->declareinterest == 1) {
+            // 'When no upcoming events are available for booking' option.
+            return 2;
+        }
+        // Should be never happened, but well, something happened.
         return (int)$this->declareinterest;
     }
     /**

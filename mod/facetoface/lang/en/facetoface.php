@@ -2753,8 +2753,6 @@ $string['confirmmanageremailaddressquestion'] = 'Is <strong>{$a}</strong> still 
 $string['confirmmanageremailinstruction1'] = 'You previously entered the following as your manager\'s email address:';
 $string['confirmmanageremailinstruction2'] = 'Is this still your manager\'s email address?';
 $string['costheading'] = 'Session Cost';
-$string['declareinterestonlyiffull'] = 'Show "Declare Interest" link only if all events are closed';
-$string['declareinterestonlyiffull_help'] = 'Only show the declare interest option if there are no events with spaces or waiting lists.';
 $string['error:couldnotupdatemanageremail'] = 'Could not update manager email address.';
 $string['error:emptymanageremail'] = 'Manager email address empty.';
 $string['error:mismatchdatesdetected'] = 'Mismatch in dates detected. Start time and finish time should be provided for each date.';
@@ -2887,3 +2885,5 @@ Name: {$a->name}
 Event start: {$a->starttime}
 Capacity: {$a->booked} / {$a->capacity} (minimum: {$a->mincapacity})
 {$a->link}';
+$string['declareinterestonlyiffull'] = 'Show "Declare Interest" link only if all events are closed';
+$string['declareinterestonlyiffull_help'] = 'Only show the declare interest option if there are no events with spaces or waiting lists.';

@@ -86,15 +86,16 @@ final class interest implements seminar_iterator_item {
      *
      * @return boolean
      */
-    public function can_user_declare() : bool {
+    public function can_user_declare(): bool {
         global $DB;
 
         if (empty($this->seminar)) {
             $this->seminar = new seminar($this->facetoface);
         }
 
+        // 'Never' option.
         // "Declare interest" must be turned on for the activity.
-        if (!$this->seminar->get_declareinterest()) {
+        if ($this->seminar->get_declareinterest() === 0) {
             return false;
         }
 
@@ -103,30 +104,39 @@ final class interest implements seminar_iterator_item {
             return false;
         }
 
-        // If "only when full" is turned on, allow only when all sessions are fully booked.
-        if ($this->seminar->get_interestonlyiffull()) {
-            $signups = signup_list::user_active_signups_within_seminar($this->userid, $this->seminar->get_id());
+        // 'Always' option.
+        if ($this->seminar->get_declareinterest() === 1) {
+            return true;
+        }
 
-            // If user is already signed up for one of the events within this seminar. Then no declare interest.
-            if (0 < count($signups)) {
-                return false;
-            }
-
+        // 'When no upcoming events are available for booking' option.
+        if ($this->seminar->get_declareinterest() === 2) {
             $now = time();
-            $sql = "SELECT DISTINCT fs.id FROM {facetoface_sessions} fs
-                    INNER JOIN {facetoface_sessions_dates} fsd ON (fsd.sessionid = fs.id)
-                        WHERE fsd.timestart > :now AND fs.facetoface = :facetoface";
-
+            $sql = "
+                SELECT DISTINCT fs.id
+                  FROM {facetoface_sessions} fs
+                 INNER JOIN {facetoface_sessions_dates} fsd ON (fsd.sessionid = fs.id)
+                 WHERE fsd.timestart > :now
+                   AND fs.facetoface = :facetoface
+                   ";
             $sessions = $DB->get_records_sql($sql, ['now' => $now, 'facetoface' => $this->facetoface]);
+            if (empty($sessions)) {
+                return true;
+            }
             foreach ($sessions as $sessionrec) {
-                $signup = signup::create($this->userid, new seminar_event((int)$sessionrec->id));
+                $signup = signup::create($this->userid, new seminar_event((int) $sessionrec->id));
                 if (signup_helper::can_signup($signup)) {
                     return false;
                 }
             }
-        }
 
-        return true;
+            $signups = signup_list::user_active_signups_within_seminar($this->userid, $this->seminar->get_id());
+            // If user is already signed up for one of the events within this seminar. Then no declare interest.
+            if (count($signups) == 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
