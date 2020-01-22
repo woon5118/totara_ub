@@ -76,13 +76,13 @@
     }
 }}
 <li class="totara_core__myreports__list__item">
-    <div class="totara_core__myreports__list__item__content">
+    <a class="totara_core__myreports__list__item__content" href="{{href}}">
         <div class="totara_core__myreports__list__item__content__image">
             {{#graphimagedata}}{{> &&graphimagetemplate }}{{/graphimagedata}}
         </div>
 
         <div class="totara_core__myreports__list__item__content__title">
-            <a class="totara_core__myreports__list__item__link" href="{{href}}">{{name}}</a>
+            {{name}}
         </div>
 
         {{#showdescription}}
@@ -90,5 +90,5 @@
                 {{description}}
             </div>
         {{/showdescription}}
-    </div>
+    </a>
 </li>

@@ -38,26 +38,21 @@
             transition-property: transform, box-shadow;
             transition-duration: 200ms;
             transition-timing-function: ease-in-out;
-            &:hover {
+
+            display: block;
+            color: @myReports_base-color_neutral_7;
+
+            &:hover,
+            &:active,
+            &:focus {
                 box-shadow: @totara_style-shadow_1;
                 transform: scale(1.01);
+                text-decoration: none;
+                color: @myReports_base-color_neutral_7;
             }
 
             &__title {
                 font-weight: 600;
-            }
-
-            // This is an trick for accessibility where rather than having the entire card be
-            // link, we expand a pseudo-element inside the link to cover the card. This prevents
-            // a screen reader trying to read out the whole card
-            // https://inclusive-components.design/cards/
-            &__link:after {
-                position: absolute;
-                content: ' ';
-                left: 0;
-                top: 0;
-                bottom: 0;
-                right: 0;
             }
         }
     }
