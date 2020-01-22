@@ -21,14 +21,8 @@
  * @package criteria_linkedcourses
  */
 
-use core\event\course_completed;
-use core\event\course_deleted;
-use core\event\course_restored;
-use totara_competency\entities\course as course_entity;
 use totara_competency\linked_courses;
 use totara_completionimport\event\bulk_course_completionimport;
-use criteria_linkedcourses\observer\course as course_observer;
-use totara_criteria\entities\criterion as criterion_entity;
 use totara_criteria\hook\criteria_achievement_changed;
 use totara_criteria\hook\criteria_validity_changed;
 
@@ -87,8 +81,6 @@ class criteria_linkedcourses_course_observer_testcase extends advanced_testcase 
     public function test_course_completed_no_criterion() {
         $data = $this->setup_data(0);
 
-        /** @var phpunit_event_sink $event_sink */
-        $event_sink = $this->redirectEvents();
         /** @var phpunit_hook_sink $hook_sink */
         $hook_sink = $this->redirectHooks();
 
@@ -96,19 +88,8 @@ class criteria_linkedcourses_course_observer_testcase extends advanced_testcase 
         $completion = new completion_completion(['course' => $data->courses[1]->id, 'userid' => $data->users[1]->id]);
         $completion->mark_complete();
 
-        $events = $event_sink->get_events();
-        // Expecting the course_completed
-        $this->assertEquals(1, count($events));
-        $cc_event = reset($events);
-        $this->assertEquals(course_completed::class, get_class($cc_event));
-        $event_sink->clear();
-
-        course_observer::course_completion_changed($cc_event);
-        $events = $event_sink->get_events();
-        $this->assertEmpty($events);
-
+        $this->assertEquals(0, $hook_sink->count());
         $hook_sink->close();
-        $event_sink->close();
     }
 
     public function test_course_completed_single_item() {
@@ -118,8 +99,6 @@ class criteria_linkedcourses_course_observer_testcase extends advanced_testcase 
             ['id' => $data->courses[1]->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
         ]);
 
-        /** @var phpunit_event_sink $event_sink */
-        $event_sink = $this->redirectEvents();
         /** @var phpunit_hook_sink $hook_sink */
         $hook_sink = $this->redirectHooks();
 
@@ -127,16 +106,8 @@ class criteria_linkedcourses_course_observer_testcase extends advanced_testcase 
         $completion = new completion_completion(['course' => $data->courses[1]->id, 'userid' => $data->users[1]->id]);
         $completion->mark_complete();
 
-        $events = $event_sink->get_events();
-        // Expecting the course_completed
-        $this->assertEquals(1, count($events));
-        $cc_event = reset($events);
-        $this->assertEquals(course_completed::class, get_class($cc_event));
-
-        course_observer::course_completion_changed($cc_event);
         $this->verify_achievement_changed_hook($hook_sink, [$data->users[1]->id => [$data->criteria[1]->get_id()]]);
 
-        $event_sink->close();
         $hook_sink->close();
     }
 
@@ -148,8 +119,6 @@ class criteria_linkedcourses_course_observer_testcase extends advanced_testcase 
             ['id' => $data->courses[2]->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
         ]);
 
-        /** @var phpunit_event_sink $event_sink */
-        $event_sink = $this->redirectEvents();
         /** @var phpunit_hook_sink $hook_sink */
         $hook_sink = $this->redirectHooks();
 
@@ -157,18 +126,10 @@ class criteria_linkedcourses_course_observer_testcase extends advanced_testcase 
         $completion = new completion_completion(['course' => $data->courses[1]->id, 'userid' => $data->users[1]->id]);
         $completion->mark_complete();
 
-        $events = $event_sink->get_events();
-        // Expecting the course_completed
-        $this->assertEquals(1, count($events));
-        $cc_event = reset($events);
-        $this->assertEquals(course_completed::class, get_class($cc_event));
-
-        course_observer::course_completion_changed($cc_event);
         $this->verify_achievement_changed_hook($hook_sink,
             [$data->users[1]->id => [$data->criteria[1]->get_id(), $data->criteria[2]->get_id()]]
         );
 
-        $event_sink->close();
         $hook_sink->close();
     }
 
@@ -202,8 +163,8 @@ class criteria_linkedcourses_course_observer_testcase extends advanced_testcase 
         ];
 
         $import_event = bulk_course_completionimport::create_from_list($course_completions);
+        $import_event->trigger();
 
-        course_observer::bulk_course_completions_imported($import_event);
         $this->verify_achievement_changed_hook($hook_sink, [
             $data->users[1]->id => [$data->criteria[1]->get_id()],
             $data->users[2]->id => [$data->criteria[1]->get_id()],

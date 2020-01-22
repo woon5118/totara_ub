@@ -21,8 +21,6 @@
  * @package criteria_coursecompletion
  */
 
-use core\event\course_completed;
-use core\event\course_deleted;
 use core\event\course_restored;
 use totara_competency\entities\course as course_entity;
 use totara_completionimport\event\bulk_course_completionimport;
@@ -69,74 +67,49 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
     public function test_course_completed_no_item() {
         $data = $this->setup_data();
 
-        // No other way to stop event propagation without sinking the course_completed event and manually pass it to the function
-        $sink = $this->redirectEvents();
+        /** @var phpunit_hook_sink $hook_sink */
+        $hook_sink = $this->redirectHooks();
 
         /** @var completion_completion $completion */
         $completion = new completion_completion(['course' => $data->courses[1]->id, 'userid' => $data->users[1]->id]);
         $completion->mark_complete();
 
-        $events = $sink->get_events();
-        // Expecting the course_completed
-        $this->assertEquals(1, count($events));
-        $cc_event = reset($events);
-        $this->assertEquals(course_completed::class, get_class($cc_event));
-        $sink->clear();
-
-        course_observer::course_completion_changed($cc_event);
-        $events = $sink->get_events();
-        $this->assertEmpty($events);
-        $sink->close();
+        $this->assertEquals(0, $hook_sink->count());
 
         // We now generate a coursecompletion criterion but not for this course
         /** @var totara_criteria_generator $criteria_generator */
         $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
         $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id]]);
 
-        $sink = $this->redirectEvents();
+        $hook_sink->clear();
         $completion = new completion_completion(['course' => $data->courses[2]->id, 'userid' => $data->users[2]->id]);
         $completion->mark_complete();
 
-        $events = $sink->get_events();
-        $this->assertEquals(1, count($events));
-        $cc_event = reset($events);
-        $this->assertEquals(course_completed::class, get_class($cc_event));
-        $sink->clear();
-
-        $sink = $this->redirectHooks();
-        course_observer::course_completion_changed($cc_event);
-        $hooks = $sink->get_hooks();
-        $this->assertEmpty($hooks);
-        $sink->close();
+        $this->assertEquals(0, $hook_sink->count());
+        $hook_sink->close();
     }
 
     public function test_course_completed_single_item() {
         $data = $this->setup_data();
+        /** @var totara_criteria_generator $criteria_generator */
         $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
         $criterion = $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id]]);
 
-        // No other way to stop event propagation without sinking the course_completed event and manually pass it to the function
-        $sink = $this->redirectEvents();
+        /** @var phpunit_hook_sink $hook_sink */
+        $hook_sink = $this->redirectHooks();
 
         /** @var completion_completion $completion */
         $completion = new completion_completion(['course' => $data->courses[1]->id, 'userid' => $data->users[1]->id]);
         $completion->mark_complete();
 
-        $events = $sink->get_events();
-        // Expecting the course_completed
-        $this->assertEquals(1, count($events));
-        $cc_event = reset($events);
-        $this->assertEquals(course_completed::class, get_class($cc_event));
-        $sink->close();
-
-        $sink = $this->redirectHooks();
-        course_observer::course_completion_changed($cc_event);
-        $this->verify_achievement_changed_hook($sink, [$data->users[1]->id => [$criterion->get_id()]]);
-        $sink->close();
+        $this->verify_achievement_changed_hook($hook_sink, [$data->users[1]->id => [$criterion->get_id()]]);
+        $hook_sink->close();
     }
 
     public function test_course_completed_multiple_items() {
         $data = $this->setup_data();
+
+        /** @var totara_criteria_generator $criteria_generator */
         $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
         $criteria = [
@@ -145,28 +118,24 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
             3 => $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[2]->id, $data->courses[3]->id]])
         ];
 
-        // No other way to stop event propagation without sinking the course_completed event and manually pass it to the function
-        $sink = $this->redirectEvents();
+        /** @var phpunit_hook_sink $hook_sink */
+        $hook_sink = $this->redirectHooks();
 
         /** @var completion_completion $completion */
         $completion = new completion_completion(['course' => $data->courses[1]->id, 'userid' => $data->users[1]->id]);
         $completion->mark_complete();
 
-        $events = $sink->get_events();
-        // Expecting the course_completed
-        $this->assertEquals(1, count($events));
-        $cc_event = reset($events);
-        $this->assertEquals(course_completed::class, get_class($cc_event));
-        $sink->close();
-
-        $sink = $this->redirectHooks();
-        course_observer::course_completion_changed($cc_event);
-        $this->verify_achievement_changed_hook($sink, [$data->users[1]->id => [$criteria[1]->get_id(), $criteria[2]->get_id()]]);
-        $sink->close();
+        $this->verify_achievement_changed_hook($hook_sink, [$data->users[1]->id => [$criteria[1]->get_id(), $criteria[2]->get_id()]]);
+        $hook_sink->close();
     }
 
     public function test_bulk_course_completions_imported() {
         $data = $this->setup_data();
+
+        /** @var phpunit_hook_sink $hook_sink */
+        $hook_sink = $this->redirectHooks();
+
+        /** @var totara_criteria_generator $criteria_generator */
         $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
         $criteria = [
@@ -195,22 +164,25 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
 
         $import_event = bulk_course_completionimport::create_from_list($course_completions);
 
-        $sink = $this->redirectHooks();
-
         course_observer::bulk_course_completions_imported($import_event);
-        $this->verify_achievement_changed_hook($sink, [
+        $this->verify_achievement_changed_hook($hook_sink, [
             $data->users[1]->id => [$criteria[1]->get_id(), $criteria[2]->get_id()],
             $data->users[2]->id => [$criteria[1]->get_id(), $criteria[2]->get_id()],
             $data->users[3]->id => [$criteria[3]->get_id()],
             $data->users[4]->id => [$criteria[3]->get_id()],
         ]);
-        $sink->close();
+
+        $hook_sink->close();
     }
 
 
     public function test_course_deleted_not_used() {
         $data = $this->setup_data();
+        /** @var totara_criteria_generator $criteria_generator */
         $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        /** @var phpunit_hook_sink $hook_sink */
+        $hook_sink = $this->redirectHooks();
 
         $criteria = [
             1 => $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id]]),
@@ -225,25 +197,10 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
             ->count();
         $this->assertEquals(3, $nvalid);
 
-        // No other way to stop event propagation without sinking the course_completed event and manually pass it to the function
-        $sink = $this->redirectEvents();
         delete_course($data->courses[4], false);
 
-        $events = $sink->get_events();
-        // Expecting the course_deleted event
-        $events = array_filter($events, function ($event) {
-            return $event instanceof course_deleted;
-        });
-
-        $this->assertEquals(1, count($events));
-        $cc_event = reset($events);
-        $this->assertEquals(course_deleted::class, get_class($cc_event));
-        $sink->close();
-
-        $sink = $this->redirectHooks();
-        course_observer::course_deleted($cc_event);
-        $this->assertEmpty($sink->get_hooks());
-        $sink->close();
+        $this->assertEmpty($hook_sink->get_hooks());
+        $hook_sink->close();
 
         // Verify that the status didn't changed on disk
         $nvalid = criterion_entity::repository()
@@ -255,7 +212,11 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
 
     public function test_course_deleted() {
         $data = $this->setup_data();
+        /** @var totara_criteria_generator $criteria_generator */
         $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        /** @var phpunit_hook_sink $hook_sink */
+        $hook_sink = $this->redirectHooks();
 
         $criteria = [
             1 => $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id]]),
@@ -270,25 +231,10 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
             ->count();
         $this->assertEquals(3, $nvalid);
 
-        // No other way to stop event propagation without sinking the course_completed event and manually pass it to the function
-        $sink = $this->redirectEvents();
         delete_course($data->courses[1], false);
 
-        $events = $sink->get_events();
-        // Expecting the course_deleted event
-        $events = array_filter($events, function ($event) {
-            return $event instanceof course_deleted;
-        });
-
-        $this->assertEquals(1, count($events));
-        $cc_event = reset($events);
-        $this->assertEquals(course_deleted::class, get_class($cc_event));
-        $sink->close();
-
-        $sink = $this->redirectHooks();
-        course_observer::course_deleted($cc_event);
-        $this->verify_validity_changed_hook($sink, [$criteria[1]->get_id(), $criteria[2]->get_id()]);
-        $sink->close();
+        $this->verify_validity_changed_hook($hook_sink, [$criteria[1]->get_id(), $criteria[2]->get_id()]);
+        $hook_sink->close();
 
         // Verify that the status changed on disk
         $nvalid = criterion_entity::repository()
@@ -311,7 +257,11 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
         require_once($CFG->dirroot . '/backup/backup.class.php');
 
         $data = $this->setup_data();
+        /** @var totara_criteria_generator $criteria_generator */
         $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        /** @var phpunit_hook_sink $hook_sink */
+        $hook_sink = $this->redirectHooks();
 
         // Delete the course first to ensure the criteria's valid attribute is set correctly
         $deleted_course_id = $data->courses[3]->id;
@@ -339,8 +289,6 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
 
         $restored_course = $this->getDataGenerator()->create_course(['enablecompletion' => true]);
 
-        $sink = $this->redirectHooks();
-
         $cc_event = course_restored::create([
             'objectid' => $restored_course->id,
             'context' => context_course::instance($restored_course->id),
@@ -354,9 +302,9 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
             ]
         ]);
 
-        course_observer::course_restored($cc_event);
-        $this->verify_validity_changed_hook($sink, [$criteria[3]->get_id()]);
-        $sink->close();
+        $cc_event->trigger();
+        $this->verify_validity_changed_hook($hook_sink, [$criteria[3]->get_id()]);
+        $hook_sink->close();
 
         // Verify that the status changed on disk
         $nvalid = criterion_entity::repository()
@@ -370,6 +318,55 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
             ->where('valid', 0)
             ->count();
         $this->assertEquals(0, $ninvalid);
+    }
+
+    public function test_course_settings_changed() {
+        $data = $this->setup_data();
+        /** @var totara_criteria_generator $criteria_generator */
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        /** @var phpunit_hook_sink $hook_sink */
+        $hook_sink = $this->redirectHooks();
+
+        $criteria = [
+            1 => $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id]]),
+            2 => $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id, $data->courses[2]->id]]),
+            3 => $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[2]->id, $data->courses[3]->id]])
+        ];
+        $criteria_ids = [$criteria[1]->get_id(), $criteria[2]->get_id(), $criteria[3]->get_id()];
+
+        $nvalid = criterion_entity::repository()
+            ->where('id', $criteria_ids)
+            ->where('valid', 1)
+            ->count();
+        $this->assertEquals(3, $nvalid);
+
+        $course1 = new course_entity($data->courses[1]->id);
+        $course1->enablecompletion = 0;
+        $course1->save();
+
+        $hook_sink->clear();
+        $event = \core\event\course_updated::create([
+            'objectid' => $course1->id,
+            'context' => context_course::instance($course1->id),
+            'other'    => ['fulname' => $course1->fullname],
+        ]);
+        $event->trigger();
+        $this->verify_validity_changed_hook($hook_sink, [$criteria[1]->get_id(), $criteria[2]->get_id()]);
+        $hook_sink->clear();
+
+        // Verify that the status changed on disk
+        $nvalid = criterion_entity::repository()
+            ->where('id', $criteria_ids)
+            ->where('valid', 1)
+            ->count();
+        $this->assertEquals(1, $nvalid);
+
+        $ninvalid = criterion_entity::repository()
+            ->where('id', $criteria_ids)
+            ->where('valid', 0)
+            ->count();
+        $this->assertEquals(2, $ninvalid);
     }
 
 

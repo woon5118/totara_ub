@@ -26,6 +26,7 @@ namespace totara_criteria;
 
 use core\orm\collection;
 use core\orm\entity\repository;
+use core\orm\query\builder;
 use totara_criteria\entities\criteria_item as criteria_item_entity;
 use totara_criteria\entities\criterion as criterion_entity;
 use totara_criteria\hook\criteria_achievement_changed;
@@ -156,6 +157,87 @@ class course_item_helper {
         }
     }
 
+    /**
+     * When the course settings are changed we re-evaluate the validity of all criteria that uses the course
+     * as the change may have included a change to the course's completion tracking
+     * A validity_changed hook is executed with the ids of all criteria that were affected
+     *
+     * @param int $course_id
+     * @param string|null $plugin_type Used for criteria filtering if provided
+     */
+    public static function course_settings_changed(int $course_id, ?string $plugin_type = null) {
+        $criteria = self::get_criteria_from_course($course_id, false, $plugin_type);
+
+        if (!$criteria->count()) {
+            return;
+        }
+
+        $affected_criteria = [];
+        foreach ($criteria as $criterion_entity) {
+            $criterion = criterion_factory::fetch_from_entity($criterion_entity);
+
+            // Validate and save validity
+            $criterion->validate();
+            if ($criterion->is_valid() != $criterion_entity->valid) {
+                $criterion->save_valid();
+                $affected_criteria[] = $criterion_entity->id;
+            }
+        }
+
+        if (!empty($affected_criteria)) {
+            $hook = new criteria_validity_changed($affected_criteria);
+            $hook->execute();
+        }
+    }
+
+    /**
+     * When the global 'enablecompletion' setting is changed, we re-evaluate the validity of
+     * all criteria with course items
+     *
+     * @param string|null $plugin_type Used for criteria filtering if provided
+     */
+    public static function global_setting_changed(?string $plugin_type = null) {
+        global $CFG;
+
+        $item_builder = builder::table(criteria_item_entity::TABLE)
+            ->where_field('criterion_id', 'c.id')
+            ->where('item_type', 'course');
+
+        $criteria = criterion_entity::repository()
+            ->as('c')
+            ->where_exists($item_builder)
+            ->when(!is_null($plugin_type), function (repository $repository) use ($plugin_type) {
+                $repository->where('c.plugin_type', $plugin_type);
+            })
+            ->get();
+
+        $affected_criteria = [];
+        foreach ($criteria as $criterion_entity) {
+            $criterion = criterion_factory::fetch_from_entity($criterion_entity);
+            if (!$CFG->enablecompletion) {
+                // Now disabled - no need to valid, we simply need to mark all existing 'valid' criteria as invalid
+                if ($criterion_entity->valid) {
+                    $criterion->set_valid(false);
+                    $criterion->save_valid();
+
+                    $affected_criteria[] = $criterion_entity->id;
+                }
+            } else {
+                // Now enabled, we need to re-evaluate the criteria
+                $criterion->validate();
+                if ($criterion->is_valid() != $criterion_entity->valid) {
+                    $criterion->save_valid();
+                    $affected_criteria[] = $criterion_entity->id;
+                }
+            }
+        }
+
+        if (!empty($affected_criteria)) {
+            $hook = new criteria_validity_changed($affected_criteria);
+            $hook->execute();
+        }
+    }
+
 
     /**
      * Find all criteria items for completion of this course
@@ -166,6 +248,8 @@ class course_item_helper {
      */
     private static function get_criteria_items_from_course_ids(array $ids, ?string $plugin_type = null): collection {
         return criteria_item_entity::repository()
+            ->where('item_type', 'course')
+            ->where('item_id', $ids)
             ->when(!is_null($plugin_type), function (repository $repository) use ($plugin_type) {
                 $repository->join([criterion_entity::TABLE, 'criterion'], 'criterion_id', 'id');
                 $repository->where('criterion.plugin_type', $plugin_type);

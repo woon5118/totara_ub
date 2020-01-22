@@ -26,9 +26,10 @@
  * This lists event observers.
  */
 
+use core\event\admin_settings_changed;
 use core\event\course_completed;
-use core\event\course_deleted;
-use core\event\course_restored;
+use core\event\course_updated;
+use criteria_linkedcourses\observer\totara_core as core_observer;
 use totara_completioneditor\event\course_completion_edited;
 use totara_completionimport\event\bulk_course_completionimport;
 use criteria_linkedcourses\observer\linked_courses as linked_courses_observer;
@@ -54,4 +55,16 @@ $observers = [
         'eventname' => bulk_course_completionimport::class,
         'callback' => course_observer::class.'::bulk_course_completions_imported',
     ],
+
+    // Validity currently just checks whether completion tracking is enabled on the course,
+    // not whether there are any completion criteria set - thus just checking for course update
+    [
+        'eventname' => course_updated::class,
+        'callback' => course_observer::class.'::course_updated',
+    ],
+    [
+        'eventname' => admin_settings_changed::class,
+        'callback' => core_observer::class.'::admin_settings_changed',
+    ],
+
 ];

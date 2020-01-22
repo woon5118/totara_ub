@@ -26,8 +26,7 @@ namespace criteria_linkedcourses\observer;
 use coding_exception;
 use core\event\base;
 use core\event\course_completed;
-use core\event\course_deleted;
-use core\event\course_restored;
+use core\event\course_updated;
 use totara_completionimport\event\bulk_course_completionimport;
 use totara_criteria\course_item_helper;
 
@@ -66,5 +65,17 @@ class course {
 
         course_item_helper::course_completions_updated($user_courses, 'linkedcourses');
     }
+
+    /**
+     * We are only interested in whether the course's completion is tracked or not. Unfortunately we can only
+     * determine that some course settings have been changed. When this happens we re-evaluate the validity
+     * of  all criteria that uses the course
+     *
+     * @param course_update $event
+     */
+    public static function course_updated(course_updated $event) {
+        course_item_helper::course_settings_changed($event->objectid, 'linkedcourses');
+    }
+
 
 }

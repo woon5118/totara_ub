@@ -21,7 +21,6 @@
  * @package totara_criteria
  */
 
-
 use totara_criteria\course_item_helper;
 use totara_criteria\entities\criterion as criterion_entity;
 use totara_competency\entities\course as course_entity;
@@ -267,6 +266,184 @@ class course_item_helper_testcase extends advanced_testcase {
             ->where('valid', 0)
             ->count();
         $this->assertEquals(0, $ninvalid);
+
+        $event_sink->close();
+        $hook_sink->close();
+    }
+
+    public function test_settings_changed() {
+        /** @var phpunit_event_sink $hook_sink */
+        $event_sink = $this->redirectEvents();
+        /** @var phpunit_hook_sink $hook_sink */
+        $hook_sink = $this->redirectHooks();
+
+        $data = $this->setup_data();
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        $criteria = [
+            1 => $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id]]),
+            2 => $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id, $data->courses[2]->id]]),
+            3 => $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[2]->id, $data->courses[3]->id]])
+        ];
+        $criteria_ids = [$criteria[1]->get_id(), $criteria[2]->get_id(), $criteria[3]->get_id()];
+
+        $nvalid = criterion_entity::repository()
+            ->where('id', $criteria_ids)
+            ->where('valid', 1)
+            ->count();
+        $this->assertEquals(3, $nvalid);
+
+        // Test with no changes to completion tracking
+        course_item_helper::course_settings_changed($data->courses[1]->id);
+        $this->assertSame(0, $hook_sink->count());
+
+        // Verify that no statuses were changed on disk
+        $nvalid = criterion_entity::repository()
+            ->where('id', $criteria_ids)
+            ->where('valid', 1)
+            ->count();
+        $this->assertEquals(3, $nvalid);
+
+        $ninvalid = criterion_entity::repository()
+            ->where('id', $criteria_ids)
+            ->where('valid', 0)
+            ->count();
+        $this->assertEquals(0, $ninvalid);
+
+        // Now update the course's enablecompletion
+        $course1 = new course_entity($data->courses[1]->id);
+        $course1->enablecompletion = 0;
+        $course1->update();
+
+        course_item_helper::course_settings_changed($data->courses[1]->id);
+        $this->verify_validity_changed_hook($hook_sink, [$criteria[1]->get_id(), $criteria[2]->get_id()]);
+
+        // Verify that the status changed on disk
+        $nvalid = criterion_entity::repository()
+            ->where('id', $criteria_ids)
+            ->where('valid', 1)
+            ->count();
+        $this->assertEquals(1, $nvalid);
+
+        $ninvalid = criterion_entity::repository()
+            ->where('id', $criteria_ids)
+            ->where('valid', 0)
+            ->count();
+        $this->assertEquals(2, $ninvalid);
+
+        $event_sink->close();
+        $hook_sink->close();
+    }
+
+    public function test_global_setting_changed() {
+        /** @var phpunit_event_sink $hook_sink */
+        $event_sink = $this->redirectEvents();
+        /** @var phpunit_hook_sink $hook_sink */
+        $hook_sink = $this->redirectHooks();
+
+        set_config('enablecompletion', 1);
+        $data = $this->setup_data();
+
+        // Disable coursecompletion for courses 3 and 4
+        $course3 = new course_entity($data->courses[3]->id);
+        $course3->enablecompletion = 0;
+        $course3->update();
+
+        $course4 = new course_entity($data->courses[4]->id);
+        $course4->enablecompletion = 0;
+        $course4->update();
+
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        $criteria = [
+            1 => $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id]]),
+            2 => $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id, $data->courses[2]->id]]),
+            3 => $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[2]->id, $data->courses[3]->id]]),
+            4 => $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[4]->id]]),
+        ];
+        $criteria_ids = [$criteria[1]->get_id(), $criteria[2]->get_id(), $criteria[3]->get_id(), $criteria[4]->get_id()];
+
+        $nvalid = criterion_entity::repository()
+            ->where('id', $criteria_ids)
+            ->where('valid', 1)
+            ->count();
+        $this->assertEquals(2, $nvalid);
+
+        $ninvalid = criterion_entity::repository()
+            ->where('id', $criteria_ids)
+            ->where('valid', 0)
+            ->count();
+        $this->assertEquals(2, $ninvalid);
+
+        $hook_sink->clear();
+
+        // Test with no change
+        course_item_helper::global_setting_changed();
+        $this->assertSame(0, $hook_sink->count());
+
+        // Verify that no statuses were changed on disk
+        $nvalid = criterion_entity::repository()
+            ->where('id', $criteria_ids)
+            ->where('valid', 1)
+            ->count();
+        $this->assertEquals(2, $nvalid);
+
+        $ninvalid = criterion_entity::repository()
+            ->where('id', $criteria_ids)
+            ->where('valid', 0)
+            ->count();
+        $this->assertEquals(2, $ninvalid);
+
+        // Now disable completion
+        set_config('enablecompletion', 0);
+        course_item_helper::global_setting_changed();
+
+        $hooks = $hook_sink->get_hooks();
+        $this->assertSame(1, count($hooks));
+        /** @var criteria_validity_changed $hook */
+        $hook = reset($hooks);
+
+        $this->assertTrue($hook instanceof criteria_validity_changed);
+        $this->assertEqualsCanonicalizing([$criteria[1]->get_id(), $criteria[2]->get_id()], $hook->get_criteria_ids());
+
+        // Verify that the status changed on disk
+        $nvalid = criterion_entity::repository()
+            ->where('id', $criteria_ids)
+            ->where('valid', 1)
+            ->count();
+        $this->assertEquals(0, $nvalid);
+
+        $ninvalid = criterion_entity::repository()
+            ->where('id', $criteria_ids)
+            ->where('valid', 0)
+            ->count();
+        $this->assertEquals(4, $ninvalid);
+        $hook_sink->clear();
+
+        // Enable completion again
+        set_config('enablecompletion', 1);
+        course_item_helper::global_setting_changed();
+
+        $hooks = $hook_sink->get_hooks();
+        $this->assertSame(1, count($hooks));
+        /** @var criteria_validity_changed $hook */
+        $hook = reset($hooks);
+
+        $this->assertTrue($hook instanceof criteria_validity_changed);
+        $this->assertEqualsCanonicalizing([$criteria[1]->get_id(), $criteria[2]->get_id()], $hook->get_criteria_ids());
+
+        // Verify that the status changed on disk
+        $nvalid = criterion_entity::repository()
+            ->where('id', $criteria_ids)
+            ->where('valid', 1)
+            ->count();
+        $this->assertEquals(2, $nvalid);
+
+        $ninvalid = criterion_entity::repository()
+            ->where('id', $criteria_ids)
+            ->where('valid', 0)
+            ->count();
+        $this->assertEquals(2, $ninvalid);
 
         $event_sink->close();
         $hook_sink->close();
