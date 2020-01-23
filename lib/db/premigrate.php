@@ -23,8 +23,6 @@
 
 /**
  * Transforms Moodle installation to Moodle 3.4.9 data format.
- *
- * @param int|float $oldversion
  */
 function xmldb_core_premigrate() {
     global $CFG, $DB;

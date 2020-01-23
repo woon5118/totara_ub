@@ -43,12 +43,12 @@ function premigrate_main_savepoint($version) {
     $callee = str_replace(DIRECTORY_SEPARATOR, '/', $debuginfo[0]['file']);
     $dirroot = str_replace(DIRECTORY_SEPARATOR, '/', $CFG->dirroot);
     if ($callee !== $dirroot . '/lib/db/premigrate.php') {
-        throw new coding_Exception('premigrate_main_savepoint() must be called from main premigration script only');
+        throw new coding_exception('premigrate_main_savepoint() must be called from main premigration script only');
     }
 
     if ($CFG->version < $version) {
         // something really wrong is going on in main upgrade script
-        throw new coding_Exception('Premigration cannot increase main version number');
+        throw new coding_exception('Premigration cannot increase main version number');
     }
 
     set_config('version', $version);
@@ -138,7 +138,7 @@ function premigrate_plugin_savepoint($version, $type, $plugin): string {
 
     if ($dbversion < $version) {
         // Something really wrong is going on in the upgrade script
-        throw new coding_Exception('Plugin version cannot be increased during pre-migration');
+        throw new coding_exception('Plugin version cannot be increased during pre-migration');
     }
 
     set_config('version', $version, $component);
