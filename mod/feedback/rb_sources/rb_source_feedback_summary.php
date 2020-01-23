@@ -62,6 +62,8 @@ class rb_source_feedback_summary extends rb_base_source {
     protected function define_joinlist() {
         global $CFG, $DB;
 
+        $moduleid = $DB->get_field('modules', 'id', ['name' => 'feedback']);
+
         // get the trainer role's id (or set a dummy value)
         $trainerroleid = $DB->get_field('role', 'id', array('shortname' => 'trainer'));
         if (!$trainerroleid) {
@@ -79,6 +81,14 @@ class rb_source_feedback_summary extends rb_base_source {
                 '{feedback}',
                 'feedback.id = base.feedback',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
+            ),
+            new rb_join(
+                'cmdl',
+                'LEFT',
+                '{course_modules}',
+                "(cmdl.module = {$moduleid} AND cmdl.instance = feedback.id)",
+                REPORT_BUILDER_RELATION_ONE_TO_ONE,
+                'feedback'
             ),
             new rb_join(
                 'session_value',
@@ -148,6 +158,7 @@ class rb_source_feedback_summary extends rb_base_source {
             'course', 'category');
         $this->add_totara_job_tables($joinlist, 'base', 'userid');
         $this->add_core_tag_tables('core', 'course', $joinlist, 'feedback', 'course');
+        $this->add_core_tag_tables('core', 'course_modules', $joinlist, 'cmdl', 'id');
         return $joinlist;
     }
 
@@ -233,6 +244,7 @@ class rb_source_feedback_summary extends rb_base_source {
         $this->add_core_course_category_columns($columnoptions);
         $this->add_totara_job_columns($columnoptions);
         $this->add_core_tag_columns('core', 'course', $columnoptions);
+        $this->add_core_tag_columns('core', 'course_modules', $columnoptions);
 
         return $columnoptions;
     }
@@ -286,6 +298,7 @@ class rb_source_feedback_summary extends rb_base_source {
         $this->add_core_course_category_filters($filteroptions);
         $this->add_totara_job_filters($filteroptions, 'base', 'userid');
         $this->add_core_tag_filters('core', 'course', $filteroptions);
+        $this->add_core_tag_filters('core', 'course_modules', $filteroptions);
 
         return $filteroptions;
     }

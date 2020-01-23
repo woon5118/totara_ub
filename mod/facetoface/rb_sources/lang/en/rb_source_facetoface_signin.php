@@ -86,6 +86,8 @@ $string['type_status'] = 'Status';
 $string['type_role'] = 'Role';
 $string['type_room'] = 'Room';
 $string['type_user_signups'] = 'User Session Signups';
+$string['type_tags'] = 'Course tags';
+$string['type_course_modules_tags'] = 'Seminar tags';
 
 # Deprecated in 13.0
 $string['sessdate'] = 'Session Start Date';

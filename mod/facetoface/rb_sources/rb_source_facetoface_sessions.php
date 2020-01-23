@@ -87,8 +87,10 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
     //
 
     protected function define_joinlist() {
-        global $CFG;
+        global $CFG, $DB;
         require_once($CFG->dirroot .'/mod/facetoface/lib.php');
+
+        $moduleid = $DB->get_field('modules', 'id', ['name' => 'facetoface']);
 
         // joinlist for this source
         $joinlist = array(
@@ -106,6 +108,14 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'facetoface.id = sessions.facetoface',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
                 'sessions'
+            ),
+            new rb_join(
+                'cmdl',
+                'LEFT',
+                '{course_modules}',
+                "(cmdl.module = {$moduleid} AND cmdl.instance = facetoface.id)",
+                REPORT_BUILDER_RELATION_ONE_TO_ONE,
+                'facetoface'
             ),
             new rb_join(
                 'sessiondate',
@@ -225,6 +235,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         $this->add_core_course_category_tables($joinlist, 'course', 'category');
         $this->add_totara_job_tables($joinlist, 'base', 'userid');
         $this->add_core_tag_tables('core', 'course', $joinlist, 'facetoface', 'course');
+        $this->add_core_tag_tables('core', 'course_modules', $joinlist, 'cmdl', 'id');
 
         $this->add_facetoface_session_roles_to_joinlist($joinlist);
 
@@ -530,6 +541,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         $this->add_core_course_category_columns($columnoptions);
         $this->add_totara_job_columns($columnoptions);
         $this->add_core_tag_columns('core', 'course', $columnoptions);
+        $this->add_core_tag_columns('core', 'course_modules', $columnoptions);
         $this->add_facetoface_session_roles_to_columns($columnoptions);
         $this->add_assets_fields_to_columns($columnoptions);
         $this->add_rooms_fields_to_columns($columnoptions);
@@ -672,6 +684,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         $this->add_core_course_category_filters($filteroptions);
         $this->add_totara_job_filters($filteroptions, 'base', 'userid');
         $this->add_core_tag_filters('core', 'course', $filteroptions);
+        $this->add_core_tag_filters('core', 'course_modules', $filteroptions);
         // add session role fields to filters
         $this->add_facetoface_session_role_fields_to_filters($filteroptions);
 

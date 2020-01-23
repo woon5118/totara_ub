@@ -53,6 +53,9 @@ class rb_source_scorm extends rb_base_source {
     //
 
     protected function define_joinlist() {
+        global $DB;
+        $moduleid = $DB->get_field('modules', 'id', ['name' => 'scorm']);
+
         $joinlist = array(
             new rb_join(
                 'scorm',
@@ -67,6 +70,14 @@ class rb_source_scorm extends rb_base_source {
                 '{scorm_scoes}',
                 'sco.id = base.scoid',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
+            ),
+            new rb_join(
+                'cmdl',
+                'LEFT',
+                '{course_modules}',
+                "(cmdl.module = {$moduleid} AND cmdl.instance = scorm.id)",
+                REPORT_BUILDER_RELATION_ONE_TO_ONE,
+                'scorm'
             ),
         );
 
@@ -102,6 +113,7 @@ class rb_source_scorm extends rb_base_source {
             'course', 'category');
         $this->add_totara_job_tables($joinlist, 'base', 'userid');
         $this->add_core_tag_tables('core', 'course', $joinlist, 'scorm', 'course');
+        $this->add_core_tag_tables('core', 'course_modules', $joinlist, 'cmdl', 'id');
         $this->add_totara_cohort_course_tables($joinlist, 'scorm', 'course');
 
         return $joinlist;
@@ -221,6 +233,7 @@ class rb_source_scorm extends rb_base_source {
         $this->add_core_course_category_columns($columnoptions);
         $this->add_totara_job_columns($columnoptions);
         $this->add_core_tag_columns('core', 'course', $columnoptions);
+        $this->add_core_tag_columns('core', 'course_modules', $columnoptions);
         $this->add_totara_cohort_course_columns($columnoptions);
 
         return $columnoptions;
@@ -302,6 +315,7 @@ class rb_source_scorm extends rb_base_source {
         $this->add_core_course_category_filters($filteroptions);
         $this->add_totara_job_filters($filteroptions, 'base', 'userid');
         $this->add_core_tag_filters('core', 'course', $filteroptions);
+        $this->add_core_tag_filters('core', 'course_modules', $filteroptions);
         $this->add_totara_cohort_course_filters($filteroptions);
 
         return $filteroptions;

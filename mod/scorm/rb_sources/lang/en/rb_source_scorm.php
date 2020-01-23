@@ -34,3 +34,5 @@ $string['failed'] = 'Failed';
 // column types for this source, as strings
 $string['type_scorm'] = 'SCORM';
 $string['type_sco'] = 'SCO';
+$string['type_tags'] = 'Course tags';
+$string['type_course_modules_tags'] = 'SCORM tags';

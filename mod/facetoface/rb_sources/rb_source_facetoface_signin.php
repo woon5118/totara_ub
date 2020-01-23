@@ -95,8 +95,10 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
      * @return array
      */
     protected function define_joinlist() {
-        global $CFG;
+        global $CFG, $DB;
         require_once($CFG->dirroot .'/mod/facetoface/lib.php');
+
+        $moduleid = $DB->get_field('modules', 'id', ['name' => 'facetoface']);
 
         $joinlist = array(
             new rb_join(
@@ -113,6 +115,14 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 'facetoface.id = sessions.facetoface',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
                 'sessions'
+            ),
+            new rb_join(
+                'cmdl',
+                'INNER',
+                '{course_modules}',
+                "(cmdl.module = {$moduleid} AND cmdl.instance = facetoface.id)",
+                REPORT_BUILDER_RELATION_ONE_TO_ONE,
+                'facetoface'
             ),
             new rb_join(
                 'sessiondate',
@@ -165,6 +175,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         $this->add_core_course_category_tables($joinlist, 'course', 'category');
         $this->add_totara_job_tables($joinlist, 'base', 'userid');
         $this->add_core_tag_tables('core', 'course', $joinlist, 'facetoface', 'course');
+        $this->add_core_tag_tables('core', 'course_modules', $joinlist, 'cmdl', 'id');
         $this->add_facetoface_session_roles_to_joinlist($joinlist);
         $this->add_totara_cohort_course_tables($joinlist, 'facetoface', 'course');
 
@@ -305,6 +316,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         $this->add_core_course_category_columns($columnoptions);
         $this->add_totara_job_columns($columnoptions);
         $this->add_core_tag_columns('core', 'course', $columnoptions);
+        $this->add_core_tag_columns('core', 'course_modules', $columnoptions);
         $this->add_facetoface_session_roles_to_columns($columnoptions);
         $this->add_totara_cohort_course_columns($columnoptions);
 
@@ -405,6 +417,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         $this->add_core_course_category_filters($filteroptions);
         $this->add_totara_job_filters($filteroptions, 'base', 'userid');
         $this->add_core_tag_filters('core', 'course', $filteroptions);
+        $this->add_core_tag_filters('core', 'course_modules', $filteroptions);
         $this->add_facetoface_session_role_fields_to_filters($filteroptions);
         $this->add_totara_cohort_course_filters($filteroptions);
 

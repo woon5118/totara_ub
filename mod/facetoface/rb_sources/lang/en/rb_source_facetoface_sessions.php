@@ -104,6 +104,8 @@ $string['type_facetoface_session'] = 'Event Custom Fields';
 $string['type_facetoface_signup'] = 'Signup Custom Fields';
 $string['type_facetoface_sessioncancel'] = 'Event cancellation Custom Fields';
 $string['type_date'] = 'Date';
+$string['type_tags'] = 'Course tags';
+$string['type_course_modules_tags'] = 'Seminar tags';
 
 # Deprecated in 13.0
 $string['sessdate'] = 'Session Start';
