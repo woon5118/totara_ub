@@ -1,0 +1,102 @@
+"""
+Pathway classification is simply an indication whether completing a pathway results in a specific scalevalue or can result in any of the scalevalues
+"""
+enum totara_competency_pathway_classification {
+  MULTIVALUE
+  SINGLEVALUE
+}
+
+"""
+Possible pathway statuses
+"""
+enum totara_competency_pathway_status {
+  ACTIVE
+  ARCHIVED
+}
+
+"""
+Summarized pathway criteria detail
+"""
+type totara_competency_summarized_pathway_criteria {
+  item_type: String!
+  item_aggregation: String
+  items(format: core_format = HTML): [String!]
+}
+
+"""
+ This is the generic pathway type. Each plugin must define its specific type with name pathway_<pathway_type>_instance
+These should be retrieved separately and should contain the plugin specific detail
+None of the strings are retrieved from user input - therefore no formatting requirement
+"""
+type totara_competency_pathway {
+  id: core_id!
+  pathway_type: String!
+  instance_id: core_id
+  title: String!
+  sortorder: Int!
+  status: totara_competency_pathway_status!
+  classification: totara_competency_pathway_classification!
+  scale_value(format: core_format = HTML): String
+  criteria_summary: [totara_competency_summarized_pathway_criteria!]
+}
+
+"""
+ How achievement values are aggregated
+None of the strings are retrieved from user input - therefore no formatting requirement
+"""
+type totara_competency_overall_aggregation {
+  aggregation_type: String!
+  title: String!
+  description: String
+}
+
+"""
+Achievement configuration
+"""
+type totara_competency_achievement_configuration {
+  competency_id: core_id!
+  overall_aggregation: totara_competency_overall_aggregation!
+  paths: [totara_competency_pathway!]!
+}
+
+"""
+Competency profile details page related types and queries
+"""
+type totara_competency_achievement_path {
+  class: totara_competency_pathway_classification! # SINGLE, MLULTI
+  type: String # manual, learning_plan, null
+}
+
+"""
+This represents an item which is shown under within a specific scale.
+The pathway_type can be any type which supports single scale values, i.e. criteria_group
+"""
+type totara_competency_scale_achievement_item {
+  instance_id: core_id! # specific instance id
+  pathway_type: String # criteria_group
+}
+
+"""
+Returns items for each scale value, which could be criteria groups
+"""
+type totara_competency_scale_achievement {
+  scale_value: totara_competency_scale_value
+  items: [totara_competency_pathway]
+}
+
+extend type Query {
+  totara_competency_achievement_criteria(
+    competency_id: core_id!
+  ): totara_competency_achievement_configuration!
+
+  """
+  This query returns all achievement paths for a given competency and user
+  """
+  totara_competency_achievement_paths(
+    assignment_id: core_id!
+  ): [totara_competency_achievement_path]
+
+  totara_competency_scale_achievements(
+    assignment_id: core_id!
+  ): [totara_competency_scale_achievement]
+}

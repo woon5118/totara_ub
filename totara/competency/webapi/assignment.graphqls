@@ -1,0 +1,94 @@
+"""
+Competency assignment
+
+NOTE: The query is responsible for ensuring the user can see the assignment.
+"""
+type totara_competency_assignment {
+  id: core_id!
+  type: String!
+  type_name: String!
+  competency_id: core_id!
+  user_group_type: String!
+  user_group_id: core_id!
+  optional: Boolean
+  status: Int!
+  created_by: Int
+  created_at(format: core_date_format = TIMESTAMP): core_date!
+  updated_at(format: core_date_format = TIMESTAMP): core_date!
+  archived_at(format: core_date_format = TIMESTAMP): core_date
+  competency: totara_competency_competency!
+  user_group: totara_competency_user_group!
+  progress_name(format: core_format = HTML): String
+  reason_assigned(format: core_format = HTML): String
+}
+
+type totara_competency_user_group {
+  id: ID!
+  name(format: core_format = HTML): String!
+  type: String!
+  is_deleted: Boolean!
+}
+
+type totara_competency_self_assignable_competency implements totara_competency_competency_interface {
+  id: core_id!
+  fullname(format: core_format = HTML): String!
+  idnumber(format: core_format = HTML): String
+  shortname(format: core_format = HTML): String
+  display_name(format: core_format = HTML): String
+  description(format: core_format = HTML): String
+  timecreated(format: core_date_format = TIMESTAMP): core_date
+  timemodified(format: core_date_format = TIMESTAMP): core_date
+  frameworkid: core_id
+  framework: totara_competency_competency_framework
+  path: String!
+  visible: Boolean!
+  parentid: core_id
+  parent: totara_competency_competency
+  children: [totara_competency_competency]!
+  typeid: core_id
+  type: totara_competency_competency_type
+  assignments: [totara_competency_assignment]
+  user_assignments: [totara_competency_assignment]
+  aggregation_method: Int
+}
+
+type totara_competency_self_assigned_competencies_result implements core_pageable_result {
+  items: [totara_competency_self_assignable_competency]
+  total: Int!
+  next_cursor: String!
+}
+
+input totara_competency_self_assigned_competencies_filter {
+  text: param_text
+  assignment_type: [param_alphaext]
+  framework: param_integer
+  assignment_status: [param_integer]
+  parent: param_integer
+  path: param_integer
+  type: [param_integer]
+  ids: [param_integer]
+}
+
+extend type Query {
+  totara_competency_assignment(
+    assignment_id: core_id!
+  ): totara_competency_assignment!
+
+  totara_competency_self_assignable_competencies(
+    user_id: core_id!
+    filters: totara_competency_self_assigned_competencies_filter
+    order_by: String
+    order_dir: totara_competency_order_dir
+    cursor: String
+  ): totara_competency_self_assigned_competencies_result!
+}
+
+extend type Mutation {
+  """
+  Creates new assignments for the user
+  """
+  totara_competency_create_user_assignments(
+    user_id: core_id!
+    competency_ids: [core_id!]!
+  ): [totara_competency_assignment!]!
+}

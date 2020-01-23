@@ -1,0 +1,110 @@
+type totara_competency_activity_log_row {
+  timestamp(format: core_date_format = TIMESTAMP): core_date
+  description(format: core_format = HTML): String
+  proficient_status: Boolean
+  assignment: totara_competency_assignment
+  assignment_action: String
+  type: String
+}
+
+"""
+Competency profile overall progress
+"""
+type totara_competency_profile_overall_progress {
+  user: core_user
+  items: [totara_competency_profile_progress_item!]
+  latest_achievement(format: core_format = HTML): String
+  filters: [totara_competency_profile_assignment_filter_option!]
+}
+
+"""
+Competency profile overall progress individual items
+To simplify, it is a list of assignments grouped by assignment type, user group type and user group id
+"""
+type totara_competency_profile_progress_item {
+  overall_progress: Int!
+  name(format: core_format = HTML): String!
+  items: [totara_competency_profile_assignment_progress]
+}
+
+"""
+Competency profile progress item per assignment,
+"""
+type totara_competency_profile_assignment_progress {
+  assignment: totara_competency_assignment
+  competency: totara_competency_competency
+  proficient: Boolean
+  my_value: totara_competency_profile_scale_value_progress
+  min_value: totara_competency_profile_scale_value_progress!
+}
+
+"""
+Competency profile progress item per competency, with a list of assignments (for a given user)
+"""
+type totara_competency_profile_competency_progress {
+  competency: totara_competency_competency
+  items: [totara_competency_profile_assignment_progress]
+}
+
+"""
+Competency profile scale_value progress type that includes extra details (the percentage towards competency progress)
+"""
+type totara_competency_profile_scale_value_progress {
+  id: core_id
+  scale_id: core_id
+  name(format: core_format = HTML): String!
+  percentage: Int
+  proficient: Boolean
+}
+
+"""
+Competency profile assignment filter option
+"""
+type totara_competency_profile_assignment_filter_option {
+  name(format: core_format = HTML): String!
+  user_group_type: String!
+  user_group_id: Int!
+  type: String!
+  status: Int!
+  status_name(format: core_format = HTML): String!
+}
+
+"""
+Competency profile assignment filters
+"""
+input totara_competency_profile_assignment_filters {
+  user_group_type: String
+  user_group_id: Int
+  type: String
+  status: Int
+  proficient: Boolean
+  search: String
+}
+
+input totara_competency_activity_log_filters {
+  assignment_id: core_id
+}
+
+extend type Query {
+  totara_competency_activity_log(
+    competency_id: core_id!
+    user_id: core_id!
+    filters: totara_competency_activity_log_filters
+  ): [totara_competency_activity_log_row]
+
+  totara_competency_profile_progress(
+    user_id: core_id
+    filters: totara_competency_profile_assignment_filters
+  ): totara_competency_profile_overall_progress
+
+  totara_competency_profile_competency_progress(
+    user_id: core_id
+    order: String
+    filters: totara_competency_profile_assignment_filters
+  ): [totara_competency_profile_competency_progress]
+
+  totara_competency_profile_competency_details(
+    user_id: core_id
+    competency_id: core_id
+  ): totara_competency_profile_competency_progress
+}
