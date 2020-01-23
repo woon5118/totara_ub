@@ -471,6 +471,10 @@ class job_assignment {
                     'oldmanagerjapath' => $jobassignment->managerjapath,
                     'oldpositionid' => null,
                     'oldorganisationid' => null,
+                    'newmanagerjaid' => $jobassignment->managerjaid,
+                    'newmanagerjapath' => $jobassignment->managerjapath,
+                    'newpositionid' => $jobassignment->positionid,
+                    'neworganisationid' => $jobassignment->organisationid,
                 ),
             )
         );
@@ -815,6 +819,10 @@ class job_assignment {
                     'oldmanagerjapath' => $oldmanagerjapath,
                     'oldpositionid' => $oldpositionid,
                     'oldorganisationid' => $oldorganisationid,
+                    'newmanagerjaid' => $this->managerjaid,
+                    'newmanagerjapath' => $this->managerjapath,
+                    'newpositionid' => $this->positionid,
+                    'neworganisationid' => $this->organisationid,
                 ),
             )
         );
@@ -1284,6 +1292,10 @@ class job_assignment {
                         'oldmanagerjapath' => $record->managerjapath,
                         'oldpositionid' => $record->positionid,
                         'oldorganisationid' => $record->organisationid,
+                        'newmanagerjaid' => $record->managerjaid,
+                        'newmanagerjapath' => $record->managerjapath,
+                        'newpositionid' => $field == 'positionid' ? null : $record->positionid,
+                        'neworganisationid' => $field == 'organisationid' ? null : $record->organisationid,
                     ),
                 )
             );

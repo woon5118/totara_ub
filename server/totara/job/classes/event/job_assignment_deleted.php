@@ -37,6 +37,7 @@ class job_assignment_deleted extends \core\event\base {
      *
      * @param job_assignment $jobassignment Job assignment object.
      * @param \context $context
+     * @return \core\event\base
      */
     public static function create_from_instance(job_assignment $jobassignment, \context $context) {
 
@@ -44,6 +45,16 @@ class job_assignment_deleted extends \core\event\base {
             'objectid'      => $jobassignment->id,
             'context'       => $context,
             'relateduserid' => $jobassignment->userid,
+            'other' => [
+                'oldmanagerjaid' => $jobassignment->managerjaid,
+                'oldmanagerjapath' => $jobassignment->managerjapath,
+                'oldpositionid' => $jobassignment->positionid,
+                'oldorganisationid' => $jobassignment->organisationid,
+                'newmanagerjaid' => null,
+                'newmanagerjapath' => null,
+                'newpositionid' => null,
+                'neworganisationid' => null,
+            ],
         ];
 
         return self::create($data);

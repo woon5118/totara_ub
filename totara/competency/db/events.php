@@ -23,6 +23,8 @@
  */
 
 use core\event\cohort_deleted;
+use core\event\cohort_member_added;
+use core\event\cohort_member_removed;
 use core\event\course_deleted;
 use core\event\user_deleted;
 use hierarchy_competency\event\competency_created;
@@ -31,6 +33,7 @@ use hierarchy_competency\event\competency_updated;
 use hierarchy_competency\event\scale_min_proficient_value_updated;
 use hierarchy_organisation\event\organisation_deleted;
 use hierarchy_position\event\position_deleted;
+use totara_cohort\event\members_updated;
 use totara_competency\event\assignment_activated;
 use totara_competency\event\assignment_archived;
 use totara_competency\event\assignment_created;
@@ -41,6 +44,7 @@ use totara_competency\event\assignment_user_assigned_bulk;
 use totara_competency\event\assignment_user_unassigned;
 use totara_competency\observers\assignment as assignment_observer;
 use totara_competency\observers\assignment_aggregation;
+use totara_competency\observers\assignment_user_groups;
 use totara_competency\observers\audience_deleted as audience_deleted_observer;
 use totara_competency\observers\competency as competency_observer;
 use totara_competency\observers\competency_deleted as competency_deleted_observer;
@@ -51,6 +55,9 @@ use totara_competency\observers\scale as scale_observer;
 use totara_competency\observers\user_deleted as user_deleted_observer;
 use totara_competency\observers\user_log as user_log_observer;
 use totara_competency\observers\user_unassigned as user_unassigned_observer;
+use totara_job\event\job_assignment_created;
+use totara_job\event\job_assignment_deleted;
+use totara_job\event\job_assignment_updated;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -145,5 +152,29 @@ $observers = [
     [
         'eventname' => course_deleted::class,
         'callback' => course::class.'::deleted',
+    ],
+    [
+        'eventname' => members_updated::class,
+        'callback' => assignment_user_groups::class.'::cohort_updated',
+    ],
+    [
+        'eventname' => cohort_member_added::class,
+        'callback' => assignment_user_groups::class.'::cohort_updated',
+    ],
+    [
+        'eventname' => cohort_member_removed::class,
+        'callback' => assignment_user_groups::class.'::cohort_updated',
+    ],
+    [
+        'eventname' => job_assignment_created::class,
+        'callback' => assignment_user_groups::class.'::job_assignment_updated',
+    ],
+    [
+        'eventname' => job_assignment_updated::class,
+        'callback' => assignment_user_groups::class.'::job_assignment_updated',
+    ],
+    [
+        'eventname' => job_assignment_deleted::class,
+        'callback' => assignment_user_groups::class.'::job_assignment_updated',
     ],
 ];

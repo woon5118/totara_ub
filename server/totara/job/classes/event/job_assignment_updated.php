@@ -56,10 +56,15 @@ class job_assignment_updated extends \core\event\base {
             'objectid' => $jobassignment->id,
             'context' => $context,
             'relateduserid' => $jobassignment->userid,
-            'other' => array('oldmanagerjaid' => $oldmanagerjaid,
-                             'oldmanagerjapath' => $oldmanagerjapath,
-                             'oldpositionid' => $oldpositionid,
-                             'oldorganisationid' => $oldorganisationid,
+            'other' => array(
+                'oldmanagerjaid' => $oldmanagerjaid,
+                'oldmanagerjapath' => $oldmanagerjapath,
+                'oldpositionid' => $oldpositionid,
+                'oldorganisationid' => $oldorganisationid,
+                'newmanagerjaid' => $jobassignment->managerjaid,
+                'newmanagerjapath' => $jobassignment->managerjapath,
+                'newpositionid' => $jobassignment->positionid,
+                'neworganisationid' => $jobassignment->organisationid,
             ),
         );
 

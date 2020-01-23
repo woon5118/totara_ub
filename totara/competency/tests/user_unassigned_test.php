@@ -32,6 +32,7 @@ use totara_competency\entities\scale_value;
 use totara_competency\expand_task;
 use totara_competency\settings;
 use totara_competency\task\competency_aggregation_all;
+use totara_job\job_assignment;
 
 class totara_competency_user_unassigned_testcase extends advanced_testcase {
 
@@ -50,10 +51,13 @@ class totara_competency_user_unassigned_testcase extends advanced_testcase {
 
         // We need to remove user from a position and check that the event has been fired
         // To remove user from a position we need to remove the related job assignment record.
-        builder::table('job_assignment')
+        $job_assignment_record = builder::table('job_assignment')
             ->where('userid', $user->id)
             ->where('positionid', $pos->id)
-            ->delete();
+            ->one();
+
+        $job_assignment = job_assignment::get_with_id($job_assignment_record->id);
+        job_assignment::delete($job_assignment);
 
         $achievement = competency_achievement::repository()
             ->where('user_id', $user->id)
@@ -128,10 +132,13 @@ class totara_competency_user_unassigned_testcase extends advanced_testcase {
 
         // We need to remove user from a position and check that the event has been fired
         // To remove user from a position we need to remove the related job assignment record.
-        builder::table('job_assignment')
+        $job_assignment_record = builder::table('job_assignment')
             ->where('userid', $user->id)
             ->where('positionid', $pos->id)
-            ->delete();
+            ->one();
+
+        $job_assignment = job_assignment::get_with_id($job_assignment_record->id);
+        job_assignment::delete($job_assignment);
 
         $achievement = competency_achievement::repository()
             ->where('user_id', $user->id)
@@ -209,10 +216,13 @@ class totara_competency_user_unassigned_testcase extends advanced_testcase {
 
         // We need to remove user from a position and check that the event has been fired
         // To remove user from a position we need to remove the related job assignment record.
-        builder::table('job_assignment')
+        $job_assignment_record = builder::table('job_assignment')
             ->where('userid', $user->id)
             ->where('positionid', $pos->id)
-            ->delete();
+            ->one();
+
+        $job_assignment = job_assignment::get_with_id($job_assignment_record->id);
+        job_assignment::delete($job_assignment);
 
         $achievement = competency_achievement::repository()
             ->where('user_id', $user->id)
@@ -385,8 +395,7 @@ class totara_competency_user_unassigned_testcase extends advanced_testcase {
             ->assignment_generator()
             ->create_position_assignment($comp->id, $another_pos->id);
 
-        (new expand_task(builder::get_db()))->expand_single($ass->id);
-        (new expand_task(builder::get_db()))->expand_single($another_ass->id);
+        (new expand_task(builder::get_db()))->expand_multiple([$ass->id, $another_ass->id]);
 
         $manual_pathway = $this->generator()->create_manual($comp);
 
@@ -394,7 +403,7 @@ class totara_competency_user_unassigned_testcase extends advanced_testcase {
             ->where('name', 'Competent')
             ->one();
 
-        // assign user to competency
+        // Create a manual rating and aggregate
         $this->generator()->create_manual_rating($manual_pathway, $user, $user, manual::ROLE_SELF, $value);
         (new competency_aggregation_all())->execute();
 

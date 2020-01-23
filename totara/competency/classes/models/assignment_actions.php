@@ -34,6 +34,7 @@ use totara_competency\models\assignment as assignment_model;
 use totara_competency\settings;
 use core\orm\entity\filter\hierarchy_item_visible;
 use totara_competency\task\expand_assignment_task;
+use totara_competency\user_groups;
 
 class assignment_actions {
 
@@ -53,8 +54,8 @@ class assignment_actions {
         $affected_assignment_ids = [];
 
         // only active assignments can be archived
-        $assignments = entities\assignment::repository()
-            ->where('status', entities\assignment::STATUS_ACTIVE)
+        $assignments = assignment::repository()
+            ->where('status', assignment::STATUS_ACTIVE)
             ->where('id', $ids)
             ->get_lazy();
 
@@ -87,8 +88,8 @@ class assignment_actions {
         $affected_assignment_ids = [];
 
         // Only active assignments can be archived
-        $assignments = entities\assignment::repository()
-            ->where('status', entities\assignment::STATUS_DRAFT)
+        $assignments = assignment::repository()
+            ->where('status', assignment::STATUS_DRAFT)
             ->where('id', $ids)
             ->get_lazy();
 
@@ -144,12 +145,12 @@ class assignment_actions {
         $affected_assignment_ids = [];
 
         // only active assignments can be archived
-        $assignments = entities\assignment::repository()
+        $assignments = assignment::repository()
             ->where(function (builder $builder) use ($force) {
                 if (!$force) {
                     $builder->where('status', [
-                        entities\assignment::STATUS_DRAFT,
-                        entities\assignment::STATUS_ARCHIVED
+                        assignment::STATUS_DRAFT,
+                        assignment::STATUS_ARCHIVED
                     ]);
                 }
             })
@@ -287,6 +288,26 @@ class assignment_actions {
             ->pluck('id');
 
         return $this->delete($assignments, $force);
+    }
+
+    /**
+     * Mark all related assignments for expansion on the next expand run
+     *
+     * @param array $user_group_type_ids array of [user_group_type, user_group_id]
+     */
+    public function mark_for_expansion(array $user_group_type_ids) {
+        foreach ($user_group_type_ids as [$user_group_type, $user_group_id]) {
+            if (!in_array($user_group_type, user_groups::get_available_types())) {
+                throw new \coding_exception('Invalid user group type given!');
+            }
+
+            assignment::repository()
+                ->where('user_group_type', $user_group_type)
+                ->where('user_group_id', $user_group_id)
+                ->where('status', assignment::STATUS_ACTIVE)
+                ->where('expand', 0)
+                ->update(['expand' => 1]);
+        }
     }
 
     /**
