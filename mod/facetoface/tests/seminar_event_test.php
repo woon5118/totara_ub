@@ -322,21 +322,21 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
                 'timestart' => $times[0],
                 'timefinish' => $times[0] + 100,
                 'sessiontimezone' => '99',
-                'roomid' => $rooms[0],
+                'roomids' => [$rooms[0]],
                 'assetids' => []
             ],
             (object)[
                 'timestart' => $times[1],
                 'timefinish' => $times[1] + 100,
                 'sessiontimezone' => '99',
-                'roomid' => $rooms[1],
+                'roomids' => [$rooms[1]],
                 'assetids' => []
             ],
             (object)[
                 'timestart' => $times[2],
                 'timefinish' => $times[2] + 100,
                 'sessiontimezone' => '99',
-                'roomid' => $rooms[2],
+                'roomids' => [$rooms[2]],
                 'assetids' => []
             ]
         ];
@@ -350,7 +350,7 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
                 'timestart' => $sessions[1]->get_timestart(),
                 'timefinish' => $sessions[1]->get_timefinish(),
                 'sessiontimezone' => '99',
-                'roomid' => $rooms[0],
+                'roomids' => [$rooms[0]],
                 'assetids' => []
             ],
             (object)[
@@ -358,7 +358,7 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
                 'timestart' => $sessions[2]->get_timestart(),
                 'timefinish' => $sessions[2]->get_timefinish(),
                 'sessiontimezone' => '99',
-                'roomid' => $rooms[1],
+                'roomids' => [$rooms[1]],
                 'assetids' => []
             ],
             (object)[
@@ -366,7 +366,7 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
                 'timestart' => $sessions[0]->get_timestart(),
                 'timefinish' => $sessions[0]->get_timefinish(),
                 'sessiontimezone' => '99',
-                'roomid' => $rooms[2],
+                'roomids' => [$rooms[2]],
                 'assetids' => []
             ]
         ];
@@ -377,7 +377,11 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
 
         $newsessions = iterator_to_array($seminarevent->get_sessions(true), false);
         usort($newsessions, function ($x, $y) {
-            return $x->get_roomid() <=> $y->get_roomid();
+            $session_x_rooms = \mod_facetoface\room_list::from_session($x->get_id());
+            $session_y_rooms = \mod_facetoface\room_list::from_session($y->get_id());
+            $x_room = $session_x_rooms->current();
+            $y_room = $session_y_rooms->current();
+            return $x_room->get_id() <=> $y_room->get_id();
         });
         $this->assertCount(3, $newsessions);
         $this->assertEquals($sessions[1]->get_timestart(), $newsessions[0]->get_timestart());
@@ -409,21 +413,21 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
                 'timestart' => $times[0],
                 'timefinish' => $times[0] + 1000,
                 'sessiontimezone' => '99',
-                'roomid' => $rooms[0],
+                'roomids' => [$rooms[0]],
                 'assetids' => []
             ],
             (object)[
                 'timestart' => $times[1],
                 'timefinish' => $times[1] + 1000,
                 'sessiontimezone' => '99',
-                'roomid' => $rooms[1],
+                'roomids' => [$rooms[1]],
                 'assetids' => []
             ],
             (object)[
                 'timestart' => $times[2],
                 'timefinish' => $times[2] + 1000,
                 'sessiontimezone' => '99',
-                'roomid' => $rooms[2],
+                'roomids' => [$rooms[2]],
                 'assetids' => []
             ]
         ];
@@ -437,7 +441,7 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
                 'timestart' => $times[1],
                 'timefinish' => $times[1] + 100,
                 'sessiontimezone' => '99',
-                'roomid' => $rooms[0],
+                'roomids' => [$rooms[0]],
                 'assetids' => []
             ],
             (object)[
@@ -445,7 +449,7 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
                 'timestart' => $times[2],
                 'timefinish' => $times[2] + 100,
                 'sessiontimezone' => '99',
-                'roomid' => $rooms[1],
+                'roomids' => [$rooms[1]],
                 'assetids' => []
             ],
             (object)[
@@ -453,7 +457,7 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
                 'timestart' => $times[3],
                 'timefinish' => $times[3] + 100,
                 'sessiontimezone' => '99',
-                'roomid' => $rooms[2],
+                'roomids' => [$rooms[2]],
                 'assetids' => []
             ]
         ];
@@ -465,14 +469,21 @@ class mod_facetoface_seminar_event_testcase extends advanced_testcase {
         /** @var seminar_session[] $newsessions */
         $newsessions = iterator_to_array($seminarevent->get_sessions(true), false);
         usort($newsessions, function ($x, $y) {
-            return $x->get_roomid() <=> $y->get_roomid();
+            $session_x_rooms = \mod_facetoface\room_list::from_session($x->get_id());
+            $session_y_rooms = \mod_facetoface\room_list::from_session($y->get_id());
+            $x_room = $session_x_rooms->current();
+            $y_room = $session_y_rooms->current();
+            return $x_room->get_id() <=> $y_room->get_id();
         });
         $this->assertCount(3, $newsessions);
         $this->assertEquals($times[1], $newsessions[0]->get_timestart());
         $this->assertEquals($times[2], $newsessions[1]->get_timestart());
         $this->assertEquals($times[3], $newsessions[2]->get_timestart());
-        $this->assertEquals($rooms[0], $newsessions[0]->get_roomid());
-        $this->assertEquals($rooms[1], $newsessions[1]->get_roomid());
-        $this->assertEquals($rooms[2], $newsessions[2]->get_roomid());
+        $session_0_rooms = \mod_facetoface\room_list::from_session($newsessions[0]->get_id());
+        $session_1_rooms = \mod_facetoface\room_list::from_session($newsessions[1]->get_id());
+        $session_2_rooms = \mod_facetoface\room_list::from_session($newsessions[2]->get_id());
+        $this->assertEquals($rooms[0], $session_0_rooms->current()->get_id());
+        $this->assertEquals($rooms[1], $session_1_rooms->current()->get_id());
+        $this->assertEquals($rooms[2], $session_2_rooms->current()->get_id());
     }
 }
