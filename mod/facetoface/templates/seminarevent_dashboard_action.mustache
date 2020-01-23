@@ -95,7 +95,7 @@
                     {{#menuicon}}{{#context}}{{> &&template }}{{/context}}{{/menuicon}}
                     {{^menuicon}}{{menutext}}{{/menuicon}}
                 </button>
-                <ul role="menu" class="mod_facetoface__sessionlist__action__dropdown__menu dropdown-menu dropdown-menu-right" aria-labelledby="{{menuid}}" data-f2f-dropdown-id="{{menuid}}">
+                <ul role="menu" class="mod_facetoface__sessionlist__action__dropdown__menu dropdown-menu" aria-labelledby="{{menuid}}" data-f2f-dropdown-id="{{menuid}}">
                     {{#menus}}
                         {{#separator}}<li role="separator" class="divider"></li>{{/separator}}
                         {{^separator}}<li role="none"><a role="menuitem" href="{{link}}" class="dropdown-item">{{#icon}}{{#context}}{{> &&template }}{{/context}}{{/icon}}{{text}}</a></li>{{/separator}}

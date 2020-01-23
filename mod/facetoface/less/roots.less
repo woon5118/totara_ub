@@ -297,7 +297,6 @@ select.menuf2f-select {
                 // Override Moodle form
                 font: inherit;
                 font-size: @totara_style-size_11;
-                letter-spacing: @totara_style-size_1;
                 line-height: @totara_style-size_16;
                 padding: 0 0 @totara_style-size_1;
             }
@@ -421,10 +420,12 @@ select.menuf2f-select {
                     > td {
                         // Override the border inserted by Bootstrap
                         border-top: none;
+                        border-bottom: none;
                     }
                 }
             }
             // Add bottom border
+            > thead,
             > tbody {
                 border-bottom: 2px solid @table-border-color;
             }
@@ -482,12 +483,13 @@ select.menuf2f-select {
 
         // Override Bootstrap.
         &__table td.mod_facetoface__sessionlist__actions {
-            vertical-align: middle;
+            padding-bottom: @totara_style-size_base;
+            padding-top: @totara_style-size_base;
         }
 
         &__actions {
-            // This does not seem to work on Chrome.
-            width: 0;
+            // Chrome requires the width be greater than 0.
+            width: 1px;
         }
 
         &__action {
@@ -516,15 +518,16 @@ select.menuf2f-select {
 
                 // Override Bootstrap.
                 &__menu.dropdown-menu {
-                    position: fixed;
                     left: auto;
                     margin: 0;
+                    position: fixed;
+                    right: auto;
 
                     > li > a {
                         color: @dropdown-link-color;
                         &:hover, &:focus {
-                            color: @dropdown-link-active-color;
                             background-color: @dropdown-link-active-bg;
+                            color: @dropdown-link-active-color;
                             text-decoration: none;
                         }
                     }

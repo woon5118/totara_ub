@@ -193,13 +193,23 @@ define(['core/log'], function(log) {
                     that.scrollTimerId = null;
                     var buttonRect = that.el.getBoundingClientRect();
                     var viewSize = getViewSize();
-                    var right = viewSize.width - buttonRect.left - buttonRect.width;
                     var top = buttonRect.top + buttonRect.height;
-                    if (right < 0) {
-                        right = 0;
-                    }
-                    that.menu.style.right = right + 'px';
                     that.menu.style.top = top + 'px';
+                    if (getComputedStyle(that.el).direction === 'rtl') {
+                        var left = buttonRect.left;
+                        if (left < 0) {
+                            left = 0;
+                        }
+                        that.menu.style.left = left + 'px';
+                        that.menu.style.right = '';
+                    } else {
+                        var right = viewSize.width - buttonRect.left - buttonRect.width;
+                        if (right < 0) {
+                            right = 0;
+                        }
+                        that.menu.style.left = '';
+                        that.menu.style.right = right + 'px';
+                    }
                     that.scrollTimerId = null;
                     if (that.scrollDone) {
                         that.scrollDone();

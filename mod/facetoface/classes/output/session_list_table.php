@@ -213,10 +213,11 @@ final class session_list_table extends html_table {
             $isbookedsession = (!empty($session->bookedsession) && ($session->id == $session->bookedsession->sessionid));
             $signupcount = attendees_helper::count_signups($seminarevent, $includedeleted);
 
-            $row_classes = [self::SESSION_LIST_CSS.'table__sessionrow'];
-            $row_classes += $this->table_row_status_classes($seminarevent, $isbookedsession, $signupcount);
+            $baserowclasses = [self::SESSION_LIST_CSS.'table__sessionrow'];
+            $baserowclasses += $this->table_row_status_classes($seminarevent, $isbookedsession, $signupcount);
 
             if (!$seminarevent->is_sessions()) {
+                $sessionrowclasses = $baserowclasses;
                 // An event without session dates, is a wait-listed event
                 $sessionrow = array();
 
@@ -257,7 +258,8 @@ final class session_list_table extends html_table {
                 $row = new html_table_row($sessionrow);
 
                 // Set the CSS class for the row.
-                $row->attributes['class'] = implode(' ', $row_classes);
+                $sessionrowclasses[] = 'firstsession';
+                $row->attributes['class'] = implode(' ', $sessionrowclasses);
 
                 // Add row to table.
                 $this->data[] = $row;
@@ -272,6 +274,7 @@ final class session_list_table extends html_table {
 
                 /** @var seminar_session $date */
                 foreach ($sessiondates as $date) {
+                    $sessionrowclasses = $baserowclasses;
                     $sessionrow = [];
                     if (!$config->minimal) {
                         if ($firstsessiondate) {
@@ -329,9 +332,9 @@ final class session_list_table extends html_table {
 
                     // Set the CSS class for the row.
                     if ($firstsessiondate) {
-                        $row_classes[] = 'firstsession';
+                        $sessionrowclasses[] = 'firstsession';
                     }
-                    $row->attributes['class'] = implode(' ', $row_classes);
+                    $row->attributes['class'] = implode(' ', $sessionrowclasses);
 
                     // $firsessiondate should only be true on the iteration of this foreach loop.
                     $firstsessiondate = false;
