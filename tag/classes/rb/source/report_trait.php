@@ -26,6 +26,10 @@ namespace core_tag\rb\source;
 defined('MOODLE_INTERNAL') || die();
 
 trait report_trait {
+    /** @var array */
+    private $core_tag_join = [];
+    /** @var array */
+    private $core_tag_field = [];
 
     /**
      * Adds the tag tables to the $joinlist array
@@ -38,42 +42,11 @@ trait report_trait {
      * @param string $join Name of the join that provides the
      *                     $type table
      * @param string $field Name of course id field to join on
-     * @return boolean True
+     * @return bool True
      */
     protected function add_core_tag_tables($component, $itemtype, &$joinlist, $join, $field) {
-        global $DB;
-
-
-        $idlist = $DB->sql_group_concat($DB->sql_cast_2char('t.id'), '|');
-        $joinlist[] = new \rb_join(
-            'tagids',
-            'LEFT',
-            // subquery as table name
-            "(SELECT til.id AS tilid, {$idlist} AS idlist
-                FROM {{$itemtype}} til
-           LEFT JOIN {tag_instance} ti ON til.id = ti.itemid AND ti.itemtype = '{$itemtype}'
-           LEFT JOIN {tag} t ON ti.tagid = t.id AND t.isstandard = '1'
-            GROUP BY til.id)",
-            "tagids.tilid = {$join}.{$field}",
-            REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            $join
-        );
-
-
-        $namelist = $DB->sql_group_concat($DB->sql_cast_2char('t.name'), ', ');
-        $joinlist[] = new \rb_join(
-            'tagnames',
-            'LEFT',
-            // subquery as table name
-            "(SELECT tnl.id AS tnlid, {$namelist} AS namelist
-                FROM {{$itemtype}} tnl
-           LEFT JOIN {tag_instance} ti ON tnl.id = ti.itemid AND ti.itemtype = '{$itemtype}'
-           LEFT JOIN {tag} t ON ti.tagid = t.id AND t.isstandard = '1'
-            GROUP BY tnl.id)",
-            "tagnames.tnlid = {$join}.{$field}",
-            REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            $join
-        );
+        $this->core_tag_join[$component][$itemtype] = $join;
+        $this->core_tag_field[$component][$itemtype] = $field;
 
         // Create a join for each tag in the collection.
         $tags = \core_tag\report_builder_tag_loader::get_tags($component, $itemtype);
@@ -85,7 +58,7 @@ trait report_trait {
                 'LEFT',
                 '{tag_instance}',
                 "($name.itemid = $join.$field AND $name.tagid = $tagid " .
-                    "AND $name.itemtype = '{$itemtype}')",
+                    "AND $name.itemtype = '{$itemtype}' AND $name.component = '{$component}')",
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
                 $join
             );
@@ -102,28 +75,28 @@ trait report_trait {
      * @param array &$columnoptions Array of current column options
      *                              Passed by reference and updated by
      *                              this method
-     * @param string $tagids name of the join that provides the 'tagids' table.
-     * @param string $tagnames name of the join that provides the 'tagnames' table.
-     *
-     * @return True
+     * @return bool True
      */
-    protected function add_core_tag_columns($component, $itemtype, &$columnoptions, $tagids='tagids', $tagnames='tagnames') {
+    protected function add_core_tag_columns($component, $itemtype, &$columnoptions) {
+        $join = $this->core_tag_join[$component][$itemtype];
+        $field = $this->core_tag_field[$component][$itemtype];
+        if ($component === 'core' && ($itemtype === 'course' || $itemtype === 'cohort')) {
+            $prefix = '';
+        } else {
+            $prefix = $itemtype . '_';
+        }
         $columnoptions[] = new \rb_column_option(
-            'tags',
-            'tagids',
-            get_string('tagids', 'totara_reportbuilder'),
-            "$tagids.idlist",
-            array('joins' => $tagids, 'selectable' => false)
-        );
-        $columnoptions[] = new \rb_column_option(
-            'tags',
+            $prefix . 'tags',
             'tagnames',
             get_string('tags', 'totara_reportbuilder'),
-            "$tagnames.namelist",
-            array('joins' => $tagnames,
-                  'dbdatatype' => 'char',
-                  'outputformat' => 'text',
-                  'displayfunc' => 'format_string')
+            "{$join}.{$field}",
+            array(
+                'nosort' => true,
+                'displayfunc' => 'tag_list',
+                'extracontext' => ['component' => $component, 'itemtype' => $itemtype],
+                'iscompound' => true,
+                'joins' => $join,
+            )
         );
 
         // Only get the tags in the collection for this item type.
@@ -132,15 +105,15 @@ trait report_trait {
         // Create a on/off field for every official tag.
         foreach ($tags as $tag) {
             $tagid = $tag->id;
-            $name = $tag->name;
-            $join = "{$itemtype}_tag_$tagid";
+            $name = format_string($tag->name);
+            $ajoin = "{$itemtype}_tag_$tagid";
             $columnoptions[] = new \rb_column_option(
-                'tags',
-                $join,
+                $prefix . 'tags',
+                $ajoin,
                 get_string('taggedx', 'totara_reportbuilder', $name),
-                "CASE WHEN $join.id IS NOT NULL THEN 1 ELSE 0 END",
+                "CASE WHEN $ajoin.id IS NOT NULL THEN 1 ELSE 0 END",
                 array(
-                    'joins' => $join,
+                    'joins' => $ajoin,
                     'displayfunc' => 'yes_or_no',
                 )
             );
@@ -159,6 +132,15 @@ trait report_trait {
      * @return True
      */
     protected function add_core_tag_filters($component, $itemtype, &$filteroptions) {
+        $join = $this->core_tag_join[$component][$itemtype];
+        $field = $this->core_tag_field[$component][$itemtype];
+
+        if ($component === 'core' && ($itemtype === 'course' || $itemtype === 'cohort')) {
+            $prefix = '';
+        } else {
+            $prefix = $itemtype . '_';
+        }
+
         // Only get the tags in the collection for this item type.
         $tags = \core_tag\report_builder_tag_loader::get_tags($component, $itemtype);
 
@@ -166,10 +148,10 @@ trait report_trait {
         foreach ($tags as $tag) {
             $tagid = $tag->id;
             $name = $tag->name;
-            $join = "{$itemtype}_tag_{$tagid}";
+            $ajoin = "{$itemtype}_tag_{$tagid}";
             $filteroptions[] = new \rb_filter_option(
-                'tags',
-                $join,
+                $prefix . 'tags',
+                $ajoin,
                 get_string('taggedx', 'totara_reportbuilder', $name),
                 'select',
                 array(
@@ -185,25 +167,22 @@ trait report_trait {
             $tagoptions[$tag->id] = $tag->name;
         }
 
-        // create a tag list selection filter
         $filteroptions[] = new \rb_filter_option(
-            'tags',         // type
-            'tagids',           // value
-            get_string('tags', 'totara_reportbuilder'), // label
-            'multicheck',     // filtertype
-            array(            // options
+            $prefix . 'tags',
+            'tagid',
+            get_string('tags', 'totara_reportbuilder'),
+            'correlated_subquery_select',
+            array(
+                'simplemode' => true,
                 'selectchoices' => $tagoptions,
-                'concat' => true, // Multicheck filter needs to know that we are working with concatenated values
-                'showcounts' => array(
-                        'joins' => array("LEFT JOIN (SELECT ti.itemid, ti.tagid FROM {{$itemtype}} base " .
-                                                      "LEFT JOIN {tag_instance} ti ON base.id = ti.itemid " .
-                                                            "AND ti.itemtype = '{$itemtype}'" .
-                                                      "LEFT JOIN {tag} tag ON ti.tagid = tag.id " .
-                                                            "AND tag.isstandard = '1')\n {$itemtype}_tagids_filter " .
-                                                "ON base.id = {$itemtype}_tagids_filter.itemid"),
-                        'dataalias' => $itemtype.'_tagids_filter',
-                        'datafield' => 'tagid')
-            )
+                'searchfield' => "ti.tagid",
+                'subquery' => "EXISTS(SELECT 'x'
+                                        FROM {tag_instance} ti
+                                       WHERE ti.itemtype = '{$itemtype}' AND ti.component = '{$component}'
+                                             AND ti.itemid = (%1\$s) AND (%2\$s) )",
+            ),
+            "{$join}.{$field}",
+            $join
         );
         return true;
     }

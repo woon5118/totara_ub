@@ -298,13 +298,6 @@ class rb_source_feedback_summary extends rb_base_source {
         $this->add_basic_user_content_options($contentoptions);
 
         $contentoptions[] = new rb_content_option(
-            'tag',
-            get_string('course', 'rb_source_feedback_summary'),
-            'tagids.idlist',
-            'tagids'
-        );
-
-        $contentoptions[] = new rb_content_option(
             'date',
             get_string('responsetime', 'rb_source_feedback_summary'),
             'base.timemodified'
