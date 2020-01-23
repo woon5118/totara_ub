@@ -105,6 +105,11 @@ Input parameter equivalent to PARAM_USERNAME, '' is converted to NULL.
 scalar param_username
 
 """
+Input parameter equivalent to PARAM_URL, '' is converted to NULL
+"""
+scalar param_url
+
+"""
 Represents database id fields (numeric string).
 """
 scalar core_id
