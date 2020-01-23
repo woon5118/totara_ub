@@ -1,6 +1,7 @@
 <?php
-/*
- * This file is part of Totara Learn
+/**
+ *
+ * This file is part of Totara LMS
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
@@ -21,33 +22,35 @@
  * @package mod_perform
  *
  */
+namespace mod_perform\controllers;
 
-namespace mod_perform\controllers\activity;
-
-use container_perform\perform;
 use context;
-use context_system;
 use totara_mvc\controller;
-use totara_mvc\tui_view;
+use totara_mvc\view;
+use mod_perform\models\activity;
 
-class activities extends controller {
+class show extends controller {
 
     /**
-     * @inheritDoc
+     * @var activity $model;
      */
+    protected $model;
+
     protected function setup_context(): context {
-        $category_id = perform::get_default_categoryid();
-        return \context_coursecat::instance($category_id);
+        $id = $this->get_param('id',  PARAM_INT, null, true);
+        // Store the model for use in the action.
+        $this->model = activity::load_by_id($id);
+        return $this->model->get_context();
     }
 
-    /**
-     * @return tui_view
-     */
-    public function action(): tui_view {
+    public function action() {
         $this->require_capability('mod/perform:view', $this->get_context());
 
-        return tui_view::create('mod_perform/pages/Activities', [])
-            ->set_title(get_string('perform:manage', 'mod_perform'));
+        // Not how you access model data, just for demonstration purposes.
+        $data = $this->model->get_entity()->to_array();
+        $data['rawdata'] = var_export((array)$data, true);
+
+        return new view('mod_perform/show', $data);
     }
 
 }

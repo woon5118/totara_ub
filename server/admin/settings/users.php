@@ -101,6 +101,7 @@ if ($hassiteconfig
             $learnerroles      = array();
             $staffmanagerroles = array();
             $editorroles       = array();
+            $performanceactivitymanagerroles = array();
 
             $defaultteacherid = null;
             $defaultuserid    = null;
@@ -108,6 +109,7 @@ if ($hassiteconfig
             //Totara id defaults
             $defaultlearnerid  = null;
             $defaultmanagerid  = null;
+            $defaultperformanceactivitymanagerid = null;
 
             $roles = role_fix_names(get_all_roles(), null, ROLENAME_ORIGINALANDSHORT);
             foreach ($roles as $role) {
@@ -144,9 +146,13 @@ if ($hassiteconfig
                         $defaultuserid = isset($defaultuserid) ? $defaultuserid : $role->id;
                         $userroles[$role->id] = $rolename;
                         break;
+                    case 'performanceactivitymanager':
+                        $defaultperformanceactivitymanagerid = isset($defaultperformanceactivitymanagerid) ? $defaultperformanceactivitymanagerid : $role->id;
+                        $performanceactivitymanagerroles[$role->id] = $rolename;
                     case 'frontpage':
                     case 'tenantusermanager':
                     case 'tenantdomainmanager':
+                    case 'performanceactivitycreator':
                         break;
                     default:
                         $creatornewroles[$role->id] = $rolename;
@@ -179,6 +185,8 @@ if ($hassiteconfig
                            new lang_string('managerroleid_help', 'admin'), $defaultmanagerid, ($editorroles + $staffmanagerroles + $learnerroles + $otherroles)));
             $temp->add(new admin_setting_configselect('assessorroleid', new lang_string('assessorroleid', 'admin'),
                           new lang_string('assessorroleid_help', 'admin'), $defaultteacherid, ($editorroles + $staffmanagerroles + $learnerroles + $otherroles)));
+            $temp->add(new admin_setting_configselect('performanceactivitycreatornewroleid', new lang_string('performanceactivitycreatornewroleid', 'admin'),
+                new lang_string('performanceactivitycreatornewroleid_help', 'admin'), $defaultperformanceactivitymanagerid, ($performanceactivitymanagerroles + $editorroles + $creatornewroles)));
             // End Totara options
             $temp->add(new admin_setting_configselect('defaultuserroleid', new lang_string('defaultuserroleid', 'admin'),
                           new lang_string('configdefaultuserroleid', 'admin'), $defaultuserid, ($userroles + $otherroles)));
@@ -197,6 +205,7 @@ if ($hassiteconfig
             unset($editorroles);
             unset($learnerroles);
             unset($staffmanagerroles);
+            unset($performanceactivitymanagerroles);
         }
 
         $temp->add(new admin_setting_configcheckbox('autologinguests', new lang_string('autologinguests', 'admin'), new lang_string('configautologinguests', 'admin'), 0));

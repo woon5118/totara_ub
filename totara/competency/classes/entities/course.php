@@ -64,6 +64,7 @@ use core\orm\entity\entity;
  * @property int $cacherev
  * @property int $coursetype
  * @property string $icon
+ * @property string $containertype
  *
  * @method static course_repository repository()
  *

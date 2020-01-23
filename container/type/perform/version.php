@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara Learn
+ * This file is part of Totara LMS
  *
- * Copyright (C) 2020 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,37 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Coggins <simon.coggins@totaralearning.com>
- *
+ * @package container_perform
  */
-function perform_add_instance($data) {
-    global $DB;
 
-    $data->timemodified = time();
-    $data->id = $DB->insert_record('perform', $data);
+defined('MOODLE_INTERNAL') || die();
 
-    return $data->id;
-}
+/* NOTE: the following version number must be bumped during each major or minor Totara release. */
 
-function perform_update_instance($data) {
-    global $DB;
-
-    $data->timemodified = time();
-    $data->id           = $data->instance;
-
-    $DB->update_record('perform', $data);
-
-    return true;
-}
-
-function perform_delete_instance($id) {
-    global $DB;
-
-    if (!$perform = $DB->get_record('perform', array('id'=>$id))) {
-        return false;
-    }
-
-    $DB->delete_records('perform', array('id'=>$perform->id));
-
-    return true;
-
-}
+$plugin->version  = 2020012400;                 // The current module version (Date: YYYYMMDDXX).
+$plugin->requires = 2017051509;                 // Requires this Moodle version.
+$plugin->component = 'container_perform';    // To check on upgrade, that module sits in correct place

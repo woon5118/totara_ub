@@ -924,6 +924,7 @@ $capabilities = array(
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
             'manager' => CAP_ALLOW,
+            'performanceactivitymanager' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
         )
     ),
@@ -1074,6 +1075,8 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
+            // TODO temporary workaround for activity visibility issues
+            'performanceactivitymanager' => CAP_ALLOW,
         )
     ),
 
@@ -1638,6 +1641,8 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
+            // TODO temporary workaround for section 0 visibility issues
+            'performanceactivitymanager' => CAP_ALLOW,
         )
     ),
 

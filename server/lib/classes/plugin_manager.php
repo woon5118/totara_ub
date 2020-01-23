@@ -1331,7 +1331,7 @@ class core_plugin_manager {
 
             // Totara
             'container' => array(
-                'course', 'site'
+                'course', 'site', 'perform',
             ),
 
             // Totara
@@ -1444,7 +1444,7 @@ class core_plugin_manager {
                 'forum', 'glossary', 'imscp', 'label', 'lesson', 'lti', 'page',
                 'quiz', 'resource', 'scorm', 'survey', 'url', 'wiki', 'workshop'
                 // Totara
-                , 'certificate', 'facetoface'
+                , 'certificate', 'facetoface', 'perform'
             ),
 
             'pathway' => array(

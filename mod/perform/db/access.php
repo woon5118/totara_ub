@@ -29,6 +29,18 @@ $capabilities = [
     'mod/perform:view' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => [
+            'performanceactivitymanager' => CAP_ALLOW,
+        ]
+    ],
+    // Manage a performance activity.
+    'mod/perform:manage' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+            'performanceactivitymanager' => CAP_ALLOW,
+        ]
     ],
     // Manage a performance activity.
     'mod/perform:manage' => [

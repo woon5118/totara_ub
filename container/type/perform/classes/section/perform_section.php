@@ -1,6 +1,7 @@
 <?php
-/*
- * This file is part of Totara Learn
+/**
+ *
+ * This file is part of Totara LMS
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
@@ -20,35 +21,16 @@
  * @author Simon Coggins <simon.coggins@totaralearning.com>
  *
  */
-function perform_add_instance($data) {
-    global $DB;
 
-    $data->timemodified = time();
-    $data->id = $DB->insert_record('perform', $data);
+namespace container_perform\section;
 
-    return $data->id;
-}
+use container_perform\perform;
+use core_container\section\section;
 
-function perform_update_instance($data) {
-    global $DB;
+class perform_section extends section {
 
-    $data->timemodified = time();
-    $data->id           = $data->instance;
-
-    $DB->update_record('perform', $data);
-
-    return true;
-}
-
-function perform_delete_instance($id) {
-    global $DB;
-
-    if (!$perform = $DB->get_record('perform', array('id'=>$id))) {
-        return false;
-    }
-
-    $DB->delete_records('perform', array('id'=>$perform->id));
-
-    return true;
-
+    /**
+     * @var string
+     */
+    public const CONTAINER_CLASS = perform::class;
 }

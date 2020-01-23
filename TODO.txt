@@ -1,0 +1,8 @@
+
+Convert mod/perform/lib.php to use entities. Issue: what data does moodle API pass in when calling these methods? Can we rely on receiving the right data to use entities?
+Enrolment issue - accessing activity pages after creating (+ more testing of permissions inheritance and MT behaviour after this is fixed).
+Default category + MT - auto-create hidden categories for performance activities?
+Adding observers/watchers to get desired container behaviour.
+Should we use container_perform\perform::can_create_instance()?
+Issues with lack of mod/perform:addinstance causing failing unit tests (and other problems?)
+Breadcrumbs on activity page - how to remove?

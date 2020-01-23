@@ -1,6 +1,7 @@
 <?php
-/*
- * This file is part of Totara Learn
+/**
+ *
+ * This file is part of Totara LMS
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
@@ -18,37 +19,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Coggins <simon.coggins@totaralearning.com>
+ * @package container_perform
  *
  */
-function perform_add_instance($data) {
-    global $DB;
 
-    $data->timemodified = time();
-    $data->id = $DB->insert_record('perform', $data);
+$capabilities = [
+    'container/perform:create' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSECAT,
+        'archetypes' => [
+            'performanceactivitycreator' => CAP_ALLOW,
+        ]
+    ],
+];
 
-    return $data->id;
-}
-
-function perform_update_instance($data) {
-    global $DB;
-
-    $data->timemodified = time();
-    $data->id           = $data->instance;
-
-    $DB->update_record('perform', $data);
-
-    return true;
-}
-
-function perform_delete_instance($id) {
-    global $DB;
-
-    if (!$perform = $DB->get_record('perform', array('id'=>$id))) {
-        return false;
-    }
-
-    $DB->delete_records('perform', array('id'=>$perform->id));
-
-    return true;
-
-}
