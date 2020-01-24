@@ -3,15 +3,101 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
-* seminar_event::get_normalcost() now returns string instead of int.
-* The first argument to seminar_event:set_normalcost() was an int, it has been changed to string
-* seminar_event::get_discountcost() now returns string instead of int.
-* The first argument to seminar_event::set_discountcost() was an int, it has been changed to string
-* seminar_event_helper::delete_seminarevent() has been changed to trigger the session_deleted event
-* The user profile links are now retrieved through the mod_facetoface\user_helper class
-* In mod_facetoface_renderer, render_room_details() and render_asset_details() have been rewritten to share the code base
-* The asset, facilitator and room links no longer open a popup window
-* The asset, facilitator and room classes have implemented the seminar_attachment_item interface
+Note that more recent update comes to the top.
+
+--- Look and feel ---
+* A new default column 'Event Attendance' is added to the event reports
+* Rooms are no longer removed when a session is cancelled for historical records
+* The asset behaviour has been updated; when session is cancelled the assets are not removed, they stick with the session for history records
+* In the Asset Totara dialog, "Create new asset" link is replaced with "Create" tab.
+* Take attendance page added 'Upload attendance' button
+* The sign-up page and cancellation page have been replaced with a new event page
+* The seminar session list table is redesigned especially:
+  * The asset, facilitator and room links no longer open a popup window
+  * The "Attendees" link in a cancelled seminar event has been changed; it now points to the cancellation tab
+  * The Actions (Options) column has been changed as below:
+    * Replaced the "Sign-up", "More info" and "Cancel booking" link with the "Go to event" button that opens an event page
+    * The "Attendees" link and action icons have been moved to a drop down menu
+    * Added the "Event details" link to the drop down menu
+    * The "Sign-up unavailable" text has been removed
+  * Table columns have been reordered and renamed
+  * The capacity column now hides "(0 Wait-listed)" text when nobody is wait-listed
+  * Date, time and timezone are combined for better readability
+  * The "Event status" table column now reports three status with event attendance link
+  * For more information, please refer to output\session_list_table
+
+--- Deprecated in renderer --
+* Deprecated renderer functions have been moved out to the mod_facetoface_renderer_deprecated trait
+* print_session_list_table() has been deprecated; please use mod_facetoface_renderer::render_session_list_table() instead
+* print_session_list() has been deprecated; please use output\session_list_table instead
+* render_session_list() has been deprecated; please use output\session_list_table instead
+* attendance_tracking_table_cell() has been deprecated; please use output\session_list_table instead
+* session_status_table_cell() has been deprecated; please use output\session_list_table instead
+* event_status_table_cell() has been deprecated; please use output\session_list_table instead
+* event_status_attendance_taking_html() has been deprecated; please use output\session_list_table instead
+* print_filter_bar() has been deprecated; please use mod_facetoface_renderer::render_filter_bar() instead
+* filter_by_room() has been deprecated; please use mod_facetoface_renderer::render_filter_bar() instead
+* get_filter_by_room() has been deprecated; please use filter_list instead
+* get_filter_by_event_time() has been deprecated; please use filter_list instead
+* set_signup_link() has been deprecated; please use hook\alternative_signup_link instead
+* PARAM_FILTER_xxx constants have been deprecated; please use filter_list instead
+
+--- Update in renderer ---
+* render_room_details() and render_asset_details() have been rewritten to share the code base
+* get_room_details_html() added 3rd parameter $joinnow
+* render_seminar_event() updated to use the seminarevent_information template
+* get_room_details_html() displays room custom fields (or not) depending on the facetoface_roomidentifier setting
+* session_resgistrationperiod_table_cell() updated to use output\session_time::signup_period()
+* event_status_table_cell() updated to use seminar_event_helper::booking_status()
+* session_status_table_cell() updated to use seminar_session_helper::get_status()
+* event_status_table_cell() updated to use the $session record instead of fetching the database record
+* session_status_table_cell() updated to use the $session record instead of fetching the database record
+* attendance_tracking_table_cell() updated to use the $session record instead of fetching the database record
+* print_session_list() updated to use seminar_event_helper::get_sessiondata()
+* get_room_details_html() displays room name instead of "(Room details)" or "View details"
+* render_seminar_event() updated 5th parameter $class, default value changed from 'f2f' to 'mod_facetoface__event_details'
+* print_userlist_table() updated to respect the showuseridentity config
+* render_seminar_event() updated to prevent a record not found exception if a user has a deleted job assignment
+* print_session_list() added 3rd parameter $eventtime
+* print_session_list_table() added optional parameters $sessionattendance, $eventattendance, $viewsignupperiod, $viewactions
+* print_session_list_table() updated to use the data supplied by the $sessions parameter as much as possible
+* attendance_tracking_table_cell() updated to use seminar_session::get_attendance_taking_status()
+* event_status_table_cell() updated to use seminar_event_helper::event_status()
+* print_session_list_table() updated to call get_signup_link() to resolve the signup link by hooks
+* attendees_export_form() changed to attach an aria-label attribute to the <select> element
+* print_session_list_table() changed to check the capability of current session user to decide whether it should include the deleted users or not in the number of booking users.
+* print_userlist_table() updated to format user idnumbers before output
+
+--- Deprecated or removed CSS ---
+* 'highlight' and 'dimmed_text' removed fom the seminar session list table
+* 'upcomingsessionlist' and 'previoussessionlist' have been deprecated
+* 'room' and 'room_details' CSS classes have been deprecated in get_room_details_html()
+* 'generaltable' and 'fullwidth' have been removed; please use 'mod_facetoface__sessionlist__table' instead
+* 'f2f', 'dl-horizontal' classes have been removed from renderer::render_room_details() and renderer::render_asset_details()
+
+--- Update to CSS ---
+* Seminar session list now provides a CSS class for each table cell; custom fields are prefixed by 'cf-'
+* 'mod_facetoface__filter__item' added to the seminarevent_filterbar template
+* 'mod_facetoface__list-items' and 'mod_facetoface__list-item' added to list items that do not require a bullet point
+* mod_facetoface__action-(class) added to the action bar
+* mod_facetoface__sessionlist__table__sessionrow added to each table row in session list table
+* Converted styles.css to less
+
+--- JavaScript ---
+* Seminar session list is now rendered through AJAX request performed by seminarevent_dashboard.js
+
+--- Mustache ---
+* event_grade_input mustache removed Bootstrap CSS classes
+* seminarevent_filterbar mustache added noscript parameter
+* seminarevent_filterbar mustache added icon, filters.show_tooltips and links parameters
+* take_attendance mustache has been updated:
+  * to disable the 'Upload attendance' button when an event is upcoming or in progress
+  * to hide the 'Upload attendance' button when the current page is session take attendance
+* seminarevent_actionbar mustache added class parameter
+* take_attendance_status_picker replaced cryptic <label> with a human-readable aria-label for better accessibility
+* event_grade_input updated the aria-label to contain the name of an attendee for better accessibility
+
+--- Roles and capabilities ---
 * The following capabilities are added to 'editingteacher' and 'teacher' roles:
   * mod/facetoface:manageadhocroom
   * mod/facetoface:managesitewideroom
@@ -19,163 +105,98 @@ information provided here is intended especially for developers.
   * mod/facetoface:managesitewideasset
   * mod/facetoface:manageadhocfacilitator
   * mod/facetoface:managesitewidefacilitator
-* Deprecated renderer functions have been moved out to the mod_facetoface_renderer_deprecated trait
-* Removed Bootstrap CSS classes from event_grade_input.mustache
-* All action links/icons but the "Go to event" button have been moved to the "..." button
-* Seminar session list is now rendered through AJAX request implemented by mod_facetoface\external and seminarevent_dashboard.js
-* Seminar session list now provides a CSS class for each table cell; custom fields are prefixed by 'cf-'
-* seminarevent_filterbar mustache template added the noscript option and mod_facetoface__filter__item CSS classes
-* mod_facetoface\query\event\event_query has been reimplemented to use the query builder for more flexibility
-* mod_facetoface\query\event\filter\filter::get_where_and_params() has been deprecated and no longer implemented; please use the apply() instead
-* mod_facetoface\query\event\sortorder\sortorder::get_sort_sql() has been deprecated and no longer implemented; please use apply() instead
-* mod_facetoface\event_time class added more constants
-* mod_facetoface\signup_helper::is_booked() added 2nd parameter
-* mod_facetoface\seminar_session_helper::get_status_from() has been added; please use get_status_from() rather than get_status() if possible
-* mod_facetoface_renderer::render_unordered_list() has been updated; only the 1st parameter has become be mandatory
-* mod_facetoface__list-item(s) CSS classes have been added to list items
-* The "Attendees" link of a cancelled seminar event has been changed; it now points to the cancellation tab
-* facetoface_cm_info_view() has been updated to use mod_facetoface_renderer::render_session_list_table()
-* Added array $conditions as 4th optional parameter to totara\customfield\fieldlib::customfield_validation_filedata() function
-* A new default column 'Event Attendance' is added to the event reports
-* seminar_event::is_session_open() function has been deprecated, please use seminar_session::is_attendance_open()
-* seminar_event::is_any_attendance_open() function has been deprecated, please use seminar_event::is_any_session_attendance_open()
-* seminar_event::is_attendance_open() function has been updated to use the event attendance taking status
-* mod_facetoface_renderer::event_status_table_cell() function has been updated to take the $eventattendance parameter for the event attendance state
-* mod_facetoface\event\booking_cancelled::create_from_session() function has been deprecated, please use mod_facetoface\event\booking_cancelled::create_from_signup() instead
-* Added 'relateduserid' optional parameter for the following seminar event triggers:
-  * mod_facetoface\event\booking_booked::create_from_signup()
-  * mod_facetoface\event\booking_cancelled::create_from_signup()
-  * mod_facetoface\event\booking_waitlisted::create_from_signup()
-  * mod_facetoface\event\booking_requested::create_from_signup()
-  * mod_facetoface\event\session_signup::create_from_signup()
-  * mod_facetoface\event\signup_status_updated::create_from_items()
-* facetoface_update_grades() has been rewritten to provide better compatibility with other modules
+  * mod/facetoface:viewallsessions
+
+--- Deprecated in backend code ---
+* seminar_event::is_session_open() has been deprecated, please use seminar_session::is_attendance_open() instead
+* seminar_event::is_any_attendance_open() has been deprecated, please use seminar_event::is_any_session_attendance_open() instead
+* seminar_event::is_attendance_open() has been updated to use the event attendance taking status instead
+* query\event\filter\filter::get_where_and_params() has been deprecated and no longer implemented; please use apply() instead
+* query\event\sortorder\sortorder::get_sort_sql() has been deprecated and no longer implemented; please use apply() instead
+* event\booking_cancelled::create_from_session() has been deprecated, please use booking_cancelled::create_from_signup() instead
 * signup_helper::compute_final_grade() has been deprecated; please use grade_helper::get_final_grades() instead
 * signup_helper::compute_final_grade_with_time() has been deprecated; please use grade_helper::get_final_grades() instead
 * signup_helper::update_activity_completion() has been deprecated; please use seminar::set_completion() instead
-* mod_facetoface\room::find() function has been deprecated, please use mod_facetoface\room::seek()
-* mod_facetoface\seminar_event::find() function has been deprecated, please use mod_facetoface\seminar_event::seek()
-* added url property into mod_facetoface\room instance as optional property with default value 0
-* added url field(column) into 'room' sql table as optional field(column) with default value 0
-* added bool $joinnow var as 3rd param to mod_facetoface\mod_facetoface_renderer::get_room_details_html()
-* mod_facetoface\rb_sources\rb_facetoface_base_source::add_rooms_fields_to_columns() moved to mod_facetoface\rb\traits\rooms::add_rooms_fields_to_columns()
-* mod_facetoface\rb_sources\rb_facetoface_base_source::add_rooms_fields_to_filters() moved to mod_facetoface\rb\traits\rooms::add_rooms_fields_to_filters()
-* The room behaviour has been changed extensively. These are the main changes that developers should be aware of:
-  * The roomid field has been removed from the facetoface_sessions_dates database table
-  * The roomid values have been moved to the facetoface_room_dates database table, supporting a many-to-many relationship
-  * mod_facetoface\seminar_session::roomid property has been removed (deprecated means it still works with a warning)
-  * mod_facetoface\seminar_session::get_roomid() function has been deprecated, please use room::get_id()
-  * mod_facetoface\seminar_session::has_room() function has been deprecated, please use room::exists()
-  * mod_facetoface\seminar_session::set_roomid() function has been deprecated, please use room::__construct(id)
-  * Rooms are no longer removed when a session is cancelled for historical records
-* The asset behaviour has been updated
-  * when session is cancelled the assets are not removed, they stick with the session for history records
-* Asset Totara dialog has been updated:
-  * "Create new asset" link is replaced with "Create" tab.
-* mod_facetoface\room::find() function has been deprecated, please use mod_facetoface\room::seek()
-* mod_facetoface\seminar_event::find() function has been deprecated, please use mod_facetoface\seminar_event::seek()
-* mod_facetoface_renderer::get_room_details_html() displays room custom fields (or not) depending on the facetoface_roomidentifier setting
-* mod_facetoface\room::get_display_customfields() returns building and location by default, but will optionally return fields based on facetoface_roomidentifier setting
-* 'teacher' and 'editingteacher' roles got the 'mod/facetoface:viewallsessions' capability
-* [facetofacename] notification placeholder is changed to [seminarname]
-* new [seminardescription] notification placeholder is added to support seminar notifications
-* seminar::ATTENDANCE_TIME_xxx have been deprecated; please use EVENT_ATTENDANCE_xxx and/or SESSION_ATTENDANCE_xxx instead
+* room::find() has been deprecated; please use room::seek() instead
+* seminar_event::find() has been deprecated; please use seminar_event::seek() instead
+* seminar_session::roomid property has been removed (deprecated means it still works with a warning)
+* seminar_session::get_roomid() has been deprecated; please use room::get_id() instead
+* seminar_session::has_room() has been deprecated; please use room::exists() instead
+* seminar_session::set_roomid() has been deprecated; please use room::__construct() instead
+* seminar::ATTENDANCE_TIME_xxx constants have been deprecated; please use EVENT_ATTENDANCE_xxx and/or SESSION_ATTENDANCE_xxx instead
 * seminar_event::is_started() has been deprecated; please use seminar_event::is_first_started() instead
 * seminar_session_list::reload() has been deprecated; please remove any calls to the method
-* the $reload parameter of seminar_session_list::get_summary() has been deprecated; please do not set the parameter
-* mod_facetoface\form\import_attendance form is accepting a 'signupid' field from 'CSV Take attendance' export and ignores not required fields
-* mod_facetoface\attendance\event_content::generate_downloadable_content() has been updated
+* seminar_session_list::get_summary() the $reload parameter has been deprecated; please do not set the parameter
+* attendees_add_confirm::get_user_list() has been deprecated; please use attendees_list_helper::get_user_list() instead
+* signup_status::get_state() has been deprecated; please use signup::get_state() instead
+* attendees_helper::show_customfields() has been deprecated; please use mod_facetoface_renderer::render_seminar_event() instead
+* signup_status::get_state() has been deprecated; please use signup::get_state() instead
+* attendees_list_helper::get_status() has been deprecated; please use attendees_helper::get_status() instead
+* attendees_list_helper::process_no_sessionid() has been deprecated; please use attendees_helper::process_no_sessionid() instead
+* attendees_list_helper::process_js() has been deprecated; please use attendees_helper::process_js() instead
+* attendees_list_helper::get_allowed_available_actions() has been deprecated; please use attendees_helper::get_allowed_available_actions() instead
+* query\event\sortorder\default_sortorder has been deprecated; please use query\event\sortorder\past_sortorder instead
+* attendees_helper::get_allowed_available_actions() the $session parameter has been deprecated; please do not use it
+* form\event::new_user_roles_added() has been deprecated and will be removed in Totara 14
+
+--- Update in backend code ---
+* seminar_event::get_normalcost() changed return type from int to string
+* seminar_event::set_normalcost() changed 1st parameter from int to string
+* seminar_event::get_discountcost() changed return type from int to string
+* seminar_event::set_discountcost() changed 1st parameter from int to string
+* seminar_event_helper::delete_seminarevent() changed to trigger the session_deleted event
+* seminar_attachment_item interface added and implemented by the asset, facilitator and room classes
+* query\event\event_query reimplemented to take advantage of the query builder for more flexibility
+* event_time added more constants
+* signup_helper::is_booked() added 2nd parameter
+* seminar_session_helper::get_status_from() has been added; please use get_status_from() rather than get_status() if possible
+* facetoface_cm_info_view() has been updated to use mod_facetoface_renderer::render_session_list_table()
+* facetoface_cm_info_view() has been updated to hide cancelled events and sort events by future first
+* totara\customfield\fieldlib::customfield_validation_filedata() added 4th optional parameter $conditions
+* abstract_signup_event::create_from_signup() added 'relateduserid' optional parameter; the following functions are affected:
+  * event\booking_booked::create_from_signup()
+  * event\booking_cancelled::create_from_signup()
+  * event\booking_waitlisted::create_from_signup()
+  * event\booking_requested::create_from_signup()
+  * event\session_signup::create_from_signup()
+  * event\signup_status_updated::create_from_items()
+* facetoface_update_grades() has been rewritten to provide better compatibility with other modules
+* rb_sources\rb_facetoface_base_source::add_rooms_fields_to_columns() moved to rb\traits\rooms::add_rooms_fields_to_columns()
+* rb_sources\rb_facetoface_base_source::add_rooms_fields_to_filters() moved to rb\traits\rooms::add_rooms_fields_to_filters()
+* room::get_display_customfields() returns building and location by default, but will optionally return fields based on facetoface_roomidentifier setting
+* attendance\content_generator::generate_allowed_action_content() added 3rd parameter $disabled
+* attendance\content_generator::generate_downloadable_content() added 2nd parameter $format
+* form\import_attendance form is accepting a 'signupid' field from 'CSV Take attendance' export and ignores not required fields
+* attendance\event_content::generate_downloadable_content() has been updated
   * to respect the showuseridentity config
   * added 'signupid' field for case if manager requires to re-import CSV file
   * added export format value as a second parameter
-* mod_facetoface\attendance\event_content::generate_allowed_action_content() has been updated to accept 'disabled' as 3rd param
-* mod_facetoface\attendance\take_attendance_tracking::is_disable_bulk_action() has been updated and returns value depending if seminar session is over or not
-* mod_facetoface\attendance\session_content::create_attendance_status() has been updated and returns value depending if seminar session is over or not
-* mod_facetoface\attendance\session_content::generate_allowed_action_content() has been updated to accept 'disabled' as 3rd param
-* mod_facetoface\attendance\session_content::generate_downloadable_content() has been updated
+* attendance\take_attendance_tracking::is_disable_bulk_action() has been updated and returns value depending if seminar session is over or not
+* attendance\session_content::create_attendance_status() has been updated and returns value depending if seminar session is over or not
+* attendance\session_content::generate_downloadable_content() has been updated
   * to respect the showuseridentity config and added session start and end date/time
   * returns data including session start date and finish date
   * added export format value as a second parameter
-  mod_facetoface\attendance\content_generator::generate_downloadable_content() has been updated to support export format value as a second parameter
-* mod_facetoface\rb\display\local_event_date::display() has been updated to use mod_facetoface\output\session_time::format_datetime() to display and export date/time
-* mod_facetoface\export_helper::download_ods() has been updated to support mod_facetoface\output\session_time::format_datetime() array output
-* mod_facetoface\export_helper::download_xls() has been updated to support mod_facetoface\output\session_time::format_datetime() array output
-* mod_facetoface\bulk_list::__construct() has been updated to support seminar event id
-* mod_facetoface\output\take_attendance::create has been updated to support CSV export for Upload event attendance
+* rb\display\local_event_date::display() has been updated to use output\session_time::format_datetime() to display and export date/time
+* export_helper::download_ods() has been updated to support output\session_time::format_datetime() array output
+* export_helper::download_xls() has been updated to support output\session_time::format_datetime() array output
+* bulk_list::__construct() added 4th parameter $seminareventid
+* output\take_attendance::create() has been updated to support CSV export for Upload event attendance
 * output\event_grade_input::create() has been updated to respect the course grade_decimalpoints config
-* take_attendance mustache has been updated:
-  * to disable the 'Upload attendance' button when an event is upcoming or in progress
-  * to hide the 'Upload attendance' button when the current page is session take attendance
 * signup\condition\user_is_enrolable::pass() has been updated to allow suspended users to be enrolled into seminar event
-* The following functions and constants have been deprecated in mod_facetoface_renderer
-  * print_session_list_table: please use mod_facetoface_renderer::render_session_list_table()
-  * print_session_list: please use mod_facetoface\output\session_list_table
-  * render_session_list: please use mod_facetoface\output\session_list_table
-  * attendance_tracking_table_cell: please use mod_facetoface\output\session_list_table
-  * session_status_table_cell: please use mod_facetoface\output\session_list_table
-  * event_status_table_cell: please use mod_facetoface\output\session_list_table
-  * event_status_attendance_taking_html(): please use mod_facetoface\output\session_list_table
-  * print_filter_bar: please use mod_facetoface_renderer::render_filter_bar()
-  * filter_by_room: please use mod_facetoface_renderer::render_filter_bar()
-  * get_filter_by_room: please use mod_facetoface\filter_list
-  * get_filter_by_event_time: please use mod_facetoface\filter_list
-  * set_signup_link: please use mod_facetoface\hook\alternative_signup_link
-  * PARAM_FILTER_xxx: please use mod_facetoface\filter_list
-* The following CSS classes have been deprecated or removed in mod_facetoface_renderer
-  * highlight and dimmed_text CSS classes have been deprecated in print_session_list_table()
-  * upcomingsessionlist and previoussessionlist CSS classes have been deprecated in print_session_list()
-  * room and room_details CSS classes have been deprecated in get_room_details_html()
-  * generaltable and fullwidth CSS classes have been removed from print_session_list_table(),
-    please use mod_facetoface__sessionlist__table instead
-  * f2f, roomdetails, dl-horizontal classes have been removed from render_room_details() and render_asset_details()
-* The class parameter has been added to the seminarevent_actionbar mustache template
-* The icon, filters.show_tooltips and links parameters have been added to the seminarevent_filterbar mustache template
-  Also, the CSS class name has been changed to contain the class parameter
-* The following changes have been made to the mod_facetoface_renderer class:
-  * get_room_details_html() now links room name instead of linking the separate string "(Room details)" or "View details"
-  * session_resgistrationperiod_table_cell() now uses \mod_facetoface\output\session_time::signup_period() to generate its registration string
-  * event_status_table_cell() has been updated to use \mod_facetoface\seminar_event_helper::booking_status()
-  * event_status_table_cell() has been updated to adhere to the $session record instead of fetching the database record
-  * session_status_table_cell() has been updated to use \mod_facetoface\seminar_session_helper::get_status()
-  * session_status_table_cell() has been updated to adhere to the $session record instead of fetching the database record
-  * attendance_tracking_table_cell() has been updated to adhere to the $session record instead of fetching the database record
-  * print_session_list() has been updated to use \mod_facetoface\seminar_event_helper::get_sessiondata()
-  * render_seminar_event() has been updated:
-      * Changed the $class default value from 'f2f' to 'mod_facetoface__event_details'
-      * Rendering info changed from 'new line' label/value to 'one line colon'
-      * Added Sign-up period date/time info
-      * Added Event booking info
-      * Added Session status info
-      * Added Asests info
-      * Session date/time format is changed
-      * rendered event information now includes:
-        * event custom fields
-        * event maximum bookings
-        * sign-up period
-        * booking status
-        * event status
-        * event trainers
-        * event cost(s)
-        * event details
-        * session list with the following for each session:
-        * session dates/times
-        * session duration
-        * linked room name (and identifiers if configured)
-        * list of assets
-* mod_facetoface_renderer::print_userlist_table() has been updated to respect the showuseridentity config
-* take_attendance::create() has been updated, added 'Upload attendance' button
 * bulk_list::returnurl() has been updated, removed url clone() as url already cloned in __construct()
-* attendees_add_confirm::get_user_list() function has been deprecated, please use attendees_list_helper::get_user_list()
-* mod_facetoface_renderer::print_userlist_table() has been updated to format user idnumbers before output
 * seminar_event_list::form_seminar() has been renamed to seminar_event_list::from_seminar()
-* signup_status::get_state() has been deprecated, please use signup::get_state()
-* attendees_helper::show_customfields() function has been deprecated, please use mod_facetoface_renderer::render_seminar_event()
-* signup_status::get_state() function has been deprecated, please use signup::get_state()
-* attendees_list_helper::get_status() function has been deprecated, please use attendees_helper::get_status()
-* attendees_list_helper::process_no_sessionid() function has been deprecated, please use attendees_helper::process_no_sessionid()
-* attendees_list_helper::process_js() function has been deprecated, please use attendees_helper::process_js()
-* attendees_list_helper::get_allowed_available_actions() function has been deprecated, please use attendees_helper::get_allowed_available_actions()
-* query\event\sortorder\default_sortorder has been deprecated, please use query\event\sortorder\past_sortorder
+
+--- Database ---
+* facetoface_room table added url field
+* facetoface_sessions_dates table removed roomid field
+* facetoface_room_dates table added to support a many-to-many relationship
+
+--- Miscellaneous ---
+* The user profile links are now retrieved through the user_helper class
+* [facetofacename] notification placeholder is changed to [seminarname]
+* new [seminardescription] notification placeholder is added to support seminar notifications
+
 * facetoface_confirm_attendees() function has been deprecated, please use signup_helper::confirm_waitlist()
 * facetoface_waitlist_randomly_confirm_users() function has been deprecated, please use signup_helper::confirm_waitlist_randomly()
 * facetoface_cancel_attendees() function has been deprecated, please use signup_helper::cancel_waitlist()
@@ -195,48 +216,9 @@ information provided here is intended especially for developers.
 * facetoface_task_check_capacity() function has been deprecated as unused
 * facetoface_get_ical_attachment() function has been deprecated as unused
 * Deprecated function facetoface_get_ical_attachment() has been removed
-* mod_facetoface\form\event::new_user_roles_added() function has been deprecated and will be removed in Totara 14
 * facetoface_build_user_roles_in_conflict_message() function has been deprecated, please use facetoface_build_user_in_conflict_message() function instead
 * facetoface_cost() function has been deprecated, please use signup::get_cost()
 * facetoface_set_completion() function has been deprecated, please use seminar::set_completion()
-* facetoface_cm_info_view() function now hides cancelled events and displays events by future first
-* seminar_event::get_normalcost() used to return an integer, now returns a string
-* seminar_event::set_normalcost() used to expect an integer as the only argument, now expects a string
-* seminar_event::get_discountcost() used to return an integer, now returns a string
-* seminar_event::set_discountcost() used to expect an integer as the only argument, now expects a string
-* Converted styles.css to less
-* mod_facetoface_renderer::render_seminar_event has been changed to prevent a record not found exception if a user has a deleted job assignment
-* The following changes have been made to the mod_facetoface_renderer class
-  * In print_session_list() function
-    * Added an optional parameter for filtering by event time, to the function
-  * In print_session_list_table() function
-    * Table columns have been reordered, please refer to lib/renderer_test.php
-    * Added optional arguments: $sessionattendance, $eventattendance, $viewsignupperiod, $viewactions
-    * The summary text of a session event list table no longer says 'past events'
-    * Added a session status column to the session event list table
-    * Added an attendance tracking column to the session event list table; the column will be hidden if attendance tracking is off
-    * Note that both new columns, session status and attendance tracking, will be hidden if $minimal = true is passed to the function
-    * Changed the name of some columns on the session event list table; Date -> Session dates, Time -> Session times, Status -> Event status, Options -> Actions
-    * The capacity column on the session event list table now hides "(0 Wait-listed)" text when nobody is wait-listed
-    * Removed a "Sign-up unavailable" link from Actions table cells
-    * The Room column on the session event list table does not have room information if a session is over
-    * Combined session date and time, and added CSS class to session times and timezone
-    * Added mod_facetoface__sessionlist__table__sessionrow CSS class to each table row
-    * The "Actions" table column now uses <nav> to group action links instead of <br> tags
-      * mod_facetoface__sessionlist__action__buttons for icon links
-      * mod_facetoface__sessionlist__action__links for text links
-      * mod_facetoface__sessionlist__action__reserve for reserve links
-      * The "More info" text has been changed to "Event info"
-    * The "Event status" table column now reports three different kinds of status separately, grouping by <ul>/<li>
-    * The function renders the session list table using the data supplied by the $sessions parameter as much as possible
-  * Added two new overridable functions for session/event status - session_status_table_cell() and event_status_table_cell()
-  * attendance_tracking_table_cell() has been updated to use seminar_session::get_attendance_taking_status()
-  * event_status_table_cell() has been updated to use seminar_event_helper::event_status()
-* mod_facetoface_renderer::print_session_list_table() function has been changed to call get_signup_link() function to resolve signup link
-* mod_facetoface_renderer::attendees_export_form() has been changed to attach an aria-label attribute to the <select> element
-* The following templates have been updated for better accessibility:
-  * In take_attendance_status_picker, replaced a non-human-readable <label> with a human-readable aria-label (XX's attendance)
-  * In event_grade_input, the aria-label now contains the name of an attendee (XX's event grade)
 * facetoface_send_notice() function has been deprecated, please use \mod_facetoface\notice_sender::send_notice()
 * facetoface_send_oneperday_notice() function has been deprecated, please use \mod_facetoface\notice_sender::send_notice_oneperday()
 * facetoface_send_registration_closure_notice() function has been deprecated, please use \mod_facetoface\notice_sender::registration_closure()
@@ -248,7 +230,6 @@ information provided here is intended especially for developers.
 * facetoface_get_trainer_roles() function has been deprecated, please use \mod_facetoface\trainer_helper::get_trainer_roles() instead
 * facetoface_get_trainers() function has been deprecated, please use \mod_facetoface\trainer_helper::get_trainers() instead
 * facetoface_get_session_managers() function has been deprecated, please use \mod_facetoface\signup_helper::find_managers_from_signup() instead
-* mod_facetoface_renderer::print_session_list_table has been changed to check the capability of current session user to decide whether it should include the deleted users or not in the number of booking users.
 * facetoface_get_num_attendees() function takes another parameter to flag that the query should include the deleted users or not
 * facetoface_get_users_by_status() function takes another parameter to flag that the query should include the deleted users or not
 * facetoface_get_cancellations() function takes another parameter to flag that the query should include the deleted users or not
@@ -259,7 +240,6 @@ information provided here is intended especially for developers.
 * facetoface_get_sessions_within() function has been deprecated, please use \mod_facetoface\seminar_session_list::load_sessiondates_foruser() instead
 * facetoface_get_session() function has been deprecated, please use new \mod_facetoface\seminar_event($sessionid)
 * facetoface_get_env_session() function has been deprecated, please use \mod_facetoface\seminar or \mod_facetoface\seminar_event functions
-* $session parameter in function \mod_facetoface\attendees_helper::get_allowed_available_actions() has been deprecated, please do not use
 * facetoface_save_dates() function has been deprecated, please use \mod_facetoface\seminar_event_helper::merge_sessions()
 * facetoface_session_dates_check() function has been deprecated, please use \mod_facetoface\seminar_session_list::dates_check()
 * facetoface_write_activity_attendance() function has been deprecated, please use \mod_facetoface\export_helper::prepare()
