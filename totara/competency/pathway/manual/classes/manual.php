@@ -244,12 +244,22 @@ class manual extends pathway {
     public function get_summarized_criteria_set(): array {
         $result = new \stdClass();
         $result->item_type = $this->get_title();
-        $result->items = array_map(
-            function ($role) {
-                return ucfirst($role);
-            },
-            $this->get_roles()
-        );
+        if (!$this->is_valid()) {
+            $result->error = get_string('error:invalidconfiguration', 'totara_competency');
+            $result->items = [
+                (object)[
+                    'description' => '',
+                    'error' => get_string('error:noraters', 'pathway_manual'),
+                ],
+            ];
+        } else {
+            $result->items = array_map(
+                function ($role) {
+                    return (object)['description' => ucfirst($role)];
+                },
+                $this->get_roles()
+            );
+        }
 
         return [$result];
     }

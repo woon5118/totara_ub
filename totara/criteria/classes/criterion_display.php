@@ -51,6 +51,10 @@ abstract class criterion_display {
         $result = new stdClass();
         $result->item_type = $this->get_display_items_type();
         $result->item_aggregation = $this->get_display_aggregation();
+        if (!$this->criterion->is_valid()) {
+            $result->error = get_string('error:invalidconfiguration', 'totara_criteria');
+        }
+
         $result->items = $this->get_display_configuration_items();
 
         return $result;

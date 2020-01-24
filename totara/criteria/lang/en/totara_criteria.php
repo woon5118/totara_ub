@@ -41,6 +41,7 @@ $string['criteria'] = 'Criteria';
 $string['criterion_not_found'] = 'Criteria not found';
 $string['criterion'] = 'Criterion';
 $string['done'] = 'Done';
+$string['error:invalidconfiguration'] = 'The criterion configuration is invalid';
 $string['hidden_course'] = 'This course is not available to view';
 $string['managetypes'] = 'Manage criteria types';
 $string['no'] = 'No';

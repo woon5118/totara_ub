@@ -461,7 +461,7 @@ abstract class criterion {
             }
         }
 
-        return $nitems == $nvalid;
+        return $nvalid >= $nrequired;
     }
 
     /**
@@ -965,6 +965,13 @@ abstract class criterion {
      *******************************************************************************************************/
 
     /**
+     * @return string
+     */
+    public function export_configuration_error_description(): string {
+        return '';
+    }
+
+    /**
      * Export the edit template name and data
      *
      * @return array
@@ -1017,12 +1024,18 @@ abstract class criterion {
      * @return array
      */
     public function export_edit_overview(): array {
-        return [
+        $result = [
             'id' => $this->get_id() ?? 0,
             'type' => $this->get_plugin_type(),
             'title' => $this->get_title(),
             'singleuse' => $this->is_singleuse(),
         ];
+
+        if (!$this->is_valid()) {
+            $result['error'] = get_string('error:invalidconfiguration', 'totara_criteria');
+        }
+
+        return $result;
     }
 
     /**
@@ -1037,6 +1050,8 @@ abstract class criterion {
 
         if ($this->has_items()) {
             $results['items'] = $this->export_edit_items();
+        } else if (!$this->is_valid()) {
+            $results['error'] = $this->export_configuration_error_description();
         }
 
         if ($this->has_metadata()) {

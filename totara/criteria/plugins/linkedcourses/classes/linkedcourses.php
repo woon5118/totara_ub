@@ -115,6 +115,19 @@ class linkedcourses extends criterion {
      ************************************************************************************/
 
     /**
+     * @return string
+     */
+    public function export_configuration_error_description(): string {
+        if ($this->is_valid()) {
+            return '';
+        }
+
+        return get_string('error:notenoughcourses', 'criteria_linkedcourses');
+    }
+
+
+
+    /**
      * Export the edit template name and data
      *
      * @return string

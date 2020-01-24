@@ -60,7 +60,7 @@ function(templates, notification, ajax, ModalList, Loader) {
         };
 
         this.domClasses = {
-            hidden: 'crit_hidden',
+            hidden: 'tw-criterion-hidden',
         };
 
         this.filename = 'coursecompletion.js';
@@ -256,7 +256,7 @@ function(templates, notification, ajax, ModalList, Loader) {
                 that.criterion.itemids = [];
 
                 if (courses.length == 0 || !coursesTarget) {
-                    that.showHideNoCourses();
+                    that.showHideNotEnoughCourses();
                     resolve();
 
                 } else {
@@ -264,11 +264,14 @@ function(templates, notification, ajax, ModalList, Loader) {
                         that.courses[courses[a].id] = courses[a];
                         that.criterion.itemids.push(courses[a].id);
                         templateData = {item_parent: 'criterionCourseCompletion', value: courses[a].id, text: courses[a].name};
+                        if (courses[a].error) {
+                            templateData.error = courses[a].error;
+                        }
                         coursesPromiseArr.push(templates.renderAppend('totara_criteria/partial_item', templateData, coursesTarget));
                     }
 
                     Promise.all(coursesPromiseArr).then(function() {
-                        that.showHideNoCourses();
+                        that.showHideNotEnoughCourses();
                         resolve();
                     }).catch(function(e) {
                         e.fileName = that.filename;
@@ -415,7 +418,7 @@ function(templates, notification, ajax, ModalList, Loader) {
 
             if (coursesPromiseArr.length > 0) {
                 Promise.all(coursesPromiseArr).then(function() {
-                    that.showHideNoCourses();
+                    that.showHideNotEnoughCourses();
 
                     that.triggerEvent('update', {criterion: that.criterion});
                     that.triggerEvent('dirty', {});
@@ -446,7 +449,7 @@ function(templates, notification, ajax, ModalList, Loader) {
             }
 
             // Show nocourses warning
-            that.showHideNoCourses();
+            that.showHideNotEnoughCourses();
 
             that.triggerEvent('update', {criterion: that.criterion});
             that.triggerEvent('dirty', {});
@@ -455,8 +458,8 @@ function(templates, notification, ajax, ModalList, Loader) {
         /**
          * Show or hide the No Criteria warning depending on the number of items
          */
-        showHideNoCourses: function() {
-            var target = this.widget.querySelector('[data-tw-criterionCourseCompletion-error="nocourses"]');
+        showHideNotEnoughCourses: function() {
+            var target = this.widget.querySelector('[data-tw-criterionCourseCompletion-error="notenoughcourses"]');
             if (!target) {
                 return;
             }

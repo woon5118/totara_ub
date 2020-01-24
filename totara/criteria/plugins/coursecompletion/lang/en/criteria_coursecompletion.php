@@ -28,6 +28,8 @@ $string['addcourses'] = "Add courses";
 $string['courses'] = 'Courses';
 $string['selectcourses'] = "Select courses";
 
-$string['error:nocourses'] = 'No courses selected';
+$string['error:notenoughcourses'] = 'Not enough courses with completion tracking enabled';
 $string['error:courseerror'] = 'One or more courses have errors';
+$string['error:nocoursecompletion'] = 'Completion tracking is disabled';
+$string['error:nocourse'] = 'Course no longer exists';
 

@@ -31,10 +31,10 @@ use totara_core\formatter\field\string_field_formatter;
 /**
  * Summarized pathway criteria
  */
-class summarized_pathway_criteria implements type_resolver {
+class summarized_pathway_criterion_item implements type_resolver {
 
     /**
-     * Resolves summarized pathway criteria
+     * Resolves summarized pathway criterion_item
      *
      * @param string $field
      * @param \stdClass $summary
@@ -45,27 +45,18 @@ class summarized_pathway_criteria implements type_resolver {
     public static function resolve(string $field, $summary, array $args, execution_context $ec) {
 
         switch ($field) {
-            case 'item_type':
-                if (!isset($summary->{$field})) {
-                    throw new \coding_exception('Expected value, but was not found and was not nullable.', $field);
-                }
-                return $summary->{$field};
-            case 'item_aggregation':
+            case 'description':
                 if (!isset($summary->{$field})) {
                     return null;
                 }
-                return $summary->{$field};
+                $formatter = new string_field_formatter($args['format'] ?? format::FORMAT_HTML, \context_system::instance());
+                return $formatter->format($summary->{$field});
             case 'error':
                 if (!isset($summary->{$field})) {
                     return null;
                 }
                 $formatter = new string_field_formatter($args['format'] ?? format::FORMAT_HTML, \context_system::instance());
                 return $formatter->format($summary->{$field});
-            case 'items':
-                if (!isset($summary->{$field})) {
-                    return null;
-                }
-                return $summary->{$field};
         }
 
         throw new \coding_exception('Unknown field', $field);

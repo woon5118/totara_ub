@@ -138,6 +138,7 @@ class external extends \external_api {
                     'id' => new \external_value(PARAM_INT, 'Pathway id'),
                     'title' => new \external_value(PARAM_TEXT, 'Pathway title'),
                     'sortorder' => new \external_value(PARAM_INT, 'Sortorder'),
+                    'title' => new \external_value(PARAM_TEXT, 'Pathway title', VALUE_OPTIONAL),
                     'pathway_templatename' => new \external_value(PARAM_TEXT, 'Template for displaying this pathway'),
                     'scalevalue' => new \external_value(PARAM_INT, 'Scale value id. Ignored for multivalue pathways', VALUE_OPTIONAL),
                 ]

@@ -45,6 +45,13 @@
 }}
 <div data-tw-{{item_parent}}-item-value="{{value}}">
     {{text}}
+    {{#error}}
+      <span class="cc_warning">
+        {{#flex_icon}}notification-warning{{/flex_icon}}
+        {{error}}
+      </span>
+    {{/error}}
+
     <a href="#">
         <span class="tw_criterion_item__btn_small_icon" data-tw-{{item_parent}}-item-remove="">
             {{#flex_icon}}trash{{/flex_icon}}

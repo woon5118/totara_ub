@@ -62,6 +62,7 @@ class external extends external_api {
                             'type' => new external_value(PARAM_TEXT, 'Item type'),
                             'id' => new external_value(PARAM_INT, 'Item id'),
                             'name' => new external_value(PARAM_TEXT, 'Item name'),
+                            'error' => new external_value(PARAM_TEXT, 'Error description', VALUE_OPTIONAL),
                         ]
                     )
                 ),

@@ -55,6 +55,10 @@ function(ajax, notification, Loader) {
             detail: 'criteria_childcompetency_get_detail',
         };
 
+        this.domClasses = {
+            hidden: 'tw-criterion-hidden',
+        };
+
         this.fileName = 'childcompetency.js';
     }
 
@@ -152,6 +156,8 @@ function(ajax, notification, Loader) {
                     that.criterion.metadata = instance.metadata;
                     that.criterionKey = key;
 
+                    that.showHideConfigurationError(instance.error);
+
                     // Aggregation
                     that.setAggregationMethod(instance.aggregation.method);
                     that.setAggregationCount(instance.aggregation.reqitems);
@@ -196,6 +202,24 @@ function(ajax, notification, Loader) {
                 });
             });
         },
+
+        /**
+         * Show or hide the configuration error warning
+         */
+        showHideConfigurationError: function(theError) {
+            var target = this.widget.querySelector('[data-tw-criterionChildCompetency-error]');
+            if (!target) {
+                return;
+            }
+
+            if (theError) {
+                // Show the warning
+                target.classList.remove(this.domClasses.hidden);
+            } else {
+                target.classList.add(this.domClasses.hidden);
+            }
+        },
+
 
         /**
          * Set the aggregation method

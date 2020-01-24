@@ -113,6 +113,18 @@ class childcompetency extends criterion {
      ************************************************************************************/
 
     /**
+     * @return string
+     */
+    public function export_configuration_error_description(): string {
+        if ($this->is_valid()) {
+            return '';
+        }
+
+        return get_string('error:notenoughchildren', 'criteria_childcompetency');
+    }
+
+
+    /**
      * Export the edit template name and data
      *
      * @return string

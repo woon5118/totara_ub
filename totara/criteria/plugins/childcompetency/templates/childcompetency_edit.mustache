@@ -49,6 +49,13 @@
      data-core-autoinitialise-amd="criteria_childcompetency/childcompetency"
      data-tw-loader-target="">
 
+    <div class="tw-criterion-hidden" data-tw-criterionChildCompetency-error="">
+      <span class="tw-criterion-warning">
+          {{#flex_icon}}notification-warning{{/flex_icon}}
+          {{#str}}error:notenoughchildren, criteria_childcompetency{{/str}}
+      </span>
+    </div>
+
     <div data-tw-criterionChildCompetency-aggregation="">
         <div class="tw-criterion-label">
             <span>{{#str}}aggregation, totara_criteria{{/str}}</span>

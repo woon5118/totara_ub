@@ -703,6 +703,10 @@ abstract class pathway {
             'sortorder' => $this->get_sortorder(),
         ];
 
+        if (!$this->is_valid()) {
+            $result['error'] = get_string('error:invalidconfiguration', 'totara_competency');
+        }
+
         if ($this->get_classification() == static::PATHWAY_SINGLE_VALUE) {
             $result['scalevalue'] = $this->get_scale_value()->id;
         }

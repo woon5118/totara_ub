@@ -58,6 +58,7 @@ class external extends \external_api {
                 'type' => new \external_value(PARAM_TEXT, 'Criterion type'),
                 'id' => new \external_value(PARAM_INT, 'Criterion id'),
                 'title' => new \external_value(PARAM_TEXT, 'Criterion name'),
+                'error' => new \external_value(PARAM_TEXT, 'Criterion name', VALUE_OPTIONAL),
                 'criterion_templatename' => new \external_value(PARAM_TEXT, 'Template to use to display and manage instances of this criterion'),
                 'singleuse' => new \external_value(PARAM_BOOL, 'Indication whether this is a single-use criterion', VALUE_OPTIONAL),
             ])

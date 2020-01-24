@@ -81,15 +81,30 @@
                 >
                   <Divider v-if="criterionIdx" label="AND" />
 
+                  <span v-if="criterion.error"
+                    ><FlexIcon
+                      icon="notification-warning"
+                      size="200"
+                      :alt="$str('warning', 'moodle')"
+                  /></span>
                   <Label :label="criterion.item_type" />
                   <span v-if="criterion.item_aggregation"
                     >({{ criterion.item_aggregation }})</span
                   >
+
                   <div
                     v-for="(item, itemIdx) in criterion.items"
                     :key="itemIdx"
                   >
-                    {{ item }}
+                    {{ item.description }}
+                    <span v-if="item.error"
+                      ><FlexIcon
+                        icon="notification-warning"
+                        size="100"
+                        :alt="$str('warning', 'moodle')"
+                      />
+                      {{ item.error }}</span
+                    >
                   </div>
                 </div>
               </div>

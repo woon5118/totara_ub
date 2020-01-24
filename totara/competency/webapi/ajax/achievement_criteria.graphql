@@ -18,10 +18,15 @@ query totara_competency_achievement_criteria(
       status
       classification
       scale_value
+      error
       criteria_summary @include(if: $summarized) {
         item_type
         item_aggregation
-        items
+        error
+        items {
+          error
+          description
+        }
       }
     }
   }

@@ -59,6 +59,12 @@
                         {{#flex_icon}}collapsed{{/flex_icon}}
                     </span>
                     {{title}}
+                    {{#error}}
+                        <span class="cc_warning">
+                          {{#flex_icon}}notification-warning{{/flex_icon}}
+                          {{error}}
+                        </span>
+                    {{/error}}
                 </a>
             </div>
 

@@ -72,6 +72,7 @@ class external extends external_api {
                     ],
                     'Linked courses aggregation'
                 ),
+                'error' => new external_value(PARAM_TEXT, 'Configuration error detail', VALUE_OPTIONAL),
             ]
         );
     }

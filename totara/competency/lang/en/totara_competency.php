@@ -321,6 +321,7 @@ $string['event:assignment_user_unassigned'] = 'User competency assignment unassi
 
 $string['error_competencies_out_of_sync'] = 'An error occurred with your selection. {$a} competencies were removed from your selection due to no longer being available for assignment.';
 $string['error_create_assignments'] = 'An error occurred during assignment creation, due to modifications to the competencies or user groups after you selected them. Your selection has been updated to reflect these changes – please verify before proceeding.';
+$string['error:invalidconfiguration'] = 'The pathway configuration is invalid';
 
 $string['filter'] = 'Filter';
 

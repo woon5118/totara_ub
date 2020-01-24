@@ -28,3 +28,5 @@ $string['pluginname'] = 'Aggregation of child competencies';
 $string['required_only'] = '{$a} required only';
 $string['self_assign_competency'] = 'Self assign competency';
 $string['view_competency'] = 'View competency';
+
+$string['error:notenoughchildren'] = 'This competency does not have enough child competencies in which the user can become proficient';

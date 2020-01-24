@@ -48,7 +48,17 @@ class linkedcourses_display extends criterion_display {
      * @return string[]
      */
     protected function get_display_configuration_items(): array {
-        return [];
+        if ($this->criterion->is_valid()) {
+            return [];
+        }
+
+        return [
+            (object)[
+                'description' => '',
+                'error' => get_string('error:notenoughcourses', 'criteria_linkedcourses'),
+            ],
+        ];
+
     }
 
 }

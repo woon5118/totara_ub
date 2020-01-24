@@ -71,6 +71,13 @@ class pathway implements type_resolver {
                 $formatter = new string_field_formatter($format, \context_system::instance());
                 $scale_value = $pathway->get_scale_value();
                 return $formatter->format($scale_value ? $scale_value->name : null);
+            case 'error':
+                if ($pathway->is_valid()) {
+                    return null;
+                }
+                $format = $args['format'] ?? format::FORMAT_HTML;
+                $formatter = new string_field_formatter($format, \context_system::instance());
+                return $formatter->format(get_string('error:invalidconfiguration', 'totara_competency'));
             case 'criteria_summary':
                 return $pathway->get_summarized_criteria_set();
         }

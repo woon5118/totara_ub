@@ -94,6 +94,18 @@ class coursecompletion extends criterion {
      ************************************************************************************/
 
     /**
+     * @return string
+     */
+    public function export_configuration_error_description(): string {
+        if ($this->is_valid()) {
+            return '';
+        }
+
+        return get_string('error:notenoughchildren', 'criteria_childcompetency');
+    }
+
+
+    /**
      * Return the name of the template for defining this criterion
      *
      * @return string Edit template name
@@ -117,15 +129,29 @@ class coursecompletion extends criterion {
      * @return  array Array of item detail
      */
     public function export_edit_items(): array {
+        global $DB;
+
         $items = [];
 
         foreach ($this->get_item_ids() as $course_id) {
-            $course = get_course($course_id);
-            $items[] = [
+            $item_detail = [
                 'type' => $this->get_items_type(),
                 'id' => $course_id,
-                'name' => format_string(get_course_display_name_for_list($course)),
             ];
+
+            $course = $DB->get_record('course', ['id' => $course_id]);
+            if ($course) {
+                $item_detail['name'] = format_string(get_course_display_name_for_list($course));
+
+                if (!$course->enablecompletion) {
+                    $item_detail['error'] = get_string('error:nocoursecompletion', 'criteria_coursecompletion');
+                }
+            } else {
+                $item_detail['name'] = '';
+                $item_detail['error'] = get_string('error:nocourse', 'criteria_coursecompletion');
+            }
+
+            $items[] = $item_detail;
         }
 
         return $items;

@@ -50,6 +50,14 @@
      data-core-autoinitialise-amd="criteria_linkedcourses/linkedcourses"
      data-tw-loader-target="">
 
+    <div class="tw-criterion-hidden" data-tw-criterionLinkedCourses-error="">
+      <span class="tw-criterion-warning">
+          {{#flex_icon}}notification-warning{{/flex_icon}}
+          {{#str}}error:notenoughcourses, criteria_linkedcourses{{/str}}
+      </span>
+    </div>
+
+
     <div data-tw-criterionLinkedCourses-aggregation="">
         <div class="tw-criterion-label">
             <span>{{#str}}aggregation, totara_criteria{{/str}}</span>

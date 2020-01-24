@@ -68,13 +68,9 @@
                         {{#str}}addcourses, criteria_coursecompletion{{/str}}
                     </span>
                 </a>
-                <span class="tw-criterion-warning {{^nocourses}}tw-criterion-hidden{{/nocourses}}" data-tw-criterionCourseCompletion-error="nocourses">
+                <span class="tw-criterion-warning tw-criterion-hidden" data-tw-criterionCourseCompletion-error="notenoughcourses">
                     {{#flex_icon}}notification-warning{{/flex_icon}}
-                    {{#str}}error:nocourses, criteria_coursecompletion{{/str}}
-                </span>
-                <span class="tw-criterion-warning {{^courseerror}}tw-criterion-hidden{{/courseerror}}" data-tw-criterionCourseCompletion-error="invalidcourse">
-                    {{#flex_icon}}notification-warning{{/flex_icon}}
-                    {{#str}}error:courseerror, criteria_coursecompletion{{/str}}
+                    {{#str}}error:notenoughcourses, criteria_coursecompletion{{/str}}
                 </span>
             </div>
         </div>

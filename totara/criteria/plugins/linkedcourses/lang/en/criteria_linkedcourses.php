@@ -27,3 +27,5 @@ $string['achievementvia'] = 'Course completion';
 $string['linkedcourses'] = 'Linked courses';
 $string['requiredcourses'] = 'Required courses';
 $string['updatelinkedcoursecriteria'] = 'Update linkedcourses criteria';
+
+$string['error:notenoughcourses'] = 'Not enough linked courses with completion tracking enabled';

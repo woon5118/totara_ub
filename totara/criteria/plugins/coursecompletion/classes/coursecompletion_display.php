@@ -47,14 +47,18 @@ class coursecompletion_display extends criterion_display {
      * @return string[]
      */
     protected function get_display_configuration_items(): array {
-        $items = [];
+        global $DB;
 
-        foreach ($this->criterion->get_item_ids() as $course_id) {
-            $course = get_course($course_id);
-            $items[] = get_course_display_name_for_list($course);
+        $course_ids = $this->criterion->get_item_ids();
+        if (empty($course_ids)) {
+            return [
+                (object)[
+                    'description' => '',
+                    'error' => get_string('error:notenoughcourses', 'criteria_coursecompletion'),
+                ],
+            ];
         }
-
-        return $items;
+        return [];
     }
 
 }
