@@ -41,7 +41,10 @@ M.totara_seminar_facilitator = M.totara_seminar_facilitator || {
         }
 
         $('#id_submitbutton').on('click', function (e) {
-            e.preventDefault();
+            var div = $('div#fgroup_id_labeltype > fieldset > div.felement');
+            div.removeClass('error');
+            $("#id_error_userid").remove();
+            $("#id_error_break_userid").remove();
             var option = $('select[name="facilitatortype"] option:selected');
             if (option.val() == '0') {
                 var val = $('input[name="userid"]').val();
@@ -49,10 +52,11 @@ M.totara_seminar_facilitator = M.totara_seminar_facilitator || {
                     $('div#fgroup_id_labeltype > fieldset > div.felement')
                         .addClass('error')
                         .prepend(M.totara_seminar_facilitator.config.errorblock);
+                    $('html,body').scrollTop($("#id_error_userid").offset().top);
+                    e.preventDefault();
                     return false;
                 }
             }
-            $('#mform_modal1').submit();
         });
 
         $('select[name="facilitatortype"]').change(M.totara_seminar_facilitator.checkuseraddvisibility);

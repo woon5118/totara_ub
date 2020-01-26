@@ -39,6 +39,7 @@ $baseurl = new moodle_url('/mod/facetoface/room/manage.php');
 // Check permissions.
 if (is_siteadmin()) {
     admin_externalpage_setup('modfacetofacerooms', '', null, $baseurl);
+    \totara_core\quickaccessmenu\helper::add_quickaction_page_button($PAGE, 'modfacetofacerooms');
 } else {
     $context = context_system::instance();
     $PAGE->set_pagelayout('standard');

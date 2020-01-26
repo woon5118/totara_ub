@@ -38,6 +38,7 @@ $baseurl = new moodle_url('/mod/facetoface/asset/manage.php');
 // Check permissions.
 if (is_siteadmin()) {
     admin_externalpage_setup('modfacetofaceassets', '', null, $baseurl);
+    \totara_core\quickaccessmenu\helper::add_quickaction_page_button($PAGE, 'modfacetofaceassets');
 } else {
     $context = context_system::instance();
     $PAGE->set_pagelayout('standard');

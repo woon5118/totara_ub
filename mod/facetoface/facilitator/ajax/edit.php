@@ -43,7 +43,7 @@ $context = $seminar->get_contextmodule($cm->id);
 
 ajax_require_login($seminar->get_course(), false, $cm, false, true);
 if (!has_capability('mod/facetoface:manageadhocfacilitators', $context)) {
-    throw new required_capability_exception($context, $capability, 'nopermissions');
+    throw new required_capability_exception($context, $capability, 'nopermissions', '');
 }
 require_sesskey();
 

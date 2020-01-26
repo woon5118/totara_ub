@@ -38,6 +38,7 @@ $baseurl = new moodle_url('/mod/facetoface/facilitator/manage.php');
 // Check permissions.
 if (is_siteadmin()) {
     admin_externalpage_setup('modfacetofacefacilitators', '', null, $baseurl);
+    \totara_core\quickaccessmenu\helper::add_quickaction_page_button($PAGE, 'modfacetofacefacilitators');
 } else {
     $context = context_system::instance();
     $PAGE->set_pagelayout('standard');

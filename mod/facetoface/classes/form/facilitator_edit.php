@@ -99,14 +99,25 @@ class facilitator_edit extends \moodleform {
             $username[] =& $mform->createElement('button', 'facilitatorselector', get_string('selectuserwithdot', 'mod_facetoface'),
                 ['id' => 'show-facilitator-dialog']);
             $username[] =& $mform->createElement('static', 'facilitatortitle', null, $span);
+            $mform->setDefault('facilitatortype', facilitator_type::INTERNAL);
             $mform->addGroup($username, 'labeltype', get_string('facilitatortype', 'mod_facetoface'), null, false);
-            $mform->setType('userid', PARAM_INT);
-            $mform->addHelpButton('labeltype', 'facilitatortype', 'mod_facetoface');
-            $mform->disabledIf('facilitatorselector', 'facilitatortype', 'eq', facilitator_type::EXTERNAL);
         } else {
-            $mform->addElement('hidden', 'userid', 0);
-            $mform->setType('userid', PARAM_INT);
+            $username = [];
+            $username[] =& $mform->createElement('hidden', 'userid', 0);
+            $typeoptions = [
+                facilitator_type::EXTERNAL => get_string('facilitatorexternal', 'mod_facetoface'),
+            ];
+            $username[] =& $mform->createElement('select', 'facilitatortype', null, $typeoptions);
+            $username[] =& $mform->createElement('button', 'facilitatorselector', get_string('selectuserwithdot', 'mod_facetoface'),
+                ['id' => 'show-facilitator-dialog']);
+            $mform->setDefault('facilitatortype', facilitator_type::EXTERNAL);
+            $mform->disabledIf('facilitatortype', 'userid', 'eq', 0);
+            $mform->disabledIf('facilitatorselector', 'userid', 'eq', 0);
+            $mform->addGroup($username, 'labeltype', get_string('facilitatortype', 'mod_facetoface'), null, false);
         }
+        $mform->setType('userid', PARAM_INT);
+        $mform->addHelpButton('labeltype', 'facilitatortype', 'mod_facetoface');
+        $mform->disabledIf('facilitatorselector', 'facilitatortype', 'eq', facilitator_type::EXTERNAL);
 
         // Allow booking conflicts.
         $mform->addElement('advcheckbox', 'allowconflicts', get_string('allowfacilitatorconflicts', 'mod_facetoface'));
@@ -164,7 +175,6 @@ class facilitator_edit extends \moodleform {
         $formdata = (object)[
             'id' => $facilitator->get_id(),
             'userid' => $facilitator->get_userid(),
-            'facilitatortype' => (bool)$facilitator->get_userid() ? '0' : '1',
             'name' => $facilitator->get_name(),
             'allowconflicts' => $facilitator->get_allowconflicts(),
             'description_editor' => ['text' => $facilitator->get_description()],
@@ -172,6 +182,9 @@ class facilitator_edit extends \moodleform {
             'description' => $facilitator->get_description(),
             'descriptionformat' => FORMAT_HTML,
         ];
+        if ($facilitator->exists()) {
+            $formdata->facilitatortype = (bool)$facilitator->get_userid() ? '0' : '1';
+        }
         customfield_load_data($formdata, $prefix, $tblprefix);
         $formdata = file_prepare_standard_editor(
             $formdata,
