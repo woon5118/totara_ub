@@ -135,4 +135,64 @@ class totara_core_install_xmls_testcase extends advanced_testcase {
             }
         }
     }
+
+    /**
+     * Make sure developers do not add invalid new nullable composed unique indexes.
+     *
+     * The problem is that all records with at least one NULL are considered unique because
+     * NULL is not equal to anything, not even other NULL. (MS SQL Server thinks different of course)
+     */
+    public function test_nullable_unique_composed_indexes() {
+        global $DB;
+        $dbmanager = $DB->get_manager();
+
+        $schema = $dbmanager->get_install_xml_schema();
+
+        $kwownproblems = [
+            'course_completion_aggr_methd:course,criteriatype',
+            'badge_criteria:badgeid,criteriatype',
+            'competency:competencyframeworkid,idnumber',
+            'appraisal_scale_value:appraisalscaleid,name,score',
+            'catalog_search_metadata:instanceid,pluginname,plugintype',
+            'cohort_visibility:cohortid,instanceid,instancetype',
+            'quickaccess_preferences:userid,name',
+            'feedback360_scale_value:feedback360scaleid,name,score',
+            'dp_component_settings:templateid,component',
+            'prog_future_user_assignment:programid,userid,assignmentid',
+            'tool_sitepolicy_user_consent:userid,timeconsented,consentoptionid',
+        ];
+        $kwownproblems = array_flip($kwownproblems);
+
+        foreach ($schema->getTables() as $table) {
+            $fields = [];
+            foreach ($table->getFields() as $field) {
+                $fields[$field->getName()] = $field;
+            }
+            $indexes = $table->getIndexes();
+            foreach ($indexes as $index) {
+                if (!$index->getUnique()) {
+                    continue;
+                }
+                $fieldnames = $index->getFields();
+                if (count($fieldnames) < 2) {
+                    continue;
+                }
+                foreach ($fieldnames as $fieldname) {
+                    $field = $fields[$fieldname];
+                    if (!$field->getNotNull()) {
+                        $problem = $table->getName() . ':' . implode(',', $fieldnames);
+                        if (isset($kwownproblems[$problem])) {
+                            unset($kwownproblems[$problem]);
+                            continue 2;
+                        }
+                        $this->fail('Invalid unexpected composed nullable unique index detected: ' . $problem);
+                    }
+                }
+            }
+        }
+
+        if ($kwownproblems) {
+            $this->fail('Known invalid composed nullable unique index was removed without deleting it from the whitelist: ' . implode("\n", array_keys($kwownproblems)));
+        }
+    }
 }
