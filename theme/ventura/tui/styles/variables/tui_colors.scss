@@ -27,7 +27,7 @@
   //
 
   // Primary colour
-  // Often used for default image, backgrounds, line separators & visiual indicators
+  // Often used for default image, backgrounds, line separators & visual indicators
   --tui-color-primary: #dce44b;
 
   // Secondary colour
@@ -147,4 +147,6 @@
   @import 'theme_ventura/variables/colors/progressbar';
   // collapsible
   @import 'theme_ventura/variables/colors/collapsible';
+  // progress tracker
+  @import 'theme_ventura/variables/colors/progresstracker';
 }
