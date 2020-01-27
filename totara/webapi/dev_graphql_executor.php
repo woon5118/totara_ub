@@ -21,11 +21,9 @@
  * @package totara_webapi
  */
 
-use GraphQL\Error\Debug;
-use GraphQL\Server\StandardServer;
 use core\webapi\execution_context;
 use totara_webapi\graphql;
-use totara_webapi\local\util;
+use totara_webapi\server;
 
 define('NO_DEBUG_DISPLAY', true);
 define('AJAX_SCRIPT', true);
@@ -44,20 +42,7 @@ if (!defined('GRAPHQL_DEVELOPMENT_MODE') or !GRAPHQL_DEVELOPMENT_MODE) {
     die;
 }
 
-try {
-    $schema = graphql::get_schema();
-    $schema->assertValid();
-
-    $server = new StandardServer([
-        'debug' => Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE,
-        'schema' => $schema,
-        'fieldResolver' => [graphql::class, 'default_resolver'],
-        'rootValue' => graphql::get_server_root($schema),
-        'context' => execution_context::create('dev', null),
-        'errorsHandler' => [util::class, 'graphql_error_handler'],
-    ]);
-    $server->handleRequest();
-} catch (Throwable $e) {
-    StandardServer::send500Error($e, Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE, true);
-}
+$server = new server(execution_context::create(graphql::TYPE_DEV));
+$result = $server->handle_request();
+$server->send_response($result);
 

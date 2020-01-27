@@ -18,85 +18,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Petr Skoda <petr.skoda@totaralearning.com>
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package totara_webapi
  */
 
-use GraphQL\Error\Debug;
-use GraphQL\Executor\ExecutionResult;
-use GraphQL\Server\Helper;
-use GraphQL\Server\StandardServer;
-use \totara_webapi\graphql;
 use core\webapi\execution_context;
-use totara_webapi\local\util;
+use totara_webapi\graphql;
 
 class totara_webapi_graphql_testcase extends advanced_testcase {
-
-    public function test_get_graphqls_files() {
-        // Non-existant folder
-        $files = graphql::get_graphqls_files(__DIR__.'/fixtures/idontexist');
-        $this->assertIsArray($files);
-        $this->assertEmpty($files);
-
-        // Folder without any graphqls files
-        $files = graphql::get_graphqls_files(__DIR__.'/');
-        $this->assertIsArray($files);
-        $this->assertEmpty($files);
-
-        // Test folder with some test files in it
-        $files = graphql::get_graphqls_files(__DIR__.'/fixtures/webapi');
-        $this->assertIsArray($files);
-        $this->assertCount(3, $files);
-        $this->assertEqualsCanonicalizing(
-            [
-                __DIR__.'/fixtures/webapi/test_schema_1.graphqls',
-                __DIR__.'/fixtures/webapi/test_schema_2.graphqls',
-                __DIR__.'/fixtures/webapi/test_schema_3.graphqls',
-            ],
-            $files
-        );
-    }
-
-    public function test_get_schema_file_contents() {
-        $schema = graphql::get_schema_file_contents();
-
-        $this->assertIsArray($schema);
-        foreach ($schema as $i => $content) {
-            $this->assertIsInt($i);
-            $this->assertIsString($content);
-        }
-    }
-
-    public function test_schema_is_valid() {
-        $schema = graphql::get_schema();
-        $this->assertInstanceOf('GraphQL\Type\Schema', $schema);
-
-        $schema->assertValid();
-    }
 
     /**
      * @return array
      */
     public function standard_operation_types() {
         return [['ajax'], ['external'], ['mobile']];
-    }
-
-    /**
-     * @dataProvider standard_operation_types
-     * @param $type
-     */
-    public function test_get_persisted_operations($type) {
-        $operations = graphql::get_persisted_operations($type);
-        $this->assertIsArray($operations);
-        foreach ($operations as $name => $file) {
-            $this->assertRegExp('/^[a-z]+_[a-z0-9_]+$/D', $name);
-            $this->assertFileExists($file);
-            $this->assertRegExp('/\.graphql$/D', $file);
-            // Make sure the operation name matches the file name.
-            $filename = basename($file, '.graphql');
-            $this->assertStringEndsWith($filename, $name);
-            $contents = file_get_contents($file);
-            $this->assertRegExp("/(mutation|query)\s+{$name}\s*[\{\(]/", $contents);
-        }
     }
 
     /**
@@ -113,7 +48,11 @@ class totara_webapi_graphql_testcase extends advanced_testcase {
     }
 
     public function test_get_server_root() {
-        $schema = graphql::get_schema();
+        // We do not need the full schema, so mock it
+        $schema = $this->getMockBuilder(\GraphQL\Type\Schema ::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $root = graphql::get_server_root($schema);
         $this->assertSame([], $root);
     }
@@ -162,10 +101,7 @@ class totara_webapi_graphql_testcase extends advanced_testcase {
     }
 
     public function test_execute_operation_with_invalid_name() {
-        $this->expectException(coding_exception::class);
-        $this->expectExceptionMessage('Invalid Web API operation name');
-
-        graphql::execute_operation(
+        $result = graphql::execute_operation(
             execution_context::create('ajax', 'xxxcore_lang_strings_nosession'),
             [
                 'lang' => 'en',
@@ -174,68 +110,8 @@ class totara_webapi_graphql_testcase extends advanced_testcase {
                 ]
             ]
         );
-    }
 
-    public function test_execute_introspection_query() {
-        $schema = graphql::get_schema();
-
-        $server = new StandardServer([
-            'debug' => Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE,
-            'schema' => $schema,
-            'fieldResolver' => [graphql::class, 'default_resolver'],
-            'rootValue' => graphql::get_server_root($schema),
-            'context' => execution_context::create('dev', null),
-            'errorsHandler' => [util::class, 'graphql_error_handler'],
-        ]);
-
-        $helper = new Helper();
-        $request = $helper->parseRequestParams('POST', self::get_introspection_query_params(), []);
-
-        $response = $server->executeRequest($request);
-        $this->assertInstanceOf(ExecutionResult::class, $response);
-        $this->assertEmpty($response->errors, 'Unexpected errors found in request');
-    }
-
-    private static function get_introspection_query_params(): array {
-        return [
-            'query' => self::get_introspection_query(),
-            'variables' => [],
-            'operationName' => null
-        ];
-    }
-
-    private static function get_introspection_query(): string {
-        // Not getting the types to keep performance impact of this as low as possible.
-        // It should still be enough to test that introspection works.
-        return '
-            query IntrospectionQuery {
-                __schema {
-                    queryType { name }
-                    mutationType { name }
-                    subscriptionType { name }
-                    directives {
-                        name
-                        description
-                        locations
-                        args {
-                            ...InputValue
-                        }
-                    }
-                }
-            }
-        
-            fragment InputValue on __InputValue {
-                name
-                description
-                type { ...TypeRef }
-                defaultValue
-            }
-        
-            fragment TypeRef on __Type {
-                kind
-                name
-            }
-        ';
+        $this->assertNotEmpty($result->errors);
     }
 
 }

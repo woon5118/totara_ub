@@ -27,8 +27,11 @@ global $CFG;
 
 require_once($CFG->dirroot . '/totara/job/lib.php');
 
+use core\webapi\execution_context;
+use GraphQL\Error\Debug;
 use \totara_job\job_assignment;
 use \totara_job\webapi\resolver\query;
+use totara_webapi\graphql;
 
 /**
  * Tests the totara job assignments query resolver
@@ -36,7 +39,7 @@ use \totara_job\webapi\resolver\query;
 class totara_job_webapi_resolver_query_assignments_testcase extends advanced_testcase {
 
     private function get_execution_context(string $type = 'dev', ?string $operation = null) {
-        return \core\webapi\execution_context::create($type, $operation);
+        return execution_context::create($type, $operation);
     }
 
     private function create_job_assignment($data) {
@@ -132,8 +135,8 @@ class totara_job_webapi_resolver_query_assignments_testcase extends advanced_tes
         $job1 =  $this->create_job_assignment(['userid' => $user->id, 'idnumber' => 'j1']);
         $job2 =  $this->create_job_assignment(['userid' => $user->id, 'idnumber' => 'j2', 'managerjaid' => $managerja->id, 'appraiserid' => $appraiser->id]);
 
-        $result = \totara_webapi\graphql::execute_operation(
-            \core\webapi\execution_context::create('ajax', 'totara_job_assignments'),
+        $result = graphql::execute_operation(
+            execution_context::create('ajax', 'totara_job_assignments'),
             ['userid' => $user->id]
         );
         $expected = [
@@ -168,13 +171,13 @@ class totara_job_webapi_resolver_query_assignments_testcase extends advanced_tes
                 function($obj) {
                     return (array)$obj;
                 },
-                $result->toArray(\GraphQL\Error\Debug::INCLUDE_DEBUG_MESSAGE)
+                $result->toArray(Debug::INCLUDE_DEBUG_MESSAGE)
             )
         );
 
         $this->setUser($user);
-        $result = \totara_webapi\graphql::execute_operation(
-            \core\webapi\execution_context::create('ajax', 'totara_job_assignments'),
+        $result = graphql::execute_operation(
+            execution_context::create('ajax', 'totara_job_assignments'),
             ['userid' => $user->id]
         );
         self::assertSame(
@@ -183,70 +186,30 @@ class totara_job_webapi_resolver_query_assignments_testcase extends advanced_tes
                 function($obj) {
                     return (array)$obj;
                 },
-                $result->toArray(\GraphQL\Error\Debug::INCLUDE_DEBUG_MESSAGE)
+                $result->toArray(Debug::INCLUDE_DEBUG_MESSAGE)
             )
         );
 
         // Invalid userid
-        $result = \totara_webapi\graphql::execute_operation(
-            \core\webapi\execution_context::create('ajax', 'totara_job_assignments'),
+        $result = graphql::execute_operation(
+            execution_context::create('ajax', 'totara_job_assignments'),
             ['userid' => 'apples']
         );
-        $expected = [
-            'errors' => [
-                [
-                    'message' => 'Internal server error',
-                    'extensions' => [
-                        'category' => 'internal'
-                    ],
-                    'locations' => [
-                        [
-                            'line' => 1,
-                            'column' => 30
-                        ]
-                    ]
-                ]
-            ]
-        ];
-        self::assertSame(
-            $expected,
-            array_map(
-                function($obj) {
-                    return (array)$obj;
-                },
-                $result->toArray()
-            )
+
+        $this->assertEquals(
+            'Variable "$userid" got invalid value "apples"; Expected type core_id; Invalid parameter value detected',
+            $result->toArray(Debug::INCLUDE_DEBUG_MESSAGE)['errors'][0]['debugMessage']
         );
 
         // Missing userid
-        $result = \totara_webapi\graphql::execute_operation(
-            \core\webapi\execution_context::create('ajax', 'totara_job_assignments'),
+        $result = graphql::execute_operation(
+            execution_context::create('ajax', 'totara_job_assignments'),
             []
         );
-        $expected = [
-            'errors' => [
-                [
-                    'message' => 'Variable "$userid" of required type "core_id!" was not provided.',
-                    'extensions' => [
-                        'category' => 'graphql'
-                    ],
-                    'locations' => [
-                        [
-                            'line' => 1,
-                            'column' => 30
-                        ]
-                    ]
-                ]
-            ]
-        ];
-        self::assertSame(
-            $expected,
-            array_map(
-                function($obj) {
-                    return (array)$obj;
-                },
-                $result->toArray(\GraphQL\Error\Debug::INCLUDE_DEBUG_MESSAGE)
-            )
+
+        $this->assertEquals(
+            'Variable "$userid" of required type "core_id!" was not provided.',
+            $result->toArray(Debug::INCLUDE_DEBUG_MESSAGE)['errors'][0]['message']
         );
     }
 }

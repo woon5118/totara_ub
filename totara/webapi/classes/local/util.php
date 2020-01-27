@@ -23,30 +23,37 @@
 
 namespace totara_webapi\local;
 
+use Throwable;
+
 /**
  * Class util
  *
  * NOTE: This is not a public API - do not use in plugins or 3rd party code!
  */
 final class util {
+
     /**
      * Send response and stop execution.
      *
      * @param array $response
-     * @param int $statuscode optional status code for transfer protocol related errors
+     * @param int $status_code optional status code for transfer protocol related errors
+     * @param bool $stop_execution
      * @return void - does not return
      */
-    public static function send_response(array $response, $statuscode = null) {
-        if (!$statuscode) {
-            $statuscode = 200;
+    public static function send_response(array $response, $status_code = null, bool $stop_execution = true) {
+        if (!$status_code) {
+            $status_code = 200;
         }
-        header('Content-type: application/json; charset=utf-8', true, $statuscode);
-        header('X-Content-Type-Options: nosniff');
-        header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
-        header('Pragma: no-cache');
-        header('Expires: Mon, 20 Aug 1969 09:23:00 GMT');
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-        header('Accept-Ranges: none');
+        if (!headers_sent()) {
+            header('Content-type: application/json; charset=utf-8', true, $status_code);
+            header('X-Content-Type-Options: nosniff');
+            header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+            header('Pragma: no-cache');
+            header('Expires: Mon, 20 Aug 1969 09:23:00 GMT');
+            header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+            header('Accept-Ranges: none');
+        }
+
         if (!empty($response['errors']) and !isset($response['error'])) {
             // BC for Moodle ajaxexception
             $errors = [];
@@ -56,7 +63,9 @@ final class util {
             $response['error'] = implode("\n", $errors);
         }
         echo json_encode($response, JSON_PRESERVE_ZERO_FRACTION | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        die;
+        if ($stop_execution) {
+            die;
+        }
     }
 
     /**
@@ -64,9 +73,10 @@ final class util {
      *
      * @param string $message
      * @param int $statuscode optional status code for transfer protocol related errors
+     * @param bool $stop_execution
      */
-    public static function send_error(string $message, $statuscode = null) {
-        self::send_response(['errors' => [['message' => $message]]], $statuscode);
+    public static function send_error(string $message, $statuscode = null, bool $stop_execution = true) {
+        self::send_response(['errors' => [['message' => $message]]], $statuscode, $stop_execution);
     }
 
     /**
@@ -90,7 +100,7 @@ final class util {
     /**
      * Default exception handler for Web API ajax.
      *
-     * @param \Throwable $ex
+     * @param Throwable $ex
      * @return void - does not return. Terminates execution!
      */
     public static function exception_handler($ex) {
@@ -115,14 +125,24 @@ final class util {
 
     /**
      * Log exceptions during ajax execution.
-     * @param \Throwable $ex
+     *
+     * @param Throwable $ex
      */
     public static function log_exception($ex) {
-        $message = $ex->getMessage();
-        $info = get_exception_info($ex);
-        error_log("AJAX API error: $message Debug: " . $info->debuginfo
-            . "\n" . format_backtrace($info->backtrace, true));
-
+        global $CFG;
+        // For now just logging if on developer mode to not flood the logs if someone sends a whole lot of invalid requests
+        if ($CFG->debugdeveloper) {
+            $message = $ex->getMessage();
+            $info = get_exception_info($ex);
+            error_log(
+                sprintf(
+                    "AJAX API error: %s Debug: %s\n%s",
+                    $message,
+                    $info->debuginfo,
+                    format_backtrace($info->backtrace, true)
+                )
+            );
+        }
     }
 
     /**
@@ -134,7 +154,7 @@ final class util {
      */
     public static function graphql_error_handler(array $errors, callable $formatter) {
         foreach ($errors as $error) {
-            /** @var \Throwable $error */
+            /** @var Throwable $error */
             $prev = $error->getPrevious();
             if (!$prev) {
                 continue;
@@ -142,5 +162,36 @@ final class util {
             self::log_exception($prev);
         }
         return array_map($formatter, $errors);
+    }
+
+    /**
+     * Get all files with given extension from directory
+     *
+     * @param string $dir
+     * @param string $extension
+     * @return array
+     */
+    public static function get_files_from_dir(string $dir, string $extension): array {
+        if (!file_exists($dir) || !is_readable($dir) || !is_dir($dir)) {
+            return [];
+        }
+
+        // We could use glob() but using open/readdir is more performant
+        $files = [];
+        if ($handle = opendir($dir)) {
+            while (false !== ($file_name = readdir($handle))) {
+                if (preg_match("/\\.".preg_quote($extension)."$/", $file_name)) {
+                    $name = basename($file_name, ".{$extension}");
+                    if ($name !== clean_param($name, PARAM_SAFEDIR)) {
+                        continue;
+                    }
+                    $files[$name] = "{$dir}/{$file_name}";
+                }
+            }
+
+            closedir($handle);
+        }
+
+        return $files;
     }
 }

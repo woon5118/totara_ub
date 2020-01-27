@@ -18,10 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package core
+ * @package totara_webapi
  */
 
-namespace core\webapi\resolver\query;
+namespace totara_webapi\webapi\resolver\query;
 
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
@@ -29,7 +29,7 @@ use core\webapi\query_resolver;
 /**
  * Simple query returning ok to be able to test availability of the webapi services
  */
-final class webapi_status implements query_resolver {
+final class status implements query_resolver {
     public static function resolve(array $args, execution_context $ec) {
         return [
             'status' => 'ok',

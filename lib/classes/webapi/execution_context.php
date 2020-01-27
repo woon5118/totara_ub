@@ -25,6 +25,7 @@ namespace core\webapi;
 
 use core\date_format;
 use core\format;
+use GraphQL\Type\Definition\ResolveInfo;
 use totara_core\formatter\field\date_field_formatter;
 use totara_core\formatter\field\text_field_formatter;
 
@@ -32,13 +33,14 @@ use totara_core\formatter\field\text_field_formatter;
  * GraphQL execution context.
  */
 class execution_context {
+
     /** @var string */
     private $type;
 
     /** @var string|null */
     private $operationname;
 
-    /** @var \GraphQL\Type\Definition\ResolveInfo|null */
+    /** @var ResolveInfo|null */
     private $resolveinfo;
 
     /** @var \context */
@@ -47,14 +49,11 @@ class execution_context {
     /**
      * Constructor.
      *
-     * @param string $type type of end point 'ajax', 'external', 'mobile', 'dev', etc.
-     * @param string|null $operationname the name of query or mutation
+     * @param string $type type of end point, see TYPE_* constants in \totara_webapi\graphql class
+     * @param string|null $operationname the name of query or mutation, can be null, i.e. in batched queries
      */
     protected function __construct(string $type, ?string $operationname) {
         $this->type = $type;
-        if ($type !== 'dev' and !$operationname) {
-            throw new \coding_exception('Persisted operations must be used outside of development mode');
-        }
         $this->operationname = $operationname;
     }
 
@@ -65,7 +64,7 @@ class execution_context {
      * @param string|null $operationname the name of query or mutation
      * @return execution_context
      */
-    final public static function create(string $type, ?string $operationname) {
+    final public static function create(string $type, ?string $operationname = null) {
         // NOTE: the main purpose of this method is to allow us to introduce subclasses for different types
         //       without breaking BC.
         return new self($type, $operationname);
@@ -73,16 +72,16 @@ class execution_context {
 
     /**
      * @internal
-     * @param \GraphQL\Type\Definition\ResolveInfo|null $info
+     * @param ResolveInfo|null $info
      */
-    final public function set_resolve_info(?\GraphQL\Type\Definition\ResolveInfo $info) {
+    final public function set_resolve_info(?ResolveInfo $info) {
         $this->resolveinfo = $info;
     }
 
     /**
      * Returns advanced information for the current resolve step.
      *
-     * @return \GraphQL\Type\Definition\ResolveInfo|null
+     * @return ResolveInfo|null
      */
     final public function get_resolve_info() {
         return $this->resolveinfo;

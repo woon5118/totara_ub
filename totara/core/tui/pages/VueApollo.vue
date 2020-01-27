@@ -25,13 +25,13 @@
 </template>
 
 <script>
-import statusQuery from 'core/graphql/webapi_status_nosession';
+import statusQuery from 'totara_webapi/graphql/status_nosession';
 
 export default {
   apollo: {
     ping: {
       query: statusQuery,
-      update: data => data.core_webapi_status,
+      update: data => data.totara_webapi_status,
     },
   },
 };
