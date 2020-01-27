@@ -82,7 +82,7 @@ class auth_plugin_connect extends auth_plugin_base {
             $idp = array(
                 'url' => new moodle_url('/auth/connect/sso_start.php', array('serverid' => $server->id)),
                 'name' => format_string($server->servername),
-                'icon' => new pix_icon('icon', format_string($server->servername), 'auth_connect'),
+                'icon' => \core\output\flex_icon::get_icon('icon', 'auth_connect', ['alt' => format_string($server->servername)]),
             );
             $result[] = $idp;
         }
