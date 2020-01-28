@@ -798,7 +798,9 @@ class core_message_externallib_testcase extends externallib_advanced_testcase {
             $messageid = core_message_external::delete_message($m2to3, $user3->id, false);
             $this->fail('Exception expected due invalid messageid.');
         } catch (moodle_exception $e) {
-            $this->assertEquals('You do not have permission to delete this message', $e->errorcode);
+            // Totara: fix test for bogus error message
+            $this->assertSame('notlocalisederrormessage', $e->errorcode);
+            $this->assertContains('You do not have permission to delete this message', $e->getMessage());
         }
 
         $this->setUser($user3);

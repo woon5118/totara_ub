@@ -231,7 +231,7 @@ class totara_program_program_completion_testcase extends reportcache_advanced_te
             $this->assertEquals("Shouldn't reach this code, exception not triggered!", $progcompletion);
         } catch (exception $e) {
             $a = array('programid' => 1234321, 'userid' => -5);
-            $this->assertContains(get_string('error:cannotloadcompletionrecord', 'totara_program', $a), $e->getMessage());
+            $this->assertContains(s(get_string('error:cannotloadcompletionrecord', 'totara_program', $a)), $e->getMessage());
         }
     }
 
@@ -269,7 +269,7 @@ class totara_program_program_completion_testcase extends reportcache_advanced_te
             prog_write_completion($progcompletion);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (exception $e) {
-            $this->assertStringStartsWith('error/Call to prog_write_completion with completion record that does not match the existing record', $e->getMessage());
+            $this->assertContains('Call to prog_write_completion with completion record that does not match the existing record', $e->getMessage());
         }
 
         // Update, but records don't match the database #1.
@@ -279,7 +279,7 @@ class totara_program_program_completion_testcase extends reportcache_advanced_te
             prog_write_completion($progcompletion);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (exception $e) {
-            $this->assertStringStartsWith('error/Call to prog_write_completion with completion record that does not match the existing record', $e->getMessage());
+            $this->assertContains('Call to prog_write_completion with completion record that does not match the existing record', $e->getMessage());
         }
 
         // Update, but records don't match the database #2.
@@ -289,7 +289,7 @@ class totara_program_program_completion_testcase extends reportcache_advanced_te
             prog_write_completion($progcompletion);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (exception $e) {
-            $this->assertStringStartsWith('error/Call to prog_write_completion with completion record that does not match the existing record', $e->getMessage());
+            $this->assertContains('Call to prog_write_completion with completion record that does not match the existing record', $e->getMessage());
         }
     }
 
@@ -457,7 +457,7 @@ class totara_program_program_completion_testcase extends reportcache_advanced_te
             prog_write_courseset_completion($cscompletion);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (exception $e) {
-            $this->assertStringStartsWith('error/Call to prog_write_courseset_completion insert with completion record that does not match the existing record', $e->getMessage());
+            $this->assertContains('Call to prog_write_courseset_completion insert with completion record that does not match the existing record', $e->getMessage());
         }
 
         // Update, but records don't match the database #1.
@@ -467,7 +467,7 @@ class totara_program_program_completion_testcase extends reportcache_advanced_te
             prog_write_courseset_completion($cscompletion);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (exception $e) {
-            $this->assertStringStartsWith('error/Call to prog_write_courseset_completion update with completion record that does not match the existing record', $e->getMessage());
+            $this->assertContains('Call to prog_write_courseset_completion update with completion record that does not match the existing record', $e->getMessage());
         }
 
         // Update, but records don't match the database #2.
@@ -477,7 +477,7 @@ class totara_program_program_completion_testcase extends reportcache_advanced_te
             prog_write_courseset_completion($cscompletion);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (exception $e) {
-            $this->assertStringStartsWith('error/Call to prog_write_courseset_completion update with completion record that does not match the existing record', $e->getMessage());
+            $this->assertContains('Call to prog_write_courseset_completion update with completion record that does not match the existing record', $e->getMessage());
         }
 
         // Update, but records don't match the database #3.
@@ -487,7 +487,7 @@ class totara_program_program_completion_testcase extends reportcache_advanced_te
             prog_write_courseset_completion($cscompletion);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (exception $e) {
-            $this->assertStringStartsWith('error/Call to prog_write_courseset_completion update with completion record that does not match the existing record', $e->getMessage());
+            $this->assertContains('Call to prog_write_courseset_completion update with completion record that does not match the existing record', $e->getMessage());
         }
     }
 

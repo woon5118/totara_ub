@@ -218,7 +218,7 @@ class core_cache_config_writer_testcase extends advanced_testcase {
             $config->delete_store_instance('default_application');
             $this->fail('Default store deleted. This should not be possible!');
         } catch (Exception $e) {
-            $this->assertStringStartsWith('cache/The can not delete the default stores.', $e->getMessage());
+            $this->assertContains('The can not delete the default stores.', $e->getMessage());
             $this->assertInstanceOf('cache_exception', $e);
         }
 
@@ -226,7 +226,7 @@ class core_cache_config_writer_testcase extends advanced_testcase {
             $config->delete_store_instance('some_crazy_store');
             $this->fail('You should not be able to delete a store that does not exist.');
         } catch (Exception $e) {
-            $this->assertStringStartsWith('cache/The requested store does not exist.', $e->getMessage());
+            $this->assertContains('The requested store does not exist.', $e->getMessage());
             $this->assertInstanceOf('cache_exception', $e);
         }
 
@@ -235,7 +235,7 @@ class core_cache_config_writer_testcase extends advanced_testcase {
             $config->add_store_instance('storeconfigtest', 'shallowfail', array('test' => 'a', 'one' => 'two'));
             $this->fail('You should not be able to add an instance of a store that does not exist.');
         } catch (Exception $e) {
-            $this->assertStringStartsWith('cache/Invalid plugin name specified. The plugin does not exist or is not valid.', $e->getMessage());
+            $this->assertContains('Invalid plugin name specified. The plugin does not exist or is not valid.', $e->getMessage());
             $this->assertInstanceOf('cache_exception', $e);
         }
     }

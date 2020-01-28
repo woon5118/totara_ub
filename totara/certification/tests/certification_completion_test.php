@@ -3206,7 +3206,7 @@ class totara_certification_certification_completion_testcase extends reportcache
             $this->assertEquals("Shouldn't reach this code, exception not triggered!", $certcompletion);
         } catch (exception $e) {
             $a = array('programid' => 1234321, 'userid' => -5);
-            $this->assertContains(get_string('error:cannotloadcompletionrecords', 'totara_certification', $a), $e->getMessage());
+            $this->assertContains(s(get_string('error:cannotloadcompletionrecords', 'totara_certification', $a)), $e->getMessage());
         }
     }
 

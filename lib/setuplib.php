@@ -105,19 +105,30 @@ class moodle_exception extends Exception {
             $module = 'error';
         }
 
+        // Totara: make sure real error code from lang string is used as parameter, human readable string is invalid!
+        if ((clean_param($module, PARAM_COMPONENT) !== $module) || (clean_param($errorcode, PARAM_STRINGID) !== $errorcode)) {
+            // NOTE: bogus parameters, later we should trigger debugging here, this is plain wrong.
+            $a = s($errorcode);
+            $errorcode = 'notlocalisederrormessage';
+            $module = 'error';
+            $message = get_string($errorcode, $module, $a);
+            $haserrorstring = true;
+
+        } else if (get_string_manager()->string_exists($errorcode, $module)) {
+            $message = get_string($errorcode, $module, $a);
+            $haserrorstring = true;
+
+        } else {
+            // NOTE: it looks like developer intended to add an error string, we should add debugging later.
+            $message = $module . '/' . $errorcode;
+            $haserrorstring = false;
+        }
+
         $this->errorcode = $errorcode;
         $this->module    = $module;
         $this->link      = $link;
         $this->a         = $a;
         $this->debuginfo = is_null($debuginfo) ? null : (string)$debuginfo;
-
-        if (get_string_manager()->string_exists($errorcode, $module)) {
-            $message = get_string($errorcode, $module, $a);
-            $haserrorstring = true;
-        } else {
-            $message = $module . '/' . $errorcode;
-            $haserrorstring = false;
-        }
 
         if (defined('PHPUNIT_TEST') and PHPUNIT_TEST and $debuginfo) {
             $message = "$message ($debuginfo)";

@@ -66,8 +66,9 @@ class core_backup_encrypted_content_testscase extends advanced_testcase {
             $this->fail('Expecting base_element_struct_exception exception, none happened');
         } catch (exception $e) {
             $this->assertInstanceOf('base_element_struct_exception', $e);
-            $this->assertEquals('encrypted_final_element incorrect key length', $e->errorcode);
-
+            // Totara: fix test for bogus error message
+            $this->assertSame('notlocalisederrormessage', $e->errorcode);
+            $this->assertContains('encrypted_final_element incorrect key length', $e->getMessage());
         }
 
         // Using a manually defined (correct length) key.

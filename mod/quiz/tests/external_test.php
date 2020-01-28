@@ -676,7 +676,9 @@ class mod_quiz_external_testcase extends externallib_advanced_testcase {
             mod_quiz_external::start_attempt($quiz->id, array(array("name" => "quizpassword", "value" => 'bad')));
             $this->fail('Exception expected due to invalid passwod.');
         } catch (moodle_exception $e) {
-            $this->assertEquals(get_string('passworderror', 'quizaccess_password'), $e->errorcode);
+            // Totara: fix test for bogus error message
+            $this->assertSame('notlocalisederrormessage', $e->errorcode);
+            $this->assertContains(get_string('passworderror', 'quizaccess_password'), $e->getMessage());
         }
 
         // Now, try everything correct.
@@ -772,7 +774,9 @@ class mod_quiz_external_testcase extends externallib_advanced_testcase {
             testable_mod_quiz_external::validate_attempt($params);
             $this->fail('Exception expected due to invalid passwod.');
         } catch (moodle_exception $e) {
-            $this->assertEquals(get_string('passworderror', 'quizaccess_password'), $e->errorcode);
+            // Totara: fix test for bogus error message
+            $this->assertSame('notlocalisederrormessage', $e->errorcode);
+            $this->assertContains(get_string('passworderror', 'quizaccess_password'), $e->getMessage());
         }
 
         // Now, try everything correct.
@@ -788,7 +792,9 @@ class mod_quiz_external_testcase extends externallib_advanced_testcase {
             testable_mod_quiz_external::validate_attempt($params);
             $this->fail('Exception expected due to page out of range.');
         } catch (moodle_quiz_exception $e) {
-            $this->assertEquals('Invalid page number', $e->errorcode);
+            // Totara: fix test for bogus error message
+            $this->assertSame('notlocalisederrormessage', $e->errorcode);
+            $this->assertContains('Invalid page number', $e->getMessage());
         }
 
         $params['page'] = 0;
@@ -1389,7 +1395,9 @@ class mod_quiz_external_testcase extends externallib_advanced_testcase {
             mod_quiz_external::view_attempt($attempt->id, 0);
             $this->fail('Exception expected due to try to see a previous page.');
         } catch (moodle_quiz_exception $e) {
-            $this->assertEquals('Out of sequence access', $e->errorcode);
+            // Totara: fix test for bogus error message
+            $this->assertSame('notlocalisederrormessage', $e->errorcode);
+            $this->assertContains('Out of sequence access', $e->getMessage());
         }
 
     }
