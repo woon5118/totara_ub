@@ -395,23 +395,28 @@ final class signup_helper {
 
         \core_collator::asort_objects_by_property($users, 'timesignedup', \core_collator::SORT_NUMERIC);
 
+        $newstate = false;
         if ($users) {
-            // We want to book users from waitlist...
-            $oldstate = waitlisted::class;
-            $newstate = booked::class;
+            // We want to book users from waitlist, unless waitlist everyone is enabled.
+            if (empty($seminarevent->get_waitlisteveryone())) {
+                $oldstate = waitlisted::class;
+                $newstate = booked::class;
+            }
             // Unless there no sessions, in which case we want to waitlist booked users.
             if (!$seminarevent->is_sessions()) {
                 $oldstate = booked::class;
                 $newstate = waitlisted::class;
             }
 
-            foreach ($users as $user) {
-                $signup = new \mod_facetoface\signup((int)$user->submissionid);
-                $signup->set_actorid($signup->get_userid());
-                $state = $signup->get_state();
-                if ($state instanceof $oldstate) {
-                    if ($state->can_switch($newstate)) {
-                        $signup->switch_state($newstate);
+            if ($newstate) {
+                foreach ($users as $user) {
+                    $signup = new \mod_facetoface\signup((int) $user->submissionid);
+                    $signup->set_actorid($signup->get_userid());
+                    $state = $signup->get_state();
+                    if ($state instanceof $oldstate) {
+                        if ($state->can_switch($newstate)) {
+                            $signup->switch_state($newstate);
+                        }
                     }
                 }
             }

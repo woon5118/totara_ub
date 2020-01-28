@@ -362,7 +362,12 @@ function facetoface_update_instance($facetoface, $mform = null) {
                 $signup = new signup($attendee->submissionid);
                 $signup->set_actorid($signup->get_userid());
                 $state = $signup->get_state();
-                if ($state->can_switch(signup\state\booked::class, signup\state\waitlisted::class)) {
+                // If waitlist everyone is enabled, only try switching to waitlisted; otherwise try switching to booked or waitlisted.
+                if (!empty($seminarevent->get_waitlisteveryone())) {
+                    if ($state->can_switch(signup\state\waitlisted::class)) {
+                        $signup->switch_state(signup\state\waitlisted::class);
+                    }
+                } else if ($state->can_switch(signup\state\booked::class, signup\state\waitlisted::class)) {
                     $signup->switch_state(signup\state\booked::class, signup\state\waitlisted::class);
                 } else if (!$seminarevent->is_first_started()) {
                     // Requested state for "Manager approval" and "Role approval" will not change state,

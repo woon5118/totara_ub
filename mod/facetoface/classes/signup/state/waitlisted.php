@@ -24,15 +24,15 @@
 namespace mod_facetoface\signup\state;
 
 use mod_facetoface\event\booking_waitlisted;
-use mod_facetoface\signup\condition\{booking_common,
-    event_has_capacity,
+use mod_facetoface\signup\condition\{
+    booking_common,
     event_has_session,
     event_is_cancelled,
     event_is_not_cancelled,
     event_not_in_the_past,
     event_registration_is_available,
     is_not_reservation,
-    waitlist_everyone_disabled};
+};
 use mod_facetoface\signup\restriction\actor_can_overbook;
 use mod_facetoface\signup\transition;
 use mod_facetoface\event\abstract_signup_event;
@@ -54,6 +54,14 @@ class waitlisted extends state implements interface_event {
     final public function get_map() : array {
         return [
             transition::to(new booked($this->signup))->with_conditions(
+                /**
+                 * - waitlist everyone is disabled
+                 * - event has session
+                 * - event has capacity
+                 * - event not in the past
+                 * - registration is available
+                 * - event not cancelled
+                 */
                 booking_common::class
             ),
             transition::to(new booked($this->signup))->with_conditions(
@@ -64,14 +72,6 @@ class waitlisted extends state implements interface_event {
                 is_not_reservation::class
             )->with_restrictions(
                 actor_can_overbook::class
-            ),
-            transition::to(new booked($this->signup))->with_conditions(
-                event_has_session::class,
-                event_not_in_the_past::class,
-                event_registration_is_available::class,
-                event_is_not_cancelled::class,
-                event_has_capacity::class,
-                waitlist_everyone_disabled::class
             ),
             transition::to(new user_cancelled($this->signup))->with_conditions(
                 event_is_not_cancelled::class

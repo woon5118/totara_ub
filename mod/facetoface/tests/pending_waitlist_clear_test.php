@@ -50,7 +50,6 @@ class mod_facetoface_pending_waitlist_clear_testcase extends advanced_testcase {
         $e = new seminar_event();
         $e->set_capacity(2);
         $e->set_facetoface($f2f->id);
-        $e->set_waitlisteveryone(1);
         $e->set_allowoverbook(1);
         $e->save();
 

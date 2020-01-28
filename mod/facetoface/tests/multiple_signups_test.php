@@ -129,7 +129,6 @@ class mod_facetoface_multiple_signups_testcase extends \advanced_testcase {
         $seminar1->save();
 
         $seminarevent11 = array_pop($s1events);
-        $seminarevent11->set_waitlisteveryone(1); // Enable waitlist.
         $seminarevent11->set_allowoverbook(1); // Enable waitlist.
         $seminarevent11->set_capacity(2);
         $seminarevent11->save();
@@ -144,7 +143,6 @@ class mod_facetoface_multiple_signups_testcase extends \advanced_testcase {
         }
 
         $seminarevent12 = array_pop($s1events);
-        $seminarevent12->set_waitlisteveryone(1); // Enable waitlist.
         $seminarevent12->set_allowoverbook(1); // Enable waitlist.
         $seminarevent12->set_capacity(1);
 
@@ -161,7 +159,6 @@ class mod_facetoface_multiple_signups_testcase extends \advanced_testcase {
         $seminar2->save();
 
         $seminarevent21 = array_pop($s2events);
-        $seminarevent21->set_waitlisteveryone(1); // Enable waitlist.
         $seminarevent21->set_allowoverbook(1); // Enable waitlist.
         $seminarevent21->set_capacity(3);
 
@@ -306,7 +303,6 @@ class mod_facetoface_multiple_signups_testcase extends \advanced_testcase {
 
         // Sign all the users up to the event so we can move them into testable states.
         $seminarevent = array_pop($s1events);
-        $seminarevent->set_waitlisteveryone(1); // Enable waitlist.
         $seminarevent->set_allowoverbook(1); // Enable waitlist.
         $seminarevent->set_capacity(7);
         $seminarevent->save();

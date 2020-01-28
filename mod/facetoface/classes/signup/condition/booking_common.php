@@ -35,6 +35,7 @@ class booking_common extends condition {
      * - waitlist everyone is disabled
      * - event has session
      * - event has capacity
+     * - event not in the past
      * - registration is available
      * - event not cancelled
      *
