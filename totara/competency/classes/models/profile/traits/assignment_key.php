@@ -37,13 +37,14 @@ trait assignment_key {
     protected static function build_key(assignment $assignment, bool $include_status = false) {
         $type = $assignment->type;
 
-        // We are grouping individual admin and manager assignments together...
+        // We are grouping individual admin and manager assignments together
+        // in an artificial "direct assignments" group
         if ($type === assignment::TYPE_OTHER) {
             $type = assignment::TYPE_ADMIN;
         }
 
         $key = $include_status ? "{$assignment->status}/" : '';
 
-        return md5("{$key}{$type}/{$assignment->user_group_type}/{$assignment->user_group_id}");
+        return "{$key}{$type}/{$assignment->user_group_type}/{$assignment->user_group_id}";
     }
 }

@@ -17,77 +17,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
  * @author Fabian Derschatta <fabian.derschata@totaralearning.com>
  * @package totara_competency
  */
 
 use core\collection;
-use core\entities\user;
 use totara_competency\entities\assignment;
 use totara_competency\models\assignment as assignment_model;
-use totara_competency\models\profile\competency_progress;
-use totara_competency\models\profile\filter;
 use totara_competency\models\profile\item;
-use totara_competency\models\profile\progress;
+use totara_competency\models\profile\traits\assignment_key;
 
 global $CFG;
 
 require_once($CFG->dirroot . '/totara/competency/tests/totara_competency_testcase.php');
 
-/**
- * Class totara_competency_model_scale_testcase
- *
- * @coversDefaultClass \totara_competency\models\scale
- */
-class totara_competency_model_profile_progress_testcase extends totara_competency_testcase {
+class totara_competency_model_profile_item_testcase extends totara_competency_testcase {
 
-    /**
-     * @covers ::find_by_id
-     * @covers ::find_by_ids
-     * @covers ::__construct
-     */
-    public function test_it_loads_scales_using_ids() {
-        $data = $this->create_sorting_testing_data(true);
+    use assignment_key;
 
-        // Let's build data for a user
-        /** @var user $user */
-        $user = $data['users']->first()->add_extra_attribute('fullname');
-
-        $progress = progress::for($user->id);
-
-        $this->assertInstanceOf(progress::class, $progress);
-
-        // Let's check that it has required objects
-
-        // User
-        $this->assertInstanceOf(stdClass::class, $progress->user);
-        $this->assertEquals($user->to_array(), (array) $progress->user);
-
-        // Individual progress items
-        $this->assertInstanceOf(collection::class, $progress->items);
-
-        $this->assertGreaterThan(0, count($progress->items));
-
-        $progress->items->map(function (item $item) {
-            // Well having type-hint will already assert that the item is of the correct type
-
-            // TODO Let's quickly assert items for the correct structure and content
-        });
-
-        // Filters
-        $this->assertIsArray($progress->filters);
-        $this->assertGreaterThan(0, count($progress->filters));
-
-        foreach ($progress->filters as $filter) {
-            $this->assertInstanceOf(filter::class, $filter);
-        }
-
-        // Latest achievement
-        $this->assertEquals($data['competencies']->first()->fullname, $progress->latest_achievement);
-    }
-
-    public function test_build_progress_items_from_assignments() {
+    public function test_build_items_from_assignments() {
         $fw = $this->generator()->create_framework();
         $comp1 = $this->generator()->create_competency(null, $fw);
         $comp2 = $this->generator()->create_competency(null, $fw);
@@ -109,11 +57,12 @@ class totara_competency_model_profile_progress_testcase extends totara_competenc
 
         $user_ass1 = new assignment($ass_gen->create_user_assignment($comp2->id, $user1->id));
         $user_ass2 = new assignment($ass_gen->create_user_assignment($comp1->id, $user1->id));
+        $user_ass3 = new assignment($ass_gen->create_user_assignment($comp2->id, $user1->id, ['type' => assignment::TYPE_OTHER]));
+        $user_ass4 = new assignment($ass_gen->create_user_assignment($comp1->id, $user2->id, ['type' => assignment::TYPE_OTHER]));
 
         $self_ass1 = new assignment($ass_gen->create_self_assignment($comp2->id, $user1->id));
         $self_ass2 = new assignment($ass_gen->create_self_assignment($comp1->id, $user1->id));
         $self_ass3 = new assignment($ass_gen->create_self_assignment($comp1->id, $user2->id));
-        $self_ass4 = new assignment($ass_gen->create_self_assignment($comp1->id, $user2->id, ['status' => assignment::STATUS_ARCHIVED]));
 
         $assignments = new \core\orm\collection([
             $pos_ass1,
@@ -122,34 +71,48 @@ class totara_competency_model_profile_progress_testcase extends totara_competenc
             $pos_ass4,
             $user_ass1,
             $user_ass2,
+            $user_ass3,
+            $user_ass4,
             $self_ass1,
             $self_ass2,
             $self_ass3,
-            $self_ass4,
         ]);
 
-        $collection = competency_progress::build_from_assignments($assignments);
+        $collection = item::build_from_assignments($assignments);
 
         // Expecting 2 items as there are two competencies
-        $this->assertCount(2, $collection);
+        $this->assertCount(6, $collection);
 
-        // Only those assignments were added which differ in user_group (type/id) and status
-        $expected_assignemts[$comp1->id] = collection::new([
+        $expected_assignemts[self::build_key($pos_ass1)] = collection::new([
             $pos_ass1,
-            $pos_ass3,
-            $user_ass2,
-            $self_ass3,
-            $self_ass4 // status is different so it should still shows up
-        ]);
-
-        // Only those assignments were added which differ in user_group (type/id) and status
-        $expected_assignemts[$comp2->id] = collection::new([
             $pos_ass2,
-            $pos_ass4,
-            $user_ass1,
         ]);
 
-        /** @var competency_progress $item */
+        $expected_assignemts[self::build_key($pos_ass3)] = collection::new([
+            $pos_ass3,
+            $pos_ass4,
+        ]);
+
+        $expected_assignemts[self::build_key($user_ass1)] = collection::new([
+            $user_ass1,
+            $user_ass2,
+            // $user_ass3  --> skipped as there's already an item in the collection for the same user group type / id
+        ]);
+
+        $expected_assignemts[self::build_key($user_ass4)] = collection::new([
+            $user_ass4,
+        ]);
+
+        $expected_assignemts[self::build_key($self_ass2)] = collection::new([
+            $self_ass1,
+            $self_ass2,
+        ]);
+
+        $expected_assignemts[self::build_key($self_ass3)] = collection::new([
+            $self_ass3,
+        ]);
+
+        /** @var item $item */
         foreach ($collection as $key => $item) {
             $this->assertEqualsCanonicalizing(
                 $expected_assignemts[$key]->pluck('id'),

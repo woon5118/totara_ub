@@ -98,11 +98,26 @@ class item {
     /**
      * Append assignment to this progress groups
      *
-     * @param $assignment
+     * @param assignment_model $assignment
      * @return $this
      */
-    public function append_assignment($assignment) {
-        $this->assignments->append($assignment);
+    public function append_assignment(assignment_model $assignment) {
+        // In the case when there's the same competency assigned to the same
+        // group and user we only add it once. Currently, all assignments for the same
+        // competency will have the same achievements value as assignment specific criteria
+        // are not yet implemented so there's no reason to show it multiple times in one group
+        $existing_assignment = $this->assignments->find(function (assignment_model $item) use ($assignment) {
+            $item_entity = $item->get_entity();
+            $assignment_entity = $assignment->get_entity();
+
+            return $item_entity->competency_id == $assignment_entity->competency_id
+                && $item_entity->user_group_type == $assignment_entity->user_group_type
+                && $item_entity->user_group_id == $assignment_entity->user_group_id;
+        });
+
+        if (!$existing_assignment) {
+            $this->assignments->append($assignment);
+        }
 
         return $this;
     }
@@ -141,7 +156,9 @@ class item {
                 $progress->set(new static($key, $model->get_progress_name()), $key);
             }
 
-            $progress->item($key)->append_assignment($model);
+            /** @var self $item */
+            $item = $progress->item($key);
+            $item->append_assignment($model);
         });
 
         $progress->map(function (self $item) {

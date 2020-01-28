@@ -113,7 +113,9 @@ class competency_progress {
             if (!$progress->item($assignment->competency_id)) {
                 $progress->set(new static($assignment), $assignment->competency_id);
             } else {
-                $progress->item($assignment->competency_id)->append_assignment($assignment);
+                /** @var self $item */
+                $item = $progress->item($assignment->competency_id);
+                $item->append_assignment($assignment);
             }
         });
 
@@ -165,13 +167,29 @@ class competency_progress {
     }
 
     /**
-     * Append assignment to the current progress item model
+     * Append assignment to the current progress item model.
+     * Only adds the assignment to the collection if there's none with the same
+     * user_group_type and user_group_id to not show duplicates.
      *
      * @param assignment $assignment
      * @return $this
      */
     protected function append_assignment(assignment $assignment) {
-        $this->assignments->append(assignment_model::load_by_entity($assignment));
+        // In the case when there's the same competency assigned to the same
+        // group and user we only add it once. Currently, all assignments for the same
+        // competency will have the same achievements value as assignment specific criteria
+        // are not yet implemented so there's no reason to show it multiple times in one group
+        $existing_assignment = $this->assignments->find(function (assignment_model $item) use ($assignment) {
+            $item_entity = $item->get_entity();
+
+            return $item_entity->competency_id == $assignment->competency_id
+                && $item_entity->user_group_type == $assignment->user_group_type
+                && $item_entity->user_group_id == $assignment->user_group_id
+                && $item_entity->status == $assignment->status;
+        });
+        if (!$existing_assignment) {
+            $this->assignments->append(assignment_model::load_by_entity($assignment));
+        }
 
         return $this;
     }
