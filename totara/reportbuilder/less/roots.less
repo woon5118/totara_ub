@@ -344,8 +344,10 @@ form[id^="toolbarsearch"].mform .fsubmit {
 
         &--progress {
             display: block;
+            float: left;
             margin: unset;
             width: 33%;
+            height: 200px;
 
             @media (min-width: @totara_style-screen_sm_min) {
                 width: 25%;
@@ -353,7 +355,6 @@ form[id^="toolbarsearch"].mform .fsubmit {
 
             .rb-chartjs__chart__canvas {
                 margin: 0 auto;
-                width: @reportbuilder_minimum_size;
             }
         }
     }
