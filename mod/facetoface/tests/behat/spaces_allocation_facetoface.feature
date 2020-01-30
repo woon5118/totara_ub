@@ -266,27 +266,22 @@ Feature: Allocate spaces for team in seminar
     And I follow "View all events"
     And I follow "Add event"
     And I follow "show-selectdate0-dialog"
-    And I fill seminar session with relative date in form data:
-      | sessiontimezone     | Pacific/Auckland |
-      | timestart[day]      | -1               |
-      | timestart[hour]     | 9                |
-      | timestart[minute]   | 0                |
-      | timestart[timezone] | Pacific/Auckland |
-      | timefinish[day]     | 1                |
-      | timefinish[hour]    | 15               |
-      | timefinish[minute]  | 0                |
-      | timefinish[timezone]| Pacific/Auckland |
-    And I press "OK"
     And I set the following fields to these values:
-      | capacity | 33 |
+      | timestart[day]     | 3    |
+      | timestart[month]   | 3    |
+      | timestart[year]    | ## last year ## Y ## |
+      | timefinish[day]    | 4    |
+      | timefinish[month]  | 4    |
+      | timefinish[year]   | ## next year ## Y ## |
+    And I press "OK"
     And I press "Save changes"
     And I log out
 
     When I log in as "sitemanager1"
     And I am on "Course 1" course homepage
-    Then I should see "In progress" in the "0 / 33" "table_row"
+    Then I should see "In progress" in the "3 March" "table_row"
 
-    And I click on "Go to event" "link" in the "0 / 33" "table_row"
+    And I click on "Go to event" "link" in the "3 March" "table_row"
     And I should not see "Allocate spaces for team"
     And I should not see "Reserve spaces for team"
     And I should not see "Manage reservations"
