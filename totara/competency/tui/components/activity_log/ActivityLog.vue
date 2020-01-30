@@ -124,7 +124,7 @@ export default {
         if (entry.assignment != null) {
           assignmentList[entry.assignment.id] = {
             id: entry.assignment.id,
-            label: entry.assignment.progress_name,
+            label: this.getFilterLabel(entry),
           };
         }
       });
@@ -135,6 +135,33 @@ export default {
       } else {
         return this.assignments;
       }
+    },
+
+    getFilterLabel(entry) {
+      let label = entry.assignment.progress_name;
+      // Special handling for direct assignments which we list
+      // as "Directly assigned", this adds some more information
+      // to the string which includes the full name of the assigner and their role
+      if (this.isDirectlyAssigned(entry.assignment)) {
+        let str_options = {
+          progress_name: entry.assignment.progress_name,
+          user_fullname_role: entry.assignment.reason_assigned,
+        };
+        label = this.$str(
+          'progress_name_by_user',
+          'totara_competency',
+          str_options
+        );
+      }
+
+      return label;
+    },
+
+    isDirectlyAssigned(assignment) {
+      return (
+        assignment.user_group_type === 'user' &&
+        (assignment.type === 'admin' || assignment.type === 'other')
+      );
     },
   },
 
@@ -175,7 +202,8 @@ export default {
     "totara_competency": [
       "activity_log",
       "assignment",
-      "activitylog_proficientstatus"
+      "activitylog_proficientstatus",
+      "progress_name_by_user"
     ]
   }
 </lang-strings>

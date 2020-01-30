@@ -522,6 +522,9 @@ class assignment {
             case 'min_value':
                 return $this->get_min_value();
 
+            case 'assigner':
+                return (object)$this->get_assigner()->to_array();
+
             // We fall back to the default if it's not there intentionally
             case 'assigned_at':
                 if ($this->entity->relation_loaded('assignment_user')) {
@@ -565,7 +568,8 @@ class assignment {
             'min_value',
             'proficient',
             'archived_at',
-            'assigned_at'
+            'assigned_at',
+            'assigner',
         ];
 
         return in_array($field, $extra_fields) || isset($this->entity->{$field});

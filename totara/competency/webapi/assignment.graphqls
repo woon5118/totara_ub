@@ -20,6 +20,7 @@ type totara_competency_assignment {
   user_group: totara_competency_user_group!
   progress_name(format: core_format = HTML): String
   reason_assigned(format: core_format = HTML): String
+  assigner: core_user
 }
 
 type totara_competency_user_group {

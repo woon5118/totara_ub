@@ -35,7 +35,7 @@ class assignment implements type_resolver {
 
     /**
      * @param string $field
-     * @param assignment $assignment
+     * @param assignment_model $assignment
      * @param array $args
      * @param execution_context $ec
      * @return mixed

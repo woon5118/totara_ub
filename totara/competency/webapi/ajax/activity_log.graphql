@@ -17,6 +17,7 @@ query totara_competency_activity_log(
       type
       user_group_type
       progress_name
+      reason_assigned
     }
     assignment_action
     type
