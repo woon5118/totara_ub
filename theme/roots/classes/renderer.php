@@ -76,7 +76,7 @@ class theme_roots_renderer extends plugin_renderer_base {
         if ($region === $this->grid::REGION_TOP) {
             $html = '<div id="region-top" class="row">' . $html . '</div>';
         } else if ($region === $this->grid::REGION_BOTTOM) {
-            $html = '<div id="region-top" class="row">' . $html . '</div>';
+            $html = '<div id="region-bottom" class="row">' . $html . '</div>';
         }
 
         return $html;
