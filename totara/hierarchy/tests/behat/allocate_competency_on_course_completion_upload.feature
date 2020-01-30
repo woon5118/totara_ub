@@ -41,13 +41,13 @@ Feature: Verify competencies completion status is updated when the associated co
     When I am on "Course 1" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
-    And I click on "criteria_activity_value[1]" "checkbox"
+    And I click on "Page - Course 1 Completion Page" "checkbox"
     And I press "Save changes"
 
     And I am on "Course 2" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
-    And I click on "criteria_activity_value[2]" "checkbox"
+    And I click on "Page - Course 2 Completion Page" "checkbox"
     And I press "Save changes"
 
     # Create the competency scale.

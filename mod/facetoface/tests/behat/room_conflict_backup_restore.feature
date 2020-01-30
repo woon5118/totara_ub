@@ -87,9 +87,9 @@ Feature: Test room conflicts through backup/restore
 
     When I click on "Duplicate" "link" in the "Facetoface TL12734" activity
     And I turn editing mode off
-    Then I should see "Room 2" in the "#module-1.facetoface" "css_element"
-    And I should see "Room 1" in the "#module-1.facetoface" "css_element"
+    Then I should see "Room 2" in the ".activity.facetoface:first-child" "css_element"
+    And I should see "Room 1" in the ".activity.facetoface:first-child" "css_element"
     # The room with prevent conflict should not appear.
-    And I should see "Room 2" in the "#module-2.facetoface" "css_element"
-    And I should not see "Room 1" in the "#module-2.facetoface" "css_element"
+    And I should see "Room 2" in the ".activity.facetoface:last-child" "css_element"
+    And I should not see "Room 1" in the ".activity.facetoface:last-child" "css_element"
 

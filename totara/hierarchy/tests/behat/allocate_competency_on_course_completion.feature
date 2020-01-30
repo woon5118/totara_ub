@@ -32,7 +32,7 @@ Feature: Verify completion of a course triggers assigning a competency.
     And I am on "Course 1" course homepage
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
-    And I click on "criteria_activity_value[1]" "checkbox"
+    And I click on "Page - Course Completion Page" "checkbox"
     And I press "Save changes"
 
     # Create the competency scale.
@@ -130,7 +130,7 @@ Feature: Verify completion of a course triggers assigning a competency.
     And I follow "Bob's Learning Plan"
     And I click on "Competencies" "link" in the "#dp-plan-content" "css_element"
     # Not competent. Needs to be set by a cron run.
-    Then the field "compprof_competency[1]" matches value "1"
+    Then the field "Status of Competency 1" matches value "1"
 
     When I navigate to "Scheduled tasks" node in "Site administration > Server"
     And I press "Set all enabled tasks to run on next cron"
@@ -142,9 +142,9 @@ Feature: Verify completion of a course triggers assigning a competency.
     And I follow "Bob's Learning Plan"
     And I click on "Competencies" "link" in the "#dp-plan-content" "css_element"
     # Minimum competency set by the course.
-    Then the field "compprof_competency[1]" matches value "3"
+    Then the field "Status of Competency 1" matches value "3"
 
-    When I set the field "compprof_competency[1]" to "5"
+    When I set the field "Status of Competency 1" to "5"
     And I navigate to "Scheduled tasks" node in "Site administration > Server"
     And I press "Set all enabled tasks to run on next cron"
     And I trigger cron
@@ -156,6 +156,6 @@ Feature: Verify completion of a course triggers assigning a competency.
     And I click on "Competencies" "link" in the "#dp-plan-content" "css_element"
 
     # This should match the higher competency value set by admin,
-    Then the field "compprof_competency[1]" matches value "5"
+    Then the field "Status of Competency 1" matches value "5"
 
     And I log out

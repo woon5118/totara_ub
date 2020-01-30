@@ -58,7 +58,7 @@ Feature: Verify the LCA block content displays the correct information.
     # Set course completion on course 2.
     Then I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
-    And I click on "criteria_activity_value[1]" "checkbox"
+    And I click on "Page - Test Page" "checkbox"
     And I press "Save changes"
     And I log out
 
@@ -123,9 +123,9 @@ Feature: Verify the LCA block content displays the correct information.
     # Set course completion on course 2.
     Then I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
-    And I click on "criteria_activity_value[1]" "checkbox"
-    And I click on "criteria_activity_value[2]" "checkbox"
-    And I click on "criteria_activity_value[3]" "checkbox"
+    And I click on "Page - Test Page" "checkbox"
+    And I click on "Page - Second Page" "checkbox"
+    And I click on "Page - Last Page" "checkbox"
     And I press "Save changes"
 
     # Visit the course.
@@ -140,7 +140,7 @@ Feature: Verify the LCA block content displays the correct information.
     And I follow "My Forum"
     And I press "Add a new discussion topic"
     And I set the field "Subject" to "My Discussion"
-    And I set the field "Message" to "<p><a href='../../mod/page/view.php?id=1'>Link to Course 2 activity</a>.</p>"
+    And I set the field "Message" to "<p><a href='#'>Link to Course 2 activity</a>.</p>"
     And I press "Post to forum"
     Then I should see "Your post was successfully added."
     And I log out
@@ -157,7 +157,9 @@ Feature: Verify the LCA block content displays the correct information.
     # We're still on Course one, but click the forum link to a page in Course 2.
     When I follow "My Forum"
     And I follow "My Discussion"
-    And I follow "Link to Course 2 activity"
+    And "Link to Course 2 activity" "link" should exist
+    And I am on "Course 2" course homepage
+    And I follow "Test Page"
 
     When I click on "Dashboard" in the totara menu
     Then I should see "Course 2" in the "Last Course Accessed" "block"
