@@ -57,9 +57,9 @@ Feature: Test facilitator conflicts through backup/restore
 
     When I click on "Duplicate" "link" in the "seminar 1" activity
     And I turn editing mode off
-    Then I should see "facilitator 2" in the "#module-1.facetoface" "css_element"
-    And I should see "facilitator 1" in the "#module-1.facetoface" "css_element"
+    Then I should see "facilitator 2" in the ".activity.facetoface:first-child" "css_element"
+    And I should see "facilitator 1" in the ".activity.facetoface:first-child" "css_element"
     # The facilitator with prevent conflict should not appear.
-    And I should see "facilitator 2" in the "#module-2.facetoface" "css_element"
-    And I should not see "facilitator 1" in the "#module-2.facetoface" "css_element"
+    And I should see "facilitator 2" in the ".activity.facetoface:last-child" "css_element"
+    And I should not see "facilitator 1" in the ".activity.facetoface:last-child" "css_element"
 
