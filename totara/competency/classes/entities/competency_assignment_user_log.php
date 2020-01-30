@@ -25,6 +25,7 @@ namespace totara_competency\entities;
 
 
 use core\orm\entity\entity;
+use core\orm\entity\relations\belongs_to;
 
 /**
  * @property int $assignment_id
@@ -33,6 +34,7 @@ use core\orm\entity\entity;
  * @property int $created_at
  *
  * @property-read string $action_name
+ * @property-read assignment $assignment
  *
  * @package totara_competency\entities
  */
@@ -88,6 +90,15 @@ class competency_assignment_user_log extends entity {
                 throw new \coding_exception('Unknown action name for assignment user log action \''.$this->action.'\'');
         }
         return $name;
+    }
+
+    /**
+     * Assignment
+     *
+     * @return belongs_to
+     */
+    public function assignment(): belongs_to {
+        return $this->belongs_to(assignment::class, 'assignment_id');
     }
 
 }

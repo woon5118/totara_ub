@@ -48,7 +48,7 @@ class competency_achievement extends activity_log {
 
         $model = new competency_achievement();
         $model->set_entity($entity);
-        $model->scale_value = new scale_value($entity->scale_value_id);
+        $model->scale_value = $entity->value;
         return $model;
     }
 
@@ -98,7 +98,7 @@ class competency_achievement extends activity_log {
      * @return bool
      */
     public function has_scale_value(): bool {
-        return $this->scale_value->exists();
+        return !empty($this->scale_value);
     }
 
 }

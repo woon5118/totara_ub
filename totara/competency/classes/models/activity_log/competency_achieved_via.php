@@ -62,15 +62,15 @@ class competency_achieved_via extends activity_log {
     public function get_description(): string {
         /** @var entities\competency_achievement $achievement */
         $achievement = $this->get_entity();
-        $scale_value = new scale_value($achievement->scale_value_id);
+        $scale_value = $achievement->value;
 
-        if (!$scale_value->exists()) {
+        if (!$scale_value) {
             return get_string('activitylog_rating_value_reset', 'totara_competency');
         }
 
         $criteria_met = [];
-        foreach ($achievement->get_achieved_via() as $via) {
-            $achievement_detail_strings = pathway::fetch($via->pathway_id)
+        foreach ($achievement->achieved_via as $via) {
+            $achievement_detail_strings = pathway::from_entity($via->pathway)
                 ->get_achievement_detail()
                 ->set_related_info((array) json_decode($via->related_info))
                 ->get_achieved_via_strings();

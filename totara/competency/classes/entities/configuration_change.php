@@ -3,6 +3,7 @@
 namespace totara_competency\entities;
 
 use core\orm\entity\entity;
+use core\orm\entity\relations\belongs_to;
 use core\orm\query\builder;
 use totara_competency\aggregation_users_table;
 use totara_competency\hook\competency_configuration_changed;
@@ -14,6 +15,9 @@ use totara_competency\hook\competency_configuration_changed;
  * @property int $time_changed
  * @property string $change_type
  * @property string $related_info
+ *
+ * @property-read assignment $assignment
+ * @property-read competency $competency
  */
 class configuration_change extends entity {
 
@@ -136,4 +140,23 @@ class configuration_change extends entity {
 
         return $decoded;
     }
+
+    /**
+     * Competency relation
+     *
+     * @return belongs_to
+     */
+    public function competency(): belongs_to {
+        return $this->belongs_to(competency::class, 'comp_id');
+    }
+
+    /**
+     * Assignment relation
+     *
+     * @return belongs_to
+     */
+    public function assignment(): belongs_to {
+        return $this->belongs_to(assignment::class, 'assignment_id');
+    }
+
 }

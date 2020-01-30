@@ -31,6 +31,7 @@ use hierarchy_position\entities\position;
 use core\entities\user;
 use totara_competency\models\activity_log;
 use totara_competency\entities;
+use totara_competency\user_groups;
 
 class assignment extends activity_log {
 
@@ -70,10 +71,11 @@ class assignment extends activity_log {
      * @return string
      */
     public function get_description(): string {
-        $assignment = new entities\assignment($this->get_assignment()->get_id());
+        $assignment_model = $this->get_assignment();
+        $assignment_entity = $assignment_model->get_entity();
         switch ($this->get_entity()->action) {
             case competency_assignment_user_log::ACTION_ASSIGNED:
-                switch ($assignment->type) {
+                switch ($assignment_entity->type) {
                     case entities\assignment::TYPE_SYSTEM:
                         return get_string('activitylog_assignedcontinuous', 'totara_competency');
                     case entities\assignment::TYPE_LEGACY:
@@ -81,39 +83,34 @@ class assignment extends activity_log {
                     case entities\assignment::TYPE_SELF:
                         return get_string('activitylog_assignedself', 'totara_competency');
                     case entities\assignment::TYPE_ADMIN:
-                        switch ($assignment->user_group_type) {
-                            // Todo: Use methods available in assignment model when branches have been merged.
-                            case 'user':
-                                $assigner = new user($assignment->created_by);
-                                $a = new \stdClass();
-                                $a->assigner_name = fullname((object)$assigner->to_array());
+                        // Use the models user group loading functionality
+                        $user_group = $assignment_model->get_user_group();
+                        $name = $user_group->get_name();
+                        $a = new \stdClass();
+
+                        switch ($user_group->get_type()) {
+                            case user_groups::USER:
+                                $a->assigner_name = fullname((object)$assignment_entity->assigner->to_array());
                                 return get_string('activitylog_assignedadmin', 'totara_competency', $a);
-                            case 'cohort':
-                                $user_group = new cohort($assignment->user_group_id);
-                                $a = new \stdClass();
-                                $a->audience_name = $user_group->name;
+                            case user_groups::COHORT:
+                                $a->audience_name = $name;
                                 return get_string('activitylog_assignedaudience', 'totara_competency', $a);
-                            case 'position':
-                                $user_group = new position($assignment->user_group_id);
-                                $a = new \stdClass();
-                                $a->position_name = $user_group->fullname;
+                            case user_groups::POSITION:
+                                $a->position_name = $name;
                                 return get_string('activitylog_assignedposition', 'totara_competency', $a);
-                            case 'organisation':
-                                $user_group = new organisation($assignment->user_group_id);
-                                $a = new \stdClass();
-                                $a->organisation_name = $user_group->fullname;
+                            case user_groups::ORGANISATION:
+                                $a->organisation_name = $name;
                                 return get_string('activitylog_assignedorganisation', 'totara_competency', $a);
                             default:
                                 throw new \coding_exception(
                                     'Invalid type',
-                                    'Assignment group type not found: '. $assignment->user_group_type
+                                    'Assignment group type not found: '. $assignment_entity->user_group_type
                                 );
                         }
                         break;
                     case entities\assignment::TYPE_OTHER:
-                        $assigner = new user($assignment->created_by);
                         $a = new \stdClass();
-                        $a->assigner_name = fullname((object)$assigner->to_array());
+                        $a->assigner_name = fullname((object)$assignment_entity->assigner->to_array());
                         // Todo: How to get role...
                         $a->assigner_role = 'Todo: Get Role';
                         return get_string('activitylog_assignedother', 'totara_competency', $a);
@@ -126,44 +123,40 @@ class assignment extends activity_log {
                 break;
             case competency_assignment_user_log::ACTION_UNASSIGNED_USER_GROUP:
             case competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED:
-                switch ($assignment->type) {
+                switch ($assignment_entity->type) {
                     case entities\assignment::TYPE_SYSTEM:
                         return get_string('activitylog_unassignedcontinuous', 'totara_competency');
                     case entities\assignment::TYPE_SELF:
                         return get_string('activitylog_unassignedself', 'totara_competency');
                     case entities\assignment::TYPE_ADMIN:
-                        switch ($assignment->user_group_type) {
-                            case 'user':
-                                $assigner = new user($assignment->created_by);
-                                $a = new \stdClass();
-                                $a->assigner_name = fullname((object)$assigner->to_array());
+                        // Use the models user group loading functionality
+                        $user_group = $assignment_model->get_user_group();
+                        $name = $user_group->get_name();
+                        $a = new \stdClass();
+
+                        switch ($user_group->get_type()) {
+                            case user_groups::USER:
+                                $a->assigner_name = fullname((object)$assignment_entity->assigner->to_array());
                                 return get_string('activitylog_unassignedadmin', 'totara_competency', $a);
-                            case 'cohort':
-                                $user_group = new cohort($assignment->user_group_id);
-                                $a = new \stdClass();
-                                $a->audience_name = $user_group->name;
+                            case user_groups::COHORT:
+                                $a->audience_name = $name;
                                 return get_string('activitylog_unassignedaudience', 'totara_competency', $a);
-                            case 'position':
-                                $user_group = new position($assignment->user_group_id);
-                                $a = new \stdClass();
-                                $a->position_name = $user_group->fullname;
+                            case user_groups::POSITION:
+                                $a->position_name = $name;
                                 return get_string('activitylog_unassignedposition', 'totara_competency', $a);
-                            case 'organisation':
-                                $user_group = new organisation($assignment->user_group_id);
-                                $a = new \stdClass();
-                                $a->organisation_name = $user_group->fullname;
+                            case user_groups::ORGANISATION:
+                                $a->organisation_name = $name;
                                 return get_string('activitylog_unassignedorganisation', 'totara_competency', $a);
                             default:
                                 throw new \coding_exception(
                                     'Invalid type',
-                                    'Assignment group type not found: '. $assignment->user_group_type
+                                    'Assignment group type not found: '. $assignment_entity->user_group_type
                                 );
                         }
                         break;
                     case entities\assignment::TYPE_OTHER:
-                        $assigner = new user($assignment->created_by);
                         $a = new \stdClass();
-                        $a->assigner_name = fullname((object)$assigner->to_array());
+                        $a->assigner_name = fullname((object)$assignment_entity->assigner->to_array());
                         // Todo: How to get role...
                         $a->assigner_role = 'Todo: Get Role';
                         return get_string('activitylog_unassignedother', 'totara_competency', $a);

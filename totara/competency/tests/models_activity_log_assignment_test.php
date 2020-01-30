@@ -318,12 +318,13 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
     public function test_user_by_admin() {
         $time = time();
 
+        $subject = $this->getDataGenerator()->create_user(['firstname' => 'Albert', 'lastname' => 'Einstein']);
         $user = $this->getDataGenerator()->create_user(['firstname' => 'Isaac', 'lastname' => 'Newton']);
 
         $assignment = new assignment();
         $assignment->type = assignment::TYPE_ADMIN;
         $assignment->user_group_type = user_groups::USER;
-        $assignment->user_group_id = 100;
+        $assignment->user_group_id = $subject->id;
         $assignment->created_by = $user->id;
         $assignment->competency_id = 100;
         $assignment->save();

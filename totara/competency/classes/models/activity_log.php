@@ -85,8 +85,12 @@ abstract class activity_log {
      * @return assignment_model|null
      */
     public function get_assignment(): ?assignment_model {
-        if (isset($this->entity->assignment_id)) {
-            return assignment_model::load_by_entity(assignment_entity::repository()->find($this->entity->assignment_id));
+        if (!$this->entity->relation_exists('assignment')) {
+            throw new \coding_exception('The entity used for activity log has to have an assignment relation');
+        }
+        $assignment = $this->entity->assignment;
+        if (!empty($assignment)) {
+            return assignment_model::load_by_entity($assignment);
         }
 
         return null;

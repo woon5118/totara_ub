@@ -27,6 +27,7 @@ namespace totara_competency\entities;
 use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
+use core\orm\entity\relations\has_many_through;
 
 /**
  * Class competency_achievement
@@ -45,7 +46,9 @@ use core\orm\entity\relations\belongs_to;
  * @property int $last_aggregated
  *
  * @property-read competency $competency
+ * @property-read assignment $assignment
  * @property-read scale_value $value
+ * @property-read pathway_achievement[] $achieved_via
  */
 class competency_achievement extends entity {
 
@@ -70,6 +73,15 @@ class competency_achievement extends entity {
     }
 
     /**
+     * Assignment
+     *
+     * @return belongs_to
+     */
+    public function assignment(): belongs_to {
+        return $this->belongs_to(assignment::class, 'assignment_id');
+    }
+
+    /**
      * Scale value
      *
      * @return belongs_to
@@ -81,12 +93,10 @@ class competency_achievement extends entity {
     /**
      * Get the pathway achievements that led to this competency achievement initially being created.
      *
-     * @return pathway_achievement[]
+     * @return has_many_through
      */
-    public function get_achieved_via(): collection {
-        return pathway_achievement::repository()
-            ->join('totara_competency_achievement_via', 'id', '=', 'pathway_achievement_id')
-            ->where('totara_competency_achievement_via.comp_achievement_id', $this->id)
-            ->get();
+    public function achieved_via(): has_many_through {
+        return $this->has_many_through(pathway_achievement::class, achievement_via::class, 'comp_achievement_id', 'id', 'id', 'pathway_achievement_id');
     }
+
 }

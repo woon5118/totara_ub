@@ -24,14 +24,13 @@
 namespace totara_competency\data_providers;
 
 use core\orm\entity\entity;
-use core\orm\query\builder;
+use core\orm\entity\repository;
 use totara_competency\entities\assignment;
-use totara_competency\entities\competency_assignment_user_log;
-use totara_competency\models\assignment_user_log;
 use totara_competency\entities\competency_achievement;
+use totara_competency\entities\competency_assignment_user_log;
 use totara_competency\entities\configuration_change;
-use totara_competency\models\activity_log_factory;
 use totara_competency\models;
+use totara_competency\models\activity_log_factory;
 
 /**
  * Class activity_log_loader
@@ -59,6 +58,7 @@ class activity_log {
 
     /**
      * @param array $filters
+     * @return activity_log
      */
     public function set_filters(array $filters): activity_log {
 
@@ -147,8 +147,20 @@ class activity_log {
         $achievements = competency_achievement::repository()
             ->where('comp_id', $this->competency_id)
             ->where('user_id', $this->user_id)
+            ->with([
+                'assignment' => function (repository $repository) {
+                    $repository->with('assigner');
+                }
+            ])
+            ->with('value')
+            ->with([
+                'achieved_via' => function (repository $repository) {
+                    $repository->with('pathway');
+                }
+            ])
             ->order_by('time_created', 'desc')
             ->order_by('id', 'desc');
+
         if (!is_null($this->assignment_id)) {
             $achievements->where('assignment_id', $this->assignment_id);
         }
