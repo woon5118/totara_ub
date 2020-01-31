@@ -69,8 +69,6 @@ $string['archivehelp'] = '<p>This option means that the badge will be marked as 
 <p>If you would like your users to retain access to the earned badges it is important to select this option instead of fully deleting badges.</p>';
 $string['attachment'] = 'Attach badge to message';
 $string['attachment_help'] = 'If enabled, an issued badge file will be attached to the recipient\'s email for download. (Attachments must be enabled in *Site administration > Plugins > Message outputs > Email* to use this option.)';
-$string['authorimage'] = 'Image author';
-$string['authorimage_help'] = 'Author of the image, must be an URL.';
 $string['award'] = 'Award badge';
 $string['awardedtoyou'] = 'Issued to me';
 $string['awardoncron'] = 'Access to the badges was successfully enabled. Too many users can instantly earn this badge. To ensure site performance, this action will take some time to process.';
@@ -288,7 +286,6 @@ $string['error:dialognotreeitems'] = 'No badges';
 $string['error:duplicatename'] = 'Badge with such name already exists in the system.';
 $string['error:externalbadgedoesntexist'] = 'Badge not found';
 $string['error:guestuseraccess'] = 'You are currently using guest access. To see badges you need to log in with your user account.';
-$string['error:invalidbadgeurl'] = 'Invalid badge issuer URL format.';
 $string['error:invalidcriteriaparam'] = 'Invalid criteria parameters. ';
 $string['error:invalidcriteriatype'] = 'Invalid criteria type.';
 $string['error:invalidexpiredate'] = 'Expiry date has to be in the future.';
@@ -507,3 +504,6 @@ $string['version'] = 'Version';
 $string['version_help'] = 'When you have multiple related badges and want to keep track of the history behind the badge\'s developements, use this field to version each badge. You can add all related badges on Related badge page.';
 $string['warnexpired'] = ' (This badge has expired!)';
 $string['year'] = 'Year(s)';
+
+// Deprecated since Moodle 3.6.
+$string['error:invalidbadgeurl'] = 'Invalid issuer URL format. The URL should have a prefix http:// or https://.';
