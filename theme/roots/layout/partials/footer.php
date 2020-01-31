@@ -34,6 +34,7 @@ global $OUTPUT;
         <div class="page-footer-loggedin-info">
             <?php echo $OUTPUT->login_info(); ?>
         </div>
+        <div class="tool_usertours-resettourcontainer"><?php // Reset user tour container ?></div>
         <?php echo $OUTPUT->standard_footer_html(); ?>
     </div>
    <small class="page-footer-poweredby"><?php echo $OUTPUT->powered_by_totara(); ?></small>

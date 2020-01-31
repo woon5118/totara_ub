@@ -6,6 +6,7 @@ This file describes API changes for 'theme_roots'.
 * Styling changes applied to login page theme/roots/less/totara/login.less
 * Updated tool_usertours/tourstep template
 * Upgraded Bootstrap to 3.4.1
+* Added reset tour container to theme/roots/layout/partials/footer.php
 
 === 12.0 ===
 
