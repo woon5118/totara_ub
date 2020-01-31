@@ -409,17 +409,6 @@ class core_badges_renderer extends plugin_renderer_base {
         } else {
             $output .= get_string('norelated', 'badges');
         }
-        $output .= $this->heading(get_string('alignment', 'badges'), 3);
-        $competencies = $badge->get_alignment();
-        if (!empty($competencies)) {
-            $items = array();
-            foreach ($competencies as $competency) {
-                $items[] = html_writer::link($competency->targeturl, $competency->targetname, array('target' => '_blank'));
-            }
-            $output .= html_writer::alist($items, array(), 'ul');
-        } else {
-            $output .= get_string('noalignment', 'badges');
-        }
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
 

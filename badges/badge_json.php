@@ -95,22 +95,6 @@ if ($badge->status != BADGE_STATUS_INACTIVE) {
             $json['endorsement'] = $endorsementurl->out(false);
         }
 
-        $competencies = $badge->get_alignment();
-        if (!empty($competencies)) {
-            foreach ($competencies as $item) {
-                $alignment = array('targetName' => $item->targetname, 'targetUrl' => $item->targeturl);
-                if ($item->targetdescription) {
-                    $alignment['targetDescription'] = $item->targetdescription;
-                }
-                if ($item->targetframework) {
-                    $alignment['targetFramework'] = $item->targetframework;
-                }
-                if ($item->targetcode) {
-                    $alignment['targetCode'] = $item->targetcode;
-                }
-                $json['alignment'][] = $alignment;
-            }
-        }
     } else if ($action == 0) {
         // Get the content for issuer.
         $json = $badge->get_badge_issuer();
