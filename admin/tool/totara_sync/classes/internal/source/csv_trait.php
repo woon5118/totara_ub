@@ -66,16 +66,19 @@ trait csv_trait {
         $mform->addElement('header', 'fileheader', get_string('filedetails', 'tool_totara_sync'));
         $mform->setExpanded('fileheader');
 
-        try {
-            if ($this->get_element()->get_fileaccess() == FILE_ACCESS_DIRECTORY) {
-                $mform->addElement('static', 'nameandloc', get_string('nameandloc', 'tool_totara_sync'),
-                    \html_writer::tag('strong', $this->get_filepath()));
-            } else {
-                $link = "{$CFG->wwwroot}/admin/tool/totara_sync/admin/uploadsourcefiles.php";
-                $mform->addElement('static', 'uploadfilelink', get_string('uploadfilelink', 'tool_totara_sync', $link));
+        $classname = get_class($this->get_element());
+        if ($classname::has_file_access_been_configured()) {
+            try {
+                if ($this->get_element()->get_fileaccess() == FILE_ACCESS_DIRECTORY) {
+                    $mform->addElement('static', 'nameandloc', get_string('nameandloc', 'tool_totara_sync'),
+                        \html_writer::tag('strong', $this->get_filepath()));
+                } else {
+                    $link = "{$CFG->wwwroot}/admin/tool/totara_sync/admin/uploadsourcefiles.php";
+                    $mform->addElement('static', 'uploadfilelink', get_string('uploadfilelink', 'tool_totara_sync', $link));
+                }
+            } catch (\totara_sync_exception $e) {
+                $mform->addElement('static', 'configurefileaccess', '', get_string('configurefileaccess', 'tool_totara_sync'));
             }
-        } catch (\totara_sync_exception $e) {
-            $mform->addElement('static', 'configurefileaccess', '', get_string('configurefileaccess', 'tool_totara_sync'));
         }
 
         $encodings = \core_text::get_encodings();
