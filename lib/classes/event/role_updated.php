@@ -15,11 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Role allow switch updated event.
+ * Role updated event.
  *
  * @package    core
- * @since      Moodle 2.6
- * @copyright  2013 Rajesh Taneja <rajesh@moodle.com>
+ * @copyright  2019 Simey Lameze <simey@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,21 +27,21 @@ namespace core\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Role allow switch updated event class.
+ * Role updated event class.
  *
  * @package    core
- * @since      Moodle 2.6
- * @copyright  2013 Rajesh Taneja <rajesh@moodle.com>
+ * @since      Moodle 3.8
+ * @copyright  2019 Simey Lameze <simey@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class role_allow_switch_updated extends base {
+class role_updated extends base {
     /**
      * Initialise event parameters.
      */
     protected function init() {
+        $this->data['objecttable'] = 'role';
         $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_OTHER;
-        $this->data['objecttable'] = 'role_allow_switch';
     }
 
     /**
@@ -51,7 +50,7 @@ class role_allow_switch_updated extends base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventroleallowswitchupdated', 'role');
+        return get_string('eventroleupdated', 'role');
     }
 
     /**
@@ -60,9 +59,7 @@ class role_allow_switch_updated extends base {
      * @return string
      */
     public function get_description() {
-        $action = ($this->other['allow']) ? 'allow' : 'stop allowing';
-        return "The user with id '$this->userid' modified the role with id '" . $this->other['targetroleid']
-            . "' to $action users with that role from switching the role with id '" . $this->objectid . "' to users";
+        return "The user with id '$this->userid' updated the role with id '$this->objectid'.";
     }
 
     /**
@@ -71,7 +68,7 @@ class role_allow_switch_updated extends base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/admin/roles/allow.php', array('mode' => 'switch'));
+        return new \moodle_url('/admin/roles/define.php', ['action' => 'edit', 'roleid' => $this->objectid]);
     }
 
     /**
@@ -80,6 +77,21 @@ class role_allow_switch_updated extends base {
      * @return array
      */
     protected function get_legacy_logdata() {
-        return array(SITEID, 'role', 'edit allow switch', 'admin/roles/allow.php?mode=switch');
+        return [SITEID, 'role', 'update', 'admin/roles/manage.php?action=edit&roleid=' . $this->objectid,
+            $this->other['shortname'], ''];
+    }
+
+    /**
+     * Custom validation.
+     *
+     * @throws \coding_exception
+     * @return void
+     */
+    protected function validate_data() {
+        parent::validate_data();
+
+        if (!isset($this->other['shortname'])) {
+            throw new \coding_exception('The \'shortname\' value must be set in other.');
+        }
     }
 }

@@ -32,12 +32,17 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package    core
  * @since      Moodle 2.6
+ * @depreacted since Totara 13, not triggered any more
  * @copyright  2013 Rajesh Taneja <rajesh@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class role_capabilities_updated extends base {
     /** @var array Legacy log data */
     protected $legacylogdata = null;
+
+    protected function validate_data() {
+        debugging('role_capabilities_updated capability was deprecated and should not be triggered anywhere, it is displayed in historic logs only');
+    }
 
     /**
      * Initialise event parameters.
@@ -101,5 +106,14 @@ class role_capabilities_updated extends base {
 
     public static function get_objectid_mapping() {
         return array('db' => 'role', 'restore' => 'role');
+    }
+
+    /**
+     * This event has been deprecated.
+     *
+     * @return boolean
+     */
+    public static function is_deprecated() {
+        return true;
     }
 }
