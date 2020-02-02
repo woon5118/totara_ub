@@ -110,9 +110,7 @@ class assignment extends activity_log {
                         break;
                     case entities\assignment::TYPE_OTHER:
                         $a = new \stdClass();
-                        $a->assigner_name = fullname((object)$assignment_entity->assigner->to_array());
-                        // Todo: How to get role...
-                        $a->assigner_role = 'Todo: Get Role';
+                        $a->assigner_name = $assignment_model->get_reason_assigned();
                         return get_string('activitylog_assignedother', 'totara_competency', $a);
                     default:
                         throw new \coding_exception(
@@ -156,9 +154,7 @@ class assignment extends activity_log {
                         break;
                     case entities\assignment::TYPE_OTHER:
                         $a = new \stdClass();
-                        $a->assigner_name = fullname((object)$assignment_entity->assigner->to_array());
-                        // Todo: How to get role...
-                        $a->assigner_role = 'Todo: Get Role';
+                        $a->assigner_name = $assignment_model->get_reason_assigned();
                         return get_string('activitylog_unassignedother', 'totara_competency', $a);
                     default:
                         throw new \coding_exception(
