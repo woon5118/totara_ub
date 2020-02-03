@@ -19,10 +19,7 @@
  * @author Simon Chester <simon.chester@totaralearning.com>
  * @package totara_core
  */
-
-const possiblyIE =
-  typeof navigator !== 'undefined' &&
-  /MSIE|Trident\//.test(navigator.userAgent);
+const isIE = document.body.classList.contains('ie');
 
 let rootStyle = null;
 
@@ -52,15 +49,25 @@ export default {
     // HTML5 specifies that JS that comes after CSS waits for the CSS to load
     // before executing
     let value = rootStyle.getPropertyValue('--' + name);
-    value = value === '' ? null : value.trim();
-    if (value === null && possiblyIE) {
+    value = value == null || value === '' ? null : value.trim();
+    if (value === null && isIE) {
       // can't read custom properties in IE, so they are transformed to have a
       // different name, which we can read by indexing into style
       value = rootStyle['-var--' + name];
-      value = value === '' ? null : value.trim();
+      value = value == null || value === '' ? null : value.trim();
     }
     varCache.set(name, value);
     return value;
+  },
+
+  /**
+   * Get the supported variable usage of a given variable name
+   *
+   * @param {string} name
+   * @return {string}
+   */
+  getVarUsage(name) {
+    return isIE ? this.getVar(name) : `var(--${name})`;
   },
 
   /**
