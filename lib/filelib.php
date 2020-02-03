@@ -2899,6 +2899,8 @@ class curl {
     private $securityhelper;
     /** @var bool ignoresecurity a flag which can be supplied to the constructor, allowing security to be bypassed. */
     private $ignoresecurity;
+    /** @var array $mockresponses For unit testing only - return the head of this list instead of making the next request. */
+    private static $mockresponses = [];
 
     /**
      * Curl constructor.
@@ -3440,6 +3442,19 @@ class curl {
     }
 
     /**
+     * For use only in unit tests - we can pre-set the next curl response.
+     * This is useful for unit testing APIs that call external systems.
+     * @param string $response
+     */
+    public static function mock_response($response) {
+        if ((defined('PHPUNIT_TEST') && PHPUNIT_TEST)) {
+            array_push(self::$mockresponses, $response);
+        } else {
+            throw new coding_exception('mock_response function is only available for unit tests.');
+        }
+    }
+
+    /**
      * Single HTTP Request
      *
      * @param string $url The URL to request
@@ -3455,6 +3470,13 @@ class curl {
 
         // Reset here so that the data is valid when result returned from cache, or if we return due to a blacklist hit.
         $this->reset_request_state_vars();
+
+        if ((defined('PHPUNIT_TEST') && PHPUNIT_TEST)) {
+            if ($mockresponse = array_pop(self::$mockresponses)) {
+                $this->info = [ 'http_code' => 200 ];
+                return $mockresponse;
+            }
+        }
 
         // If curl security is enabled, check the URL against the blacklist before calling curl_exec.
         // Note: This will only check the base url. In the case of redirects, the blacklist is also after the curl_exec.

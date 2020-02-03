@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2018120301;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->version   = 2019111800;        // The current plugin version (Date: YYYYMMDDXX).
 $plugin->requires  = 2017110800;        // Requires this Moodle version.
 $plugin->component = 'auth_oauth2';       // Full name of the plugin (used for diagnostics).
-$plugin->backported = 'v3.6.8'; // Backported from this upstream tagged release.
+$plugin->backported = 'v3.8.1'; // Backported from this upstream tagged release.

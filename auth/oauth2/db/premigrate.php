@@ -34,12 +34,8 @@ function xmldb_auth_oauth2_premigrate() {
         throw new coding_exception("Invalid plugin (auth_oauth2) version ($version) for pre-migration");
     }
 
-    // Moodle 3.8 pre-migration line.
-
-    // Moodle 3.7 pre-migration line.
-
-    // OAuth was backported from Moodle 3.6
-    if ($version > 2018120301) {
-        $version = premigrate_plugin_savepoint(2018120301, 'auth', 'oauth2');
+    // OAuth was backported from Moodle 3.8.1
+    if ($version > 2019111800) {
+        $version = premigrate_plugin_savepoint(2019111800, 'auth', 'oauth2');
     }
 }
