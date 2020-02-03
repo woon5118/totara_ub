@@ -95,8 +95,7 @@ class capability_assigned extends base {
         if ($this->contextlevel == CONTEXT_SYSTEM) {
             return new \moodle_url('/admin/roles/define.php', ['action' => 'edit', 'roleid' => $this->objectid]);
         } else {
-            return new \moodle_url('/admin/roles/override.php', ['contextid' => $this->contextid,
-                'roleid' => $this->objectid]);
+            return new \moodle_url('/admin/roles/override.php', ['contextid' => $this->contextid, 'roleid' => $this->objectid]);
         }
     }
 }

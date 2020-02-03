@@ -377,7 +377,7 @@ class core_accesslib_testcase extends advanced_testcase {
         $this->setAdminUser();
         $admin = get_admin();
         $id = create_role('New student role', 'student2', 'New student description', 'student');
-        $role = $DB->get_record('role', array('id'=>$id));
+        $role = $DB->get_record('role', array('id' => $id));
 
         $sink = $this->redirectEvents();
         update_role($role->id, 'Other name', 'othername', 'No description', 'teacher');
@@ -1120,16 +1120,16 @@ class core_accesslib_testcase extends advanced_testcase {
         global $DB, $CFG;
 
         $otherid = create_role('Other role', 'other', 'Some other role', '');
-        $student = $DB->get_record('role', array('shortname'=>'student'), '*', MUST_EXIST);
+        $student = $DB->get_record('role', array('shortname' => 'student'), '*', MUST_EXIST);
 
-        $this->assertFalse($DB->record_exists('role_allow_assign', array('roleid'=>$otherid, 'allowassign'=>$student->id)));
+        $this->assertFalse($DB->record_exists('role_allow_assign', array('roleid' => $otherid, 'allowassign' => $student->id)));
 
         $sink = $this->redirectEvents();
         allow_assign($otherid, $student->id);
         $events = $sink->get_events();
         $this->assertCount(1, $events);
         $sink->close();
-        $this->assertTrue($DB->record_exists('role_allow_assign', array('roleid'=>$otherid, 'allowassign'=>$student->id)));
+        $this->assertTrue($DB->record_exists('role_allow_assign', array('roleid' => $otherid, 'allowassign' => $student->id)));
         $event = array_pop($events);
         $this->assertInstanceOf(core\event\role_allow_assign_updated::class, $event);
         $baseurl = new moodle_url('/admin/roles/allow.php', array('mode' => 'assign'));
@@ -1142,7 +1142,7 @@ class core_accesslib_testcase extends advanced_testcase {
         $events = $sink->get_events();
         $this->assertCount(1, $events);
         $sink->close();
-        $this->assertFalse($DB->record_exists('role_allow_assign', array('roleid'=>$otherid, 'allowassign'=>$student->id)));
+        $this->assertFalse($DB->record_exists('role_allow_assign', array('roleid' => $otherid, 'allowassign' => $student->id)));
         $event = array_pop($events);
         $this->assertInstanceOf(core\event\role_allow_assign_updated::class, $event);
         $baseurl = new moodle_url('/admin/roles/allow.php', array('mode' => 'assign'));
@@ -1158,16 +1158,16 @@ class core_accesslib_testcase extends advanced_testcase {
         global $DB, $CFG;
 
         $otherid = create_role('Other role', 'other', 'Some other role', '');
-        $student = $DB->get_record('role', array('shortname'=>'student'), '*', MUST_EXIST);
+        $student = $DB->get_record('role', array('shortname' => 'student'), '*', MUST_EXIST);
 
-        $this->assertFalse($DB->record_exists('role_allow_override', array('roleid'=>$otherid, 'allowoverride'=>$student->id)));
+        $this->assertFalse($DB->record_exists('role_allow_override', array('roleid' => $otherid, 'allowoverride' => $student->id)));
 
         $sink = $this->redirectEvents();
         allow_override($otherid, $student->id);
         $events = $sink->get_events();
         $this->assertCount(1, $events);
         $sink->close();
-        $this->assertTrue($DB->record_exists('role_allow_override', array('roleid'=>$otherid, 'allowoverride'=>$student->id)));
+        $this->assertTrue($DB->record_exists('role_allow_override', array('roleid' => $otherid, 'allowoverride' => $student->id)));
         $event = array_pop($events);
         $this->assertInstanceOf(core\event\role_allow_override_updated::class, $event);
         $baseurl = new moodle_url('/admin/roles/allow.php', array('mode' => 'override'));
@@ -1180,7 +1180,7 @@ class core_accesslib_testcase extends advanced_testcase {
         $events = $sink->get_events();
         $this->assertCount(1, $events);
         $sink->close();
-        $this->assertFalse($DB->record_exists('role_allow_override', array('roleid'=>$otherid, 'allowoverride'=>$student->id)));
+        $this->assertFalse($DB->record_exists('role_allow_override', array('roleid' => $otherid, 'allowoverride' => $student->id)));
         $event = array_pop($events);
         $this->assertInstanceOf(core\event\role_allow_override_updated::class, $event);
         $baseurl = new moodle_url('/admin/roles/allow.php', array('mode' => 'override'));
@@ -1196,15 +1196,15 @@ class core_accesslib_testcase extends advanced_testcase {
         global $DB, $CFG;
 
         $otherid = create_role('Other role', 'other', 'Some other role', '');
-        $student = $DB->get_record('role', array('shortname'=>'student'), '*', MUST_EXIST);
+        $student = $DB->get_record('role', array('shortname' => 'student'), '*', MUST_EXIST);
 
-        $this->assertFalse($DB->record_exists('role_allow_switch', array('roleid'=>$otherid, 'allowswitch'=>$student->id)));
+        $this->assertFalse($DB->record_exists('role_allow_switch', array('roleid' => $otherid, 'allowswitch' => $student->id)));
 
         $sink = $this->redirectEvents();
         allow_switch($otherid, $student->id);
         $events = $sink->get_events();
         $sink->close();
-        $this->assertTrue($DB->record_exists('role_allow_switch', array('roleid'=>$otherid, 'allowswitch'=>$student->id)));
+        $this->assertTrue($DB->record_exists('role_allow_switch', array('roleid' => $otherid, 'allowswitch' => $student->id)));
         $event = array_pop($events);
         $this->assertInstanceOf(core\event\role_allow_switch_updated::class, $event);
         $baseurl = new moodle_url('/admin/roles/allow.php', array('mode' => 'switch'));
@@ -1216,7 +1216,7 @@ class core_accesslib_testcase extends advanced_testcase {
         allow_switch($otherid, $student->id, false);
         $events = $sink->get_events();
         $sink->close();
-        $this->assertFalse($DB->record_exists('role_allow_switch', array('roleid'=>$otherid, 'allowswitch'=>$student->id)));
+        $this->assertFalse($DB->record_exists('role_allow_switch', array('roleid' => $otherid, 'allowswitch' => $student->id)));
         $event = array_pop($events);
         $this->assertInstanceOf(core\event\role_allow_switch_updated::class, $event);
         $baseurl = new moodle_url('/admin/roles/allow.php', array('mode' => 'switch'));
