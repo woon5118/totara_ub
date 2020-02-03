@@ -32,9 +32,10 @@ defined('MOODLE_INTERNAL') || die();
  * @property-read array $other {
  *      Extra information about event.
  *
+ *      - string name: name of role.
  *      - string shortname: shortname of role.
- *      - string description: (optional) role description.
- *      - string archetype: (optional) role type.
+ *      - string description: role description.
+ *      - string archetype: role archetype.
  * }
  *
  * @package    core
@@ -67,7 +68,22 @@ class role_deleted extends base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' deleted the role with id '$this->objectid'.";
+        $result = "The user with id '$this->userid' deleted the role with id '$this->objectid'";
+        $info = [];
+        if (isset($this->other['shortname'])) {
+            $info[] = 'shortname: ' . $this->other['shortname'];
+        }
+        if (isset($this->other['name'])) {
+            $info[] = 'name: ' . $this->other['name'];
+        }
+        if (isset($this->other['archetype'])) {
+            $info[] = 'archetype: ' . ($this->other['archetype'] === '' ? 'none' : $this->other['archetype']);
+        }
+        if ($info) {
+            $result .= ' (' . implode(', ', $info) . ')';
+        }
+        $result .= '.';
+        return $result;
     }
 
     /**
@@ -100,6 +116,15 @@ class role_deleted extends base {
 
         if (!isset($this->other['shortname'])) {
             throw new \coding_exception('The \'shortname\' value must be set in other.');
+        }
+        if (!isset($this->other['name'])) {
+            throw new \coding_exception('The \'name\' value must be set in other.');
+        }
+        if (!isset($this->other['description'])) {
+            throw new \coding_exception('The \'description\' value must be set in other.');
+        }
+        if (!isset($this->other['archetype'])) {
+            throw new \coding_exception('The \'archetype\' value must be set in other.');
         }
     }
 

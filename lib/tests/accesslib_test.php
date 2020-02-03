@@ -365,7 +365,8 @@ class core_accesslib_testcase extends advanced_testcase {
         $this->assertSame('New student description', $role->description);
         $this->assertSame('student', $role->archetype);
         $this->assertInstanceOf(core\event\role_created::class, $event);
-        $this->assertSame("The user with id '{$admin->id}' created the role with id '{$role->id}'.", $event->get_description());
+        $this->assertSame("The user with id '{$admin->id}' created the role with id '{$role->id}' (shortname: student2, name: New student role, archetype: student).",
+            $event->get_description());
     }
 
     /**
@@ -390,7 +391,8 @@ class core_accesslib_testcase extends advanced_testcase {
         $this->assertSame('No description', $role->description);
         $this->assertSame('teacher', $role->archetype);
         $this->assertInstanceOf(core\event\role_updated::class, $event);
-        $this->assertSame("The user with id '{$admin->id}' updated the role with id '{$role->id}'.", $event->get_description());
+        $this->assertSame("The user with id '{$admin->id}' updated the role with id '{$role->id}' (shortname: othername, name: Other name, archetype: teacher, description: changed).",
+            $event->get_description());
 
         // No changes.
         $sink = $this->redirectEvents();
@@ -409,7 +411,8 @@ class core_accesslib_testcase extends advanced_testcase {
         $this->assertSame('No description', $role->description);
         $this->assertSame('teacher', $role->archetype);
         $this->assertInstanceOf(core\event\role_updated::class, $event);
-        $this->assertSame("The user with id '{$admin->id}' updated the role with id '{$role->id}'.", $event->get_description());
+        $this->assertSame("The user with id '{$admin->id}' updated the role with id '{$role->id}' (name: Other name2).",
+            $event->get_description());
 
         $sink = $this->redirectEvents();
         update_role($role->id, 'Other name2', 'othername2', 'No description', 'teacher');
@@ -422,7 +425,8 @@ class core_accesslib_testcase extends advanced_testcase {
         $this->assertSame('No description', $role->description);
         $this->assertSame('teacher', $role->archetype);
         $this->assertInstanceOf(core\event\role_updated::class, $event);
-        $this->assertSame("The user with id '{$admin->id}' updated the role with id '{$role->id}'.", $event->get_description());
+        $this->assertSame("The user with id '{$admin->id}' updated the role with id '{$role->id}' (shortname: othername2).",
+            $event->get_description());
 
         $sink = $this->redirectEvents();
         update_role($role->id, 'Other name2', 'othername2', 'No description 2', 'teacher');
@@ -435,7 +439,8 @@ class core_accesslib_testcase extends advanced_testcase {
         $this->assertSame('No description 2', $role->description);
         $this->assertSame('teacher', $role->archetype);
         $this->assertInstanceOf(core\event\role_updated::class, $event);
-        $this->assertSame("The user with id '{$admin->id}' updated the role with id '{$role->id}'.", $event->get_description());
+        $this->assertSame("The user with id '{$admin->id}' updated the role with id '{$role->id}' (description: changed).",
+            $event->get_description());
 
         $sink = $this->redirectEvents();
         update_role($role->id, 'Other name2', 'othername2', 'No description 2', '');
@@ -448,7 +453,8 @@ class core_accesslib_testcase extends advanced_testcase {
         $this->assertSame('No description 2', $role->description);
         $this->assertSame('', $role->archetype);
         $this->assertInstanceOf(core\event\role_updated::class, $event);
-        $this->assertSame("The user with id '{$admin->id}' updated the role with id '{$role->id}'.", $event->get_description());
+        $this->assertSame("The user with id '{$admin->id}' updated the role with id '{$role->id}' (archetype: none).",
+            $event->get_description());
     }
 
     /**
@@ -882,7 +888,8 @@ class core_accesslib_testcase extends advanced_testcase {
         $expectedlegacylog = array(SITEID, 'role', 'delete', 'admin/roles/manage.php?action=delete&roleid='.$role->id,
                                    $role->shortname, '');
         $this->assertEventLegacyLogData($expectedlegacylog, $event);
-        $this->assertSame("The user with id '{$admin->id}' deleted the role with id '{$role->id}'.", $event->get_description());
+        $this->assertSame("The user with id '{$admin->id}' deleted the role with id '{$role->id}' (shortname: manager, name: , archetype: manager).",
+            $event->get_description());
     }
 
     /**

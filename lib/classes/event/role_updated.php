@@ -29,12 +29,63 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Role updated event class.
  *
+ * @property-read array $other {
+ *      Extra information about event.
+ *
+ *      - string name: name of role.
+ *      - string shortname: shortname of role.
+ *      - string description: role description.
+ *      - string archetype: role type.
+ *      - bool updated_name
+ *      - bool updated_shortname
+ *      - bool updated_description
+ *      - bool updated_archetype
+ * }
+ *
  * @package    core
  * @since      Totara 13.0
  * @copyright  2019 Simey Lameze <simey@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class role_updated extends base {
+    /**
+     * Flag for prevention of direct create() call.
+     * @var bool
+     */
+    protected static $preventcreatecall = true;
+
+    /**
+     * Create instance of event.
+     *
+     * @param \stdClass $role Updated role
+     * @param \stdClass $oldrole Old role
+     * @return role_updated
+     */
+    public static function create_from_instance(\stdClass $role, \stdClass $oldrole) {
+        $data = array(
+            'objectid' => $role->id,
+            'context' => \context_system::instance(),
+            'other' => array(
+                'name' => $role->name,
+                'shortname' => $role->shortname,
+                'archetype' => $role->archetype,
+                'description' => $role->description,
+                'updated_name' => ($role->name !== $oldrole->name),
+                'updated_shortname' => ($role->shortname !== $oldrole->shortname),
+                'updated_description' => ($role->description !== $oldrole->description),
+                'updated_archetype' => ($role->archetype !== $oldrole->archetype),
+            )
+        );
+
+        self::$preventcreatecall = false;
+        /** @var role_updated $event */
+        $event = self::create($data);
+        $event->add_record_snapshot('role', $role);
+        self::$preventcreatecall = true;
+
+        return $event;
+    }
+
     /**
      * Initialise event parameters.
      */
@@ -59,7 +110,26 @@ class role_updated extends base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' updated the role with id '$this->objectid'.";
+        $result = "The user with id '$this->userid' updated the role with id '$this->objectid'";
+        $info = [];
+        if (!empty($this->other['updated_shortname'])) {
+            $info[] = 'shortname: ' . $this->other['shortname'];
+        }
+        if (!empty($this->other['updated_name'])) {
+            $info[] = 'name: ' . $this->other['name'];
+        }
+        if (!empty($this->other['updated_archetype'])) {
+            $info[] = 'archetype: ' . ($this->other['archetype'] === '' ? 'none' : $this->other['archetype']);
+        }
+        if (!empty($this->other['updated_description'])) {
+            // Do not put full description here, it might be too long.
+            $info[] = 'description: changed';
+        }
+        if ($info) {
+            $result .= ' (' . implode(', ', $info) . ')';
+        }
+        $result .= '.';
+        return $result;
     }
 
     /**
@@ -82,6 +152,15 @@ class role_updated extends base {
 
         if (!isset($this->other['shortname'])) {
             throw new \coding_exception('The \'shortname\' value must be set in other.');
+        }
+        if (!isset($this->other['name'])) {
+            throw new \coding_exception('The \'name\' value must be set in other.');
+        }
+        if (!isset($this->other['description'])) {
+            throw new \coding_exception('The \'description\' value must be set in other.');
+        }
+        if (!isset($this->other['archetype'])) {
+            throw new \coding_exception('The \'archetype\' value must be set in other.');
         }
     }
 }

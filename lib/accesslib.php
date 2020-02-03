@@ -1380,27 +1380,16 @@ function update_role(int $roleid, string $name, string $shortname, string $descr
         return;
     }
 
+    $oldrole = clone($role);
+
     $role->name = $name;
     $role->shortname = $shortname;
     $role->description = $description;
     $role->archetype = $archetype;
-    
     $DB->update_record('role', $role);
 
-    // Trigger role updated event.
-    $event = core\event\role_updated::create([
-        'userid' => $USER->id,
-        'context' => context_system::instance(),
-        'objectid' => $role->id,
-        'other' => [
-            'name' => $role->name,
-            'shortname' => $role->shortname,
-            'description' => $role->description,
-            'archetype' => $role->archetype
-        ]
-    ]);
-    $event->add_record_snapshot('role', $role);
-    $event->trigger();
+    // Trigger event.
+    core\event\role_updated::create_from_instance($role, $oldrole)->trigger();
 }
 
 /**
