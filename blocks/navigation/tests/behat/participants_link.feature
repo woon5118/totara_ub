@@ -47,6 +47,7 @@ Feature: Displaying the link to the Participants page
   @javascript
   Scenario: Site participants link is not displayed to students (MDL-55667)
     Given I log in as "admin"
+    And I am on site homepage
     And I follow "Edit settings"
     And I set the field "Default frontpage role" to "Student (student)"
     And I click on "Save changes" "button"

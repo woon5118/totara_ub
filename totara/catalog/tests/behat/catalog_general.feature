@@ -32,6 +32,8 @@ Feature: Test file for catalog
       | username | firstname | lastname |
       | jongsuk  | Jong Suk  | Lee      |
     And I log in as "admin"
+    And I set the following administration settings values:
+      | allowdefaultpageselection | 1 |
     And I go to the courses management page
     And I click on "edit" action for "Cat1" in management category listing
     And I set the field "Parent category" to "1"

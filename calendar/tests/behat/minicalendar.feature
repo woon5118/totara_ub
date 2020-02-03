@@ -15,6 +15,8 @@ Feature: Open calendar popup
       | user | course | role |
       | student1 | C1 | student |
     And I log in as "admin"
+    And I set the following administration settings values:
+      | allowdefaultpageselection | 1 |
     And I click on "Dashboard" in the totara menu
     And I press "Make home page"
 

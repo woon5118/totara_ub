@@ -24,6 +24,7 @@ Feature: Test that the course form element works
       | activity   | name              | course               | idnumber  |
       | feedback   | frontpagefeedback | Acceptance test site | feedback0 |
     And I log in as "admin"
+    And I am on site homepage
     And I turn editing mode on
     And I add the "Main menu" block
     And I log out

@@ -7,6 +7,7 @@ Feature: Ensure page layouts are listed correctly
   Background:
     Given I am on a totara site
     And I log in as "admin"
+    And I am on site homepage
 
   Scenario: Ensure editing a block on the home page lists the home page layout options
     When I navigate to "Turn editing on" node in "Front page settings"
