@@ -1301,7 +1301,7 @@ function get_context_info_array($contextid) {
  * @return int id or dml_exception
  */
 function create_role($name, $shortname, $description, $archetype = '') {
-    global $DB;
+    global $DB, $USER;
 
     if (strpos($archetype, 'moodle/legacy:') !== false) {
         throw new coding_exception('Use new role archetype parameter in create_role() instead of old legacy capabilities.');
@@ -1331,6 +1331,7 @@ function create_role($name, $shortname, $description, $archetype = '') {
     // Trigger event.
     $event = \core\event\role_created::create(
         array(
+            'userid' => $USER->id,
             'context' => context_system::instance(),
             'objectid' => $role->id,
             'other' =>
@@ -1346,6 +1347,60 @@ function create_role($name, $shortname, $description, $archetype = '') {
     $event->trigger();
 
     return $id;
+}
+
+/**
+ * Update role details.
+ *
+ * @since Totara 3.0
+ *
+ * @param int $roleid
+ * @param string $name role name
+ * @param string $shortname role short name
+ * @param string $description role description
+ * @param string $archetype
+ * @return void
+ */
+function update_role(int $roleid, string $name, string $shortname, string $description, string $archetype) {
+    global $DB, $USER;
+
+    if (strpos($archetype, 'moodle/legacy:') !== false) {
+        throw new coding_exception('Use new role archetype parameter in create_role() instead of old legacy capabilities.');
+    }
+
+    // Verify role archetype actually exists.
+    $archetypes = get_role_archetypes();
+    if (empty($archetypes[$archetype])) {
+        $archetype = '';
+    }
+
+    $role = $DB->get_record('role', ['id' => $roleid], '*', MUST_EXIST);
+
+    if ($role->name === $name && $role->shortname === $shortname && $role->description === $description && $role->archetype === $archetype) {
+        return;
+    }
+
+    $role->name = $name;
+    $role->shortname = $shortname;
+    $role->description = $description;
+    $role->archetype = $archetype;
+    
+    $DB->update_record('role', $role);
+
+    // Trigger role updated event.
+    $event = core\event\role_updated::create([
+        'userid' => $USER->id,
+        'context' => context_system::instance(),
+        'objectid' => $role->id,
+        'other' => [
+            'name' => $role->name,
+            'shortname' => $role->shortname,
+            'description' => $role->description,
+            'archetype' => $role->archetype
+        ]
+    ]);
+    $event->add_record_snapshot('role', $role);
+    $event->trigger();
 }
 
 /**

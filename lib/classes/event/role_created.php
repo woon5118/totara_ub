@@ -63,7 +63,7 @@ class role_created extends base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' created role with id '$this->objectid'.";
+        return "The user with id '$this->userid' created the role with id '$this->objectid'.";
     }
 
     /**

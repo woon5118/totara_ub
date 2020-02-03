@@ -350,16 +350,105 @@ class core_accesslib_testcase extends advanced_testcase {
     public function test_create_role() {
         global $DB;
 
-        $this->resetAfterTest();
+        $this->setAdminUser();
+        $admin = get_admin();
 
+        $sink = $this->redirectEvents();
         $id = create_role('New student role', 'student2', 'New student description', 'student');
-        $role = $DB->get_record('role', array('id'=>$id));
+        $events = $sink->get_events();
+        $this->assertCount(1, $events);
+        $event = reset($events);
 
-        $this->assertNotEmpty($role);
+        $role = $DB->get_record('role', array('id' => $id));
         $this->assertSame('New student role', $role->name);
         $this->assertSame('student2', $role->shortname);
         $this->assertSame('New student description', $role->description);
         $this->assertSame('student', $role->archetype);
+        $this->assertInstanceOf(core\event\role_created::class, $event);
+        $this->assertSame("The user with id '{$admin->id}' created the role with id '{$role->id}'.", $event->get_description());
+    }
+
+    /**
+     * Test updating of roles.
+     */
+    public function test_update_role() {
+        global $DB;
+
+        $this->setAdminUser();
+        $admin = get_admin();
+        $id = create_role('New student role', 'student2', 'New student description', 'student');
+        $role = $DB->get_record('role', array('id'=>$id));
+
+        $sink = $this->redirectEvents();
+        update_role($role->id, 'Other name', 'othername', 'No description', 'teacher');
+        $events = $sink->get_events();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+        $role = $DB->get_record('role', array('id' => $role->id));
+        $this->assertSame('Other name', $role->name);
+        $this->assertSame('othername', $role->shortname);
+        $this->assertSame('No description', $role->description);
+        $this->assertSame('teacher', $role->archetype);
+        $this->assertInstanceOf(core\event\role_updated::class, $event);
+        $this->assertSame("The user with id '{$admin->id}' updated the role with id '{$role->id}'.", $event->get_description());
+
+        // No changes.
+        $sink = $this->redirectEvents();
+        update_role($role->id, 'Other name', 'othername', 'No description', 'teacher');
+        $events = $sink->get_events();
+        $this->assertCount(0, $events);
+
+        $sink = $this->redirectEvents();
+        update_role($role->id, 'Other name2', 'othername', 'No description', 'teacher');
+        $events = $sink->get_events();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+        $role = $DB->get_record('role', array('id' => $role->id));
+        $this->assertSame('Other name2', $role->name);
+        $this->assertSame('othername', $role->shortname);
+        $this->assertSame('No description', $role->description);
+        $this->assertSame('teacher', $role->archetype);
+        $this->assertInstanceOf(core\event\role_updated::class, $event);
+        $this->assertSame("The user with id '{$admin->id}' updated the role with id '{$role->id}'.", $event->get_description());
+
+        $sink = $this->redirectEvents();
+        update_role($role->id, 'Other name2', 'othername2', 'No description', 'teacher');
+        $events = $sink->get_events();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+        $role = $DB->get_record('role', array('id' => $role->id));
+        $this->assertSame('Other name2', $role->name);
+        $this->assertSame('othername2', $role->shortname);
+        $this->assertSame('No description', $role->description);
+        $this->assertSame('teacher', $role->archetype);
+        $this->assertInstanceOf(core\event\role_updated::class, $event);
+        $this->assertSame("The user with id '{$admin->id}' updated the role with id '{$role->id}'.", $event->get_description());
+
+        $sink = $this->redirectEvents();
+        update_role($role->id, 'Other name2', 'othername2', 'No description 2', 'teacher');
+        $events = $sink->get_events();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+        $role = $DB->get_record('role', array('id' => $role->id));
+        $this->assertSame('Other name2', $role->name);
+        $this->assertSame('othername2', $role->shortname);
+        $this->assertSame('No description 2', $role->description);
+        $this->assertSame('teacher', $role->archetype);
+        $this->assertInstanceOf(core\event\role_updated::class, $event);
+        $this->assertSame("The user with id '{$admin->id}' updated the role with id '{$role->id}'.", $event->get_description());
+
+        $sink = $this->redirectEvents();
+        update_role($role->id, 'Other name2', 'othername2', 'No description 2', '');
+        $events = $sink->get_events();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+        $role = $DB->get_record('role', array('id' => $role->id));
+        $this->assertSame('Other name2', $role->name);
+        $this->assertSame('othername2', $role->shortname);
+        $this->assertSame('No description 2', $role->description);
+        $this->assertSame('', $role->archetype);
+        $this->assertInstanceOf(core\event\role_updated::class, $event);
+        $this->assertSame("The user with id '{$admin->id}' updated the role with id '{$role->id}'.", $event->get_description());
     }
 
     /**
@@ -735,7 +824,8 @@ class core_accesslib_testcase extends advanced_testcase {
     public function test_delete_role() {
         global $DB;
 
-        $this->resetAfterTest();
+        $this->setAdminUser();
+        $admin = get_admin();
 
         $role = $DB->get_record('role', array('shortname'=>'manager'), '*', MUST_EXIST);
         $user = $this->getDataGenerator()->create_user();
@@ -757,8 +847,8 @@ class core_accesslib_testcase extends advanced_testcase {
         $sink = $this->redirectEvents();
         $result = delete_role($role->id);
         $events = $sink->get_events();
+        $this->assertCount(2, $events);
         $sink->close();
-        $event = array_pop($events);
 
         $this->assertTrue($result);
         $this->assertFalse($DB->record_exists('role', array('id'=>$role->id)));
@@ -771,8 +861,17 @@ class core_accesslib_testcase extends advanced_testcase {
         $this->assertFalse($DB->record_exists('role_allow_override', array('roleid'=>$role->id)));
         $this->assertFalse($DB->record_exists('role_allow_override', array('allowoverride'=>$role->id)));
 
-        // Test triggered event.
-        $this->assertInstanceOf('\core\event\role_deleted', $event);
+        // Test triggered events.
+        $event = $events[0];
+        $this->assertInstanceOf(core\event\role_unassigned::class, $event);
+        $this->assertSame('role', $event->target);
+        $this->assertSame('role', $event->objecttable);
+        $this->assertSame($role->id, $event->objectid);
+        $this->assertEquals(context_system::instance(), $event->get_context());
+        $this->assertSame("The user with id '{$admin->id}' unassigned the role with id '{$role->id}' from the user with id '{$user->id}'.", $event->get_description());
+
+        $event = $events[1];
+        $this->assertInstanceOf(core\event\role_deleted::class, $event);
         $this->assertSame('role', $event->target);
         $this->assertSame('role', $event->objecttable);
         $this->assertSame($role->id, $event->objectid);
@@ -780,10 +879,10 @@ class core_accesslib_testcase extends advanced_testcase {
         $this->assertSame($role->shortname, $event->other['shortname']);
         $this->assertSame($role->description, $event->other['description']);
         $this->assertSame($role->archetype, $event->other['archetype']);
-
         $expectedlegacylog = array(SITEID, 'role', 'delete', 'admin/roles/manage.php?action=delete&roleid='.$role->id,
                                    $role->shortname, '');
         $this->assertEventLegacyLogData($expectedlegacylog, $event);
+        $this->assertSame("The user with id '{$admin->id}' deleted the role with id '{$role->id}'.", $event->get_description());
     }
 
     /**
