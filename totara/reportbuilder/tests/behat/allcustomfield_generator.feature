@@ -105,7 +105,7 @@ Feature: All customfields column generator
       | timefinish[year]   | ## +2 years ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | capacity           | 10    |
     And I press "Save changes"

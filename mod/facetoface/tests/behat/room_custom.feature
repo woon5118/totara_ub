@@ -56,7 +56,7 @@ Feature: Manage custom rooms by admin and non-admin user
     And I click on the seminar event action "Edit event" in row "#1"
 
     # Edit
-    When I click on "Edit room" "link"
+    When I click on "Edit custom room Room created in session" "link"
     Then I should see "Edit room" in the "Edit room" "totaradialogue"
     And the field "Add to sitewide list" matches value "0"
     When I set the following fields to these values:
@@ -88,7 +88,7 @@ Feature: Manage custom rooms by admin and non-admin user
     And I click on the seminar event action "Edit event" in row "#1"
 
     # Publish a custom room i.e. make it a site-wide room
-    When I click on "Edit room" "link"
+    When I click on "Edit custom room Room edited in session" "link"
     Then I should see "Edit room" in the "Edit room" "totaradialogue"
     And the field "Add to sitewide list" matches value "0"
     When I set the following fields to these values:
@@ -97,7 +97,7 @@ Feature: Manage custom rooms by admin and non-admin user
     And I set the field "Add to sitewide list" to "1"
     And I click on "//*[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element" in the "Edit room" "totaradialogue"
     Then I should see "Room published"
-    And I should not see "Edit room" in the "Room published" "table_row"
+    When I should not see "Edit custom room Room published in session" in the "Room published" "table_row"
     # No need to submit a form here; the room is published as soon as the totaradialogue is closed
 
     And I navigate to "Rooms" node in "Site administration > Seminars"
@@ -168,7 +168,7 @@ Feature: Manage custom rooms by admin and non-admin user
     Then I should see "Room 1"
 
     # Edit
-    When I click on "Edit room" "link"
+    When I click on "Edit custom room Room 1 in session" "link"
     Then I should see "Edit room" in the "Edit room" "totaradialogue"
     And I should not see "Add to sitewide list"
     When I set the following fields to these values:

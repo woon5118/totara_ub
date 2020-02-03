@@ -50,7 +50,7 @@ Feature: Take attendance for a seminar with multiple sessions
       | timefinish[year]     | 0             |
       | timefinish[hour]     | 0             |
       | timefinish[minute]   | +5            |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
 
     And I click on "Select rooms" "link"
     And I click on "Create" "link"
@@ -81,7 +81,7 @@ Feature: Take attendance for a seminar with multiple sessions
       | timefinish[year]     | 0             |
       | timefinish[hour]     | 0             |
       | timefinish[minute]   | 0             |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
 
     And I click on "Select rooms" "link" in the ".lastrow" "css_element"
     And I click on "Create" "link"

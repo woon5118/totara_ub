@@ -163,7 +163,7 @@ Feature: Seminar asset/facilitator availability related to switching
     And I press "Save changes"
 
     When I click on the seminar event action "Edit event" in row "0 / 50"
-    And I click on "Edit <item_type>" "link" in the "Etwas 1" "table_row"
+    And I click on "Edit custom <item_type> Etwas 1 in session" "link" in the "Etwas 1" "table_row"
     And I set the following fields to these values:
       | Allow booking conflicts | 0 |
     And I click on "OK" "button" in the "Edit <item_type>" "totaradialogue"
@@ -184,7 +184,7 @@ Feature: Seminar asset/facilitator availability related to switching
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     When I click on the seminar event action "Edit event" in row "0 / 50"
-    And I click on "Edit <item_type>" "link" in the "Etwas 1" "table_row"
+    And I click on "Edit custom <item_type> Etwas 1 in session" "link" in the "Etwas 1" "table_row"
     And I set the following fields to these values:
       | Allow booking conflicts | 0 |
     And I click on "OK" "button" in the "Edit <item_type>" "totaradialogue"

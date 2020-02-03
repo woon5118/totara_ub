@@ -420,9 +420,9 @@ class event extends \moodleform {
 
         // Options.
         $cloneicon = $OUTPUT->action_icon('#', new \pix_icon('t/copy', $strcopy), null,
-            array('class' => 'action-icon dateclone', 'data-offset' => $offset));
+            array('class' => 'action-icon dateclone', 'data-offset' => $offset, 'data-action' => 'clonedate'));
         $deleteicon = $OUTPUT->action_icon('#', new \pix_icon('t/delete', $strdelete), null,
-            array('class' => 'action-icon dateremove', 'data-offset' => $offset));
+            array('class' => 'action-icon dateremove', 'data-offset' => $offset, 'data-action' => 'removedate'));
         $row[] = $cloneicon . $deleteicon;
 
         return $row;

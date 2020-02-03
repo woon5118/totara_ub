@@ -53,7 +53,7 @@ Feature: Seminar sign-up periods validation
       | timefinish[hour]     | <sessionendhour>   |
       | timefinish[minute]   | 00                 |
       | timefinish[timezone] | Pacific/Auckland   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I wait "1" seconds
     And I press "Save changes"
     Then I should see "<message>"

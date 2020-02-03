@@ -76,12 +76,7 @@ $jsconfig = array(
     'manageadhocfacilitators' => has_capability('mod/facetoface:manageadhocfacilitators', $context),
     'manageadhocrooms' => has_capability('mod/facetoface:manageadhocrooms', $context),
 );
-$jsmodule = array(
-    'name' => 'totara_f2f_room',
-    'fullpath' => '/mod/facetoface/js/event.js',
-    'requires' => array('json', 'totara_core')
-);
-$PAGE->requires->js_init_call('M.totara_f2f_room.init', array($jsconfig), false, $jsmodule);
+$PAGE->requires->js_call_amd('mod_facetoface/event', 'init', array($jsconfig));
 
 if ($backtoallsessions) {
     $returnurl = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));

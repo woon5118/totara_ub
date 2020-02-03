@@ -67,7 +67,7 @@ Feature: Allocate spaces for team in seminar
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 0    |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | capacity           | 3    |
     And I press "Save changes"
@@ -84,7 +84,7 @@ Feature: Allocate spaces for team in seminar
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 0    |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | capacity           | 3    |
     And I press "Save changes"
@@ -273,7 +273,7 @@ Feature: Allocate spaces for team in seminar
       | timefinish[day]    | 4    |
       | timefinish[month]  | 4    |
       | timefinish[year]   | ## next year ## Y ## |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I log out
 

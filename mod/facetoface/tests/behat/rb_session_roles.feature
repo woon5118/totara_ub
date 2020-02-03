@@ -110,7 +110,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the field "Terry Teacher1" to "1"
     And I press "Save changes"
     And I click on the seminar event action "Attendees" in row "1 January"
@@ -134,7 +134,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the field "Alex Teacher2" to "1"
     And I press "Save changes"
     And I click on the seminar event action "Attendees" in row "1 February"
@@ -212,7 +212,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the field "Terry Teacher1" to "1"
     And I press "Save changes"
     And I click on the seminar event action "Attendees" in row "1 January"
@@ -236,7 +236,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the field "Alex Teacher2" to "1"
     And I press "Save changes"
     And I click on the seminar event action "Attendees" in row "1 February"
@@ -262,7 +262,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the field "Terry Teacher1" to "1"
     And I press "Save changes"
     And I click on the seminar event action "Attendees" in row "2 January"
@@ -286,7 +286,7 @@ Feature: Use facetoface session roles content restriction in facetoface session 
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the field "Alex Teacher2" to "1"
     And I press "Save changes"
     And I click on the seminar event action "Attendees" in row "2 February"

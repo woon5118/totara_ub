@@ -33,7 +33,7 @@ Feature: Check the seminar events and sessions reports display correctly
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     Then I should see date "1 January next year" formatted "%d %B %Y"
 

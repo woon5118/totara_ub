@@ -58,7 +58,7 @@ Feature: Test expand course details in Reportbuilder
       | timefinish[year]   | 0                |
       | timefinish[hour]   | +1               |
       | timefinish[minute] | 0                |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     And I click on "Disable" "link" in the "Manual enrolments" "table_row"

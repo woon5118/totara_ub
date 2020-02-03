@@ -36,7 +36,7 @@ Feature: Manage custom assets/facilitators by non-admin user
     Then I should see "<name> 1"
 
     # Edit
-    And I click on "Edit <item_type>" "link"
+    And I click on "Edit custom <item_type> <name> 1 in session" "link"
     And I should see "Edit <item_type>" in the "Edit <item_type>" "totaradialogue"
     And I set the following fields to these values:
       | Name | <name> updated |

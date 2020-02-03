@@ -44,7 +44,7 @@ Feature: Export seminar attendees
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     When I press "Save changes"
     Then I should see "Pacific/Auckland" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see date "10 February next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"

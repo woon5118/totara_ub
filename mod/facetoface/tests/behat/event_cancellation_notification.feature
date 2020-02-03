@@ -82,7 +82,7 @@ Feature: Seminar event cancellation notifications
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Teacher One" "checkbox"
     And I click on "Manager Four" "checkbox"
     And I press "Save changes"

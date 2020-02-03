@@ -148,7 +148,7 @@ Feature: Cancellation for session
       | timefinish[year]   | 0                |
       | timefinish[hour]   | -1               |
       | timefinish[minute] | 0                |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | cancellationcutoff[number]   | 2      |
       | cancellationcutoff[timeunit] | days   |

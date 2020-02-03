@@ -68,7 +68,7 @@ Feature: Certification completion date is based on course completion time
       | timefinish[year]   | 0                |
       | timefinish[hour]   | 0                |
       | timefinish[minute] | 0                |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
@@ -94,7 +94,7 @@ Feature: Certification completion date is based on course completion time
       | timefinish[year]   | 0                |
       | timefinish[hour]   | 0                |
       | timefinish[minute] | 0                |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
 
     And I click on the seminar event action "Attendees" in row "#1"
@@ -117,7 +117,7 @@ Feature: Certification completion date is based on course completion time
       | timefinish[year]   | 0                |
       | timefinish[hour]   | 0                |
       | timefinish[minute] | 0                |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I am on "Certification One" certification homepage
     And I press "Edit certification details"

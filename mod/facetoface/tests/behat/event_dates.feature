@@ -68,7 +68,7 @@ Feature: I can add and edit seminar session dates
     And I set the following fields to these values:
       | timestart[year]    | 2016 |
       | timefinish[year]   | 2016 |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     Then I should see "Upcoming events"
     And I should not see "The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect."

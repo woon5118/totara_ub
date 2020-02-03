@@ -417,7 +417,7 @@ Feature: Seminar room availability
       | roomcapacity                 | 40       |
       | Allow booking conflicts      | 0        |
     And I click on "//div[@aria-describedby='editcustomroom0-dialog']//div[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element"
-    And I click on "Delete" "link" in the "Zimmer 2" "table_row"
+    And I click on "Remove room Zimmer 2 from session" "link"
     And I press "Save changes"
     And I should not see "Zimmer 2" in the "0 / 40" "table_row"
 
@@ -600,7 +600,7 @@ Feature: Seminar room availability
     And I should see "Zimmer 1" in the "0 / 50" "table_row"
 
     When I click on the seminar event action "Edit event" in row "0 / 50"
-    And I click on "Edit room" "link" in the "Zimmer 1" "table_row"
+    And I click on "Edit custom room Zimmer 1 in session" "link" in the "Zimmer 1" "table_row"
     And I set the following fields to these values:
       | Allow booking conflicts | 0 |
     And I click on "//div[@aria-describedby='editcustomroom0-dialog']//div[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element"
@@ -621,7 +621,7 @@ Feature: Seminar room availability
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     When I click on the seminar event action "Edit event" in row "0 / 50"
-    And I click on "Edit room" "link" in the "Zimmer 1" "table_row"
+    And I click on "Edit custom room Zimmer 1 in session" "link" in the "Zimmer 1" "table_row"
     And I set the following fields to these values:
       | Allow booking conflicts | 0 |
     And I click on "//div[@aria-describedby='editcustomroom0-dialog']//div[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element"

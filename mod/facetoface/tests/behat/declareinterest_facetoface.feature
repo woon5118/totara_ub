@@ -125,7 +125,7 @@ Feature: Manager approval and declare of interest
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I follow "Course 1"
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -146,7 +146,7 @@ Feature: Manager approval and declare of interest
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I log out
     And I log in as "student1"
@@ -204,7 +204,7 @@ Feature: Manager approval and declare of interest
       | timefinish[year]   | 0                |
       | timefinish[hour]   | +1               |
       | timefinish[minute] | 0                |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I log out
     And I log in as "student1"

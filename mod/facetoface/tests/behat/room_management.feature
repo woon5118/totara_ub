@@ -131,7 +131,7 @@ Feature: Manage pre-defined rooms
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | capacity           | 5    |
     When I click on "Select rooms" "link"
@@ -154,7 +154,7 @@ Feature: Manage pre-defined rooms
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     When I click on "Select rooms" "link"
     And I wait "1" seconds
     Then I should see "(Room unavailable)" in the "Choose rooms" "totaradialogue"
@@ -172,7 +172,7 @@ Feature: Manage pre-defined rooms
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 15   |
       | timefinish[minute] | 0    |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     When I click on "Select rooms" "link"
     And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose rooms" "totaradialogue"
     And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
@@ -189,7 +189,7 @@ Feature: Manage pre-defined rooms
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 0    |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I should see "The new dates you have selected are unavailable due to a scheduling conflict"
     And I click on "Cancel" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
@@ -216,7 +216,7 @@ Feature: Manage pre-defined rooms
       | timefinish[hour]     | 20               |
       | timefinish[minute]   | 0                |
       | timefinish[timezone] | Pacific/Auckland |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | capacity                | 7                |
     When I click on "Select rooms" "link"
@@ -241,7 +241,7 @@ Feature: Manage pre-defined rooms
       | timefinish[hour]     | 7             |
       | timefinish[minute]   | 0             |
       | timefinish[timezone] | Europe/London |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | capacity                | 7             |
     When I click on "Select rooms" "link"
@@ -262,7 +262,7 @@ Feature: Manage pre-defined rooms
       | timefinish[hour]     | 15            |
       | timefinish[minute]   | 0             |
       | timefinish[timezone] | Europe/London |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I wait "1" seconds
     When I click on "Select rooms" "link"
     And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose rooms" "totaradialogue"
@@ -282,7 +282,7 @@ Feature: Manage pre-defined rooms
       | timefinish[hour]     | 7             |
       | timefinish[minute]   | 0             |
       | timefinish[timezone] | Europe/London |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I should see "The new dates you have selected are unavailable due to a scheduling conflict"
     And I click on "Cancel" "button" in the "Select date" "totaradialogue"
     And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"

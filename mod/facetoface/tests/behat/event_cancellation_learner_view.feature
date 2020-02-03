@@ -57,7 +57,7 @@ Feature: Seminar event cancellation learner views
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Teacher One" "checkbox"
     And I press "Save changes"
 
@@ -77,7 +77,7 @@ Feature: Seminar event cancellation learner views
       | timefinish[hour]    | 16               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Teacher One" "checkbox"
     And I press "Save changes"
 
@@ -99,7 +99,7 @@ Feature: Seminar event cancellation learner views
       | timefinish[hour]    | 18               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Teacher One" "checkbox"
     And I press "Save changes"
 

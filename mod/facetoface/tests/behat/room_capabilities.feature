@@ -58,8 +58,8 @@ Feature: Check room actions are performed by users with the right permissions
       | Name         | Room 1 |
       | roomcapacity | 15     |
     And I click on "//div[@aria-describedby='editcustomroom0-dialog']//div[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element"
-    And I should see "Delete" in the "#roomname0_1" "css_element"
-    And I should see "Edit room" in the "#roomname0_1" "css_element"
+    And I should see "Remove room Room 1 from session"
+    And I should see "Edit custom room Room 1 in session"
     And I press "Save changes"
     And I log out
 
@@ -95,8 +95,8 @@ Feature: Check room actions are performed by users with the right permissions
       | Name         | Room 1 |
       | roomcapacity | 15     |
     And I click on "//div[@aria-describedby='editcustomroom0-dialog']//div[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element"
-    And I should see "Delete" in the "#roomname0_1" "css_element"
-    And I should see "Edit room" in the "#roomname0_1" "css_element"
+    And I should see "Remove room Room 1 from session"
+    And I should see "Edit custom room Room 1 in session"
     And I press "Save changes"
     And I log out
 
@@ -132,8 +132,8 @@ Feature: Check room actions are performed by users with the right permissions
       | Name         | Room |
       | roomcapacity | 15   |
     And I click on "//div[@aria-describedby='editcustomroom0-dialog']//div[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element"
-    And I should see "Delete" in the "#roomname0_1" "css_element"
-    And I should see "Edit room" in the "#roomname0_1" "css_element"
+    And I should see "Remove room Room from session"
+    And I should see "Edit custom room Room in session"
     And I press "Save changes"
 
     When I navigate to "Rooms" node in "Seminar administration"
@@ -153,7 +153,7 @@ Feature: Check room actions are performed by users with the right permissions
     And I should see "Create" in the "Choose rooms" "totaradialogue"
     And I click on "Room 1" "text" in the "Choose rooms" "totaradialogue"
     And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
-    And I should see "Delete" in the "#roomname0_2" "css_element"
+    And I should see "Remove room Room 1 from session"
     And I press "Save changes"
 
     When I navigate to "Rooms" node in "Site administration > Seminars"
@@ -173,6 +173,6 @@ Feature: Check room actions are performed by users with the right permissions
     And I should see "Create" in the "Choose rooms" "totaradialogue"
     And I click on "Room 2" "text" in the "Choose rooms" "totaradialogue"
     And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
-    And I should see "Delete" in the "#roomname0_3" "css_element"
+    And I should see "Remove room Room 2 from session"
     And I press "Save changes"
     And I log out

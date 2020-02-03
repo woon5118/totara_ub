@@ -37,7 +37,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | capacity           | 5    |
     And I press "Save changes"
@@ -125,7 +125,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | capacity                  | 5   |
     And I press "Save changes"
@@ -186,7 +186,7 @@ Feature: I cannot edit seminar session dates that will result in booking conflic
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | capacity                  | 5   |
     And I press "Save changes"

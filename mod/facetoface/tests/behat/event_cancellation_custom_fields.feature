@@ -136,7 +136,7 @@ Feature: Seminar event cancellation custom fields
       | timestart[timezone] | Pacific/Auckland |
       | timefinish[day]     | 10               |
       | timefinish[timezone]| Pacific/Auckland |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
 
     Given I follow "show-selectdate0-dialog"
     And I set the following fields to these values:
@@ -147,7 +147,7 @@ Feature: Seminar event cancellation custom fields
       | timefinish[hour]    | 16               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Teacher One" "checkbox"
     And I press "Save changes"
 

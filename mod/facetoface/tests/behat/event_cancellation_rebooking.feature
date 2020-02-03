@@ -49,7 +49,7 @@ Feature: Seminar event cancellation rebooking
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | Maximum bookings | 39 |
     And I press "Save changes"
@@ -88,7 +88,7 @@ Feature: Seminar event cancellation rebooking
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | Maximum bookings | 19 |
     And I press "Save changes"

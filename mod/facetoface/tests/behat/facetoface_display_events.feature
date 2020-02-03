@@ -36,7 +36,7 @@ Feature: Displaying seminar's events with settings overlapping
         | timefinish[day]    | 0                |
         | timefinish[hour]   | +1               |
         | timefinish[minute] | 0                |
-    And I click on "OK" "button"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I log out
 

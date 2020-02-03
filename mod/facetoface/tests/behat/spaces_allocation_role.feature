@@ -56,7 +56,7 @@ Feature: Reserve and allocate spaces by staff manager with job assignment
       | timefinish[year]   | 0                |
       | timefinish[hour]   | +1               |
       | timefinish[minute] | 0                |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I click on the link "Go to event" in row 1
     And I click on "Reserve for another manager" "link"

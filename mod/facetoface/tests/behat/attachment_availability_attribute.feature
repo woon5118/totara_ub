@@ -211,7 +211,7 @@ Feature: Seminar asset/facilitator availability related to attributes
       | Name                    | Etwas 2 |
       | Allow booking conflicts | 0       |
     And I click on "OK" "button" in the "Create new <item_type>" "totaradialogue"
-    And I click on "Delete" "link" in the "Etwas 2" "table_row"
+    And I click on "Remove <item_type> Etwas 2 from session" "link" in the "Etwas 2" "table_row"
     And I press "Save changes"
 
     When I click on the seminar event action "Edit event" in row "0 / 40"

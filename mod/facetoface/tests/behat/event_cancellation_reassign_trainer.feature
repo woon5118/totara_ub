@@ -43,7 +43,7 @@ Feature: Seminar event cancellation trainer can be reassigned
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Teacher One" "checkbox"
     And I press "Save changes"
 
@@ -72,7 +72,7 @@ Feature: Seminar event cancellation trainer can be reassigned
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Teacher One" "checkbox"
     When I press "Save changes"
     And I wait "1" seconds
@@ -103,7 +103,7 @@ Feature: Seminar event cancellation trainer can be reassigned
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Teacher One" "checkbox"
     When I press "Save changes"
     Then I should see "Test Seminar" in the ".mod_facetoface__event-dashboard" "css_element"

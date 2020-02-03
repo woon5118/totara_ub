@@ -65,7 +65,7 @@ Feature: Display the rooms in select room dialog when room is booked and hidden
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
 
     When I click on "Select rooms" "link"
     Then I should see "Room 1, Building 123, 123 Tory street (Capacity: 10)" in the "Choose rooms" "totaradialogue"
@@ -89,7 +89,7 @@ Feature: Display the rooms in select room dialog when room is booked and hidden
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
 
     When I click on "Select rooms" "link"
     Then I should see "Room 1, Building 123, 123 Tory street (Capacity: 10)" in the "Choose rooms" "totaradialogue"

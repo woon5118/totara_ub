@@ -57,7 +57,7 @@ Feature: Check attendees actions are performed by users with the right permissio
       | timefinish[year]   | 0                |
       | timefinish[hour]   | 0                |
       | timefinish[minute] | 0                |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
@@ -87,7 +87,7 @@ Feature: Check attendees actions are performed by users with the right permissio
       | timefinish[year]   | 0                |
       | timefinish[hour]   | 0                |
       | timefinish[minute] | 0                |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
 
     And I log out
@@ -195,7 +195,7 @@ Feature: Check attendees actions are performed by users with the right permissio
       | timefinish[year]   | 0                |
       | timefinish[hour]   | 0                |
       | timefinish[minute] | +30              |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I log out
 

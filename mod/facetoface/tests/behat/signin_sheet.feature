@@ -44,7 +44,7 @@ Feature: Download a seminar signin sheet
       | timefinish[year]   | 2030 |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 0    |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I click on the seminar event action "Attendees" in row "#1"
     And I should not see "Download sign-in sheet"
@@ -84,7 +84,7 @@ Feature: Download a seminar signin sheet
       | timefinish[year]   | 2030 |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 0    |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Add a new session"
     And I press "Save changes"
     And I click on the seminar event action "Edit event" in row "0 / 10"
@@ -100,7 +100,7 @@ Feature: Download a seminar signin sheet
       | timefinish[year]   | 2030 |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 0    |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I click on the seminar event action "Attendees" in row "#1"
     And I should not see "Download sign-in sheet"
@@ -140,7 +140,7 @@ Feature: Download a seminar signin sheet
       | timefinish[year]   | 2030 |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 0    |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Add a new session"
     And I press "Save changes"
     And I click on the seminar event action "Edit event" in row "0 / 10"
@@ -156,7 +156,7 @@ Feature: Download a seminar signin sheet
       | timefinish[year]   | 2030 |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 0    |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I click on the seminar event action "Attendees" in row "#1"
     And I should not see "Download sign-in sheet"

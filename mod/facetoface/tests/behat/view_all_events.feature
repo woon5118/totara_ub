@@ -38,7 +38,7 @@ Feature: Check previous and upcomings sections are right populated
       | timefinish[year]   | 0                |
       | timefinish[hour]   | +1               |
       | timefinish[minute] | 0                |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
 
     And I press "Add a new session"
     And I follow "show-selectdate1-dialog"
@@ -86,7 +86,7 @@ Feature: Check previous and upcomings sections are right populated
       | timefinish[year]   | 1999 |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
 
     And I follow "Add event"
@@ -102,7 +102,7 @@ Feature: Check previous and upcomings sections are right populated
       | timefinish[year]   | 2037 |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I log out
 

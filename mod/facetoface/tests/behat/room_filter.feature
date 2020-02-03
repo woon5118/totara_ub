@@ -77,7 +77,7 @@ Feature: Filter session by pre-defined rooms
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     And I click on "Room 1, Building 123, 123 Tory street (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
     And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
@@ -96,7 +96,7 @@ Feature: Filter session by pre-defined rooms
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     And I click on "Room 2, Building 234, 234 Tory street (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
     And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
@@ -115,7 +115,7 @@ Feature: Filter session by pre-defined rooms
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     And I click on "Room 3, Building 345, 345 Tory street (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
     And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
@@ -134,7 +134,7 @@ Feature: Filter session by pre-defined rooms
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     And I click on "Room 4, Building 456, 456 Tory street (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
     And I click on "OK" "button" in the "Choose rooms" "totaradialogue"

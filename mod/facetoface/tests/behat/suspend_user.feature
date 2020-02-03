@@ -48,7 +48,7 @@ Feature: Suspend user in different session times
       | timefinish[year]   | ## 2 years ## Y ## |
       | timefinish[hour]   | 12                 |
       | timefinish[minute] | 00                 |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | Maximum bookings | 1 |
     And I press "Save changes"
@@ -95,7 +95,7 @@ Feature: Suspend user in different session times
       | timefinish[year]   | ## 2 years ago ## Y ## |
       | timefinish[hour]   | 12                     |
       | timefinish[minute] | 00                     |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | Maximum bookings | 2 |
     And I press "Save changes"
@@ -124,7 +124,7 @@ Feature: Suspend user in different session times
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 1                    |
       | timefinish[minute] | 0                    |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | Maximum bookings | 2 |
     And I press "Save changes"

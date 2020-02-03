@@ -57,8 +57,8 @@ Feature: Check asset/facilitator actions are performed by users with the right p
     And I set the following fields to these values:
       | Name | <name> |
     And I click on "OK" "button" in the "Create new <item_type>" "totaradialogue"
-    Then "Delete" "link" should exist in the "//li[@class='<item_type>name' and contains(.,'<name>')]" "xpath_element"
-    And "Edit <item_type>" "link" should exist in the "//li[@class='<item_type>name' and contains(.,'<name>')]" "xpath_element"
+    Then "Remove <item_type> <name> from session" "link" should exist
+    And "Edit custom <item_type> <name> in session" "link" should exist
     And I press "Save changes"
     Then I should see "Upcoming events"
     And I log out
@@ -104,8 +104,8 @@ Feature: Check asset/facilitator actions are performed by users with the right p
     And I set the following fields to these values:
       | Name | <name> |
     And I click on "OK" "button" in the "Create new <item_type>" "totaradialogue"
-    Then "Delete" "link" should exist in the "//li[@class='<item_type>name' and contains(.,'<name>')]" "xpath_element"
-    And "Edit <item_type>" "link" should exist in the "//li[@class='<item_type>name' and contains(.,'<name>')]" "xpath_element"
+    Then "Remove <item_type> <name> from session" "link" should exist
+    And "Edit custom <item_type> <name> in session" "link" should exist
     And I press "Save changes"
     Then I should see "Upcoming events"
     And I log out
@@ -151,8 +151,8 @@ Feature: Check asset/facilitator actions are performed by users with the right p
     And I set the following fields to these values:
       | Name | <name> Zero |
     And I click on "OK" "button" in the "Create new <item_type>" "totaradialogue"
-    Then "Delete" "link" should exist in the "//li[@class='<item_type>name' and contains(.,'<name> Zero')]" "xpath_element"
-    And "Edit <item_type>" "link" should exist in the "//li[@class='<item_type>name' and contains(.,'<name> Zero')]" "xpath_element"
+    Then "Remove <item_type> <name> Zero from session" "link" should exist
+    And "Edit custom <item_type> <name> Zero in session" "link" should exist
     And I press "Save changes"
     Then I should see "Upcoming events"
 
@@ -170,8 +170,8 @@ Feature: Check asset/facilitator actions are performed by users with the right p
     And I should see "Create" in the "Choose <collection_type>" "totaradialogue"
     And I click on "<name> One" "text" in the "Choose <collection_type>" "totaradialogue"
     And I click on "OK" "button" in the "Choose <collection_type>" "totaradialogue"
-    Then "Delete" "link" should exist in the "//li[@class='<item_type>name' and contains(.,'<name> One')]" "xpath_element"
-    But "Edit" "link" should not exist in the "//li[@class='<item_type>name' and contains(.,'<name> One')]" "xpath_element"
+    Then "Remove <item_type> <name> One from session" "link" should exist
+    But "Edit custom <item_type> <name> One in session" "link" should not exist
     And I press "Save changes"
     Then I should see "Upcoming events"
 
@@ -189,8 +189,8 @@ Feature: Check asset/facilitator actions are performed by users with the right p
     And I should see "Create" in the "Choose <collection_type>" "totaradialogue"
     And I click on "<name> Two" "text" in the "Choose <collection_type>" "totaradialogue"
     And I click on "OK" "button" in the "Choose <collection_type>" "totaradialogue"
-    Then "Delete" "link" should exist in the "//li[@class='<item_type>name' and contains(.,'<name> Two')]" "xpath_element"
-    But "Edit" "link" should not exist in the "//li[@class='<item_type>name' and contains(.,'<name> Two')]" "xpath_element"
+    Then "Remove <item_type> <name> Two from session" "link" should exist
+    But "Edit custom <item_type> <name> Two in session" "link" should not exist
     And I press "Save changes"
     Then I should see "Upcoming events"
     And I log out

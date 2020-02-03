@@ -60,7 +60,7 @@ Feature: Seminar event cancellation status
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
 
   # -------------------------------------------------------------------------------------

@@ -58,7 +58,7 @@ Feature: Minimum Seminar bookings
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 13       |
       | timefinish[minute] | 00       |
-    And I click on "OK" "button"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I wait "1" seconds
     And I click on "Save changes" "button"
     And I click on the seminar event action "Edit event" in row "29 December"

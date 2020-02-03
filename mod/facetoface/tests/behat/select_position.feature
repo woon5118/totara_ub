@@ -46,7 +46,7 @@ Feature: Add a seminar with select position
       | timefinish[year]     | ## next year ## Y ## |
       | timefinish[hour]     | 12   |
       | timefinish[minute]   | 0    |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I should see date "1 January next year" formatted "%d %B %Y"
     And I log out
@@ -89,7 +89,7 @@ Feature: Add a seminar with select position
       | timefinish[year]     | ## next year ## Y ## |
       | timefinish[hour]     | 12   |
       | timefinish[minute]   | 0    |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I should see date "1 January next year" formatted "%d %B %Y"
     And I log out
@@ -143,7 +143,7 @@ Feature: Add a seminar with select position
       | timefinish[year]     | ## next year ## Y ## |
       | timefinish[hour]     | 12   |
       | timefinish[minute]   | 0    |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I should see date "1 January next year" formatted "%d %B %Y"
     And I log out
@@ -185,7 +185,7 @@ Feature: Add a seminar with select position
       | timefinish[year]     | ## next year ## Y ## |
       | timefinish[hour]     | 12   |
       | timefinish[minute]   | 0    |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I should see date "1 January next year" formatted "%d %B %Y"
     And I log out

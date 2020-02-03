@@ -41,7 +41,7 @@ Feature: Check My bookings displays the right information for future and past ev
       | timefinish[year]     | 0  |
       | timefinish[hour]     | 0  |
       | timefinish[minute]   | 0  |
-    And I click on "OK" "button"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I wait "1" seconds
     And I set the field "Maximum bookings" to "115"
     And I click on "Save changes" "button"
@@ -60,7 +60,7 @@ Feature: Check My bookings displays the right information for future and past ev
       | timefinish[year]     | 0  |
       | timefinish[hour]     | 0  |
       | timefinish[minute]   | 0  |
-    And I click on "OK" "button"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I wait "1" seconds
     And I click on "Save changes" "button"
     And I click on the seminar event action "Attendees" in row "Session in progress"
@@ -96,7 +96,7 @@ Feature: Check My bookings displays the right information for future and past ev
       | timefinish[year]     | 0  |
       | timefinish[hour]     | 0  |
       | timefinish[minute]   | 0  |
-    And I click on "OK" "button"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I wait "1" seconds
     And I click on "Save changes" "button"
     And I click on the seminar event action "Attendees" in row "Session over"
@@ -122,7 +122,7 @@ Feature: Check My bookings displays the right information for future and past ev
       | timefinish[year]     | 0  |
       | timefinish[hour]     | 0  |
       | timefinish[minute]   | 0  |
-    And I click on "OK" "button"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I wait "1" seconds
     And I set the field "Maximum bookings" to "125"
     And I click on "Save changes" "button"

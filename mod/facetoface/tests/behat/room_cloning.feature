@@ -52,7 +52,7 @@ Feature: Clone pre-defined rooms in seminar
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose rooms" "totaradialogue"
     And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
@@ -74,7 +74,7 @@ Feature: Clone pre-defined rooms in seminar
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 15   |
       | timefinish[minute] | 0    |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose rooms" "totaradialogue"
     And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
@@ -90,7 +90,7 @@ Feature: Clone pre-defined rooms in seminar
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 0    |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I should see "The new dates you have selected are unavailable due to a scheduling conflict"
     And I set the following fields to these values:
       | timestart[day]     | 1    |
@@ -103,7 +103,7 @@ Feature: Clone pre-defined rooms in seminar
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 15   |
       | timefinish[minute] | 0    |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     And I click on "Room 1, That house, 123 here street (Capacity: 5)" "text" in the "Choose rooms" "totaradialogue"
     And I click on "OK" "button" in the "Choose rooms" "totaradialogue"

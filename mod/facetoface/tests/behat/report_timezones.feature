@@ -44,7 +44,7 @@ Feature: Seminar timezones in reports
       | timefinish[hour]     | 3               |
       | timefinish[minute]   | 45              |
       | timefinish[timezone] | Australia/Perth |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
 
     And I click on "Select rooms" "link"
     And I click on "Create" "link"
@@ -79,7 +79,7 @@ Feature: Seminar timezones in reports
       | timefinish[hour]     | 2               |
       | timefinish[minute]   | 30              |
       | timefinish[timezone] | Australia/Perth |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
 
     And I click on "Select rooms" "link"
     And I click on "Create" "link"
@@ -188,7 +188,7 @@ Feature: Seminar timezones in reports
       | timefinish[hour]     | 3               |
       | timefinish[minute]   | 45              |
       | timefinish[timezone] | Australia/Perth |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I am on "Course 1" course homepage
     And I add a "Seminar" to section "1" and I fill the form with:
@@ -211,7 +211,7 @@ Feature: Seminar timezones in reports
       | timefinish[hour]     | 2               |
       | timefinish[minute]   | 30              |
       | timefinish[timezone] | Australia/Perth |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
 
     And I navigate to my "F2F summary" report

@@ -39,6 +39,6 @@ Feature: Add a seminar event and session
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I should see date "1 Jan next year" formatted "%d %B %Y"

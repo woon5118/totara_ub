@@ -50,7 +50,7 @@ Feature: Seminar event cancellation basic
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
 
     Given I click on the seminar event action "Attendees" in row "#1"
@@ -130,7 +130,7 @@ Feature: Seminar event cancellation basic
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
 
     Given I press "Add a new session"
     And I follow "show-selectdate1-dialog"
@@ -201,7 +201,7 @@ Feature: Seminar event cancellation basic
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
 
     Given I press "Add a new session"
     And I follow "show-selectdate1-dialog"
@@ -284,7 +284,7 @@ Feature: Seminar event cancellation basic
       | timefinish[hour]    | 15               |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
 
     Given I press "Add a new session"
     And I follow "show-selectdate1-dialog"
@@ -363,7 +363,7 @@ Feature: Seminar event cancellation basic
       | timefinish[hour]    | 2               |
       | timefinish[minute]  | 0               |
       | timefinish[timezone]| Australia/Perth |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
 
     Given I click on the seminar event action "Attendees" in row "#1"
@@ -409,7 +409,7 @@ Feature: Seminar event cancellation basic
       | timefinish[hour]    | 2               |
       | timefinish[minute]  | 0               |
       | timefinish[timezone]| Australia/Perth |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
 
     When I press "Save changes"
     Then I should see date "0 day Australia/Perth" formatted "%d %B %Y"
@@ -442,7 +442,7 @@ Feature: Seminar event cancellation basic
       | timefinish[hour]    | 0                |
       | timefinish[minute]  | 0                |
       | timefinish[timezone]| Pacific/Auckland |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
 
     When I click on the seminar event action "Cancel event" in row "Booking open"
@@ -472,7 +472,7 @@ Feature: Seminar event cancellation basic
       | timefinish[year]   | 0                |
       | timefinish[hour]   | +1               |
       | timefinish[minute] | 0                |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I follow "Add event"
     And I set the field "Maximum bookings" to "30"
@@ -488,7 +488,7 @@ Feature: Seminar event cancellation basic
       | timefinish[year]   | 0                |
       | timefinish[hour]   | +1               |
       | timefinish[minute] | 0                |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
 
     When I click on the seminar event action "Cancel event" in row "0 / 30"
@@ -523,7 +523,7 @@ Feature: Seminar event cancellation basic
       | timefinish[year]   | 0                |
       | timefinish[hour]   | +1               |
       | timefinish[minute] | 0                |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I follow "Add event"
     And I set the field "Maximum bookings" to "30"
@@ -539,7 +539,7 @@ Feature: Seminar event cancellation basic
       | timefinish[year]   | 0                |
       | timefinish[hour]   | +1               |
       | timefinish[minute] | 0                |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
 
     When I click on the seminar event action "Cancel event" in row "0 / 30"

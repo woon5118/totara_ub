@@ -39,7 +39,7 @@ Feature: Hide elements on the page based on sessions available
       | timefinish[year]   | 0                |
       | timefinish[hour]   | +1               |
       | timefinish[minute] | 0                |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And ".mod_facetoface__filter" "css_element" should exist
     And "eventtime" "select" should not exist
@@ -62,7 +62,7 @@ Feature: Hide elements on the page based on sessions available
       | timefinish[year]   | 0                |
       | timefinish[hour]   | +1               |
       | timefinish[minute] | 0                |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I follow "Add event"
     And I click on "Edit session" "link"
@@ -78,7 +78,7 @@ Feature: Hide elements on the page based on sessions available
       | timefinish[year]   | 0                |
       | timefinish[hour]   | +1               |
       | timefinish[minute] | 0                |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And "eventtime" "select" should exist
     And "Export format" "select" should exist

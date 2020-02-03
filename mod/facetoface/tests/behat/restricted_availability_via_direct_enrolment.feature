@@ -46,7 +46,7 @@ Feature: Seminar availability based on activity completion using direct enrolmen
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
 
     # Create a Seminar and add restriction so it won't be available until the first activity is marked as completed.
@@ -76,7 +76,7 @@ Feature: Seminar availability based on activity completion using direct enrolmen
       | timefinish[year]   | ## 2 years ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I log out
 

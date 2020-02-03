@@ -57,7 +57,7 @@ Feature: Add - Remove manager reservations in Seminar
       | timefinish[year]   | ## next year ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | capacity              | 2    |
     And I press "Save changes"

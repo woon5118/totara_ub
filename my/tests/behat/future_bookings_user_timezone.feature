@@ -39,7 +39,7 @@ Feature: My Future Bookings seminar sessions report overview
       | timefinish[hour]     | 3               |
       | timefinish[minute]   | 45              |
       | timefinish[timezone] | Europe/Prague   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
 
     And I follow "Add event"
@@ -55,7 +55,7 @@ Feature: My Future Bookings seminar sessions report overview
       | timefinish[year]     | ## next year ## Y ## |
       | timefinish[hour]     | 3               |
       | timefinish[minute]   | 45              |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
 
     And I click on the seminar event action "Attendees" in row "Australia/Perth"

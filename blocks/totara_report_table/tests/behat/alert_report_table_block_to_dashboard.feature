@@ -42,7 +42,7 @@ Feature: Only Alerts Report table block on dashboard
       | timefinish[year]   | ## +2 years ## Y ## |
       | timefinish[hour]   | 12   |
       | timefinish[minute] | 00   |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I set the following fields to these values:
       | capacity           | 1    |
     And I press "Save changes"
