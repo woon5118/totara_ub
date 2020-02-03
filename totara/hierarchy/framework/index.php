@@ -213,12 +213,11 @@ if ($cancreateframeworks) {
 if ($canviewframeworks) {
     if ($frameworks) {
         $templatedata->frameworks = $table->export_for_template($OUTPUT);
+        $templatedata->exportbuttons = $hierarchy->export_frameworks_select_for_template($baseurl, !$frameworks);
     } else {
         $templatedata->noframeworkmessage = get_string($prefix.'noframeworks', 'totara_hierarchy');
     }
 }
-
-$templatedata->exportbuttons = $hierarchy->export_frameworks_select_for_template($baseurl, !$frameworks);
 
 echo $OUTPUT->render_from_template('totara_hierarchy/admin_frameworks', $templatedata);
 
