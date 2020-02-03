@@ -503,7 +503,7 @@ class core_accesslib_testcase extends advanced_testcase {
         $sink->close();
         $this->assertCount(1, $events);
         $event = $events[0];
-        $this->assertInstanceOf('\core\event\capability_assigned', $event);
+        $this->assertInstanceOf('\core\event\role_capability_updated', $event);
         $this->assertSame('role', $event->objecttable);
         $this->assertEquals($student->id, $event->objectid);
         $this->assertEquals($syscontext->id, $event->contextid);
@@ -541,7 +541,7 @@ class core_accesslib_testcase extends advanced_testcase {
         $sink->close();
         $this->assertCount(1, $events);
         $event = $events[0];
-        $this->assertInstanceOf('\core\event\capability_assigned', $event);
+        $this->assertInstanceOf('\core\event\role_capability_updated', $event);
         $this->assertSame('role', $event->objecttable);
         $this->assertEquals($student->id, $event->objectid);
         $this->assertEquals($coursecontext->id, $event->contextid);
@@ -611,7 +611,7 @@ class core_accesslib_testcase extends advanced_testcase {
         $sink->close();
         $this->assertCount(1, $events);
         $event = $events[0];
-        $this->assertInstanceOf('\core\event\capability_assigned', $event);
+        $this->assertInstanceOf('\core\event\role_capability_updated', $event);
         $this->assertSame('role', $event->objecttable);
         $this->assertEquals($manager->id, $event->objectid);
         $this->assertEquals($syscontext->id, $event->contextid);

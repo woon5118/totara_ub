@@ -1511,14 +1511,14 @@ function assign_capability($capability, $permission, $roleid, $contextid, $overw
         }
     }
 
-    // Trigger capability_assigned event.
-    \core\event\capability_assigned::create([
+    // Trigger event.
+    \core\event\role_capability_updated::create([
         'userid' => $cap->modifierid,
         'context' => $context,
         'objectid' => $roleid,
         'other' => [
             'capability' => $capability,
-            'oldpermission' => $existing->permission ?? CAP_INHERIT,
+            'oldpermission' => $existing ? $existing->permission : CAP_INHERIT,
             'permission' => $permission
         ]
     ])->trigger();
@@ -1557,8 +1557,8 @@ function unassign_capability($capability, $roleid, $contextid = null) {
         }
         $DB->delete_records('role_capabilities', array('id' => $existing->id));
 
-        // Trigger capability_assigned event.
-        \core\event\capability_assigned::create([
+        // Trigger event.
+        \core\event\role_capability_updated::create([
             'userid' => empty($USER->id) ? 0 : $USER->id,
             'context' => $context,
             'objectid' => $roleid,
@@ -1578,8 +1578,8 @@ function unassign_capability($capability, $roleid, $contextid = null) {
         $DB->delete_records('role_capabilities', array('capability' => $capability, 'roleid' => $roleid));
 
         foreach ($caps as $existing) {
-            // Trigger capability_assigned event - the unassigned event is not used in Totara.
-            \core\event\capability_assigned::create([
+            // Trigger event.
+            \core\event\role_capability_updated::create([
                 'userid' => empty($USER->id) ? 0 : $USER->id,
                 'context' => context::instance_by_id($existing->contextid),
                 'objectid' => $roleid,
