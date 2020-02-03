@@ -1544,22 +1544,39 @@ class core_accesslib_testcase extends advanced_testcase {
     public function test_set_role_contextlevels() {
         global $DB;
 
-        $this->resetAfterTest();
+        $this->setAdminUser();
+        $admin = get_admin();
 
         $roleid = create_role('New student role', 'student2', 'New student description', 'student');
 
         $this->assertFalse($DB->record_exists('role_context_levels', array('roleid' => $roleid)));
 
+        $sink = $this->redirectEvents();
         set_role_contextlevels($roleid, array(CONTEXT_COURSE, CONTEXT_MODULE));
+        $events = $sink->get_events();
+        $sink->close();
         $levels = $DB->get_records('role_context_levels', array('roleid' => $roleid), '', 'contextlevel, contextlevel');
         $this->assertCount(2, $levels);
         $this->assertTrue(isset($levels[CONTEXT_COURSE]));
         $this->assertTrue(isset($levels[CONTEXT_MODULE]));
+        $this->assertCount(2, $events);
+        $event = $events[0];
+        $this->assertInstanceOf(core\event\role_contextlevel_updated::class, $event);
+        $this->assertSame("The user with id '{$admin->id}' added supported context level 50 to the role '{$roleid}'", $event->get_description());
+        $event = $events[1];
+        $this->assertInstanceOf(core\event\role_contextlevel_updated::class, $event);
+        $this->assertSame("The user with id '{$admin->id}' added supported context level 70 to the role '{$roleid}'", $event->get_description());
 
+        $sink = $this->redirectEvents();
         set_role_contextlevels($roleid, array(CONTEXT_COURSE));
+        $events = $sink->get_events();
+        $sink->close();
         $levels = $DB->get_records('role_context_levels', array('roleid' => $roleid), '', 'contextlevel, contextlevel');
         $this->assertCount(1, $levels);
         $this->assertTrue(isset($levels[CONTEXT_COURSE]));
+        $event = $events[0];
+        $this->assertInstanceOf(core\event\role_contextlevel_updated::class, $event);
+        $this->assertSame("The user with id '{$admin->id}' removed supported context level 70 from the role '{$roleid}'", $event->get_description());
     }
 
     /**

@@ -3887,19 +3887,43 @@ function get_default_contextlevels($rolearchetype) {
  * Throws exceptions in case of error.
  *
  * @param integer $roleid the id of a role.
- * @param array $contextlevels the context levels at which this role should be assignable,
- *      duplicate levels are removed.
+ * @param array $contextlevels the context levels at which this role should be assignable
  * @return void
  */
-function set_role_contextlevels($roleid, array $contextlevels) {
+function set_role_contextlevels(int $roleid, array $contextlevels) {
     global $DB;
-    $DB->delete_records('role_context_levels', array('roleid' => $roleid));
-    $rcl = new stdClass();
-    $rcl->roleid = $roleid;
-    $contextlevels = array_unique($contextlevels);
-    foreach ($contextlevels as $level) {
-        $rcl->contextlevel = $level;
-        $DB->insert_record('role_context_levels', $rcl, false, true);
+
+    $role = $DB->get_record('role', ['id' => $roleid], '*', MUST_EXIST);
+
+    $alllevels = context_helper::get_all_levels();
+    foreach ($alllevels as $contextlevel => $ignored) {
+        $current = $DB->get_record('role_context_levels', ['roleid' => $role->id, 'contextlevel' => $contextlevel]);
+        if (in_array($contextlevel, $contextlevels)) {
+            if (!$current) {
+                $rcl = new stdClass();
+                $rcl->roleid = $role->id;
+                $rcl->contextlevel = $contextlevel;
+                $DB->insert_record('role_context_levels', $rcl, false);
+                $event = core\event\role_contextlevel_updated::create([
+                    'context' => context_system::instance(),
+                    'objectid' => $role->id,
+                    'other' => ['contextlevel' => $contextlevel, 'allow' => true]
+                ]);
+                $event->add_record_snapshot('role', $role);
+                $event->trigger();
+            }
+        } else {
+            if ($current) {
+                $DB->delete_records('role_context_levels', ['id' => $current->id]);
+                $event = core\event\role_contextlevel_updated::create([
+                    'context' => context_system::instance(),
+                    'objectid' => $role->id,
+                    'other' => ['contextlevel' => $contextlevel, 'allow' => false]
+                ]);
+                $event->add_record_snapshot('role', $role);
+                $event->trigger();
+            }
+        }
     }
 }
 
