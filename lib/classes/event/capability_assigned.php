@@ -60,24 +60,27 @@ class capability_assigned extends base {
      * @return string
      */
     public function get_description() {
-
-        $strpermissions = [
-            CAP_INHERIT => get_string('notset', 'role'),
-            CAP_ALLOW => get_string('allow', 'role'),
-            CAP_PREVENT => get_string('prevent', 'role'),
-            CAP_PROHIBIT => get_string('prohibit', 'role')
-        ];
-
         $capability = $this->other['capability'];
-        $oldpermission = $this->other['oldpermission'];
         $permission = $this->other['permission'];
 
-        if ($oldpermission == CAP_INHERIT && $permission == CAP_ALLOW) {
-            $description = "The user id '$this->userid' assigned the '$capability' capability for " .
-                "role '$this->objectid' with '$strpermissions[$permission]' permission";
+        if ($this->contextlevel == CONTEXT_SYSTEM) {
+            if ($permission == CAP_ALLOW) {
+                $description = "The user id '$this->userid' assigned the '$capability' capability to role '$this->objectid'";
+            } else if ($permission == CAP_PROHIBIT) {
+                $description = "The user id '$this->userid' prohibited the '$capability' capability from role '$this->objectid'";
+            } else {
+                $description = "The user id '$this->userid' unassigned the '$capability' capability from role '$this->objectid'";
+            }
         } else {
-            $description = "The user id '$this->userid' changed the '$capability' capability permission for " .
-            "role '$this->objectid' from '$strpermissions[$oldpermission]' to '$strpermissions[$permission]'";
+            if ($permission == CAP_ALLOW) {
+                $description = "The user id '$this->userid' overrode the '$capability' capability with 'Allow' permission for role '$this->objectid'";
+            } else if ($permission == CAP_INHERIT) {
+                $description = "The user id '$this->userid' removed override for the '$capability' capability for role '$this->objectid'";
+            } else if ($permission == CAP_PROHIBIT) {
+                $description = "The user id '$this->userid' overrode the '$capability' capability with 'Prohibit' permission for role '$this->objectid'";
+            } else {
+                $description = "The user id '$this->userid' overrode the '$capability' capability with 'Prevent' permission for role '$this->objectid'";
+            }
         }
 
         return $description;

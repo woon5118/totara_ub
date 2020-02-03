@@ -19,6 +19,7 @@
  *
  * @package    core
  * @since      Moodle 2.6
+ * @depreacted since Totara 13.0, not triggered any more
  * @copyright  2013 Rajesh Taneja <rajesh@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -32,16 +33,13 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package    core
  * @since      Moodle 2.6
- * @depreacted since Totara 13, not triggered any more
+ * @depreacted since Totara 13.0, not triggered any more
  * @copyright  2013 Rajesh Taneja <rajesh@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class role_capabilities_updated extends base {
-    /** @var array Legacy log data */
-    protected $legacylogdata = null;
-
     protected function validate_data() {
-        debugging('role_capabilities_updated capability was deprecated and should not be triggered anywhere, it is displayed in historic logs only');
+        debugging('role_capabilities_updated event was deprecated and should not be triggered anywhere, it is displayed in historic logs only');
     }
 
     /**
@@ -80,28 +78,8 @@ class role_capabilities_updated extends base {
         if ($this->contextlevel == CONTEXT_SYSTEM) {
             return new \moodle_url('/admin/roles/define.php', array('action' => 'view', 'roleid' => $this->objectid));
         } else {
-            return new \moodle_url('/admin/roles/override.php', array('contextid' => $this->contextid,
-                'roleid' => $this->objectid));
+            return new \moodle_url('/admin/roles/override.php', array('contextid' => $this->contextid, 'roleid' => $this->objectid));
         }
-    }
-
-    /**
-     * Sets legacy log data.
-     *
-     * @param array $legacylogdata
-     * @return void
-     */
-    public function set_legacy_logdata($legacylogdata) {
-        $this->legacylogdata = $legacylogdata;
-    }
-
-    /**
-     * Returns array of parameters to be passed to legacy add_to_log() function.
-     *
-     * @return null|array
-     */
-    protected function get_legacy_logdata() {
-        return $this->legacylogdata;
     }
 
     public static function get_objectid_mapping() {

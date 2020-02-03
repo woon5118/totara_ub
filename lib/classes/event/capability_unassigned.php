@@ -19,6 +19,7 @@
  *
  * @package    core
  * @since      Moodle 3.8
+ * @depreacted since Totara 13.0, not triggered any more
  * @copyright  2019 Simey Lameze <simey@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -32,6 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package    core
  * @since      Moodle 3.8
+ * @depreacted since Totara 13.0, not triggered any more
  * @copyright  2019 Simey Lameze <simey@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -43,6 +45,19 @@ class capability_unassigned extends base {
         $this->data['objecttable'] = 'role_capabilities';
         $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_OTHER;
+    }
+
+    protected function validate_data() {
+        debugging('capability_unassigned event was deprecated and should not be triggered anywhere, it is displayed in historic logs only');
+    }
+
+    /**
+     * This event has been deprecated.
+     *
+     * @return boolean
+     */
+    public static function is_deprecated() {
+        return true;
     }
 
     /**

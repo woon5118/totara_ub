@@ -1415,6 +1415,11 @@ function assign_capability($capability, $permission, $roleid, $contextid, $overw
         return true;
     }
 
+    if ($existing && $existing->permission == $permission) {
+        // Totara: nothing to do, do not trigger events or purge caches.
+        return true;
+    }
+
     $cap = new stdClass();
     $cap->contextid    = $context->id;
     $cap->roleid       = $roleid;
@@ -1472,21 +1477,46 @@ function unassign_capability($capability, $roleid, $contextid = null) {
         } else {
             $context = context::instance_by_id($contextid);
         }
-        // delete from context rel, if this is the last override in this context
-        $DB->delete_records('role_capabilities', array('capability'=>$capability, 'roleid'=>$roleid, 'contextid'=>$context->id));
-    } else {
-        $DB->delete_records('role_capabilities', array('capability'=>$capability, 'roleid'=>$roleid));
-    }
+        $existing = $DB->get_record('role_capabilities', array('contextid' => $context->id, 'roleid' => $roleid, 'capability' => $capability));
+        if (!$existing) {
+            return true;
+        }
+        $DB->delete_records('role_capabilities', array('id' => $existing->id));
 
-    // Trigger capability_assigned event.
-    \core\event\capability_unassigned::create([
-        'userid' => $USER->id,
-        'context' => $context ?? context_system::instance(),
-        'objectid' => $roleid,
-        'other' => [
-            'capability' => $capability,
-        ]
-    ])->trigger();
+        // Trigger capability_assigned event.
+        \core\event\capability_assigned::create([
+            'userid' => empty($USER->id) ? 0 : $USER->id,
+            'context' => $context,
+            'objectid' => $roleid,
+            'other' => [
+                'capability' => $capability,
+                'oldpermission' => $existing->permission,
+                'permission' => CAP_INHERIT
+            ]
+        ])->trigger();
+
+    } else {
+        // delete from context rel, if this is the last override in this context
+        $caps = $DB->get_records('role_capabilities', array('roleid' => $roleid, 'capability' => $capability));
+        if (!$caps) {
+            return true;
+        }
+        $DB->delete_records('role_capabilities', array('capability' => $capability, 'roleid' => $roleid));
+
+        foreach ($caps as $existing) {
+            // Trigger capability_assigned event - the unassigned event is not used in Totara.
+            \core\event\capability_assigned::create([
+                'userid' => empty($USER->id) ? 0 : $USER->id,
+                'context' => context::instance_by_id($existing->contextid),
+                'objectid' => $roleid,
+                'other' => [
+                    'capability' => $capability,
+                    'oldpermission' => $existing->permission,
+                    'permission' => CAP_INHERIT
+                ]
+            ])->trigger();
+        }
+    }
 
     // Reset any cache of this role, including MUC.
     accesslib_clear_role_cache($roleid);
