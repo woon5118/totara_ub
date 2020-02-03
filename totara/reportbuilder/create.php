@@ -30,7 +30,9 @@ require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
 
-admin_externalpage_setup('rbmanagereports');
+// This is not a real admin page, set actual URL here to avoid admin menu issues.
+$actualurl = new moodle_url('/totara/reportbuilder/create.php');
+admin_externalpage_setup('rbmanagereports', '', null, $actualurl);
 
 $output = $PAGE->get_renderer('totara_reportbuilder');
 

@@ -43,8 +43,7 @@ if (!$report = reportbuilder::create_embedded($shortname, $config)) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
 }
 
-$url = new moodle_url('/totara/reportbuilder/index.php', $pageparams);
-admin_externalpage_setup('rbmanagereports', '', null, $url);
+admin_externalpage_setup('rbmanagereports', '', $pageparams);
 
 $PAGE->set_button($report->edit_button() . $PAGE->button);
 
