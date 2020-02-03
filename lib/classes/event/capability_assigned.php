@@ -18,7 +18,7 @@
  * Capability assigned event.
  *
  * @package    core
- * @since      Moodle 3.8
+ * @since      Totara 13.0
  * @copyright  2019 Simey Lameze <simey@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,7 +31,7 @@ defined('MOODLE_INTERNAL') || die();
  * Capability assigned event class.
  *
  * @package    core
- * @since      Moodle 3.8
+ * @since      Totara 13.0
  * @copyright  2019 Simey Lameze <simey@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -40,7 +40,7 @@ class capability_assigned extends base {
      * Initialise event parameters.
      */
     protected function init() {
-        $this->data['objecttable'] = 'role_capabilities';
+        $this->data['objecttable'] = 'role'; // Totara: this MUST match the $this->objectid, this is NOT "Affected table" as incorrectly stated in event monitor tool.
         $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }

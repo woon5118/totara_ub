@@ -32,8 +32,8 @@ class core_role_allow_assign_page extends core_role_allow_role_page {
         parent::__construct('role_allow_assign', 'allowassign');
     }
 
-    protected function set_allow($fromroleid, $targetroleid) {
-        allow_assign($fromroleid, $targetroleid);
+    protected function set_allow($fromroleid, $targetroleid, bool $value) {
+        allow_assign($fromroleid, $targetroleid, $value);
     }
 
     protected function get_cell_tooltip($fromrole, $targetrole) {
@@ -45,9 +45,5 @@ class core_role_allow_assign_page extends core_role_allow_role_page {
 
     public function get_intro_text() {
         return get_string('configallowassign', 'core_admin');
-    }
-
-    protected function get_eventclass() {
-        return \core\event\role_allow_assign_updated::class;
     }
 }

@@ -3368,51 +3368,135 @@ function get_user_roles_with_special(context $context, $userid = 0) {
 }
 
 /**
- * Creates a record in the role_allow_override table
+ * Creates/delete a record in the role_allow_override table
  *
  * @param int $sroleid source roleid
  * @param int $troleid target roleid
+ * @param bool $value true means allow, false means remove allowed flag
  * @return void
  */
-function allow_override($sroleid, $troleid) {
+function allow_override($sroleid, $troleid, bool $value = true) {
     global $DB;
 
-    $record = new stdClass();
-    $record->roleid        = $sroleid;
-    $record->allowoverride = $troleid;
-    $DB->insert_record('role_allow_override', $record);
+    $existing = $DB->get_record('role_allow_override', ['roleid' => $sroleid, 'allowoverride' => $troleid]);
+
+    if ($value) {
+        if ($existing) {
+            return;
+        }
+
+        $record = new stdClass();
+        $record->roleid = $sroleid;
+        $record->allowoverride = $troleid;
+        $DB->insert_record('role_allow_override', $record);
+
+        core\event\role_allow_override_updated::create([
+            'context' => context_system::instance(),
+            'objectid' => $sroleid,
+            'other' => ['targetroleid' => $troleid, 'allow' => true]
+        ])->trigger();
+
+    } else {
+        if (!$existing) {
+            return;
+        }
+
+        $DB->delete_records('role_allow_override', ['id' => $existing->id]);
+
+        core\event\role_allow_override_updated::create([
+            'context' => context_system::instance(),
+            'objectid' => $sroleid,
+            'other' => ['targetroleid' => $troleid, 'allow' => false]
+        ])->trigger();
+    }
 }
 
 /**
- * Creates a record in the role_allow_assign table
+ * Creates/delete a record in the role_allow_assign table
  *
  * @param int $fromroleid source roleid
  * @param int $targetroleid target roleid
+ * @param bool $value true means allow, false means remove allowed flag
  * @return void
  */
-function allow_assign($fromroleid, $targetroleid) {
+function allow_assign($fromroleid, $targetroleid, bool $value = true) {
     global $DB;
 
-    $record = new stdClass();
-    $record->roleid      = $fromroleid;
-    $record->allowassign = $targetroleid;
-    $DB->insert_record('role_allow_assign', $record);
+    $existing = $DB->get_record('role_allow_assign', ['roleid' => $fromroleid, 'allowassign' => $targetroleid]);
+
+    if ($value) {
+        if ($existing) {
+            return;
+        }
+
+        $record = new stdClass();
+        $record->roleid = $fromroleid;
+        $record->allowassign = $targetroleid;
+        $DB->insert_record('role_allow_assign', $record);
+
+        core\event\role_allow_assign_updated::create([
+            'context' => context_system::instance(),
+            'objectid' => $fromroleid,
+            'other' => ['targetroleid' => $targetroleid, 'allow' => true]
+        ])->trigger();
+
+    } else {
+        if (!$existing) {
+            return;
+        }
+
+        $DB->delete_records('role_allow_assign', ['id' => $existing->id]);
+
+        core\event\role_allow_assign_updated::create([
+            'context' => context_system::instance(),
+            'objectid' => $fromroleid,
+            'other' => ['targetroleid' => $targetroleid, 'allow' => false]
+        ])->trigger();
+    }
 }
 
 /**
- * Creates a record in the role_allow_switch table
+ * Creates/delete a record in the role_allow_switch table
  *
  * @param int $fromroleid source roleid
  * @param int $targetroleid target roleid
+ * @param bool $value true means allow, false means remove allowed flag
  * @return void
  */
-function allow_switch($fromroleid, $targetroleid) {
+function allow_switch($fromroleid, $targetroleid, bool $value = true) {
     global $DB;
 
-    $record = new stdClass();
-    $record->roleid      = $fromroleid;
-    $record->allowswitch = $targetroleid;
-    $DB->insert_record('role_allow_switch', $record);
+    $existing = $DB->get_record('role_allow_switch', ['roleid' => $fromroleid, 'allowswitch' => $targetroleid]);
+
+    if ($value) {
+        if ($existing) {
+            return;
+        }
+
+        $record = new stdClass();
+        $record->roleid = $fromroleid;
+        $record->allowswitch = $targetroleid;
+        $DB->insert_record('role_allow_switch', $record);
+
+        core\event\role_allow_switch_updated::create([
+            'context' => context_system::instance(),
+            'objectid' => $fromroleid,
+            'other' => ['targetroleid' => $targetroleid, 'allow' => true]
+        ])->trigger();
+
+    } else {
+        if (!$existing) {
+            return;
+        }
+
+        $DB->delete_records('role_allow_switch', ['id' => $existing->id]);
+
+        core\event\role_allow_switch_updated::create([
+            'context' => context_system::instance(),
+            'objectid' => $fromroleid,
+            'other' => ['targetroleid' => $targetroleid, 'allow' => false]
+        ])->trigger();
+    }
 }
 
 /**

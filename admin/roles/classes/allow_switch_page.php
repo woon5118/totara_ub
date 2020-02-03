@@ -40,8 +40,8 @@ class core_role_allow_switch_page extends core_role_allow_role_page {
         $this->allowedtargetroles = $DB->get_records_menu('role', null, 'id');
     }
 
-    protected function set_allow($fromroleid, $targetroleid) {
-        allow_switch($fromroleid, $targetroleid);
+    protected function set_allow($fromroleid, $targetroleid, bool $value) {
+        allow_switch($fromroleid, $targetroleid, $value);
     }
 
     protected function is_allowed_target($targetroleid) {
@@ -57,9 +57,5 @@ class core_role_allow_switch_page extends core_role_allow_role_page {
 
     public function get_intro_text() {
         return get_string('configallowswitch', 'core_admin');
-    }
-
-    protected function get_eventclass() {
-        return \core\event\role_allow_switch_updated::class;
     }
 }

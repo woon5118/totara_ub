@@ -460,43 +460,15 @@ class core_role_define_role_table_advanced extends core_role_capability_table_wi
     }
 
     protected function save_allow($type) {
-        global $DB;
-
-        $current = array_keys($this->get_allow_roles_list($type));
         $wanted = $this->{'allow'.$type};
-
         $addfunction = 'allow_'.$type;
-        $deltable = 'role_allow_'.$type;
-        $field = 'allow'.$type;
-        $eventclass = "\\core\\event\\role_allow_" . $type . "_updated";
-        $context = context_system::instance();
 
-        foreach ($current as $roleid) {
-            if (!in_array($roleid, $wanted)) {
-                $DB->delete_records($deltable, array('roleid'=>$this->roleid, $field=>$roleid));
-                $eventclass::create([
-                    'context' => $context,
-                    'objectid' => $this->roleid,
-                    'other' => ['targetroleid' => $roleid, 'allow' => false]
-                ])->trigger();
-                continue;
-            }
-            $key = array_search($roleid, $wanted);
-            unset($wanted[$key]);
-        }
-
-        foreach ($wanted as $roleid) {
-            if ($roleid == -1) {
-                $roleid = $this->roleid;
-            }
-            $addfunction($this->roleid, $roleid);
-
-            if (in_array($roleid, $wanted)) {
-                $eventclass::create([
-                    'context' => $context,
-                    'objectid' => $this->roleid,
-                    'other' => ['targetroleid' => $roleid, 'allow' => true]
-                ])->trigger();
+        $allroles = get_all_roles();
+        foreach ($allroles as $role) {
+            if (in_array($role->id, $wanted)) {
+                $addfunction($this->roleid, $role->id, true);
+            } else {
+                $addfunction($this->roleid, $role->id, false);
             }
         }
     }

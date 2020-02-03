@@ -42,7 +42,7 @@ class role_allow_override_updated extends base {
     protected function init() {
         $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_OTHER;
-        $this->data['objecttable'] = 'role_allow_override';
+        $this->data['objecttable'] = 'role'; // Totara: this MUST match the $this->objectid, this is NOT "Affected table" as incorrectly stated in event monitor tool.
     }
 
     /**
@@ -60,9 +60,11 @@ class role_allow_override_updated extends base {
      * @return string
      */
     public function get_description() {
-        $action = ($this->other['allow']) ? 'allow' : 'stop allowing';
-        return "The user with id '$this->userid' modified the role with id '" . $this->other['targetroleid']
-            . "' to $action users with that role from overriding the role with id '" . $this->objectid . "' to users";
+        if ($this->other['allow']) {
+            return "The user with id '$this->userid' modified the role with id '" . $this->objectid . "' to allow overriding role '" . $this->other['targetroleid'] . "'";
+        } else {
+            return "The user with id '$this->userid' modified the role with id '" . $this->objectid . "' to disallow overriding role '" . $this->other['targetroleid'] . "'";
+        }
     }
 
     /**
@@ -71,7 +73,7 @@ class role_allow_override_updated extends base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/admin/roles/allow.php', array('mode' => 'override'));
+        return new \moodle_url('/admin/roles/define.php', ['action' => 'view', 'roleid' => $this->objectid]);
     }
 
     /**
