@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  * Role updated event class.
  *
  * @package    core
- * @since      Moodle 3.8
+ * @since      Totara 13.0
  * @copyright  2019 Simey Lameze <simey@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -68,17 +68,7 @@ class role_updated extends base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/admin/roles/define.php', ['action' => 'edit', 'roleid' => $this->objectid]);
-    }
-
-    /**
-     * Returns array of parameters to be passed to legacy add_to_log() function.
-     *
-     * @return array
-     */
-    protected function get_legacy_logdata() {
-        return [SITEID, 'role', 'update', 'admin/roles/manage.php?action=edit&roleid=' . $this->objectid,
-            $this->other['shortname'], ''];
+        return new \moodle_url('/admin/roles/define.php', ['action' => 'view', 'roleid' => $this->objectid]);
     }
 
     /**

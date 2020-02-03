@@ -1326,6 +1326,24 @@ function create_role($name, $shortname, $description, $archetype = '') {
         $role->sortorder = 1;
     }
     $id = $DB->insert_record('role', $role);
+    $role = $DB->get_record('role', array('id' => $id), '*', MUST_EXIST);
+
+    // Trigger event.
+    $event = \core\event\role_created::create(
+        array(
+            'context' => context_system::instance(),
+            'objectid' => $role->id,
+            'other' =>
+                array(
+                    'name' => $role->name,
+                    'shortname' => $role->shortname,
+                    'description' => $role->description,
+                    'archetype' => $role->archetype
+                )
+        )
+    );
+    $event->add_record_snapshot('role', $role);
+    $event->trigger();
 
     return $id;
 }
@@ -1365,6 +1383,7 @@ function delete_role($roleid) {
             'objectid' => $roleid,
             'other' =>
                 array(
+                    'name' => $role->name,
                     'shortname' => $role->shortname,
                     'description' => $role->description,
                     'archetype' => $role->archetype

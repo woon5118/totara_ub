@@ -227,6 +227,7 @@ $string['eventroleallowoverrideupdated'] = 'Allow role override';
 $string['eventroleallowswitchupdated'] = 'Allow role switch';
 $string['eventroleassigned'] = 'Role assigned';
 $string['eventrolecapabilitiesupdated'] = 'Role capabilities updated';
+$string['eventrolecreated'] = 'Role created';
 $string['eventroledeleted'] = 'Role deleted';
 $string['eventroleunassigned'] = 'Role unassigned';
 $string['eventroleupdated'] = 'Role updated';
