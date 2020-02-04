@@ -60,10 +60,16 @@ final class api {
 
     /**
      * Get an individual learning object.
-     * @param int $id remote id of the learning object.
+     * @param string|int $id remote id of the learning object.
      * @return \stdClass Object returned from the Go1 web service.
      */
-    public function get_learning_object(int $id) {
+    public function get_learning_object(string $id) {
+        if ((string)(int)$id != $id) {
+            throw new \Exception('GO1 learning-objects are expected to have integer ids');
+        }
+
+        $id = (int)$id;
+
         $data = $this->learningobjectcache->get($id);
         if ($data === false) {
             $data = $this->client->get('learning-objects/' . $id);

@@ -62,10 +62,10 @@ abstract class search {
     abstract public function select_all($query, array $filter, string $mode, \context $context);
 
     /**
-     * @param int $id
+     * @param string|int $id
      * @return mixed
      */
-    abstract public function get_details(int $id);
+    abstract public function get_details(string $id);
 
     /**
      * @param array $listing

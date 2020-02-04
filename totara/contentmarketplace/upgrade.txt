@@ -1,0 +1,8 @@
+List of upgrade and API changes in content marketplace,
+information provided here is intended especially for developers.
+
+=== 13.0 ===
+
+* totara_contentmarketplace\local\contentmarketplace\search::get_learning_object: The function signature was changed.
+  $id is now expected to be a string rather than an int. Classes that implement this function in custom content
+  marketplaces must be updated to match.

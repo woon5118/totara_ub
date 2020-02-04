@@ -26,7 +26,7 @@ use totara_contentmarketplace\plugininfo\contentmarketplace;
 define('AJAX_SCRIPT', true);
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 
-$id = required_param('id', PARAM_INT);
+$id = required_param('id', PARAM_ALPHANUMEXT);
 $marketplace = required_param('marketplace', PARAM_ALPHA);
 
 $context = context_system::instance();

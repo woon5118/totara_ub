@@ -287,10 +287,10 @@ final class search extends \totara_contentmarketplace\local\contentmarketplace\s
     }
 
     /**
-     * @param int $id
+     * @param string|int $id
      * @return \stdClass|null
      */
-    public function get_details(int $id) {
+    public function get_details(string $id) {
         try {
             $api = new api();
             $learningobject = $api->get_learning_object($id);
