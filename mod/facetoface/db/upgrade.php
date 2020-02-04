@@ -672,8 +672,8 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2019090100, 'facetoface');
     }
 
-    // Add room to session dates many-to-many relationship.
-    if ($oldversion < 2019090400) {
+    // Add room to session dates many-to-many relationship, facilitor tables, and fields completiondelay and decluttersessiontable
+    if ($oldversion < 2020020300) {
 
         $table = new xmldb_table('facetoface_room_dates');
 
@@ -715,10 +715,6 @@ function xmldb_facetoface_upgrade($oldversion) {
             $dbman->drop_field($table, $roomidfield);
         }
 
-        upgrade_mod_savepoint(true, 2019090400, 'facetoface');
-    }
-
-    if ($oldversion < 2019090401) {
         // Define table for facetoface_facilitator.
         $table = new xmldb_table('facetoface_facilitator');
         // Adding fields to table facetoface_facilitator.
@@ -822,21 +818,13 @@ function xmldb_facetoface_upgrade($oldversion) {
             $dbman->create_table($table);
         }
 
-        upgrade_mod_savepoint(true, 2019090401, 'facetoface');
-    }
-
-    // Define field completiondelay to create criteria for number of days after event when activity completion is allowed.
-    if ($oldversion < 2019091000) {
+        // Define field completiondelay to create criteria for number of days after event when activity completion is allowed.
         $table = new xmldb_table('facetoface_room');
         $field = new xmldb_field('url', XMLDB_TYPE_CHAR, '1024', null, false, null, null, 'allowconflicts');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_mod_savepoint(true, 2019091000, 'facetoface');
-    }
-
-    if ($oldversion < 2019112700) {
         // Define field decluttersessiontable to be added to facetoface.
         $table = new xmldb_table('facetoface');
         $field = new xmldb_field('decluttersessiontable', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'waitlistautoclean');
@@ -847,7 +835,7 @@ function xmldb_facetoface_upgrade($oldversion) {
         }
 
         // Facetoface savepoint reached.
-        upgrade_mod_savepoint(true, 2019112700, 'facetoface');
+        upgrade_mod_savepoint(true, 2020020300, 'facetoface');
     }
 
     return true;
