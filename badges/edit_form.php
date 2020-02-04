@@ -66,7 +66,7 @@ class edit_details_form extends moodleform {
         $mform->addHelpButton('description', 'description', 'badges');
 
         $str = $action == 'new' ? get_string('badgeimage', 'badges') : get_string('newimage', 'badges');
-        $imageoptions = array('maxbytes' => 262144, 'accepted_types' => array('web_image'));
+        $imageoptions = array('maxbytes' => 262144, 'accepted_types' => array('.png'));
         $mform->addElement('filepicker', 'image', $str, null, $imageoptions);
 
         if ($action == 'new') {
