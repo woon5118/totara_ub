@@ -28,7 +28,15 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Event signalling change of role capability or override.
  *
- * @since      Totara 13.0
+ * @property-read array $other {
+ *      Extra information about event.
+ *
+ *      - string capability: capability name
+ *      - int oldpermission: previous permission value
+ *      - int permission: new permission value
+ * }
+ *
+ * @since Totara 13.0
  */
 class role_capability_updated extends base {
     /**
@@ -91,6 +99,26 @@ class role_capability_updated extends base {
             return new \moodle_url('/admin/roles/define.php', ['action' => 'edit', 'roleid' => $this->objectid]);
         } else {
             return new \moodle_url('/admin/roles/override.php', ['contextid' => $this->contextid, 'roleid' => $this->objectid]);
+        }
+    }
+
+    /**
+     * Custom validation.
+     *
+     * @throws \coding_exception
+     * @return void
+     */
+    protected function validate_data() {
+        parent::validate_data();
+
+        if (!isset($this->other['capability'])) {
+            throw new \coding_exception('The \'objecttable\' value must be set in other.');
+        }
+        if (!isset($this->other['oldpermission'])) {
+            throw new \coding_exception('The \'oldpermission\' value must be set in other.');
+        }
+        if (!isset($this->other['permission'])) {
+            throw new \coding_exception('The \'permission\' value must be set in other.');
         }
     }
 }

@@ -39,7 +39,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class role_capabilities_updated extends base {
     protected function validate_data() {
-        debugging('role_capabilities_updated event was deprecated and should not be triggered anywhere, it is displayed in historic logs only');
+        debugging('role_capabilities_updated event was deprecated and should not be triggered anywhere, it is displayed in historic logs only', DEBUG_DEVELOPER);
     }
 
     /**

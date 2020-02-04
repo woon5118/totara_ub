@@ -1362,7 +1362,7 @@ function create_role($name, $shortname, $description, $archetype = '') {
  * @return void
  */
 function update_role(int $roleid, string $name, string $shortname, string $description, string $archetype) {
-    global $DB, $USER;
+    global $DB;
 
     if (strpos($archetype, 'moodle/legacy:') !== false) {
         throw new coding_exception('Use new role archetype parameter in create_role() instead of old legacy capabilities.');
@@ -3416,7 +3416,7 @@ function get_user_roles_with_special(context $context, $userid = 0) {
  *
  * @param int $sroleid source roleid
  * @param int $troleid target roleid
- * @param bool $value true means allow, false means remove allowed flag
+ * @param bool $value true means allow, false means remove allowed flag (since Totara 13.0)
  * @return void
  */
 function allow_override($sroleid, $troleid, bool $value = true) {
@@ -3460,7 +3460,7 @@ function allow_override($sroleid, $troleid, bool $value = true) {
  *
  * @param int $fromroleid source roleid
  * @param int $targetroleid target roleid
- * @param bool $value true means allow, false means remove allowed flag
+ * @param bool $value true means allow, false means remove allowed flag (since Totara 13.0)
  * @return void
  */
 function allow_assign($fromroleid, $targetroleid, bool $value = true) {
@@ -3504,7 +3504,7 @@ function allow_assign($fromroleid, $targetroleid, bool $value = true) {
  *
  * @param int $fromroleid source roleid
  * @param int $targetroleid target roleid
- * @param bool $value true means allow, false means remove allowed flag
+ * @param bool $value true means allow, false means remove allowed flag (since Totara 13.0)
  * @return void
  */
 function allow_switch($fromroleid, $targetroleid, bool $value = true) {

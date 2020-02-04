@@ -48,7 +48,7 @@ class capability_unassigned extends base {
     }
 
     protected function validate_data() {
-        debugging('capability_unassigned event was deprecated and should not be triggered anywhere, it is displayed in historic logs only');
+        debugging('capability_unassigned event was deprecated and should not be triggered anywhere, it is displayed in historic logs only', DEBUG_DEVELOPER);
     }
 
     /**

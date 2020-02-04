@@ -3,6 +3,16 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* new function update_role(int $roleid, string $name, string $shortname, string $description, string $archetype),
+  direct writes into role table are forbidden now
+* function allow_override($sroleid, $troleid, bool $value = true) has new parameter $value,
+  direct writes into role_allow_override table are forbidden now
+* function allow_assign($fromroleid, $targetroleid, bool $value = true)
+  direct writes into role_allow_assign table are forbidden now
+* function allow_override($sroleid, $troleid, bool $value = true) has new parameter $value,
+  direct writes into role_allow_override table are forbidden now
+* function allow_assign($fromroleid, $targetroleid, bool $value = true) has new parameter $value,
+  direct writes to role_allow_assign table are forbidden now
 * Node.js minimum supported version has changed to Node.js 12, please use the latest NPM available
 * core_collator now supports reversed order with core_collator::REVERSED flag, the value of core_collator::SORT_REGULAR
   constant was changed to 128

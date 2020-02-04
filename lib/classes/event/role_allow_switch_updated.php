@@ -30,6 +30,13 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Role allow switch updated event class.
  *
+ * @property-read array $other {
+ *      Extra information about event.
+ *
+ *      - int targetroleid: role that can be switched to by user with role in objectid
+ *      - bool allow: true means allowed, false disallowed
+ * }
+ *
  * @package    core
  * @since      Moodle 2.6
  * @copyright  2013 Rajesh Taneja <rajesh@moodle.com>
@@ -61,9 +68,9 @@ class role_allow_switch_updated extends base {
      */
     public function get_description() {
         if ($this->other['allow']) {
-            return "The user with id '$this->userid' modified the role with id '" . $this->objectid . "' to allow users to switch to role '" . $this->other['targetroleid'] . "'";
+            return "The user with id '{$this->userid}' modified the role with id '{$this->objectid}' to allow users to switch to role '{$this->other['targetroleid']}'";
         } else {
-            return "The user with id '$this->userid' modified the role with id '" . $this->objectid . "' to disallow users to switch to role '" . $this->other['targetroleid'] . "'";
+            return "The user with id '$this->userid' modified the role with id '{$this->objectid}' to disallow users to switch to role '{$this->other['targetroleid']}'";
         }
     }
 
@@ -83,5 +90,22 @@ class role_allow_switch_updated extends base {
      */
     protected function get_legacy_logdata() {
         return array(SITEID, 'role', 'edit allow switch', 'admin/roles/allow.php?mode=switch');
+    }
+
+    /**
+     * Custom validation.
+     *
+     * @throws \coding_exception
+     * @return void
+     */
+    protected function validate_data() {
+        parent::validate_data();
+
+        if (!isset($this->other['targetroleid'])) {
+            throw new \coding_exception('The \'targetroleid\' value must be set in other.');
+        }
+        if (!isset($this->other['allow'])) {
+            throw new \coding_exception('The \'allow\' value must be set in other.');
+        }
     }
 }
