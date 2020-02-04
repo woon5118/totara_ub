@@ -89,12 +89,13 @@ final class attendees_helper {
      * codes associated with. This functionality will not include any reservations, as that would be not a good idea
      * to be in same place here. However, we have another API for it, and developers should be using it.
      *
-     * @param array $statuscodes
-     * @param bool $includedeleted
+     * @param integer[] $statuscodes
+     * @param bool $includedeleted include deleted users
+     * @param bool $includereserved include reserved spaces
      *
      * @return int
      */
-    public function count_attendees_with_codes(array $statuscodes, bool $includedeleted = true): int {
+    public function count_attendees_with_codes(array $statuscodes, bool $includedeleted = true, bool $includereserved = false): int {
         global $DB;
 
         if (0 === $this->seminarevent->get_id()) {
@@ -103,18 +104,19 @@ final class attendees_helper {
         }
 
         [$asql, $params] = $DB->get_in_or_equal($statuscodes, SQL_PARAMS_NAMED);
+        $userjoin = $includereserved ? 'LEFT' : 'INNER';
         $sql = "
             SELECT COUNT(su.id)
             FROM {facetoface_signups} su
             INNER JOIN {facetoface_signups_status} ss ON su.id = ss.signupid
-            INNER JOIN {user} u ON u.id = su.userid
+            {$userjoin} JOIN {user} u ON u.id = su.userid
             WHERE su.sessionid = :sessionid
             AND ss.superceded = 0
             AND ss.statuscode {$asql}
         ";
 
         if (!$includedeleted) {
-            $sql .= " AND u.deleted = 0";
+            $sql .= $includereserved ? " AND (u.id IS NULL OR u.deleted = 0)" : " AND u.deleted = 0";
         }
 
         $params['sessionid'] = $this->seminarevent->get_id();
@@ -126,8 +128,11 @@ final class attendees_helper {
      * but available for user to be put it.
      *
      * @return int
+     * @deprecated since Totara 13
      */
     public function count_reserved_spaces(): int {
+        debugging(__METHOD__ . '() is deprecated. Please use a method of ' . reservations::class . ' instead.', DEBUG_DEVELOPER);
+
         global $DB;
 
         if (0 === $this->seminarevent->get_id()) {
@@ -170,8 +175,7 @@ final class attendees_helper {
         }
 
         // Need to include reserved spaces here. If there is any.
-        $signupcount = $helper->count_attendees_with_codes($statuscodes, $includedeleted);
-        $signupcount += $helper->count_reserved_spaces();
+        $signupcount = $helper->count_attendees_with_codes($statuscodes, $includedeleted, true);
         return $signupcount;
     }
 
@@ -262,7 +266,7 @@ final class attendees_helper {
      * Returning a list of attendee or not set attendee which had been reserved by their manager or admin. This function
      * is also returning those reserved space that had been taken with a proper attendee.
      *
-     * @return event_attendee[] | \stdClass[]
+     * @return event_attendee[]
      */
     public function get_reservations(): array {
         global $DB;
@@ -572,7 +576,7 @@ final class attendees_helper {
                 $available_actions[] = 'attendees';
             }
 
-            $users = $helper->get_attendees_with_codes([waitlisted::get_code()]);
+            $users = $helper->count_attendees_with_codes([waitlisted::get_code()], true, true);
             if (!empty($users)) {
                 $available_actions[] = 'waitlist';
             }

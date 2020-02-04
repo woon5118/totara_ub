@@ -2370,6 +2370,7 @@ $string['state_approvalrequired_desc'] = 'Approval is required';
 $string['state_bookingcommon_desc'] = 'Common booking conditions must be met';
 $string['state_hasmanager_desc'] = 'Seminar requires user to have a manager during signup.';
 $string['state_hasrequiredjobassignment_desc'] = 'Seminar requires user must have job assignment selected during sign up.';
+$string['state_isnotreservation_desc'] = 'Signup is not reservation';
 $string['state_isreservation_desc'] = 'Signup is reservation';
 $string['state_eventallowscancellations_desc'] = 'Seminar event allows cancellations';
 $string['state_eventallowscancellations_fail'] = 'Seminar event does not allow cancellations';

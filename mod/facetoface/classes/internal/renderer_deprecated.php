@@ -205,8 +205,7 @@ trait mod_facetoface_renderer_deprecated {
             }
 
             // Need to include reserved spaces here. If there is any.
-            $signupcount = $helper->count_attendees_with_codes($statuscodes, $includedeleted);
-            $signupcount += $helper->count_reserved_spaces();
+            $signupcount = $helper->count_attendees_with_codes($statuscodes, $includedeleted, true);
             $sessionfull = ($signupcount >= $seminarevent->get_capacity());
 
             $rooms = \mod_facetoface\room_list::get_event_rooms($seminarevent->get_id());

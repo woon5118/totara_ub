@@ -115,6 +115,7 @@ Note that more recent update comes to the top.
   * mod/facetoface:viewallsessions
 
 --- Deprecated in backend code ---
+* attendees_helper::count_reserved_spaces() has been deprecated; please use the functions in the reservations class instead
 * seminar_event::is_session_open() has been deprecated, please use seminar_session::is_attendance_open() instead
 * seminar_event::is_any_attendance_open() has been deprecated, please use seminar_event::is_any_session_attendance_open() instead
 * seminar_event::is_attendance_open() has been updated to use the event attendance taking status instead
@@ -147,6 +148,7 @@ Note that more recent update comes to the top.
 * form\event::new_user_roles_added() has been deprecated and will be removed in Totara 14
 
 --- Update in backend code ---
+* attendees_helper::count_attendees_with_codes() added 3rd parameter
 * facetoface_archive_completion() has been updated; facetoface.completiondelay now taken into account
 * The signup_not_archived state has been added to prevent a state transition to/from booked and graded states
 * signup::create() added 4th parameter $includearchived

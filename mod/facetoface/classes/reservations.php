@@ -28,20 +28,24 @@ use \mod_facetoface\exception\signup_exception;
 use \mod_facetoface\signup\state\user_cancelled as user_cancelled;
 use \moodle_exception;
 
-
+/**
+ * Helper functions for reservation.
+ */
 final class reservations {
 
     /**
      * Add the number of reservations requested (it is assumed that all capacity checks have
      * already been done by this point, so no extra checking is performed).
+     * Note that the function does not distinguish $number and $waitlisted and
+     * just add ($number + $waitlisted) reservations.
      *
      * @param seminar_event $seminarevent the reservations are for
      * @param int $bookedby the user making the reservations
      * @param int $number how many reservations to make
      * @param int $waitlisted how many reservations to add to the waitlist (not included in $number)
      */
-    public static function add(seminar_event $seminarevent, $bookedby, $number, $waitlisted) {
-        for ($i=0; $i<($number+$waitlisted); $i++) {
+    public static function add(seminar_event $seminarevent, int $bookedby, int $number, int $waitlisted): void {
+        for ($i = 0; $i < ($number + $waitlisted); $i++) {
             $signup = signup::create(0, $seminarevent);
             $signup->set_bookedby($bookedby);
             signup_helper::signup($signup);
@@ -55,7 +59,7 @@ final class reservations {
      * @param seminar_event $seminarevent
      * @return array Array of reservations
      */
-    public static function get(seminar_event $seminarevent) {
+    public static function get(seminar_event $seminarevent): array {
         global $DB;
 
         $userfields =  get_all_user_name_fields(true, 'u');
@@ -79,9 +83,9 @@ final class reservations {
      *
      * @param seminar_event $seminarevent
      * @param int $managerid
-     * @return object[]
+     * @return array
      */
-    public static function get_others(seminar_event $seminarevent, $managerid) {
+    public static function get_others(seminar_event $seminarevent, int $managerid): array {
         global $DB;
 
         $usernamefields = get_all_user_name_fields(true, 'u');
@@ -108,7 +112,7 @@ final class reservations {
      * @param int $number the number of reservations to remove
      * @param bool $sendnotification
      */
-    public static function remove(seminar_event $seminarevent, $bookedby, $number, $sendnotification = false) {
+    public static function remove(seminar_event $seminarevent, int $bookedby, int $number, bool $sendnotification = false): void {
         global $DB;
 
         $sql = 'SELECT su.id
@@ -138,9 +142,9 @@ final class reservations {
      *
      * @param seminar_event $seminarevent
      * @param int $managerid
-     * @return bool True if dng of the reservations succeeded
+     * @return true
      */
-    public static function delete(seminar_event $seminarevent, int $managerid) {
+    public static function delete(seminar_event $seminarevent, int $managerid): bool {
         global $DB;
 
         $params = ['userid' => 0, 'sessionid' => $seminarevent->get_id(), 'bookedby' => $managerid];
@@ -164,7 +168,7 @@ final class reservations {
      * @throws moodle_exception
      * @return int[]
      */
-    public static function replace(seminar_event $seminarevent, int $bookedby, array $userids) {
+    public static function replace(seminar_event $seminarevent, int $bookedby, array $userids): array {
         global $DB, $CFG;
 
         $courseid = $seminarevent->get_seminar()->get_course();
@@ -214,7 +218,7 @@ final class reservations {
      * @param seminar $seminar
      * @param object[] $sessions
      * @param \context $context
-     * @param int $managerid optional defaults to current user
+     * @param int|null $managerid optional defaults to current user
      * @throws moodle_exception
      * @return array with values 'allocate' - array how many spare allocations there are, per sesion + 'all'
      *                                        (false if not able to allocate)
@@ -227,7 +231,7 @@ final class reservations {
      *                           'reservedeadline' - any sessions that start after this date are able to reserve places
      *                           'reservecancel' - any sessions that before this date will have all reservations deleted
      */
-    public static function can_reserve_or_allocate(seminar $seminar, $sessions, $context, $managerid = null) {
+    public static function can_reserve_or_allocate(seminar $seminar, array $sessions, \context $context, int $managerid = null): array {
         global $USER;
 
         $reserveother = has_capability('mod/facetoface:reserveother', $context);
@@ -305,13 +309,13 @@ final class reservations {
      *
      * @param seminar $seminar
      * @param seminar_event $seminarevent
-     * @param int $managerid optional
+     * @param int|null $managerid optional
      * @return object containing potential - list of users who could be allocated
      *                           current - list of users who are already allocated
      *                           othersession - users allocated to another sesssion
      *                           cannotunallocate - users who cannot be unallocated (also listed in 'current')
      */
-    public static function get_staff_to_allocate(seminar $seminar, seminar_event $seminarevent , $managerid = null) {
+    public static function get_staff_to_allocate(seminar $seminar, seminar_event $seminarevent , int $managerid = null): object {
         global $DB, $USER;
 
         if (!$managerid) {
@@ -444,9 +448,10 @@ final class reservations {
      * @param seminar $seminar
      * @param int[] $userids
      * @param bool $converttoreservations if true, convert allocations to reservations, if false, just cancel
-     * @param int $managerid optional defaults to current user
+     * @param int|null $managerid optional defaults to current user
+     * @return string[] errors
      */
-    public static function remove_allocations(seminar_event $seminarevent, seminar $seminar, $userids, $converttoreservations, $managerid = null) {
+    public static function remove_allocations(seminar_event $seminarevent, seminar $seminar, array $userids, bool $converttoreservations, int $managerid = null): array {
         global $DB, $USER;
 
         if (!$managerid) {
@@ -501,7 +506,7 @@ final class reservations {
      * @param int $managerid
      * @return array 'all' => total count; sessionid => session count
      */
-    public static function count(seminar $seminar, $managerid) {
+    public static function count(seminar $seminar, int $managerid): array {
         global $DB;
         static $reservations = array();
 
@@ -526,7 +531,7 @@ final class reservations {
      * @param int $managerid
      * @return array 'all' => total count; sessionid => session count
      */
-    public static function count_allocations(seminar $seminar, $managerid) {
+    public static function count_allocations(seminar $seminar, int $managerid): array {
         global $DB;
         static $allocations = array();
 
@@ -552,7 +557,7 @@ final class reservations {
      *
      * @param bool $testing testing mode for send_notifications task
      */
-    public static function remove_after_deadline($testing) {
+    public static function remove_after_deadline(bool $testing): void {
         global $DB;
         $sql = "SELECT DISTINCT su.id, s.id AS sessionid, f.id AS facetofaceid, su.bookedby
                   FROM {facetoface} f
@@ -621,7 +626,7 @@ final class reservations {
      * @param int $managerid The user's manager ID.
      * @return bool True if the user can be unallocated, false otherwise.
      */
-    public static function user_can_be_unallocated(&$user, $managerid) {
+    public static function user_can_be_unallocated(object &$user, int $managerid): bool {
         // Booked by someone else or self booking - cannot be unbooked.
         if ($user->bookedby != $managerid) {
             $user->cannotremove = ($user->bookedby == 0) ? 'selfbooked' : 'otherbookedby';
@@ -644,7 +649,7 @@ final class reservations {
      * @param int $capacityleft
      * @return array - see reservations::can_reserve_or_allocate for details
      */
-    public static function limit_info_to_capacity_left(seminar_event $seminarevent, $reserveinfo, $capacityleft) {
+    public static function limit_info_to_capacity_left(seminar_event $seminarevent, array $reserveinfo, int $capacityleft): array {
         if (!empty($reserveinfo['reserve'])) {
             if ($reserveinfo['reserve'][$seminarevent->get_id()] > $capacityleft) {
                 $reserveinfo['reserve'][$seminarevent->get_id()] = $capacityleft;
@@ -663,7 +668,7 @@ final class reservations {
      *                  'reservepastdeadline' - true if the deadline for adding new reservations has passed
      *                  'reservepastcancel' - true if all existing reservations should be cancelled
      */
-    public static function limit_info_by_session_date(seminar_event $seminarevent, $reserveinfo) {
+    public static function limit_info_by_session_date(seminar_event $seminarevent, array $reserveinfo): array {
         $reserveinfo['reservepastdeadline'] = false;
         $reserveinfo['reservepastcancel'] = false;
         $mintimestart = $seminarevent->get_mintimestart();

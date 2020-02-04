@@ -21,8 +21,9 @@
  * @package mod_facetoface
  */
 
-use mod_facetoface\{seminar_event, signup};
-use mod_facetoface\signup\state\{booked, requested, requestedadmin, requestedrole, waitlisted};
+use core\orm\query\builder;
+use mod_facetoface\{attendees_helper, reservations, seminar_event, signup, signup_helper};
+use mod_facetoface\signup\state\{attendance_state, booked, requested, requestedadmin, requestedrole, waitlisted};
 use totara_job\job_assignment;
 
 defined('MOODLE_INTERNAL') || die();
@@ -44,6 +45,7 @@ class mod_facetoface_reservation_testcase extends advanced_testcase {
         $this->getDataGenerator()->enrol_user($user1->id, $course->id);
         $this->getDataGenerator()->enrol_user($user2->id, $course->id);
 
+        /** @var mod_facetoface_generator $facetofacegenerator */
         $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
         $facetoface = $facetofacegenerator->create_instance(array(
             'course' => $course->id,
@@ -172,5 +174,141 @@ class mod_facetoface_reservation_testcase extends advanced_testcase {
         foreach ([booked::class, waitlisted::class] as $stateclass) {
             $this->assertFalse($reservebystaff->can_switch($stateclass), 'staff should not be able to switch to '.$stateclass);
         }
+    }
+
+    /**
+     * @param integer $sessionid
+     * @param integer[] $codes
+     * @return builder
+     */
+    private static function attendees_builder_with_codes(int $sessionid, array $codes) {
+        return builder::table('facetoface_signups', 'su')
+            ->join(['facetoface_signups_status', 'sus'], 'id', '=', 'signupid', 'inner')
+            ->where('su.sessionid', $sessionid)
+            ->where('sus.superceded', 0)
+            ->where('sus.statuscode', '=', $codes);
+    }
+
+    /**
+     * Test current signup records including reservations against expected outcomes.
+     * @param integer $sessionid
+     * @param stdClass[] $expected
+     */
+    private static function assert_signups_of_event(int $sessionid, array $expected): void {
+        $statcodes = attendance_state::get_all_attendance_code_with([booked::class, waitlisted::class]);
+        $signups = self::attendees_builder_with_codes($sessionid, $statcodes)
+            ->select(['su.id', 'su.userid', 'sus.statuscode'])
+            ->order_by('su.id')
+            ->get()
+            ->all(false);
+        // remove id
+        $signups = array_map(function ($signup) {
+            unset($signup->id);
+            return $signup;
+        }, $signups);
+        self::assertEquals($expected, $signups);
+    }
+
+    public function test_make_reservation_in_overbooked_event() {
+        $gen = $this->getDataGenerator();
+        $manager = $gen->create_user();
+        $student1 = $gen->create_user();
+        $student2 = $gen->create_user();
+        $student3 = $gen->create_user();
+        $course = $gen->create_course();
+
+        $managerja = job_assignment::create_default($manager->id);
+        job_assignment::create_default($student1->id, ['managerjaid' => $managerja->id]);
+        job_assignment::create_default($student2->id, ['managerjaid' => $managerja->id]);
+
+        $gen->enrol_user($student1->id, $course->id);
+        $gen->enrol_user($student3->id, $course->id);
+        $gen->enrol_user($manager->id, $course->id, 'manager');
+
+        /** @var mod_facetoface_generator $f2fgen */
+        $f2fgen = $gen->get_plugin_generator('mod_facetoface');
+        $f2f = $f2fgen->create_instance([
+            'course' => $course->id,
+            'managerreserve' => 1,
+            'maxmanagerreserves' => 2
+        ]);
+        $sessionid = $f2fgen->add_session([
+            'facetoface' => $f2f->id,
+            'capacity' => 2,
+            'allowoverbook' => 1,
+            'sessiondates' => [time() + YEARSECS]
+        ]);
+
+        $seminarevent = new seminar_event($sessionid);
+        $helper = new attendees_helper($seminarevent);
+        $bookedstatcodes = attendance_state::get_all_attendance_code_with([booked::class]);
+        $waitliststatcodes = [waitlisted::get_code()];
+        $this->setUser($manager);
+
+        // Add student3
+        $signup3 = signup_helper::signup(signup::create($student3->id, $seminarevent));
+        $this->assertInstanceOf(booked::class, $signup3->get_state());
+        $this->assertEquals(1, self::attendees_builder_with_codes($sessionid, $bookedstatcodes)->count());
+        $this->assertEquals(0, self::attendees_builder_with_codes($sessionid, $waitliststatcodes)->count());
+        $this->assertEquals(1, $helper->count_attendees_with_codes($bookedstatcodes, false, true));
+        $this->assertEquals(1, $helper->count_attendees_with_codes($bookedstatcodes, false, false));
+        $this->assertEquals(0, $helper->count_attendees_with_codes($waitliststatcodes, false, true));
+        $this->assertEquals(0, $helper->count_attendees_with_codes($waitliststatcodes, false, false));
+
+        // Make two reservations
+        reservations::add($seminarevent, $manager->id, 0, 2);
+        $this->assertEquals(2, self::attendees_builder_with_codes($sessionid, $bookedstatcodes)->count());
+        $this->assertEquals(1, self::attendees_builder_with_codes($sessionid, $waitliststatcodes)->count());
+        $this->assertEquals(2, $helper->count_attendees_with_codes($bookedstatcodes, false, true));
+        $this->assertEquals(1, $helper->count_attendees_with_codes($bookedstatcodes, false, false));
+        $this->assertEquals(1, $helper->count_attendees_with_codes($waitliststatcodes, false, true));
+        $this->assertEquals(0, $helper->count_attendees_with_codes($waitliststatcodes, false, false));
+
+        sleep(1);
+
+        // Add student1
+        $signup1 = signup_helper::signup(signup::create($student1->id, $seminarevent));
+        $this->assertInstanceOf(waitlisted::class, $signup1->get_state());
+        $this->assertEquals(2, self::attendees_builder_with_codes($sessionid, $bookedstatcodes)->count());
+        $this->assertEquals(2, self::attendees_builder_with_codes($sessionid, $waitliststatcodes)->count());
+        $this->assertEquals(2, $helper->count_attendees_with_codes($bookedstatcodes, false, true));
+        $this->assertEquals(1, $helper->count_attendees_with_codes($bookedstatcodes, false, false));
+        $this->assertEquals(2, $helper->count_attendees_with_codes($waitliststatcodes, false, true));
+        $this->assertEquals(1, $helper->count_attendees_with_codes($waitliststatcodes, false, false));
+
+        self::assert_signups_of_event($sessionid, [
+            (object)['userid' => $student3->id, 'statuscode' => booked::get_code()],
+            (object)['userid' => 0, 'statuscode' => booked::get_code()],
+            (object)['userid' => 0, 'statuscode' => waitlisted::get_code()],
+            (object)['userid' => $student1->id, 'statuscode' => waitlisted::get_code()],
+        ]);
+
+        $reservedsignupstats = builder::table('facetoface_signups_status', 'sus')
+            ->join(['facetoface_signups', 'su'], 'signupid', '=', 'id', 'inner')
+            ->where('su.sessionid', $sessionid)
+            ->where('su.userid', '=', 0)
+            ->select(['sus.id', 'sus.statuscode'])
+            ->order_by('su.id')
+            ->get()
+            ->all();
+
+        $this->assertCount(2, $reservedsignupstats);
+        $this->assertEquals(booked::get_code(), $reservedsignupstats[0]->statuscode);
+        $this->assertEquals(waitlisted::get_code(), $reservedsignupstats[1]->statuscode);
+
+        // Remove student3
+        signup_helper::user_cancel(signup::create($student3->id, $seminarevent));
+        self::assert_signups_of_event($sessionid, [
+            (object)['userid' => 0, 'statuscode' => booked::get_code()],
+            (object)['userid' => 0, 'statuscode' => booked::get_code()],
+            (object)['userid' => $student1->id, 'statuscode' => waitlisted::get_code()],
+        ]);
+
+        // Remove one reservation
+        reservations::remove($seminarevent, $manager->id, 1);
+        self::assert_signups_of_event($sessionid, [
+            (object)['userid' => 0, 'statuscode' => booked::get_code()],
+            (object)['userid' => $student1->id, 'statuscode' => booked::get_code()],
+        ]);
     }
 }

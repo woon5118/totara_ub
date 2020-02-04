@@ -492,11 +492,6 @@ final class session_list_table extends html_table {
 
         if ($config->viewattendees) {
             if ($seminarevent->is_sessions()) {
-                // All attendance statuses with booked and waitlisted status. If the event is not a wailisted event,
-                // then we need to get all the attendees that have code from waitlisted to the fully_attendeed. So that
-                // we can start figuring out the number of how many user is in waitlisted.
-                $statuscodes = attendance_state::get_all_attendance_code_with([booked::class, waitlisted::class]);
-
                 $currenthtml = html_writer::span($signupcount, $class.'current');
                 $maximumhtml = html_writer::span($seminarevent->get_capacity(), $class.'maximum');
                 $a = array('current' => $currenthtml, 'maximum' => $maximumhtml);
@@ -505,9 +500,7 @@ final class session_list_table extends html_table {
                     $stats[] = get_string('capacityoverbooked', 'mod_facetoface');
                 }
 
-                $waitlisted = $helper->count_attendees_with_codes($statuscodes, $includedeleted);
-                $waitlisted -= $signupcount;
-
+                $waitlisted = $helper->count_attendees_with_codes([waitlisted::get_code()], $includedeleted, true);
                 if ($waitlisted > 0) {
                     $stats[] = get_string('status_capacity_waitlisted', 'mod_facetoface', $waitlisted);
                 }

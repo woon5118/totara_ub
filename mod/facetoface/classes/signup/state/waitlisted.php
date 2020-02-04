@@ -31,6 +31,7 @@ use mod_facetoface\signup\condition\{booking_common,
     event_is_not_cancelled,
     event_not_in_the_past,
     event_registration_is_available,
+    is_not_reservation,
     waitlist_everyone_disabled};
 use mod_facetoface\signup\restriction\actor_can_overbook;
 use mod_facetoface\signup\transition;
@@ -59,7 +60,8 @@ class waitlisted extends state implements interface_event {
                 event_has_session::class,
                 event_not_in_the_past::class,
                 event_registration_is_available::class,
-                event_is_not_cancelled::class
+                event_is_not_cancelled::class,
+                is_not_reservation::class
             )->with_restrictions(
                 actor_can_overbook::class
             ),

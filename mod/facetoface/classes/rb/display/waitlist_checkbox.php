@@ -40,6 +40,9 @@ class waitlist_checkbox extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
 
         $extrafields = self::get_extrafields_row($row, $column);
+        if (empty($extrafields->userid)) {
+            return '';
+        }
         return \html_writer::empty_tag(
             'input', array('type' => 'checkbox', 'value' => $extrafields->userid, 'name' => 'userid')
         );
