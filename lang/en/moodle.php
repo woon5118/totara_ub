@@ -108,6 +108,7 @@ $string['adminhelpuploadusers'] = 'Import new user accounts from a text file';
 $string['adminhelpusers'] = 'Define your users and set up authentication';
 $string['adminhelpxmldbeditor'] = 'Interface to edit the XMLDB files. Only for developers.';
 $string['administration'] = 'Administration';
+$string['administrationoverview'] = 'Administration overview';
 $string['administrationsite'] = 'Site administration';
 $string['administrator'] = 'Administrator';
 $string['administratordescription'] = 'Administrators can usually do anything on the site, in all courses.';

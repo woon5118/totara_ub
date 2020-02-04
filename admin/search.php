@@ -1,6 +1,7 @@
 <?php
 
 // searches for admin settings
+define('ADMIN_SEARCH_PAGE', true);
 
 require_once('../config.php');
 require_once($CFG->libdir.'/adminlib.php');
@@ -61,6 +62,11 @@ $form->display();
 echo '<hr>';
 if ($query) {
     echo admin_search_settings_html($query);
+} else {
+    $node = $PAGE->settingsnav->find('root', navigation_node::TYPE_SITE_ADMIN);
+    if ($node) {
+        echo $OUTPUT->render_from_template('core/settings_link_page', ['node' => $node]);
+    }
 }
 
 echo $OUTPUT->footer();

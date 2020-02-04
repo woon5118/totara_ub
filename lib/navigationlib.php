@@ -3988,7 +3988,7 @@ class settings_navigation extends navigation_node {
                 $url = new moodle_url('/'.$CFG->admin.'/settings.php', array('section'=>$adminbranch->name));
             } else if ($adminbranch instanceof admin_externalpage) {
                 $url = $adminbranch->url;
-            } else if (!empty($CFG->linkadmincategories) && $adminbranch instanceof admin_category) {
+            } else if ((!empty($CFG->linkadmincategories) || defined('ADMIN_SEARCH_PAGE')) && $adminbranch instanceof admin_category) {
                 $url = new moodle_url('/'.$CFG->admin.'/category.php', array('category' => $adminbranch->name));
             }
 

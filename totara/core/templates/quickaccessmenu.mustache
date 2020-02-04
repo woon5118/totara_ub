@@ -153,6 +153,9 @@
             {{#can_edit}}
                 <a href="{{config.wwwroot}}/user/quickaccessmenu.php">{{#str}}quickaccessmenu:menusettings,totara_core{{/str}}</a>
             {{/can_edit}}
+            {{#can_search}}
+                <a class="totara_core__QuickAccess_footer-last" href="{{config.wwwroot}}/admin/search.php">{{#str}}administrationoverview,core{{/str}}</a>
+            {{/can_search}}
         </footer>
     </aside>
 </div>
