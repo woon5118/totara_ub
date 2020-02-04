@@ -58,7 +58,26 @@ class coursecompletion_display extends criterion_display {
                 ],
             ];
         }
-        return [];
+
+        $items = [];
+        foreach ($course_ids as $course_id) {
+            $item_detail = [];
+            $course = $DB->get_record('course', ['id' => $course_id]);
+            if ($course) {
+                $item_detail['description'] = format_string(get_course_display_name_for_list($course));
+
+                if (!$course->enablecompletion) {
+                    $item_detail['error'] = get_string('error:nocoursecompletion', 'criteria_coursecompletion');
+                }
+            } else {
+                $item_detail['description'] = '';
+                $item_detail['error'] = get_string('error:nocourse', 'criteria_coursecompletion');
+            }
+
+            $items[] = (object)$item_detail;
+        }
+
+        return $items;
     }
 
 }

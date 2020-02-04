@@ -36,6 +36,7 @@ class criteria_coursecompletion_display_testcase extends advanced_testcase {
             $record = [
                 'shortname' => $prefix . $i,
                 'fullname' => $prefix . $i,
+                'enablecompletion' => true,
             ];
 
             $data->courses[$i] = $this->getDataGenerator()->create_course($record);
@@ -106,11 +107,48 @@ class criteria_coursecompletion_display_testcase extends advanced_testcase {
             );
         }
 
-        foreach ($courses as $course_idx) {
-            $expected->items[] = $data->courses[$course_idx]->fullname;
+        if (!empty($courses)) {
+            foreach ($courses as $course_idx) {
+                $expected->items[] = (object)['description' => $data->courses[$course_idx]->fullname];
+            }
+        } else {
+            $expected->error = get_string('error:invalidconfiguration', 'totara_criteria');
+            $expected->items[] = (object)[
+                'description' => '',
+                'error' => get_string('error:notenoughcourses', 'criteria_coursecompletion'),
+            ];
         }
 
-        $this->assertEqualsCanonicalizing($expected, $display_configuration);
+        $this->validate_display_configuration($expected, $display_configuration);
+    }
+
+    /**
+     * Validate the actual vs expected display configuration
+     * @param \stdClass $expected
+     * @param \stdClass $actual
+     */
+    private function validate_display_configuration($expected, $actual) {
+        $this->assertEquals($expected->item_type, $actual->item_type);
+        $this->assertEquals($expected->item_aggregation, $actual->item_aggregation);
+
+        $expected_error = $expected->error ?? null;
+        $actual_error = $actual->error ?? null;
+        $this->assertEquals($expected_error, $actual_error);
+
+        $this->assertSame(count($expected->items), count($actual->items));
+        foreach ($actual->items as $actual_item) {
+            foreach ($expected->items as $idx => $expected_item) {
+                $expected_error = $expected_item->error ?? null;
+                $actual_error = $actual_item->error ?? null;
+                if ($expected_item->description == $actual_item->description
+                    && $expected_error == $actual_error) {
+                    unset($expected->items[$idx]);
+                    break;
+                }
+            }
+        }
+
+        $this->assertEmpty($expected->items);
     }
 
 }

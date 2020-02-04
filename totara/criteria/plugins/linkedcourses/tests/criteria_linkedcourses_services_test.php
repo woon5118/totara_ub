@@ -69,6 +69,7 @@ class criteria_linkedcourses_services_testcase extends advanced_testcase {
                 'method' => criterion::AGGREGATE_ANY_N,
                 'reqitems' => 2,
             ],
+            'error' => get_string('error:notenoughcourses', 'criteria_linkedcourses'),
         ];
 
         $res = external_api::call_external_function(

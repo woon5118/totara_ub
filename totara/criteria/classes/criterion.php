@@ -458,6 +458,9 @@ abstract class criterion {
         foreach ($this->get_item_ids() as $item_id) {
             if ($validator_class::validate_item($item_id)) {
                 $nvalid++;
+            } else {
+                // If any item is invalid, the criterion is considered as invalid - can thus stop here
+                return false;
             }
         }
 
