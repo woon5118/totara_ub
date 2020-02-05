@@ -143,4 +143,15 @@ class rb_filter_url extends rb_filter_type {
 
         return '';
     }
+
+    /**
+     * Is this filter performing the filtering of results?
+     *
+     * @param array $data element filtering data
+     * @return bool
+     */
+    public function is_filtering(array $data): bool {
+        $operator = $data['operator'] ?? self::RB_FILTER_CONTAINS;
+        return ($operator == self::RB_FILTER_ISEMPTY || $operator == self::RB_FILTER_ISNOTEMPTY);
+    }
 }

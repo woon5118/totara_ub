@@ -45,6 +45,7 @@ class rb_filter_type {
     public $defaultvalue;
     public $region;
     public $filtertype;
+    /** @var String Human readable localised filter name to display in reports. */
     public $label;
     /**
      * @var mixed $field string|array Direct access to this field is @deprecated and prohibited.
@@ -63,6 +64,8 @@ class rb_filter_type {
     public $grouping;
     public $name;
     public $filterid;
+    /** @var bool Is user required to filer the results with this filter? */
+    public $filteringrequired = false;
     /**
      * Constructor
      *
@@ -73,8 +76,6 @@ class rb_filter_type {
      * @param integer $region Which region this filter appears in.
      * @param reportbuilder object $report The report this filter is for
      * @param array $defaultvalue The default filter value
-     *
-     * @return filter_* object
      */
     public function __construct($type, $value, $advanced, $region, $report, $defaultvalue = array()) {
         $this->type = $type;
@@ -326,12 +327,13 @@ class rb_filter_type {
      * @param string $value The filter value (from the db or embedded source)
      * @param integer $advanced If the filter should be shown by default (0) or only
      *                          when advanced options are shown (1)
-     * @param reportbuilder object $report The report this filter is for
+     * @param reportbuilder $report The report this filter is for
      * @param array $defaultvalue The default value for the filter
+     * @param bool $filteringrequired ignored for advanced and non-standard filters
      *
      * @return rb_filter_type|bool false on failure
      */
-    public static function get_filter($type, $value, $advanced, $region, $report, $defaultvalue = array()) {
+    public static function get_filter($type, $value, $advanced, $region, $report, $defaultvalue = array(), $filteringrequired = false) {
         global $CFG;
 
         // figure out what sort of filter it is
@@ -352,7 +354,15 @@ class rb_filter_type {
             return false;
         }
 
-        return new $classname($type, $value, $advanced, $region, $report, $defaultvalue);
+        /** @var rb_filter_type $filter */
+        $filter = new $classname($type, $value, $advanced, $region, $report, $defaultvalue);
+        if ($filter->advanced || $region != self::RB_FILTER_REGION_STANDARD) {
+            $filter->filteringrequired = false;
+        } else {
+            $filter->filteringrequired = (bool)$filteringrequired;
+        }
+
+        return $filter;
     }
 
 
@@ -446,9 +456,33 @@ class rb_filter_type {
     }
 
     /**
+     * Is this filter performing the filtering of results?
+     *
+     * @param array $data element filtering data
+     * @return bool
+     */
+    public function is_filtering(array $data): bool {
+        // NOTE: always override in filter class!
+        debugging(get_class($this) . '::is_filtering() method must be implemented', DEBUG_DEVELOPER);
+
+        return false;
+    }
+
+    /**
+     * Is the filter configured to require filtering?
+     *
+     * NOTE: get_filter() if forcing this to false for all advanced filters
+     *
+     * @return bool
+     */
+    public function is_filtering_required(): bool {
+        return $this->filteringrequired;
+    }
+
+    /**
      * Get showcount params.
      *
-     * @return returns the showcount parameters, otherwise false.
+     * @return array|bool returns the showcount parameters, otherwise false.
      * If true then filter needs to define save_temp_data, restore_temp_data, set_counts.
      */
     public function get_showcount_params() {

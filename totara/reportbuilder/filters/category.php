@@ -267,6 +267,18 @@ class rb_filter_category extends rb_filter_type {
 
         $PAGE->requires->js_call_amd('totara_reportbuilder/filter_dialogs', 'init', $jsdetails->args);
     }
+
+    /**
+     * Is this filter performing the filtering of results?
+     *
+     * @param array $data element filtering data
+     * @return bool
+     */
+    public function is_filtering(array $data): bool {
+        $operator = $data['operator'] ?? 0;
+        $value = $data['value'] ?? '';
+        return ($operator > 0 && !empty($value));
+    }
 }
 
 /**

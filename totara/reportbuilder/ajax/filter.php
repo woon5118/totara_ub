@@ -49,6 +49,7 @@ switch ($action) {
         $filter = required_param('filter', PARAM_TEXT);
         $filtername = optional_param('filtername', '', PARAM_ALPHANUMEXT);
         $customname = optional_param('customname', 0, PARAM_BOOL);
+        $filteringrequired = optional_param('filteringrequired', 0, PARAM_BOOL);
         $advanced = optional_param('advanced', 0, PARAM_BOOL);
         $regiontext = optional_param('region', 0, PARAM_ALPHA);
 
@@ -82,6 +83,11 @@ switch ($action) {
         $todb->type = $ftype;
         $todb->value = $fvalue;
         $todb->advanced = $advanced;
+        if ($todb->advanced || $region != rb_filter_type::RB_FILTER_REGION_STANDARD) {
+            $todb->filteringrequired = 0;
+        } else {
+            $todb->filteringrequired = $filteringrequired;
+        }
         $todb->region = $region;
         $todb->customname = $customname;
         $todb->filtername = $filtername;

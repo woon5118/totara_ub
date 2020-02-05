@@ -217,6 +217,21 @@ class rb_filter_hierarchy_multi extends rb_filter_type {
 
         $PAGE->requires->js_call_amd('totara_reportbuilder/filter_dialogs', 'init', $jsdetails->args);
     }
+
+    /**
+     * Is this filter performing the filtering of results?
+     *
+     * @param array $data element filtering data
+     * @return bool
+     */
+    public function is_filtering(array $data): bool {
+        $operator = $data['operator'] ?? 0;
+        if ($operator == 0) {
+            return false;
+        }
+        $value = $data['value'] ?? '';
+        return !empty($value);
+    }
 }
 
 

@@ -1066,6 +1066,14 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         $getdata->setAccessible(true);
         $getdata->invoke($rb);
 
+        // Test that all filters override is_filtering().
+        $DB->set_field('report_builder_filters', 'filteringrequired', 1, []);
+        reportbuilder::reset_caches();
+        $this->assertDebuggingNotCalled();
+        $rb = reportbuilder::create($bigreportid);
+        $DB->set_field('report_builder_filters', 'filteringrequired', 0, []);
+        $this->assertDebuggingNotCalled();
+
         if (!$src->cacheable) {
             return;
         }

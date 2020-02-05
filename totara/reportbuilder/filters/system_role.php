@@ -242,4 +242,16 @@ class rb_filter_system_role extends rb_filter_type {
 
         return $options;
     }
+
+    /**
+     * Is this filter performing the filtering of results?
+     *
+     * @param array $data element filtering data
+     * @return bool
+     */
+    public function is_filtering(array $data): bool {
+        $value = $data['value'] ?? '';
+        // Note: 0=>'Anny role' option is valid here.
+        return ($value !== '');
+    }
 }

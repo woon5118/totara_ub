@@ -122,7 +122,7 @@ print $OUTPUT->single_button(
         new moodle_url("/totara/plan/record/evidence/edit.php",
                 array('id' => 0, 'userid' => $userid)), get_string('addevidence', 'totara_plan'), 'get');
 
-echo $renderer->showhide_button($report->_id, $report->shortname);
+echo $renderer->showhide_button($report);
 echo $reporthtml;
 
 // Export button.

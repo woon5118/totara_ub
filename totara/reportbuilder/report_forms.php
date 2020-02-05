@@ -133,6 +133,7 @@ class report_builder_edit_filters_form extends moodleform {
 
         // Common.
         $mform =& $this->_form;
+        /** @var reportbuilder $report */
         $report = $this->_customdata['report'];
         $id = $this->_customdata['id'];
         $allstandardfilters = $this->_customdata['allstandardfilters'];
@@ -180,6 +181,7 @@ class report_builder_edit_filters_form extends moodleform {
                     html_writer::start_tag('tr') . html_writer::tag('th', get_string('searchfield', 'totara_reportbuilder')) .
                     html_writer::tag('th', get_string('customisename', 'totara_reportbuilder'), array('colspan' => 2)) .
                     html_writer::tag('th', get_string('advanced', 'totara_reportbuilder')) .
+                    html_writer::tag('th', get_string('filteringrequired', 'totara_reportbuilder')) .
                     html_writer::tag('th', get_string('options', 'totara_reportbuilder')) . html_writer::end_tag('tr'));
 
             if (isset($report->filters) && is_array($report->filters) && count($report->filters) > 0) {
@@ -211,6 +213,9 @@ class report_builder_edit_filters_form extends moodleform {
                     $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
                     $mform->addElement('advcheckbox', "advanced{$filterid}", '', '', array('class' => 'filter_advanced_checkbox'));
                     $mform->setDefault("advanced{$filterid}", $filter->advanced);
+                    $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
+                    $mform->addElement('advcheckbox', "filteringrequired{$filterid}", '', '', array('class' => 'filter_filteringrequired_checkbox'));
+                    $mform->setDefault("filteringrequired{$filterid}", $filter->filteringrequired);
                     $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
                     $deleteurl = new moodle_url('/totara/reportbuilder/filters.php',
                         array('d' => '1', 'id' => $id, 'fid' => $filterid));
@@ -262,6 +267,9 @@ class report_builder_edit_filters_form extends moodleform {
             $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
             $mform->addElement('advcheckbox', 'newstandardadvanced', '', '', array('class' => 'filter_advanced_checkbox'));
             $mform->disabledIf('newstandardadvanced', 'newstandardfilter', 'eq', 0);
+            $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
+            $mform->addElement('advcheckbox', 'newstandardfilteringrequired', '', '', array('class' => 'filter_filteringrequired_checkbox'));
+            $mform->disabledIf('newstandardfilteringrequired', 'newstandardfilter', 'eq', 0);
             $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
             $mform->addElement('html', html_writer::end_tag('td') . html_writer::end_tag('tr'));
             $mform->addElement('html', html_writer::end_tag('table') . $OUTPUT->container_end());
@@ -363,6 +371,7 @@ class report_builder_edit_filters_form extends moodleform {
             $renderer->setElementTemplate($selectelementtemplate, 'newstandardfilter');
             $renderer->setElementTemplate($selectelementtemplate, 'newsidebarfilter');
             $renderer->setElementTemplate($checkelementtemplate, 'newstandardadvanced');
+            $renderer->setElementTemplate($checkelementtemplate, 'newstandardfilteringrequired');
             $renderer->setElementTemplate($checkelementtemplate, 'newsidebaradvanced');
             $renderer->setElementTemplate($textelementtemplate, 'newstandardfiltername');
             $renderer->setElementTemplate($textelementtemplate, 'newsidebarfiltername');
@@ -373,6 +382,7 @@ class report_builder_edit_filters_form extends moodleform {
                 $filterid = $filter->filterid;
                 $renderer->setElementTemplate($selectelementtemplate, 'filter' . $filterid);
                 $renderer->setElementTemplate($checkelementtemplate, 'advanced' . $filterid);
+                $renderer->setElementTemplate($checkelementtemplate, 'filteringrequired' . $filterid);
                 $renderer->setElementTemplate($textelementtemplate, 'filtername' . $filterid);
                 $renderer->setElementTemplate($checkelementtemplate, 'customname' . $filterid);
             }
@@ -1345,15 +1355,35 @@ class report_builder_save_form extends moodleform {
 class report_builder_standard_search_form extends moodleform {
     function definition() {
         $mform =& $this->_form;
+        /** @var rb_filter_type[] $fields */
         $fields = $this->_customdata['fields'];
         $cansave = $this->_customdata['cansave'];
 
         $mform->disable_form_change_checker();
 
         if ($fields && is_array($fields) && count($fields) > 0) {
-            $mform->addElement('header', 'newfilterstandard', get_string('searchby', 'totara_reportbuilder'));
-
+            $requiredheaderprinted = false;
             foreach ($fields as $ft) {
+                if (!$ft->is_filtering_required()) {
+                    continue;
+                }
+                if (!$requiredheaderprinted) {
+                    $requiredheaderprinted = true;
+                    $mform->addElement('header', 'newfilterrequired', get_string('searchbyrequired', 'totara_reportbuilder'));
+                }
+                $ft->setupForm($mform);
+            }
+
+            $headerprinted = false;
+            foreach ($fields as $ft) {
+                if ($ft->is_filtering_required()) {
+                    continue;
+                }
+                if (!$headerprinted) {
+                    $headerprinted = true;
+                    $headerlabel = get_string('searchby', 'totara_reportbuilder');
+                    $mform->addElement('header', 'newfilterstandard', $headerlabel);
+                }
                 $ft->setupForm($mform);
             }
 
@@ -1363,6 +1393,7 @@ class report_builder_standard_search_form extends moodleform {
             $submitgroup[] =& $mform->createElement('submit', 'clearstandardfilters',
                     get_string('clearform', 'totara_reportbuilder'));
             $mform->addGroup($submitgroup, 'submitgroupstandard', '&nbsp;', ' &nbsp; ');
+            $mform->closeHeaderBefore('submitgroupstandard');
 
             if ($cansave) {
                 // Save search button.

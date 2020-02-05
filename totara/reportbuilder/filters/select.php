@@ -261,4 +261,22 @@ class rb_filter_select extends rb_filter_type {
 
         return get_string('selectlabel', 'filters', $a);
     }
+
+    /**
+     * Is this filter performing the filtering of results?
+     *
+     * @param array $data element filtering data
+     * @return bool
+     */
+    public function is_filtering(array $data): bool {
+        if (!$this->options['simplemode']) {
+            $operator = $data['operator'] ?? 0;
+            if ($operator == 0) {
+                return false;
+            }
+        }
+
+        $value = $data['value'] ?? '';
+        return ($value !== '');
+    }
 }

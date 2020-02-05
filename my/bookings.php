@@ -134,7 +134,7 @@ $report->display_sidebar_search();
 
 echo html_writer::empty_tag('br');
 
-echo $renderer->showhide_button($report->_id, $report->shortname);
+echo $renderer->showhide_button($report);
 
 echo $reporthtml;
 

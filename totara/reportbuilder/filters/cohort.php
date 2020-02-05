@@ -29,16 +29,6 @@ require_once($CFG->dirroot.'/totara/reportbuilder/filters/lib.php');
 class rb_filter_cohort extends rb_filter_type {
 
     /**
-     * Returns an array of comparison operators
-     * @return array of comparison operators
-     */
-    function get_operators() {
-        return array(0 => get_string('isanyvalue','filters'),
-                     1 => get_string('matchesanyselected','filters'),
-                     2 => get_string('matchesallselected','filters'));
-    }
-
-    /**
      * Adds controls specific to this filter in the form.
      * @param object $mform a MoodleForm object to setup
      */
@@ -222,6 +212,17 @@ class rb_filter_cohort extends rb_filter_type {
         }
 
         $PAGE->requires->js_call_amd('totara_reportbuilder/filter_dialogs', 'init', $jsdetails->args);
+    }
+
+    /**
+     * Is this filter performing the filtering of results?
+     *
+     * @param array $data element filtering data
+     * @return bool
+     */
+    public function is_filtering(array $data): bool {
+        $value = $data['value'] ?? '';
+        return !empty($value);
     }
 }
 

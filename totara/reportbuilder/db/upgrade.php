@@ -652,5 +652,20 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019102301, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2020032100) {
+
+        // Define field filteringrequired to be added to report_builder_filters.
+        $table = new xmldb_table('report_builder_filters');
+        $field = new xmldb_field('filteringrequired', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'sortorder', ['0', '1']);
+
+        // Conditionally launch add field filteringrequired.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2020032100, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

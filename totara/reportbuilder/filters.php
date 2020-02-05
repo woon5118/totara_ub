@@ -40,7 +40,7 @@ $confirm = optional_param('confirm', 0, PARAM_INT); // Confirm delete.
 $rawreport = $DB->get_record('report_builder', array('id' => $id), '*', MUST_EXIST);
 
 $adminpage = $rawreport->embedded ? 'rbmanageembeddedreports' : 'rbmanagereports';
-admin_externalpage_setup($adminpage);
+admin_externalpage_setup($adminpage, '', null, new moodle_url('/totara/reportbuilder/filters.php', ['id' => $id]));
 
 $output = $PAGE->get_renderer('totara_reportbuilder');
 
@@ -251,18 +251,30 @@ function build_filters($id, $fromform) {
     $oldfilters = $DB->get_records('report_builder_filters', array('reportid' => $id));
     foreach ($oldfilters as $fid => $oldfilter) {
         $filtername = "filter{$fid}";
+        $filteringrequiredname = "filteringrequired{$fid}";
         $advancedname = "advanced{$fid}";
         $headingname = "filtername{$fid}";
         $customheadingname = "customname{$fid}";
+
+        $filteringrequired = isset($fromform->$filteringrequiredname) ? $fromform->$filteringrequiredname : 0;
+        $advanced = isset($fromform->$advancedname) ? $fromform->$advancedname : 0;
+
         // Update db only if filter has changed.
         if (isset($fromform->$filtername) &&
             ($fromform->$filtername != $oldfilter->type.'-'.$oldfilter->value ||
-            $fromform->$advancedname != $oldfilter->advanced ||
+            $filteringrequired != $oldfilter->filteringrequired ||
+            $advanced != $oldfilter->advanced ||
             $fromform->$headingname != $oldfilter->filtername ||
-            $fromform->$customheadingname != $oldfilter->customname)) {
+            $fromform->$customheadingname != $oldfilter->customname))
+        {
             $todb = new stdClass();
             $todb->id = $fid;
-            $todb->advanced = $fromform->$advancedname;
+            $todb->advanced = $advanced;
+            if ($advanced || $oldfilter->region != rb_filter_type::RB_FILTER_REGION_STANDARD) {
+                $todb->filteringrequired = 0;
+            } else {
+                $todb->filteringrequired = $filteringrequired;
+            }
             $parts = explode('-', $fromform->$filtername);
             $todb->type = $parts[0];
             $todb->value = $parts[1];
@@ -305,7 +317,12 @@ function build_filters($id, $fromform) {
             $todb = new stdClass();
             $todb->reportid = $id;
             $todb->advanced = isset($fromform->{'new' . $regioncode . 'advanced'}) ?
-                    $fromform->{'new' . $regioncode . 'advanced'} : 0;
+                $fromform->{'new' . $regioncode . 'advanced'} : 0;
+            if ($todb->advanced || $regionkey != rb_filter_type::RB_FILTER_REGION_STANDARD) {
+                $todb->filteringrequired = 0;
+            } else {
+                $todb->filteringrequired = !empty($fromform->{'new' . $regioncode . 'filteringrequired'});
+            }
             $parts = explode('-', $fromform->{'new' . $regioncode . 'filter'});
             $todb->region = $regionkey;
             $todb->type = $parts[0];

@@ -529,4 +529,19 @@ class rb_filter_date extends rb_filter_type {
 
         return true;
     }
+
+    /**
+     * Is this filter performing the filtering of results?
+     *
+     * @param array $data element filtering data
+     * @return bool
+     */
+    public function is_filtering(array $data): bool {
+        $after = $data['after'] ?? 0;
+        $before = $data['before'] ?? 0;
+        $daysafter = $data['daysafter'] ?? 0;
+        $daysbefore = $data['daysbefore'] ?? 0;
+
+        return ($after != 0 || $before != 0 || $daysafter != 0 || $daysbefore != 0);
+    }
 }

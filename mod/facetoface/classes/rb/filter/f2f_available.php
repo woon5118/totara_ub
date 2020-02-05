@@ -179,4 +179,18 @@ abstract class rb_filter_f2f_available extends rb_filter_type {
      * Actual function to get SQL restriction (WHERE part) of available item.
      */
     abstract function get_sql_snippet($sessionstarts, $sessionends);
+
+    /**
+     * Is this filter performing the filtering of results?
+     *
+     * @param array $data element filtering data
+     * @return bool
+     */
+    public function is_filtering(array $data): bool {
+        $enable = $data['enable'] ?? 0;
+        if (!$enable) {
+            return false;
+        }
+        return true;
+    }
 }

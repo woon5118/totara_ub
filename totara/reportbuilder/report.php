@@ -116,7 +116,7 @@ $report->display_search();
 $report->display_sidebar_search();
 
 // Show results.
-echo $output->showhide_button($report->_id, $report->shortname);
+echo $output->showhide_button($report);
 echo $tablehtml;
 
 // Export button.

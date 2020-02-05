@@ -157,7 +157,20 @@ class reportbuilder {
     /** @var rb_column[] */
     public $columns;
 
-    public $fullname, $shortname, $source, $hidden, $searchcolumns, $filters, $filteroptions, $requiredcolumns, $initialdisplay;
+    public $fullname, $shortname, $source, $hidden, $searchcolumns, $requiredcolumns, $initialdisplay;
+
+    /** @var rb_filter_type[] */
+    public $filters;
+
+    /** @var rb_filter_option[] */
+    public $filteroptions;
+
+    /** @var bool true means that at least one filter requires filtering */
+    protected $filteringrequired;
+
+    /** @var string[] names of filters with required filtering enabled that are not applied */
+    protected $missingfiltering = [];
+
     public $_filtering, $contentoptions, $contentmode, $embeddedurl, $description;
     public $_id, $recordsperpage, $defaultsortcolumn, $defaultsortorder;
     private $_joinlist, $_base, $_params, $_sid;
@@ -1691,6 +1704,7 @@ class reportbuilder {
         foreach ($filters as $filter) {
             $type = $filter->type;
             $value = $filter->value;
+            $filteringrequired = $filter->filteringrequired;
             $advanced = $filter->advanced;
             $defaultvalue = !empty($filter->defaultvalue) ? unserialize($filter->defaultvalue) : array();
             $region = $filter->region;
@@ -1702,7 +1716,7 @@ class reportbuilder {
             $option = $this->filteroptions[$key];
 
             // Only include filter if a valid object is returned.
-            if ($filterobj = rb_filter_type::get_filter($type, $value, $advanced, $region, $this, $defaultvalue)) {
+            if ($filterobj = rb_filter_type::get_filter($type, $value, $advanced, $region, $this, $defaultvalue, $filteringrequired)) {
                 $filterobj->filterid = $filter->id;
                 $filterobj->filtername = $filter->filtername;
                 $filterobj->customname = $filter->customname;
@@ -1983,6 +1997,25 @@ class reportbuilder {
                     unset($_POST['toolbarsearchtext']);
                 } else {
                     $SESSION->reportbuilder[$this->get_uniqueid()]['toolbarsearchtext'] = $data;
+                }
+            }
+        }
+
+        // Find out if filtering is required for this report.
+        $this->filteringrequired = false;
+        $this->missingfiltering = [];
+        foreach ($this->get_standard_filters() as $filter) {
+            if ($filter->is_filtering_required()) {
+                $this->filteringrequired = true;
+                if ($clearstandardfilters) {
+                    $this->missingfiltering[] = $filter->label;
+                    continue;
+                }
+                $data = $SESSION->reportbuilder[$this->get_uniqueid()][$filter->name] ?? [];
+                $data = (array)$data;
+                if (!$filter->is_filtering($data)) {
+                    $this->missingfiltering[] = $filter->label;
+                    continue;
                 }
             }
         }
@@ -2439,10 +2472,10 @@ class reportbuilder {
     /**
      * Wrapper for displaying search form from filtering class
      *
-     * @return Nothing returned but prints the search box
+     * @return void Nothing returned but prints the search box
      */
     public function display_search() {
-        global $CFG;
+        global $CFG, $OUTPUT;
 
         $standard_filters = $this->get_standard_filters();
         if (empty($standard_filters)) {
@@ -2455,6 +2488,11 @@ class reportbuilder {
         // Calling get_data to get the form validated before displaying it, so we can see errors present in the form.
         $mformstandard->get_data();
         $mformstandard->display();
+
+        $missingfiltering = $this->get_missing_filtering();
+        if ($missingfiltering) {
+            echo $OUTPUT->notification(get_string('error:missingfilteringmissing', 'totara_reportbuilder', implode (', ', $missingfiltering)), 'error');
+        }
     }
 
     /**
@@ -2596,6 +2634,9 @@ class reportbuilder {
     }
 
 
+    /**
+     * @return rb_filter_type[]
+     */
     public function get_standard_filters() {
         $result = array();
         foreach ($this->filters as $key => $filter) {
@@ -2606,6 +2647,9 @@ class reportbuilder {
         return $result;
     }
 
+    /**
+     * @return rb_filter_type[]
+     */
     public function get_sidebar_filters() {
         $result = array();
         foreach ($this->filters as $key => $filter) {
@@ -4601,8 +4645,15 @@ class reportbuilder {
      * @return void No return but initiates save dialog
      */
     function export_data($format) {
+        global $PAGE;
+
         if (!$this->can_access()) {
             throw new moodle_exception('nopermission', 'totara_reportbuilder');
+        }
+
+        if ($this->get_missing_filtering()) {
+            // This should not happen because we do not print the selector if required filtering is missing.
+            redirect($PAGE->url);
         }
 
         // Release session lock and make sure abort is not ignored.
@@ -4797,7 +4848,10 @@ class reportbuilder {
         $table->setup();
         $table->initialbars(true);
 
-        if ($initiallyhidden) {
+        $missing = $this->get_missing_filtering();
+        if ($missing) {
+            $table->set_no_records_message(get_string('filteringrequired_missing', 'totara_reportbuilder'));
+        } else if ($initiallyhidden) {
             $table->pagesize($perpage, $this->get_filtered_count());
             $table->set_no_records_message(get_string('initialdisplay_pending', 'totara_reportbuilder'));
         } else {
@@ -5747,6 +5801,24 @@ class reportbuilder {
     }
 
     /**
+     * Is user required to use filters to see the report?
+     *
+     * @return bool
+     */
+    public function is_filtering_required(): bool {
+        return $this->filteringrequired;
+    }
+
+    /**
+     * How many filters with required filtering did user forget to select?
+     *
+     * @return string[]
+     */
+    public function get_missing_filtering(): array {
+        return $this->missingfiltering;
+    }
+
+    /**
      * Setter for post_config_restrictions property
      *
      * This is an array of the form:
@@ -6300,6 +6372,11 @@ function reportbuilder_send_scheduled_report($sched) {
             mtrace("Error: Scheduled report {$sched->id} could not be created, unknown exception: " . get_class($e));
             return false;
         }
+    }
+
+    if ($missing = $report->get_missing_filtering()) {
+        mtrace("Error: Scheduled report {$sched->id} is missing required filtering input for filters: " . implode(', ', $missing));
+        return false;
     }
 
     $format = \totara_core\tabexport_writer::normalise_format($sched->format);

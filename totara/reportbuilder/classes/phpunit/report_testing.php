@@ -120,7 +120,7 @@ trait report_testing {
      * Add a new filter to report
      * This will not update report instance, so use it before new reportbuilder.
      *
-     * @param int $reportid
+     * @param int|\reportbuilder $reportorid
      * @param string $type
      * @param string $value
      * @param int $advanced
@@ -128,10 +128,29 @@ trait report_testing {
      * @param int $customname
      * @param int $region
      * @param array $defaultvalue
+     * @param int $filteringrequired
      * @return array of records
      */
-    protected function add_filter($reportid, $type, $value, $advanced, $filtername, $customname, $region, $defautvalue = array()) {
+    protected function add_filter($reportorid, $type, $value, $advanced, $filtername, $customname, $region, $defaultvalue = array(), $filteringrequired = 0) {
         global $DB;
+
+        if ($reportorid instanceof \reportbuilder) {
+            $report = $reportorid;
+        } else {
+            $report = \reportbuilder::create($reportorid);
+        }
+        $reportid = $report->_id;
+
+        $found = null;
+        foreach ($report->src->filteroptions as $filteroption) {
+            if ($filteroption->value === $value && $filteroption->type == $type) {
+                $found = $filteroption;
+                break;
+            }
+        }
+        if (!$found) {
+            throw new \coding_exception("Invalid filter option ({$type}_{$value}) for source " . get_class($report->src));
+        }
 
         $sortorder = $DB->get_field('report_builder_filters', 'MAX(sortorder) + 1', array('reportid' => $reportid));
         if (!$sortorder) {
@@ -146,7 +165,12 @@ trait report_testing {
         $todb->filtername = $filtername;
         $todb->customname = $customname;
         $todb->region = $region;
-        $todb->defaultvalue = !empty($defautvalue) ? serialize($defautvalue): '';
+        $todb->defaultvalue = !empty($defaultvalue) ? serialize($defaultvalue): '';
+        if ($advanced || $region != \rb_filter_type::RB_FILTER_REGION_STANDARD) {
+            $todb->filteringrequired = 0;
+        } else {
+            $todb->filteringrequired = (int)(bool)$filteringrequired;
+        }
         $todb->sortorder = $sortorder;
         $id = $DB->insert_record('report_builder_filters', $todb);
 

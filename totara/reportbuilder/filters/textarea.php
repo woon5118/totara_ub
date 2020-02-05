@@ -150,5 +150,16 @@ class rb_filter_textarea extends rb_filter_type {
 
         return '';
     }
+
+    /**
+     * Is this filter performing the filtering of results?
+     *
+     * @param array $data element filtering data
+     * @return bool
+     */
+    public function is_filtering(array $data): bool {
+        $value = $data['value'] ?? '';
+        return ($value !== '');
+    }
 }
 

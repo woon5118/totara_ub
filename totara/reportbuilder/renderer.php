@@ -405,7 +405,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
      *
      * @param integer|reportbuilder $report ID or instance of the report to exported
      * @param integer $sid Saved search ID if a saved search is active (optional)
-     * @return No return value but prints export select form
+     * @return void No return value but prints export select form
      */
     public function export_select($report, $sid = 0) {
         global $CFG, $PAGE;
@@ -427,6 +427,11 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
                     }
                 }
             }
+        }
+
+        if ($report->get_missing_filtering()) {
+            // Do not show export options until users sets up all required filters.
+            return;
         }
 
         $extparams = array();
@@ -582,12 +587,26 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
      * JQuery, dialog code and showhide.js.php should be included in page
      * when this is used (see code in report.php)
      *
-     * @param int $reportid
-     * @param string $reportshortname the report short name
+     * @param reportbuilder $report
      * @return string HTML to display the button
      */
-    public function showhide_button($reportid, $reportshortname) {
-        $js = "var id = {$reportid}; var shortname = '{$reportshortname}';";
+    public function showhide_button($report) {
+        if ($report instanceof reportbuilder) {
+            $reportid = $report->_id;
+            if (func_num_args() !== 1) {
+                debugging('\totara_reportbuilder_renderer::showhide_button() expect only one parameter to be reportbuilder instance, old shortname parameter must be removed', DEBUG_DEVELOPER);
+            }
+        } else {
+            debugging('\totara_reportbuilder_renderer::showhide_button() expect only one parameter to be reportbuilder instance, not id', DEBUG_DEVELOPER);
+            $reportid = (int)$report;
+            $report = reportbuilder::create($reportid);
+        }
+
+        if ($report->get_missing_filtering()) {
+            return '';
+        }
+
+        $js = "var id = {$reportid}; var shortname = '{$report->shortname}';";
         $html = html_writer::script($js);
 
         // hide if javascript disabled
@@ -692,6 +711,10 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
      * @return string
      */
     public function result_count_info(reportbuilder $report) {
+
+        if ($report->get_missing_filtering()) {
+            return '';
+        }
 
         $filteredcount = $report->get_filtered_count();
         if ($report->can_display_total_count()) {

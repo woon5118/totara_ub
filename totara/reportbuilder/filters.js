@@ -96,9 +96,28 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
             textElement.prop('disabled', true);
         });
 
+        var handleFilter = function() {
+            var filterRequired = this.closest('tr').querySelector('.filter_filteringrequired_checkbox');
+            window.onbeforeunload = null;
+            if (filterRequired) {
+                if (this.checked === true) {
+                    filterRequired.checked = false;
+                    filterRequired.disabled = true;
+                } else {
+                    filterRequired.disabled = false;
+                }
+            }
+        };
+
         // Disable onbeforeunload for advanced checkbox.
-        $('input.filter_advanced_checkbox').off('click');
-        $('input.filter_advanced_checkbox').on('click', function() {
+        $('input.filter_advanced_checkbox').off('change');
+        $('input.filter_advanced_checkbox').on('change', handleFilter);
+
+        // now intitialise all feilds
+        $('input.filter_advanced_checkbox').each(handleFilter);
+
+        $('input.filter_filteringrequired_checkbox').off('change');
+        $('input.filter_filteringrequired_checkbox').on('change', function() {
             window.onbeforeunload = null;
         });
 
@@ -133,11 +152,12 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
         });
 
         // Handle changes to the 'Add another filter...' selector.
-        $('select.new_standard_filter_selector, select.new_sidebar_filter_selector').on('change', function() {
+        var handleSelector = function() {
             window.onbeforeunload = null;
             var region = $(this).attr('id').substring(6, $(this).attr('id').indexOf("filter"));
             var addbutton = module.rb_init_filter_addbutton($(this), region);
             var advancedCheck = $('#id_new' + region + 'advanced');
+            var filteringrequiredCheck = $('#id_new' + region + 'filteringrequired');
             var newNameBox = $('input.filter_name_text', $(this).parents('tr:first'));
             var newCheckBox = $('input.filter_custom_name_checkbox', $(this).parents('tr:first'));
             var selectedval = $(this).val();
@@ -146,6 +166,10 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
                 // Clean out the selections.
                 advancedCheck.prop('disabled', true);
                 advancedCheck.removeAttr('checked');
+                if (region == 'standard') {
+                    filteringrequiredCheck.prop('disabled', true);
+                    filteringrequiredCheck.removeAttr('checked');
+                }
                 newNameBox.val('');
                 newNameBox.prop('disabled', true);
                 addbutton.remove();
@@ -154,9 +178,14 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
             } else {
                 // Reenable it (binding above will fill the value)
                 advancedCheck.prop('disabled', false);
+                if (region == 'standard') {
+                    filteringrequiredCheck.prop('disabled', false);
+                }
                 newCheckBox.prop('disabled', false);
             }
-        });
+        };
+        $('select.new_standard_filter_selector, select.new_sidebar_filter_selector').on('change', handleSelector);
+        $('select.new_standard_filter_selector, select.new_sidebar_filter_selector').each(handleSelector);
 
         // Set up delete button events.
         module.rb_init_filter_deletebuttons();
@@ -195,8 +224,9 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
     rb_init_filter_addbutton: function(filterselector, region) {
         var module = this;
         var advancedCheck = $('#id_new' + region + 'advanced');
+        var filteringrequiredCheck = $('#id_new' + region + 'filteringrequired');
         var customnameCheck = $('#id_new' + region + 'customname');
-        var optionsbox = advancedCheck.closest('td').next('td');
+        var optionsbox = advancedCheck.closest('tr').find('td:last-child');
         var selector = filterselector.closest('td');
         var newfilterinput = filterselector.closest('tr').clone();  // Clone of current 'Add new filter...' tr.
         newfilterinput.find("input:text").val(""); // Reset value.
@@ -219,6 +249,7 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
                 type: "POST",
                 data: ({action: 'add', sesskey: module.config.user_sesskey, id: module.config.rb_reportid,
                         filter: filterselector.val(), advanced: Number(advancedCheck.is(':checked')), region: region,
+                        filteringrequired: Number(filteringrequiredCheck.is(':checked')),
                         customname: Number(customnameCheck.is(':checked')), filtername: newfiltername}),
                 beforeSend: function() {
                     addbutton.html(module.loadingimg);
@@ -255,7 +286,13 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
                         nametext.attr('name', 'filtername'+fid);
                         advancedCheck.attr('name', 'advanced'+fid);
                         advancedCheck.attr('id', 'id_advanced'+fid);
-                        advancedCheck.closest('tr').attr('fid', fid);
+                        if (region == 'standard') {
+                            filteringrequiredCheck.attr('name', 'filteringrequired'+fid);
+                            filteringrequiredCheck.attr('id', 'id_filteringrequired'+fid);
+                            filteringrequiredCheck.closest('tr').attr('fid', fid);
+                        } else {
+                            advancedCheck.closest('tr').attr('fid', fid);
+                        }
 
                         // Append a new filter select box
                         filterbox.closest('table').append(newfilterinput);

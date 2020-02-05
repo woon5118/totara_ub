@@ -288,4 +288,16 @@ class rb_filter_course_multi extends rb_filter_type {
 
         return $out;
     }
+
+    /**
+     * Is this filter performing the filtering of results?
+     *
+     * @param array $data element filtering data
+     * @return bool
+     */
+    public function is_filtering(array $data): bool {
+        $operator = $data['operator'] ?? 0;
+        $value = $data['value'] ?? '';
+        return ($operator > 0 && !empty($value));
+    }
 }

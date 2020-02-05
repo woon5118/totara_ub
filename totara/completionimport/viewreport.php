@@ -128,7 +128,7 @@ echo $renderer->print_description($report->description, $report->_id);
 $report->display_search();
 $report->display_sidebar_search();
 
-echo $renderer->showhide_button($report->_id, $report->shortname);
+echo $renderer->showhide_button($report);
 echo $reporthtml;
 
 // Export button.

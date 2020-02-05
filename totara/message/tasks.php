@@ -121,7 +121,7 @@ $report->display_sidebar_search();
 $PAGE->requires->string_for_js('reviewitems', 'block_totara_alerts');
 $PAGE->requires->js_init_call('M.totara_message.dismiss_input_toggle');
 
-echo $output->showhide_button($report->_id, $report->shortname);
+echo $output->showhide_button($report);
 echo html_writer::start_tag('form', array('id' => 'totara_messages', 'name' => 'totara_messages',
         'action' => new moodle_url('/totara/message/action.php'),  'method' => 'post'));
 echo $reporthtml;

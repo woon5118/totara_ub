@@ -176,4 +176,21 @@ class rb_filter_text extends rb_filter_type {
 
         return '';
     }
+
+    /**
+     * Is this filter performing the filtering of results?
+     *
+     * @param array $data element filtering data
+     * @return bool
+     */
+    public function is_filtering(array $data): bool {
+        $operator = $data['operator'] ?? self::RB_FILTER_CONTAINS;
+        $value = $data['value'] ?? '';
+
+        if ($operator == self::RB_FILTER_ISEMPTY || $operator == self::RB_FILTER_ISNOTEMPTY) {
+            return true;
+        } else {
+            return (strlen((string)$value) > 0);
+        }
+    }
 }

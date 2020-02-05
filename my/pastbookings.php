@@ -143,7 +143,7 @@ $report->display_search();
 $report->display_sidebar_search();
 
 echo html_writer::empty_tag('br');
-echo $output->showhide_button($report->_id, $report->shortname);
+echo $output->showhide_button($report);
 echo $reporthtml;
 
 // Export button.

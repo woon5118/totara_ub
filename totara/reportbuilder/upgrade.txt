@@ -3,6 +3,11 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* rb_filter_type::get_filter() has a new optional parameter $filteringrequired
+* all filters must implement \rb_filter_type::is_filtering() method
+* all embedded reports need to be updated to use \totara_reportbuilder_renderer::showhide_button($report)
+  instead of report id and short name parameters
+* totara_reportbuilder_renderer::showhide_button() expect reportbuilder object instead of id and shortname
 * removed support for deprecated counted record sets
 * reportbuilder_get_embedded_report_object() has been deprecated. Please consider calling
   reportbuilder::get_embedded_report_class() and creating embedded report objects directly instead.
