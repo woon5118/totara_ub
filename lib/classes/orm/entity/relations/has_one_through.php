@@ -73,7 +73,7 @@ class has_one_through extends has_many_through {
         $results = $this->repo
             ->add_select($this->repo->get_table() . '.*')
             ->add_select($intermediate_builder->get_table() . '.' . $this->get_intermediate_foreign_key() . ' as ' . $this->get_intermediate_key_name())
-            ->join($this->intermediate::TABLE, $this->get_foreign_key(), $this->get_intermediate_key())
+            ->join($this->intermediate::TABLE, $this->get_foreign_key(), $this->get_intermediate_related_foreign_key())
             ->where(new field($this->get_intermediate_foreign_key(), $intermediate_builder), $keys)
             ->get(true);
 

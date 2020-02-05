@@ -786,30 +786,30 @@ abstract class entity implements \JsonSerializable {
      * Define has many through relationship
      * Technically it's just a convenience method.
      *
-     * @param string $entity Entity related class
      * @param string $intermediate Intermediate model
-     * @param string $intermediate_foreign_key
-     * @param string $foreign_key related entity key to use
-     * @param string $key This model key to use
-     * @param string $intermediate_key Intermediate model key
+     * @param string $related Entity related class
+     * @param string $key The key in the given entity used as foreign_key in the intermediate table, usually 'id'
+     * @param string $intermediate_foreign_key The foreign_key in the intermediate table matching the key in the entity table
+     * @param string $intermediate_related_foreign_key The foreign_key in the intermed. table matching the key in the related table
+     * @param string $related_key The key of the related table, usually 'id'
      * @return has_many_through
      */
     protected function has_many_through(
-        string $entity,
         string $intermediate,
+        string $related,
+        string $key,
         string $intermediate_foreign_key,
-        string $foreign_key,
-        string $key = 'id',
-        string $intermediate_key = 'id'
+        string $intermediate_related_foreign_key,
+        string $related_key
     ): has_many_through {
         return new has_many_through(
             $this,
             $intermediate,
-            $entity,
-            $foreign_key,
-            $intermediate_key,
+            $related,
             $key,
-            $intermediate_foreign_key
+            $intermediate_foreign_key,
+            $intermediate_related_foreign_key,
+            $related_key
         );
     }
 
@@ -817,30 +817,30 @@ abstract class entity implements \JsonSerializable {
      * Define has one through relationship
      * Technically it's just a convenience method.
      *
-     * @param string $entity Entity related class
      * @param string $intermediate Intermediate model
-     * @param string $intermediate_foreign_key
-     * @param string $foreign_key related entity key to use
-     * @param string $key This model key to use
-     * @param string $intermediate_key Intermediate model key
+     * @param string $related Entity related class
+     * @param string $key The key in the given entity used as foreign_key in the intermediate table, usually 'id'
+     * @param string $intermediate_foreign_key The foreign_key in the intermediate table matching the key in the entity table
+     * @param string $intermediate_related_foreign_key The foreign_key in the intermed. table matching the key in the related table
+     * @param string $related_key The key of the related table, usually 'id'
      * @return has_one_through
      */
     protected function has_one_through(
-        string $entity,
         string $intermediate,
+        string $related,
+        string $key,
         string $intermediate_foreign_key,
-        string $foreign_key,
-        string $key = 'id',
-        string $intermediate_key = 'id'
+        string $intermediate_related_foreign_key,
+        string $related_key
     ): has_one_through {
         return new has_one_through(
             $this,
             $intermediate,
-            $entity,
-            $foreign_key,
-            $intermediate_foreign_key,
+            $related,
             $key,
-            $intermediate_key
+            $intermediate_foreign_key,
+            $intermediate_related_foreign_key,
+            $related_key
         );
     }
 

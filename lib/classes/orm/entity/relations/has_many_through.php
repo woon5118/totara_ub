@@ -38,7 +38,7 @@ class has_many_through extends relation {
     /**
      * Intermediate entity model class
      *
-     * @var string
+     * @var string|entity
      */
     protected $intermediate;
 
@@ -47,7 +47,7 @@ class has_many_through extends relation {
      *
      * @var string
      */
-    protected $intermediate_key;
+    protected $intermediate_related_foreign_key;
 
     /**
      * Intermediate entity foreign key
@@ -56,18 +56,29 @@ class has_many_through extends relation {
      */
     protected $intermediate_foreign_key;
 
-    public function __construct(entity $entity, string $intermediate,
+    /**
+     * @param entity $entity The entity this relation is for
+     * @param string $intermediate The class name of the intermediate entity
+     * @param string $related The class name of the table this relation is resolving
+     * @param string $key The key in the given entity used as foreign_key in the intermediate table, usually 'id'
+     * @param string $intermediate_foreign_key The foreign_key in the intermediate table matching the key in the entity table
+     * @param string $intermediate_related_foreign_key The foreign_key in the intermed. table matching the key in the related table
+     * @param string $related_key The key of the related table, usually 'id'
+     */
+    public function __construct(
+        entity $entity,
+        string $intermediate,
         string $related,
-        string $foreign_key,
-        string $intermediate_key,
-        string $key = 'id',
-        string $intermediate_foreign_key ='id'
+        string $key,
+        string $intermediate_foreign_key,
+        string $intermediate_related_foreign_key,
+        string $related_key
     ) {
         $this->intermediate_foreign_key = $intermediate_foreign_key;
-        $this->intermediate_key = $intermediate_key;
+        $this->intermediate_related_foreign_key = $intermediate_related_foreign_key;
         $this->intermediate = $intermediate;
 
-        parent::__construct($entity, $related, $foreign_key, $key);
+        parent::__construct($entity, $related, $related_key, $key);
     }
 
     /**
@@ -76,8 +87,11 @@ class has_many_through extends relation {
      * @return void
      */
     public function constraints_for_entity() {
-        $this->repo->join($this->intermediate::TABLE, $this->get_foreign_key(), $this->get_intermediate_key())
-            ->where(new field($this->get_intermediate_foreign_key(), builder::table($this->intermediate::TABLE)), $this->entity->{$this->get_key()});
+        $this->repo->join($this->intermediate::TABLE, $this->get_related_key(), $this->get_intermediate_related_foreign_key())
+            ->where(new field(
+                $this->get_intermediate_foreign_key(),
+                builder::table($this->intermediate::TABLE)
+            ), $this->entity->{$this->get_key()});
     }
 
     /**
@@ -96,8 +110,13 @@ class has_many_through extends relation {
         // Load possible values
         $results = $this->repo
             ->select($this->repo->get_table() . '.*')
-            ->add_select($intermediate_builder->get_table() . '.' . $this->get_intermediate_foreign_key() . ' as ' . $this->get_intermediate_key_name())
-            ->join($this->intermediate::TABLE, $this->get_foreign_key(), $this->get_intermediate_key())
+            ->add_select(sprintf(
+                "%s.%s as %s",
+                $intermediate_builder->get_table(),
+                $this->get_intermediate_foreign_key(),
+                $this->get_intermediate_key_name()
+            ))
+            ->join($this->intermediate::TABLE, $this->get_related_key(), $this->get_intermediate_related_foreign_key())
             ->where(new field($this->get_intermediate_foreign_key(), $intermediate_builder), $keys)
             ->get();
 
@@ -161,8 +180,8 @@ class has_many_through extends relation {
      *
      * @return string
      */
-    public function get_intermediate_key() {
-        return $this->intermediate_key;
+    public function get_intermediate_related_foreign_key() {
+        return $this->intermediate_related_foreign_key;
     }
 
     /**
@@ -181,6 +200,15 @@ class has_many_through extends relation {
      */
     public function get_intermediate_key_name() {
         return $this->intermediate::TABLE . '___' . $this->get_intermediate_foreign_key();
+    }
+
+    /**
+     * Alias for foreign key
+     *
+     * @return string
+     */
+    public function get_related_key() {
+        return $this->get_foreign_key();
     }
 
 }

@@ -606,7 +606,14 @@ class sample_parent_entity extends entity {
      * @return has_many_through
      */
     public function siblings(): has_many_through {
-        return $this->has_many_through(sample_sibling_entity::class, sample_child_entity::class, 'parent_id', 'child_id');
+        return $this->has_many_through(
+            sample_child_entity::class,
+            sample_sibling_entity::class,
+            'id',
+            'parent_id',
+            'id',
+            'child_id'
+        );
     }
 
     /**
@@ -616,12 +623,12 @@ class sample_parent_entity extends entity {
      */
     public function a_sibling(): has_one_through {
         return $this->has_one_through(
-            sample_sibling_entity::class,
             sample_pivot_entity::class,
+            sample_sibling_entity::class,
+            'id',
+            'parent_id',
             'sibling_id',
-            'id',
-            'id',
-            'parent_id'
+            'id'
         );
     }
 
@@ -669,7 +676,14 @@ class sample_passport_entity extends entity {
     }
 
     public function children(): has_many_through {
-        return $this->has_many_through(sample_child_entity::class, sample_parent_entity::class, 'id', 'parent_id', 'parent_id', 'id');
+        return $this->has_many_through(
+            sample_parent_entity::class,
+            sample_child_entity::class,
+            'parent_id',
+            'id',
+            'id',
+            'parent_id'
+        );
     }
 }
 
@@ -732,7 +746,7 @@ class sample_pivot_entity extends entity {
     public const TABLE = 'test__sample_pivot';
 
     /**
-     * Child this sibling belongs to
+     * Sibling this belongs to
      *
      * @return belongs_to
      */
@@ -741,7 +755,7 @@ class sample_pivot_entity extends entity {
     }
 
     /**
-     * Child this sibling belongs to
+     * Parent this belongs to
      *
      * @return belongs_to
      */
