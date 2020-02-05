@@ -23,13 +23,12 @@
 
 namespace totara_competency\webapi\resolver\mutation;
 
-use context_system;
-use context_user;
 use core\orm\collection;
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use totara_competency\entities\assignment;
 use totara_competency\expand_task;
+use totara_competency\helpers\capability_helper;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\models\assignment_actions;
 use totara_competency\user_groups;
@@ -79,8 +78,7 @@ class create_user_assignments implements mutation_resolver {
     protected static function authorize(int $user_id) {
         require_login(null, false);
 
-        $capability = self::is_logged_in_user($user_id) ? 'totara/competency:assign_self' : 'totara/competency:assign_other';
-        require_capability($capability, context_user::instance($user_id));
+        capability_helper::require_can_assign($user_id);
     }
 
     protected static function get_type(int $user_id): string {

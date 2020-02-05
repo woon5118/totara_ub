@@ -23,7 +23,6 @@
 
 namespace criteria_childcompetency\webapi\resolver\query;
 
-use context_user;
 use core\orm\collection;
 use core\orm\entity\repository;
 use core\webapi\execution_context;
@@ -32,12 +31,13 @@ use criteria_childcompetency\childcompetency;
 use Exception;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency;
+use totara_competency\helpers\capability_helper;
 use totara_competency\models\assignment_user;
 use totara_core\advanced_feature;
 use totara_criteria\criterion_not_found_exception;
 
 /**
- * Fetches all achievments for the childcompetency criteria type
+ * Fetches all achievements for the childcompetency criteria type
  */
 class achievements implements query_resolver {
 
@@ -150,18 +150,6 @@ class achievements implements query_resolver {
     }
 
     /**
-     * Check whether a user can "self-assign" competencies
-     *
-     * @param int $user_id
-     * @return bool
-     */
-    public static function can_assign_competencies(int $user_id) {
-        return static::is_for_current_user($user_id) ?
-            has_capability('totara/competency:assign_self', context_user::instance($user_id)) :
-            has_capability('totara/competency:assign_other', context_user::instance($user_id));
-    }
-
-    /**
      * Authorize a user to make sure he can list and optionally self-assign competencies
      *
      * @param int $user_id
@@ -170,12 +158,9 @@ class achievements implements query_resolver {
     public static function authorize(int $user_id): bool {
         require_login(null, false, null, false, true);
 
-        $capability = static::is_for_current_user($user_id)
-            ? 'totara/competency:view_own_profile'
-            : 'totara/competency:view_other_profile';
-        require_capability($capability, context_user::instance($user_id));
+        capability_helper::require_can_view_profile($user_id);
 
-        return static::can_assign_competencies($user_id);
+        return capability_helper::can_assign($user_id);
     }
 
 }

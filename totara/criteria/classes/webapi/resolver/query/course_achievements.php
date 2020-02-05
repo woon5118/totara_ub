@@ -23,11 +23,11 @@
 
 namespace totara_criteria\webapi\resolver\query;
 
-use context_user;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use core_course\user_learning\item;
 use Exception;
+use totara_competency\helpers\capability_helper;
 use totara_core\advanced_feature;
 use totara_criteria\criterion;
 use totara_criteria\criterion_not_found_exception;
@@ -57,10 +57,7 @@ abstract class course_achievements implements query_resolver {
 
         // Currently we only use this for competencies, if the criteria is used
         // later in other areas like goals this need to be refactored
-        $capability = static::is_for_current_user($user_id)
-            ? 'totara/competency:view_own_profile'
-            : 'totara/competency:view_other_profile';
-        require_capability($capability, context_user::instance($user_id));
+        capability_helper::require_can_view_profile($user_id);
 
         try {
             $criterion = static::get_criterion();

@@ -61,7 +61,8 @@ class totara_competency_webapi_resolver_mutation_create_user_assignments_testcas
             'competency_ids' => [$data->comp1->id, $data->comp2->id],
         ];
 
-        $this->expectException(required_capability_exception::class);
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Assign competency to yourself');
 
         create_user_assignments::resolve($args, $this->get_execution_context());
     }
@@ -76,7 +77,8 @@ class totara_competency_webapi_resolver_mutation_create_user_assignments_testcas
             'competency_ids' => [$data->comp1->id, $data->comp2->id],
         ];
 
-        $this->expectException(required_capability_exception::class);
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Assign competency to other users');
 
         create_user_assignments::resolve($args, $this->get_execution_context());
     }

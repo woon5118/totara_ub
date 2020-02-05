@@ -29,7 +29,10 @@ use context_user;
 use moodle_exception;
 use moodle_url;
 use core\entities\user;
+use pathway_manual\models\roles\appraiser;
 use pathway_manual\models\roles\self_role;
+use required_capability_exception;
+use totara_competency\helpers\capability_helper;
 use totara_core\advanced_feature;
 use totara_mvc\controller;
 use totara_mvc\view;
@@ -67,8 +70,7 @@ abstract class base extends controller {
         advanced_feature::require('competency_assignment');
 
         // parent::authorize(); We don't need to call require login here, it's always required.
-        $capability = $this->is_for_current_user() ? 'totara/competency:view_own_profile' : 'totara/competency:view_other_profile';
-        require_capability($capability, $this->context);
+        capability_helper::require_can_view_profile($this->user->id, $this->context);
 
         return $this;
     }

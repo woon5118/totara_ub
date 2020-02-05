@@ -23,9 +23,8 @@
 
 namespace totara_competency\webapi\resolver\query;
 
-use context_user;
 use core\webapi\query_resolver;
-use core\entities\user;
+use totara_competency\helpers\capability_helper;
 use totara_core\advanced_feature;
 
 abstract class profile_resolver implements query_resolver {
@@ -43,15 +42,9 @@ abstract class profile_resolver implements query_resolver {
 
         require_login();
 
-        $authorized_user = user::logged_in();
-
         advanced_feature::require('competency_assignment');
 
-        $capability = $authorized_user->id === $user_id
-            ? 'totara/competency:view_own_profile'
-            : 'totara/competency:view_other_profile';
-
-        require_capability($capability, context_user::instance($user_id));
+        capability_helper::require_can_view_profile($user_id);
 
         return $user_id;
     }

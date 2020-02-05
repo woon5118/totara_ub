@@ -119,7 +119,7 @@ class totara_competency_webapi_resolver_query_competency_plans_testcase extends 
 
         unassign_capability('totara/competency:view_own_profile', $role);
 
-        $this->expectException(required_capability_exception::class);
+        $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('View own competency profile');
 
         $this->resolve();
@@ -136,7 +136,7 @@ class totara_competency_webapi_resolver_query_competency_plans_testcase extends 
 
         unassign_capability('totara/competency:view_other_profile', $role);
 
-        $this->expectException(required_capability_exception::class);
+        $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('View profile of other users');
 
         $this->resolve();

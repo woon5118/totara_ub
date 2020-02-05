@@ -99,7 +99,7 @@ class pathway_manual_webapi_resolver_query_role_ratings_testcase extends pathway
 
         unassign_capability('totara/competency:view_own_profile', $role);
 
-        $this->expectException(required_capability_exception::class);
+        $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('View own competency profile');
 
         $this->resolve();
@@ -116,7 +116,7 @@ class pathway_manual_webapi_resolver_query_role_ratings_testcase extends pathway
 
         unassign_capability('totara/competency:view_other_profile', $role);
 
-        $this->expectException(required_capability_exception::class);
+        $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('View profile of other users');
 
         $this->resolve();

@@ -23,7 +23,6 @@
 
 use core\orm\query\builder;
 use pathway_manual\data_providers\user_rateable_competencies;
-use pathway_manual\manual;
 use pathway_manual\models\rateable_competency;
 use pathway_manual\models\roles\appraiser;
 use pathway_manual\models\roles\manager;
@@ -230,10 +229,76 @@ class pathway_manual_data_provider_user_rateable_competencies_testcase extends p
         $this->assert_has_competencies($framework_group2->get_competencies(), [$competencies[2], $competencies[3]]);
     }
 
+    public function get_by_role_data_provider() {
+        $self = self_role::get_name();
+        $man = manager::get_name();
+        $app = appraiser::get_name();
+        return [
+            [
+                [self_role::class], // pathway roles competency1
+                [manager::class], // pathway roles competency2
+                [$self], // role filters
+                [$self => [1], $man => [], $app => []],
+            ],
+            [
+                [self_role::class, manager::class, appraiser::class],
+                [self_role::class, manager::class],
+                [$self, $man, $app],
+                [$self => [1, 2], $man => [1, 2], $app => [1]],
+            ],
+            [
+                [],
+                [],
+                [$self, $man, $app],
+                [$self => [], $app => [], $man => []],
+            ],
+        ];
+    }
+
+    /**
+     * Check that get_by_role() returns the correct competencies.
+     *
+     * @dataProvider get_by_role_data_provider
+     */
+    public function test_get_by_role(
+        array $pathway_roles_comp1,
+        array $pathway_roles_comp2,
+        array $role_filters,
+        array $expected_results
+    ) {
+        $this->generator->assignment_generator()->create_assignment([
+            'user_group_type' => user_groups::USER,
+            'user_group_id' => $this->user1->id,
+            'competency_id' => $this->competency1->id,
+        ]);
+        $this->generator->assignment_generator()->create_assignment([
+            'user_group_type' => user_groups::USER,
+            'user_group_id' => $this->user1->id,
+            'competency_id' => $this->competency2->id,
+        ]);
+        (new expand_task(builder::get_db()))->expand_all();
+
+        if ($pathway_roles_comp1) {
+            $this->generator->create_manual($this->competency1, $pathway_roles_comp1);
+        }
+        if ($pathway_roles_comp2) {
+            $this->generator->create_manual($this->competency2, $pathway_roles_comp2);
+        }
+        $provider = (new user_rateable_competencies())
+            ->add_filters(['roles' => $role_filters]);
+        foreach ($expected_results as $role_name => $expected_result) {
+            $expected_comps = [];
+            foreach ($expected_result as $comp_number) {
+                $expected_comps[] = $this->{"competency" . $comp_number};
+            }
+            $this->assert_has_competencies($provider->get_by_role($role_name)->all(), $expected_comps);
+        }
+    }
+
     /**
      * Make sure the provider has the same competency data as expected.
      *
-     * @param rateable_competency[] $actual_competencies
+     * @param rateable_competency[]|competency[] $actual_competencies
      * @param competency[] $expected_competencies
      */
     private function assert_has_competencies(array $actual_competencies, array $expected_competencies) {
@@ -241,7 +306,10 @@ class pathway_manual_data_provider_user_rateable_competencies_testcase extends p
 
         for ($i = 0; $i < count($expected_competencies); $i++) {
             $expected_data = $expected_competencies[$i]->to_array();
-            $actual_data = $actual_competencies[$i]->get_entity()->to_array();
+            $actual_entity = $actual_competencies[$i] instanceof competency
+                ? $actual_competencies[$i]
+                : $actual_competencies[$i]->get_entity();
+            $actual_data = $actual_entity->to_array();
 
             foreach ($expected_data as $attribute => $value) {
                 $this->assertEquals($value, $actual_data[$attribute]);

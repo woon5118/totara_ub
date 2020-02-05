@@ -24,12 +24,12 @@
 namespace totara_competency\webapi\resolver\query;
 
 use context_system;
-use context_user;
 use core\orm\cursor;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use core\entities\user;
 use totara_competency\data_providers\self_assignable_competencies as provider;
+use totara_competency\helpers\capability_helper;
 use totara_core\advanced_feature;
 
 /**
@@ -64,11 +64,7 @@ class self_assignable_competencies implements query_resolver {
 
         require_capability('totara/hierarchy:viewcompetency', context_system::instance());
 
-        $context = context_user::instance($args['user_id']);
-        $capability = ($args['user_id'] == user::logged_in()->id)
-            ? 'totara/competency:assign_self'
-            : 'totara/competency:assign_other';
-        require_capability($capability, $context);
+        capability_helper::require_can_assign($args['user_id']);
     }
 
 }

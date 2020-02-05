@@ -25,14 +25,14 @@ namespace totara_competency\controllers\profile;
 
 use totara_competency\entities\competency_framework;
 use totara_competency\entities\competency_type;
+use totara_competency\helpers\capability_helper;
 use totara_mvc\tui_view;
 
 class self_assignment extends base {
 
     public function action() {
 
-        $capability = $this->is_for_current_user() ? 'totara/competency:assign_self' : 'totara/competency:assign_other';
-        $this->require_capability($capability, $this->context);
+        capability_helper::require_can_assign($this->user->id, $this->context);
 
         // Add breadcrumbs.
         $this->add_navigation('Self assignment');

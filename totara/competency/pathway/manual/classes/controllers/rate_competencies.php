@@ -31,6 +31,7 @@ use pathway_manual\models\roles;
 use pathway_manual\models\roles\manager;
 use pathway_manual\models\roles\role;
 use pathway_manual\models\roles\self_role;
+use totara_competency\helpers\capability_helper;
 use totara_mvc\controller;
 use totara_mvc\tui_view;
 use totara_mvc\view;
@@ -130,17 +131,9 @@ class rate_competencies extends controller {
      * @return moodle_url
      */
     private function get_return_url(): moodle_url {
-        if ($this->user->is_logged_in()) {
-            $capability = 'totara/competency:view_own_profile';
-        } else {
-            $capability = 'totara/competency:view_other_profile';
-        }
-
-        if (has_capability($capability, $this->context)) {
-            $url = '/totara/competency/profile/';
-        } else {
-            $url = '/totara/competency/rate_users.php';
-        }
+        $url = capability_helper::can_view_profile($this->user->id, $this->context)
+            ? '/totara/competency/profile/'
+            : '/totara/competency/rate_users.php';
 
         return new moodle_url($url, ['user_id' => $this->user->id]);
     }

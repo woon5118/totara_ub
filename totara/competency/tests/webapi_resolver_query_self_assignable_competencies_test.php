@@ -66,7 +66,8 @@ class totara_competency_webapi_resolver_query_self_assignable_competencies_testc
 
         $args = $this->get_args(['user_id' => $user1->id]);
 
-        $this->expectException(required_capability_exception::class);
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Assign competency to yourself');
 
         self_assignable_competencies::resolve($args, $this->get_execution_context());
     }
@@ -81,7 +82,8 @@ class totara_competency_webapi_resolver_query_self_assignable_competencies_testc
 
         $args = $this->get_args(['user_id' => $user2->id]);
 
-        $this->expectException(required_capability_exception::class);
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Assign competency to other users');
 
         self_assignable_competencies::resolve($args, $this->get_execution_context());
     }

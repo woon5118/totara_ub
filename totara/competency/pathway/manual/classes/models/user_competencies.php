@@ -108,30 +108,28 @@ class user_competencies {
      * Can the current user rate competencies for the specified user?
      *
      * @param int $for_user User ID
-     * @param context|null $context
      * @return bool
      */
-    public static function can_rate_competencies(int $for_user, context $context = null) {
-        $roles = array_map(function (role $role) {
+    public static function can_rate_competencies(int $for_user) {
+        $roles = roles::get_current_user_roles($for_user);
+        $role_names = array_map(function (role $role) {
             return $role::get_name();
-        }, roles::get_current_user_roles($for_user));
+        }, $roles);
 
         $rateable_competencies = (new rateable_competencies())->add_filters([
             'user_id' => $for_user,
-            'roles' => $roles,
+            'roles' => $role_names,
         ]);
 
-        if (is_null($context)) {
-            $context = context_user::instance($for_user);
+        /** @var role $role */
+        foreach ($roles as $role) {
+            if ($role->has_capability($for_user)
+                && $rateable_competencies->get_by_role($role::get_name())->count() > 0
+            ) {
+                return true;
+            }
         }
-
-        if ($for_user == user::logged_in()->id) {
-            $has_capability = has_capability('totara/competency:rate_own_competencies', $context);
-        } else {
-            $has_capability = has_capability('totara/competency:rate_other_competencies', $context);
-        }
-
-        return $has_capability && $rateable_competencies->count() > 0;
+        return false;
     }
 
     /**

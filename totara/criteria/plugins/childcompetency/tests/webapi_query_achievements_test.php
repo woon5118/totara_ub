@@ -84,7 +84,7 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends advanc
             true
         );
 
-        $this->expectException(required_capability_exception::class);
+        $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Sorry, but you do not currently have permissions to do that (View own competency profile)');
         achievements::resolve([
             'instance_id' => $data['criterion']->get_id(),
@@ -150,7 +150,7 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends advanc
             true
         );
 
-        $this->expectException(required_capability_exception::class);
+        $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Sorry, but you do not currently have permissions to do that (View profile of other users)');
         achievements::resolve([
             'instance_id' => $data['criterion']->get_id(),

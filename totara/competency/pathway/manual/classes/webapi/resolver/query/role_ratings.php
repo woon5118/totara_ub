@@ -23,12 +23,12 @@
 
 namespace pathway_manual\webapi\resolver\query;
 
-use context_user;
 use core\entities\user;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use pathway_manual\models\rateable_competency;
 use totara_competency\entities\assignment;
+use totara_competency\helpers\capability_helper;
 use totara_core\advanced_feature;
 
 class role_ratings implements query_resolver {
@@ -41,14 +41,12 @@ class role_ratings implements query_resolver {
     public static function resolve(array $args, execution_context $ec) {
         advanced_feature::require('competency_assignment');
 
-        global $USER;
-
         require_login(null, false, null, false, true);
 
         $assignment_id = $args['assignment_id'];
         $user_id = $args['user_id'];
-        $capability = $USER->id == $user_id ? 'totara/competency:view_own_profile' : 'totara/competency:view_other_profile';
-        require_capability($capability, context_user::instance($user_id));
+
+        capability_helper::require_can_view_profile($user_id);
 
         return rateable_competency::for_assignment(new assignment($assignment_id), new user($user_id))
             ->get_all_role_ratings();

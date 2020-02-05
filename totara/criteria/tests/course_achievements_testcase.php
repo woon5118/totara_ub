@@ -256,7 +256,7 @@ abstract class totara_criteria_course_achievements_testcase extends advanced_tes
             $this->get_resolver_classname()::resolve($args, $this->get_execution_context());
             $this->fail('Expected required_capability_exception');
         } catch (Exception $exception) {
-            $this->assertInstanceOf(required_capability_exception::class, $exception);
+            $this->assertInstanceOf(moodle_exception::class, $exception);
         }
 
         // User needs to be able to access the profile

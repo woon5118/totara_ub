@@ -23,6 +23,7 @@
 
 use core_user\output\myprofile\node;
 use core_user\output\myprofile\tree;
+use totara_competency\helpers\capability_helper;
 use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
@@ -42,8 +43,7 @@ function totara_competency_myprofile_navigation(tree $tree, $user, $this_user, $
         return true;
     }
 
-    $capability = $this_user ? 'totara/competency:view_own_profile' : 'totara/competency:view_other_profile';
-    $can_view = has_capability($capability, context_user::instance($user->id));
+    $can_view = capability_helper::can_view_profile($user->id, $this_user);
 
     $can_view && $tree->add_node(
         new node(

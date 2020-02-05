@@ -24,6 +24,7 @@
 namespace totara_competency\controllers\profile;
 
 use pathway_manual\models\user_competencies;
+use totara_competency\helpers\capability_helper;
 use totara_mvc\tui_view;
 use user_picture;
 
@@ -42,8 +43,8 @@ class index extends base {
             'user-name' => $this->user->fullname,
             'is-mine' => $this->is_for_current_user(),
             'base-url' => (string) $this->get_base_url(),
-            'can-assign' => $this->can_assign(),
-            'can-rate-competencies' => user_competencies::can_rate_competencies($this->user->id, $this->context),
+            'can-assign' => capability_helper::can_assign($this->user->id, $this->context),
+            'can-rate-competencies' => user_competencies::can_rate_competencies($this->user->id),
         ];
 
         return tui_view::create('totara_competency/pages/CompetencyProfile', $props)
@@ -54,10 +55,5 @@ class index extends base {
         $avatar = new user_picture((object)($this->user->to_array()));
         $avatar->size = $size;
         return $avatar->get_url($this->page);
-    }
-
-    protected function can_assign(): bool {
-        $capability = $this->is_for_current_user() ? 'totara/competency:assign_self' : 'totara/competency:assign_other';
-        return has_capability($capability, $this->context);
     }
 }

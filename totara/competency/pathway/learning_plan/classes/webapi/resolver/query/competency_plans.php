@@ -23,10 +23,10 @@
 
 namespace pathway_learning_plan\webapi\resolver\query;
 
-use context_user;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use pathway_learning_plan\models\competency_plan;
+use totara_competency\helpers\capability_helper;
 
 class competency_plans implements query_resolver {
 
@@ -38,13 +38,11 @@ class competency_plans implements query_resolver {
      * @return competency_plan
      */
     public static function resolve(array $args, execution_context $ec) {
-        global $USER;
-
         require_login(null, false, null, false, true);
 
         $user_id = $args['user_id'];
-        $capability = $USER->id == $user_id ? 'totara/competency:view_own_profile' : 'totara/competency:view_other_profile';
-        require_capability($capability, context_user::instance($user_id));
+
+        capability_helper::require_can_view_profile($user_id);
 
         return competency_plan::for_assignment($args['assignment_id'], $user_id);
     }
