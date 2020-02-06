@@ -56,6 +56,7 @@ class renderer extends plugin_renderer_base {
             get_string('configuredstatus', 'tool_oauth2'),
             get_string('loginissuer', 'tool_oauth2'),
             get_string('discoverystatus', 'tool_oauth2') . ' ' . $this->help_icon('discovered', 'tool_oauth2'),
+            get_string('systemauthstatus', 'tool_oauth2') . ' ' . $this->help_icon('systemaccountconnected', 'tool_oauth2'),
             get_string('edit'),
         ];
         $table->attributes['class'] = 'admintable generaltable';
@@ -111,6 +112,23 @@ class renderer extends plugin_renderer_base {
             }
 
             $discoverystatuscell = new html_table_cell($discovered);
+
+            // Connected.
+            if ($issuer->is_system_account_connected()) {
+                $systemaccount = \core\oauth2\api::get_system_account($issuer);
+                $systemauth = s($systemaccount->get('email')) . ' (' . s($systemaccount->get('username')). ') ';
+                $systemauth .= $this->pix_icon('yes', get_string('systemaccountconnected', 'tool_oauth2'), 'tool_oauth2');
+            } else {
+                $systemauth = $this->pix_icon('no', get_string('systemaccountnotconnected', 'tool_oauth2'), 'tool_oauth2');
+            }
+
+            $params = ['id' => $issuer->get('id'), 'action' => 'auth'];
+            $authurl = new moodle_url('/admin/tool/oauth2/issuers.php', $params);
+            $icon = $this->pix_icon('auth', get_string('connectsystemaccount', 'tool_oauth2'), 'tool_oauth2');
+            $authlink = html_writer::link($authurl, $icon);
+            $systemauth .= ' ' . $authlink;
+
+            $systemauthstatuscell = new html_table_cell($systemauth);
 
             $links = '';
             // Action links.
@@ -172,6 +190,7 @@ class renderer extends plugin_renderer_base {
                 $configuredstatuscell,
                 $loginissuerstatuscell,
                 $discoverystatuscell,
+                $systemauthstatuscell,
                 $editcell,
             ]);
 
