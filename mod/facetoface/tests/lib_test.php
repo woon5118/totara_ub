@@ -1965,9 +1965,9 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         ];
         $sessionid2 = $facetofacegenerator->add_session($sessiondata2);
 
+        // Manager approval required. User can not request a second approval, once the user done already.
         $signup22 = signup::create($student2->id, new seminar_event($sessionid2));
-        $this->assertTrue(signup_helper::can_signup($signup22));
-        signup_helper::signup($signup22);
+        $this->assertFalse(signup_helper::can_signup($signup22));
     }
 
     public function test_seminar_user_signup_select_manager_message_manager() {

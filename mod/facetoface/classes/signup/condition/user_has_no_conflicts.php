@@ -24,6 +24,8 @@
 namespace mod_facetoface\signup\condition;
 
 use mod_facetoface\seminar_session_list;
+use mod_facetoface\signup\state\requested;
+use mod_facetoface\signup\state\requestedadmin;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -51,7 +53,9 @@ class user_has_no_conflicts extends condition {
         // If the list of conflict sessions is not empty, then this condition should be failed.
         $conflictsessions = seminar_session_list::from_user_conflicts_with_sessions(
             $userid,
-            $seminarevent->get_sessions()
+            $seminarevent->get_sessions(),
+            null,
+            [requested::class, requestedadmin::class]
         );
 
         return $conflictsessions->is_empty();

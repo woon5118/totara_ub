@@ -282,3 +282,54 @@ Feature: Seminar Signup Manager Approval
     Then I should see "(Event has been deleted)"
     And I should see "Dismiss"
     And I should not see "Approve"
+
+  Scenario: Student can not request approval for another session with same dates
+    And the following job assignments exist:
+      | user  | fullname | idnumber | manager |
+      | sally | jajaja1  | 1        | timmy   |
+    And I am on "Classroom Connect Course" course homepage
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name                | Classroom Connect 2       |
+      | Description         | Classroom Connect Tests 2 |
+    And I follow "Classroom Connect 2"
+    And I follow "Add event"
+    And I set the following fields to these values:
+      | capacity | 5 |
+    And I press "Save changes"
+    And I follow "Add event"
+    And I click on "Edit session" "link" in the "Select room" "table_row"
+    And I fill seminar session with relative date in form data:
+      | timestart[day]       | +2 |
+      | timefinish[day]      | +3 |
+      | timefinish[hour]     | +2 |
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
+    And I set the following fields to these values:
+      | capacity              | 10   |
+    And I press "Save changes"
+    And I am on "Classroom Connect Course" course homepage
+    And I follow "Classroom Connect"
+    And I follow "View all events"
+    And I follow "Add event"
+    And I click on "Edit session" "link" in the "Select room" "table_row"
+    And I fill seminar session with relative date in form data:
+      | timestart[day]       | +2 |
+      | timefinish[day]      | +3 |
+      | timefinish[hour]     | +2 |
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
+    And I set the following fields to these values:
+      | capacity | 10 |
+    And I press "Save changes"
+    And I log out
+
+    And I log in as "sally"
+    And I am on "Classroom Connect Course" course homepage
+    And I follow "Classroom Connect"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
+    When I press "Request approval"
+    And I should see "Manager Approval"
+    Then I should see "Your request was sent to your manager for approval."
+    And I run all adhoc tasks
+    When I follow "View all events"
+    Then I should see "(Requested)" in the "Upcoming" "table_row"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
+    And I should see "Cancel booking"

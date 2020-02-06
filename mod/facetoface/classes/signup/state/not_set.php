@@ -47,11 +47,18 @@ class not_set extends state {
                 has_signup_capability::class,
                 has_required_job_assignment::class,
                 no_other_signups::class,
+                user_is_enrolable::class,
+                user_has_no_conflicts::class,
+
                 booking_common::class,
                 approval_not_required::class,
-                user_is_enrolable::class,
-                waitlist_everyone_disabled::class,
-                user_has_no_conflicts::class
+                waitlist_everyone_disabled::class
+            ),
+            // Reservations
+            transition::to(new booked($this->signup))->with_conditions(
+                is_reservation::class,
+                booking_common::class,
+                waitlist_everyone_disabled::class
             ),
             // Straight-forward wait list
             transition::to(new waitlisted($this->signup))->with_conditions(
@@ -59,28 +66,36 @@ class not_set extends state {
                 has_signup_capability::class,
                 has_required_job_assignment::class,
                 no_other_signups::class,
-                waitlist_common::class,
-                approval_not_required::class,
                 user_is_enrolable::class,
-                user_has_no_conflicts::class
+                user_has_no_conflicts::class,
+                waitlist_common::class,
+                approval_not_required::class
+            ),
+            transition::to(new waitlisted($this->signup))->with_conditions(
+                is_reservation::class,
+                waitlist_common::class
             ),
             // Request approval: manager and user has manager
             transition::to(new requested($this->signup))->with_conditions(
                 multisignup_common::class,
-                approval_manager_required::class,
                 has_signup_capability::class,
                 has_required_job_assignment::class,
-                user_has_manager::class,
-                user_is_enrolable::class
+                no_other_signups::class,
+                user_is_enrolable::class,
+                user_has_no_conflicts::class,
+                approval_manager_required::class,
+                user_has_manager::class
             ),
             // Request approval: manager and user can select manager
             transition::to(new requested($this->signup))->with_conditions(
                 multisignup_common::class,
-                approval_manager_required::class,
                 has_signup_capability::class,
                 has_required_job_assignment::class,
-                user_can_select_manager::class,
-                user_is_enrolable::class
+                no_other_signups::class,
+                user_is_enrolable::class,
+                user_has_no_conflicts::class,
+                approval_manager_required::class,
+                user_can_select_manager::class
             ),
             // Request approval: role
             transition::to(new requestedrole($this->signup))->with_conditions(
@@ -88,20 +103,10 @@ class not_set extends state {
                 has_signup_capability::class,
                 has_required_job_assignment::class,
                 no_other_signups::class,
+                user_is_enrolable::class,
+                user_has_no_conflicts::class,
                 approval_role_required::class,
-                event_has_role_approver::class,
-                user_is_enrolable::class
-            ),
-
-            // Reservations
-            transition::to(new booked($this->signup))->with_conditions(
-                is_reservation::class,
-                booking_common::class,
-                waitlist_everyone_disabled::class
-            ),
-            transition::to(new waitlisted($this->signup))->with_conditions(
-                is_reservation::class,
-                waitlist_common::class
+                event_has_role_approver::class
             )
         ];
     }
