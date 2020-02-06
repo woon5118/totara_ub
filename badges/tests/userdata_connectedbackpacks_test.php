@@ -24,7 +24,6 @@
 namespace core_badges\userdata;
 
 use advanced_testcase;
-use tool_usertours\target;
 use totara_userdata\userdata\export;
 use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;
@@ -80,8 +79,6 @@ class core_badges_userdata_backpack_testcase extends advanced_testcase {
      * Tests purge of connected backpacks.
      */
     public function test_purge_active_users() {
-        $this->resetAfterTest();
-
         $generator = $this->getDataGenerator();
         /** @var \core_badges_generator $badgegenerator */
         $badgegenerator = $generator->get_plugin_generator('core_badges');
@@ -139,8 +136,6 @@ class core_badges_userdata_backpack_testcase extends advanced_testcase {
      * Tests purge of connected backpacks for suspended users.
      */
     public function test_purge_suspended_users() {
-        $this->resetAfterTest();
-
         $generator = $this->getDataGenerator();
         /** @var \core_badges_generator $badgegenerator */
         $badgegenerator = $generator->get_plugin_generator('core_badges');
@@ -197,14 +192,10 @@ class core_badges_userdata_backpack_testcase extends advanced_testcase {
         self::assertNull(get_backpack_settings($user2->id));
     }
 
-
     /**
      * Tests purge of connected backpacks for suspended users.
      */
     public function test_purge_deleted_users() {
-        global $DB;
-        $this->resetAfterTest();
-
         $generator = $this->getDataGenerator();
         /** @var \core_badges_generator $badgegenerator */
         $badgegenerator = $generator->get_plugin_generator('core_badges');
@@ -307,8 +298,6 @@ class core_badges_userdata_backpack_testcase extends advanced_testcase {
 
         require_once($CFG->libdir . '/badgeslib.php');
 
-        $this->resetAfterTest();
-
         $generator = $this->getDataGenerator();
         /** @var \core_badges_generator $badgegenerator */
         $badgegenerator = $generator->get_plugin_generator('core_badges');
@@ -342,8 +331,6 @@ class core_badges_userdata_backpack_testcase extends advanced_testcase {
         global $CFG;
 
         require_once($CFG->libdir . '/badgeslib.php');
-
-        $this->resetAfterTest();
 
         $generator = $this->getDataGenerator();
         /** @var \core_badges_generator $badgegenerator */
@@ -381,9 +368,6 @@ class core_badges_userdata_backpack_testcase extends advanced_testcase {
         global $CFG;
 
         require_once($CFG->libdir . '/badgeslib.php');
-
-        global $DB;
-        $this->resetAfterTest();
 
         $generator = $this->getDataGenerator();
         /** @var \core_badges_generator $badgegenerator */
@@ -425,8 +409,6 @@ class core_badges_userdata_backpack_testcase extends advanced_testcase {
      * Test counting connected backpacks belonging to the user.
      */
     public function test_count() {
-        $this->resetAfterTest();
-
         $generator = $this->getDataGenerator();
         /** @var \core_badges_generator $badgegenerator */
         $badgegenerator = $generator->get_plugin_generator('core_badges');

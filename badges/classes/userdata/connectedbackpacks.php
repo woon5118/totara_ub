@@ -124,7 +124,7 @@ class connectedbackpacks extends item {
     protected static function export(target_user $user, \context $context) {
         global $DB;
 
-        $backpacks = $DB->get_records('badge_backpack', ['userid' => $user->id], 'id', 'id, email, backpackurl, backpackuid');
+        $backpacks = $DB->get_records('badge_backpack', ['userid' => $user->id], 'id', 'id, email, backpackuid');
         foreach ($backpacks as &$backpack) {
             $collections = $DB->get_records('badge_external', ['backpackid' => $backpack->id], 'collectionid', 'collectionid');
             unset($backpack->id); // We don't need this any more, and we don't want it in the export.
