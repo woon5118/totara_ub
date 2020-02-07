@@ -1,0 +1,16 @@
+"""
+This is generic performance activity type
+
+"""
+type mod_perform_activity {
+  id: core_id
+  name(format: core_format = HTML): String!
+  timemodified(format: core_date_format = TIMESTAMP): core_date
+}
+
+extend type Query {
+  """
+  This query returns all performance activities
+  """
+  mod_perform_activities: [mod_perform_activity!]!
+}
