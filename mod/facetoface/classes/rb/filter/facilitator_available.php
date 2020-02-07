@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 // namespace mod_facetoface\rb\filter;
 
 global $CFG;
-require_once($CFG->dirroot . '/mod/facetoface/rb_sources/f2f_available.php');
+require_once($CFG->dirroot . '/mod/facetoface/classes/rb/filter/f2f_available.php');
 
 /**
  * Keep this classname with rb_filter prefix as report_builder will never load this filter.

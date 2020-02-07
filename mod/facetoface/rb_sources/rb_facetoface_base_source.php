@@ -24,11 +24,14 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
-require_once($CFG->dirroot . '/mod/facetoface/rb_sources/f2f_roomavailable.php');
-require_once($CFG->dirroot . '/mod/facetoface/rb_sources/f2f_assetavailable.php');
+require_once($CFG->dirroot . '/mod/facetoface/classes/rb/filter/f2f_roomavailable.php');
+require_once($CFG->dirroot . '/mod/facetoface/classes/rb/filter/f2f_assetavailable.php');
 require_once($CFG->dirroot . '/mod/facetoface/classes/rb/filter/facilitator_available.php');
 
 abstract class rb_facetoface_base_source extends rb_base_source {
+
+    use \mod_facetoface\rb\traits\deprecated_base_source;
+
     public function __construct() {
         $this->usedcomponents[] = 'mod_facetoface';
         parent::__construct();
@@ -613,48 +616,6 @@ abstract class rb_facetoface_base_source extends rb_base_source {
     }
 
     /**
-     * Return list of user names linked to their profiles from string of concatenated user names, their ids,
-     * and length of every name with id
-     *
-     * @deprecated Since Totara 12.0
-     * @param string $name Concatenated list of names, ids, and lengths
-     * @param stdClass $row
-     * @param bool $isexport
-     * @return string
-     */
-    public function rb_display_coded_link_user($name, $row, $isexport = false) {
-        debugging('rb_facetoface_base_source::rb_display_coded_link_user been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_coded_user_link::display', DEBUG_DEVELOPER);
-        // Concatenated names are provided as (kind of) pascal string beginning with id in the following format:
-        // length_of_following_string.' '.id.' '.name.', '
-        if (empty($name)) {
-            return '';
-        }
-        $leftname = $name;
-        $result = array();
-        while(true) {
-            $len = (int)$leftname; // Take string length.
-            if (!$len) {
-                break;
-            }
-            $idname = core_text::substr($leftname, core_text::strlen((string)$len)+1, $len, 'UTF-8');
-            if (empty($idname)) {
-                break;
-            }
-            $idendpos = core_text::strpos($idname, ' ');
-            $id = (int)core_text::substr($idname, 0, $idendpos);
-            if (!$id) {
-                break;
-            }
-            $name = trim(core_text::substr($idname, $idendpos));
-            $result[] = ($isexport) ? $name : html_writer::link(new moodle_url('/user/view.php', array('id' => $id)), $name);
-
-            // length(length(idname)) + length(' ') + length(idname) + length(', ').
-            $leftname = core_text::substr($leftname, core_text::strlen((string)$len)+1+$len+2);
-        }
-        return implode(', ', $result);
-    }
-
-    /*
      * Adds some common user field to the $filteroptions array
      *
      * @param array &$filteroptions Array of current filter options
@@ -707,118 +668,6 @@ abstract class rb_facetoface_base_source extends rb_base_source {
     }
 
     /**
-     * Convert a f2f approvaltype into a human readable string
-     *
-     * @deprecated Since Totara 12.0
-     * @param int $approvaltype
-     * @param object $row
-     * @return string
-     */
-    function rb_display_f2f_approval($approvaltype, $row) {
-        debugging('rb_facetoface_base_source::rb_display_f2f_approval been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_approval::display', DEBUG_DEVELOPER);
-        return facetoface_get_approvaltype_string($approvaltype, $row->approvalrole);
-    }
-
-    /**
-     * Room name linked to room details
-     *
-     * @deprecated Since Totara 12.0
-     * @param string $roomname
-     * @param stdClass $row
-     * @param bool $isexport
-     */
-    public function rb_display_room_name_link($roomname, $row, $isexport = false) {
-        debugging('rb_facetoface_base_source::rb_display_room_name_link been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_room_name_link::display', DEBUG_DEVELOPER);
-        if ($isexport) {
-            return $roomname;
-        }
-        if (empty($roomname)) {
-            return '';
-        }
-
-        if ($row->custom) {
-            $roomname .= get_string("roomcustom", "mod_facetoface");
-        }
-
-        return html_writer::link(
-            new moodle_url('/mod/facetoface/reports/rooms.php', array('roomid' => $row->roomid)),
-            $roomname
-        );
-    }
-
-    /**
-     * Asset name linked to asset details
-     *
-     * @deprecated Since Totara 12.0
-     * @param string $assetname
-     * @param stdClass $row
-     * @param bool $isexport
-     */
-    public function rb_display_asset_name_link($assetname, $row, $isexport = false) {
-        debugging('rb_facetoface_base_source::rb_display_asset_name_link been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_asset_name_link::display', DEBUG_DEVELOPER);
-        if ($isexport) {
-            return $assetname;
-        }
-        if (empty($assetname)) {
-            return '';
-        }
-        return html_writer::link(
-            new moodle_url('/mod/facetoface/reports/assets.php', array('assetid' => $row->assetid)),
-            $assetname
-        );
-    }
-
-    /**
-     * Display opposite to rb_display_yes_no. E.g. zero value will be 'yes', and non-zero 'no'
-     *
-     * @deprecated Since Totara 12.0
-     * @param scalar $no
-     * @param stdClass $row
-     * @param bool $isexport
-     */
-    public function rb_display_no_yes($no, $row, $isexport = false) {
-        debugging('rb_facetoface_base_source::rb_display_no_yes been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_no_yes::display', DEBUG_DEVELOPER);
-        return ($no) ? get_string('no') : get_string('yes');
-    }
-
-    /**
-     * Display if room allows scheduling conflicts
-     *
-     * @deprecated Since Totara 12.0
-     * @param string $allowconflicts
-     * @param stdClass $row
-     * @param bool $isexport
-     */
-    public function rb_display_conflicts($allowconflicts, $row, $isexport = false) {
-        debugging('rb_facetoface_base_source::rb_display_conflicts been deprecated since Totara 12.0. Use \totara_reportbuilder\rb\display\yes_or_no::display()', DEBUG_DEVELOPER);
-        return $allowconflicts ? get_string('yes') : get_string('no');
-    }
-
-    /**
-     * Display count of attendees and link to session attendees report page.
-     *
-     * @deprecated Since Totara 12.0
-     * @param int $cntattendees
-     * @param stdClass $row
-     * @param bool $isexport
-     */
-    public function rb_display_numattendeeslink($cntattendees, $row, $isexport = false) {
-        debugging('rb_facetoface_base_source::rb_display_numattendeeslink been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_num_attendees_link::display', DEBUG_DEVELOPER);
-        if ($isexport) {
-            return $cntattendees;
-        }
-        if (!$cntattendees) {
-            $cntattendees = '0';
-        }
-
-        $viewattendees = get_string('viewattendees', 'mod_facetoface');
-
-        $description = html_writer::span($viewattendees, 'sr-only');
-        return html_writer::link(new moodle_url('/mod/facetoface/attendees/view.php', array('s' => $row->session)), $cntattendees . $description, array('title' => $viewattendees));
-
-    }
-
-    /**
      * Get currently supported booking status filter options
      * @return array
      */
@@ -862,159 +711,5 @@ abstract class rb_facetoface_base_source extends rb_base_source {
             'ended' => get_string('status:ended', 'rb_source_facetoface_summary'),
         );
         return $statusopts;
-    }
-
-    /**
-     * Add common assets column options (excluding custom fields)
-     * @param array $columnoptions
-     * @param string $join alias of join or table that provides assets fields
-     */
-    protected function add_assets_fields_to_columns(array &$columnoptions, $join = 'asset') {
-        $columnoptions[] = new rb_column_option(
-            'asset',
-            'id',
-            get_string('assetid', 'rb_source_facetoface_asset'),
-            "$join.id",
-            array(
-                'joins' => $join,
-                'dbdatatype' => 'integer',
-                'displayfunc' => 'integer'
-            )
-        );
-
-        $columnoptions[] = new rb_column_option(
-            'asset',
-            'name',
-            get_string('name', 'rb_source_facetoface_asset'),
-            "$join.name",
-            array(
-                'joins' => $join,
-                'dbdatatype' => 'text',
-                'displayfunc' => 'format_string'
-            )
-        );
-
-        $columnoptions[] = new rb_column_option(
-            'asset',
-            'namelink',
-            get_string('namelink', 'rb_source_facetoface_asset'),
-            "$join.name",
-            array(
-                'joins' => $join,
-                'dbdatatype' => 'text',
-                'displayfunc' => 'f2f_asset_name_link',
-                'defaultheading' => get_string('name', 'rb_source_facetoface_asset'),
-                'extrafields' => array('assetid' => "$join.id")
-            )
-        );
-
-        $columnoptions[] = new rb_column_option(
-            'asset',
-            'published',
-            get_string('published', 'rb_source_facetoface_asset'),
-            "CASE WHEN $join.custom > 0 THEN 1 ELSE 0 END",
-            array(
-                'joins' => $join,
-                'dbdatatype' => 'integer',
-                'displayfunc' => 'f2f_no_yes',
-            )
-        );
-
-        $columnoptions[] = new rb_column_option(
-            'asset',
-            'description',
-            get_string('description', 'rb_source_facetoface_asset'),
-            "$join.description",
-            array(
-                'joins' => $join,
-                'dbdatatype' => 'text',
-                'displayfunc' => 'asset_description',
-                'extrafields' => array('assetid' => "$join.id")
-            )
-        );
-
-        $columnoptions[] = new rb_column_option(
-            'asset',
-            'visible',
-            get_string('visible', 'rb_source_facetoface_asset'),
-            "$join.hidden",
-            array(
-                'joins' => $join,
-                'dbdatatype' => 'integer',
-                'displayfunc' => 'f2f_no_yes'
-            )
-        );
-
-        $columnoptions[] = new rb_column_option(
-            'asset',
-            'allowconflicts',
-            get_string('allowconflicts', 'rb_source_facetoface_asset'),
-            "$join.allowconflicts",
-            array(
-                'joins' => $join,
-                'dbdatatype' => 'text',
-                'displayfunc' => 'yes_or_no',
-            )
-        );
-    }
-
-    /**
-     * Add common asset filter options (excluding custom fields)
-     * @param array $filteroptions
-     */
-    protected function add_assets_fields_to_filters(array &$filteroptions) {
-        $filteroptions[] = new rb_filter_option(
-            'asset',
-            'id',
-            get_string('assetid', 'rb_source_facetoface_asset'),
-            'number'
-        );
-
-        $filteroptions[] = new rb_filter_option(
-            'asset',
-            'name',
-            get_string('name', 'rb_source_facetoface_asset'),
-            'text'
-        );
-
-        $filteroptions[] = new rb_filter_option(
-            'asset',
-            'published',
-            get_string('published', 'rb_source_facetoface_asset'),
-            'select',
-            array(
-                'simplemode' => true,
-                'selectchoices' => array('0' => get_string('yes'), '1' => get_string('no'))
-            )
-        );
-
-        $filteroptions[] = new rb_filter_option(
-            'asset',
-            'description',
-            get_string('description', 'rb_source_facetoface_asset'),
-            'text'
-        );
-
-        $filteroptions[] = new rb_filter_option(
-            'asset',
-            'visible',
-            get_string('visible', 'rb_source_facetoface_asset'),
-            'select',
-            array(
-                'simplemode' => true,
-                'selectchoices' => array('0' => get_string('yes'), '1' => get_string('no'))
-            )
-        );
-
-        $filteroptions[] = new rb_filter_option(
-            'asset',
-            'allowconflicts',
-            get_string('allowconflicts', 'rb_source_facetoface_asset'),
-            'select',
-            array(
-                'simplemode' => true,
-                'selectchoices' => array(1 => get_string('yes'), 0 => get_string('no'))
-            )
-        );
     }
 }

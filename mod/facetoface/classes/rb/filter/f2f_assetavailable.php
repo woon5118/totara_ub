@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/facetoface/rb_sources/f2f_available.php');
+require_once($CFG->dirroot . '/mod/facetoface/classes/rb/filter/f2f_available.php');
 
 /**
  * Empty rooms during specified time search implementation

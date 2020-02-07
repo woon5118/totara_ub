@@ -33,6 +33,7 @@ require_once($CFG->dirroot . '/mod/facetoface/rb_sources/rb_facetoface_base_sour
  * Class rb_source_facetoface_signin
  */
 class rb_source_facetoface_signin extends rb_facetoface_base_source {
+
     use \core_course\rb\source\report_trait;
     use \core_tag\rb\source\report_trait;
     use \totara_reportbuilder\rb\source\report_trait;
@@ -41,6 +42,7 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
     use \mod_facetoface\rb\traits\post_config;
     use \mod_facetoface\rb\traits\rooms;
     use \totara_cohort\rb\source\report_trait;
+    use \mod_facetoface\rb\traits\deprecated_signin_source;
 
     /**
      * Constructor.
@@ -575,131 +577,6 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         $this->add_totara_customfield_component('facetoface_session', 'sessions', 'facetofacesessionid', $this->joinlist, $this->columnoptions, $this->filteroptions);
         $this->add_totara_customfield_component('facetoface_signup', 'base', 'facetofacesignupid', $this->joinlist, $this->columnoptions, $this->filteroptions);
     }
-
-    //
-    //
-    // Face-to-face specific display functions
-    //
-    //
-
-    /**
-     * Display function for signature column.
-     *
-     * This column is used by reports which generate sign-in sheets
-     * (printed PDF exports). The content here increases the space
-     * for an attendee to provide a signature. [Unix] newlines are
-     * converted to linebreak HTML tags.
-     *
-     * @deprecated Since Totara 12.0
-     * @param $position
-     * @param $row
-     * @return string
-     */
-    public function rb_display_signature($position, $row) {
-        debugging('rb_source_facetoface_signin::rb_display_signature has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_signature::display', DEBUG_DEVELOPER);
-        return "\n\n";
-    }
-
-    /**
-     * Display function for job.
-     *
-     * @deprecated Since Totara 12.0
-     * @param $jobassignmentid
-     * @param $row
-     * @return string
-     */
-    public function rb_display_position_type($jobassignmentid, $row) {
-        debugging('rb_source_facetoface_signin::rb_display_position_type has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
-        // Deprecate - you should probably link to the job table and get the full name (unless we want default lang string names).
-        return 'fixme';
-    }
-
-    /**
-     * Display function for the booking managers name (linked to
-     * their profile).
-     *
-     * @deprecated Since Totara 12.0
-     * @param $name
-     * @param $row
-     * @return string
-     */
-    function rb_display_link_f2f_bookedby($name, $row) {
-        debugging('rb_source_facetoface_signin::rb_display_link_f2f_bookedby has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_booked_by_link::display', DEBUG_DEVELOPER);
-        $user = fullname($row);
-        return $this->rb_display_link_user($user, $row, false);
-    }
-
-    /**
-     * Display function for the actioning users name (linked to
-     * their profile).
-     *
-     * @deprecated Since Totara 12.0
-     * @param $name
-     * @param $row
-     * @return string
-     */
-    function rb_display_link_f2f_actionedby($name, $row) {
-        debugging('rb_source_facetoface_signin::rb_display_link_f2f_actionedby has been deprecated since Totara 12.0', DEBUG_DEVELOPER);
-        $user = fullname($row);
-        return $this->rb_display_link_user($user, $row, false);
-    }
-
-    /**
-     * Display function to show 'Reserved' for reserved spaces.
-     *
-     * @deprecated Since Totara 12.0
-     * @param string $user
-     * @param object $row
-     * @param bool $isexport
-     * @return string
-     */
-    function rb_display_link_user($user, $row, $isexport = false) {
-        debugging('rb_source_facetoface_signin::rb_display_link_user has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_user_link::display', DEBUG_DEVELOPER);
-        if ($row->id) {
-            return parent::rb_display_link_user($user, $row, $isexport);
-        }
-        return get_string('reserved', 'rb_source_facetoface_signin');
-    }
-
-    /**
-     * Display function to link the user icon.
-     *
-     * @deprecated Since Totara 12.0
-     * @param string $user
-     * @param object $row
-     * @param bool $isexport
-     * @return string
-     */
-    function rb_display_link_user_icon($user, $row, $isexport = false) {
-        debugging('rb_source_facetoface_signin::rb_display_link_user_icon has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_user_icon_link::display', DEBUG_DEVELOPER);
-        if ($row->id) {
-            return parent::rb_display_link_user_icon($user, $row, $isexport);
-        }
-        return get_string('reserved', 'rb_source_facetoface_signin');
-    }
-
-    /**
-     * Display function to show the user.
-     *
-     * @deprecated Since Totara 12.0
-     * @param string $user
-     * @param object $row
-     * @param bool $isexport
-     * @return string
-     */
-    function rb_display_user($user, $row, $isexport = false) {
-        debugging('rb_source_facetoface_signin::rb_display_user has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_user::display', DEBUG_DEVELOPER);
-        if (!empty($user)) {
-            return parent::rb_display_user($user, $row, $isexport);
-        }
-        return get_string('reserved', 'rb_source_facetoface_signin');
-    }
-
-    //
-    //
-    // Source specific filter display methods
-    //
-    //
 
     /**
      * Filter option for session status list.

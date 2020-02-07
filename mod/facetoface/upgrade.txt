@@ -140,6 +140,9 @@ Note that more recent update comes to the top.
 * form\event::new_user_roles_added() has been deprecated and will be removed in Totara 14
 
 --- Update in backend code ---
+* mod_facetoface\rb_sources\rb_facetoface_base_source::add_assets_fields_to_columns() moved to mod_facetoface\rb\traits\assets::add_assets_fields_to_columns()
+* mod_facetoface\rb_sources\rb_facetoface_base_source::add_assets_fields_to_filters() moved to mod_facetoface\rb\traits\assets::add_assets_fields_to_filters()
+* all deprecated seminar report builder methods are moved to mod_facetoface\rb\traits\deprecated_*.php files
 * seminar_event::get_normalcost() changed return type from int to string
 * seminar_event::set_normalcost() changed 1st parameter from int to string
 * seminar_event::get_discountcost() changed return type from int to string
