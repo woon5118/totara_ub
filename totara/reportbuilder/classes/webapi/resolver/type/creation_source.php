@@ -45,6 +45,8 @@ class creation_source implements \core\webapi\type_resolver {
                 return $object->templates;
             case 'sources':
                 return $object->sources;
+            case 'totalcount':
+                return $object->totalcount;
         }
 
         throw new \coding_exception('Unknown field', $field);

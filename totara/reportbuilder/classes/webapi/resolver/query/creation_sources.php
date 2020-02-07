@@ -103,10 +103,13 @@ class creation_sources implements \core\webapi\query_resolver {
         // Sort the sources.
         \core_collator::asort_objects_by_property($sources, 'sourcetitle', \core_collator::SORT_STRING);
 
+        $all = array_merge($templates, $sources);
+
         // Limit results.
-        $creationsources = array_slice(array_merge($templates, $sources), $start, $limit);
+        $creationsources = array_slice($all, $start, $limit);
 
         $data = new \stdClass();
+        $data->totalcount = count($all);
         $data->templates = [];
         $data->sources = [];
         foreach ($creationsources as $creationsource) {

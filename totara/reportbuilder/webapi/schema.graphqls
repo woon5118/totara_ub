@@ -41,6 +41,7 @@ Reportbuilder creation_source type
 type totara_reportbuilder_creation_source {
   templates: [totara_reportbuilder_template!]!
   sources: [totara_reportbuilder_source!]!
+  totalcount: String!
 }
 
 extend type Query {

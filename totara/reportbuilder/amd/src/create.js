@@ -318,7 +318,7 @@ define(['core/templates', 'core/webapi', 'core/flex_icon', 'core/config', 'core/
                     });
                 });
 
-                if (tiles.length === limit + that.currentIndex) {
+                if (tiles.length < data.totalcount) {
                     that.loadContainer.removeAttribute('data-tw-report-create-disabled');
                     that.currentIndex += limit;
                 } else {

@@ -23,5 +23,6 @@ query totara_reportbuilder_creation_sources(
       fullname
       label
     }
+    totalcount
   }
 }
