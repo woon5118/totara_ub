@@ -25,6 +25,8 @@ namespace block_totara_quicklinks\form;
 
 defined('MOODLE_INTERNAL') || die();
 
+use block_totara_quicklinks\form\validator\is_valid_url;
+
 /**
  * Add quick link.
  */
@@ -36,12 +38,14 @@ final class add extends \totara_form\form {
      */
     public function definition() {
         $this->model->add(new \totara_form\form\element\hidden('blockinstanceid', PARAM_INT));
+
         $linktitle = new \totara_form\form\element\text('linktitle', get_string('linktitle', 'block_totara_quicklinks'), PARAM_TEXT);
         $linktitle->set_attributes(array('required'=> 1));
         $this->model->add($linktitle);
-        $linkurl = new \totara_form\form\element\url('linkurl', get_string('url', 'block_totara_quicklinks'));
-        $linkurl->set_attributes(['required' => true, 'size' => 60]);
-        $this->model->add($linkurl);
+
+        $linkurlgroup = $this->model->add(new \totara_form\form\element\text('linkurl', get_string('url', 'block_totara_quicklinks'), PARAM_URL));
+        $linkurlgroup->set_attributes(['required' => true, 'size' => 60]);
+        $linkurlgroup->add_validator(new is_valid_url());
 
         $this->model->add_action_buttons(false, get_string('addlink', 'block_totara_quicklinks'));
     }

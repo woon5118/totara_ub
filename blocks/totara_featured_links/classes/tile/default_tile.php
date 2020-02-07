@@ -249,33 +249,16 @@ class default_tile extends base{
             $this->data->background_img = false;
         }
 
-        /* Checks if the url starts with the wwwroot.
-         * If it does it strips the wwwroot so it can be added back dynamically
-         * Also checks if the url doesn't start with http:// https:// or a / then it adds https://
-         * to stop people from using other protocols like FTP ect.
-        */
-        if (\core_text::substr($data->url, 0, 7) != 'http://'
-            && \core_text::substr($data->url, 0, 8) != 'https://'
-            && \core_text::substr($data->url, 0, 1) != '/') {
-            $data->url = 'https://'.$data->url;
+        // Form validation should handle the URL.
+        if (isset($data->url) && !empty($data->url)) {
+            $data->url = clean_param($data->url, PARAM_URL);
+            $this->data->url = $data->url;
+        } else {
+            $this->data->url = '';
         }
-        $wwwroot_chopped = preg_replace('/^(https:\/\/)|(http:\/\/)/', '', $CFG->wwwroot);
-        if (\core_text::substr($data->url, 0, strlen($wwwroot_chopped)) == $wwwroot_chopped) {
-            $data->url = \core_text::substr($data->url, strlen($wwwroot_chopped));
-        }
-        if (\core_text::substr($data->url, 0, strlen($CFG->wwwroot)) == $CFG->wwwroot) {
-            $data->url = \core_text::substr($data->url, strlen($CFG->wwwroot));
-        }
-        if ($data->url == '') {
-            $data->url = '/';
-        }
-
         // Saves the rest of the data for the tile.
         if (isset($data->alt_text)) {
             $this->data->alt_text = $data->alt_text;
-        }
-        if (isset($data->url)) {
-            $this->data->url = $data->url;
         }
         if (isset($data->heading)) {
             $this->data->heading = $data->heading;

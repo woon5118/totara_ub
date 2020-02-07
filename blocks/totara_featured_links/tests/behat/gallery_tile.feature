@@ -110,17 +110,29 @@ Feature: Tests the behaviour of the gallery tile
     And I click on "Save changes" "button"
     And I click on "Add Tile" "link"
     And I set the following fields to these values:
-      | URL | https://www.example.com |
-      | Description | Tile two |
+      | URL         | /course/view.php?id=1 |
+      | Description | Tile two              |
+    And I click on "Save changes" "button"
+    And I click on "Add Tile" "link"
+    And I set the following fields to these values:
+      | URL         | course/view.php?id=2 |
+      | Description | Tile three           |
+    And I click on "Save changes" "button"
+    And I should see "Invalid URL address format"
+    And I set the following fields to these values:
+      | URL         | /course/view.php?id=2 |
     And I click on "Save changes" "button"
     And I follow "Finished editing"
     Then I should see "Tile one" in the ".slick-current" "css_element"
     And I should not see "Tile two" in the ".slick-current" "css_element"
+    And I should not see "Tile three" in the ".slick-current" "css_element"
     When I wait "5" seconds
     Then I should see "Tile two" in the ".slick-current" "css_element"
     And I should not see "Tile one" in the ".slick-current" "css_element"
+    And I should not see "Tile three" in the ".slick-current" "css_element"
     When I wait "5" seconds
-    Then I should see "Tile one" in the ".slick-current" "css_element"
+    Then I should see "Tile three" in the ".slick-current" "css_element"
+    And I should not see "Tile one" in the ".slick-current" "css_element"
     And I should not see "Tile two" in the ".slick-current" "css_element"
 
   Scenario: Check that disabling repeat stops looping

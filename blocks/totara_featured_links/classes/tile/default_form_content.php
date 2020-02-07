@@ -29,6 +29,7 @@ use block_totara_featured_links\form\element\iconpicker;
 use block_totara_featured_links\form\element\colorpicker;
 use block_totara_featured_links\form\validator\alt_text_required;
 use block_totara_featured_links\form\validator\is_color;
+use block_totara_featured_links\form\validator\is_valid_url;
 use totara_form\form\element\checkbox;
 use totara_form\form\element\filemanager;
 use totara_form\form\element\radios;
@@ -53,9 +54,11 @@ class default_form_content extends base_form_content{
      * @return void
      */
     public function specific_definition(group $group) {
-        $url = $group->add(new url('url', get_string('url_title', 'block_totara_featured_links')));
+
+        $urlgroup = $this->model->add(new text('url', get_string('url_title', 'block_totara_featured_links'), PARAM_URL));
         // Help button is not necessary, this is a regular URL element now.
-        $url->set_attributes(['required' => true, 'size' => 60]);
+        $urlgroup->set_attributes(['required' => false, 'size' => 60]);
+        $urlgroup->add_validator(new is_valid_url());
 
         $group->add(new checkbox('target', get_string('link_target_label', 'block_totara_featured_links'), '_blank', '_self'));
 

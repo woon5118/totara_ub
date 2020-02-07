@@ -39,12 +39,30 @@ Feature: Test Quick Links block
     And I set the "linkurl" Totara form field to "https://www.totaralms.com/"
     And I click on "Add link" "button"
     And I should see "Successfully added new quicklink"
+    # Refresh the page to remove "Successfully added new quicklink" message
+    And I click on "Manage links" "link"
+    And I set the "linktitle" Totara form field to "Seminar 1"
+    And I set the "linkurl" Totara form field to "/mod/facetoface/view.php?id=1"
+    And I click on "Add link" "button"
+    And I should see "Successfully added new quicklink"
+    And "//table[@id='quicklinks']/tbody/tr/td[contains(text(), 'Seminar 1')]" "xpath_element" should exist
+    And "//table[@id='quicklinks']/tbody/tr/td/a[contains(text(), '/mod/facetoface/view.php?id=1')]" "xpath_element" should exist
+    # Refresh the page to remove "Successfully added new quicklink" message
+    And I click on "Manage links" "link"
+    And I set the "linktitle" Totara form field to "Seminar 2"
+    And I set the "linkurl" Totara form field to "http://example.com/mod/facetoface/view.php?id=2"
+    And I click on "Add link" "button"
+    And I should see "Successfully added new quicklink"
+    And "//table[@id='quicklinks']/tbody/tr/td[contains(text(), 'Seminar 2')]" "xpath_element" should exist
+    And "//table[@id='quicklinks']/tbody/tr/td/a[contains(text(), 'http://example.com/mod/facetoface/view.php?id=2')]" "xpath_element" should exist
     And I click on "Dashboard" in the totara menu
     Then I should see "My Links"
     And I should see "Totara" in the "My Links" "block"
     And I should see "Home" in the "My Links" "block"
     And I should see "Reports" in the "My Links" "block"
     And I should see "Courses" in the "My Links" "block"
+    And I should see "Seminar 1" in the "My Links" "block"
+    And I should see "Seminar 2" in the "My Links" "block"
 
     # Check the learner can remove links.
     When I open the "My Links" blocks action menu

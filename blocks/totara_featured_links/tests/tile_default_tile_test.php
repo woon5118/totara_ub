@@ -84,7 +84,7 @@ class block_totara_featured_links_tile_default_tile_testcase extends test_helper
         $data = new \stdClass();
         $data->type = 'block_totara_featured_links-default_tile';
         $data->sortorder = 4;
-        $data->url = 'www.example.com';
+        $data->url = 'https://www.example.com';
         $data->heading = 'some heading';
         $data->textbody = 'some textbody';
         $data->background_color = '#123abc';
@@ -103,7 +103,7 @@ class block_totara_featured_links_tile_default_tile_testcase extends test_helper
         $data->url = $CFG->wwwroot . '/';
         $tile1->save_content($data);
         $this->refresh_tiles($tile1);
-        $this->assertSame('/', $this->get_protected_property($tile1, 'data')->url);
+        $this->assertSame('https://www.example.com/moodle/', $this->get_protected_property($tile1, 'data')->url);
         // Check urls that are to be left alone are.
         $data->url = '/www.example.com';
         $tile1->save_content($data);
@@ -115,15 +115,15 @@ class block_totara_featured_links_tile_default_tile_testcase extends test_helper
         $this->refresh_tiles($tile1);
         $this->assertSame('https://www.example.com', $this->get_protected_property($tile1, 'data')->url);
         // Tests using part of the wwwroot.
-        $data->url = preg_replace('/^(https:\/\/)|(http:\/\/)/', '', $CFG->wwwroot) . '/index.php';
+        $data->url .= '/index.php';
         $tile1->save_content($data);
         $this->refresh_tiles($tile1);
-        $this->assertSame('/index.php', $this->get_protected_property($tile1, 'data')->url);
-        // Tests just the wwwroot.
-        $data->url = $CFG->wwwroot;
+        $this->assertSame('https://www.example.com/index.php', $this->get_protected_property($tile1, 'data')->url);
+        // Tests catalogue-style url, like https://www.example.com/totara/catalog/index.php?catalog_learning_type_panel[]=certification
+        $data->url = 'https://www.example.com/totara/catalog/index.php?catalog_learning_type_panel[]=certification';
         $tile1->save_content($data);
         $this->refresh_tiles($tile1);
-        $this->assertSame('/', $this->get_protected_property($tile1, 'data')->url);
+        $this->assertSame('https://www.example.com/totara/catalog/index.php?catalog_learning_type_panel%5B%5D=certification', $this->get_protected_property($tile1, 'data')->url);
     }
 
     /**

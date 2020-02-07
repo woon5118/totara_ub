@@ -938,10 +938,6 @@ abstract class base {
         $this->audiences = explode(',', $this->audiences_raw);
         $this->filter_data_values();
         $this->url_mod = isset($this->data->url) ? $this->data->url : '';
-        if (substr($this->url_mod, 0, 1) === '/') {
-            // NOTE: do not use moodle_url() here, this is a random URL that might not be supported there.
-            $this->url_mod = $CFG->wwwroot . $this->url_mod;
-        }
         $this->url_mod = clean_param($this->url_mod, PARAM_URL);
 
         $options = ['context' => \context_block::instance($this->blockid)];
@@ -979,12 +975,6 @@ abstract class base {
         }
         foreach ($this->data as $key => $value) {
             if (in_array($key, $this->used_fields)) {
-                if ($key === 'url') {
-                    // Note: URL starting with '/' is a magic value which means this site.
-                    if ($value and substr($value, 0, 1) === '/') {
-                        $value = $CFG->wwwroot . $value;
-                    }
-                }
                 $this->data_filtered->$key = $value;
             }
         }
