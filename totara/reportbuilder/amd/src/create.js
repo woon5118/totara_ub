@@ -260,10 +260,6 @@ define(['core/templates', 'core/webapi', 'core/flex_icon', 'core/config', 'core/
          * @param {Promise} loading A loading promise
          */
         loadRecords: function(limit, loading) {
-            if (this.currentIndex === -1) {
-                return;
-            }
-
             var that = this;
             var operation = 'totara_reportbuilder_creation_sources';
             var tiles = this.tiles;
@@ -285,7 +281,6 @@ define(['core/templates', 'core/webapi', 'core/flex_icon', 'core/config', 'core/
                 var strings = results[1];
                 var graphs = results[2];
                 var data = res[operation];
-                var resultsString = str.get_string('xrecords', 'totara_reportbuilder', (that.currentIndex + data.templates.length + data.sources.length));
 
                 // insert templates first
                 data.templates.forEach(function(result) {
@@ -324,10 +319,11 @@ define(['core/templates', 'core/webapi', 'core/flex_icon', 'core/config', 'core/
                 });
 
                 if (tiles.length === limit + that.currentIndex) {
+                    that.loadContainer.removeAttribute('data-tw-report-create-disabled');
                     that.currentIndex += limit;
                 } else {
                     // We're out of records, so mark that we shouldn't load anymore
-                    that.currentIndex = -1;
+                    that.currentIndex = 0;
                     that.loadContainer.setAttribute('data-tw-report-create-disabled', true);
                 }
 
@@ -335,6 +331,7 @@ define(['core/templates', 'core/webapi', 'core/flex_icon', 'core/config', 'core/
                     tiles: tiles,
                     single_column: false
                 });
+                var resultsString = str.get_string('xrecords', 'totara_reportbuilder', tiles.length);
 
                 return Promise.all([template, resultsString, loading]);
             }).then(function(html) {
@@ -367,8 +364,6 @@ define(['core/templates', 'core/webapi', 'core/flex_icon', 'core/config', 'core/
             // We've changed our filters, so we need to reset a bunch of things and reload the items
             this.currentIndex = 0;
             this.tiles = [];
-
-            this.loadContainer.removeAttribute('data-tw-report-create-disabled');
 
             this.loadRecords(PAGE_SIZE, loading);
         },
