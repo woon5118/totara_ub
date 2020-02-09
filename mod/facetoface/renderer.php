@@ -1533,8 +1533,9 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             $trainer_names = [];
             $rolename = $rolename->localname;
             foreach ($trainers[$role] as $trainer) {
-                $trainer_url = new moodle_url('/user/view.php', ['id' => $trainer->id]);
-                $trainer_names[] = html_writer::link($trainer_url, fullname($trainer));
+                $user = fullname($trainer);
+                $trainer_url = user_get_profile_url($trainer->id);
+                $trainer_names[] = $trainer_url ? html_writer::link($trainer_url, $user) : html_writer::span($user);
             }
             if (!empty($trainer_names)) {
                 $section->add_detail_unsafe($rolename, implode(', ', $trainer_names));

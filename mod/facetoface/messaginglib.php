@@ -115,7 +115,7 @@ function facetoface_generate_ical($f2f, $session, $method, $user, $dates = null,
     });
 
     // Get user object if only id is given.
-    $user = is_object($user) ? $user : $DB->get_record('user', ['id' => $user]);
+    $user = is_object($user) ? $user : \core_user::get_user($user);
     $rooms = \mod_facetoface\room_list::get_event_rooms($session->id);
 
     // If generating event for a single date, then use REQUEST, otherwise use PUBLISH.

@@ -112,7 +112,7 @@ class notice_sender {
 
         $fromuser = $signup->get_fromuser();
         if (empty($fromuser) && !empty($signup->get_managerid())) {
-            $fromuser = $DB->get_record('user', ['id' => $signup->get_managerid()]);
+            $fromuser = \core_user::get_user($signup->get_managerid());
         }
 
         return static::send($signup, $params, $notificationtype, MDL_F2F_INVITE, $fromuser);
@@ -136,7 +136,7 @@ class notice_sender {
 
         $fromuser = $signup->get_fromuser();
         if (empty($fromuser) && !empty($signup->get_managerid())) {
-            $fromuser = $DB->get_record('user', ['id' => $signup->get_managerid()]);
+            $fromuser = \core_user::get_user($signup->get_managerid());
         }
 
         return static::send($signup, $params, $notificationtype, MDL_F2F_INVITE, $fromuser);
@@ -439,7 +439,7 @@ class notice_sender {
             return false;
         }
 
-        $recipient = $DB->get_record('user', ['id' => $recipientid]);
+        $recipient = \core_user::get_user($recipientid);
         if (!$recipient) {
             return 'userdoesnotexist';
         }
@@ -535,7 +535,7 @@ class notice_sender {
             return false;
         }
 
-        $user = $DB->get_record('user', ['id' => $userid]);
+        $user = \core_user::get_user($userid);
         if (!$user) {
             return 'userdoesnotexist';
         }

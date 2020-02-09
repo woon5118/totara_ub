@@ -110,11 +110,11 @@ final class session_content extends content_generator {
 
             $data[] = $this->create_checkbox($attendee);
 
-            $url = new moodle_url('/user/view.php', ['id' => $attendee->id]);
-            if ($courseid != SITEID && is_enrolled($context, $attendee->id)) {
+            $url = user_get_profile_url($attendee->id);
+            if ($courseid != SITEID && is_enrolled($context, $attendee->id) && $url) {
                 $url->param('course', $courseid);
             }
-            $data[] = html_writer::link($url, fullname($attendee));
+            $data[] = $url ? html_writer::link($url, fullname($attendee)) : html_writer::span(fullname($attendee));
 
             // Attendance's status of the single attendee
             $data[] = $this->create_attendance_status($attendee);

@@ -125,7 +125,7 @@ class event_handler {
 
         // Get all the facetofaces associated with the course.
         $f2fs = $DB->get_fieldset_select('facetoface', 'id', 'course = :cid', array('cid' => $cid));
-        $user = $DB->get_record('user', ['id' => $uid]);
+        $user = \core_user::get_user($uid);
 
         if (!empty($f2fs)) {
             // Get all the sessions for the facetofaces.

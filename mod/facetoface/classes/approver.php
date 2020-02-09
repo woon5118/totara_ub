@@ -123,7 +123,7 @@ final class approver {
         if (!empty($selected)) {
             $activityapprovers = explode(',', $selected);
             foreach ($activityapprovers as $actapprover) {
-                $item = $DB->get_record('user', array('id' => $actapprover));
+                $item = \core_user::get_user($actapprover);
                 $item->fullname = fullname($item);
                 $select_items[$item->id] = $item;
             }
@@ -178,7 +178,7 @@ final class approver {
             // will not be picked up by the SQL statement above - simply
             // because no approval record need to be created when they
             // were waitlisted or booked. Hence the check here.
-            $approver = isset($apprecord->createdby) ? fullname($DB->get_record('user', array('id' => $apprecord->createdby))) : '';
+            $approver = isset($apprecord->createdby) ? fullname(\core_user::get_user($apprecord->createdby)) : '';
             $approval_time = isset($apprecord->timecreated) ? userdate($apprecord->timecreated) : '';
         }
         return [$approver, $approval_time];

@@ -36,7 +36,7 @@ class attendee_note extends \moodleform {
         $userid = $signup->get_userid();
         $sessionid = $signup->get_sessionid();
 
-        $user = \mod_facetoface\signup_helper::get_user_details($userid);
+        $user = \core_user::get_user($userid);
         $userfullname = fullname($user);
         $mform->addElement('header', 'usernoteheader', get_string('usernoteheading', 'facetoface', $userfullname));
 

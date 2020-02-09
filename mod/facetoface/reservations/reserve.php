@@ -89,7 +89,7 @@ if (optional_param('cancel', false, PARAM_BOOL)) {
 if (!$managerid || $managerid == $USER->id) { // Can only reserve for other users, not allocate.
     $manager = $USER;
 } else {
-    $manager = $DB->get_record('user', array('id' => $managerid), '*', MUST_EXIST);
+    $manager = \core_user::get_user($managerid, '*', MUST_EXIST);
 }
 $reserveinfo = reservations::can_reserve_or_allocate($seminar, array($seminarevent->to_record()), $context, $manager->id);
 if ($reserveinfo['reserve'] === false) { // Current user does not have permission to do the requested action for themselves.

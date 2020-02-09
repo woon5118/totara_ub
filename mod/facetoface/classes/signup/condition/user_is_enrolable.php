@@ -41,7 +41,7 @@ class user_is_enrolable extends condition {
             return false;
         }
 
-        $user = $DB->get_record('user', ['id' => $this->signup->get_userid()]);
+        $user = \core_user::get_user($this->signup->get_userid());
         // $user->suspended is allowed with a reason sample: "A manager may be allocating reserved space to a team
         // member who is on maternity leave, who will not be suspended anymore by the time the event starts."
         if ($user->deleted) {

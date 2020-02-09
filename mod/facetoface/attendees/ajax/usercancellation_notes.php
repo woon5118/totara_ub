@@ -64,7 +64,7 @@ $customfields = customfield_get_data($cancellationnote, 'facetoface_cancellation
 
 // Prepare output.
 $usernamefields = get_all_user_name_fields(true);
-$user = $DB->get_record('user', array('id' => $userid), "{$usernamefields}");
+$user = \core_user::get_user($userid, $usernamefields);
 $output = get_string('usercancellationnoteheading', 'facetoface', fullname($user));
 $output .= html_writer::empty_tag('hr');
 if (!empty($customfields)) {

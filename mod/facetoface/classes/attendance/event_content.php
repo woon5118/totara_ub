@@ -127,12 +127,11 @@ final class event_content extends content_generator {
 
             $this->reset_attendee_statuscode($attendee);
             $data[] = $this->create_checkbox($attendee);
-            $url = new moodle_url('/user/view.php', ['id' => $attendee->id]);
-            if ($courseid != SITEID && is_enrolled($context, $attendee->id)) {
+            $url = user_get_profile_url($attendee->id);
+            if ($courseid != SITEID && is_enrolled($context, $attendee->id) && $url) {
                 $url->param('course', $courseid);
             }
-            $data[] = html_writer::link($url, fullname($attendee));
-
+            $data[] = $url ? html_writer::link($url, fullname($attendee)) : html_writer::span(fullname($attendee));
             if ($isessionattendance) {
                 $stat = isset($stats[$attendee->id]) ? $stats[$attendee->id] : [];
                 // If seminar enabled session tracking, which means that our editor is able to

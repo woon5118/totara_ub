@@ -188,8 +188,11 @@ $params = ['s' => $seminarevent->get_id(), 'sesskey' => sesskey(), 'return' => $
 foreach ($requests as $attendee) {
     $attendeefullname = format_string(fullname($attendee));
     $data = array();
-    $attendee_link = new moodle_url('/user/view.php', array('id' => $attendee->id, 'course' => $seminar->get_course()));
-    $data[] = html_writer::link($attendee_link, $attendeefullname);
+    $attendee_link = user_get_profile_url($attendee->id);
+    if ($attendee_link) {
+        $attendee_link->param('course', $seminar->get_course());
+    }
+    $data[] = $attendee_link ? html_writer::link($attendee_link, $attendeefullname) : html_writer::span($attendeefullname);
     $data[] = userdate($attendee->timecreated, get_string('strftimedatetime'));
 
     // Get signup note.

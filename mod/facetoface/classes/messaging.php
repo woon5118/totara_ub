@@ -74,7 +74,7 @@ final class messaging {
         });
 
         // Get user object if only id is given.
-        $user = is_object($user) ? $user : $DB->get_record('user', ['id' => $user]);
+        $user = is_object($user) ? $user : \core_user::get_user($user);
         $roomlist = [];
         // Generating for updated dates.
         foreach ($dates as $date) {
@@ -267,7 +267,7 @@ final class messaging {
 
     /**
      * Generates a timestamp for Ical
-     * 
+     *
      * @param int $timestamp
      * @return string|false a formatted date string. If a non-numeric value is used for timestamp, false is returned
      */
@@ -279,7 +279,7 @@ final class messaging {
     /**
      * Escapes data of the text datatype in ICAL documents.
      * See RFC2445 or http://www.kanzaki.com/docs/ical/text.html or a more readable definition
-     * 
+     *
      * @param string $text
      * @param bool $converthtml
      * @return string

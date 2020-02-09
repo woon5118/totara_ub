@@ -557,7 +557,7 @@ final class signup_helper {
         if ($managerselect && $signup->has_manager()) {
             // Check if they selected a manager for their signup.
             $managerid = $signup->get_managerid();
-            $managers[] = $DB->get_record('user', ['id' => $managerid]);
+            $managers[] = \core_user::get_user($managerid);
         } else if ($selectjobassignmentonsignupglobal && $signup->has_jobassignment()) {
             // The job assignment could not be found here, because the system admin might had deleted
             // the job assignment record, but did not update the seminar signup record here.
@@ -569,7 +569,7 @@ final class signup_helper {
             $ja = job_assignment::get_with_id($jobasssignmentid, false);
 
             if (null !== $ja && $ja->managerid) {
-                $managers[] = $DB->get_record('user', ['id' => $ja->managerid]);
+                $managers[] = \core_user::get_user($ja->managerid);
             }
         } else {
             $userid = $signup->get_userid();
@@ -594,9 +594,7 @@ final class signup_helper {
      * @return stdClass
      */
     public static function get_user_details(int $userid): \stdClass {
-        global $DB;
-
-        return $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
+        return \core_user::get_user($userid, '*', MUST_EXIST);
     }
 
     /**

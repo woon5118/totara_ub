@@ -77,7 +77,7 @@ $confirmurl = new moodle_url('/mod/facetoface/reservations/delete.php', [
 ]);
 $cancelurl  = new moodle_url('/mod/facetoface/reservations/manage.php', ['s' => $sid, 'backtoallsessions' => $backtoallsessions, 'backtoeventinfo' => $backtoeventinfo]);
 
-$manager = $DB->get_record('user', ['id' => $managerid]);
+$manager = \core_user::get_user($managerid);
 $managername = fullname($manager);
 
 echo $OUTPUT->confirm(get_string('deletereservationconfirm', 'mod_facetoface', $managername), $confirmurl, $cancelurl);

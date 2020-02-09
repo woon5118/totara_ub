@@ -51,7 +51,7 @@ $jobassignments = \totara_job\job_assignment::get_all($userid);
 $usernamefields = get_all_user_name_fields(true, 'u');
 
 $params = array('userid' => $userid);
-$user = $DB->get_record('user', array('id' => $userid));
+$user = \core_user::get_user($userid);
 
 $list = new \mod_facetoface\bulk_list($listid);
 $userlist = $list->get_user_ids();

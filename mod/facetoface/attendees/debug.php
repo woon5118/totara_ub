@@ -37,7 +37,7 @@ $eventid = required_param('event', PARAM_INT);
 
 // Check that there is a user in the database matching the userid.
 // Note: There is no need to check if user is deleted etc, the state debug will do that.
-if (!$user = $DB->get_record('user', ['id' => $userid])) {
+if (!$user = \core_user::get_user($userid)) {
     throw new Exception("Invalid userid");
 }
 

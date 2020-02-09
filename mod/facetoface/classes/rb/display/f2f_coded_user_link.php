@@ -72,8 +72,13 @@ class f2f_coded_user_link extends base {
                 break;
             }
 
+            $url = user_get_profile_url($id);
             $name = trim(\core_text::substr($idname, $idendpos));
-            $result[] = ($isexport) ? $name : \html_writer::link(new \moodle_url('/user/view.php', array('id' => $id)), $name);
+            if ($isexport) {
+                $result[] = $name;
+            } else {
+                $result[] = $url ? html_writer::link($url, $name) : html_writer::span($name);
+            }
 
             // length(length(idname)) + length(' ') + length(idname) + length(', ').
             $leftname = \core_text::substr($leftname, \core_text::strlen((string)$len) + 1 + $len + 2);
