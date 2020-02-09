@@ -24,6 +24,8 @@
 
 $string['pluginname'] = 'Totara criteria';
 
+$string['achieved_n_out_of_n'] = '{$a->current} / {$a->target}';
+$string['achieve_proficiency_in_linked_courses'] = 'Achieve proficiency in linked courses';
 $string['addroles'] = 'Add roles';
 $string['aggregate_all'] = 'ALL';
 $string['aggregate_any'] = 'Complete any {$a->x}';
@@ -32,8 +34,10 @@ $string['approvalrequired'] = 'Approval required';
 $string['approve_none'] = 'Approval: None';
 $string['approve_list'] = 'Approval: {$a}';
 $string['cancel'] = 'Cancel';
+$string['complete'] = 'Complete';
 $string['completeall'] = 'Complete all';
 $string['completeany'] = 'Complete';
+$string['completion'] = 'Completion';
 $string['course_link'] = 'Go to course';
 $string['courses'] = 'Courses';
 $string['courses_required'] = '{$a} required only';
@@ -46,6 +50,9 @@ $string['hidden_course'] = 'This course is not available to view';
 $string['managetypes'] = 'Manage criteria types';
 $string['no'] = 'No';
 $string['no_courses'] = 'There are no courses available to view';
+$string['not_available'] = 'Not available';
+$string['not_complete'] = 'Not complete';
+$string['progress'] = 'Progress';
 $string['selectroles'] = 'Select roles';
 $string['type'] = 'Type';
 $string['unknowntype'] = 'Unknown criteria type {$a}';

@@ -105,8 +105,8 @@
 </template>
 
 <script>
-import CreateUserAssignmentMutation from '../../../../../competency/webapi/ajax/create_user_assignments.graphql';
-import AchievementsQuery from '../../webapi/ajax/achievements.graphql';
+import CreateUserAssignmentMutation from '../../../../../../competency/webapi/ajax/create_user_assignments.graphql';
+import AchievementsQuery from '../../../webapi/ajax/achievements.graphql';
 import HeaderCell from 'totara_core/components/datatable/HeaderCell';
 import Cell from 'totara_core/components/datatable/Cell';
 import CheckSuccess from 'totara_core/components/icons/common/CheckSuccess';

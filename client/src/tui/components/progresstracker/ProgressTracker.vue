@@ -66,8 +66,8 @@ export default {
 
   props: {
     gap: String,
-    currentId: Number,
-    targetId: Number,
+    currentId: [Number, String],
+    targetId: [Number, String],
     items: {
       type: Array,
       required: true,

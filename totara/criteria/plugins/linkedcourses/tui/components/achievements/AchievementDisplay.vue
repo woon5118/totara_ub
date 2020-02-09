@@ -17,7 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
-  @package criteria_coursecompletion
+  @package criteria_linkedcourses
 -->
 
 <template>
@@ -25,8 +25,8 @@
 </template>
 
 <script>
-import AchievementsQuery from '../../webapi/ajax/achievements.graphql';
-import CourseAchievementDisplay from 'totara_criteria/components/CourseAchievementDisplay';
+import AchievementsQuery from '../../../webapi/ajax/achievements.graphql';
+import CourseAchievementDisplay from 'totara_criteria/components/achievements/CourseAchievementDisplay';
 
 export default {
   components: { CourseAchievementDisplay },
@@ -59,7 +59,7 @@ export default {
           user_id: this.userId,
         };
       },
-      update({ criteria_coursecompletion_achievements: achievements }) {
+      update({ criteria_linkedcourses_achievements: achievements }) {
         this.$emit('loaded');
         return achievements;
       },

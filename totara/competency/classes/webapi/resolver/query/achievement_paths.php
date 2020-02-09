@@ -72,7 +72,8 @@ class achievement_paths implements query_resolver {
             if ($pathway_classname::CLASSIFICATION === pathway::PATHWAY_SINGLE_VALUE) {
                 $paths[$single_value_key] = [
                     'class' => $classification_enums[pathway::PATHWAY_SINGLE_VALUE],
-                    'type' => null
+                    'type' => null,
+                    'name' => 'criteria'
                 ];
             } else {
                 $order_key = array_search($pathway_type, $order);
@@ -82,7 +83,8 @@ class achievement_paths implements query_resolver {
                 }
                 $paths[$order_key] = [
                     'class' => $classification_enums[$pathway_classname::CLASSIFICATION],
-                    'type' => $pathway_type
+                    'type' => $pathway_type,
+                    'name' => $pathway_type
                 ];
             }
         }

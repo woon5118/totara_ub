@@ -75,6 +75,7 @@ Competency profile details page related types and queries
 type totara_competency_achievement_path {
   class: totara_competency_pathway_classification! # SINGLE, MLULTI
   type: String # manual, learning_plan, null
+  name: String! # human readable name for the path
 }
 
 """

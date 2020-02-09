@@ -94,7 +94,7 @@
 <script>
 import AchievementDisplayHeader from 'totara_competency/components/details/AchievementDisplayHeader';
 
-import RoleRatingsQuery from '../../webapi/ajax/role_ratings.graphql';
+import RoleRatingsQuery from '../../../webapi/ajax/role_ratings.graphql';
 
 export default {
   components: { AchievementDisplayHeader },

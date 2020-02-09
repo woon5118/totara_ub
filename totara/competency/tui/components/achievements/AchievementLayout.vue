@@ -1,7 +1,7 @@
 <!--
   This file is part of Totara Learn
 
-  Copyright (C) 2019 onwards Totara Learning Solutions LTD
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -16,49 +16,42 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
-  @package criteria_onactivate
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+  @package totara_competency
 -->
 
 <template>
-  <div>
-    <h4>{{ $str('achievement_display', 'criteria_onactivate') }}</h4>
-  </div>
+  <Grid
+    class="tui-achievementLayout"
+    :class="{ 'tui-achievementLayout--borderless': noBorders }"
+    :stack-at="750"
+  >
+    <GridItem :units="2">
+      <div class="tui-achievementLayout__left">
+        <slot name="left" />
+      </div>
+    </GridItem>
+    <GridItem :units="10">
+      <slot name="right" />
+    </GridItem>
+  </Grid>
 </template>
 
 <script>
+// Components
+import Grid from 'totara_core/components/grid/Grid';
+import GridItem from 'totara_core/components/grid/GridItem';
+
 export default {
+  components: {
+    Grid,
+    GridItem,
+  },
+
   props: {
-    instanceId: {
-      required: true,
-      type: Number,
-    },
-    userId: {
-      required: true,
-      type: Number,
-    },
-    assignmentId: {
-      required: true,
-      type: Number,
+    noBorders: {
+      type: Boolean,
     },
   },
-
-  data: function() {
-    return {};
-  },
-
-  mounted() {
-    this.$emit('loaded');
-  },
-
-  methods: {},
 };
 </script>
-
-<lang-strings>
-{
-  "criteria_onactivate": [
-    "achievement_display"
-  ]
-}
-</lang-strings>

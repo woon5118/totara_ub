@@ -1,7 +1,7 @@
 <!--
   This file is part of Totara Learn
 
-  Copyright (C) 2019 onwards Totara Learning Solutions LTD
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -17,43 +17,62 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
   @package pathway_criteria_group
 -->
 
 <template>
-  <div class="tui-pathwayCriteriaGroup-achievement__group">
-    <div v-for="(component, id) in achievements" :key="id">
-      <div class="tui-pathwayCriteriaGroup-achievement__group__criteria">
+  <div class="tui-pathwayCriteriaGroupAchievement">
+    <template v-for="(component, id) in achievements">
+      <!-- Criteria group item -->
+      <div :key="id" class="tui-pathwayCriteriaGroupAchievement__item">
         <component
           :is="component.component"
           v-bind="component.props"
           @loaded="itemLoaded"
         />
       </div>
-      <Divider
+
+      <!-- And seperator -->
+      <div
         v-if="!isLastItem(id, achievements)"
-        :label="$str('and', 'totara_competency')"
-      />
-    </div>
+        :key="id + 'andseperator'"
+        class="tui-pathwayCriteriaGroupAchievement__seperator"
+      >
+        <AchievementLayout :no-borders="true">
+          <template v-slot:left>
+            <AndBox />
+          </template>
+        </AchievementLayout>
+      </div>
+    </template>
   </div>
 </template>
 
 <script>
-import CriteriaGroupAchievementsQuery from '../../webapi/ajax/achievements.graphql';
-import Divider from 'totara_competency/components/common/Divider';
+// Components
+import AchievementLayout from 'totara_competency/components/achievements/AchievementLayout';
+import AndBox from 'totara_core/components/decor/AndBox';
+
+// GraphQL
+import CriteriaGroupAchievementsQuery from 'pathway_criteria_group/graphql/achievements';
 
 export default {
-  components: { Divider },
+  components: {
+    AchievementLayout,
+    AndBox,
+  },
+
   props: {
+    assignmentId: {
+      required: true,
+      type: Number,
+    },
     instanceId: {
       required: true,
       type: Number,
     },
     userId: {
-      required: true,
-      type: Number,
-    },
-    assignmentId: {
       required: true,
       type: Number,
     },
@@ -64,21 +83,6 @@ export default {
       achievements: [],
       itemsLoaded: 0,
     };
-  },
-
-  computed: {
-    numberOfItems() {
-      return this.achievements.length;
-    },
-  },
-
-  watch: {
-    itemsLoaded: function(newLoading) {
-      // If all items are loaded
-      if (newLoading === this.numberOfItems) {
-        this.$emit('loaded');
-      }
-    },
   },
 
   apollo: {
@@ -93,14 +97,14 @@ export default {
       update({ pathway_criteria_group_achievements: achievements }) {
         let newAchievementComponents = [];
         achievements.forEach(achievement => {
-          let compPath = `criteria_${achievement.type}/components/AchievementDisplay`;
+          let compPath = `criteria_${achievement.type}/components/achievements/AchievementDisplay`;
 
           newAchievementComponents.push({
             component: tui.asyncComponent(compPath),
             props: {
-              userId: this.userId,
               assignmentId: this.assignmentId,
               instanceId: parseInt(achievement.instance_id),
+              userId: this.userId,
             },
           });
         });
@@ -115,40 +119,49 @@ export default {
     },
   },
 
+  computed: {
+    /**
+     * Calculates the number of items and returns the value
+     *
+     * @return {Int}
+     */
+    numberOfItems() {
+      return this.achievements.length;
+    },
+  },
+
+  watch: {
+    /**
+     * Check if all items are loaded, emit a 'loaded' event if they are
+     *
+     * @param {Object} loadedItems
+     */
+    itemsLoaded: function(loadedItems) {
+      if (loadedItems === this.numberOfItems) {
+        this.$emit('loaded');
+      }
+    },
+  },
+
   methods: {
+    /**
+     * Checks if current item is last and returns a bool
+     *
+     * @param {Int} id
+     * @param {Array} items
+     * @return {Boolean}
+     */
     isLastItem(id, items) {
       return id === items.length - 1;
     },
 
+    /**
+     * Increments number of items loaded
+     *
+     */
     itemLoaded() {
       this.itemsLoaded += 1;
     },
   },
 };
 </script>
-
-<style lang="scss">
-.tui-pathwayCriteriaGroup-achievement {
-  &__group {
-    margin: 1em;
-    padding: 1em;
-    border: 1px dashed grey;
-    border-radius: 6px;
-
-    &__criteria {
-      margin: 1em;
-      padding: 1em;
-      border: 1px solid black;
-      border-radius: 6px;
-    }
-  }
-}
-</style>
-
-<lang-strings>
-  {
-    "totara_competency" : [
-      "and"
-    ]
-  }
-</lang-strings>

@@ -17,30 +17,23 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
-  @package totara_competency
+  @package criteria_coursecompletion
 -->
 
 <template>
-  <div>
-    <component
-      :is="component"
-      :assignment-id="assignmentId"
-      :user-id="userId"
-      @loaded="isLoaded"
-    />
-  </div>
+  <CourseAchievementDisplay :achievements="achievements" />
 </template>
 
 <script>
+import AchievementsQuery from '../../../webapi/ajax/achievements.graphql';
+import CourseAchievementDisplay from 'totara_criteria/components/achievements/CourseAchievementDisplay';
+
 export default {
+  components: { CourseAchievementDisplay },
   props: {
-    assignmentId: {
+    instanceId: {
       required: true,
       type: Number,
-    },
-    type: {
-      required: true,
-      type: String,
     },
     userId: {
       required: true,
@@ -50,23 +43,29 @@ export default {
 
   data: function() {
     return {
-      component: null,
+      achievements: {
+        items: [],
+      },
     };
   },
 
-  mounted: function() {
-    let compPath = `pathway_${this.type}/components/achievements/AchievementDisplay`;
-    this.component = tui.asyncComponent(compPath);
-  },
-
-  methods: {
-    /**
-     * Emit a 'loaded' event once the component emits an event saying it's ready
-     *
-     */
-    isLoaded() {
-      this.$emit('loaded');
+  apollo: {
+    achievements: {
+      query: AchievementsQuery,
+      context: { batch: true },
+      variables() {
+        return {
+          instance_id: this.instanceId,
+          user_id: this.userId,
+        };
+      },
+      update({ criteria_coursecompletion_achievements: achievements }) {
+        this.$emit('loaded');
+        return achievements;
+      },
     },
   },
+
+  methods: {},
 };
 </script>

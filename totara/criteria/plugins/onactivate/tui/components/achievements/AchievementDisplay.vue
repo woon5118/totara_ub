@@ -17,20 +17,35 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
-  @package criteria_linkedcourses
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+  @package criteria_onactivate
 -->
 
 <template>
-  <CourseAchievementDisplay :achievements="achievements" />
+  <div class="tui-criteriaOnActiveAchievement">
+    <AchievementLayout>
+      <template v-slot:left>
+        <h5 class="tui-criteriaOnActiveAchievement__title">
+          {{ $str('achievement_display', 'criteria_onactivate') }}
+        </h5>
+      </template>
+    </AchievementLayout>
+  </div>
 </template>
 
 <script>
-import AchievementsQuery from '../../webapi/ajax/achievements.graphql';
-import CourseAchievementDisplay from 'totara_criteria/components/CourseAchievementDisplay';
+import AchievementLayout from 'totara_competency/components/achievements/AchievementLayout';
 
 export default {
-  components: { CourseAchievementDisplay },
+  components: {
+    AchievementLayout,
+  },
+
   props: {
+    assignmentId: {
+      required: true,
+      type: Number,
+    },
     instanceId: {
       required: true,
       type: Number,
@@ -41,31 +56,16 @@ export default {
     },
   },
 
-  data: function() {
-    return {
-      achievements: {
-        items: [],
-      },
-    };
+  mounted() {
+    this.$emit('loaded');
   },
-
-  apollo: {
-    achievements: {
-      query: AchievementsQuery,
-      context: { batch: true },
-      variables() {
-        return {
-          instance_id: this.instanceId,
-          user_id: this.userId,
-        };
-      },
-      update({ criteria_linkedcourses_achievements: achievements }) {
-        this.$emit('loaded');
-        return achievements;
-      },
-    },
-  },
-
-  methods: {},
 };
 </script>
+
+<lang-strings>
+{
+  "criteria_onactivate": [
+    "achievement_display"
+  ]
+}
+</lang-strings>
