@@ -158,7 +158,15 @@ final class room_helper {
         if (is_null($signup)) {
             $signup = signup::create($USER->id, $seminarevent);
         }
-        return self::has_time_come($session, $time) && (signup_helper::is_booked($signup, false) || self::seek_event_role($seminarevent));
+        return self::has_time_come($session, $time)
+            &&
+            (
+                signup_helper::is_booked($signup, false)
+                ||
+                self::has_join_room_capability($seminarevent)
+                ||
+                self::is_user_facilitator($session)
+            );
     }
 
     /**
@@ -180,36 +188,55 @@ final class room_helper {
     }
 
     /**
-     * Seek any event role/s in current seminar event which may assigned
+     * Check if a user has the joinanyvirtualroom capability
      * @param seminar_event $seminarevent
      * @return bool
      */
-    private static function seek_event_role(seminar_event $seminarevent): bool {
+    private static function has_join_room_capability(seminar_event $seminarevent): bool {
         global $USER;
-        // Private cache.
-        static $userlist = [];
-        if (isset($userlist[$seminarevent->get_id()][$USER->id])) {
-            return (bool)$userlist[$seminarevent->get_id()][$USER->id];
+        // Private cache;
+        static $usercapabilitylist = [];
+        if (isset($usercapabilitylist[$seminarevent->get_id()][$USER->id])) {
+            return $usercapabilitylist[$seminarevent->get_id()][$USER->id];
         }
 
-        $anyrole = false;
-        $context = context_course::instance($seminarevent->get_seminar()->get_course());
-        $userroles = get_user_roles($context, $USER->id, false);
-        $eventroles = trainer_helper::get_trainer_roles($context);
-        foreach ($eventroles as $i => $eventrole) {
-            foreach ($userroles as $j => $userrole) {
-                if ((int)$userrole->roleid == (int)$eventrole->id) {
-                    $anyrole = true;
-                    // Exit second foreach
-                    break 1;
-                }
-            }
-            if ($anyrole) {
-                // Exit first foreach
+        $seminar = $seminarevent->get_seminar();
+        $cm = $seminar->get_coursemodule();
+        $context = $seminar->get_contextmodule($cm->id);
+
+        $usercapabilitylist[$seminarevent->get_id()][$USER->id] = has_capability(
+            'mod/facetoface:joinanyvirtualroom',
+            $context,
+            $USER
+        );
+        return (bool)$usercapabilitylist[$seminarevent->get_id()][$USER->id];
+    }
+
+    /**
+     * Check if a user is the facilitator
+     * @param seminar_session $session
+     * @return bool
+     */
+    private static function is_user_facilitator(seminar_session $session): bool {
+        global $USER;
+        // Private cache.
+        static $facilitatorlist = [];
+        if (isset($facilitatorlist[$session->get_id()][$USER->id])) {
+            return (bool)$facilitatorlist[$session->get_id()][$USER->id];
+        }
+        $facilitators = facilitator_list::from_session($session->get_id());
+        if ($facilitators->is_empty()) {
+            return false;
+        }
+
+        $isfacilitator = false;
+        foreach ($facilitators as $facilitator) {
+            if ($USER->id == $facilitator->get_userid()) {
+                $isfacilitator = true;
                 break;
             }
         }
-        $userlist[$seminarevent->get_id()][$USER->id] = $anyrole;
-        return (bool)$userlist[$seminarevent->get_id()][$USER->id];
+        $facilitatorlist[$session->get_id()][$USER->id] = $isfacilitator;
+        return (bool)$facilitatorlist[$session->get_id()][$USER->id];
     }
 }

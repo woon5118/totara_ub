@@ -447,4 +447,14 @@ $capabilities = array(
             'manager' => CAP_ALLOW
         ),
     ),
+
+    // Ability to see 'Join now' room link.
+    'mod/facetoface:joinanyvirtualroom' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW
+        ),
+    ),
 );
