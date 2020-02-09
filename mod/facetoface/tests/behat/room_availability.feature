@@ -22,20 +22,20 @@ Feature: Seminar room availability
     And I press "Add a new room"
     And I set the following fields to these values:
       | Name                         | Room 1          |
-      | Room capacity                | 10              |
-      | Allow room booking conflicts | 0               |
+      | Capacity                     | 10              |
+      | Allow booking conflicts      | 0               |
     And I press "Add a room"
     And I press "Add a new room"
     And I set the following fields to these values:
       | Name                         | Room 2          |
-      | Room capacity                | 10              |
-      | Allow room booking conflicts | 1               |
+      | Capacity                     | 10              |
+      | Allow booking conflicts      | 1               |
     And I press "Add a room"
     And I press "Add a new room"
     And I set the following fields to these values:
       | Name                         | Room 3          |
-      | Room capacity                | 10              |
-      | Allow room booking conflicts | 0               |
+      | Capacity                     | 10              |
+      | Allow booking conflicts      | 0               |
     And I press "Add a room"
     And I click on "Hide from users when choosing a room on the Add/Edit event page" "link" in the "Room 3" "table_row"
     And I am on "Course 1" course homepage with editing mode on
@@ -360,7 +360,7 @@ Feature: Seminar room availability
     And I set the following fields to these values:
       | Name                         | Zimmer 1 |
       | roomcapacity                 | 30       |
-      | Allow room booking conflicts | 0        |
+      | Allow booking conflicts      | 0        |
     And I click on "//div[@aria-describedby='editcustomroom0-dialog']//div[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element"
 
     When  I press "Add a new session"
@@ -415,7 +415,7 @@ Feature: Seminar room availability
     And I set the following fields to these values:
       | Name                         | Zimmer 2 |
       | roomcapacity                 | 40       |
-      | Allow room booking conflicts | 0        |
+      | Allow booking conflicts      | 0        |
     And I click on "//div[@aria-describedby='editcustomroom0-dialog']//div[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element"
     And I click on "Delete" "link" in the "Zimmer 2" "table_row"
     And I press "Save changes"
@@ -519,7 +519,7 @@ Feature: Seminar room availability
     When I navigate to "Rooms" node in "Site administration > Seminars"
     And I click on "Edit" "link" in the "Room 2" "table_row"
     And I set the following fields to these values:
-      | Allow room booking conflicts | 0               |
+      | Allow booking conflicts | 0 |
     And I press "Save changes"
     Then I should see "Room has conflicting usage"
     And I press "Cancel"
@@ -544,7 +544,7 @@ Feature: Seminar room availability
     And I navigate to "Rooms" node in "Site administration > Seminars"
     And I click on "Edit" "link" in the "Room 2" "table_row"
     And I set the following fields to these values:
-      | Allow room booking conflicts | 0               |
+      | Allow booking conflicts | 0 |
     And I press "Save changes"
     Then I should not see "Room has conflicting usage"
 
@@ -573,7 +573,7 @@ Feature: Seminar room availability
     And I set the following fields to these values:
       | Name                         | Zimmer 1 |
       | roomcapacity                 | 40       |
-      | Allow room booking conflicts | 1        |
+      | Allow booking conflicts      | 1        |
     And I click on "//div[@aria-describedby='editcustomroom0-dialog']//div[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element"
     And I press "Save changes"
     And I follow "Add event"
@@ -602,7 +602,7 @@ Feature: Seminar room availability
     When I click on the seminar event action "Edit event" in row "0 / 50"
     And I click on "Edit room" "link" in the "Zimmer 1" "table_row"
     And I set the following fields to these values:
-      | Allow room booking conflicts | 0 |
+      | Allow booking conflicts | 0 |
     And I click on "//div[@aria-describedby='editcustomroom0-dialog']//div[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element"
     Then I should see "Room has conflicting usage" in the "Edit room" "totaradialogue"
     And I click on "Cancel" "button" in the "Edit room" "totaradialogue"
@@ -623,7 +623,7 @@ Feature: Seminar room availability
     When I click on the seminar event action "Edit event" in row "0 / 50"
     And I click on "Edit room" "link" in the "Zimmer 1" "table_row"
     And I set the following fields to these values:
-      | Allow room booking conflicts | 0 |
+      | Allow booking conflicts | 0 |
     And I click on "//div[@aria-describedby='editcustomroom0-dialog']//div[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element"
     Then I should not see "Room has conflicting usage"
     And I press "Save changes"

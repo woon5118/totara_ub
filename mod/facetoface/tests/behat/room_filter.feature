@@ -20,7 +20,7 @@ Feature: Filter session by pre-defined rooms
       | Name              | Room 1          |
       | Building          | Building 123    |
       | Address           | 123 Tory street |
-      | Room capacity     | 10              |
+      | Capacity          | 10              |
     And I click on "#id_customfield_locationsize_medium" "css_element"
     And I click on "#id_customfield_locationview_satellite" "css_element"
     And I click on "#id_customfield_locationdisplay_map" "css_element"
@@ -31,7 +31,7 @@ Feature: Filter session by pre-defined rooms
       | Name              | Room 2          |
       | Building          | Building 234    |
       | Address           | 234 Tory street |
-      | Room capacity     | 10              |
+      | Capacity          | 10              |
     And I click on "#id_customfield_locationsize_medium" "css_element"
     And I click on "#id_customfield_locationview_satellite" "css_element"
     And I click on "#id_customfield_locationdisplay_map" "css_element"
@@ -42,7 +42,7 @@ Feature: Filter session by pre-defined rooms
       | Name              | Room 3          |
       | Building          | Building 345    |
       | Address           | 345 Tory street |
-      | Room capacity     | 10              |
+      | Capacity          | 10              |
     And I click on "#id_customfield_locationsize_medium" "css_element"
     And I click on "#id_customfield_locationview_satellite" "css_element"
     And I click on "#id_customfield_locationdisplay_map" "css_element"
@@ -53,7 +53,7 @@ Feature: Filter session by pre-defined rooms
       | Name              | Room 4          |
       | Building          | Building 456    |
       | Address           | 456 Tory street |
-      | Room capacity     | 10              |
+      | Capacity          | 10              |
     And I click on "#id_customfield_locationsize_medium" "css_element"
     And I click on "#id_customfield_locationview_satellite" "css_element"
     And I click on "#id_customfield_locationdisplay_map" "css_element"

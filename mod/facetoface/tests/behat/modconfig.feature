@@ -47,8 +47,8 @@ Feature: Configure seminar settings
 
     When I navigate to "Assets" node in "Site administration > Seminars"
     And I click on "Add a new asset" "button"
-    Then I should see "Asset name"
+    Then I should see "Name"
 
     When I navigate to "Facilitators" node in "Site administration > Seminars"
     And I click on "Add a new facilitator" "button"
-    Then I should see "Facilitator Name"
+    Then I should see "Name"

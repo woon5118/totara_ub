@@ -236,7 +236,7 @@ class totara_core_generator extends component_generator_base {
         if (empty($prefix)) {
             throw new coding_exception('Must specify custom Totara field type in $type');
         }
-        if (in_array($prefix, array('course', 'prog', 'facetoface_session', 'facetoface_signup', 'facetoface_cancellation'))) {
+        if (in_array($prefix, array('course', 'prog', 'facetoface_session', 'facetoface_signup', 'facetoface_cancellation', 'facetoface_sessioncancel', 'facetoface_asset', 'facetoface_facilitator', 'facetoface_room'))) {
             if (!empty($record->typeid)) {
                 throw new coding_exception('Cannot use typeid with $prefix: ' . $prefix);
             }

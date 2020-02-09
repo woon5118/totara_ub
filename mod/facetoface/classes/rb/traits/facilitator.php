@@ -25,22 +25,51 @@ namespace mod_facetoface\rb\traits;
 
 use rb_column_option;
 use rb_filter_option;
+use rb_join;
 
 defined('MOODLE_INTERNAL') || die();
 
 trait facilitator {
 
     /**
+     * Add facilitator joints.
+     *
+     * @param array $joinlist
+     * @param string $sessiondatejoin
+     * @return void
+     */
+    protected function add_facilitators_to_join_list(array &$joinlist, $sessiondatejoin) {
+        $joinlist[] = new rb_join(
+            'facilitatordates',
+            'LEFT',
+            '{facetoface_facilitator_dates}',
+            "facilitatordates.sessionsdateid = {$sessiondatejoin}.id",
+            REPORT_BUILDER_RELATION_ONE_TO_MANY,
+            $sessiondatejoin
+        );
+
+        $joinlist[] = new rb_join(
+            'facilitator',
+            'LEFT',
+            '{facetoface_facilitator}',
+            'facilitator.id = facilitatordates.facilitatorid',
+            REPORT_BUILDER_RELATION_ONE_TO_MANY,
+            'facilitatordates'
+        );
+    }
+
+    /**
      * Add common facilitators column options (excluding custom fields)
      * @param array $columnoptions
      * @param string $join alias of join or table that provides facilitators fields
+     * @param boolean $facilitatoronly
      */
-    protected function add_facilitators_fields_to_columns(array &$columnoptions, $join = 'facilitator') {
+    protected function add_facilitators_fields_to_columns(array &$columnoptions, $join = 'facilitator', bool $facilitatoronly = false) {
 
         $columnoptions[] = new rb_column_option(
             'facilitator',
             'id',
-            get_string('facilitatorid', 'mod_facetoface'),
+            $facilitatoronly ? get_string('id', 'rb_source_facetoface_facilitator') : get_string('facilitatorid', 'rb_source_facetoface_facilitator'),
             "$join.id",
             array(
                 'joins' => $join,
@@ -51,7 +80,7 @@ trait facilitator {
         $columnoptions[] = new rb_column_option(
             'facilitator',
             'userid',
-            get_string('facilitatoruserid', 'mod_facetoface'),
+            $facilitatoronly ? get_string('userid', 'rb_source_facetoface_facilitator') : get_string('facilitatoruserid', 'rb_source_facetoface_facilitator'),
             "$join.userid",
             array(
                 'joins' => $join,
@@ -62,7 +91,7 @@ trait facilitator {
         $columnoptions[] = new rb_column_option(
             'facilitator',
             'name',
-            get_string('facilitatorname', 'mod_facetoface'),
+            $facilitatoronly ? get_string('name', 'rb_source_facetoface_facilitator') : get_string('facilitatorname', 'rb_source_facetoface_facilitator'),
             "$join.name",
             array(
                 'joins' => $join,
@@ -76,13 +105,13 @@ trait facilitator {
         $columnoptions[] = new rb_column_option(
             'facilitator',
             'namelink',
-            get_string('facilitatornamelink', 'mod_facetoface'),
+            $facilitatoronly ? get_string('namelink', 'rb_source_facetoface_facilitator') : get_string('facilitatornamelink', 'rb_source_facetoface_facilitator'),
             "$join.name",
             array(
                 'joins' => $join,
                 'dbdatatype' => 'text',
                 'displayfunc' => 'facilitator_name_link',
-                'defaultheading' => get_string('facilitatorname', 'mod_facetoface'),
+                'defaultheading' => $facilitatoronly ? get_string('name', 'rb_source_facetoface_facilitator') : get_string('facilitatorname', 'rb_source_facetoface_facilitator'),
                 'extrafields' => [
                     'id' => "$join.id",
                     'userid' => "$join.userid",
@@ -92,7 +121,7 @@ trait facilitator {
         $columnoptions[] = new rb_column_option(
             'facilitator',
             'published',
-            get_string('published', 'mod_facetoface'),
+            $facilitatoronly ? get_string('sitewide', 'rb_source_facetoface_facilitator') : get_string('facilitatorsitewide', 'rb_source_facetoface_facilitator'),
             "CASE WHEN $join.custom > 0 THEN 1 ELSE 0 END",
             array(
                 'joins' => $join,
@@ -103,7 +132,7 @@ trait facilitator {
         $columnoptions[] = new rb_column_option(
             'facilitator',
             'description',
-            get_string('descriptionlabel', 'mod_facetoface'),
+            $facilitatoronly ? get_string('description', 'rb_source_facetoface_facilitator') : get_string('facilitatordescription', 'rb_source_facetoface_facilitator'),
             "$join.description",
             array(
                 'joins' => $join,
@@ -117,7 +146,7 @@ trait facilitator {
         $columnoptions[] = new rb_column_option(
             'facilitator',
             'visible',
-            get_string('visible', 'mod_facetoface'),
+            $facilitatoronly ? get_string('visible', 'rb_source_facetoface_facilitator') : get_string('facilitatorvisible', 'rb_source_facetoface_facilitator'),
             "$join.hidden",
             array(
                 'joins' => $join,
@@ -128,7 +157,7 @@ trait facilitator {
         $columnoptions[] = new rb_column_option(
             'facilitator',
             'allowconflicts',
-            get_string('allowfacilitatorconflicts', 'mod_facetoface'),
+            $facilitatoronly ? get_string('allowconflicts', 'rb_source_facetoface_facilitator') : get_string('facilitatorallowconflicts', 'rb_source_facetoface_facilitator'),
             "$join.allowconflicts",
             array(
                 'joins' => $join,
@@ -141,25 +170,26 @@ trait facilitator {
     /**
      * Add common facilitator filter options (excluding custom fields)
      * @param array $filteroptions
+     * @param boolean $facilitatoronly
      */
-    protected function add_facilitators_fields_to_filters(array &$filteroptions) {
+    protected function add_facilitators_fields_to_filters(array &$filteroptions, bool $facilitatoronly = false) {
 
         $filteroptions[] = new rb_filter_option(
             'facilitator',
             'id',
-            get_string('facilitatorid', 'mod_facetoface'),
+            $facilitatoronly ? get_string('id', 'rb_source_facetoface_facilitator') : get_string('facilitatorid', 'rb_source_facetoface_facilitator'),
             'number'
         );
         $filteroptions[] = new rb_filter_option(
             'facilitator',
             'name',
-            get_string('facilitatorname', 'mod_facetoface'),
+            $facilitatoronly ? get_string('name', 'rb_source_facetoface_facilitator') : get_string('facilitatorname', 'rb_source_facetoface_facilitator'),
             'text'
         );
         $filteroptions[] = new rb_filter_option(
             'facilitator',
             'published',
-            get_string('published', 'mod_facetoface'),
+            $facilitatoronly ? get_string('sitewide', 'rb_source_facetoface_facilitator') : get_string('facilitatorsitewide', 'rb_source_facetoface_facilitator'),
             'select',
             array(
                 'simplemode' => true,
@@ -172,13 +202,13 @@ trait facilitator {
         $filteroptions[] = new rb_filter_option(
             'facilitator',
             'description',
-            get_string('description', 'mod_facetoface'),
+            $facilitatoronly ? get_string('description', 'rb_source_facetoface_facilitator') : get_string('facilitatordescription', 'rb_source_facetoface_facilitator'),
             'text'
         );
         $filteroptions[] = new rb_filter_option(
             'facilitator',
             'visible',
-            get_string('visible', 'mod_facetoface'),
+            $facilitatoronly ? get_string('visible', 'rb_source_facetoface_facilitator') : get_string('facilitatorvisible', 'rb_source_facetoface_facilitator'),
             'select',
             array(
                 'simplemode' => true,
@@ -191,7 +221,7 @@ trait facilitator {
         $filteroptions[] = new rb_filter_option(
             'facilitator',
             'allowconflicts',
-            get_string('allowfacilitatorconflicts', 'mod_facetoface'),
+            $facilitatoronly ? get_string('allowconflicts', 'rb_source_facetoface_facilitator') : get_string('facilitatorallowconflicts', 'rb_source_facetoface_facilitator'),
             'select',
             array(
                 'simplemode' => true,

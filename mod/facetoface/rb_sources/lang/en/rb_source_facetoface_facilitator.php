@@ -24,3 +24,26 @@
 $string['sourcelabel'] = 'Seminar';
 $string['sourcesummary'] = 'List of seminar facilitators.';
 $string['sourcetitle'] = 'Seminar Facilitators';
+
+$string['allowconflicts'] = 'Allow booking conflicts';
+$string['available'] = 'Availability';
+$string['description'] = 'Bio';
+$string['embeddedreportname'] = 'Manage Seminar Facilitators';
+$string['facilitatorallowconflicts'] = 'Facilitator Allow booking conflicts';
+$string['facilitatoravailable'] = 'Facilitator Availability';
+$string['facilitatordescription'] = 'Facilitator Bio';
+$string['facilitatorid'] = 'Facilitator ID';
+$string['facilitatorname'] = 'Facilitator Name';
+$string['facilitatornamelink'] = 'Facilitator Name (linked to facilitator details page)';
+$string['facilitatorsitewide'] = 'Facilitator Sitewide';
+$string['facilitatoruserid'] = 'Facilitator User ID';
+$string['facilitatorvisible'] = 'Facilitator Visible';
+$string['id'] = 'ID';
+$string['name'] = 'Name';
+$string['namelink'] = 'Name (linked to facilitator details page)';
+$string['sitewide'] = 'Sitewide';
+$string['userid'] = 'User ID';
+$string['visible'] = 'Visible';
+
+// Deprecated since Totara 13.0
+$string['published'] = 'Facilitator Published';

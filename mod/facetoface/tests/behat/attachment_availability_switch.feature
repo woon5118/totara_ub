@@ -110,9 +110,9 @@ Feature: Seminar asset/facilitator availability related to switching
     Then I should not see "<name> has conflicting usage"
 
     Examples:
-      | name        | item_type   | collection_type | name_label       | an_item_type  | column_or_node |
-      | Asset       | asset       | assets          | Asset name       | an asset      | Assets         |
-      | Facilitator | facilitator | facilitators    | Facilitator Name | a facilitator | Facilitators   |
+      | name        | item_type   | collection_type | an_item_type  | column_or_node |
+      | Asset       | asset       | assets          | an asset      | Assets         |
+      | Facilitator | facilitator | facilitators    | a facilitator | Facilitators   |
 
   Scenario Outline: Seminar switch custom item to not allow conflicts
     Given I log in as "teacher1"
@@ -137,7 +137,7 @@ Feature: Seminar asset/facilitator availability related to switching
     And I click on "Select <item_type>" "link"
     And I click on "Create" "link" in the "Choose <collection_type>" "totaradialogue"
     And I set the following fields to these values:
-      | <name_label>              | Etwas 1 |
+      | Name                    | Etwas 1 |
       | Allow booking conflicts | 1       |
     And I click on "OK" "button" in the "Create new <item_type>" "totaradialogue"
     And I press "Save changes"
@@ -192,6 +192,6 @@ Feature: Seminar asset/facilitator availability related to switching
     And I press "Save changes"
 
     Examples:
-      | name        | item_type   | collection_type | name_label       | an_item_type  | column_or_node |
-      | Asset       | asset       | assets          | Asset name       | an asset      | Assets         |
-      | Facilitator | facilitator | facilitators    | Facilitator Name | a facilitator | Facilitators   |
+      | name        | item_type   | collection_type | an_item_type  | column_or_node |
+      | Asset       | asset       | assets          | an asset      | Assets         |
+      | Facilitator | facilitator | facilitators    | a facilitator | Facilitators   |

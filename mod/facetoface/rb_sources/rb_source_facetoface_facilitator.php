@@ -94,7 +94,7 @@ class rb_source_facetoface_facilitator extends rb_facetoface_base_source {
     protected function define_columnoptions() {
         $columnoptions = array();
 
-        $this->add_facilitators_fields_to_columns($columnoptions, 'base');
+        $this->add_facilitators_fields_to_columns($columnoptions, 'base', true);
 
         $columnoptions[] = new rb_column_option(
             'facilitator',
@@ -122,12 +122,12 @@ class rb_source_facetoface_facilitator extends rb_facetoface_base_source {
     protected function define_filteroptions() {
         $filteroptions = array();
 
-        $this->add_facilitators_fields_to_filters($filteroptions);
+        $this->add_facilitators_fields_to_filters($filteroptions, true);
 
         $filteroptions[] = new rb_filter_option(
             'facilitator',
             'facilitatoravailable',
-            get_string('facilitatoravailable', 'mod_facetoface'),
+            get_string('available', 'rb_source_facetoface_facilitator'),
             'facilitator_available',
             array(),
             'base.id'

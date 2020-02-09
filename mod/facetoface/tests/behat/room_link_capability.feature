@@ -37,8 +37,8 @@ Feature: Check seminar room link setting
     And I press "Add a new room"
     And I set the following fields to these values:
       | Name                         | Room 1          |
-      | Room capacity                | 10              |
-      | Allow room booking conflicts | 0               |
+      | Capacity                     | 10              |
+      | Allow booking conflicts      | 0               |
       | Room link                    | http://example.com?id=12345 |
       | Building                     | Some Building 1 |
       | Address                      | 123 Main Street |
@@ -46,8 +46,7 @@ Feature: Check seminar room link setting
 
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    And I click on "Actions" "button" in the "Upcoming" "table_row"
-    And I click on "Edit event" "link" in the "Upcoming" "table_row"
+    And I click on the seminar event action "Edit event" in row "Upcoming"
     And I click on "Select room" "link"
     And I click on "Room 1" "text" in the "Choose rooms" "totaradialogue"
     And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
@@ -58,16 +57,14 @@ Feature: Check seminar room link setting
     Given I log in as "student1"
     And I follow "Course 1"
     And I click on "View all events" "link"
-    And I should see "Join now" in the "Upcoming" "table_row"
-    And "//table[@id='mod_facetoface_upcoming_events_table']/tbody/tr/td[contains(@class, 'mod_facetoface__sessionlist__room')]/ul/li/span/a[contains(@class, 'roomurl')]" "xpath_element" should exist
+    And "Join now" "link" should exist in the "Upcoming" "table_row"
     And I log out
 
   Scenario: Testing 15min before session and teacher with mod/facetoface:joinanyvirtualroom capability
     Given I log in as "trainer1"
     And I follow "Course 1"
     And I click on "View all events" "link"
-    And I should see "Join now" in the "Upcoming" "table_row"
-    And "//table[@id='mod_facetoface_upcoming_events_table']/tbody/tr/td[contains(@class, 'mod_facetoface__sessionlist__room')]/ul/li/span/a[contains(@class, 'roomurl')]" "xpath_element" should exist
+    And "Join now" "link" should exist in the "Upcoming" "table_row"
     And I log out
 
     And I log in as "admin"
@@ -79,8 +76,7 @@ Feature: Check seminar room link setting
     And I log in as "trainer1"
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    And I should not see "Join now" in the "Upcoming" "table_row"
-    And "//table[@id='mod_facetoface_upcoming_events_table']/tbody/tr/td[contains(@class, 'mod_facetoface__sessionlist__room')]/ul/li/span/a[contains(@class, 'roomurl')]" "xpath_element" should not exist
+    And "Join now" "link" should not exist in the "Upcoming" "table_row"
     And I log out
 
   Scenario: Testing 15min before session and user is facilitator
@@ -93,8 +89,7 @@ Feature: Check seminar room link setting
     And I log in as "facilitator1"
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    And I should not see "Join now" in the "Upcoming" "table_row"
-    And "//table[@id='mod_facetoface_upcoming_events_table']/tbody/tr/td[contains(@class, 'mod_facetoface__sessionlist__room')]/ul/li/span/a[contains(@class, 'roomurl')]" "xpath_element" should not exist
+    And "Join now" "link" should not exist in the "Upcoming" "table_row"
     And I log out
 
     And I log in as "admin"
@@ -105,14 +100,13 @@ Feature: Check seminar room link setting
     And I click on "Facilitator One" "text" in the "Choose facilitator" "totaradialogue"
     And I click on "OK" "button" in the "Choose facilitator" "totaradialogue"
     And I set the following fields to these values:
-      | Facilitator Name | Facilitator 1 |
+      | Name | Facilitator 1 |
     And I press "Add a facilitator"
     And I should see "Facilitator 1"
 
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    And I click on "Actions" "button" in the "Upcoming" "table_row"
-    And I click on "Edit event" "link" in the "Upcoming" "table_row"
+    And I click on the seminar event action "Edit event" in row "Upcoming"
     When I click on "Select facilitators" "link"
     And I click on "Facilitator 1" "text" in the "Choose facilitators" "totaradialogue"
     And I click on "OK" "button" in the "Choose facilitators" "totaradialogue"
@@ -122,6 +116,5 @@ Feature: Check seminar room link setting
     And I log in as "facilitator1"
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
-    And I should see "Join now" in the "Upcoming" "table_row"
-    And "//table[@id='mod_facetoface_upcoming_events_table']/tbody/tr/td[contains(@class, 'mod_facetoface__sessionlist__room')]/ul/li/span/a[contains(@class, 'roomurl')]" "xpath_element" should exist
+    And "Join now" "link" should exist in the "Upcoming" "table_row"
     And I log out

@@ -24,17 +24,22 @@
 $string['sourcelabel'] = 'Seminar';
 $string['sourcesummary'] = 'Upcoming events using rooms.';
 $string['sourcetitle'] = 'Seminar Room Assignments';
+
 $string['assetnames'] = 'Asset Names';
 $string['assets'] = 'Assets';
-$string['selectaroom'] = 'To view this report, first <a href="{$a}">select a room</a> you want to view.';
 $string['ftfid'] = 'Seminar ID';
 $string['sessfinishdatetime'] = 'Session Finish Date/Time';
 $string['sessstartdatetime'] = 'Session Start Date/Time';
 $string['sessionid'] = 'Session ID';
 $string['type_asset'] = 'Assets';
+$string['type_facilitator'] = 'Facilitators';
 $string['type_session'] = 'Sessions';
 $string['type_room'] = 'Rooms';
 $string['type_facetoface_asset'] = 'Assets';
+$string['type_facetoface_facilitator'] = 'Facilitators';
 $string['type_facetoface_room'] = 'Rooms';
 $string['type_facetoface_session'] = 'Event Custom Fields';
 $string['type_date'] = 'Date';
+
+// Deprecated since Totara 13.0
+$string['selectaroom'] = 'To view this report, first <a href="{$a}">select a room</a> you want to view.';

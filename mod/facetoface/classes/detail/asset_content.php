@@ -74,7 +74,7 @@ class asset_content extends content_generator {
     }
 
     protected function render_empty(moodle_url $manageurl): string {
-        return get_string('selectanasset', 'rb_source_facetoface_asset_assignments', $manageurl->out());
+        return get_string('reports:selectasset', 'mod_facetoface', $manageurl->out());
     }
 
     protected function get_manage_button(bool $frommanage): string {

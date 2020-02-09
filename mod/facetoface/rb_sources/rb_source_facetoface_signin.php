@@ -155,22 +155,6 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
-                'roomdates',
-                'LEFT',
-                '{facetoface_room_dates}',
-                'sessiondate.id = roomdates.sessionsdateid',
-                REPORT_BUILDER_RELATION_ONE_TO_MANY,
-                'sessiondate'
-            ),
-            new rb_join(
-                'room',
-                'LEFT',
-                '{facetoface_room}',
-                'roomdates.roomid = room.id',
-                REPORT_BUILDER_RELATION_ONE_TO_MANY,
-                'roomdates'
-            ),
-            new rb_join(
                 'bookedby',
                 'LEFT',
                 '{user}',
@@ -178,6 +162,8 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 REPORT_BUILDER_RELATION_MANY_TO_ONE
             ),
         );
+
+        $this->add_rooms_to_join_list($joinlist, 'sessiondate');
 
         // Include some standard joins.
         $this->add_core_user_tables($joinlist, 'base', 'userid');

@@ -28,7 +28,8 @@ defined("MOODLE_INTERNAL") || die();
 global $CFG;
 require_once($CFG->dirroot . "/totara/reportbuilder/lib.php");
 
-use mod_facetoface\room_helper;
+use mod_facetoface\{asset_helper, facilitator_helper, room_helper};
+use mod_facetoface\{seminar, seminar_event, seminar_session};
 
 /**
  * Unit test for facetoface_rooms reprot builder
@@ -38,10 +39,10 @@ use mod_facetoface\room_helper;
 class mod_facetoface_rooms_reportbuilder_testcase extends advanced_testcase {
     /**
      * Saving all the columns for the report builder
-     * @param rb_source_facetoface_rooms    $src
+     * @param rb_facetoface_base_source    $src
      * @param int                           $id     The report builder id
      */
-    private function set_up_columns(rb_source_facetoface_rooms $src, int $id): void {
+    private function set_up_columns(rb_facetoface_base_source $src, int $id): void {
         global $DB;
         $columnoptions = $src->defaultcolumns;
         $so = 1;
@@ -76,26 +77,59 @@ class mod_facetoface_rooms_reportbuilder_testcase extends advanced_testcase {
     }
 
     /**
+     * Saving all the filters for the report builder
+     * @param rb_facetoface_base_source    $src
+     * @param int                           $id     The report builder id
+     */
+    public function set_up_filters(rb_facetoface_base_source $src, int $id): void {
+        global $DB;
+        $filteroptions = $src->filteroptions;
+        $so = 1;
+
+        foreach ($filteroptions as $filteroption) {
+            if ($filteroption->value !== 'published') {
+                continue;
+            }
+            $item = [
+                'reportid' => $id,
+                'type' => $filteroption->type,
+                'value' => $filteroption->value,
+                'sortorder' => 1,
+                'advanced' => 0,
+                'filtername' => $filteroption->label,
+                'customname' => '',
+                'region' => rb_filter_type::RB_FILTER_REGION_STANDARD,
+                'defaultvalue' => ''
+            ];
+
+            $DB->insert_record("report_builder_filters", (object) $item);
+            $so += 1;
+        }
+    }
+
+    /**
      * Helper method to setup the
      * report builder within the phpunit system
      *
+     * @param string            $source
+     * @param string            $shortname
      * @param stdClass          $user                 The user that is creating the report
      * @param bool              $userembedded         Determine whether using the default source report or not
      * @return reportbuilder
      */
-    private function set_up_report_builder(stdClass $user, $userembedded = false): reportbuilder {
+    private function set_up_report_builder(string $source, string $shortname, stdClass $user, $userembedded = false): reportbuilder {
         global $DB;
         $id = null;
 
         $config = (new rb_config())->set_reportfor($user->id);
 
         if ($userembedded) {
-            return reportbuilder::create_embedded('facetoface_rooms', $config);
+            return reportbuilder::create_embedded($shortname, $config);
         }
 
         $rp = [
             'shortname'         => 'f2fr_test',
-            'source'            => 'facetoface_rooms',
+            'source'            => $source,
             'fullname'          => 'This is SPARTAN',
             'hidden'            => 0,
             'embed'             => 0,
@@ -111,69 +145,71 @@ class mod_facetoface_rooms_reportbuilder_testcase extends advanced_testcase {
 
         $id = $DB->insert_record('report_builder', (object)$rp);
 
-        /** @var rb_source_facetoface_rooms $src */
+        /** @var rb_facetoface_base_source $src */
         $src = reportbuilder::get_source_object($rp['source']);
         $this->set_up_columns($src, $id);
+        $this->set_up_filters($src, $id);
 
         return reportbuilder::create($id, $config);
     }
 
     /**
-     * Injecting the data within table
-     * `facetoface_room` and update the
-     * the source parameters.
+     * Insert a site-wide resource as
+     * well as an ad-hoc resource
      *
-     * @param array $items
+     * @param string $type one of asset, facilitator or room
+     * @param stdClass $user
+     * @return stdClass[] rooms
      */
-    private function create_face2face_rooms(array &$items): void {
-        if (empty($items)) return;
-        global $DB;
-
-        foreach ($items as $index => $item) {
-            /** @var stdClass $item */
-            $item = is_array($item) ? (object)$item : $item;
-            $id = $DB->insert_record("facetoface_room", $item, true);
-            $item->id = $id;
-            $items[$index] = $item;
-        }
-    }
-
-    /**
-     * Providing the data with the ability to tweak data type
-     *
-     * @param stdClass  $user   User who created the room
-     * @param bool      $isobj  As if we want an array of stdClass, then make this true.
-     * @return array
-     */
-    private function dummy_data(stdClass $user, $isobj = false): array {
-        $data = [
-            [
+    private function create_face2face_resources(string $type, stdClass $user): array {
+        $addsitewide = "add_site_wide_{$type}";
+        $addcustom = "add_custom_{$type}";
+        /** @var mod_facetoface_generator $f2fgen */
+        $f2fgen = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        return [
+            $f2fgen->{$addsitewide}([
                 'name'              => "test1",
                 'capacity'          => 10,
                 'allowconflicts'    => 1,
-                'description'       => "" ,
-                "custom"            => 0,
+                'description'       => "",
                 'usercreated'       => $user->id,
                 'usermodified'      => $user->id,
                 'timecreated'       => time(),
                 'timemodified'      => time(),
-            ],
-            [
+            ]),
+            $f2fgen->{$addcustom}([
                 'name'              => 'test2',
                 'capacity'          => 15,
                 'allowconflicts'    => 1,
                 'description'       => "",
-                'custom'            => 1,
                 'usercreated'       => $user->id,
                 'usermodified'      => $user->id,
                 'timecreated'       => time(),
                 'timemodified'      => time(),
-            ]
+            ])
         ];
+    }
 
-        if ($isobj) {
-            $data[0] = (object)$data[0];
-            $data[1] = (object)$data[1];
+    /**
+     * @return array of [type, source, shortname]
+     */
+    public function data_provider_types(): array {
+        return [
+            ['asset', 'facetoface_asset', 'facetoface_assets'],
+            ['facilitator', 'facetoface_facilitator', 'facetoface_facilitators'],
+            ['room', 'facetoface_rooms', 'facetoface_rooms'] // watch out!
+        ];
+    }
+
+    /**
+     * @return array of [type, source, shortname, published, filteredCount]
+     */
+    public function data_provider_types_post(): array {
+        $data = [];
+        foreach ($this->data_provider_types() as $args) {
+            $data[] = array_merge($args, [[], 2]);
+            $data[] = array_merge($args, [['published' => 0], 1]);
+            $data[] = array_merge($args, [['published' => 1], 1]);
         }
         return $data;
     }
@@ -182,56 +218,50 @@ class mod_facetoface_rooms_reportbuilder_testcase extends advanced_testcase {
      * Test suite for checking whether
      * the sql is actually working or not
      *
-     * Since we are creating 2 records of
-     * facetoface_rooms, however with one
-     * of the records is set as custom room
-     * and it is not in use (SPECTRE Room)
-     * Therefore within this test suite,
-     * it should not appear in the record resultset
+     * @dataProvider data_provider_types_post
      */
-    public function test_query(): void {
+    public function test_query_vacancy(string $type, string $source, string $shortname, array $post, int $filteredcount): void {
         global $USER;
 
         $this->setAdminUser();
         $user = $USER;
 
-        $reportbuilder = $this->set_up_report_builder($user, false);
-        $data = $this->dummy_data($user);
-        $this->create_face2face_rooms($data);
+        $_POST = $post;
+        $reportbuilder = $this->set_up_report_builder($source, $shortname, $user, false);
+        $data = $this->create_face2face_resources($type, $user);
 
-        $this->assertEquals(1, $reportbuilder->get_filtered_count());
+        $this->assertEquals($filteredcount, $reportbuilder->get_filtered_count());
     }
 
     /**
      * The test suite for the case
-     * of one room of record is the custom
-     * room and it is in use.
+     * of one resource of record is the custom
+     * resource and it is in use.
      *
-     * Therefore the result we are expecting from querying the record
-     * should equal to 2
+     * @dataProvider data_provider_types_post
      */
-    public function test_query2(): void {
-        global $DB, $USER;
+    public function test_query_occupied(string $type, string $source, string $shortname, array $post, int $filteredcount): void {
+        global $USER;
 
         $this->setAdminUser();
         $user = $USER;
 
-        $reportbuilder = $this->set_up_report_builder($user, false);
-        $data = $this->dummy_data($user, false);
-        $this->create_face2face_rooms($data);
-        $ghostroom = $data[1];
+        $_POST = $post;
+        $reportbuilder = $this->set_up_report_builder($source, $shortname, $user, false);
+        $data = $this->create_face2face_resources($type, $user);
+        $ghost = $data[1];
 
-        $params = [
-            'sessionid'       => 1,
-            'sessiontimezone' => "something",
-            'timestart'       => time(),
-            'timefinish'      => time() * 36,
-        ];
+        $seminar = new seminar();
+        $seminar->set_name('test seminar')->save();
+        $seminarevent = new seminar_event();
+        $seminarevent->set_facetoface($seminar->get_id())->save();
+        $seminarsession = new seminar_session();
+        $seminarsession->set_sessionid($seminarevent->get_id())->set_timestart(time() + HOURSECS)->set_timefinish(time() + HOURSECS * 2)->save();
 
-        $fsdid = $DB->insert_record("facetoface_sessions_dates", (object)$params);
-        room_helper::sync($fsdid, [$ghostroom->id]);
+        $helper = "mod_facetoface\\{$type}_helper";
+        $helper::sync($seminarsession->get_id(), [$ghost->id]);
 
-        $this->assertEquals(2, $reportbuilder->get_filtered_count());
+        $this->assertEquals($filteredcount, $reportbuilder->get_filtered_count());
     }
 
     /**
@@ -239,21 +269,20 @@ class mod_facetoface_rooms_reportbuilder_testcase extends advanced_testcase {
      * the viewing of report is embedded report
      *
      * Therefore the base query would have been tweaked
-     * a bit. However, we still expected result the same with the
-     * test suite test_query, as the embedded report will
+     * a bit. However, we still expect the embedded report will
      * only look into those global rooms.
      *
      * @see rb_facetoface_rooms_reportbuilder_test::test_query
+     * @dataProvider data_provider_types
      */
-    public function test_embedded_query(): void {
+    public function test_embedded_query(string $type, string $source, string $shortname): void {
         global $USER;
 
         $this->setAdminUser();
         $user = $USER;
 
-        $reportbuilder = $this->set_up_report_builder($user, true);
-        $data = $this->dummy_data($user, false);
-        $this->create_face2face_rooms($data);
+        $reportbuilder = $this->set_up_report_builder($source, $shortname, $user, true);
+        $data = $this->create_face2face_resources($type, $user);
 
         $this->assertEquals(1, $reportbuilder->get_filtered_count());
     }

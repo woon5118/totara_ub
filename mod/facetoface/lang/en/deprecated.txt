@@ -62,6 +62,7 @@ noticedeleteconfirm,mod_facetoface
 noticetext,mod_facetoface
 notrequired,mod_facetoface
 position,mod_facetoface
+publishreuse,mod_facetoface
 roommustbebookedtoexternalcalendar,mod_facetoface
 seeattendees,mod_facetoface
 selectedpositionassignment,mod_facetoface

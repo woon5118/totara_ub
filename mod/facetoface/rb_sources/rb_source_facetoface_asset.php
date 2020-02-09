@@ -95,7 +95,7 @@ class rb_source_facetoface_asset extends rb_facetoface_base_source {
     protected function define_columnoptions() {
         $columnoptions = array();
 
-        $this->add_assets_fields_to_columns($columnoptions, 'base');
+        $this->add_assets_fields_to_columns($columnoptions, 'base', true);
 
         $columnoptions[] = new rb_column_option(
                 'asset',
@@ -122,12 +122,12 @@ class rb_source_facetoface_asset extends rb_facetoface_base_source {
     protected function define_filteroptions() {
         $filteroptions = array();
 
-        $this->add_assets_fields_to_filters($filteroptions);
+        $this->add_assets_fields_to_filters($filteroptions, true);
 
         $filteroptions[] = new rb_filter_option(
             'asset',
             'assetavailable',
-            get_string('assetavailable', 'rb_source_facetoface_asset'),
+            get_string('available', 'rb_source_facetoface_asset'),
             'f2f_assetavailable',
             array(),
             'base.id'

@@ -55,7 +55,7 @@ Feature: Check asset/facilitator actions are performed by users with the right p
     And I should see "Create" in the "Choose <collection_type>" "totaradialogue"
     And I click on "Create" "link" in the "Choose <collection_type>" "totaradialogue"
     And I set the following fields to these values:
-      | <name_label> | <name> |
+      | Name | <name> |
     And I click on "OK" "button" in the "Create new <item_type>" "totaradialogue"
     Then "Delete" "link" should exist in the "//li[@class='<item_type>name' and contains(.,'<name>')]" "xpath_element"
     And "Edit <item_type>" "link" should exist in the "//li[@class='<item_type>name' and contains(.,'<name>')]" "xpath_element"
@@ -64,9 +64,9 @@ Feature: Check asset/facilitator actions are performed by users with the right p
     And I log out
 
     Examples:
-      | name        | item_type   | collection_type | name_label       |
-      | Asset       | asset       | assets          | Asset name       |
-      | Facilitator | facilitator | facilitators    | Facilitator Name |
+      | name        | item_type   | collection_type |
+      | Asset       | asset       | assets          |
+      | Facilitator | facilitator | facilitators    |
 
   Scenario Outline: Check editingteacher role permission with removed manageadhoc capability
     Given I log in as "admin"
@@ -87,9 +87,9 @@ Feature: Check asset/facilitator actions are performed by users with the right p
     And I log out
 
     Examples:
-      | name        | item_type   | collection_type | name_label       |
-      | Asset       | asset       | assets          | Asset name       |
-      | Facilitator | facilitator | facilitators    | Facilitator Name |
+      | name        | item_type   | collection_type |
+      | Asset       | asset       | assets          |
+      | Facilitator | facilitator | facilitators    |
 
   Scenario Outline: Check manageadhoc capability for teacher role
     Given I log in as "trainer2"
@@ -102,7 +102,7 @@ Feature: Check asset/facilitator actions are performed by users with the right p
     And I should see "Create" in the "Choose <collection_type>" "totaradialogue"
     When I click on "Create" "link" in the "Choose <collection_type>" "totaradialogue"
     And I set the following fields to these values:
-      | <name_label> | <name> |
+      | Name | <name> |
     And I click on "OK" "button" in the "Create new <item_type>" "totaradialogue"
     Then "Delete" "link" should exist in the "//li[@class='<item_type>name' and contains(.,'<name>')]" "xpath_element"
     And "Edit <item_type>" "link" should exist in the "//li[@class='<item_type>name' and contains(.,'<name>')]" "xpath_element"
@@ -111,9 +111,9 @@ Feature: Check asset/facilitator actions are performed by users with the right p
     And I log out
 
     Examples:
-      | name        | item_type   | collection_type | name_label       | column_or_node |
-      | Asset       | asset       | assets          | Asset name       | Assets         |
-      | Facilitator | facilitator | facilitators    | Facilitator Name | Facilitators   |
+      | name        | item_type   | collection_type | column_or_node |
+      | Asset       | asset       | assets          | Assets         |
+      | Facilitator | facilitator | facilitators    | Facilitators   |
 
   Scenario Outline: Check teacher role permission with removed manageadhoc capability
     Given I log in as "admin"
@@ -134,9 +134,9 @@ Feature: Check asset/facilitator actions are performed by users with the right p
     And I log out
 
     Examples:
-      | name        | item_type   | collection_type | name_label       |
-      | Asset       | asset       | assets          | Asset name       |
-      | Facilitator | facilitator | facilitators    | Facilitator Name |
+      | name        | item_type   | collection_type |
+      | Asset       | asset       | assets          |
+      | Facilitator | facilitator | facilitators    |
 
   Scenario Outline: Check manageadhoc/managesitewide capabilities for manager
     Given I log in as "manager"
@@ -149,19 +149,17 @@ Feature: Check asset/facilitator actions are performed by users with the right p
     And I should see "Create" in the "Choose <collection_type>" "totaradialogue"
     When I click on "Create" "link" in the "Choose <collection_type>" "totaradialogue"
     And I set the following fields to these values:
-      | <name_label> | <name> Zero |
+      | Name | <name> Zero |
     And I click on "OK" "button" in the "Create new <item_type>" "totaradialogue"
     Then "Delete" "link" should exist in the "//li[@class='<item_type>name' and contains(.,'<name> Zero')]" "xpath_element"
     And "Edit <item_type>" "link" should exist in the "//li[@class='<item_type>name' and contains(.,'<name> Zero')]" "xpath_element"
     And I press "Save changes"
     Then I should see "Upcoming events"
 
-    When I navigate to "<column_or_node>" node in "Seminar administration"
-    Then I press "Add a new <item_type>"
-    And I set the following fields to these values:
-      | <name_label> | <name> One |
-    And I press "Add <an_item_type>"
-    And I should see "<name> One"
+    # TL-23000 made impossible to create a facilitator with the same steps as an asset
+    Given the following "global <collection_type>" exist in "mod_facetoface" plugin:
+      | name       |
+      | <name> One |
 
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
@@ -177,12 +175,10 @@ Feature: Check asset/facilitator actions are performed by users with the right p
     And I press "Save changes"
     Then I should see "Upcoming events"
 
-    When I navigate to "<column_or_node>" node in "Site administration > Seminars"
-    Then I press "Add a new <item_type>"
-    And I set the following fields to these values:
-      | <name_label> | <name> Two |
-    And I press "Add <an_item_type>"
-    And I should see "<name> Two"
+    # TL-23000 made impossible to create a facilitator with the same steps as an asset
+    Given the following "global <collection_type>" exist in "mod_facetoface" plugin:
+      | name       |
+      | <name> Two |
 
     And I am on "Course 1" course homepage
     And I click on "View all events" "link"
@@ -200,6 +196,6 @@ Feature: Check asset/facilitator actions are performed by users with the right p
     And I log out
 
     Examples:
-      | name        | item_type   | collection_type | name_label       | an_item_type  | column_or_node |
-      | Asset       | asset       | assets          | Asset name       | an asset      | Assets         |
-      | Facilitator | facilitator | facilitators    | Facilitator Name | a facilitator | Facilitators   |
+      | name        | item_type   | collection_type | an_item_type  | column_or_node |
+      | Asset       | asset       | assets          | an asset      | Assets         |
+      | Facilitator | facilitator | facilitators    | a facilitator | Facilitators   |

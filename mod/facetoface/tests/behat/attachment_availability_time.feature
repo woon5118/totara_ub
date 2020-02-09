@@ -244,6 +244,6 @@ Feature: Seminar asset/facilitator availability related to time
     And I press "Cancel"
 
     Examples:
-      | name        | item_type   | collection_type | name_label       | an_item_type  | column_or_node |
-      | Asset       | asset       | assets          | Asset name       | an asset      | Assets         |
-      | Facilitator | facilitator | facilitators    | Facilitator Name | a facilitator | Facilitators   |
+      | name        | item_type   | collection_type | an_item_type  | column_or_node |
+      | Asset       | asset       | assets          | an asset      | Assets         |
+      | Facilitator | facilitator | facilitators    | a facilitator | Facilitators   |

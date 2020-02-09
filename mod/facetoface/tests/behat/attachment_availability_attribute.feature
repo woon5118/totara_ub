@@ -127,9 +127,9 @@ Feature: Seminar asset/facilitator availability related to attributes
     And I should see "Upcoming events"
 
     Examples:
-      | name        | item_type   | collection_type | name_label       | an_item_type  | column_or_node |
-      | Asset       | asset       | assets          | Asset name       | an asset      | Assets         |
-      | Facilitator | facilitator | facilitators    | Facilitator Name | a facilitator | Facilitators   |
+      | name        | item_type   | collection_type | an_item_type  | column_or_node |
+      | Asset       | asset       | assets          | an asset      | Assets         |
+      | Facilitator | facilitator | facilitators    | a facilitator | Facilitators   |
 
   Scenario Outline: Custom seminar item availability
     Given I log in as "teacher1"
@@ -154,7 +154,7 @@ Feature: Seminar asset/facilitator availability related to attributes
     And I click on "Select <item_type>" "link"
     And I click on "Create" "link" in the "Choose <collection_type>" "totaradialogue"
     And I set the following fields to these values:
-      | <name_label>              | Etwas 1 |
+      | Name                    | Etwas 1 |
       | Allow booking conflicts | 0       |
     And I click on "OK" "button" in the "Create new <item_type>" "totaradialogue"
 
@@ -208,7 +208,7 @@ Feature: Seminar asset/facilitator availability related to attributes
     And I should not see "<name> 3"
     And I click on "Create" "link" in the "Choose <collection_type>" "totaradialogue"
     And I set the following fields to these values:
-      | <name_label>              | Etwas 2 |
+      | Name                    | Etwas 2 |
       | Allow booking conflicts | 0       |
     And I click on "OK" "button" in the "Create new <item_type>" "totaradialogue"
     And I click on "Delete" "link" in the "Etwas 2" "table_row"
@@ -264,6 +264,6 @@ Feature: Seminar asset/facilitator availability related to attributes
     And I press "Cancel"
 
     Examples:
-      | name        | item_type   | collection_type | name_label       | an_item_type  | column_or_node |
-      | Asset       | asset       | assets          | Asset name       | an asset      | Assets         |
-      | Facilitator | facilitator | facilitators    | Facilitator Name | a facilitator | Facilitators   |
+      | name        | item_type   | collection_type | an_item_type  | column_or_node |
+      | Asset       | asset       | assets          | an asset      | Assets         |
+      | Facilitator | facilitator | facilitators    | a facilitator | Facilitators   |

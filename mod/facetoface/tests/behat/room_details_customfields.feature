@@ -100,7 +100,7 @@ Feature: Check room details with all possible custom fields
     And I press "Add a new room"
     And I set the following fields to these values:
       | Name                 | Room 1          |
-      | Room capacity        | 10              |
+      | Capacity             | 10              |
       | Building             | Building 123    |
       | Address              | 123 Tory street |
       | Room checkbox        | 1               |

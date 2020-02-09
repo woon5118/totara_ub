@@ -29,11 +29,13 @@ class rb_facetoface_rooms_embedded extends rb_base_embedded {
         $this->fullname = get_string('embedded:seminarrooms', 'mod_facetoface');
         $this->columns = array(
             array('type' => 'room', 'value' => 'namelink', 'heading' => null),
+            array('type' => 'room', 'value' => 'allowconflicts', 'heading' => null),
             // NOTE: hardcoding custom field ids is not nice, but this should work fine at least in new installs and upgrades,
             //       if fields does not exist it is ignored.
             array('type' => 'facetoface_room', 'value' => 'custom_field_1', 'heading' => null),
             array('type' => 'facetoface_room', 'value' => 'custom_field_2', 'heading' => null),
             array('type' => 'room', 'value' => 'capacity', 'heading' => null),
+            array('type' => 'room', 'value' => 'published', 'heading' => null),
             array('type' => 'room', 'value' => 'visible', 'heading' => null),
             array('type' => 'room', 'value' => 'actions', 'heading' => null)
         );

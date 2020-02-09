@@ -25,21 +25,50 @@ namespace mod_facetoface\rb\traits;
 
 use rb_column_option;
 use rb_filter_option;
+use rb_join;
 
 defined('MOODLE_INTERNAL') || die();
 
 trait assets {
 
     /**
+     * Add asset joints.
+     *
+     * @param array $joinlist
+     * @param string $sessiondatejoin
+     * @return void
+     */
+    protected function add_assets_to_join_list(array &$joinlist, string $sessiondatejoin) {
+        $joinlist[] = new rb_join(
+            'assetdates',
+            'LEFT',
+            '{facetoface_asset_dates}',
+            "assetdates.sessionsdateid = {$sessiondatejoin}.id",
+            REPORT_BUILDER_RELATION_ONE_TO_MANY,
+            $sessiondatejoin
+        );
+
+        $joinlist[] = new rb_join(
+            'asset',
+            'LEFT',
+            '{facetoface_asset}',
+            'asset.id = assetdates.assetid',
+            REPORT_BUILDER_RELATION_ONE_TO_MANY,
+            'assetdates'
+        );
+    }
+
+    /**
      * Add common assets column options (excluding custom fields)
      * @param array $columnoptions
      * @param string $join alias of join or table that provides assets fields
+     * @param boolean $assetonly
      */
-    protected function add_assets_fields_to_columns(array &$columnoptions, $join = 'asset') {
+    protected function add_assets_fields_to_columns(array &$columnoptions, $join = 'asset', $assetonly = false) {
         $columnoptions[] = new rb_column_option(
             'asset',
             'id',
-            get_string('assetid', 'rb_source_facetoface_asset'),
+            $assetonly ? get_string('id', 'rb_source_facetoface_asset') : get_string('assetid', 'rb_source_facetoface_asset'),
             "$join.id",
             array(
                 'joins' => $join,
@@ -51,7 +80,7 @@ trait assets {
         $columnoptions[] = new rb_column_option(
             'asset',
             'name',
-            get_string('name', 'rb_source_facetoface_asset'),
+            $assetonly ? get_string('name', 'rb_source_facetoface_asset') : get_string('assetname', 'rb_source_facetoface_asset'),
             "$join.name",
             array(
                 'joins' => $join,
@@ -63,13 +92,13 @@ trait assets {
         $columnoptions[] = new rb_column_option(
             'asset',
             'namelink',
-            get_string('namelink', 'rb_source_facetoface_asset'),
+            $assetonly ? get_string('namelink', 'rb_source_facetoface_asset') : get_string('assetnamelink', 'rb_source_facetoface_asset'),
             "$join.name",
             array(
                 'joins' => $join,
                 'dbdatatype' => 'text',
                 'displayfunc' => 'f2f_asset_name_link',
-                'defaultheading' => get_string('name', 'rb_source_facetoface_asset'),
+                'defaultheading' => $assetonly ? get_string('name', 'rb_source_facetoface_asset') : get_string('assetname', 'rb_source_facetoface_asset'),
                 'extrafields' => array('assetid' => "$join.id")
             )
         );
@@ -77,7 +106,7 @@ trait assets {
         $columnoptions[] = new rb_column_option(
             'asset',
             'published',
-            get_string('published', 'rb_source_facetoface_asset'),
+            $assetonly ? get_string('sitewide', 'rb_source_facetoface_asset') : get_string('assetsitewide', 'rb_source_facetoface_asset'),
             "CASE WHEN $join.custom > 0 THEN 1 ELSE 0 END",
             array(
                 'joins' => $join,
@@ -89,7 +118,7 @@ trait assets {
         $columnoptions[] = new rb_column_option(
             'asset',
             'description',
-            get_string('description', 'rb_source_facetoface_asset'),
+            $assetonly ? get_string('description', 'rb_source_facetoface_asset') : get_string('assetdescription', 'rb_source_facetoface_asset'),
             "$join.description",
             array(
                 'joins' => $join,
@@ -102,7 +131,7 @@ trait assets {
         $columnoptions[] = new rb_column_option(
             'asset',
             'visible',
-            get_string('visible', 'rb_source_facetoface_asset'),
+            $assetonly ? get_string('visible', 'rb_source_facetoface_asset') : get_string('assetvisible', 'rb_source_facetoface_asset'),
             "$join.hidden",
             array(
                 'joins' => $join,
@@ -114,7 +143,7 @@ trait assets {
         $columnoptions[] = new rb_column_option(
             'asset',
             'allowconflicts',
-            get_string('allowconflicts', 'rb_source_facetoface_asset'),
+            $assetonly ? get_string('allowconflicts', 'rb_source_facetoface_asset') : get_string('assetallowconflicts', 'rb_source_facetoface_asset'),
             "$join.allowconflicts",
             array(
                 'joins' => $join,
@@ -127,26 +156,27 @@ trait assets {
     /**
      * Add common asset filter options (excluding custom fields)
      * @param array $filteroptions
+     * @param bool $assetonly
      */
-    protected function add_assets_fields_to_filters(array &$filteroptions) {
+    protected function add_assets_fields_to_filters(array &$filteroptions, bool $assetonly = false) {
         $filteroptions[] = new rb_filter_option(
             'asset',
             'id',
-            get_string('assetid', 'rb_source_facetoface_asset'),
+            $assetonly ? get_string('id', 'rb_source_facetoface_asset') : get_string('assetid', 'rb_source_facetoface_asset'),
             'number'
         );
 
         $filteroptions[] = new rb_filter_option(
             'asset',
             'name',
-            get_string('name', 'rb_source_facetoface_asset'),
+            $assetonly ? get_string('name', 'rb_source_facetoface_asset') : get_string('assetname', 'rb_source_facetoface_asset'),
             'text'
         );
 
         $filteroptions[] = new rb_filter_option(
             'asset',
             'published',
-            get_string('published', 'rb_source_facetoface_asset'),
+            $assetonly ? get_string('sitewide', 'rb_source_facetoface_asset') : get_string('assetsitewide', 'rb_source_facetoface_asset'),
             'select',
             array(
                 'simplemode' => true,
@@ -157,14 +187,14 @@ trait assets {
         $filteroptions[] = new rb_filter_option(
             'asset',
             'description',
-            get_string('description', 'rb_source_facetoface_asset'),
+            $assetonly ? get_string('description', 'rb_source_facetoface_asset') : get_string('assetdescription', 'rb_source_facetoface_asset'),
             'text'
         );
 
         $filteroptions[] = new rb_filter_option(
             'asset',
             'visible',
-            get_string('visible', 'rb_source_facetoface_asset'),
+            $assetonly ? get_string('visible', 'rb_source_facetoface_asset') : get_string('assetvisible', 'rb_source_facetoface_asset'),
             'select',
             array(
                 'simplemode' => true,
@@ -175,7 +205,7 @@ trait assets {
         $filteroptions[] = new rb_filter_option(
             'asset',
             'allowconflicts',
-            get_string('allowconflicts', 'rb_source_facetoface_asset'),
+            $assetonly ? get_string('allowconflicts', 'rb_source_facetoface_asset') : get_string('assetallowconflicts', 'rb_source_facetoface_asset'),
             'select',
             array(
                 'simplemode' => true,

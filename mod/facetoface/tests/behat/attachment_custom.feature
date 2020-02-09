@@ -28,10 +28,10 @@ Feature: Manage custom assets/facilitators by non-admin user
     And I click on "Create" "link"
     And I should see "Create new <item_type>" in the "Create new <item_type>" "totaradialogue"
     And I set the following fields to these values:
-      | <name_label>            | <name> 1 |
-      | Allow booking conflicts | 1        |
-      | <description_label>     | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. |
-    And I should not see "Publish for reuse"
+      | Name                     | <name> 1 |
+      | Allow booking conflicts  | 1        |
+      | description_editor[text] | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. |
+    And I should not see "Add to sitewide list"
     When I click on "OK" "button" in the "Create new <item_type>" "totaradialogue"
     Then I should see "<name> 1"
 
@@ -39,24 +39,24 @@ Feature: Manage custom assets/facilitators by non-admin user
     And I click on "Edit <item_type>" "link"
     And I should see "Edit <item_type>" in the "Edit <item_type>" "totaradialogue"
     And I set the following fields to these values:
-      | <name_label> | <name> updated |
-    And I should not see "Publish for reuse"
+      | Name | <name> updated |
+    And I should not see "Add to sitewide list"
     When I click on "OK" "button" in the "Edit <item_type>" "totaradialogue"
     Then I should see "<name> updated"
 
     Examples:
-      | name        | item_type   | collection_type | name_label       | description_label |
-      | Asset       | asset       | assets          | Asset name       | Asset description |
-      | Facilitator | facilitator | facilitators    | Facilitator Name | Description       |
+      | name        | item_type   | collection_type |
+      | Asset       | asset       | assets          |
+      | Facilitator | facilitator | facilitators    |
 
   Scenario Outline: Confirm images work when adding an item through a totaradialogue
     And I click on "Select <collection_type>" "link"
     And I click on "Create" "link"
     And I should see "Create new <item_type>" in the "Create new <item_type>" "totaradialogue"
     And I set the following fields to these values:
-      | <name_label>            | <name> 1 |
-      | Allow booking conflicts | 1        |
-      | <description_label>     | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. |
+      | Name                     | <name> 1 |
+      | Allow booking conflicts  | 1        |
+      | description_editor[text] | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. |
     And I click on "Image" "button" in the "Create new <item_type>" "totaradialogue"
     And I click on "Browse repositories..." "button"
     And I click on "Wikimedia" "link"
@@ -66,23 +66,23 @@ Feature: Manage custom assets/facilitators by non-admin user
     And I press "Select this file"
     And I set the field "Describe this image for someone who cannot see it" to "hello"
     And I press "Save image"
-    And I set the field "<name_label>" to "woof"
+    And I set the field "Name" to "woof"
     And I click on "OK" "button" in the "Create new <item_type>" "totaradialogue"
     Then I should see "woof"
 
     Examples:
-      | name        | item_type   | collection_type | name_label       | description_label |
-      | Asset       | asset       | assets          | Asset name       | Asset description |
-      | Facilitator | facilitator | facilitators    | Facilitator Name | Description       |
+      | name        | item_type   | collection_type |
+      | Asset       | asset       | assets          |
+      | Facilitator | facilitator | facilitators    |
 
   Scenario Outline: Confirm images load when viewing added items
     And I click on "Select <collection_type>" "link"
     And I click on "Create" "link"
     And I should see "Create new <item_type>" in the "Create new <item_type>" "totaradialogue"
     And I set the following fields to these values:
-      | <name_label>                      | <name> 1 |
-      | Allow booking conflicts           | 1        |
-      | <description_label>               | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. |
+      | Name                     | <name> 1 |
+      | Allow booking conflicts  | 1        |
+      | description_editor[text] | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. |
     And I click on "Image" "button" in the "Create new <item_type>" "totaradialogue"
     And I click on "Browse repositories..." "button"
     And I click on "Wikimedia" "link"
@@ -92,7 +92,7 @@ Feature: Manage custom assets/facilitators by non-admin user
     And I press "Select this file"
     And I set the field "Describe this image for someone who cannot see it" to "hello"
     And I press "Save image"
-    And I set the field "<name_label>" to "woof"
+    And I set the field "Name" to "woof"
     And I click on "OK" "button" in the "Create new <item_type>" "totaradialogue"
     Then I should see "woof"
     And I press "Save changes"
@@ -100,7 +100,7 @@ Feature: Manage custom assets/facilitators by non-admin user
     And I log in as "admin"
     When I navigate to "<column_or_node>" node in "Site administration > Seminars"
     Then I should see "There are no records that match your selected criteria"
-    When I set the field "<published_label>" to "No"
+    When I set the field "Sitewide" to "No"
     And I click on "#id_submitgroupstandard_addfilter" "css_element"
     And I click on "woof" "link" in the "facetoface_<collection_type>" "table"
     Then I should see image with alt text "hello"
@@ -108,18 +108,18 @@ Feature: Manage custom assets/facilitators by non-admin user
     Then I should see "There are no records that match your selected criteria"
 
     Examples:
-      | name        | item_type   | collection_type | name_label       | description_label | published_label | column_or_node |
-      | Asset       | asset       | assets          | Asset name       | Asset description | Asset Published | Assets         |
-      | Facilitator | facilitator | facilitators    | Facilitator Name | Description       | Published       | Facilitators   |
+      | name        | item_type   | collection_type | column_or_node |
+      | Asset       | asset       | assets          | Assets         |
+      | Facilitator | facilitator | facilitators    | Facilitators   |
 
   Scenario Outline: Confirm the custom item is available after event cancellation
     And I click on "Select <collection_type>" "link"
     And I click on "Create" "link"
     And I should see "Create new <item_type>" in the "Create new <item_type>" "totaradialogue"
     And I set the following fields to these values:
-      | <name_label>        | <name> 1 |
-      | <description_label> | Lorem ipsum dolor sit amet, consectetur adipisicing elit |
-    And I should not see "Publish for reuse"
+      | Name                     | <name> 1 |
+      | description_editor[text] | Lorem ipsum dolor sit amet, consectetur adipisicing elit |
+    And I should not see "Add to sitewide list"
     When I click on "OK" "button" in the "Create new <item_type>" "totaradialogue"
     Then I should see "<name> 1"
     And I press "Save changes"
@@ -138,6 +138,6 @@ Feature: Manage custom assets/facilitators by non-admin user
     Then I should see "Sign-up" in the ".mod_facetoface__eventinfo__sidebar__signup" "css_element"
 
     Examples:
-      | name        | item_type   | collection_type | name_label       | description_label |
-      | Asset       | asset       | assets          | Asset name       | Asset description |
-      | Facilitator | facilitator | facilitators    | Facilitator Name | Description       |
+      | name        | item_type   | collection_type |
+      | Asset       | asset       | assets          |
+      | Facilitator | facilitator | facilitators    |

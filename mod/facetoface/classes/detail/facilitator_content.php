@@ -75,7 +75,7 @@ class facilitator_content extends content_generator {
     }
 
     protected function render_empty(moodle_url $manageurl): string {
-        return get_string('selectfacilitator', 'mod_facetoface', $manageurl->out());
+        return get_string('reports:selectfacilitator', 'mod_facetoface', $manageurl->out());
     }
 
     protected function get_manage_button(bool $frommanage): string {

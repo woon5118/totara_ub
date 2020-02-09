@@ -156,22 +156,6 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
-                'roomdates',
-                'LEFT',
-                '{facetoface_room_dates}',
-                'roomdates.sessionsdateid = sessiondate.id',
-                REPORT_BUILDER_RELATION_ONE_TO_MANY,
-                'sessiondate'
-            ),
-            new rb_join(
-                'room',
-                'LEFT',
-                '{facetoface_room}',
-                'roomdates.roomid = room.id',
-                REPORT_BUILDER_RELATION_ONE_TO_MANY,
-                'roomdates'
-            ),
-            new rb_join(
                 'bookedby',
                 'LEFT',
                 '{user}',
@@ -211,38 +195,6 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
-                'assetdate',
-                'LEFT',
-                '{facetoface_asset_dates}',
-                'assetdate.sessionsdateid = sessiondate.id',
-                REPORT_BUILDER_RELATION_MANY_TO_ONE,
-                'sessiondate'
-            ),
-            new rb_join(
-                'asset',
-                'LEFT',
-                '{facetoface_asset}',
-                'assetdate.assetid = asset.id',
-                REPORT_BUILDER_RELATION_MANY_TO_ONE,
-                'assetdate'
-            ),
-            new rb_join(
-                'facilitatordate',
-                'LEFT',
-                '{facetoface_facilitator_dates}',
-                'facilitatordate.sessionsdateid = sessiondate.id',
-                REPORT_BUILDER_RELATION_MANY_TO_ONE,
-                'sessiondate'
-            ),
-            new rb_join(
-                'facilitator',
-                'LEFT',
-                '{facetoface_facilitator}',
-                'facilitatordate.facilitatorid = facilitator.id',
-                REPORT_BUILDER_RELATION_MANY_TO_ONE,
-                'facilitatordate'
-            ),
-            new rb_join(
                 'selected_job_assignment',
                 'LEFT',
                 '{job_assignment}',
@@ -250,6 +202,10 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
         );
+
+        $this->add_rooms_to_join_list($joinlist, 'sessiondate');
+        $this->add_assets_to_join_list($joinlist, 'sessiondate');
+        $this->add_facilitators_to_join_list($joinlist, 'sessiondate');
 
         // include some standard joins
         $this->add_core_user_tables($joinlist, 'base', 'userid');
@@ -567,10 +523,10 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
         $this->add_core_tag_columns('core', 'course', $columnoptions);
         $this->add_core_tag_columns('core', 'course_modules', $columnoptions);
         $this->add_facetoface_session_roles_to_columns($columnoptions);
-        $this->add_assets_fields_to_columns($columnoptions);
-        $this->add_rooms_fields_to_columns($columnoptions);
+        $this->add_assets_fields_to_columns($columnoptions, 'asset', false);
+        $this->add_rooms_fields_to_columns($columnoptions, 'room', false);
+        $this->add_facilitators_fields_to_columns($columnoptions, 'facilitator', false);
         $this->add_totara_cohort_course_columns($columnoptions);
-        $this->add_facilitators_fields_to_columns($columnoptions);
 
         return $columnoptions;
     }

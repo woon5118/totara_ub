@@ -132,7 +132,7 @@ Feature: Filter seminar events in calendar by their customfields
     And I set the following fields to these values:
       | Name                          | Room 1          |
       | Address                       | 123 here street |
-      | Room capacity                 | 5               |
+      | Capacity                      | 5               |
       | Building                      | That house      |
       | Checkbox                      | 1               |
       | customfield_datetime[enabled] | 1               |
@@ -150,7 +150,7 @@ Feature: Filter seminar events in calendar by their customfields
     And I set the following fields to these values:
       | Name                          | Room 2        |
       | Address                       | 123 other ave |
-      | Room capacity                 | 5             |
+      | Capacity                      | 5             |
       | Building                      | My house      |
       | Checkbox                      | 0             |
       | customfield_datetime[enabled] | 1             |
@@ -167,7 +167,7 @@ Feature: Filter seminar events in calendar by their customfields
     And I set the following fields to these values:
       | Name                          | Room 3          |
       | Address                       | 123 new street  |
-      | Room capacity                 | 15              |
+      | Capacity                      | 15              |
       | Building                      | New house       |
       | Checkbox                      | 1               |
       | customfield_datetime[enabled] | 1               |
@@ -185,7 +185,7 @@ Feature: Filter seminar events in calendar by their customfields
     And I set the following fields to these values:
       | Name                          | Room 4        |
       | Address                       | 123 old ave   |
-      | Room capacity                 | 15            |
+      | Capacity                      | 15            |
       | Building                      | Old house     |
       | Checkbox                      | 0             |
       | customfield_datetime[enabled] | 1             |

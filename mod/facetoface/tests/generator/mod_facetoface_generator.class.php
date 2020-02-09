@@ -310,13 +310,48 @@ class mod_facetoface_generator extends testing_module_generator {
     }
 
     /**
-     * Add global room.
+     * Validate record fields for behat.
      *
-     * @param stdClass|array $record
-     * @return stdClass
+     * @param array $record
+     * @param string[] $musthavefields array of field names $record must have
+     * @param string[] $mustnothavefields array of field names $record must not have
+     * @throws coding_exception
      */
-    public function create_global_room_for_behat(array $record=[]) {
-        return $this->add_site_wide_room($record);
+    private function validate_record_for_behat(array $record, array $musthavefields, array $mustnothavefields) {
+        if (empty($musthavefields) && empty($mustnothavefields)) {
+            throw new coding_exception('No constraints specified');
+        }
+        foreach ($musthavefields as $fieldname) {
+            if (!isset($record[$fieldname])) {
+                throw new coding_exception("The field {$fieldname} is mandatory");
+            }
+        }
+        foreach ($mustnothavefields as $fieldname) {
+            if (isset($record[$fieldname])) {
+                throw new coding_exception("The field {$fieldname} is not accepted");
+            }
+        }
+    }
+
+    /**
+     * Resolve record fields for behat.
+     *
+     * @param array $record
+     * @return void
+     */
+    private function translate_record_for_behat(array &$record) {
+        foreach (['usercreated', 'usermodified'] as $fieldname) {
+            if (isset($record[$fieldname])) {
+                $user = core_user::get_user_by_username($record[$fieldname], 'id');
+                if ($user) {
+                    $record[$fieldname] = $user->id;
+                } else {
+                    // Remove the field if a user is not found.
+                    unset($record[$fieldname]);
+                }
+            }
+        }
+        // Add any adjustments here if necessary.
     }
 
     /**
@@ -689,38 +724,69 @@ class mod_facetoface_generator extends testing_module_generator {
     }
 
     /**
+     * Add a site-wide room.
      * @param array $record
+     * @return stdClass
      */
-    public function create_custom_room_for_behat(array $record) {
-        $this->add_custom_room($record);
+    public function create_global_room_for_behat(array $record): stdClass {
+        $this->validate_record_for_behat($record, [], ['custom']);
+        $this->translate_record_for_behat($record);
+        return $this->add_site_wide_room($record);
     }
 
     /**
+     * Add an ad-hoc room.
      * @param array $record
+     * @return stdClass
      */
-    public function create_global_asset_for_behat(array $record) {
-        $this->add_site_wide_asset($record);
+    public function create_custom_room_for_behat(array $record): stdClass {
+        $this->validate_record_for_behat($record, [], ['custom']);
+        $this->translate_record_for_behat($record);
+        return $this->add_custom_room($record);
     }
 
     /**
+     * Add a site-wide asset.
      * @param array $record
+     * @return stdClass
      */
-    public function create_custom_asset_for_behat(array $record) {
-        $this->add_custom_asset($record);
+    public function create_global_asset_for_behat(array $record): stdClass {
+        $this->validate_record_for_behat($record, [], ['custom']);
+        $this->translate_record_for_behat($record);
+        return $this->add_site_wide_asset($record);
     }
 
     /**
+     * Add an ad-hoc asset.
      * @param array $record
+     * @return stdClass
      */
-    public function create_global_facilitator_for_behat(array $record) {
-        $this->add_site_wide_facilitator($record);
+    public function create_custom_asset_for_behat(array $record): stdClass {
+        $this->validate_record_for_behat($record, [], ['custom']);
+        $this->translate_record_for_behat($record);
+        return $this->add_custom_asset($record);
     }
 
     /**
+     * Add a site-wide facilitator.
      * @param array $record
+     * @return stdClass
      */
-    public function create_custom_facilitator_for_behat(array $record) {
-        $this->add_custom_facilitator($record);
+    public function create_global_facilitator_for_behat(array $record): stdClass {
+        $this->validate_record_for_behat($record, [], ['custom']);
+        $this->translate_record_for_behat($record);
+        return $this->add_site_wide_facilitator($record);
+    }
+
+    /**
+     * Add an ad-hoc facilitator.
+     * @param array $record
+     * @return stdClass
+     */
+    public function create_custom_facilitator_for_behat(array $record): stdClass {
+        $this->validate_record_for_behat($record, [], ['custom']);
+        $this->translate_record_for_behat($record);
+        return $this->add_custom_facilitator($record);
     }
 
     /**
@@ -821,5 +887,17 @@ class mod_facetoface_generator extends testing_module_generator {
      */
     public function create_signups_for_behat(array $record) {
         return mod_facetoface_generator_util::create_signups_for_behat($record);
+    }
+
+    /**
+     * @param array $record
+     * @return stdClass
+     */
+    public function create_custom_field_for_behat(array $record) {
+        /** @var totara_core_generator $gen */
+        $gen = (new testing_data_generator())->get_plugin_generator('totara_core');
+        $prefix = 'facetoface_'.$record['prefix'];
+        unset($record['prefix']);
+        return $gen->create_custom_field($prefix, $record);
     }
 }

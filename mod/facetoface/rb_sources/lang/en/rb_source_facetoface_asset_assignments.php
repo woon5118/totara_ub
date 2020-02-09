@@ -22,14 +22,18 @@
  */
 $string['sourcelabel'] = 'Seminar';
 $string['sourcesummary'] = 'Upcoming events using assets.';
-$string['sourcetitle'] = 'Seminar Asset Assignments';
 
 $string['facetofacesummaryasset'] = 'Upcoming Sessions using Asset';
-$string['selectanasset'] = 'To view this report, first <a href="{$a}">select an asset</a> you want to view.';
 $string['type_asset'] = 'Assets';
+$string['type_facilitator'] = 'Facilitators';
 $string['type_session'] = 'Sessions';
 $string['type_room'] = 'Rooms';
 $string['type_facetoface_asset'] = 'Assets';
+$string['type_facetoface_facilitator'] = 'Facilitators';
 $string['type_facetoface_room'] = 'Rooms';
 $string['type_facetoface_session'] = 'Event Custom Fields';
 $string['type_date'] = 'Date';
+
+// Deprecated since Totara 13.0
+$string['selectanasset'] = 'To view this report, first <a href="{$a}">select an asset</a> you want to view.';
+$string['sourcetitle'] = 'Seminar Asset Assignments';

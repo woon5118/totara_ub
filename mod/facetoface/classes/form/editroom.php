@@ -81,14 +81,14 @@ class editroom extends \moodleform {
         $mform->addRule('roomcapacity', null, 'required', null, 'client');
         $mform->addRule('roomcapacity', null, 'numeric', null, 'client');
 
+        // Room link.
+        $mform->addElement('text', 'url', get_string('roomurl', 'mod_facetoface'), ['maxlength' => '1024', 'size' => '45']);
+        $mform->setType('url', PARAM_URL);
+
         // 'Allow room booking conflicts' checkbox
         $mform->addElement('advcheckbox', 'allowconflicts', get_string('allowroomconflicts', 'mod_facetoface'));
         $mform->addHelpButton('allowconflicts', 'allowroomconflicts', 'mod_facetoface');
         $mform->setType('allowconflicts', PARAM_INT);
-
-        // Room link.
-        $mform->addElement('text', 'url', get_string('roomurl', 'mod_facetoface'), ['maxlength' => '1024', 'size' => '45']);
-        $mform->setType('url', PARAM_URL);
 
         // We don't need autosave here
         $editoropts = $TEXTAREA_OPTIONS;
@@ -98,16 +98,6 @@ class editroom extends \moodleform {
 
         // Custom fields: Building and Location.
         customfield_definition($mform, (object)['id' => $room->get_id()], 'facetofaceroom', 0, 'facetoface_room');
-
-        // 'Publish for reuse by other events' checkbox or hidden element.
-        $capability = has_capability('mod/facetoface:managesitewiderooms', \context_system::instance());
-        if ($capability and !empty($seminar) and $room->get_custom()) {
-            $mform->addElement('advcheckbox', 'notcustom', get_string('publishreuse', 'mod_facetoface'));
-            // Disable if does not seem to work in dialog forms, back luck.
-        } else {
-            $mform->addElement('hidden', 'notcustom');
-        }
-        $mform->setType('notcustom', PARAM_INT);
 
         // Version control.
         if (!empty($room) && $room->exists()) {
@@ -129,6 +119,17 @@ class editroom extends \moodleform {
                 );
             }
         }
+
+        // Add to sitewide list.
+        $capability = has_capability('mod/facetoface:managesitewiderooms', \context_system::instance());
+        if ($capability and !empty($seminar) and $room->get_custom()) {
+            $mform->addElement('advcheckbox', 'notcustom', get_string('addtositewidelist', 'mod_facetoface'));
+        } else {
+            $mform->addElement('hidden', 'notcustom');
+        }
+        $mform->setType('notcustom', PARAM_INT);
+        $mform->closeHeaderBefore('notcustom');
+
         // Buttons.
         if (empty($seminar)) {
             $label = null;

@@ -24,14 +24,25 @@ $string['sourcelabel'] = 'Seminar';
 $string['sourcesummary'] = 'List of seminar assets.';
 $string['sourcetitle'] = 'Seminar Assets';
 
-$string['allowconflicts'] = 'Asset Allow Schedule Conflicts';
+$string['allowconflicts'] = 'Allow booking conflicts';
+$string['assetallowconflicts'] = 'Asset Allow booking conflicts';
 $string['assetavailable'] = 'Asset Availability';
+$string['assetdescription'] = 'Asset Description';
 $string['assetid'] = 'Asset ID';
-$string['description'] = 'Asset Description';
+$string['assetname'] = 'Asset Name';
+$string['assetnamelink'] = 'Asset Name (linked to asset details page)';
+$string['assetsitewide'] = 'Asset Sitewide';
+$string['assetvisible'] = 'Asset Visible';
+$string['available'] = 'Availability';
+$string['description'] = 'Description';
 $string['embeddedreportname'] = 'Manage Seminar Assets';
-$string['name'] = 'Asset Name';
-$string['namelink'] = 'Asset Name (linked to asset details page)';
-$string['published'] = 'Asset Published';
+$string['id'] = 'ID';
+$string['name'] = 'Name';
+$string['namelink'] = 'Name (linked to asset details page)';
+$string['sitewide'] = 'Sitewide';
 $string['type_asset'] = 'Assets';
 $string['type_facetoface_asset'] = 'Asset Custom Fields';
-$string['visible'] = 'Asset Visible';
+$string['visible'] = 'Visible';
+
+// Deprecated since Totara 13.0
+$string['published'] = 'Asset Published';

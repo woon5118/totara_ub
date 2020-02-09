@@ -13,7 +13,7 @@ Feature: Search pre-defined assets in seminar
     And I navigate to "Assets" node in "Site administration > Seminars"
     And I press "Add a new asset"
     And I set the following fields to these values:
-      | Asset name | Basset Asset |
+      | Name | Basset Asset |
     And I press "Add an asset"
     Then I should see "Basset Asset"
 

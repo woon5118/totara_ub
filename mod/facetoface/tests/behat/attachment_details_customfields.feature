@@ -96,11 +96,15 @@ Feature: Check asset/facilitator details with all possible custom fields
     And I should see "<name> address"
 
     # Create an item
+    # TL-23000 made impossible to create a facilitator with the same steps as an asset
+    Given the following "global <collection_type>" exist in "mod_facetoface" plugin:
+      | name                        |
+      | <name>_created_by_generator |
     When I navigate to "<column_or_node>" node in "Site administration > Seminars"
-    And I press "Add a new <item_type>"
+    And I click on "Edit <item_type>" "link" in the "<name>_created_by_generator" "table_row"
     # Set the basic fields.
     And I set the following fields to these values:
-      | <name_label>                  | <name> 1 |
+      | Name                          | <name> 1 |
       | <name> checkbox               | 1 |
       | <name> menu of choices        | Orange |
       | <name> text area              | Lorem ipsum dolor sit amet, consectetur adipisicing elit |
@@ -141,7 +145,7 @@ Feature: Check asset/facilitator details with all possible custom fields
     And I set the field "Describe this image for someone who cannot see it" to "Green leaves on customfield text area"
     And I click on "Save image" "button"
     # Create the item.
-    And I press "Add <an_item_type>"
+    And I press "Save changes"
 
     # Verify that the item was created correctly.
     When I click on "<name> 1" "link" in the "facetoface_<collection_type>" "table"
@@ -160,6 +164,6 @@ Feature: Check asset/facilitator details with all possible custom fields
     And I should see image with alt text "Green leaves on customfield text area"
 
     Examples:
-      | name        | item_type   | collection_type | name_label       | an_item_type  | column_or_node |
-      | Asset       | asset       | assets          | Asset name       | an asset      | Assets         |
-      | Facilitator | facilitator | facilitators    | Facilitator Name | a facilitator | Facilitators   |
+      | name        | item_type   | collection_type | an_item_type  | column_or_node |
+      | Asset       | asset       | assets          | an asset      | Assets         |
+      | Facilitator | facilitator | facilitators    | a facilitator | Facilitators   |

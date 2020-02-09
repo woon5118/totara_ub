@@ -20,24 +20,24 @@ Feature: Check seminar room identifiers setting
     And I press "Add a new room"
     And I set the following fields to these values:
       | Name                         | Room 1          |
-      | Room capacity                | 10              |
-      | Allow room booking conflicts | 0               |
+      | Capacity                     | 10              |
+      | Allow booking conflicts      | 0               |
       | Building                     | Some Building 1 |
       | Address                      | 123 Main Street |
     And I press "Add a room"
     And I press "Add a new room"
     And I set the following fields to these values:
       | Name                         | Room 2          |
-      | Room capacity                | 10              |
-      | Allow room booking conflicts | 0               |
+      | Capacity                     | 10              |
+      | Allow booking conflicts      | 0               |
       | Building                     | Some Building 2 |
       | Address                      |                 |
     And I press "Add a room"
     And I press "Add a new room"
     And I set the following fields to these values:
       | Name                         | Room 3          |
-      | Room capacity                | 10              |
-      | Allow room booking conflicts | 0               |
+      | Capacity                     | 10              |
+      | Allow booking conflicts      | 0               |
       | Building                     |                 |
       | Address                      | 321 Main Street |
     And I press "Add a room"

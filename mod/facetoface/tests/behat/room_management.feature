@@ -34,7 +34,7 @@ Feature: Manage pre-defined rooms
       | Name              | Room 1          |
       | Building          | That house      |
       | Address           | 123 here street |
-      | Room capacity     | 5               |
+      | Capacity          | 5               |
     And I click on "#id_customfield_locationsize_medium" "css_element"
     And I click on "#id_customfield_locationview_satellite" "css_element"
     And I click on "#id_customfield_locationdisplay_map" "css_element"
@@ -45,7 +45,7 @@ Feature: Manage pre-defined rooms
       | Name              | Room 2          |
       | Building          | Your house      |
       | Address           | 123 near street |
-      | Room capacity     | 6               |
+      | Capacity          | 6               |
     And I click on "#id_customfield_locationsize_medium" "css_element"
     And I click on "#id_customfield_locationview_satellite" "css_element"
     And I click on "#id_customfield_locationdisplay_map" "css_element"

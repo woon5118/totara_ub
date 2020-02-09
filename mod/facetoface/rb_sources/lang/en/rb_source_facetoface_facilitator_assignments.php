@@ -24,6 +24,13 @@
 $string['sourcelabel'] = 'Seminar';
 $string['sourcesummary'] = 'Upcoming events using facilitators.';
 $string['sourcetitle'] = 'Seminar Facilitators Assignments';
-$string['type_date'] = 'Date';
-$string['type_session'] = 'Sessions';
 
+$string['type_asset'] = 'Assets';
+$string['type_facilitator'] = 'Facilitators';
+$string['type_session'] = 'Sessions';
+$string['type_room'] = 'Rooms';
+$string['type_facetoface_asset'] = 'Assets';
+$string['type_facetoface_facilitator'] = 'Facilitators';
+$string['type_facetoface_room'] = 'Rooms';
+$string['type_facetoface_session'] = 'Event Custom Fields';
+$string['type_date'] = 'Date';

@@ -100,7 +100,7 @@ Feature: Seminar event cancellation calendar views
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
     And I should see "Cancelled" in the "10:00 AM - 4:00 PM" "table_row"
     And "Go to event" "link" should not exist in the ".mod_facetoface__event-dashboard" "css_element"
-    And "Actions" "button" should not exist in the ".mod_facetoface__event-dashboard" "css_element"
+    And "More actions" "button" should not exist in the ".mod_facetoface__event-dashboard" "css_element"
 
     When I click on "Dashboard" in the totara menu
     And I click on "Go to calendar" "link"
@@ -135,7 +135,7 @@ Feature: Seminar event cancellation calendar views
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
     And I should see "Cancelled" in the "10:00 AM - 4:00 PM" "table_row"
     And "Go to event" "link" should not exist in the ".mod_facetoface__event-dashboard" "css_element"
-    But "Actions" "button" should exist in the ".mod_facetoface__event-dashboard" "css_element"
+    But "More actions" "button" should exist in the ".mod_facetoface__event-dashboard" "css_element"
 
     When I click on "Dashboard" in the totara menu
     And I click on "Go to calendar" "link"
@@ -162,7 +162,7 @@ Feature: Seminar event cancellation calendar views
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
     And I should see "Cancelled" in the "10:00 AM - 4:00 PM" "table_row"
     And "Go to event" "link" should not exist in the ".mod_facetoface__event-dashboard" "css_element"
-    But "Actions" "button" should exist in the ".mod_facetoface__event-dashboard" "css_element"
+    But "More actions" "button" should exist in the ".mod_facetoface__event-dashboard" "css_element"
 
     When I click on "Dashboard" in the totara menu
     And I click on "Go to calendar" "link"

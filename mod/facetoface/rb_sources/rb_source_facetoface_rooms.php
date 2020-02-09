@@ -45,28 +45,6 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source {
      */
     protected $urlparams = array();
 
-    /**
-     * The default condition that is always appearing in the sql
-     * for the report builder source
-     * @see reportbuilder::build_query
-     * @var string
-     */
-    public $sourcewhere;
-
-    /**
-     * Attribute for setting the default join table for
-     * the report builder source.
-     *
-     * Use string if it is only one join,
-     * or array if it is multiple joins (preferred array)
-     *
-     * The value is the name of the join for report builder.
-     * @example $rb_join->name
-     * @see rb_join::name
-     * @var string | array
-     */
-    public $sourcejoins;
-
     public function __construct(rb_global_restriction_set $globalrestrictionset = null) {
 
         $this->base = '{facetoface_room}';
@@ -80,8 +58,6 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source {
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->defaultfilters = $this->define_defaultfilters();
         $this->paramoptions = $this->define_paramoptions();
-        $this->sourcewhere = " ( base.custom = 0 OR assigned.cntdates IS NOT NULL ) ";
-        $this->sourcejoins = array("assigned") ;
         $this->add_customfields();
 
         parent::__construct();
@@ -122,7 +98,7 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source {
     protected function define_columnoptions() {
         $columnoptions = array();
 
-        $this->add_rooms_fields_to_columns($columnoptions, 'base');
+        $this->add_rooms_fields_to_columns($columnoptions, 'base', true);
 
         $columnoptions[] = new rb_column_option(
             'room',
@@ -149,12 +125,12 @@ class rb_source_facetoface_rooms extends rb_facetoface_base_source {
     protected function define_filteroptions() {
         $filteroptions = array();
 
-        $this->add_rooms_fields_to_filters($filteroptions);
+        $this->add_rooms_fields_to_filters($filteroptions, true);
 
         $filteroptions[] = new rb_filter_option(
             'room',
             'roomavailable',
-            get_string('roomavailable', 'rb_source_facetoface_rooms'),
+            get_string('available', 'rb_source_facetoface_rooms'),
             'f2f_roomavailable',
             array(),
             'base.id'

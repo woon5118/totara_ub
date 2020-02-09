@@ -85,16 +85,6 @@ class asset_edit extends \moodleform {
         // Asset customfields.
         customfield_definition($mform, (object)['id' => $asset->get_id()], 'facetofaceasset', 0, 'facetoface_asset');
 
-        // Publish for reuse by other events.
-        $capability = has_capability('mod/facetoface:managesitewideassets', \context_system::instance());
-        if ($capability and !empty($seminar) and $asset->get_custom()) {
-            $mform->addElement('advcheckbox', 'notcustom', get_string('publishreuse', 'mod_facetoface'));
-            // Disable if does not seem to work in dialog forms, back luck.
-        } else {
-            $mform->addElement('hidden', 'notcustom');
-        }
-        $mform->setType('notcustom', PARAM_INT);
-
         // Version control.
         if ($asset->exists()) {
             $mform->addElement('header', 'versions', get_string('versioncontrol', 'mod_facetoface'));
@@ -115,6 +105,17 @@ class asset_edit extends \moodleform {
                 );
             }
         }
+
+        // Add to sitewide list.
+        $capability = has_capability('mod/facetoface:managesitewideassets', \context_system::instance());
+        if ($capability and !empty($seminar) and $asset->get_custom()) {
+            $mform->addElement('advcheckbox', 'notcustom', get_string('addtositewidelist', 'mod_facetoface'));
+        } else {
+            $mform->addElement('hidden', 'notcustom');
+        }
+        $mform->setType('notcustom', PARAM_INT);
+        $mform->closeHeaderBefore('notcustom');
+
         // Buttons.
         if (empty($seminar)) {
             $label = null;

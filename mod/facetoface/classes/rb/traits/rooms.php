@@ -25,22 +25,51 @@ namespace mod_facetoface\rb\traits;
 
 use rb_column_option;
 use rb_filter_option;
+use rb_join;
 
 defined('MOODLE_INTERNAL') || die();
 
 trait rooms {
 
     /**
+     * Add room joints.
+     *
+     * @param array $joinlist
+     * @param string $sessiondatejoin
+     * @return void
+     */
+    protected function add_rooms_to_join_list(array &$joinlist, $sessiondatejoin) {
+        $joinlist[] = new rb_join(
+            'roomdates',
+            'LEFT',
+            '{facetoface_room_dates}',
+            "roomdates.sessionsdateid = {$sessiondatejoin}.id",
+            REPORT_BUILDER_RELATION_ONE_TO_MANY,
+            $sessiondatejoin
+        );
+
+        $joinlist[] = new rb_join(
+            'room',
+            'LEFT',
+            '{facetoface_room}',
+            'room.id = roomdates.roomid',
+            REPORT_BUILDER_RELATION_ONE_TO_MANY,
+            'roomdates'
+        );
+    }
+
+    /**
      * Add common room column options (excluding custom fields)
      *
      * @param array $columnoptions
      * @param string $join alias of join or table that provides room fields
+     * @param boolean $roomonly
      */
-    protected function add_rooms_fields_to_columns(array &$columnoptions, $join = 'room') {
+    protected function add_rooms_fields_to_columns(array &$columnoptions, $join = 'room', bool $roomonly = false) {
         $columnoptions[] = new rb_column_option(
             'room',
             'id',
-            get_string('roomid', 'rb_source_facetoface_rooms'),
+            $roomonly ? get_string('id', 'rb_source_facetoface_rooms') : get_string('roomid', 'rb_source_facetoface_rooms'),
             "$join.id",
             array(
                 'joins' => $join,
@@ -52,7 +81,7 @@ trait rooms {
         $columnoptions[] = new rb_column_option(
             'room',
             'name',
-            get_string('name', 'rb_source_facetoface_rooms'),
+            $roomonly ? get_string('name', 'rb_source_facetoface_rooms') : get_string('roomname', 'rb_source_facetoface_rooms'),
             "$join.name",
             array(
                 'joins' => $join,
@@ -64,13 +93,13 @@ trait rooms {
         $columnoptions[] = new rb_column_option(
             'room',
             'namelink',
-            get_string('namelink', 'rb_source_facetoface_rooms'),
+            $roomonly ? get_string('namelink', 'rb_source_facetoface_rooms') : get_string('roomnamelink', 'rb_source_facetoface_rooms'),
             "$join.name",
             array(
                 'joins' => $join,
                 'dbdatatype' => 'text',
                 'displayfunc' => 'f2f_room_name_link',
-                'defaultheading' => get_string('name', 'rb_source_facetoface_rooms'),
+                'defaultheading' => $roomonly ? get_string('name', 'rb_source_facetoface_rooms') : get_string('roomname', 'rb_source_facetoface_rooms'),
                 'extrafields' => array('roomid' => "$join.id", 'custom' => "{$join}.custom")
             )
         );
@@ -78,7 +107,7 @@ trait rooms {
         $columnoptions[] = new rb_column_option(
             'room',
             'published',
-            get_string('published', 'rb_source_facetoface_rooms'),
+            $roomonly ? get_string('sitewide', 'rb_source_facetoface_rooms') : get_string('roomsitewide', 'rb_source_facetoface_rooms'),
             "CASE WHEN $join.custom > 0 THEN 1 ELSE 0 END",
             array(
                 'joins' => $join,
@@ -90,7 +119,7 @@ trait rooms {
         $columnoptions[] = new rb_column_option(
             'room',
             'description',
-            get_string('description', 'rb_source_facetoface_rooms'),
+            $roomonly ? get_string('description', 'rb_source_facetoface_rooms') : get_string('roomdescription', 'rb_source_facetoface_rooms'),
             "$join.description",
             array(
                 'joins' => $join,
@@ -103,7 +132,7 @@ trait rooms {
         $columnoptions[] = new rb_column_option(
             'room',
             'visible',
-            get_string('visible', 'rb_source_facetoface_rooms'),
+            $roomonly ? get_string('visible', 'rb_source_facetoface_rooms') : get_string('roomvisible', 'rb_source_facetoface_rooms'),
             "$join.hidden",
             array(
                 'joins' => $join,
@@ -115,7 +144,7 @@ trait rooms {
         $columnoptions[] = new rb_column_option(
             'room',
             'capacity',
-            get_string('capacity', 'rb_source_facetoface_rooms'),
+            $roomonly ? get_string('capacity', 'rb_source_facetoface_rooms') : get_string('roomcapacity', 'rb_source_facetoface_rooms'),
             "$join.capacity",
             array(
                 'joins' => $join,
@@ -127,7 +156,7 @@ trait rooms {
         $columnoptions[] = new rb_column_option(
             'room',
             'allowconflicts',
-            get_string('allowconflicts', 'rb_source_facetoface_rooms'),
+            $roomonly ? get_string('allowconflicts', 'rb_source_facetoface_rooms') : get_string('roomallowconflicts', 'rb_source_facetoface_rooms'),
             "$join.allowconflicts",
             array(
                 'joins' => $join,
@@ -139,7 +168,7 @@ trait rooms {
         $columnoptions[] = new rb_column_option(
             'room',
             'url',
-            get_string('roomlink', 'rb_source_facetoface_rooms'),
+            $roomonly ? get_string('link', 'rb_source_facetoface_rooms') : get_string('roomlink', 'rb_source_facetoface_rooms'),
             "$join.url",
             array(
                 'joins' => $join,
@@ -152,26 +181,27 @@ trait rooms {
     /**
      * Add common room filter options (excluding custom fields)
      * @param array $filteroptions
+     * @param boolean $roomonly
      */
-    protected function add_rooms_fields_to_filters(array &$filteroptions) {
+    protected function add_rooms_fields_to_filters(array &$filteroptions, bool $roomonly = false) {
         $filteroptions[] = new rb_filter_option(
             'room',
             'id',
-            get_string('roomid', 'rb_source_facetoface_rooms'),
+            $roomonly ? get_string('id', 'rb_source_facetoface_rooms') : get_string('roomid', 'rb_source_facetoface_rooms'),
             'number'
         );
 
         $filteroptions[] = new rb_filter_option(
             'room',
             'name',
-            get_string('name', 'rb_source_facetoface_rooms'),
+            $roomonly ? get_string('name', 'rb_source_facetoface_rooms') : get_string('roomname', 'rb_source_facetoface_rooms'),
             'text'
         );
 
         $filteroptions[] = new rb_filter_option(
             'room',
             'published',
-            get_string('published', 'rb_source_facetoface_rooms'),
+            $roomonly ? get_string('sitewide', 'rb_source_facetoface_rooms') : get_string('roomsitewide', 'rb_source_facetoface_rooms'),
             'select',
             array(
                 'simplemode' => true,
@@ -182,14 +212,14 @@ trait rooms {
         $filteroptions[] = new rb_filter_option(
             'room',
             'description',
-            get_string('description', 'rb_source_facetoface_rooms'),
+            $roomonly ? get_string('description', 'rb_source_facetoface_rooms') : get_string('roomdescription', 'rb_source_facetoface_rooms'),
             'text'
         );
 
         $filteroptions[] = new rb_filter_option(
             'room',
             'visible',
-            get_string('visible', 'rb_source_facetoface_rooms'),
+            $roomonly ? get_string('visible', 'rb_source_facetoface_rooms') : get_string('roomvisible', 'rb_source_facetoface_rooms'),
             'select',
             array(
                 'simplemode' => true,
@@ -200,7 +230,7 @@ trait rooms {
         $filteroptions[] = new rb_filter_option(
             'room',
             'allowconflicts',
-            get_string('allowconflicts', 'rb_source_facetoface_rooms'),
+            $roomonly ? get_string('allowconflicts', 'rb_source_facetoface_rooms') : get_string('roomallowconflicts', 'rb_source_facetoface_rooms'),
             'select',
             array(
                 'simplemode' => true,
@@ -211,7 +241,7 @@ trait rooms {
         $filteroptions[] = new rb_filter_option(
             'room',
             'capacity',
-            get_string('capacity', 'rb_source_facetoface_rooms'),
+            $roomonly ? get_string('capacity', 'rb_source_facetoface_rooms') : get_string('roomcapacity', 'rb_source_facetoface_rooms'),
             'number'
         );
     }

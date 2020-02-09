@@ -75,7 +75,7 @@ class room_content extends content_generator {
     }
 
     protected function render_empty(moodle_url $manageurl): string {
-        return get_string('selectaroom', 'rb_source_facetoface_room_assignments', $manageurl->out());
+        return get_string('reports:selectroom', 'mod_facetoface', $manageurl->out());
     }
 
     protected function get_manage_button(bool $frommanage): string {

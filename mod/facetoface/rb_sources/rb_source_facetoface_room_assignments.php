@@ -31,6 +31,8 @@ require_once($CFG->dirroot . '/totara/customfield/field/location/define.class.ph
 class rb_source_facetoface_room_assignments extends rb_facetoface_base_source {
     use \core_course\rb\source\report_trait;
     use \mod_facetoface\rb\traits\rooms;
+    use \mod_facetoface\rb\traits\assets;
+    use \mod_facetoface\rb\traits\facilitator;
 
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         if ($groupid instanceof rb_global_restriction_set) {
@@ -79,6 +81,9 @@ class rb_source_facetoface_room_assignments extends rb_facetoface_base_source {
             'sessiondate'
         );
 
+        $this->add_assets_to_join_list($joinlist, 'sessiondate');
+        $this->add_facilitators_to_join_list($joinlist, 'sessiondate');
+
         $this->add_session_common_to_joinlist($joinlist, 'sessiondate');
         $this->add_session_status_to_joinlist($joinlist);
         $this->add_core_course_tables($joinlist, 'facetoface', 'course');
@@ -91,7 +96,9 @@ class rb_source_facetoface_room_assignments extends rb_facetoface_base_source {
 
         $this->add_core_course_columns($columnoptions);
         $this->add_facetoface_common_to_columns($columnoptions);
-        $this->add_rooms_fields_to_columns($columnoptions, 'room');
+        $this->add_assets_fields_to_columns($columnoptions, 'asset', false);
+        $this->add_rooms_fields_to_columns($columnoptions, 'room', false);
+        $this->add_facilitators_fields_to_columns($columnoptions, 'facilitator', false);
         $this->add_session_common_to_columns($columnoptions, 'sessiondate');
         $this->add_session_status_to_columns($columnoptions, 'sessiondate');
 

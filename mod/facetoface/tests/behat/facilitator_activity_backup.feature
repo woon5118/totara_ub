@@ -25,13 +25,15 @@ Feature: Test facilitator conflicts through backup/restore
     And I navigate to "Facilitators" node in "Site administration > Seminars"
     And I press "Add a new facilitator"
     And I set the following fields to these values:
-      | Facilitator Name        | facilitator 1 |
+      | Name                    | facilitator 1 |
+      | Facilitator type        | External      |
       | Allow booking conflicts | 0             |
     And I press "Add a facilitator"
 
     And I press "Add a new facilitator"
     And I set the following fields to these values:
-      | Facilitator Name        | facilitator 2 |
+      | Name                    | facilitator 2 |
+      | Facilitator type        | External      |
       | Allow booking conflicts | 1             |
     And I press "Add a facilitator"
 

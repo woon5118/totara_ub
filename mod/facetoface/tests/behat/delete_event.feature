@@ -28,8 +28,8 @@ Feature: Test deletion of a Seminar event
     And I click on "Select assets" "link"
     And I click on "Create" "link"
     And I set the following fields to these values:
-      | Asset name        | Projector       |
-      | Asset description | A 3D projector  |
+      | Name        | Projector       |
+      | Description | A 3D projector  |
     When I click on "OK" "button" in the "Create new asset" "totaradialogue"
     Then I should see "Projector"
 
@@ -60,11 +60,11 @@ Feature: Test deletion of a Seminar event
       | Name         | Room 1          |
       | Building     | That house      |
       | Address      | 123 here street |
-      | roomcapacity | 5               |
+      | Capacity     | 5               |
     And I click on "#id_customfield_locationsize_medium" "css_element"
     And I click on "#id_customfield_locationview_satellite" "css_element"
     And I click on "#id_customfield_locationdisplay_map" "css_element"
-    And I should not see "Publish for reuse"
+    And I should not see "Add to sitewide list"
     And I click on "//div[@aria-describedby='editcustomroom0-dialog']//div[@class='ui-dialog-buttonset']/button[contains(.,'OK')]" "xpath_element"
     Then I should see "Room 1"
 

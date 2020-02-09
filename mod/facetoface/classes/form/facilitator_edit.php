@@ -107,7 +107,7 @@ class facilitator_edit extends \moodleform {
             $typeoptions = [
                 facilitator_type::EXTERNAL => get_string('facilitatorexternal', 'mod_facetoface'),
             ];
-            $username[] =& $mform->createElement('select', 'facilitatortype', null, $typeoptions);
+            $username[] =& $mform->createElement('select', 'facilitatortype', get_string('facilitatortype_label', 'mod_facetoface'), $typeoptions);
             $username[] =& $mform->createElement('button', 'facilitatorselector', get_string('selectuserwithdot', 'mod_facetoface'),
                 ['id' => 'show-facilitator-dialog']);
             $mform->setDefault('facilitatortype', facilitator_type::EXTERNAL);
@@ -124,21 +124,11 @@ class facilitator_edit extends \moodleform {
         $mform->addHelpButton('allowconflicts', 'allowfacilitatorconflicts', 'mod_facetoface');
         $mform->setType('allowconflicts', PARAM_INT);
 
-        // Publish for reuse by other events.
-        $capability = has_capability('mod/facetoface:managesitewidefacilitators', \context_system::instance());
-        if ($capability and !empty($seminar) and $facilitator->get_custom()) {
-            $mform->addElement('advcheckbox', 'notcustom', get_string('addfacilitatortositewidelist', 'mod_facetoface'));
-            $mform->addHelpButton('notcustom', 'addfacilitatortositewidelist', 'mod_facetoface');
-        } else {
-            $mform->addElement('hidden', 'notcustom');
-        }
-        $mform->setType('notcustom', PARAM_INT);
-
         // We don't need autosave here
         $editoropts = $TEXTAREA_OPTIONS;
         $editoropts['autosave'] = false;
         // Facilitator description.
-        $mform->addElement('editor', 'description_editor', get_string('descriptionlabel', 'mod_facetoface'), null, $editoropts);
+        $mform->addElement('editor', 'description_editor', get_string('facilitatordescriptionlabel', 'mod_facetoface'), null, $editoropts);
 
         // Facilitator custom fields.
         customfield_definition($mform, (object)['id' => $facilitator->get_id()], $prefix, 0, $tblprefix);
@@ -163,6 +153,17 @@ class facilitator_edit extends \moodleform {
                 );
             }
         }
+
+        // Add to sitewide list.
+        $capability = has_capability('mod/facetoface:managesitewidefacilitators', \context_system::instance());
+        if ($capability and !empty($seminar) and $facilitator->get_custom()) {
+            $mform->addElement('advcheckbox', 'notcustom', get_string('addtositewidelist', 'mod_facetoface'));
+        } else {
+            $mform->addElement('hidden', 'notcustom');
+        }
+        $mform->setType('notcustom', PARAM_INT);
+        $mform->closeHeaderBefore('notcustom');
+
         // Buttons.
         if (empty($seminar)) {
             $label = null;
