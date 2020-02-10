@@ -27,7 +27,7 @@ $string['allow'] = 'Use this service to retrieve members\' information as per pr
 $string['ltiservice_memberships'] = 'IMS LTI Names and Role Provisioning';
 $string['ltiservice_memberships_help'] = 'Allow the tool to retrieve member\'s info from the course ' .
   'using the IMS LTI Names and Role Provisioning Service. The privacy settings will apply.  For course-level ' .
-  'requests these will be based on the tool confguration settings.  If you wish to always send such details ' .
+  'requests these will be based on the tool configuration settings.  If you wish to always send such details ' .
   'do not delegate the choice to teachers.  Link-level requests will always use the privacy settings which ' .
   'apply to the link.';
 $string['notallow'] = 'Do not use this service';
