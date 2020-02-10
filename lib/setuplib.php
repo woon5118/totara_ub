@@ -1446,7 +1446,7 @@ function is_major_upgrade_required() {
 
     // Totara: bump up the following version to match /totara/core/version.php
     //         if your upgrade step prevents users from logging in before upgrade.
-    $totaracoremajordbchanges = 2019083001;
+    $totaracoremajordbchanges = 2020022701;
 
     $required = empty($CFG->version);
     $required = $required || (float)$CFG->version < $lastmajordbchanges;

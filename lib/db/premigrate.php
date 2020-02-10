@@ -71,48 +71,6 @@ function xmldb_core_premigrate() {
 
     // Moodle 3.8 pre-migration line.
 
-    if ($version >= 2019050600.00) {
-        $table = new xmldb_table('badge_backpack');
-        $field = new xmldb_field('apiversion', XMLDB_TYPE_CHAR, '12', null, XMLDB_NOTNULL, null, '1.0');
-        if ($dbman->field_exists($table, $field)) {
-            $dbman->drop_field($table, $field);
-        }
-
-        $table = new xmldb_table('badge_external_backpack');
-        if ($dbman->table_exists($table)) {
-            $dbman->drop_table($table);
-        }
-
-        $table = new xmldb_table('badge_external');
-        $field = new xmldb_field('entityid', XMLDB_TYPE_CHAR, '255', null, null, null, null);
-        if ($dbman->field_exists($table, $field)) {
-            $dbman->drop_field($table, $field);
-        }
-
-        $table = new xmldb_table('badge_external_identifier');
-        if ($dbman->table_exists($table)) {
-            $dbman->drop_table($table);
-        }
-
-        $table = new xmldb_table('badge_backpack');
-        $key = new xmldb_key('externalbackpack', XMLDB_KEY_FOREIGN, ['externalbackpackid'], 'badge_external_backpack', ['id']);
-        $dbman->drop_key($table, $key);
-
-        $table = new xmldb_table('badge_backpack');
-        $field = new xmldb_field('externalbackpackid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'password');
-        if ($dbman->field_exists($table, $field)) {
-            $dbman->drop_field($table, $field);
-        }
-
-        $table = new xmldb_table('badge_backpack');
-        $field = new xmldb_field('backpackurl', XMLDB_TYPE_CHAR, 255, null, XMLDB_NOTNULL, null);
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        $version = premigrate_main_savepoint(2019050500.00);
-    }
-
     if ($version >= 2019042300.03) {
         $table = new xmldb_table('message');
         $field = new xmldb_field('customdata', XMLDB_TYPE_TEXT, null, null, null, null, null, 'eventtype');
@@ -206,42 +164,6 @@ function xmldb_core_premigrate() {
     }
 
     if ($version >= 2018110500.01) {
-        $tablebadge = new xmldb_table('badge');
-        $fieldversion = new xmldb_field('version', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'nextcron');
-        $fieldlanguage = new xmldb_field('language', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'version');
-        $fieldimageauthorname = new xmldb_field('imageauthorname', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'language');
-        $fieldimageauthoremail = new xmldb_field('imageauthoremail', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'imageauthorname');
-        $fieldimageauthorurl = new xmldb_field('imageauthorurl', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'imageauthoremail');
-        $fieldimagecaption = new xmldb_field('imagecaption', XMLDB_TYPE_TEXT, null, null, null, null, null, 'imageauthorurl');
-        if ($dbman->field_exists($tablebadge, $fieldversion)) {
-            $dbman->drop_field($tablebadge, $fieldversion);
-        }
-        if ($dbman->field_exists($tablebadge, $fieldlanguage)) {
-            $dbman->drop_field($tablebadge, $fieldlanguage);
-        }
-        if ($dbman->field_exists($tablebadge, $fieldimageauthorname)) {
-            $dbman->drop_field($tablebadge, $fieldimageauthorname);
-        }
-        if ($dbman->field_exists($tablebadge, $fieldimageauthoremail)) {
-            $dbman->drop_field($tablebadge, $fieldimageauthoremail);
-        }
-        if ($dbman->field_exists($tablebadge, $fieldimageauthorurl)) {
-            $dbman->drop_field($tablebadge, $fieldimageauthorurl);
-        }
-        if ($dbman->field_exists($tablebadge, $fieldimagecaption)) {
-            $dbman->drop_field($tablebadge, $fieldimagecaption);
-        }
-
-        $table = new xmldb_table('badge_endorsement');
-        if ($dbman->table_exists($table)) {
-            $dbman->drop_table($table);
-        }
-
-        $table = new xmldb_table('badge_related');
-        if ($dbman->table_exists($table)) {
-            $dbman->drop_table($table);
-        }
-
         $table = new xmldb_table('badge_competencies');
         if ($dbman->table_exists($table)) {
             $dbman->drop_table($table);
