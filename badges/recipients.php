@@ -107,7 +107,7 @@ if ($badge->has_awards()) {
 
     echo $output->render($recipients);
 } else {
-    echo $output->notification(get_string('noawards', 'badges'));
+    echo $output->box(get_string('noawards', 'badges'));
 }
 
 echo $output->footer();

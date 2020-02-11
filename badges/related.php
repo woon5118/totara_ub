@@ -99,7 +99,7 @@ if (is_null($action)) {
         $renderrelated->totalcount = count($badgerelated);
         echo $output->render($renderrelated);
     } else {
-        echo $output->notification(get_string('norelated', 'badges'));
+        echo $output->box(get_string('norelated', 'badges'));
     }
 } else if ($action == 'add') {
     $mform->display();

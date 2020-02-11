@@ -314,6 +314,9 @@ class core_badges_renderer extends plugin_renderer_base {
         $badgeclass = $ibadge->badgeclass;
         $badge = new badge($ibadge->badgeid);
         $now = time();
+        if (isset($issued['expires']) && !is_numeric($issued['expires'])) {
+            $issued['expires'] = strtotime($issued['expires']);
+        }
         $expiration = isset($issued['expires']) ? $issued['expires'] : $now + 86400;
         $badgeimage = is_array($badgeclass['image']) ? $badgeclass['image']['id'] : $badgeclass['image'];
         $languages = get_string_manager()->get_list_of_languages();
@@ -341,7 +344,7 @@ class core_badges_renderer extends plugin_renderer_base {
                     $action = new component_action('click', 'addtobackpack', array('assertion' => $assertion->out(false)));
                     $attributes = array(
                             'type'  => 'button',
-                            'class' => 'btn btn-secondary m-1',
+                            'class' => 'btn btn-default',
                             'id'    => 'addbutton',
                             'value' => get_string('addtobackpack', 'badges'));
                     $tobackpack = html_writer::tag('input', '', $attributes);
@@ -349,7 +352,7 @@ class core_badges_renderer extends plugin_renderer_base {
                     $output .= $tobackpack;
                 } else {
                     $assertion = new moodle_url('/badges/backpack-add.php', array('hash' => $ibadge->hash));
-                    $attributes = ['class' => 'btn btn-secondary m-1', 'role' => 'button'];
+                    $attributes = ['class' => 'btn btn-default', 'role' => 'button'];
                     $tobackpack = html_writer::link($assertion, get_string('addtobackpack', 'badges'), $attributes);
                     $output .= $tobackpack;
                 }
@@ -511,13 +514,13 @@ class core_badges_renderer extends plugin_renderer_base {
         // Technically, we should alway have a user at this point, but added an extra check just in case.
         if ($userinfo) {
             if (!$ibadge->valid) {
-                $notify = $this->output->notification(get_string('recipientvalidationproblem', 'badges'), 'notifynotice');
+                $notify = $this->output->notification(get_string('recipientvalidationproblem', 'badges'), \core\output\notification::NOTIFY_WARNING);
                 $dl[get_string('name')] = fullname($userinfo) . $notify;
             } else {
                 $dl[get_string('name')] = fullname($userinfo);
             }
         } else {
-            $notify = $this->output->notification(get_string('recipientidentificationproblem', 'badges'), 'notifynotice');
+            $notify = $this->output->notification(get_string('recipientidentificationproblem', 'badges'), \core\output\notification::NOTIFY_WARNING);
             $dl[get_string('name')] = $notify;
         }
         $output .= $this->definition_list($dl);
@@ -603,12 +606,12 @@ class core_badges_renderer extends plugin_renderer_base {
                     get_string('downloadall'), 'POST', array('class' => 'activatebadge'));
         $downloadall = $this->output->box('', 'col-md-3');
         $downloadall .= $this->output->box($actionhtml, 'col-md-9');
-        $downloadall = $this->output->box($downloadall, 'row m-l-2');
+        $downloadall = $this->output->box($downloadall, 'row');
 
         // Local badges.
         $localhtml = html_writer::start_tag('div', array('id' => 'issued-badge-table', 'class' => 'generalbox'));
         $sitename = format_string($SITE->fullname, true, array('context' => context_system::instance()));
-        $heading = get_string('localbadges', 'badges', $sitename);
+        $heading = get_string('localbadgesh', 'badges', $sitename);
         $localhtml .= $this->output->heading_with_help($heading, 'localbadgesh', 'badges');
         if ($badges->badges) {
             $countmessage = $this->output->box(get_string('badgesearned', 'badges', $badges->totalcount));
@@ -617,7 +620,12 @@ class core_badges_renderer extends plugin_renderer_base {
             $localhtml .= $backpackconnect . $countmessage . $searchform;
             $localhtml .= $htmlpagingbar . $htmllist . $htmlpagingbar . $downloadall;
         } else {
-            $localhtml .= $searchform . $this->output->notification(get_string('nobadges', 'badges'));
+            $message = get_string('nolocalbadges', 'badges');
+            if (!empty($badges->search)) {
+                $message = get_string('nolocalbadgesfound', 'badges');
+            }
+            $localhtml .= $searchform . $this->output->box($message);
+            $localhtml .= $this->output->spacer([], true);
         }
         $localhtml .= html_writer::end_tag('div');
 
@@ -646,12 +654,12 @@ class core_badges_renderer extends plugin_renderer_base {
             }
 
             $externalhtml .= html_writer::end_tag('div');
-            $attr = ['class' => 'btn btn-secondary'];
+            $attr = ['class' => 'btn btn-default'];
             $label = get_string('backpackbadgessettings', 'badges');
             $backpacksettings = html_writer::link(new moodle_url('/badges/mybackpack.php'), $label, $attr);
             $actionshtml = $this->output->box('', 'col-md-3');
             $actionshtml .= $this->output->box($backpacksettings, 'col-md-9');
-            $actionshtml = $this->output->box($actionshtml, 'row m-l-2');
+            $actionshtml = $this->output->box($actionshtml, 'row');
             $externalhtml .= $actionshtml;
         }
 
@@ -784,7 +792,7 @@ class core_badges_renderer extends plugin_renderer_base {
                 );
 
         if (has_capability('moodle/badges:configuredetails', $context)) {
-            $row[] = new tabobject('details',
+            $row[] = new tabobject('badge',
                         new moodle_url('/badges/edit.php', array('id' => $badgeid, 'action' => 'badge')),
                         get_string('bdetails', 'badges')
                     );

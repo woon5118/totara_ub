@@ -28,6 +28,10 @@ require_once(__DIR__ . '/../config.php');
 require_once($CFG->libdir . '/badgeslib.php');
 require_once($CFG->libdir . '/filelib.php');
 
+if (empty($CFG->enablebadges)) {
+    print_error('badgesdisabled', 'badges');
+}
+
 $id = required_param('hash', PARAM_ALPHANUM);
 $bake = optional_param('bake', 0, PARAM_BOOL);
 
@@ -42,6 +46,7 @@ $badge = new \core_badges\output\issued_badge($id);
 if (!empty($badge->recipient->id)) {
     if ($bake && ($badge->recipient->id == $USER->id)) {
         $name = str_replace(' ', '_', $badge->badgeclass['name']) . '.png';
+        $name = clean_param($name, PARAM_FILE);
         $filehash = badges_bake($id, $badge->badgeid, $USER->id, true);
         $fs = get_file_storage();
         $file = $fs->get_file_by_hash($filehash);

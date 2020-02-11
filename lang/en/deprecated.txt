@@ -62,6 +62,7 @@ completion-title-manual-n,core_completion
 completion-title-manual-y,core_completion
 error:invalidbadgeurl,core_badges
 backpackbadges,core_badges
+localbadges,core_badges
 nobackpackbadges,core_badges
 nobackpackcollections,core_badges
 error:nogroups,core_badges

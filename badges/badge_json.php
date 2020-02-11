@@ -29,6 +29,10 @@ define('NO_MOODLE_COOKIES', true); // No need for a session here.
 require_once(__DIR__ . '/../config.php');
 require_once($CFG->libdir . '/badgeslib.php');
 
+if (empty($CFG->enablebadges)) {
+    print_error('badgesdisabled', 'badges');
+}
+
 $id = required_param('id', PARAM_INT);
 $action = optional_param('action', null, PARAM_INT); // Generates badge class if true.
 $json = array();
