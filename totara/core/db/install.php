@@ -93,6 +93,8 @@ function xmldb_totara_core_install() {
         }
     }
 
+    totara_core_upgrade_fix_role_risks();
+
     $systemcontext->mark_dirty();
 
     // Turn completion on in Totara when upgrading from Moodle.

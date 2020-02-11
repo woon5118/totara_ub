@@ -1628,6 +1628,18 @@ $icons = array(
                     'classes' => 'fa-asterisk ft-state-danger',
                 ),
         ),
+    'risk-allowxss' =>
+        array(
+            'template' => 'core/flex_icon_stack',
+            'data' =>
+                array(
+                    'classes' =>
+                        array(
+                            'fa-code ft-stack-main',
+                            'fa-warning ft-stack-suffix ft-state-danger',
+                        ),
+                ),
+        ),
     'risk-config' =>
         array(
             'template' => 'core/flex_icon_stack',
@@ -2286,6 +2298,7 @@ $deprecated = array(
     'core|i/repository' => 'database',
     'core|i/restore' => 'download',
     'core|i/return' => 'undo',
+    'core|i/risk_allowxss' => 'risk-allowxss',
     'core|i/risk_config' => 'risk-config',
     'core|i/risk_dataloss' => 'risk-dataloss',
     'core|i/risk_managetrust' => 'risk-managetrust',

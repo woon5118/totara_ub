@@ -786,5 +786,13 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020012302, 'totara', 'core');
     }
 
+    if ($oldversion < 2020021200) {
+        // Initial introduction of RISK_ALLLOWXSS.
+        totara_core_upgrade_fix_role_risks();
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2020021200, 'totara', 'core');
+    }
+
     return true;
 }

@@ -57,7 +57,7 @@ defined('MOODLE_INTERNAL') || die();
 $capabilities = array(
     'moodle/site:config' => array(
 
-        'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS | RISK_CONFIG | RISK_DATALOSS,
+        'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS | RISK_CONFIG | RISK_DATALOSS | RISK_ALLOWXSS,
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
@@ -298,7 +298,7 @@ $capabilities = array(
     // Totara: allow users to restore backups that are not trusted
     'moodle/restore:restoreuntrusted' => array(
 
-        'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS,
+        'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS | RISK_ALLOWXSS,
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
@@ -762,7 +762,7 @@ $capabilities = array(
 
     'moodle/role:override' => array(
 
-        'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS,
+        'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS | RISK_ALLOWXSS,
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE, // Totara: actually this is usable in all contexts!
@@ -785,7 +785,7 @@ $capabilities = array(
 
     'moodle/role:manage' => array(
 
-        'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS,
+        'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS | RISK_ALLOWXSS,
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,

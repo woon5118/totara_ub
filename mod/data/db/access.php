@@ -180,7 +180,7 @@ $capabilities = array(
 
     'mod/data:managetemplates' => array(
 
-        'riskbitmask' => RISK_SPAM | RISK_XSS,
+        'riskbitmask' => RISK_SPAM | RISK_XSS | RISK_ALLOWXSS,
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,

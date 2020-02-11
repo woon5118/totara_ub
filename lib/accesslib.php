@@ -143,8 +143,16 @@ define('CONTEXT_BLOCK', 80);
 define('RISK_MANAGETRUST', 0x0001);
 /** Capability allows changes in system configuration - see {@link http://docs.moodle.org/dev/Hardening_new_Roles_system} */
 define('RISK_CONFIG',      0x0002);
-/** Capability allows user to add scripted content - see {@link http://docs.moodle.org/dev/Hardening_new_Roles_system} */
+/**
+ * Capability allows user to add scripted content, not used unless $CFG->disableconsistentcleaning enabled
+ * see {@link http://docs.moodle.org/dev/Hardening_new_Roles_system}
+ */
 define('RISK_XSS',         0x0004);
+/**
+ * Capability allows user to add scripted content,
+ * compared to RISK_XSS this is intended for areas where scripted content is absolutely necessary.
+ */
+define('RISK_ALLOWXSS',    0x0040);
 /** Capability allows access to personal user information - see {@link http://docs.moodle.org/dev/Hardening_new_Roles_system} */
 define('RISK_PERSONAL',    0x0008);
 /** Capability allows users to add content others may see - see {@link http://docs.moodle.org/dev/Hardening_new_Roles_system} */
@@ -2790,14 +2798,25 @@ function capabilities_cleanup($component, $newcapdef = null) {
  * @return array all the known types of risk.
  */
 function get_all_risks() {
-    return array(
+    global $CFG;
+
+    $result = array(
         'riskmanagetrust' => RISK_MANAGETRUST,
         'riskconfig'      => RISK_CONFIG,
+        'riskallowxss'    => RISK_ALLOWXSS,
         'riskxss'         => RISK_XSS,
         'riskpersonal'    => RISK_PERSONAL,
         'riskspam'        => RISK_SPAM,
         'riskdataloss'    => RISK_DATALOSS,
     );
+
+    if (empty($CFG->disableconsistentcleaning)) {
+        unset($result['riskxss']);
+    } else {
+        unset($result['riskallowxss']);
+    }
+
+    return $result;
 }
 
 /**

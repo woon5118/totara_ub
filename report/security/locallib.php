@@ -38,7 +38,9 @@ function report_security_hide_timearning() {
 }
 
 function report_security_get_issue_list() {
-    return array(
+    global $CFG;
+
+    $result = array(
         'report_security_check_unsecuredataroot',
         'report_security_check_displayerrors',
         'report_security_check_vendordir',
@@ -57,6 +59,7 @@ function report_security_get_issue_list() {
         'report_security_check_persistentlogin',
         'report_security_check_scormsessionkeepalive',
         'report_security_check_configrw',
+        'report_security_check_riskallowxss',
         'report_security_check_riskxss',
         'report_security_check_logincsrf',
         'report_security_check_riskadmin',
@@ -72,6 +75,16 @@ function report_security_get_issue_list() {
         'report_security_check_disableconsistentcleaning',
         'report_security_check_devgraphql',
     );
+
+    $result = array_flip($result);
+    if (empty($CFG->disableconsistentcleaning)) {
+        unset($result['report_security_check_riskxss']);
+    } else {
+        unset($result['report_security_check_riskallowxss']);
+    }
+    $result = array_flip($result);
+
+    return $result;
 }
 
 function report_security_doc_link($issue, $name) {
@@ -484,6 +497,64 @@ function report_security_check_configrw($detailed=false) {
 
     if ($detailed) {
         $result->details = get_string('check_configrw_details', 'report_security');
+    }
+
+    return $result;
+}
+
+
+/**
+ * Lists all users with XSS risk, it would be great to combine this with risk trusts in user table,
+ * unfortunately nobody implemented user trust UI yet :-(
+ *
+ * @since Totara 13.0
+ *
+ * @param bool $detailed
+ * @return object result
+ */
+function report_security_check_riskallowxss($detailed=false) {
+    global $DB;
+
+    $result = new stdClass();
+    $result->issue   = 'report_security_check_riskallowxss';
+    $result->name    = get_string('check_riskallowxss_name', 'report_security');
+    $result->info    = null;
+    $result->details = null;
+    $result->status  = REPORT_SECURITY_WARNING;
+    $result->link    = null;
+
+    $params = array('capallow'=>CAP_ALLOW);
+
+    $sqlfrom = "FROM (SELECT rcx.*
+                       FROM {role_capabilities} rcx
+                       JOIN {capabilities} cap ON (cap.name = rcx.capability AND ".$DB->sql_bitand('cap.riskbitmask', RISK_ALLOWXSS)." <> 0)
+                       WHERE rcx.permission = :capallow) rc,
+                     {context} c,
+                     {context} sc,
+                     {role_assignments} ra,
+                     {user} u
+               WHERE c.id = rc.contextid
+                     AND (sc.path = c.path OR sc.path LIKE ".$DB->sql_concat('c.path', "'/%'")." OR c.path LIKE ".$DB->sql_concat('sc.path', "'/%'").")
+                     AND u.id = ra.userid AND u.deleted = 0
+                     AND ra.contextid = sc.id AND ra.roleid = rc.roleid";
+
+    $count = $DB->count_records_sql("SELECT COUNT(DISTINCT u.id) $sqlfrom", $params);
+
+    $result->info = get_string('check_riskallowxss_warning', 'report_security', $count);
+
+    if ($count === 0) {
+        // Totara: no users means no warning, this is good for new installs.
+        $result->status = REPORT_SECURITY_OK;
+    }
+
+    if ($detailed) {
+        $userfields = user_picture::fields('u');
+        $users = $DB->get_records_sql("SELECT DISTINCT $userfields $sqlfrom", $params);
+        foreach ($users as $uid=>$user) {
+            $users[$uid] = fullname($user);
+        }
+        $users = implode(', ', $users);
+        $result->details = get_string('check_riskallowxss_details', 'report_security', $users);
     }
 
     return $result;

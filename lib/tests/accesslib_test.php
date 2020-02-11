@@ -4310,6 +4310,34 @@ class core_accesslib_testcase extends advanced_testcase {
         );
         $this->assertEquals($expected, $results);
     }
+
+    public function test_get_all_risks() {
+        global $CFG;
+
+        unset($CFG->disableconsistentcleaning);
+        $risks = get_all_risks();
+        $expected = array(
+            'riskmanagetrust' => RISK_MANAGETRUST,
+            'riskconfig'      => RISK_CONFIG,
+            'riskallowxss'    => RISK_ALLOWXSS,
+            'riskpersonal'    => RISK_PERSONAL,
+            'riskspam'        => RISK_SPAM,
+            'riskdataloss'    => RISK_DATALOSS,
+        );
+        $this->assertSame($expected, $risks);;
+
+        $CFG->disableconsistentcleaning = true;
+        $risks = get_all_risks();
+        $expected = array(
+            'riskmanagetrust' => RISK_MANAGETRUST,
+            'riskconfig'      => RISK_CONFIG,
+            'riskxss'         => RISK_XSS,
+            'riskpersonal'    => RISK_PERSONAL,
+            'riskspam'        => RISK_SPAM,
+            'riskdataloss'    => RISK_DATALOSS,
+        );
+        $this->assertSame($expected, $risks);;
+    }
 }
 
 /**

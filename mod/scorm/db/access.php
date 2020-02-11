@@ -60,7 +60,7 @@ $capabilities = array(
     ),
 
     'mod/scorm:addinstance' => array(
-        'riskbitmask' => RISK_XSS,
+        'riskbitmask' => RISK_XSS | RISK_ALLOWXSS, // TODO: TL-20799 we need to add new capabilty for uploading of scorm packages and move the RISK_ALLOWXSS there
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,

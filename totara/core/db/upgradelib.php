@@ -1044,3 +1044,44 @@ function totara_core_core_tag_upgrade_tags() {
         $DB->delete_records('tag', ['id' => $tagid]);
     }
 }
+
+/**
+ * After adding RISK_ALLOWXSS we would need to manually bump all
+ * affected version.phps to update the capability risks in database,
+ * this is a workaround that can be triggered from core upgrade instead
+ * which requires only totara_core version bump.
+ *
+ * @since Totara 13.0
+ */
+function totara_core_upgrade_fix_role_risks() {
+    global $DB, $CFG;
+
+    $currentcaps = $DB->get_records_menu('capabilities', [], 'name ASC', 'name, riskbitmask');
+
+    $types = core_component::get_plugin_types();
+    foreach ($types as $type => $typedir) {
+        $plugins = core_component::get_plugin_list($type);
+        $plugins['core'] = $CFG->dirroot . '/lib';
+        foreach ($plugins as $name => $plugindir) {
+            $file = $plugindir . '/db/access.php';
+            if (!file_exists($file)) {
+                continue;
+            }
+            $capabilities = [];
+            require($file);
+            foreach ($capabilities as $capname => $capdef) {
+                if (!isset($currentcaps[$capname])) {
+                    continue;
+                }
+                if (empty($capdef['riskbitmask'])) {
+                    $risks = 0;
+                } else {
+                    $risks = $capdef['riskbitmask'];
+                }
+                if ($risks != $currentcaps[$capname]) {
+                    $DB->set_field('capabilities', 'riskbitmask', $risks, ['name' => $capname]);
+                }
+            }
+        }
+    }
+}

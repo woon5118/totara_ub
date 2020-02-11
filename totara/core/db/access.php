@@ -71,7 +71,7 @@ $capabilities = array(
         )
     ),
     'totara/core:appearance' => array(
-        'riskbitmask'   => RISK_CONFIG,
+        'riskbitmask'   => RISK_CONFIG | RISK_ALLOWXSS,
         'captype'       => 'write',
         'contextlevel'  => CONTEXT_SYSTEM,
         'archetypes'    => array(

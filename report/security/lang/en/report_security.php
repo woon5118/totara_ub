@@ -135,6 +135,10 @@ $string['check_riskadmin_name'] = 'Administrators';
 $string['check_riskadmin_ok'] = 'Found {$a} server administrator(s).';
 $string['check_riskadmin_unassign'] = '<a href="{$a->url}">{$a->fullname} ({$a->email}) review role assignment</a>';
 $string['check_riskadmin_warning'] = 'Found {$a->admincount} server administrators and {$a->unsupcount} unsupported admin role assignments.';
+$string['check_riskallowxss_details'] = '<p>RISK_ALLOWXSS denotes all dangerous capabilities that only trusted users may use.</p>
+<p>Please verify the following list of users and make sure that you trust them completely on this server:</p><p>{$a}</p>';
+$string['check_riskallowxss_name'] = 'XSS trusted users';
+$string['check_riskallowxss_warning'] = 'RISK_ALLOWXSS - found {$a} users that have to be trusted.';
 $string['check_riskbackup_detailsok'] = 'No roles explicitly allow backup of user data.  However, note that admins with the "doanything" capability are still likely to be able to do this.';
 $string['check_riskbackup_details_overriddenroles'] = '<p>These active overrides give users the ability to include user data in backups. Please make sure this permission is necessary.</p> {$a}';
 $string['check_riskbackup_details_systemroles'] = '<p>The following system roles currently allow users to include user data in backups.  Please make sure this permission is necessary.</p> {$a}';
