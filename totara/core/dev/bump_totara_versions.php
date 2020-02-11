@@ -244,7 +244,12 @@ function dev_is_moodle_plugin($type, $name, $fulldir) {
         return false;
     }
 
-    return dev_is_upstream_file("$fulldir/version.php");
+    $moodletag = dev_get_plugin_backported($fulldir);
+    if (!$moodletag) {
+        $moodletag = MOODLE_DEFAULT_TAG;
+    }
+
+    return dev_is_upstream_file("$fulldir/version.php", $moodletag);
 }
 
 /**
