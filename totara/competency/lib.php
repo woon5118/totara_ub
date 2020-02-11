@@ -43,7 +43,7 @@ function totara_competency_myprofile_navigation(tree $tree, $user, $this_user, $
         return true;
     }
 
-    $can_view = capability_helper::can_view_profile($user->id, $this_user);
+    $can_view = capability_helper::can_view_profile($user->id);
 
     $can_view && $tree->add_node(
         new node(

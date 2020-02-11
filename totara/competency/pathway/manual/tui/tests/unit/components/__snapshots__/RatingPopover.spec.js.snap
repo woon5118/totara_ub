@@ -12,7 +12,7 @@ exports[`components/RatingPopover.vue Checks snapshot 1`] = `
   </h2>
    
   <div
-    class="tui-bulkManualRatingRatingInput__scaleValues"
+    class="tui-bulkManualRatingPopover__scaleValues"
   >
     <label
       id="id-scale-value-heading"
@@ -37,7 +37,7 @@ exports[`components/RatingPopover.vue Checks snapshot 1`] = `
       </radio-stub>
        
       <span
-        class="tui-bulkManualRatingRatingInput__divider"
+        class="tui-bulkManualRatingPopover__divider"
       />
        
       <radio-stub
@@ -52,7 +52,7 @@ exports[`components/RatingPopover.vue Checks snapshot 1`] = `
   </div>
    
   <div
-    class="tui-bulkManualRatingRatingInput__comment"
+    class="tui-bulkManualRatingPopover__comment"
   >
     <label
       id="id-comment-heading"
@@ -64,7 +64,7 @@ exports[`components/RatingPopover.vue Checks snapshot 1`] = `
      
     <textarea-stub
       arialabelledby="id-comment-heading"
-      class="tui-bulkManualRatingRatingInput__textarea"
+      class="tui-bulkManualRatingPopover__textarea"
       value="Test comment"
     />
   </div>
