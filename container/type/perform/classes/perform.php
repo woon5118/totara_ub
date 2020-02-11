@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,18 +15,21 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Coggins <simon.coggins@totaralearning.com>
  * @package container_perform
  */
+
 namespace container_perform;
 
 use core_container\{category, container};
-use core\entities\user;
 
 /**
- * Container for performance activity
+ * Container for performance activities
+ *
+ * While this container was primarily designed to contain a single performance activity, it is possible
+ * to extend it to allow multiple performance activities or even other types of activity.
  */
 class perform extends container {
     /*
@@ -62,7 +65,7 @@ class perform extends container {
         if (null == $context) {
             $categoryid = static::get_default_categoryid();
             if (0 == $categoryid) {
-                // Nope, this user is not able to add a performance activity.
+                // Nope, this user is not able to add a performance activity container.
                 return false;
             }
 
@@ -86,11 +89,15 @@ class perform extends container {
             $parent_category_id = $DB->get_field('tenant', 'categoryid', ['id' => $USER->tenantid]) ?? 0;
         }
 
-        $activity_category_id = $DB->get_field('course_categories', 'id', ['parent' => $parent_category_id, 'name' => self::DEFAULT_CATEGORY_NAME]);
+        $perform_category_id = $DB->get_field(
+            'course_categories',
+            'id',
+            ['parent' => $parent_category_id, 'name' => self::DEFAULT_CATEGORY_NAME]
+        );
 
         // If there is a category for performance activities already, return the ID.
-        if (!empty($activity_category_id)) {
-            return $activity_category_id;
+        if (!empty($perform_category_id)) {
+            return $perform_category_id;
         }
 
         // Otherwise attempt to create one.
@@ -112,7 +119,7 @@ class perform extends container {
      * @inheritDoc
      */
     public function get_view_url(): \moodle_url {
-        return new \moodle_url("/container/type/perform/view.php", ['id' => $this->id]);
+        return null;
     }
 
     /**
@@ -138,13 +145,12 @@ class perform extends container {
     }
 
     /**
-     * @param \stdClass $data
-     * @return void
+     * @inheritDoc
      */
     protected static function pre_create(\stdClass $data): void {
         parent::pre_create($data);
 
-        // Shortname is not relevant to perform containers, just generate a unique one.
+        // Shortname is not relevant to performance containers, just generate a unique one.
         $name = $data->name ?? '';
         $data->shortname = self::get_unique_shortname($name);
 

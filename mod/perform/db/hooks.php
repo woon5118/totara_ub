@@ -1,7 +1,6 @@
 <?php
-/**
- *
- * This file is part of Totara LMS
+/*
+ * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
@@ -16,14 +15,15 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Coggins <simon.coggins@totaralearning.com>
- *
+ * @author Nathan Lewis <nathan.lewis@totaralearning.com>
+ * @package mod_perform
  */
 
-namespace mod_perform;
-
-class activity_create_exception extends \moodle_exception {
-
-}
+$watchers = [
+    [
+        'hookname' => '\core_container\hook\module_supported_in_container',
+        'callback' => ['\mod_perform\watcher\activity', 'filter_module'],
+    ]
+];

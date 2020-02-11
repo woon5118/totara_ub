@@ -29,7 +29,6 @@ use mod_perform\entities\activity\activity_repository;
 /**
  * Activity entity
  *
- *
  * @property-read int $id ID
  * @property int $course ID of parent course
  * @property string $name Activity name
@@ -44,6 +43,5 @@ class activity extends entity {
     public const TABLE = 'perform';
 
     public const UPDATED_TIMESTAMP = 'timemodified';
-
-    public const STATUS_ACTIVE = 1 ;
+    public const SET_UPDATED_WHEN_CREATED = true;
 }

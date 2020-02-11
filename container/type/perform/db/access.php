@@ -1,7 +1,6 @@
 <?php
-/**
- *
- * This file is part of Totara LMS
+/*
+ * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
@@ -16,14 +15,15 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Coggins <simon.coggins@totaralearning.com>
  * @package container_perform
- *
  */
 
 $capabilities = [
+    // Create a performance container. Addtionally requires 'mod/perform:view_manage_activities' to access
+    // the page where creation is done.
     'container/perform:create' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSECAT,
@@ -32,4 +32,3 @@ $capabilities = [
         ]
     ],
 ];
-

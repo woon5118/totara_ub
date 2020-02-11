@@ -1,7 +1,6 @@
 <?php
-/**
- *
- * This file is part of Totara LMS
+/*
+ * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
@@ -16,12 +15,24 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Coggins <simon.coggins@totaralearning.com>
- *
+ * @author Nathan Lewis <nathan.lewis@totaralearning.com>
+ * @package mod_perform
  */
 
-require_once(__DIR__ . '/../../config.php');
+namespace mod_perform\watcher;
 
-(new \mod_perform\controllers\create())->process();
+use container_perform\perform as perform_container;
+use core_container\hook\module_supported_in_container;
+
+class activity {
+
+    public static function filter_module(module_supported_in_container $hook): void {
+        // The perform module can only be used within perform containers.
+        if ($hook->get_containertype() !== perform_container::get_type()) {
+            $hook->remove_mod('perform');
+        }
+    }
+
+}

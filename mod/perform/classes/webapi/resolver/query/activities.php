@@ -31,7 +31,7 @@ class activities implements query_resolver {
 
     public static function resolve(array $args, execution_context $ec) {
         require_login();
-        require_capability('mod/perform:view', \context_system::instance());
+        require_capability('mod/perform:view_manage_activities', \context_system::instance());
 
         return (new activity\activity())->fetch()->get();
     }

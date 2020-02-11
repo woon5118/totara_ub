@@ -1,0 +1,6 @@
+mutation mod_perform_create_activity(
+  $name: param_text!
+  $status: mod_perform_activity_status
+) {
+  mod_perform_create_activity(name: $name, status: $status)
+}

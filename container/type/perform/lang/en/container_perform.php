@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Coggins <simon.coggins@totaralearning.com>
  * @package container_perform
@@ -23,5 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['error:create_permission_missing'] = "Insufficient permission to create performance activity";
+$string['error:name_missing'] = 'Name must be provided';
 $string['pluginname'] = 'Performance activity container';
-$string['perform:create'] = 'Create performance activity containers';
+$string['perform:create'] = 'Create performance activities';

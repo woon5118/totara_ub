@@ -21,4 +21,4 @@
  * @package mod_perform
  */
 
-require_once(__DIR__ . '/mod_perform_activity_generator.class.php');
+require_once(__DIR__ . '/mod_perform_generator.class.php');

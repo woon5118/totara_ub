@@ -57,7 +57,7 @@ class activity {
         $this->items = [];
 
         foreach ($entities as $entity) {
-            $this->items[] = activity_model::create($entity);
+            $this->items[] = activity_model::load_by_entity($entity);
         }
         return $this;
     }

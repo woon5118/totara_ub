@@ -21,13 +21,15 @@
  * @package mod_perform
  */
 
-$string['pluginname'] = 'Performance activity';
+$string['create_activity'] = 'Add activity';
 $string['modulename'] = 'Performance activity';
 $string['modulenameplural'] = 'Performance activities';
-$string['perform:manage'] = 'Manage performance activities';
-$string['perform:view'] = 'View performance activities';
-$string['pluginadministration'] = 'Performance activity administration';
+$string['perform:create_activity'] = 'Create performance activities';
+$string['perform:manage_activity'] = 'Manage performance activities';
+$string['perform:view_manage_activities'] = 'Access the performance activities management interface';
 $string['perform:view:name'] = 'Name';
 $string['perform:view:status'] = 'Status';
 $string['perform:view:status:active'] = 'Active';
 $string['perform:view:status:inactive'] = 'Inactive';
+$string['pluginadministration'] = 'Performance activity administration';
+$string['pluginname'] = 'Performance activity';

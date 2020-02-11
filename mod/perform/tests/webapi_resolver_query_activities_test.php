@@ -44,7 +44,10 @@ class mod_perform_webapi_resolver_query_activities_testcase extends advanced_tes
     public function test_get_activities() {
         $this->setAdminUser();
         $this->create_test_data();
+
+        /** @var mod_perform\models\activity\activity[] $activities */
         $activities = activities::resolve([], $this->get_execution_context());
+
         $this->assertCount(2, $activities);
         $this->assertEqualsCanonicalizing(
             ['Mid year performance', 'End year performance'],
@@ -54,7 +57,9 @@ class mod_perform_webapi_resolver_query_activities_testcase extends advanced_tes
 
     public function test_get_empty_activities() {
         $this->setAdminUser();
+
         $activities = activities::resolve([], $this->get_execution_context());
+
         $this->assertCount(0, $activities);
     }
 
@@ -62,9 +67,9 @@ class mod_perform_webapi_resolver_query_activities_testcase extends advanced_tes
      * @expectedException moodle_exception
      */
     public function test_get_activities_non_admin() {
-        global $USER;
-        $this->setUser($USER);
-        $activities = activities::resolve([], $this->get_execution_context());
+        $this->setGuestUser();
+
+        activities::resolve([], $this->get_execution_context());
     }
 
     public function test_ajax_query() {
@@ -78,8 +83,10 @@ class mod_perform_webapi_resolver_query_activities_testcase extends advanced_tes
     }
 
     private function create_test_data() {
+        /** @var mod_perform_generator $perform_generator */
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-        $perform_generator->create_activity(['name' => 'Mid year performance']);
-        $perform_generator->create_activity(['name' => 'End year performance']);
+
+        $perform_generator->create_activity_in_container(['activity_name' => 'Mid year performance']);
+        $perform_generator->create_activity_in_container(['activity_name' => 'End year performance']);
     }
 }

@@ -18,17 +18,20 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @author Simon Coggins <simon.coggins@totaralearning.com>
  * @package mod_perform
  */
 
 namespace mod_perform\models\activity;
 
+use Exception;
 use mod_perform\entities\activity\activity as activity_entity;
-use container_perform\perform;
-use context_module;
-use mod_perform\activity_create_exception;
+use container_perform\perform as perform_container;
 
 class activity {
+
+    public const STATUS_ACTIVE = 1;
+    public const STATUS_INACTIVE = 1;
 
     /**
      * @var activity_entity
@@ -48,6 +51,13 @@ class activity {
     public static function load_by_id(int $id): self {
         $entity = new activity_entity($id);
         return new static($entity);
+    }
+
+    public static function load_by_container_id(int $container_id): self {
+        $entity = activity_entity::repository()
+            ->where('course', $container_id)
+            ->one(true);
+        return self::load_by_entity($entity);
     }
 
     public static function load_by_entity(activity_entity $entity): self {
@@ -70,19 +80,31 @@ class activity {
         return $this->entity;
     }
 
-    public static function create(\stdClass $data): ?self {
-        global $CFG, $USER;
+    public static function can_create(int $userid = null, \context_coursecat $context = null): bool {
+        global $USER;
 
-        if (empty($data->name)) {
-            // TODO this should be a string key and module
-            throw new activity_create_exception('Activity name must be provided');
+        if (null == $userid) {
+            // Including zero check
+            $userid = $USER->id;
         }
 
-        $courseinfo = new \stdClass();
-        $courseinfo->fullname = $data->name;
-        $courseinfo->category = $data->category ?? perform::get_default_categoryid();
 
-        $container = perform::create($courseinfo);
+        if (null == $context) {
+            $categoryid = perform_container::get_default_categoryid();
+            if (0 == $categoryid) {
+                // Nope, this user is not able to add a performance activity.
+                return false;
+            }
+
+            $context = \context_coursecat::instance($categoryid);
+        }
+
+        return has_capability('mod/perform:create_activity', $context, $userid) &&
+            perform_container::can_create_instance($userid, $context);
+    }
+
+    public static function create(\stdClass $data, perform_container $container): self {
+        global $CFG, $DB, $USER;
 
         $modinfo = new \stdClass();
         $modinfo->modulename = 'perform';
@@ -93,28 +115,40 @@ class activity {
         $modinfo->section = 0;
         $modinfo->groupmode = 0;
         $modinfo->groupingid = 0;
-        $cm = $container->add_module($modinfo);
 
-        $containercontext = $container->get_context();
-        if (!empty($CFG->performanceactivitycreatornewroleid) and !is_viewing($containercontext)) {
-            // TODO should I be setting component and itemid args here? What to?
-            role_assign($CFG->performanceactivitycreatornewroleid, $USER->id, $containercontext);
-            // TODO alternative approach - create an enrolment, but no enrolment plugins enabled for containers by default?
-            //enrol_try_internal_enrol($container->id, $USER->id, $CFG->performanceactivitycreatornewroleid);
+        $entity = new activity_entity();
+
+        $entity->course = $container->id;
+        $entity->name = $data->name;
+        $entity->status = $data->status;
+
+        $transaction = $DB->start_delegated_transaction();
+        try {
+            $entity->save();
+
+            $modinfo->instanceid = $entity->id;
+            $container->add_module($modinfo);
+
+            $container_context = $container->get_context();
+            if (!empty($CFG->performanceactivitycreatornewroleid) and !is_viewing($container_context)) {
+                role_assign($CFG->performanceactivitycreatornewroleid, $USER->id, $container_context);
+            }
+
+            $transaction->allow_commit();
+        } catch (Exception $e) {
+            $DB->rollback_delegated_transaction($transaction);
+
+            throw $e;
         }
 
-        // Reload full activity entity after creation.
-        $perform = self::load_by_id($cm->instance);
-
-        // TODO provide way to access CM and containers object from activity model?
-        return $perform;
+        return self::load_by_entity($entity);
     }
 
     /**
      * Return the context object for this activity.
      */
-    public function get_context(): context_module {
+    public function get_context(): \context_module {
         $cm = get_coursemodule_from_instance('perform', $this->entity->id, $this->entity->course, false, MUST_EXIST);
-        return context_module::instance($cm->id);
+        return \context_module::instance($cm->id);
     }
 }

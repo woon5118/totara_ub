@@ -15,40 +15,23 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Coggins <simon.coggins@totaralearning.com>
- *
+ * @package mod_perform
+ */
+
+/**
+ * Required in order to prevent failures in tests.
  */
 function perform_add_instance($data) {
-    global $DB;
-
-    $data->timemodified = time();
-    $data->id = $DB->insert_record('perform', $data);
-
-    return $data->id;
+    return null;
 }
 
 function perform_update_instance($data) {
-    global $DB;
-
-    $data->timemodified = time();
-    $data->id           = $data->instance;
-
-    $DB->update_record('perform', $data);
-
     return true;
 }
 
 function perform_delete_instance($id) {
-    global $DB;
-
-    if (!$perform = $DB->get_record('perform', array('id'=>$id))) {
-        return false;
-    }
-
-    $DB->delete_records('perform', array('id'=>$perform->id));
-
     return true;
-
 }

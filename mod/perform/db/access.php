@@ -21,33 +21,27 @@
  * @package mod_perform
  */
 
-
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
-    // View a performance activity.
-    'mod/perform:view' => [
+    // View the performance activities management page, where users can create and manage performance activities.
+    'mod/perform:view_manage_activities' => [
         'captype' => 'read',
-        'contextlevel' => CONTEXT_MODULE,
+        'contextlevel' => CONTEXT_COURSECAT,
         'archetypes' => [
-            'performanceactivitymanager' => CAP_ALLOW,
+            'performanceactivitycreator' => CAP_ALLOW,
         ]
     ],
-    // Manage a performance activity.
-    'mod/perform:manage' => [
+    // Manage a performance activity. Automatically granted when a user creates a performance activity.
+    // Addtionally requires 'mod/perform:view_manage_activities' to access the page where creation is
+    // done - if a user created a performance activity themselves then they must already have the capability
+    // to view the management page.
+    'mod/perform:manage_activity' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => [
             'manager' => CAP_ALLOW,
             'performanceactivitymanager' => CAP_ALLOW,
-        ]
-    ],
-    // Manage a performance activity.
-    'mod/perform:manage' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => [
-            'manager' => CAP_ALLOW
         ]
     ],
 ];

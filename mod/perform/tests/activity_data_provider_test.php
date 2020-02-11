@@ -29,20 +29,29 @@ use  mod_perform\data_providers\activity\activity;
 class mod_perform_activity_data_provider_testcase extends advanced_testcase {
 
     public function test_fetch() {
-        $this->create_test_data();
+        $this->setAdminUser();
+
+        $data = $this->create_test_data();
+
         $data_provider = new activity();
         $performs = $data_provider->fetch()->get();
 
         $this->assertCount(2, $performs);
         $this->assertEqualsCanonicalizing(
-            ['Mid year performance', 'End year performance'],
+            [$data->activity1->get_entity()->name, $data->activity2->get_entity()->name],
             [$performs[0]->get_entity()->name, $performs[1]->get_entity()->name]
         );
     }
 
-    private function create_test_data() {
+    private function create_test_data(): stdClass {
+        /** @var mod_perform_generator $perform_generator */
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-        $perform_generator->create_activity(['name' => 'Mid year performance']);
-        $perform_generator->create_activity(['name' => 'End year performance']);
+
+        $data = new stdClass();
+
+        $data->activity1 = $perform_generator->create_activity_in_container(['activity_name' => 'Mid year performance']);
+        $data->activity2 = $perform_generator->create_activity_in_container(['activity_name' => 'End year performance']);
+
+        return $data;
     }
 }

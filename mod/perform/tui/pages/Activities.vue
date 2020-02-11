@@ -1,6 +1,10 @@
 <template>
   <div>
-    <h2 v-text="$str('perform:manage', 'mod_perform')" />
+    <h2 v-text="$str('perform:manage_activity', 'mod_perform')" />
+    <Button
+      :text="$str('create_activity', 'mod_perform')"
+      @click="create_activity()"
+    />
     <Table :data="activities" :expandable-rows="true">
       <template v-slot:header-row>
         <HeaderCell size="8">{{
@@ -33,9 +37,12 @@ import Table from 'totara_core/components/datatable/Table';
 import Cell from 'totara_core/components/datatable/Cell';
 import HeaderCell from 'totara_core/components/datatable/HeaderCell';
 import performActivitiesQuery from '../../webapi/ajax/activities.graphql';
+import Button from 'totara_core/components/buttons/Button';
+import CreateActivityMutation from '../../webapi/ajax/create_activity.graphql';
 
 export default {
   components: {
+    Button,
     Cell,
     HeaderCell,
     Table,
@@ -54,15 +61,40 @@ export default {
       activities: [],
     };
   },
+  methods: {
+    create_activity: function() {
+      console.log(this);
+      this.$apollo
+        .mutate({
+          // Query
+          mutation: CreateActivityMutation,
+          // Parameters
+          variables: {
+            name: 'placeholder_name',
+          },
+        })
+        .then(data => {
+          if (data.data && data.data.container_perform_create) {
+            console.log('successfully created activity');
+          }
+        })
+        .catch(error => {
+          // TODO Handle error case
+          console.log('error');
+          console.error(error);
+        });
+    },
+  },
 };
 </script>
 <lang-strings>
   {
     "mod_perform": [
-        "perform:manage",
-        "perform:view:name",
-        "perform:view:status:active",
-        "perform:view:status"
+      "create_activity",
+      "perform:manage_activity",
+      "perform:view:name",
+      "perform:view:status:active",
+      "perform:view:status"
     ]
   }
 </lang-strings>

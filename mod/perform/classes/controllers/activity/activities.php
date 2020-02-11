@@ -15,18 +15,15 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Coggins <simon.coggins@totaralearning.com>
  * @package mod_perform
- *
  */
 
 namespace mod_perform\controllers\activity;
 
 use container_perform\perform;
-use context;
-use context_system;
 use totara_mvc\controller;
 use totara_mvc\tui_view;
 
@@ -35,7 +32,7 @@ class activities extends controller {
     /**
      * @inheritDoc
      */
-    protected function setup_context(): context {
+    protected function setup_context(): \context {
         $category_id = perform::get_default_categoryid();
         return \context_coursecat::instance($category_id);
     }
@@ -44,10 +41,10 @@ class activities extends controller {
      * @return tui_view
      */
     public function action(): tui_view {
-        $this->require_capability('mod/perform:view', $this->get_context());
+        $this->require_capability('mod/perform:view_manage_activities', $this->get_context());
 
         return tui_view::create('mod_perform/pages/Activities', [])
-            ->set_title(get_string('perform:manage', 'mod_perform'));
+            ->set_title(get_string('perform:manage_activity', 'mod_perform'));
     }
 
 }
