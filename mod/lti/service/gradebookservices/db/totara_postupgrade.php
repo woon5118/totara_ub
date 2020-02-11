@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Player <simon.player@totaralearning.com>
- * @package mod_lti
+ * @package ltiservice_gradebookservices
  */
 
 defined('MOODLE_INTERNAL') || die;
@@ -35,20 +35,27 @@ defined('MOODLE_INTERNAL') || die;
  * @return boolean
  *
  */
-function xmldb_ltiservice_gradebookservices_upgrade($oldversion) {
+function xmldb_ltiservice_gradebookservices_totara_postupgrade($oldversion) {
     global $DB;
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2019031304) {
-        $table = new xmldb_table('ltiservice_gradebookservices');
-        $key = new xmldb_key('itemnumbercourse', XMLDB_KEY_FOREIGN, ['gradeitemid', 'courseid'], 'grade_items', ['id']);
-        if ($dbman->key_exists($table, $key)) {
-            $dbman->drop_key($table, $key);
-        }
+    $table = new xmldb_table('ltiservice_gradebookservices');
+    $key = new xmldb_key('itemnumbercourse', XMLDB_KEY_FOREIGN, ['gradeitemid', 'courseid'], 'grade_items', ['id']);
+    if ($dbman->key_exists($table, $key)) {
+        $dbman->drop_key($table, $key);
+    }
 
-        // Lti savepoint reached.
-        upgrade_mod_savepoint(true, 2019031304, 'ltiservice_gradebookservices');
+    $table = new xmldb_table('ltiservice_gradebookservices');
+    $key = new xmldb_key('gradeitemid', XMLDB_KEY_FOREIGN, array('gradeitemid'), 'grade_items', array('id'));
+    if (!$dbman->key_exists($table, $key)) {
+        $dbman->add_key($table, $key);
+    }
+
+    $table = new xmldb_table('ltiservice_gradebookservices');
+    $key = new xmldb_key('courseid', XMLDB_KEY_FOREIGN, array('courseid'), 'course', array('id'));
+    if (!$dbman->key_exists($table, $key)) {
+        $dbman->add_key($table, $key);
     }
 
     return true;

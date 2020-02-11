@@ -29,4 +29,4 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->version   = 2019111800;
 $plugin->requires  = 2017110800;
 $plugin->component = 'ltiservice_basicoutcomes';
-$plugin->backported = 'v3.7.0';     // TOTARA: backported v3.7.0 for Totara 13
+$plugin->backported = 'v3.8.1';     // TOTARA: backported from this release

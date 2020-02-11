@@ -1146,7 +1146,6 @@ class core_plugin_manager {
             'forumreport_summary',
 
             // Moodle 3.7.x premigration removals.
-            'ltiservice_basicoutcomes',
             'dataformat_pdf',
             'theme_classic',
             'customfield_checkbox',
@@ -1163,7 +1162,6 @@ class core_plugin_manager {
             'block_timeline',
 
             // Moodle 3.5.x premigration removals.
-            'ltiservice_gradebookservices',
             'atto_recordrtc',
             'search_simpledb',
 

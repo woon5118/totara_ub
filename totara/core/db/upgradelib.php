@@ -366,7 +366,6 @@ function totara_core_upgrade_delete_moodle_plugins() {
         'forumreport_summary',
 
         // Moodle 3.7.x premigration removals.
-        'ltiservice_basicoutcomes',
         'dataformat_pdf',
         'theme_classic',
         'customfield_checkbox',
@@ -383,7 +382,6 @@ function totara_core_upgrade_delete_moodle_plugins() {
         'block_timeline',
 
         // Moodle 3.5.x premigration removals.
-        'ltiservice_gradebookservices',
         'atto_recordrtc',
         'search_simpledb',
 

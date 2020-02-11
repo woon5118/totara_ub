@@ -249,5 +249,11 @@ function xmldb_lti_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2019031302, 'lti');
     }
 
+    // Automatically generated Moodle v3.7.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Automatically generated Moodle v3.8.0 release upgrade line.
+    // Put any upgrade step following this.
+
     return true;
 }

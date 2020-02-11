@@ -18,24 +18,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Petr Skoda <petr.skoda@totaralearning.com>
- * @package mod_lti
+ * @package ltiservice_toolsettings
  */
 
 /**
  * Transforms plugin data to Moodle data format supported in migration.
  */
-function xmldb_mod_lti_premigrate() {
+function xmldb_ltiservice_toolsettings_premigrate() {
     global $DB;
     $dbman = $DB->get_manager();
 
-    $version = premigrate_get_plugin_version('mod', 'lti');
+    $version = premigrate_get_plugin_version('ltiservice', 'toolsettings');
 
     if ($version > 2019111800) {
-        throw new coding_exception("Invalid plugin (mod_lti) version ($version) for pre-migration");
+        throw new coding_exception("Invalid plugin (ltiservice_toolsettings) version ($version) for pre-migration");
     }
 
     // Plugin was backported from Moodle 3.8.1 to Totara 13.
     if ($version > 2019111800) {
-        $version = premigrate_plugin_savepoint(2019111800, 'mod', 'lti');
+        $version = premigrate_plugin_savepoint(2019111800, 'mod', 'toolsettings');
     }
 }
