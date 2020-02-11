@@ -30,7 +30,7 @@ Feature: Seminar availability based on activity completion
 
     # Create a Seminar activity and add restriction so it won't be available until the Certificate is marked as completed
     And I add a "Seminar" to section "1"
-    And I set the following fields to these values
+    And I set the following fields to these values:
       | Name             | Test seminar 1 |
       | Description      | Test seminar 1 |
     And I expand all fieldsets
