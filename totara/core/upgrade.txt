@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* totara_print_report_manager() function has been deprecated and should no longer be used.
 * Added 'Totara grid catalogue' as a third option for 'Default home page for users' setting in Navigation settings
 * Changed 'Allow default page selection' default value from 'Yes' to 'No'
 * totara_core\quickaccessmenu\menu::get_items_in_group() added second argument $includehidden

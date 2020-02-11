@@ -1185,8 +1185,10 @@ function totara_print_my_team_nav() {
 }
 
 /**
-* print out the table of visible reports
-*/
+ * print out the table of visible reports
+ *
+ * @deprecated since Totara 13.
+ */
 function totara_print_report_manager() {
     global $CFG, $USER, $PAGE;
     require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');

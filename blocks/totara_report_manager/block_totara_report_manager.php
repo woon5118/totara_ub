@@ -38,14 +38,11 @@ class block_totara_report_manager extends block_base {
             return $this->content;
         }
 
-        if (empty($this->instance->pinned)) {
-            $context = context_block::instance($this->instance->id);
-        } else {
-            $context = context_system::instance(); // pinned blocks do not have own context
-        }
+        /** @var \block_totara_report_manager\output\renderer $output */
+        $output = $this->page->get_renderer('block_totara_report_manager');
 
-        $this->content = new stdClass;
-        $this->content->text = totara_print_report_manager();
+        $this->content = new stdClass();
+        $this->content->text = $output->report_list();
         $this->content->footer = '';
 
         return $this->content;
