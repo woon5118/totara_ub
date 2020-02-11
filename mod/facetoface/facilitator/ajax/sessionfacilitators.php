@@ -120,6 +120,7 @@ $dialog->type = \totara_dialog_content::TYPE_CHOICE_MULTI;
 $dialog->manageadhoc = has_capability('mod/facetoface:manageadhocfacilitators', $context);
 $dialog->items = $allfacilitators;
 $dialog->disabled_items = $unavailablefacilitators;
+$dialog->selected_id = 'selected-facilitators';
 $dialog->selected_items = $selectedfacilitators;
 $dialog->selected_title = 'selected';
 $dialog->lang_file = 'mod_facetoface';

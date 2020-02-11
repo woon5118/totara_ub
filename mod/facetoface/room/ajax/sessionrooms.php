@@ -119,6 +119,7 @@ $dialog->type = totara_dialog_content::TYPE_CHOICE_MULTI;
 $dialog->manageadhoc = has_capability('mod/facetoface:manageadhocrooms', $context);
 $dialog->items = $allrooms;
 $dialog->disabled_items = $unavailablerooms;
+$dialog->selected_id = 'selected-rooms';
 $dialog->selected_items = $selectedrooms;
 $dialog->selected_title = 'selected';
 $dialog->lang_file = 'mod_facetoface';

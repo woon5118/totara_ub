@@ -118,6 +118,7 @@ $dialog->type = \totara_dialog_content::TYPE_CHOICE_MULTI;
 $dialog->manageadhoc = has_capability('mod/facetoface:manageadhocassets', $context);
 $dialog->items = $allassets;
 $dialog->disabled_items = $unavailableassets;
+$dialog->selected_id = 'selected-assets';
 $dialog->selected_items = $selectedassets;
 $dialog->selected_title = 'selected';
 $dialog->lang_file = 'mod_facetoface';

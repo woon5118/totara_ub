@@ -1171,7 +1171,7 @@ select.menuf2f-select {
             width: 25%;
         }
     }
-    
+
     .facetoface-bulk-actions-selector,
     .facetoface-bulk-actions-picker {
         float: left;
@@ -1180,7 +1180,7 @@ select.menuf2f-select {
     #selectoptionbefore {
         display: none;
         color: @mod_facetoface-error-colour;
-        
+
         &.f2f-selectionoptionbefore-error {
             display: block;
         }
@@ -1332,6 +1332,44 @@ a.mod_facetoface__action_goback {
                     padding-right:@totara_style-spacing_x_small ;
                 }
             }
+            #search-tab {
+                #fitem_id_query {
+                    margin-bottom: 0;
+                    .fitemtitle {
+                        padding: @totara_style-spacing_x_small 0 0 0;
+                    }
+                    .ftext {
+                        padding-right: 0;
+                    }
+                }
+                #fitem_id_dialogsearchsubmitbutton {
+                    margin-bottom: 0;
+                    .fsubmit {
+                        margin-left: @totara_style-spacing_x_small;
+                    }
+                }
+            }
+            #browse-tab,
+            #search-tab {
+                ul.treeview li {
+                    font-size: @totara_style-size_13;
+                    span {
+                        margin-left: 2px;
+                    }
+                }
+            }
+        }
+        .selected {
+            .treeview-selected-item {
+                display: block;
+                font-size: @totara_style-size_13;
+            }
+            // Taken from theme/basis/less
+            div:hover span.deletebutton,
+            .deletebutton {
+                background: transparent url([[pix:totara_core|jquery_ui_dialog/ui-icons_cd0a0a_256x240]]) no-repeat -80px -128px;
+            }
+
         }
     }
     .ui-dialog-content .mform {
