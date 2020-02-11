@@ -21,18 +21,32 @@
 -->
 
 <template>
-  <span class="tui-pathwayManual-lastRatingBlock">
-    <span v-if="hasBeenRated" class="tui-pathwayManual-lastRatingBlock__blocks">
-      <span v-if="showValue">{{ scaleValue }}</span>
-      <span>{{ date }}</span>
-      <span
-        v-if="raterName"
-        class="tui-pathwayManual-lastRatingBlock__raterName"
-      >
-        {{ raterName }}
+  <span>
+    <span
+      v-if="latestRating != null"
+      class="tui-bulkManualRatingLastRatingBlock__blocks"
+    >
+      <template v-if="showValue">
+        <span v-if="latestRating.scale_value == null">
+          {{ $str('rating_set_to_none', 'pathway_manual') }}
+        </span>
+        <span v-else>{{ latestRating.scale_value.name }}</span>
+      </template>
+      <span v-if="isToday">
+        {{ $str('today') }}
       </span>
+      <span v-else>
+        {{ latestRating.date }}
+      </span>
+      <span v-if="!isCurrentUser && !raterPurged">{{
+        $str(
+          'user_fullname_wrapper',
+          'pathway_manual',
+          latestRating.rater.fullname
+        )
+      }}</span>
     </span>
-    <span v-else class="tui-pathwayManual-lastRatingBlock__neverRated">{{
+    <span v-else class="tui-bulkManualRatingLastRatingBlock__neverRated">{{
       $str('never_rated', 'pathway_manual')
     }}</span>
   </span>
@@ -42,7 +56,6 @@
 export default {
   props: {
     latestRating: {
-      required: false,
       type: Object,
     },
     currentUserId: {
@@ -50,75 +63,40 @@ export default {
       type: Number,
     },
     showValue: {
-      required: false,
       type: Boolean,
       default: true,
     },
   },
 
   computed: {
-    hasBeenRated() {
-      return this.latestRating != null;
-    },
-
-    scaleValue() {
-      if (this.latestRating.scale_value == null) {
-        return this.$str('rating_set_to_none', 'pathway_manual');
-      }
-      return this.latestRating.scale_value.name;
-    },
-
+    /**
+     * Is the date of the last rating today?
+     * @returns {boolean}
+     */
     isToday() {
       let specifiedDate = new Date(this.latestRating.date_iso8601);
       let today = new Date();
       return specifiedDate.setHours(0, 0, 0, 0) === today.setHours(0, 0, 0, 0);
     },
 
+    /**
+     * Has the user data been purged for the person who last rated?
+     * @returns {boolean}
+     */
     raterPurged() {
       return this.latestRating.rater == null;
     },
 
+    /**
+     * Was the current user the last person to make a rating?
+     * @returns {boolean}
+     */
     isCurrentUser() {
       return parseInt(this.latestRating.rater.id) === this.currentUserId;
-    },
-
-    raterName() {
-      if (this.raterPurged || this.isCurrentUser) {
-        return null;
-      }
-
-      return this.$str(
-        'user_fullname_wrapper',
-        'pathway_manual',
-        this.latestRating.rater.fullname
-      );
-    },
-
-    date() {
-      if (this.isToday) {
-        return this.$str('today');
-      }
-      return this.latestRating.date;
     },
   },
 };
 </script>
-
-<style lang="scss">
-.tui-pathwayManual-lastRatingBlock {
-  @media (min-width: $tui-screen-xs) {
-    &__blocks {
-      & > span {
-        display: block;
-      }
-    }
-
-    &__neverRated {
-      display: none;
-    }
-  }
-}
-</style>
 
 <lang-strings>
   {

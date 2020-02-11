@@ -16,29 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Matthias Bonk <matthias.bonk@totaralearning.com>
- * @package pathway_manual
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
+ * @package totara_competency
  */
 
-import { shallowMount } from '@vue/test-utils';
-import component from 'pathway_manual/components/RatingInput';
-let wrapper;
-
-const props = {
-  scale: {},
-  scaleValueId: '1',
-  compId: '123',
-  comment: 'Test comment',
-};
-const mocks = {
-  $str: function() {
-    return 'fff';
+export const mocks = {
+  $apollo: {
+    loading: false,
+  },
+  $id: id => {
+    return 'id-' + id;
+  },
+  $str: function(identifier, plugin, props) {
+    let string = "$str('" + identifier;
+    if (plugin != null) {
+      string += "', '" + plugin;
+    }
+    if (props != null) {
+      return string + "', " + JSON.stringify(props) + ')';
+    }
+    return string + "')";
   },
 };
-
-describe('components/RatingInput.vue', () => {
-  it('Checks snapshot', () => {
-    wrapper = shallowMount(component, { mocks: mocks, propsData: props });
-    expect(wrapper.element).toMatchSnapshot();
-  });
-});

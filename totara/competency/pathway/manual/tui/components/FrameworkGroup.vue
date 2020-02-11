@@ -21,123 +21,79 @@
 -->
 
 <template>
-  <div class="tui-pathwayManual__frameworkGroup">
-    <div class="tui-pathwayManual__frameworkGroup_titleBar">
-      <span
-        class="tui-pathwayManual__frameworkGroup_titleBar_icon"
-        @click.prevent="toggleOpen"
-      >
-        <FlexIcon v-if="showContent" icon="nav-expanded" size="200" />
-        <FlexIcon v-else icon="nav-expand" size="200" />
-      </span>
-      <span class="tui-pathwayManual__frameworkGroup_titleBar_title">
-        {{ groupTitle }}
-      </span>
-    </div>
-    <Table
-      v-show="showContent"
-      :data="group.competencies"
-      :expandable-rows="false"
-      class="tui-pathwayManual__frameworkGroup_table"
-    >
+  <Collapsible :label="groupTitle" :initial-state="isExpanded">
+    <Table :data="group.competencies" :expandable-rows="false">
       <template v-slot:header-row>
-        <HeaderCell size="11">
-          {{ columnHeaders[0] }}
+        <HeaderCell size="10">
+          {{ $str('competency', 'totara_hierarchy') }}
         </HeaderCell>
-        <HeaderCell size="8">
-          <div class="tui-pathwayManual__frameworkGroup_table_block">
-            {{ columnHeaders[1] }}
-            <LastRatingHelp :is-for-self="isForSelf" />
+        <HeaderCell size="4">
+          <div class="tui-bulkManualRatingFrameworkGroup__headerWithHelp">
+            {{ $str('last_rating_given', 'pathway_manual') }}
+            <LastRatingHelp :is-for-self="role === roleSelf" />
           </div>
         </HeaderCell>
-        <HeaderCell
-          size="3"
-          class="tui-pathwayManual__frameworkGroup_table_block"
-        >
-          <div class="tui-pathwayManual__frameworkGroup_table__block">
-            {{ columnHeaders[2] }}
-            <ScalePopover
-              :scale="group"
-              :show-descriptions="true"
+        <HeaderCell size="6">
+          <div class="tui-bulkManualRatingFrameworkGroup__headerWithHelp">
+            {{ $str('new_rating', 'pathway_manual') }}
+            <InfoIconButton
+              :aria-label="$str('rating_scale_help', 'totara_competency')"
               position="right"
-              class="tui-pathwayManual-frameworkGroup__table_help"
             >
-              <FlexIcon icon="info" size="200" />
-            </ScalePopover>
+              <RatingScaleOverview :scale="group" :show-descriptions="true" />
+            </InfoIconButton>
           </div>
         </HeaderCell>
-        <HeaderCell
-          size="3"
-          class="tui-pathwayManual__frameworkGroup_table_block"
-        />
       </template>
       <template v-slot:row="{ row }">
-        <Cell size="11" :column-header="columnHeaders[0]">
+        <Cell size="10" :column-header="$str('competency', 'totara_hierarchy')">
           {{ row.competency.display_name }}
         </Cell>
-        <Cell size="8" :column-header="columnHeaders[1]">
+        <Cell
+          size="4"
+          :column-header="$str('last_rating_given', 'pathway_manual')"
+        >
           <LastRatingBlock
             :latest-rating="row.latest_rating"
             :current-user-id="currentUserId"
           />
         </Cell>
-        <Cell size="3" :column-header="columnHeaders[2]">
-          <span
-            v-if="hasNoneRating(row.competency.id)"
-            class="tui-pathwayManual__frameworkGroup_table_noneRating"
-          >
-            {{ $str('rating_none', 'pathway_manual') }}
-          </span>
-          <span
-            v-else-if="hasRating(row.competency.id)"
-            class="tui-pathwayManual__frameworkGroup_table_ratingText"
-          >
-            {{ getScaleValueName(row.competency.id) }}
-          </span>
-          <FlexIcon
-            v-if="hasComment(row.competency.id)"
-            icon="pathway_manual|comment-filled"
-            size="200"
-          />
-        </Cell>
-        <Cell size="3" valign="center">
-          <RatingInput
+        <Cell size="6" :column-header="$str('new_rating', 'pathway_manual')">
+          <RatingCell
             :comp-id="row.competency.id"
             :scale="group"
-            :scale-value-id="getScaleValueId(row.competency.id)"
-            :comment="getComment(row.competency.id)"
+            :rating="getRating(row.competency.id)"
             @update-rating="value => updateRating(row.competency.id, value)"
             @delete-rating="deleteRating(row.competency.id)"
           />
         </Cell>
       </template>
     </Table>
-  </div>
+  </Collapsible>
 </template>
 
 <script>
 import Cell from 'totara_core/components/datatable/Cell';
-import FlexIcon from 'totara_core/components/icons/FlexIcon';
+import Collapsible from 'totara_core/components/collapsible/Collapsible';
 import HeaderCell from 'totara_core/components/datatable/HeaderCell';
+import InfoIconButton from 'totara_core/components/buttons/InfoIconButton';
 import LastRatingBlock from 'pathway_manual/components/LastRatingBlock';
 import LastRatingHelp from 'pathway_manual/components/LastRatingHelp';
-import RatingInput from 'pathway_manual/components/RatingInput';
-import ScalePopover from 'totara_competency/components/ScalePopover';
+import RatingCell from 'pathway_manual/components/RatingCell';
+import RatingScaleOverview from 'totara_competency/components/RatingScaleOverview';
 import Table from 'totara_core/components/datatable/Table';
-
-import { NONE_OPTION_VALUE } from 'pathway_manual/components/RatingPopover';
-
-const ROLE_SELF = 'self';
+import { ROLE_SELF } from 'pathway_manual/constants';
 
 export default {
   components: {
     Cell,
-    FlexIcon,
+    Collapsible,
     HeaderCell,
+    InfoIconButton,
     LastRatingBlock,
     LastRatingHelp,
-    RatingInput,
-    ScalePopover,
+    RatingCell,
+    RatingScaleOverview,
     Table,
   },
 
@@ -154,7 +110,7 @@ export default {
       required: true,
       type: Object,
     },
-    expanded: {
+    isExpanded: {
       default: true,
       type: Boolean,
     },
@@ -166,26 +122,17 @@ export default {
 
   data() {
     return {
-      showContent: this.expanded,
+      roleSelf: ROLE_SELF,
       showRatingTooltip: false,
       showScaleTooltip: false,
-      noneOptionValue: NONE_OPTION_VALUE,
     };
   },
 
   computed: {
-    columnHeaders() {
-      return [
-        this.$str('competency', 'totara_hierarchy'),
-        this.$str('last_rating_given', 'pathway_manual'),
-        this.$str('new_rating', 'pathway_manual'),
-      ];
-    },
-
-    isForSelf() {
-      return this.role === ROLE_SELF;
-    },
-
+    /**
+     * The name of the framework and how many competencies it has.
+     * @returns {String}
+     */
     groupTitle() {
       let count = this.group.competencies.length;
 
@@ -202,10 +149,11 @@ export default {
   },
 
   methods: {
-    toggleOpen() {
-      this.showContent = !this.showContent;
-    },
-
+    /**
+     * Notify the parent of a new/updated rating.
+     * @param {Number} compId
+     * @param {Object} ratingData
+     */
     updateRating(compId, ratingData) {
       this.$emit('update-rating', {
         comp_id: compId,
@@ -214,107 +162,25 @@ export default {
       });
     },
 
+    /**
+     * Notify the parent of a deleted rating.
+     * @param {Number} compId
+     */
     deleteRating(compId) {
       this.$emit('delete-rating', compId);
     },
 
-    getComment(compId) {
-      let foundRating = this.getRating(compId);
-      return foundRating && foundRating.comment ? foundRating.comment : '';
-    },
-
-    getScaleValueId(compId) {
-      let foundRating = this.getRating(compId);
-      return foundRating && foundRating.scale_value_id
-        ? foundRating.scale_value_id
-        : '';
-    },
-
-    getScaleValueName(compId) {
-      let currentScaleValueId = this.getScaleValueId(compId);
-      if (!currentScaleValueId.length) {
-        return '';
-      }
-      let found = this.group.values.find(
-        scaleData => scaleData.id === currentScaleValueId
-      );
-      return found ? found.name : '';
-    },
-
+    /**
+     * Get the rating made for a specific competency.
+     * @param {Number} compId
+     * @returns {Object}
+     */
     getRating(compId) {
       return this.selectedRatings.find(compData => compData.comp_id === compId);
-    },
-
-    hasRating(compId) {
-      return !!this.getRating(compId);
-    },
-
-    hasComment(compId) {
-      return !!this.getComment(compId).length;
-    },
-
-    hasNoneRating(compId) {
-      return this.getScaleValueId(compId) === this.noneOptionValue.toString();
     },
   },
 };
 </script>
-
-<style lang="scss">
-.tui-pathwayManual__frameworkGroup {
-  &:not(:last-child) {
-    margin-bottom: var(--tui-gap-7);
-  }
-
-  &_titleBar {
-    width: 100%;
-    padding: var(--tui-gap-2) var(--tui-gap-3);
-    background-color: var(--tui-color-neutral-2);
-
-    &_title {
-      font-weight: bold;
-      font-size: var(--tui-font-size-16);
-    }
-
-    &_icon {
-      color: var(--tui-color-state);
-      .flex-icon {
-        vertical-align: text-top;
-      }
-      cursor: pointer;
-    }
-  }
-
-  &_table {
-    &_block {
-      display: block;
-    }
-
-    &_help {
-      display: inline;
-      & .flex-icon {
-        cursor: pointer;
-      }
-    }
-
-    &_flex {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-    }
-
-    &_noneRating {
-      margin-right: var(--tui-gap-1);
-      font-style: italic;
-    }
-
-    &_ratingText {
-      margin-right: var(--tui-gap-1);
-      font-weight: bold;
-    }
-  }
-}
-</style>
 
 <lang-strings>
   {
@@ -327,6 +193,9 @@ export default {
       "new_rating",
       "rater_details_removed",
       "rating_set_to_none"
+    ],
+    "totara_competency": [
+      "rating_scale_help"
     ],
     "totara_hierarchy": [
       "competency"

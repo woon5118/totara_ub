@@ -22,20 +22,23 @@
 
 <template>
   <div class="tui-totaraCompetency-achievementDisplayHeader">
-    <div class="tui-totaraCompetency-achievementDisplayHeader_title">
+    <strong class="tui-totaraCompetency-achievementDisplayHeader_title">
       {{ title }}
-    </div>
-    <HelpPopover v-if="helpText">
+    </strong>
+    <InfoIconButton
+      v-if="helpText"
+      :aria-label="$str('show_help_for_x', 'totara_competency', title)"
+    >
       {{ helpText }}
-    </HelpPopover>
+    </InfoIconButton>
   </div>
 </template>
 
 <script>
-import HelpPopover from 'totara_competency/components/HelpPopover';
+import InfoIconButton from 'totara_core/components/buttons/InfoIconButton';
 
 export default {
-  components: { HelpPopover },
+  components: { InfoIconButton },
 
   props: {
     title: {
@@ -58,21 +61,20 @@ export default {
 
 <style lang="scss">
 .tui-totaraCompetency-achievementDisplayHeader {
+  display: flex;
   padding-bottom: var(--tui-gap-1);
   border-bottom: 1px solid var(--tui-color-neutral-5);
 
   &_title {
-    display: inline-block;
-    margin-top: auto;
-    margin-bottom: auto;
-    font-weight: bold;
     font-size: var(--tui-font-size-16);
-    vertical-align: middle;
-  }
-
-  &_help {
-    display: inline;
-    margin-bottom: var(--tui-gap-4);
   }
 }
 </style>
+
+<lang-strings>
+  {
+    "totara_competency": [
+      "show_help_for_x"
+    ]
+  }
+</lang-strings>

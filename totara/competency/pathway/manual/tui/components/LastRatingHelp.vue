@@ -21,21 +21,29 @@
 -->
 
 <template>
-  <HelpPopover class="tui-pathwayManual-lastRatingHelp">
-    <span v-if="isForSelf">
+  <InfoIconButton
+    :aria-label="
+      $str(
+        'show_help_for_x',
+        'totara_competency',
+        $str('last_rating_given', 'pathway_manual')
+      )
+    "
+  >
+    <template v-if="isForSelf">
       {{ $str('last_rating_given_self_tooltip', 'pathway_manual') }}
-    </span>
-    <span v-else>
+    </template>
+    <template v-else>
       {{ $str('last_rating_given_other_tooltip', 'pathway_manual') }}
-    </span>
-  </HelpPopover>
+    </template>
+  </InfoIconButton>
 </template>
 
 <script>
-import HelpPopover from 'totara_competency/components/HelpPopover';
+import InfoIconButton from 'totara_core/components/buttons/InfoIconButton';
 
 export default {
-  components: { HelpPopover },
+  components: { InfoIconButton },
 
   props: {
     isForSelf: {
@@ -47,17 +55,15 @@ export default {
 };
 </script>
 
-<style lang="scss">
-.tui-pathwayManual-lastRatingHelp {
-  font-weight: normal;
-}
-</style>
-
 <lang-strings>
   {
     "pathway_manual": [
+      "last_rating_given",
       "last_rating_given_other_tooltip",
       "last_rating_given_self_tooltip"
+    ],
+    "totara_competency": [
+      "show_help_for_x"
     ]
   }
 </lang-strings>

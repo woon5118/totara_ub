@@ -1,0 +1,447 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/RatingScaleOverview.vue Checks snapshot - with descriptions: withDescriptions 1`] = `
+<div
+  class="tui-competencyRatingScaleOverview"
+>
+  <h3
+    class="tui-competencyRatingScaleOverview__title"
+    id="id-rating-scale-title"
+  >
+    
+    $str('rating_scale', 'totara_competency')
+  
+  </h3>
+   
+  <ol
+    aria-labelledby="id-rating-scale-title"
+    class="tui-competencyRatingScaleOverview__list"
+  >
+    <li
+      class="tui-competencyRatingScaleOverview__list-item"
+    >
+      <div
+        class="tui-competencyRatingScaleOverview__proficientStatus"
+      >
+        <!---->
+      </div>
+       
+      <div
+        class="tui-competencyRatingScaleOverview__scaleValue"
+      >
+        <h4
+          class="tui-competencyRatingScaleOverview__scaleValue-name"
+        >
+          
+          Extremely competent
+        
+        </h4>
+         
+        <p
+          class="tui-competencyRatingScaleOverview__scaleValue-description"
+        >
+          <b>
+            No doubt this fella is competent
+          </b>
+        </p>
+         
+        <span
+          class="sr-only"
+        >
+          
+          $str('is_proficient_value', 'totara_competency')
+        
+        </span>
+      </div>
+    </li>
+    <li
+      class="tui-competencyRatingScaleOverview__list-item"
+    >
+      <div
+        class="tui-competencyRatingScaleOverview__proficientStatus"
+      >
+        <!---->
+      </div>
+       
+      <div
+        class="tui-competencyRatingScaleOverview__scaleValue"
+      >
+        <h4
+          class="tui-competencyRatingScaleOverview__scaleValue-name"
+        >
+          
+          Competent
+        
+        </h4>
+         
+        <p
+          class="tui-competencyRatingScaleOverview__scaleValue-description"
+        >
+          <i>
+            There is some merit co call it competent
+          </i>
+        </p>
+         
+        <span
+          class="sr-only"
+        >
+          
+          $str('is_proficient_value', 'totara_competency')
+        
+        </span>
+      </div>
+    </li>
+    <li
+      class="tui-competencyRatingScaleOverview__list-item"
+    >
+      <div
+        class="tui-competencyRatingScaleOverview__proficientStatus"
+      >
+        <!---->
+      </div>
+       
+      <div
+        class="tui-competencyRatingScaleOverview__scaleValue"
+      >
+        <h4
+          class="tui-competencyRatingScaleOverview__scaleValue-name"
+        >
+          
+          Competent on Tuesdays
+        
+        </h4>
+         
+        <p
+          class="tui-competencyRatingScaleOverview__scaleValue-description"
+        >
+          Competent, but only on Tuesdays, do not ask why.
+        </p>
+         
+        <span
+          class="sr-only"
+        >
+          
+          $str('is_proficient_value', 'totara_competency')
+        
+        </span>
+      </div>
+    </li>
+    <li
+      class="tui-competencyRatingScaleOverview__list-item"
+    >
+      <div
+        class="tui-competencyRatingScaleOverview__proficientStatus"
+      >
+        <checksuccess-stub
+          size="300"
+        />
+      </div>
+       
+      <div
+        class="tui-competencyRatingScaleOverview__scaleValue"
+      >
+        <h4
+          class="tui-competencyRatingScaleOverview__scaleValue-name"
+        >
+          
+          Not competent on Tuesdays
+        
+        </h4>
+         
+        <p
+          class="tui-competencyRatingScaleOverview__scaleValue-description"
+        >
+          Not competent, but only on Tuesdays, do not ask why.
+        </p>
+         
+        <span
+          class="sr-only"
+        >
+          
+          $str('is_proficient_value', 'totara_competency')
+        
+        </span>
+      </div>
+    </li>
+    <li
+      class="tui-competencyRatingScaleOverview__list-item"
+    >
+      <div
+        class="tui-competencyRatingScaleOverview__proficientStatus"
+      >
+        <!---->
+      </div>
+       
+      <div
+        class="tui-competencyRatingScaleOverview__scaleValue"
+      >
+        <h4
+          class="tui-competencyRatingScaleOverview__scaleValue-name"
+        >
+          
+          Below average
+        
+        </h4>
+         
+        <p
+          class="tui-competencyRatingScaleOverview__scaleValue-description"
+        >
+          We can not call it competent for just yet, maybe wait for Tuesday.
+        </p>
+         
+        <span
+          class="sr-only"
+        >
+          
+          $str('is_not_proficient_value', 'totara_competency')
+        
+        </span>
+      </div>
+    </li>
+    <li
+      class="tui-competencyRatingScaleOverview__list-item"
+    >
+      <div
+        class="tui-competencyRatingScaleOverview__proficientStatus"
+      >
+        <!---->
+      </div>
+       
+      <div
+        class="tui-competencyRatingScaleOverview__scaleValue"
+      >
+        <h4
+          class="tui-competencyRatingScaleOverview__scaleValue-name"
+        >
+          
+          Not competent
+        
+        </h4>
+         
+        <p
+          class="tui-competencyRatingScaleOverview__scaleValue-description"
+        >
+          Why does this value even exist?
+        </p>
+         
+        <span
+          class="sr-only"
+        >
+          
+          $str('is_not_proficient_value', 'totara_competency')
+        
+        </span>
+      </div>
+    </li>
+  </ol>
+</div>
+`;
+
+exports[`components/RatingScaleOverview.vue Checks snapshot - without descriptions: withoutDescriptions 1`] = `
+<div
+  class="tui-competencyRatingScaleOverview"
+>
+  <h3
+    class="tui-competencyRatingScaleOverview__title"
+    id="id-rating-scale-title"
+  >
+    
+    $str('rating_scale', 'totara_competency')
+  
+  </h3>
+   
+  <ol
+    aria-labelledby="id-rating-scale-title"
+    class="tui-competencyRatingScaleOverview__list"
+  >
+    <li
+      class="tui-competencyRatingScaleOverview__list-item"
+    >
+      <div
+        class="tui-competencyRatingScaleOverview__proficientStatus"
+      >
+        <!---->
+      </div>
+       
+      <div
+        class="tui-competencyRatingScaleOverview__scaleValue"
+      >
+        <h4
+          class="tui-competencyRatingScaleOverview__scaleValue-name"
+        >
+          
+          Extremely competent
+        
+        </h4>
+         
+        <!---->
+         
+        <span
+          class="sr-only"
+        >
+          
+          $str('is_proficient_value', 'totara_competency')
+        
+        </span>
+      </div>
+    </li>
+    <li
+      class="tui-competencyRatingScaleOverview__list-item"
+    >
+      <div
+        class="tui-competencyRatingScaleOverview__proficientStatus"
+      >
+        <!---->
+      </div>
+       
+      <div
+        class="tui-competencyRatingScaleOverview__scaleValue"
+      >
+        <h4
+          class="tui-competencyRatingScaleOverview__scaleValue-name"
+        >
+          
+          Competent
+        
+        </h4>
+         
+        <!---->
+         
+        <span
+          class="sr-only"
+        >
+          
+          $str('is_proficient_value', 'totara_competency')
+        
+        </span>
+      </div>
+    </li>
+    <li
+      class="tui-competencyRatingScaleOverview__list-item"
+    >
+      <div
+        class="tui-competencyRatingScaleOverview__proficientStatus"
+      >
+        <!---->
+      </div>
+       
+      <div
+        class="tui-competencyRatingScaleOverview__scaleValue"
+      >
+        <h4
+          class="tui-competencyRatingScaleOverview__scaleValue-name"
+        >
+          
+          Competent on Tuesdays
+        
+        </h4>
+         
+        <!---->
+         
+        <span
+          class="sr-only"
+        >
+          
+          $str('is_proficient_value', 'totara_competency')
+        
+        </span>
+      </div>
+    </li>
+    <li
+      class="tui-competencyRatingScaleOverview__list-item"
+    >
+      <div
+        class="tui-competencyRatingScaleOverview__proficientStatus"
+      >
+        <checksuccess-stub
+          size="300"
+        />
+      </div>
+       
+      <div
+        class="tui-competencyRatingScaleOverview__scaleValue"
+      >
+        <h4
+          class="tui-competencyRatingScaleOverview__scaleValue-name"
+        >
+          
+          Not competent on Tuesdays
+        
+        </h4>
+         
+        <!---->
+         
+        <span
+          class="sr-only"
+        >
+          
+          $str('is_proficient_value', 'totara_competency')
+        
+        </span>
+      </div>
+    </li>
+    <li
+      class="tui-competencyRatingScaleOverview__list-item"
+    >
+      <div
+        class="tui-competencyRatingScaleOverview__proficientStatus"
+      >
+        <!---->
+      </div>
+       
+      <div
+        class="tui-competencyRatingScaleOverview__scaleValue"
+      >
+        <h4
+          class="tui-competencyRatingScaleOverview__scaleValue-name"
+        >
+          
+          Below average
+        
+        </h4>
+         
+        <!---->
+         
+        <span
+          class="sr-only"
+        >
+          
+          $str('is_not_proficient_value', 'totara_competency')
+        
+        </span>
+      </div>
+    </li>
+    <li
+      class="tui-competencyRatingScaleOverview__list-item"
+    >
+      <div
+        class="tui-competencyRatingScaleOverview__proficientStatus"
+      >
+        <!---->
+      </div>
+       
+      <div
+        class="tui-competencyRatingScaleOverview__scaleValue"
+      >
+        <h4
+          class="tui-competencyRatingScaleOverview__scaleValue-name"
+        >
+          
+          Not competent
+        
+        </h4>
+         
+        <!---->
+         
+        <span
+          class="sr-only"
+        >
+          
+          $str('is_not_proficient_value', 'totara_competency')
+        
+        </span>
+      </div>
+    </li>
+  </ol>
+</div>
+`;

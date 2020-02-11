@@ -162,6 +162,7 @@ $string['proficient_value'] = 'Proficient value';
 $string['progress_name_by_user'] = '{$a->progress_name} by {$a->user_fullname_role}';
 $string['rating_none'] = 'None';
 $string['rating_scale'] = 'Rating scale';
+$string['rating_scale_help'] = 'Show information about the rating scale';
 $string['removelinkedcourse'] = 'Remove linked course';
 $string['removedlinkedcourse'] = 'Removed linked course';
 $string['revertallchanges:body'] = 'Are you sure you want to revert all changes? All changes not yet activated will be permanently deleted.';
@@ -190,6 +191,7 @@ $string['setupbasictitle'] = 'Basic set up';
 $string['setupcustom'] = 'Custom';
 $string['setuptemplate'] = 'Use template';
 $string['setuptemplatetitle'] = 'Select template';
+$string['show_help_for_x'] = 'Show help for {$a}';
 $string['singlevaluepaths'] = 'Criteria-based paths';
 $string['singlevalueproficientmark_help'] = 'Proficient values marked with';
 $string['sort:alphabetical'] = 'Alphabetical';
@@ -357,6 +359,8 @@ $string['header:competency_name'] = 'Competency name';
 $string['header:status'] = 'Status';
 
 $string['individual'] = 'Individual';
+$string['is_not_proficient_value'] = 'This value is not proficient.';
+$string['is_proficient_value'] = 'This value is proficient.';
 
 $string['no_user_groups'] = 'No assignments';
 

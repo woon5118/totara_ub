@@ -22,7 +22,9 @@
 
 <template>
   <div>
-    <RateHeader />
+    <h2>
+      {{ $str('rate_competencies', 'pathway_manual') }}
+    </h2>
     <RoleSelector
       :specified-role="specifiedRole"
       :has-default-selected="true"
@@ -33,20 +35,14 @@
 </template>
 
 <script>
-import RateHeader from 'pathway_manual/components/RateHeader';
 import RateUsersList from 'pathway_manual/components/RateUsersList';
 import RoleSelector from 'pathway_manual/components/RoleSelector';
 
 export default {
-  components: {
-    RateHeader,
-    RateUsersList,
-    RoleSelector,
-  },
+  components: { RateUsersList, RoleSelector },
 
   props: {
     specifiedRole: {
-      required: false,
       type: String,
     },
     currentUserId: {
@@ -68,3 +64,11 @@ export default {
   },
 };
 </script>
+
+<lang-strings>
+  {
+    "pathway_manual": [
+      "rate_competencies"
+    ]
+  }
+</lang-strings>

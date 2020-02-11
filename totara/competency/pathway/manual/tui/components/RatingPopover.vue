@@ -26,83 +26,92 @@
     position="bottom-right"
     @open-changed="popoverOpenChanged"
   >
-    <template v-slot:trigger>
-      <slot name="rating-trigger" />
-    </template>
-    <span class="tui-pathwayManual-ratingInput__heading">
-      {{ $str('select_scale_value', 'pathway_manual') }}
-    </span>
-    <RadioGroup v-model="inputScaleValueId">
-      <Radio
-        v-for="(scaleValue, key) in scale.values"
-        :key="key"
-        :label="scaleValue.name"
-        :value="scaleValue.id"
-        :name="uniqueRadioName"
+    <h2 class="sr-only">{{ $str('add_rating', 'pathway_manual') }}</h2>
+    <div class="tui-bulkManualRatingPopover__scaleValues">
+      <label :id="$id('scale-value-heading')">
+        {{ $str('select_scale_value', 'pathway_manual') }}
+      </label>
+      <RadioGroup
+        v-model="inputScaleValueId"
+        :aria-labelledby="$id('scale-value-heading')"
       >
-        <template>
-          {{ scaleValue.name }}
-        </template>
-      </Radio>
-      <hr class="tui-pathwayManual-ratingInput__radioDivider" />
-      <Radio :value="noneOptionValue.toString()" :name="uniqueRadioName">
-        <template>
-          {{ $str('rating_set_to_none', 'pathway_manual') }}
-        </template>
-      </Radio>
-    </RadioGroup>
-
-    <br />
-    <span class="tui-pathwayManual-ratingInput__heading">
-      {{ $str('add_comment', 'pathway_manual') }}
-    </span>
-    <textarea
-      v-model="inputComment"
-      class="tui-pathwayManual-ratingInput__textarea"
-    />
+        <Radio
+          v-for="(scaleValue, key) in scale.values"
+          :key="key"
+          :label="scaleValue.name"
+          :value="scaleValue.id"
+          :name="$id('scale-radio')"
+        >
+          <template>
+            {{ scaleValue.name }}
+          </template>
+        </Radio>
+        <span class="tui-bulkManualRatingPopover__divider" />
+        <Radio :value="noneOptionValue" :name="$id('scale-radio')">
+          <template>
+            {{ $str('rating_set_to_none', 'pathway_manual') }}
+          </template>
+        </Radio>
+      </RadioGroup>
+    </div>
+    <div class="tui-bulkManualRatingPopover__comment">
+      <label :id="$id('comment-heading')">
+        {{ $str('add_comment', 'pathway_manual') }}
+      </label>
+      <Textarea
+        v-model="inputComment"
+        class="tui-bulkManualRatingPopover__textarea"
+        :aria-labelledby="$id('comment-heading')"
+      />
+    </div>
     <template v-slot:buttons="{ close }">
       <Button
-        :disabled="!inputScaleValueId.length"
+        :disabled="inputScaleValueId == null"
         :styleclass="{ small: true, primary: true }"
         :text="$str('rating_done', 'pathway_manual')"
-        @click="updateRating(inputScaleValueId, inputComment, close)"
+        @click="updateRating(close)"
       />
       <ButtonIcon
-        v-if="hasInputData"
+        v-if="hasInput"
         :styleclass="{ small: true, alert: true }"
-        :aria-label="$str('delete_comment', 'pathway_manual')"
-        :text="$str('delete_comment', 'pathway_manual')"
+        :aria-label="$str('delete')"
+        :text="$str('delete')"
         @click="deleteRating(close)"
       >
-        <FlexIcon icon="trash" size="200" />
+        <DeleteIcon />
       </ButtonIcon>
       <Button
         v-else
         :styleclass="{ small: true, primary: false }"
-        :text="$str('rating_cancel', 'pathway_manual')"
+        :text="$str('cancel')"
         @click="cancelRating(close)"
       />
+    </template>
+    <template v-slot:trigger>
+      <slot name="rating-trigger" />
     </template>
   </Popover>
 </template>
 <script>
 import Button from 'totara_core/components/buttons/Button';
 import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import FlexIcon from 'totara_core/components/icons/FlexIcon';
+import DeleteIcon from 'totara_core/components/icons/common/Delete';
 import Popover from 'totara_core/components/popover/Popover';
 import Radio from 'totara_core/components/form/Radio';
 import RadioGroup from 'totara_core/components/form/RadioGroup';
+import Textarea from 'totara_core/components/form/Textarea';
 
-export const NONE_OPTION_VALUE = -1;
+import { NONE_OPTION_VALUE } from 'pathway_manual/constants';
 
 export default {
   components: {
     Button,
     ButtonIcon,
-    FlexIcon,
+    DeleteIcon,
     Popover,
     Radio,
     RadioGroup,
+    Textarea,
   },
 
   props: {
@@ -124,49 +133,89 @@ export default {
 
   data() {
     return {
-      inputScaleValueId: this.scaleValueId.toString(),
+      inputScaleValueId: this.scaleValueId,
       inputComment: this.comment,
-      noneOptionValue: NONE_OPTION_VALUE,
     };
   },
 
   computed: {
-    hasInputData() {
-      return this.comment.length || this.scaleValueId.length;
+    /**
+     * Has a scale value been selected or a comment typed?
+     * @returns {boolean}
+     */
+    hasInput() {
+      return this.inputScaleValueId != null || this.hasInputComment;
     },
-    uniqueRadioName() {
-      return 'scaleRadio' + this.compId;
+
+    /**
+     * Has a comment been typed in?
+     * @returns {boolean}
+     */
+    hasInputComment() {
+      return this.inputComment != null;
+    },
+
+    /**
+     * The comment made, with unnecessary whitespace removed.
+     * @returns {String|null}
+     */
+    trimmedComment() {
+      return this.hasInputComment ? this.inputComment.trim() : null;
+    },
+
+    /**
+     * Dummy value for selecting a null scale value.
+     * @returns {string}
+     */
+    noneOptionValue() {
+      return NONE_OPTION_VALUE.toString();
     },
   },
 
   methods: {
-    updateRating(inputScaleValueId, inputComment, close) {
+    /**
+     * Close the popover and notify the parent that a rating has been made or updated.
+     * @param {function} close
+     */
+    updateRating(close) {
       close();
       this.$emit('update-rating', {
-        scale_value_id: inputScaleValueId,
-        comment: inputComment.trim(),
+        scale_value_id: this.inputScaleValueId,
+        comment: this.trimmedComment,
       });
     },
 
+    /**
+     * Close the popover and notify the parent that the rating has been deleted.
+     * @param {function} close
+     */
     deleteRating(close) {
       close();
       this.$emit('delete-rating');
     },
 
+    /**
+     * Close the popover and clear any draft changes.
+     * @param {function} close
+     */
     cancelRating(close) {
       close();
       this.dismissChanges();
     },
 
+    /**
+     * Clear any changes if the popover is no longer open.
+     * @param isOpen
+     */
     popoverOpenChanged(isOpen) {
-      // console.log('openChanged');
-      // console.log(this.scaleValueId + '|' + this.inputScaleValueId);
-      // console.log(typeof this.scaleValueId + '|' + typeof this.inputScaleValueId);
       if (!isOpen) {
         this.dismissChanges();
       }
     },
 
+    /**
+     * Clear the selected scale value and comment.
+     */
     dismissChanges() {
       this.inputComment = this.comment;
       this.inputScaleValueId = this.scaleValueId;
@@ -175,48 +224,18 @@ export default {
 };
 </script>
 
-<style lang="scss">
-.tui-pathwayManual-ratingInput {
-  &__comment-disabled {
-    color: var(--tui-color-neutral-4);
-    :hover {
-      text-decoration: none;
-      cursor: default;
-    }
-  }
-  &__heading {
-    font-weight: bold;
-  }
-  &__textarea {
-    width: 100%;
-    height: 4em;
-  }
-  &__radioDivider {
-    width: 100%;
-    margin-bottom: 0;
-  }
-  &__rateButton {
-    float: right;
-  }
-  &__editButton {
-    float: left;
-  }
-  &__saveButtons {
-    float: left;
-    width: 100%;
-  }
-}
-</style>
-
 <lang-strings>
   {
+    "moodle": [
+      "cancel",
+      "delete"
+    ],
     "pathway_manual": [
       "add_comment",
+      "add_rating",
       "comment_done",
-      "delete_comment",
       "edit_rating",
       "rate",
-      "rating_cancel",
       "rating_done",
       "rating_none",
       "rating_set_to_none",

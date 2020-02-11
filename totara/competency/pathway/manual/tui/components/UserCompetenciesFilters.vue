@@ -21,66 +21,89 @@
 -->
 
 <template>
-  <FilterBar
-    v-if="hasAnyFilters"
-    v-model="selectedFilters"
-    :styleclass="{
-      lastItemRight: true,
-    }"
-  >
-    <SelectFilter
-      v-if="filterOptions.competency_type"
-      v-model="selectedFilters.competencyType"
-      :label="$str('filter:competency_type', 'totara_competency')"
-      :show-label="true"
-      :options="competencyTypeFilterOptions"
-      @input="filtersSelected = true"
-    />
-    <SelectFilter
-      v-if="filterOptions.assignment_reason"
-      v-model="selectedFilters.assignmentReason"
-      :label="$str('filter:reason_assigned', 'pathway_manual')"
-      :show-label="true"
-      :options="assignmentReasonFilterOptions"
-      @input="filtersSelected = true"
-    />
-    <SelectFilter
-      v-if="filterOptions.rating_history"
-      v-model="selectedFilters.ratingHistory"
-      :label="$str('filter:rating_history', 'pathway_manual')"
-      :show-label="true"
-      :options="ratingHistoryFilterOptions"
-      @input="filtersSelected = true"
-    />
-    <div class="tui-selectFilter" style="flex-shrink: 0">
-      <Button
-        :text="$str('filter:update_selection', 'pathway_manual')"
-        :styleclass="{ small: true }"
-        :disabled="!filtersSelected"
-        @click="updateFiltersWithWarning"
-      />
-    </div>
-    <ConfirmModal
-      :open="showConfirmFiltersModal"
-      :title="$str('modal:confirm_update_filters_title', 'pathway_manual')"
-      @confirm="updateFilters"
-      @cancel="showConfirmFiltersModal = false"
+  <div>
+    <div
+      v-if="isRatingSingleCompetency"
+      class="tui-bulkManualUserCompetenciesFilters__singleCompetencyMessage"
     >
       <span
-        v-html="$str('modal:confirm_update_filters_body', 'pathway_manual')"
+        class="tui-bulkManualUserCompetenciesFilters__singleCompetencyMessage-text"
+      >
+        {{ $str('viewing_single_competency', 'pathway_manual') }}
+      </span>
+      <Button
+        class="tui-bulkManualUserCompetenciesFilters__singleCompetencyMessage-button"
+        :text="$str('view_all', 'pathway_manual')"
+        :styleclass="{ small: true }"
+        @click="viewAll"
       />
-    </ConfirmModal>
-  </FilterBar>
+    </div>
+    <FilterBar
+      v-else-if="hasAnyFilters"
+      v-model="selectedFilters"
+      :styleclass="{
+        lastItemRight: true,
+      }"
+    >
+      <SelectFilter
+        v-if="filterOptions.competency_type"
+        v-model="selectedFilters.competencyType"
+        :label="$str('filter:competency_type', 'totara_competency')"
+        :show-label="true"
+        :options="competencyTypeFilterOptions"
+        @input="filtersSelected = true"
+      />
+      <SelectFilter
+        v-if="filterOptions.assignment_reason"
+        v-model="selectedFilters.assignmentReason"
+        :label="$str('filter:reason_assigned', 'pathway_manual')"
+        :show-label="true"
+        :options="assignmentReasonFilterOptions"
+        @input="filtersSelected = true"
+      />
+      <SelectFilter
+        v-if="filterOptions.rating_history"
+        v-model="selectedFilters.ratingHistory"
+        :label="$str('filter:rating_history', 'pathway_manual')"
+        :show-label="true"
+        :options="ratingHistoryFilterOptions"
+        @input="filtersSelected = true"
+      />
+      <div class="tui-selectFilter" style="flex-shrink: 0">
+        <Button
+          :text="$str('filter:update_selection', 'pathway_manual')"
+          :styleclass="{ small: true }"
+          :disabled="!filtersSelected"
+          @click="updateFiltersWithWarning"
+        />
+      </div>
+      <ConfirmationModal
+        :open="showConfirmFiltersModal"
+        :title="$str('modal:confirm_update_filters_title', 'pathway_manual')"
+        @confirm="updateFilters"
+        @cancel="showConfirmFiltersModal = false"
+      >
+        <span
+          v-html="$str('modal:confirm_update_filters_body', 'pathway_manual')"
+        />
+      </ConfirmationModal>
+    </FilterBar>
+  </div>
 </template>
 
 <script>
 import Button from 'totara_core/components/buttons/Button';
-import ConfirmModal from 'pathway_manual/components/ConfirmModal';
+import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
 import FilterBar from 'totara_core/components/filters/FilterBar';
 import SelectFilter from 'totara_core/components/filters/SelectFilter';
 
 export default {
-  components: { Button, ConfirmModal, FilterBar, SelectFilter },
+  components: {
+    Button,
+    ConfirmationModal,
+    FilterBar,
+    SelectFilter,
+  },
 
   props: {
     filterOptions: {
@@ -89,6 +112,10 @@ export default {
     },
     hasRatings: {
       required: true,
+      type: Boolean,
+    },
+    isRatingSingleCompetency: {
+      default: false,
       type: Boolean,
     },
   },
@@ -107,6 +134,10 @@ export default {
   },
 
   computed: {
+    /**
+     * Are there any filters that can be selected?
+     * @returns {boolean}
+     */
     hasAnyFilters() {
       return (
         this.filterOptions.assignment_reason != null ||
@@ -115,6 +146,10 @@ export default {
       );
     },
 
+    /**
+     * Assignment reason filters that can be selected.
+     * @returns {{id: *, label: *}[]}
+     */
     assignmentReasonFilterOptions() {
       let filters = this.filterOptions.assignment_reason;
 
@@ -132,6 +167,10 @@ export default {
       return filters;
     },
 
+    /**
+     * Competency type filter options that can be selected.
+     * @returns {{id: *, label: *}[]}
+     */
     competencyTypeFilterOptions() {
       let filters = this.filterOptions.competency_type;
 
@@ -149,6 +188,10 @@ export default {
       return filters;
     },
 
+    /**
+     * Previous rating history filter options that can be selected.
+     * @returns {{id: *, label: *}[]}
+     */
     ratingHistoryFilterOptions() {
       return [
         {
@@ -183,6 +226,9 @@ export default {
   },
 
   methods: {
+    /**
+     * Confirm that the user wants to change the screen before actually applying the filters.
+     */
     updateFiltersWithWarning() {
       if (this.hasRatings) {
         this.showConfirmFiltersModal = true;
@@ -192,6 +238,9 @@ export default {
       this.updateFilters();
     },
 
+    /**
+     * Apply the filters that have been selected by notify the parent of what has been selected.
+     */
     updateFilters() {
       let filters = {};
 
@@ -212,9 +261,17 @@ export default {
 
       this.$emit('update-filters', filters);
     },
-  },
 
-  apollo: {},
+    /**
+     * Reset any applied filters.
+     */
+    viewAll() {
+      this.selectedFilters.competencyType = 0;
+      this.selectedFilters.assignment = 0;
+      this.selectedFilters.ratingHistory = 0;
+      this.updateFiltersWithWarning();
+    },
+  },
 };
 </script>
 
@@ -230,7 +287,9 @@ export default {
       "filter:update_selection",
       "modal:confirm_update_filters_body",
       "modal:confirm_update_filters_title",
-      "never_rated"
+      "never_rated",
+      "view_all",
+      "viewing_single_competency"
     ],
     "totara_competency": [
       "filter:competency_type"

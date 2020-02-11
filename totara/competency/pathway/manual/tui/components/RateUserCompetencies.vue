@@ -22,28 +22,31 @@
 -->
 
 <template>
-  <div v-if="isLoaded" class="tui-pathwayManual-rateUserCompetencies">
-    <div class="tui-pathwayManual-rateUserCompetencies__filters">
+  <div class="tui-bulkManualRatingRateUserCompetencies">
+    <div class="tui-bulkManualRatingRateUserCompetencies__filters">
       <UserCompetenciesFilters
-        v-if="filterOptions"
         :filter-options="filterOptions"
         :has-ratings="hasSelectedRatings"
+        :is-rating-single-competency="isRatingSingleCompetency"
         @update-filters="applyFilters"
+        @go-back="$emit('go-back')"
       />
     </div>
-    <div v-if="hasRateableCompetencies">
+    <Loader :loading="$apollo.loading" />
+    <div v-if="!$apollo.loading && competencies.framework_groups.length > 0">
       <FrameworkGroup
-        v-for="group in data.framework_groups"
+        v-for="group in competencies.framework_groups"
         :key="group.framework.id"
+        class="tui-bulkManualRatingRateUserCompetencies__frameworkGroup"
         :group="group"
         :role="role"
         :current-user-id="currentUserId"
         :selected-ratings="selectedRatings"
-        :expanded="expandFrameworkGroups"
+        :is-expanded="expandFrameworkGroups"
         @update-rating="updateRating"
         @delete-rating="deleteRating"
       />
-      <div class="tui-pathwayManual-rateUserCompetencies__submitButtons">
+      <div class="tui-bulkManualRatingRateUserCompetencies__submitButtons">
         <ButtonGroup>
           <Button
             :styleclass="{ primary: 'true' }"
@@ -54,7 +57,7 @@
           />
           <Button :text="$str('cancel')" @click="$emit('go-back')" />
         </ButtonGroup>
-        <ConfirmModal
+        <ConfirmationModal
           :open="showSubmitRatingsModal"
           :title="
             $str('modal:submit_ratings_confirmation_title', 'pathway_manual')
@@ -71,11 +74,18 @@
               )
             }}
           </p>
-        </ConfirmModal>
+        </ConfirmationModal>
       </div>
     </div>
-    <div v-else>
-      <em>{{ $str('filter:no_competencies', 'pathway_manual') }}</em>
+    <div
+      v-else-if="!$apollo.loading"
+      class="tui-bulkManualRatingRateUserCompetencies__noCompetencies"
+    >
+      {{
+        hasSelectedFilters
+          ? $str('filter:no_competencies', 'pathway_manual')
+          : $str('no_rateable_competencies', 'pathway_manual')
+      }}
     </div>
   </div>
 </template>
@@ -83,15 +93,13 @@
 <script>
 import Button from 'totara_core/components/buttons/Button';
 import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
-import ConfirmModal from 'pathway_manual/components/ConfirmModal';
+import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
+import CreateManualRatingsMutation from 'pathway_manual/graphql/create_manual_ratings.graphql';
 import FrameworkGroup from 'pathway_manual/components/FrameworkGroup';
+import Loader from 'totara_core/components/loader/Loader';
+import RateableCompetenciesQuery from 'pathway_manual/graphql/user_rateable_competencies.graphql';
 import UserCompetenciesFilters from 'pathway_manual/components/UserCompetenciesFilters';
-
-import CreateManualRatingsMutation from '../../webapi/ajax/create_manual_ratings.graphql';
-import RateableCompetenciesQuery from '../../webapi/ajax/user_rateable_competencies.graphql';
-
-import { ROLE_SELF } from 'pathway_manual/components/RoleSelector';
-import { NONE_OPTION_VALUE } from 'pathway_manual/components/RatingPopover';
+import { NONE_OPTION_VALUE, ROLE_SELF } from 'pathway_manual/constants';
 
 /**
  * If there are more than this amount of competencies available to rate,
@@ -99,14 +107,15 @@ import { NONE_OPTION_VALUE } from 'pathway_manual/components/RatingPopover';
  *
  * @type {number}
  */
-const MAX_COMPETENCIES_TO_DISPLAY = 50; // TODO: Should do some performance testing to pick an appropriate number
+const MAX_COMPETENCIES_TO_DISPLAY = 200;
 
 export default {
   components: {
     Button,
     ButtonGroup,
-    ConfirmModal,
+    ConfirmationModal,
     FrameworkGroup,
+    Loader,
     UserCompetenciesFilters,
   },
 
@@ -124,62 +133,68 @@ export default {
       type: Number,
     },
     assignmentId: {
-      required: false,
       type: Number,
     },
   },
 
   data() {
-    let selectedFilters = {};
-    if (this.assignmentId != null) {
-      selectedFilters = {
-        assignment_reason: [this.assignmentId],
-      };
-    }
-
-    return {
-      data: {},
-      selectedFilters: selectedFilters,
-      filterOptions: null,
+    let data = {
+      competencies: {},
+      selectedFilters: {},
+      filterOptions: {},
       showSubmitRatingsModal: false,
       selectedRatings: [],
-      noneOptionValue: NONE_OPTION_VALUE,
-      roleSelf: ROLE_SELF,
+      isRatingSingleCompetency: false,
     };
+
+    if (this.assignmentId != null) {
+      data.selectedFilters = {
+        assignment_reason: [this.assignmentId],
+      };
+      data.isRatingSingleCompetency = true;
+    }
+
+    return data;
   },
 
   computed: {
-    isLoaded() {
-      return this.data.count != null;
-    },
-
-    hasRateableCompetencies() {
-      return this.data.framework_groups.length > 0;
-    },
-
-    isForSelf() {
-      return this.role === this.roleSelf;
-    },
-
+    /**
+     * Should the framework groups of competencies be expanded?
+     * We don't expand them if there are too many competencies.
+     * @returns {boolean}
+     */
     expandFrameworkGroups() {
-      return this.data.count < MAX_COMPETENCIES_TO_DISPLAY;
+      return this.competencies.count < MAX_COMPETENCIES_TO_DISPLAY;
     },
 
+    /**
+     * Are there any draft ratings made that haven't been saved?
+     * @returns {boolean}
+     */
     hasSelectedRatings() {
       return this.selectedRatings.length > 0;
     },
 
-    numSelectedRatings() {
-      return this.selectedRatings.length;
+    /**
+     * Are there any filters that have been selected but not applied yet?
+     * @returns {boolean}
+     */
+    hasSelectedFilters() {
+      return Object.keys(this.selectedFilters).length > 0;
     },
 
+    /**
+     * Message to show to confirm saving ratings.
+     * @returns {String}
+     */
     submitRatingsModalMessage() {
       let ratingSummary = 'modal:submit_ratings_summary';
-      ratingSummary += this.numSelectedRatings === 1 ? '_singular' : '_plural';
-      ratingSummary += this.isForSelf ? '_self' : '_other';
+      ratingSummary +=
+        this.selectedRatings.length === 1 ? '_singular' : '_plural';
+      ratingSummary += this.role === ROLE_SELF ? '_self' : '_other';
 
       let confirmMsgParams = {
-        amount: this.numSelectedRatings,
+        amount: this.selectedRatings.length,
         subject_user: this.user.fullname,
       };
 
@@ -188,11 +203,21 @@ export default {
   },
 
   methods: {
+    /**
+     * Apply the filters that have been selected.
+     * This will reload the competencies listed.
+     * @param filters
+     */
     applyFilters(filters) {
       this.selectedRatings = [];
       this.selectedFilters = filters;
+      this.isRatingSingleCompetency = false;
     },
 
+    /**
+     * Add/modify an unsaved draft rating.
+     * @param ratingData
+     */
     updateRating(ratingData) {
       let previousRating = this.selectedRatings.find(
         ratingObj => ratingObj.comp_id === ratingData.comp_id
@@ -210,6 +235,10 @@ export default {
       this.updateUnloadHandler();
     },
 
+    /**
+     * Remove an unsaved draft rating.
+     * @param compId
+     */
     deleteRating(compId) {
       this.selectedRatings = this.selectedRatings.filter(
         previousRating => previousRating.comp_id !== compId
@@ -218,6 +247,9 @@ export default {
       this.updateUnloadHandler();
     },
 
+    /**
+     * Notify the browser and parent component that a rating has been changed.
+     */
     updateUnloadHandler() {
       // Warn user about leaving the page when having unsaved selections.
       if (this.hasSelectedRatings) {
@@ -229,6 +261,10 @@ export default {
       this.$emit('has-unsaved-ratings', this.hasSelectedRatings);
     },
 
+    /**
+     * Update a comment
+     * @param newComment
+     */
     updateComment(newComment) {
       let rating = this.selectedRatings.find(
         ratingData => ratingData.comp_id === newComment.comp_id
@@ -238,6 +274,11 @@ export default {
       }
     },
 
+    /**
+     * Displays a warning message if the user tries to navigate away without saving.
+     * @param {Event} e
+     * @returns {string}
+     */
     unloadHandler(e) {
       // For older browsers that still show custom message.
       let discardUnsavedChanges = this.$str(
@@ -249,19 +290,25 @@ export default {
       return discardUnsavedChanges;
     },
 
-    // Get rating data for sending to GQL mutation.
+    /**
+     * Get rating data for sending to GQL mutation.
+     * @returns {{scale_value_id: (null|*), comment: (string|*), comp_id: *}[]}
+     */
     getRatingsForSaving() {
       return this.selectedRatings.map(rating => ({
         comp_id: rating.comp_id,
         // Map "None" to null.
         scale_value_id:
-          parseInt(rating.scale_value_id) === this.noneOptionValue
+          parseInt(rating.scale_value_id) === NONE_OPTION_VALUE
             ? null
             : rating.scale_value_id,
         comment: typeof rating.comment === 'undefined' ? '' : rating.comment,
       }));
     },
 
+    /**
+     * Save the draft ratings the user has made.
+     */
     submitRatings() {
       window.removeEventListener('beforeunload', this.unloadHandler);
       this.showSubmitRatingsModal = false;
@@ -294,7 +341,7 @@ export default {
   },
 
   apollo: {
-    data: {
+    competencies: {
       query: RateableCompetenciesQuery,
       variables() {
         return {
@@ -303,30 +350,16 @@ export default {
           filters: this.selectedFilters,
         };
       },
-      update({ pathway_manual_user_rateable_competencies: data }) {
-        if (data.filters != null) {
-          this.filterOptions = data.filters;
+      update({ pathway_manual_user_rateable_competencies: competencies }) {
+        if (competencies.filters != null) {
+          this.filterOptions = competencies.filters;
         }
-        return data;
+        return competencies;
       },
     },
   },
 };
 </script>
-
-<style lang="scss">
-.tui-pathwayManual-rateUserCompetencies {
-  margin-top: var(--tui-gap-4);
-
-  &__filters {
-    margin-bottom: var(--tui-gap-5);
-  }
-
-  &__submitButtons {
-    float: right;
-  }
-}
-</style>
 
 <lang-strings>
   {
@@ -338,6 +371,7 @@ export default {
       "modal:submit_ratings_summary_singular_self",
       "modal:submit_ratings_summary_plural_other",
       "modal:submit_ratings_summary_plural_self",
+      "no_rateable_competencies",
       "unsaved_ratings_warning"
     ],
     "moodle": [

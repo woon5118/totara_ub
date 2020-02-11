@@ -22,7 +22,7 @@
 
 <template>
   <div>
-    <RateHeader :user="user" :is-for-another-user="isForAnotherUser" />
+    <PageHeader :user="user" :is-for-another-user="isForAnotherUser" />
     <RoleSelector
       v-if="isForAnotherUser"
       :user-id="user.id"
@@ -43,13 +43,13 @@
 </template>
 
 <script>
-import RateHeader from 'pathway_manual/components/RateHeader';
+import PageHeader from 'pathway_manual/components/PageHeader';
 import RateUserCompetencies from 'pathway_manual/components/RateUserCompetencies';
 import RoleSelector from 'pathway_manual/components/RoleSelector';
 
 export default {
   components: {
-    RateHeader,
+    PageHeader,
     RateUserCompetencies,
     RoleSelector,
   },
@@ -60,7 +60,6 @@ export default {
       type: Object,
     },
     specifiedRole: {
-      required: false,
       type: String,
     },
     currentUserId: {
@@ -71,9 +70,8 @@ export default {
       required: true,
       type: String,
     },
-    assignmentId: {
-      required: false,
-      type: Number,
+    assignment: {
+      type: Object,
     },
   },
 
@@ -92,6 +90,13 @@ export default {
     isForAnotherUser() {
       return this.user.id !== this.currentUserId;
     },
+
+    assignmentId() {
+      if (this.assignment) {
+        return parseInt(this.assignment.assignment_id);
+      }
+      return null;
+    },
   },
 
   methods: {
@@ -106,23 +111,3 @@ export default {
   },
 };
 </script>
-
-<style lang="scss">
-.tui-pathwayManual-rateCompetencies {
-  margin-bottom: var(--tui-gap-4);
-
-  &__backLink {
-    display: inline-block;
-    align-self: start;
-    padding-bottom: var(--tui-gap-2);
-  }
-}
-</style>
-
-<lang-strings>
-  {
-    "totara_competency": [
-      "back_to_competency_profile"
-    ]
-  }
-</lang-strings>

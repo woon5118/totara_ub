@@ -31,6 +31,7 @@ use pathway_manual\models\roles;
 use pathway_manual\models\roles\manager;
 use pathway_manual\models\roles\role;
 use pathway_manual\models\roles\self_role;
+use totara_competency\entities\competency_assignment_user;
 use totara_competency\helpers\capability_helper;
 use totara_mvc\controller;
 use totara_mvc\tui_view;
@@ -85,7 +86,7 @@ class rate_competencies extends controller {
         }
 
         if ($assignment_id = $this->get_param('assignment_id', PARAM_INT)) {
-            $vue_props['assignment-id'] = $assignment_id;
+            $vue_props['assignment'] = $this->get_assignment($assignment_id)->to_array();
         }
 
         $view = tui_view::create('pathway_manual/pages/RateCompetencies', $vue_props);
@@ -159,6 +160,19 @@ class rate_competencies extends controller {
         $this->page->navbar->add($page_title);
 
         $view->set_title($page_title)->set_url($page_url);
+    }
+
+    /**
+     * Get a user's assignment record.
+     *
+     * @param int $assignment_id
+     * @return competency_assignment_user|object
+     */
+    private function get_assignment(int $assignment_id): competency_assignment_user {
+        return competency_assignment_user::repository()
+            ->where('user_id', $this->user->id)
+            ->where('assignment_id', $assignment_id)
+            ->one();
     }
 
 }

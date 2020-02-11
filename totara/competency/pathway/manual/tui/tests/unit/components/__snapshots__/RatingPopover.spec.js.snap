@@ -5,54 +5,68 @@ exports[`components/RatingPopover.vue Checks snapshot 1`] = `
   position="bottom-right"
   triggers="click"
 >
-   
-  <span
-    class="tui-pathwayManual-ratingInput__heading"
+  <h2
+    class="sr-only"
   >
-    
-    fff
-  
-  </span>
+    $str('add_rating', 'pathway_manual')
+  </h2>
    
-  <radiogroup-stub
-    value="1"
+  <div
+    class="tui-bulkManualRatingRatingInput__scaleValues"
   >
-    <radio-stub
-      label="Competent"
-      name="scaleRadio321"
-      value="123"
+    <label
+      id="id-scale-value-heading"
     >
       
-        Competent
-      
-    </radio-stub>
+      $str('select_scale_value', 'pathway_manual')
+    
+    </label>
      
-    <hr
-      class="tui-pathwayManual-ratingInput__radioDivider"
+    <radiogroup-stub
+      arialabelledby="id-scale-value-heading"
+      value="1"
+    >
+      <radio-stub
+        label="Competent"
+        name="id-scale-radio"
+        value="123"
+      >
+        
+          Competent
+        
+      </radio-stub>
+       
+      <span
+        class="tui-bulkManualRatingRatingInput__divider"
+      />
+       
+      <radio-stub
+        name="id-scale-radio"
+        value="-1"
+      >
+        
+          $str('rating_set_to_none', 'pathway_manual')
+        
+      </radio-stub>
+    </radiogroup-stub>
+  </div>
+   
+  <div
+    class="tui-bulkManualRatingRatingInput__comment"
+  >
+    <label
+      id="id-comment-heading"
+    >
+      
+      $str('add_comment', 'pathway_manual')
+    
+    </label>
+     
+    <textarea-stub
+      arialabelledby="id-comment-heading"
+      class="tui-bulkManualRatingRatingInput__textarea"
+      value="Test comment"
     />
-     
-    <radio-stub
-      name="scaleRadio321"
-      value="-1"
-    >
-      
-        fff
-      
-    </radio-stub>
-  </radiogroup-stub>
-   
-  <br />
-   
-  <span
-    class="tui-pathwayManual-ratingInput__heading"
-  >
-    
-    fff
-  
-  </span>
-   
-  <textarea
-    class="tui-pathwayManual-ratingInput__textarea"
-  />
+  </div>
 </popover-stub>
 `;

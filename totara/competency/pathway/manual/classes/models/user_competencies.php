@@ -111,6 +111,7 @@ class user_competencies {
      * @return bool
      */
     public static function can_rate_competencies(int $for_user) {
+        /** @var role[] $roles */
         $roles = roles::get_current_user_roles($for_user);
         $role_names = array_map(function (role $role) {
             return $role::get_name();

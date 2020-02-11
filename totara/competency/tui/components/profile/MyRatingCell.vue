@@ -22,23 +22,20 @@
 -->
 
 <template>
-  <ScalePopover
-    v-if="scale"
-    :scale="scale"
-    :reverse-values="true"
-    :triggers="['hover', 'focus', 'click']"
-  >
-    <div class="tui-MyRatingCell__inline">
-      <span class="tui-MyRatingCell__link-alike">{{ value.name }}</span>
-    </div>
-  </ScalePopover>
+  <Popover v-if="scale" :triggers="['hover', 'focus', 'click']">
+    <template v-slot:trigger>
+      <div class="tui-totaraCompetency__myRatingCell">{{ value.name }}</div>
+    </template>
+    <RatingScaleOverview :scale="scale" :reverse-values="true" />
+  </Popover>
 </template>
 
 <script>
-import ScalePopover from 'totara_competency/components/ScalePopover';
+import Popover from 'totara_core/components/popover/Popover';
+import RatingScaleOverview from 'totara_competency/components/RatingScaleOverview';
 
 export default {
-  components: { ScalePopover },
+  components: { Popover, RatingScaleOverview },
   props: {
     value: {
       required: true,
@@ -58,15 +55,10 @@ export default {
 };
 </script>
 <style lang="scss">
-.tui-MyRatingCell__ {
-  &inline {
-    display: inline-block;
-  }
-
-  &link-alike {
-    text-decoration: underline;
-    text-decoration-style: dashed;
-    cursor: pointer;
-  }
+.tui-totaraCompetency__myRatingCell {
+  display: inline-block;
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  cursor: pointer;
 }
 </style>

@@ -21,26 +21,19 @@
 -->
 
 <template>
-  <div>
-    <div v-if="isForAnotherUser" class="tui-pathwayManual-rateHeader">
-      <div class="tui-pathwayManual-rateHeader">
-        <Avatar
-          :src="user.profileimageurl"
-          :alt="user.fullname"
-          size="medium"
-        />
-        <h2
-          class="tui-pathwayManual-rateHeader__title tui-pathwayManual-rateHeader__title--withPhoto"
-        >
-          {{ $str('rate_user', 'pathway_manual', user.fullname) }}
-        </h2>
-      </div>
+  <div class="tui-bulkManualRatingPageHeader">
+    <div v-if="isForAnotherUser" class="tui-bulkManualRatingPageHeader__title">
+      <Avatar :src="user.profileimageurl" :alt="user.fullname" size="medium" />
     </div>
-    <div v-else class="tui-pathwayManual-rateHeader">
-      <h2 class="tui-pathwayManual-rateHeader__title">
-        {{ $str('rate_competencies', 'pathway_manual') }}
-      </h2>
-    </div>
+    <h2
+      v-if="isForAnotherUser"
+      class="tui-bulkManualRatingPageHeader__title tui-bulkManualRatingPageHeader__title-withPhoto"
+    >
+      {{ $str('rate_user', 'pathway_manual', user.fullname) }}
+    </h2>
+    <h2 v-else class="tui-bulkManualRatingPageHeader__title">
+      {{ $str('rate_competencies', 'pathway_manual') }}
+    </h2>
   </div>
 </template>
 
@@ -48,40 +41,22 @@
 import Avatar from 'totara_core/components/avatar/Avatar';
 
 export default {
-  components: { Avatar },
+  components: {
+    Avatar,
+  },
 
   props: {
     user: {
-      required: false,
+      required: true,
       type: Object,
     },
     isForAnotherUser: {
-      required: false,
+      required: true,
       type: Boolean,
-      default: false,
     },
   },
 };
 </script>
-
-<style lang="scss">
-.tui-pathwayManual-rateHeader {
-  display: table-row;
-
-  &__photoContainer,
-  &__title {
-    display: table-cell;
-  }
-
-  &__title {
-    margin: 0;
-    vertical-align: middle;
-    &--withPhoto {
-      padding-left: var(--tui-gap-3);
-    }
-  }
-}
-</style>
 
 <lang-strings>
   {

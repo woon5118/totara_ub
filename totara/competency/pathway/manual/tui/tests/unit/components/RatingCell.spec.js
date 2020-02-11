@@ -21,61 +21,20 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'pathway_manual/components/RatingPopover';
+import component from 'pathway_manual/components/RatingCell';
 import { mocks } from './mocks';
 let wrapper;
 
 const props = {
-  scale: {
-    values: [
-      {
-        id: '123',
-        name: 'Competent',
-      },
-    ],
-  },
-  compId: '321',
+  scale: {},
   scaleValueId: '1',
+  compId: '123',
   comment: 'Test comment',
 };
 
-describe('components/RatingPopover.vue', () => {
+describe('components/RatingCell.vue', () => {
   it('Checks snapshot', () => {
     wrapper = shallowMount(component, { mocks: mocks, propsData: props });
     expect(wrapper.element).toMatchSnapshot();
-  });
-
-  it('Checks updateRating method', () => {
-    const vueHandler = jest.fn();
-    const closeFn = jest.fn();
-    const wrapper = shallowMount(component, {
-      mocks: mocks,
-      propsData: props,
-      listeners: {
-        'update-rating': vueHandler,
-      },
-    });
-    wrapper.vm.updateRating(closeFn);
-    expect(vueHandler).toHaveBeenCalled();
-    expect(vueHandler.mock.calls[0][0]).toEqual({
-      scale_value_id: '1',
-      comment: 'Test comment',
-    });
-    expect(closeFn).toHaveBeenCalled();
-  });
-
-  it('Checks deleteRating method', () => {
-    const vueHandler = jest.fn();
-    const closeFn = jest.fn();
-    const wrapper = shallowMount(component, {
-      mocks: mocks,
-      propsData: props,
-      listeners: {
-        'delete-rating': vueHandler,
-      },
-    });
-    wrapper.vm.deleteRating(closeFn);
-    expect(vueHandler).toHaveBeenCalled();
-    expect(closeFn).toHaveBeenCalled();
   });
 });
