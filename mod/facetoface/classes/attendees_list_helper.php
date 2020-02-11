@@ -530,10 +530,12 @@ final class attendees_list_helper {
                     // Values of multi-select are changed after edit_save_data func.
                     $data = unserialize($clonefromform);
 
-                    $removed[]['result'] = get_string('removedsuccessfully', 'mod_facetoface');
+                    $result['result'] = get_string('removedsuccessfully', 'mod_facetoface');
+                    $removed[] = $result;
                 } else {
                     $failures = $signup->get_failures(user_cancelled::class);
-                    $errors[]['result'] = current($failures);
+                    $result['result'] = current($failures);
+                    $errors[] = $result;
                 }
             }
         }
