@@ -406,7 +406,7 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/cust
                     throw new Error(response[0].errormessage);
                 }
                 // Fire an event to say the message was sent.
-                this.messageArea.trigger(Events.MESSAGESENT, [this._getUserId(), text]);
+                this.messageArea.trigger(Events.MESSAGESENT, [this._getUserId(), response[0].msgtext]);
                 // Update the messaging area.
                 return this._addLastMessageToDom();
             }.bind(this)).then(function() {

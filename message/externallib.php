@@ -162,6 +162,7 @@ class core_message_external extends external_api {
             }
             if ($success) {
                 $resultmsg['msgid'] = $success;
+                $resultmsg['msgtext'] = format_text($message['text'], external_validate_format($message['textformat']));
             } else {
                 // WARNINGS: for backward compatibility we return this errormessage.
                 //          We should have thrown exceptions as these errors prevent results to be returned.
@@ -187,6 +188,7 @@ class core_message_external extends external_api {
             new external_single_structure(
                 array(
                     'msgid' => new external_value(PARAM_INT, 'test this to know if it succeeds:  id of the created message if it succeeded, -1 when failed'),
+                    'msgtext' => new external_value(PARAM_CLEANHTML, 'your own cleaned message', VALUE_OPTIONAL),
                     'clientmsgid' => new external_value(PARAM_ALPHANUMEXT, 'your own id for the message', VALUE_OPTIONAL),
                     'errormessage' => new external_value(PARAM_TEXT, 'error message - if it failed', VALUE_OPTIONAL)
                 )

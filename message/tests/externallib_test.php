@@ -101,7 +101,8 @@ class core_message_externallib_testcase extends externallib_advanced_testcase {
         // Create test message data.
         $message1 = array();
         $message1['touserid'] = $user1->id;
-        $message1['text'] = 'the message.';
+        $message1['text'] = 'the message <img src="a" onerror="alert(1)">.';
+        $message1['textformat'] = FORMAT_HTML;
         $message1['clientmsgid'] = 4;
         $messages = array($message1);
 
@@ -117,6 +118,7 @@ class core_message_externallib_testcase extends externallib_advanced_testcase {
         $this->assertEquals($themessage->useridto, $message1['touserid']);
         $this->assertEquals($themessage->smallmessage, $message1['text']);
         $this->assertEquals($sentmessages[0]['clientmsgid'], $message1['clientmsgid']);
+        $this->assertEquals(clean_text($message1['text']), $sentmessages[0]['msgtext']);
     }
 
     /**
