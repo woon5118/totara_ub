@@ -34,15 +34,23 @@ define("LABEL_MAX_NAME_LENGTH", 50);
  * @return string
  */
 function get_label_name($label) {
-    $name = strip_tags(format_string($label->intro,true));
+    // Totara: format_string() is not suitable for general HTML markup, also shortening with substr would be wrong.
+    $format = isset($label->introformat) ? $label->introformat : FORMAT_MOODLE;
+    $name = format_text($label->intro, $format);
+
+    $name = html_to_text($name, LABEL_MAX_NAME_LENGTH * 2, false);
+    $name = trim($name);
+
     if (core_text::strlen($name) > LABEL_MAX_NAME_LENGTH) {
-        $name = core_text::substr($name, 0, LABEL_MAX_NAME_LENGTH)."...";
+        $name = shorten_text($name, LABEL_MAX_NAME_LENGTH);
     }
 
-    if (empty($name)) {
-        // arbitrary name
+    if ($name === '') {
+        // General activity name.
         $name = get_string('modulename','label');
     }
+
+    $name = clean_string($name);
 
     return $name;
 }
