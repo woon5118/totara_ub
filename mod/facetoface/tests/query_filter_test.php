@@ -134,14 +134,13 @@ class mod_facetoface_query_filter_testcase extends advanced_testcase {
     }
 
     /**
-     * Helper function to count the number of saved attendees excluding archived records.
+     * Helper function to count the number of saved attendees.
      *
      * @return integer
      */
     private function count_saved_attendees(int $seminareventid): int {
         return builder::table('facetoface_signups', 'su')
             ->join(['facetoface_signups_status', 'sus'], 'id', 'signupid')
-            ->where('su.archived', 0)
             ->where('sus.superceded', 0)
             ->where('su.sessionid', $seminareventid)
             ->where_in('sus.statuscode', attendance_state::get_all_attendance_code())
@@ -197,14 +196,8 @@ class mod_facetoface_query_filter_testcase extends advanced_testcase {
             $seminarevent->save();
             $time += HOURSECS * 2;
             seminar_event_helper::merge_sessions($seminarevent, [$this->prepare_date($time, $time + HOURSECS)]);
-            // Pollute with archived signups.
-            for ($i = $data[0]; $i < 4; $i++) {
-                $signup = $this->signup_state($seminarevent, $users[$i], booked::class);
-                $signup->set_archived(1)->save();
-            }
             /** @var signup[] $signups */
             $signups = [];
-            // These are the real signups.
             for ($i = 0; $i < $data[0]; $i++) {
                 $signup = $this->signup_state($seminarevent, $users[$i], booked::class);
                 $signups[] = $signup;
@@ -280,14 +273,8 @@ class mod_facetoface_query_filter_testcase extends advanced_testcase {
                 $this->prepare_date($time - HOURSECS * 1, $time + HOURSECS * 1),
                 $this->prepare_date($time + HOURSECS * 2, $time + HOURSECS * 3),
             ]);
-            // Pollute with archived signups.
-            for ($i = $data[0]; $i < 2; $i++) {
-                $signup = $this->signup_state($seminarevent, $users[$i], booked::class);
-                $signup->set_archived(1)->save();
-            }
             /** @var signup[] $signups */
             $signups = [];
-            // These are the real signups.
             for ($i = 0; $i < 2; $i++) {
                 $signup = $this->signup_state($seminarevent, $users[$i], booked::class);
                 $signups[] = $signup;
@@ -433,14 +420,8 @@ class mod_facetoface_query_filter_testcase extends advanced_testcase {
             $seminarevent->save();
             $time = time() + $data[1] * HOURSECS;
             seminar_event_helper::merge_sessions($seminarevent, [$this->prepare_date($time, $time + HOURSECS * 2)]);
-            // Pollute with archived signups.
-            for ($i = $data[0]; $i < 4; $i++) {
-                $signup = $this->signup_state($seminarevent, $users[$i], booked::class);
-                $signup->set_archived(1)->save();
-            }
             /** @var signup[] $signups */
             $signups = [];
-            // These are the real signups.
             for ($i = 0; $i < $data[0]; $i++) {
                 $signup = $this->signup_state($seminarevent, $users[$i], booked::class);
                 $signups[] = $signup;
@@ -510,12 +491,6 @@ class mod_facetoface_query_filter_testcase extends advanced_testcase {
             if ($data[3]) {
                 $seminarevent->set_registrationtimefinish(time() + HOURSECS * $data[3])->save();
             }
-            // Pollute with archived signups.
-            $this->signup_state($seminarevent, $userid, booked::class)->set_archived(1)->save();
-            $this->signup_state($seminarevent, $userid, fully_attended::class)->set_archived(1)->save();
-            $this->signup_state($seminarevent, $userid, requested::class)->set_archived(1)->save();
-            $this->signup_state($seminarevent, $userid, waitlisted::class)->set_archived(1)->save();
-            // This is the real signup.
             $this->signup_state($seminarevent, $userid, $data[0]);
             if ($data[4]) {
                 // Poor man's cancellation: flip cancelledstatus instead of seminar_event::cancel()

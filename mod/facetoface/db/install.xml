@@ -132,6 +132,9 @@
         <KEY NAME="facesign_man_fk" TYPE="foreign" FIELDS="managerid" REFTABLE="user" REFFIELDS="id"/>
         <KEY NAME="facesign_job_fk" TYPE="foreign" FIELDS="jobassignmentid" REFTABLE="job_assignment" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="facesignup_sessarchiv_ix" UNIQUE="false" FIELDS="userid, sessionid, archived"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="facetoface_signups_status" COMMENT="Status of user signups, this table keeps the history for each user signup, no data is deleted">
       <FIELDS>

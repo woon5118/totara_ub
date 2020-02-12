@@ -866,5 +866,19 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020021300, 'facetoface');
     }
 
+    if ($oldversion < 2020021400) {
+        // Define index facesignup_sessarchiv_ix (not unique) to be added to facetoface_signups.
+        $table = new xmldb_table('facetoface_signups');
+        $index = new xmldb_index('facesignup_sessarchiv_ix', XMLDB_INDEX_NOTUNIQUE, array('userid', 'sessionid', 'archived'));
+
+        // Conditionally launch add index facesignup_sessarchiv_ix.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2020021400, 'facetoface');
+    }
+
     return true;
 }

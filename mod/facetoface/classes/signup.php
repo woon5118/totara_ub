@@ -125,9 +125,10 @@ final class signup implements seminar_iterator_item {
      * @param int $userid
      * @param seminar_event $seminarevent
      * @param int $notificationtype - Default 3 = MDL_F2F_BOTH
+     * @param bool $includearchived - Default false = exclude archived
      * @return signup
      */
-    public static function create(int $userid, seminar_event $seminarevent, int $notificationtype = 3): signup {
+    public static function create(int $userid, seminar_event $seminarevent, int $notificationtype = 3, bool $includearchived = false): signup {
         global $DB;
 
         if (empty($seminarevent->get_id())) {
@@ -140,7 +141,11 @@ final class signup implements seminar_iterator_item {
         $signup->userid = $userid;
         $signup->sessionid = $seminarevent->get_id();
         if ($signup->userid > 0) {
-            $existing = $DB->get_record('facetoface_signups', ['userid' => $userid, 'sessionid' => $seminarevent->get_id(), 'archived' => 0]);
+            $conditions = ['userid' => $userid, 'sessionid' => $seminarevent->get_id()];
+            if (!$includearchived) {
+                $conditions['archived'] = 0;
+            }
+            $existing = $DB->get_record('facetoface_signups', $conditions);
             if (!empty($existing)) {
                 return $signup->map_object($existing);
             }

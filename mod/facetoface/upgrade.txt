@@ -147,6 +147,9 @@ Note that more recent update comes to the top.
 * form\event::new_user_roles_added() has been deprecated and will be removed in Totara 14
 
 --- Update in backend code ---
+* facetoface_archive_completion() has been updated; facetoface.completiondelay now taken into account
+* The signup_not_archived state has been added to prevent a state transition to/from booked and graded states
+* signup::create() added 4th parameter $includearchived
 * event_registration_is_available::pass() changed to use seminar_event::is_registration_open()
 * seminar_event::is_cancellable() has been added; please use this method to see whether the event can be cancelled or not
 * signup_helper::process_attendance() has been changed to trigger the signup_status_updated event whenever signup status is changed

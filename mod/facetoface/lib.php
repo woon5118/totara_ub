@@ -593,8 +593,8 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                 $numberofeventstodisplay = isset($facetoface->display) ? (int)$facetoface->display : 0;
                 $index = 0;
 
-                /** @var seminar_event $seminarevent */
                 foreach ($seminarevents as $seminarevent) {
+                    /** @var seminar_event $seminarevent */
                     $id = $seminarevent->get_id();
                     if (array_key_exists($id, $sessions)) {
                         continue;
@@ -654,8 +654,8 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
             $sessions = [];
 
             if ($facetoface->display > 0) {
-                /** @var seminar_event $seminarevent */
                 foreach ($seminarevents as $seminarevent) {
+                    /** @var seminar_event $seminarevent */
                     if ($seminarevent->is_over() || $seminarevent->get_cancelledstatus()) {
                         // We only want upcoming sessions (or those with no date set).
                         // For now, we've cut down the sessions to loop through to just those displayed.
@@ -663,7 +663,8 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                     }
 
                     $id = $seminarevent->get_id();
-                    $sessiondata = \mod_facetoface\seminar_event_helper::get_sessiondata($seminarevent, null, true);
+                    $signup = signup::create($USER->id, $seminarevent, MDL_F2F_BOTH, true);
+                    $sessiondata = \mod_facetoface\seminar_event_helper::get_sessiondata($seminarevent, $signup, true);
                     $sessions[$id] = $sessiondata;
                 }
 
@@ -1138,6 +1139,7 @@ function facetoface_pluginfile($course, $cm, $context, $filearea, $args, $forced
  * @global object $DB
  * @param int $userid
  * @param int $courseid
+ * @param int|null $windowopens
  * @return boolean
  */
 function facetoface_archive_completion($userid, $courseid, $windowopens = NULL) {
@@ -1162,8 +1164,13 @@ function facetoface_archive_completion($userid, $courseid, $windowopens = NULL) 
                         WHERE s.facetoface = f.id)";
     $facetofaces = $DB->get_records_sql($sql, array('courseid' => $courseid, 'userid' => $userid));
     foreach ($facetofaces as $facetoface) {
+        $delay_seconds = 0;
+        if ((int)$facetoface->completiondelay > 0) {
+            // Get signups. Find earliest possible activity completion window based on signups.
+            $delay_seconds = (int)$facetoface->completiondelay * DAYSECS;
+        }
         // Add an archive flag.
-        $params = array('facetofaceid' => $facetoface->id, 'userid' => $userid, 'archived' => 1, 'archived2' => 1, 'windowopens' => $windowopens);
+        $params = array('facetofaceid' => $facetoface->id, 'userid' => $userid, 'archived' => 1, 'archived2' => 1, 'windowopens' => $windowopens - $delay_seconds);
         $sql = "UPDATE {facetoface_signups}
                 SET archived = :archived
                 WHERE userid = :userid

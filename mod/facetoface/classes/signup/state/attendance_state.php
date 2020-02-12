@@ -28,7 +28,8 @@ use mod_facetoface\signup\transition;
 use mod_facetoface\signup\condition\{
     event_is_cancelled,
     event_is_not_cancelled,
-    event_taking_attendance
+    event_taking_attendance,
+    signup_not_archived
 };
 
 defined('MOODLE_INTERNAL') || die();
@@ -50,13 +51,16 @@ abstract class attendance_state extends state {
             // do not include itself
             if (get_class($this) !== $stateclass) {
                 $transitions[] = transition::to(new $stateclass($this->signup))->with_conditions(
+                    signup_not_archived::class,
                     event_is_not_cancelled::class,
                     event_taking_attendance::class
                 );
             }
         }
-        // Attendance state can always be reverted back to booked.
-        $transitions[] = transition::to(new booked($this->signup));
+        // Attendance state can always be reverted back to booked as long as it is not archived.
+        $transitions[] = transition::to(new booked($this->signup))->with_conditions(
+            signup_not_archived::class
+        );
 
         // Or attendance state is able to go to event_cancelled, only if the event is cancelled
         $transitions[] = transition::to(new event_cancelled($this->signup))->with_conditions(

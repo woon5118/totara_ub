@@ -30,6 +30,7 @@ use mod_facetoface\signup\condition\{
     event_in_the_future,
     event_is_not_cancelled,
     event_taking_attendance,
+    signup_not_archived,
     waitlist_common
 };
 use mod_facetoface\signup\restriction\actor_can_removeattendees;
@@ -52,6 +53,7 @@ class booked extends state implements interface_event {
 
         foreach ($stateclasses as $stateclass) {
             $transitions[] = transition::to(new $stateclass($this->signup))->with_conditions(
+                signup_not_archived::class,
                 event_is_not_cancelled::class,
                 event_taking_attendance::class
             );
@@ -78,12 +80,14 @@ class booked extends state implements interface_event {
             $transitions,
             [
                 transition::to(new user_cancelled($this->signup))->with_conditions(
+                    signup_not_archived::class,
                     event_is_not_cancelled::class,
                     event_allows_cancellation::class,
                     event_in_the_future::class
                 ),
                 // Users with "signuppastevents" capability can remove users from non cancelled events that allow cancellations.
                 transition::to(new user_cancelled($this->signup))->with_conditions(
+                    signup_not_archived::class,
                     event_is_not_cancelled::class,
                     event_allows_cancellation::class
                 )->with_restrictions(
@@ -91,6 +95,7 @@ class booked extends state implements interface_event {
                 ),
                 // Users with "removeattendees" capability can remove users from non cancelled events in future.
                 transition::to(new user_cancelled($this->signup))->with_conditions(
+                    signup_not_archived::class,
                     event_is_not_cancelled::class,
                     event_in_the_future::class
                 )->with_restrictions(
@@ -99,6 +104,7 @@ class booked extends state implements interface_event {
                 // Users with both "removeattendees" and "signuppastevents" capabilities  can remove users
                 // from non cancelled events.
                 transition::to(new user_cancelled($this->signup))->with_conditions(
+                    signup_not_archived::class,
                     event_is_not_cancelled::class
                 )->with_restrictions(
                     actor_can_removeattendees::class,

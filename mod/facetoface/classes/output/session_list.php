@@ -77,7 +77,7 @@ final class session_list extends template {
      * @return array of [reservation, table]
      */
     private function __construct(seminar $seminar, filter_list $filters, render_session_option $option, context $context, ?string $id, ?int $userid) {
-        global $USER;
+        global $USER, $CFG;
 
         if (empty($userid)) {
             $userid = $USER->id;
@@ -98,12 +98,14 @@ final class session_list extends template {
             return;
         }
 
+        require_once($CFG->dirroot . '/mod/facetoface/lib.php');
+
         $time = time();
         /** @var session_data[] $sessionarray */
         $sessionarray = [];
         /** @var seminar_event $seminarevent */
         foreach ($seminarevents as $seminarevent) {
-            $signup = signup::create($userid, $seminarevent);
+            $signup = signup::create($userid, $seminarevent, MDL_F2F_BOTH, true);
             $sessiondata = seminar_event_helper::get_sessiondata($seminarevent, $signup, $option->get_sessionascendingorder(), $time);
             $sessionarray[] = $sessiondata;
         }

@@ -470,6 +470,8 @@ final class attendees_list_helper {
      *      customfields optional
      */
     public static function remove(\stdClass $data): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
         $listid = $data->listid;
         $seminarevent = new seminar_event($data->s);
@@ -533,6 +535,8 @@ final class attendees_list_helper {
                     $result['result'] = get_string('removedsuccessfully', 'mod_facetoface');
                     $removed[] = $result;
                 } else {
+                    // Reload signup with including archived entries for more meaningful error information.
+                    $signup = signup::create($attendee->id, $seminarevent, MDL_F2F_BOTH, true);
                     $failures = $signup->get_failures(user_cancelled::class);
                     $result['result'] = current($failures);
                     $errors[] = $result;

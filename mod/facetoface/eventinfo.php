@@ -52,7 +52,7 @@ $pageurl = new moodle_url('/mod/facetoface/eventinfo.php', [
 $PAGE->set_url($pageurl);
 
 define('FACETOFACE_EVENTINFO_INTERNAL', true);
-$signup = signup::create($USER->id, $seminarevent);
+$signup = signup::create($USER->id, $seminarevent, MDL_F2F_BOTH, true);
 
 if ($action === 'signup') {
     require_once(__DIR__ . '/signup.php');
