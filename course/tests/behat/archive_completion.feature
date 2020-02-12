@@ -1,4 +1,4 @@
-@totara @core_course
+@totara @core_course @core_grades
 Feature: Test we can manually archive course completion.
 
   Background:
