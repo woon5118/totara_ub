@@ -26,6 +26,7 @@ use totara_reportbuilder\rb\display\base;
 
 /**
  * Display class intended to override parent \totara_reportbuilder\rb\display\link_user::display() to show 'Reserved' for reserved spaces.
+ * @deprecated since Totara 12.15
  *
  * @author Simon Player <simon.player@totaralearning.com>
  * @package mod_facetoface
@@ -43,12 +44,14 @@ class f2f_user_link extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+
+        debugging('mod_facetoface\rb\display\f2f_user_link::display has been deprecated since Totara 12.15. Use mod_facetoface\rb\display\user_link::display', DEBUG_DEVELOPER);
+
         $extrafields = self::get_extrafields_row($row, $column);
 
         if (!empty($extrafields->id)) {
             return \totara_reportbuilder\rb\display\user_link::display($value, $format, $row, $column, $report);
         }
-
         return get_string('reserved', 'rb_source_facetoface_sessions');
     }
 

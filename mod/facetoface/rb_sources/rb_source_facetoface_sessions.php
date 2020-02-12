@@ -342,7 +342,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 $DB->sql_concat_join("' '", $usernamefieldscreator),
                 array(
                     'joins' => 'creator',
-                    'displayfunc' => 'f2f_user_link',
+                    'displayfunc' => 'user_link',
                     'extrafields' => array_merge(
                         ['id' => 'creator.id', 'deleted' => 'creator.deleted'],
                         $usernamefieldscreator
@@ -367,7 +367,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 $DB->sql_concat_join("' '", $usernamefieldsbooked),
                 array(
                     'joins' => 'bookedby',
-                    'displayfunc' => 'f2f_user_link',
+                    'displayfunc' => 'user_link',
                     'extrafields' => array_merge(
                         ['id' => 'bookedby.id', 'deleted' => 'bookedby.deleted'],
                         $usernamefieldsbooked

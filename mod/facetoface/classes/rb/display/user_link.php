@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2018 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Player <simon.player@totaralearning.com>
+ * @author Oleg Demeshev <oleg.demeshev@totaralearning.com>
  * @package mod_facetoface
  */
 
 namespace mod_facetoface\rb\display;
-use totara_reportbuilder\rb\display\base;
 
 /**
- * Display class intended for the booking managers name (linked to their profile).
+ * Display class intended to override parent \totara_reportbuilder\rb\display\user_link::display() to show 'Reserved' for reserved spaces.
+ * When exporting, only the user's full name is displayed (without link)
  *
- * @author Simon Player <simon.player@totaralearning.com>
+ * @author Oleg Demeshev <oleg.demeshev@totaralearning.com>
  * @package mod_facetoface
  */
-class f2f_booked_by_link extends base {
+class user_link extends \totara_reportbuilder\rb\display\user_link {
 
     /**
      * Handles the display
@@ -42,9 +42,15 @@ class f2f_booked_by_link extends base {
      * @param \reportbuilder $report
      * @return string
      */
-    public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+    public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report): string {
 
-        return \totara_reportbuilder\rb\display\user_link::display($value, $format, $row, $column, $report);
+        $extrafields = self::get_extrafields_row($row, $column);
+
+        if (!empty($extrafields->id)) {
+            return parent::display($value, $format, $row, $column, $report);
+        }
+
+        return get_string('reserved', 'rb_source_facetoface_sessions');
     }
 
     /**
@@ -55,7 +61,7 @@ class f2f_booked_by_link extends base {
      * @param \reportbuilder $report
      * @return bool
      */
-    public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
+    public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report): bool {
         return false;
     }
 }

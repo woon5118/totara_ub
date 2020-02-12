@@ -395,7 +395,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                   ELSE " . $DB->sql_concat_join("' '", $usernamefieldscreator) . " END",
             array(
                 'joins' => 'modifiedby',
-                'displayfunc' => 'f2f_user_link',
+                'displayfunc' => 'user_link',
                 'extrafields' => array_merge(
                     ['id' => 'modifiedby.id', 'deleted' => 'modifiedby.deleted'],
                     $usernamefieldscreator

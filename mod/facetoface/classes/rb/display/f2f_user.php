@@ -26,6 +26,7 @@ use totara_reportbuilder\rb\display\base;
 
 /**
  * Display class intended to override parent \totara_reportbuilder\rb\display\user::display() to show 'Reserved' for reserved spaces.
+ * @deprecated since Totara 12.15
  *
  * @author Simon Player <simon.player@totaralearning.com>
  * @package mod_facetoface
@@ -43,6 +44,8 @@ class f2f_user extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+
+        debugging('mod_facetoface\rb\display\f2f_user::display has been deprecated since Totara 12.15. Use mod_facetoface\rb\display\user::display', DEBUG_DEVELOPER);
 
         if (!empty($value)) {
             return \totara_reportbuilder\rb\display\user::display($value, $format, $row, $column, $report);

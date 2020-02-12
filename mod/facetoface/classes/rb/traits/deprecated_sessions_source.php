@@ -88,7 +88,7 @@ trait deprecated_sessions_source {
      * @return string
      */
     function rb_display_user($user, $row, $isexport = false) {
-        debugging('rb_source_facetoface_sessions::rb_display_user has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_user::display', DEBUG_DEVELOPER);
+        debugging('rb_source_facetoface_sessions::rb_display_user has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\user::display', DEBUG_DEVELOPER);
         if (!empty($user)) {
             return parent::rb_display_user($user, $row, $isexport);
         }
@@ -145,7 +145,7 @@ trait deprecated_sessions_source {
      * @return string
      */
     function rb_display_link_user($user, $row, $isexport = false) {
-        debugging('rb_source_facetoface_sessions::rb_display_link_user has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_user_link::display', DEBUG_DEVELOPER);
+        debugging('rb_source_facetoface_sessions::rb_display_link_user has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\user_link::display', DEBUG_DEVELOPER);
         if (!empty($row->id)) {
             return parent::rb_display_link_user($user, $row, $isexport);
         }
@@ -162,7 +162,7 @@ trait deprecated_sessions_source {
      * @return string
      */
     function rb_display_link_user_icon($user, $row, $isexport = false) {
-        debugging('rb_source_facetoface_sessions::rb_display_link_user_icon has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\f2f_user_icon_link::display', DEBUG_DEVELOPER);
+        debugging('rb_source_facetoface_sessions::rb_display_link_user_icon has been deprecated since Totara 12.0. Use mod_facetoface\rb\display\user_icon_link::display', DEBUG_DEVELOPER);
         if (!empty($row->id)) {
             return parent::rb_display_link_user_icon($user, $row, $isexport);
         }

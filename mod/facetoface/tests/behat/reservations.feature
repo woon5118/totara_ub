@@ -90,6 +90,12 @@ Feature: Add - Remove manager reservations in Seminar
     When I press "Update"
     Then I should see "Reserve spaces for team (2/2)"
 
+    When I follow "Manage attendees"
+    Then I should see "Reserved" in the "//table[@id='facetoface_sessions']/tbody/tr[@id='rb_1_r0']/td[@id='rb_1_r0_c0']" "xpath_element"
+    And I should see "Reserved" in the "//table[@id='facetoface_sessions']/tbody/tr[@id='rb_1_r1']/td[@id='rb_1_r1_c0']" "xpath_element"
+    And I follow "View all events"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
+
     When I follow "Manage reservations"
     Then I should see "2" in the "Max Manager" "table_row"
     And I press "Go back"
@@ -99,12 +105,22 @@ Feature: Add - Remove manager reservations in Seminar
     And I press "Add"
     Then I should see "Allocate spaces for team (2/2)"
 
+    When I follow "Manage attendees"
+    Then I should see "Sam1 Student1" in the "//table[@id='facetoface_sessions']/tbody/tr[@id='rb_1_r0']/td[@id='rb_1_r0_c0']" "xpath_element"
+    And I should see "Sam2 Student2" in the "//table[@id='facetoface_sessions']/tbody/tr[@id='rb_1_r1']/td[@id='rb_1_r1_c0']" "xpath_element"
+    And I follow "View all events"
+    And I click on "Go to event" "link" in the "Upcoming" "table_row"
+
     When I click on "Allocate spaces for team" "link"
     And I set the field "Allocated team members" to "Sam2 Student2"
     And I press "Remove"
     Then I should see "Allocate spaces for team (1/2)"
     And I should see "Reserve spaces for team (1/1)"
 
+    When I follow "Manage attendees"
+    Then I should see "Sam1 Student1" in the "//table[@id='facetoface_sessions']/tbody/tr[@id='rb_1_r0']/td[@id='rb_1_r0_c0']" "xpath_element"
+    And I should see "Reserved" in the "//table[@id='facetoface_sessions']/tbody/tr[@id='rb_1_r1']/td[@id='rb_1_r1_c0']" "xpath_element"
+    And I log out
 
   Scenario: Confirm correct message when other manager cannot have reservations
     Given I log in as "admin"
