@@ -77,7 +77,7 @@ class f2f_coded_user_link extends base {
             if ($isexport) {
                 $result[] = $name;
             } else {
-                $result[] = $url ? html_writer::link($url, $name) : html_writer::span($name);
+                $result[] = $url ? \html_writer::link($url, $name) : \html_writer::span($name);
             }
 
             // length(length(idname)) + length(' ') + length(idname) + length(', ').
