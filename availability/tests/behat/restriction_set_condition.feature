@@ -194,7 +194,7 @@ Feature: Restriction set of course's restriction is appearing when user editing 
 
     And I navigate to "Audiences > Audiences" in site administration
     And I click on "Delete" "link" in the "Hunga" "table_row"
-    And I press "Yes"
+    And I press "Delete"
     And I navigate to "Organisations >  Manage organisations" in site administration
     And I click on "Delete" "link" in the "Organisation Framework 1" "table_row"
     And I press "Yes"
