@@ -946,7 +946,7 @@ trait mod_facetoface_renderer_deprecated {
                     max(0, $seminarevent->get_capacity() - $signupcount));
             }
             $sessreserveinfo = \mod_facetoface\reservations::limit_info_by_session_date($seminarevent, $sessreserveinfo);
-            if (!empty($sessreserveinfo['allocate']) && $sessreserveinfo['maxallocate'][$seminarevent->get_id()] > 0) {
+            if (!empty($sessreserveinfo['allocate']) && !is_int($sessreserveinfo['maxallocate']) && $sessreserveinfo['maxallocate'][$seminarevent->get_id()] > 0) {
                 // Able to allocate and not used all allocations for other sessions.
                 $allocateurl = new moodle_url('/mod/facetoface/reservations/allocate.php', ['s' => $seminarevent->get_id(), 'backtoallsessions' => 1]);
                 $reservelink .= html_writer::start_span('mod_facetoface__sessionlist__action__reserve');
@@ -954,7 +954,7 @@ trait mod_facetoface_renderer_deprecated {
                 $reservelink .= ' (' . $sessreserveinfo['allocated'][$seminarevent->get_id()] . '/' . $sessreserveinfo['maxallocate'][$seminarevent->get_id()] . ')';
                 $reservelink .= html_writer::end_span();
             }
-            if (!empty($sessreserveinfo['reserve']) && $sessreserveinfo['maxreserve'][$seminarevent->get_id()] > 0) {
+            if (!empty($sessreserveinfo['reserve']) && !is_int($sessreserveinfo['maxreserve']) && $sessreserveinfo['maxreserve'][$seminarevent->get_id()] > 0) {
                 if (empty($sessreserveinfo['reservepastdeadline'])) {
                     $reserveurl = new moodle_url('/mod/facetoface/reservations/reserve.php', ['s' => $seminarevent->get_id(), 'backtoallsessions' => 1]);
                     $reservelink .= html_writer::start_span('mod_facetoface__sessionlist__action__reserve');
