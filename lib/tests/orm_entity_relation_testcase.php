@@ -577,6 +577,7 @@ abstract class orm_entity_relation_testcase extends advanced_testcase {
  * Class sample_entity used for testing a entity
  *
  * @property string $name
+ * @property int $parent_id
  * @property int $created_at
  * @property int $updated_at
  * @property-read collection $children Children items
@@ -689,6 +690,13 @@ class sample_passport_entity extends entity {
 
 /**
  * Class sample_entity used for testing a entity
+ *
+ * @property string $name
+ * @property int $parent_id
+ * @property int $type
+ * @property string $description
+ * @property int $created_at
+ * @property int $updated_at
  *
  * @property-read string $capital_name Name returned in capital case
  * @property-read sample_parent_entity $parent Name
