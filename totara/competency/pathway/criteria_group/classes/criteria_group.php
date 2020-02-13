@@ -27,6 +27,7 @@ namespace pathway_criteria_group;
 use coding_exception;
 use core\orm\collection;
 use core\orm\query\builder;
+use \core\orm\entity\repository;
 use pathway_criteria_group\entities\criteria_group as criteria_group_entity;
 use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
 use pathway_criteria_group\validators\criteria_group_validator;
@@ -567,7 +568,7 @@ class criteria_group extends pathway {
         return $achievement_detail;
     }
 
-   /**
+    /**
      * Does this instance contain any singleuse criteria
      *
      * @return bool
@@ -610,4 +611,51 @@ class criteria_group extends pathway {
         });
     }
 
+    /**
+     * Get number of pathways using scale value.
+     *
+     * @param int $value_id Scale value id.
+     *
+     * @return int
+     */
+    public static function get_pathway_count_by_scale_value_id(int $value_id): int {
+        return self::get_pathways_by_scale_value_builder($value_id)->count();
+    }
+
+    /**
+     * Delete Pathways using the scale values.
+     *
+     * @param int $value_id Scale value id.
+     *
+     * @return array
+     */
+    public static function delete_pathways_with_scale_value_id(int $value_id): array {
+        $pathways = self::get_pathways_by_scale_value_builder($value_id)->with('competency')->get();
+        $pathways_deleted = [];
+
+        if (!empty($pathways)) {
+            foreach ($pathways as $pathway) {
+                $pathway_instance = pathway_factory::from_entity($pathway);
+                $pathways_deleted[] = $pathway_instance->delete();
+            }
+        }
+
+        return $pathways_deleted;
+    }
+
+    /**
+     * Get reusable query builder to fetch pathways by scale value.
+     *
+     * @param int $value_id Scale value id.
+     *
+     * @return repository
+     *
+     * @throws coding_exception
+     */
+    private static function get_pathways_by_scale_value_builder(int $value_id): repository {
+        return $scale_value_pathways = pathway_entity::repository()
+            ->where('path_type', 'criteria_group')
+            ->join([criteria_group_entity::TABLE, 'cg'], 'path_instance_id', 'id')
+            ->where('cg.scale_value_id', $value_id);
+    }
 }

@@ -22,6 +22,7 @@
  * @subpackage totara_hierarchy
  */
 
+use \pathway_criteria_group\criteria_group;
 use totara_competency\models\scale;
 
 require_once(__DIR__ . '/../../../../../config.php');
@@ -81,9 +82,27 @@ if ($value->id == $scale->defaultid) {
 
 if (!$delete) {
     echo $OUTPUT->header();
-    $strdelete = get_string('deletecheckscalevalue', 'totara_hierarchy');
 
-    echo $OUTPUT->confirm($strdelete . html_writer::empty_tag('br') . html_writer::empty_tag('br') . format_string($value->name), $deleteurl, $returnurl);
+    $scale_value_delete_message = html_writer::tag('p', get_string('deletecheckscalevalue', 'totara_hierarchy'));
+    $scale_value_pathway_count = criteria_group::get_pathway_count_by_scale_value_id($value->id);
+
+    if ($scale_value_pathway_count > 0) {
+        $pathway_message_object = new stdClass();
+        $pathway_message_object->scale_value_name = $value->name;
+        $pathway_message_object->pathway_count = $scale_value_pathway_count;
+        $pathway_delete_message = html_writer::tag(
+            'p',
+            get_string('delete_check_scale_value_pathways', 'totara_hierarchy', $pathway_message_object)
+        );
+        $scale_value_delete_message = $pathway_delete_message . $scale_value_delete_message;
+    }
+
+    echo $OUTPUT->confirm(
+        $scale_value_delete_message,
+        $deleteurl,
+        $returnurl,
+        get_string('delete_check_scale_value_confirmation', 'totara_hierarchy')
+    );
 
     echo $OUTPUT->footer();
     exit;

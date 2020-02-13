@@ -383,7 +383,10 @@ $string['customfields'] = 'Custom fields';
 $string['datainx'] = 'Data in {$a}:';
 $string['deletecheckdepth'] = 'Are you absolutely sure you want to completely delete this depth level?';
 $string['deletecheckscale'] = 'Are you absolutely sure you want to completely delete this scale?';
-$string['deletecheckscalevalue'] = 'Are you absolutely sure you want to delete this scale value?';
+$string['deletecheckscalevalue'] = 'Are you sure you would like to delete this scale value?';
+$string['delete_check_scale_value_confirmation'] = 'Confirm scale value deletion';
+$string['delete_check_scale_value_pathways'] = 'Deleting the \'{$a->scale_value_name}\' scale value will affect competencies that have achievement pathways defined against it.
+ A total of {$a->pathway_count} achievement pathway(s) will be deleted.';
 $string['deletechecktemplate'] = 'Are you absolutely sure you want to delete this competency template?';
 $string['deletechecktype'] = 'Are you absolutely sure you want to delete this type?';
 $string['deletechecktypeassociated'] = 'This type has {$a} assigned items. Are you absolutely sure you want to delete this type?';
