@@ -11,6 +11,8 @@ Feature: Test Dashboard defaults
       | student1 | Student   | One      | student.one@example.com |
     # Login to get the Latest announcements created.
     And I log in as "admin"
+    And I set the following administration settings values:
+      | allowdefaultpageselection | 1 |
     And I am on site homepage
     And I turn editing mode on
     And I add the "Latest announcements" block
