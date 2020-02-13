@@ -794,5 +794,19 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020021200, 'totara', 'core');
     }
 
+    if ($oldversion < 2020021300) {
+        // Fix problems from older upgrades.
+
+        // Define key job_userid_fk (foreign) to be added to job_assignment.
+        $table = new xmldb_table('job_assignment');
+        $key = new xmldb_key('job_userid_fk', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+        if (!$dbman->key_exists($table, $key)) {
+            $dbman->add_key($table, $key);
+        }
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2020021300, 'totara', 'core');
+    }
+
     return true;
 }

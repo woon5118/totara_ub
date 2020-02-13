@@ -838,5 +838,33 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020020300, 'facetoface');
     }
 
+    if ($oldversion < 2020021300) {
+        // Fix problems from older upgrades.
+
+        // Define key facesign_man_fk (foreign) to be added to facetoface_signups.
+        $table = new xmldb_table('facetoface_signups');
+        $key = new xmldb_key('facesign_man_fk', XMLDB_KEY_FOREIGN, array('managerid'), 'user', array('id'));
+        if (!$dbman->key_exists($table, $key)) {
+            $dbman->add_key($table, $key);
+        }
+
+        // Define key facesign_job_fk (foreign) to be added to facetoface_signups.
+        $table = new xmldb_table('facetoface_signups');
+        $key = new xmldb_key('facesign_job_fk', XMLDB_KEY_FOREIGN, array('jobassignmentid'), 'job_assignment', array('id'));
+        if (!$dbman->key_exists($table, $key)) {
+            $dbman->add_key($table, $key);
+        }
+
+        // Define index custom (not unique) to be added to facetoface_asset.
+        $table = new xmldb_table('facetoface_asset');
+        $index = new xmldb_index('custom', XMLDB_INDEX_NOTUNIQUE, array('custom'));
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2020021300, 'facetoface');
+    }
+
     return true;
 }

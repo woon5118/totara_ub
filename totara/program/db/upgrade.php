@@ -272,5 +272,26 @@ function xmldb_totara_program_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019080600, 'totara', 'program');
     }
 
+    if ($oldversion < 2020021300) {
+        // Fix problems from older upgrades.
+
+        // Define key cerifid (foreign) to be added to prog.
+        $table = new xmldb_table('prog');
+        $key = new xmldb_key('cerifid', XMLDB_KEY_FOREIGN, array('certifid'), 'certif', array('id'));
+        if (!$dbman->key_exists($table, $key)) {
+            $dbman->add_key($table, $key);
+        }
+
+        // Define key proginfodata_com_fk (foreign) to be added to prog_info_data.
+        $table = new xmldb_table('prog_info_data');
+        $key = new xmldb_key('proginfodata_com_fk', XMLDB_KEY_FOREIGN, array('programid'), 'prog', array('id'));
+        if (!$dbman->key_exists($table, $key)) {
+            $dbman->add_key($table, $key);
+        }
+
+        // Program savepoint reached.
+        upgrade_plugin_savepoint(true, 2020021300, 'totara', 'program');
+    }
+
     return true;
 }
