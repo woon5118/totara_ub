@@ -1322,7 +1322,9 @@ class page_wiki_history extends page_wiki {
                 // Print the form.
                 echo html_writer::start_tag('form', array('action'=>new moodle_url('/mod/wiki/diff.php'), 'method'=>'get', 'id'=>'diff'));
                 echo html_writer::tag('div', html_writer::empty_tag('input', array('type'=>'hidden', 'name'=>'pageid', 'value'=>$pageid)));
+                echo html_writer::start_div('mod_wiki__revisions');
                 echo html_writer::table($table);
+                echo html_writer::end_div();
                 echo html_writer::start_tag('div');
                 echo html_writer::empty_tag('input', array('type'=>'submit', 'class'=>'wiki_form-button btn btn-secondary', 'value'=>get_string('comparesel', 'wiki')));
                 echo html_writer::end_tag('div');

@@ -201,6 +201,12 @@
     float: left;
 }
 
+.mod_wiki__revisions {
+    max-width: 100%;
+    position: relative;
+    overflow-x: auto;
+}
+
 .wiki_histdate {
     text-align: left;
 }
