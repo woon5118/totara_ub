@@ -60,6 +60,7 @@ function report_security_get_issue_list() {
         'report_security_check_scormsessionkeepalive',
         'report_security_check_configrw',
         'report_security_check_riskallowxss',
+        'report_security_check_resourcesallowxss',
         'report_security_check_riskxss',
         'report_security_check_logincsrf',
         'report_security_check_riskadmin',
@@ -81,6 +82,7 @@ function report_security_get_issue_list() {
         unset($result['report_security_check_riskxss']);
     } else {
         unset($result['report_security_check_riskallowxss']);
+        unset($result['report_security_check_resourcesallowxss']);
     }
     $result = array_flip($result);
 
@@ -555,6 +557,43 @@ function report_security_check_riskallowxss($detailed=false) {
         }
         $users = implode(', ', $users);
         $result->details = get_string('check_riskallowxss_details', 'report_security', $users);
+    }
+
+    return $result;
+}
+
+/**
+ * Lists resources that have allowxss setting enabled.
+ *
+ * @since Totara 13.0
+ *
+ * @param bool $detailed
+ * @return stdClass result
+ */
+function report_security_check_resourcesallowxss($detailed=false) {
+    $result = new stdClass();
+    $result->issue   = 'report_security_check_resourcesallowxss';
+    $result->name    = get_string('check_resourcesallowxss_name', 'report_security');
+    $result->info    = null;
+    $result->details = null;
+    $result->status  = REPORT_SECURITY_SERIOUS;
+    $result->link    = null;
+
+    $allresources = ['label', 'page', 'resource'];
+    $dangerous = [];
+    foreach ($allresources as $resource) {
+        if (get_config($resource, 'allowxss')) {
+            $dangerous[] = get_string('pluginname', $resource);
+        }
+    }
+
+    if (!$dangerous) {
+        // Totara: no users means no warning, this is good for new installs.
+        $result->status = REPORT_SECURITY_OK;
+        $result->info = get_string('check_resourcesallowxss_ok', 'report_security');
+    } else {
+        $result->info = get_string('check_resourcesallowxss_warning', 'report_security');
+        $result->details = get_string('check_resourcesallowxss_details', 'report_security', implode(', ', $dangerous));
     }
 
     return $result;

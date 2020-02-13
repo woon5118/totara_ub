@@ -128,6 +128,11 @@ $string['check_repositoryurl_details'] = '<p>Enabling the URL downloader can all
 $string['check_repositoryurl_warning'] = 'URL downloader repository is enabled.';
 $string['check_repositoryurl_name'] = 'URL downloader repository';
 $string['check_repositoryurl_ok'] = 'URL downloader repository is disabled.';
+$string['check_resourcesallowxss_details'] = '<p>Users that may add or update course resources must be fully trusted because they may
+use unsafe markup and files in following resource types: {$a}</p><p>It is recommended to disable all "Allow unsafe markup and files" settings.</p>';
+$string['check_resourcesallowxss_name'] = 'Unsafe markup and files in course resources';
+$string['check_resourcesallowxss_ok'] = 'All "Allow unsafe markup and files" resource settings are disabled.';
+$string['check_resourcesallowxss_warning'] = 'Users editing course resources may use unsafe markup and files.';
 $string['check_riskadmin_detailsok'] = '<p>Please verify the following list of system administrators:</p>{$a}';
 $string['check_riskadmin_detailswarning'] = '<p>Please verify the following list of system administrators:</p>{$a->admins}
 <p>It is recommended to assign administrator role in the system context only. The following users have (unsupported) admin role assignments in other contexts:</p>{$a->unsupported}';
