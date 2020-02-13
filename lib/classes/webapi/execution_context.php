@@ -97,6 +97,13 @@ class execution_context {
     }
 
     /**
+     * @param string|null $operationname
+     */
+    public function set_operationname(?string $operationname) {
+        $this->operationname = $operationname;
+    }
+
+    /**
      * Returns persisted query/mutation name.
      *
      * @return string|null
@@ -138,6 +145,7 @@ class execution_context {
     final public function has_relevant_context(): bool {
         return isset($this->relevantcontext);
     }
+
     // === Utility functions for resolvers ===
 
     /**
@@ -184,4 +192,5 @@ class execution_context {
 
         return $formatter->format($text);
     }
+
 }

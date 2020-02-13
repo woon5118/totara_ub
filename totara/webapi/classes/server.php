@@ -164,9 +164,12 @@ class server {
         } else {
             $params = $request->get_params();
             // We want to be sure that the operation name in the execution context matches the one in the request
-            if ($this->execution_context->get_operationname() !== $params['operationName']) {
+            if ($this->execution_context->get_operationname() !== null
+                && $this->execution_context->get_operationname() !== $params['operationName']
+            ) {
                 throw new coding_exception('Operation name mismatch, request has different value as the execution_context.');
             }
+            $this->execution_context->set_operationname($params['operationName']);
             return $this->create_operation($params);
         }
     }
