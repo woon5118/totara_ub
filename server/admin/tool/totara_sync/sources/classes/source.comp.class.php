@@ -288,30 +288,16 @@ abstract class totara_sync_source_comp extends totara_sync_source {
      * @return string|null JSON array of assignment availability integers, or null if it is invalid
      */
     protected function get_assign_availability_json($fromsource) {
-        $assignment_availabilities = [
-            'none'  => [],
-            'self'  => [competency::ASSIGNMENT_CREATE_SELF],
-            'other' => [competency::ASSIGNMENT_CREATE_OTHER],
-            'any'   => [
-                competency::ASSIGNMENT_CREATE_SELF,
-                competency::ASSIGNMENT_CREATE_OTHER,
-            ],
-        ];
-
-        if (is_number($fromsource)) {
-            $assignment_availabilities = [
-                0 => $assignment_availabilities['none'],
-                1 => $assignment_availabilities['self'],
-                2 => $assignment_availabilities['other'],
-            ];
-        } else {
+        if (!is_number($fromsource)) {
             // We also allow for the English names for the values as used in code.
             // We cannot use language strings as these can change.
             $fromsource = core_text::strtolower($fromsource);
         }
 
-        if (isset($assignment_availabilities[$fromsource])) {
-            return json_encode($assignment_availabilities[$fromsource]);
+        $assignment_availabilities = totara_hierarchy_parse_competency_assignment_availability($fromsource);
+
+        if (isset($assignment_availabilities)) {
+            return json_encode($assignment_availabilities);
         }
 
         return null;

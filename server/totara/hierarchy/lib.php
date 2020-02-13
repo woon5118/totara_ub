@@ -3969,3 +3969,35 @@ function totara_hierarchy_save_cohorts_for_type($shortprefix, $idfield, stdClass
     }
     $transaction->allow_commit();
 }
+
+/**
+ * Convert an assignment availability number or string into an array of assignment options.
+ *
+ * @param string|int $assignavailability String or number - e.g. 'none'/'self' or '0'/'1'
+ * @return int[]|null Array of the assignment availability integers, or null if it is invalid.
+ */
+function totara_hierarchy_parse_competency_assignment_availability($assignavailability) {
+    $assignment_availabilities = [
+        'none'  => [],
+        'self'  => [competency::ASSIGNMENT_CREATE_SELF],
+        'other' => [competency::ASSIGNMENT_CREATE_OTHER],
+        'any'   => [
+            competency::ASSIGNMENT_CREATE_SELF,
+            competency::ASSIGNMENT_CREATE_OTHER,
+        ],
+    ];
+
+    if (is_numeric($assignavailability)) {
+        $assignment_availabilities = [
+            0 => $assignment_availabilities['none'],
+            1 => $assignment_availabilities['self'],
+            2 => $assignment_availabilities['other'],
+        ];
+    }
+
+    if (isset($assignment_availabilities[$assignavailability])) {
+        return $assignment_availabilities[$assignavailability];
+    }
+
+    return null;
+}

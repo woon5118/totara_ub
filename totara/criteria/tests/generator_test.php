@@ -117,7 +117,6 @@ class totara_criteria_generator_testcase extends advanced_testcase {
         $record = [
             'aggregation' => [
                 'method' => criterion::AGGREGATE_ALL,
-                'req_items' => 1,
             ],
             'competency' => 1,
         ];
@@ -228,7 +227,6 @@ class totara_criteria_generator_testcase extends advanced_testcase {
         $record = [
             'aggregation' => [
                 'method' => criterion::AGGREGATE_ALL,
-                'req_items' => 1,
             ],
             'competency' => 1,
         ];

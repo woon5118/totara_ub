@@ -44,4 +44,8 @@ class scale_value extends entity {
 
     public const TABLE = 'comp_scale_values';
 
+    public const UPDATED_TIMESTAMP = 'timemodified';
+
+    public const SET_UPDATED_WHEN_CREATED = true;
+
 }

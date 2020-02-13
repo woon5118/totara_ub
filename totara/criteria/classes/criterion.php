@@ -51,6 +51,9 @@ abstract class criterion {
     /** @var string $type Type of criterion*/
     private $plugin_type;
 
+    /** @var string $idnumber */
+    private $idnumber;
+
     /** @var int $aggregation_method Aggregation method to use */
     private $aggregation_method = self::AGGREGATE_ALL;
 
@@ -108,6 +111,7 @@ abstract class criterion {
         }
 
         $instance->set_id($criterion->id);
+        $instance->set_idnumber($criterion->idnumber);
         $instance->set_aggregation_method($criterion->aggregation_method ?? static::AGGREGATE_ALL);
         $instance->set_aggregation_params($criterion->aggregation_params ?? []);
         $instance->set_last_evaluated($criterion->last_evaluated);
@@ -143,6 +147,30 @@ abstract class criterion {
      */
     public function set_id(?int $id): criterion {
         $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * Get the ID number of the criterion
+     *
+     * Public scope for testing purposes
+     *
+     * @return string|null
+     */
+    public function get_idnumber(): ?string {
+        return $this->idnumber;
+    }
+
+    /**
+     * Set the ID number of the criterion
+     *
+     * @param string|null $idnumber New criterion ID number
+     * @return $this
+     */
+    public function set_idnumber(?string $idnumber): criterion {
+        if (!empty($idnumber)) {
+            $this->idnumber = $idnumber;
+        }
         return $this;
     }
 
@@ -592,6 +620,7 @@ abstract class criterion {
         $tst_methods = [
             'get_aggregation_method',
             'get_aggregation_params',
+            'get_idnumber',
             'get_item_ids',
             'get_metadata',
         ];
@@ -641,6 +670,12 @@ abstract class criterion {
 
         $criterion = $exists ? new criterion_entity($this->get_id()) : new criterion_entity();
         $criterion->plugin_type = $this->get_plugin_type();
+
+        if (!empty($this->get_idnumber()) && totara_idnumber_exists(criterion_entity::TABLE, $this->get_idnumber())) {
+            throw new coding_exception("ID number '{$this->get_idnumber()}' already exists in " . criterion_entity::TABLE);
+        }
+        $criterion->idnumber = $this->get_idnumber();
+
         $criterion->aggregation_method = $this->get_aggregation_method();
         $criterion->aggregation_params = json_encode($this->get_aggregation_params());
         $criterion->criterion_modified = time();

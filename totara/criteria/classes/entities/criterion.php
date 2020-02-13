@@ -32,6 +32,7 @@ use core\orm\entity\relations\has_many;
  * One criterion
  *
  * @property string $plugin_type
+ * @property string $idnumber
  * @property int $aggregation_method
  * @property string $aggregation_params
  * @property int $criterion_modified

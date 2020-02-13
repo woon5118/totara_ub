@@ -27,6 +27,8 @@ use criteria_childcompetency\childcompetency;
 use criteria_coursecompletion\coursecompletion;
 use criteria_linkedcourses\linkedcourses;
 use criteria_onactivate\onactivate;
+use totara_competency\entities\competency;
+use totara_competency\entities\course;
 use totara_competency\plugin_types;
 use totara_criteria\criterion;
 use totara_criteria\criterion_factory;
@@ -49,7 +51,10 @@ class totara_criteria_generator extends component_generator_base {
      *          'method' => criterion::AGGREGATE_ALL, // Optional Aggregation method - defaults to ALL
      *          'req_items' => 1, // Optional number of required items. Only used with AGGREGATE_ANY_N. Defaults to 1
      *      ]
-     *      'courseids' =>[], // Ids of courses to be completed.
+     *      'courseids' => [], // Ids of courses to be completed. PHPUnit only.
+     *      'number_required' => 'all', // Either 'all' or the number of items required for aggregation. Behat only.
+     *      'courses' => [], // Shortnames of courses to be completed. Behat only.
+     *      'idnumber' => '...', // ID number of the criterion.
      *  ]
      *
      * @param array $data Criterion data
@@ -58,11 +63,10 @@ class totara_criteria_generator extends component_generator_base {
     public function create_coursecompletion(array $data = []) {
         $instance = new coursecompletion();
 
-        $data['aggregation'] = $data['aggregation'] ?? [];
-        $instance->set_aggregation_method($data['aggregation']['method'] ?? criterion::AGGREGATE_ALL);
-        $instance->set_aggregation_params(['req_items' => $data['aggregation']['req_items'] ?? 1]);
+        $instance->set_idnumber($data['idnumber'] ?? null);
+        $this->set_aggregation($instance, $data);
+        $this->set_courses($instance, $data);
 
-        $instance->add_items($data['courseids']);
         $instance->save();
 
         return $instance;
@@ -77,7 +81,9 @@ class totara_criteria_generator extends component_generator_base {
      *          'method' => criterion::AGGREGATE_ALL, // Optional Aggregation method - defaults to ALL
      *          'req_items' => 1, // Optional number of required items. Only used with AGGREGATE_ANY_N. Defaults to 1
      *      ],
+     *      'number_required' => 'all', // Either 'all' or the number of items required for aggregation. Behat only.
      *      'competency' => 1,   // Id of competency whose child competencies should be achieved
+     *      'idnumber' => '...', // ID number of the criterion.
      *  ]
      *
      * @param array $data Criterion data
@@ -86,13 +92,9 @@ class totara_criteria_generator extends component_generator_base {
     public function create_linkedcourses(array $data = []) {
         $instance = new linkedcourses();
 
-        $data['aggregation'] = $data['aggregation'] ?? [];
-        $instance->set_aggregation_method($data['aggregation']['method'] ?? criterion::AGGREGATE_ALL);
-        $instance->set_aggregation_params(['req_items' => $data['aggregation']['req_items'] ?? 1]);
-
-        if (!empty($data['competency'])) {
-            $instance->set_competency_id($data['competency']);
-        }
+        $instance->set_idnumber($data['idnumber'] ?? null);
+        $this->set_aggregation($instance, $data);
+        $this->set_competency_id($instance, $data['competency']);
 
         $instance->save();
 
@@ -105,6 +107,7 @@ class totara_criteria_generator extends component_generator_base {
      *  Data
      *  [
      *      'competency' => 1,   // Id of competency whose child competencies should be achieved
+     *      'idnumber' => '...', // ID number of the criterion.
      *  ]
      *
      * @param array $data
@@ -112,9 +115,9 @@ class totara_criteria_generator extends component_generator_base {
      */
     public function create_onactivate(array $data = []) {
         $instance = new onactivate();
-        if (!empty($data['competency'])) {
-            $instance->set_competency_id($data['competency']);
-        }
+
+        $instance->set_idnumber($data['idnumber'] ?? null);
+        $this->set_competency_id($instance, $data['competency']);
 
         $instance->save();
 
@@ -131,7 +134,9 @@ class totara_criteria_generator extends component_generator_base {
      *          'method' => criterion::AGGREGATE_ALL, // Optional Aggregation method - defaults to ALL
      *          'req_items' => 1, // Optional number of required items. Only used with AGGREGATE_ANY_N. Defaults to 1
      *      ],
+     *      'number_required' => 'all', // Either 'all' or the number of items required for aggregation. Behat only.
      *      'competency' => 1,   // Id of competency whose child competencies should be achieved
+     *      'idnumber' => '...', // ID number of the criterion.
      *  ]
      *
      * @param array $data Criterion data
@@ -140,13 +145,9 @@ class totara_criteria_generator extends component_generator_base {
     public function create_childcompetency(array $data = []) {
         $instance = new childcompetency();
 
-        $data['aggregation'] = $data['aggregation'] ?? [];
-        $instance->set_aggregation_method($data['aggregation']['method'] ?? criterion::AGGREGATE_ALL);
-        $instance->set_aggregation_params(['req_items' => $data['aggregation']['req_items'] ?? 1]);
-
-        if (!empty($data['competency'])) {
-            $instance->set_competency_id($data['competency']);
-        }
+        $instance->set_idnumber($data['idnumber'] ?? null);
+        $this->set_aggregation($instance, $data);
+        $this->set_competency_id($instance, $data['competency'] ?? null);
 
         $instance->save();
 
@@ -186,6 +187,83 @@ class totara_criteria_generator extends component_generator_base {
         $record->item_type = 'course';
         $record->item_id = $course->id;
         return $DB->insert_record('totara_criteria_item', $record);
+    }
+
+    /**
+     * Set the aggregation for a criterion.
+     * Intended to be compatible with both unit and behat tests.
+     *
+     * @param criterion $instance
+     * @param array|null $data
+     * @throws coding_exception
+     */
+    private function set_aggregation(criterion $instance, $data) {
+        if (isset($data['aggregation'])) {
+            // For PHPUnit.
+            $instance->set_aggregation_method($data['aggregation']['method'] ?? criterion::AGGREGATE_ALL);
+            $instance->set_aggregation_params(['req_items' => $data['aggregation']['req_items'] ?? 1]);
+        } else if (isset($data['number_required'])) {
+            // For Behat.
+            if ($data['number_required'] == 'all') {
+                $instance->set_aggregation_method(criterion::AGGREGATE_ALL);
+            } else if (is_numeric($data['number_required'])) {
+                $instance->set_aggregation_method(criterion::AGGREGATE_ANY_N);
+                $instance->set_aggregation_params(['req_items' => $data['number_required']]);
+            } else {
+                throw new Exception('Must specify either a number or \'all\' for number_required when creating criteria.');
+            }
+        }
+    }
+
+    /**
+     * Set the competency ID items for a criterion.
+     * Intended to be compatible with both unit and behat tests.
+     *
+     * Note that if an ID number that is just a number is specified, then it will not be resolved (for performance reasons).
+     * For behat, make sure your competency ID number is non-numeric.
+     *
+     * @param criterion $instance
+     * @param int|string $competency Competency ID or ID number
+     */
+    private function set_competency_id(criterion $instance, $competency) {
+        global $DB;
+
+        if (empty($competency)) {
+            return;
+        }
+
+        if (!is_numeric($competency)) {
+            $competency = $DB->get_field(competency::TABLE, 'id', ['idnumber' => $competency]);
+        }
+
+        $instance->set_competency_id($competency);
+    }
+
+    /**
+     * Set the course items for a criterion.
+     * Intended to be compatible with both unit and behat tests.
+     *
+     * @param criterion $instance
+     * @param array|null $data
+     * @throws Exception
+     */
+    private function set_courses(criterion $instance, $data) {
+        if (isset($data['courseids'])) {
+            // For PHPUnit.
+            $instance->add_items($data['courseids']);
+        } else if (isset($data['courses'])) {
+            // For Behat.
+            $course_shortnames = explode(',', $data['courses']);
+            $course_ids = course::repository()
+                ->select('id')
+                ->where_in('shortname', $course_shortnames)
+                ->get()
+                ->pluck('id');
+            $instance->add_items($course_ids);
+        } else {
+            // None specified.
+            throw new Exception("Must specify either courseids or courses when creating {$instance->get_plugin_type()} criteria.");
+        }
     }
 
 }

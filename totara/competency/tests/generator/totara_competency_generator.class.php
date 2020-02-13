@@ -23,28 +23,31 @@
  */
 
 use aggregation_test_aggregation\test_aggregation;
+use core\entities\cohort;
 use core\entities\user;
+use hierarchy_organisation\entities\organisation;
+use hierarchy_position\entities\position;
 use pathway_criteria_group\criteria_group;
 use pathway_learning_plan\learning_plan;
 use pathway_manual\entities\rating;
 use pathway_manual\manual;
-use pathway_manual\models\roles;
 use pathway_manual\models\roles\role;
 use pathway_manual\models\roles\role_factory;
-use pathway_manual\entities\role as role_entity;
 use pathway_test_pathway\test_pathway;
-use tool_totara_sync\task\comp;
 use totara_competency\aggregation_users_table;
 use totara_competency\entities\competency;
 use totara_competency\entities\competency_framework;
 use totara_competency\entities\competency_type;
+use totara_competency\entities\course;
 use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\entities\scale;
 use totara_competency\entities\scale_value;
 use totara_competency\pathway;
-use totara_competency\pathway_aggregation;
 use totara_competency\plugin_types;
+use totara_competency\user_groups;
 use totara_criteria\criterion;
+use totara_criteria\criterion_factory;
+use totara_criteria\entities\criterion as criterion_entity;
 
 global $CFG;
 require_once($CFG->dirroot . '/totara/competency/tests/fixtures/test_achievement_detail.php');
@@ -369,10 +372,10 @@ class totara_competency_generator extends component_generator_base {
      *
      * @param stdClass|int $course Course ID or record
      * @param stdClass|int $user User ID or record
-     * @param int $completion_status One of COMPLETION_STATUS_NOTYETSTARTED, COMPLETION_STATUS_INPROGRESS,
-     *                                  COMPLETION_STATUS_COMPLETE, or COMPLETION_STATUS_COMPLETEVIARPL.
+     * @param int|null $completion_status One of COMPLETION_STATUS_NOTYETSTARTED, COMPLETION_STATUS_INPROGRESS,
+     *                                  COMPLETION_STATUS_COMPLETE, or COMPLETION_STATUS_COMPLETEVIARPL. Defaults to complete.
      */
-    public function create_course_enrollment_and_completion($course, $user, int $completion_status) {
+    public function create_course_enrollment_and_completion($course, $user, ?int $completion_status = null) {
         global $CFG;
         require_once($CFG->dirroot . '/lib/enrollib.php');
         require_once($CFG->dirroot . '/completion/completion_completion.php');
@@ -409,10 +412,12 @@ class totara_competency_generator extends component_generator_base {
      * @param stdClass|int $for_user User the learning plan is for
      * @param array $competencies Array of [Competency ID => Scale Value ID]
      * @param bool $completed Mark the plan as completed?
+     * @param string|null $plan_name Give the learning plan a specific name
      *
      * @return development_plan
      */
-    public function create_learning_plan_with_competencies($for_user, $competencies, bool $completed = false): development_plan {
+    public function create_learning_plan_with_competencies($for_user, $competencies,
+                                                           bool $completed = false, string $plan_name = null): development_plan {
         global $CFG;
         require_once($CFG->dirroot . '/totara/plan/components/competency/competency.class.php');
 
@@ -422,7 +427,7 @@ class totara_competency_generator extends component_generator_base {
 
         /** @var totara_plan_generator $plan_generator */
         $plan_generator = $this->datagenerator->get_plugin_generator('totara_plan');
-        $plan = $plan_generator->create_learning_plan(['userid' => $for_user]);
+        $plan = $plan_generator->create_learning_plan(['userid' => $for_user, 'name' => $plan_name]);
 
         $plan = new development_plan($plan->id);
 
@@ -440,6 +445,91 @@ class totara_competency_generator extends component_generator_base {
         }
 
         return $plan;
+    }
+
+
+    /**************************************************************************
+     * Behat Specific Generators
+     **************************************************************************/
+
+    /**
+     * @param array $attributes
+     */
+    public function create_assignment_for_behat(array $attributes = []) {
+        $attributes['competency_id'] = self::get_record_id_from_field(competency::TABLE, 'idnumber', $attributes['competency']);
+        unset($attributes['competency']);
+
+        $attributes['user_group_id'] = self::get_user_group_id_for_assignment(
+            $attributes['user_group_type'],
+            $attributes['user_group']
+        );
+        unset($attributes['user_group']);
+
+        $this->assignment_generator()->create_assignment($attributes);
+    }
+
+    /**
+     * @param array $attributes
+     */
+    public function create_criteria_group_pathway_for_behat(array $attributes = []) {
+        $competency = self::get_record_id_from_field(competency::TABLE, 'idnumber', $attributes['competency']);
+        $scale_value = self::get_record_id_from_field(scale_value::TABLE, 'idnumber', $attributes['scale_value']);
+
+        $criteria = criterion_entity::repository()
+            ->where_in('idnumber', explode(',', $attributes['criteria']))
+            ->get()
+            ->map_to(function (criterion_entity $criterion) {
+                return criterion_factory::fetch_from_entity($criterion);
+            })
+            ->all();
+
+        $this->create_criteria_group($competency, $criteria, $scale_value, $attributes['sortorder'] ?? null);
+    }
+
+    /**
+     * @param array $attributes
+     */
+    public function create_learning_plan_pathway_for_behat(array $attributes = []) {
+        $this->create_learning_plan_pathway(
+            self::get_record_id_from_field(competency::TABLE, 'idnumber', $attributes['competency']),
+            $attributes['sortorder'] ?? null
+        );
+    }
+
+    /**
+     * @param array $attributes
+     */
+    public function create_manual_pathway_for_behat(array $attributes = []) {
+        $this->create_manual(
+            self::get_record_id_from_field(competency::TABLE, 'idnumber', $attributes['competency']),
+            explode(',', $attributes['roles']),
+            $attributes['sortorder'] ?? null
+        );
+    }
+
+    /**
+     * @param array $attributes
+     */
+    public function create_manual_rating_for_behat(array $attributes = []) {
+        $this->create_manual_rating(
+            self::get_record_id_from_field(competency::TABLE, 'idnumber', $attributes['competency']),
+            self::get_record_id_from_field(user::TABLE, 'username', $attributes['subject_user']),
+            self::get_record_id_from_field(user::TABLE, 'username', $attributes['rater_user']),
+            $attributes['role'],
+            self::get_record_id_from_field(scale_value::TABLE, 'idnumber', $attributes['scale_value']),
+            $attributes['comment'] ?? null
+        );
+    }
+
+    /**
+     * @param array $attributes
+     */
+    public function create_course_enrollment_and_completion_for_behat(array $attributes = []) {
+        $this->create_course_enrollment_and_completion(
+            self::get_record_id_from_field(course::TABLE, 'shortname', $attributes['course']),
+            self::get_record_id_from_field(user::TABLE, 'username', $attributes['user']),
+            $attributes['status'] ?? null
+        );
     }
 
 
@@ -469,9 +559,9 @@ class totara_competency_generator extends component_generator_base {
     /**
      * Create a test aggregation type.
      *
-     * @return test_aggregation|pathway_aggregation
+     * @return test_aggregation
      */
-    public function create_test_aggregation(): pathway_aggregation {
+    public function create_test_aggregation(): test_aggregation {
         return new test_aggregation();
     }
 
@@ -504,6 +594,46 @@ class totara_competency_generator extends component_generator_base {
         }
 
         return $this->hierarchy_generator;
+    }
+
+
+    /**************************************************************************
+     * Internal Helpers
+     **************************************************************************/
+
+    /**
+     * We want to get the ID for a record based upon a unique, human readable identifier. Used for behat.
+     *
+     * @param string $table
+     * @param string $field
+     * @param string $identifier
+     * @return int
+     */
+    private static function get_record_id_from_field(string $table, string $field, string $identifier): int {
+        global $DB;
+        return $DB->get_field($table, 'id', [$field => $identifier]);
+    }
+
+    /**
+     * Get the appropriate group ID for the specified group type and specified identifer.
+     *
+     * @param string $user_group_type
+     * @param string $group_identifier
+     * @return int
+     */
+    private static function get_user_group_id_for_assignment(string $user_group_type, string $group_identifier): int {
+        switch ($user_group_type) {
+            case user_groups::USER:
+                return self::get_record_id_from_field(user::TABLE, 'username', $group_identifier);
+            case user_groups::ORGANISATION:
+                return self::get_record_id_from_field(organisation::TABLE, 'idnumber', $group_identifier);
+            case user_groups::POSITION:
+                return self::get_record_id_from_field(position::TABLE, 'idnumber', $group_identifier);
+            case user_groups::COHORT:
+                return self::get_record_id_from_field(cohort::TABLE, 'idnumber', $group_identifier);
+            default:
+                throw new coding_exception('Invalid user group specified: ' . $user_group_type);
+        }
     }
 
 }

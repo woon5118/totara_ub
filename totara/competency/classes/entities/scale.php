@@ -49,6 +49,10 @@ class scale extends entity {
 
     public const TABLE = 'comp_scale';
 
+    public const UPDATED_TIMESTAMP = 'timemodified';
+
+    public const SET_UPDATED_WHEN_CREATED = true;
+
     /**
      * Values for this scale, sorted from lowest to highest value
      *

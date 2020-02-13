@@ -185,7 +185,10 @@ class totara_hierarchy_generator extends component_generator_base {
         $framework_id = $DB->insert_record($shortprefix.'_framework', $record);
         $framework = $DB->get_record($shortprefix.'_framework', array('id' => $framework_id));
 
-        if (!isset($record['scale'])) {
+        if (isset($record['scale']) && !is_numeric($record['scale'])) {
+            // Scale name has been specified, so load the scale with that name.
+            $record['scale'] = $DB->get_field($shortprefix . '_scale', 'id', ['name' => $record['scale']]);
+        } else if (!isset($record['scale'])) {
             $record['scale'] = 1;
         }
 

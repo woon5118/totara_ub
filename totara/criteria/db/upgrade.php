@@ -121,5 +121,19 @@ function xmldb_totara_criteria_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019121300, 'totara', 'criteria');
     }
 
+    if ($oldversion < 2020021400) {
+        // Define field idnumber to be added to totara_criteria.
+        $table = new xmldb_table('totara_criteria');
+        $field = new xmldb_field('idnumber', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'valid');
+
+        // Conditionally launch add field idnumber.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Criteria savepoint reached.
+        upgrade_plugin_savepoint(true, 2020021400, 'totara', 'criteria');
+    }
+
     return true;
 }

@@ -22,12 +22,48 @@
  */
 
 use totara_criteria\criterion;
+use totara_criteria\entities\criterion as criterion_entity;
 
 
 /**
  * Test concrete criterion methods
  */
 class totara_criteria_criterion_testcase extends advanced_testcase {
+
+    /**
+     * Test setting, getting and saving a criterion with an ID number.
+     */
+    public function test_idnumber() {
+        /** @var criterion $mock_criterion */
+        $mock_criterion = $this->getMockForAbstractClass(criterion::class);
+        $mock_criterion->save();
+
+        $this->assertNull($mock_criterion->get_idnumber());
+
+        $empty_idnumber = '';
+        $mock_criterion->set_idnumber($empty_idnumber);
+        $this->assertNull($mock_criterion->get_idnumber());
+
+        $this->assertFalse($mock_criterion->is_dirty());
+
+        $valid_idnumber = 'ABC';
+        $mock_criterion->set_idnumber($valid_idnumber);
+        $this->assertEquals($valid_idnumber, $mock_criterion->get_idnumber());
+        $this->assertTrue($mock_criterion->is_dirty());
+
+        $mock_criterion->save();
+        $this->assertEquals($valid_idnumber, $mock_criterion->get_idnumber());
+        $this->assertFalse($mock_criterion->is_dirty());
+
+        /** @var criterion $mock_criterion2 */
+        $mock_criterion2 = $this->getMockForAbstractClass(criterion::class);
+
+        // Re-use the same id number that is already used.
+        $mock_criterion2->set_idnumber($valid_idnumber);
+
+        $this->expectExceptionMessage("ID number '{$valid_idnumber}' already exists in " . criterion_entity::TABLE);
+        $mock_criterion2->save();
+    }
 
     /**
      * Test aggregation attributes
@@ -231,6 +267,7 @@ class totara_criteria_criterion_testcase extends advanced_testcase {
             ->willReturn('mockitem');
         $mock_criterion2->set_item_ids([1, 2, 3]);
         $mock_criterion2->set_competency_id(345);
+        $mock_criterion2->set_idnumber('mock_criterion2');
         $mock_criterion2->save();
         $mock_criterion2->fetch($mock_criterion2->get_id());
         $this->assertNotSame($mock_criterion, $fetched_criterion);
@@ -239,6 +276,7 @@ class totara_criteria_criterion_testcase extends advanced_testcase {
         // Change items and metadata
         $mock_criterion2->add_items([2, 3, 5]);
         $mock_criterion2->set_competency_id(456);
+        $mock_criterion2->set_idnumber('mock_criterion2_new');
         $mock_criterion2->add_metadata([['metakey' => 'key1', 'metavalue' => 'value1']]);
         $mock_criterion2->save();
         $mock_criterion2->fetch($mock_criterion2->get_id());
@@ -271,6 +309,7 @@ class totara_criteria_criterion_testcase extends advanced_testcase {
             ->willReturn('mockitem');
         $mock_criterion2->set_item_ids([1, 2, 3]);
         $mock_criterion2->set_competency_id(123);
+        $mock_criterion2->set_idnumber('mock_criterion2');
         $mock_criterion2->save();
         $id = $mock_criterion2->get_id();
 

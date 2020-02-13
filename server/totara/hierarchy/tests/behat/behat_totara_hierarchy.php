@@ -109,7 +109,7 @@ class behat_totara_hierarchy extends behat_base {
     public function the_following_hierarchy_exists($prefix, TableNode $table) {
         \behat_hooks::set_step_readonly(true); // Backend action.
 
-        global $DB;
+        global $CFG, $DB;
 
         $required = array(
             'framework',
@@ -123,6 +123,10 @@ class behat_totara_hierarchy extends behat_base {
             'type', // ID number.
             'targetdate' // For goals. Uses d/m/Y format.
         );
+
+        if ($prefix == competency::PREFIX) {
+            $optional[] = 'assignavailability'; // For competencies.
+        }
 
         $data = $table->getHash();
         $firstrow = reset($data);
@@ -143,6 +147,9 @@ class behat_totara_hierarchy extends behat_base {
                 } else if (in_array($fieldname, $optional)) {
                     if ($fieldname === 'targetdate') {
                         $record[$fieldname] = totara_date_parse_from_format('d/m/Y', $value);
+                    } else if ($fieldname = 'assignavailability') {
+                        require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
+                        $record[$fieldname] = totara_hierarchy_parse_competency_assignment_availability($value);
                     } else {
                         $record[$fieldname] = $value;
                     }

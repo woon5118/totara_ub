@@ -302,6 +302,50 @@ class behat_totara_data_generators extends behat_base {
                 'required' => array('fullname', 'shortname', 'source'),
             )
         ),
+        'totara_competency' => array(
+            'assignments' => array(
+                'datagenerator' => 'assignment_for_behat',
+                'required' => array('competency', 'user_group', 'user_group_type')
+            ),
+            'course enrollments and completions' => array(
+                'datagenerator' => 'course_enrollment_and_completion_for_behat',
+                'required' => array('course', 'user')
+            ),
+            'criteria group pathways' => array(
+                'datagenerator' => 'criteria_group_pathway_for_behat',
+                'required' => array('competency', 'scale_value', 'criteria')
+            ),
+            'learning plan pathways' => array(
+                'datagenerator' => 'learning_plan_pathway_for_behat',
+                'required' => array('competency')
+            ),
+            'manual pathways' => array(
+                'datagenerator' => 'manual_pathway_for_behat',
+                'required' => array('competency', 'roles')
+            ),
+            'manual ratings' => array(
+                'datagenerator' => 'manual_rating_for_behat',
+                'required' => array('competency', 'subject_user', 'rater_user', 'role', 'scale_value')
+            ),
+        ),
+        'totara_criteria' => array(
+            'childcompetency' => array(
+                'datagenerator' => 'childcompetency',
+                'required' => array('idnumber', 'competency', 'number_required')
+            ),
+            'coursecompletion' => array(
+                'datagenerator' => 'coursecompletion',
+                'required' => array('idnumber', 'courses', 'number_required')
+            ),
+            'linkedcourses' => array(
+                'datagenerator' => 'linkedcourses',
+                'required' => array('idnumber', 'competency', 'number_required')
+            ),
+            'onactivate' => array(
+                'datagenerator' => 'onactivate',
+                'required' => array('idnumber', 'competency')
+            ),
+        ),
         'totara_evidence' => array(
             'evidence' => array(
                 'datagenerator' => 'evidence_item_for_behat',

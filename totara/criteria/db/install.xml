@@ -8,6 +8,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="plugin_type" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false" COMMENT="Type of criterion"/>
+        <FIELD NAME="idnumber" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="External systems ID number"/>
         <FIELD NAME="aggregation_method" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Aggregation method"/>
         <FIELD NAME="aggregation_params" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Additional parameters required by the aggregation method"/>
         <FIELD NAME="criterion_modified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Time when criterion configuration was last changed"/>
