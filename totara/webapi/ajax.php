@@ -24,7 +24,8 @@
 
 /*
  * This file is not intended to be used directly from Javascript code,
- * all requests must be done via public API in core/webapi AMD module.
+ * all requests must be done via public API in core/webapi AMD module
+ * or via the Apollo client code in VueJS.
  *
  * This endpoint is not a public API, the parameters or data structure
  * may change even in stable branches.

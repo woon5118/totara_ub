@@ -31,11 +31,7 @@ use core\webapi\execution_context;
  */
 final class graphql {
 
-    /**
-     * For now tui and ajax share the same type
-     */
     public const TYPE_AJAX = 'ajax';
-    public const TYPE_TUI = self::TYPE_AJAX;
     public const TYPE_DEV = 'dev';
     public const TYPE_MOBILE = 'mobile';
 
@@ -129,7 +125,6 @@ final class graphql {
     public static function get_available_types(): array {
         return [
             self::TYPE_DEV,
-            self::TYPE_TUI,
             self::TYPE_MOBILE,
             self::TYPE_AJAX
         ];

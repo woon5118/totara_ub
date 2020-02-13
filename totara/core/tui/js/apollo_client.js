@@ -30,7 +30,7 @@ import { createDevLink } from './internal/apollo/dev_link';
 import { globalConfig } from './config';
 
 const httpLinkOptions = {
-  uri: globalConfig.wwwroot + '/totara/webapi/tui.php',
+  uri: globalConfig.wwwroot + '/totara/webapi/ajax.php',
   credentials: 'same-origin',
   headers: {
     'X-Totara-Sesskey': globalConfig.sesskey,
