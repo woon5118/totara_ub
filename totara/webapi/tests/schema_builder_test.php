@@ -22,17 +22,12 @@
  */
 
 use GraphQL\Type\Schema;
-use totara_webapi\graphql;
 use totara_webapi\schema_builder;
 use totara_webapi\schema_file_loader;
 
 class totara_webapi_schema_builder_test  extends \advanced_testcase {
 
-    /**
-     * @dataProvider get_type_data_provider
-     * @param string $type
-     */
-    public function test_build_schema(string $type) {
+    public function test_build_schema() {
         global $CFG;
 
         $schema_files = [
@@ -56,7 +51,7 @@ class totara_webapi_schema_builder_test  extends \advanced_testcase {
             ->method('load')
             ->willReturn($schema_files);
 
-        $builder = new schema_builder($type, $file_loader);
+        $builder = new schema_builder($file_loader);
         $schema = $builder->build();
 
         $this->assertInstanceOf(Schema::class, $schema);
@@ -80,13 +75,5 @@ class totara_webapi_schema_builder_test  extends \advanced_testcase {
         $this->assertArrayHasKey('core_my_courses', $queries);
     }
 
-    public function get_type_data_provider(): array {
-        return [
-            [graphql::TYPE_AJAX],
-            [graphql::TYPE_DEV],
-            [graphql::TYPE_MOBILE],
-            [graphql::TYPE_TUI],
-        ];
-    }
 
 }

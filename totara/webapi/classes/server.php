@@ -27,9 +27,11 @@ use coding_exception;
 use core\webapi\execution_context;
 use Exception;
 use GraphQL\Error\Debug;
+use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\StandardServer;
+use GraphQL\Type\Schema;
 use Throwable;
 use totara_webapi\local\util;
 
@@ -114,16 +116,9 @@ class server {
 
             $request->validate();
 
-            try {
-                $operations = $this->prepare_operations($request);
+            $operations = $this->prepare_operations($request);
 
-                $schema_file_loader = new schema_file_loader();
-                $schema_builder = new schema_builder($this->type, $schema_file_loader);
-                $schema = $schema_builder->build();
-            } catch (Exception $exception) {
-                // Schema errors are clearly a server problem so returning as a 500 makes more sense
-                StandardServer::send500Error($exception, $this->debug, true);
-            }
+            $schema = $this->prepare_schema($request);
 
             $server = new StandardServer([
                 'persistentQueryLoader' => new persistent_operations_loader(),
@@ -142,6 +137,24 @@ class server {
         }
         
         return $result;
+    }
+
+    /**
+     * Build and validate the schema (on developer mode)
+     *
+     * @param request $request
+     * @return Schema
+     */
+    protected function prepare_schema(request $request): Schema {
+        $schema_file_loader = new schema_file_loader();
+        $schema_builder = new schema_builder($schema_file_loader);
+        $schema = $schema_builder->build();
+
+        if ($this->type == graphql::TYPE_DEV) {
+            $schema->assertValid();
+        }
+
+        return $schema;
     }
 
     /**
@@ -193,25 +206,48 @@ class server {
      * @param bool $stop_execution
      */
     public function send_response($result, bool $stop_execution = true) {
-        $errors = false;
+        $status_code = 200;
         if (is_array($result)) {
-            $result = array_map(function ($execution_result) use (& $errors) {
-                if (!$execution_result instanceof ExecutionResult) {
-                    util::send_error('Invalid result', 400);
-                }
-                if (!empty($execution_result->errors)) {
-                    $errors = true;
-                }
-                return $execution_result->toArray($this->debug);
-            }, $result);
+            $result = array_map(
+                function ($execution_result) use (& $errors, & $status_code) {
+                    if (!$execution_result instanceof ExecutionResult) {
+                        util::send_error('Invalid result', 500);
+                    }
+                    if (!empty($execution_result->errors)) {
+                        $status_code = $this->has_internal_errors($execution_result) ? 500 : 400;
+                    }
+                    return $execution_result->toArray($this->debug);
+                }, $result
+            );
         } else {
             if (!empty($result->errors)) {
-                $errors = true;
+                $status_code = $this->has_internal_errors($result) ? 500 : 400;
             }
             $result = $result->toArray($this->debug);
         }
 
-        util::send_response($result, $errors ? 400 : 200, $stop_execution);
+        util::send_response($result, $status_code, $stop_execution);
+    }
+
+    /**
+     * Check for internal errors in the result, everything not explicitly
+     * a webapi or graphql exception counts as internal
+     *
+     * @param ExecutionResult $result
+     * @return bool
+     */
+    private function has_internal_errors(ExecutionResult $result): bool {
+        if (empty($result->errors)) {
+            return false;
+        }
+        foreach ($result->errors as $error) {
+            // If it's an error not happening in the GraphQL server or as part of the request,
+            // i.e. in the resolver we can give it a 500
+            if ((!$error instanceof Error || $error->getPrevious()) && !$error instanceof webapi_request_exception) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

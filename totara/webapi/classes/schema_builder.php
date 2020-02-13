@@ -46,8 +46,7 @@ class schema_builder {
      */
     protected $schema_file_loader;
 
-    public function __construct(string $type, schema_file_loader $schema_file_loader) {
-        $this->type = $type;
+    public function __construct(schema_file_loader $schema_file_loader) {
         $this->schema_file_loader = $schema_file_loader;
     }
 
@@ -62,10 +61,6 @@ class schema_builder {
         $this->add_support_for_custom_scalars($schema);
         $this->add_support_for_param_types($schema);
         $this->add_support_for_interface_types($schema);
-
-        if ($this->type == graphql::TYPE_DEV) {
-            $schema->assertValid();
-        }
 
         return $schema;
     }
