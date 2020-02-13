@@ -25,6 +25,7 @@ namespace totara_webapi;
 
 use coding_exception;
 use core\webapi\execution_context;
+use Exception;
 use GraphQL\Error\Debug;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Server\OperationParams;
@@ -113,11 +114,16 @@ class server {
 
             $request->validate();
 
-            $operations = $this->prepare_operations($request);
+            try {
+                $operations = $this->prepare_operations($request);
 
-            $schema_file_loader = new schema_file_loader();
-            $schema_builder = new schema_builder($this->type, $schema_file_loader);
-            $schema = $schema_builder->build();
+                $schema_file_loader = new schema_file_loader();
+                $schema_builder = new schema_builder($this->type, $schema_file_loader);
+                $schema = $schema_builder->build();
+            } catch (Exception $exception) {
+                // Schema errors are clearly a server problem so returning as a 500 makes more sense
+                StandardServer::send500Error($exception, $this->debug, true);
+            }
 
             $server = new StandardServer([
                 'persistentQueryLoader' => new persistent_operations_loader(),
