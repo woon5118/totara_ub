@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace core\oauth2;
+namespace core\task;
 
 use \core\task\scheduled_task;
 use core_user;

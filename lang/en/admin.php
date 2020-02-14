@@ -1136,6 +1136,7 @@ $string['taskpasswordresetcleanup'] = 'Cleanup password reset attempts';
 $string['taskplagiarismcron'] = 'Background processing for legacy cron in plagiarism plugins';
 $string['taskportfoliocron'] = 'Background processing for portfolio plugins';
 $string['taskquestioncron'] = 'Background processing for question engine';
+$string['taskrefreshsystemtokens'] = 'Refresh OAuth tokens for service accounts';
 $string['taskregistrationcron'] = 'Site registration';
 $string['tasksendfailedloginnotifications'] = 'Send failed login notifications';
 $string['tasksendnewuserpasswords'] = 'Send new user passwords';
