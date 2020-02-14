@@ -497,6 +497,10 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
         $this->add_core_course_category_filters($filteroptions);
         $this->add_core_course_filters($filteroptions);
 
+        $this->add_assets_fields_to_filters($filteroptions);
+        $this->add_rooms_fields_to_filters($filteroptions);
+        $this->add_facilitators_fields_to_filters($filteroptions);
+
         return $filteroptions;
     }
 
