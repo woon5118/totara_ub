@@ -37,7 +37,7 @@ $seminar = $seminarevent->get_seminar();
 $cm = $seminar->get_coursemodule();
 $context =  context_module::instance($cm->id);
 
-$returnurl  = new moodle_url('/mod/facetoface/attendees/view.php', array('s' => $s, 'backtoallsessions' => 1));
+$returnurl  = new moodle_url('/mod/facetoface/attendees/view.php', array('s' => $s));
 $currenturl = new moodle_url('/mod/facetoface/attendees/list/addlist.php', array('s' => $s, 'listid' => $listid));
 
 // Check capability

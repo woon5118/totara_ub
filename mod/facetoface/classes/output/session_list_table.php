@@ -621,7 +621,7 @@ final class session_list_table extends html_table {
      * @return html_table_cell
      */
     private function table_cell_actions(seminar_event $seminarevent, render_session_list_config $config, int $datescount = 0): html_table_cell {
-        $params = ['s' => $seminarevent->get_id(), 'backtoallsessions' => (int)(bool)$config->returntoallsessions];
+        $params = ['s' => $seminarevent->get_id()];
 
         $builder = seminarevent_dashboard_action::builder();
 
@@ -644,25 +644,21 @@ final class session_list_table extends html_table {
             } else {
                 $url = '/mod/facetoface/attendees/view.php';
             }
-            // $builder->add_action_link(get_string('attendees', 'mod_facetoface'), new moodle_url($url, $params));
             $builder->add_menu(get_string('attendees', 'mod_facetoface'), new moodle_url($url, $params));
         }
 
         // Can edit sessions.
         if ($config->editevents) {
+            $params['backtoallsessions'] = (int)(bool)$config->returntoallsessions;
             if ($config->viewattendees) {
                 $builder->add_menu_separator();
             }
             if (!$seminarevent->get_cancelledstatus()) {
-                // $builder->add_action_icon(new flex_icon('edit', ['alt' => get_string('editsession', 'mod_facetoface')]), new moodle_url('/mod/facetoface/events/edit.php', $params));
                 $builder->add_menu(get_string('editsession', 'mod_facetoface'), new moodle_url('/mod/facetoface/events/edit.php', $params));
                 if (!$seminarevent->is_first_started($config->currenttime)) {
-                    // $builder->add_action_icon(new flex_icon('ban', ['alt' => get_string('cancelsession', 'mod_facetoface')]), new moodle_url('/mod/facetoface/events/cancel.php', $params));
                     $builder->add_menu(get_string('cancelsession', 'mod_facetoface'), new moodle_url('/mod/facetoface/events/cancel.php', $params));
                 }
             }
-            // $builder->add_action_icon(new flex_icon('duplicate', ['alt' => get_string('copysession', 'mod_facetoface')]), new moodle_url('/mod/facetoface/events/edit.php', $params + ['c' => 1]));
-            // $builder->add_action_icon(new flex_icon('delete', ['alt' => get_string('deletesession', 'mod_facetoface')]), new moodle_url('/mod/facetoface/events/delete.php', $params));
             $builder->add_menu(get_string('copysession', 'mod_facetoface'), new moodle_url('/mod/facetoface/events/edit.php', $params + ['c' => 1]));
             $builder->add_menu(get_string('deletesession', 'mod_facetoface'), new moodle_url('/mod/facetoface/events/delete.php', $params));
         }

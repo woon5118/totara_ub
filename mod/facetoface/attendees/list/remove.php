@@ -100,7 +100,7 @@ if ($frm = data_submitted()) {
 
 if ($cancel) {
     $list->clean();
-    redirect(new moodle_url('/mod/facetoface/attendees/view.php', array('s' => $s, 'backtoallsessions' => 1)));
+    redirect(new moodle_url('/mod/facetoface/attendees/view.php', array('s' => $s)));
     return;
 }
 

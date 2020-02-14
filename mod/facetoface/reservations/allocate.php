@@ -36,23 +36,16 @@ require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot.'/mod/facetoface/lib.php');
 
 $sid = required_param('s', PARAM_INT);
-$backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
-$backtosession = optional_param('backtosession', null, PARAM_ALPHA);
 $backtoeventinfo = optional_param('backtoeventinfo', 0, PARAM_BOOL);
 $managerid = optional_param('managerid', null, PARAM_INT);
 
 $seminarevent = new \mod_facetoface\seminar_event($sid);
-$seminar = new \mod_facetoface\seminar($seminarevent->get_facetoface());
+$seminar = $seminarevent->get_seminar();
 $course = $DB->get_record('course', array('id' => $seminar->get_course()), '*', MUST_EXIST);
 $cm = $seminar->get_coursemodule();
 $context = context_module::instance($cm->id);
 
-$url = new moodle_url('/mod/facetoface/reservations/allocate.php', array('s' => $seminarevent->get_id(), 'backtoallsessions' => $backtoallsessions));
-$helper = new attendees_helper($seminarevent);
-
-if ($backtosession) {
-    $url->param('backtosession', $backtosession);
-}
+$url = new moodle_url('/mod/facetoface/reservations/allocate.php', ['s' => $seminarevent->get_id()]);
 if ($backtoeventinfo) {
     $url->param('backtoeventinfo', 1);
 }
@@ -63,13 +56,9 @@ $PAGE->set_url($url);
 
 require_login($course, false, $cm);
 
-if ($backtoallsessions) {
-    $allsessionsurl = new moodle_url('/mod/facetoface/view.php', array('id' => $cm->id));
-} else {
-    $allsessionsurl = new moodle_url('/course/view.php', ['id' => $seminar->get_course()]);
-}
+$allsessionsurl = new moodle_url('/mod/facetoface/view.php', array('id' => $cm->id));
 if ($backtoeventinfo) {
-    $gobackurl = new moodle_url('/mod/facetoface/eventinfo.php', array('s' => $seminarevent->get_id(), 'backtoallsessions' => $backtoallsessions));
+    $gobackurl = new moodle_url('/mod/facetoface/eventinfo.php', array('s' => $seminarevent->get_id()));
 } else {
     $gobackurl = null;
 }
@@ -77,13 +66,8 @@ if ($backtoeventinfo) {
 // Handle cancel.
 if ($backtoeventinfo) {
     $redir = $gobackurl;
-} else if ($backtoallsessions) {
-    $redir = $allsessionsurl;
-} else if ($backtosession) {
-    $redir = new moodle_url('/mod/facetoface/attendees/view.php', array('s' => $seminarevent->get_id(), 'backtoallsessions' => 1,
-        'action' => $backtosession));
 } else {
-    $redir = new moodle_url('/course/view.php', array('id' => $course->id));
+    $redir = $allsessionsurl;
 }
 if (optional_param('cancel', false, PARAM_BOOL)) {
     redirect($redir);
@@ -96,7 +80,9 @@ if ($reserveinfo['allocate'] === false) { // Current user does not have permissi
     print_error('nopermissionreserve', 'mod_facetoface'); // Not allowed to reserve/allocate spaces.
 }
 
+$helper = new attendees_helper($seminarevent);
 $statuscodes = attendance_state::get_all_attendance_code_with([booked::class]);
+
 if ($seminarevent->is_sessions()) {
     $signupcount = $helper->count_attendees_with_codes($statuscodes);
 } else {

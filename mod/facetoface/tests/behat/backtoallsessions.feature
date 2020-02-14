@@ -227,12 +227,12 @@ Feature: Return to previous page after actions in seminar
     And I press "Cancel booking"
     Then I should see "Back to top"
 
-  Scenario: Seminar attendees back link return to original page - top level only
+  Scenario: Seminar attendees back link return to seminar page - top level only
     Given I am on "Course 1" course homepage
     When I click on the seminar event action "Attendees" in row "Booking open"
     And I click on "View all events" "link"
-    Then I should see "View all events"
-    And ".mod_facetoface__event-dashboard" "css_element" should not exist
+    Then I should not see "View all events"
+    And ".mod_facetoface__event-dashboard" "css_element" should exist
 
     Given I am on "Course 1" course homepage
     And I follow "View all events"
@@ -267,7 +267,7 @@ Feature: Return to previous page after actions in seminar
 
     # Event page -> Allocate spaces for team -> Go back -> Event page
     When I follow "Allocate spaces for team"
-    And I click on "Go back" "button"
+    And I click on "Go to event" "button"
     Then ".mod_facetoface__navigation" "css_element" should exist
 
     # Event page -> Allocate spaces for team -> View all events -> Event dashboard
@@ -291,7 +291,7 @@ Feature: Return to previous page after actions in seminar
 
     # Event page -> Reserve spaces for team -> Go back -> Event page
     When I follow "Reserve spaces for team"
-    And I click on "Go back" "button"
+    And I click on "Go to event" "button"
     Then ".mod_facetoface__navigation" "css_element" should exist
 
     # Event page -> Reserve spaces for team -> View all events -> Event dashboard
@@ -309,7 +309,7 @@ Feature: Return to previous page after actions in seminar
 
     # Event page -> Manage reservations -> Go back -> Event page
     When I follow "Manage reservations"
-    And I click on "Go back" "button"
+    And I click on "Go to event" "button"
     Then ".mod_facetoface__navigation" "css_element" should exist
 
     # Event page -> Manage reservations -> View all events -> Event dashboard
@@ -323,7 +323,7 @@ Feature: Return to previous page after actions in seminar
     When I follow "Manage reservations"
     And I click on "Delete" "link" in the "Teacher1" "table_row"
     And I press "Cancel"
-    And I click on "Go back" "button"
+    And I click on "Go to event" "button"
     Then ".mod_facetoface__navigation" "css_element" should exist
 
     # Event page -> Manage reservations -> Delete -> Cancel -> View all events -> Event dashboard

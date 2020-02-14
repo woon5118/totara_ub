@@ -695,7 +695,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
             $message->fullmessagehtml);
         $this->assertContains('Course:   Test course 1', $message->fullmessagehtml);
         $this->assertContains('Seminar:   facetoface', $message->fullmessagehtml);
-        $this->assertContains('Date(s) and location(s):', $message->fullmessagehtml);
+        $this->assertContains('Details:', $message->fullmessagehtml);
 
         // seminar event needs to be reloaded with info from DB
         $seminarevent = new seminar_event($seminarevent->get_id());

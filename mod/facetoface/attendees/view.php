@@ -42,8 +42,6 @@ $action            = optional_param('action', 'attendees', PARAM_ALPHA);
 $onlycontent       = optional_param('onlycontent', false, PARAM_BOOL);
 // Export download.
 $download = optional_param('download', '', PARAM_ALPHA);
-// Back to all sessions.
-$backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
 // Report support.
 $sid = optional_param('sid', '0', PARAM_INT);
 $debug = optional_param('debug', 0, PARAM_INT);
@@ -153,11 +151,7 @@ if ($seminarevent->is_sessions() && has_capability('mod/facetoface:exportsession
 }
 
 // Go back.
-if ($backtoallsessions) {
-    $url = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));
-} else {
-    $url = new moodle_url('/course/view.php', array('id' => $seminar->get_course()));
-}
+$url = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));
 $f2f_renderer = $PAGE->get_renderer('mod_facetoface');
 $f2f_renderer->setcontext($context);
 echo $f2f_renderer->render_action_bar_on_tabpage($url);

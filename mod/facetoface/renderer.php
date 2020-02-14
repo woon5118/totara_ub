@@ -560,7 +560,6 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                     array('id' => $reservation->bookedby)), $managername);
 
                 $deleteurl = new moodle_url('/mod/facetoface/reservations/delete.php', ['s' => $reservation->sessionid,
-                    'backtoallsessions' => (int)$backtoallsessions,
                     'backtoeventinfo' => (int)$backtoeventinfo,
                     'managerid' => $reservation->bookedby, 'sesskey' => sesskey()]);
                 $buttons = $this->action_icon($deleteurl, new pix_icon('t/delete', $strdelete));
@@ -998,7 +997,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             ->set_class('reservation');
 
         if ($goback_url !== null) {
-            $actionbar->add_commandlink('goback', $goback_url, get_string('goback', 'mod_facetoface'));
+            $actionbar->add_commandlink('goback', $goback_url, get_string('gotosession', 'mod_facetoface'));
         }
         if ($viewall_url) {
             $actionbar->add_commandlink('viewallsessions', $viewall_url, get_string('viewallsessions', 'mod_facetoface'));

@@ -29,7 +29,7 @@ $userid    = required_param('userid', PARAM_INT); // Facetoface cancellation use
 $sessionid = required_param('s', PARAM_INT); // Facetoface session ID.
 
 $url = new moodle_url('/mod/facetoface/attendees/edit_usercancellation_notes.php', array('userid' => $userid, 'sessionid' => $sessionid));
-$returnurlparams = array('s' => $sessionid, 'backtoallsessions' => 1);
+$returnurlparams = array('s' => $sessionid);
 $returnurl = new moodle_url('/mod/facetoface/attendees/cancellations.php', $returnurlparams);
 
 require_sesskey();

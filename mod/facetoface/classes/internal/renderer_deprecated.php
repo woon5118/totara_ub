@@ -822,7 +822,7 @@ trait mod_facetoface_renderer_deprecated {
 
         // Can view attendees.
         if ($viewattendees) {
-            $actionlinks .= html_writer::link(new moodle_url('/mod/facetoface/attendees/view.php', array('s' => $seminarevent->get_id(), 'backtoallsessions' => $bas)), s(get_string('attendees', 'mod_facetoface')), array('title' => get_string('seeattendees', 'mod_facetoface'), 'class' => 'mod_facetoface__sessionlist__action__link'));
+            $actionlinks .= html_writer::link(new moodle_url('/mod/facetoface/attendees/view.php', array('s' => $seminarevent->get_id())), s(get_string('attendees', 'mod_facetoface')), array('title' => get_string('seeattendees', 'mod_facetoface'), 'class' => 'mod_facetoface__sessionlist__action__link'));
         }
 
         if (!empty($reservelink)) {

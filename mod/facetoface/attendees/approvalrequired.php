@@ -45,8 +45,6 @@ $s = optional_param('s', 0, PARAM_INT);
 $action = optional_param('action', 'approvalrequired', PARAM_ALPHA);
 // If approval requests have been updated, show a success message.
 $approved = optional_param('approved', 0, PARAM_INT);
-// Back to all sessions.
-$backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
 
 // If there's no sessionid specified.
 if (!$s) {
@@ -308,12 +306,7 @@ echo html_writer::end_tag('form');
 // Hide "Go back" link for case if a user does not have any capabilities to see facetoface/course.
 $goback = !($approved == 1);
 if ($goback) {
-    // Go back.
-    if ($backtoallsessions) {
-        $url = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));
-    } else {
-        $url = new moodle_url('/course/view.php', array('id' => $seminar->get_course()));
-    }
+    $url = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));
     $f2f_renderer = $PAGE->get_renderer('mod_facetoface');
     $f2f_renderer->setcontext($context);
     echo $f2f_renderer->render_action_bar_on_tabpage($url);

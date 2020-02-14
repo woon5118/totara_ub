@@ -37,8 +37,6 @@ $s = optional_param('s', 0, PARAM_INT);
 // Action being performed, a proper default will be set shortly.
 // Require for attendees.js
 $action = optional_param('action', 'messageusers', PARAM_ALPHA);
-// Back to all sessions.
-$backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
 
 // If there's no sessionid specified.
 if (!$s) {
@@ -107,11 +105,7 @@ echo $OUTPUT->container_start('f2f-attendees-table');
 $mform->display();
 
 // Go back.
-if ($backtoallsessions) {
-    $url = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));
-} else {
-    $url = new moodle_url('/course/view.php', array('id' => $seminar->get_course()));
-}
+$url = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));
 $f2f_renderer = $PAGE->get_renderer('mod_facetoface');
 $f2f_renderer->setcontext($context);
 echo $f2f_renderer->render_action_bar_on_tabpage($url);

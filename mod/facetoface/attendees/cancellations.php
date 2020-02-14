@@ -34,8 +34,6 @@ $s = optional_param('s', 0, PARAM_INT);
 // Action being performed, a proper default will be set shortly.
 // Require for attendees.js
 $action = optional_param('action', 'cancellations', PARAM_ALPHA);
-// Back to all sessions.
-$backtoallsessions = optional_param('backtoallsessions', 1, PARAM_BOOL);
 $sid = optional_param('sid', '0', PARAM_INT);
 $debug = optional_param('debug', 0, PARAM_INT);
 
@@ -108,11 +106,7 @@ echo $reporthtml;
 attendees_helper::report_export_form($report, $sid);
 
 // Go back.
-if ($backtoallsessions) {
-    $url = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));
-} else {
-    $url = new moodle_url('/course/view.php', array('id' => $seminar->get_course()));
-}
+$url = new moodle_url('/mod/facetoface/view.php', array('f' => $seminar->get_id()));
 $f2f_renderer = $PAGE->get_renderer('mod_facetoface');
 $f2f_renderer->setcontext($context);
 echo $f2f_renderer->render_action_bar_on_tabpage($url);

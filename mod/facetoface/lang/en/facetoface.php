@@ -1332,9 +1332,9 @@ $string['uploadattendancestep'] = 'Upload event attendance and grades (step {$a}
 $string['uploadattendanceresults'] = 'Upload event attendance and grades results';
 $string['uploadattendancereview'] = 'Review and confirm changes ({$a} records)';
 $string['uploadcsvfile'] = 'Upload CSV file';
-$string['viewallassets'] = 'View all assets';
-$string['viewallfacilitators'] = 'View all facilitators';
-$string['viewallrooms'] = 'View all rooms';
+$string['viewallassets'] = 'Manage assets';
+$string['viewallfacilitators'] = 'Manage facilitators';
+$string['viewallrooms'] = 'Manage rooms';
 $string['viewfacilitator'] = 'View facilitator';
 $string['visible'] = 'Visible';
 $string['attendancetrackingheader'] = 'Attendance tracking and grading';
@@ -1491,7 +1491,7 @@ Participant:   [firstname] [lastname]
 Course:   [coursename]
 Seminar:   [seminarname]
 
-Date(s) and location(s):
+Details:
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
@@ -1525,7 +1525,7 @@ $string['setting:defaultcancelallreservationsmessagedefault_v9'] = 'This is to a
 
 Course:   [seminarname]
 
-Date(s) and location(s):
+Details:
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
@@ -1554,7 +1554,7 @@ $string['setting:defaultcancelreservationmessagedefault_v9'] = 'This is to advis
 
 Course:   [seminarname]
 
-Date(s) and location(s):
+Details:
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
@@ -1603,7 +1603,7 @@ Participant:   [firstname] [lastname]
 Course:   [coursename]
 Seminar:   [seminarname]
 
-Date(s) and location(s):
+Details:
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
@@ -1665,7 +1665,7 @@ Course:   [coursename]
 Seminar:   [seminarname]
 Cost:   [cost]
 
-Date(s) and location(s):
+Details:
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
@@ -1704,7 +1704,7 @@ Participant:   [firstname] [lastname]
 Course:   [coursename]
 Seminar:   [seminarname]
 
-Date(s) and location(s):
+Details:
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
@@ -1737,7 +1737,7 @@ Course: [coursename]
 
 Seminar: [seminarname]
 
-Date(s) and location(s):
+Details:
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
@@ -1773,7 +1773,7 @@ Course: [coursename]
 
 Face-to-face: [seminarname]
 
-Date(s) and location(s):
+Details:
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
@@ -1787,7 +1787,7 @@ Course: [coursename]
 
 Seminar: [seminarname]
 
-Date(s) and location(s):
+Details:
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
@@ -1849,7 +1849,7 @@ Course:   [coursename]
 Seminar:   [seminarname]
 Cost:   [cost]
 
-Date(s) and location(s):
+Details:
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
@@ -1925,7 +1925,7 @@ Course:   [coursename]
 Seminar:   [seminarname]
 Cost:   [cost]
 
-Date(s) and location(s):
+Details:
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
@@ -1977,7 +1977,7 @@ Course:   [coursename]
 Seminar:   [seminarname]
 Cost:   [cost]
 
-Date(s) and location(s):
+Details:
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
@@ -2028,7 +2028,7 @@ Course:   [coursename]
 Seminar:   [seminarname]
 Cost:   [cost]
 
-Date(s) and location(s):
+Details:
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
@@ -2065,7 +2065,7 @@ Participant:   [firstname] [lastname]
 Course:   [coursename]
 Seminar:   [seminarname]
 
-Date(s) and location(s):
+Details:
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
@@ -2108,7 +2108,7 @@ Participant:   [firstname] [lastname]
 Course:   [coursename]
 Seminar:   [seminarname]
 
-Date(s) and location(s):
+Details:
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
@@ -2147,7 +2147,7 @@ Participant:   [firstname] [lastname]
 Course:   [coursename]
 Seminar:   [seminarname]
 
-Date(s) and location(s):
+Details:
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
@@ -2169,7 +2169,7 @@ Seminar:   [seminarname]
 
 Capacity: [booked] / [capacity] (minimum: [mincapacity])
 
-Date(s) and location(s):
+Details:
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
@@ -2184,7 +2184,7 @@ $string['setting:defaultwaitlistautocleanmessagedefault'] = 'This is to advise y
 
 Course:   [seminarname]
 
-Date(s) and location(s):
+Details:
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
@@ -2262,7 +2262,7 @@ $string['setting:defaultsessioncancellationmessagedefault_v9'] = 'This is to adv
 Course:   [coursename]
 Seminar:   [seminarname]
 
-Date(s) and location(s):
+Details:
 [#sessions]
 [session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
 Duration: [session:duration]
