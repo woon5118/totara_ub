@@ -33,7 +33,7 @@
         <KEY NAME="comp_comfra_fk" TYPE="foreign" FIELDS="frameworkid" REFTABLE="comp_framework" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="comp_record" COMMENT="Track current proficiency of a user in each competency">
+    <TABLE NAME="comp_record" COMMENT="Deprecated since Totara 13, please do not use">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
@@ -65,7 +65,7 @@
         <INDEX NAME="compreco_rea_ix" UNIQUE="false" FIELDS="reaggregate"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="comp_record_history" COMMENT="Store changes to proficiency in comp_record.">
+    <TABLE NAME="comp_record_history" COMMENT="Deprecated since Totara 13, please do not use">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
@@ -106,7 +106,7 @@
         <INDEX NAME="compcrit_ite_ix" UNIQUE="false" FIELDS="itemtype"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="comp_criteria_record" COMMENT="Tracks historical progress towards a competency for each user">
+    <TABLE NAME="comp_criteria_record" COMMENT="Deprecated since Totara 13, please do not use">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>

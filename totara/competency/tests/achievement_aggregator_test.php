@@ -287,7 +287,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         // Hooks aren't triggered if the value isn't updated.
         $this->assertEquals(0, $sink->count());
 
-        // Check comp_record value. Just to make sure it hasn't been set to null or some such thing when the other
+        // Check achieved value. Just to make sure it hasn't been set to null or some such thing when the other
         // achievement was taken away.
         $comp_records = $DB->get_records('totara_competency_achievement');
         $this->assertCount(1, $comp_records);
@@ -531,7 +531,7 @@ class totara_competency_achievement_aggregator_testcase extends advanced_testcas
         $hook = reset($hooks);
         $this->assertInstanceOf(competency_achievement_updated_bulk::class, $hook);
 
-        // Follow-on scenario. One of the assignments is archived. The status on just that comp_record should reflect that.
+        // Follow-on scenario. One of the assignments is archived
 
         $disable_assignment_id = array_pop($assignmentids);
 

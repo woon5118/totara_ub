@@ -27,6 +27,7 @@
  */
 
 use core\entities\user;
+use totara_competency\entities\competency_achievement;
 use totara_core\advanced_feature;
 use totara_evidence\entities\evidence_item;
 use totara_evidence\models\helpers\evidence_item_capability_helper;
@@ -517,7 +518,13 @@ function dp_get_rol_tabs_visible($userid) {
         $visible[] = 'courses';
     }
 
-    $assigned_comps = $DB->count_records('comp_record', array('userid' => $userid));
+    $sql =
+        "SELECT COUNT(DISTINCT comp_id) as ncompetency
+           FROM {totara_competency_achievement}
+          WHERE user_id = :userid
+            AND status = :activestatus";
+    $params = ['userid' => $userid, 'activestatus' => competency_achievement::ACTIVE_ASSIGNMENT];
+    $assigned_comps = $DB->count_records_sql($sql, $params);
     if (advanced_feature::is_enabled('competencies') && ($assigned_comps > 0 || $show_competency_tab)) {
         $visible[] = 'competencies';
     }

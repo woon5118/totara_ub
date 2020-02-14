@@ -3,6 +3,14 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* hierarchy_competency\userdata\competency_evidence class has been deprecated, please use totara_competency\userdata\achievement instead.
+* hierarchy_competency\userdata\competency_progress class has been deprecated, please use totara_competency\userdata\achievement instead.
+* Deprecated the use of the following tables:
+  * comp_record. Information on the user's latest achievement in a specific competency is now stored in totara_competency_achievement.
+    Query with status = 0 to find current achievement value.
+  * comp_record_history. Information on a user's previous achievements in a specific competency is also stored in totara_competency_achievement.
+    Query with status <> 0 to find previous achievements.
+  * comp_criteria_record. Information on a user's completion of courses (evidence) linked to a competency is now stored in totara_criteria_item_record.
 * Added minproficiencyid field to the comp_scale table. This should be relied on over the proficient field in the
   comp_scale_values table when determining if a value should be considered proficient.
 * totara_competency_scale_proficient_not_in_order has been deprecated. There should always be a minimum proficient id according to the scale.
@@ -21,6 +29,7 @@ information provided here is intended especially for developers.
   * hierarchy::output_delete_message() and overrides
   Please use hierarchy::delete_item_confirmation_modal(), hierarchy::delete_bulk_confirmation_modal()
   or hierarchy::get_all_related_data() instead of hierarchy::get_item_stats().
+
 === 12.0 ===
 
 * Removed deprecated methods:

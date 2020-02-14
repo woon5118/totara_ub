@@ -23,6 +23,8 @@
  * @subpackage plan
  */
 
+use totara_competency\entities\competency_achievement as competency_achievement_entity;
+
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/evidence/lib.php');
 require_once($CFG->dirroot.'/totara/plan/component.class.php');
@@ -116,16 +118,22 @@ class dp_competency_component extends dp_base_component {
             $status = "LEFT JOIN {comp_scale_values} csv ON a.scalevalueid = csv.id ";
         } else {
             // Use the 'live' status value
+            // TL-22134: There is an achievement record per competency assignment,
+            //           For now all will have the same achieved value
+            //           When implementing criteria per assignment in future we will need to decide what to do here
             $status = "
-                LEFT JOIN
-                    {comp_record} cr
-                 ON a.competencyid = cr.competencyid
-                AND cr.userid = :planuserid
+                LEFT JOIN (
+                    SELECT DISTINCT user_id, comp_id, scale_value_id
+                      FROM {totara_competency_achievement}
+                     WHERE status = :activeachievement) cr
+                 ON a.competencyid = cr.comp_id
+                AND cr.user_id = :planuserid
                 LEFT JOIN
                     {comp_scale_values} csv
-                 ON cr.proficiency = csv.id
+                 ON cr.scale_value_id = csv.id
                  ";
             $params['planuserid'] = $this->plan->userid;
+            $params['activeachievement'] = competency_achievement_entity::ACTIVE_ASSIGNMENT;
 
             // We also will be checking for a value set for this plan only.
             $status .= "
@@ -252,15 +260,22 @@ class dp_competency_component extends dp_base_component {
             $status = "LEFT JOIN {comp_scale_values} csv ON a.scalevalueid = csv.id ";
         } else {
             // Use the 'live' status value.
+            // TL-22134: There is an achievement record per competency assignment,
+            //           For now all will have the same achieved value
+            //           When implementing criteria per assignment in future we will need to decide what to do here
             $status = "
-                LEFT JOIN
-                    {comp_record} cr
-                 ON a.competencyid = cr.competencyid
-                AND cr.userid = :planuserid
+                LEFT JOIN (
+                    SELECT DISTINCT user_id, comp_id, scale_value_id
+                      FROM {totara_competency_achievement}
+                     WHERE status = :activeachievement) cr
+                 ON a.competencyid = cr.comp_id
+                AND cr.user_id = :planuserid
                 LEFT JOIN
                     {comp_scale_values} csv
-                 ON cr.proficiency = csv.id";
+                 ON cr.scale_value_id = csv.id
+                 ";
             $params['planuserid'] = $this->plan->userid;
+            $params['activeachievement'] = competency_achievement_entity::ACTIVE_ASSIGNMENT;
         }
 
         $sql = "FROM
@@ -395,7 +410,7 @@ class dp_competency_component extends dp_base_component {
             $PAGE->requires->string_for_js('continue', 'moodle');
             $PAGE->requires->string_for_js('addcompetencys', 'totara_plan');
             $PAGE->requires->string_for_js('error:nocompetency', 'totara_program');
-            
+
             $jsparams = [$this->plan->id, $paginated, $component_name];
             $PAGE->requires->js_call_amd('totara_plan/components_competency_find', 'init', $jsparams);
         }
@@ -634,10 +649,17 @@ class dp_competency_component extends dp_base_component {
             $from .= "LEFT JOIN {comp_scale_values} csv ON ca.scalevalueid = csv.id ";
         } else {
             // Use the 'live' status value
-            $from .= "LEFT JOIN {comp_record} cr
-                             ON ca.competencyid = cr.competencyid AND cr.userid = ?
+            // TL-22134: There is an achievement record per competency assignment,
+            //           For now all will have the same achieved value
+            //           When implementing criteria per assignment in future we will need to decide what to do here
+            $from .= "LEFT JOIN (
+                        SELECT DISTINCT user_id, comp_id, scale_value_id
+                          FROM {totara_competency_achievement}
+                         WHERE status = ?) cr
+                             ON ca.competencyid = cr.comp_id AND cr.user_id = ?
                       LEFT JOIN {comp_scale_values} csv
                              ON cr.proficiency = csv.id ";
+            $params[] = competency_achievement_entity::ACTIVE_ASSIGNMENT;
             $params[] = $this->plan->userid;
         }
         $from .= "LEFT JOIN {dp_priority_scale_value} psv
@@ -1182,7 +1204,7 @@ class dp_competency_component extends dp_base_component {
         $record->scale_value_id = $scale_value_id;
         $record->date_assigned = time();
 
-        // Below are details that learning plans used to save directly to the comp_record table.
+        // Below are details that learning plans used to save a value directly.
         $record->positionid = $details->positionid ?? null;
         $record->organisationid = $details->organisationid ?? null;
         $record->assessorid = $details->assessorid ?? null;
@@ -1716,6 +1738,8 @@ class dp_competency_component extends dp_base_component {
     public function get_status($compid) {
         global $DB;
 
+        $params = [];
+
         $sql = "SELECT csv.name
             FROM {dp_plan_competency_assign} ca ";
 
@@ -1724,19 +1748,29 @@ class dp_competency_component extends dp_base_component {
             $sql .= "LEFT JOIN {comp_scale_values} csv ON ca.scalevalueid = csv.id ";
         } else {
             // Use the 'live' status value
+            // TL-22134: There is an achievement record per competency assignment,
+            //           For now all will have the same achieved value
+            //           When implementing criteria per assignment in future we will need to decide what to do here
             $sql .= "
-                LEFT JOIN
-                    {comp_record} cr
-                 ON ca.competencyid = cr.competencyid
-                AND cr.userid = ?
+                LEFT JOIN (
+                    SELECT DISTINCT user_id, comp_id, scale_value_id
+                      FROM {totara_competency_achievement}
+                     WHERE status = ?) cr
+                 ON ca.competencyid = cr.comp_id
+                AND cr.user_id = ?
                 LEFT JOIN
                     {comp_scale_values} csv
-                 ON cr.proficiency = csv.id ";
+                 ON cr.scale_value_id = csv.id
+                 ";
+
+            $params[] = competency_achievement_entity::ACTIVE_ASSIGNMENT;
         }
 
         $sql .= "WHERE ca.competencyid = ? AND ca.planid = ?";
 
-        return $DB->get_field_sql($sql, array($this->plan->userid, $compid, $this->plan->id));
+        array_push($params, $this->plan->userid, $compid, $this->plan->id);
+
+        return $DB->get_field_sql($sql, $params);
     }
 
 

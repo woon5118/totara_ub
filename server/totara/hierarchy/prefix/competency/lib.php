@@ -31,6 +31,7 @@
 
 use core\orm\query\builder;
 use hierarchy_competency\event\competency_updated;
+use totara_competency\entities\competency_achievement as competency_achievement_entity;
 use totara_competency\pathway;
 use totara_core\advanced_feature;
 
@@ -776,27 +777,25 @@ class competency extends hierarchy {
     }
 
     /**
-     * Returns an array of competency ids that have completed by the specified user
+     * Returns an array of competency ids that have been completed by the specified user
      * @param int $userid user to get competencies for
      * @return array list of ids of completed competencies
      */
     static function get_user_completed_competencies($userid) {
         global $DB;
 
-        $proficient_values = self::get_all_proficient_scale_values();
-
-        if (empty($proficient_values)) {
-            return array();
-        }
-
-        list($in_sql, $in_params) = $DB->get_in_or_equal(array_keys($proficient_values));
-
+        // We store achievements per assignment - need DISTINCT
         return $DB->get_fieldset_sql(
-            "SELECT competencyid
-                 FROM {comp_record}
-                 WHERE userid = ?
-                 AND proficiency " . $in_sql,
-            array_merge(array($userid), $in_params)
+            "SELECT DISTINCT comp_id
+                 FROM {totara_competency_achievement}
+                 WHERE user_id = :userid
+                   AND status = :status
+                   AND proficient = :proficient",
+            [
+                'userid' => $userid,
+                'status' => competency_achievement_entity::ACTIVE_ASSIGNMENT,
+                'proficient' => 1
+            ]
         );
     }
 
@@ -997,11 +996,14 @@ class competency extends hierarchy {
         if (!empty($children)) {
             $ids = array_keys($children);
 
-            [$idssql, $idsparams] = sql_sequence('competencyid', $ids);
-            // number of comp_record records
-            $data['user_achievement'] = $DB->count_records_select('comp_record', $idssql, $idsparams);
+            // number of achievement records
+            $data['user_achievement'] = competency_achievement_entity::repository()
+                ->where('comp_id', $ids)
+                ->where('status', competency_achievement_entity::ACTIVE_ASSIGNMENT)
+                ->count();
 
             // number of comp_criteria records
+            [$idssql, $idsparams] = sql_sequence('competencyid', $ids);
             $data['evidence'] = $DB->count_records_select('comp_criteria', $idssql, $idsparams);
 
             // Count competency assignments
@@ -1045,12 +1047,14 @@ class competency extends hierarchy {
 
         $ids = array_keys($children);
 
-        [$ids_sql, $ids_params] = sql_sequence('competencyid', $ids);
-
         // It's not really called user achievement anywhere.
-        $data['user_achievement'] = $DB->count_records_select('comp_record', $ids_sql, $ids_params);
+        $data['user_achievement'] = competency_achievement_entity::repository()
+            ->where('comp_id', $ids)
+            ->where('status', competency_achievement_entity::ACTIVE_ASSIGNMENT)
+            ->count();
 
         // Number of comp_criteria records.
+        [$ids_sql, $ids_params] = sql_sequence('competencyid', $ids);
         $data['evidence'] = $DB->count_records_select('comp_criteria', $ids_sql, $ids_params);
 
         // Number of comp_relations records.

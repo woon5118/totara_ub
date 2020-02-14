@@ -37,9 +37,9 @@ class rb_source_comp_status_history extends rb_base_source {
         $this->globalrestrictionset = $globalrestrictionset;
 
         // Apply global user restrictions.
-        $this->add_global_report_restriction_join('base', 'userid');
+        $this->add_global_report_restriction_join('base', 'user_id');
 
-        $this->base = '{comp_record_history}';
+        $this->base = '{totara_competency_achievement}';
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();
@@ -72,41 +72,20 @@ class rb_source_comp_status_history extends rb_base_source {
                 'competency',
                 'LEFT',
                 '{comp}',
-                'competency.id = base.competencyid',
+                'competency.id = base.comp_id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
                 'scalevalue',
                 'LEFT',
                 '{comp_scale_values}',
-                'scalevalue.id = base.proficiency',
+                'scalevalue.id = base.scale_value_id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
-            new rb_join(
-                'usermodified',
-                'LEFT',
-                '{user}',
-                'usermodified.id = base.usermodified',
-                REPORT_BUILDER_RELATION_ONE_TO_ONE
-            ),
-            new rb_join(
-                'completion_organisation',
-                'LEFT',
-                '{org}',
-                'completion_organisation.id = user.organisationid', // TODO - remove this.
-                REPORT_BUILDER_RELATION_ONE_TO_ONE
-            ),
-            new rb_join(
-                'completion_position',
-                'LEFT',
-                '{pos}',
-                'completion_position.id = user.positionid', // TODO - remove this.
-                REPORT_BUILDER_RELATION_ONE_TO_ONE
-            )
         );
 
-        $this->add_core_user_tables($joinlist, 'base', 'userid');
-        $this->add_totara_job_tables($joinlist, 'base', 'userid');
+        $this->add_core_user_tables($joinlist, 'base', 'user_id');
+        $this->add_totara_job_tables($joinlist, 'base', 'user_id');
 
         return $joinlist;
     }
@@ -114,22 +93,19 @@ class rb_source_comp_status_history extends rb_base_source {
     protected function define_columnoptions() {
         global $DB;
 
-        $usednamefields = totara_get_all_user_name_fields_join('usermodified', null, true);
-        $allnamefields = totara_get_all_user_name_fields_join('usermodified');
-
         $columnoptions = array(
             new rb_column_option(
                 'competency',
                 'competencyid',
                 get_string('compidcolumn', 'rb_source_comp_status_history'),
-                'base.competencyid',
+                'base.comp_id',
                 array('selectable' => false)
             ),
             new rb_column_option(
                 'history',
-                'scalevalueid',
+                'scalevalue_id',
                 get_string('compscalevalueidcolumn', 'rb_source_comp_status_history'),
-                'base.proficiency',
+                'base.scale_value_id',
                 array('selectable' => false)
             ),
             new rb_column_option(
@@ -156,32 +132,21 @@ class rb_source_comp_status_history extends rb_base_source {
             ),
             new rb_column_option(
                 'history',
+                'scalevaluedate',
+                get_string('scalevaluedatecolumn', 'rb_source_comp_status_history'),
+                'base.time_scale_value',
+                array(
+                    'defaultheading' => get_string('scalevaluedateheading', 'rb_source_comp_status_history'),
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp')
+            ),
+            new rb_column_option(
+                'history',
                 'proficientdate',
                 get_string('proficientdate', 'rb_source_competency_evidence'),
-                'base.timeproficient',
+                'base.time_proficient',
                 array('displayfunc' => 'nice_date', 'dbdatatype' => 'timestamp')
             ),
-            new rb_column_option(
-                'history',
-                'timemodified',
-                get_string('comptimemodifiedcolumn', 'rb_source_comp_status_history'),
-                'base.timemodified',
-                array('defaultheading' => get_string('comptimemodifiedheading', 'rb_source_comp_status_history'),
-                      'displayfunc' => 'nice_datetime',
-                      'dbdatatype' => 'timestamp')
-            ),
-            new rb_column_option(
-                'history',
-                'usermodifiednamelink',
-                get_string('compusermodifiedcolumn', 'rb_source_comp_status_history'),
-                $DB->sql_concat_join("' '", $usednamefields),
-                array('defaultheading' => get_string('compusermodifiedheading', 'rb_source_comp_status_history'),
-                      'joins' => 'usermodified',
-                      'displayfunc' => 'user_link',
-                      'extrafields' => array_merge(array('id' => 'usermodified.id', 'deleted' => 'usermodified.deleted'),
-                                                   $allnamefields)
-                )
-            )
         );
 
         $this->add_core_user_columns($columnoptions);
@@ -203,10 +168,10 @@ class rb_source_comp_status_history extends rb_base_source {
             ),
             new rb_filter_option(
                 'history',
-                'timemodified',
-                get_string('comptimemodifiedcolumn', 'rb_source_comp_status_history'),
+                'scalevaluedate',
+                get_string('scalevaluedateheading', 'rb_source_comp_status_history'),
                 'date',
-                array('includetime' => true)
+                array()
             ),
             new rb_filter_option(
                 'history',
@@ -219,7 +184,7 @@ class rb_source_comp_status_history extends rb_base_source {
         );
 
         $this->add_core_user_filters($filteroptions);
-        $this->add_totara_job_filters($filteroptions, 'base', 'userid');
+        $this->add_totara_job_filters($filteroptions, 'base', 'user_id');
 
         return $filteroptions;
     }
@@ -231,19 +196,6 @@ class rb_source_comp_status_history extends rb_base_source {
         // Add the manager/position/organisation content options.
         $this->add_basic_user_content_options($contentoptions);
 
-        $contentoptions[] = new rb_content_option(
-            'completed_org',
-            get_string('completedorg', 'rb_source_competency_evidence'),
-            'completion_organisation.path',
-            'completion_organisation'
-        );
-
-        $contentoptions[] = new rb_content_option(
-            'date',
-            get_string('completiondate', 'rb_source_competency_evidence'),
-            'base.timemodified'
-        );
-
         return $contentoptions;
     }
 
@@ -251,11 +203,11 @@ class rb_source_comp_status_history extends rb_base_source {
         $paramoptions = array(
             new rb_param_option(
                 'userid',
-                'base.userid'
+                'base.user_id'
             ),
             new rb_param_option(
                 'competencyid',
-                'base.competencyid'
+                'base.comp_id'
             ),
         );
 
@@ -278,15 +230,31 @@ class rb_source_comp_status_history extends rb_base_source {
             ),
             array(
                 'type' => 'history',
-                'value' => 'timemodified'
+                'value' => 'scalevaluedate'
             ),
-            array(
-                'type' => 'history',
-                'value' => 'usermodifiednamelink'
-            )
         );
         return $defaultcolumns;
     }
 
+    /**
+     * Returns expected result for column_test.
+     *
+     * @codeCoverageIgnore
+     * @param rb_column_option $columnoption
+     * @return int
+     */
+    public function phpunit_column_test_expected_count($columnoption) {
+        if (!PHPUNIT_TEST) {
+            throw new coding_exception('phpunit_column_test_expected_count() cannot be used outside of unit tests');
+        }
+
+        // TODO: This needs to be fixed during implementation of TL_19974
+        //       The problem is that during testing of the other reports users are assigned to competencies
+        //       This results in additional records in totara_competency_achievements - the number can not be predicted.
+        //       Therefore retrieving the number here
+
+        global $DB;
+        return $DB->count_records('totara_competency_achievement');
+    }
 
 }

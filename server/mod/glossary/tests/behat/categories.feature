@@ -55,6 +55,7 @@ Feature: Glossary entries can be organised in categories
     And I press "Save changes"
     And I should see "Category3"
     And I should not see "Category2"
+    And
     And I click on "Delete" "link" in the "Category3" "table_row"
     And I press "No"
     And I should see "Category3"

@@ -517,7 +517,6 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $comprecord->timemodified = 1100775600;
         $comprecord->reaggregate = 0;
         $comprecord->manual = 1;
-        $comprecord->id = $DB->insert_record('comp_record', $comprecord);
 
         \totara_job\job_assignment::create_default($user->id, array('organisationid' => 1, 'positionid' => 1));
 

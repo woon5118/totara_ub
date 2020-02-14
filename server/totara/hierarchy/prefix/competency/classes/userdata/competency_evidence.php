@@ -27,11 +27,19 @@ use totara_userdata\userdata\export;
 use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;
 
+
 /**
  * Class competency_evidence
  * handles the data for the progress the user has made on a competency
+ * @deprecated since Totara 13
  */
 class competency_evidence extends item {
+
+    // To allow the userdata unit tests to succeed, we can't output the deprecation message at the top if as all userdata
+    // class files are imported during the tests.
+    private static function is_deprecated() {
+        debugging('hierarchy_competency\userdata\competency_evidence has been deprecated, please use totara_competency\userdata\achievement instead.', DEBUG_DEVELOPER);
+    }
 
     /**
      * Get main Frankenstyle component name (core subsystem or plugin).
@@ -57,7 +65,8 @@ class competency_evidence extends item {
      * @return bool
      */
     public static function is_purgeable(int $userstatus) {
-        return true;
+        // This is now replaced by totara_competency\userdata\achievement
+        return false;
     }
 
     /**
@@ -72,6 +81,8 @@ class competency_evidence extends item {
      */
     protected static function purge(target_user $user, \context $context) {
         global $DB;
+
+        static::is_deprecated();
         $DB->delete_records('comp_record_history', ['userid' => $user->id]);
         $DB->delete_records('comp_record', ['userid' => $user->id]);
         $DB->delete_records('block_totara_stats', [
@@ -87,7 +98,9 @@ class competency_evidence extends item {
      * @return bool
      */
     public static function is_exportable() {
-        return true;
+
+        // This is now replaced by totara_competency\userdata\achievement
+        return false;
     }
 
     /**
@@ -99,6 +112,9 @@ class competency_evidence extends item {
      */
     protected static function export(target_user $user, \context $context) {
         global $DB;
+
+        static::is_deprecated();
+
         $export = new export();
         $export->data = $DB->get_records('comp_record', ['userid' => $user->id]);
         foreach ($export->data as &$record) {
@@ -118,7 +134,7 @@ class competency_evidence extends item {
      * @return bool
      */
     public static function is_countable() {
-        return true;
+        return false;
     }
 
     /**
@@ -130,6 +146,8 @@ class competency_evidence extends item {
      */
     protected static function count(target_user $user, \context $context) {
         global $DB;
+
+        static::is_deprecated();
         return $DB->count_records('comp_record', ['userid' => $user->id]);
     }
 }

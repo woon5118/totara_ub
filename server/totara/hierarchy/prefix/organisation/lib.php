@@ -106,7 +106,7 @@ class organisation extends hierarchy {
             return false;
         }
 
-
+        // TODO: Not using the comp_record table anymore. Leaving it in for v1 as it will not have any adverse effect
         // nullify all references to these organisations in comp_record table
         $prefix = hierarchy::get_short_prefix('competency');
 

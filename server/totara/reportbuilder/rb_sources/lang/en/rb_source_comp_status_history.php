@@ -37,6 +37,9 @@ $string['comptimemodifiedcolumn'] = 'User\'s Status Time Modified';
 $string['comptimemodifiedheading'] = 'Time modified';
 $string['compusermodifiedcolumn'] = 'User\'s Status Modifed By User';
 $string['compusermodifiedheading'] = 'Modifed by';
+$string['scalevaluedatecolumn'] = 'Time when user achieved the value';
+$string['scalevaluedateheading'] = 'Time Achieved';
+$string['scalevaluedateheading'] = 'Time Achieved';
 
 
 // Embedded column headings.
@@ -45,6 +48,10 @@ $string['embeddedscalevalueheading'] = 'Status';
 $string['embeddedtimemodifiedheading'] = 'Time modified';
 $string['embeddedusermodifiedheading'] = 'User modified';
 $string['embeddedusernameheading'] = 'Name';
+$string['embeddedsheading'] = 'Time modified';
+$string['embeddedusermodifiedheading'] = 'User modified';
+$string['embeddedscalevaluedateheading'] = 'Time achieved';
+$string['embeddedproficientdateheading'] = 'Time proficient';
 
 
 // Column types for this source, as strings.

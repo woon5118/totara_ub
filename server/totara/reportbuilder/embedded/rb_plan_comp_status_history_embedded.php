@@ -96,13 +96,13 @@ class rb_plan_comp_status_history_embedded extends rb_base_embedded {
             ),
             array(
                 'type' => 'history',
-                'value' => 'timemodified',
-                'heading' => get_string('embeddedtimemodifiedheading', 'rb_source_comp_status_history')
+                'value' => 'scalevaluedate',
+                'heading' => get_string('embeddedscalevaluedateheading', 'rb_source_comp_status_history')
             ),
             array(
                 'type' => 'history',
-                'value' => 'usermodifiednamelink',
-                'heading' => get_string('embeddedusermodifiedheading', 'rb_source_comp_status_history')
+                'value' => 'proficientdate',
+                'heading' => get_string('embeddedproficientdateheading', 'rb_source_comp_status_history')
             )
         );
 
@@ -113,7 +113,7 @@ class rb_plan_comp_status_history_embedded extends rb_base_embedded {
         $filters = array(
             array(
                 'type' => 'history',
-                'value' => 'timemodified',
+                'value' => 'scalevaluedate',
                 'advanced' => 0
             )
         );

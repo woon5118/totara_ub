@@ -32,8 +32,15 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Handler for the tracking of a user's progress towards achieving a competency.
+ * @deprecated since Totara 13
  */
 class competency_progress extends item {
+
+    // To allow the userdata unit tests to succeed, we can't output the deprecation message at the top if as all userdata
+    // class files are imported during the tests.
+    private static function is_deprecated() {
+        debugging('hierarchy_competency\userdata\competency_evidence has been deprecated, please use totara_competency\userdata\achievement instead.', DEBUG_DEVELOPER);
+    }
 
     /**
      * Get main Frankenstyle component name (core subsystem or plugin).
@@ -56,7 +63,7 @@ class competency_progress extends item {
      * {@inheritDoc}
      */
     public static function is_purgeable(int $userstatus) {
-        return true;
+        return false;
     }
 
 
@@ -66,6 +73,7 @@ class competency_progress extends item {
     protected static function purge(target_user $user, \context $unused) {
         global $DB;
 
+        static::is_deprecated();
         $params = ['userid' => $user->get_user_record()->id];
         $DB->delete_records('comp_criteria_record', $params);
 
@@ -77,7 +85,7 @@ class competency_progress extends item {
      * {@inheritDoc}
      */
     public static function is_exportable() {
-        return true;
+        return false;
     }
 
 
@@ -86,6 +94,8 @@ class competency_progress extends item {
      */
     protected static function export(target_user $user, \context $context) {
         global $DB;
+
+        static::is_deprecated();
         $params = ['userid' => $user->get_user_record()->id];
         $filter = "
             SELECT c.shortname, cc.itemtype, ccr.timecreated
@@ -112,7 +122,7 @@ class competency_progress extends item {
      * {@inheritDoc}
      */
     public static function is_countable() {
-        return true;
+        return false;
     }
 
 
@@ -122,6 +132,7 @@ class competency_progress extends item {
     protected static function count(target_user $user, \context $context) {
         global $DB;
 
+        static::is_deprecated();
         $params = ['userid' => $user->get_user_record()->id];
         return $DB->count_records('comp_criteria_record', $params);
     }

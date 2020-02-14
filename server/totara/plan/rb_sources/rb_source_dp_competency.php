@@ -1,4 +1,4 @@
-<?php
+f<?php
 /*
  * This file is part of Totara LMS
  *
@@ -22,6 +22,7 @@
  * @subpackage reportbuilder
  */
 
+use totara_competency\entities\competency_achievement;
 use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
@@ -61,14 +62,14 @@ class rb_source_dp_competency extends rb_base_source {
         $global_restriction_join_cr = $this->get_global_report_restriction_join('cr', 'userid');
         $global_restriction_join_p1 = $this->get_global_report_restriction_join('p1', 'userid');
 
-        $crjoin = $DB->sql_concat_join("','", array($DB->sql_cast_2char('cr.userid'), $DB->sql_cast_2char('cr.competencyid')));
+        $tcajoin = $DB->sql_concat_join("','", array($DB->sql_cast_2char('tca.user_id'), $DB->sql_cast_2char('tca.comp_id')));
         $pjoin  = $DB->sql_concat_join("','", array($DB->sql_cast_2char('p1.userid'), $DB->sql_cast_2char('pca1.competencyid')));
 
         $this->base = "(
-            SELECT DISTINCT {$crjoin} AS id, cr.userid AS userid, cr.competencyid AS competencyid
-            FROM {comp_record} cr
+            SELECT DISTINCT {$tcajoin} AS id, tca.user_id AS userid, tca.comp_id AS competencyid
+            FROM {totara_competency_achievement} tca
             {$global_restriction_join_cr}
-            WHERE cr.proficiency IS NOT NULL
+            WHERE tca.scale_value_id IS NOT NULL
             UNION
                 SELECT DISTINCT {$pjoin} AS id, p1.userid AS userid, pca1.competencyid AS competencyid
                 FROM {dp_plan_competency_assign} pca1
@@ -200,21 +201,22 @@ from
         );
 
         $joinlist[] = new rb_join(
-                'comp_record',
+                'achievement',
                 'LEFT',
-                '{comp_record}',
-                '(base.competencyid = comp_record.competencyid
-                  AND comp_record.userid = base.userid)',
-                  REPORT_BUILDER_RELATION_ONE_TO_ONE
+                '{totara_competency_achievement}',
+                '(base.competencyid = achievement.comp_id
+                  AND achievement.user_id = base.userid
+                  AND achievement.status = ' . competency_achievement::ACTIVE_ASSIGNMENT . ')',
+                  REPORT_BUILDER_RELATION_MANY_TO_ONE
         );
 
         $joinlist[] = new rb_join(
                 'evidence_scale_value',
                 'LEFT',
                 '{comp_scale_values}',
-                'comp_record.proficiency = evidence_scale_value.id',
+                'achievement.scale_value_id = evidence_scale_value.id',
                 REPORT_BUILDER_RELATION_MANY_TO_ONE,
-                'comp_record'
+                'achievement'
         );
 
         $joinlist[] = new rb_join(
@@ -828,4 +830,26 @@ from
     public static function is_source_ignored() {
         return (!advanced_feature::is_enabled('recordoflearning') or !advanced_feature::is_enabled('competencies'));
     }
+
+    /**
+     * Returns expected result for column_test.
+     *
+     * @codeCoverageIgnore
+     * @param rb_column_option $columnoption
+     * @return int
+     */
+    public function phpunit_column_test_expected_count($columnoption) {
+        if (!PHPUNIT_TEST) {
+            throw new coding_exception('phpunit_column_test_expected_count() cannot be used outside of unit tests');
+        }
+
+        // TODO: This needs to be fixed during implementation of TL_19974
+        //       The problem is that during testing of the other reports users are assigned to competencies
+        //       This results in additional records in totara_competency_achievements - the number can not be predicted.
+        //       Therefore retrieving the number here
+
+        global $DB;
+        return $DB->count_records('totara_competency_achievement');
+    }
+
 }

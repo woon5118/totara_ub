@@ -521,10 +521,6 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         'id' => 1, 'courseid' => 1, 'userid' => 1, 'timecompleted' => 1332153671, 'grade' => 1,
     );
 
-    protected $comp_record_history_data = array(
-        'id' => 1, 'userid' => 1, 'competencyid' => 1, 'proficiency' => 1, 'timemodified' => 1332153671, 'usermodified' => 2,
-    );
-
     protected $filler_data = array(
         'id' => 1, 'courseid' => 1, 'programid' => 1, 'competencyid' => 1, 'templateid' => 1, 'enabled' => 1,
         'sortorder' => 1, 'manualcomplete' => 1, 'component' => 'program', 'enrol' => 'cohort', 'customint1' => 1,
@@ -576,6 +572,17 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         'master' => 'totara', 'local' => 'Totara', 'timecustomized' => 1416859984, 'timemodified' => 1416859984);
 
     protected $tool_customlang_components_data = array('id' => 1, 'name' => 'totara', 'version' => '1985031400');
+
+    protected $totara_competency_assignments_data = array(
+        'id' => 1, 'type' => 'system', 'competency_id' => 1, 'user_group_type' => 'user', 'user_group_id' => 2, 'optional' => 0,
+        'status' => 0, 'created_by' => 2, 'created_at' => 1332153671, 'updated_at' => 1332153671, 'expand' => 0,
+    );
+
+    protected $totara_competency_achievement_data = array(
+        'id' => 1, 'user_id' => 2, 'comp_id' => 1, 'assignment_id' => 1, 'scale_value_id' => 1, 'proficient' => 0, 'status' => 0,
+        'time_created' =>  1332153671, 'time_status' => 1332153671,
+    );
+
 
     // NOTE: Do not add more data above - you can now avoid core changes by defining the
     // {@link phpunit_column_test_add_data()} method in your source instead.
@@ -688,7 +695,6 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         $this->certif_completion_data = null;
         $this->certif_completion_history_data = null;
         $this->course_completion_history_data = null;
-        $this->comp_record_history_data = null;
         $this->filler_data = null;
         $this->dummy_data = null;
         $this->badges_issued = null;
@@ -701,6 +707,8 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         $this->totara_connect_clients_data = null;
         $this->tool_customlang_data = null;
         $this->tool_customlang_components_data = null;
+        $this->totara_competency_assignments_data = null;
+        $this->totara_competency_achievement_data = null;
         parent::tearDown();
     }
 
@@ -737,7 +745,6 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             'comp_type_info_field' => array($this->type_field_data),
             'comp_type_info_data' => array($this->type_data_data),
             'comp_record' => array($this->dummy_data),
-            'comp_record_history' => array($this->comp_record_history_data),
             'comp_criteria' => array($this->dummy_data),
             'comp_criteria_record' => array($this->dummy_data),
             'comp_template' => array($this->dummy_data),
@@ -826,6 +833,8 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             'totara_connect_clients' => array($this->totara_connect_clients_data),
             'tool_customlang' => array($this->tool_customlang_data),
             'tool_customlang_components' => array($this->tool_customlang_components_data),
+            'totara_competency_assignments' => array($this->totara_competency_assignments_data),
+            'totara_competency_achievement' => array($this->totara_competency_achievement_data),
         )));
     }
 

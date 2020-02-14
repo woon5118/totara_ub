@@ -262,9 +262,7 @@ class totara_hierarchy_lib_testcase extends advanced_testcase {
         $this->competency_data->iteminstance = 1;
         $this->competency_data->usermodified = $userid;
         $this->competency_data->itemid = 1;
-        $this->competency_data->comprecordid = $DB->insert_record('comp_record', $this->competency_data);
         $this->competency_data->compcriteriaid = $DB->insert_record('comp_criteria', $this->competency_data);
-        $this->competency_data->compcriteriarecordid = $DB->insert_record('comp_criteria_record', $this->competency_data);
 
         //set up a competency template
         $this->template_data = new stdClass();

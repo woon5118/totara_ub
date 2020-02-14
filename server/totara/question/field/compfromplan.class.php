@@ -87,17 +87,24 @@ class question_compfromplan extends reviewrating {
     protected function add_rating_selector(MoodleQuickForm $form, $item) {
         global $DB;
 
-        // Get the scale value id (field "proficiency" in comp_record).
+        // Get the scale value id.
         $compassign = $DB->get_record('dp_plan_competency_assign', array('id' => $item->itemid));
         if (empty($compassign)) {
             return;
         }
 
-        $comprecord = $DB->get_record('comp_record',
-                array('userid' => $this->subjectid, 'competencyid' => $compassign->competencyid));
+        // At the moment the same value is stored for all assignements
+        $comprecord = $DB->get_record('totara_competency_achievement',
+                [
+                    'userid' => $this->subjectid,
+                    'comp_id' => $compassign->competencyid,
+                    'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                ],
+                IGNORE_MULTIPLE
+        );
 
-        if (isset($comprecord) && isset($comprecord->proficiency) && $comprecord->proficiency > 0) {
-            $scalevalueid = $comprecord->proficiency;
+        if (isset($comprecord) && isset($comprecord->scale_value_id) && !is_null($comprecord->scale_value_id)) {
+            $scalevalueid = $comprecord->scale_value_id;
             $scalevalue = $DB->get_record('comp_scale_values', array('id' => $scalevalueid));
             $scaleid = $scalevalue->scaleid;
             $scalevaluename = format_string($scalevalue->name);
