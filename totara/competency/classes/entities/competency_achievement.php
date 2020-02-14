@@ -96,7 +96,14 @@ class competency_achievement extends entity {
      * @return has_many_through
      */
     public function achieved_via(): has_many_through {
-        return $this->has_many_through(pathway_achievement::class, achievement_via::class, 'comp_achievement_id', 'id', 'id', 'pathway_achievement_id');
+        return $this->has_many_through(
+            achievement_via::class,
+            pathway_achievement::class,
+            'id',
+            'comp_achievement_id',
+            'pathway_achievement_id',
+            'id'
+        );
     }
 
 }

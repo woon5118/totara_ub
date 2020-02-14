@@ -113,12 +113,12 @@ class competency extends hierarchy_item {
      */
     public function scale(): has_one_through {
         return $this->has_one_through(
-            scale::class,
             competency_scale_assignment::class,
+            scale::class,
             'frameworkid',
-            'id',
             'frameworkid',
-            'scaleid'
+            'scaleid',
+            'id'
         );
     }
 
