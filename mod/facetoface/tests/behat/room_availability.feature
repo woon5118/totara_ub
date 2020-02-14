@@ -17,40 +17,19 @@ Feature: Seminar room availability
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
       | teacher2 | C1     | editingteacher |
-    And I log in as "admin"
-    And I navigate to "Rooms" node in "Site administration > Seminars"
-    And I press "Add a new room"
-    And I set the following fields to these values:
-      | Name                         | Room 1          |
-      | Capacity                     | 10              |
-      | Allow booking conflicts      | 0               |
-    And I press "Add a room"
-    And I press "Add a new room"
-    And I set the following fields to these values:
-      | Name                         | Room 2          |
-      | Capacity                     | 10              |
-      | Allow booking conflicts      | 1               |
-    And I press "Add a room"
-    And I press "Add a new room"
-    And I set the following fields to these values:
-      | Name                         | Room 3          |
-      | Capacity                     | 10              |
-      | Allow booking conflicts      | 0               |
-    And I press "Add a room"
-    And I click on "Hide from users when choosing a room on the Add/Edit event page" "link" in the "Room 3" "table_row"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test Seminar 1 |
-      | Description | test           |
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test Seminar 2 |
-      | Description | test           |
-    And I log out
+    And the following "global rooms" exist in "mod_facetoface" plugin:
+      | name   | allowconflicts | hidden | capacity |
+      | Room 1 | 0              | 0      | 10       |
+      | Room 2 | 1              | 0      | 10       |
+      | Room 3 | 0              | 1      | 10       |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name           | course | intro       |
+      | Test Seminar 1 | C1     | <p>test</p> |
+      | Test Seminar 2 | C1     | <p>test</p> |
 
   Scenario: Time based seminar room conflicts
     Given I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test Seminar 1"
+    And I am on "Test Seminar 1" seminar homepage
     And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
@@ -59,11 +38,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     And I should see "Room 1 (Capacity: 10)"
@@ -87,11 +61,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 2    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     And I should see "Room 1 (Capacity: 10)"
@@ -110,11 +79,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 12   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 13   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     And I should see "Room 1 (Capacity: 10)"
@@ -137,11 +101,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 10   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 11   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     And I should see "Room 1 (Capacity: 10)"
@@ -162,11 +121,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 13   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 14   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     And I should see "Room 1 (Capacity: 10)"
@@ -187,11 +141,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 2    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     And I should see "Room 1 (Capacity: 10)"
@@ -212,11 +161,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     Then I should see "Room 1 (Capacity: 10) (Room unavailable)"
@@ -231,11 +175,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I should see "Room 1 is already booked"
     When I click on "Cancel" "button" in the "Select date" "totaradialogue"
@@ -243,8 +182,7 @@ Feature: Seminar room availability
 
   Scenario: Hiding related seminar room availability
     Given I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test Seminar 1"
+    And I am on "Test Seminar 1" seminar homepage
     And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 20 |
@@ -255,11 +193,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     And I should see "Room 1 (Capacity: 10)"
@@ -279,8 +212,7 @@ Feature: Seminar room availability
     And I click on "Hide from users when choosing a room on the Add/Edit event page" "link" in the "Room 1" "table_row"
     And I log out
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test Seminar 1"
+    And I am on "Test Seminar 1" seminar homepage
 
     When I follow "Add event"
     And I click on "Edit session" "link"
@@ -290,11 +222,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 2    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     Then I should not see "Room 1 (Capacity: 10)"
@@ -320,11 +247,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 2    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     Then I should see "Room 1 (Capacity: 10)"
@@ -337,8 +259,7 @@ Feature: Seminar room availability
 
   Scenario: Custom seminar room availability
     Given I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test Seminar 1"
+    And I am on "Test Seminar 1" seminar homepage
     And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 30 |
@@ -349,11 +270,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     And I click on "Create" "link" in the "Choose rooms" "totaradialogue"
@@ -374,11 +290,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 12   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 13   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     Then I should see "Zimmer 1 (Capacity: 30) (Seminar: Test Seminar 1)"
@@ -400,11 +311,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     Then I should see "Zimmer 1 (Capacity: 30) (Room unavailable) (Seminar: Test Seminar 1)"
@@ -431,8 +337,7 @@ Feature: Seminar room availability
     And I click on "Cancel" "button" in the "Choose rooms" "totaradialogue"
     And I press "Cancel"
 
-    When I am on "Course 1" course homepage
-    And I follow "Test Seminar 2"
+    When I am on "Test Seminar 2" seminar homepage
     And I follow "Add event"
     And I click on "Select rooms" "link"
     Then I should not see "Zimmer 1"
@@ -445,8 +350,7 @@ Feature: Seminar room availability
     And I log out
 
     When I log in as "teacher2"
-    And I am on "Course 1" course homepage
-    And I follow "Test Seminar 2"
+    And I am on "Test Seminar 2" seminar homepage
     And I follow "Add event"
     And I click on "Select rooms" "link"
     Then I should not see "Zimmer 1"
@@ -457,8 +361,7 @@ Feature: Seminar room availability
     And I click on "Cancel" "button" in the "Choose rooms" "totaradialogue"
     And I press "Cancel"
 
-    When I am on "Course 1" course homepage
-    And I follow "Test Seminar 1"
+    When I am on "Test Seminar 1" seminar homepage
     And I follow "Add event"
     And I click on "Select rooms" "link"
     Then I should see "Zimmer 1 (Capacity: 30) (Seminar: Test Seminar 1)"
@@ -471,8 +374,7 @@ Feature: Seminar room availability
 
   Scenario: Seminar switch site room to not allow conflicts
     Given I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "Test Seminar 1"
+    And I am on "Test Seminar 1" seminar homepage
     And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 20 |
@@ -483,11 +385,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     And I click on "Room 2 (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
@@ -503,11 +400,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     And I click on "Room 2 (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
@@ -524,8 +416,7 @@ Feature: Seminar room availability
     Then I should see "Room has conflicting usage"
     And I press "Cancel"
 
-    When I am on "Course 1" course homepage
-    And I follow "Test Seminar 1"
+    When I am on "Test Seminar 1" seminar homepage
     And I click on the seminar event action "Edit event" in row "0 / 30"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
@@ -534,11 +425,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 12   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 13   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I navigate to "Rooms" node in "Site administration > Seminars"
@@ -550,8 +436,7 @@ Feature: Seminar room availability
 
   Scenario: Seminar switch custom room to not allow conflicts
     Given I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test Seminar 1"
+    And I am on "Test Seminar 1" seminar homepage
     And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 40 |
@@ -562,11 +447,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     And I click on "Create" "link" in the "Choose rooms" "totaradialogue"
@@ -586,11 +466,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     And I click on "Zimmer 1 (Capacity: 40) (Seminar: Test Seminar 1)" "link"
@@ -613,11 +488,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 12   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 13   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     When I click on the seminar event action "Edit event" in row "0 / 50"
@@ -630,8 +500,7 @@ Feature: Seminar room availability
 
   Scenario: Reportbuilder seminar room availability filter
     Given I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "Test Seminar 1"
+    And I am on "Test Seminar 1" seminar homepage
     And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 20 |
@@ -642,11 +511,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     And I click on "Room 1 (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
@@ -662,11 +526,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 13   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 14   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     And I click on "Room 1 (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
@@ -682,11 +541,6 @@ Feature: Seminar room availability
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 15   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 16   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select rooms" "link"
     And I click on "Room 2 (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"

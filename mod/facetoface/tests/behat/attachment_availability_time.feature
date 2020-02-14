@@ -34,8 +34,7 @@ Feature: Seminar asset/facilitator availability related to time
 
   Scenario Outline: Time based seminar item conflicts
     Given I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test Seminar 1"
+    And I am on "Test Seminar 1" seminar homepage
     And I follow "Add event"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
@@ -44,11 +43,6 @@ Feature: Seminar asset/facilitator availability related to time
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select <item_type>" "link"
     And I should see "<name> 1"
@@ -73,11 +67,6 @@ Feature: Seminar asset/facilitator availability related to time
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 2    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select <item_type>" "link"
     And I should see "<name> 1"
@@ -96,11 +85,6 @@ Feature: Seminar asset/facilitator availability related to time
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 12   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 13   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select <item_type>" "link"
     And I should see "<name> 1"
@@ -128,11 +112,6 @@ Feature: Seminar asset/facilitator availability related to time
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 10   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 11   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select <item_type>" "link"
     And I should see "<name> 1"
@@ -156,11 +135,6 @@ Feature: Seminar asset/facilitator availability related to time
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 13   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 14   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select <item_type>" "link"
     And I should see "<name> 1"
@@ -185,11 +159,6 @@ Feature: Seminar asset/facilitator availability related to time
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 2    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select <item_type>" "link"
     And I should see "<name> 1"
@@ -213,11 +182,6 @@ Feature: Seminar asset/facilitator availability related to time
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select <item_type>" "link"
     Then I should see "<name> 1 (<item_type> unavailable on selected dates)"
@@ -233,11 +197,6 @@ Feature: Seminar asset/facilitator availability related to time
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I should see "<name> 1 is already booked"
     When I click on "Cancel" "button" in the "Select date" "totaradialogue"

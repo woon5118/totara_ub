@@ -24,52 +24,32 @@ Feature: Seminar event cancellation attendees view
       | learner2 | C1     | student        |
       | learner3 | C1     | student        |
 
-    Given I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test Seminar |
-      | Description | Test Seminar |
-    And I turn editing mode off
-    And I follow "View all events"
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name         | course | intro               |
+      | Test Seminar | C1     | <p>Test Seminar</p> |
 
-    Given I follow "Add event"
-    And I follow "show-selectdate0-dialog"
-    And I fill seminar session with relative date in form data:
-      | sessiontimezone     | Pacific/Auckland |
-      | timestart[day]      | 10               |
-      | timestart[timezone] | Pacific/Auckland |
-      | timefinish[day]     | 10               |
-      | timefinish[timezone]| Pacific/Auckland |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I follow "show-selectdate0-dialog"
-    And I set the following fields to these values:
-      | sessiontimezone     | Pacific/Auckland |
-      | timestart[hour]     | 10               |
-      | timestart[minute]   | 0                |
-      | timestart[timezone] | Pacific/Auckland |
-      | timefinish[hour]    | 16               |
-      | timefinish[minute]  | 0                |
-      | timefinish[timezone]| Pacific/Auckland |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Save changes"
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface   | details |
+      | Test Seminar | event 1 |
 
-    Given I click on the seminar event action "Attendees" in row "#1"
-    And I set the field "Attendee actions" to "Add users"
-    And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
-    And I press "Add"
-    And I press "Continue"
-    And I press "Confirm"
-    And I follow "View all events"
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start        | finish       | sessiontimezone  | starttimezone    | finishtimezone   |
+      | event 1      | +10 days 1am | +10 days 2am | Pacific/Auckland | Pacific/Auckland | Pacific/Auckland |
+      | event 1      | +1 day 10am  | +1 day 4pm   | Pacific/Auckland | Pacific/Auckland | Pacific/Auckland |
 
-    Given I log out
+    And the following "seminar signups" exist in "mod_facetoface" plugin:
+      | user     | eventdetails | status |
+      | learner1 | event 1      | booked |
+      | learner2 | event 1      | booked |
+
     And I log in as "learner3"
-    And I am on "Course 1" course homepage
+    And I am on "Test Seminar" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I press "Sign-up"
 
     Given I log out
     And I log in as "learner1"
-    And I am on "Course 1" course homepage
+    And I am on "Test Seminar" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I click on "Cancel booking" "link_or_button" in the seminar event sidebar "Booked"
     And I wait "1" seconds
@@ -77,8 +57,7 @@ Feature: Seminar event cancellation attendees view
 
     Given I log out
     And I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar" seminar homepage
     And I click on the seminar event action "Cancel event" in row "10:00 AM - 4:00 PM"
     And I press "Yes"
 

@@ -104,42 +104,36 @@ Feature: Seminar calendar publishing to course, site, and user calendars
     And I should not see "HN Seminar"
 
   Scenario: Normal visibility, seminars set to course calendar, check calendar event view
-    Given I am on "OTL Course" course homepage
-    And I follow "OTL Seminar"
+    Given I am on "OTL Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
     | showoncalendar |   1 |
-    And I click on "Save and return to course" "button"
-    And I am on "OTL Hidden Course" course homepage
-    And I follow "OTL Hidden Seminar"
+    And I click on "Save and display" "button"
+    And I am on "OTL Hidden Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   1 |
-    And I click on "Save and return to course" "button"
-    And I am on "HTL Course" course homepage
-    And I follow "HTL Seminar"
+    And I click on "Save and display" "button"
+    And I am on "HTL Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   1 |
-    And I click on "Save and return to course" "button"
-    And I am on "ON Course" course homepage
-    And I follow "ON Seminar"
+    And I click on "Save and display" "button"
+    And I am on "ON Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   1 |
-    And I click on "Save and return to course" "button"
-    And I am on "ON Hidden Course" course homepage
-    And I follow "ON Hidden Seminar"
+    And I click on "Save and display" "button"
+    And I am on "ON Hidden Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   1 |
-    And I click on "Save and return to course" "button"
-    And I am on "HN Course" course homepage
-    And I follow "HN Seminar"
+    And I click on "Save and display" "button"
+    And I am on "HN Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   1 |
-    And I click on "Save and return to course" "button"
+    And I click on "Save and display" "button"
 
     Given I click on "Dashboard" in the totara menu
     When I follow "Go to calendar"
@@ -176,48 +170,42 @@ Feature: Seminar calendar publishing to course, site, and user calendars
   # TODO: TL-23555 will fix this broken test
   Scenario: Normal visibility, seminars set to user calendar only, check calendar event view
     Given I skip the scenario until issue "TL-23555" lands
-    Given I am on "OTL Course" course homepage
-    And I follow "OTL Seminar"
+    Given I am on "OTL Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   0 |
       | usercalentry   |   1 |
-    And I click on "Save and return to course" "button"
-    And I am on "OTL Hidden Course" course homepage
-    And I follow "OTL Hidden Seminar"
+    And I click on "Save and display" "button"
+    And I am on "OTL Hidden Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   0 |
       | usercalentry   |   1 |
-    And I click on "Save and return to course" "button"
-    And I am on "HTL Course" course homepage
-    And I follow "HTL Seminar"
+    And I click on "Save and display" "button"
+    And I am on "HTL Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   0 |
       | usercalentry   |   1 |
-    And I click on "Save and return to course" "button"
-    And I am on "ON Course" course homepage
-    And I follow "ON Seminar"
+    And I click on "Save and display" "button"
+    And I am on "ON Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   0 |
       | usercalentry   |   1 |
-    And I click on "Save and return to course" "button"
-    And I am on "ON Hidden Course" course homepage
-    And I follow "ON Hidden Seminar"
+    And I click on "Save and display" "button"
+    And I am on "ON Hidden Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   0 |
       | usercalentry   |   1 |
-    And I click on "Save and return to course" "button"
-    And I am on "HN Course" course homepage
-    And I follow "HN Seminar"
+    And I click on "Save and display" "button"
+    And I am on "HN Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   0 |
       | usercalentry   |   1 |
-    And I click on "Save and return to course" "button"
+    And I click on "Save and display" "button"
 
     Given I click on "Dashboard" in the totara menu
     When I follow "Go to calendar"
@@ -311,42 +299,36 @@ Feature: Seminar calendar publishing to course, site, and user calendars
     And I wait "1" seconds
     And I press "Save and display"
 
-    Given I am on "OTL Course" course homepage
-    And I follow "OTL Seminar"
+    Given I am on "OTL Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   1 |
-    And I click on "Save and return to course" "button"
-    And I am on "OTL Hidden Course" course homepage
-    And I follow "OTL Hidden Seminar"
+    And I click on "Save and display" "button"
+    And I am on "OTL Hidden Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   1 |
-    And I click on "Save and return to course" "button"
-    And I am on "HTL Course" course homepage
-    And I follow "HTL Seminar"
+    And I click on "Save and display" "button"
+    And I am on "HTL Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   1 |
-    And I click on "Save and return to course" "button"
-    And I am on "ON Course" course homepage
-    And I follow "ON Seminar"
+    And I click on "Save and display" "button"
+    And I am on "ON Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   1 |
-    And I click on "Save and return to course" "button"
-    And I am on "ON Hidden Course" course homepage
-    And I follow "ON Hidden Seminar"
+    And I click on "Save and display" "button"
+    And I am on "ON Hidden Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   1 |
-    And I click on "Save and return to course" "button"
-    And I am on "HN Course" course homepage
-    And I follow "HN Seminar"
+    And I click on "Save and display" "button"
+    And I am on "HN Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   1 |
-    And I click on "Save and return to course" "button"
+    And I click on "Save and display" "button"
     And I log out
 
     When I log in as "kbomba"
@@ -392,48 +374,42 @@ Feature: Seminar calendar publishing to course, site, and user calendars
     And I wait "1" seconds
     And I press "Save and display"
 
-    Given I am on "OTL Course" course homepage
-    And I follow "OTL Seminar"
+    Given I am on "OTL Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   0 |
       | usercalentry   |   1 |
-    And I click on "Save and return to course" "button"
-    And I am on "OTL Hidden Course" course homepage
-    And I follow "OTL Hidden Seminar"
+    And I click on "Save and display" "button"
+    And I am on "OTL Hidden Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   0 |
       | usercalentry   |   1 |
-    And I click on "Save and return to course" "button"
-    And I am on "HTL Course" course homepage
-    And I follow "HTL Seminar"
+    And I click on "Save and display" "button"
+    And I am on "HTL Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   0 |
       | usercalentry   |   1 |
-    And I click on "Save and return to course" "button"
-    And I am on "ON Course" course homepage
-    And I follow "ON Seminar"
+    And I click on "Save and display" "button"
+    And I am on "ON Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   0 |
       | usercalentry   |   1 |
-    And I click on "Save and return to course" "button"
-    And I am on "ON Hidden Course" course homepage
-    And I follow "ON Hidden Seminar"
+    And I click on "Save and display" "button"
+    And I am on "ON Hidden Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   0 |
       | usercalentry   |   1 |
-    And I click on "Save and return to course" "button"
-    And I am on "HN Course" course homepage
-    And I follow "HN Seminar"
+    And I click on "Save and display" "button"
+    And I am on "HN Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | showoncalendar |   0 |
       | usercalentry   |   1 |
-    And I click on "Save and return to course" "button"
+    And I click on "Save and display" "button"
     And I log out
 
     When I log in as "kbomba"

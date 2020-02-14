@@ -24,75 +24,40 @@ Feature: Seminar event cancellation rebooking
       | learner2 | C1     | student        |
       | learner3 | C1     | student        |
 
-    Given I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name                                   | Test Seminar |
-      | Description                            | Test Seminar |
-      | How many times the user can sign-up?   | 1            |
-    And I turn editing mode off
-    And I follow "View all events"
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name         | intro               | course | multisignupamount |
+      | Test Seminar | <p>Test Seminar</p> | C1     | 1                 |
 
-    Given I follow "Add event"
-    And I follow "show-selectdate0-dialog"
-    And I set the following fields to these values:
-      | sessiontimezone     | Pacific/Auckland |
-      | timestart[day]      | 10               |
-      | timestart[month]    | 2                |
-      | timestart[year]     | ## next year ## Y ## |
-      | timestart[hour]     | 9                |
-      | timestart[minute]   | 0                |
-      | timestart[timezone] | Pacific/Auckland |
-      | timefinish[day]     | 10               |
-      | timefinish[month]   | 2                |
-      | timefinish[year]    | ## next year ## Y ## |
-      | timefinish[hour]    | 15               |
-      | timefinish[minute]  | 0                |
-      | timefinish[timezone]| Pacific/Auckland |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I set the following fields to these values:
-      | Maximum bookings | 39 |
-    And I press "Save changes"
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface   | details | capacity |
+      | Test Seminar | event 1 | 39       |
 
-    Given I click on the seminar event action "Attendees" in row "#1"
-    And I set the field "Attendee actions" to "Add users"
-    And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
-    And I press "Add"
-    And I press "Continue"
-    And I press "Confirm"
-    And I follow "View all events"
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start                | finish               | starttimezone    | finishtimezone   | sessiontimezone  |
+      | event 1      | 10 Feb next year 9am | 10 Feb next year 3pm | Pacific/Auckland | Pacific/Auckland | Pacific/Auckland |
 
-    Given I log out
+    And the following "seminar signups" exist in "mod_facetoface" plugin:
+      | user     | eventdetails | status |
+      | learner1 | event 1      | booked |
+      | learner2 | event 1      | booked |
+
     And I log in as "learner3"
-    And I am on "Course 1" course homepage
+    And I am on "Test Seminar" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I press "Sign-up"
 
     Given I log out
-    And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
-    And I follow "Add event"
-    And I follow "show-selectdate0-dialog"
-    And I set the following fields to these values:
-      | sessiontimezone     | Pacific/Auckland |
-      | timestart[day]      | 11               |
-      | timestart[month]    | 3                |
-      | timestart[year]     | ## 2 years ## Y ## |
-      | timestart[hour]     | 9                |
-      | timestart[minute]   | 0                |
-      | timestart[timezone] | Pacific/Auckland |
-      | timefinish[day]     | 11               |
-      | timefinish[month]   | 3                |
-      | timefinish[year]    | ## 2 years ## Y ## |
-      | timefinish[hour]    | 15               |
-      | timefinish[minute]  | 0                |
-      | timefinish[timezone]| Pacific/Auckland |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I set the following fields to these values:
-      | Maximum bookings | 19 |
-    And I press "Save changes"
 
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface   | details | capacity |
+      | Test Seminar | event 2 | 19       |
+
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start               | finish              | starttimezone    | finishtimezone   | sessiontimezone  |
+      | event 2      | 11 Mar +2 years 9am | 11 Mar +2 years 3pm | Pacific/Auckland | Pacific/Auckland | Pacific/Auckland |
+
+    And I log in as "teacher1"
+    And I am on "Test Seminar" seminar homepage
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_600: Mass rebooking after a cancelled event
@@ -110,15 +75,13 @@ Feature: Seminar event cancellation rebooking
 
     Given I log out
     And I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar" seminar homepage
     And I click on the seminar event action "Cancel event" in row "10 February"
     And I press "Yes"
 
     Given I log out
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar" seminar homepage
     Then I should see "Booking open" in the "11 March" "table_row"
     And I should see "Cancelled" in the "10 February" "table_row"
 
@@ -135,15 +98,13 @@ Feature: Seminar event cancellation rebooking
   Scenario: mod_facetoface_cancel_601: Individual learner rebooking after a cancelled event
     Given I log out
     And I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar" seminar homepage
     And I click on the seminar event action "Cancel event" in row "10 February"
     And I press "Yes"
 
     Given I log out
     And I log in as "learner1"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar" seminar homepage
     Then I should see "Booking open" in the "11 March" "table_row"
     Then I should see "19" in the "11 March" "table_row"
     And I should see "Cancelled" in the "10 February" "table_row"
@@ -157,8 +118,7 @@ Feature: Seminar event cancellation rebooking
 
     Given I log out
     And I log in as "learner2"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar" seminar homepage
     Then I should see "Booking open" in the "11 March" "table_row"
     Then I should see "18" in the "11 March" "table_row"
     And I should see "Cancelled" in the "10 February" "table_row"
@@ -172,8 +132,7 @@ Feature: Seminar event cancellation rebooking
 
     Given I log out
     And I log in as "learner3"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar" seminar homepage
     Then I should see "Booking open" in the "11 March" "table_row"
     Then I should see "17" in the "11 March" "table_row"
     And I should see "Cancelled" in the "10 February" "table_row"

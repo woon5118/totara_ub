@@ -21,32 +21,18 @@ Feature: Sign up to a seminar
       | teacher1 | C1     | editingteacher |
       | student1 | C1     | student        |
       | student2 | C1     | student        |
-    And I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Label" to section "1" and I fill the form with:
-      | Label text | Course view page |
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
-    And I follow "View all events"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 1    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | ## next year ## Y ## |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 0    |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 0    |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I set the following fields to these values:
-      | capacity              | 1    |
-    And I press "Save changes"
-    And I log out
+    And the following "activities" exist:
+      | activity | name             | course | idnumber |
+      | label    | Course view page | C1     | label    |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | intro                           | course  |
+      | Test seminar name | <p>Test seminar description</p> | C1      |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details | capacity |
+      | Test seminar name | event 1 | 1        |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start                | finish               | starttimezone    | finishtimezone   | sessiontimezone  |
+      | event 1      | 1 Jan next year 11am | 1 Jan next year 12pm | Pacific/Auckland | Pacific/Auckland | Pacific/Auckland |
 
   @totara_customfield
   Scenario: Language filter should work on custom fields in seminar when an admin looks at the note in the seminar attendees list popup

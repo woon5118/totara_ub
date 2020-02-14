@@ -28,6 +28,19 @@ Feature: Seminar event cancellation custom fields
       | capability                     | permission | role           | contextlevel | reference |
       | mod/facetoface:viewallsessions | Allow      | editingteacher | Course       | C1        |
 
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name         | course | intro               |
+      | Test Seminar | C1     | <p>Test Seminar</p> |
+
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface   | details |
+      | Test Seminar | event 1 |
+
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start        | finish       | sessiontimezone  | starttimezone    | finishtimezone   |
+      | event 1      | +10 days 1am | +10 days 2am | Pacific/Auckland | Pacific/Auckland | Pacific/Auckland |
+      | event 1      | +1 day 10am  | +1 day 4pm   | Pacific/Auckland | Pacific/Auckland | Pacific/Auckland |
+
     Given I log in as "admin"
     Given I navigate to "Global settings" node in "Site administration > Seminars"
     And I click on "Editing Trainer" "text" in the "#admin-facetoface_session_roles" "css_element"
@@ -122,37 +135,12 @@ Feature: Seminar event cancellation custom fields
     Then I should see "test.jpg"
     And I should see "leaves-green.png"
 
-    And I am on "Course 1" course homepage
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test Seminar |
-      | Description | Test Seminar |
-    And I follow "View all events"
+    And I am on "Test Seminar" seminar homepage
 
-    Given I follow "Add event"
-    And I follow "show-selectdate0-dialog"
-    And I fill seminar session with relative date in form data:
-      | sessiontimezone     | Pacific/Auckland |
-      | timestart[day]      | 10               |
-      | timestart[timezone] | Pacific/Auckland |
-      | timefinish[day]     | 10               |
-      | timefinish[timezone]| Pacific/Auckland |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-
-    Given I follow "show-selectdate0-dialog"
-    And I set the following fields to these values:
-      | sessiontimezone     | Pacific/Auckland |
-      | timestart[hour]     | 10               |
-      | timestart[minute]   | 0                |
-      | timestart[timezone] | Pacific/Auckland |
-      | timefinish[hour]    | 16               |
-      | timefinish[minute]  | 0                |
-      | timefinish[timezone]| Pacific/Auckland |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
+    Given I click on the seminar event action "Edit event" in row "#1"
     And I click on "Teacher One" "checkbox"
     And I press "Save changes"
 
-    Given I am on "Course 1" course homepage
-    And I follow "View all events"
     And I click on the seminar event action "Cancel event" in row "10:00 AM - 4:00 PM"
     And I set the following fields to these values:
       | customfield_cancelcheckbox          | 1                  |

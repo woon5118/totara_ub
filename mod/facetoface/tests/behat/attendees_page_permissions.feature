@@ -26,76 +26,45 @@ Feature: Check attendees actions are performed by users with the right permissio
       | student1 | C1     | student        |
       | student2 | C1     | student        |
       | student3 | C1     | student        |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | intro                           | course  |
+      | Test seminar name | <p>Test seminar description</p> | C1      |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details |
+      | Test seminar name | event 1 |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start           | finish  | sessiontimezone  |
+      | event 1      | -2 days -1 hour | -2 days | Pacific/Auckland |
+    And the following "seminar signups" exist in "mod_facetoface" plugin:
+      | user     | eventdetails | status |
+      | student1 | event 1      | booked |
+      | student2 | event 1      | booked |
+      | student3 | event 1      | booked |
+
     And I log in as "admin"
     And I set the following administration settings values:
       | Enable restricted access | 1 |
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
+    And I am on "Test seminar name" seminar homepage
+    And I click on the seminar event action "Attendees" in row "#1"
+    Then I should see "Sam1 Student1"
+    And I should see "Sam2 Student2"
+    And I should see "Sam3 Student3"
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
       | Completion tracking           | Show activity as complete when conditions are met |
       | completionstatusrequired[100] | 1                                                 |
+    And I press "Save and display"
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
     And I set the following fields to these values:
       | Seminar - Test seminar name | 1 |
-    And I press "Save changes"
-    And I turn editing mode off
-    And I follow "View all events"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    # In order to signup create session in future, and then move it back in time
-    And I fill seminar session with relative date in form data:
-      | sessiontimezone    | Pacific/Auckland |
-      | timestart[day]     | +2               |
-      | timestart[month]   | 0                |
-      | timestart[year]    | 0                |
-      | timestart[hour]    | -1               |
-      | timestart[minute]  | 0                |
-      | timefinish[day]    | +2               |
-      | timefinish[month]  | 0                |
-      | timefinish[year]   | 0                |
-      | timefinish[hour]   | 0                |
-      | timefinish[minute] | 0                |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Save changes"
-    And I click on the seminar event action "Attendees" in row "#1"
-    And I set the field "Attendee actions" to "Add users"
-    And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com,Sam3 Student3, student3@example.com"
-    And I press "Add"
-    # We must wait here, because the refresh may not happen before the save button is clicked otherwise.
-    And I wait "1" seconds
-    And I press "Continue"
-    And I press "Confirm"
-    Then I should see "Sam1 Student1"
-    And I should see "Sam2 Student2"
-    And I should see "Sam3 Student3"
-
-    # Move event back in time.
-    And I follow "View all events"
-    And I click on the seminar event action "Edit event" in row "#1"
-    And I click on "Edit session" "link"
-    And I fill seminar session with relative date in form data:
-      | sessiontimezone    | Pacific/Auckland |
-      | timestart[day]     | -2               |
-      | timestart[month]   | 0                |
-      | timestart[year]    | 0                |
-      | timestart[hour]    | -1               |
-      | timestart[minute]  | 0                |
-      | timefinish[day]    | -2               |
-      | timefinish[month]  | 0                |
-      | timefinish[year]   | 0                |
-      | timefinish[hour]   | 0                |
-      | timefinish[minute] | 0                |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
 
     And I log out
 
   Scenario: Check trainer actions on attendees page
     Given I log in as "trainer1"
-    And I am on "Course 1" course homepage
-    And I click on "View all events" "link"
+    And I am on "Test seminar name" seminar homepage
     When I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Attendees" in the "div.tabtree" "css_element"
     And I should see "Wait-list" in the "div.tabtree" "css_element"
@@ -109,8 +78,7 @@ Feature: Check attendees actions are performed by users with the right permissio
       | capability                       | permission | role           | contextlevel | reference |
       | mod/facetoface:takeattendance    | Prohibit   | editingteacher | Course       |        C1 |
     When I log in as "trainer1"
-    And I am on "Course 1" course homepage
-    And I click on "View all events" "link"
+    And I am on "Test seminar name" seminar homepage
     And I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Attendees" in the "div.tabtree" "css_element"
     And I should see "Wait-list" in the "div.tabtree" "css_element"
@@ -129,8 +97,7 @@ Feature: Check attendees actions are performed by users with the right permissio
       | capability                       | permission | role           | contextlevel | reference |
       | mod/facetoface:viewcancellations | Prohibit   | editingteacher | Course       |        C1 |
     And I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I click on "View all events" "link"
+    And I am on "Test seminar name" seminar homepage
     And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Remove users"
     And I set the field "Current attendees" to "Sam1 Student1, student1@example.com"
@@ -140,8 +107,7 @@ Feature: Check attendees actions are performed by users with the right permissio
     And I press "Confirm"
     And I log out
     And I log in as "trainer1"
-    And I am on "Course 1" course homepage
-    And I click on "View all events" "link"
+    And I am on "Test seminar name" seminar homepage
     When I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Attendees" in the "div.tabtree" "css_element"
     And I should see "Wait-list" in the "div.tabtree" "css_element"
@@ -154,8 +120,7 @@ Feature: Check attendees actions are performed by users with the right permissio
       | capability                    | permission | role           | contextlevel | reference |
       | mod/facetoface:viewattendees  | Prohibit   | editingteacher | Course       |        C1 |
     When I log in as "trainer1"
-    And I am on "Course 1" course homepage
-    And I click on "View all events" "link"
+    And I am on "Test seminar name" seminar homepage
     Then I should not see the seminar event action "Attendees" in row "#1"
 
     When I visit the attendees page for session "1" with action "takeattendance"
@@ -164,38 +129,31 @@ Feature: Check attendees actions are performed by users with the right permissio
     And I should not see "Message users" in the "div.tabtree" "css_element"
     And I should not see "Attendees" in the "div.tabtree" "css_element"
     And I should not see "Wait-list" in the "div.tabtree" "css_element"
-#    I cannot visit attendees page with action=attendees because an exception is thrown a Behat doesn't like it
+    When I visit the attendees page for session "1" with action "view"
+    Then "Attendee actions" "select" should not exist
 
   Scenario: Check managers can view attendees page
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name               | intro                            | course  | approvaltype |
+      | Test seminar2 name | <p>Test seminar2 description</p> | C1      | 4            |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface         | details |
+      | Test seminar2 name | event 2 |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start   | finish              | sessiontimezone  |
+      | event 2      | +8 days | +8 days +30 minutes | Pacific/Auckland |
+
     Given I log in as "admin"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar2 name        |
-      | Description | Test seminar2 description |
+    And I am on "Test seminar2 name" seminar homepage
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I set the following fields to these values:
       | Completion tracking           | Show activity as complete when conditions are met |
       | completionstatusrequired[100] | 1                                                 |
-      | Manager Approval              | 1                                                 |
+    And I press "Save and display"
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
     And I set the following fields to these values:
       | Seminar - Test seminar2 name | 1 |
-    And I press "Save changes"
-    And I follow "Test seminar2 name"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I fill seminar session with relative date in form data:
-      | sessiontimezone    | Pacific/Auckland |
-      | timestart[day]     | +8               |
-      | timestart[month]   | 0                |
-      | timestart[year]    | 0                |
-      | timestart[hour]    | 0                |
-      | timestart[minute]  | 0                |
-      | timefinish[day]    | +8               |
-      | timefinish[month]  | 0                |
-      | timefinish[year]   | 0                |
-      | timefinish[hour]   | 0                |
-      | timefinish[minute] | +30              |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I log out
 
@@ -235,8 +193,7 @@ Feature: Check attendees actions are performed by users with the right permissio
 
   Scenario: Check trainer ability to view user profiles before and after prohibition
     Given I log in as "trainer1"
-    And I am on "Course 1" course homepage
-    And I click on "View all events" "link"
+    And I am on "Test seminar name" seminar homepage
     And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Sam1 Student1"
     Then I should see "User details"
@@ -249,8 +206,7 @@ Feature: Check attendees actions are performed by users with the right permissio
       | capability               | permission | role           | contextlevel | reference |
       | moodle/user:viewdetails  | Prohibit   | editingteacher | Course       |        C1 |
     And I log in as "trainer1"
-    And I am on "Course 1" course homepage
-    And I click on "View all events" "link"
+    And I am on "Test seminar name" seminar homepage
     And I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Sam1 Student1"
     And "Sam1 Student1" "link" should not exist
@@ -263,8 +219,7 @@ Feature: Check attendees actions are performed by users with the right permissio
       | capability              | permission | role           | contextlevel | reference |
       | moodle/site:sendmessage | Prohibit   | editingteacher | System       | C1        |
     When I log in as "trainer1"
-    And I am on "Course 1" course homepage
-    And I click on "View all events" "link"
+    And I am on "Test seminar name" seminar homepage
     And I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Attendees" in the "div.tabtree" "css_element"
     And I should see "Wait-list" in the "div.tabtree" "css_element"

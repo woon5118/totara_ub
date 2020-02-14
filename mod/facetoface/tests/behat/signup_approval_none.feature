@@ -33,20 +33,19 @@ Feature: Seminar Signup No Approval
       | jimmy | manager |
       | timmy | manager |
       | sammy | manager |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | intro                          | course  | approvaltype |
+      | Classroom Connect | <p>Classroom Connect Tests</p> | CCC     | 0            |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details | capacity |
+      | Classroom Connect | event 1 | 10       |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start        | finish        |
+      | event 1      | tomorrow 9am | tomorrow 10am |
     And I log in as "admin"
     And I navigate to "Global settings" node in "Site administration > Seminars"
     And I click on "s__facetoface_approvaloptions[approval_manager]" "checkbox"
     And I click on "s__facetoface_approvaloptions[approval_self]" "checkbox"
-    And I press "Save changes"
-    And I am on "Classroom Connect Course" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name                | Classroom Connect       |
-      | Description         | Classroom Connect Tests |
-      | approvaloptions     | approval_admin          |
-    And I follow "View all events"
-    And I follow "Add event"
-    And I set the following fields to these values:
-      | capacity              | 10   |
     And I press "Save changes"
     And I log out
 
@@ -60,4 +59,4 @@ Feature: Seminar Signup No Approval
     And I follow "View all events"
     Then I should see "Booked" in the "Upcoming" "table_row"
     When I click on "Go to event" "link" in the "Booked" "table_row"
-    Then I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
+    Then I should see "Cancel booking" "link_or_button" in the seminar event sidebar "Booked"

@@ -84,34 +84,16 @@ Feature: Seminar sessions report overview
     And I press "Save changes"
 
     # 1: (1st activity of C1) Underbooked, upcoming, manager approval
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name             | Test seminar name 1      |
-      | Description      | Test seminar description |
-      | Manager Approval | 1                           |
-    And I follow "Test seminar name 1"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 1    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | ## next year ## Y ## |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 0    |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 0    |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I set the following fields to these values:
-      | capacity              | 2    |
-      | mincapacity           | 1    |
-      | sendcapacityemail     | 1    |
-      | cutoff[number]        | 25   |
-      | normalcost            | 1.11 |
-      | discountcost          | 1.00 |
-    And I press "Save changes"
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name                | course  | intro                           | approvaltype |
+      | Test seminar name 1 | C1      | <p>Test seminar description</p> | 4            |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface          | details | capacity | mincapacity | sendcapacityemail | cutoff | normalcost | discountcost |
+      | Test seminar name 1 | event 1 | 2        | 1           | 1                 | 90000  | 1.11       | 1.00         |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start                | finish               |
+      | event 1      | 1 Jan next year 11am | 1 Jan next year 12pm |
+    And I am on "Test seminar name 1" seminar homepage
 
   Scenario: Check canceled seminar sessions summary report
     Given I click on the seminar event action "Cancel event" in row "#1"
@@ -125,191 +107,76 @@ Feature: Seminar sessions report overview
     Given I click on "Reports" in the totara menu
     When I click on "Seminar Summary" "link"
     And I click on "Test seminar name 1" "link" in the "Course 1" "table_row"
-    Then I should see "Test seminar name 1" in the ".mod_facetoface__event-dashboard" "css_element"
+    Then I should see "C1: Test seminar name 1" in the page title
 
   Scenario: Check active seminar sessions summary report
     # Prepare 4 sessions in three activities:
     # 2: (2nd activity of C1) Two dates, self approved, overbooked, 1st started, 2nd upcoming
-    And I am on "Course 1" course homepage
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name              | Test seminar name 2      |
-      | Description       | Test seminar description |
-    And I follow "Test seminar name 2"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I fill seminar session with relative date in form data:
-      | sessiontimezone    | Pacific/Auckland |
-      | timestart[day]     | -1               |
-      | timestart[month]   | 0                |
-      | timestart[year]    | 0                |
-      | timestart[hour]    | 0                |
-      | timestart[minute]  | 0                |
-      | timefinish[day]    | 0                |
-      | timefinish[month]  | 0                |
-      | timefinish[year]   | 0                |
-      | timefinish[hour]   | 0                |
-      | timefinish[minute] | +30              |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Add a new session"
-    And I click on "Edit session" "link" in the ".f2fmanagedates .lastrow" "css_element"
-    And I set the following fields to these values:
-      | timestart[day]     | 1                |
-      | timestart[month]   | 1                |
-      | timestart[year]    | ## 2 years ## Y ## |
-      | timestart[hour]    | 0                |
-      | timestart[minute]  | 0                |
-      | timefinish[day]    | 1                |
-      | timefinish[month]  | 1                |
-      | timefinish[year]   | ## 2 years ## Y ## |
-      | timefinish[hour]   | 0                |
-      | timefinish[minute] | 30               |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I set the following fields to these values:
-      | capacity              | 1                |
-      | normalcost           | 2.22              |
-      | discountcost         | 2.10              |
-    And I press "Save changes"
-    And I click on the seminar event action "Attendees" in row "#1"
-    And I set the field "Attendee actions" to "Add users"
-    And I set the field "potential users" to "Sam1 Student1, student1@example.com"
-    And I press exact "add"
-    And I wait "1" seconds
-    And I press "Continue"
-    And I press "Confirm"
-    And I follow "View all events"
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name                | course  | intro                           |
+      | Test seminar name 2 | C1      | <p>Test seminar description</p> |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface          | details  | capacity | normalcost | discountcost |
+      | Test seminar name 2 | event 2a | 1        | 2.22       | 2.10         |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start                | finish                     |
+      | event 2a     | -1 day               | +30 minutes                |
+      | event 2a     | 1 Jan +2 years       | 1 Jan +2 years +30 minutes |
+    And the following "seminar signups" exist in "mod_facetoface" plugin:
+      | user     | eventdetails | status |
+      | student1 | event 2a     | booked |
+      | student3 | event 2a     | booked |
 
     # 3: (2nd activity of C1) Bookings available, upcoming
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 1    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | ## next year ## Y ## |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I set the following fields to these values:
-      | capacity              | 2    |
-      | normalcost            | 3.33 |
-      | discountcost          | 1.50 |
-    And I press "Save changes"
-    And I click on the seminar event action "Attendees" in row "#1"
-    And I set the field "Attendee actions" to "Add users"
-    And I set the field "potential users" to "Sam3 Student3, student3@example.com"
-    And I press exact "add"
-    And I wait "1" seconds
-    And I press "Continue"
-    And I press "Confirm"
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface          | details  | capacity | normalcost | discountcost |
+      | Test seminar name 2 | event 2b | 2        | 3.33       | 1.50         |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start                | finish                     |
+      | event 2b     | 1 Jan next year 11am | 1 Jan next year 12pm       |
 
     # 4: (1st activity of C2) Fully booked, ended, no one
-    And I am on "Course 2" course homepage
-    #And I turn editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name              | Test seminar name 3      |
-      | Description       | Test seminar description |
-    And I follow "Test seminar name 3"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I fill seminar session with relative date in form data:
-      | sessiontimezone    | Pacific/Auckland |
-      | timestart[day]     | -2               |
-      | timestart[month]   | 0                |
-      | timestart[year]    | 0                |
-      | timestart[hour]    | 0                |
-      | timestart[minute]  | 0                |
-      | timefinish[day]    | -1               |
-      | timefinish[month]  | 0                |
-      | timefinish[year]   | 0                |
-      | timefinish[hour]   | 0                |
-      | timefinish[minute] | 0                |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I set the following fields to these values:
-      | capacity              | 1                |
-      | normalcost            | 4.44             |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name                | course  | intro                           |
+      | Test seminar name 3 | C2      | <p>Test seminar description</p> |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface          | details | capacity | normalcost |
+      | Test seminar name 3 | event 3 | 1        | 4.44       |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start   | finish |
+      | event 3      | -2 days | -1 day |
+    And the following "seminar signups" exist in "mod_facetoface" plugin:
+      | user     | eventdetails | status |
+      | student6 | event 3      | booked |
+    And I am on "Test seminar name 3" seminar homepage
+    And I click on the seminar event action "Edit event" in row "#1"
     And I click on "Sam4 Student4" "checkbox"
     And I click on "Sam5 Student5" "checkbox"
     And I press "Save changes"
-    And I click on the seminar event action "Attendees" in row "#1"
-    And I set the field "Attendee actions" to "Add users"
-    And I set the field "potential users" to "Sam6 Student6, student6@example.com"
-    And I press exact "add"
-    And I wait "1" seconds
-    And I press "Continue"
-    And I press "Confirm"
 
     # 5: (1st activity of C2) N/A, ended, no one
-    And I am on "Course 2" course homepage
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name              | Test seminar name 4      |
-      | Description       | Test seminar description |
-    And I follow "Test seminar name 4"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I fill seminar session with relative date in form data:
-      | sessiontimezone    | Pacific/Auckland |
-      | timestart[day]     | -2               |
-      | timestart[month]   | 0                |
-      | timestart[year]    | 0                |
-      | timestart[hour]    | 0                |
-      | timestart[minute]  | 0                |
-      | timefinish[day]    | -1               |
-      | timefinish[month]  | 0                |
-      | timefinish[year]   | 0                |
-      | timefinish[hour]   | 0                |
-      | timefinish[minute] | 0                |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I set the following fields to these values:
-      | capacity           | 2             |
-      | normalcost         | 5.55          |
-    And I press "Save changes"
-    And I click on the seminar event action "Attendees" in row "#1"
-    And I set the field "Attendee actions" to "Add users"
-    And I set the field "potential users" to "Sam7 Student7, student7@example.com"
-    And I press exact "add"
-    And I wait "1" seconds
-    And I press "Continue"
-    And I press "Confirm"
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name                | course  | intro                           |
+      | Test seminar name 4 | C2      | <p>Test seminar description</p> |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface          | details | capacity | normalcost |
+      | Test seminar name 4 | event 4 | 2        | 5.55       |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start   | finish |
+      | event 4      | -2 days | -1 day |
+    And the following "seminar signups" exist in "mod_facetoface" plugin:
+      | user     | eventdetails | status |
+      | student7 | event 4      | booked |
 
     And I click on "Reports" in the totara menu
     When I click on "Seminar Summary" "link"
-    Then I should see "Course 1" in the "2.22" "table_row"
-    And I should see "No" in the "1.11" "table_row"
-    And I should see "Manager Approval" in the "1.11" "table_row"
-    And I should see "Underbooked" in the "1.11" "table_row"
-    And I should see "Upcoming" in the "1.11" "table_row"
-    And I should see "1.00" in the "1.11" "table_row"
-
-    And I should see "Course 1" in the "2.22" "table_row"
-    And I should see "No" in the "2.22" "table_row"
-    And I should see "No Approval" in the "2.22" "table_row"
-    And I should see "Overbooked" in the "2.22" "table_row"
-    And I should see "Event in progress" in the "2.22" "table_row"
-    And I should see "2.10" in the "2.22" "table_row"
-
-    And I should see "Course 1" in the "3.33" "table_row"
-    And I should see "No" in the "3.33" "table_row"
-    And I should see "No Approval" in the "3.33" "table_row"
-    And I should see "Booking open" in the "3.33" "table_row"
-    And I should see "Upcoming" in the "3.33" "table_row"
-    And I should see "1.50" in the "3.33" "table_row"
-
-    And I should see "Course 2" in the "4.44" "table_row"
-    And I should see "No" in the "4.44" "table_row"
-    And I should see "No Approval" in the "4.44" "table_row"
-    And I should see "Booking full" in the "4.44" "table_row"
-    And I should see "Event over" in the "4.44" "table_row"
-    And "Sam4 Student4" "link" should exist in the "4.44" "table_row"
-    And "Sam5 Student5" "link" should exist in the "4.44" "table_row"
-
-    And I should see "Course 2" in the "5.55" "table_row"
-    And I should see "No Approval" in the "5.55" "table_row"
-    And I should see "N/A" in the "5.55" "table_row"
-    And I should see "Event over" in the "5.55" "table_row"
+    Then the "report_seminar_summary" table should contain the following:
+      | Normal cost | Course Name | Overbooking allowed | Approval Type    | Event Status      | Booking Status | Discount cost | Event Learner | Event Learner |
+      | 1.11        | Course 1    | No                  | Manager Approval | Upcoming          | Underbooked    | 1.00          |               |               |
+      | 2.22        | Course 1    | No                  | No Approval      | Event in progress | Overbooked     | 2.10          |               |               |
+      | 3.33        | Course 1    | No                  | No Approval      | Upcoming          | Booking open   | 1.50          |               |               |
+      | 4.44        | Course 2    | No                  | No Approval      | Event over        | Booking full   |               | Sam4 Student4 | Sam5 Student5 |
+      | 5.55        | Course 2    | No                  | No Approval      | Event over        | N/A            |               |               |               |
 
     # Check filters
     When I set the field "Booking Status field limiter" to "is equal to"
@@ -426,8 +293,7 @@ Feature: Seminar sessions report overview
     Given "Event Trainer" "link" should exist in the ".reportbuilder-table" "css_element"
     And I click on "Home" in the totara menu
     When I navigate to "Global settings" node in "Site administration > Seminars"
-    # Trainer is ambigous with Editing Trainer
-    And I click on "s__facetoface_session_roles[4]" "checkbox" in the "#admin-facetoface_session_roles" "css_element"
+    And I click on "Trainer" "checkbox_exact" in the "#admin-facetoface_session_roles" "css_element"
     And I press "Save changes"
     And I click on "Reports" in the totara menu
     And I follow "Seminar Summary"

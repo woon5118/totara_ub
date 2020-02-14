@@ -14,24 +14,23 @@ Feature: Users are forced to get manager approval where required
     And the following "course enrolments" exist:
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | intro                           | course | approvaltype |
+      | Test seminar name | <p>Test seminar description</p> | C1     | 4            |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details |
+      | Test seminar name | event 1 |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start        | finish        |
+      | event 1      | tomorrow 9am | tomorrow 10am |
 
     And I log in as "admin"
     And I navigate to "Manage enrol plugins" node in "Site administration > Plugins > Enrolments"
     And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
     And I log out
-    And I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name             | Test seminar name        |
-      | Description      | Test seminar description |
-      | Manager Approval | 1                        |
-    And I follow "View all events"
-    And I follow "Add event"
-    And I press "Save changes"
-    And I log out
 
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
+    And I am on "Test seminar name" seminar homepage
     When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
     And I log out
@@ -60,8 +59,7 @@ Feature: Users are forced to get manager approval where required
     And I log out
 
     When I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test seminar name" seminar homepage
     And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Approval required"
     Then I should see "Student 1"
@@ -77,8 +75,7 @@ Feature: Users are forced to get manager approval where required
     And I log out
 
     When I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test seminar name" seminar homepage
     And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Cancellations"
     Then I should see "Student 1"
@@ -91,8 +88,7 @@ Feature: Users are forced to get manager approval where required
     Then I should see "Your request was sent to your manager for approval."
     And I log out
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test seminar name" seminar homepage
     And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Approval required"
     And I click on "input[value='2']" "css_element" in the "Student 1" "table_row"

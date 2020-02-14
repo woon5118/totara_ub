@@ -15,6 +15,12 @@ Feature: Test suitable job assignment for session sign-up
     And the following "activities" exist:
       | activity   | name              | course | idnumber | forceselectjobassignment |
       | facetoface | Test seminar name | C1     | seminar  | 1                        |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details | capacity |
+      | Test seminar name | event 1 | 10       |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start        | finish        |
+      | event 1      | tomorrow 9am | tomorrow 10am |
     And the following "course enrolments" exist:
       | user     | course | role           |
       | student1 | C1     | student        |
@@ -28,21 +34,13 @@ Feature: Test suitable job assignment for session sign-up
     And I navigate to "Global settings" node in "Site administration > Seminars"
     And I click on "id_s__facetoface_selectjobassignmentonsignupglobal" "checkbox"
     And I press "Save changes"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Course 1" "text"
-    And I follow "Test seminar name"
-    And I follow "Add event"
-    And I set the following fields to these values:
-      | capacity           | 10   |
-    And I press "Save changes"
+    And I am on "Test seminar name" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I click on "Sign-up Workflow" "link"
     And I click on "#id_approvaloptions_approval_manager" "css_element"
     And I press "Save and display"
     And I log out
     When I log in as "student1"
-    And I click on "Find Learning" in the totara menu
-    And I click on "Course 1" "text"
-    And I follow "Test seminar name"
+    And I am on "Test seminar name" seminar homepage
     And I click on the link "Go to event" in row 1
     Then I should see "You must have a suitable job assignment to sign up for this seminar activity."

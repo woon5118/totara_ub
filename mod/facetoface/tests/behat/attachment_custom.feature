@@ -19,8 +19,7 @@ Feature: Manage custom assets/facilitators by non-admin user
       | name              | course | intro                           |
       | Test seminar name | C1     | <p>Test seminar description</p> |
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
+    And I am on "Test seminar name" seminar homepage
     And I follow "Add event"
 
   Scenario Outline: Add edit seminar custom item as editing teacher

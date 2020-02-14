@@ -12,133 +12,30 @@ Feature: Filter session by pre-defined rooms
     And the following "activities" exist:
       | activity   | name              | course | idnumber |
       | facetoface | Test seminar name | C1     | S9103    |
+    And the following "global rooms" exist in "mod_facetoface" plugin:
+      | name   | capacity | custom:building | custom:location |
+      | Room 1 | 10       | Building 123    | {"address":"123 Tory street","size":"medium","view":"satellite","display":"map","zoom":12,"location":{"latitude":-31.95,"longitude":115.85}} |
+      | Room 2 | 10       | Building 234    | {"address":"234 Tory street","size":"medium","view":"satellite","display":"map","zoom":12,"location":{"latitude":-31.95,"longitude":115.85}} |
+      | Room 3 | 10       | Building 345    | {"address":"345 Tory street","size":"medium","view":"satellite","display":"map","zoom":12,"location":{"latitude":-31.95,"longitude":115.85}} |
+      | Room 4 | 10       | Building 456    | {"address":"456 Tory street","size":"medium","view":"satellite","display":"map","zoom":12,"location":{"latitude":-31.95,"longitude":115.85}} |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details |
+      | Test seminar name | event 1 |
+      | Test seminar name | event 2 |
+      | Test seminar name | event 3 |
+      | Test seminar name | event 4 |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start                | finish               | rooms  |
+      | event 1      | 1 Jan next year 11am | 1 Jan next year 12pm | Room 1 |
+      | event 2      | 2 Jan next year 11am | 2 Jan next year 12pm | Room 2 |
+      | event 3      | 3 Jan next year 11am | 3 Jan next year 12pm | Room 3 |
+      | event 4      | 4 Jan next year 11am | 4 Jan next year 12pm | Room 4 |
 
     And I log in as "admin"
-    And I navigate to "Rooms" node in "Site administration > Seminars"
-    And I press "Add a new room"
-    And I set the following fields to these values:
-      | Name              | Room 1          |
-      | Building          | Building 123    |
-      | Address           | 123 Tory street |
-      | Capacity          | 10              |
-    And I click on "#id_customfield_locationsize_medium" "css_element"
-    And I click on "#id_customfield_locationview_satellite" "css_element"
-    And I click on "#id_customfield_locationdisplay_map" "css_element"
-    And I press "Add a room"
-
-    And I press "Add a new room"
-    And I set the following fields to these values:
-      | Name              | Room 2          |
-      | Building          | Building 234    |
-      | Address           | 234 Tory street |
-      | Capacity          | 10              |
-    And I click on "#id_customfield_locationsize_medium" "css_element"
-    And I click on "#id_customfield_locationview_satellite" "css_element"
-    And I click on "#id_customfield_locationdisplay_map" "css_element"
-    And I press "Add a room"
-
-    And I press "Add a new room"
-    And I set the following fields to these values:
-      | Name              | Room 3          |
-      | Building          | Building 345    |
-      | Address           | 345 Tory street |
-      | Capacity          | 10              |
-    And I click on "#id_customfield_locationsize_medium" "css_element"
-    And I click on "#id_customfield_locationview_satellite" "css_element"
-    And I click on "#id_customfield_locationdisplay_map" "css_element"
-    And I press "Add a room"
-
-    And I press "Add a new room"
-    And I set the following fields to these values:
-      | Name              | Room 4          |
-      | Building          | Building 456    |
-      | Address           | 456 Tory street |
-      | Capacity          | 10              |
-    And I click on "#id_customfield_locationsize_medium" "css_element"
-    And I click on "#id_customfield_locationview_satellite" "css_element"
-    And I click on "#id_customfield_locationdisplay_map" "css_element"
-    And I press "Add a room"
 
   @javascript
   Scenario: Add sessions with different rooms and filter sessions by rooms
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
-
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 1    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | ## next year ## Y ## |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select rooms" "link"
-    And I click on "Room 1, Building 123, 123 Tory street (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
-    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
-    And I press "Save changes"
-
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 2    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | ## next year ## Y ## |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 00   |
-      | timefinish[day]    | 2    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select rooms" "link"
-    And I click on "Room 2, Building 234, 234 Tory street (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
-    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
-    And I press "Save changes"
-
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 3    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | ## next year ## Y ## |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 00   |
-      | timefinish[day]    | 3    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select rooms" "link"
-    And I click on "Room 3, Building 345, 345 Tory street (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
-    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
-    And I press "Save changes"
-
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 4    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | ## next year ## Y ## |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 00   |
-      | timefinish[day]    | 4    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I click on "Select rooms" "link"
-    And I click on "Room 4, Building 456, 456 Tory street (Capacity: 10)" "text" in the "Choose rooms" "totaradialogue"
-    And I click on "OK" "button" in the "Choose rooms" "totaradialogue"
-    And I press "Save changes"
+    And I am on "Test seminar name" seminar homepage
 
     When I set the field "roomid" to "Room 1"
     Then I should see "Room 1" in the "1 January" "table_row"

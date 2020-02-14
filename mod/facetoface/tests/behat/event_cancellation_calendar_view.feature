@@ -26,44 +26,22 @@ Feature: Seminar event cancellation calendar views
     And I press "Save changes"
     And I log out
 
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name         | course | intro               |
+      | Test Seminar | C1     | <p>Test Seminar</p> |
+
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface   | details | capacity |
+      | Test Seminar | event 1 | 29       |
+
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start       | finish     | sessiontimezone | starttimezone   | finishtimezone  |
+      | event 1      | +1 day 1am  | +1 day 2am | Australia/Perth | Australia/Perth | Australia/Perth |
+      | event 1      | +1 day 10am | +1 day 4pm | Australia/Perth | Australia/Perth | Australia/Perth |
+
     Given I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test Seminar |
-      | Description | Test Seminar |
-    And I turn editing mode off
-    And I follow "View all events"
-
-    Given I follow "Add event"
-    And I set the following fields to these values:
-      | Maximum bookings | 29 |
-    And I follow "show-selectdate0-dialog"
-    And I fill seminar session with relative date in form data:
-      | sessiontimezone     | Australia/Perth |
-      | timestart[day]      | 1                |
-      | timestart[month]    | 0                |
-      | timestart[year]     | 0                |
-      | timestart[hour]     | 0                |
-      | timestart[minute]   | 0                |
-      | timestart[timezone] | Australia/Perth |
-      | timefinish[day]     | 1                |
-      | timefinish[month]   | 0                |
-      | timefinish[year]    | 0                |
-      | timefinish[hour]    | 0                |
-      | timefinish[minute]  | 0                |
-      | timefinish[timezone]| Australia/Perth |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-
-    Given I follow "show-selectdate0-dialog"
-    And I set the following fields to these values:
-      | sessiontimezone     | Australia/Perth |
-      | timestart[hour]     | 10               |
-      | timestart[minute]   | 0                |
-      | timestart[timezone] | Australia/Perth |
-      | timefinish[hour]    | 16               |
-      | timefinish[minute]  | 0                |
-      | timefinish[timezone]| Australia/Perth |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
+    And I am on "Test Seminar" seminar homepage
+    Given I click on the seminar event action "Edit event" in row "0 / 29"
     And I click on "Teacher One" "checkbox"
     And I press "Save changes"
 
@@ -88,15 +66,13 @@ Feature: Seminar event cancellation calendar views
 
     Given I log out
     And I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar" seminar homepage
     And I click on the seminar event action "Cancel event" in row "1 / 29"
     And I press "Yes"
 
     When I log out
     And I log in as "learner1"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar" seminar homepage
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
     And I should see "Cancelled" in the "10:00 AM - 4:00 PM" "table_row"
     And "Go to event" "link" should not exist in the ".mod_facetoface__event-dashboard" "css_element"
@@ -123,15 +99,13 @@ Feature: Seminar event cancellation calendar views
 
     Given I log out
     And I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar" seminar homepage
     And I click on the seminar event action "Cancel event" in row "1 / 29"
     And I press "Yes"
 
     When I log out
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar" seminar homepage
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
     And I should see "Cancelled" in the "10:00 AM - 4:00 PM" "table_row"
     And "Go to event" "link" should not exist in the ".mod_facetoface__event-dashboard" "css_element"
@@ -146,8 +120,7 @@ Feature: Seminar event cancellation calendar views
     And I should not see "Editing Trainer Teacher One"
 
   Scenario: mod_facetoface_cancel_802: cancelled events do not re-create in calendar when seminar updated
-    Given I am on "Course 1" course homepage
-    And I follow "Test Seminar"
+    Given I am on "Test Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | Description | Test Seminar Lorem ipsum dolor sit amet |
@@ -157,8 +130,7 @@ Feature: Seminar event cancellation calendar views
     And I log out
 
     When I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar" seminar homepage
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
     And I should see "Cancelled" in the "10:00 AM - 4:00 PM" "table_row"
     And "Go to event" "link" should not exist in the ".mod_facetoface__event-dashboard" "css_element"

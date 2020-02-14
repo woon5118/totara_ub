@@ -35,6 +35,9 @@ Feature: Seminar Signup Admin Approval
       | jimmy | manager |
       | timmy | manager |
       | sammy | manager |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name                       | intro                          | course  |
+      | Classroom Connect Activity | <p>Classroom Connect Tests</p> | CCC     |
     And I log in as "admin"
     And I navigate to "Global settings" node in "Site administration > Seminars"
     And I click on "s__facetoface_approvaloptions[approval_none]" "checkbox"
@@ -42,11 +45,7 @@ Feature: Seminar Signup Admin Approval
     And I click on "s__facetoface_approvaloptions[approval_manager]" "checkbox"
     And I click on "s__facetoface_approvaloptions[approval_admin]" "checkbox"
     And I press "Save changes"
-    And I am on "Classroom Connect Course" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name              | Classroom Connect Activity |
-      | Description       | Classroom Connect Tests    |
-    And I follow "View all events"
+    And I am on "Classroom Connect Activity" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I expand all fieldsets
     And I click on "#id_approvaloptions_approval_admin" "css_element"
@@ -65,7 +64,7 @@ Feature: Seminar Signup Admin Approval
 
   Scenario: Student signs up with no manager assigned when admin approval is required
     When I log in as "sally"
-    And I am on "Classroom Connect Course" course homepage
+    And I am on "Classroom Connect Activity" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager and Administrative approval"
     Then I should see "This seminar requires manager approval. Users without a manager cannot join the seminar."
@@ -77,7 +76,7 @@ Feature: Seminar Signup Admin Approval
     And I press "Save changes"
     And I log out
     And I log in as "sally"
-    And I am on "Classroom Connect Course" course homepage
+    And I am on "Classroom Connect Activity" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager and Administrative approval"
     And I press "Request approval"
@@ -113,7 +112,7 @@ Feature: Seminar Signup Admin Approval
 
   Scenario: Student gets approved through both steps of the 2 stage approval
     When I log in as "jimmy"
-    And I am on "Classroom Connect Course" course homepage
+    And I am on "Classroom Connect Activity" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager and Administrative approval"
     And I press "Request approval"
@@ -153,8 +152,7 @@ Feature: Seminar Signup Admin Approval
     And I click on "Dashboard" in the totara menu
     Then I should see "Seminar booking confirmation"
 
-    When I am on "Classroom Connect Course" course homepage
-    And I follow "View all events"
+    When I am on "Classroom Connect Activity" seminar homepage
     Then I should see "Booked" in the "Upcoming" "table_row"
 
   Scenario: Student signs up with manager assigned with manager select enabled and admin approval required and does not select manager
@@ -165,7 +163,7 @@ Feature: Seminar Signup Admin Approval
     And I log out
 
     And I log in as "sammy"
-    And I am on "Classroom Connect Course" course homepage
+    And I am on "Classroom Connect Activity" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager and Administrative approval"
     And I should see "Managers from all job assignments will be chosen if left empty"
@@ -183,8 +181,7 @@ Feature: Seminar Signup Admin Approval
   Scenario: Administrator approve and deny before manager
     # Add admin approver
     Given I log in as "admin"
-    And I am on "Classroom Connect Course" course homepage
-    And I follow "Classroom Connect Activity"
+    And I am on "Classroom Connect Activity" seminar homepage
     # Add users
     And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
@@ -219,16 +216,14 @@ Feature: Seminar Signup Admin Approval
 
     # Check decline
     When I log in as "jimmy"
-    And I am on "Classroom Connect Course" course homepage
-    And I follow "Classroom Connect Activity"
+    And I am on "Classroom Connect Activity" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should see "Request approval" in the ".mod_facetoface__eventinfo__sidebar__signup" "css_element"
     And I log out
 
     # Check approve
     When I log in as "timmy"
-    And I am on "Classroom Connect Course" course homepage
-    And I follow "Classroom Connect Activity"
+    And I am on "Classroom Connect Activity" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
     And I should see "Cancel booking" "link_or_button" in the seminar event sidebar "Booked"
@@ -236,8 +231,7 @@ Feature: Seminar Signup Admin Approval
 
     # Check haven't decided
     When I log in as "sammy"
-    And I am on "Classroom Connect Course" course homepage
-    And I follow "Classroom Connect Activity"
+    And I am on "Classroom Connect Activity" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should see "Requested" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
     And I should see "Cancel booking" "link_or_button" in the seminar event sidebar "Requested"
@@ -259,8 +253,7 @@ Feature: Seminar Signup Admin Approval
     And I press "Add"
     Then I should see "Approver name"
     # Add user to the event
-    And I am on "Classroom Connect Course" course homepage
-    And I follow "Classroom Connect Activity"
+    And I am on "Classroom Connect Activity" seminar homepage
     And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sammy Sam, sammy@example.com"
@@ -288,8 +281,7 @@ Feature: Seminar Signup Admin Approval
     And I log out
 
     When I log in as "admin"
-    And I am on "Classroom Connect Course" course homepage
-    And I follow "Classroom Connect Activity"
+    And I am on "Classroom Connect Activity" seminar homepage
     And I click on the seminar event action "Attendees" in row "#1"
     Then the following should exist in the "facetoface_sessions" table:
         | Name      | Status | Approver name |

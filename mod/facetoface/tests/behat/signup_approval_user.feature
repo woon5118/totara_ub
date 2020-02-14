@@ -19,6 +19,9 @@ Feature: Seminar Signup User Approval
     And the following job assignments exist:
       | user     | manager  |
       | student1 | student2 |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name         | course | approvaltype |
+      | Seminar 9360 | C9360  | 4            |
 
     And I log in as "admin"
     And I navigate to "Global settings" node in "Site administration > Seminars"
@@ -26,20 +29,17 @@ Feature: Seminar Signup User Approval
     And I click on "s__facetoface_approvaloptions[approval_self]" "checkbox"
     And I press "Save changes"
 
-    And I am on "Course 9360" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name              | Seminar 9360     |
-      | approvaloptions   | approval_manager |
-
   Scenario: Student gets approved through manager approval by "learner" role
-    And I am on "Course 9360" course homepage
-    And I follow "Seminar 9360"
-    And I follow "Add event"
-    And I press "Save changes"
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface   | details |
+      | Seminar 9360 | event 1 |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start        | finish        |
+      | event 1      | tomorrow 9am | tomorrow 10am |
     And I log out
 
     And I log in as "student1"
-    And I am on "Course 9360" course homepage
+    And I am on "Seminar 9360" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager Approval"
     And I press "Request approval"

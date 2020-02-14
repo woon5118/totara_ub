@@ -33,25 +33,25 @@ Feature: Seminar Signup Manager Approval
       | jimmy | manager |
       | timmy | manager |
       | sammy | manager |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | intro                          | course  | approvaltype |
+      | Classroom Connect | <p>Classroom Connect Tests</p> | CCC     | 4            |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details  | capacity |
+      | Classroom Connect | event 1a | 10       |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start        | finish        |
+      | event 1a     | tomorrow 9am | tomorrow 10am |
     And I log in as "admin"
     And I navigate to "Global settings" node in "Site administration > Seminars"
     And I click on "s__facetoface_approvaloptions[approval_none]" "checkbox"
     And I click on "s__facetoface_approvaloptions[approval_self]" "checkbox"
     And I press "Save changes"
-    And I am on "Classroom Connect Course" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name                | Classroom Connect       |
-      | Description         | Classroom Connect Tests |
-    And I follow "View all events"
-    And I follow "Add event"
-    And I set the following fields to these values:
-      | capacity              | 10   |
-    And I press "Save changes"
 
   Scenario: Student signs up with no manager assigned
     When I log out
     When I log in as "sally"
-    And I am on "Classroom Connect Course" course homepage
+    And I am on "Classroom Connect" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager Approval"
     And I should see "This seminar requires manager approval. Users without a manager cannot join the seminar."
@@ -72,7 +72,7 @@ Feature: Seminar Signup Manager Approval
     And I log out
 
     And I log in as "sally"
-    And I am on "Classroom Connect Course" course homepage
+    And I am on "Classroom Connect" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager Approval"
     And I press "Request approval"
@@ -108,7 +108,7 @@ Feature: Seminar Signup Manager Approval
     And I press "Save changes"
     And I log out
     And I log in as "sally"
-    And I am on "Classroom Connect Course" course homepage
+    And I am on "Classroom Connect" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager Approval"
     And I press "Request approval"
@@ -136,7 +136,7 @@ Feature: Seminar Signup Manager Approval
   Scenario: Student gets approved through manager approval
     When I log out
     And I log in as "jimmy"
-    And I am on "Classroom Connect Course" course homepage
+    And I am on "Classroom Connect" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager Approval"
     And I should see "Cassy Cas"
@@ -163,8 +163,7 @@ Feature: Seminar Signup Manager Approval
     And I click on "Dashboard" in the totara menu
     Then I should see "Seminar booking confirmation"
 
-    When I am on "Classroom Connect Course" course homepage
-    And I follow "View all events"
+    When I am on "Classroom Connect" seminar homepage
     Then I should see "Booked" in the "Upcoming" "table_row"
 
     When I click on "Go to event" "link" in the "Upcoming" "table_row"
@@ -177,7 +176,7 @@ Feature: Seminar Signup Manager Approval
     And I press "Save changes"
     And I log out
     And I log in as "jimmy"
-    And I am on "Classroom Connect Course" course homepage
+    And I am on "Classroom Connect" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager Approval"
     And I should see "Cassy Cas"
@@ -209,14 +208,13 @@ Feature: Seminar Signup Manager Approval
     And I click on "Dashboard" in the totara menu
     Then I should see "Seminar booking confirmation"
 
-    When I am on "Classroom Connect Course" course homepage
-    And I follow "View all events"
+    When I am on "Classroom Connect" seminar homepage
     Then I should see "Booked" in the "Upcoming" "table_row"
 
   Scenario: Trainer is given permission to approve any bookings
     And I log out
     When I log in as "jimmy"
-    And I am on "Classroom Connect Course" course homepage
+    And I am on "Classroom Connect" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager Approval"
     And I should see "Cassy Cas"
@@ -225,8 +223,7 @@ Feature: Seminar Signup Manager Approval
     And I run all adhoc tasks
     And I log out
     When I log in as "trainer"
-    And I am on "Classroom Connect Course" course homepage
-    And I follow "View all events"
+    And I am on "Classroom Connect" seminar homepage
     And I click on the seminar event action "Attendees" in row "#1"
     Then I should not see "Approval required" in the ".tabtree" "css_element"
 
@@ -237,8 +234,7 @@ Feature: Seminar Signup Manager Approval
       | mod/facetoface:approveanyrequest | Allow      | teacher | Course       | CCC       |
     And I log out
     When I log in as "trainer"
-    And I am on "Classroom Connect Course" course homepage
-    And I follow "View all events"
+    And I am on "Classroom Connect" seminar homepage
     And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Approval required"
     And I click on "input[value='2']" "css_element" in the "Jimmy Jim" "table_row"
@@ -253,7 +249,7 @@ Feature: Seminar Signup Manager Approval
     And I log out
 
     And I log in as "jimmy"
-    And I am on "Classroom Connect Course" course homepage
+    And I am on "Classroom Connect" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager Approval"
     But I should see "You don't have permission to signup to this seminar event"
@@ -272,7 +268,7 @@ Feature: Seminar Signup Manager Approval
     And I run all adhoc tasks
     And I log out
     And I log in as "admin"
-    And I am on "Classroom Connect Course" course homepage
+    And I am on "Classroom Connect" seminar homepage
     And I click on the seminar event action "Delete event" in row "#1"
     And I press "Delete"
     And I run all adhoc tasks
@@ -287,43 +283,23 @@ Feature: Seminar Signup Manager Approval
     And the following job assignments exist:
       | user  | fullname | idnumber | manager |
       | sally | jajaja1  | 1        | timmy   |
-    And I am on "Classroom Connect Course" course homepage
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name                | Classroom Connect 2       |
-      | Description         | Classroom Connect Tests 2 |
-    And I follow "Classroom Connect 2"
-    And I follow "Add event"
-    And I set the following fields to these values:
-      | capacity | 5 |
-    And I press "Save changes"
-    And I follow "Add event"
-    And I click on "Edit session" "link" in the "Select room" "table_row"
-    And I fill seminar session with relative date in form data:
-      | timestart[day]       | +2 |
-      | timefinish[day]      | +3 |
-      | timefinish[hour]     | +2 |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I set the following fields to these values:
-      | capacity              | 10   |
-    And I press "Save changes"
-    And I am on "Classroom Connect Course" course homepage
-    And I follow "Classroom Connect"
-    And I follow "View all events"
-    And I follow "Add event"
-    And I click on "Edit session" "link" in the "Select room" "table_row"
-    And I fill seminar session with relative date in form data:
-      | timestart[day]       | +2 |
-      | timefinish[day]      | +3 |
-      | timefinish[hour]     | +2 |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I set the following fields to these values:
-      | capacity | 10 |
-    And I press "Save changes"
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name                | intro                            | course  | approvaltype |
+      | Classroom Connect 2 | <p>Classroom Connect Tests 2</p> | CCC     | 4            |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface          | details  | capacity |
+      | Classroom Connect   | event 1b | 10       |
+      | Classroom Connect 2 | event 2a | 5        |
+      | Classroom Connect 2 | event 2b | 10       |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start        | finish        |
+      | event 1b     | +2 days 12am | +3 days 12am  |
+      | event 2a     | tomorrow 9am | tomorrow 10am |
+      | event 2b     | +2 days 12am | +3 days 12am  |
     And I log out
 
     And I log in as "sally"
-    And I am on "Classroom Connect Course" course homepage
-    And I follow "Classroom Connect"
+    And I am on "Classroom Connect" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     When I press "Request approval"
     And I should see "Manager Approval"

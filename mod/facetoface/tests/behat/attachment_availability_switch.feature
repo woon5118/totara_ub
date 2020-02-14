@@ -34,8 +34,7 @@ Feature: Seminar asset/facilitator availability related to switching
 
   Scenario Outline: Seminar switch site item to not allow conflicts
     Given I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "Test Seminar 1"
+    And I am on "Test Seminar 1" seminar homepage
     And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 20 |
@@ -46,11 +45,6 @@ Feature: Seminar asset/facilitator availability related to switching
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select <item_type>" "link"
     And I click on "<name> 2" "text" in the "Choose <collection_type>" "totaradialogue"
@@ -66,11 +60,6 @@ Feature: Seminar asset/facilitator availability related to switching
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select <item_type>" "link"
     And I click on "<name> 2" "text" in the "Choose <collection_type>" "totaradialogue"
@@ -85,8 +74,7 @@ Feature: Seminar asset/facilitator availability related to switching
     Then I should see "<name> has conflicting usage"
     And I press "Cancel"
 
-    When I am on "Course 1" course homepage
-    And I follow "Test Seminar 1"
+    When I am on "Test Seminar 1" seminar homepage
     And I click on the seminar event action "Edit event" in row "0 / 30"
     And I click on "Edit session" "link"
     And I set the following fields to these values:
@@ -95,11 +83,6 @@ Feature: Seminar asset/facilitator availability related to switching
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 12   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 13   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     And I navigate to "<column_or_node>" node in "Site administration > Seminars"
@@ -116,8 +99,7 @@ Feature: Seminar asset/facilitator availability related to switching
 
   Scenario Outline: Seminar switch custom item to not allow conflicts
     Given I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test Seminar 1"
+    And I am on "Test Seminar 1" seminar homepage
     And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 40 |
@@ -128,11 +110,6 @@ Feature: Seminar asset/facilitator availability related to switching
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select <item_type>" "link"
     And I click on "Create" "link" in the "Choose <collection_type>" "totaradialogue"
@@ -151,11 +128,6 @@ Feature: Seminar asset/facilitator availability related to switching
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select <item_type>" "link"
     And I click on "Etwas 1 (Seminar: Test Seminar 1)" "link"
@@ -176,11 +148,6 @@ Feature: Seminar asset/facilitator availability related to switching
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 12   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 13   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     When I click on the seminar event action "Edit event" in row "0 / 50"

@@ -34,8 +34,7 @@ Feature: Seminar asset/facilitator availability related to attributes
 
   Scenario Outline: Hiding related seminar item availability
     Given I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test Seminar 1"
+    And I am on "Test Seminar 1" seminar homepage
     And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 20 |
@@ -46,11 +45,6 @@ Feature: Seminar asset/facilitator availability related to attributes
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select <item_type>" "link"
     And I should see "<name> 1"
@@ -70,8 +64,7 @@ Feature: Seminar asset/facilitator availability related to attributes
     And I click on "Hide" "link" in the "<name> 1" "table_row"
     And I log out
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test Seminar 1"
+    And I am on "Test Seminar 1" seminar homepage
 
     When I follow "Add event"
     And I click on "Edit session" "link"
@@ -81,11 +74,6 @@ Feature: Seminar asset/facilitator availability related to attributes
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 2    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select <item_type>" "link"
     Then I should not see "<name> 1"
@@ -111,11 +99,6 @@ Feature: Seminar asset/facilitator availability related to attributes
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 2    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select <item_type>" "link"
     Then I should see "<name> 1"
@@ -133,8 +116,7 @@ Feature: Seminar asset/facilitator availability related to attributes
 
   Scenario Outline: Custom seminar item availability
     Given I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test Seminar 1"
+    And I am on "Test Seminar 1" seminar homepage
     And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 30 |
@@ -145,11 +127,6 @@ Feature: Seminar asset/facilitator availability related to attributes
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select <item_type>" "link"
     And I click on "Create" "link" in the "Choose <collection_type>" "totaradialogue"
@@ -169,11 +146,6 @@ Feature: Seminar asset/facilitator availability related to attributes
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 12   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 13   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select <item_type>" "link"
     Then I should see "Etwas 1 (Seminar: Test Seminar 1)"
@@ -195,11 +167,6 @@ Feature: Seminar asset/facilitator availability related to attributes
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select <item_type>" "link"
     Then I should see "Etwas 1 (<item_type> unavailable on selected dates) (Seminar: Test Seminar 1)"
@@ -225,8 +192,7 @@ Feature: Seminar asset/facilitator availability related to attributes
     And I click on "Cancel" "button" in the "Choose <collection_type>" "totaradialogue"
     And I press "Cancel"
 
-    When I am on "Course 1" course homepage
-    And I follow "Test Seminar 2"
+    When I am on "Test Seminar 2" seminar homepage
     And I follow "Add event"
     And I click on "Select <item_type>" "link"
     Then I should not see "Etwas 1"
@@ -239,8 +205,7 @@ Feature: Seminar asset/facilitator availability related to attributes
     And I log out
 
     When I log in as "teacher2"
-    And I am on "Course 1" course homepage
-    And I follow "Test Seminar 2"
+    And I am on "Test Seminar 2" seminar homepage
     And I follow "Add event"
     And I click on "Select <item_type>" "link"
     Then I should not see "Etwas 1"
@@ -251,8 +216,7 @@ Feature: Seminar asset/facilitator availability related to attributes
     And I click on "Cancel" "button" in the "Choose <collection_type>" "totaradialogue"
     And I press "Cancel"
 
-    When I am on "Course 1" course homepage
-    And I follow "Test Seminar 1"
+    When I am on "Test Seminar 1" seminar homepage
     And I follow "Add event"
     And I click on "Select <item_type>" "link"
     Then I should see "Etwas 1 (Seminar: Test Seminar 1)"

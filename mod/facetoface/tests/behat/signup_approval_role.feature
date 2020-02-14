@@ -34,6 +34,15 @@ Feature: Seminar Signup Role Approval
       | jimmy | manager |
       | timmy | manager |
       | sammy | manager |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | intro                          | course  | approvaltype | approvalrole |
+      | Classroom Connect | <p>Classroom Connect Tests</p> | CCC     | 2            | 3            |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details | capacity |
+      | Classroom Connect | event 1 | 10       |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start        | finish        |
+      | event 1      | tomorrow 9am | tomorrow 10am |
     And I log in as "admin"
     And I navigate to "Global settings" node in "Site administration > Seminars"
     And I click on "s__facetoface_session_roles[3]" "checkbox"
@@ -43,14 +52,8 @@ Feature: Seminar Signup Role Approval
     And I press "Save changes"
     And I click on "s__facetoface_approvaloptions[approval_role_3]" "checkbox"
     And I press "Save changes"
-    And I am on "Classroom Connect Course" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name              | Classroom Connect       |
-      | Description       | Classroom Connect Tests |
-    And I follow "View all events"
-    And I follow "Add event"
-    And I set the following fields to these values:
-      | capacity              | 10   |
+    And I am on "Classroom Connect" seminar homepage
+    And I click on the seminar event action "Edit event" in row "#1"
     And I click on "Freddy Fred" "checkbox" in the "#id_trainerroles" "css_element"
     And I press "Save changes"
     And I log out

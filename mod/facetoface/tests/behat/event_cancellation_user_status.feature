@@ -33,46 +33,34 @@ Feature: Seminar event cancellation status
       | learner4 | C1     | student         |
       | manager1 | C1     | editingteacher  |
 
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name         | intro               | course  |
+      | Test Seminar | <p>Test Seminar</p> | C1      |
+
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface   | details |
+      | Test Seminar | event 1 |
+
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start                | finish               | starttimezone    | finishtimezone   | sessiontimezone  |
+      | event 1      | 10 Feb next year 9am | 10 Feb next year 3pm | Pacific/Auckland | Pacific/Auckland | Pacific/Auckland |
+
     Given I log in as "admin"
     And I expand "Site administration" node
     And I expand "Plugins" node
     And I expand "Enrolments" node
     And I follow "Manage enrol plugins"
     And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name                               | Test Seminar |
-      | Description                        | Test Seminar |
-    And I follow "View all events"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | sessiontimezone     | Pacific/Auckland |
-      | timestart[day]      | 10               |
-      | timestart[month]    | 2                |
-      | timestart[year]     | ## next year ## Y ## |
-      | timestart[hour]     | 9                |
-      | timestart[minute]   | 0                |
-      | timestart[timezone] | Pacific/Auckland |
-      | timefinish[day]     | 10               |
-      | timefinish[month]   | 2                |
-      | timefinish[year]    | ## next year ## Y ## |
-      | timefinish[hour]    | 15               |
-      | timefinish[minute]  | 0                |
-      | timefinish[timezone]| Pacific/Auckland |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Save changes"
 
   # -------------------------------------------------------------------------------------
   Scenario: Event cancellation in a Seminar with manager approval required.
-    Given I click on "Test Seminar" "link"
+    Given I am on "Test Seminar" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I expand all fieldsets
     And I click on "#id_approvaloptions_approval_manager" "css_element"
     And I press "Save and display"
 
-    Then I am on "Course 1" course homepage
-    And I navigate to "Enrolment methods" node in "Course administration > Users"
+    Then I navigate to "Enrolment methods" node in "Course administration > Users"
     And I set the field "Add method" to "Seminar direct enrolment"
     And I press "Add method"
     And I log out
@@ -110,7 +98,7 @@ Feature: Seminar event cancellation status
 
 #   Manager adding Learners 3 and 4 as attendees, approving Learner 1 and declining request for Learner 2
     Given I log in as "manager1"
-    And I am on "Course 1" course homepage
+    And I am on "Test Seminar" seminar homepage
     And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner Three, learner3@example.com,Learner Four, learner4@example.com"
@@ -185,8 +173,7 @@ Feature: Seminar event cancellation status
 #  Cancel the event and check status again. Cancelled users should remain in the cancellation tab and declined users
 #  should not appear anywhere
     Given I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "Test Seminar"
+    And I am on "Test Seminar" seminar homepage
     When I click on the seminar event action "Cancel event" in row "3 / 10"
     And I should see "Cancelling event in"
     And I should see "Cancelling this event will remove all of its booking, attendance and grade records. All attendees will be notified."
@@ -215,7 +202,7 @@ Feature: Seminar event cancellation status
     And I log out
 
     Given I log in as "manager1"
-    And I am on "Course 1" course homepage
+    And I am on "Test Seminar" seminar homepage
     And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Five, learner5@example.com"
@@ -237,7 +224,7 @@ Feature: Seminar event cancellation status
     And I log out
 
     When I log in as "manager1"
-    And I am on "Course 1" course homepage
+    And I am on "Test Seminar" seminar homepage
     And I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Learner One" in the "#facetoface_sessions" "css_element"
     And I should see "Learner Three" in the "#facetoface_sessions" "css_element"
@@ -250,8 +237,7 @@ Feature: Seminar event cancellation status
     And I log out
 
     When I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "Test Seminar"
+    And I am on "Test Seminar" seminar homepage
     When I click on the seminar event action "Cancel event" in row "#1"
     And I should see "Cancelling event in"
     And I should see "Cancelling this event will remove all of its booking, attendance and grade records. All attendees will be notified."

@@ -12,52 +12,26 @@ Feature: Admin can change default Seminar direct enrolment plugin settings
     And the following "courses" exist:
       | fullname | shortname | format |
       | Course 1 | C1        | topics |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | intro                           | course | approvaltype |
+      | Test seminar name | <p>Test seminar description</p> | C1     | 0            |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details |
+      | Test seminar name | event 1 |
+      | Test seminar name | event 2 |
+      | Test seminar name | event 3 |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start               | finish               |
+      | event 1      | 1 Jan next year 9am | 1 Jan next year 10am |
+      | event 2      | 2 Jan next year 9am | 2 Jan next year 10am |
+      | event 3      | 3 Jan next year 9am | 3 Jan next year 10am |
 
     And I log in as "admin"
     And I navigate to "Manage enrol plugins" node in "Site administration > Plugins > Enrolments"
     And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
-    And I am on "Course 1" course homepage
+    And I am on "Test seminar name" seminar homepage
     And I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name | Seminar direct enrolment |
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
-      | No Approval | 1                        |
-    And I follow "View all events"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 1    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | ## next year ## Y ## |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Save changes"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 2    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | ## next year ## Y ## |
-      | timefinish[day]    | 2    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Save changes"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 3    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | ## next year ## Y ## |
-      | timefinish[day]    | 3    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Save changes"
     And I log out
 
   Scenario: Change Enrolment displayed on course page setting from default setting to a new one
@@ -69,7 +43,7 @@ Feature: Admin can change default Seminar direct enrolment plugin settings
     And I log out
 
     And I log in as "admin"
-    And I am on "Course 1" course homepage
+    And I am on "Test seminar name" seminar homepage
     And I navigate to "Enrolment methods" node in "Course administration > Users"
     And I click on "Edit" "link" in the "Seminar direct enrolment" "table_row"
     And I set the following fields to these values:

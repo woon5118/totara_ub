@@ -34,8 +34,7 @@ Feature: Verify what users on waitlist can be seen in the seminar event dashboar
       | learner2  | event 1      | waitlisted |
 
     Given I log in as "admin"
-    And I am on "Course 1" course homepage
-    When I follow "View all events"
+    When I am on "Seminar 1" seminar homepage
     Then I should see "1 / 10" in the "mod_facetoface_upcoming_events_table" "table"
     And I should see "1 on waitlist" in the "mod_facetoface_upcoming_events_table" "table"
 
@@ -50,8 +49,7 @@ Feature: Verify what users on waitlist can be seen in the seminar event dashboar
       | Seminar 1  | event 1 | 10       |
 
     Given I log in as "admin"
-    And I am on "Course 1" course homepage
-    When I follow "View all events"
+    When I am on "Seminar 1" seminar homepage
     Then I should see "0 / 10" in the "mod_facetoface_upcoming_events_table" "table"
     And I should not see "on waitlist" in the "mod_facetoface_upcoming_events_table" "table"
 
@@ -82,8 +80,7 @@ Feature: Verify what users on waitlist can be seen in the seminar event dashboar
       | learner4  | event 1      | booked     |
 
     Given I log in as "admin"
-    And I am on "Course 1" course homepage
-    When I follow "View all events"
+    When I am on "Seminar 1" seminar homepage
     Then I should see "3 / 2" in the "mod_facetoface_upcoming_events_table" "table"
     And I should see "(Overbooked)" in the "mod_facetoface_upcoming_events_table" "table"
     And I should see "1 on waitlist" in the "mod_facetoface_upcoming_events_table" "table"

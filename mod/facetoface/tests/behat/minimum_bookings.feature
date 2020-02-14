@@ -51,15 +51,7 @@ Feature: Minimum Seminar bookings
       | timestart[day]     | 29       |
       | timestart[month]   | December |
       | timestart[year]    | ## next year ## Y ## |
-      | timestart[hour]    | 12       |
-      | timestart[minute]  | 00       |
-      | timefinish[day]    | 29       |
-      | timefinish[month]  | December |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 13       |
-      | timefinish[minute] | 00       |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I wait "1" seconds
     And I click on "Save changes" "button"
     And I click on the seminar event action "Edit event" in row "29 December"
     Then the field "Minimum bookings" matches value "2"
@@ -80,9 +72,6 @@ Feature: Minimum Seminar bookings
     And I click on "Editing Trainer" "text" in the "#admin-facetoface_session_rolesnotify" "css_element"
     And I click on "<notification to>" "checkbox" in the "#admin-facetoface_session_rolesnotify" "css_element"
     And I press "Save changes"
-    Given I am on "Course 1" course homepage
-    And I follow "View all events"
-    And I should see "test activity" in the ".mod_facetoface__event-dashboard" "css_element"
     And I run the scheduled task "mod_facetoface\task\send_notifications_task"
     And I run all adhoc tasks
     # Confirm that the alert was sent.

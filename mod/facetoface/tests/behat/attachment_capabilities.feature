@@ -46,8 +46,7 @@ Feature: Check asset/facilitator actions are performed by users with the right p
 
   Scenario Outline: Check manageadhoc capability for editingteacher role
     Given I log in as "trainer1"
-    And I am on "Course 1" course homepage
-    And I click on "View all events" "link"
+    And I am on "seminar 1" seminar homepage
     And I click on the seminar event action "Edit event" in row "Upcoming"
     When I click on "Select <collection_type>" "link"
     Then I should see "Browse" in the "Choose <collection_type>" "totaradialogue"
@@ -75,8 +74,7 @@ Feature: Check asset/facilitator actions are performed by users with the right p
       | mod/facetoface:manageadhoc<collection_type> | Prohibit   | editingteacher | Course       | C1        |
     And I log out
     And I log in as "trainer1"
-    And I am on "Course 1" course homepage
-    And I click on "View all events" "link"
+    And I am on "seminar 1" seminar homepage
     And I click on the seminar event action "Edit event" in row "Upcoming"
     When I click on "Select <collection_type>" "link"
     Then I should see "Browse" in the "Choose <collection_type>" "totaradialogue"
@@ -93,8 +91,7 @@ Feature: Check asset/facilitator actions are performed by users with the right p
 
   Scenario Outline: Check manageadhoc capability for teacher role
     Given I log in as "trainer2"
-    And I am on "Course 1" course homepage
-    And I click on "View all events" "link"
+    And I am on "seminar 1" seminar homepage
     And I click on the seminar event action "Edit event" in row "Upcoming"
     When I click on "Select <collection_type>" "link"
     Then I should see "Browse" in the "Choose <collection_type>" "totaradialogue"
@@ -122,8 +119,7 @@ Feature: Check asset/facilitator actions are performed by users with the right p
       | mod/facetoface:manageadhoc<collection_type> | Prohibit   | teacher | Course       | C1        |
     And I log out
     And I log in as "trainer2"
-    And I am on "Course 1" course homepage
-    And I click on "View all events" "link"
+    And I am on "seminar 1" seminar homepage
     And I click on the seminar event action "Edit event" in row "Upcoming"
     When I click on "Select <collection_type>" "link"
     Then I should see "Browse" in the "Choose <collection_type>" "totaradialogue"
@@ -140,8 +136,7 @@ Feature: Check asset/facilitator actions are performed by users with the right p
 
   Scenario Outline: Check manageadhoc/managesitewide capabilities for manager
     Given I log in as "manager"
-    And I am on "Course 1" course homepage
-    And I click on "View all events" "link"
+    And I am on "seminar 1" seminar homepage
     And I click on the seminar event action "Edit event" in row "Upcoming"
     When I click on "Select <collection_type>" "link"
     Then I should see "Browse" in the "Choose <collection_type>" "totaradialogue"
@@ -161,8 +156,7 @@ Feature: Check asset/facilitator actions are performed by users with the right p
       | name       |
       | <name> One |
 
-    And I am on "Course 1" course homepage
-    And I click on "View all events" "link"
+    And I am on "seminar 1" seminar homepage
     And I click on the seminar event action "Edit event" in row "Upcoming"
     When I click on "Select <collection_type>" "link"
     Then I should see "Browse" in the "Choose <collection_type>" "totaradialogue"
@@ -180,8 +174,7 @@ Feature: Check asset/facilitator actions are performed by users with the right p
       | name       |
       | <name> Two |
 
-    And I am on "Course 1" course homepage
-    And I click on "View all events" "link"
+    And I am on "seminar 1" seminar homepage
     And I click on the seminar event action "Edit event" in row "Upcoming"
     When I click on "Select <collection_type>" "link"
     Then I should see "Browse" in the "Choose <collection_type>" "totaradialogue"

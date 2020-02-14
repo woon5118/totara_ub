@@ -17,33 +17,24 @@ Feature: Seminar event cancellation trainer can be reassigned
       | user     | course | role    |
       | teacher1 | C1     | teacher |
 
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name         | intro               | course |
+      | Test Seminar | <p>Test Seminar</p> | C1     |
+
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface   | details |
+      | Test Seminar | event 1 |
+
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start                | finish               | starttimezone    | finishtimezone   | sessiontimezone  |
+      | event 1      | 10 Feb next year 9am | 10 Feb next year 3pm | Pacific/Auckland | Pacific/Auckland | Pacific/Auckland |
+
     Given I log in as "admin"
     And I navigate to "Global settings" node in "Site administration > Seminars"
-    And I wait "1" seconds
-    And I click on "#id_s__facetoface_session_roles_4" "css_element"
+    And I click on "Trainer" "checkbox_exact" in the "#admin-facetoface_session_roles" "css_element"
     And I press "Save changes"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test Seminar |
-      | Description | Test Seminar |
-    And I follow "View all events"
-    And I follow "Add event"
-    And I follow "show-selectdate0-dialog"
-    And I set the following fields to these values:
-      | sessiontimezone     | Pacific/Auckland |
-      | timestart[day]      | 10               |
-      | timestart[month]    | 2                |
-      | timestart[year]     | ## next year ## Y ## |
-      | timestart[hour]     | 9                |
-      | timestart[minute]   | 0                |
-      | timestart[timezone] | Pacific/Auckland |
-      | timefinish[day]     | 10               |
-      | timefinish[month]   | 2                |
-      | timefinish[year]    | ## next year ## Y ## |
-      | timefinish[hour]    | 15               |
-      | timefinish[minute]  | 0                |
-      | timefinish[timezone]| Pacific/Auckland |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
+    And I am on "Test Seminar" seminar homepage
+    And I click on the seminar event action "Edit event" in row "#1"
     And I click on "Teacher One" "checkbox"
     And I press "Save changes"
 
@@ -75,7 +66,6 @@ Feature: Seminar event cancellation trainer can be reassigned
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Teacher One" "checkbox"
     When I press "Save changes"
-    And I wait "1" seconds
     Then I should see "Saving this event as it is will cause a scheduling conflict"
     And I click on "Cancel" "button" in the ".modal" "css_element"
     And I log out

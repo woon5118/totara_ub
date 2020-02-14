@@ -15,12 +15,11 @@ Feature: Seminar sign-up periods validation
     And the following "course enrolments" exist:
       | user     | course | role    |
       | student1 | C1     | student |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | intro                           | course  |
+      | Test seminar name | <p>Test seminar description</p> | C1      |
     And I log in as "admin"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
-    And I follow "View all events"
+    And I am on "Test seminar name" seminar homepage
 
   Scenario Outline: Test sign-up period validation
     Given I follow "Add event"

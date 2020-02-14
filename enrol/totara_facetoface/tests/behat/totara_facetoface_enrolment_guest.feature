@@ -17,14 +17,20 @@ Feature: Guest users enrol themselves in courses where seminar direct enrolment 
     And the following "seminar sessions" exist in "mod_facetoface" plugin:
       | eventdetails | start                            | finish                                   |
       | event 1      | first day of September next year | first day of September next year +1 hour |
+    And the following "activities" exist:
+      | activity | name            | course | idnumber | submissiondrafts |
+      | assign   | Kawenga Taumaha | C1     | assign   | 0                |
 
     And I log in as "admin"
     And I navigate to "Manage enrol plugins" node in "Site administration > Plugins > Enrolments"
     And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
 
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Assignment" to section "1" and I fill the form with:
-      | Assignment name | Kawenga Taumaha |
+    And I am on "Wananga Whakamatautau" seminar homepage
+    And I follow "Kawenga Taumaha"
+    And I navigate to "Edit settings" node in "Assignment administration"
+    And I set the field "File submissions" to "1"
+    And I press "Save and display"
+
     And I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name | Whakauru Tika |
 
@@ -36,8 +42,7 @@ Feature: Guest users enrol themselves in courses where seminar direct enrolment 
 
   Scenario: Guest seminar direct enrolment from course page without auto sign-up
     When I log in as "user1"
-    And I am on "Course 1" course homepage
-    Then I should see "Wananga Whakamatautau"
+    And I am on "Wananga Whakamatautau" seminar homepage
     When I click on "Go to event" "link" in the "1 September" "table_row"
     And I press "Sign-up"
     Then I should see "Your" in the "#user-notifications" "css_element"
@@ -58,14 +63,14 @@ Feature: Guest users enrol themselves in courses where seminar direct enrolment 
     And I log out
 
     And I log in as "admin"
-    And I am on "Course 1" course homepage
+    And I am on "Wananga Whakamatautau" seminar homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     And I should see "Whakauru Tika" in the "One Uno" "table_row"
 
   Scenario: Guest seminar direct enrolment from course page with auto sign-up
     # Turn on auto sign-up as admin
     And I log in as "admin"
-    And I am on "Course 1" course homepage
+    And I am on "Wananga Whakamatautau" seminar homepage
     And I navigate to "Whakauru Tika" node in "Course administration > Users > Enrolment methods"
     And I set the following fields to these values:
       | Automatically sign users up to seminar events | 1 |
@@ -94,7 +99,7 @@ Feature: Guest users enrol themselves in courses where seminar direct enrolment 
     And I log out
 
     And I log in as "admin"
-    And I am on "Course 1" course homepage
+    And I am on "Wananga Whakamatautau" seminar homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     And I should see "Whakauru Tika" in the "One Uno" "table_row"
 
@@ -122,14 +127,14 @@ Feature: Guest users enrol themselves in courses where seminar direct enrolment 
     And I log out
 
     And I log in as "admin"
-    And I am on "Course 1" course homepage
+    And I am on "Wananga Whakamatautau" seminar homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     And I should see "Whakauru Tika" in the "One Uno" "table_row"
 
   Scenario: Guest seminar direct enrolment from enrolment options page with auto sign-up
     # Turn on auto sign-up as admin
     And I log in as "admin"
-    And I am on "Course 1" course homepage
+    And I am on "Wananga Whakamatautau" seminar homepage
     And I navigate to "Whakauru Tika" node in "Course administration > Users > Enrolment methods"
     And I set the following fields to these values:
       | Automatically sign users up to seminar events | 1 |
@@ -158,6 +163,6 @@ Feature: Guest users enrol themselves in courses where seminar direct enrolment 
     And I log out
 
     And I log in as "admin"
-    And I am on "Course 1" course homepage
+    And I am on "Wananga Whakamatautau" seminar homepage
     And I navigate to "Enrolled users" node in "Course administration > Users"
     And I should see "Whakauru Tika" in the "One Uno" "table_row"

@@ -26,6 +26,15 @@ Feature: Users can enrol on courses when two steps approval is on
       | jimmy | manager |
       | timmy | manager |
       | sammy | manager |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name             | intro                               | course |
+      | Course1 Seminar1 | <p>Course1 Seminar1 description</p> | CCC    |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface       | details |
+      | Course1 Seminar1 | event 1 |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start        | finish        | capacity |
+      | event 1      | tomorrow 9am | tomorrow 10am | 10       |
     And I log in as "admin"
     And I navigate to "Manage enrol plugins" node in "Site administration > Plugins > Enrolments"
     And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
@@ -35,14 +44,10 @@ Feature: Users can enrol on courses when two steps approval is on
     And I click on "s__facetoface_approvaloptions[approval_manager]" "checkbox"
     And I click on "s__facetoface_approvaloptions[approval_admin]" "checkbox"
     And I press "Save changes"
-    And I am on "Course1" course homepage
+    And I am on "Course1 Seminar1" seminar homepage
     And I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
-    And I am on "Course1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name              | Course1 Seminar1              |
-      | Description       | Course1 Seminar1 description  |
-    And I follow "View all events"
+    And I am on "Course1 Seminar1" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I expand all fieldsets
     And I click on "#id_approvaloptions_approval_admin" "css_element"
@@ -53,10 +58,6 @@ Feature: Users can enrol on courses when two steps approval is on
     And I click on "Micky Mau" from the search results in the "Select activity level approvers" totara dialogue
     And I click on "Save" "button" in the "Select activity level approvers" "totaradialogue"
     And I press "Save and display"
-    And I follow "Add event"
-    And I set the following fields to these values:
-      | capacity           | 10   |
-    And I press "Save changes"
     And I log out
 
   Scenario: Student gets approved and enrolled through both steps of the 2 stage approval

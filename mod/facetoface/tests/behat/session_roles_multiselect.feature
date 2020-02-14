@@ -20,6 +20,9 @@ Feature: Select from more than four available facetoface event roles
       | trainer3 | course1 | editingteacher |
       | trainer4 | course1 | editingteacher |
       | trainer5 | course1 | editingteacher |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name         | course  |
+      | Test Seminar | course1 |
     And I log in as "admin"
     And I navigate to "Global settings" node in "Site administration > Seminars"
     And I set the field "id_s__facetoface_session_roles_3" to "1"
@@ -27,10 +30,7 @@ Feature: Select from more than four available facetoface event roles
     And I log out
 
     And I log in as "trainer1"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name | Test Seminar |
-    And I follow "View all events"
+    And I am on "Test Seminar" seminar homepage
     And I follow "Add event"
     And I set the field "Editing Trainer" to "Tahi Trainer, Rua Trainer, Whā Trainer"
     And I press "Save changes"
@@ -39,7 +39,7 @@ Feature: Select from more than four available facetoface event roles
     Then I should see "Editing Trainer"
     And I should see "Tahi Trainer, Rua Trainer, Whā Trainer"
 
-    And I follow "Test Seminar"
+    And I am on "Test Seminar" seminar homepage
     And I click on the seminar event action "Edit event" in row "#1"
     And I set the field "Editing Trainer" to "Tahi Trainer"
     And I press "Save changes"
@@ -50,7 +50,7 @@ Feature: Select from more than four available facetoface event roles
     And I should not see "Rua Trainer"
     And I should not see "Whā Trainer"
 
-    And I follow "Test Seminar"
+    And I am on "Test Seminar" seminar homepage
     And I click on the seminar event action "Edit event" in row "#1"
     And I set the field "Editing Trainer" to "None"
     And I press "Save changes"

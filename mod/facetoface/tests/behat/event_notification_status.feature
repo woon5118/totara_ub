@@ -17,25 +17,23 @@ Feature: Seminar event notification must not be available for user after it has 
     And the following "activities" exist:
       | activity   | name              | course | idnumber |
       | facetoface | Test seminar name | C1     | seminar  |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details |
+      | Test seminar name | event 1 |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start        | finish        |
+      | event 1      | tomorrow 9am | tomorrow 10am |
     When I log in as "admin"
-    And I am on "Course 1" course homepage with editing mode on
-    And I turn editing mode off
-    And I follow "View all events"
-    And I follow "Add event"
-    And I press "Save changes"
 
   # Booking confirmation notifications.
   @javascript
   Scenario Outline: Seminar booking confirmation notifications are not available when disabled
-    Given I am on a totara site
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
+    And I am on "Test seminar name" seminar homepage
     And I navigate to "Notifications" node in "Seminar administration"
     And I click on "Edit" "link" in the "Seminar booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]" "table_row"
     And I click on "<signup_enabled>" "radio_exact"
     And I press "Save"
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
+    And I am on "Test seminar name" seminar homepage
     And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Boris Nikolaevich, boris@example.com"
@@ -46,8 +44,7 @@ Feature: Seminar event notification must not be available for user after it has 
     And I log out
 
     And I log in as "student1"
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
+    And I am on "Test seminar name" seminar homepage
     When I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I <visibility> "Receive confirmation by"
     When I press "Sign-up"
@@ -61,15 +58,12 @@ Feature: Seminar event notification must not be available for user after it has 
   # Booking cancellation notifications.
   @javascript
   Scenario Outline: Seminar booking cancellation notifications are not available when disabled
-    Given I am on a totara site
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
+    And I am on "Test seminar name" seminar homepage
     And I navigate to "Notifications" node in "Seminar administration"
     And I click on "Edit" "link" in the "Seminar booking cancellation" "table_row"
     And I click on "<cancellation_enabled>" "radio_exact"
     And I press "Save"
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
+    And I am on "Test seminar name" seminar homepage
     And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Boris Nikolaevich, boris@example.com"

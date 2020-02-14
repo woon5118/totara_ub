@@ -34,8 +34,7 @@ Feature: Seminar asset/facilitator availability related to reports
 
   Scenario Outline: Reportbuilder seminar item availability filter
     Given I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "Test Seminar 1"
+    And I am on "Test Seminar 1" seminar homepage
     And I follow "Add event"
     And I set the following fields to these values:
       | Maximum bookings | 20 |
@@ -46,11 +45,6 @@ Feature: Seminar asset/facilitator availability related to reports
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 11   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select <item_type>" "link"
     And I click on "<name> 1" "text" in the "Choose <collection_type>" "totaradialogue"
@@ -66,11 +60,6 @@ Feature: Seminar asset/facilitator availability related to reports
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 13   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 14   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select <item_type>" "link"
     And I click on "<name> 1" "text" in the "Choose <collection_type>" "totaradialogue"
@@ -86,11 +75,6 @@ Feature: Seminar asset/facilitator availability related to reports
       | timestart[year]    | ## next year ## Y ## |
       | timestart[hour]    | 15   |
       | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 16   |
-      | timefinish[minute] | 00   |
     And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I click on "Select <item_type>" "link"
     And I click on "<name> 2" "text" in the "Choose <collection_type>" "totaradialogue"

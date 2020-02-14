@@ -47,58 +47,21 @@ Feature: Allocate spaces for team in seminar
       | student3 | POS001   | sitemanager2 |
       | student4 | POS001   | sitemanager2 |
       | student5 | POS001   | staff1       |
-    And I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name                                    | Test seminar name        |
-      | Description                             | Test seminar description |
-      | How many times the user can sign-up?    | Unlimited                |
-      | Fully attended                          | 0                        |
-      | Partially attended                      | 0                        |
-      | No show                                 | 0                        |
-      | Unable to attend                        | 0                        |
-      | Allow manager reservations              | Yes                      |
-      | Maximum reservations                    | 10                       |
-    And I follow "View all events"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 1    |
-      | timestart[month]   | 2    |
-      | timestart[year]    | ## next year ## Y ## |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 0    |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 2    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 0    |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I set the following fields to these values:
-      | capacity           | 3    |
-    And I press "Save changes"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 2    |
-      | timestart[month]   | 2    |
-      | timestart[year]    | ## next year ## Y ## |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 0    |
-      | timefinish[day]    | 2    |
-      | timefinish[month]  | 2    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 0    |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I set the following fields to these values:
-      | capacity           | 3    |
-    And I press "Save changes"
-    And I log out
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | intro                           | course  | multisignupamount | multisignupfully | multisignuppartly | multisignupnoshow | multisignupunableto | managerreserve | maxmanagerreserves |
+      | Test Seminar name | <p>Test Seminar description</p> | C1      | unlimited         | 0                | 0                 | 0                 | 0                   | 1              | 10                 |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details | capacity |
+      | Test Seminar name | event 1 | 3        |
+      | Test Seminar name | event 2 | 3        |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start                 | finish                |
+      | event 1      | 1 Feb next year 11:00 | 1 Feb next year 12:00 |
+      | event 2      | 2 Feb next year 11:00 | 2 Feb next year 12:00 |
 
   Scenario: Manager can deallocate users that he has allocated in the current session
     Given I log in as "sitemanager1"
-    And I am on "Course 1" course homepage
+    And I am on "Test Seminar name" seminar homepage
     And I click on the link "Go to event" in row 1
     And I follow "Allocate spaces for team"
     And I set the field "Available team members" to "Sam1 Student1"
@@ -113,7 +76,7 @@ Feature: Allocate spaces for team in seminar
 
   Scenario: Capacity should be unaffected if removing allocation and create reservations when removing allocations is set to Yes
     Given I log in as "sitemanager1"
-    And I am on "Course 1" course homepage
+    And I am on "Test Seminar name" seminar homepage
     And I click on the link "Go to event" in row 1
     And I follow "Allocate spaces for team"
     And I set the field "Available team members" to "Sam1 Student1"
@@ -137,7 +100,7 @@ Feature: Allocate spaces for team in seminar
 
   Scenario: Capacity should be affected if removing allocation and create reservations when removing allocations is set to No
     Given I log in as "sitemanager1"
-    And I am on "Course 1" course homepage
+    And I am on "Test Seminar name" seminar homepage
     And I click on the link "Go to event" in row 1
     And I follow "Allocate spaces for team"
     And I set the field "Available team members" to "Sam1 Student1"
@@ -160,7 +123,7 @@ Feature: Allocate spaces for team in seminar
 
   Scenario: Manager cannot see users allocated from another managers
     Given I log in as "sitemanager1"
-    And I am on "Course 1" course homepage
+    And I am on "Test Seminar name" seminar homepage
     And I click on the link "Go to event" in row 1
     And I follow "Allocate spaces for team"
     And I set the field "Available team members" to "Sam1 Student1"
@@ -170,7 +133,7 @@ Feature: Allocate spaces for team in seminar
     And I log out
 
     When I log in as "sitemanager2"
-    And I am on "Course 1" course homepage
+    And I am on "Test Seminar name" seminar homepage
     And I click on the link "Go to event" in row 1
     And I follow "Allocate spaces for team"
     Then the "Allocated team members" select box should not contain "Sam1 Student1"
@@ -178,14 +141,14 @@ Feature: Allocate spaces for team in seminar
 
   Scenario: Manager cannot deallocate self booked users even if he is their manager
     Given I log in as "student1"
-    And I am on "Course 1" course homepage
+    And I am on "Test Seminar name" seminar homepage
     And I click on the link "Go to event" in row 1
     And I press "Sign-up"
     And I should see "Your request was accepted"
     And I log out
 
     When I log in as "sitemanager1"
-    And I am on "Course 1" course homepage
+    And I am on "Test Seminar name" seminar homepage
     And I click on the link "Go to event" in row 1
     And I follow "Allocate spaces for team"
     Then the "Allocated team members" select box should contain "Sam1 Student1 (Self booked)"
@@ -197,7 +160,7 @@ Feature: Allocate spaces for team in seminar
 
   Scenario: Manager cannot deallocate users in another activity even if he is their manager and he allocated the user
     Given I log in as "sitemanager1"
-    And I am on "Course 1" course homepage
+    And I am on "Test Seminar name" seminar homepage
     And I click on the link "Go to event" in row 1
     And I follow "Allocate spaces for team"
     And I set the field "Available team members" to "Sam1 Student1"
@@ -217,7 +180,7 @@ Feature: Allocate spaces for team in seminar
 
   Scenario: Allocate spaces for students in different sessions should be allowed if multiple sessions per signup is On
     Given I log in as "sitemanager1"
-    And I am on "Course 1" course homepage
+    And I am on "Test Seminar name" seminar homepage
     And I click on the link "Go to event" in row 1
     And I follow "Allocate spaces for team"
     When I set the field "Available team members" to "Sam1 Student1"
@@ -236,14 +199,14 @@ Feature: Allocate spaces for team in seminar
 
   Scenario: Allocate and remove spaces for students when student has self-booked
     Given I log in as "student1"
-    And I am on "Course 1" course homepage
+    And I am on "Test Seminar name" seminar homepage
     And I click on the link "Go to event" in row 1
     And I press "Sign-up"
     And I should see "Your request was accepted"
     And I log out
 
     When I log in as "sitemanager1"
-    And I am on "Course 1" course homepage
+    And I am on "Test Seminar name" seminar homepage
     And I click on the link "Go to event" in row 1
     And I follow "Allocate spaces for team"
     Then the "Allocated team members" select box should contain "Sam1 Student1 (Self booked)"
@@ -268,8 +231,7 @@ Feature: Allocate spaces for team in seminar
 
   Scenario: Cannot allocate learners in already started event.
     Given I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar name" seminar homepage
     And I follow "Add event"
     And I follow "show-selectdate0-dialog"
     And I set the following fields to these values:
@@ -306,8 +268,7 @@ Feature: Allocate spaces for team in seminar
 
   Scenario: Cannot allocate learners when sign-up is closed
     When I log in as "staff1"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar name" seminar homepage
     And I click on "Go to event" "link" in the "1 February" "table_row"
     Then I should not see "Sign-up unavailable"
     And I should see "Booking open"
@@ -316,8 +277,7 @@ Feature: Allocate spaces for team in seminar
     And I log out
 
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar name" seminar homepage
     And I click on the seminar event action "Edit event" in row "1 February"
     When I set the following fields to these values:
       | registrationtimestart[enabled] | 1 |
@@ -328,8 +288,7 @@ Feature: Allocate spaces for team in seminar
     And I log out
 
     When I log in as "staff1"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar name" seminar homepage
     And I click on "Go to event" "link" in the "1 February" "table_row"
     Then I should see "Sign-up unavailable"
     And I should not see "Reserve for another manager"
@@ -339,8 +298,7 @@ Feature: Allocate spaces for team in seminar
     And I log out
 
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar name" seminar homepage
     And I click on the seminar event action "Edit event" in row "1 February"
     And I set the following fields to these values:
       | registrationtimefinish[enabled] | 1 |
@@ -351,8 +309,7 @@ Feature: Allocate spaces for team in seminar
     And I log out
 
     When I log in as "staff1"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar name" seminar homepage
     And I click on "Go to event" "link" in the "1 February" "table_row"
     Then I should see "Sign-up unavailable"
     And I should not see "Reserve for another manager"
@@ -362,8 +319,7 @@ Feature: Allocate spaces for team in seminar
     And I log out
 
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar name" seminar homepage
     And I click on the seminar event action "Edit event" in row "1 February"
     And I set the following fields to these values:
       | registrationtimestart[enabled]  | 0 |
@@ -372,8 +328,7 @@ Feature: Allocate spaces for team in seminar
     And I log out
 
     When I log in as "staff1"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar name" seminar homepage
     And I click on "Go to event" "link" in the "1 February" "table_row"
     Then I should see "Sign-up unavailable"
     And I should not see "Reserve for another manager"

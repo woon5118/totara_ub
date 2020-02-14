@@ -16,25 +16,24 @@ Feature: Users can auto-enrol themself in courses where seminar direct enrolment
     And the following "course enrolments" exist:
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | intro                           | course | approvaltype |
+      | Test seminar name | <p>Test seminar description</p> | C1     | 0            |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details |
+      | Test seminar name | event 1 |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start        | finish        |
+      | event 1      | tomorrow 9am | tomorrow 10am |
 
     And I log in as "admin"
     And I navigate to "Manage enrol plugins" node in "Site administration > Plugins > Enrolments"
     And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
     And I log out
-    And I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
-      | No Approval | 1                        |
-    And I follow "View all events"
-    And I follow "Add event"
-    And I press "Save changes"
-    And I log out
 
   Scenario: Enrol using seminar direct enrolment
     Given I log in as "teacher1"
-    And I am on "Course 1" course homepage
+    And I am on "Test seminar name" seminar homepage
     When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
     And I log out
@@ -48,8 +47,7 @@ Feature: Users can auto-enrol themself in courses where seminar direct enrolment
     And I log out
     # Check signup note
     And I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
+    And I am on "Test seminar name" seminar homepage
     When I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Lorem ipsum dolor sit amet" in the "Student 1" "table_row"
 
@@ -64,7 +62,7 @@ Feature: Users can auto-enrol themself in courses where seminar direct enrolment
       | catalogtype | enhanced |
     And I log out
     Given I log in as "teacher1"
-    And I am on "Course 1" course homepage
+    And I am on "Test seminar name" seminar homepage
     When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
     And I log out
@@ -95,7 +93,7 @@ Feature: Users can auto-enrol themself in courses where seminar direct enrolment
     And I log out
 
     Given I log in as "teacher1"
-    And I am on "Course 1" course homepage
+    And I am on "Test seminar name" seminar homepage
     When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
     And I log out
@@ -110,8 +108,7 @@ Feature: Users can auto-enrol themself in courses where seminar direct enrolment
     And I log out
   # Check signup note
     And I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
+    And I am on "Test seminar name" seminar homepage
     When I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Lorem ipsum dolor sit amet" in the "Student 1" "table_row"
     And I should see "Some other text data" in the "Student 1" "table_row"

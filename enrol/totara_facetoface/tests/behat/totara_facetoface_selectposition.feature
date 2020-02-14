@@ -18,40 +18,45 @@ Feature: Users can enrol on courses that have position signup enabled and get si
       | user | course | role |
       | teacher1 | C1 | editingteacher |
       | teacher1 | C2 | editingteacher |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name                | intro                             | course |
+      | Test seminar name 1 | <p>Test seminar description 1</p> | C1     |
+      | Test seminar name 2 | <p>Test seminar description 2</p> | C2     |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface          | details |
+      | Test seminar name 1 | event 1 |
+      | Test seminar name 2 | event 2 |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start        | finish        |
+      | event 1      | tomorrow 9am | tomorrow 10am |
+      | event 2      | tomorrow 9am | tomorrow 10am |
 
     And I log in as "admin"
     And I navigate to "Manage enrol plugins" node in "Site administration > Plugins > Enrolments"
     And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
-    And I navigate to "Global settings" node in "Site administration > Seminars"
-    And I set the field "Select job assignment on signup" to "checked_checkbox"
-    And I press "Save changes"
+    And I set the following administration settings values:
+      | facetoface_selectjobassignmentonsignupglobal | 1 |
     And I log out
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name                                                            | Test seminar name 1        |
-      | Description                                                     | Test seminar description 1 |
+    And I am on "Test seminar name 1" seminar homepage
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I expand all fieldsets
+    And I set the following fields to these values:
       | Select job assignment on signup                                 | 1                          |
       | Prevent signup if no job assignment is selected or can be found | 0                          |
-    And I follow "Test seminar name 1"
-    And I follow "Add event"
-    And I press "Save changes"
-    And I log out
-    And I log in as "teacher1"
-    And I am on "Course 2" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name                                                            | Test seminar name 1        |
-      | Description                                                     | Test seminar description 1 |
+    And I press "Save and display"
+    And I am on "Test seminar name 2" seminar homepage
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I expand all fieldsets
+    And I set the following fields to these values:
       | Select job assignment on signup                                 | 1                          |
       | Prevent signup if no job assignment is selected or can be found | 1                          |
-    And I follow "Test seminar name 1"
-    And I follow "Add event"
-    And I press "Save changes"
+    And I press "Save and display"
     And I log out
 
   Scenario: Enrol using seminar direct where position asked for but not required
     Given I log in as "teacher1"
-    And I am on "Course 1" course homepage
+    And I am on "Test seminar name 1" seminar homepage
     When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name                          | Test student enrolment |
       | Automatically sign users up to seminar events | 0                      |
@@ -64,7 +69,7 @@ Feature: Users can enrol on courses that have position signup enabled and get si
 
   Scenario: Enrol using seminar direct where position asked for and required
     Given I log in as "teacher1"
-    And I follow "Course 2"
+    And I am on "Test seminar name 2" seminar homepage
     When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name                          | Test student enrolment |
       | Automatically sign users up to seminar events | 0                      |

@@ -24,39 +24,20 @@ Feature: Seminar event cancellation reporting
       | learner2 | C1     | student        |
       | learner3 | C1     | student        |
 
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name         | intro               | course  |
+      | Test Seminar | <p>Test Seminar</p> | C1      |
+
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface   | details | capacity |
+      | Test Seminar | event 1 | 20       |
+
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start         | finish       |
+      | event 1      | +10 days 10am | +10 days 4pm |
+
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test Seminar |
-      | Description | Test Seminar |
-    And I turn editing mode off
-    And I follow "View all events"
-
-    Given I follow "Add event"
-    And I set the following fields to these values:
-      | Maximum bookings | 20 |
-    And I follow "show-selectdate0-dialog"
-    And I fill seminar session with relative date in form data:
-      | Timezone displayed  | Pacific/Auckland |
-      | sessiontimezone     | Pacific/Auckland |
-      | timestart[day]      | 10               |
-      | timestart[timezone] | Pacific/Auckland |
-      | timefinish[day]     | 10               |
-      | timefinish[timezone]| Pacific/Auckland |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I follow "show-selectdate0-dialog"
-    And I set the following fields to these values:
-      | Timezone displayed  | Pacific/Auckland |
-      | sessiontimezone     | Pacific/Auckland |
-      | timestart[hour]     | 10               |
-      | timestart[minute]   | 0                |
-      | timestart[timezone] | Pacific/Auckland |
-      | timefinish[hour]    | 16               |
-      | timefinish[minute]  | 0                |
-      | timefinish[timezone]| Pacific/Auckland |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Save changes"
+    And I am on "Test Seminar" seminar homepage
 
     Given I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
@@ -68,13 +49,13 @@ Feature: Seminar event cancellation reporting
 
     Given I log out
     And I log in as "learner3"
-    And I am on "Course 1" course homepage
+    And I am on "Test Seminar" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I press "Sign-up"
 
     Given I log out
     And I log in as "learner1"
-    And I am on "Course 1" course homepage
+    And I am on "Test Seminar" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I click on "Cancel booking" "link_or_button" in the seminar event sidebar "Booked"
     And I wait "1" seconds
@@ -82,8 +63,7 @@ Feature: Seminar event cancellation reporting
 
     Given I log out
     And I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar" seminar homepage
     And I click on the seminar event action "Cancel event" in row "10:00 AM - 4:00 PM"
     And I press "Yes"
 

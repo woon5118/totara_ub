@@ -18,6 +18,15 @@ Feature: Seminar Signup Role Approval Trainer Role
       | user    | course | role           |
       | trainer | CCC    | teacher        |
       | jimmy   | CCC    | student        |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | intro                          | course  | approvaltype | approvalrole |
+      | Classroom Connect | <p>Classroom Connect Tests</p> | CCC     | 2            | 4            |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details | capacity |
+      | Classroom Connect | event 1 | 10       |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start        | finish        |
+      | event 1      | tomorrow 9am | tomorrow 10am |
     And I log in as "admin"
     And I navigate to "Global settings" node in "Site administration > Seminars"
     And I click on "s__facetoface_session_roles[4]" "checkbox"
@@ -27,22 +36,15 @@ Feature: Seminar Signup Role Approval Trainer Role
     And I press "Save changes"
     And I click on "s__facetoface_approvaloptions[approval_role_4]" "checkbox"
     And I press "Save changes"
-    And I am on "Classroom Connect Course" course homepage
-    And I turn editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
-    And I follow "View all events"
-    And I follow "Add event"
-    And I set the following fields to these values:
-      | capacity              | 10   |
+    And I am on "Classroom Connect" seminar homepage
+    And I click on the seminar event action "Edit event" in row "#1"
     And I click on "Benny Ben" "checkbox" in the "#id_trainerroles" "css_element"
     And I press "Save changes"
     And I log out
 
   Scenario: Student gets approved through role approval
     When I log in as "jimmy"
-    And I am on "Classroom Connect Course" course homepage
+    And I am on "Classroom Connect" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should see "Trainer"
     And I should see "Benny Ben"
@@ -54,4 +56,4 @@ Feature: Seminar Signup Role Approval Trainer Role
     When I log in as "trainer"
     And I click on "Dashboard" in the totara menu
     Then I should see "View all tasks"
-    And I should see "Seminar booking role request: Test seminar name"
+    And I should see "Seminar booking role request: Classroom Connect"

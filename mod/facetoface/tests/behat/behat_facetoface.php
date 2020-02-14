@@ -37,6 +37,23 @@ use Behat\Mink\Exception\ExpectationException;
 class behat_facetoface extends behat_base {
 
     /**
+     * Opens the seminar event dashboard page.
+     *
+     * @Given /^I am on "(?P<seminarname_string>(?:[^"]|\\")*)" seminar homepage$/
+     * @throws coding_exception
+     * @param string $seminarname
+     * @return void
+     */
+    public function i_am_on_seminar_homepage(string $seminarname) {
+        \behat_hooks::set_step_readonly(false);
+        global $DB;
+        $facetoface = $DB->get_record('facetoface', ['name' => $seminarname], 'id', MUST_EXIST);
+        $url = new moodle_url('/mod/facetoface/view.php', ['f' => $facetoface->id]);
+        $this->getSession()->visit($this->locate_path($url->out_as_local_url(false)));
+        $this->wait_for_pending_js();
+    }
+
+    /**
      * Create a session in the future based on the current date.
      *
      * @Given /^I fill seminar session with relative date in form data:$/

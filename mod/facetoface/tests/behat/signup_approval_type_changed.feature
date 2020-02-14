@@ -25,32 +25,28 @@ Feature: Seminar Manager signup approval changes
       | jimmy | manager |
       | timmy | manager |
       | sammy | manager |
-    And I log in as "teacher"
-    And I am on "Classroom Connect Course" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name              | Test seminar name        |
-      | Description       | Test seminar description |
-    And I follow "View all events"
-    And I follow "Add event"
-    And I set the following fields to these values:
-      | capacity                       | 1    |
-      | Enable waitlist                | 1    |
-    And I press "Save changes"
-    And I log out
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | intro                          | course  |
+      | Classroom Connect | <p>Classroom Connect Tests</p> | CCC     |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details | capacity | allowoverbook |
+      | Classroom Connect | event 1 | 1        | 1             |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start        | finish        |
+      | event 1      | tomorrow 9am | tomorrow 10am |
 
   @javascript
   Scenario: The waitlisted report should be correct when the approval type changes
     When I log in as "jimmy"
-    And I am on "Classroom Connect Course" course homepage
+    And I am on "Classroom Connect" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
-    Then I should not see "Manager Approval"
 
     When I press "Sign-up"
     Then I should see "Your request was accepted"
 
     When I log out
     And I log in as "timmy"
-    And I am on "Classroom Connect Course" course homepage
+    And I am on "Classroom Connect" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should not see "Manager Approval"
     And I should see "This event is currently full. Upon successful sign-up, you will be placed on the event's waitlist."
@@ -58,8 +54,7 @@ Feature: Seminar Manager signup approval changes
     Given I press "Join waitlist"
     And I log out
     And I log in as "teacher"
-    And I am on "Classroom Connect Course" course homepage
-    And I follow "Test seminar name"
+    And I am on "Classroom Connect" seminar homepage
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I click on "#id_approvaloptions_approval_manager" "css_element"
@@ -67,7 +62,7 @@ Feature: Seminar Manager signup approval changes
     And I log out
 
     When I log in as "sammy"
-    And I am on "Classroom Connect Course" course homepage
+    And I am on "Classroom Connect" seminar homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should see "Manager Approval"
     And I should see "This event is currently full. Upon successful sign-up, you will be placed on the event's waitlist."
@@ -89,8 +84,7 @@ Feature: Seminar Manager signup approval changes
     And I log out
 
     And I log in as "admin"
-    And I am on "Classroom Connect Course" course homepage
-    And I follow "Test seminar name"
+    And I am on "Classroom Connect" seminar homepage
     And I click on the seminar event action "Attendees" in row "#1"
     And I follow "Wait-list"
     And I press "Edit this report"
@@ -101,8 +95,7 @@ Feature: Seminar Manager signup approval changes
     And I log out
 
     When I log in as "teacher"
-    And I am on "Classroom Connect Course" course homepage
-    And I follow "Test seminar name"
+    And I am on "Classroom Connect" seminar homepage
     And I click on the seminar event action "Attendees" in row "#1"
     Then I should see "Booked" in the "Jimmy Jim" "table_row"
 

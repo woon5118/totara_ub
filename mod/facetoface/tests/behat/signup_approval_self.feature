@@ -56,8 +56,7 @@ Feature: Seminar Signup Self Approval
     And I press "Save changes"
 
   Scenario: Student signs up and self approves
-    When I am on "Classroom Connect Course" course homepage
-    And I follow "View all events"
+    When I am on "Classroom Connect" seminar homepage
     And I follow "Edit settings"
     And I expand all fieldsets
     Then I should see "Blah Blah Blah, agree?"

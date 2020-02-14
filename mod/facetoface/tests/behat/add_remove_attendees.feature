@@ -15,9 +15,9 @@ Feature: Add - Remove seminar attendees
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
-    And the following "activities" exist:
-      | activity   | name              | course | idnumber |
-      | facetoface | Test seminar name | C1     | seminar  |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | course  |
+      | Test seminar name | C1      |
     And the following "course enrolments" exist:
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
@@ -31,27 +31,14 @@ Feature: Add - Remove seminar attendees
       | student2 | job2     | ja2      |
 
   Scenario: Add users to a seminar session with dates
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details | capacity |
+      | Test seminar name | event 1 | 1        |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start                | finish               |
+      | event 1      | 1 Jan next year 11am | 1 Jan next year 12pm |
     Given I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 1    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | ## next year ## Y ## |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I set the following fields to these values:
-      | capacity           | 1    |
-    And I press "Save changes"
-
+    And I am on "Test seminar name" seminar homepage
     When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
@@ -68,27 +55,14 @@ Feature: Add - Remove seminar attendees
     Then I should see "Sam1 Student1, student1@example.com"
 
   Scenario: Add and remove users to a seminar in past
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details | capacity |
+      | Test seminar name | event 1 | 1        |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start                | finish               |
+      | event 1      | 1 Jan last year 11am | 1 Jan last year 12pm |
     Given I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 1    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | ## last year ## Y ## |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## last year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I set the following fields to these values:
-      | capacity           | 1    |
-    And I press "Save changes"
-
+    And I am on "Test seminar name" seminar homepage
     When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the following fields to these values:
@@ -113,15 +87,11 @@ Feature: Add - Remove seminar attendees
 
 
   Scenario: Add and remove users to a Seminar session without dates (waitlist)
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details | capacity |
+      | Test seminar name | event 1 | 1        |
     Given I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
-    And I follow "Add event"
-    And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
-    And I set the following fields to these values:
-      | capacity              | 1    |
-    And I press "Save changes"
-
+    And I am on "Test seminar name" seminar homepage
     When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com"
@@ -149,15 +119,11 @@ Feature: Add - Remove seminar attendees
     And I press "Cancel"
 
   Scenario: Add users by username via textarea
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details | capacity |
+      | Test seminar name | event 1 | 1        |
     Given I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
-    And I follow "Add event"
-    And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
-    And I set the following fields to these values:
-      | capacity              | 1    |
-    And I press "Save changes"
-
+    And I am on "Test seminar name" seminar homepage
     When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users via list of IDs"
     # By default user is expected to separate ID's by newline, but comma is also supported.
@@ -176,15 +142,11 @@ Feature: Add - Remove seminar attendees
     And I should see "Sam2 Student2"
 
   Scenario: Add users by email via textarea
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details | capacity |
+      | Test seminar name | event 1 | 1        |
     Given I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
-    And I follow "Add event"
-    And I click on "Delete" "link" in the ".f2fmanagedates" "css_element"
-    And I set the following fields to these values:
-      | capacity              | 1    |
-    And I press "Save changes"
-
+    And I am on "Test seminar name" seminar homepage
     When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users via list of IDs"
     # By default user separate ID's by newline, but comma is also supported.
@@ -204,14 +166,14 @@ Feature: Add - Remove seminar attendees
 
   @_file_upload
   Scenario: Add users via file upload and then remove
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details | capacity |
+      | Test seminar name | event 1 | 1        |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start        | finish        |
+      | event 1      | tomorrow 9am | tomorrow 10am |
     Given I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
-    And I follow "Add event"
-    And I set the following fields to these values:
-      | capacity           | 2                |
-    And I press "Save changes"
-
+    And I am on "Test seminar name" seminar homepage
     When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users via file upload"
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "CSV text file" filemanager
@@ -230,27 +192,19 @@ Feature: Add - Remove seminar attendees
     And I should not see "Sam1 Student1"
 
   Scenario: Use the allow scheduling conflicts checkbox
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name                  | course  | intro                           |
+      | Test seminar name two | C1      | <p>Test seminar description</p> |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface            | details | capacity |
+      | Test seminar name     | event 1 | 1        |
+      | Test seminar name two | event 2 | 1        |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start                | finish               |
+      | event 1      | 1 Jan next year 11am | 1 Jan next year 12pm |
+      | event 2      | 1 Jan next year 11am | 1 Jan next year 12pm |
     Given I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 1    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | ## next year ## Y ## |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I set the following fields to these values:
-      | capacity           | 1    |
-    And I press "Save changes"
-
+    And I am on "Test seminar name" seminar homepage
     When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com"
@@ -259,29 +213,8 @@ Feature: Add - Remove seminar attendees
     And I press "Confirm"
     Then I should see "Sam1 Student1"
 
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name two    |
-      | Description | Test seminar description |
+    And I am on "Course 1" course homepage
     And I follow "Test seminar name two"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 1    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | ## next year ## Y ## |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I set the following fields to these values:
-      | capacity           | 1    |
-    And I press "Save changes"
-
     When I click on the seminar event action "Attendees" in row "#1"
     And I set the field "Attendee actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com"
@@ -311,8 +244,7 @@ Feature: Add - Remove seminar attendees
   Scenario: Use invalid csv file to test the errors
     Given I log in as "admin"
 
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
+    And I am on "Test seminar name" seminar homepage
     And I follow "Add event"
     And I set the following fields to these values:
       | capacity           | 2                |
@@ -331,8 +263,7 @@ Feature: Add - Remove seminar attendees
     And I log out
 
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
+    And I am on "Test seminar name" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | Select job assignment on signup | 1 |
@@ -368,8 +299,7 @@ Feature: Add - Remove seminar attendees
     And I log out
 
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
+    And I am on "Test seminar name" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I set the following fields to these values:
       | Select job assignment on signup | 1 |
@@ -391,8 +321,7 @@ Feature: Add - Remove seminar attendees
       | Show user identity | ID number |
     And I log out
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
+    And I am on "Test seminar name" seminar homepage
     And I follow "Add event"
     And I set the following fields to these values:
       | capacity           | 1    |
@@ -442,8 +371,7 @@ Feature: Add - Remove seminar attendees
       | moodle/site:viewuseridentity | Prohibit |
     And I log out
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
+    And I am on "Test seminar name" seminar homepage
     And I follow "Add event"
     And I set the following fields to these values:
       | capacity           | 1    |

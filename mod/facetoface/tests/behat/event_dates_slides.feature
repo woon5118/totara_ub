@@ -22,12 +22,11 @@ Feature: I can slide seminar session dates
       | Event 1      | Room 2 |  7th Dec next year 9:00 |  7th Dec next year 10:00 |
       | Event 1      | Room 3 | 14th Dec next year 9:00 | 14th Dec next year 10:00 |
     And I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "Seminar 1"
+    And I am on "Seminar 1" seminar homepage
     And I should see "Room 1" in the "1 December" "table_row"
     And I should see "Room 2" in the "7 December" "table_row"
     And I should see "Room 3" in the "14 December" "table_row"
-    And I click to edit the seminar session in row 1
+    And I click on the seminar event action "Edit event" in row "#1"
 
   Scenario: I can shift seminar session dates
     # 01/12 -> 07/12

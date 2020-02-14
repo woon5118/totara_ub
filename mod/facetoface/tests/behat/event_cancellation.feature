@@ -22,49 +22,28 @@ Feature: Seminar event cancellation basic
       | learner1 | C1     | student        |
       | learner2 | C1     | student        |
 
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name         | intro               | course  |
+      | Test Seminar | <p>Test Seminar</p> | C1      |
+
     Given I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test Seminar |
-      | Description | Test Seminar |
-    And I turn editing mode off
-    And I follow "View all events"
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_100: cancel event with single future date, with attendees and confirm booking status.
-    Given I follow "Add event"
-    And I set the following fields to these values:
-      | Maximum bookings | 39 |
-    And I follow "show-selectdate0-dialog"
-    And I set the following fields to these values:
-      | sessiontimezone     | Pacific/Auckland |
-      | timestart[day]      | 10               |
-      | timestart[month]    | 2                |
-      | timestart[year]     | ## next year ## Y ## |
-      | timestart[hour]     | 9                |
-      | timestart[minute]   | 0                |
-      | timestart[timezone] | Pacific/Auckland |
-      | timefinish[day]     | 10               |
-      | timefinish[month]   | 2                |
-      | timefinish[year]    | ## next year ## Y ## |
-      | timefinish[hour]    | 15               |
-      | timefinish[minute]  | 0                |
-      | timefinish[timezone]| Pacific/Auckland |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Save changes"
-
-    Given I click on the seminar event action "Attendees" in row "#1"
-    And I set the field "Attendee actions" to "Add users"
-    And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
-    And I press "Add"
-    And I press "Continue"
-    And I press "Confirm"
-    And I follow "View all events"
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface   | details | capacity |
+      | Test Seminar | event 1 | 39       |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start                | finish               | starttimezone    | finishtimezone   | sessiontimezone  |
+      | event 1      | 10 Feb next year 9am | 10 Feb next year 3pm | Pacific/Auckland | Pacific/Auckland | Pacific/Auckland |
+    And the following "seminar signups" exist in "mod_facetoface" plugin:
+      | user     | eventdetails | status |
+      | learner1 | event 1      | booked |
+      | learner2 | event 1      | booked |
 
     When I log out
     And I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar" seminar homepage
     Then I should see date "10 February next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "Timezone: Pacific/Auckland" in the "10 February" "table_row"
     And I should see "2 / 39" in the "10 February" "table_row"
@@ -98,8 +77,7 @@ Feature: Seminar event cancellation basic
 
     When I log out
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar" seminar homepage
     Then I should see date "10 February next year" formatted "%d %B %Y, 9:00 AM - 3:00 PM" in the "Timezone: Pacific/Auckland" "table_row"
     And I should see date "10 February next year" formatted "%d %B %Y" in the "2 / 39" "table_row"
     And I should see date "10 February next year" formatted "%d %B %Y" in the "Cancelled" "table_row"
@@ -112,53 +90,19 @@ Feature: Seminar event cancellation basic
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_101: cancel event with multiple future dates, with attendees.
-    Given I follow "Add event"
-    And I set the following fields to these values:
-      | Maximum bookings | 39 |
-    And I follow "show-selectdate0-dialog"
-    And I set the following fields to these values:
-      | sessiontimezone     | Pacific/Auckland |
-      | timestart[day]      | 10               |
-      | timestart[month]    | 2                |
-      | timestart[year]     | ## next year ## Y ## |
-      | timestart[hour]     | 9                |
-      | timestart[minute]   | 0                |
-      | timestart[timezone] | Pacific/Auckland |
-      | timefinish[day]     | 10               |
-      | timefinish[month]   | 2                |
-      | timefinish[year]    | ## next year ## Y ## |
-      | timefinish[hour]    | 15               |
-      | timefinish[minute]  | 0                |
-      | timefinish[timezone]| Pacific/Auckland |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface   | details | capacity |
+      | Test Seminar | event 1 | 39       |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start                | finish               | starttimezone    | finishtimezone   | sessiontimezone  |
+      | event 1      | 10 Feb next year 9am | 10 Feb next year 3pm | Pacific/Auckland | Pacific/Auckland | Pacific/Auckland |
+      | event 1      | 11 Mar +2 years 10am | 11 Mar +2 years 4pm  | Pacific/Auckland | Pacific/Auckland | Pacific/Auckland |
+    And the following "seminar signups" exist in "mod_facetoface" plugin:
+      | user     | eventdetails | status |
+      | learner1 | event 1      | booked |
+      | learner2 | event 1      | booked |
+    And I am on "Test Seminar" seminar homepage
 
-    Given I press "Add a new session"
-    And I follow "show-selectdate1-dialog"
-    And I set the following fields to these values:
-      | sessiontimezone     | Pacific/Auckland |
-      | timestart[day]      | 11               |
-      | timestart[month]    | 3                |
-      | timestart[year]     | ## 2 years ## Y ## |
-      | timestart[hour]     | 10               |
-      | timestart[minute]   | 0                |
-      | timestart[timezone] | Pacific/Auckland |
-      | timefinish[day]     | 11               |
-      | timefinish[month]   | 3                |
-      | timefinish[year]    | ## 2 years ## Y ## |
-      | timefinish[hour]    | 16               |
-      | timefinish[minute]  | 0                |
-      | timefinish[timezone]| Pacific/Auckland |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Save changes"
-
-    Given I click on the seminar event action "Attendees" in row "#1"
-    And I set the field "Attendee actions" to "Add users"
-    And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
-    And I press "Add"
-    And I press "Continue"
-    And I press "Confirm"
-
-    When I follow "View all events"
     Then I should see date "10 February next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "Timezone: Pacific/Auckland" in the "10 February" "table_row"
     And I should see date "11 March +2 years" formatted "%d %B %Y" in the "10:00 AM - 4:00 PM" "table_row"
@@ -183,60 +127,21 @@ Feature: Seminar event cancellation basic
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_102: cancel event with future and past dates, with attendees.
-    Given I follow "Add event"
-    And I set the following fields to these values:
-      | Maximum bookings | 39 |
-    And I follow "show-selectdate0-dialog"
-    And I set the following fields to these values:
-      | sessiontimezone     | Pacific/Auckland |
-      | timestart[day]      | 10               |
-      | timestart[month]    | 2                |
-      | timestart[year]     | ## next year ## Y ## |
-      | timestart[hour]     | 9                |
-      | timestart[minute]   | 0                |
-      | timestart[timezone] | Pacific/Auckland |
-      | timefinish[day]     | 10               |
-      | timefinish[month]   | 2                |
-      | timefinish[year]    | ## next year ## Y ## |
-      | timefinish[hour]    | 15               |
-      | timefinish[minute]  | 0                |
-      | timefinish[timezone]| Pacific/Auckland |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-
-    Given I press "Add a new session"
-    And I follow "show-selectdate1-dialog"
-    And I fill seminar session with relative date in form data:
-      | sessiontimezone     | Pacific/Auckland |
-      | timestart[day]      | -10              |
-      | timestart[timezone] | Pacific/Auckland |
-      | timefinish[day]     | -10              |
-      | timefinish[timezone]| Pacific/Auckland |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-
-    Given I follow "show-selectdate1-dialog"
-    And I set the following fields to these values:
-      | sessiontimezone     | Pacific/Auckland |
-      | timestart[hour]     | 10               |
-      | timestart[minute]   | 0                |
-      | timestart[timezone] | Pacific/Auckland |
-      | timefinish[hour]    | 16               |
-      | timefinish[minute]  | 0                |
-      | timefinish[timezone]| Pacific/Auckland |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Save changes"
-
-    Given I click on the seminar event action "Attendees" in row "#1"
-    And I set the field "Attendee actions" to "Add users"
-    And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
-    And I press "Add"
-    And I press "Continue"
-    And I press "Confirm"
-    And I follow "View all events"
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface   | details | capacity |
+      | Test Seminar | event 1 | 39       |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start                | finish               | starttimezone    | finishtimezone   | sessiontimezone  |
+      | event 1      | 10 Feb next year 9am | 10 Feb next year 3pm | Pacific/Auckland | Pacific/Auckland | Pacific/Auckland |
+      | event 1      | -10 days 10am        | -10 days 4pm         | Pacific/Auckland | Pacific/Auckland | Pacific/Auckland |
+    And the following "seminar signups" exist in "mod_facetoface" plugin:
+      | user     | eventdetails | status |
+      | learner1 | event 1      | booked |
+      | learner2 | event 1      | booked |
 
     When I log out
     And I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar" seminar homepage
     Then I should see date "10 February next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "Timezone: Pacific/Auckland" in the "10 February" "table_row"
     And I should see date "-10 day Pacific/Auckland" formatted "%d %B %Y"
@@ -250,8 +155,7 @@ Feature: Seminar event cancellation basic
 
     When I log out
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar" seminar homepage
     Then I should see date "10 February next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "Timezone: Pacific/Auckland" in the "10 February" "table_row"
     And I should see date "-10 day Pacific/Auckland" formatted "%d %B %Y"
@@ -266,56 +170,19 @@ Feature: Seminar event cancellation basic
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_103: cancel event with today and future dates, with attendees.
-    Given I follow "Add event"
-    And I set the following fields to these values:
-      | Maximum bookings | 39 |
-    And I follow "show-selectdate0-dialog"
-    And I set the following fields to these values:
-      | sessiontimezone     | Pacific/Auckland |
-      | timestart[day]      | 10               |
-      | timestart[month]    | 2                |
-      | timestart[year]     | ## next year ## Y ## |
-      | timestart[hour]     | 9                |
-      | timestart[minute]   | 0                |
-      | timestart[timezone] | Pacific/Auckland |
-      | timefinish[day]     | 10               |
-      | timefinish[month]   | 2                |
-      | timefinish[year]    | ## next year ## Y ## |
-      | timefinish[hour]    | 15               |
-      | timefinish[minute]  | 0                |
-      | timefinish[timezone]| Pacific/Auckland |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface   | details | capacity |
+      | Test Seminar | event 1 | 39       |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start                | finish               | starttimezone    | finishtimezone   | sessiontimezone  |
+      | event 1      | 10 Feb next year 9am | 10 Feb next year 3pm | Pacific/Auckland | Pacific/Auckland | Pacific/Auckland |
+      | event 1      | today 12:05am        | today 11:55pm        | Pacific/Auckland | Pacific/Auckland | Pacific/Auckland |
+    And the following "seminar signups" exist in "mod_facetoface" plugin:
+      | user     | eventdetails | status |
+      | learner1 | event 1      | booked |
+      | learner2 | event 1      | booked |
+    And I am on "Test Seminar" seminar homepage
 
-    Given I press "Add a new session"
-    And I follow "show-selectdate1-dialog"
-    And I fill seminar session with relative date in form data:
-      | sessiontimezone     | Pacific/Auckland |
-      | timestart[day]      | 0              |
-      | timestart[timezone] | Pacific/Auckland |
-      | timefinish[day]     | 0              |
-      | timefinish[timezone]| Pacific/Auckland |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-
-    Given I follow "show-selectdate1-dialog"
-    And I set the following fields to these values:
-      | sessiontimezone     | Pacific/Auckland |
-      | timestart[hour]     | 0                |
-      | timestart[minute]   | 5                |
-      | timestart[timezone] | Pacific/Auckland |
-      | timefinish[hour]    | 23               |
-      | timefinish[minute]  | 55               |
-      | timefinish[timezone]| Pacific/Auckland |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Save changes"
-
-    Given I click on the seminar event action "Attendees" in row "#1"
-    And I set the field "Attendee actions" to "Add users"
-    And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
-    And I press "Add"
-    And I press "Continue"
-    And I press "Confirm"
-
-    When I follow "View all events"
     Then I should see date "10 February next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "Timezone: Pacific/Auckland" in the "10 February" "table_row"
     And I should see date "0 day Pacific/Auckland" formatted "%d %B %Y"
@@ -329,8 +196,7 @@ Feature: Seminar event cancellation basic
 
     When I log out
     And I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test Seminar" seminar homepage
     Then I should see date "10 February next year" formatted "%d %B %Y" in the "9:00 AM - 3:00 PM" "table_row"
     And I should see "Timezone: Pacific/Auckland" in the "10 February" "table_row"
     And I should see date "0 day Pacific/Auckland" formatted "%d %B %Y"
@@ -345,36 +211,19 @@ Feature: Seminar event cancellation basic
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_104: cancel event with today, in 1 hr, with attendees.
-    Given I follow "Add event"
-    And I set the following fields to these values:
-      | Maximum bookings | 39 |
-    And I follow "show-selectdate0-dialog"
-    And I fill seminar session with relative date in form data:
-      | sessiontimezone     | Australia/Perth |
-      | timestart[day]      | 0               |
-      | timestart[month]    | 0               |
-      | timestart[year]     | 0               |
-      | timestart[hour]     | 1               |
-      | timestart[minute]   | 0               |
-      | timestart[timezone] | Australia/Perth |
-      | timefinish[day]     | 0               |
-      | timefinish[month]   | 0               |
-      | timefinish[year]    | 0               |
-      | timefinish[hour]    | 2               |
-      | timefinish[minute]  | 0               |
-      | timefinish[timezone]| Australia/Perth |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Save changes"
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface   | details | capacity |
+      | Test Seminar | event 1 | 39       |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start   | finish   | starttimezone   | finishtimezone  | sessiontimezone |
+      | event 1      | +1 hour | +2 hours | Australia/Perth | Australia/Perth | Australia/Perth |
+    And the following "seminar signups" exist in "mod_facetoface" plugin:
+      | user     | eventdetails | status |
+      | learner1 | event 1      | booked |
+      | learner2 | event 1      | booked |
+    And I am on "Test Seminar" seminar homepage
 
-    Given I click on the seminar event action "Attendees" in row "#1"
-    And I set the field "Attendee actions" to "Add users"
-    And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
-    And I press "Add"
-    And I press "Continue"
-    And I press "Confirm"
-
-    When I follow "View all events"
-    Then I should see date "0 day Australia/Perth" formatted "%d %B %Y"
+    Then I should see date "+1 hour Australia/Perth" formatted "%d %B %Y"
     And I should see "Booking open"
     And I should see "2 / 39" in the "Booking open" "table_row"
     And I should see the seminar event action "Cancel event" in row "2 / 39"
@@ -391,28 +240,15 @@ Feature: Seminar event cancellation basic
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_105: cancel event with single past date with no attendees.
-    Given I follow "Add event"
-    And I set the following fields to these values:
-      | Maximum bookings | 39 |
-    And I follow "show-selectdate0-dialog"
-    And I fill seminar session with relative date in form data:
-      | sessiontimezone     | Australia/Perth |
-      | timestart[day]      | 0               |
-      | timestart[month]    | 0               |
-      | timestart[year]     | 0               |
-      | timestart[hour]     | -2              |
-      | timestart[minute]   | 0               |
-      | timestart[timezone] | Australia/Perth |
-      | timefinish[day]     | 0               |
-      | timefinish[month]   | 0               |
-      | timefinish[year]    | 0               |
-      | timefinish[hour]    | 2               |
-      | timefinish[minute]  | 0               |
-      | timefinish[timezone]| Australia/Perth |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface   | details | capacity |
+      | Test Seminar | event 1 | 39       |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start    | finish   | starttimezone   | finishtimezone  | sessiontimezone |
+      | event 1      | -2 hours | +2 hours | Australia/Perth | Australia/Perth | Australia/Perth |
+    And I am on "Test Seminar" seminar homepage
 
-    When I press "Save changes"
-    Then I should see date "0 day Australia/Perth" formatted "%d %B %Y"
+    Then I should see date "-2 hours Australia/Perth" formatted "%d %B %Y"
     And I should not see "Event in progress"
     And I should see "In progress"
     And I should see "0 / 39" in the "In progress" "table_row"
@@ -424,26 +260,13 @@ Feature: Seminar event cancellation basic
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_106: cancel event with single future date with no attendees.
-    Given I follow "Add event"
-    And I set the following fields to these values:
-      | Maximum bookings | 39 |
-    And I follow "show-selectdate0-dialog"
-    And I fill seminar session with relative date in form data:
-      | sessiontimezone     | Pacific/Auckland |
-      | timestart[day]      | 10               |
-      | timestart[month]    | 0                |
-      | timestart[year]     | 0                |
-      | timestart[hour]     | 0                |
-      | timestart[minute]   | 0                |
-      | timestart[timezone] | Pacific/Auckland |
-      | timefinish[day]     | 10               |
-      | timefinish[month]   | 0                |
-      | timefinish[year]    | 0                |
-      | timefinish[hour]    | 0                |
-      | timefinish[minute]  | 0                |
-      | timefinish[timezone]| Pacific/Auckland |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Save changes"
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface   | details | capacity |
+      | Test Seminar | event 1 | 39       |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start    | finish   | starttimezone    | finishtimezone   | sessiontimezone  |
+      | event 1      | +10 days | +10 days | Pacific/Auckland | Pacific/Auckland | Pacific/Auckland |
+    And I am on "Test Seminar" seminar homepage
 
     When I click on the seminar event action "Cancel event" in row "Booking open"
     And I press "Yes"
@@ -458,38 +281,15 @@ Feature: Seminar event cancellation basic
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_107: cancel and delete the whole seminar event
-    Given I follow "Add event"
-    And I set the field "Maximum bookings" to "20"
-    And I click on "Edit session" "link"
-    And I fill seminar session with relative date in form data:
-      | timestart[day]     | +1               |
-      | timestart[month]   | 0                |
-      | timestart[year]    | 0                |
-      | timestart[hour]    | 0                |
-      | timestart[minute]  | 0                |
-      | timefinish[day]    | +1               |
-      | timefinish[month]  | 0                |
-      | timefinish[year]   | 0                |
-      | timefinish[hour]   | +1               |
-      | timefinish[minute] | 0                |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Save changes"
-    And I follow "Add event"
-    And I set the field "Maximum bookings" to "30"
-    And I click on "Edit session" "link"
-    And I fill seminar session with relative date in form data:
-      | timestart[day]     | +2               |
-      | timestart[month]   | 0                |
-      | timestart[year]    | 0                |
-      | timestart[hour]    | 0                |
-      | timestart[minute]  | 0                |
-      | timefinish[day]    | +2               |
-      | timefinish[month]  | 0                |
-      | timefinish[year]   | 0                |
-      | timefinish[hour]   | +1               |
-      | timefinish[minute] | 0                |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Save changes"
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface   | details | capacity |
+      | Test Seminar | event 1 | 20       |
+      | Test Seminar | event 2 | 30       |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start  | finish         |
+      | event 1      | +1 day | +1 day +1 hour |
+      | event 2      | +2 day | +2 day +1 hour |
+    And I am on "Test Seminar" seminar homepage
 
     When I click on the seminar event action "Cancel event" in row "0 / 30"
     And I should see "Cancelling event in"
@@ -509,38 +309,15 @@ Feature: Seminar event cancellation basic
 
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_108: cancel and clone cancelled event
-    Given I follow "Add event"
-    And I set the field "Maximum bookings" to "20"
-    And I click on "Edit session" "link"
-    And I fill seminar session with relative date in form data:
-      | timestart[day]     | +1               |
-      | timestart[month]   | 0                |
-      | timestart[year]    | 0                |
-      | timestart[hour]    | 0                |
-      | timestart[minute]  | 0                |
-      | timefinish[day]    | +1               |
-      | timefinish[month]  | 0                |
-      | timefinish[year]   | 0                |
-      | timefinish[hour]   | +1               |
-      | timefinish[minute] | 0                |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Save changes"
-    And I follow "Add event"
-    And I set the field "Maximum bookings" to "30"
-    And I click on "Edit session" "link"
-    And I fill seminar session with relative date in form data:
-      | timestart[day]     | +2               |
-      | timestart[month]   | 0                |
-      | timestart[year]    | 0                |
-      | timestart[hour]    | 0                |
-      | timestart[minute]  | 0                |
-      | timefinish[day]    | +2               |
-      | timefinish[month]  | 0                |
-      | timefinish[year]   | 0                |
-      | timefinish[hour]   | +1               |
-      | timefinish[minute] | 0                |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Save changes"
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface   | details | capacity |
+      | Test Seminar | event 1 | 20       |
+      | Test Seminar | event 2 | 30       |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start  | finish         |
+      | event 1      | +1 day | +1 day +1 hour |
+      | event 2      | +2 day | +2 day +1 hour |
+    And I am on "Test Seminar" seminar homepage
 
     When I click on the seminar event action "Cancel event" in row "0 / 30"
     And I should see "Cancelling event in"

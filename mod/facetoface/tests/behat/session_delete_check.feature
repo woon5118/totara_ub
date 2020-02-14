@@ -9,28 +9,18 @@ Feature: Confirm overlapping sessions can be removed
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | intro                           | course |
+      | Test seminar name | <p>Test seminar description</p> | C1     |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details |
+      | Test seminar name | event 1 |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start                 | starttimezone    | finish                | finishtimezone   |
+      | event 1      | 15 July next year 3pm | Pacific/Auckland | 15 July next year 4pm | Pacific/Auckland |
     And I log in as "admin"
-    Given I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
-    And I follow "View all events"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]       | 15               |
-      | timestart[month]     | 7                |
-      | timestart[year]      | ## next year ## Y ## |
-      | timestart[hour]      | 15               |
-      | timestart[minute]    | 0                |
-      | timestart[timezone]  | Pacific/Auckland |
-      | timefinish[day]      | 15               |
-      | timefinish[month]    | 7                |
-      | timefinish[year]     | ## next year ## Y ## |
-      | timefinish[hour]     | 16               |
-      | timefinish[minute]   | 0                |
-      | timefinish[timezone] | Pacific/Auckland |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
+    Given I am on "Test seminar name" seminar homepage
+    And I click on the seminar event action "Edit event" in row "#1"
     And I press "Add a new session"
     And I click on "Edit session" "link" in the ".f2fmanagedates .lastrow" "css_element"
     And I set the following fields to these values:

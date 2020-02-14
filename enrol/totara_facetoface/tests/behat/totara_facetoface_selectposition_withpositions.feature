@@ -18,11 +18,6 @@ Feature: Users can enrol themself in courses with selected position where semina
       | teacher1 | C1 | editingteacher |
 
     And I log in as "admin"
-    And I navigate to "Global settings" node in "Site administration > Seminars"
-    And I set the following fields to these values:
-      | Select job assignment on signup | 1 |
-    And I press "Save changes"
-
     And I navigate to "Manage enrol plugins" node in "Site administration > Plugins > Enrolments"
     And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
 
@@ -37,24 +32,32 @@ Feature: Users can enrol themself in courses with selected position where semina
       | user     | position | fullname       |
       | student1 | POS001   | jobassignment1 |
       | student1 | POS002   | jobassignment2 |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | intro                           | course |
+      | Test seminar name | <p>Test seminar description</p> | C1     |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details |
+      | Test seminar name | event 1 |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start        | finish        |
+      | event 1      | tomorrow 9am | tomorrow 10am |
 
     And I set the following administration settings values:
       | catalogtype | enhanced |
+      | facetoface_selectjobassignmentonsignupglobal | 1 |
 
     And I log out
 
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
+    And I am on "Test seminar name" seminar homepage
     And I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
+    And I am on "Test seminar name" seminar homepage
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I expand all fieldsets
+    And I set the following fields to these values:
       | Select job assignment on signup | 1             |
-    And I follow "View all events"
-    And I follow "Add event"
-    And I press "Save changes"
+    And I press "Save and display"
     And I log out
 
   Scenario: Add and configure a seminar activity with a single session and position asked for but not mandated then
@@ -69,8 +72,7 @@ Feature: Users can enrol themself in courses with selected position where semina
     And I log out
 
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test seminar name" seminar homepage
     And I click on the seminar event action "Attendees" in row "#1"
     And I should see "Position2"
 
@@ -86,7 +88,6 @@ Feature: Users can enrol themself in courses with selected position where semina
     And I log out
 
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test seminar name" seminar homepage
     And I click on the seminar event action "Attendees" in row "#1"
     And I should see "Position2"

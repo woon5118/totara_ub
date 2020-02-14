@@ -13,15 +13,14 @@ Feature: I can add and edit seminar session dates
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | intro                           | course  |
+      | Test seminar name | <p>Test seminar description</p> | C1      |
 
   @javascript
   Scenario: I can edit a past seminar session
     Given I log in as "admin"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
-    And I follow "View all events"
+    And I am on "Test seminar name" seminar homepage
     And I follow "Add event"
     And I click to edit the seminar event date at position 1
     And I set the following fields to these values:
@@ -52,7 +51,7 @@ Feature: I can add and edit seminar session dates
     Then I should see "Upcoming events"
     And I should see "26 October 2016"
 
-    When I click to edit the seminar session in row 1
+    When I click on the seminar event action "Edit event" in row "#1"
     Then I should see "Editing event in Test seminar name"
 
     When I set the following fields to these values:
@@ -61,7 +60,7 @@ Feature: I can add and edit seminar session dates
     And I should not see "The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect."
     Then I should see "Upcoming events"
 
-    When I click to edit the seminar session in row 1
+    When I click on the seminar event action "Edit event" in row "#1"
     Then I should see "This event was run in the past"
 
     When I click to edit the seminar event date at position 1
@@ -76,11 +75,7 @@ Feature: I can add and edit seminar session dates
   @javascript
   Scenario: I can edit a future seminar session
     Given I log in as "admin"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
-    And I follow "View all events"
+    And I am on "Test seminar name" seminar homepage
     And I follow "Add event"
     And I click to edit the seminar event date at position 1
     And I set the following fields to these values:
@@ -104,7 +99,7 @@ Feature: I can add and edit seminar session dates
     And I should see "Upcoming events"
     And I should see date "9 Jan next year" formatted "%d %B %Y"
 
-    When I click to edit the seminar session in row 1
+    When I click on the seminar event action "Edit event" in row "#1"
     Then I should see "Editing event in Test seminar name"
 
     When I set the following fields to these values:
@@ -113,7 +108,7 @@ Feature: I can add and edit seminar session dates
     And I should not see "The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect."
     Then I should see "Upcoming events"
 
-    When I click to edit the seminar session in row 1
+    When I click on the seminar event action "Edit event" in row "#1"
     Then I should see "This event was run in the past"
 
     When I click to edit the seminar event date at position 1
@@ -138,11 +133,7 @@ Feature: I can add and edit seminar session dates
   @javascript
   Scenario: I can edit a past seminar session with a minimum bookings and cutoff
     Given I log in as "admin"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
-    And I follow "View all events"
+    And I am on "Test seminar name" seminar homepage
     And I follow "Add event"
     And I click to edit the seminar event date at position 1
     And I set the following fields to these values:
@@ -176,7 +167,7 @@ Feature: I can add and edit seminar session dates
     Then I should see "Upcoming events"
     And I should see "26 October 2016"
 
-    When I click to edit the seminar session in row 1
+    When I click on the seminar event action "Edit event" in row "#1"
     Then I should see "Editing event in Test seminar name"
 
     When I set the following fields to these values:
@@ -185,7 +176,7 @@ Feature: I can add and edit seminar session dates
     And I should not see "The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect."
     Then I should see "Upcoming events"
 
-    When I click to edit the seminar session in row 1
+    When I click on the seminar event action "Edit event" in row "#1"
     Then I should see "This event was run in the past"
 
     When I click to edit the seminar event date at position 1
@@ -210,11 +201,7 @@ Feature: I can add and edit seminar session dates
   @javascript
   Scenario: I can edit a future seminar session with a minimum bookings and cutoff
     Given I log in as "admin"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
-    And I follow "View all events"
+    And I am on "Test seminar name" seminar homepage
     And I follow "Add event"
     And I click to edit the seminar event date at position 1
     And I set the following fields to these values:
@@ -242,7 +229,7 @@ Feature: I can add and edit seminar session dates
     And I should see "Upcoming events"
     And I should see date "9 Jan next year" formatted "%d %B %Y"
 
-    When I click to edit the seminar session in row 1
+    When I click on the seminar event action "Edit event" in row "#1"
     Then I should see "Editing event in Test seminar name"
 
     When I set the following fields to these values:
@@ -251,7 +238,7 @@ Feature: I can add and edit seminar session dates
     And I should not see "The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect."
     Then I should see "Upcoming events"
 
-    When I click to edit the seminar session in row 1
+    When I click on the seminar event action "Edit event" in row "#1"
     Then I should see "This event was run in the past"
 
     When I click to edit the seminar event date at position 1

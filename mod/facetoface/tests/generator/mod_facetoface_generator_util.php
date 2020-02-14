@@ -88,41 +88,18 @@ final class mod_facetoface_generator_util {
         $eventid = static::get_event_id_from_detail($record['eventdetails']);
 
         $times = [
-            'start' => [
-                'original' => $record['start'],
-                'cumputed' => 0
-            ],
-            'finish' => [
-                'original' => $record['finish'],
-                'computed' => 0
-            ]
+            'start' => 0,
+            'finish' => 0
         ];
 
         foreach ($times as $key => $time) {
-            $original = $time['original'];
-            $computed = 0;
-
-            if (!is_numeric($original)) {
-                // This could mean that it is a format instead of normal returned value from `time()`.
-                try {
-                    // Using DateTime object, because it can throw exception, and so we could catch and fail the
-                    // behat step pretty much.
-                    $datetimeobject = new DateTime($original);
-                    $computed = $datetimeobject->getTimestamp();
-                } catch (\Throwable $e) {
-                    throw new coding_exception("An exception occured: {$e->getMessage()}'");
-                }
-            } else {
-                $computed = (int) $original;
-            }
-
-            $times[$key]['computed'] = $computed;
+            $times[$key] = self::compute_timestamp($record, $key);
         }
 
         $rc = new stdClass();
         $rc->sessionid = $eventid;
-        $rc->timestart = $times['start']['computed'];
-        $rc->timefinish = $times['finish']['computed'];
+        $rc->timestart = $times['start'];
+        $rc->timefinish = $times['finish'];
         $rc->sessiontimezone = isset($record['sessiontimezone']) ? $record['sessiontimezone'] : 99;
         $rc->id = $DB->insert_record('facetoface_sessions_dates', $rc);
 
@@ -276,19 +253,7 @@ final class mod_facetoface_generator_util {
         $registrationtime = [];
         foreach ($items as $item) {
             if (isset($record[$item])) {
-                $original = $record[$item];
-                if (!is_numeric($original)) {
-                    // Must be some kind of time format string that the PHP is able to understand.
-                    // Otherwise, we should throw exception here to let the test just fail.
-                    try {
-                        $dt = new DateTime($original);
-                        $original = $dt->getTimestamp();
-                    } catch (\Throwable $e) {
-                        throw new coding_exception("Something went wrong: {$e->getMessage()}");
-                    }
-                }
-
-                $registrationtime[$item] = $original;
+                $registrationtime[$item] = self::compute_timestamp($record, $item);
             }
         }
 
@@ -306,6 +271,38 @@ final class mod_facetoface_generator_util {
 
         $seminarevent->save();
         return $seminarevent->get_id();
+    }
+
+    /**
+     * Translate the date/time field with optionally taking timezone into account.
+     * If $record[$field] is a number, then it is treated as Unix timestamp in UTC.
+     * If it is a string, then it is passed to the DateTime constructor with $record[$field.'timezone'] as timezone
+     *
+     * @param array $record
+     * @param string $field
+     * @return integer
+     */
+    private static function compute_timestamp(array $record, string $field): int {
+        $original = $record[$field];
+        if (!empty($original) && !is_numeric($original)) {
+            if (isset($record[$field.'timezone']) && (string)$record[$field.'timezone'] !== '') {
+                $timezone = \core_date::get_user_timezone_object($record[$field.'timezone']);
+            } else {
+                $timezone = null;
+            }
+            // This could mean that it is a format instead of normal returned value from `time()`.
+            // Must be some kind of time format string that the PHP is able to understand.
+            // Otherwise, we should throw exception here to let the test just fail.
+            try {
+                // Using DateTime object, because it can throw exception, and so we could catch and fail the
+                // behat step pretty much.
+                $datetimeobject = new DateTime($original, $timezone);
+                $original = $datetimeobject->getTimestamp();
+            } catch (\Throwable $e) {
+                throw new coding_exception("An exception occurred: {$e->getMessage()}'");
+            }
+        }
+        return (int)$original;
     }
 
     /**

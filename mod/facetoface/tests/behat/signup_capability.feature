@@ -23,28 +23,25 @@ Feature: Add seminar attendees without signup capability
     And the following "permission overrides" exist:
       | capability            | permission | role    | contextlevel | reference |
       | mod/facetoface:signup | Prohibit   | student | Course       |        C1 |
-    And I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
-    And I turn editing mode off
-    And I follow "View all events"
-    And I follow "Add event"
-    And I press "Save changes"
-    And I log out
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | intro                           | course |
+      | Test seminar name | <p>Test seminar description</p> | C1     |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details | capacity |
+      | Test seminar name | event 1 | 10       |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start        | finish        |
+      | event 1      | tomorrow 9am | tomorrow 10am |
 
   Scenario: Confirms that teacher still can add users with disabled signup capability.
     Given I log in as "student1"
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
+    And I am on "Test seminar name" seminar homepage
     When I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should see "You don't have permission to signup to this seminar event."
     And I log out
 
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Test seminar name"
+    And I am on "Test seminar name" seminar homepage
     And I click on the seminar event action "Attendees" in row "#1"
     And I set the field "menuf2f-actions" to "Add users"
     And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com"

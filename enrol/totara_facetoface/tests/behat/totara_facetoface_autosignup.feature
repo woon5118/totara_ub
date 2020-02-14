@@ -22,51 +22,20 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     And I log out
 
   Scenario: Auto enrol using seminar direct
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name                | intro                             | course | approvaltype |
+      | Test seminar name 1 | <p>Test seminar description 1</p> | C1     | 0            |
+      | Test seminar name 2 | <p>Test seminar description 2</p> | C1     | 0            |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface          | details |
+      | Test seminar name 1 | event 1 |
+      | Test seminar name 2 | event 2 |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start                | finish               |
+      | event 1      | 1 Jan next year 11am | 1 Jan next year 12pm |
+      | event 2      | 2 Jan next year 11am | 2 Jan next year 12pm |
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name 1        |
-      | Description | Test seminar description 1 |
-      | No Approval | 1                          |
-    And I follow "Test seminar name 1"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 1    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | ## next year ## Y ## |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Save changes"
-    And I follow "Course 1"
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name 2        |
-      | Description | Test seminar description 2 |
-      | No Approval | 1                          |
-    And I follow "Test seminar name 2"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 2    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | ## next year ## Y ## |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 00   |
-      | timefinish[day]    | 2    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Save changes"
-
-    And I am on "Course 1" course homepage
+    And I am on "Test seminar name 1" seminar homepage
     When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name                          | Test student enrolment |
       | Automatically sign users up to seminar events |                      1 |
@@ -77,19 +46,14 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     Then I should see "Your booking has been completed and you have been enrolled on 2 event(s)."
 
   Scenario: Auto enrol to waiting list using seminar direct and managers enabled required
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name                | intro                             | course | approvaltype | managerreserve |
+      | Test seminar name 1 | <p>Test seminar description 1</p> | C1     | 0            | 1              |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface          | details |
+      | Test seminar name 1 | event 1 |
     Given I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name                       | Test seminar name 1        |
-      | Description                | Test seminar description 1 |
-      | No Approval                | 1                          |
-      | Allow manager reservations | Yes                        |
-    And I follow "Test seminar name 1"
-    And I follow "Add event"
-    And I click on "Delete" "link" in the "Select rooms" "table_row"
-    And I press "Save changes"
-    And I follow "Course 1"
-    And I am on "Course 1" course homepage
+    And I am on "Test seminar name 1" seminar homepage
     When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name  | Test student enrolment |
       | Default assigned role | Learner                |
@@ -113,52 +77,21 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     And the following job assignments exist:
       | user     | position | manager  |
       | student1 | POS001   | teacher1 |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name                | intro                             | course | approvaltype |
+      | Test seminar name 1 | <p>Test seminar description 1</p> | C1     | 4            |
+      | Test seminar name 2 | <p>Test seminar description 2</p> | C1     | 4            |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface          | details |
+      | Test seminar name 1 | event 1 |
+      | Test seminar name 2 | event 2 |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start                | finish               |
+      | event 1      | 1 Jan next year 11am | 1 Jan next year 12pm |
+      | event 2      | 2 Jan next year 11am | 2 Jan next year 12pm |
 
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name             | Test seminar name 1        |
-      | Description      | Test seminar description 1 |
-      | Manager Approval | 1                          |
-    And I follow "Test seminar name 1"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 1    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | ## next year ## Y ## |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 00   |
-      | timefinish[day]    | 1    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Save changes"
-    And I follow "Course 1"
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name             | Test seminar name 2        |
-      | Description      | Test seminar description 2 |
-      | Manager Approval | 1                          |
-    And I follow "Test seminar name 2"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I set the following fields to these values:
-      | timestart[day]     | 2    |
-      | timestart[month]   | 1    |
-      | timestart[year]    | ## next year ## Y ## |
-      | timestart[hour]    | 11   |
-      | timestart[minute]  | 00   |
-      | timefinish[day]    | 2    |
-      | timefinish[month]  | 1    |
-      | timefinish[year]   | ## next year ## Y ## |
-      | timefinish[hour]   | 12   |
-      | timefinish[minute] | 00   |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Save changes"
-
-    And I am on "Course 1" course homepage
+    And I am on "Test seminar name 1" seminar homepage
     When I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name                          | Test student enrolment |
       | Automatically sign users up to seminar events |                      1 |
@@ -169,6 +102,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     Then I should see "Your request was sent to your manager for approval."
 
   Scenario: Auto enrol using seminar direct with Learner accepts terms and conditions
+    # NOTE: do not use the generator in this scenario so behat can see the default T&C is inherited.
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:

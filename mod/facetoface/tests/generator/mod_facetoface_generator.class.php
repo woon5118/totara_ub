@@ -861,6 +861,13 @@ class mod_facetoface_generator extends testing_module_generator {
             $options['idnumber'] = $record['idnumber'];
         }
 
+        if (isset($record['multisignupamount'])) {
+            // Taken from mod/facetoface/mod_form.php.
+            $copy['multiplesessions'] = $record['multisignupamount'] != 1;
+            $copy['multisignupmaximum'] = (int)$record['multisignupamount'];
+            unset($copy['multisignupamount']);
+        }
+
         $instance = $this->create_instance($copy, $options);
         return $instance->id;
     }

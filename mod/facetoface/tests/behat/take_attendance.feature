@@ -23,66 +23,54 @@ Feature: Take attendance for seminar sessions
       | student2 | C1     | student        |
       | student3 | C1     | student        |
       | student4 | C1     | student        |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | intro                           | course  |
+      | Test seminar name | <p>Test seminar description</p> | C1      |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details |
+      | Test seminar name | event 1 |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start  | finish      | sessiontimezone  |
+      | event 1      | -1 day | -30 minutes | Pacific/Auckland |
+    And the following "seminar signups" exist in "mod_facetoface" plugin:
+      | user     | eventdetails | status |
+      | student1 | event 1      | booked |
+      | student2 | event 1      | booked |
+      | student3 | event 1      | booked |
+      | student4 | event 1      | booked |
     And I log in as "admin"
     And I set the following administration settings values:
       | Enable restricted access | 1 |
     And I log out
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
+    And I am on "Test seminar name" seminar homepage
+    And I navigate to "Edit settings" node in "Seminar administration"
+    And I expand all fieldsets
+    And I set the following fields to these values:
       | Completion tracking           | Show activity as complete when conditions are met |
       | completionstatusrequired[100] | 1                                                 |
-    And I turn editing mode off
+    And I click on "Save and display" "button"
     And I navigate to "Course completion" node in "Course administration"
     And I expand all fieldsets
     And I set the following fields to these values:
       | Seminar - Test seminar name | 1 |
     And I press "Save changes"
-    And I follow "View all events"
-    And I follow "Add event"
-    And I click on "Edit session" "link"
-    And I fill seminar session with relative date in form data:
-      | sessiontimezone    | Pacific/Auckland |
-      | timestart[day]     | -1               |
-      | timestart[month]   | 0                |
-      | timestart[year]    | 0                |
-      | timestart[hour]    | 0                |
-      | timestart[minute]  | 0                |
-      | timefinish[day]    | 0                |
-      | timefinish[month]  | 0                |
-      | timefinish[year]   | 0                |
-      | timefinish[hour]   | 0                |
-      | timefinish[minute] | -30              |
-    And I click on "OK" "button" in the "Select date" "totaradialogue"
-    And I press "Save changes"
-    And I click on the seminar event action "Attendees" in row "#1"
-    And I set the field "Attendee actions" to "Add users"
-    And I set the field "potential users" to "Sam1 Student1, student1@example.com,Sam2 Student2, student2@example.com,Sam3 Student3, student3@example.com, Sam4 Student4, student4@example.com"
-    And I press "Add"
-    And I press "Continue"
-    And I press "Confirm"
-    Then I should see "Sam1 Student1"
-    And I should see "Sam2 Student2"
-    And I should see "Sam3 Student3"
-    And I should see "Sam4 Student4"
     And I log out
 
   Scenario: Set attendance for individual users
     Given I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I click on "View all events" "link"
-    And I click on the seminar event action "Attendees" in row "#1"
-    And I switch to "Take attendance" tab
+    And I am on "Test seminar name" seminar homepage
+    And I click on "Take event attendance" "link"
     And I set the field "Sam1 Student1's attendance" to "Fully attended"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
     And I switch to "Attendees" tab
-    And I should see "Fully attended" in the "Sam1 Student1" "table_row"
-    And I should see "Booked" in the "Sam2 Student2" "table_row"
-    And I should see "Booked" in the "Sam3 Student3" "table_row"
-    And I should see "Booked" in the "Sam4 Student4" "table_row"
+    Then the "facetoface_sessions" table should contain the following:
+      | Name          | Status         |
+      | Sam1 Student1 | Fully attended |
+      | Sam2 Student2 | Booked         |
+      | Sam3 Student3 | Booked         |
+      | Sam4 Student4 | Booked         |
     When I navigate to "Course completion" node in "Course administration > Reports"
     And I click on "Sam1 Student1" "link"
     Then I should see "Completed" in the "#criteriastatus" "css_element"
@@ -94,10 +82,8 @@ Feature: Take attendance for seminar sessions
 
   Scenario: Set attendance in bulk
     Given I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I click on "View all events" "link"
-    And I click on the seminar event action "Attendees" in row "#1"
-    And I click on "Take attendance" "link"
+    And I am on "Test seminar name" seminar homepage
+    And I click on "Take event attendance" "link"
     And I click on "Select Sam1 Student1" "checkbox"
     And I click on "Select Sam2 Student2" "checkbox"
     And I set the field "and mark as" to "Fully attended"
@@ -118,28 +104,32 @@ Feature: Take attendance for seminar sessions
 
   Scenario: Reset attendance for user
     Given I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I click on "View all events" "link"
-    And I click on the seminar event action "Attendees" in row "#1"
-    And I switch to "Take attendance" tab
+    And I am on "Test seminar name" seminar homepage
+    And I click on "Take event attendance" "link"
     And I set the field "Sam1 Student1's attendance" to "Fully attended"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
     And I switch to "Attendees" tab
-    And I should see "Fully attended" in the "Sam1 Student1" "table_row"
-    And I should see "Booked" in the "Sam2 Student2" "table_row"
+    Then the "facetoface_sessions" table should contain the following:
+      | Name          | Status         |
+      | Sam1 Student1 | Fully attended |
+      | Sam2 Student2 | Booked         |
     When I switch to "Take attendance" tab
     And I set the field "Sam1 Student1's attendance" to "Partially attended"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
     And I switch to "Attendees" tab
-    And I should see "Partially attended" in the "Sam1 Student1" "table_row"
-    And I should see "Booked" in the "Sam2 Student2" "table_row"
+    Then the "facetoface_sessions" table should contain the following:
+      | Name          | Status             |
+      | Sam1 Student1 | Partially attended |
+      | Sam2 Student2 | Booked             |
     When I switch to "Take attendance" tab
     And I set the field "Sam1 Student1's attendance" to "Not set"
     And I press "Save attendance"
     Then I should see "Successfully updated attendance"
     And I switch to "Attendees" tab
-    And I should see "Booked" in the "Sam1 Student1" "table_row"
-    And I should see "Booked" in the "Sam2 Student2" "table_row"
+    Then the "facetoface_sessions" table should contain the following:
+      | Name          | Status |
+      | Sam1 Student1 | Booked |
+      | Sam2 Student2 | Booked |
     And I log out

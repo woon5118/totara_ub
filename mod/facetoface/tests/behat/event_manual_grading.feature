@@ -39,14 +39,12 @@ Feature: Event manual grading
     And I log in as "admin"
 
   Scenario: Take attendance while manual event grading is off
-    Given I am on "course1" course homepage
-    And I follow "seminar 1"
+    Given I am on "seminar 1" seminar homepage
     And I navigate to "Edit settings" node in "Seminar administration"
     And I expand all fieldsets
     And I set the field "Manual event grading" to "0"
     And I click on "Save and display" "button"
-    And I click on the seminar event action "Attendees" in row "#1"
-    When I follow "Take attendance"
+    When I click on "Take event attendance" "link"
     Then "One Uno's event grade" "select" should not exist
     And "Two Duex's event grade" "select" should not exist
     And "Three Toru's event grade" "select" should not exist
@@ -74,10 +72,8 @@ Feature: Event manual grading
     And I should not see "Six Sechs" in the "#user-grades" "css_element"
 
   Scenario: Take attendance and leave event grades as blank
-    Given I am on "course1" course homepage
-    And I follow "seminar 1"
-    And I click on the seminar event action "Attendees" in row "#1"
-    When I follow "Take attendance"
+    Given I am on "seminar 1" seminar homepage
+    When I click on "Take event attendance" "link"
     Then the following fields match these values:
       | One Uno's event grade    | |
       | Two Duex's event grade   | |
@@ -119,10 +115,8 @@ Feature: Event manual grading
     And I should not see "Six Sechs" in the "#user-grades" "css_element"
 
   Scenario: Take attendance and manually fill event grades
-    Given I am on "course1" course homepage
-    And I follow "seminar 1"
-    And I click on the seminar event action "Attendees" in row "#1"
-    And I follow "Take attendance"
+    Given I am on "seminar 1" seminar homepage
+    And I click on "Take event attendance" "link"
 
     When I set the following fields to these values:
       | One Uno's event grade    | 12     |
@@ -158,10 +152,8 @@ Feature: Event manual grading
     And I should not see "Six Sechs" in the "#user-grades" "css_element"
 
   Scenario: Take attendance and manually fill invalid event grades
-    Given I am on "course1" course homepage
-    And I follow "seminar 1"
-    And I click on the seminar event action "Attendees" in row "#1"
-    And I follow "Take attendance"
+    Given I am on "seminar 1" seminar homepage
+    And I click on "Take event attendance" "link"
 
     And I set the field "One Uno's event grade" to "forty-two"
     And I set the field "Two Duex's event grade" to "-1"
@@ -183,10 +175,8 @@ Feature: Event manual grading
 
   @_file_upload
   Scenario: Take attendance via CSV file with valid and invalid data
-    Given I am on "course1" course homepage
-    And I follow "seminar 1"
-    And I click on the seminar event action "Attendees" in row "#1"
-    And I follow "Take attendance"
+    Given I am on "seminar 1" seminar homepage
+    And I click on "Take event attendance" "link"
     And I follow "Upload event attendance"
 
     # Scenario: Take attendance via CSV file missing eventattendance/eventgrade fields

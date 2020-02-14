@@ -22,8 +22,7 @@ Feature: Seminar sign-up periods display
       | facetoface        | details |
       | Test seminar name | event 1 |
     And I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "View all events"
+    And I am on "Test seminar name" seminar homepage
 
   Scenario Outline: Sign up students regardless of sign in period status
     Given I follow "Add event"

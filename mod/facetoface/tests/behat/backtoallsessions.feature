@@ -17,16 +17,16 @@ Feature: Return to previous page after actions in seminar
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
       | student1 | C1     | student        |
+    And the following "seminars" exist in "mod_facetoface" plugin:
+      | name              | intro                           | course |
+      | Test seminar name | <p>Test seminar description</p> | C1     |
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details            |
+      | Test seminar name | Test seminar event |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails       | start       | finish       |
+      | Test seminar event | +3 days 9am | +3 days 10am |
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
-    And I am on "Course 1" course homepage
-    And I click on "Turn editing off" "button"
-    And I follow "View all events"
-    And I follow "Add event"
-    And I click on "Save changes" "button"
 
   Scenario: Course page - Seminar edit session actions return to original page
     Given I am on "Course 1" course homepage
