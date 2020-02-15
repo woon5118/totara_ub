@@ -4,7 +4,7 @@
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="perform" COMMENT="each record is one performance activity">
+    <TABLE NAME="perform" COMMENT="Each record is one performance activity">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -17,6 +17,118 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="perform_section" COMMENT="Performance activities are split into one or more sections">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="activity_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="activity_id" TYPE="foreign" FIELDS="activity_id" REFTABLE="perform" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="perform_relationship" COMMENT="Identifies the type of relationships between users used by each performance activity">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="activity_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Each row represents the use of a relationship within a single activity"/>
+        <FIELD NAME="classname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Name of the class that implements this relationship type"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="activity_id" TYPE="foreign" FIELDS="activity_id" REFTABLE="perform" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="activity_id_classname" UNIQUE="true" FIELDS="activity_id, classname" COMMENT="Each relationship classname is only declared as used by a performance activity once"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="perform_section_relationship" COMMENT="Defines a relationship used in a specific section">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="section_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="relationship_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="can_view" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="can_answer" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="section_id" TYPE="foreign" FIELDS="section_id" REFTABLE="perform_section" REFFIELDS="id"/>
+        <KEY NAME="relationship_id" TYPE="foreign" FIELDS="relationship_id" REFTABLE="perform_relationship" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="can_view" UNIQUE="false" FIELDS="can_view"/>
+        <INDEX NAME="can_answer" UNIQUE="false" FIELDS="can_answer"/>
+        <INDEX NAME="section_relationship" UNIQUE="true" FIELDS="section_id, relationship_id" COMMENT="Each available relationship can only be used once per section"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="perform_element" COMMENT="An element used within a section of a performance activity">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="pluginname" TYPE="char" LENGTH="1024" NOTNULL="true" SEQUENCE="false" COMMENT="Name of plugin that manages element of this type"/>
+        <FIELD NAME="title" TYPE="char" LENGTH="1024" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="identifier" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Secondary identifier used to allow distinct questions to be aggregated together for reporting purposes."/>
+        <FIELD NAME="element_data" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON encoded element data, format specific to element type"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="perform_section_element" COMMENT="Table to connect a specific question to a specific performance activity section">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="section_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="element_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="sort_order" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="section_id" TYPE="foreign" FIELDS="section_id" REFTABLE="perform_section" REFFIELDS="id"/>
+        <KEY NAME="element_id" TYPE="foreign" FIELDS="element_id" REFTABLE="perform_element" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="sort_order" UNIQUE="false" FIELDS="sort_order"/>
+        <INDEX NAME="section_sort_order" UNIQUE="true" FIELDS="section_id, sort_order" COMMENT="Each sort order should only be used once with a section"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="perform_subject_instance" COMMENT="Represents a single activity for one subject user">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="subject_user_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="subject_user_id" TYPE="foreign" FIELDS="subject_user_id" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="perform_participant_instance" COMMENT="Each participant instance represents a form to be completed by a a single participant">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="relationship_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="participant_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Identifies the actual user who is participating in this case"/>
+        <FIELD NAME="subject_instance_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Status of the participant instance. 0 - active, 1 - complete, 2 - closed"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="relationship_id" TYPE="foreign" FIELDS="relationship_id" REFTABLE="perform_relationship" REFFIELDS="id"/>
+        <KEY NAME="subject_instance_id" TYPE="foreign" FIELDS="subject_instance_id" REFTABLE="perform_subject_instance" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="perform_element_response" COMMENT="Contains a single response to a single performance activity element">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="section_element_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="participant_instance_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="response_data" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON encoded response data, format specific to element type"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="section_element_id" TYPE="foreign" FIELDS="section_element_id" REFTABLE="perform_section_element" REFFIELDS="id"/>
+        <KEY NAME="participant_instance_id" TYPE="foreign" FIELDS="participant_instance_id" REFTABLE="perform_participant_instance" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="element_participant_instance" UNIQUE="true" FIELDS="section_element_id, participant_instance_id" COMMENT="Each participant instance should only respond to an element once"/>
       </INDEXES>
     </TABLE>
   </TABLES>
