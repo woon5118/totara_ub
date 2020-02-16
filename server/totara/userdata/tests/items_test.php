@@ -32,12 +32,6 @@ defined('MOODLE_INTERNAL') || die();
  */
 class totara_userdata_items_testcase extends advanced_testcase {
 
-    // TL-22134 - deprecated hierarchy_competency\userdata classes in favour of otara_competency\userdata classes.
-    private $deprecated = [
-        'hierarchy_competency\\userdata\\competency_evidence',
-        'hierarchy_competency\\userdata\\competency_progress',
-    ];
-
     /**
      * Returns list of all item classes to be tested.
      * @return array
@@ -45,10 +39,6 @@ class totara_userdata_items_testcase extends advanced_testcase {
     public function item_classes() {
         $return = array();
         foreach (\totara_userdata\local\util::get_item_classes() as $class) {
-            if (in_array($class, $this->deprecated)) {
-                continue;
-            }
-
             $return[] = array($class);
         }
         return $return;

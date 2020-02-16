@@ -33,7 +33,6 @@ class plugininfo extends \totara_hierarchy\plugininfo\hierarchy {
         $data = array();
         $data['numcompframeworks'] = $DB->count_records('comp_framework');
         $data['numcomps'] = $DB->count_records('comp');
-        // TODO: Not sure whether we should return count of all achievement records, or only count of all current achievement records
         $data['numcomprecords'] = $DB->count_records('totara_competency_achievement', ['status' => competency_achievement::ACTIVE_ASSIGNMENT]);
         $data['compsenabled'] = (int)!empty($CFG->enablecompetencies);
 
