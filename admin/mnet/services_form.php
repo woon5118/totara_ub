@@ -43,6 +43,7 @@ class mnet_services_form extends moodleform {
 
         $count = 0;
         foreach ($myservices as $name => $versions) {
+            $name = clean_string($name);
             $version = current($versions);
             $langmodule =
                 ($version['plugintype'] == 'mod'
@@ -53,7 +54,7 @@ class mnet_services_form extends moodleform {
             if ($count > 0) {
                 $mform->addElement('html', '<hr />');
             }
-            $mform->addElement('html', '<h3>' .  get_string($name.'_name', $langmodule , $mnet_peer->name) . '</h3>' . get_string($name.'_description', $langmodule, $mnet_peer->name));
+            $mform->addElement('html', '<h3>' .  get_string($name.'_name', $langmodule , clean_string($mnet_peer->name)) . '</h3>' . get_string($name.'_description', $langmodule, clean_string($mnet_peer->name)));
 
             $mform->addElement('hidden', 'exists[' . $version['serviceid'] . ']', 1);
             // Temporary fix until MDL-38885 gets integrated.

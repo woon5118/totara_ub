@@ -105,7 +105,7 @@ abstract class enrol_bulk_enrolment_confirm_form extends enrol_bulk_enrolment_ch
         $form = $this->_form;
         $users = $this->_customdata['users'];
         $title = $this->_customdata['title'];
-        $message = $this->_customdata['message'];
+        $message = clean_text($this->_customdata['message']);
         $button = $this->_customdata['button'];
 
         $form->addElement('html', $this->get_users_table($users, $this->get_status_options()));

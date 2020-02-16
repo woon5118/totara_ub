@@ -115,7 +115,7 @@ class customfield_define_location extends customfield_define_base {
         $formprefix = (!$fielddefinition) ? $form->_customlocationfieldname : '';
 
         // Give html element a name here, so it won't cause moodle form bug
-        $h3element = $form->createElement('html', html_writer::tag('h3', $fieldname));
+        $h3element = $form->createElement('html', html_writer::tag('h3', format_string($fieldname)));
         $h3element->setName(uniqid("customfieldtitle_"));
         $form->addElement($h3element);
 

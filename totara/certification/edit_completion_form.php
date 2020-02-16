@@ -64,6 +64,7 @@ class certif_edit_completion_form extends moodleform {
         $yesnooptions[1] = get_string('yes');
 
         if (!empty($solution) && !$showconfirm) {
+            $solution = clean_text($solution);
             $mform->addElement('html', html_writer::div(html_writer::span($solution), 'notifyproblem problemsolution'));
         }
 

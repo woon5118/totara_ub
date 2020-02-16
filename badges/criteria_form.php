@@ -52,6 +52,7 @@ class edit_criteria_form extends moodleform {
             list($none, $message) = $criteria->get_options($mform);
 
             if ($none) {
+                $message = clean_text($message);
                 $mform->addElement('html', html_writer::tag('div', $message));
                 $mform->addElement('submit', 'cancel', get_string('continue'));
             } else {

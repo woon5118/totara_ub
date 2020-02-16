@@ -67,7 +67,7 @@ class program_edit_form extends moodleform {
 
         if ($action == 'delete') {
             // Only show delete confirmation
-            $mform->addElement('html', get_string('checkprogramdelete', 'totara_program', $program->fullname));
+            $mform->addElement('html', get_string('checkprogramdelete', 'totara_program', format_string($program->fullname)));
             $buttonarray = array();
             $buttonarray[] = $mform->createElement('submit', 'deleteyes', get_string('yes'));
             $buttonarray[] = $mform->createElement('submit', 'deleteno', get_string('no'));

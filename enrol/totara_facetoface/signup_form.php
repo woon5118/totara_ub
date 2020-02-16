@@ -121,7 +121,7 @@ class enrol_totara_facetoface_signup_form extends moodleform {
                 $seminar = new seminar($facetofaceid);
 
                 $mform->addElement('html', html_writer::start_div('f2factivity', array('id' => 'f2factivity' . $facetofaceid)));
-                $mform->addElement('html', $OUTPUT->heading($seminar->get_name(), 3));
+                $mform->addElement('html', $OUTPUT->heading(format_string($seminar->get_name()), 3));
                 $activejobassigns = \totara_job\job_assignment::get_all($USER->id, $seminar->is_manager_required());
                 if ($seminar->get_forceselectjobassignment() && empty($activejobassigns)) {
                     $msg = get_string('error:nojobassignmentselectedactivity', 'facetoface');
@@ -245,6 +245,7 @@ class enrol_totara_facetoface_signup_form extends moodleform {
                     $roomhtml .= (string)$room;
                 }
             }
+            $roomhtml = clean_text($roomhtml);
             $mform->addElement('html', html_writer::tag('td', $roomhtml, array('class' => 'session-room')));
 
             // Signup information.

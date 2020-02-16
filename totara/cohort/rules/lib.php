@@ -279,7 +279,7 @@ function cohort_ruleset_form_template_object($ruleset) {
         $data->editurl = new moodle_url('/totara/cohort/rules/ruledetail.php', array('type' => 'rule', 'id' => $rulerec->id));
         $data->ruledescription = $description;
         $data->ruletype = $rulerec->ruletype;
-        $data->rulename = $rulerec->name;
+        $data->rulename = format_string($rulerec->name);
         $data->broken = $brokenrule;
         $data->brokenruleinfo = json_encode($brokenruleinfo);
         $data->brokenruleinfostring = get_string('cohortbrokenrule', 'totara_cohort', $brokenruleinfo);
