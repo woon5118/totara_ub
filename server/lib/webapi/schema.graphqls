@@ -123,11 +123,3 @@ Output can be usually selected via format argument. See core_date_format
 enum for the list of supported formats.
 """
 scalar core_date
-
-"""
-Represents a paginaeble result returning a next cursor containing the information needed to load the next page
-"""
-interface core_pageable_result {
-  total: Int!
-  next_cursor: String!
-}

@@ -106,6 +106,7 @@ $string['enablecompetency_assignment'] = 'Enable Competency Assignment';
 $string['enablecompetency_assignment_desc'] = 'This option will let you: Enable(show)/Disable Competency Assignment feature on this site.';
 $string['enabled'] = 'Enabled';
 $string['editcompetency'] = 'Edit competency: {$a}';
+$string['error:filter_assignment_not_supported'] = 'Filtering by "{$a}" is currently not supported';
 $string['event:linked_courses_updated'] = 'Linked courses updated';
 
 // Expand task related
