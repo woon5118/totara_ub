@@ -38,8 +38,8 @@
   }
 
   &__submitButtons {
-    width: max-content;
-    margin-left: auto;
+    display: flex;
+    flex-direction: row-reverse;
   }
 }
 </style>
