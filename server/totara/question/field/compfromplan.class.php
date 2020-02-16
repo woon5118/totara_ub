@@ -97,10 +97,11 @@ class question_compfromplan extends reviewrating {
         // At the moment the same value is stored for all assignements
         $comprecord = $DB->get_record('totara_competency_achievement',
                 [
-                    'userid' => $this->subjectid,
+                    'user_id' => $this->subjectid,
                     'comp_id' => $compassign->competencyid,
                     'status' => competency_achievement::ACTIVE_ASSIGNMENT,
                 ],
+                '*',
                 IGNORE_MULTIPLE
         );
 
