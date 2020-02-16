@@ -100,7 +100,7 @@ class signup extends \moodleform {
                     get_string('manager', 'totara_job'),
                     \html_writer::tag('span', format_string($manager_title), ['id' => 'managertitle'])
                     . \html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('choosemanager', 'totara_job'), 'id' => 'show-manager-dialog'))
-                );
+                )->set_allow_xss(true);
                 $mform->addHelpButton('managerselector', 'choosemanager', 'totara_job');
                 if (!empty($managerids)) {
                     $mform->addElement('static', 'managerjadesc', '', get_string('alljamanagersdesc', 'mod_facetoface'));
@@ -123,7 +123,7 @@ class signup extends \moodleform {
                     get_string('manager', 'totara_job'),
                     \html_writer::tag('span', format_string($manager_title), ['id' => 'managertitle'])
                     . \html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('choosemanager', 'totara_job'), 'id' => 'show-manager-dialog'))
-                );
+                )->set_allow_xss(true);
 
                 $mform->addHelpButton('managerselector', 'choosemanager', 'totara_job');
 

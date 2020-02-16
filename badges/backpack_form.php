@@ -56,7 +56,7 @@ class edit_backpack_form extends moodleform {
             // email or cancel the verification process entirely and start over.
             $status = html_writer::tag('span', get_string('backpackemailverificationpending', 'badges'),
                 array('class' => 'notconnected', 'id' => 'connection-status'));
-            $mform->addElement('static', 'status', get_string('status'), $status);
+            $mform->addElement('static', 'status', get_string('status'), $status)->set_allow_xss(true);
             $mform->addElement('hidden', 'email', $this->_customdata['email']);
             $mform->setType('email', PARAM_EMAIL);
             $mform->hardFreeze(['email']);

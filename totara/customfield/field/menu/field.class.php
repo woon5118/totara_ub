@@ -98,7 +98,7 @@ class customfield_menu extends customfield_base {
                     null,
                     ['id' => 'id_customfield_' . $this->field->shortname]
                 )
-            );
+            )->set_allow_xss(true);
         } else {
             $mform->addElement('select', $this->inputname, format_string($this->field->fullname), $this->formoptions);
         }

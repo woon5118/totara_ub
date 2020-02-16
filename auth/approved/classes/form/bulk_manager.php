@@ -50,7 +50,7 @@ final class bulk_manager extends \moodleform {
             get_string('bulkactionmanagerselect', 'auth_approved', $bulkcount),
             \html_writer::tag('span', '', array('class' => '', 'id' => 'managertitle')) .
             \html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('choosemanager', 'totara_job'), 'id' => 'show-manager-dialog'))
-        );
+        )->set_allow_xss(true);
 
         $mform->addElement('hidden', 'managerjaid');
         $mform->setType('managerjaid', PARAM_INT);

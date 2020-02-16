@@ -69,7 +69,7 @@ class customfield_define_multiselect extends customfield_define_base {
 
         $group[] = $form->createElement('static', 'addoptionelem', '',
                 html_writer::link('#', get_string('addanotheroption', 'totara_question'),
-                        array('id' => "addoptionlink_specificsettings", 'class' => 'addoptionlink')));
+                        array('id' => "addoptionlink_specificsettings", 'class' => 'addoptionlink')))->set_allow_xss(true);
         $sep[] = '';
         $form->addElement('group', 'multiselectitem', $title, $group, $sep);
         $form->addHelpButton('multiselectitem', 'customfieldmultiselectoptions', 'totara_customfield');

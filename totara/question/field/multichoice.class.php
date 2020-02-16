@@ -312,7 +312,7 @@ abstract class multichoice extends question_base {
         if (!$readonly) {
             $form->addElement('static', 'addoptionelem', '',
                 html_writer::link('#', get_string('addanotheroption', 'totara_question'),
-                        array('id' => "addoptionlink_$jsid", 'class'=>'addoptionlink')));
+                        array('id' => "addoptionlink_$jsid", 'class'=>'addoptionlink')))->set_allow_xss(true);
 
             $save = array();
             $save[] = $form->createElement('advcheckbox', 'saveoptions', 0, get_string('savechoicesas', 'totara_question'));

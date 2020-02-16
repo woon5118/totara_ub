@@ -91,17 +91,17 @@ class rb_filter_course_multi extends rb_filter_type {
 
         $objs = array();
         $objs[] =& $mform->createElement('select', $this->name.'_op', $label, $this->get_operators());
-        $objs[] =& $mform->createElement('static', 'title'.$this->name, '',
-            html_writer::tag('span', '', array('id' => $this->name . 'title', 'class' => 'dialog-result-title')));
+        $objs[] = $mform->createElement('static', 'title'.$this->name, '',
+            html_writer::tag('span', '', array('id' => $this->name . 'title', 'class' => 'dialog-result-title')))->set_allow_xss(true);
         $mform->setType($this->name.'_op', PARAM_TEXT);
 
         // Can't use a button because id must be 'show-*-dialog' and formslib appends 'id_' to ID.
-        $objs[] =& $mform->createElement('static', 'selectorbutton',
+        $objs[] = $mform->createElement('static', 'selectorbutton',
             '',
             html_writer::empty_tag('input', array('type' => 'button',
                 'class' => 'rb-filter-button rb-filter-choose-course',
                 'value' => get_string('coursemultiitemchoose', 'totara_reportbuilder'),
-                'id' => 'show-' . $this->name . '-dialog')));
+                'id' => 'show-' . $this->name . '-dialog')))->set_allow_xss(true);
 
         // Container for currently selected items.
         $content = html_writer::tag('div', '', array('class' => 'rb-filter-content-list list-' . $this->name));

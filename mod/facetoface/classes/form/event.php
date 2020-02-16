@@ -299,7 +299,7 @@ class event extends \moodleform {
 
         // Render this content hidden. Then it will be displayed by js during init.
         $html = \html_writer::div($dateshtmlcontent, 'sessiondates hidden', array('id'=>'sessiondates_' . $sessionid));
-        $mform->addElement('static', 'sessiondates', get_string('sessiondates', 'facetoface'), $html);
+        $mform->addElement('static', 'sessiondates', get_string('sessiondates', 'facetoface'), $html)->set_allow_xss(true);
         $mform->addElement('submit','date_add_fields', get_string('dateadd', 'facetoface'));
         $mform->registerNoSubmitButton('date_add_fields');
     }

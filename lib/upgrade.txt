@@ -3,6 +3,9 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* Static fields in legacy forms are now automatically sanitised to prevent XSS,
+  if necessary plugins that require unsafe or malformed HTML markup in static fields
+  need to be updated to use $field->set_allow_xss(true).
 * new function update_role(int $roleid, string $name, string $shortname, string $description, string $archetype),
   direct writes into role table are forbidden now
 * function allow_override($sroleid, $troleid, bool $value = true) has new parameter $value,

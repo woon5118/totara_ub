@@ -52,7 +52,7 @@ class rb_filter_badge extends rb_filter_type {
         $mform->addElement('static', $this->name.'_list', $label,
             // Container for currently selected badges.
             '<div class="list-' . $this->name . '">' .
-            '</div>' . display_add_badge_link($this->name));
+            '</div>' . display_add_badge_link($this->name))->set_allow_xss(true);
 
         if ($advanced) {
             $mform->setAdvanced($this->name.'_list');

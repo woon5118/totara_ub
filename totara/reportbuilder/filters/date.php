@@ -105,7 +105,7 @@ class rb_filter_date extends rb_filter_type {
                 get_string('isbeforetoday', 'totara_reportbuilder'),
                 array('class' => 'accesshide', 'for' => 'id_' . $objs['pre']->getAttribute('name'))
             );
-            $objs[] =& $mform->createElement('static', null, null, $accesslabel);
+            $objs[] = $mform->createElement('static', null, null, $accesslabel)->set_allow_xss(true);
             $objs[] =& $mform->createElement('text', $this->name.'daysbefore', get_string('isbeforetoday', 'totara_reportbuilder'), 'size="2"');
             $mform->setType($this->name.'daysbefore', PARAM_INT);
             $objs[] =& $mform->createElement('static', null, null, html_writer::span(get_string('isbeforetoday', 'totara_reportbuilder')));
@@ -117,7 +117,7 @@ class rb_filter_date extends rb_filter_type {
                 get_string('isaftertoday', 'totara_reportbuilder'),
                 array('class' => 'accesshide', 'for' => 'id_' . $objs['post']->getAttribute('name'))
             );
-            $objs[] =& $mform->createElement('static', null, null, $accesslabel);
+            $objs[] = $mform->createElement('static', null, null, $accesslabel)->set_allow_xss(true);
             $objs[] =& $mform->createElement('text', $this->name.'daysafter', get_string('isaftertoday', 'totara_reportbuilder'), 'size="2"');
             $mform->setType($this->name.'daysafter', PARAM_INT);
             $objs[] =& $mform->createElement('static', null, null, html_writer::span(get_string('isaftertoday', 'totara_reportbuilder')));

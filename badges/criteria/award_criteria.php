@@ -210,7 +210,7 @@ abstract class award_criteria {
             $mform->addGroup($parameter, 'param_' . $prefix . $param['id'], '', array(' '), false);
         } else {
             $parameter[] =& $mform->createElement('advcheckbox', $prefix . $param['id'], '', $param['name'], null, array(0, $param['id']));
-            $parameter[] =& $mform->createElement('static', 'break_start_' . $param['id'], null, '<div style="margin-left: 3em;">');
+            $parameter[] = $mform->createElement('static', 'break_start_' . $param['id'], null, '<div style="margin-left: 3em;">')->set_allow_xss(true);
 
             if (in_array('grade', $this->optional_params)) {
                 $parameter[] =& $mform->createElement('static', 'mgrade_' . $param['id'], null, get_string('mingrade', 'badges'));
@@ -223,7 +223,7 @@ abstract class award_criteria {
                 $parameter[] =& $mform->createElement('date_selector', 'bydate_' . $param['id'], "", array('optional' => true));
             }
 
-            $parameter[] =& $mform->createElement('static', 'break_end_' . $param['id'], null, '</div>');
+            $parameter[] = $mform->createElement('static', 'break_end_' . $param['id'], null, '</div>')->set_allow_xss(true);
             $mform->addGroup($parameter, 'param_' . $prefix . $param['id'], '', array(' '), false);
             if (in_array('grade', $this->optional_params)) {
                 $mform->addGroupRule('param_' . $prefix . $param['id'], array(

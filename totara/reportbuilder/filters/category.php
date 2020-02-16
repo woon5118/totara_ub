@@ -49,17 +49,17 @@ class rb_filter_category extends rb_filter_type {
 
         $objs = array();
         $objs[] =& $mform->createElement('select', $this->name.'_op', $label, $this->get_operators());
-        $objs[] =& $mform->createElement('static', 'title'.$this->name, '',
-            html_writer::tag('span', '', array('id' => $this->name . 'title', 'class' => 'dialog-result-title')));
+        $objs[] = $mform->createElement('static', 'title'.$this->name, '',
+            html_writer::tag('span', '', array('id' => $this->name . 'title', 'class' => 'dialog-result-title')))->set_allow_xss(true);
         $mform->setType($this->name.'_op', PARAM_TEXT);
 
         // Can't use a button because id must be 'show-*-dialog' and formslib appends 'id_' to ID.
-        $objs[] =& $mform->createElement('static', 'selectorbutton',
+        $objs[] = $mform->createElement('static', 'selectorbutton',
             '',
             html_writer::empty_tag('input', array('type' => 'button',
                 'class' => 'rb-filter-button rb-filter-choose-category',
                 'value' => get_string('choosecatplural', 'totara_reportbuilder'),
-                'id' => 'show-' . $this->name . '-dialog')));
+                'id' => 'show-' . $this->name . '-dialog')))->set_allow_xss(true);
         $objs[] =& $mform->createElement('checkbox', $this->name . '_rec', '', get_string('includesubcategories', 'filters'));
         $mform->setType($this->name . '_rec', PARAM_TEXT);
 

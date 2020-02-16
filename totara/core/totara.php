@@ -1026,7 +1026,7 @@ function totara_add_icon_picker(&$mform, $action, $type, $currenticon='default',
         $mform->addElement('header', 'iconheader', get_string($type.'icon', 'totara_core'));
     }
     if ($nojs == 1) {
-        $mform->addElement('static', 'currenticon', get_string('currenticon', 'totara_core'), $iconhtml);
+        $mform->addElement('static', 'currenticon', get_string('currenticon', 'totara_core'), $iconhtml)->set_allow_xss(true);
         if ($action=='add' || $action=='edit') {
             $path = $CFG->dirroot . '/totara/core/pix/' . $type . 'icons';
             foreach (scandir($path) as $icon) {
@@ -1046,7 +1046,7 @@ function totara_add_icon_picker(&$mform, $action, $type, $currenticon='default',
             $mform->addElement('hidden', 'icon');
             $mform->setType('icon', PARAM_TEXT);
         }
-        $mform->addElement('static', 'currenticon', get_string('currenticon', 'totara_core'), $iconhtml . $buttonhtml);
+        $mform->addElement('static', 'currenticon', get_string('currenticon', 'totara_core'), $iconhtml . $buttonhtml)->set_allow_xss(true);
     }
     if ($fieldset) {
         $mform->setExpanded('iconheader');
@@ -1078,7 +1078,7 @@ function totara_create_icon_picker(&$mform, $action, $type, $currenticon = '', $
 
     if ($nojs == 1) {
         $return['currenticon'.$ind] = $mform->createElement('static', 'currenticon',
-                get_string('currenticon', 'totara_core'), $iconhtml);
+                get_string('currenticon', 'totara_core'), $iconhtml)->set_allow_xss(true);
         if ($action == 'add' || $action == 'edit') {
             $path = $CFG->dirroot . '/totara/core/pix/' . $type . 'icons';
             foreach (scandir($path) as $icon) {
@@ -1103,7 +1103,7 @@ function totara_create_icon_picker(&$mform, $action, $type, $currenticon = '', $
                     array('id'=>'icon' . $ind));
         }
         $return['currenticon' . $ind] = $mform->createElement('static', 'currenticon', '',
-                get_string('icon', 'totara_program') . $iconhtml . $linkhtml);
+                get_string('icon', 'totara_program') . $iconhtml . $linkhtml)->set_allow_xss(true);
     }
     return $return;
 }

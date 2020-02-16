@@ -164,7 +164,7 @@ class core_user_editadvanced_form {
             'aspirationalposition',
             get_string('useraspirationalposition', 'totara_hierarchy'),
             $poshtml . $buttonhtml
-        );
+        )->set_allow_xss(true);
 
         // Reverse add elements because only insertElementBefore method is exists.
         $beforename = 'moodle_optional';
@@ -209,7 +209,7 @@ class core_user_editadvanced_form {
             'aspirationalposition',
             get_string('useraspirationalposition', 'totara_hierarchy'),
             $poshtml
-        );
+        )->set_allow_xss(true);
 
         // Reverse add elements because only insertElementBefore method is exists.
         $beforename = 'moodle_optional';

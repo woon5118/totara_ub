@@ -1386,7 +1386,7 @@ class assign {
             $label = $plugin->get_name();
             $pluginsenabled[] = $mform->createElement('checkbox', $name, '', $label);
             $helpicon = $this->get_renderer()->help_icon('enabled', $plugin->get_subtype() . '_' . $plugin->get_type());
-            $pluginsenabled[] = $mform->createElement('static', '', '', $helpicon);
+            $pluginsenabled[] = $mform->createElement('static', '', '', $helpicon)->set_allow_xss(true);
 
             $default = get_config($plugin->get_subtype() . '_' . $plugin->get_type(), 'default');
             if ($plugin->get_config('enabled') !== false) {

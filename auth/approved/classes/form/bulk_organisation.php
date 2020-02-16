@@ -50,7 +50,7 @@ final class bulk_organisation extends \moodleform {
             get_string('bulkactionorganisationselect', 'auth_approved', $bulkcount),
             \html_writer::tag('span', '', array('class' => '', 'id' => 'organisationtitle')) .
             \html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('chooseorganisation', 'totara_job'), 'id' => 'show-organisation-dialog'))
-        );
+        )->set_allow_xss(true);
 
         $mform->addElement('hidden', 'organisationid');
         $mform->setType('organisationid', PARAM_INT);

@@ -220,7 +220,7 @@ class customfield_define_location extends customfield_define_base {
             $formprefix . 'googlemap',
             null,
             html_writer::tag('div', null, array('id' => "{$formprefix}location_map", 'class' => 'location_map'))
-        );
+        )->set_allow_xss(true);
 
         $form->addGroup($mapelements, $formprefix . 'mapelements', get_string('customfieldtypelocation_setmap', 'totara_customfield'), ' ', false);
         $form->addHelpButton($formprefix . 'mapelements', 'customfieldtypelocation_setmap', 'totara_customfield');

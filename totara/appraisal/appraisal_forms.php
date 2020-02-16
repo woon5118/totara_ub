@@ -403,7 +403,7 @@ class appraisal_add_quest_form extends question_choose_element_form {
         $pageid = $this->_customdata['pageid'];
         $prev_permissions = $this->_customdata['prev_perms'];
         $mform->addElement('static', 'prev_quest_roles', null,
-            '<script type="text/javascript">var prevRoles = [' . $prev_permissions . '];</script>');
+            '<script type="text/javascript">var prevRoles = [' . $prev_permissions . '];</script>')->set_allow_xss(true);
         $mform->addElement('hidden', 'appraisalstagepageid');
         $mform->setType('appraisalstagepageid', PARAM_INT);
         $mform->getElement('appraisalstagepageid')->setValue($pageid);

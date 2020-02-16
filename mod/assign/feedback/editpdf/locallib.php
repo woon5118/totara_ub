@@ -173,7 +173,7 @@ class assign_feedback_editpdf extends assign_feedback_plugin {
         $widget = $this->get_widget($userid, $grade, false);
 
         $html = $renderer->render($widget);
-        $mform->addElement('static', 'editpdf', get_string('editpdf', 'assignfeedback_editpdf'), $html);
+        $mform->addElement('static', 'editpdf', get_string('editpdf', 'assignfeedback_editpdf'), $html)->set_allow_xss(true);
         $mform->addHelpButton('editpdf', 'editpdf', 'assignfeedback_editpdf');
         $mform->addElement('hidden', 'editpdf_source_userid', $userid);
         $mform->setType('editpdf_source_userid', PARAM_INT);

@@ -427,7 +427,7 @@ class program_edit_details_button_form extends moodleform {
 
         $button = $OUTPUT->single_button(new moodle_url($this->_form->getAttribute('action')),
             get_string('editprogramdetails', 'totara_program'), 'get');
-        $mform->addElement('static', 'progdetailsbutton', '', $button);
+        $mform->addElement('static', 'progdetailsbutton', '', $button)->set_allow_xss(true);
     }
 }
 
@@ -459,7 +459,7 @@ class program_content_nonedit_form extends moodleform {
         if (has_capability('totara/program:configurecontent', $program->get_context())) {
             $button = $OUTPUT->single_button(new moodle_url($this->_form->getAttribute('action'), array('id' => $program->id)),
                 get_string('editprogramcontent', 'totara_program'), 'get');
-            $mform->addElement('static', 'progcontentbutton', '', $button);
+            $mform->addElement('static', 'progcontentbutton', '', $button)->set_allow_xss(true);
         }
 
     }
@@ -477,7 +477,7 @@ class program_content_nonedit_form extends moodleform {
                 $elementname = $courseset->get_set_prefix();
                 $formlabel = $courseset->display_form_label();
                 $formelement = $courseset->display_form_element();
-                $mform->addElement('static', $elementname, $formlabel, $formelement);
+                $mform->addElement('static', $elementname, $formlabel, $formelement)->set_allow_xss(true);
             }
 
             $this->display_time_allowed($mform, $content, $certifpath);
@@ -529,14 +529,14 @@ class program_assignments_nonedit_form extends moodleform {
         $formlabel = $assignments->display_form_label();
         $formelement = $assignments->display_form_element();
 
-        $mform->addElement('static', $elementname, $formlabel, $formelement);
+        $mform->addElement('static', $elementname, $formlabel, $formelement)->set_allow_xss(true);
 
         // Check capabilities
         if (has_capability('totara/program:configureassignments', $program->get_context())) {
             $button = $OUTPUT->single_button(new moodle_url($this->_form->getAttribute('action'), array('id' => $program->id)),
                 get_string('editprogramassignments', 'totara_program'), 'get');
 
-            $mform->addElement('static', 'progassignbutton', '', $button);
+            $mform->addElement('static', 'progassignbutton', '', $button)->set_allow_xss(true);
         }
     }
 
@@ -563,14 +563,14 @@ class program_messages_nonedit_form extends moodleform {
         $formlabel = $messagesmanager->display_form_label();
         $formelement = $messagesmanager->display_form_element();
 
-        $mform->addElement('static', $elementname, $formlabel, $formelement);
+        $mform->addElement('static', $elementname, $formlabel, $formelement)->set_allow_xss(true);
 
         // Check capabilities
         if (has_capability('totara/program:configuremessages', $program->get_context())) {
             $button = $OUTPUT->single_button(new moodle_url($this->_form->getAttribute('action'), array('id' => $program->id)),
                 get_string('editprogrammessages', 'totara_program'), 'get');
 
-            $mform->addElement('static', 'progmessagebutton', '', $button);
+            $mform->addElement('static', 'progmessagebutton', '', $button)->set_allow_xss(true);
         }
     }
 }
@@ -609,7 +609,7 @@ class program_certifications_nonedit_form extends moodleform {
         if (has_capability('totara/certification:configurecertification', $program->get_context())) {
             $button = $OUTPUT->single_button(new moodle_url($this->_form->getAttribute('action'),
                  array('id' => $program->id)), get_string('editcertification', 'totara_certification'), 'get');
-            $mform->addElement('static', 'certificationbutton', '', $button);
+            $mform->addElement('static', 'certificationbutton', '', $button)->set_allow_xss(true);
         }
     }
 }

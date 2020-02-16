@@ -86,18 +86,18 @@ class rb_filter_hierarchy extends rb_filter_type {
         $objs = array();
         $objs['select'] =& $mform->createElement('select', $this->name.'_op', null, $this->get_operators(), $attr);
         $objs['select']->setLabel(get_string('valuefor', 'filters', $label));
-        $objs[] =& $mform->createElement('static', 'title'.$this->name, '',
-            html_writer::tag('span', '', array('id' => $this->name . 'title', 'class' => 'dialog-result-title')));
+        $objs[] = $mform->createElement('static', 'title'.$this->name, '',
+            html_writer::tag('span', '', array('id' => $this->name . 'title', 'class' => 'dialog-result-title')))->set_allow_xss(true);
         $mform->setType($this->name.'_op', PARAM_TEXT);
         // can't use a button because id must be 'show-*-dialog' and
         // formslib appends 'id_' to ID
         // TODO change dialogs to bind to any id
-        $objs[] =& $mform->createElement('static', 'selectorbutton',
+        $objs[] = $mform->createElement('static', 'selectorbutton',
             '',
             html_writer::empty_tag('input', array('type' => 'button',
                 'class' => 'rb-filter-button rb-filter-choose-' . $type,
                 'value' => get_string('choose' . $type, 'totara_reportbuilder'),
-                'id' => 'show-' . $this->name . '-dialog')));
+                'id' => 'show-' . $this->name . '-dialog')))->set_allow_xss(true);
         $objs[] =& $mform->createElement('checkbox', $this->name . '_rec', '', get_string('includesubcategories', 'filters'));
         $mform->setType($this->name . '_rec', PARAM_TEXT);
 

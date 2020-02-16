@@ -1197,7 +1197,7 @@ class report_builder_edit_performance_form extends moodleform {
                 $mform->addElement('static', 'cachenowselector', get_string('reportbuilderinitcache', 'totara_reportbuilder'),
                     html_writer::tag('span', $lastcached. ' ') .
                     $output->cachenow_button($id)
-                );
+                )->set_allow_xss(true);
             } else {
                 $mform->addElement('advcheckbox', 'generatenow', get_string('cachenow', 'totara_reportbuilder'), '', null, array(0, 1));
                 $mform->setType('generatenow', PARAM_INT);
@@ -1424,7 +1424,7 @@ class report_builder_standard_saved_search_form extends moodleform {
         $html = html_writer::link('#', get_string('manageyoursavedsearches', 'totara_reportbuilder'),
             array('id' => 'totara_reportbuilder_manageseacheslink', 'data-id' => $id));
 
-        $mform->addElement('static', 'managesearch', null, $html);
+        $mform->addElement('static', 'managesearch', null, $html)->set_allow_xss(true);
     }
 }
 

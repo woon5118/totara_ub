@@ -57,7 +57,7 @@ class customfield_textarea extends customfield_base {
                         null,
                         ['id' => 'id_customfield_' . $this->field->shortname]
                     )
-                );
+                )->set_allow_xss(true);
             } else {
                 $mform->addElement('editor', $this->inputname, format_string($this->field->fullname), array('cols' => $cols, 'rows' => $rows), $TEXTAREA_OPTIONS);
                 $data = file_rewrite_pluginfile_urls($this->data, 'pluginfile.php', $context->id, 'totara_customfield', 'textarea', $this->fieldid);

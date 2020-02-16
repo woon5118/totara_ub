@@ -727,7 +727,7 @@ function profile_signup_position($mform, $nojs, $positionid = 0) {
         $mform->addElement('static', 'positionselector', get_string('position', 'totara_job'),
             html_writer::tag('span', $positiontitle, array('class' => $class, 'id' => 'positiontitle')).
             html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('chooseposition', 'totara_job'), 'id' => 'show-position-dialog'))
-        );
+        )->set_allow_xss(true);
         $mform->addElement('hidden', 'positionid');
         $mform->setType('positionid', PARAM_INT);
         $mform->setDefault('positionid', 0);
@@ -759,7 +759,7 @@ function profile_signup_organisation($mform, $nojs, $organisationid = 0) {
         $mform->addElement('static', 'organisationselector', get_string('organisation', 'totara_job'),
             html_writer::tag('span', $organisationtitle, array('class' => $class, 'id' => 'organisationtitle')) .
             html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('chooseorganisation', 'totara_job'), 'id' => 'show-organisation-dialog'))
-        );
+        )->set_allow_xss(true);
 
         $mform->addElement('hidden', 'organisationid');
         $mform->setType('organisationid', PARAM_INT);
@@ -815,7 +815,7 @@ function profile_signup_manager($mform, $nojs, $managerjaid = 0) {
             get_string('manager', 'totara_job'),
             html_writer::tag('span', $managername, array('class' => $class, 'id' => 'managertitle')) .
             html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('choosemanager', 'totara_job'), 'id' => 'show-manager-dialog'))
-        );
+        )->set_allow_xss(true);
 
         $mform->addElement('hidden', 'managerid');
         $mform->setType('managerid', PARAM_INT);

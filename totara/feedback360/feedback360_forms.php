@@ -372,7 +372,7 @@ class request_select_users extends moodleform {
         }
 
         // Create a place to show existing system requests.
-        $mform->addElement('static', 'system_assignments', get_string('requestuserssystem', 'totara_feedback360'), '');
+        $mform->addElement('static', 'system_assignments', get_string('requestuserssystem', 'totara_feedback360'), '')->set_allow_xss(true);
 
         // Self evaluation.
         if ($this->_customdata['selfeval'] != feedback360::SELF_EVALUATION_DISABLED) {

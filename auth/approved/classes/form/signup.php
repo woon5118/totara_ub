@@ -131,7 +131,7 @@ final class signup extends \moodleform {
         if ($this->stage == request::STAGE_SIGNUP and !empty($CFG->sitepolicy)) {
             $mform->addElement('header', 'policyagreement', get_string('policyagreement'), '');
             $mform->setExpanded('policyagreement');
-            $mform->addElement('static', 'policylink', '', '<a href="'.$CFG->sitepolicy.'" onclick="this.target=\'_blank\'">'.get_String('policyagreementclick').'</a>');
+            $mform->addElement('static', 'policylink', '', '<a href="'.$CFG->sitepolicy.'" target="_blank">'.get_String('policyagreementclick').'</a>');
             $mform->addElement('checkbox', 'policyagreed', get_string('policyaccept'));
             $mform->addRule('policyagreed', get_string('policyagree'), 'required', null, 'client');
         }
@@ -271,7 +271,7 @@ final class signup extends \moodleform {
             $mform->addElement('static', 'positionselector', get_string('positionselect', 'auth_approved'),
                 \html_writer::tag('span', '', array('class' => '', 'id' => 'positiontitle')).
                 \html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('chooseposition', 'totara_job'), 'id' => 'show-position-dialog'))
-            );
+            )->set_allow_xss(true);
 
             $mform->addElement('hidden', 'positionid');
             $mform->setType('positionid', PARAM_INT);
@@ -333,7 +333,7 @@ final class signup extends \moodleform {
             $mform->addElement('static', 'organisationselector', get_string('organisationselect', 'auth_approved'),
                 \html_writer::tag('span', '', array('class' => '', 'id' => 'organisationtitle')) .
                 \html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('chooseorganisation', 'totara_job'), 'id' => 'show-organisation-dialog'))
-            );
+            )->set_allow_xss(true);
 
             $mform->addElement('hidden', 'organisationid');
             $mform->setType('organisationid', PARAM_INT);
@@ -435,7 +435,7 @@ final class signup extends \moodleform {
             $mform->addElement('static',  'managerselector', get_string('managerselect', 'auth_approved'),
                 \html_writer::tag('span', '', array('class' => '', 'id' => 'managertitle')) .
                 \html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('choosemanager', 'totara_job'), 'id' => 'show-manager-dialog'))
-            );
+            )->set_allow_xss(true);
 
             $mform->addElement('hidden', 'managerjaid');
             $mform->setType('managerjaid', PARAM_INT);

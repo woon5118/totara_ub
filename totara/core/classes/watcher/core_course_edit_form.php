@@ -253,7 +253,7 @@ class core_course_edit_form {
             $mform->insertElementBefore(
                 $mform->createElement('static', 'currenticon', get_string('currenticon', 'totara_core'), $iconhtml),
                 $beforename
-            );
+            )->set_allow_xss(true);
             $path = $CFG->dirroot . '/totara/core/pix/courseicons';
             $replace = array(
                 '.png' => '',
@@ -285,7 +285,7 @@ class core_course_edit_form {
             $mform->insertElementBefore(
                 $mform->createElement('static', 'currenticon', get_string('currenticon', 'totara_core'), $iconhtml . $buttonhtml),
                 $beforename
-            );
+            )->set_allow_xss(true);
         }
 
         // Add background image element for the Grid Catalogue.

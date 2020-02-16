@@ -342,7 +342,7 @@ class question_dataset_dependent_items_form extends question_wizard_form {
 
             $previewlink = $PAGE->get_renderer('core_question')->question_preview_link(
                         $this->question->id, $this->categorycontext, true);
-            $buttonarray[] = $mform->createElement('static', 'previewlink', '', $previewlink);
+            $buttonarray[] = $mform->createElement('static', 'previewlink', '', $previewlink)->set_allow_xss(true);
 
             $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
             $mform->closeHeaderBefore('buttonar');

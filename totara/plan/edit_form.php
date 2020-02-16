@@ -96,7 +96,7 @@ class plan_edit_form extends moodleform {
 
         if ($action == 'delete') {
             // Only show delete confirmation
-            $mform->addElement('html', get_string('checkplandelete', 'totara_plan', $plan->name));
+            $mform->addElement('html', get_string('checkplandelete', 'totara_plan', format_string($plan->name)));
             $buttonarray = array();
             $buttonarray[] = $mform->createElement('submit', 'deleteyes', get_string('yes'));
             $buttonarray[] = $mform->createElement('submit', 'deleteno', get_string('no'));
@@ -107,7 +107,7 @@ class plan_edit_form extends moodleform {
         }
         if ($action == 'complete') {
             // Only show complete plan confirmation
-            $mform->addElement('html', get_string('checkplancomplete11', 'totara_plan', $plan->name));
+            $mform->addElement('html', get_string('checkplancomplete11', 'totara_plan', format_string($plan->name)));
             $buttonarray = array();
             $buttonarray[] = $mform->createElement('submit', 'completeyes', get_string('completeplan', 'totara_plan'));
             $buttonarray[] = $mform->createElement('submit', 'completeno', get_string('no'));

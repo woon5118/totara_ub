@@ -51,7 +51,7 @@ class core_max_input_vars_form extends moodleform {
         // without using a Moodle form element.
         $select = html_writer::select(array(13 => 'ArrayOpt13', 42 => 'ArrayOpt4', 666 => 'ArrayOpt666'),
                 'arraytest[]', array(13, 42), false, array('multiple' => 'multiple', 'size' => 10));
-        $mform->addElement('static', 'arraybit', $select);
+        $mform->addElement('static', 'arraybit', $select)->set_allow_xss(true);
 
         switch ($this->_customdata['control']) {
             case 'c' :
@@ -73,14 +73,14 @@ class core_max_input_vars_form extends moodleform {
                 }
                 $select = html_writer::select($options,
                         'test_a[]', $values, false, array('multiple' => 'multiple', 'size' => 50));
-                $mform->addElement('static', 'bigarraybit', $select);
+                $mform->addElement('static', 'bigarraybit', $select)->set_allow_xss(true);
                 break;
         }
 
         // For the sake of it, let's have a second array.
         $select = html_writer::select(array(13 => 'Array2Opt13', 42 => 'Array2Opt4', 666 => 'Array2Opt666'),
                 'array2test[]', array(13, 42), false, array('multiple' => 'multiple', 'size' => 10));
-        $mform->addElement('static', 'array2bit', $select);
+        $mform->addElement('static', 'array2bit', $select)->set_allow_xss(true);
 
         $mform->addElement('submit', 'submitbutton', 'Submit here!');
     }

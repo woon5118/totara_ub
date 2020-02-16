@@ -61,13 +61,13 @@ class block_totara_program_completion_edit_form extends block_edit_form {
 
         $objs = array();
         $objs[] = $mform->createElement('static', 'programselector', '',
-            html_writer::tag('span', '', array('id' => 'programtitle', 'class' => 'dialog-result-title')));
+            html_writer::tag('span', '', array('id' => 'programtitle', 'class' => 'dialog-result-title')))->set_allow_xss(true);
         $objs[] = $mform->createElement('static', 'selectorbutton',
             '',
             html_writer::empty_tag('input', array('type' => 'button',
                 'class' => '',
                 'value' => get_string('addprograms', 'block_totara_program_completion'),
-                'id' => 'add-block-programs-dialog')));
+                'id' => 'add-block-programs-dialog')))->set_allow_xss(true);
 
         $mform->addElement('group', 'program_grp', get_string('programs', 'block_totara_program_completion'), $objs, '',
                 false);

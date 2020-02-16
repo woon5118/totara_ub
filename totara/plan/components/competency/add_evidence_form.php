@@ -123,19 +123,19 @@ class totara_competency_evidence_form extends moodleform {
         if ($editing) {
             $mform->addElement('hidden', 'competencyid', $cr->competencyid);
             $mform->setType('competencyid', PARAM_INT);
-            $mform->addElement('static', 'compname', get_string('competency', 'totara_hierarchy'), html_writer::tag('span', format_string($competency_title), array('id' => "competencytitle1")));
+            $mform->addElement('static', 'compname', get_string('competency', 'totara_hierarchy'), html_writer::tag('span', format_string($competency_title), array('id' => "competencytitle1")))->set_allow_xss(true);
             $mform->addHelpButton('compname', 'competencyevidencecompetency', 'totara_hierarchy');
         } else {
             if ($nojs) {
                 $mform->addElement('static','assigncompetency',get_string('assigncompetency', 'totara_hierarchy'), $OUTPUT->container(format_string($competency_title).
                     new action_link(new moodle_url('/totara/hierarchy/prefix/competency/assign/find.php',
-                    array('nojs' => '1', 's' => sesskey(), 'returnurl' => $newreturn, 'userid' => $userid)), get_string('assigncompetency', 'totara_hierarchy')), null, "competencytitle"));
+                    array('nojs' => '1', 's' => sesskey(), 'returnurl' => $newreturn, 'userid' => $userid)), get_string('assigncompetency', 'totara_hierarchy')), null, "competencytitle"))->set_allow_xss(true);
                 $mform->addElement('hidden', 'competencyid');
                 $mform->setType('competencyid', PARAM_INT);
                 $mform->setDefault('competencyid', $competencyid);
             } else {
                 // competency selector
-                $mform->addElement('static', 'competencyselector', get_string('competency', 'totara_hierarchy'), html_writer::tag('span', format_string($competency_title), array('id' => "competencytitle")));
+                $mform->addElement('static', 'competencyselector', get_string('competency', 'totara_hierarchy'), html_writer::tag('span', format_string($competency_title), array('id' => "competencytitle")))->set_allow_xss(true);
                 $mform->addElement('hidden', 'competencyid');
                 $mform->setType('competencyid', PARAM_INT);
                 $mform->setDefault('competencyid', $competencyid);

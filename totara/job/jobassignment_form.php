@@ -159,7 +159,7 @@ class job_assignment_form extends moodleform {
             $mform->addElement('static', 'positionselector', get_string('position', 'totara_job'),
                 html_writer::tag('span', format_string($positiontitle), array('class' => $pos_class, 'id' => 'positiontitle')).
                 ($canedit ? html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('chooseposition', 'totara_job'), 'id' => 'show-position-dialog')) : '')
-            );
+            )->set_allow_xss(true);
             $mform->addElement('hidden', 'positionid');
             $mform->setType('positionid', PARAM_INT);
             $mform->setDefault('positionid', 0);
@@ -170,7 +170,7 @@ class job_assignment_form extends moodleform {
         $mform->addElement('static', 'organisationselector', get_string('organisation', 'totara_job'),
             html_writer::tag('span', format_string($organisationtitle), array('class' => $org_class, 'id' => 'organisationtitle')) .
             ($canedit ? html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('chooseorganisation', 'totara_job'), 'id' => 'show-organisation-dialog')) : '')
-        );
+        )->set_allow_xss(true);
 
         $mform->addElement('hidden', 'organisationid');
         $mform->setType('organisationid', PARAM_INT);
@@ -190,7 +190,7 @@ class job_assignment_form extends moodleform {
                         array('class' => $appraiser_class, 'id' => 'appraisertitle')) .
                     html_writer::empty_tag('input', array('type' => 'button',
                         'value' => get_string('chooseappraiser', 'totara_job'), 'id' => 'show-appraiser-dialog'))
-                );
+                )->set_allow_xss(true);
             } else {
                 if (!empty($appraiserid)) {
                     $usercontext = context_user::instance($appraiserid, MUST_EXIST);
@@ -209,14 +209,14 @@ class job_assignment_form extends moodleform {
                         get_string('appraiser', 'totara_job'),
                         html_writer::tag('span', html_writer::link(new moodle_url('/user/view.php',
                             array('id' => $appraiserid)), format_string($appraisertitle)), array('id' => 'appraisertitle'))
-                    );
+                    )->set_allow_xss(true);
                 } else {
                     $mform->addElement(
                         'static',
                         'appraiserselector',
                         get_string('appraiser', 'totara_job'),
                         html_writer::tag('span', format_string($appraisertitle), array('id' => 'appraisertitle'))
-                    );
+                    )->set_allow_xss(true);
                 }
             }
 
@@ -237,7 +237,7 @@ class job_assignment_form extends moodleform {
                 html_writer::tag('span', format_string($managertitle), array('class' => $manager_class, 'id' => 'managertitle'))
                 . html_writer::empty_tag('input',
                     array('type' => 'button', 'value' => get_string('choosemanager', 'totara_job'), 'id' => 'show-manager-dialog'))
-            );
+            )->set_allow_xss(true);
             $mform->addElement('hidden', 'manageridjaid');
             $mform->setType('manageridjaid', PARAM_ALPHANUMEXT);
             $mform->setDefault('manageridjaid', $managerid . '-' .$managerjaid);
@@ -259,14 +259,14 @@ class job_assignment_form extends moodleform {
                     get_string('manager', 'totara_job'),
                     html_writer::tag('span', html_writer::link(new moodle_url('/user/view.php',
                         array('id' => $managerid)), format_string($managertitle)), array('id' => 'managertitle'))
-                );
+                )->set_allow_xss(true);
             } else {
                 $mform->addElement(
                     'static',
                     'managerselector',
                     get_string('manager', 'totara_job'),
                     html_writer::tag('span', format_string($managertitle), array('id' => 'managertitle'))
-                );
+                )->set_allow_xss(true);
             }
         }
 
@@ -324,7 +324,7 @@ class job_assignment_form extends moodleform {
                             array('class' => $tempmanagerclass, 'id' => 'tempmanagertitle')) .
                     html_writer::empty_tag('input', array('type' => 'button',
                             'value' => get_string('choosetempmanager', 'totara_job'), 'id' => 'show-tempmanager-dialog'))
-                );
+                )->set_allow_xss(true);
                 $mform->addElement('hidden', 'tempmanageridjaid');
                 $mform->setType('tempmanageridjaid', PARAM_ALPHANUMEXT);
                 $mform->setDefault('tempmanageridjaid', $tempmanagerid . '-' .$tempmanagerjaid);
@@ -347,7 +347,7 @@ class job_assignment_form extends moodleform {
                         html_writer::tag('span', html_writer::link(new moodle_url('/user/view.php',
                                 array('id' => $tempmanagerid)), format_string($tempmanagertitle)),
                                 array('id' => 'tempmanagertitle'))
-                    );
+                    )->set_allow_xss(true);
                 } else {
                     $mform->addElement(
                             'static',
@@ -355,7 +355,7 @@ class job_assignment_form extends moodleform {
                             get_string('tempmanager', 'totara_job'),
                             html_writer::tag('span', format_string($tempmanagertitle),
                                     array('id' => 'tempmanagertitle'))
-                        );
+                        )->set_allow_xss(true);
                 }
             }
 

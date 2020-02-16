@@ -626,7 +626,7 @@ abstract class moodleform_mod extends moodleform {
             if ($this->_features->groups || $this->_features->groupings) {
                 $mform->addElement('static', 'restrictgroupbutton', '',
                         html_writer::tag('button', get_string('restrictbygroup', 'availability'),
-                        array('id' => 'restrictbygroup', 'disabled' => 'disabled', 'class' => 'btn btn-secondary')));
+                        array('id' => 'restrictbygroup', 'disabled' => 'disabled', 'class' => 'btn btn-secondary')))->set_allow_xss(true);
             }
 
             // Availability field. This is just a textarea; the user interface

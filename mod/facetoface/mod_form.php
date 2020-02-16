@@ -309,7 +309,7 @@ class mod_facetoface_mod_form extends moodleform_mod {
                 }
                 $systemapprovers .= html_writer::end_tag('div');
 
-                $radiogroup[] =& $mform->createElement('static', "siteapprovers", '', $systemapprovers);
+                $radiogroup[] = $mform->createElement('static', "siteapprovers", '', $systemapprovers)->set_allow_xss(true);
 
                 $activityapprovers = html_writer::start_tag('div', array('id' => 'activityapproverbox', 'class' => 'activity_approvers'));
                 $approvers = array();
@@ -324,7 +324,7 @@ class mod_facetoface_mod_form extends moodleform_mod {
                 }
                 $activityapprovers .= html_writer::end_tag('div');
 
-                $radiogroup[] =& $mform->createElement('static', "activityapprovers", '', $activityapprovers);
+                $radiogroup[] = $mform->createElement('static', "activityapprovers", '', $activityapprovers)->set_allow_xss(true);
 
                 $radiogroup[] =& $mform->createElement('submit', 'addapprovaladmins', get_string('approval_addapprover', 'mod_facetoface'),
                         array('id' => 'show-addapprover-dialog'));

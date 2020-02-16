@@ -50,7 +50,7 @@ final class bulk_position extends \moodleform {
             get_string('bulkactionpositionselect', 'auth_approved', $bulkcount),
             \html_writer::tag('span', '', array('class' => '', 'id' => 'positiontitle')) .
             \html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('chooseposition', 'totara_job'), 'id' => 'show-position-dialog'))
-        );
+        )->set_allow_xss(true);
 
         $mform->addElement('hidden', 'positionid');
         $mform->setType('positionid', PARAM_INT);

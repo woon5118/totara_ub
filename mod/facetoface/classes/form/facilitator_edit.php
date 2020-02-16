@@ -98,7 +98,7 @@ class facilitator_edit extends \moodleform {
             $username[] =& $mform->createElement('select', 'facilitatortype', get_string('facilitatortype_label', 'mod_facetoface'), $typeoptions);
             $username[] =& $mform->createElement('button', 'facilitatorselector', get_string('selectuserwithdot', 'mod_facetoface'),
                 ['id' => 'show-facilitator-dialog']);
-            $username[] =& $mform->createElement('static', 'facilitatortitle', null, $span);
+            $username[] = $mform->createElement('static', 'facilitatortitle', null, $span)->set_allow_xss(true);
             $mform->setDefault('facilitatortype', facilitator_type::INTERNAL);
             $mform->addGroup($username, 'labeltype', get_string('facilitatortype', 'mod_facetoface'), null, false);
         } else {

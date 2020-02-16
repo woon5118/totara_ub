@@ -51,7 +51,7 @@ class rb_filter_cohort extends rb_filter_type {
         $mform->addElement('static', $this->name.'_list', $label,
             // container for currently selected cohorts
             '<div class="list-' . $this->name . '">' .
-            '</div>' . display_add_cohort_link($this->name));
+            '</div>' . display_add_cohort_link($this->name))->set_allow_xss(true);
 
         if ($advanced) {
             $mform->setAdvanced($this->name.'_list');

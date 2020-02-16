@@ -160,7 +160,7 @@ class scheduled_reports_new_form extends moodleform {
 
             // Create a place to show existing audiences.
             $audiences = array();
-            $audiences[] =& $mform->createElement('static', 'audiences_list', '', html_writer::div('', 'list-audiences'));
+            $audiences[] = $mform->createElement('static', 'audiences_list', '', html_writer::div('', 'list-audiences'))->set_allow_xss(true);
             $audiences[] =& $mform->createElement('button', 'addaudiences', get_string('addcohorts', 'totara_reportbuilder'), array('id' => 'show-audiences-dialog'));
             $mform->addGroup($audiences, 'audiences_group', get_string('cohorts', 'totara_cohort'), '');
         }
@@ -173,7 +173,7 @@ class scheduled_reports_new_form extends moodleform {
 
             // Create a place to show existing system users.
             $sysusers = array();
-            $sysusers[] =& $mform->createElement('static', 'systemusers_list', get_string('systemusers', 'totara_reportbuilder'), html_writer::div('', 'list-systemusers'));
+            $sysusers[] = $mform->createElement('static', 'systemusers_list', get_string('systemusers', 'totara_reportbuilder'), html_writer::div('', 'list-systemusers'))->set_allow_xss(true);
             $sysusers[] =& $mform->createElement('button', 'addsystemusers', get_string('addsystemusers', 'totara_reportbuilder'), array('id' => 'show-systemusers-dialog'));
             $mform->addGroup($sysusers, 'systemusers_list_group', get_string('systemusers', 'totara_reportbuilder'), '');
         }
@@ -186,7 +186,7 @@ class scheduled_reports_new_form extends moodleform {
 
             // Text input to add new emails for external users.
             $objs = array();
-            $objs[] =& $mform->createElement('static', 'externalemails_list', '', html_writer::div('', 'list-externalemails'));
+            $objs[] = $mform->createElement('static', 'externalemails_list', '', html_writer::div('', 'list-externalemails'))->set_allow_xss(true);
             $objs[] =& $mform->createElement('text', 'emailexternals', get_string('externalemail', 'totara_reportbuilder'), array('class' => 'reportbuilder_scheduled_addexternal', 'maxlength' => 150, 'size' => 30));
             $objs[] =& $mform->createElement('button', 'addemail', get_string('addexternalemail', 'totara_reportbuilder'),
                 array('id' => 'addexternalemail'));

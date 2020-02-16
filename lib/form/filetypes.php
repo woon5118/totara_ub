@@ -100,10 +100,10 @@ class MoodleQuickForm_filetypes extends MoodleQuickForm_group {
             ]),
 
             $this->createFormElement('static', 'browser', null,
-                '<span data-filetypesbrowser="'.$this->getAttribute('id').'"></span>'),
+                '<span data-filetypesbrowser="'.$this->getAttribute('id').'"></span>')->set_allow_xss(true),
 
             $this->createFormElement('static', 'descriptions', null,
-                '<div data-filetypesdescriptions="'.$this->getAttribute('id').'"></div>')
+                '<div data-filetypesdescriptions="'.$this->getAttribute('id').'"></div>')->set_allow_xss(true)
         ]);
     }
 

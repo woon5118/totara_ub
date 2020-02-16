@@ -76,7 +76,7 @@ class rb_filter_hierarchy_multi extends rb_filter_type {
         // Container for currently selected items.
         $content = html_writer::tag('div', '', array('class' => 'list-' . $this->name));
         $content .= display_choose_hierarchy_items_link($this->name, $type);
-        $mform->addElement('static', $this->name.'_list', $label, $content);
+        $mform->addElement('static', $this->name.'_list', $label, $content)->set_allow_xss(true);
 
         if ($advanced) {
             $mform->setAdvanced($this->name.'_list');

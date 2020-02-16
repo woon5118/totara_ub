@@ -186,7 +186,7 @@ class rb_filter_grpconcat_jobassignment extends rb_filter_hierarchy_multi {
         // Add choose link.
         $content .= display_choose_items_link($this->name, $this->shortname);
 
-        $objs['static'] = $mform->createElement('static', $this->name . '_list', null, $content);
+        $objs['static'] = $mform->createElement('static', $this->name . '_list', null, $content)->set_allow_xss(true);
 
         // Only show the children checkbox for hierarchies.
         if ($this->showchildren) {
