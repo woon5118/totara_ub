@@ -87,9 +87,11 @@ class static_html extends element {
      * otherwise the supplied html is cleaned before output.
      *
      * @param bool $state
+     * @return static_html self instance to allow chaining
      */
     public function set_allow_xss($state) {
         $this->allowxss = (bool)$state;
+        return $this;
     }
 
     /**
@@ -115,7 +117,7 @@ class static_html extends element {
         if ($this->allowxss) {
             $attributes['html'] = (string)$this->html;
         } else {
-            $attributes['html'] = clean_text($this->html);
+            $attributes['html'] = clean_text($this->html, FORMAT_HTML);
         }
         $this->set_attribute_template_data($result, $attributes);
 
