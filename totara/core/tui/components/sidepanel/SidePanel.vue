@@ -53,6 +53,7 @@
       v-if="showButtonControl"
       :disabled="opening || closing"
       :aria-label="$str(isOpen ? 'collapse' : 'expand', 'moodle')"
+      :aria-expanded="isOpen ? 'true' : 'false'"
       class="tui-sidePanel__outsideClose"
       @click.prevent="isOpen ? collapse() : expand()"
     >
@@ -353,9 +354,10 @@ export default {
 
     doResize() {
       let rect = this.$refs.sidePanel.getBoundingClientRect(),
+        parentRect = this.$refs.sidePanel.parentNode.getBoundingClientRect(),
         newMaxHeight,
-        positionTop = false,
-        positionBottom = false;
+        positionTop,
+        positionBottom;
 
       // is the window scrolled up to the top? if so, allow SidePanel's max
       // height to be equal to the height of the window minus its relative top
@@ -373,26 +375,25 @@ export default {
         window.innerHeight + window.scrollY >= document.body.offsetHeight
       ) {
         positionBottom = true;
-        newMaxHeight = this.maxHeight + rect.top;
+        newMaxHeight =
+          window.innerHeight - (window.innerHeight - parentRect.bottom);
       }
 
       // if the window is scrolled somewhere between the top and bottom scrollY
       // position, determine a suitable new max height
       if (!positionTop && !positionBottom) {
-        // if the relative top position has been scrolled in a positive
-        // direction away from being flush with the viewport, adjust for that
-        if (rect.top >= 0) {
-          newMaxHeight = window.innerHeight - rect.top;
-        } else {
-          // if we've moved in a negative direction, so the SidePanel is now
-          // being obscured by the top viewport, adjust for that
-          newMaxHeight = this.maxHeight + rect.top;
+        // start with full window height assumption
+        newMaxHeight = window.innerHeight;
+
+        // then, if the parent bottom coords have scrolled into view, remove
+        // the parent rect.bottom value from the height of the SidePanel
+        if (parentRect.bottom < window.innerHeight) {
+          newMaxHeight = parentRect.bottom;
         }
       }
 
       // set the new SidePanel max height
       this.maxHeight = newMaxHeight;
-
       return;
     },
   },

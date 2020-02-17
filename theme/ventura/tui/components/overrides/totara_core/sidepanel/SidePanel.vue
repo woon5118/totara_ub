@@ -28,8 +28,11 @@
   justify-content: flex-end;
   height: 100%;
   overflow: hidden;
-  transition: max-height var(--tui-transition-sidepanel-scrollsnap-duration)
-    var(--tui-transition-sidepanel-scrollsnap-function);
+
+  &--animated {
+    transition: max-height var(--tui-transition-sidepanel-scrollsnap-duration)
+      var(--tui-transition-sidepanel-scrollsnap-function);
+  }
 
   &--sticky {
     position: sticky;
@@ -124,6 +127,7 @@
     flex-direction: column;
     flex-grow: 1;
     flex-shrink: 1;
+    width: 100%;
     height: 100%;
     max-height: 100%;
     padding: var(--tui-gap-8);
@@ -147,9 +151,17 @@
     max-height: 100%;
     overflow: hidden;
 
+    .ie & {
+      height: 100%;
+    }
+
     .tui-sidePanel--closed &,
     .tui-sidePanel--closing & {
       opacity: 0;
+    }
+
+    .tui-sidePanel--closed & {
+      visibility: hidden;
     }
 
     .tui-sidePanel--open &,
