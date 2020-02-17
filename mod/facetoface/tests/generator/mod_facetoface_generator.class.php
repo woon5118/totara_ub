@@ -900,4 +900,64 @@ class mod_facetoface_generator extends testing_module_generator {
         unset($record['prefix']);
         return $gen->create_custom_field($prefix, $record);
     }
+
+    /**
+     * Age the timecreated of asset
+     *
+     * @param string $name Asset name to age
+     * @param int $seconds Number of seconds to age
+     * @return void
+     */
+    public function age_asset_timecreated(string $name, int $seconds): void {
+        $this->age_thing_timecreated('facetoface_asset', $name, $seconds);
+    }
+
+    /**
+     * Age the timecreated of facilitator
+     *
+     * @param string $name facilitator name to age
+     * @param int $seconds Number of seconds to age
+     * @return void
+     */
+    public function age_facilitator_timecreated(string $name, int $seconds): void {
+        $this->age_thing_timecreated('facetoface_facilitator', $name, $seconds);
+    }
+
+    /**
+     * Age the timecreated of room
+     *
+     * @param string $name room name to age
+     * @param int $seconds Number of seconds to age
+     * @return void
+     */
+    public function age_room_timecreated(string $name, int $seconds): void {
+        $this->age_thing_timecreated('facetoface_room', $name, $seconds);
+    }
+
+    /**
+     * Age the timecreated
+     *
+     * @param string $tablename facetoface_{asset/facilitator/room} sql table name
+     * @param string $name Asset name to age
+     * @param int $seconds Number of seconds to age
+     * @return void
+     */
+    private function age_thing_timecreated(string $tablename, string $name, int $seconds): void {
+        global $DB;
+
+        $timecreated = (int)$DB->get_field($tablename, 'timecreated', ['name' => $name], IGNORE_MULTIPLE);
+        if (!$timecreated) {
+            throw new coding_exception(
+                "The thing with the {$name} name does not exists"
+            );
+        }
+
+        // Age the time.
+        $timecreated = $timecreated - $seconds;
+
+        $sql = "UPDATE {{$tablename}}
+                   SET timecreated = :timecreated
+                 WHERE name = :name";
+        $DB->execute($sql, ['name' => $name, 'timecreated' => $timecreated]);
+    }
 }

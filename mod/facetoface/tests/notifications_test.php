@@ -229,7 +229,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         // Call facetoface_delete_session function for session1.
         $emailsink = $this->redirectMessages();
         $e = new seminar_event($session->id);
-        \mod_facetoface\seminar_event_helper::delete_seminarevent($e);
+        $e->delete();
         $this->execute_adhoc_tasks();
         $emailsink->close();
 
@@ -244,7 +244,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         // Call facetoface_delete_session function for session1.
         $emailsink = $this->redirectMessages();
         $e = new seminar_event($session->id);
-        \mod_facetoface\seminar_event_helper::delete_seminarevent($e);
+        $e->delete();
         $emailsink->close();
 
         $emails = $emailsink->get_messages();
@@ -1115,7 +1115,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
     }
 
     /*
-     * Creates a seminar event with two sessions. 
+     * Creates a seminar event with two sessions.
      * One has a single room, asset, and facilitator; the other has two of each.
      * @return array [$session, $roomlist, $roomcf, $attachmenturls] for use with following session loop tests
      */
@@ -1149,7 +1149,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         foreach ($roomcustomfields as $cfdef) {
             $roomcustomfields[$cfdef->shortname] = $cfdef->id;
         }
-        
+
         // Create asset and facilitator custom fields
         $cfsettings = array('color'); // Will have the shortname of color
         $assetcustomfields = $customfieldgenerator->create_text('facetoface_asset', $cfsettings);

@@ -23,7 +23,17 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use mod_facetoface\{seminar_event, signup, seminar_session, role, seminar_event_helper, room, asset, asset_helper, room_helper, seminar, signup_status};
+use mod_facetoface\{
+    seminar_event,
+    signup,
+    seminar_session,
+    role,
+    asset_helper,
+    room_helper,
+    seminar,
+    signup_status,
+    facilitator_helper
+};
 use mod_facetoface\signup\state\{booked, fully_attended, partially_attended};
 
 class mod_facetoface_delete_event_testcase extends advanced_testcase {
@@ -97,7 +107,7 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
             $role->save();
         }
 
-        seminar_event_helper::delete_seminarevent($event);
+        $event->delete();
         $this->execute_adhoc_tasks();
 
         $messages = $sink->get_messages();
@@ -158,7 +168,7 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
             $role->save();
         }
 
-        seminar_event_helper::delete_seminarevent($event);
+        $event->delete();
         $this->execute_adhoc_tasks();
 
         $messages = $sink->get_messages();
@@ -175,9 +185,11 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
 
         $this->setAdminUser();
 
-        $room = room::create_custom_room();
-        $room->save();
-        $roomid = $room->get_id();
+        $time = time();
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        // Allow one day for unassigned room as it can be just created and not stored in seminar session yet.
+        $room = $generator->add_custom_room(['timecreated' => $time - (DAYSECS * 1.1)]);
+        $roomid = $room->id;
 
         $seminarevent = $this->create_seminar_event();
         $s = new seminar_session();
@@ -198,12 +210,17 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
         room_helper::sync($s2->get_id(), [$roomid]);
 
         $seminareventid = $seminarevent->get_id();
-        seminar_event_helper::delete_seminarevent($seminarevent);
+        $seminarevent->delete();
         $this->assertFalse($DB->record_exists('facetoface_sessions', ['id' => $seminareventid]));
         $this->assertTrue($DB->record_exists('facetoface_room', ['id' => $roomid]));
 
         $seminarevent2id = $seminarevent2->get_id();
-        seminar_event_helper::delete_seminarevent($seminarevent2);
+        $seminarevent2->delete();
+
+        // Run the cleanup task.
+        $task = new \mod_facetoface\task\cleanup_task();
+        $task->execute();
+
         $this->assertFalse($DB->record_exists('facetoface_sessions', ['id' => $seminarevent2id]));
         $this->assertFalse($DB->record_exists('facetoface_room', ['id' => $roomid]));
     }
@@ -216,13 +233,13 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
 
         $this->setAdminUser();
 
-        $asset1 = asset::create_custom_asset();
-        $asset1->save();
-        $asset1id = $asset1->get_id();
-
-        $asset2 = asset::create_custom_asset();
-        $asset2->save();
-        $asset2id = $asset2->get_id();
+        $time = time();
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        // Allow one day for unassigned room as it can be just created and not stored in seminar session yet.
+        $asset1 = $generator->add_custom_asset(['timecreated' => $time - (DAYSECS * 1.1)]);
+        $asset1id = $asset1->id;
+        $asset2 = $generator->add_custom_asset(['timecreated' => $time - (DAYSECS * 1.1)]);
+        $asset2id = $asset2->id;
 
         $seminarevent1 = $this->create_seminar_event();
         $seminarevent2 = $this->create_seminar_event();
@@ -246,13 +263,71 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
 
         // Deleting the first seminar event does not clear the custom assets at all, because custom asset is also
         // being linked with different seminar_event.
-        seminar_event_helper::delete_seminarevent($seminarevent1);
+        $seminarevent1->delete();
         $this->assertTrue($DB->record_exists('facetoface_asset', ['id' => $asset1id]));
         $this->assertTrue($DB->record_exists('facetoface_asset', ['id' => $asset2id]));
 
-        seminar_event_helper::delete_seminarevent($seminarevent2);
+        $seminarevent2->delete();
+
+        // Run the cleanup task.
+        $task = new \mod_facetoface\task\cleanup_task();
+        $task->execute();
+
         $this->assertFalse($DB->record_exists('facetoface_asset', ['id' => $asset2id]));
         $this->assertFalse($DB->record_exists('facetoface_asset', ['id' => $asset1id]));
+    }
+
+    /**
+     * Test delete seminar event with ad-hoc facilitators.
+     */
+    public function test_delete_event_with_custom_facilitators(): void {
+        global $DB;
+
+        $this->setAdminUser();
+
+        $time = time();
+        /** @var \mod_facetoface_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        // Allow one day for unassigned room as it can be just created and not stored in seminar session yet.
+        $facilitator1 = $generator->add_custom_facilitator(['timecreated' => $time - (DAYSECS * 1.1)]);
+        $facilitator1id = $facilitator1->id;
+        $facilitator2 = $generator->add_custom_facilitator(['timecreated' => $time - (DAYSECS * 1.1)]);
+        $facilitator2id = $facilitator2->id;
+
+        $seminarevent1 = $this->create_seminar_event();
+        $seminarevent2 = $this->create_seminar_event();
+
+        $time = time();
+
+        /** @var seminar_event $seminarevent */
+        foreach ([$seminarevent1, $seminarevent2] as $seminarevent) {
+            for ($i = 0; $i < 2; $i++) {
+                $time += 7200;
+
+                $s = new seminar_session();
+                $s->set_timestart($time);
+                $s->set_timefinish($time + 2900);
+                $s->set_sessionid($seminarevent->get_id());
+                $s->save();
+
+                facilitator_helper::sync($s->get_id(), [$facilitator1id, $facilitator2id]);
+            }
+        }
+
+        // Deleting the first seminar event does not clear the custom assets at all, because custom asset is also
+        // being linked with different seminar_event.
+        $seminarevent1->delete();
+        $this->assertTrue($DB->record_exists('facetoface_facilitator', ['id' => $facilitator1id]));
+        $this->assertTrue($DB->record_exists('facetoface_facilitator', ['id' => $facilitator2id]));
+
+        $seminarevent2->delete();
+
+        // Run the cleanup task.
+        $task = new \mod_facetoface\task\cleanup_task();
+        $task->execute();
+
+        $this->assertFalse($DB->record_exists('facetoface_facilitator', ['id' => $facilitator2id]));
+        $this->assertFalse($DB->record_exists('facetoface_facilitator', ['id' => $facilitator1id]));
     }
 
     /**
@@ -301,7 +376,7 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
     }
 
     /**
-     * Delete one of seminar events in various time period via seminar_event_helper::delete_seminarevent() and see the event grade updated.
+     * Delete one of seminar events in various time period and see the event grade updated.
      * @dataProvider data_timestart_delta
      */
     public function test_deleting_an_event_updates_grade(int $timediff) {
@@ -330,13 +405,13 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
         $session2->set_timestart(time() + $timediff)->set_timefinish(time() + $timediff + DAYSECS)->save();
 
         // The grade must become 42 because the event where the user is given 77 grade no longer exists.
-        $this->assertTrue(seminar_event_helper::delete_seminarevent($seminarevent1));
+        $seminarevent1->delete();
         $grade_grades = grade_get_grades($courseid, 'mod', 'facetoface', $f2fid, [$userid]);
         $this->assertSame(42., grade_floatval($grade_grades->items[0]->grades[$userid]->grade));
     }
 
     /**
-     * Delete a seminar event in various time period via seminar_event_helper::delete_seminarevent() and see the event grade updated.
+     * Delete a seminar event in various time period and see the event grade updated.
      * @dataProvider data_timestart_delta
      */
     public function test_deleting_last_event_updates_grade(int $timediff) {
@@ -357,7 +432,7 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
         $session->set_timestart(time() + $timediff)->set_timefinish(time() + $timediff + DAYSECS)->save();
 
         // The grade must become null because the user no longer signs up any event.
-        $this->assertTrue(seminar_event_helper::delete_seminarevent($seminarevent));
+        $seminarevent->delete();
         $grade_grades = grade_get_grades($courseid, 'mod', 'facetoface', $f2fid, [$userid]);
         $this->assertSame(null, grade_floatval($grade_grades->items[0]->grades[$userid]->grade));
     }
@@ -387,5 +462,48 @@ class mod_facetoface_delete_event_testcase extends advanced_testcase {
         $seminarevent->delete();
         $grade_grades = grade_get_grades($courseid, 'mod', 'facetoface', $f2fid, [$userid]);
         $this->assertSame(null, grade_floatval($grade_grades->items[0]->grades[$userid]->grade));
+    }
+
+    /**
+     * Test delete past seminar event will delete the calendar entries.
+     */
+    public function test_delete_event_with_calendar_entries(): void {
+        global $DB;
+
+        $this->setAdminUser();
+
+        /** @var mod_facetoface_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        $course = $this->getDataGenerator()->create_course();
+        $seminar = $this->getDataGenerator()->create_module('facetoface', ['course' => $course->id]);
+
+
+        $time = time();
+        $sessiondate = new stdClass();
+        $sessiondate->timestart = $time - (DAYSECS * 1.1);
+        $sessiondate->timefinish = $sessiondate->timestart + 3 * HOURSECS;
+        $sessiondate->sessiontimezone = '99';
+        $sessiondate->assetids = [];
+        $sid = $generator->add_session(['facetoface' => $seminar->id, 'sessiondates' => [$sessiondate]]);
+
+        // We still need to add the calendar entries.
+        $seminarevent = new seminar_event($sid);
+        \mod_facetoface\calendar::update_entries($seminarevent);
+
+        $events = $DB->get_records(
+            'event',
+            ['modulename' => 'facetoface', 'eventtype' => 'facetofacesession', 'courseid' => $course->id],
+            'timestart'
+        );
+        $this->assertEquals(1, count($events));
+
+        $seminarevent->delete();
+
+        $events = $DB->get_records(
+            'event',
+            ['modulename' => 'facetoface', 'eventtype' => 'facetofacesession', 'courseid' => $course->id],
+            'timestart'
+        );
+        $this->assertEquals(0, count($events));
     }
 }

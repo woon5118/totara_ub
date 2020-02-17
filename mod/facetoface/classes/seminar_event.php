@@ -274,11 +274,25 @@ final class seminar_event implements seminar_iterator_item {
     public function delete(): void {
         global $DB;
 
-        $sessiondates = $this->get_sessions();
-        $sessiondates->delete();
+        $cm = $this->get_seminar()->get_coursemodule();
+        $context = context_module::instance($cm->id);
+
+        // Capture the snapshot of the seminar event before cancelling or deleting it.
+        $session = $this->to_record();
+        $session->mintimestart = $this->get_mintimestart();
+        $session->sessiondates = $this->get_sessions()->sort('timestart')->to_records(false);
+
+        // Cancel the event first.
+        $this->cancel();
+
+        // Remove entries from the calendars.
+        calendar::remove_all_entries($this);
 
         $seminarsignups = signup_list::from_conditions(['sessionid' => $this->get_id()]);
         $seminarsignups->delete();
+
+        $sessiondates = $this->get_sessions();
+        $sessiondates->delete();
 
         $seminarroles = new role_list(['sessionid' => $this->get_id()]);
         $seminarroles->delete();
@@ -288,6 +302,8 @@ final class seminar_event implements seminar_iterator_item {
         $this->delete_notifications();
 
         $DB->delete_records(self::DBTABLE, ['id' => $this->id]);
+
+        \mod_facetoface\event\session_deleted::create_from_session($session, $context)->trigger();
 
         // Re-load instance with default values.
         $this->map_object((object)get_object_vars(new self()));

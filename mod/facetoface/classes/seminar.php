@@ -351,17 +351,17 @@ final class seminar implements seminar_iterator_item {
         $seminarinterests = new interest_list(['facetoface' => $this->get_id()]);
         $seminarinterests->delete();
 
+        $seminarevents = $this->get_events();
+        foreach ($seminarevents as $seminarevent) {
+            // We are going to full scale deleting seminar event here, so that the event custom assets/facilitators/rooms
+            // are going to be gone.
+            $seminarevent->delete();
+        }
+
         $notifications = $DB->get_records('facetoface_notification', ['facetofaceid' => $this->get_id()], '', 'id');
         foreach ($notifications as $notification) {
             $notification = new \facetoface_notification(['id' => $notification->id]);
             $notification->delete();
-        }
-
-        $seminarevents = $this->get_events();
-        foreach ($seminarevents as $seminarevent) {
-            // We are going to full scale deleting seminar event here, so that the event custom rooms/assets
-            // are going to be gone.
-            seminar_event_helper::delete_seminarevent($seminarevent);
         }
 
         $DB->delete_records('event', array('modulename' => 'facetoface', 'instance' => $this->get_id()));

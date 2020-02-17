@@ -880,5 +880,18 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020021400, 'facetoface');
     }
 
+    if ($oldversion < 2020021700) {
+        // Delete seminar event orphan records from calendar.
+        $sql = "DELETE FROM {event}
+                      WHERE modulename = 'facetoface'
+                        AND uuid NOT IN (
+                                 SELECT CAST(id AS VARCHAR) FROM {facetoface_sessions}
+                        )";
+        $DB->execute($sql);
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2020021700, 'facetoface');
+    }
+
     return true;
 }

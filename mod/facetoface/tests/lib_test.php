@@ -1280,7 +1280,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         // Call facetoface_delete_session function for session1.
         $sink = $this->redirectMessages();
         $event1 = new seminar_event($session1->id);
-        \mod_facetoface\seminar_event_helper::delete_seminarevent($event1);
+        $event1->delete();
         $this->execute_adhoc_tasks();
         $sink->close();
 
@@ -1457,7 +1457,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         // $seminarevent will be reset to a default object. Therefore it's ID needs to be cached here
         //for the assertion
         $id = $seminarevent->get_id();
-        \mod_facetoface\seminar_event_helper::delete_seminarevent($seminarevent);
+        $seminarevent->delete();
         $this->assertFalse($DB->record_exists('facetoface_sessions', array('id' => $id)));
 
         // Reload signups and check that other event is not affected.

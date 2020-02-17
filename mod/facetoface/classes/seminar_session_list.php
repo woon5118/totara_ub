@@ -272,10 +272,6 @@ final class seminar_session_list implements \Iterator, \Countable {
      * @return void
      */
     public function delete(): void {
-        foreach ($this->items as $item) {
-            room_helper::sync($item->get_id(), []);
-            asset_helper::sync($item->get_id(), []);
-        }
         $this->traitDelete();
     }
 

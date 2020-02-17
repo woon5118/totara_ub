@@ -97,6 +97,15 @@ class behat_totara_data_generators extends behat_base {
             'seminar signups' => array(
                 'datagenerator' => 'signups_for_behat',
                 'required' => array('eventdetails', 'user')
+            ),
+            'asset timecreated' => array(
+                'age_data' => 'age_asset_timecreated'
+            ),
+            'facilitator timecreated' => array(
+                'age_data' => 'age_facilitator_timecreated'
+            ),
+            'room timecreated' => array(
+                'age_data' => 'age_room_timecreated'
             )
         ),
         'totara_core' => array(

@@ -47,7 +47,7 @@ if ($backtoallsessions) {
 
 try {
     // Start deleting now.
-    \mod_facetoface\seminar_event_helper::delete_seminarevent($seminarevent);
+    $seminarevent->delete();
     redirect($returnurl);
 } catch (Exception $e) {
     print_error('error:couldnotdeletesession', 'facetoface', $returnurl);

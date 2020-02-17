@@ -143,6 +143,34 @@ final class facilitator_list  implements \Iterator {
     }
 
     /**
+     * Load most of the ad-hoc facilitators that are being used by the seminar event.
+     *
+     * @param int   $seminareventid
+     * @return facilitator_list
+     */
+    public static function get_custom_facilitators_from_seminarevent(int $seminareventid): facilitator_list {
+        global $DB;
+        // Using distinct here, because there could be a possibility that different session dates are using the same
+        // facilitator. And would cause an unexpecing debugging message where duplicated Id is appearing in the list.
+        $sql = "
+            SELECT DISTINCT f.*
+            FROM {facetoface_facilitator} f
+            INNER JOIN {facetoface_facilitator_dates} ffd ON ffd.facilitatorid = f.id
+            INNER JOIN {facetoface_sessions_dates} fsd ON fsd.id = ffd.sessionsdateid
+            WHERE f.custom = 1
+            AND fsd.sessionid = :sessionid
+        ";
+        $records = $DB->get_records_sql($sql, ['sessionid' => $seminareventid]);
+        $list = new static();
+        foreach ($records as $record) {
+            $facilitator = new facilitator();
+            $facilitator->from_record($record);
+            $list->add($facilitator);
+        }
+        return $list;
+    }
+
+    /**
      * Get the relevant facilitators for a seminar activity
      * @param int $seminarid
      * @return facilitator_list

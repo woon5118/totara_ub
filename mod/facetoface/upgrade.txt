@@ -115,6 +115,7 @@ Note that more recent update comes to the top.
   * mod/facetoface:viewallsessions
 
 --- Deprecated in backend code ---
+* seminar_event_helper::delete_seminarevent() function has been deprecated, please use \mod_facetoface\seminar_event::delete() instead
 * attendees_helper::count_reserved_spaces() has been deprecated; please use the functions in the reservations class instead
 * seminar_event::is_session_open() has been deprecated, please use seminar_session::is_attendance_open() instead
 * seminar_event::is_any_attendance_open() has been deprecated, please use seminar_event::is_any_session_attendance_open() instead
@@ -168,7 +169,6 @@ Note that more recent update comes to the top.
 * seminar_event::set_normalcost() changed 1st parameter from int to string
 * seminar_event::get_discountcost() changed return type from int to string
 * seminar_event::set_discountcost() changed 1st parameter from int to string
-* seminar_event_helper::delete_seminarevent() changed to trigger the session_deleted event
 * seminar_attachment_item interface added and implemented by the asset, facilitator and room classes
 * query\event\event_query reimplemented to take advantage of the query builder for more flexibility
 * event_time added more constants
@@ -249,7 +249,7 @@ Note that more recent update comes to the top.
 * facetoface_notify_under_capacity() function has been deprecated, please use mod_facetoface\notification\notification_helper::notify_under_capacity instead
 * facetoface_notify_registration_ended() function has been deprecated, please use mod_facetoface\notification\notification_helper::notify_registration_ended instead
 * facetoface_cancel_pending_requests() function has been deprecated
-* facetoface_delete_session() function has been deprecated, please use \mod_facetoface\seminar_event_helper::delete_seminarevent() instead
+* facetoface_delete_session() function has been deprecated, please use \mod_facetoface\seminar_event::delete() instead
 * facetoface_update_trainers() function has been deprecated, please use \mod_facetoface\trainer_helper class instead
 * facetoface_get_trainer_roles() function has been deprecated, please use \mod_facetoface\trainer_helper::get_trainer_roles() instead
 * facetoface_get_trainers() function has been deprecated, please use \mod_facetoface\trainer_helper::get_trainers() instead

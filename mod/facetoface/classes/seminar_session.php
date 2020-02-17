@@ -125,6 +125,11 @@ final class seminar_session implements seminar_iterator_item {
     public function delete(): void {
         global $DB;
 
+        // Unlink ad-hoc assets/facilitators/rooms.
+        asset_helper::sync($this->id);
+        facilitator_helper::sync($this->id);
+        room_helper::sync($this->id);
+
         $DB->delete_records(self::DBTABLE, ['id' => $this->id]);
 
         // Re-load instance with default values.
