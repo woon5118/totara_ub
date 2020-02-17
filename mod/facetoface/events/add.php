@@ -66,9 +66,10 @@ $PAGE->requires->strings_for_js(array('cancel', 'ok', 'edit', 'loadinghelp'), 'm
 $PAGE->requires->strings_for_js(
     array(
         'chooseassets', 'choosefacilitators', 'chooserooms', 'dateselect', 'useroomcapacity', 'nodatesyet', 'createnewasset', 'editasset',
-        'createnewroom', 'editroom', 'createnewfacilitator', 'editfacilitator'
+        'createnewroom', 'editroom', 'createnewfacilitator', 'editfacilitator', 'editcustomassetx', 'editcustomroomx', 'editcustomfacilitatorx',
+        'chooserooms', 'chooseassets', 'choosefacilitators', 'removeroomx', 'removeassetx', 'removefacilitatorx', 'bookingconflict'
     ),
-    'facetoface'
+    'mod_facetoface'
 );
 $jsconfig = array(
     'sessionid' => $s, 'can_edit' => 'true', 'facetofaceid' => $seminar->get_id(), 'clone' => 0,
