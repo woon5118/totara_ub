@@ -62,9 +62,9 @@ Feature: Seminar event booking cancellation calendar views
     And I should not see "Go to this Seminar event"
 
     When I follow "Seminar event"
-    And I follow "Cancel booking"
+    And I click on "Cancel booking" "link_or_button" in the seminar event sidebar "Booked"
     And I wait "1" seconds
-    And I press "Cancel booking"
+    And I click on "Cancel booking" "button" in the seminar event sidebar "Cancel booking"
     Then I should see "Your booking has been cancelled"
     And I am on "Course 1" course homepage
 
@@ -111,9 +111,9 @@ Feature: Seminar event booking cancellation calendar views
     And I should not see "Go to this Seminar event"
 
     When I follow "Seminar event"
-    And I follow "Cancel booking"
+    And I click on "Cancel booking" "link_or_button" in the seminar event sidebar "Requested"
     And I wait "1" seconds
-    And I press "Cancel booking"
+    And I click on "Cancel booking" "button" in the seminar event sidebar "Cancel booking"
     Then I should see "Your booking has been cancelled"
     And I am on "Course 1" course homepage
 
@@ -140,9 +140,9 @@ Feature: Seminar event booking cancellation calendar views
     Then I should see "You are booked for this Seminar event" exactly "2" times
 
     When I follow "Seminar event"
-    And I follow "Cancel booking"
+    And I click on "Cancel booking" "link_or_button" in the seminar event sidebar "Booked"
     And I wait "1" seconds
-    And I press "Cancel booking"
+    And I click on "Cancel booking" "button" in the seminar event sidebar "Cancel booking"
     Then I should see "Your booking has been cancelled"
     And I am on "Course 1" course homepage
 
@@ -240,9 +240,9 @@ Feature: Seminar event booking cancellation calendar views
 
     # Withdraw from the second event
     When I click on "//div[contains(.,'8:00 PM')]/a[.='Seminar event']" "xpath_element"
-    And I follow "Cancel booking"
+    And I click on "Cancel booking" "link_or_button" in the seminar event sidebar "Booked"
     And I wait "1" seconds
-    And I press "Cancel booking"
+    And I click on "Cancel booking" "button" in the seminar event sidebar "Cancel booking"
     Then I should see "Your booking has been cancelled"
     And I am on "Course 1" course homepage
 

@@ -76,9 +76,9 @@ Feature: Seminar event cancellation reporting
     And I log in as "learner1"
     And I am on "Course 1" course homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
-    And I follow "Cancel booking"
+    And I click on "Cancel booking" "link_or_button" in the seminar event sidebar "Booked"
     And I wait "1" seconds
-    And I press "Cancel booking"
+    And I click on "Cancel booking" "button" in the seminar event sidebar "Cancel booking"
 
     Given I log out
     And I log in as "admin"

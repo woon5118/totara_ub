@@ -77,19 +77,19 @@
     }
 }}
 
-<div data-core-autoinitialise-amd="mod_facetoface/seminarevent_information" data-core-autoinitialise="true">
+<div id="{{id}}" data-core-autoinitialise-amd="mod_facetoface/seminarevent_information" data-core-autoinitialise="true">
     {{#navigation}}{{> mod_facetoface/event_page_navigation }}{{/navigation}}
     <div class="mod_facetoface__eventinfo mod_facetoface__event_details">
         {{^nosidebar}}
-        <aside class="mod_facetoface__eventinfo__sidebars mod_facetoface__sidebars">
+        <div class="mod_facetoface__eventinfo__sidebars mod_facetoface__sidebars">
             {{#sidebars}}
-                {{#toggle}}<input type="checkbox" id="{{id}}" autocomplete="off" class="mod_facetoface__eventinfo__sidebars__toggle mod_facetoface__eventinfo__{{class}}" style="display:none" aria-hidden="true" aria-controls="{{idon}} {{idoff}}" data-id-on="{{idon}}" data-id-off="{{idoff}}"{{#on}} checked{{/on}}>{{/toggle}}
+                {{#toggle}}<input type="checkbox" id="{{id}}" autocomplete="off" class="mod_facetoface__eventinfo__sidebars__toggle mod_facetoface__eventinfo__{{class}}" style="display:none" aria-hidden="true" aria-controls="{{idon}} {{idoff}}" tabindex="0" data-id-on="{{idon}}" data-id-off="{{idoff}}"{{#on}} checked{{/on}}>{{/toggle}}
                 <div class="mod_facetoface__eventinfo__sidebar__panel mod_facetoface__eventinfo__sidebar__{{class}}"{{#id}} id="{{.}}"{{/id}}>
-                    {{#togglebutton}}<label for="{{togglebutton.id}}" role="button" class="mod_facetoface__eventinfo__sidebar__{{class}}"{{#alttext}} title="{{alttext}}" aria-label="{{alttext}}"{{/alttext}}>{{{text}}}</label>{{/togglebutton}}
+                    {{#togglebutton}}<button data-for="{{togglebutton.id}}" class="mod_facetoface__eventinfo__toggle mod_facetoface__eventinfo__sidebar__{{class}}" {{#alttext}} title="{{alttext}}" aria-label="{{alttext}}"{{/alttext}}>{{{text}}}</button>{{/togglebutton}}
                     {{{content}}}
                 </div>
             {{/sidebars}}
-        </aside>
+        </div>
         {{/nosidebar}}
         <article class="mod_facetoface__eventinfo__content">
             {{#management}}
@@ -108,3 +108,20 @@
     </div>
     {{#footeraction}}{{> mod_facetoface/seminarevent_actionbar }}{{/footeraction}}
 </div>
+
+{{#js}}
+(function(doc, id) {
+    doc.getElementById(id).addEventListener('click', function(e) {
+        var sender = e.target.closest('.mod_facetoface__eventinfo__toggle');
+        if (sender) {
+            e.preventDefault();
+            var check = doc.getElementById(sender.getAttribute('data-for'));
+            check.checked = !check.checked;
+            var on = check.checked.toString();
+            var off = (!check.checked).toString();
+            doc.getElementById(check.getAttribute('data-id-on')).setAttribute('aria-hidden', on);
+            doc.getElementById(check.getAttribute('data-id-off')).setAttribute('aria-hidden', off);
+        }
+    });
+})(document, '{{id}}')
+{{/js}}

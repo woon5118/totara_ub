@@ -279,6 +279,55 @@ class behat_facetoface extends behat_base {
     }
 
     /**
+     * Return the xpath for location a sidebar panel.
+     *
+     * @param string $title
+     * @return string xpath
+     */
+    private static function resolve_xpath_for_sidebar_panel(string $title): string {
+        return ".//h3[contains(., ".behat_context_helper::escape($title).")]/ancestor::*[contains(concat(' ', @class, ' '), ' mod_facetoface__eventinfo__sidebar__panel ')]";
+    }
+
+    /**
+     * Click on an item in a sidebar on the seminar event page.
+     *
+     * @Given /^I click on "([^"]*)" "([^"]*)" in the seminar event sidebar "([^"]*)"$/
+     * @param string $element
+     * @param string $selectortype
+     * @param string $title
+     */
+    public function i_click_on_in_the_seminar_event_sidebar(string $element, string $selectortype, string $title) {
+        $xpath = self::resolve_xpath_for_sidebar_panel($title);
+        $this->execute('behat_general::i_click_on_in_the', [$element, $selectortype, $xpath, 'xpath_element']);
+    }
+
+    /**
+     * Checks the provided item should exist in a sidebar on the seminar event page.
+     *
+     * @Given /^I should see "([^"]*)" "([^"]*)" in the seminar event sidebar "([^"]*)"$/
+     * @param string $element
+     * @param string $selectortype
+     * @param string $title
+     */
+    public function i_should_see_in_the_seminar_event_sidebar(string $element, string $selectortype, string $title) {
+        $xpath = self::resolve_xpath_for_sidebar_panel($title);
+        $this->execute('behat_general::should_exist_in_the', [$element, $selectortype, $xpath, 'xpath_element']);
+    }
+
+    /**
+     * Checks the provided item should not exist in a sidebar on the seminar event page.
+     *
+     * @Given /^I should not see "([^"]*)" "([^"]*)" in the seminar event sidebar "([^"]*)"$/
+     * @param string $element
+     * @param string $selectortype
+     * @param string $title
+     */
+    public function i_should_not_see_in_the_seminar_event_sidebar(string $element, string $selectortype, string $title) {
+        $xpath = self::resolve_xpath_for_sidebar_panel($title);
+        $this->execute('behat_general::should_not_exist_in_the', [$element, $selectortype, $xpath, 'xpath_element']);
+    }
+
+    /**
      * Use magic to alter facetoface cut off to value which is not allowed in UI so that we do not have to wait in tests.
      *
      * @Given /^I use magic to set Seminar "([^"]*)" to send capacity notification two days ahead$/

@@ -231,7 +231,7 @@ Feature: Check attendees actions are performed by users with the right permissio
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Go to event"
-    Then I should see "Cancel booking" in the ".mod_facetoface__eventinfo__sidebar__cancellation" "css_element"
+    Then I should see "Cancel booking" "link_or_button" in the seminar event sidebar "Booked"
 
   Scenario: Check trainer ability to view user profiles before and after prohibition
     Given I log in as "trainer1"

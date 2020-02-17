@@ -231,7 +231,7 @@ Feature: Seminar Signup Admin Approval
     And I follow "Classroom Connect Activity"
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
-    And I should see "Cancel booking" in the ".mod_facetoface__eventinfo__sidebar__cancellation" "css_element"
+    And I should see "Cancel booking" "link_or_button" in the seminar event sidebar "Booked"
     And I log out
 
     # Check haven't decided
@@ -240,7 +240,7 @@ Feature: Seminar Signup Admin Approval
     And I follow "Classroom Connect Activity"
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     Then I should see "Requested" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
-    And I should see "Cancel booking" in the ".mod_facetoface__eventinfo__sidebar__cancellation" "css_element"
+    And I should see "Cancel booking" "link_or_button" in the seminar event sidebar "Requested"
     And I log out
 
   Scenario: Multiple seminar event approvals and denials for the same user

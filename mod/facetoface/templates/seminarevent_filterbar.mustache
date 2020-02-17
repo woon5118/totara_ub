@@ -147,7 +147,7 @@
     {{#togglelabel}}<input type="checkbox" aria-hidden="true" class="mod_facetoface__filter__toggle" autocomplete="off" id="f2f-filter-toggle-{{formid}}">{{/togglelabel}}
     <div class="mod_facetoface__filter__toggle-button">
         {{#icon}}{{#context}}{{> &&template }}{{/context}}{{/icon}}
-        {{#togglelabel}}<label role="button" for="f2f-filter-toggle-{{formid}}" class="mod_facetoface__filter__toggle-button__label"><span class="mod_facetoface__filter__toggle-button__label__hidden">{{hidden}}</span><span class="mod_facetoface__filter__toggle-button__label__shown">{{shown}}</span></label>{{/togglelabel}}
+        {{#togglelabel}}<button data-for="f2f-filter-toggle-{{formid}}" class="mod_facetoface__filter__toggle-button__label"><span class="mod_facetoface__filter__toggle-button__label__hidden">{{hidden}}</span><span class="mod_facetoface__filter__toggle-button__label__shown">{{shown}}</span></button>{{/togglelabel}}
     </div>
     {{#params}}
         <input type="hidden" name="{{name}}" value="{{value}}">
@@ -168,3 +168,15 @@
         <a class="mod_facetoface__filter__link" href="{{url}}">{{label}}</a>
     {{/links}}
 </form>
+{{^noscript}}{{#js}}
+(function(doc, id) {
+    var toggle = doc.querySelector('#' + id + ' .mod_facetoface__filter__toggle-button__label');
+    if (toggle) {
+        toggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            var check = doc.getElementById(toggle.getAttribute('data-for'));
+            check.checked = !check.checked;
+        });
+    }
+})(document, 'mod_facetoface__filter_{{formid}}');
+{{/js}}{{/noscript}}

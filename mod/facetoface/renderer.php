@@ -64,6 +64,7 @@ use mod_facetoface\output\seminarevent_detail;
 use mod_facetoface\output\seminarevent_detail_section;
 use mod_facetoface\output\seminarevent_detail_session_list;
 use mod_facetoface\output\seminarevent_information;
+use mod_facetoface\output\seminarevent_signup_card;
 use mod_facetoface\output\session_list_table;
 use mod_facetoface\seminar_attachment_item;
 use mod_facetoface\signup\state\attendance_state;
@@ -1141,7 +1142,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
         $signup = signup::create($USER->id, $seminarevent);
 
-        $data = ['nosidebar' => true, 'details' => $this->get_seminar_event_details_data($signup, $option)];
+        $data = ['id' => html_writer::random_id('f2f-eventinfo-'), 'nosidebar' => true, 'details' => $this->get_seminar_event_details_data($signup, $option)];
         return $this->render(new seminarevent_information($data));
     }
 
@@ -1158,7 +1159,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $seminar = $seminarevent->get_seminar();
         $cm = $seminar->get_coursemodule();
 
-        $data = ['class' => 'eventinfo'];
+        $data = ['id' => html_writer::random_id('f2f-eventinfo-'), 'class' => 'eventinfo'];
 
         $data['navigation'] = event_page_navigation::create(
             $seminarevent,
@@ -1738,9 +1739,9 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     protected function get_sidebar_signup_failure(signup $signup): array {
         $failures = signup_helper::get_failures($signup);
         // Display first failure as the most relevant
-        $failure = clean_string(reset($failures));
-        $heading = html_writer::tag('h3', get_string('signupunavailable', 'mod_facetoface'));
-        return ['class' => 'signup-failure', 'content' => $heading . $failure];
+        $failure = reset($failures);
+        $card = seminarevent_signup_card::create_plain(get_string('signupunavailable', 'mod_facetoface'), $failure);
+        return ['class' => 'signup-failure', 'content' => $this->render($card)];
     }
 
     /**
@@ -1781,6 +1782,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @return array of the template data of the sidebar
      */
     protected function get_sidebars_cancellation(signup $signup, render_event_info_option $option, bool $cancelsignup): array {
+        global $OUTPUT;
         $idpart = 'f2f-signup-cancel-';
         $checkid = html_writer::random_id($idpart);
         $bookedid = html_writer::random_id($idpart);
@@ -1796,16 +1798,15 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         } else {
             $canceltext = get_string('cancelbooking', 'mod_facetoface');
         }
-        $class = 'mod_facetoface__eventinfo__cancellation';
-        $heading = html_writer::tag('h3', signup_helper::get_user_booking_status($currentstate, false));
+        $heading = signup_helper::get_user_booking_status($currentstate, false);
         if ($allowcancellation) {
-            $link = html_writer::tag('label', $canceltext, ['title' => $canceltext, 'for' => $checkid, 'role' => 'link', 'class' => $class . '__link']);
+            $card = seminarevent_signup_card::create_toggle($heading, $canceltext, $checkid);
             $toggle = ['id' => $checkid, 'class' => 'cancellation', 'on' => $cancelsignup, 'idon' => $bookedid, 'idoff' => $confirmid];
         } else {
-            $link = '';
+            $card = seminarevent_signup_card::create_simple($heading);
             $toggle = [];
         }
-        $sidebars[] = ['class' => 'cancellation', 'content' => $heading . $link, 'id' => $bookedid, 'toggle' => $toggle];
+        $sidebars[] = ['class' => 'cancellation', 'content' => $this->render($card), 'id' => $bookedid, 'toggle' => $toggle];
 
         if ($allowcancellation) {
             // Confirm
@@ -1824,7 +1825,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             if (!$mform->is_cancelled() && $mform->is_submitted()) {
                 $mform->is_validated();
             }
-            $closebutton = ['id' => $checkid, 'text' => '&times;', 'alttext' => get_string('eventinfo:cancelcancel', 'mod_facetoface'), 'class' => 'cancellation-cancellation'];
+            $closebutton = ['id' => $checkid, 'text' => $OUTPUT->flex_icon('close'), 'alttext' => get_string('eventinfo:cancelcancel', 'mod_facetoface'), 'class' => 'cancellation-cancellation'];
             $sidebars[] = ['class' => 'cancellation-confirm', 'content' => $mform->render(), 'id' => $confirmid, 'togglebutton' => $closebutton];
         }
 

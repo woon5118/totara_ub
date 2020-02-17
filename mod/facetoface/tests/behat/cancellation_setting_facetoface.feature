@@ -50,9 +50,9 @@ Feature: Cancellation for session
     And I follow "View all events"
     When I click on the link "Go to event" in row 1
     Then I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
-    And I click on "Cancel booking" "link" in the ".mod_facetoface__eventinfo__sidebar__cancellation" "css_element"
+    And I click on "Cancel booking" "link_or_button" in the seminar event sidebar "Booked"
     And I wait "1" seconds
-    And I press "Cancel booking"
+    And I click on "Cancel booking" "button" in the seminar event sidebar "Cancel booking"
     Then I should see "Your booking has been cancelled"
     And I log out
 
@@ -128,7 +128,7 @@ Feature: Cancellation for session
     And I follow "View all events"
     When I click on the link "Go to event" in row 1
     Then I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
-    And I should see "Cancel booking" in the ".mod_facetoface__eventinfo__sidebar__cancellation" "css_element"
+    And I should see "Cancel booking" "link_or_button" in the seminar event sidebar "Booked"
     And I log out
 
     And I log in as "teacher1"
@@ -189,8 +189,8 @@ Feature: Cancellation for session
     And I follow "View all events"
     When I click on the link "Go to event" in row 1
     Then I should see "Booked" in the ".mod_facetoface__eventinfo__sidebars" "css_element"
-    And I click on "Cancel booking" "link" in the ".mod_facetoface__eventinfo__sidebar__cancellation" "css_element"
+    And I click on "Cancel booking" "link_or_button" in the seminar event sidebar "Booked"
     And I wait "1" seconds
-    And I press "Cancel booking"
+    And I click on "Cancel booking" "button" in the seminar event sidebar "Cancel booking"
     Then I should see "Your booking has been cancelled"
     And I log out

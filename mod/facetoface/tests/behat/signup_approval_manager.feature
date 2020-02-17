@@ -332,4 +332,4 @@ Feature: Seminar Signup Manager Approval
     When I follow "View all events"
     Then I should see "(Requested)" in the "Upcoming" "table_row"
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
-    And I should see "Cancel booking"
+    And I should see "Cancel booking" "link_or_button" in the seminar event sidebar "Requested"

@@ -419,7 +419,7 @@ Feature: Sign up to a seminar
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
     And I click on the link "Go to event" in row 1
-    And I follow "Cancel booking"
+    And I click on "Cancel booking" "link_or_button" in the seminar event sidebar "Booked"
     And I wait "1" seconds
     And I set the following fields to these values:
       | User cancellation checkbox                    | 1                    |
@@ -447,7 +447,7 @@ Feature: Sign up to a seminar
     And I click on "Select this file" "button" in the "//div[@aria-hidden='false' and @class='moodle-dialogue-base']" "xpath_element"
     And I set the field "Describe this image for someone who cannot see it" to "Green leaves on customfield text area"
     And I click on "Save image" "button"
-    And I press "Cancel booking"
+    And I click on "Cancel booking" "button" in the seminar event sidebar "Cancel booking"
     Then I should see "Your booking has been cancelled."
 
     When I log out

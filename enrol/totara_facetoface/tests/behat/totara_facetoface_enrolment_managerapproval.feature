@@ -137,4 +137,4 @@ Feature: Users are forced to get manager approval where required
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Go to event"
-    Then I should see "Cancel booking"
+    Then I should see "Cancel booking" "link_or_button" in the seminar event sidebar "Booked"

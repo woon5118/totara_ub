@@ -45,9 +45,9 @@ Note that more recent update comes to the top.
 * PARAM_FILTER_xxx constants have been deprecated; please use filter_list instead
 
 --- Update in renderer ---
+* get_sidebar_signup_failure() now uses the seminarevent_signup_card template
+* get_sidebars_cancellation() now uses the seminarevent_signup_card template
 * print_reservation_management_table() updated to not use the 2nd parameter $backtoallsessions
-* render_seminar_event() has a new sessionid parameter that can be used to render the event with a single session in the list, a feature used by calendar events
-* get_seminar_event_details_eventinfo() and get_seminar_event_details_sessions() do not include headings if they are being used to render a calendar event
 * render_room_details() and render_asset_details() have been rewritten to share the code base
 * get_room_details_html() added 3rd parameter $joinnow
 * render_seminar_event() updated to use the seminarevent_information template

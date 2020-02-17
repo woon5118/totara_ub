@@ -13,7 +13,8 @@
 @mod_facetoface-navbar-font-size: @totara_style-size_14;
 @mod_facetoface-navbar-font-height: @totara_style-size_14;
 @mod_facetoface-navbar-height: @mod_facetoface-navbar-font-height * 2;
-@mod_facetoface-cancel-close-size: @totara_style-size_40;
+@mod_facetoface-cancel-close-size: 2rem; // use the same hard-coded value as tw-catalogDetails__close.
+@mod_facetoface-cancel-close-offset: @totara_style-size_base;
 
 @mod_facetoface-ui-dialog-width: 870px;
 
@@ -22,10 +23,6 @@
 
 @mod_facetoface-breakpoint_mobile: @totara_style-screen_sm_min;
 @mod_facetoface-filter-label-font-size: @totara_style-size_11;
-@mod_facetoface-navbar-font-size: @totara_style-size_14;
-@mod_facetoface-navbar-font-height: @totara_style-size_14;
-@mod_facetoface-navbar-height: @mod_facetoface-navbar-font-height * 2;
-@mod_facetoface-cancel-close-size: @totara_style-size_40;
 
 
 .f2fsessionlinks,
@@ -242,6 +239,25 @@ select.menuf2f-select {
     &:focus {
         color: @link-hover-color;
         text-decoration: @link-hover-decoration;
+    }
+}
+
+.force-link-style() {
+    &,
+    &:active,
+    &:focus,
+    &:hover,
+    &:active:focus,
+    &:active:hover {
+        background: transparent none;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        cursor: pointer;
+        font: inherit;
+        margin: 0;
+        outline: none;
+        padding: 0;
     }
 }
 
@@ -1012,24 +1028,41 @@ select.menuf2f-select {
             }
 
             &__cancellation-cancellation {  // NOTE: this is not a typo.
-                cursor: pointer;
-                font-size: @mod_facetoface-cancel-close-size;
-                line-height: 1;
-                padding: 0;
-                position: absolute;
-                top: 0;
-                right: @mod_facetoface-spacing-default;
+                .force-link-style();
+                color: @link-color;
+
+                &:active,
+                &:focus,
+                &:hover,
+                &:active:focus,
+                &:active:hover {
+                    color: @link-hover-color;
+                }
+
+                &,
+                &:active,
+                &:focus,
+                &:hover,
+                &:active:focus,
+                &:active:hover {
+                    font-size: @mod_facetoface-cancel-close-size;
+                    line-height: 1;
+                    position: absolute;
+                    top: @mod_facetoface-cancel-close-offset;
+                    right: @mod_facetoface-spacing-default;
+                }
+            }
+        }
+
+        &__card {
+            &__toggle {
+                .force-link-color();
+                .force-link-style();
             }
         }
 
         &__cancellation {
             display: none;
-
-            &__link {
-                .force-link-color();
-                cursor: pointer;
-                font: inherit;
-            }
 
             &:checked {
                 & ~ .mod_facetoface__eventinfo__sidebar__cancellation {
@@ -1080,12 +1113,15 @@ select.menuf2f-select {
 
                 &__label {
                     .force-link-color();
+                    .force-link-style();
 
                     display: block;
                     flex: 1;
-                    font: inherit;
-                    margin-bottom: 0;
-                    padding: @filter-spacing-small 0;
+
+                    &__hidden,
+                    &__shown {
+                        padding: @filter-spacing-small 0;
+                    }
 
                     &__hidden {
                         display: block;

@@ -180,9 +180,9 @@ Feature: Return to previous page after actions in seminar
 
     # Course page -> Go to event -> Cancel booking -> Cancel booking -> Event page
     When I click on "Go to event" "link" in the "(Booked)" "table_row"
-    And I click on "Cancel booking" "link"
+    And I click on "Cancel booking" "link_or_button" in the seminar event sidebar "Booked"
     And I wait "1" seconds
-    And I press "Cancel booking"
+    And I click on "Cancel booking" "button" in the seminar event sidebar "Cancel booking"
     Then I should see "Back to top"
 
   Scenario: Sessions page - Seminar singup and cancel actions return to original page
@@ -222,9 +222,9 @@ Feature: Return to previous page after actions in seminar
 
     # Event dashboard -> Go to event -> Cancel booking -> Cancel booking -> Event page
     When I click on "Go to event" "link" in the "(Booked)" "table_row"
-    And I click on "Cancel booking" "link"
+    And I click on "Cancel booking" "link_or_button" in the seminar event sidebar "Booked"
     And I wait "1" seconds
-    And I press "Cancel booking"
+    And I click on "Cancel booking" "button" in the seminar event sidebar "Cancel booking"
     Then I should see "Back to top"
 
   Scenario: Seminar attendees back link return to seminar page - top level only

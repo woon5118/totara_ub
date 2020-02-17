@@ -22,8 +22,6 @@
 
 
 define(['core/yui', 'core/form_duplicate_prevent'], function(Y, dupe) {
-    const CLASS_TOGGLE = '.mod_facetoface__eventinfo__sidebars__toggle';
-
     return {
         /**
          * Initialisation method
@@ -32,26 +30,8 @@ define(['core/yui', 'core/form_duplicate_prevent'], function(Y, dupe) {
          * @returns {Promise}
          */
         init: function(root) {
-            /**
-             * Update ARIA attributes.
-             * @param {HTMLInputElement} el
-             */
-            function update(el) {
-                var hiddenOn = el.checked.toString();
-                var hiddenOff = (!el.checked).toString();
-                document.getElementById(el.getAttribute('data-id-on')).setAttribute('aria-hidden', hiddenOn);
-                document.getElementById(el.getAttribute('data-id-off')).setAttribute('aria-hidden', hiddenOff);
-            }
             return new Promise(function(resolve) {
-                root.addEventListener('change', function(event) {
-                    var element = event.target.closest(CLASS_TOGGLE);
-                    if (element !== null) {
-                        update(element);
-                    }
-                });
-                Array.prototype.forEach.call(root.querySelectorAll(CLASS_TOGGLE), update);
-
-                dupe.init(root).then(function() {
+                dupe.init(root).then(function() { // eslint-disable-line promise/catch-or-return
                     // Listen to the global YUI event.
                     Y.use('moodle-core-event', function() {
                         Y.Global.on(M.core.globalEvents.FORM_ERROR, function(event) {
