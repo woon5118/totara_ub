@@ -21,7 +21,7 @@
 -->
 
 <template>
-  <aside
+  <div
     ref="sidePanel"
     class="tui-sidePanel"
     :class="{
@@ -50,6 +50,7 @@
     </div>
 
     <ButtonIcon
+      v-if="showButtonControl"
       :disabled="opening || closing"
       :aria-label="$str(isOpen ? 'collapse' : 'expand', 'moodle')"
       class="tui-sidePanel__outsideClose"
@@ -68,7 +69,7 @@
         <slot ref="removableContent" />
       </div>
     </div>
-  </aside>
+  </div>
 </template>
 
 <script>
@@ -78,8 +79,7 @@ import ExpandIcon from 'totara_core/components/icons/common/Expand';
 import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
 import { throttle } from 'totara_core/util';
 
-const isIE = document.body.classList.contains('ie'),
-  isMSEdge = document.body.classList.contains('msedge');
+const isIE = document.body.classList.contains('ie');
 
 export default {
   components: {
@@ -125,7 +125,7 @@ export default {
     },
 
     /**
-     * Whether to set a max-height CSS property with a value equal to
+     * Whether to set a CSS max-height value that is not `initial`
      **/
     limitHeight: {
       type: Boolean,
@@ -137,7 +137,7 @@ export default {
      **/
     minHeight: {
       type: Number,
-      default: 400, // assumed a px based calculation
+      default: 250, // assumed a px based calculation
     },
 
     /**
@@ -154,6 +154,14 @@ export default {
      * contents exceed its available height
      **/
     overflows: {
+      type: Boolean,
+      default: true,
+    },
+
+    /**
+     * Whether to render the expand/collapse SidePanel toggle control
+     **/
+    showButtonControl: {
       type: Boolean,
       default: true,
     },
@@ -200,7 +208,7 @@ export default {
       /**
        * Let's throttle viewport resize calculations to improve performance
        **/
-      resizeThrottleTime: 75,
+      resizeThrottleTime: 100,
 
       /**
        * Method invoked during the window.onscroll event, when the
@@ -212,7 +220,7 @@ export default {
       /**
        * Let's throttle viewport scroll calculations to improve performance
        **/
-      scrollThrottleTime: 250,
+      scrollThrottleTime: 200,
     };
   },
 
@@ -227,32 +235,31 @@ export default {
       if (open) {
         this.expand();
       } else {
-        this.close();
+        this.collapse();
       }
     },
   },
 
   mounted() {
     if (this.$refs.sidePanel instanceof Element) {
-      // handle height calculations when we need to limit height by available
-      // space in viewport
-      if (this.limitHeight) {
-        this.$_resize();
+      // handle height calculations when we need to, or can, limit height by
+      // available space in viewport
+      if (this.limitHeight && !isIE) {
+        this.doResize();
 
         this.resizeHandler = throttle(
           () => {
             this.$_resize();
           },
           this.resizeThrottleTime,
-          { leading: true, trailing: false }
+          { leading: false, trailing: true }
         );
-
         window.addEventListener('resize', this.resizeHandler);
       }
 
       // handle height calculations more acutely when we need to have fluid
       // height when the viewport is scrolled
-      if (this.growHeightOnScroll && !isIE) {
+      if (this.growHeightOnScroll) {
         this.scrollHandler = throttle(
           () => {
             this.$_scroll();
@@ -261,14 +268,9 @@ export default {
           { leading: false, trailing: true }
         );
 
-        // TODO: test if still required
-        if (isMSEdge) {
-          document.addEventListener('scroll', this.scrollHandler);
-        } else {
-          document.addEventListener('scroll', this.scrollHandler, {
-            passive: true,
-          });
-        }
+        window.addEventListener('scroll', this.scrollHandler, {
+          passive: true,
+        });
       }
     }
 
@@ -278,7 +280,7 @@ export default {
     }
   },
 
-  unmounted() {
+  beforeDestroy() {
     // clean up event listeners
     if (this.resizeHandler) {
       window.removeEventListener('resize', this.resizeHandler);
@@ -334,33 +336,63 @@ export default {
     },
 
     $_resize() {
-      let rect = this.$refs.sidePanel.getBoundingClientRect(),
-        viewportFill = window.innerHeight - rect.top;
-
-      if (this.minHeight >= viewportFill) {
-        this.maxHeight = this.minHeight;
-      } else {
-        this.maxHeight = viewportFill;
-      }
+      this.doResize();
       return;
     },
 
     $_scroll() {
+      // remove pixel calculations if we shouldn't be growing on scroll
+      if (!this.growHeightOnScroll) {
+        this.maxHeight = 'initial';
+        return;
+      }
+
+      // otherwise recalculate heights
+      this.doResize();
+    },
+
+    doResize() {
       let rect = this.$refs.sidePanel.getBoundingClientRect(),
-        newValue;
+        newMaxHeight,
+        positionTop = false,
+        positionBottom = false;
 
-      // handle missing `y` property on result from getBoundingClientRect()
-      if (isMSEdge) {
-        rect.y = rect.top;
+      // is the window scrolled up to the top? if so, allow SidePanel's max
+      // height to be equal to the height of the window minus its relative top
+      // position from 0,0 coords within window
+      if (window.scrollY === 0) {
+        positionTop = true;
+        newMaxHeight = window.innerHeight - rect.top;
       }
 
-      if (rect.y < 0) {
-        newValue = rect.bottom;
-      } else {
-        newValue = window.innerHeight - rect.y;
+      // is the window scrolled to the bottom? if so, allow SidePanel's max
+      // height to be equal to its current max height plus its relative top
+      // position from 0,0 coords within window
+      if (
+        !positionTop &&
+        window.innerHeight + window.scrollY >= document.body.offsetHeight
+      ) {
+        positionBottom = true;
+        newMaxHeight = this.maxHeight + rect.top;
       }
 
-      this.maxHeight = newValue;
+      // if the window is scrolled somewhere between the top and bottom scrollY
+      // position, determine a suitable new max height
+      if (!positionTop && !positionBottom) {
+        // if the relative top position has been scrolled in a positive
+        // direction away from being flush with the viewport, adjust for that
+        if (rect.top >= 0) {
+          newMaxHeight = window.innerHeight - rect.top;
+        } else {
+          // if we've moved in a negative direction, so the SidePanel is now
+          // being obscured by the top viewport, adjust for that
+          newMaxHeight = this.maxHeight + rect.top;
+        }
+      }
+
+      // set the new SidePanel max height
+      this.maxHeight = newMaxHeight;
+
       return;
     },
   },

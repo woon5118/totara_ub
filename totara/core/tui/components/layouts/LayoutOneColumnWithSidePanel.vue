@@ -45,7 +45,7 @@
             :animated="currentBoundaryName !== 'small'"
             :sticky="currentBoundaryName !== 'small'"
             :grow-height-on-scroll="currentBoundaryName !== 'small'"
-            :render-control="currentBoundaryName !== 'small'"
+            :show-button-control="currentBoundaryName !== 'small'"
             :initially-open="true"
             :overflows="false"
             @sidepanel-expanding="expandRequest"
