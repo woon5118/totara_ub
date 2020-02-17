@@ -35,7 +35,7 @@ class totara_webapi_schema_file_loader_test extends \advanced_testcase {
         $this->assertNotEmpty($files);
 
         // Check existing of a specific file we can be sure is there
-        $this->assertArrayHasKey(realpath($CFG->dirroot.'/totara/webapi/webapi/status.graphqls'), $files);
+        $this->assertArrayHasKey($CFG->dirroot.'/totara/webapi/webapi/status.graphqls', $files);
 
         foreach ($files as $filename => $content) {
             $this->assertRegExp('/[a-z0-9_-]+\.graphqls$/', $filename);

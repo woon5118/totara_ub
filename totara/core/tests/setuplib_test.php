@@ -50,7 +50,7 @@ class totara_core_setuplib_testcase extends advanced_testcase {
         $this->assertSame('', $exception->link);
         $this->assertSame(null, $exception->a);
         $this->assertSame(null, $exception->debuginfo);
-        $this->assertSame("stuff/weird\n\$a contents: ", $exception->getMessage());
+        $this->assertSame("stuff/weird".PHP_EOL."\$a contents: ", $exception->getMessage());
 
         $exception = new moodle_exception('This is so wrong, let\'s not code like <this>', 'book', '/yyy/', 'grrr', 'ohlala');
         $this->assertSame('notlocalisederrormessage', $exception->errorcode);
