@@ -43,6 +43,10 @@ $totara_style_transitions: (
   --tui-transition-form-duration: 0s;
   --tui-transition-modal-function: ease-out;
   --tui-transition-modal-duration: 0.15s;
+  --tui-transition-sidepanel-scrollsnap-function: ease-out;
+  --tui-transition-sidepanel-scrollsnap-duration: 0.15s;
+  --tui-transition-sidepanel-content-function: ease-in;
+  --tui-transition-sidepanel-content-duration: 0.25s;
   --tui-transition-progress-function: ease-out;
   --tui-transition-progress-duration: 0.3s;
 }
