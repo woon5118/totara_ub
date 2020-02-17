@@ -1,3 +1,25 @@
+<!--
+  This file is part of Totara Learn
+
+  Copyright (C) 2019 onwards Totara Learning Solutions LTD
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
+  @package totara_competency
+-->
+
 <template>
   <ChartJs
     :type="type"
@@ -10,10 +32,9 @@
 </template>
 
 <script>
-/* global M */
-
 import ChartJs from 'totara_core/components/chartjs/ChartJs';
 import theme from 'totara_core/theme';
+import { unique } from 'totara_core/util';
 
 let rotate = (x, y, angle) => {
   return {
@@ -398,6 +419,12 @@ export default {
       }
 
       options.tooltips.callbacks = {
+        title(tooltipItems, data) {
+          return unique(tooltipItems.map(x => x.index))
+            .map(x => data.labels[x])
+            .join(', ');
+        },
+
         label(tooltipItem, data) {
           let label = data.datasets[tooltipItem.datasetIndex].label || '';
 
@@ -424,22 +451,25 @@ export default {
         competencies: [],
         datasets: [
           {
-            label: this.$str('my_rating', 'totara_competency'), // TODO String
-            backgroundColor: '#007AB840',
-            borderColor: '#007AB8',
+            label: this.$str('achievement_level', 'totara_competency'),
+            backgroundColor: theme.getVar('tui-color-chart-transparent-1'),
+            borderColor: theme.getVar('tui-color-chart-background-1'),
             borderWidth: 2,
             rawData: [],
             data: [],
             values: [],
           },
           {
-            label: this.$str('proficient_value', 'totara_competency'),
+            label: this.$str('proficiency_level', 'totara_competency'),
 
             // For bar charts the area under the line should be transparent
-            backgroundColor: this.type === 'bar' ? 'transparent' : '#A3971940',
-            borderColor: '#A39719',
-            pointBorderColor: '#A39719',
-            pointBackgroundColor: '#A39719',
+            backgroundColor:
+              this.type === 'bar'
+                ? 'transparent'
+                : theme.getVar('tui-color-chart-transparent-4'),
+            borderColor: theme.getVar('tui-color-chart-background-4'),
+            pointBorderColor: theme.getVar('tui-color-chart-background-4'),
+            pointBackgroundColor: theme.getVar('tui-color-chart-background-4'),
             borderWidth: 2,
             steppedLine: 'middle',
             rawData: [],
@@ -519,13 +549,11 @@ export default {
 
   methods: {
     competencyLink(id) {
-      let link = `${M.cfg.wwwroot}/totara/competency/profile/details/?competency_id=${id}`;
-
+      const params = { competency_id: id };
       if (!this.isMine) {
-        link += `&user_id=${this.userId}`;
+        params.user_id = this.userId;
       }
-
-      return link;
+      return this.$url('/totara/competency/profile/details/', params);
     },
 
     chartHovered(event, context, thisChart, Chart) {
@@ -555,9 +583,12 @@ export default {
 </script>
 
 <lang-strings>
-    {
-        "totara_competency" : [
-            "proficient", "not_proficient", "proficient_value", "my_rating"
-        ]
-    }
+{
+  "totara_competency" : [
+    "proficient",
+    "not_proficient",
+    "proficiency_level",
+    "achievement_level"
+  ]
+}
 </lang-strings>

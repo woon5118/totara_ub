@@ -22,20 +22,26 @@
 -->
 
 <template>
-  <Popover v-if="scale" :triggers="['hover', 'focus', 'click']">
+  <Popover v-if="scale" :triggers="['click']">
     <template v-slot:trigger>
-      <div class="tui-totaraCompetency__myRatingCell">{{ value.name }}</div>
+      <Button :styleclass="{ reveal: true }" :text="value.name" />
     </template>
     <RatingScaleOverview :scale="scale" :reverse-values="true" />
   </Popover>
 </template>
 
 <script>
+import Button from 'totara_core/components/buttons/Button';
 import Popover from 'totara_core/components/popover/Popover';
 import RatingScaleOverview from 'totara_competency/components/RatingScaleOverview';
 
 export default {
-  components: { Popover, RatingScaleOverview },
+  components: {
+    Button,
+    Popover,
+    RatingScaleOverview,
+  },
+
   props: {
     value: {
       required: true,
@@ -54,11 +60,3 @@ export default {
   },
 };
 </script>
-<style lang="scss">
-.tui-totaraCompetency__myRatingCell {
-  display: inline-block;
-  text-decoration: underline;
-  text-decoration-style: dashed;
-  cursor: pointer;
-}
-</style>

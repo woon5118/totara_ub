@@ -17,33 +17,38 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
-  @package totara_competency
+  @author Simon Chester <simon.chester@totaralearning.com>
+  @package theme_ventura
 -->
 
-<template>
-  <transition name="tui-competencyPreloader__transition-fade">
-    <div v-if="display" class="tui-competencyPreloader">
-      <div>
-        <h1 class="title is-1" v-text="$str('loading', 'totara_competency')" />
-      </div>
-    </div>
-  </transition>
-</template>
+<style lang="scss">
+.tui-competencyProfile {
+  // disable scroll anchoring as it is problematic when switching between chart/list views
+  overflow-anchor: none;
 
-<script>
-export default {
-  props: {
-    display: {
-      required: false,
-      type: Boolean,
-      default: true,
-    },
-  },
-};
-</script>
+  &__split {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
 
-<lang-strings>
-{
-  "totara_competency": ["loading"]
+  &__titleSection {
+    margin: var(--tui-gap-6) 0 var(--tui-gap-4) 0;
+  }
+
+  &__title {
+    @include tui-font-heading-medium();
+    margin: 0;
+  }
+
+  &__sectionTitle {
+    @include tui-font-heading-small();
+    margin: var(--tui-gap-4) 0 var(--tui-gap-2) 0;
+  }
+
+  &__filtersBar {
+    margin: var(--tui-gap-6) 0;
+  }
 }
-</lang-strings>
+</style>

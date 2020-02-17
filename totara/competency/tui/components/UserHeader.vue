@@ -1,7 +1,7 @@
 <!--
   This file is part of Totara Learn
 
-  Copyright (C) 2019 onwards Totara Learning Solutions LTD
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -16,34 +16,35 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
+  @author Simon Chester <simon.chester@totaralearning.com>
   @package totara_competency
 -->
 
 <template>
-  <transition name="tui-competencyPreloader__transition-fade">
-    <div v-if="display" class="tui-competencyPreloader">
-      <div>
-        <h1 class="title is-1" v-text="$str('loading', 'totara_competency')" />
-      </div>
+  <div class="tui-competencyUserHeader">
+    <Avatar
+      :src="profilePicture"
+      size="xsmall"
+      :alt="userName"
+      :aria-hidden="true"
+    />
+    <div class="tui-competencyUserHeader__name">
+      {{ userName }}
     </div>
-  </transition>
+  </div>
 </template>
 
 <script>
+import Avatar from 'totara_core/components/avatar/Avatar';
+
 export default {
+  components: {
+    Avatar,
+  },
+
   props: {
-    display: {
-      required: false,
-      type: Boolean,
-      default: true,
-    },
+    userName: String,
+    profilePicture: String,
   },
 };
 </script>
-
-<lang-strings>
-{
-  "totara_competency": ["loading"]
-}
-</lang-strings>

@@ -1,88 +1,168 @@
+<!--
+  This file is part of Totara Learn
+
+  Copyright (C) 2019 onwards Totara Learning Solutions LTD
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
+  @author Simon Chester <simon.chester@totaralearning.com>
+  @package totara_competency
+-->
+
 <template>
-  <div>
-    <h2 v-text="$str('competency_profile', 'totara_competency')" />
-    <Preloader :display="$apollo.loading" />
-    <NoCompetencyAssignments
-      v-if="noAssignments"
-      :self-assignment-url="selfAssignmentUrl"
-    />
-    <div v-else>
-      <!-- Header-->
-      <ProfileHeader
-        :is-mine="isMine"
-        :self-assignment-url="selfAssignmentUrl"
+  <div class="tui-competencyProfile">
+    <Loader :loading="$apollo.loading">
+      <UserHeader
+        v-if="!isMine"
         :user-name="userName"
-        :data="currentProgressData"
         :profile-picture="profilePicture"
-        :latest-achievement="data.latest_achievement"
-        :rate-competencies-url="rateCompetenciesUrl"
       />
-      <div>
-        <hr />
-        <div class="tui-CompetencyProfile__filters-bar">
-          <div class="tui-CompetencyProfile__tabs">
-            <div :class="chartsTabClass" @click="selectTab('charts')">
-              <FlexIcon icon="bar-chart" size="500" />
-            </div>
-            <div :class="tableTabClass" @click="selectTab('table')">
-              <FlexIcon icon="bars" size="500" />
-            </div>
-          </div>
-          <ProgressAssignmentFilters
-            v-model="selectedFilters"
-            :filters="filters"
+      <div
+        class="tui-competencyProfile__split tui-competencyProfile__titleSection"
+      >
+        <h2 class="tui-competencyProfile__title">
+          {{ $str('competency_profile', 'totara_competency') }}
+        </h2>
+        <div v-if="!noAssignments">
+          <ActionLink
+            v-if="rateCompetenciesUrl"
+            :href="rateCompetenciesUrl"
+            :text="$str('rate_competencies', 'pathway_manual')"
+          />
+          <ActionLink
+            :href="selfAssignmentUrl"
+            :text="
+              isMine
+                ? $str('self_assign_competencies', 'totara_competency')
+                : $str('assign_competencies', 'totara_competency')
+            "
           />
         </div>
-        <transition name="tui-CompetencyProfile__transition-fade">
-          <div v-if="activeTab === 'charts'">
-            <!-- Available charts -->
-            <CompetencyCharts
-              :data="data"
-              :user-id="userId"
-              :is-current-user="isMine"
-            />
-          </div>
-        </transition>
-        <transition name="tui-CompetencyProfile__transition-fade">
-          <div v-if="activeTab === 'table'">
-            <!-- List of assignments -->
-            <CompetencyList
-              :filters="selectedFilters"
-              :user-id="userId"
-              :is-mine="isMine"
-              :base-url="baseUrl"
-            />
-          </div>
-        </transition>
       </div>
-    </div>
+      <NoCompetencyAssignments
+        v-if="noAssignments"
+        :is-mine="isMine"
+        :self-assignment-url="selfAssignmentUrl"
+      />
+      <div v-else>
+        <h3 class="tui-competencyProfile__sectionTitle">
+          {{ $str('current_assignment_progress', 'totara_competency') }}
+        </h3>
+        <CurrentProgress
+          :data="currentProgressData"
+          :latest-achievement="data.latest_achievement"
+        />
+        <Responsive
+          v-slot="{ currentBoundaryName }"
+          :breakpoints="[
+            { name: 'small', boundaries: [0, 700] },
+            { name: null, boundaries: [701, 701] },
+          ]"
+        >
+          <div>
+            <h3 class="tui-competencyProfile__sectionTitle">
+              {{ $str('header:competencies', 'totara_competency') }}
+            </h3>
+            <div
+              class="tui-competencyProfile__split tui-competencyProfile__filtersBar"
+            >
+              <ProgressAssignmentFilters
+                v-model="selectedFilters"
+                :filters="filterOptions"
+              />
+              <div
+                v-if="currentBoundaryName != 'small'"
+                class="tui-competencyProfile__tabs"
+              >
+                <ToggleSet v-model="activeTab">
+                  <ToggleButtonIcon
+                    value="charts"
+                    :label="$str('charts', 'totara_competency')"
+                  >
+                    <BarChartIcon />
+                  </ToggleButtonIcon>
+                  <ToggleButtonIcon
+                    value="table"
+                    :label="$str('table', 'totara_competency')"
+                  >
+                    <ListIcon />
+                  </ToggleButtonIcon>
+                </ToggleSet>
+              </div>
+            </div>
+            <div
+              v-if="currentBoundaryName != 'small' && activeTab === 'charts'"
+            >
+              <CompetencyCharts
+                :data="data"
+                :user-id="userId"
+                :is-current-user="isMine"
+              />
+            </div>
+            <div v-if="currentBoundaryName == 'small' || activeTab === 'table'">
+              <CompetencyList
+                :filters="selectedFilters"
+                :user-id="userId"
+                :is-mine="isMine"
+                :base-url="baseUrl"
+              />
+            </div>
+          </div>
+        </Responsive>
+      </div>
+    </Loader>
   </div>
 </template>
 
 <script>
-import FlexIcon from 'totara_core/components/icons/FlexIcon';
+import ToggleSet from 'totara_core/components/buttons/ToggleSet';
+import ToggleButtonIcon from 'totara_core/components/buttons/ToggleButtonIcon';
+import BarChartIcon from 'totara_core/components/icons/common/BarChart';
+import ListIcon from 'totara_core/components/icons/common/List';
+import Responsive from 'totara_core/components/responsive/Responsive';
+import Loader from 'totara_core/components/loader/Loader';
+import ActionLink from 'totara_core/components/links/ActionLink';
 import ProgressAssignmentFilters from 'totara_competency/components/ProgressAssignmentFilters';
 import CompetencyList from 'totara_competency/components/profile/competency_list/List';
 import CompetencyCharts from 'totara_competency/components/profile/CompetencyCharts';
-
-import ProgressQuery from '../../webapi/ajax/progress_for_user.graphql';
-import Preloader from 'totara_competency/components/Preloader';
 import NoCompetencyAssignments from 'totara_competency/components/profile/NoCompetencyAssignments';
-import ProfileHeader from 'totara_competency/components/profile/Header';
+import CurrentProgress from 'totara_competency/components/profile/CurrentProgress';
+import UserHeader from 'totara_competency/components/UserHeader';
+import ProgressQuery from 'totara_competency/graphql/progress_for_user';
+import { pick, groupBy } from 'totara_core/util';
 
 const ACTIVE_ASSIGNMENT = 1;
 // const ARCHIVED_ASSIGNMENT = 2;
 
 export default {
   components: {
-    ProfileHeader,
+    ToggleSet,
+    ToggleButtonIcon,
+    BarChartIcon,
+    ListIcon,
+    Responsive,
+    Loader,
+    ActionLink,
+    CurrentProgress,
+    UserHeader,
     NoCompetencyAssignments,
-    Preloader,
     CompetencyCharts,
     CompetencyList,
     ProgressAssignmentFilters,
-    FlexIcon,
   },
+
   props: {
     profilePicture: {
       required: true,
@@ -114,47 +194,117 @@ export default {
     },
   },
 
-  data: function() {
+  data() {
     return {
       data: {
         latest_achievement: null,
       },
       activeTab: 'charts',
-      selectedFilters: {
+      selectedFilters: this.$_addFilterKey({
         status: ACTIVE_ASSIGNMENT,
         type: null,
         user_group_id: null,
         user_group_type: null,
-      },
+      }),
       currentProgressData: [],
     };
   },
 
+  apollo: {
+    data: {
+      query: ProgressQuery,
+      variables() {
+        return {
+          user_id: this.userId,
+          filters: pick(this.selectedFilters, [
+            'status',
+            'type',
+            'user_group_id',
+            'user_group_type',
+          ]),
+        };
+      },
+      update: data => data.totara_competency_profile_progress,
+      result({ data: { totara_competency_profile_progress: data } }) {
+        if (!this.currentProgressData.length) {
+          this.currentProgressData = data.items.slice(0);
+        }
+
+        // ensure the filter we requested with is actually allowed
+        if (data.filters && data.filters.length) {
+          const filter = this.selectedFilters;
+          const isStatusFilter =
+            filter.type === null &&
+            filter.user_group_id === null &&
+            filter.user_group_type === null;
+
+          const filterPresent = isStatusFilter
+            ? data.filters.some(x => x.status == this.selectedFilters.status)
+            : data.filters.some(
+                x => this.$_filterKey(x) == this.selectedFilters.key
+              );
+
+          if (!filterPresent) {
+            // we requested with an invalid filter, try again with a valid one
+            this.selectedFilters = this.$_addFilterKey(
+              isStatusFilter
+                ? {
+                    status: data.filters[0].status,
+                    type: null,
+                    user_group_id: null,
+                    user_group_type: null,
+                  }
+                : data.filters[0]
+            );
+          }
+        }
+      },
+    },
+  },
+
   computed: {
-    chartsTabClass() {
-      return {
-        'tui-CompetencyProfile__tab-toggle-link': true,
-        active: this.activeTab === 'charts',
-      };
-    },
-
-    tableTabClass() {
-      return {
-        'tui-CompetencyProfile__tab-toggle-link': true,
-        active: this.activeTab === 'table',
-      };
-    },
-
-    filters() {
-      if (!this.data) {
+    /**
+     * Get options for the filter.
+     *
+     * @returns {Array<{id: String, name: String, value: Object, filters: Array<{id: String, name: String, value: Object}>}>}
+     */
+    filterOptions() {
+      if (!this.data || !this.data.filters) {
         return [];
       }
 
-      return this.data.filters ? this.data.filters : [];
+      return Object.entries(
+        groupBy(this.data.filters, filter => filter.status)
+        // eslint-disable-next-line no-unused-vars
+      ).map(([key, filters]) => {
+        const groupValue = this.$_addFilterKey({
+          status: filters[0].status,
+          type: null,
+          user_group_id: null,
+          user_group_type: null,
+        });
+        return {
+          id: groupValue.key,
+          name: filters[0].status_name,
+          value: groupValue,
+          filters: filters.map(filter => {
+            const value = this.$_addFilterKey(this.$_filterValue(filter));
+            return {
+              id: value.key,
+              name: filter.name,
+              value,
+            };
+          }),
+        };
+      });
     },
 
+
+    /**
+     * True if we're not loading and there are no filter options.
+     */
     noAssignments() {
-      return !this.$apollo.loading && !this.filters.length;
+      return !this.$apollo.loading && !this.filterOptions.length;
     },
 
     rateCompetenciesUrl() {
@@ -168,73 +318,59 @@ export default {
     },
   },
 
-  apollo: {
-    data: {
-      query: ProgressQuery,
-      variables() {
-        return {
-          user_id: this.userId,
-          filters: this.selectedFilters,
-        };
-      },
-      update({ totara_competency_profile_progress: data }) {
-        return data;
-      },
-
-      result({ data: { totara_competency_profile_progress: data } }) {
-        if (!this.currentProgressData.length) {
-          this.currentProgressData = data.items.slice(0);
-        }
-      },
-    },
-  },
-
   methods: {
-    selectTab(tab) {
-      if (this.activeTab === tab) {
-        return;
-      }
+    /**
+     * Filter a filter value down to the properties that the query needs
+     *
+     * @param {object} obj
+     * @returns {object}
+     */
+    $_filterValue(obj) {
+      return pick(obj, ['status', 'type', 'user_group_id', 'user_group_type']);
+    },
 
-      this.activeTab = tab;
+    /**
+     * Add the filter key to a copy of the specified object and return it
+     *
+     * @param {object} obj
+     * @returns {object}
+     */
+    $_addFilterKey(obj) {
+      return Object.assign({ key: this.$_filterKey(obj) }, obj);
+    },
 
-      if (this.activeTab === 'charts') {
-        this.$apollo.queries.data.refetch();
-      }
+    /**
+     * Generate a key for a particular filter
+     *
+     * @param {object} obj
+     * @returns {object}
+     */
+    $_filterKey(obj) {
+      return JSON.stringify([
+        obj.status,
+        obj.type,
+        obj.user_group_id,
+        obj.user_group_type,
+      ]);
     },
   },
 };
 </script>
 
-<style lang="scss">
-.tui-CompetencyProfile__ {
-  &tabs {
-    display: inline-flex;
-  }
-
-  // Tabs toggle links
-  &tab-toggle-link {
-    &:not(.active) {
-      color: #287b7c;
-      cursor: pointer;
-    }
-
-    &.active {
-      color: #c7c7c7;
-    }
-  }
-
-  // Main filters bar
-  &filters-bar {
-    display: flex;
-    flex-direction: row-reverse;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-    line-height: 32px;
-  }
-}
-</style>
 <lang-strings>
-    {
-       "totara_competency": ["latest_achievement", "assign_competencies", "no_competencies_assigned", "loading", "competency_profile"]
-    }
+{
+  "totara_competency": [
+    "competency_profile",
+    "charts",
+    "table",
+    "assign_competencies",
+    "self_assign_competencies",
+    "latest_achievement",
+    "current_assignment_progress",
+    "header:competencies"
+  ],
+  "pathway_manual": [
+    "rate_competencies"
+  ]
+}
 </lang-strings>

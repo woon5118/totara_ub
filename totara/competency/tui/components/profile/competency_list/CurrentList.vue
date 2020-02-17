@@ -1,59 +1,91 @@
+<!--
+  This file is part of Totara Learn
+
+  Copyright (C) 2019 onwards Totara Learning Solutions LTD
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
+  @author Simon Chester <simon.chester@totaralearning.com>
+  @package totara_competency
+-->
+
 <template>
-  <List :columns="columns" :data="competencies">
-    <template v-slot:column-name="props">
-      <div>
-        <a
-          :href="competencyDetailsLink(props.row)"
-          v-text="props.row.competency.fullname"
+  <Table :data="competencies">
+    <template v-slot:header-row>
+      <HeaderCell size="10">
+        {{ $str('header:competency_name', 'totara_competency') }}
+      </HeaderCell>
+      <HeaderCell size="2" align="center">
+        {{ $str('proficient', 'totara_competency') }}
+      </HeaderCell>
+      <HeaderCell size="3">
+        {{ $str('achievement_level', 'totara_competency') }}
+      </HeaderCell>
+    </template>
+    <template v-slot:row="{ row }">
+      <Cell
+        size="10"
+        :column-header="$str('header:competency_name', 'totara_competency')"
+      >
+        <a :href="competencyDetailsLink(row)">{{ row.competency.fullname }}</a>
+      </Cell>
+
+      <Cell
+        size="2"
+        align="center"
+        :column-header="$str('proficient', 'totara_competency')"
+      >
+        <CheckIcon
+          v-if="row.items[0].my_value && row.items[0].my_value.proficient"
+          size="200"
+          :alt="$str('yes')"
         />
-      </div>
+        <span v-else>
+          <span :aria-hidden="true">-</span>
+          <span class="sr-only">{{ $str('no') }}</span>
+        </span>
+      </Cell>
+
+      <Cell
+        size="3"
+        :column-header="$str('achievement_level', 'totara_competency')"
+      >
+        <MyRatingCell
+          v-if="row.items[0].my_value"
+          :value="row.items[0].my_value"
+          :scales="scales"
+        />
+      </Cell>
     </template>
-    <template v-slot:column-proficient="props">
-      <template v-if="props.row.items[0].proficient">
-        <FlexIcon icon="check" alt="//TODO add something here" />
-      </template>
-    </template>
-    <template v-slot:column-rating="props">
-      <MyRatingCell
-        v-if="props.row.items[0].my_value"
-        :value="props.row.items[0].my_value"
-        :scales="scales"
-      />
-    </template>
-  </List>
+  </Table>
 </template>
 
 <script>
-import List from 'totara_competency/components/List';
-import FlexIcon from 'totara_core/components/icons/FlexIcon';
-import MyRatingCell from './../MyRatingCell';
-
-let columns = [
-  {
-    key: 'name',
-    value: 'competency.fullname',
-    title: 'Competency',
-    grow: true,
-    size: 'md',
-  },
-  {
-    key: 'proficient',
-    title: 'Proficient',
-    size: 'xs',
-    alignment: ['center'],
-  },
-  {
-    key: 'rating',
-    title: 'Rating',
-    size: 'sm',
-  },
-];
+import Table from 'totara_core/components/datatable/Table';
+import HeaderCell from 'totara_core/components/datatable/HeaderCell';
+import Cell from 'totara_core/components/datatable/Cell';
+import CheckIcon from 'totara_core/components/icons/common/CheckSuccess';
+import MyRatingCell from 'totara_competency/components/profile/MyRatingCell';
 
 export default {
   components: {
+    Table,
+    HeaderCell,
+    Cell,
+    CheckIcon,
     MyRatingCell,
-    FlexIcon,
-    List,
   },
 
   props: {
@@ -75,42 +107,25 @@ export default {
     },
   },
 
-  computed: {
-    columns() {
-      return columns;
-    },
-  },
-
   methods: {
     competencyDetailsLink(row) {
-      let link = `${this.baseUrl}/details/?competency_id=${row.competency.id}`;
-
+      const params = { competency_id: row.competency.id };
       if (!this.isMine) {
-        link += `&user_id=${this.userId}`;
+        params.user_id = this.userId;
       }
-
-      return link;
+      return this.$url(`${this.baseUrl}/details/`, params);
     },
   },
 };
 </script>
-<style lang="scss">
-.tui-ArchivedCompetencyList__ {
-  &archived-assignments-list {
-    display: flex;
-    flex-grow: 1;
-    flex-wrap: wrap;
-    margin: 0;
-    padding: 0;
-    list-style: none;
 
-    &-padded {
-      margin-left: 2rem;
-    }
-  }
-}
-</style>
 <lang-strings>
-    {
-    }
+{
+  "moodle": ["yes", "no"],
+  "totara_competency": [
+    "header:competency_name",
+    "achievement_level",
+    "proficient"
+  ]
+}
 </lang-strings>

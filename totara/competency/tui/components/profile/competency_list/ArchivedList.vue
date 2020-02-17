@@ -1,86 +1,106 @@
+<!--
+  This file is part of Totara Learn
+
+  Copyright (C) 2019 onwards Totara Learning Solutions LTD
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
+  @author Simon Chester <simon.chester@totaralearning.com>
+  @package totara_competency
+-->
+
 <template>
-  <List :columns="columns" :data="competencies" bg-color="gray">
-    <template v-slot:column-name="props">
-      <div>
-        <a
-          :href="competencyDetailsLink(props.row)"
-          v-text="props.row.competency.fullname"
-        />
-      </div>
-      <ul
-        class="tui-ArchivedCompetencyList__assignments-list tui-ArchivedCompetencyList__assignments-list-padded"
+  <Table :data="groupedCompetencyData" :group-mode="true" :archived="true">
+    <template v-slot:header-row>
+      <HeaderCell size="3">
+        {{ $str('header:competency_name', 'totara_competency') }}
+      </HeaderCell>
+      <HeaderCell size="2">
+        {{ $str('header:reason_assigned', 'totara_competency') }}
+      </HeaderCell>
+      <HeaderCell size="2">
+        {{ $str('header:archived_date', 'totara_competency') }}
+      </HeaderCell>
+      <HeaderCell size="2" align="center">
+        {{ $str('proficient', 'totara_competency') }}
+      </HeaderCell>
+      <HeaderCell size="2">
+        {{ $str('achievement_level', 'totara_competency') }}
+      </HeaderCell>
+    </template>
+    <template v-slot:row="{ row, firstInGroup }">
+      <Cell
+        size="3"
+        :column-header="$str('header:competency_name', 'totara_competency')"
+        :repeated-header="!firstInGroup"
       >
-        <li v-for="(item, key) in props.row.items" :key="key">
-          <span v-if="item.assignment" v-text="item.assignment.progress_name" />
-        </li>
-      </ul>
+        <a :href="competencyDetailsLink(row)">{{ row.competency.fullname }}</a>
+      </Cell>
+
+      <Cell
+        size="2"
+        :column-header="$str('header:reason_assigned', 'totara_competency')"
+      >
+        {{ row.assignment && row.assignment.progress_name }}
+      </Cell>
+
+      <Cell
+        size="2"
+        :column-header="$str('header:archived_date', 'totara_competency')"
+      >
+        {{ row.assignment && row.assignment.archived_at }}
+      </Cell>
+
+      <Cell
+        size="2"
+        align="center"
+        :column-header="$str('proficient', 'totara_competency')"
+      >
+        <CheckIcon v-if="row.proficient" size="200" :alt="$str('yes')" />
+        <span v-else>
+          <span :aria-hidden="true">-</span>
+          <span class="sr-only">{{ $str('no') }}</span>
+        </span>
+      </Cell>
+
+      <Cell
+        size="2"
+        :column-header="$str('achievement_level', 'totara_competency')"
+      >
+        <MyRatingCell
+          v-if="row.my_value"
+          :value="row.my_value"
+          :scales="scales"
+        />
+      </Cell>
     </template>
-    <template v-slot:column-archived-date="props">
-      <ul class="tui-ArchivedCompetencyList__assignments-list">
-        <li v-for="(item, key) in props.row.items" :key="key">
-          <span v-if="item.assignment" v-text="item.assignment.archived_at" />
-        </li>
-      </ul>
-    </template>
-    <template v-slot:column-proficient="props">
-      <ul class="tui-ArchivedCompetencyList__assignments-list">
-        <li v-for="(item, key) in props.row.items" :key="key">
-          <template v-if="item.proficient">
-            <FlexIcon icon="check" alt="//TODO add something here" />
-          </template>
-        </li>
-      </ul>
-    </template>
-    <template v-slot:column-rating="props">
-      <ul class="tui-ArchivedCompetencyList__assignments-list">
-        <li v-for="(item, key) in props.row.items" :key="key">
-          <MyRatingCell
-            v-if="item.my_value"
-            :value="item.my_value"
-            :scales="scales"
-          />
-        </li>
-      </ul>
-    </template>
-  </List>
+  </Table>
 </template>
 
 <script>
-import List from 'totara_competency/components/List';
-import FlexIcon from 'totara_core/components/icons/FlexIcon';
-import MyRatingCell from './../MyRatingCell';
-
-let columns = [
-  {
-    key: 'name',
-    value: 'competency.fullname',
-    title: 'Competency',
-    grow: true,
-    size: 'md',
-  },
-  {
-    key: 'archived-date',
-    title: 'Archived date',
-    size: 'sm',
-  },
-  {
-    key: 'proficient',
-    title: 'Proficient',
-    size: 'xs',
-    alignment: 'center',
-  },
-  {
-    key: 'rating',
-    title: 'Rating',
-    size: 'sm',
-  },
-];
+import Table from 'totara_core/components/datatable/Table';
+import HeaderCell from 'totara_core/components/datatable/HeaderCell';
+import Cell from 'totara_core/components/datatable/Cell';
+import MyRatingCell from 'totara_competency/components/profile/MyRatingCell';
 
 export default {
   components: {
+    Table,
+    HeaderCell,
+    Cell,
     MyRatingCell,
-    FlexIcon,
-    List,
   },
 
   props: {
@@ -103,41 +123,37 @@ export default {
   },
 
   computed: {
-    columns() {
-      return columns;
+    groupedCompetencyData() {
+      return this.competencies.map(x => ({
+        id: x.competency.id,
+        rows: x.items.map(item =>
+          Object.assign({ competency: x.competency }, item)
+        ),
+      }));
     },
   },
 
   methods: {
     competencyDetailsLink(row) {
-      let link = `${this.baseUrl}/details/?competency_id=${row.competency.id}`;
-
+      const params = { competency_id: row.competency.id };
       if (!this.isMine) {
-        link += `&user_id=${this.userId}`;
+        params.user_id = this.userId;
       }
-
-      return link;
+      return this.$url(`${this.baseUrl}/details/`, params);
     },
   },
 };
 </script>
-<style lang="scss">
-.tui-ArchivedCompetencyList__ {
-  &archived-assignments-list {
-    display: flex;
-    flex-grow: 1;
-    flex-wrap: wrap;
-    margin: 0;
-    padding: 0;
-    list-style: none;
 
-    &-padded {
-      margin-left: 2rem;
-    }
-  }
-}
-</style>
 <lang-strings>
-    {
-    }
+{
+  "moodle": ["yes", "no"],
+  "totara_competency": [
+    "header:competency_name",
+    "header:reason_assigned",
+    "header:archived_date",
+    "proficient",
+    "achievement_level"
+  ]
+}
 </lang-strings>

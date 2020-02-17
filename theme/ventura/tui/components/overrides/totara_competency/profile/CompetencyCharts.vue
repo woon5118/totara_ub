@@ -17,33 +17,21 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
-  @package totara_competency
+  @package theme_ventura
 -->
 
-<template>
-  <transition name="tui-competencyPreloader__transition-fade">
-    <div v-if="display" class="tui-competencyPreloader">
-      <div>
-        <h1 class="title is-1" v-text="$str('loading', 'totara_competency')" />
-      </div>
-    </div>
-  </transition>
-</template>
+<style lang="scss">
+.tui-competencyCharts {
+  &__chart {
+    padding: var(--tui-gap-7) var(--tui-gap-5);
+    border: 1px var(--tui-color-neutral-5) solid;
+    border-radius: 4px;
 
-<script>
-export default {
-  props: {
-    display: {
-      required: false,
-      type: Boolean,
-      default: true,
-    },
-  },
-};
-</script>
-
-<lang-strings>
-{
-  "totara_competency": ["loading"]
+    &--center {
+      max-width: 800px;
+      margin-right: auto;
+      margin-left: auto;
+    }
+  }
 }
-</lang-strings>
+</style>

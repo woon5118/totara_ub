@@ -17,33 +17,24 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
-  @package totara_competency
+  @package theme_ventura
 -->
 
-<template>
-  <transition name="tui-competencyPreloader__transition-fade">
-    <div v-if="display" class="tui-competencyPreloader">
-      <div>
-        <h1 class="title is-1" v-text="$str('loading', 'totara_competency')" />
-      </div>
-    </div>
-  </transition>
-</template>
+<style lang="scss">
+.tui-assignmentProgress {
+  width: 180px;
+  padding: var(--tui-gap-3);
 
-<script>
-export default {
-  props: {
-    display: {
-      required: false,
-      type: Boolean,
-      default: true,
-    },
-  },
-};
-</script>
+  &__header {
+    overflow: hidden;
+    font-size: var(--tui-font-size-16);
+    white-space: nowrap;
+    text-align: center;
+    text-overflow: ellipsis;
+  }
 
-<lang-strings>
-{
-  "totara_competency": ["loading"]
+  &__progress-card {
+    padding: var(--tui-gap-3) var(--tui-gap-4);
+  }
 }
-</lang-strings>
+</style>

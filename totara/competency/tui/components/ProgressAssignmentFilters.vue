@@ -1,27 +1,47 @@
+<!--
+  This file is part of Totara Learn
+
+  Copyright (C) 2019 onwards Totara Learning Solutions LTD
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
+  @package totara_competency
+-->
+
 <template>
-  <div v-if="displayFilters" style="display: inline-flex;">
-    <label
-      for="totara_competency-profile-assignment-filters-unique-id"
-      class="totara_competency-profile-assignment-filters_label"
-      v-text="$str('viewing', 'totara_competency')"
-    />
-    <select
-      id="totara_competency-profile-assignment-filters-unique-id"
-      :disabled="disable"
-      @change="filterUpdated"
-    >
-      <option
-        v-for="(option, key) in filterOptions"
-        :key="key"
-        :value="key"
-        v-text="option.name"
-      />
-    </select>
-  </div>
+  <SelectFilter
+    v-if="displayFilters"
+    :show-label="true"
+    :label="$str('viewing_by_assignment', 'totara_competency')"
+    :options="
+      filterOptions.map(option => ({ id: option.id, label: option.name }))
+    "
+    :disabled="disable"
+    :value="value && value.key"
+    @input="filterUpdated"
+  />
 </template>
 
 <script>
+import SelectFilter from 'totara_core/components/filters/SelectFilter';
+
 export default {
+  components: {
+    SelectFilter,
+  },
+
   props: {
     filters: {
       type: Array,
@@ -37,78 +57,49 @@ export default {
     },
   },
 
-  data: function() {
-    return {
-      f: false,
-    };
-  },
-
   computed: {
-    filterOptions: function() {
-      let options = [];
+    displayFilters() {
+      return !(this.filters.length === 1 && this.filters[0].status === 1);
+    },
 
-      let types = {};
+    filterOptions() {
+      const options = [];
 
-      this.filters.forEach(function(filter) {
-        if (typeof types[filter.status] === 'undefined') {
-          types[filter.status] = {
-            name: filter.status_name,
-            value: {
-              status: filter.status,
-              type: null,
-              user_group_id: null,
-              user_group_type: null,
-            },
-            indent: false,
-          };
-
-          options.push(types[filter.status]);
-        }
-
+      this.filters.forEach(group => {
         options.push({
-          name: '\xa0\xa0\xa0' + filter.name,
-          value: {
-            status: filter.status,
-            type: filter.type,
-            user_group_id: filter.user_group_id,
-            user_group_type: filter.user_group_type,
-          },
-          indent: true,
+          name: group.name,
+          id: group.id,
+          value: group.value,
         });
+
+        group.filters.forEach(x =>
+          options.push(
+            Object.assign({}, x, {
+              name: '\xa0\xa0\xa0' + x.name,
+            })
+          )
+        );
       });
 
       return options;
     },
-
-    displayFilters: function() {
-      return !(this.filters.length === 1 && this.filters[0].status === 1);
-    },
   },
 
-  created: function() {},
-
-  mounted: function() {},
-
   methods: {
-    toggle: function() {
+    toggle() {
       this.open = !this.open;
     },
 
-    filterUpdated: function(e) {
-      this.$emit('input', this.filterOptions[e.target.value].value);
-      this.$emit('changed', this.filterOptions[e.target.value].value);
+    filterUpdated(value) {
+      const item = this.filterOptions.find(x => x.id == value);
+      this.$emit('input', item && item.value);
     },
   },
 };
 </script>
-<style lang="scss">
-.totara_competency-profile-assignment-filters_label {
-  margin-right: 10px;
-  line-height: 32px;
-}
-</style>
+
 <lang-strings>
-    {
-        "totara_competency": ["viewing"]
-    }
+{
+  "totara_competency": ["viewing_by_assignment"]
+}
 </lang-strings>

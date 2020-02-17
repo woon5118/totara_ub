@@ -1,48 +1,70 @@
+<!--
+  This file is part of Totara Learn
+
+  Copyright (C) 2019 onwards Totara Learning Solutions LTD
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
+  @package totara_competency
+-->
+
 <template>
   <div>
-    <Preloader :display="$apollo.loading" />
-    <hr />
-    <Filters
-      :is-for-archived="!filterNotArchived"
-      :default-order="order"
-      :default-filter-values="{
-        proficient: proficientFilter,
-        search: searchFilter,
-      }"
-      @filters-updated="filtersUpdated"
-      @order-updated="orderUpdated"
-    />
-    <hr />
-    <CurrentList
-      v-if="filterNotArchived"
-      :competencies="competencies"
-      :base-url="baseUrl"
-      :user-id="userId"
-      :scales="scales"
-    />
-    <ArchivedList
-      v-else
-      :competencies="competencies"
-      :scales="scales"
-      :base-url="baseUrl"
-      :user-id="userId"
-    />
+    <Loader :loading="$apollo.loading">
+      <Filters
+        :is-for-archived="!filterNotArchived"
+        :default-order="order"
+        :default-filter-values="{
+          proficient: proficientFilter,
+          search: searchFilter,
+        }"
+        @filters-updated="filtersUpdated"
+        @order-updated="orderUpdated"
+      />
+      <CurrentList
+        v-if="filterNotArchived"
+        :competencies="competencies"
+        :base-url="baseUrl"
+        :user-id="userId"
+        :scales="scales"
+      />
+      <ArchivedList
+        v-else
+        :competencies="competencies"
+        :scales="scales"
+        :base-url="baseUrl"
+        :user-id="userId"
+      />
+    </Loader>
   </div>
 </template>
 
 <script>
-import CompetencyProgressQuery from '../../../../webapi/ajax/competency_progress_for_user.graphql';
-import CompetencyScalesQuery from '../../../../webapi/ajax/scales.graphql';
-import Filters from './Filters';
-import Preloader from '../../Preloader';
-import ArchivedList from './ArchivedList';
-import CurrentList from './CurrentList';
+import Loader from 'totara_core/components/loader/Loader';
+import CompetencyProgressQuery from 'totara_competency/graphql/competency_progress_for_user';
+import CompetencyScalesQuery from 'totara_competency/graphql/scales';
+import Filters from 'totara_competency/components/profile/competency_list/Filters';
+import ArchivedList from 'totara_competency/components/profile/competency_list/ArchivedList';
+import CurrentList from 'totara_competency/components/profile/competency_list/CurrentList';
+import { pick } from 'totara_core/util';
 
 export default {
   components: {
+    Loader,
     CurrentList,
     ArchivedList,
-    Preloader,
     Filters,
   },
 
@@ -50,7 +72,7 @@ export default {
     filters: {
       required: false,
       type: Object,
-      default: () => {},
+      default: () => ({}),
     },
     userId: {
       required: true,
@@ -89,7 +111,15 @@ export default {
         extraFilters.proficient = this.proficientFilter;
       }
 
-      return Object.assign(extraFilters, this.filters);
+      return Object.assign(
+        extraFilters,
+        pick(this.filters, [
+          'status',
+          'type',
+          'user_group_id',
+          'user_group_type',
+        ])
+      );
     },
 
     filterNotArchived() {
@@ -146,18 +176,9 @@ export default {
       this.searchFilter = search;
       this.proficientFilter = proficient;
     },
+
     orderUpdated(order) {
       this.order = order;
-    },
-
-    competencyDetailsLink(row) {
-      let link = `${this.baseUrl}/details/?competency_id=${row.competency.id}`;
-
-      if (!this.isMine) {
-        link += `&user_id=${this.userId}`;
-      }
-
-      return link;
     },
   },
 };
