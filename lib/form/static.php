@@ -49,6 +49,8 @@ class MoodleQuickForm_static extends HTML_QuickForm_static implements templatabl
     /** @var string html for help button, if empty then no help */
     var $_helpbutton='';
 
+    protected $allowxss = false;
+
     /**
      * constructor
      *
@@ -71,6 +73,22 @@ class MoodleQuickForm_static extends HTML_QuickForm_static implements templatabl
     }
 
     /**
+     * Set to true if static element uses unsafe or malformed HTML markup,
+     * by default static HTML text is cleaned and normalised before output.
+     *
+     * NOTE: for backwards compatibility this is ignored if $CFG->disableconsistentcleaning is enabled
+     *
+     * @since Totara 13.0
+     *
+     * @param bool $value
+     * @return MoodleQuickForm_static self instance to allow chaining
+     */
+    public function set_allow_xss(bool $value) {
+        $this->allowxss = $value;
+        return $this;
+    }
+
+    /**
      * get html for help button
      *
      * @return string html for help button
@@ -86,6 +104,20 @@ class MoodleQuickForm_static extends HTML_QuickForm_static implements templatabl
      */
     function getElementTemplateType(){
         return $this->_elementTemplateType;
+    }
+
+    public function toHtml() {
+        global $CFG;
+
+        // NOTE: do not use parent::toHtml()} here!
+
+        $html = $this->_text;
+
+        if (empty($CFG->disableconsistentcleaning) && !$this->allowxss) {
+            $html = clean_text($html, FORMAT_HTML);
+        }
+
+        return $this->_getTabs() . $html;
     }
 
     public function export_for_template(renderer_base $output) {
