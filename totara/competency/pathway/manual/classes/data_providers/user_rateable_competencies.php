@@ -26,6 +26,7 @@ namespace pathway_manual\data_providers;
 use core\entities\user;
 use core\orm\collection;
 use core\orm\query\field;
+use core\webapi\scalar\id;
 use pathway_manual\entities\rating;
 use pathway_manual\models\rateable_competency;
 use pathway_manual\models\roles\role;
@@ -119,12 +120,14 @@ class user_rateable_competencies extends rateable_competencies {
             ->where('competency_id', $competencies)
             ->get();
 
-        if ($assignments->count() < 2) {
+        $assignment_reasons = assignment_reason::build_from_assignments($assignments);
+
+        if (count($assignment_reasons) < 2) {
             // No point in a filter without multiple options.
             return null;
         }
 
-        return assignment_reason::build_from_assignments($assignments);
+        return $assignment_reasons;
     }
 
     /**
@@ -148,7 +151,7 @@ class user_rateable_competencies extends rateable_competencies {
      * @return competency_type_entity[]|null
      */
     protected function get_competency_type_filter_options() {
-        $type_ids = $this->items->pluck('typeid');
+        $type_ids = array_unique($this->items->pluck('typeid'));
 
         if (count($type_ids) < 2) {
             // No point in a filter without multiple options.

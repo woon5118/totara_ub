@@ -233,7 +233,6 @@ export default {
     "pathway_manual": [
       "add_comment",
       "add_rating",
-      "comment_done",
       "edit_rating",
       "rate",
       "rating_done",

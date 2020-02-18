@@ -289,12 +289,35 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
         $this->assertNull($assignment_1_query->get_filter_options());
 
         // When no filters are specified, then filter options should also be fetched.
+        // There shouldn't be anything returned though because there is only one assignment reason to filter by.
         $query_without_filters = user_rateable_competencies::resolve([
             'user_id' => $this->user1->id,
             'role' => self_role::class,
             'filters' => null,
         ], $this->execution_context());
-        $this->assertNotNull($query_without_filters->get_filter_options());
+        $this->assertNull($query_without_filters->get_filter_options()['assignment_reason']);
+        $this->assertEmpty(user_competencies_type::resolve(
+            'filters',
+            $query_without_filters,
+            [],
+            $this->execution_context()
+        )['assignment_reason']);
+
+        $org = $this->generator->assignment_generator()->create_organisation_and_add_members($this->user1->id);
+        $assignment_3 = $this->generator->assignment_generator()->create_assignment([
+            'user_group_type' => user_groups::ORGANISATION,
+            'user_group_id' => $org->id,
+            'competency_id' => $this->competency2->id,
+        ]);
+        (new expand_task(builder::get_db()))->expand_all();
+
+        // There are multiple assignment reasons to filter by now.
+        $query_without_filters = user_rateable_competencies::resolve([
+            'user_id' => $this->user1->id,
+            'role' => self_role::class,
+            'filters' => null,
+        ], $this->execution_context());
+        $this->assertNotNull($query_without_filters->get_filter_options()['assignment_reason']);
         $this->assertNotEmpty(user_competencies_type::resolve(
             'filters',
             $query_without_filters,

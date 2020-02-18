@@ -77,17 +77,17 @@
           @click="updateFiltersWithWarning"
         />
       </div>
-      <ConfirmationModal
-        :open="showConfirmFiltersModal"
-        :title="$str('modal:confirm_update_filters_title', 'pathway_manual')"
-        @confirm="updateFilters"
-        @cancel="showConfirmFiltersModal = false"
-      >
-        <span
-          v-html="$str('modal:confirm_update_filters_body', 'pathway_manual')"
-        />
-      </ConfirmationModal>
     </FilterBar>
+    <ConfirmationModal
+      :open="showConfirmFiltersModal"
+      :title="$str('modal:confirm_update_filters_title', 'pathway_manual')"
+      @confirm="updateFilters"
+      @cancel="showConfirmFiltersModal = false"
+    >
+      <span
+        v-html="$str('modal:confirm_update_filters_body', 'pathway_manual')"
+      />
+    </ConfirmationModal>
   </div>
 </template>
 
@@ -127,7 +127,6 @@ export default {
         assignmentReason: 0,
         ratingHistory: 0,
       },
-      assignmentKeys: {},
       showConfirmFiltersModal: false,
       filtersSelected: false,
     };
@@ -208,21 +207,26 @@ export default {
         },
       ];
     },
-  },
 
-  mounted() {
-    if (this.filterOptions.assignment_reason == null) {
-      return;
-    }
-
-    this.assignmentKeys = {};
-    let assignmentReason = this.filterOptions.assignment_reason;
-    for (let i = 0; i < assignmentReason.length; i++) {
-      let reason = assignmentReason[i];
-      this.assignmentKeys[reason.key] = reason.assignments.map(
-        assignment => assignment.id
-      );
-    }
+    /**
+     * An MD5 hash table of assignment reason's associated assignments.
+     *
+     * An assignment reason is just a collection of assignment IDs,
+     * and we can't use an array for the filter values in the DOM.
+     * So instead we use a hash of the assignments for a reason, and
+     * use the hash as the filter value in the DOM.
+     *
+     * @returns {Object}
+     */
+    assignmentHashMap() {
+      let assignmentReason = this.filterOptions.assignment_reason;
+      let map = {};
+      for (let i = 0; i < assignmentReason.length; i++) {
+        let reason = assignmentReason[i];
+        map[reason.key] = reason.assignments.map(assignment => assignment.id);
+      }
+      return map;
+    },
   },
 
   methods: {
@@ -248,7 +252,7 @@ export default {
         filters.competency_type = this.selectedFilters.competencyType;
       }
       if (this.selectedFilters.assignment !== 0) {
-        filters.assignment_reason = this.assignmentKeys[
+        filters.assignment_reason = this.assignmentHashMap[
           this.selectedFilters.assignmentReason
         ];
       }
