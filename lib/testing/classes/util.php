@@ -313,7 +313,7 @@ abstract class testing_util {
      * @param bool $displayprogress
      */
     protected static function drop_database($displayprogress = false) {
-        global $DB;
+        global $DB, $CFG;
 
         $tables = $DB->get_tables(false);
         if (isset($tables['config'])) {
@@ -350,8 +350,8 @@ abstract class testing_util {
             // Totara: MySQL does not have DROP with CASCADE, so delete all foreign keys first.
             $sql = "SELECT constraint_name
                       FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
-                     WHERE table_name = :name AND constraint_name LIKE :fk ESCAPE '\\\\'";
-            $params = ['fk' => str_replace('_', '\\_', $prefix) . '%' . '\\_fk'];
+                     WHERE table_name = :name AND unique_constraint_schema = :database AND constraint_name LIKE :fk ESCAPE '\\\\'";
+            $params = ['fk' => str_replace('_', '\\_', $prefix) . '%' . '\\_fk', 'database' => $CFG->dbname];
             foreach ($tables as $tablename) {
                 $params['name'] = $prefix.$tablename;
                 $fks = $DB->get_fieldset_sql($sql, $params);
