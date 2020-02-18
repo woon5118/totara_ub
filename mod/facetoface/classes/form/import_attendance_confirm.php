@@ -72,7 +72,9 @@ class import_attendance_confirm  extends \moodleform {
         $grades = [];
         $attendance = [];
         foreach ($signuplist as $signup) {
-            if (in_array($signup->get_userid(), $userlist)) {
+            /** @var \mod_facetoface\signup $signup */
+            // User with the archived course completion record is not allowed to update the eventattendance and eventgrade values.
+            if (in_array($signup->get_userid(), $userlist) && $signup->get_archived() == 0) {
                 $data = $list->get_user_data($signup->get_userid());
                 $state = $data['eventattendance'];
                 if (in_array($state, array_keys($status))) {
