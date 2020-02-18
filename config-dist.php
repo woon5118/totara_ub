@@ -734,6 +734,17 @@ $CFG->directorypermissions = 02777;
 //      $CFG->hierarchylegacyexport = 0;
 //
 //
+// Static visibility maps were introduced in Totara 12 to improve performance
+// on sites with complex visibility needs. Under some configurations, the database
+// optimiser may choose a non-optimal strategy for the associated queries, leading
+// to much worse performance instead.
+// When $CFG->disable_visibility_maps is set to 1, the visibility maps are disabled,
+// and legacy visibility queries will be used.
+// Deprecated since Totara 13.
+//
+//      $CFG->disable_visibility_maps = 0;
+//
+//
 //=========================================================================
 // 7. SETTINGS FOR DEVELOPMENT SERVERS - not intended for production use!!!
 //=========================================================================

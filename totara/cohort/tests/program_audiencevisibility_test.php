@@ -419,6 +419,26 @@ class totara_cohort_program_audiencevisibility_testcase extends advanced_testcas
         }
     }
 
+    /**
+     * Test Audicence visibility with visibility maps disabled.
+     * @param string $user User that will login to see the programs
+     * @param array $progsvisible Array of programs visible to the user
+     * @param array $progsnotvisible Array of programs not visible to the user
+     * @param array $progsaccessible Array of programs accessible to the user
+     * @param array $progsnotaccessible Array of programs not accessible to the user
+     * @param int $audvisibilityon Setting for audience visibility (1 => ON, 0 => OFF)
+     * @dataProvider users_audience_visibility
+     */
+    public function test_audiencevisibility_with_maps_disabled($user, $progsvisible, $progsnotvisible,
+        $progsaccessible, $progsnotaccessible, $audvisibilityon) {
+        global $CFG;
+        $CFG->disable_visibility_maps = true;
+
+        $this->test_audiencevisibility($user, $progsvisible, $progsnotvisible, $progsaccessible, $progsnotaccessible, $audvisibilityon);
+
+        unset($CFG->disable_visibility_maps);
+    }
+
     public function test_check_access_audience_visibility() {
         global $CFG;
 
@@ -480,6 +500,15 @@ class totara_cohort_program_audiencevisibility_testcase extends advanced_testcas
                 self::assertFalse($visible, "{$test['user']} should not see program {$program}");
             }
         }
+    }
+
+    public function test_check_access_audience_visibility_with_maps_disabled() {
+        global $CFG;
+        $CFG->disable_visibility_maps = true;
+
+        $this->test_check_access_audience_visibility();
+
+        unset($CFG->disable_visibility_maps);
     }
 
     /**

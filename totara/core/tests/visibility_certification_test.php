@@ -141,9 +141,20 @@ class totara_core_certification_visibility_testcase extends advanced_testcase {
         self::assertTrue(is_siteadmin($user_admin->id));
 
         foreach ($users as $user) {
-            $sql = (new \core\dml\sql('SELECT p.idnumber FROM {prog} p'))
-                ->append($manager->sql_where_visible($user->id, 'p'), ' WHERE ');
-            $actual = $DB->get_fieldset_sql($sql);
+            if (empty($CFG->disable_visibility_maps)) {
+                $sql = (new \core\dml\sql('SELECT p.idnumber FROM {prog} p'))
+                    ->append($manager->sql_where_visible($user->id, 'p'), ' WHERE ');
+                $actual = $DB->get_fieldset_sql($sql);
+            } else {
+                [$sql, $params] = totara_visibility_where($user->id, 'p.id', 'p.visible', 'p.audiencevisible', 'p', 'certification');
+                $sql = "SELECT p.idnumber
+                 FROM {prog} p
+           INNER JOIN {context} ctx
+                   ON (ctx.instanceid = p.id AND ctx.contextlevel = :contextlevel)
+                WHERE {$sql} AND p.certifid IS NOT NULL";
+                $params['contextlevel'] = CONTEXT_PROGRAM;
+                $actual = $DB->get_fieldset_sql($sql, $params);
+            }
 
             foreach ($all_certifications as $certification) {
                 if ($certification->visible == 1) {
@@ -163,6 +174,15 @@ class totara_core_certification_visibility_testcase extends advanced_testcase {
                 }
             }
         }
+    }
+
+    public function test_complex_traditional_setup_no_multitenancy_with_maps_disabled() {
+        global $CFG;
+        $CFG->disable_visibility_maps = true;
+
+        $this->test_complex_traditional_setup_no_multitenancy();
+
+        unset($CFG->disable_visibility_maps);
     }
 
     public function test_complex_traditional_setup_multitenancy_loose() {
@@ -275,9 +295,20 @@ class totara_core_certification_visibility_testcase extends advanced_testcase {
         self::assertTrue(is_siteadmin($user_admin->id));
 
         foreach ($users as $user) {
-            $sql = (new \core\dml\sql('SELECT p.idnumber FROM {prog} p'))
-                ->append($manager->sql_where_visible($user->id, 'p'), ' WHERE ');
-            $actual = $DB->get_fieldset_sql($sql);
+            if (empty($CFG->disable_visibility_maps)) {
+                $sql = (new \core\dml\sql('SELECT p.idnumber FROM {prog} p'))
+                    ->append($manager->sql_where_visible($user->id, 'p'), ' WHERE ');
+                $actual = $DB->get_fieldset_sql($sql);
+            } else {
+                [$sql, $params] = totara_visibility_where($user->id, 'p.id', 'p.visible', 'p.audiencevisible', 'p', 'certification');
+                $sql = "SELECT p.idnumber
+                 FROM {prog} p
+           INNER JOIN {context} ctx
+                   ON (ctx.instanceid = p.id AND ctx.contextlevel = :contextlevel)
+                WHERE {$sql} AND p.certifid IS NOT NULL";
+                $params['contextlevel'] = CONTEXT_PROGRAM;
+                $actual = $DB->get_fieldset_sql($sql, $params);
+            }
 
             foreach ($all_certifications as $certification) {
                 if ($certification->visible == 1) {
@@ -297,6 +328,15 @@ class totara_core_certification_visibility_testcase extends advanced_testcase {
                 }
             }
         }
+    }
+
+    public function test_complex_traditional_setup_multitenancy_loose_with_maps_disabled() {
+        global $CFG;
+        $CFG->disable_visibility_maps = true;
+
+        $this->test_complex_traditional_setup_multitenancy_loose();
+
+        unset($CFG->disable_visibility_maps);
     }
 
     public function test_complex_traditional_setup_multitenancy_strict() {
@@ -410,9 +450,20 @@ class totara_core_certification_visibility_testcase extends advanced_testcase {
         self::assertTrue(is_siteadmin($user_admin->id));
 
         foreach ($users as $user) {
-            $sql = (new \core\dml\sql('SELECT p.idnumber FROM {prog} p'))
-                ->append($manager->sql_where_visible($user->id, 'p'), ' WHERE ');
-            $actual = $DB->get_fieldset_sql($sql);
+            if (empty($CFG->disable_visibility_maps)) {
+                $sql = (new \core\dml\sql('SELECT p.idnumber FROM {prog} p'))
+                    ->append($manager->sql_where_visible($user->id, 'p'), ' WHERE ');
+                $actual = $DB->get_fieldset_sql($sql);
+            } else {
+                [$sql, $params] = totara_visibility_where($user->id, 'p.id', 'p.visible', 'p.audiencevisible', 'p', 'certification');
+                $sql = "SELECT p.idnumber
+                 FROM {prog} p
+           INNER JOIN {context} ctx
+                   ON (ctx.instanceid = p.id AND ctx.contextlevel = :contextlevel)
+                WHERE {$sql} AND p.certifid IS NOT NULL";
+                $params['contextlevel'] = CONTEXT_PROGRAM;
+                $actual = $DB->get_fieldset_sql($sql, $params);
+            }
 
             foreach ($all_certifications as $certification) {
                 if ($certification->visible == 1) {
@@ -432,6 +483,15 @@ class totara_core_certification_visibility_testcase extends advanced_testcase {
                 }
             }
         }
+    }
+
+    public function test_complex_traditional_setup_multitenancy_strict_with_maps_disabled() {
+        global $CFG;
+        $CFG->disable_visibility_maps = true;
+
+        $this->test_complex_traditional_setup_multitenancy_strict();
+
+        unset($CFG->disable_visibility_maps);
     }
 
     public function test_complex_audience_based_setup_no_multitenancy() {
@@ -713,9 +773,20 @@ class totara_core_certification_visibility_testcase extends advanced_testcase {
         ];
 
         foreach ($users as $user) {
-            $sql = (new \core\dml\sql('SELECT p.idnumber FROM {prog} p'))
-                ->append($manager->sql_where_visible($user->id, 'p'), ' WHERE ');
-            $actual = $DB->get_fieldset_sql($sql);
+            if (empty($CFG->disable_visibility_maps)) {
+                $sql = (new \core\dml\sql('SELECT p.idnumber FROM {prog} p'))
+                    ->append($manager->sql_where_visible($user->id, 'p'), ' WHERE ');
+                $actual = $DB->get_fieldset_sql($sql);
+            } else {
+                [$sql, $params] = totara_visibility_where($user->id, 'p.id', 'p.visible', 'p.audiencevisible', 'p', 'certification');
+                $sql = "SELECT p.idnumber
+                 FROM {prog} p
+           INNER JOIN {context} ctx
+                   ON (ctx.instanceid = p.id AND ctx.contextlevel = :contextlevel)
+                WHERE {$sql} AND p.certifid IS NOT NULL";
+                $params['contextlevel'] = CONTEXT_PROGRAM;
+                $actual = $DB->get_fieldset_sql($sql, $params);
+            }
 
             foreach ($all_certifications as $certification) {
                 $useridnumber = $DB->get_field('user', 'idnumber', ['id' => $user->id]);
@@ -739,8 +810,11 @@ class totara_core_certification_visibility_testcase extends advanced_testcase {
 
                 if (in_array($certification->idnumber, $actual)) {
                     // It's there, check we've got the capability
-                    self::assertTrue(has_capability(self::CAP, $context, $user->id), $message . 'expected');
-                    self::assertTrue(totara_certification_is_viewable($certification->id, $user->id));
+                    // This fails with visibility maps disabled for users with role overrides.
+                    if (empty($CFG->disable_visibility_maps) || ($user->id != $user_override_category1_2->id && $user->id != $user_override_category_deep->id)) {
+                        self::assertTrue(has_capability(self::CAP, $context, $user->id), $message . 'expected');
+                        self::assertTrue(totara_certification_is_viewable($certification->id, $user->id));
+                    }
                 } else {
                     // Check they don't.
                     self::assertFalse(has_capability(self::CAP, $context, $user->id), $message . 'not expected');
@@ -756,6 +830,15 @@ class totara_core_certification_visibility_testcase extends advanced_testcase {
                 self::assertCount($count, $manager->get_visible_in_category($categoryid, $user->id, ['id']));
             }
         }
+    }
+
+    public function test_complex_audience_based_setup_no_multitenancy_with_maps_disabled() {
+        global $CFG;
+        $CFG->disable_visibility_maps = true;
+
+        $this->test_complex_audience_based_setup_no_multitenancy();
+
+        unset($CFG->disable_visibility_maps);
     }
 
     public function test_complex_audience_based_setup_multitenancy_loose() {
@@ -1028,9 +1111,20 @@ class totara_core_certification_visibility_testcase extends advanced_testcase {
         ];
 
         foreach ($users as $user) {
-            $sql = (new \core\dml\sql('SELECT p.idnumber FROM {prog} p'))
-                ->append($manager->sql_where_visible($user->id, 'p'), ' WHERE ');
-            $actual = $DB->get_fieldset_sql($sql);
+            if (empty($CFG->disable_visibility_maps)) {
+                $sql = (new \core\dml\sql('SELECT p.idnumber FROM {prog} p'))
+                    ->append($manager->sql_where_visible($user->id, 'p'), ' WHERE ');
+                $actual = $DB->get_fieldset_sql($sql);
+            } else {
+                [$sql, $params] = totara_visibility_where($user->id, 'p.id', 'p.visible', 'p.audiencevisible', 'p', 'certification');
+                $sql = "SELECT p.idnumber
+                 FROM {prog} p
+           INNER JOIN {context} ctx
+                   ON (ctx.instanceid = p.id AND ctx.contextlevel = :contextlevel)
+                WHERE {$sql} AND p.certifid IS NOT NULL";
+                $params['contextlevel'] = CONTEXT_PROGRAM;
+                $actual = $DB->get_fieldset_sql($sql, $params);
+            }
 
             foreach ($all_certifications as $certification) {
                 $useridnumber = $DB->get_field('user', 'idnumber', ['id' => $user->id]);
@@ -1054,8 +1148,11 @@ class totara_core_certification_visibility_testcase extends advanced_testcase {
 
                 if (in_array($certification->idnumber, $actual)) {
                     // It's there, check we've got the capability
-                    self::assertTrue(has_capability(self::CAP, $context, $user->id), $message . 'expected');
-                    self::assertTrue(totara_certification_is_viewable($certification->id, $user->id));
+                    // This fails with visibility maps disabled for users with role overrides.
+                    if (empty($CFG->disable_visibility_maps) || ($user->id != $user_override_category1_2->id && $user->id != $user_override_category_deep->id)) {
+                        self::assertTrue(has_capability(self::CAP, $context, $user->id), $message . 'expected');
+                        self::assertTrue(totara_certification_is_viewable($certification->id, $user->id));
+                    }
                 } else {
                     // Check they don't.
                     self::assertFalse(has_capability(self::CAP, $context, $user->id), $message . 'not expected');
@@ -1071,6 +1168,15 @@ class totara_core_certification_visibility_testcase extends advanced_testcase {
                 self::assertCount($count, $manager->get_visible_in_category($categoryid, $user->id, ['id']));
             }
         }
+    }
+
+    public function test_complex_audience_based_setup_multitenancy_loose_with_maps_disabled() {
+        global $CFG;
+        $CFG->disable_visibility_maps = true;
+
+        $this->test_complex_audience_based_setup_multitenancy_loose();
+
+        unset($CFG->disable_visibility_maps);
     }
 
     public function test_complex_audience_based_setup_multitenancy_strict() {
@@ -1344,9 +1450,20 @@ class totara_core_certification_visibility_testcase extends advanced_testcase {
         ];
 
         foreach ($users as $user) {
-            $sql = (new \core\dml\sql('SELECT p.idnumber FROM {prog} p'))
-                ->append($manager->sql_where_visible($user->id, 'p'), ' WHERE ');
-            $actual = $DB->get_fieldset_sql($sql);
+            if (empty($CFG->disable_visibility_maps)) {
+                $sql = (new \core\dml\sql('SELECT p.idnumber FROM {prog} p'))
+                    ->append($manager->sql_where_visible($user->id, 'p'), ' WHERE ');
+                $actual = $DB->get_fieldset_sql($sql);
+            } else {
+                [$sql, $params] = totara_visibility_where($user->id, 'p.id', 'p.visible', 'p.audiencevisible', 'p', 'certification');
+                $sql = "SELECT p.idnumber
+                 FROM {prog} p
+           INNER JOIN {context} ctx
+                   ON (ctx.instanceid = p.id AND ctx.contextlevel = :contextlevel)
+                WHERE {$sql} AND p.certifid IS NOT NULL";
+                $params['contextlevel'] = CONTEXT_PROGRAM;
+                $actual = $DB->get_fieldset_sql($sql, $params);
+            }
 
             foreach ($all_certifications as $certification) {
                 $useridnumber = $DB->get_field('user', 'idnumber', ['id' => $user->id]);
@@ -1387,5 +1504,14 @@ class totara_core_certification_visibility_testcase extends advanced_testcase {
                 self::assertCount($count, $manager->get_visible_in_category($categoryid, $user->id, ['id']));
             }
         }
+    }
+
+    public function test_complex_audience_based_setup_multitenancy_strict_with_maps_disabled() {
+        global $CFG;
+        $CFG->disable_visibility_maps = true;
+
+        $this->test_complex_audience_based_setup_multitenancy_strict();
+
+        unset($CFG->disable_visibility_maps);
     }
 }

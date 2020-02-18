@@ -430,6 +430,26 @@ class totara_cohort_certification_audiencevisibility_testcase extends advanced_t
         }
     }
 
+    /**
+     * Test Audience visibility with visibility maps disabled
+     * @param string $user User that will login to see the programs.
+     * @param array $certsvisible Array of programs visible to the user
+     * @param array $certsnotvisible Array of programs not visible to the user
+     * @param array $certsaccessible Array of programs accessible to the user
+     * @param array $certsnotaccessible Array of programs not accessible to the user
+     * @param int $audvisibilityon Setting for audience visibility (1 => ON, 0 => OFF)
+     * @dataProvider users_audience_visibility
+     */
+    public function test_audiencevisibility_with_maps_disabled($user, $certsvisible, $certsnotvisible,
+        $certsaccessible, $certsnotaccessible, $audvisibilityon) {
+        global $CFG;
+        $CFG->disable_visibility_maps = true;
+
+        $this->test_audiencevisibility($user, $certsvisible, $certsnotvisible, $certsaccessible, $certsnotaccessible, $audvisibilityon);
+
+        unset($CFG->disable_visibility_maps);
+    }
+
     public function test_check_access_audience_visibility() {
         global $CFG;
 
@@ -475,6 +495,15 @@ class totara_cohort_certification_audiencevisibility_testcase extends advanced_t
                 self::assertFalse($visible, "{$test['user']} should not see certification {$certification}");
             }
         }
+    }
+
+    public function test_check_access_audience_visibility_with_maps_disabled() {
+        global $CFG;
+        $CFG->disable_visibility_maps = true;
+
+        $this->test_check_access_audience_visibility();
+
+        unset($CFG->disable_visibility_maps);
     }
 
     /**

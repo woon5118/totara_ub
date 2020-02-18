@@ -262,11 +262,16 @@ switch ($searchtype) {
 
         $search_info->sql .= " WHERE {$searchsql} ";
 
-        $visibility = \totara_core\visibility_controller::course()->sql_where_visible($USER->id, 'c');
-
-        if (!$visibility->is_empty()) {
-            $search_info->sql .= ' AND ' . $visibility->get_sql();
-            $params = array_merge($params, $visibility->get_params());
+        if (empty($CFG->disable_visibility_maps)) {
+            $visibility = \totara_core\visibility_controller::course()->sql_where_visible($USER->id, 'c');
+            if (!$visibility->is_empty()) {
+                $search_info->sql .= ' AND ' . $visibility->get_sql();
+                $params = array_merge($params, $visibility->get_params());
+            }
+        } else {
+            list($visibilitysql, $visibilityparams) = totara_visibility_where($USER->id, 'c.id', 'c.visible', 'c.audiencevisible');
+            $search_info->sql .= " AND {$visibilitysql}";
+            $params = array_merge($params, $visibilityparams);
         }
 
         if ($this->requirecompletion || $this->requirecompletioncriteria) {

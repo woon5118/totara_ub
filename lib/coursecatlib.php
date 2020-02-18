@@ -988,7 +988,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      * @return array array of stdClass objects
      */
     public static function get_course_records($whereclause, $params, $options, $checkvisibility = false) {
-        global $DB, $USER;
+        global $DB, $CFG, $USER;
 
         $ctxselect = context_helper::get_preload_record_columns_sql('ctx');
         $fields = array('c.id', 'c.category', 'c.sortorder',
@@ -1002,10 +1002,18 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         }
 
         if ($checkvisibility) {
-            $visibilitysql = \totara_core\visibility_controller::course()->sql_where_visible($USER->id, 'c');
-            if (!$visibilitysql->is_empty()) {
-                $whereclause .= ' AND ' . $visibilitysql->get_sql();
-                $params = array_merge($params, $visibilitysql->get_params());
+            if (empty($CFG->disable_visibility_maps)) {
+                $visibilitysql = \totara_core\visibility_controller::course()->sql_where_visible($USER->id, 'c');
+                if (!$visibilitysql->is_empty()) {
+                    $whereclause .= ' AND ' . $visibilitysql->get_sql();
+                    $params = array_merge($params, $visibilitysql->get_params());
+                }
+            } else {
+                require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
+                list($visibilitysql, $visibilityparams) = totara_visibility_where($USER->id, 'c.id', 'c.visible', 'c.audiencevisible');
+
+                $whereclause .= " AND {$visibilitysql} ";
+                $params = array_merge($params, $visibilityparams);
             }
         }
 
@@ -1675,16 +1683,19 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             return;
         }
 
-        // Needed for totara_visibility_where!
-        require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
-
         [$insql, $inparams] = $DB->get_in_or_equal($toload, SQL_PARAMS_NAMED, 'c');
-        $where = \totara_core\visibility_controller::course()->sql_where_visible($USER->id, 'course');
-        $wheresql = '';
-        $whereparams = [];
-        if (!$where->is_empty()) {
-            $wheresql = ' AND ' . $where->get_sql();
-            $whereparams = $where->get_params();
+        if (empty($CFG->disable_visibility_maps)) {
+            $where = \totara_core\visibility_controller::course()->sql_where_visible($USER->id, 'course');
+            $wheresql = '';
+            $whereparams = [];
+            if (!$where->is_empty()) {
+                $wheresql = ' AND ' . $where->get_sql();
+                $whereparams = $where->get_params();
+            }
+        } else {
+            require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
+            [$wheresql, $whereparams] = totara_visibility_where($USER->id);
+            $wheresql = ' AND ' . $wheresql;
         }
 
         // TOTARA: Note that group_concat in MSSQL 2016 and below does not support sorting.

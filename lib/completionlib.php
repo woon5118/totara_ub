@@ -1938,14 +1938,19 @@ class completion_info {
      * @return  array
      */
     public static function get_all_courses($userid, $limit=0) {
-        global $DB;
+        global $DB, $CFG;
 
-        $visibility = \totara_core\visibility_controller::course()->sql_where_visible($userid, 'c');
-        $visibilitysql = '';
-        $visibilityparams = [];
-        if (!$visibility->is_empty()) {
-            $visibilitysql = ' AND ' . $visibility->get_sql();
-            $visibilityparams = $visibility->get_params();
+        if (empty($CFG->disable_visibility_maps)) {
+            $visibility = \totara_core\visibility_controller::course()->sql_where_visible($userid, 'c');
+            $visibilitysql = '';
+            $visibilityparams = [];
+            if (!$visibility->is_empty()) {
+                $visibilitysql = ' AND ' . $visibility->get_sql();
+                $visibilityparams = $visibility->get_params();
+            }
+        } else {
+            list($visibilitysql, $visibilityparams) = totara_visibility_where($userid, 'c.id', 'c.visible', 'c.audiencevisible');
+            $visibilitysql = 'AND ' . $visibilitysql;
         }
 
         $params = array('userid' => $userid);
