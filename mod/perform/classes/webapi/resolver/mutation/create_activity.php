@@ -28,7 +28,6 @@ use container_perform\perform as perform_container;
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use mod_perform\models\activity\activity;
-use mod_perform\util;
 
 class create_activity implements mutation_resolver {
 
@@ -42,8 +41,14 @@ class create_activity implements mutation_resolver {
             throw new create_exception(get_string('error:create_permission_missing', 'mod_perform'));
         }
 
+        if (empty($args['name'])) {
+            throw new create_exception(get_string('error:activity_name_missing', 'mod_perform'));
+        }
+
         $courseinfo = new \stdClass();
         $courseinfo->fullname = $args['name'];
+        $courseinfo->description = $args['description'] ?? null;
+        $courseinfo->category = perform_container::get_default_categoryid();
 
         return $DB->transaction(function () use ($courseinfo, $args) {
             $container = perform_container::create($courseinfo);
@@ -51,6 +56,7 @@ class create_activity implements mutation_resolver {
             // Create a performance activity inside the new performance container.
             $activity_data = new \stdClass();
             $activity_data->name = $args['name'];
+            $activity_data->description = $args['description'] ?? null;
             $activity_data->status = $args['status'] ?? activity::STATUS_ACTIVE;
 
             /** @var perform_container $container */

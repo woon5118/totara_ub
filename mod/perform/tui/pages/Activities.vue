@@ -2,9 +2,13 @@
   <div>
     <h2 v-text="$str('perform:manage_activity', 'mod_perform')" />
     <Button
-      :text="$str('create_activity', 'mod_perform')"
-      @click="create_activity()"
+      v-if="canAdd"
+      :text="$str('perform:add_activity', 'mod_perform')"
+      @click="showCreateModal()"
     />
+    <ModalPresenter :open="modalOpen" @request-close="modalRequestClose">
+      <CreateActivityModal />
+    </ModalPresenter>
     <Table :data="activities" :expandable-rows="true">
       <template v-slot:header-row>
         <HeaderCell size="8">{{
@@ -23,7 +27,7 @@
         </Cell>
         <Cell
           size="2"
-          :column-header="$str('perform:view:date', 'mod_perform')"
+          :column-header="$str('perform:view:status', 'mod_perform')"
         >
           {{ $str('perform:view:status:active', 'mod_perform') }}
         </Cell>
@@ -38,7 +42,8 @@ import Cell from 'totara_core/components/datatable/Cell';
 import HeaderCell from 'totara_core/components/datatable/HeaderCell';
 import performActivitiesQuery from '../../webapi/ajax/activities.graphql';
 import Button from 'totara_core/components/buttons/Button';
-import CreateActivityMutation from '../../webapi/ajax/create_activity.graphql';
+import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
+import CreateActivityModal from 'mod_perform/components/activity/modal/CreateActivity';
 
 export default {
   components: {
@@ -46,6 +51,14 @@ export default {
     Cell,
     HeaderCell,
     Table,
+    ModalPresenter,
+    CreateActivityModal,
+  },
+  props: {
+    canAdd: {
+      required: true,
+      type: Boolean,
+    },
   },
   apollo: {
     activities: {
@@ -59,30 +72,15 @@ export default {
   data() {
     return {
       activities: [],
+      modalOpen: false,
     };
   },
   methods: {
-    create_activity: function() {
-      console.log(this);
-      this.$apollo
-        .mutate({
-          // Query
-          mutation: CreateActivityMutation,
-          // Parameters
-          variables: {
-            name: 'placeholder_name',
-          },
-        })
-        .then(data => {
-          if (data.data && data.data.container_perform_create) {
-            console.log('successfully created activity');
-          }
-        })
-        .catch(error => {
-          // TODO Handle error case
-          console.log('error');
-          console.error(error);
-        });
+    showCreateModal() {
+      this.modalOpen = true;
+    },
+    modalRequestClose() {
+      this.modalOpen = false;
     },
   },
 };
@@ -90,7 +88,7 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "create_activity",
+      "perform:add_activity",
       "perform:manage_activity",
       "perform:view:name",
       "perform:view:status:active",

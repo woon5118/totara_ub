@@ -32,6 +32,7 @@ use mod_perform\entities\activity\activity_repository;
  * @property-read int $id ID
  * @property int $course ID of parent course
  * @property string $name Activity name
+ * @property string $description Activity description
  * @property int $status
  * @property int $timemodified
  *

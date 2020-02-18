@@ -26,6 +26,7 @@ namespace mod_perform\controllers\activity;
 use mod_perform\util;
 use totara_mvc\controller;
 use totara_mvc\tui_view;
+use mod_perform\models\activity\activity as activity_model;
 
 class activities extends controller {
 
@@ -43,7 +44,7 @@ class activities extends controller {
     public function action(): tui_view {
         $this->require_capability('mod/perform:view_manage_activities', $this->get_context());
 
-        return tui_view::create('mod_perform/pages/Activities', [])
+        return tui_view::create('mod_perform/pages/Activities', ['can-add' => activity_model::can_create()])
             ->set_title(get_string('perform:manage_activity', 'mod_perform'));
     }
 

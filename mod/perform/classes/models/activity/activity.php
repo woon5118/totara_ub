@@ -120,6 +120,9 @@ class activity {
     public static function create(\stdClass $data, perform_container $container): self {
         global $DB;
 
+        if (!isset($data->name)) {
+            throw new \coding_exception('Name property does not exist');
+        }
         $modinfo = new \stdClass();
         $modinfo->modulename = 'perform';
         $modinfo->course = $container->id;
@@ -134,7 +137,8 @@ class activity {
 
         $entity->course = $container->id;
         $entity->name = $data->name;
-        $entity->status = $data->status;
+        $entity->description = $data->description ?? null;
+        $entity->status = $data->status ?? self::STATUS_ACTIVE;
 
         return $DB->transaction(function () use ($entity, $modinfo, $container) {
             global $CFG, $USER;

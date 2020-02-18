@@ -49,6 +49,7 @@ class mod_perform_generator extends component_generator_base {
             // Create a performance activity inside the new performance container.
             $activity_data = new \stdClass();
             $activity_data->name = $data['activity_name'] ?? "test performance activity";
+            $activity_data->description = $data['description'] ?? "test description";
             $activity_data->status = $data['activity_status'] ?? activity::STATUS_ACTIVE;
 
             /** @var perform_container $container */
@@ -72,6 +73,7 @@ class mod_perform_generator extends component_generator_base {
     public function create_instance($data = []): module {
         $activity_data = new \stdClass();
         $activity_data->name = $data['name'] ?? "test performance activity";
+        $activity_data->description = $data['description'] ?? "test description";
         $activity_data->status = $data['status'] ?? activity::STATUS_ACTIVE;
 
         $container = perform_container::from_id($data['course']);

@@ -37,7 +37,6 @@ function xmldb_perform_upgrade($oldversion) {
     $dbman = $DB->get_manager();
 
     if ($oldversion < 2020022501) {
-
         // Define table perform_section to be created.
         $table = new xmldb_table('perform_section');
 
@@ -59,7 +58,6 @@ function xmldb_perform_upgrade($oldversion) {
     }
 
     if ($oldversion < 2020022502) {
-
         // Define table perform_relationship to be created.
         $table = new xmldb_table('perform_relationship');
 
@@ -85,7 +83,6 @@ function xmldb_perform_upgrade($oldversion) {
     }
 
     if ($oldversion < 2020022503) {
-
         // Define table perform_section_relationship to be created.
         $table = new xmldb_table('perform_section_relationship');
 
@@ -116,7 +113,6 @@ function xmldb_perform_upgrade($oldversion) {
     }
 
     if ($oldversion < 2020022504) {
-
         // Define table perform_element to be created.
         $table = new xmldb_table('perform_element');
 
@@ -140,7 +136,6 @@ function xmldb_perform_upgrade($oldversion) {
     }
 
     if ($oldversion < 2020022505) {
-
         // Define table perform_section_element to be created.
         $table = new xmldb_table('perform_section_element');
 
@@ -169,7 +164,6 @@ function xmldb_perform_upgrade($oldversion) {
     }
 
     if ($oldversion < 2020022506) {
-
         // Define table perform_subject_instance to be created.
         $table = new xmldb_table('perform_subject_instance');
 
@@ -191,7 +185,6 @@ function xmldb_perform_upgrade($oldversion) {
     }
 
     if ($oldversion < 2020022507) {
-
         // Define table perform_participant_instance to be created.
         $table = new xmldb_table('perform_participant_instance');
 
@@ -217,7 +210,6 @@ function xmldb_perform_upgrade($oldversion) {
     }
 
     if ($oldversion < 2020022508) {
-
         // Define table perform_element_response to be created.
         $table = new xmldb_table('perform_element_response');
 
@@ -324,6 +316,17 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020022600, 'perform');
     }
 
+    if ($oldversion < 2020022601) {
+        // Changes to perform table
+        $table = new xmldb_table('perform');
+
+        // add description field
+        $field = new xmldb_field('description', XMLDB_TYPE_TEXT, null, false, false, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_mod_savepoint(true, 2020022601, 'perform');
+    }
     return true;
 }
 

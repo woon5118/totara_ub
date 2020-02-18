@@ -21,6 +21,9 @@
  * @package mod_perform
  */
 
+use container_perform\perform as perform_container;
+use mod_perform\models\activity\activity;
+
 /**
  * @group perform
  */
@@ -54,5 +57,20 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $this->setUser($user1);
         $this->assertTrue($activity_user1->can_manage());
         $this->assertFalse($activity_user2->can_manage());
+    }
+
+    public function test_create_without_name() {
+        $courseinfo = new \stdClass();
+        $courseinfo->fullname = 'test';
+        $courseinfo->category = perform_container::get_default_categoryid();
+
+        $container = perform_container::create($courseinfo);
+
+        // Create a performance activity inside the new performance container.
+        $activity_data = new \stdClass();
+
+        $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage("Coding error detected, it must be fixed by a programmer: Name property does not exist");
+        activity::create($activity_data, $container);
     }
 }

@@ -21,10 +21,18 @@
  * @package mod_perform
  */
 
+
 $string['create_activity'] = 'Add activity';
-$string['error:create_permission_missing'] = 'Error creating a new performance activity';
+$string['error:create_permission_missing'] = 'You do not have the permission to create a performance activity';
+$string['error:activity_name_missing'] = 'You are not allowed to create an activity with an empty name';
 $string['modulename'] = 'Performance activity';
 $string['modulenameplural'] = 'Performance activities';
+$string['perform:menu:activities'] = 'Activities';
+$string['perform:add_activity'] = 'Add activity';
+$string['perform:create_activity:general_settings'] = 'General Settings';
+$string['perform:create_activity:name'] = 'Name';
+$string['perform:create_activity:description'] = 'Description';
+$string['perform:create_activity:save'] = "Add activity";
 $string['perform:create_activity'] = 'Create performance activities';
 $string['perform:manage_activity'] = 'Manage performance activities';
 $string['perform:view_manage_activities'] = 'Access the performance activities management interface';

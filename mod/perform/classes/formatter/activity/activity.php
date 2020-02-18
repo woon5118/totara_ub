@@ -25,15 +25,17 @@ namespace mod_perform\formatter\activity;
 
 use totara_core\formatter\field\date_field_formatter;
 use totara_core\formatter\field\string_field_formatter;
+use totara_core\formatter\field\text_field_formatter;
 use totara_core\formatter\formatter;
 
 class activity extends formatter {
 
     protected function get_map(): array {
         return [
-            'id' => null,
-            'name' => string_field_formatter::class,
-            'timemodified' => date_field_formatter::class
+            'id'           => null,
+            'name'         => string_field_formatter::class,
+            'description'  => text_field_formatter::class,
+            'timemodified' => date_field_formatter::class,
         ];
     }
 
