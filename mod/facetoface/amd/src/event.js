@@ -37,7 +37,6 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
             }
             window.dialoginits.push(resolve);
         }
-        resolve();
     }).then(function() {
         M.util.js_complete('mod_facetoface-events__dialogues_inited');
     });
