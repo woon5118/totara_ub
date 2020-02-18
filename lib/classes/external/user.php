@@ -70,8 +70,12 @@ class user extends \external_api {
      * @return array
      */
     public static function index(array $filters, int $page, string $order, string $direction) {
+        global $PAGE;
+        $context = \context_system::instance();
+        $PAGE->set_context($context);
+
         // TODO TL-20285 - Decide on how we deal with users in system context and user context
-        require_capability('moodle/cohort:view', \context_system::instance());
+        require_capability('moodle/cohort:view', $context);
 
         if (!in_array(strtolower($direction), ['asc', 'desc'])) {
             $direction = 'desc';
