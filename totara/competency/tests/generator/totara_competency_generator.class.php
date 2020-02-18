@@ -248,11 +248,12 @@ class totara_competency_generator extends component_generator_base {
      * @param role|string $as_role Role class or string e.g. pathway_manual\models\roles\manager::class or 'manager'
      * @param scale_value|int|null $scale_value If not specified, defaults to the first scale value set for the competency
      * @param string|null $comment
+     * @param int|null $time Timestamp of when rating was made
      *
      * @return rating
      */
     public function create_manual_rating($competency, $subject_user, $rater_user,
-                                         $as_role, $scale_value = null, $comment = null): rating {
+                                         $as_role, $scale_value = null, $comment = null, $time = null): rating {
         $subject_id = isset($subject_user->id) ? $subject_user->id : $subject_user;
         $rater_id = isset($rater_user->id) ? $rater_user->id : $rater_user;
 
@@ -282,7 +283,7 @@ class totara_competency_generator extends component_generator_base {
             'comp_id' => $competency,
             'user_id' => $subject_id,
             'scale_value_id' => $scale_value,
-            'date_assigned' => time(),
+            'date_assigned' => $time ?? time(),
             'assigned_by' => $rater_id,
             'assigned_by_role' => $as_role::get_name(),
             'comment' => $comment,
@@ -517,7 +518,8 @@ class totara_competency_generator extends component_generator_base {
             self::get_record_id_from_field(user::TABLE, 'username', $attributes['rater_user']),
             $attributes['role'],
             self::get_record_id_from_field(scale_value::TABLE, 'idnumber', $attributes['scale_value']),
-            $attributes['comment'] ?? null
+            $attributes['comment'] ?? null,
+            isset($attributes['date']) ? strtotime($attributes['date']) : null
         );
     }
 

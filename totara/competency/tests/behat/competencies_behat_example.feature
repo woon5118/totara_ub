@@ -5,12 +5,6 @@ Feature: Example behat scenario for creating data needed for testing competencie
     Given I am on a totara site
     When I log in as "admin"
 
-    # Capabilities needed for competencies
-    And I set the following system permissions of "Authenticated user" role:
-      | totara/competency:view_own_profile | Allow |
-    And I set the following system permissions of "Staff Manager" role:
-      | totara/competency:view_other_profile | Allow |
-
     # Cohorts (ie Audiences)
     And the following "cohorts" exist:
       | name       | idnumber |
@@ -126,11 +120,11 @@ Feature: Example behat scenario for creating data needed for testing competencie
       | comp1      | self                   | 2         |
       | comp2      | self,manager,appraiser | 1         |
     And the following "manual ratings" exist in "totara_competency" plugin:
-      | competency | subject_user | rater_user | role      | scale_value  | comment             |
-      | comp1      | user1        | user1      | self      | competent    | I'm good            |
-      | comp2      | user1        | user1      | self      | super        | I'm super good!     |
-      | comp2      | user1        | user2      | manager   | barely       | My staff is alright |
-      | comp2      | user1        | user3      | appraiser | incompetent  | My appraisee is bad |
+      | competency | subject_user | rater_user | role      | scale_value  | comment             | date       |
+      | comp1      | user1        | user1      | self      | competent    | I'm good            | 2020-01-01 |
+      | comp2      | user1        | user1      | self      | super        | I'm super good!     |            |
+      | comp2      | user1        | user2      | manager   | barely       | My staff is alright | 2020-01-02 |
+      | comp2      | user1        | user3      | appraiser | incompetent  | My appraisee is bad |            |
 
     # Learning plan pathway
     And the following "learning plan pathways" exist in "totara_competency" plugin:
