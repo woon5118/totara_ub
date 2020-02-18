@@ -90,6 +90,13 @@ class buffer {
         // The relation gives us the key so lets get the unique id from the entity
         $id = $entity->{$relation->get_key()};
 
+        // There's nothing to load
+        if ($id === null) {
+            return function () {
+                return null;
+            };
+        }
+
         // We want to group all relations and entities together
         $identifier = $classname.'/'.$relation_name;
         if (!isset(static::$buffered[$identifier])) {

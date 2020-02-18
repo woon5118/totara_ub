@@ -71,7 +71,6 @@ class core_orm_entity_buffer_test extends orm_entity_relation_testcase {
             ->where('name', 'Tablets')
             ->one();
 
-        // Two more queries issued
         $queries_count = $queries_count + 2;
         $this->assertEquals($queries_count, $this->db()->perf_get_reads());
 
@@ -141,7 +140,6 @@ class core_orm_entity_buffer_test extends orm_entity_relation_testcase {
             ->where('name', 'Casio vintage calculator')
             ->one();
 
-        // Two more queries issued
         $queries_count = $queries_count + 3;
         $this->assertEquals($queries_count, $this->db()->perf_get_reads());
 
@@ -187,7 +185,6 @@ class core_orm_entity_buffer_test extends orm_entity_relation_testcase {
             ->where('name', 'Tablets')
             ->one();
 
-        // Two more queries issued
         $queries_count = $queries_count + 2;
         $this->assertEquals($queries_count, $this->db()->perf_get_reads());
 
@@ -291,7 +288,6 @@ class core_orm_entity_buffer_test extends orm_entity_relation_testcase {
             ->where('name', 'Personal Computers')
             ->one();
 
-        // Two more queries issued
         $queries_count = $queries_count + 3;
         $this->assertEquals($queries_count, $this->db()->perf_get_reads());
 
@@ -493,6 +489,54 @@ class core_orm_entity_buffer_test extends orm_entity_relation_testcase {
 
         // Should result in no more queries
         $this->assertEquals($queries_count , $this->db()->perf_get_reads());
+    }
+
+    public function test_defer_does_handle_empty_relations() {
+        $this->create_sample_records();
+
+        $queries_count = $this->db()->perf_get_reads();
+
+        /** @var sample_child_entity $child1 */
+        $child1 = sample_child_entity::repository()
+            ->where('name', 'HP Personal computer')
+            ->one();
+
+        /** @var sample_child_entity $child2 */
+        $child2 = sample_child_entity::repository()
+            ->where('name', 'DELL Personal computer')
+            ->one();
+
+        // No set this relation to null
+        $child2->type = null;
+        $child2->save();
+
+        /** @var sample_child_entity $child3 */
+        $child3 = sample_child_entity::repository()
+            ->where('name', 'Casio vintage calculator')
+            ->one();
+
+        $queries_count = $queries_count + 3;
+        $this->assertEquals($queries_count, $this->db()->perf_get_reads());
+
+        $deferred1 = buffer::defer($child1, 'a_type');
+        $deferred2 = buffer::defer($child2, 'a_type');
+        $deferred3 = buffer::defer($child3, 'a_type');
+
+        // No additional queries issued
+        $this->assertEquals($queries_count, $this->db()->perf_get_reads());
+
+        /** @var sample_child_entity $type1 */
+        $type1 = $deferred1();
+        // Just checking that there's a result
+        $this->assertInstanceOf(sample_child_entity::class, $type1);
+
+        $type2 = $deferred2();
+        $this->assertNull($type2);
+
+        /** @var sample_child_entity $type3 */
+        $type3 = $deferred3();
+        // Just checking that there's a result
+        $this->assertInstanceOf(sample_child_entity::class, $type3);
     }
 
 }

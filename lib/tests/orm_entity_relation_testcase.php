@@ -172,7 +172,7 @@ abstract class orm_entity_relation_testcase extends advanced_testcase {
 
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
         $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, 'John Doe');
-        $table->add_field('type', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
+        $table->add_field('type', XMLDB_TYPE_INTEGER, '10', null, false, null, 0);
         $table->add_field('parent_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
         $table->add_field('description', XMLDB_TYPE_TEXT);
 
@@ -709,6 +709,11 @@ class sample_child_entity extends entity {
         return $this->belongs_to(sample_parent_entity::class, 'parent_id');
     }
 
+    /**
+     * This is here only to test clashes between relations and normal properties
+     *
+     * @return has_one
+     */
     public function type(): has_one {
         return $this->has_one(sample_child_entity::class, 'id');
     }
