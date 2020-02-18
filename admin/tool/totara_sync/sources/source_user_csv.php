@@ -243,6 +243,12 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
                 }
             }
 
+            if (isset($dbrow['tenantmember'])) {
+                if ($dbrow['tenantmember'] === '' && !$csvsaveemptyfields) {
+                    $dbrow['tenantmember'] = null;
+                }
+            }
+
             // Custom fields are special - needs to be json-encoded
             if (!empty($this->customfields)) {
                 $cfield_data = array();
@@ -376,6 +382,8 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
         foreach($row as $key => $value) {
             switch ($key) {
                 case 'idnumber':
+                case 'tenantmember':
+                case 'tenantparticipant':
                 case 'timemodified':
                 case 'username':
                 case 'firstname':

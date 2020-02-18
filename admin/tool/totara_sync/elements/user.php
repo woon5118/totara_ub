@@ -443,6 +443,9 @@ class totara_sync_element_user extends totara_sync_element {
                     continue;
                 }
 
+                // Do multitenancy updates.
+                $this->set_multitenancy($user, $suser);
+
                 // Update user password.
                 if ($updatepassword) {
                     $userauth = get_auth_plugin($user->auth);
@@ -575,6 +578,8 @@ class totara_sync_element_user extends totara_sync_element {
             // Update custom field data.
             $user = $this->put_custom_field_data($user, $suser);
 
+            // Do multitenancy updates.
+            $this->set_multitenancy($user, $suser);
         } catch (totara_sync_exception $e) {
             // One of the totara sync exceptions above was triggered. Rollback has already occurred. Just pass on the exception.
             throw $e;
@@ -592,6 +597,43 @@ class totara_sync_element_user extends totara_sync_element {
             )
         );
         $event->trigger();
+
+        return true;
+    }
+
+    /**
+     * @param stdClass $user existing user object
+     * @param stdClass $suser sync user object
+     * @return bool
+     */
+    public function set_multitenancy($user, $suser) {
+        global $CFG, $DB;
+
+        if (!$CFG->tenantsenabled) {
+            return false;
+        }
+
+        if (isset($suser->tenantmember)) {
+            if ($suser->tenantmember === '') {
+                $tenantid = 0; // Remove tenant membership.
+            } else {
+                // Set the tenant membership.
+                $tenantid = $DB->get_field('tenant', 'id', array('idnumber' => $suser->tenantmember), MUST_EXIST);
+            }
+        } else {
+            $tenantid = null;
+        }
+
+        $tenantparticipant = isset($suser->tenantparticipant) ? $suser->tenantparticipant : null;
+
+        if (!is_null($tenantid) || !is_null($tenantparticipant)) {
+            if ($tenantid) {
+                totara_tenant\local\util::migrate_user_to_tenant($user->id, $tenantid);
+            } else if (!is_null($tenantparticipant) || $tenantid === 0) {
+                $tenantids = empty($tenantparticipant) ? [] : explode(',', $tenantparticipant);
+                totara_tenant\local\util::set_user_participation($user->id, $tenantids);
+            }
+        }
 
         return true;
     }
@@ -749,6 +791,24 @@ class totara_sync_element_user extends totara_sync_element {
         // Check usernames against the DB to avoid saving repeated values.
         $badids = $this->check_values_in_db($synctable, 'username', 'duplicateusernamexdb');
         $invalidids = array_merge($invalidids, $badids);
+
+        // Multitenancy, ensure only tenantmember or tenantparticipant are used, not both.
+        if (property_exists($syncfields, 'tenantmember') && property_exists($syncfields, 'tenantparticipant')) {
+            $badids = $this->check_tenant_member_and_participant_set($synctable);
+            $invalidids = array_merge($invalidids, $badids);
+        }
+
+        // Multitenancy, check for invalid tenant idnumbers.
+        if (property_exists($syncfields, 'tenantmember')) {
+            $badids = $this->get_invalid_tenantmember($synctable);
+            $invalidids = array_merge($invalidids, $badids);
+        }
+
+        // Multitenancy, check for invalid tenantparticipant and convert idnumbers to ids in the source.
+        if (property_exists($syncfields, 'tenantparticipant')) {
+            $badids = $this->check_and_process_tenantparticipant($synctable, $synctable_clone);
+            $invalidids = array_merge($invalidids, $badids);
+        }
 
         // Get empty auth.
         if (property_exists($syncfields, 'auth')) {
@@ -1383,6 +1443,137 @@ class totara_sync_element_user extends totara_sync_element {
             }
         }
         $rs->close();
+
+        return $invalidids;
+    }
+
+    /**
+     * Check for invalid tenantmember
+     *
+     * @param string $synctable sync table name
+     *
+     * @return array with ids of any rows with invalid tenantmembers
+     */
+    public function get_invalid_tenantmember(string $synctable) : array {
+        global $DB;
+
+        $invalidids = [];
+
+        $sql = "SELECT s.id, s.idnumber, s.tenantmember
+                  FROM {{$synctable}} s
+             LEFT JOIN {tenant} t
+                    ON s.tenantmember = t.idnumber
+                 WHERE s.tenantmember IS NOT NULL
+                   AND s.tenantmember != ''
+                   AND t.idnumber IS NULL";
+        $rs = $DB->get_recordset_sql($sql);
+
+        foreach ($rs as $r) {
+            $this->addlog(get_string('tenantmemberxnotexist', 'tool_totara_sync', $r), 'error', 'checksanity');
+            $invalidids[] = $r->id;
+        }
+
+        $rs->close();
+
+        return $invalidids;
+    }
+
+    /**
+     * Check if both tenantmember and tenantparticipant are set, they should not be
+     *
+     * @param string $synctable sync table name
+     *
+     * @return array with ids of any invalid rows
+     */
+    public function check_tenant_member_and_participant_set(string $synctable) : array {
+        global $DB;
+
+        $invalidids = [];
+
+        $sql = "SELECT s.id, s.idnumber
+                  FROM {{$synctable}} s
+                 WHERE s.tenantmember IS NOT NULL
+                   AND s.tenantmember != ''
+                   AND s.tenantparticipant IS NOT NULL
+                   AND s.tenantparticipant != ''
+                   ";
+        $rs = $DB->get_recordset_sql($sql);
+
+        foreach ($rs as $r) {
+            $this->addlog(get_string('tenantmemberandparticipantpresent', 'tool_totara_sync', $r), 'error', 'checksanity');
+            $invalidids[] = $r->id;
+        }
+
+        $rs->close();
+
+        return $invalidids;
+    }
+
+    /**
+     * Check for invalid tenant idnumbers in the tenantparticipant source field and update source with tenant ids
+     *
+     * Note that this function actually updates the tenantparticipant in both sync tables with the actual tenant ids
+     *
+     * @param string $synctable sync table name
+     * @param string $synctable_clone sync table clone name
+     *
+     * @return array with ids of any rows with invalid tenantmembers
+     */
+    public function check_and_process_tenantparticipant(string $synctable, string $synctable_clone) : array {
+        global $DB;
+
+        $invalidids = [];
+
+        // Get all Tenants.
+        $tenants = $DB->get_records_menu('tenant', [], '', 'idnumber, id');
+
+        // Avoid users who will be deleted.
+        $extracondition = '';
+        if (empty($this->config->sourceallrecords)) {
+            $extracondition = "AND deleted = 0";
+        }
+
+        $sql = "SELECT id, idnumber, tenantparticipant
+                  FROM {{$synctable}}
+                 WHERE tenantparticipant != ''
+                   AND tenantparticipant IS NOT NULL
+                   {$extracondition}";
+        $records = $DB->get_records_sql($sql);
+
+        foreach ($records as $record) {
+            $participants_ids = [];
+
+            $participants_idnumbers = explode(',', $record->tenantparticipant);
+            $bad_participants = [];
+            foreach ($participants_idnumbers as $participant) {
+                $participant = trim($participant);
+
+                if (empty($participant)) {
+                   continue;
+                }
+
+                if (isset($tenants[$participant])) {
+                    $participants_ids[$tenants[$participant]] = $tenants[$participant];
+                } else {
+                    $bad_participants[] = $participant;
+                }
+            }
+
+            if (count($bad_participants) == 1) {
+                $record->tenantmember = $bad_participants[0];
+                $this->addlog(get_string('tenantparticipantidnumberxnotexist', 'tool_totara_sync', $record), 'error', 'checksanity');
+                $invalidids[] = $record->id;
+            } else if (count($bad_participants) > 1) {
+                $record->tenantmembers = implode(',', $bad_participants);
+                $this->addlog(get_string('tenantparticipantidnumbersxnotexist', 'tool_totara_sync', $record), 'error', 'checksanity');
+                $invalidids[] = $record->id;
+            } else {
+                // Update source with actual tenant ids.
+                $idlist = implode(',', $participants_ids);
+                $DB->set_field($synctable, 'tenantparticipant', $idlist, ['id' => $record->id]);
+                $DB->set_field($synctable_clone, 'tenantparticipant', $idlist, ['id' => $record->id]);
+            }
+        }
 
         return $invalidids;
     }

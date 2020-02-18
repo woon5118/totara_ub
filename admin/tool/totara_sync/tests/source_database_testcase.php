@@ -156,13 +156,17 @@ abstract class totara_sync_database_testcase extends advanced_testcase {
     /**
      * Run the check_sanity
      *
+     * @param bool $droptable Should the table be dropped after the check?
      * @return array containing idnumbers of all records that are invalid
      */
-    public function check_sanity() {
+    public function check_sanity($droptable = true) {
         $synctable = $this->get_element()->get_source_sync_table();
         $synctable_clone = $this->get_element()->get_source_sync_table_clone($synctable);
         $result = $this->get_element()->check_sanity($synctable, $synctable_clone);
-        $this->source->drop_table($synctable_clone);
+
+        if ($droptable) {
+            $this->source->drop_table($synctable_clone);
+        }
 
         return $result;
     }

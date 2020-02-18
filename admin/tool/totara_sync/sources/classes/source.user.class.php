@@ -46,7 +46,7 @@ abstract class totara_sync_source_user extends totara_sync_source {
     abstract function import_data($temptable);
 
     function __construct() {
-        global $DB;
+        global $DB, $CFG;
 
         $this->temptablename = 'totara_sync_user';
         $this->element = new totara_sync_element_user();
@@ -90,6 +90,12 @@ abstract class totara_sync_source_user extends totara_sync_source {
             'email',
             'auth'
         );
+
+        // Add multitenancy fields, if enabled.
+        if ($CFG->tenantsenabled) {
+            $this->fields[] = 'tenantmember';
+            $this->fields[] = 'tenantparticipant';
+        }
 
         // Custom fields
         $this->customfields = array();
@@ -153,6 +159,12 @@ abstract class totara_sync_source_user extends totara_sync_source {
             } else {
                 $mform->addElement('checkbox', $name, get_string($f, 'tool_totara_sync'));
                 if (in_array($f, array('country'))) {
+                    $mform->addHelpButton($name, $f, 'tool_totara_sync');
+                }
+                if (in_array($f, array('tenantmember'))) {
+                    $mform->addHelpButton($name, $f, 'tool_totara_sync');
+                }
+                if (in_array($f, array('tenantparticipant'))) {
                     $mform->addHelpButton($name, $f, 'tool_totara_sync');
                 }
             }
@@ -302,6 +314,12 @@ abstract class totara_sync_source_user extends totara_sync_source {
         }
         if (!empty($this->config->import_emailstop)) {
             $table->add_field('emailstop', XMLDB_TYPE_INTEGER, '1');
+        }
+        if (!empty($this->config->import_tenantmember)) {
+            $table->add_field('tenantmember', XMLDB_TYPE_CHAR, '100');
+        }
+        if (!empty($this->config->import_tenantparticipant)) {
+            $table->add_field('tenantparticipant', XMLDB_TYPE_TEXT, 'medium');
         }
         $table->add_field('customfields', XMLDB_TYPE_TEXT, 'big');
 

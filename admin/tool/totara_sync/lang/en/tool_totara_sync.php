@@ -232,6 +232,20 @@ $string['unabletomatchuseridnumber'] = 'Unable to match useridnumber \'{$a->user
 $string['updatedjobassignmentx'] = 'Updated job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
 $string['willcreateduplicatejobidnumber'] = 'User \'{$a->useridnumber}\' has another job assignment with the same idnumber as what is being updated. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
 
+// Multitenancy.
+$string['tenantmember'] = 'Tenant member';
+$string['tenantmember_help'] = 'The tenant idnumber for the tenant the user should be a member of.
+
+NOTE: A user can only be set as a member or a participant of a tenant, not both.';
+$string['tenantmemberxnotexist'] = 'Tenant idnumber {$a->tenantmember} does not exist. Skipped user {$a->idnumber}';
+$string['tenantmemberandparticipantpresent'] = 'Only a tenant member or participant can be set, not both, for user {$a->idnumber}';
+$string['tenantparticipant'] = 'Tenant participant';
+$string['tenantparticipant_help'] = 'A comma separated list of tenant idnumbers for the tenants the user should be a participant of.
+
+NOTE: A user can only be set as a member or a participant of a tenant, not both.';
+$string['tenantparticipantidnumberxnotexist'] = 'Tenant participant idnumber {$a->tenantmember} does not exist. Skipped user {$a->idnumber}';
+$string['tenantparticipantidnumbersxnotexist'] = 'Tenant participants idnumbers {$a->tenantmembers} do not exist. Skipped user {$a->idnumber}';
+
 // Database sources
 $string['dbtype'] = 'Database type';
 $string['dbname'] = 'Database name';
