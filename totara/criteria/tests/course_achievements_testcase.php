@@ -241,7 +241,7 @@ abstract class totara_criteria_course_achievements_testcase extends advanced_tes
         $data = $this->create_data();
 
         $user_role = $DB->get_record('role', ['shortname' => 'user'], '*', MUST_EXIST);
-        unassign_capability('totara/competency:view_own_profile', $user_role->id, context_user::instance($data->user->id)->id);
+        unassign_capability('totara/competency:view_own_profile', $user_role->id);
 
         // Now query as a normal user for whom the course 2 should not be visible
         $this->setUser($data->user);
