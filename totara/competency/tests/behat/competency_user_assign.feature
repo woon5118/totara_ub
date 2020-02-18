@@ -1,5 +1,5 @@
 @totara @totara_competency @javascript @vuejs
-Feature: Test competencies can be self assigned
+Feature: Test competencies can be user assigned
 
   Background:
     Given I am on a totara site
@@ -95,7 +95,7 @@ Feature: Test competencies can be self assigned
     Then I select "Framework Two" from the "Competency frameworks" singleselect
     And I should see the tui datatable is empty
 
-    When I click on "View selected" "link"
+    When I click on "View selected" "button"
 
     # The filter side panel should not be visible now
     Then I should not see "Filter competencies"
@@ -139,13 +139,13 @@ Feature: Test competencies can be self assigned
       | Self assignable | Currently assigned | Admin User (Admin) |
     And I should see "1" items in the tui basket
 
-    When I click on "View selected" "link"
+    When I click on "View selected" "button"
     Then I should see the tui datatable contains:
       | Competency name | Status             | Reason assigned    |
       | Self assignable | Currently assigned | Admin User (Admin) |
 
     # Going back should not remove the applied assignment status filter
-    When I click on "Back to Assign competencies" "link"
+    When I click on "Back to all competencies" "button"
     Then I should see the tui datatable contains:
       | Competency name | Status             | Reason assigned    |
       | Self assignable | Currently assigned | Admin User (Admin) |
@@ -153,8 +153,8 @@ Feature: Test competencies can be self assigned
     And the field "Status" matches value "Currently assigned"
 
     # Clearing all should reset all filters
-    When I click on "View selected" "link"
-    And I click on "Clear all" "link"
+    When I click on "View selected" "button"
+    And I click on "Clear all" "button"
     Then I should see the tui datatable contains:
       | Competency name                | Status             | Reason assigned    |
       | Self assignable                | Currently assigned | Admin User (Admin) |

@@ -77,6 +77,7 @@ $string['assignment'] = 'Assignment';
 $string['assignment_archived_at'] = 'Assignment archived {$a}';
 $string['assignmentcreationavailability'] = 'Assignment creation availability';
 $string['back_to'] = '« Back to {$a}';
+$string['back_to_all_competencies'] = 'Back to all competencies';
 $string['back_to_competency_profile'] = '« Back to competency profile';
 $string['back_to_competency_profile_self'] = '« Back to your competency profile';
 $string['bulkachievementcriteria'] = 'Bulk set achievements criteria';
@@ -95,7 +96,6 @@ $string['competency:rate_own_competencies'] = 'Rate own competencies';
 $string['competency:view_assignments'] = 'View competency assignments';
 $string['competency:view_own_profile'] = 'View own competency profile';
 $string['competency:view_other_profile'] = 'View profile of other users';
-$string['competency:back_to_assign_competencies'] = 'Back to Assign competencies';
 
 $string['competency_profile'] = 'Competency profile';
 $string['competencies'] = '{$a} competencies';

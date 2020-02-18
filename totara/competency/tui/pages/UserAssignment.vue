@@ -54,18 +54,33 @@
         />
       </GridItem>
       <GridItem :units="6">
-        <Basket
-          :items="selectedItems"
-          :is-viewing-selections="isViewingSelections"
-          :main-action-text="$str('assign_competencies', 'totara_competency')"
-          :go-back-text="
-            $str('competency:back_to_assign_competencies', 'totara_competency')
-          "
-          @mainAction="showConfirmationModal"
-          @goBackToAll="applyFilter"
-          @viewSelections="viewSelections"
-          @clearAll="clearSelections"
-        />
+        <Basket :items="selectedItems" :bulk-actions="basketActions">
+          <template v-slot:status="{ empty }">
+            <ButtonIcon
+              v-if="isViewingSelections && !empty"
+              :styleclass="{ small: true }"
+              :text="$str('clearall', 'totara_core')"
+              :aria-label="$str('clearall', 'totara_core')"
+              @click="clearSelections"
+            >
+              <ClearIcon />
+            </ButtonIcon>
+          </template>
+          <template v-slot:actions="{ empty }">
+            <Button
+              v-if="!isViewingSelections && !empty"
+              :styleclass="{ transparent: true }"
+              :text="$str('viewselected', 'totara_core')"
+              @click="viewSelections"
+            />
+            <Button
+              v-if="isViewingSelections && !empty"
+              :styleclass="{ transparent: true }"
+              :text="$str('back_to_all_competencies', 'totara_competency')"
+              @click="applyFilter"
+            />
+          </template>
+        </Basket>
       </GridItem>
     </Grid>
 
@@ -138,35 +153,39 @@
 </template>
 
 <script>
-import UserAssignableCompetenciesQuery from '../../webapi/ajax/user_assignable_competencies.graphql';
+import Basket from 'totara_core/components/basket/Basket';
+import Button from 'totara_core/components/buttons/Button';
+import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
+import ClearIcon from 'totara_core/components/icons/common/Clear';
+import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
 import CreateUserAssignmentMutation from '../../webapi/ajax/create_user_assignments.graphql';
+import FilterSidePanel from 'totara_core/components/filters/FilterSidePanel';
 import FlexIcon from 'totara_core/components/icons/FlexIcon';
-import Loader from 'totara_core/components/loader/Loader';
-import SelectionTable from '../components/user_assignment/SelectionTable';
-import Basket from '../components/common/Basket';
 import Grid from 'totara_core/components/grid/Grid';
 import GridItem from 'totara_core/components/grid/GridItem';
-import SelectFilter from 'totara_core/components/filters/SelectFilter';
-import Button from 'totara_core/components/buttons/Button';
-import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
-import FilterSidePanel from 'totara_core/components/filters/FilterSidePanel';
-import SearchFilter from 'totara_core/components/filters/SearchFilter';
+import Loader from 'totara_core/components/loader/Loader';
 import MultiSelectFilter from 'totara_core/components/filters/MultiSelectFilter';
+import SearchFilter from 'totara_core/components/filters/SearchFilter';
+import SelectFilter from 'totara_core/components/filters/SelectFilter';
+import SelectionTable from 'totara_competency/components/user_assignment/SelectionTable';
+import UserAssignableCompetenciesQuery from 'totara_competency/graphql/user_assignable_competencies';
 
 export default {
   components: {
-    ConfirmationModal,
-    Button,
     Basket,
-    SelectFilter,
-    SelectionTable,
+    Button,
+    ButtonIcon,
+    ClearIcon,
+    ConfirmationModal,
+    FilterSidePanel,
+    FlexIcon,
     Grid,
     GridItem,
     Loader,
-    FlexIcon,
-    FilterSidePanel,
-    SearchFilter,
     MultiSelectFilter,
+    SearchFilter,
+    SelectFilter,
+    SelectionTable,
   },
   props: {
     basePageHeading: {
@@ -243,6 +262,12 @@ export default {
         {
           id: STATUS_NOT_ASSIGNED,
           label: statusNotAssignedLabel,
+        },
+      ],
+      basketActions: [
+        {
+          label: this.$str('assign_competencies', 'totara_competency'),
+          action: this.showConfirmationModal,
         },
       ],
     };
@@ -441,9 +466,9 @@ export default {
 <lang-strings>
   {
     "totara_core": [
-      "gobacktoall",
       "loadmore",
-      "search"
+      "search",
+      "viewselected"
     ],
     "totara_hierarchy": [
       "assign",
@@ -451,11 +476,11 @@ export default {
       "competencytypes"
     ],
     "totara_competency": [
-      "any",
       "all",
+      "any",
       "assign_competencies",
+      "back_to_all_competencies",
       "competencies",
-      "competency:back_to_assign_competencies",
       "confirm_generic",
       "currently_assigned",
       "error_generic_mutation",
