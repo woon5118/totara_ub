@@ -28,6 +28,7 @@ Feature: security overview
     And I should see "OK" in the "Default role for all users" "table_row"
     And I should see "OK" in the "Guest role" "table_row"
     And I should see "OK" in the "Frontpage role" "table_row"
+    And I should see "OK" in the "HTTP only cookies" "table_row"
 
   # NOTE auth_none was removed in Totara 12, there is no way to test it, but we want to keep the error in case somebody copied it from older branch.
 
@@ -90,15 +91,15 @@ Feature: security overview
   @javascript
   Scenario: Check that the Critical status is displayed when httponly is disabled
 
-    # To start with the security setting is off
-    Given I navigate to "Security overview" node in "Site administration > Security"
-    And I should see "Serious" in the "HTTP only cookies" "table_row"
-
-    # Now change to create an OK status
-    # For this I need to enable the httponly setting.
-    Given the following config values are set as admin:
-      | cookiehttponly | 1 |
-
-    # Check the status is OK now
+    # To start with the security setting is on
     Given I navigate to "Security overview" node in "Site administration > Security"
     And I should see "OK" in the "HTTP only cookies" "table_row"
+
+    # Now change to create a Serious status
+    # For this I need to disable the httponly setting.
+    Given the following config values are set as admin:
+      | cookiehttponly | 0 |
+
+    # Check the status is Serious now
+    Given I navigate to "Security overview" node in "Site administration > Security"
+    And I should see "Serious" in the "HTTP only cookies" "table_row"

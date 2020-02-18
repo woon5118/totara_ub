@@ -212,8 +212,9 @@ class manager {
 
         $cookiesecure = is_moodle_cookie_secure();
 
+        // HTTP only cookies on by default.
         if (!isset($CFG->cookiehttponly)) {
-            $CFG->cookiehttponly = 0;
+            $CFG->cookiehttponly = 1;
         }
 
         // Set sessioncookie variable if it isn't already.
