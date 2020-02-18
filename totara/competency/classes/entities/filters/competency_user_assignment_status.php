@@ -37,22 +37,18 @@ class competency_user_assignment_status extends filter {
             throw new coding_exception('Missing user id for user assignment type filter');
         }
 
-        $val = $this->value;
-        if (count($val) === 1 && !is_null($val[0])) {
-            $assigned = $val[0] === 1;
+        $assigned = $this->value === 1;
 
-            $exist_builder = builder::table(assignment::TABLE)
-                ->join(['totara_competency_assignment_users', 'ua'], 'id', 'assignment_id')
-                ->where('ua.user_id', $user_id)
-                ->where('status', assignment::STATUS_ACTIVE)
-                ->where_field('competency_id', new field('id', $this->builder));
+        $exist_builder = builder::table(assignment::TABLE)
+            ->join(['totara_competency_assignment_users', 'ua'], 'id', 'assignment_id')
+            ->where('ua.user_id', $user_id)
+            ->where('status', assignment::STATUS_ACTIVE)
+            ->where_field('competency_id', new field('id', $this->builder));
 
-            if ($assigned) {
-                $this->builder->where_exists($exist_builder);
-            } else {
-                $this->builder->where_not_exists($exist_builder);
-            }
+        if ($assigned) {
+            $this->builder->where_exists($exist_builder);
+        } else {
+            $this->builder->where_not_exists($exist_builder);
         }
     }
-
 }

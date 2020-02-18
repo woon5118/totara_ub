@@ -1,11 +1,11 @@
-query totara_competency_self_assignable_competencies(
+query totara_competency_user_assignable_competencies(
   $user_id: core_id!
   $filters: totara_competency_self_assigned_competencies_filter
   $order_by: String
   $order_dir: totara_competency_order_dir
   $cursor: String
 ) {
-  totara_competency_self_assignable_competencies(
+  totara_competency_user_assignable_competencies(
     user_id: $user_id
     filters: $filters
     order_by: $order_by
@@ -15,6 +15,7 @@ query totara_competency_self_assignable_competencies(
     items {
       id
       display_name
+      description
       user_assignments {
         id
         type

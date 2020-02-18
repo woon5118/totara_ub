@@ -23,7 +23,7 @@
  */
 
 use core\webapi\execution_context;
-use totara_competency\webapi\resolver\query\self_assignable_competencies;
+use totara_competency\webapi\resolver\query\user_assignable_competencies;
 use totara_job\job_assignment;
 
 defined('MOODLE_INTERNAL') || die();
@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Tests the query to fetch all self assignable competencies
  */
-class totara_competency_webapi_resolver_query_self_assignable_competencies_testcase extends advanced_testcase {
+class totara_competency_webapi_resolver_query_user_assignable_competencies_testcase extends advanced_testcase {
 
     private function get_execution_context(string $type = 'dev', ?string $operation = null) {
         return execution_context::create($type, $operation);
@@ -69,7 +69,7 @@ class totara_competency_webapi_resolver_query_self_assignable_competencies_testc
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Assign competency to yourself');
 
-        self_assignable_competencies::resolve($args, $this->get_execution_context());
+        user_assignable_competencies::resolve($args, $this->get_execution_context());
     }
 
     public function test_user_by_default_can_not_assign_to_other_user() {
@@ -85,7 +85,7 @@ class totara_competency_webapi_resolver_query_self_assignable_competencies_testc
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Assign competency to other users');
 
-        self_assignable_competencies::resolve($args, $this->get_execution_context());
+        user_assignable_competencies::resolve($args, $this->get_execution_context());
     }
 
     public function test_manager_can_assign_to_team_member() {
@@ -102,7 +102,7 @@ class totara_competency_webapi_resolver_query_self_assignable_competencies_testc
 
         $args = $this->get_args(['user_id' => $user2->id]);
 
-        $result = self_assignable_competencies::resolve($args, $this->get_execution_context());
+        $result = user_assignable_competencies::resolve($args, $this->get_execution_context());
         $this->assertIsArray($result);
         $this->assertCount(0, $result['items']);
         $this->assertEquals(0, $result['total']);
@@ -125,7 +125,7 @@ class totara_competency_webapi_resolver_query_self_assignable_competencies_testc
 
         $args = $this->get_args(['user_id' => $user2->id]);
 
-        $result = self_assignable_competencies::resolve($args, $this->get_execution_context());
+        $result = user_assignable_competencies::resolve($args, $this->get_execution_context());
         $this->assertIsArray($result);
         $this->assertCount(0, $result['items']);
         $this->assertEquals(0, $result['total']);

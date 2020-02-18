@@ -38,7 +38,7 @@ class index extends base {
 
         $props = [
             'profile-picture' => $this->get_my_profile_picture_url(),
-            'self-assignment-url' => (string) $this->get_self_assignment_url(),
+            'self-assignment-url' => (string) $this->get_user_assignment_url(),
             'user-id' => $this->user->id,
             'user-name' => $this->user->fullname,
             'is-mine' => $this->is_for_current_user(),

@@ -40,6 +40,7 @@ class competency_details extends base {
             'competency-id' => $competency->id,
             'base-url' => (string) $this->get_base_url(),
             'go-back-link' => (string)$this->get_profile_url(),
+            'go-back-text' => $this->get_back_to_profile_text(),
         ];
 
         return tui_view::create('totara_competency/pages/CompetencyDetail', $props)

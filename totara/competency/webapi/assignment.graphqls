@@ -72,7 +72,7 @@ input totara_competency_self_assigned_competencies_filter {
   text: param_text
   assignment_type: [param_alphaext]
   framework: param_integer
-  assignment_status: [param_integer]
+  assignment_status: param_integer
   parent: param_integer
   path: param_integer
   type: [param_integer]
@@ -84,7 +84,7 @@ extend type Query {
     assignment_id: core_id!
   ): totara_competency_assignment!
 
-  totara_competency_self_assignable_competencies(
+  totara_competency_user_assignable_competencies(
     user_id: core_id!
     filters: totara_competency_self_assigned_competencies_filter
     order_by: String

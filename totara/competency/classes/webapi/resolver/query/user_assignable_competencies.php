@@ -27,15 +27,14 @@ use context_system;
 use core\orm\cursor;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
-use core\entities\user;
-use totara_competency\data_providers\self_assignable_competencies as provider;
+use totara_competency\data_providers\user_assignable_competencies as provider;
 use totara_competency\helpers\capability_helper;
 use totara_core\advanced_feature;
 
 /**
  * Query to return competencies available for self assignment.
  */
-class self_assignable_competencies implements query_resolver {
+class user_assignable_competencies implements query_resolver {
 
     /**
      * Returns a competency, given its ID.
@@ -49,11 +48,11 @@ class self_assignable_competencies implements query_resolver {
 
         $filters = $args['filters'] ?? [];
 
-        $cursor = !is_null($args['cursor']) ? cursor::decode($args['cursor']) : null;
+        $cursor = $args['cursor'] !== null ? cursor::decode($args['cursor']) : null;
 
         return provider::for($args['user_id'])
             ->set_filters($filters)
-            ->set_order($args['order_by'], $args['order_dir'])
+            ->set_order($args['order_by'] ?? null, $args['order_dir'] ?? null)
             ->fetch_paginated($cursor);
     }
 

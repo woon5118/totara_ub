@@ -47,7 +47,7 @@ class self_assignable_competency extends formatter {
 
                 $component = 'totara_hierarchy';
                 $filearea = \hierarchy::get_short_prefix('competency');
-                $itemid = $this->object->id;
+                $itemid = $this->object->get_id();
 
                 return $formatter
                     ->set_pluginfile_url_options($this->context, $component, $filearea, $itemid)

@@ -27,6 +27,7 @@ use core\orm\collection;
 use core\orm\cursor;
 use core\orm\cursor_paginator;
 use totara_competency\entities\competency as competency_entity;
+use totara_competency\entities\competency_repository;
 use totara_competency\entities\filters\competency_user_assignment_status;
 use totara_competency\entities\filters\competency_user_assignment_type;
 use totara_competency\models\assignment;
@@ -34,18 +35,38 @@ use totara_competency\models\assignment_user;
 use core\entities\user;
 use totara_competency\models\self_assignable_competency;
 
-class self_assignable_competencies extends user_data_provider {
+class user_assignable_competencies extends user_data_provider {
+
+    public const DEFAULT_PAGE_SIZE = 20;
 
     private $order_by;
 
     private $order_dir;
 
     /**
+     * @var competency_repository
+     */
+    private $repository;
+
+    public function set_competency_repository(competency_repository $repository): self {
+        $this->repository = $repository;
+        return $this;
+    }
+
+    private function get_repository(): competency_repository {
+        if ($this->repository === null) {
+            $this->repository = competency_entity::repository();
+        }
+
+        return $this->repository;
+    }
+
+    /**
      * @param string $order_by
      * @param string $order_dir
      * @return $this
      */
-    public function set_order(?string $order_by, ?string $order_dir) {
+    public function set_order(?string $order_by, ?string $order_dir): self {
         $this->order_by = strtolower($order_by ?? 'name');
         $this->order_dir  = strtolower($order_dir ?? 'asc');
 
@@ -57,6 +78,8 @@ class self_assignable_competencies extends user_data_provider {
      * @return $this|user_data_provider
      */
     public function set_filters(array $filters) {
+        $filters = $this->remove_empty_filters($filters);
+
         // By default filter for visible only
         $filters['visible'] = true;
 
@@ -73,11 +96,27 @@ class self_assignable_competencies extends user_data_provider {
                 ->set_value($filters['assignment_status']);
         }
 
-        if (array_key_exists('framework', $filters) && is_null($filters['framework'])) {
-            unset($filters['framework']);
-        }
-
         return parent::set_filters($filters);
+    }
+
+    /**
+     * Completely removes filter options where the supplied value is "empty" i.e. null or empty array.
+     * We want to do this for "or"/"in" filters that have no options selected, or the produced queries will
+     * be equivalent to where `field` in ()  which will always return no results.
+     *
+     * Literal zero values are not removed.
+     *
+     * @param array $filters
+     * @return array
+     */
+    private function remove_empty_filters(array &$filters): array {
+        return array_filter($filters, static function ($filter_value) {
+            return self::is_zero($filter_value) || !empty($filter_value);
+        });
+    }
+
+    private static function is_zero($value): bool {
+        return $value === 0 || $value === '0';
     }
 
     /**
@@ -85,8 +124,11 @@ class self_assignable_competencies extends user_data_provider {
      * @return array
      */
     public function fetch_paginated(?cursor $cursor = null): array {
-        $repo = competency_entity::repository()
-            ->set_filters($this->filters);
+        if ($cursor === null) {
+            $cursor = $this->get_default_cursor();
+        }
+
+        $repo = $this->get_repository();
 
         if ($this->is_logged_in_user()) {
             $repo->filter_by_self_assignable($this->user->id);
@@ -111,6 +153,10 @@ class self_assignable_competencies extends user_data_provider {
         $this->combine_competencies_with_assignments($assignments, $paginator);
 
         return $paginator->get();
+    }
+
+    private function get_default_cursor(): cursor {
+        return cursor::create()->set_limit(static::DEFAULT_PAGE_SIZE);
     }
 
     private function combine_competencies_with_assignments(collection $assignments, cursor_paginator $paginator): void {

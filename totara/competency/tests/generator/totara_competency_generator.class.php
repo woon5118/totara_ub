@@ -596,11 +596,6 @@ class totara_competency_generator extends component_generator_base {
         return $this->hierarchy_generator;
     }
 
-
-    /**************************************************************************
-     * Internal Helpers
-     **************************************************************************/
-
     /**
      * We want to get the ID for a record based upon a unique, human readable identifier. Used for behat.
      *

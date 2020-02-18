@@ -21,8 +21,8 @@
  * @package totara_competency
  */
 
-use totara_competency\controllers\profile\self_assignment;
+use totara_competency\controllers\profile\user_assignment;
 
 require_once(__DIR__ . '/../../../../config.php');
 
-(new self_assignment())->process();
+(new user_assignment())->process();

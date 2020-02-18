@@ -38,7 +38,8 @@ class activity_log extends base {
             'user-id' => $this->user->id,
             'competency-id' => $competency->id,
             'base-url' => (string) $this->get_base_url(),
-            'go-back-link' => (string)$this->get_profile_url(),
+            'go-back-link' => (string) $this->get_profile_url(),
+            'go-back-text' => $this->get_back_to_profile_text(),
             'starting-tab' => 'log',
         ];
 

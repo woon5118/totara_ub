@@ -23,11 +23,13 @@
  */
 
 use core\webapi\execution_context;
+use PHPUnit\Framework\MockObject\MockObject;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency;
+use totara_competency\entities\competency_repository;
 use totara_competency\expand_task;
 use totara_competency\user_groups;
-use totara_competency\data_providers\self_assignable_competencies as data_provider;
+use totara_competency\data_providers\user_assignable_competencies as data_provider;
 use totara_competency\entities\competency as competency_entity;
 use totara_competency\models\self_assignable_competency;
 use totara_job\job_assignment;
@@ -38,7 +40,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Tests the data provider
  */
-class totara_competency_self_assignable_competencies_data_provider_testcase extends advanced_testcase {
+class totara_competency_user_assignable_competencies_data_provider_testcase extends advanced_testcase {
 
     public function test_returns_empty_result() {
         $generator = $this->getDataGenerator();
@@ -61,6 +63,85 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $this->assertIsArray($result['items']);
         $this->assertCount(0, $result['items']);
         $this->assertEquals(0, $result['total']);
+    }
+
+    public function test_returns_the_default_page_size_when_no_cursor_is_supplied() {
+        $generator = $this->getDataGenerator();
+
+        $user1 = $generator->create_user();
+        $this->setUser($user1);
+        $fw = $this->generator()->hierarchy_generator()->create_comp_frame([]);
+
+        $self_assignable_count = data_provider::DEFAULT_PAGE_SIZE + 5;
+
+        for ($i = 1; $i <= $self_assignable_count; $i++) {
+            $competency = $this->generator()->create_competency(null, $fw->id, [
+                'shortname' => 'c-chef--' . $i,
+                'fullname' => 'Chef proficiency ' . $i,
+                'description' => 'Bossing around ' . $i,
+                'idnumber' => 'cook-chef-c--' . $i,
+            ]);
+
+            $this->activate_self_assignable($competency->id);
+        }
+
+        $filters = [];
+        $order_by = null;
+        $order_dir = null;
+
+        $result = data_provider::for($user1->id)
+            ->set_filters($filters)
+            ->set_order($order_by, $order_dir)
+            ->fetch_paginated();
+
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('items', $result);
+        $this->assertArrayHasKey('total', $result);
+        $this->assertIsArray($result['items']);
+        $this->assertCount(data_provider::DEFAULT_PAGE_SIZE, $result['items']);
+        $this->assertEquals($self_assignable_count, $result['total']);
+    }
+
+    /**
+     * @dataProvider empty_filter_provider
+     * @param array $empty_filter
+     * @param $expected_normalized_filter
+     */
+    public function test_empty_filters_are_normalized(array $empty_filter, $expected_normalized_filter): void {
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        /** @type $repository_spy competency_repository|MockObject */
+        $repository_spy = $this->getMockBuilder(competency_repository::class)
+            ->setConstructorArgs([competency_entity::class])
+            ->setMethods(['set_filters'])
+            ->getMock();
+
+        // The repository should receive normalized filters.
+        $repository_spy->expects(static::once())
+            ->method('set_filters')
+            ->with($expected_normalized_filter)
+            ->willReturnSelf();
+
+        data_provider::for($user->id)
+            ->set_competency_repository($repository_spy)
+            ->set_filters($empty_filter)
+            ->set_order(null, null)
+            ->fetch_paginated();
+    }
+
+    public function empty_filter_provider(): array {
+        $default_no_options_filter = ['visible' => true];
+
+        return [
+            'Empty array' => [[], $default_no_options_filter],
+            'Empty array options' => [['type' => [], 'assignment_status' => []], $default_no_options_filter],
+            'Null options' => [['type' => null, 'assignment_status' => null], $default_no_options_filter],
+            'Present options' => [
+                ['type' => ['type 1']],
+                ['visible' => true, 'type' => ['type 1']]
+            ],
+        ];
     }
 
     public function test_only_competencies_with_self_assign_setting_are_returned() {
@@ -527,7 +608,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
         $this->setUser($user1);
 
         // Filter by assigned only
-        $filters = ['assignment_status' => [1]];
+        $filters = ['assignment_status' => 1];
         $order_by = null;
         $order_dir = null;
 
@@ -550,7 +631,7 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
 
         // Filter by unassigned only
         $filters = [
-            'assignment_status' => [0],
+            'assignment_status' => 0,
             'framework' => $fws[1]->id,
         ];
 
@@ -564,8 +645,8 @@ class totara_competency_self_assignable_competencies_data_provider_testcase exte
             'Planning'
         ], $this->get_fieldset_from_result('display_name', $result));
 
-        // Filter by assigned and unassigned
-        $filters = ['assignment_status' => [0, 1]];
+        // Filter by (any) assigned and unassigned
+        $filters = ['assignment_status' => null];
 
         $result = data_provider::for($user1->id)
             ->set_filters($filters)

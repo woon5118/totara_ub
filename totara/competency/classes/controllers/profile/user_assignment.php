@@ -28,27 +28,27 @@ use totara_competency\entities\competency_type;
 use totara_competency\helpers\capability_helper;
 use totara_mvc\tui_view;
 
-class self_assignment extends base {
+class user_assignment extends base {
 
     public function action() {
-
         capability_helper::require_can_assign($this->user->id, $this->context);
 
-        // Add breadcrumbs.
-        $this->add_navigation('Self assignment');
+        $this->add_navigation($this->get_page_name());
 
         $props = [
             'user-id' => $this->user->id,
-            'go-back-link' => (string)$this->get_profile_url(),
+            'base-page-heading' => $this->get_base_page_heading(),
+            'go-back-link' => (string) $this->get_profile_url(),
+            'go-back-text' => $this->get_back_to_profile_text(),
             'frameworks' => $this->get_frameworks(),
-            'types' => $this->get_types()
+            'types' => $this->get_types(),
         ];
 
-        return tui_view::create('totara_competency/pages/SelfAssignment', $props)
+        return tui_view::create('totara_competency/pages/UserAssignment', $props)
             ->set_title(get_string('assign_competencies', 'totara_competency'));
     }
 
-    protected function get_frameworks() {
+    protected function get_frameworks(): array {
         $frameworks = competency_framework::repository()
             ->filter_by_visible()
             ->order_by('sortorder', 'asc')
@@ -65,7 +65,7 @@ class self_assignment extends base {
         return $result;
     }
 
-    protected function get_types() {
+    protected function get_types(): array {
         $competency_types = competency_type::repository()->get();
 
         $result = [];
@@ -78,4 +78,21 @@ class self_assignment extends base {
         }
         return $result;
     }
+
+    private function get_page_name(): string {
+        if ($this->is_for_current_user()) {
+            return get_string('user_assignment_page_title:self', 'totara_competency');
+        }
+
+        return get_string('user_assignment_page_title:other', 'totara_competency');
+    }
+
+    private function get_base_page_heading(): string {
+        if ($this->is_for_current_user()) {
+            return get_string('user_assignment_page_heading:self', 'totara_competency');
+        }
+
+        return get_string('user_assignment_page_heading:other', 'totara_competency');
+    }
+
 }

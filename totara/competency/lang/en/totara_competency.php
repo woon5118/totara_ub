@@ -76,7 +76,8 @@ $string['assignment'] = 'Assignment';
 $string['assignment_archived_at'] = 'Assignment archived {$a}';
 $string['assignmentcreationavailability'] = 'Assignment creation availability';
 $string['back_to'] = '« Back to {$a}';
-$string['back_to_competency_profile'] = '« Back to your competency profile';
+$string['back_to_competency_profile'] = '« Back to competency profile';
+$string['back_to_competency_profile_self'] = '« Back to your competency profile';
 $string['bulkachievementcriteria'] = 'Bulk set achievements criteria';
 $string['cancel'] = 'Cancel';
 $string['changesnotsaved:body'] = 'Changes will be lost if you continue. Do you want to continue?';
@@ -91,6 +92,7 @@ $string['competency:rate_own_competencies'] = 'Rate own competencies';
 $string['competency:view_assignments'] = 'View competency assignments';
 $string['competency:view_own_profile'] = 'View own competency profile';
 $string['competency:view_other_profile'] = 'View profile of other users';
+$string['competency:back_to_assign_competencies'] = 'Back to Assign competencies';
 
 $string['competency_profile'] = 'Competency profile';
 $string['competencies'] = '{$a} competencies';
@@ -99,6 +101,7 @@ $string['coursefullname'] = 'Full Name';
 $string['createachievementpath'] = 'Create achievement path';
 $string['createpath'] = 'Create path';
 $string['criteriatype'] = 'Criteria type';
+$string['currently_assigned'] = 'Currently assigned';
 $string['description'] = 'Description';
 $string['disabled'] = 'Disabled';
 $string['done'] = 'Done';
@@ -138,6 +141,7 @@ $string['messageprovider:expand_task_finished'] = 'Sync assigned users finished'
 
 $string['my_competency_profile'] = '{$a} Competency profile';
 $string['my_rating'] = 'My rating';
+$string['n_competencies_selected'] = 'You have selected {$a} competencies to assign.';
 $string['next'] = 'Next';
 $string['no_competencies_assigned'] = 'There are no competencies currently assigned.';
 $string['no_competency_to_assign'] = 'There are no competencies available to assign.';
@@ -145,6 +149,7 @@ $string['nocourseslinkedyet'] = 'No courses linked yet';
 $string['none'] = 'None';
 $string['nopaths'] = 'No achievement paths added';
 $string['no_value_achieved'] = 'No value achieved';
+$string['one_competency_selected'] = 'You have selected 1 competency to assign.';
 $string['optional'] = 'Optional';
 $string['or'] = 'or';
 $string['overallratingcalc'] = 'Overall rating calculation';
@@ -205,6 +210,7 @@ $string['title:tool_menu'] = 'Competency assignments';
 $string['title:users'] = 'Currently assigned users';
 $string['type'] = 'Type';
 $string['unassigned'] = 'Unassigned';
+$string['not_assigned'] = 'Not assigned';
 $string['undoall'] = 'Undo all';
 $string['undoRemoveLinkedCourse'] = 'Undo remove linked course';
 $string['user_group_type:cohort'] = 'Audience';
@@ -215,6 +221,7 @@ $string['userdataitemachievement_help'] = 'When purging, the user\'s achievement
 $string['userdataitemassignment_user'] = 'Competency assignments';
 $string['userdataitemassignment_user_help'] = 'This includes individual assignments and assignments due to the user being a member of an audience, being in a position or in an organisation. When purging, any achievement data associated with the assignments will also be purged (even if these data items are not selected). After purging, group-based assignments may be dynamically created again, if they user still meets the criteria for the assignment (by being a member of a group).';
 $string['viewing'] = 'Viewing';
+$string['view_selected_competencies'] = 'View selected competencies';
 
 // Strings from assignments
 $string['action:activate'] = 'Activate assignment';
@@ -309,6 +316,7 @@ $string['confirm_assignment_creation_plural_skipped_singular'] = '{$a->created} 
 $string['confirm_assignment_creation_plural_skipped_plural'] = '{$a->created} competency assignments were successfully created. {$a->skipped} competency assignments were not created, as they already exist.';
 $string['confirm_assignment_creation_none_singular'] = 'No new competency assignment was created, as it already exists.';
 $string['confirm_assignment_creation_none_plural'] = 'No new competency assignments were created, as they already exist.';
+$string['confirm_generic'] = 'Do you want to continue?';
 
 $string['continuous_tracking'] = 'Continuous tracking';
 
@@ -329,10 +337,12 @@ $string['event:assignment_user_unassigned'] = 'User competency assignment unassi
 
 $string['error_competencies_out_of_sync'] = 'An error occurred with your selection. {$a} competencies were removed from your selection due to no longer being available for assignment.';
 $string['error_create_assignments'] = 'An error occurred during assignment creation, due to modifications to the competencies or user groups after you selected them. Your selection has been updated to reflect these changes – please verify before proceeding.';
+$string['error_generic_mutation'] = 'An error occurred while saving.';
 $string['error:invalidconfiguration'] = 'The pathway configuration is invalid';
 
 $string['filter'] = 'Filter';
 
+$string['filter_competencies'] = 'Filter competencies';
 $string['filter:assignment_status'] = 'Assignment status';
 $string['filter:assignment_status:assigned'] = 'Assigned';
 $string['filter:assignment_status:unassigned'] = 'Unassigned';
@@ -381,6 +391,8 @@ $string['save:selected_organisations'] = 'Selected organisations';
 $string['save:selected_positions'] = 'Selected positions';
 $string['save:selected_users'] = 'Selected users';
 
+
+$string['selected_items_label'] = 'Selected: {$a}';
 $string['sort'] = 'Sort by';
 $string['sort:competency_name'] = 'Competency name';
 $string['sort:framework_hierarchy'] = 'Framework hierarchy';
@@ -401,6 +413,10 @@ $string['title:index'] = 'Manage competency assignments';
 $string['title:sync'] = 'Sync assigned users';
 
 $string['users_to_assign'] = 'Users to assign';
+$string['user_assignment_page_heading:self'] = 'Self-assign competencies';
+$string['user_assignment_page_heading:other'] = 'Assign competencies';
+$string['user_assignment_page_title:self'] = 'Self assignment';
+$string['user_assignment_page_title:other'] = 'Competency assignment';
 $string['user_group_name'] = 'Assigned user group';
 $string['user_groups_empty'] = 'No user groups added';
 $string['user_groups_selected'] = 'user groups';

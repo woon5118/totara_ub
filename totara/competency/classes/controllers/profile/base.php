@@ -156,17 +156,25 @@ abstract class base extends controller {
         return $this;
     }
 
-    public function get_base_url() {
+    public function get_base_url(): moodle_url {
         return new moodle_url('/totara/competency/profile', []);
     }
 
-    public function get_profile_url() {
+    public function get_profile_url(): moodle_url {
         return new moodle_url('/totara/competency/profile', $this->is_for_current_user() ? [] : ['user_id' => $this->user->id]);
     }
 
-    public function get_self_assignment_url() {
-        return new moodle_url('/totara/competency/profile/self-assign',
+    public function get_user_assignment_url(): moodle_url {
+        return new moodle_url('/totara/competency/profile/assign',
             $this->is_for_current_user() ? [] : ['user_id' => $this->user->id]
         );
+    }
+
+    protected function get_back_to_profile_text(): string {
+        if ($this->is_for_current_user()) {
+            return get_string('back_to_competency_profile_self',  'totara_competency');
+        }
+
+        return get_string('back_to_competency_profile',  'totara_competency');
     }
 }

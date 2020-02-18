@@ -24,13 +24,80 @@
 use Behat\Gherkin\Node\TableNode as TableNode;
 use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
+use Behat\Mink\Exception\ExpectationException;
+use core\entities\user;
 
 class behat_totara_competency extends behat_base {
+
+    private const COMPETENCY_PROFILE_LIST_VIEW_TOGGLE_LOCATOR = '.tui-CompetencyProfile__tabs .fa-bars';
+    private const TOTARA_COMPETENCY_PROFILE_PATH = 'totara/competency/profile/';
+    private const TOTARA_COMPETENCY_USER_ASSIGNMENT_PATH = 'totara/competency/profile/assign/';
 
     /**
      * @var totara_competency_generator
      */
     protected $generator;
+
+    /**
+     * Opens the current users competency profile.
+     *
+     * @When /^I navigate to my competency profile$/
+     * @return void
+     * @throws Exception
+     */
+    public function i_navigate_to_my_competency_profile(): void {
+        $this->getSession()->visit($this->locate_path(self::TOTARA_COMPETENCY_PROFILE_PATH));
+        $this->wait_for_pending_js();
+    }
+
+    /**
+     * @When /^I navigate to the competency self assignment page$/
+     * @return void
+     * @throws Exception
+     */
+    public function i_navigate_to_the_competency_self_assignment_page(): void {
+        $this->getSession()->visit($this->locate_path(self::TOTARA_COMPETENCY_USER_ASSIGNMENT_PATH));
+        $this->wait_for_pending_js();
+    }
+
+    /**
+     * @Then /^I should be on my competency profile$/
+     */
+    public function i_should_be_on_my_competency_profile(): void {
+        $expected_path = $this->normalize_index_url($this->locate_path(self::TOTARA_COMPETENCY_PROFILE_PATH));
+        $actual_url = $this->normalize_index_url($this->getSession()->getCurrentUrl());
+
+        if ($expected_path !== $actual_url) {
+            $exception_message = "Expected the current url to be {$expected_path}, instead was {$actual_url}";
+            throw new ExpectationException($exception_message, $this->getSession());
+        }
+    }
+
+    /**
+     * @Given /^I navigate to the competency user assignment page for guest user$/
+     * @return void
+     * @throws Exception
+     */
+    public function i_navigate_to_the_competency_user_assignment_page_for_guest_user(): void {
+        /** @var User $user */
+        $user = User::repository()
+            ->select('id')
+            ->where('username', 'guest')
+            ->order_by('id')
+            ->first();
+
+        $url = $this->locate_path((string) new moodle_url(self::TOTARA_COMPETENCY_USER_ASSIGNMENT_PATH, ['user_id' => $user->id]));
+
+        $this->getSession()->visit($url);
+        $this->wait_for_pending_js();
+    }
+
+    /**
+     * @When /^I change the competency profile to list view$/
+     */
+    public function i_change_the_competency_profile_to_list_view(): void {
+        $this->find('css', self::COMPETENCY_PROFILE_LIST_VIEW_TOGGLE_LOCATOR)->click();
+    }
 
     /**
      * Create a scale with a name and scale values.
@@ -121,4 +188,7 @@ class behat_totara_competency extends behat_base {
         return $this->generator;
     }
 
+    private function normalize_index_url(string $url): string {
+        return str_replace($url, 'index.php', '');
+    }
 }

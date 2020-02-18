@@ -2,9 +2,7 @@
   <div>
     <div class="tui-CompetencyDetail">
       <div class="tui-CompetencyDetail__backLink">
-        <a :href="goBackLink">{{
-          $str('back_to_competency_profile', 'totara_competency')
-        }}</a>
+        <a :href="goBackLink">{{ goBackText }}</a>
       </div>
       <div class="tui-CompetencyDetail__nav-links">
         <div class="tui-CompetencyDetail__nav-links_buttons">
@@ -59,6 +57,10 @@ export default {
   components: { ActivityLog, Details },
   props: {
     goBackLink: {
+      required: true,
+      type: String,
+    },
+    goBackText: {
       required: true,
       type: String,
     },
