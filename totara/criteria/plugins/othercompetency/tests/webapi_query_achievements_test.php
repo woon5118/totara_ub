@@ -121,7 +121,11 @@ class criteria_othercompetency_webapi_query_achievements_testcase extends totara
             $competencies[0]->frameworkid,
             ['sortthread' => '01.01']
         );
-        $competencies[] = $this->competency_generator->create_competency();
+        $competencies[] = $this->competency_generator->create_competency(
+            null,
+            $competencies[0]->frameworkid,
+            ['sortthread' => '02']
+        );
 
         // So we add them to the criterion here.
         $criterion->set_item_ids(array_column($competencies, 'id'))->save();
@@ -132,6 +136,7 @@ class criteria_othercompetency_webapi_query_achievements_testcase extends totara
         /** @var \totara_competency\entities\competency[] $competencies */
         $competencies = \totara_competency\entities\competency::repository()
             ->where_in('id', $criterion->get_item_ids())
+            ->order_by('sortthread')
             ->get()
             ->all();
 

@@ -56,7 +56,7 @@ abstract class totara_criteria_competency_achievements_testcase extends advanced
         $user = $this->getDataGenerator()->create_user();
 
         $role = builder::table('role')
-            ->where('shortname', 'student')
+            ->where('shortname', 'user')
             ->one();
 
         $this->getDataGenerator()->role_assign($role->id, $user->id);
@@ -157,7 +157,7 @@ abstract class totara_criteria_competency_achievements_testcase extends advanced
             'user_id'       => $this->data['user']->id,
         ];
 
-        $this->expectException(required_capability_exception::class);
+        $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Sorry, but you do not currently have permissions to do that (View own competency profile)');
         $this->execute_resolver($args);
     }

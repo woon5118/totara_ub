@@ -25,6 +25,7 @@ namespace criteria_othercompetency;
 
 use totara_competency\entities\competency as competency_entity;
 use totara_criteria\criterion;
+use totara_criteria\evaluators\competency_item_evaluator;
 
 /**
  * Class containing information of other competencies criteria instances
@@ -77,6 +78,7 @@ class othercompetency extends criterion {
 
 
     public static function item_evaluator(): string {
+        return competency_item_evaluator::class;
     }
 
     /************************************************************************************

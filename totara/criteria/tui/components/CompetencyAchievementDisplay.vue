@@ -118,16 +118,16 @@
 </template>
 
 <script>
-  import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-  import Cell from 'totara_core/components/datatable/Cell';
-  import CheckSuccess from 'totara_core/components/icons/common/CheckSuccess';
-  import Table from 'totara_core/components/datatable/Table';
+import HeaderCell from 'totara_core/components/datatable/HeaderCell';
+import Cell from 'totara_core/components/datatable/Cell';
+import CheckSuccess from 'totara_core/components/icons/common/CheckSuccess';
+import Table from 'totara_core/components/datatable/Table';
 
-  import CreateUserAssignmentMutation from '../../../competency/webapi/ajax/create_user_assignments.graphql';
-  import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
-  import ConfirmModal from 'totara_criteria/components/ConfirmModal';
+import CreateUserAssignmentMutation from '../../../competency/webapi/ajax/create_user_assignments.graphql';
+import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
+import ConfirmModal from 'totara_criteria/components/ConfirmModal';
 
-  export default {
+export default {
   components: {
     CheckSuccess,
     Cell,

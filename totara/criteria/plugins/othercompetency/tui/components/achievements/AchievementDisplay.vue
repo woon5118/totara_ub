@@ -30,10 +30,10 @@
 </template>
 
 <script>
-  import CompetencyAchievementDisplay from 'totara_criteria/components/CompetencyAchievementDisplay';
-  import AchievementsQuery from '../../webapi/ajax/achievements.graphql';
+import CompetencyAchievementDisplay from 'totara_criteria/components/CompetencyAchievementDisplay';
+import AchievementsQuery from '../../../webapi/ajax/achievements.graphql';
 
-  export default {
+export default {
   components: { CompetencyAchievementDisplay },
 
   props: {

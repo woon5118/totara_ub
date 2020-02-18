@@ -34,11 +34,11 @@
 </template>
 
 <script>
-  import Modal from 'totara_core/components/modal/Modal';
-  import ModalContent from 'totara_core/components/modal/ModalContent';
-  import OkCancelGroup from 'totara_core/components/buttons/OkCancelGroup';
+import Modal from 'totara_core/components/modal/Modal';
+import ModalContent from 'totara_core/components/modal/ModalContent';
+import OkCancelGroup from 'totara_core/components/buttons/OkCancelGroup';
 
-  export default {
+export default {
   components: {
     Modal,
     ModalContent,
