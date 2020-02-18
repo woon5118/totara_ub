@@ -23,13 +23,15 @@
  */
 
 use core\webapi\execution_context;
-use pathway_criteria_group\criteria_group;
-use pathway_criteria_group\entities\criteria_group as criteria_group_entity;
 use totara_competency\entities\assignment;
-use totara_competency\entities\pathway;
+use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\scale_value;
+use totara_competency\expand_task;
 use totara_competency\plugin_types;
+use totara_competency\task\competency_aggregation_all;
 use totara_competency\webapi\resolver\query\scale_achievements;
+use totara_criteria\criterion;
+use totara_webapi\graphql;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -62,8 +64,10 @@ class totara_competency_webapi_resolver_query_scale_achievements_testcase extend
 
         $data = $this->create_data();
 
-        $args = ['assignment_id' => $data->assignment1->id];
-
+        $args = [
+            'assignment_id' => $data->assignment1->id,
+            'user_id' => $data->assignment1->user_group_id
+        ];
         $result = scale_achievements::resolve($args, $this->get_execution_context());
         $this->assertIsArray($result);
         $this->assertEmpty($result);
@@ -76,81 +80,120 @@ class totara_competency_webapi_resolver_query_scale_achievements_testcase extend
 
         $data = $this->create_data();
 
-        $args = ['assignment_id' => $data->assignment1->id];
+        $args = [
+            'assignment_id' => $data->assignment1->id,
+            'user_id' => $data->assignment1->user_group_id
+        ];
 
-        $sortorder = 1;
+        $this->create_achievement_paths_data($data);
 
-        $pathway1 = new pathway();
-        $pathway1->comp_id = $data->assignment1->competency_id;
-        $pathway1->sortorder = $sortorder;
-        $pathway1->path_type = 'fake_multivalue_type';
-        $pathway1->path_instance_id = 0;
-        $pathway1->status = \totara_competency\pathway::PATHWAY_STATUS_ACTIVE;
-        $pathway1->save();
-
-        $sortorder++;
-
-        $scale_values = scale_value::repository()
-            ->where('scaleid', $data->scale->id)
-            ->order_by('sortorder', 'asc')
-            ->get();
-
-        $expected_ids = [];
-
-        // Each scale value should have one criteria_group more
-        // than the previous one, starting with one.
-        $pathway_amount = 1;
-        foreach ($scale_values as $scale_value) {
-            $ids = [];
-            for ($i = 1; $i <= $pathway_amount; $i ++) {
-                $criteria_group = new criteria_group_entity();
-                $criteria_group->scale_value_id = $scale_value->id;
-                $criteria_group->save();
-
-                $pathway = new pathway();
-                $pathway->comp_id = $data->assignment1->competency_id;
-                $pathway->sortorder = $sortorder;
-                $pathway->path_type = 'criteria_group';
-                $pathway->path_instance_id = $criteria_group->id;
-                $pathway->status = \totara_competency\pathway::PATHWAY_STATUS_ACTIVE;
-                $pathway->save();
-
-                $ids[] = $criteria_group->id;
-            }
-            $expected_ids[] = $ids;
-            $pathway_amount++;
-            $sortorder++;
-        }
-
-        $pathway3 = new pathway();
-        $pathway3->comp_id = $data->assignment1->competency_id;
-        $pathway3->sortorder = $sortorder;
-        $pathway3->path_type = 'learning_plan';
-        $pathway3->path_instance_id = 0;
-        $pathway3->status = \totara_competency\pathway::PATHWAY_STATUS_ACTIVE;
-        $pathway3->save();
-
-        $result = scale_achievements::resolve($args, $this->get_execution_context());
-        $this->assertCount(3, $result);
-        $expected_item_amount = 1;
-        $i = 0;
-        foreach ($result as $value) {
-            $this->assertInstanceOf(scale_value::class, $value['scale_value']);
-            $this->assertCount($expected_item_amount, $value['items']);
-            $actual_ids = [];
-            /** @var \totara_competency\pathway $item */
-            foreach ($value['items'] as $item) {
-                $this->assertInstanceOf(criteria_group::class, $item);
-                $actual_ids[] = $item->get_path_instance_id();
-            }
-            $this->assertEqualsCanonicalizing($expected_ids[$i], $actual_ids);
-            $expected_item_amount++;
-            $i++;
+        $results = scale_achievements::resolve($args, $this->get_execution_context());
+        $this->assertCount(2, $results);
+        foreach ($results as $result) {
+            $this->assertInstanceOf(scale_value::class, $result['scale_value']);
+            $this->assertIsArray($result['items']);
+            $this->assertCount(1, $result['items']);
+            $this->assertContainsOnlyInstancesOf(pathway_achievement::class, $result['items']);
         }
     }
 
+    public function test_call_service() {
+        $this->activate_additional_pathways();
+
+        $this->setAdminUser();
+
+        $data = $this->create_data();
+
+        $args = [
+            'assignment_id' => $data->assignment1->id,
+            'user_id' => $data->assignment1->user_group_id
+        ];
+
+        $pathway_data = $this->create_achievement_paths_data($data);
+
+        $this->complete_course($args['user_id'], $pathway_data->course2->id);
+        $this->aggregate();
+
+        // Create an additional group which has not been aggregated yet to make sure the service does not trip over that
+
+        $course3 = $this->getDataGenerator()->create_course([
+            'shortname' => "Course 3",
+            'fullname' => "Course 3",
+            'enablecompletion' => true,
+        ]);
+
+        $cc3 = $this->criteria_generator()->create_coursecompletion([
+            'aggregation' => [
+                'method' => criterion::AGGREGATE_ANY_N,
+                'req_items' => 1,
+            ],
+            'courseids' => [$course3->id],
+        ]);
+
+        $cg3 = $this->competency_generator()->create_criteria_group($data->comp1, [$cc3], $pathway_data->scale_value3, 3);
+
+        $execution_context = $this->get_execution_context(graphql::TYPE_AJAX, 'totara_competency_scale_achievements');
+        $result = graphql::execute_operation($execution_context, $args);
+        $result = $result->toArray();
+
+        $this->assertArrayHasKey('data', $result);
+        $this->assertArrayHasKey('totara_competency_scale_achievements', $result['data']);
+        $data = $result['data']['totara_competency_scale_achievements'];
+        $this->assertCount(3, $data);
+        $first_result = $data[0];
+        $this->assertArrayHasKey('scale_value', $first_result);
+        $this->assertEquals([
+            'name' => 'Complete',
+            'numericscore' => null,
+            'proficient' => true
+        ], $first_result['scale_value']);
+
+        $this->assertArrayHasKey('items', $first_result);
+        $this->assertCount(1, $first_result['items']);
+        $item = $first_result['items'][0];
+        $this->assertEquals(false, $item['achieved']);
+        $this->assertGreaterThan(0, $item['date_achieved']);
+        $this->assertArrayHasKey('pathway', $item);
+        $this->assertEquals($pathway_data->cg1->get_path_instance_id(), $item['pathway']['instance_id']);
+        $this->assertEquals('criteria_group', $item['pathway']['pathway_type']);
+
+        $second_result = $data[1];
+        $this->assertArrayHasKey('scale_value', $second_result);
+        $this->assertEquals([
+            'name' => 'Progress',
+            'numericscore' => null,
+            'proficient' => false
+        ], $second_result['scale_value']);
+
+        $this->assertArrayHasKey('items', $second_result);
+        $this->assertCount(1, $second_result['items']);
+        $item = $second_result['items'][0];
+        $this->assertEquals(true, $item['achieved']);
+        $this->assertGreaterThan(0, $item['date_achieved']);
+        $this->assertArrayHasKey('pathway', $item);
+        $this->assertEquals($pathway_data->cg2->get_path_instance_id(), $item['pathway']['instance_id']);
+        $this->assertEquals('criteria_group', $item['pathway']['pathway_type']);
+
+        $third_result = $data[2];
+        $this->assertArrayHasKey('scale_value', $third_result);
+        $this->assertEquals([
+            'name' => 'Assigned',
+            'numericscore' => null,
+            'proficient' => false
+        ], $third_result['scale_value']);
+
+        $this->assertArrayHasKey('items', $third_result);
+        $this->assertCount(1, $third_result['items']);
+        $item = $third_result['items'][0];
+        $this->assertEquals(false, $item['achieved']);
+        $this->assertGreaterThan(0, $item['date_achieved']);
+        $this->assertArrayHasKey('pathway', $item);
+        $this->assertEquals($cg3->get_path_instance_id(), $item['pathway']['instance_id']);
+        $this->assertEquals('criteria_group', $item['pathway']['pathway_type']);
+    }
+
     protected function create_data() {
-        $assign_generator = $this->generator()->assignment_generator();
+        $assign_generator = $this->competency_generator()->assignment_generator();
 
         $data = new class() {
             public $scale;
@@ -166,7 +209,7 @@ class totara_competency_webapi_resolver_query_scale_achievements_testcase extend
 
         $data->fw1 = $hierarchy_generator->create_comp_frame(['scale' => $data->scale->id]);
 
-        $data->comp1 = $this->generator()->create_competency(null, $data->fw1->id, [
+        $data->comp1 = $this->competency_generator()->create_competency(null, $data->fw1->id, [
             'shortname' => 'c-chef',
             'fullname' => 'Chef proficiency',
             'description' => 'Bossing around',
@@ -179,16 +222,100 @@ class totara_competency_webapi_resolver_query_scale_achievements_testcase extend
             ['status' => assignment::STATUS_ACTIVE, 'type' => assignment::TYPE_ADMIN]
         );
 
+        (new expand_task($GLOBALS['DB']))->expand_all();
+
         return $data;
     }
 
+    private function create_achievement_paths_data($data) {
+        $generator = $this->getDataGenerator();
+        $competency_generator = $this->competency_generator();
+        $criteria_generator = $this->criteria_generator();
+
+        $pathway_data = new class {
+            public $cg1, $cg2;
+            public $course1, $course2;
+            public $scale_value1, $scale_value2, $scale_value3;
+        };
+
+        /** @var scale_value[]|\core\orm\collection $scale_values */
+        $scale_values = $data->comp1->scale->sorted_values_high_to_low;
+        $pathway_data->scale_value1 = $scale_values->shift();
+        $pathway_data->scale_value2 = $scale_values->shift();
+        $pathway_data->scale_value3 = $scale_values->shift();
+
+        $pathway_data->course1 = $generator->create_course([
+            'shortname' => "Course 1",
+            'fullname' => "Course 1",
+            'enablecompletion' => true,
+        ]);
+
+        $cc1 = $criteria_generator->create_coursecompletion([
+            'aggregation' => [
+                'method' => criterion::AGGREGATE_ANY_N,
+                'req_items' => 1,
+            ],
+            'courseids' => [$pathway_data->course1->id],
+        ]);
+
+        $pathway_data->cg1 = $competency_generator->create_criteria_group($data->comp1, [$cc1], $pathway_data->scale_value1, 1);
+
+        $pathway_data->course2 = $generator->create_course([
+            'shortname' => "Course 2",
+            'fullname' => "Course 2",
+            'enablecompletion' => true,
+        ]);
+
+        $cc2 = $criteria_generator->create_coursecompletion([
+            'aggregation' => [
+                'method' => criterion::AGGREGATE_ANY_N,
+                'req_items' => 1,
+            ],
+            'courseids' => [$pathway_data->course2->id],
+        ]);
+
+        $pathway_data->cg2 = $competency_generator->create_criteria_group($data->comp1, [$cc2], $pathway_data->scale_value2, 2);
+
+        return $pathway_data;
+    }
+
     /**
-     * Get assignment specific generator
+     * Complete the given course for the given user
+     *
+     * @param int $user_id
+     * @param int $course_id
+     */
+    protected function complete_course(int $user_id, int $course_id) {
+        global $CFG;
+        require_once($CFG->dirroot . '/completion/completion_completion.php');
+
+        $completion = new completion_completion(['userid' => $user_id, 'course' => $course_id]);
+        $completion->mark_complete();
+    }
+
+    /**
+     * Aggregate all competencies
+     */
+    protected function aggregate() {
+        (new competency_aggregation_all())->execute();
+    }
+
+    /**
+     * Get competency specific generator
      *
      * @return totara_competency_generator|component_generator_base
      */
-    protected function generator() {
+    protected function competency_generator() {
         return $this->getDataGenerator()->get_plugin_generator('totara_competency');
+    }
+
+    /**
+     * Get criteria specific generator
+     *
+     * @return totara_criteria_generator|component_generator_base
+     */
+    protected function criteria_generator() {
+        return $this->getDataGenerator()->get_plugin_generator('totara_criteria');
     }
 
     private function activate_additional_pathways() {

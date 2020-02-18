@@ -28,6 +28,7 @@ use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use totara_competency\entities\assignment;
 use totara_competency\entities\pathway as pathway_entity;
+use totara_competency\entities\pathway_achievement;
 use totara_competency\pathway;
 use totara_competency\pathway_factory;
 use totara_core\advanced_feature;
@@ -53,7 +54,11 @@ class scale_achievements implements query_resolver {
 
         $scale_result = [];
         foreach ($pathways as $pathway) {
-            $pathway_instance = pathway_factory::fetch($pathway->path_type, $pathway->id);
+            $pathway_instance = pathway_factory::from_entity($pathway);
+            $pathway_achievement = pathway_achievement::get_current($pathway_instance, $args['user_id']);
+            // Let's avoid an additional query later
+            $pathway_achievement->relate('pathway', $pathway);
+
             $scale_value = $pathway_instance->get_scale_value();
             if (!$scale_value) {
                 throw new \coding_exception('Expected a single value type to have a scale value');
@@ -64,13 +69,15 @@ class scale_achievements implements query_resolver {
                     'items' => []
                 ];
             }
-            $scale_result[$scale_value->id]['items'][] = $pathway_instance;
+            $scale_result[$scale_value->id]['items'][] = $pathway_achievement;
         }
 
         return array_values($scale_result);
     }
 
     /**
+     * This is quite specific to this GraphQL query so keeping this here for now
+     *
      * @param int $assignment_id
      * @return pathway_entity[]|collection
      */
@@ -82,6 +89,7 @@ class scale_achievements implements query_resolver {
             ->where('status', pathway::PATHWAY_STATUS_ACTIVE)
             ->join([assignment::TABLE, 'ass'], 'comp_id', 'competency_id')
             ->where('ass.id', $assignment_id)
+            ->with('competency')
             ->order_by('sortorder', 'asc')
             ->get();
     }

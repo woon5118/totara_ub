@@ -26,6 +26,9 @@ namespace totara_competency\webapi\resolver\type;
 use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
+use totara_competency\entities\pathway as pathway_entity;
+use totara_competency\pathway as pathway_instance;
+use totara_competency\pathway_factory;
 use totara_core\formatter\field\string_field_formatter;
 
 /**
@@ -40,14 +43,18 @@ class pathway implements type_resolver {
      * Resolves a competency pathway field.
      *
      * @param string $field
-     * @param pathway $pathway
+     * @param pathway|pathway_entity $pathway
      * @param array $args
      * @param execution_context $ec
      * @return mixed
      */
     public static function resolve(string $field, $pathway, array $args, execution_context $ec) {
+        // We want to be flexible and be able to work with entities as well
+        if ($pathway instanceof pathway_entity) {
+            $pathway = pathway_factory::from_entity($pathway);
+        }
 
-        if (!$pathway instanceof \totara_competency\pathway) {
+        if (!$pathway instanceof pathway_instance) {
             throw new \coding_exception('Only \totara_competency\pathway objects are accepted: ' . gettype($pathway));
         }
 

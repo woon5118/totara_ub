@@ -45,6 +45,11 @@ class user implements \core\webapi\type_resolver {
     public static function resolve(string $field, $user, array $args, execution_context $ec) {
         global $CFG, $USER;
 
+        // TODO this will be put into t14-release in a separate ticket as well
+        if ($user instanceof \core\entities\user) {
+            $user = (object) $user->to_array();
+        }
+
         if ($field === 'password' or $field === 'secret') {
             // Extra safety - these must never ever be exposed.
             return null;

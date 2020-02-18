@@ -88,11 +88,44 @@ type totara_competency_scale_achievement_item {
 }
 
 """
+This represents the status an pathway achievement
+"""
+enum totara_competency_pathway_achievement_status {
+  """
+  This is the current achievement for a user
+  """
+  CURRENT
+  """
+  Every outdated record is marked as archived
+  """
+  ARCHIVED
+}
+
+"""
+This represents a single pathway achievement for a user
+"""
+type totara_competency_pathway_achievement {
+  id: core_id!
+  pathway: totara_competency_pathway!
+  user: core_user!
+  scale_value: totara_competency_scale_value
+  has_scale_value: Boolean!
+  date_achieved(format: core_date_format = TIMESTAMP): core_date!
+  last_aggregated(format: core_date_format = TIMESTAMP): core_date
+  status: totara_competency_pathway_achievement_status!
+  """
+  This is a meta field which indicates if the user achieved this pathway
+  """
+  achieved: Boolean!
+  related_info: String
+}
+
+"""
 Returns items for each scale value, which could be criteria groups
 """
 type totara_competency_scale_achievement {
   scale_value: totara_competency_scale_value
-  items: [totara_competency_pathway]
+  items: [totara_competency_pathway_achievement]
 }
 
 extend type Query {
@@ -109,5 +142,6 @@ extend type Query {
 
   totara_competency_scale_achievements(
     assignment_id: core_id!
+    user_id: core_id!
   ): [totara_competency_scale_achievement]
 }

@@ -23,9 +23,12 @@
  */
 
 use core\webapi\execution_context;
+use pathway_manual\models\roles\manager;
 use totara_competency\entities\assignment;
 use totara_competency\entities\pathway;
+use totara_competency\expand_task;
 use totara_competency\webapi\resolver\query\achievement_paths;
+use totara_criteria\criterion;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -46,7 +49,10 @@ class totara_competency_webapi_resolver_query_achievement_paths_testcase extends
 
         $user1 = $generator->create_user();
 
-        $args = ['assignment_id' => 999];
+        $args = [
+            'assignment_id' => 999,
+            'user_id' => $user1->id
+        ];
 
         $result = achievement_paths::resolve($args, $this->get_execution_context());
         $this->assertIsArray($result);
@@ -58,7 +64,10 @@ class totara_competency_webapi_resolver_query_achievement_paths_testcase extends
 
         $data = $this->create_data();
 
-        $args = ['assignment_id' => $data->assignment1->id];
+        $args = [
+            'assignment_id' => $data->assignment1->id,
+            'user_id' => $data->assignment1->user_group_id
+        ];
 
         $result = achievement_paths::resolve($args, $this->get_execution_context());
         $this->assertIsArray($result);
@@ -70,55 +79,52 @@ class totara_competency_webapi_resolver_query_achievement_paths_testcase extends
 
         $data = $this->create_data();
 
-        $args = ['assignment_id' => $data->assignment1->id];
+        $args = [
+            'assignment_id' => $data->assignment1->id,
+            'user_id' => $data->assignment1->user_group_id
+        ];
 
-        $pathway0 = new pathway();
-        $pathway0->comp_id = $data->assignment1->competency_id;
-        $pathway0->sortorder = 0;
-        $pathway0->path_type = 'learning_plan';
-        $pathway0->path_instance_id = 0;
-        $pathway0->status = \totara_competency\pathway::PATHWAY_STATUS_ACTIVE;
-        $pathway0->save();
+        /** @var totara_competency_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
-        $pathway1 = new pathway();
-        $pathway1->comp_id = $data->assignment1->competency_id;
-        $pathway1->sortorder = 1;
-        $pathway1->path_type = 'manual';
-        $pathway1->path_instance_id = 0;
-        $pathway1->status = \totara_competency\pathway::PATHWAY_STATUS_ACTIVE;
-        $pathway1->save();
+        /** @var totara_criteria_generator $criteria_generator */
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
 
-        $pathway2 = new pathway();
-        $pathway2->comp_id = $data->assignment1->competency_id;
-        $pathway2->sortorder = 2;
-        $pathway2->path_type = 'criteria_group';
-        $pathway2->path_instance_id = 0;
-        $pathway2->status = \totara_competency\pathway::PATHWAY_STATUS_ACTIVE;
-        $pathway2->save();
+        $generator->create_manual($data->comp1, [manager::class], 1);
 
-        $pathway3 = new pathway();
-        $pathway3->comp_id = $data->assignment1->competency_id;
-        $pathway3->sortorder = 3;
-        $pathway3->path_type = 'criteria_group';
-        $pathway3->path_instance_id = 0;
-        $pathway3->status = \totara_competency\pathway::PATHWAY_STATUS_ACTIVE;
-        $pathway3->save();
+        $course1 = $this->getDataGenerator()->create_course([
+            'shortname' => "Course 1",
+            'fullname' => "Course 1",
+            'enablecompletion' => true,
+        ]);
 
-        $pathway4 = new pathway();
-        $pathway4->comp_id = $data->assignment1->competency_id;
-        $pathway4->sortorder = 4;
-        $pathway4->path_type = 'criteria_group';
-        $pathway4->path_instance_id = 0;
-        $pathway4->status = \totara_competency\pathway::PATHWAY_STATUS_ACTIVE;
-        $pathway4->save();
+        $cc1 = $criteria_generator->create_coursecompletion([
+            'aggregation' => [
+                'method' => criterion::AGGREGATE_ANY_N,
+                'req_items' => 1,
+            ],
+            'courseids' => [$course1->id],
+        ]);
 
-        $pathway5 = new pathway();
-        $pathway5->comp_id = $data->assignment1->competency_id;
-        $pathway5->sortorder = 5;
-        $pathway5->path_type = 'manual';
-        $pathway5->path_instance_id = 0;
-        $pathway5->status = \totara_competency\pathway::PATHWAY_STATUS_ACTIVE;
-        $pathway5->save();
+        $scale_value = $data->comp1->scale->sorted_values_high_to_low->first();
+        $generator->create_criteria_group($data->comp1, [$cc1], $scale_value, 2);
+
+        $course2 = $this->getDataGenerator()->create_course([
+            'shortname' => "Course 2",
+            'fullname' => "Course 2",
+            'enablecompletion' => true,
+        ]);
+
+        $cc2 = $criteria_generator->create_coursecompletion([
+            'aggregation' => [
+                'method' => criterion::AGGREGATE_ANY_N,
+                'req_items' => 1,
+            ],
+            'courseids' => [$course2->id],
+        ]);
+
+        $generator->create_criteria_group($data->comp1, [$cc2], $scale_value, 3);
+        $generator->create_learning_plan_pathway($data->comp1, 4);
 
         $result = achievement_paths::resolve($args, $this->get_execution_context());
         $this->assertEquals(
@@ -145,7 +151,10 @@ class totara_competency_webapi_resolver_query_achievement_paths_testcase extends
 
         $data = $this->create_data();
 
-        $args = ['assignment_id' => $data->assignment1->id];
+        $args = [
+            'assignment_id' => $data->assignment1->id,
+            'user_id' => $data->assignment1->user_group_id
+        ];
 
         $pathway1 = new pathway();
         $pathway1->comp_id = $data->assignment1->competency_id;
@@ -184,7 +193,10 @@ class totara_competency_webapi_resolver_query_achievement_paths_testcase extends
 
         $data = $this->create_data();
 
-        $args = ['assignment_id' => $data->assignment1->id];
+        $args = [
+            'assignment_id' => $data->assignment1->id,
+            'user_id' => $data->assignment1->user_group_id
+        ];
 
         $pathway1 = new pathway();
         $pathway1->comp_id = $data->assignment1->competency_id;
@@ -261,6 +273,8 @@ class totara_competency_webapi_resolver_query_achievement_paths_testcase extends
             null,
             ['status' => assignment::STATUS_ACTIVE, 'type' => assignment::TYPE_ADMIN]
         );
+
+        (new expand_task($GLOBALS['DB']))->expand_all();
 
         return $data;
     }

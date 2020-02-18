@@ -24,9 +24,9 @@
 
 namespace totara_competency\entities;
 
+use core\entities\user;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
-use core\orm\entity\repository;
 use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\pathway;
 
@@ -42,8 +42,10 @@ use totara_competency\pathway;
  * @property int $status
  * @property string $related_info
  *
+ * @property-read bool $has_scale_value Returns true if there's a scale value attached
  * @property-read pathway_entity $pathway
  * @property-read scale_value $scale_value
+ * @property-read user $user
  */
 class pathway_achievement extends entity {
 
@@ -94,6 +96,15 @@ class pathway_achievement extends entity {
     }
 
     /**
+     * Returns true if there's a scale value attached
+     *
+     * @return bool
+     */
+    public function get_has_scale_value_attribute(): bool {
+        return $this->scale_value_id !== null;
+    }
+
+    /**
      * Sets the attributes for archiving this element.
      *
      * Calls save() internally.
@@ -120,5 +131,9 @@ class pathway_achievement extends entity {
 
     public function scale_value(): belongs_to {
         return $this->belongs_to(scale_value::class, 'scale_value_id');
+    }
+
+    public function user(): belongs_to {
+        return $this->belongs_to(user::class, 'user_id');
     }
 }
