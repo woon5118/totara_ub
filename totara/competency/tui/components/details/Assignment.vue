@@ -22,76 +22,113 @@
 
 <template>
   <div class="tui-competencyDetailAssignment">
-    <Grid :stack-at="700">
-      <GridItem :units="4">
-        <!-- Competency assignment select list -->
-        <SelectFilter
-          v-model="selectedAssignment"
-          :label="$str('assignment', 'totara_competency')"
-          :large="true"
-          :options="activeAssignmentList"
-          @input="input"
-        />
-      </GridItem>
-      <GridItem :units="4" :class="'tui-competencyDetailAssignment__level'">
-        <div
-          class="tui-competencyDetailAssignment__level-wrap"
-          :class="
-            'tui-competencyDetailAssignment__level-wrap-' +
-              selectedAssignmentProficiencyState
-          "
-        >
-          <h5 class="tui-competencyDetailAssignment__level-header">
-            {{ $str('achievement_level', 'totara_competency') }}
-            <InfoIconButton
-              :aria-label="$str('more_information', 'totara_competency')"
-              :class="'tui-competencyDetailAssignment__level-infoBtn'"
-            >
-              ...
-            </InfoIconButton>
-          </h5>
-          <div class="tui-competencyDetailAssignment__level-text">
-            {{ selectedAssignmentProficiency.name }}
+    <div class="tui-competencyDetailAssignment__bar">
+      <Grid :stack-at="700">
+        <GridItem :units="4">
+          <!-- Competency assignment select list -->
+          <SelectFilter
+            v-model="selectedAssignment"
+            :label="$str('assignment', 'totara_competency')"
+            :name="'select_assignment'"
+            :large="true"
+            :options="activeAssignmentList"
+            @input="selectedAssignmentChange"
+          />
+        </GridItem>
+        <GridItem :units="4" :class="'tui-competencyDetailAssignment__level'">
+          <div
+            class="tui-competencyDetailAssignment__level-wrap"
+            :class="
+              'tui-competencyDetailAssignment__level-wrap-' +
+                selectedAssignmentProficiencyState
+            "
+          >
+            <h5 class="tui-competencyDetailAssignment__level-header">
+              {{ $str('achievement_level', 'totara_competency') }}
+              <InfoIconButton
+                :aria-label="$str('more_information', 'totara_competency')"
+                :class="'tui-competencyDetailAssignment__level-infoBtn'"
+              >
+                ...
+              </InfoIconButton>
+            </h5>
+            <div class="tui-competencyDetailAssignment__level-text">
+              {{ selectedAssignmentProficiency.name }}
+            </div>
           </div>
-        </div>
-      </GridItem>
-      <GridItem :units="4" :class="'tui-competencyDetailAssignment__status'">
-        <ProgressTrackerCircle
-          :state="selectedAssignmentProficiencyState"
-          :target="selectedAssignmentProficiencyState !== 'complete'"
-        />
+        </GridItem>
+        <GridItem :units="4" :class="'tui-competencyDetailAssignment__status'">
+          <ProgressTrackerCircle
+            :state="selectedAssignmentProficiencyState"
+            :target="selectedAssignmentProficiencyState !== 'complete'"
+          />
 
-        <span
-          class="tui-competencyDetailAssignment__status-text"
-          :class="{
-            'tui-competencyDetailAssignment__status-text-complete':
-              selectedAssignmentProficiencyState === 'complete',
-          }"
-        >
+          <span
+            class="tui-competencyDetailAssignment__status-text"
+            :class="{
+              'tui-competencyDetailAssignment__status-text-complete':
+                selectedAssignmentProficiencyState === 'complete',
+            }"
+          >
+            {{
+              $str(
+                selectedAssignmentProficiency.proficient
+                  ? 'proficient'
+                  : 'not_proficient',
+                'totara_competency'
+              )
+            }}
+          </span>
+        </GridItem>
+      </Grid>
+      <ConfirmationModal
+        :title="$str('action:archive_user:modal:header', 'totara_competency')"
+        :open="showArchiveConfirmation"
+        @confirm="makeArchiveAssignmentMutation"
+        @cancel="showArchiveConfirmation = false"
+      >
+        <p>
           {{
-            $str(
-              selectedAssignmentProficiency.proficient
-                ? 'proficient'
-                : 'not_proficient',
-              'totara_competency'
-            )
+            $str('action:archive_user_assignment:modal', 'totara_competency')
           }}
-        </span>
-      </GridItem>
-    </Grid>
+        </p>
+        <p>
+          {{ $str('confirm_generic', 'totara_competency') }}
+        </p>
+      </ConfirmationModal>
+    </div>
+    <div class="tui-competencyDetailAssignment__actions">
+      <ButtonIcon
+        v-if="showCanArchiveButton"
+        :text="$str('action:archive_this', 'totara_competency')"
+        @click="showArchiveConfirmDialog"
+      >
+        <ArchiveIcon />
+      </ButtonIcon>
+    </div>
   </div>
 </template>
 
 <script>
 // Components
+import ArchiveIcon from 'totara_core/components/icons/common/Archive';
+import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
+import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
 import Grid from 'totara_core/components/grid/Grid';
 import GridItem from 'totara_core/components/grid/GridItem';
 import InfoIconButton from 'totara_core/components/buttons/InfoIconButton';
 import ProgressTrackerCircle from 'totara_core/components/progresstracker/ProgressTrackerCircle';
 import SelectFilter from 'totara_core/components/filters/SelectFilter';
+import { notify } from 'totara_core/notifications';
+// GraphQL
+import ArchiveUserAssignment from 'totara_competency/graphql/archive_user_assignment.graphql';
+import CompetencyProfileDetailsQuery from 'totara_competency/graphql/profile_competency_details';
 
 export default {
   components: {
+    ArchiveIcon,
+    ButtonIcon,
+    ConfirmationModal,
     Grid,
     GridItem,
     InfoIconButton,
@@ -110,11 +147,20 @@ export default {
     value: {
       type: Number,
     },
+    competencyId: {
+      required: true,
+      type: Number,
+    },
+    userId: {
+      required: true,
+      type: Number,
+    },
   },
 
   data() {
     return {
       selectedAssignment: this.value,
+      showArchiveConfirmation: false,
     };
   },
 
@@ -136,11 +182,72 @@ export default {
         return 'pending';
       }
     },
+    showCanArchiveButton() {
+      return (
+        this.activeAssignmentList[this.selectedAssignment] &&
+        this.activeAssignmentList[this.selectedAssignment].can_archive
+      );
+    },
   },
 
   methods: {
-    input(e) {
+    selectedAssignmentChange(e) {
       this.$emit('input', e);
+    },
+    showArchiveConfirmDialog() {
+      this.showArchiveConfirmation = true;
+    },
+    makeArchiveAssignmentMutation() {
+      let { assignment_id } = this.activeAssignmentList.find(
+        assignment => assignment.id === this.value
+      );
+
+      this.$apollo
+        .mutate({
+          mutation: ArchiveUserAssignment,
+          variables: {
+            assignment_id: assignment_id,
+          },
+          refetchQueries: [
+            {
+              query: CompetencyProfileDetailsQuery,
+              variables: {
+                user_id: this.userId,
+                competency_id: this.competencyId,
+              },
+            },
+          ],
+          refetchAll: false,
+        })
+        .then(() => {
+          notify({
+            type: 'success',
+            message: this.$str(
+              'event:assignment_archived',
+              'totara_competency'
+            ),
+          });
+          this.selectedAssignment = 0;
+        })
+        .catch(error => {
+          let hasErrorMessage =
+            error &&
+            error.networkError &&
+            error.networkError.result &&
+            error.networkError.result.error;
+          let errorMessage = this.$str(
+            'error_generic_mutation',
+            'totara_competency'
+          );
+
+          if (hasErrorMessage) {
+            errorMessage = error.networkError.result.error;
+          }
+          notify({ type: 'error', message: errorMessage });
+        })
+        .finally(() => {
+          this.showArchiveConfirmation = false;
+        });
     },
   },
 };
@@ -150,7 +257,13 @@ export default {
   {
     "totara_competency": [
       "achievement_level",
+      "action:archive_this",
+      "action:archive_user:modal:header",
+      "action:archive_user_assignment:modal",
       "assignment",
+      "confirm_generic",
+      "error_generic_mutation",
+      "event:assignment_archived",
       "more_information",
       "not_proficient",
       "proficient"

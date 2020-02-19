@@ -22,8 +22,14 @@
 
 <style lang="scss">
 .tui-competencyDetailAssignment {
-  padding: var(--tui-gap-4);
-  background: var(--tui-color-neutral-3);
+  &__bar {
+    padding: var(--tui-gap-4);
+    background: var(--tui-color-neutral-3);
+  }
+
+  &__actions {
+    padding: var(--tui-gap-4);
+  }
 
   .tui-grid--stacked {
     & > * + * {

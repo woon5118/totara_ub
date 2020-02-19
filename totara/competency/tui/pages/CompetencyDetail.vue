@@ -82,9 +82,11 @@
           <div v-else>
             <!-- Assignment selector & overview -->
             <Assignment
+              v-model="assignmentFilter"
               :active-assignment-list="activeAssignmentList"
               :selected-assignment-proficiency="selectedAssignmentProficiency"
-              v-model="assignmentFilter"
+              :competency-id="competencyId"
+              :user-id="userId"
             />
 
             <!-- Progress overview -->
@@ -140,7 +142,7 @@ import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
 import NotificationBanner from 'totara_core/components/notifications/NotificationBanner';
 import Progress from 'totara_competency/components/details/Progress';
 // GraphQL
-import CompetencyDetailsQuery from 'totara_competency/graphql/competency_details';
+import CompetencyProfileDetailsQuery from 'totara_competency/graphql/profile_competency_details';
 
 export default {
   components: {
@@ -191,7 +193,7 @@ export default {
 
   apollo: {
     data: {
-      query: CompetencyDetailsQuery,
+      query: CompetencyProfileDetailsQuery,
       variables() {
         return {
           user_id: this.userId,
@@ -272,12 +274,14 @@ export default {
 
       // Collect array index & label for each assignment and filter out archived
       activeAssignmentList = this.data.items
-        .map(function(elem, index) {
+        .map((elem, index) => {
           return {
             archived:
               elem.assignment.archived_at || elem.assignment.type === 'legacy',
             id: index,
-            label: elem.assignment.progress_name,
+            assignment_id: elem.assignment.id,
+            can_archive: elem.assignment.can_archive,
+            label: this.getFilterLabel(elem),
           };
         })
         .filter(function(assignment) {
@@ -326,6 +330,46 @@ export default {
      */
     updateAssignmentFilterValue(n) {
       this.assignmentFilter = n;
+    },
+
+    /**
+     * Modify the assignment label if it was directly assigned
+     *
+     * @param {Object} entry
+     * @return {String}
+     */
+    getFilterLabel(entry) {
+      let label = entry.assignment.progress_name;
+      // Special handling for direct assignments which we list
+      // as "Directly assigned", this adds some more information
+      // to the string which includes the full name of the assigner and their role
+      if (this.isDirectlyAssigned(entry.assignment)) {
+        let str_options = {
+          progress_name: entry.assignment.progress_name,
+          user_fullname_role: entry.assignment.reason_assigned,
+        };
+        label = this.$str(
+          'progress_name_by_user',
+          'totara_competency',
+          str_options
+        );
+      }
+
+      return label;
+    },
+
+    /**
+     * Calculate if label was directly assigned
+     *
+     * @param {Object} assignment
+     * @return {Boolean}
+     */
+    isDirectlyAssigned(assignment) {
+      if (assignment.user_group_type !== 'user') {
+        return false;
+      }
+
+      return assignment.type === 'admin' || assignment.type === 'other';
     },
   },
 };

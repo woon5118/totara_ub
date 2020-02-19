@@ -179,12 +179,11 @@ export default {
      * @return {Boolean}
      */
     isDirectlyAssigned(assignment) {
-      if (assignment.user_group_type === 'user') {
-        if (assignment.type === 'admin' || assignment.type === 'other') {
-          return true;
-        }
+      if (assignment.user_group_type !== 'user') {
+        return false;
       }
-      return false;
+
+      return assignment.type === 'admin' || assignment.type === 'other';
     },
   },
 };

@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2018 onwards Totara Learning Solutions LTD

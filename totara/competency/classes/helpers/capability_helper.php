@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -28,6 +28,8 @@ use context_user;
 use core\entities\user;
 use moodle_exception;
 use pathway_manual\models\roles\appraiser;
+use totara_competency\models\assignment;
+use totara_competency\entities\assignment as assignment_entity;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -115,5 +117,39 @@ class capability_helper {
             return has_capability('totara/competency:assign_other', $context)
                 || appraiser::has_for_user($for_user_id);
         }
+    }
+
+    /**
+     * Checks if user can archive a competency assignment.
+     *
+     * @param int $user_id
+     * @param int|assignment $assignment
+     *
+     * @return bool
+     */
+    public static function can_user_archive_assignment(int $user_id, $assignment): bool {
+        if (is_int($assignment)) {
+            $assignment = assignment::load_by_id($assignment);
+        }
+
+        if (!$assignment instanceof assignment) {
+            throw new \coding_exception('Accepting only assignment models.');
+        }
+
+        if (has_capability('totara/competency:manage_assignments', \context_system::instance())) {
+            return true;
+        }
+
+        if (in_array($assignment->get_type(), [assignment_entity::TYPE_SELF, assignment_entity::TYPE_OTHER], true)) {
+            $assigned_by_manager = $assignment->get_type() === assignment_entity::TYPE_OTHER;
+            $is_assigned_user = (int)$assignment->user_group_id === $user_id;
+
+            if ($is_assigned_user && $assigned_by_manager) {
+                return false;
+            }
+            return self::can_assign($assignment->user_group_id);
+        }
+
+        return false;
     }
 }

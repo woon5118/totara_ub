@@ -21,6 +21,14 @@ type totara_competency_assignment {
   progress_name(format: core_format = HTML): String
   reason_assigned(format: core_format = HTML): String
   assigner: core_user
+  can_archive: Boolean
+}
+
+"""
+Result holder for archive user assignment.
+"""
+type totara_competency_archive_user_assignment_result {
+  archived_assignment: totara_competency_assignment!
 }
 
 type totara_competency_user_group {
@@ -101,4 +109,11 @@ extend type Mutation {
     user_id: core_id!
     competency_ids: [core_id!]!
   ): [totara_competency_assignment!]!
+
+  """
+  Archives user competency assignments.
+  """
+  totara_competency_archive_user_assignment(
+    assignment_id: core_id!
+  ): totara_competency_archive_user_assignment_result
 }

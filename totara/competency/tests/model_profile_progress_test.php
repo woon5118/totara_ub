@@ -138,8 +138,9 @@ class totara_competency_model_profile_progress_testcase extends totara_competenc
             $pos_ass1,
             $pos_ass3,
             $user_ass2,
+            $self_ass2,
             $self_ass3,
-            $self_ass4 // status is different so it should still shows up
+            $self_ass4, // status is different so it should still shows up
         ]);
 
         // Only those assignments were added which differ in user_group (type/id) and status
@@ -147,6 +148,7 @@ class totara_competency_model_profile_progress_testcase extends totara_competenc
             $pos_ass2,
             $pos_ass4,
             $user_ass1,
+            $self_ass1,
         ]);
 
         /** @var competency_progress $item */

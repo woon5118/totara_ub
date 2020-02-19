@@ -37,7 +37,7 @@
 import ArchivedAssignmentsTable from 'totara_competency/components/details/ArchivedAssignmentsTable';
 import Loader from 'totara_core/components/loader/Loader';
 // GraphQL
-import CompetencyDetailsQuery from 'totara_competency/graphql/competency_details';
+import CompetencyProfileDetailsQuery from 'totara_competency/graphql/profile_competency_details';
 
 export default {
   components: {
@@ -70,7 +70,7 @@ export default {
    */
   apollo: {
     data: {
-      query: CompetencyDetailsQuery,
+      query: CompetencyProfileDetailsQuery,
       variables() {
         return {
           user_id: this.userId,

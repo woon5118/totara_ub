@@ -40,6 +40,7 @@ use totara_competency\event\assignment_archived;
 use totara_competency\event\assignment_created;
 use totara_competency\event\assignment_deleted;
 use totara_competency\event\assignment_user_archived;
+use totara_competency\helpers\capability_helper;
 use totara_competency\models\profile\proficiency_value;
 use totara_competency\task\expand_assignment_task;
 use totara_competency\user_groups;
@@ -339,6 +340,17 @@ class assignment {
         return $this->entity->status == assignment_entity::STATUS_ARCHIVED;
     }
 
+    /**
+     * Can archive assignment check.
+     *
+     * @param int $user_id User Id of user that needs the capability checked.
+     *
+     * @return bool
+     */
+    public function can_archive(int $user_id): bool {
+        return capability_helper::can_user_archive_assignment($user_id, $this);
+    }
+
     public function get_status(): int {
         return $this->entity->status;
     }
@@ -524,8 +536,10 @@ class assignment {
 
             case 'assigner':
                 return (object)$this->get_assigner()->to_array();
+            case 'can_archive':
+                return $this->can_archive(user::logged_in()->id);
 
-            // We fall back to the default if it's not there intentionally
+                // We fall back to the default if it's not there intentionally
             case 'assigned_at':
                 if ($this->entity->relation_loaded('assignment_user')) {
                     // The relation might be loaded, but the related model does not always exist,
@@ -570,6 +584,7 @@ class assignment {
             'archived_at',
             'assigned_at',
             'assigner',
+            'can_archive',
         ];
 
         return in_array($field, $extra_fields) || isset($this->entity->{$field});

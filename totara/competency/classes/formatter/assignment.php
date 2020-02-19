@@ -52,7 +52,8 @@ class assignment extends formatter {
             'type_name' => null,
             'progress_name' => string_field_formatter::class,
             'reason_assigned' => string_field_formatter::class,
-            'assigner' => null
+            'assigner' => null,
+            'can_archive' => null,
         ];
     }
 

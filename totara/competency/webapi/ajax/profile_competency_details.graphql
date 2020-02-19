@@ -1,4 +1,4 @@
-query totara_competency_competency_details(
+query totara_competency_profile_competency_details(
   $user_id: core_id
   $competency_id: core_id
 ) {
@@ -18,7 +18,10 @@ query totara_competency_competency_details(
         archived_at(format: DATE)
         created_at(format: DATE)
         type
+        user_group_type
         progress_name
+        reason_assigned
+        can_archive
       }
       my_value {
         id

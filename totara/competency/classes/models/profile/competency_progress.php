@@ -190,21 +190,7 @@ class competency_progress {
      * @return $this
      */
     protected function append_assignment(assignment $assignment) {
-        // In the case when there's the same competency assigned to the same
-        // group and user we only add it once. Currently, all assignments for the same
-        // competency will have the same achievements value as assignment specific criteria
-        // are not yet implemented so there's no reason to show it multiple times in one group
-        $existing_assignment = $this->assignments->find(function (assignment_model $item) use ($assignment) {
-            $item_entity = $item->get_entity();
-
-            return $item_entity->competency_id == $assignment->competency_id
-                && $item_entity->user_group_type == $assignment->user_group_type
-                && $item_entity->user_group_id == $assignment->user_group_id
-                && $item_entity->status == $assignment->status;
-        });
-        if (!$existing_assignment) {
             $this->assignments->append(assignment_model::load_by_entity($assignment));
-        }
 
         return $this;
     }
