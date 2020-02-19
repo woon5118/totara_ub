@@ -234,7 +234,7 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
         global $CFG, $PAGE;
         $this->resetAfterTest();
 
-        $url = 'http://www.example.com/moodle/theme/image.php/_s/basis/forum/1/icon';
+        $url = 'http://www.example.com/moodle/theme/image.php/_s/ventura/forum/1/icon';
         $flexicon = flex_icon::create_from_pix_url($url);
         $this->assertInstanceOf('core\output\flex_icon', $flexicon);
         $this->assertSame('mod_forum|icon', $flexicon->identifier);
@@ -346,7 +346,7 @@ class totara_core_flex_icon_testcase extends advanced_testcase {
     public function test_get_flex_icons_ws() {
         global $CFG;
         require_once("$CFG->libdir/externallib.php");
-        $response = external_api::call_external_function('core_output_get_flex_icons', array('themename' => 'roots'), true);
+        $response = external_api::call_external_function('core_output_get_flex_icons', array('themename' => 'ventura'), true);
         $this->assertFalse($response['error']);
         $this->assertArrayHasKey('templates', $response['data']);
         $this->assertArrayHasKey('datas', $response['data']);

@@ -36,30 +36,30 @@ class core_mustache_template_finder_testcase extends advanced_testcase {
     public function test_get_template_directories_for_component() {
         global $CFG;
         // Test a plugin.
-        $dirs = mustache_template_finder::get_template_directories_for_component('mod_assign', 'basis');
+        $dirs = mustache_template_finder::get_template_directories_for_component('mod_assign', 'ventura');
         $correct = array(
-            $CFG->dirroot . '/theme/basis/templates/mod_assign/',
-            $CFG->dirroot . '/theme/roots/templates/mod_assign/',
+            $CFG->dirroot . '/theme/ventura/templates/mod_assign/',
+            $CFG->dirroot . '/theme/legacy/templates/mod_assign/',
             $CFG->dirroot . '/theme/base/templates/mod_assign/',
             $CFG->dirroot . '/mod/assign/templates/'
         );
         $this->assertEquals($correct, $dirs);
 
         // Test a subsystem.
-        $dirs = mustache_template_finder::get_template_directories_for_component('core_user', 'basis');
+        $dirs = mustache_template_finder::get_template_directories_for_component('core_user', 'ventura');
         $correct = array(
-            $CFG->dirroot . '/theme/basis/templates/core_user/',
-            $CFG->dirroot . '/theme/roots/templates/core_user/',
+            $CFG->dirroot . '/theme/ventura/templates/core_user/',
+            $CFG->dirroot . '/theme/legacy/templates/core_user/',
             $CFG->dirroot . '/theme/base/templates/core_user/',
             $CFG->dirroot . '/user/templates/'
         );
         $this->assertEquals($correct, $dirs);
 
         // Test core.
-        $dirs = mustache_template_finder::get_template_directories_for_component('core', 'basis');
+        $dirs = mustache_template_finder::get_template_directories_for_component('core', 'ventura');
         $correct = array(
-            $CFG->dirroot . '/theme/basis/templates/core/',
-            $CFG->dirroot . '/theme/roots/templates/core/',
+            $CFG->dirroot . '/theme/ventura/templates/core/',
+            $CFG->dirroot . '/theme/legacy/templates/core/',
             $CFG->dirroot . '/theme/base/templates/core/',
             $CFG->dirroot . '/lib/templates/'
         );
@@ -69,7 +69,7 @@ class core_mustache_template_finder_testcase extends advanced_testcase {
         $dirs = mustache_template_finder::get_template_directories_for_component('mod_assign', 'xxsdsds');
         $defaulttheme = $CFG->theme;
         $themeconfig = theme_config::load($defaulttheme);
-        $this->assertDebuggingCalled('This page should be using theme xxsdsds which cannot be initialised. Falling back to the site theme basis');
+        $this->assertDebuggingCalled('This page should be using theme xxsdsds which cannot be initialised. Falling back to the site theme ventura');
         $theme_parents = $themeconfig->parents;
         $correct = array();
 
@@ -97,12 +97,12 @@ class core_mustache_template_finder_testcase extends advanced_testcase {
         $this->resetAfterTest();
 
         $CFG->themedir = '/foo/bar';
-        $dirs = mustache_template_finder::get_template_directories_for_component('totara_core', 'basis');
+        $dirs = mustache_template_finder::get_template_directories_for_component('totara_core', 'ventura');
         $correct = array(
-            $CFG->dirroot . '/theme/basis/templates/totara_core/',
-            '/foo/bar/basis/templates/totara_core/',
-            $CFG->dirroot . '/theme/roots/templates/totara_core/',
-            '/foo/bar/roots/templates/totara_core/',
+            $CFG->dirroot . '/theme/ventura/templates/totara_core/',
+            '/foo/bar/ventura/templates/totara_core/',
+            $CFG->dirroot . '/theme/legacy/templates/totara_core/',
+            '/foo/bar/legacy/templates/totara_core/',
             $CFG->dirroot . '/theme/base/templates/totara_core/',
             '/foo/bar/base/templates/totara_core/',
             $CFG->dirroot . '/totara/core/templates/'
@@ -113,13 +113,13 @@ class core_mustache_template_finder_testcase extends advanced_testcase {
     public function test_invalid_get_template_directories_for_component() {
         // Test something invalid.
         $this->expectException(coding_exception::class);
-        $dirs = mustache_template_finder::get_template_directories_for_component('octopus', 'basis');
+        $dirs = mustache_template_finder::get_template_directories_for_component('octopus', 'ventura');
     }
 
     public function test_get_template_filepath() {
         global $CFG;
 
-        $filename = mustache_template_finder::get_template_filepath('core/pix_icon', 'basis');
+        $filename = mustache_template_finder::get_template_filepath('core/pix_icon', 'ventura');
         $correct = $CFG->dirroot . '/lib/templates/pix_icon.mustache';
         $this->assertSame($correct, $filename);
     }
@@ -127,6 +127,6 @@ class core_mustache_template_finder_testcase extends advanced_testcase {
     public function test_invalid_get_template_filepath() {
         // Test something invalid.
         $this->expectException(moodle_exception::class);
-        $dirs = mustache_template_finder::get_template_filepath('core/octopus', 'basis');
+        $dirs = mustache_template_finder::get_template_filepath('core/octopus', 'ventura');
     }
 }

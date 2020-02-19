@@ -241,7 +241,7 @@ class totara_flavour_helper_testcase extends advanced_testcase {
         $this->assertArrayNotHasKey('', $result);
         // Test a few settings to verify the format.
         $this->assertSame(advanced_feature::DISABLED, $result['moodle']['enableappraisals']);
-        $this->assertSame('', $result['theme_basis']['customcss']);
+        $this->assertSame('', $result['theme_ventura']['customcss']);
     }
 
     public function test_get_prohibited_settings() {
@@ -268,7 +268,7 @@ class totara_flavour_helper_testcase extends advanced_testcase {
         $this->assertArrayNotHasKey('', $result);
         // Test a few settings to verify the format.
         $this->assertSame(true, $result['moodle']['enableappraisals']);
-        $this->assertSame(true, $result['theme_basis']['customcss']);
+        $this->assertSame(true, $result['theme_ventura']['customcss']);
     }
 
     public function test_execute_post_install_steps() {

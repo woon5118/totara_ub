@@ -26,8 +26,8 @@ function xmldb_totara_core_install() {
     global $CFG, $DB, $SITE;
     require_once(__DIR__ . '/upgradelib.php');
 
-    // switch to new default theme in totara 9.0
-    set_config('theme', 'basis');
+    // switch to new default theme in totara 13
+    set_config('theme', 'ventura');
 
     $dbman = $DB->get_manager(); // loads ddl manager and xmldb classes
     $systemcontext = context_system::instance();

@@ -28,7 +28,7 @@
  * @author  Brian Barnes <brian.barnes@totaralearning.com>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define(['jquery', 'theme_roots/bootstrap'], function($) {
+define(['jquery', 'theme_legacy/bootstrap'], function($) {
     var openPopover = null;
 
     $(document).on('shown.bs.popover', function(e) {

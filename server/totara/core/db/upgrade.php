@@ -1221,5 +1221,23 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020071700, 'totara', 'core');
     }
 
+    if ($oldversion < 2020072700) {
+        $totara_themes = ['basis', 'roots'];
+
+        // Set new Ventura theme. Only if default theme is a Totara one.
+        if (in_array($CFG->theme, $totara_themes)) {
+            // Load ventura theme.
+            $theme = theme_config::load('ventura');
+
+            // Get the config argument for the default device.
+            $themename = core_useragent::get_device_type_cfg_var_name(core_useragent::DEVICETYPE_DEFAULT);
+
+            // Set the theme in config.
+            set_config($themename, $theme->name);
+        }
+
+        upgrade_plugin_savepoint(true, 2020072700, 'totara', 'core');
+    }
+
     return true;
 }

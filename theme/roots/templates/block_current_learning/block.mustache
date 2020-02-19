@@ -78,7 +78,7 @@
 {{> block_current_learning/main_content}}
 {{> block_current_learning/paging}}
 {{#js}}
-require(['block_current_learning/current_learning', 'theme_legacy/bootstrap'], function (current_learning) {
+require(['block_current_learning/current_learning', 'theme_roots/bootstrap'], function (current_learning) {
     current_learning.init({{{contextdata}}});
 });
 {{/js}}

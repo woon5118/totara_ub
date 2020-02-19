@@ -148,7 +148,7 @@ class core_user_userlib_testcase extends advanced_testcase {
         $user->auth = 'shibboleth';
         $user->country = 'AU';
         $user->lang = 'en';
-        $user->theme = 'roots';
+        $user->theme = 'legacy';
         $user->timezone = 'Australia/Perth';
         $user->url = 'www.moodle.org';
         user_update_user($user, true, false);
@@ -235,7 +235,7 @@ class core_user_userlib_testcase extends advanced_testcase {
         $user['auth'] = 'shibboleth';
         $user['country'] = 'AU';
         $user['lang'] = 'en';
-        $user['theme'] = 'roots';
+        $user['theme'] = 'legacy';
         $user['timezone'] = 'Australia/Perth';
         $user['url'] = 'www.moodle.org';
         user_create_user($user, true, false);

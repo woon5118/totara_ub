@@ -28,7 +28,7 @@ if (file_exists(__DIR__.'/../config.php')) {
     die;
 }
 
-$content = file_get_contents(__DIR__.'/../theme/basis/style/totara.css');
+$content = file_get_contents(__DIR__.'/../theme/ventura/style/totara.css');
 
 $content .= <<<EOF
 

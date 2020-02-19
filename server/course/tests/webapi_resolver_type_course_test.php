@@ -426,7 +426,7 @@ class totara_core_webapi_resolver_type_course_testcase extends advanced_testcase
 
         // Check that each core instance of learning item gets resolved correctly.
         $value = $this->resolve('image', $course);
-        $this->assertEquals('https://www.example.com/moodle/theme/image.php/_s/basis/core/1/course_defaultimage', $value);
+        $this->assertEquals('https://www.example.com/moodle/theme/image.php/_s/ventura/core/1/course_defaultimage', $value);
         $this->assertTrue(is_string($value));
     }
 }

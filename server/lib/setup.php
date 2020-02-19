@@ -545,7 +545,7 @@ unset($urlthemename);
 
 // Ensure a valid theme is set.
 if (!isset($CFG->theme)) {
-    $CFG->theme = 'basis';
+    $CFG->theme = 'ventura';
 }
 
 // Set language/locale of printed times.  If user has chosen a language that

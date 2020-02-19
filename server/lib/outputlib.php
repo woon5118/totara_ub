@@ -168,7 +168,7 @@ class theme_config {
     /**
      * @var string Default theme, used when requested theme not found.
      */
-    const DEFAULT_THEME = 'basis';
+    const DEFAULT_THEME = 'ventura';
 
     /** The key under which the SCSS file is stored amongst the CSS files. */
     const SCSS_KEY = '__SCSS__';

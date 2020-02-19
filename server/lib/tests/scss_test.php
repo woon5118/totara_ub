@@ -40,7 +40,7 @@ class core_scss_testcase extends advanced_testcase {
      * @return array
      */
     public function is_valid_file_provider() {
-        $themedirectory = core_component::get_component_directory('theme_basis');
+        $themedirectory = core_component::get_component_directory('theme_ventura');
         $realroot = realpath($themedirectory);
         return [
             "File import 1" => [

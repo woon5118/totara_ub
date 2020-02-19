@@ -212,7 +212,7 @@ class core_webapi_resolver_type_user_testcase extends advanced_testcase {
     }
 
     public function test_resolver_theme() {
-        $value = 'basis';
+        $value = 'ventura';
         $user = $this->getDataGenerator()->create_user(['theme' => $value]);
         self::assertNull($this->resolve_graphql_type('core_user', 'theme', $user, []));
 
@@ -275,7 +275,7 @@ class core_webapi_resolver_type_user_testcase extends advanced_testcase {
         self::assertNull($this->resolve_graphql_type('core_user', 'profileimageurl', $user, []));
 
         $this->setAdminUser();
-        self::assertStringContainsString('theme/image.php/_s/basis/core/1/u/f1', $this->resolve_graphql_type('core_user', 'profileimageurl', $user, []));
+        self::assertStringContainsString('theme/image.php/_s/ventura/core/1/u/f1', $this->resolve_graphql_type('core_user', 'profileimageurl', $user, []));
     }
 
     public function test_resolver_profileimageurlsmall() {
@@ -283,7 +283,7 @@ class core_webapi_resolver_type_user_testcase extends advanced_testcase {
         self::assertNull($this->resolve_graphql_type('core_user', 'profileimageurlsmall', $user, []));
 
         $this->setAdminUser();
-        self::assertStringContainsString('theme/image.php/_s/basis/core/1/u/f2', $this->resolve_graphql_type('core_user', 'profileimageurlsmall', $user, []));
+        self::assertStringContainsString('theme/image.php/_s/ventura/core/1/u/f2', $this->resolve_graphql_type('core_user', 'profileimageurlsmall', $user, []));
     }
 
     public function test_resolver_profileimagealt() {

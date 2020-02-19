@@ -33,7 +33,7 @@ abstract class core_only_ascii_in_tui_scss_base_testcase extends basic_testcase 
     /**
      * Check TUI SCSS does not contain any non-ascii characters
      *
-     * @param string $component Component name, e.g. theme_roots
+     * @param string $component Component name, e.g. theme_legacy
      */
     protected function check_tui_scss_for_non_ascii(string $component) {
         $tui_dir = $this->unix_path(core_component::get_component_directory($component)) . '/tui';

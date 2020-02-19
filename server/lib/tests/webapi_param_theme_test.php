@@ -23,13 +23,13 @@
 
 class core_webapi_param_theme_testcase extends basic_testcase {
     public function test_parse_value() {
-        $this->assertSame('basis', \core\webapi\param\theme::parse_value('basis'));
-        $this->assertSame('roots', \core\webapi\param\theme::parse_value('roots'));
+        $this->assertSame('ventura', \core\webapi\param\theme::parse_value('ventura'));
+        $this->assertSame('legacy', \core\webapi\param\theme::parse_value('legacy'));
 
         $this->assertNull(\core\webapi\param\theme::parse_value(''));
         $this->assertNull(\core\webapi\param\theme::parse_value(null));
 
-        $invalids = [' ', 'basis ', 'xx', 1, false, true, 1.1];
+        $invalids = [' ', 'ventura ', 'xx', 1, false, true, 1.1];
         foreach ($invalids as $invalid) {
             $message = 'invalid_parameter_exception exception expected for value: ' . var_export($invalid, true);
             try {
