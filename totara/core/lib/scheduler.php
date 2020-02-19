@@ -285,10 +285,8 @@ class scheduler {
                 break;
             case self::DAILY:
                 $date->setTime($schedule, 0, 0);
-                date_default_timezone_set('UTC');
                 $out .= new lang_string('scheduleddaily', 'totara_core',
-                    strftime(get_string('strftimetime', 'langconfig'), $date->getTimestamp()), $lang);
-                core_date::set_default_server_timezone();
+                    date_format_string($date->getTimestamp(), get_string('strftimetime', 'langconfig'), 'UTC'), $lang);
                 break;
             case self::WEEKLY:
                 $out .= new lang_string('scheduledweekly', 'totara_core',  $calendardays[$schedule]['fullname'], $lang);
