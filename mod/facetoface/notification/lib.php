@@ -23,7 +23,7 @@
  * @subpackage facetoface
  */
 
-use mod_facetoface\{attendees_helper, seminar_event};
+use mod_facetoface\{attendees_helper, seminar_event, output\session_time};
 use mod_facetoface\signup\state\{attendance_state, booked, waitlisted};
 use mod_facetoface\task\send_user_message_adhoc_task;
 use mod_facetoface\notification\notification_map;
@@ -1844,7 +1844,7 @@ function facetoface_notification_loop_session_placeholders($msg, $session, $room
                         $value = $displaytimezones ? core_date::get_user_timezone($sessiontimezone) : '';
                         break;
                     case 'session:duration':
-                        $value = format_time((int)$sessiondate->timestart - (int)$sessiondate->timefinish);
+                        $value = session_time::format_duration($sessiondate->timestart, $sessiondate->timefinish);
                         break;
                     case 'room:name':
                     case 'asset:name':

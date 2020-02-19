@@ -23,6 +23,8 @@
 
 namespace mod_facetoface;
 
+use mod_facetoface\output\session_time;
+
 /**
  * Additional export functionality.
  */
@@ -393,7 +395,7 @@ final class export_helper {
             $worksheet->write_string($i, $j++, $session->roomstring);
             $worksheet->write_string($i, $j++, $session->sessiondates->starttime);
             $worksheet->write_string($i, $j++, $session->sessiondates->finishtime);
-            $worksheet->write_string($i, $j++, format_time((int)$session->timestart - (int)$session->timefinish));
+            $worksheet->write_string($i, $j++, session_time::format_duration($session->timestart, $session->timefinish));
             $worksheet->write_string($i, $j++, $session->status);
             static::write_trainerroles($worksheet, $coursecontext, $session, $i, $j);
             static::write_userfields($worksheet, $fields, $attendee, $dateformat, $coursecontext, $i, $j);
@@ -429,7 +431,7 @@ final class export_helper {
         $worksheet->write_string($i, $j++, $session->roomstring);
         $worksheet->write_string($i, $j++, $session->sessiondates->starttime);
         $worksheet->write_string($i, $j++, $session->sessiondates->finishtime);
-        $worksheet->write_string($i, $j++, format_time((int)$session->timestart - (int)$session->timefinish));
+        $worksheet->write_string($i, $j++, session_time::format_duration($session->timestart, $session->timefinish));
         $worksheet->write_string($i, $j++, $session->status);
         static::write_trainerroles($worksheet, $coursecontext, $session, $i, $j);
 

@@ -2493,19 +2493,20 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->getDataGenerator()->enrol_user($user1->id, $course1->id);
 
         //create multiple session dates. Out of order to test that placeholders do pull earliest date and not first date entered.
+        $now = time();
         $sessiondate1 = new stdClass();
-        $sessiondate1->timestart = time() + (DAYSECS * 4) + (HOURSECS);
-        $sessiondate1->timefinish = time() + (DAYSECS * 5) + (HOURSECS * 4);
+        $sessiondate1->timestart = $now + (DAYSECS * 4) + (HOURSECS);
+        $sessiondate1->timefinish = $now + (DAYSECS * 5) + (HOURSECS * 4);
         $sessiondate1->sessiontimezone = 'Pacific/Auckland';
         $sessiondate1->assetids = array();
         $sessiondate2 = new stdClass();
-        $sessiondate2->timestart = time() + (HOURSECS);
-        $sessiondate2->timefinish = time() + (HOURSECS * 2);
+        $sessiondate2->timestart = $now + (HOURSECS);
+        $sessiondate2->timefinish = $now + (HOURSECS * 2);
         $sessiondate2->sessiontimezone = 'Pacific/Auckland';
         $sessiondate2->assetids = array();
         $sessiondate3 = new stdClass();
-        $sessiondate3->timestart = time() + (DAYSECS) + (HOURSECS * 3);
-        $sessiondate3->timefinish = time() + (DAYSECS) + (HOURSECS * 6);
+        $sessiondate3->timestart = $now + (DAYSECS) + (HOURSECS * 3);
+        $sessiondate3->timefinish = $now + (DAYSECS) + (HOURSECS * 6);
         $sessiondate3->sessiontimezone = 'Pacific/Auckland';
         $sessiondate3->assetids = array();
 
@@ -2607,10 +2608,11 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->assertContains('cost '.$seminarevent->get_normalcost(), $fullmessage);
         $this->assertContains('cost '.$seminarevent->get_normalcost(), $fullmessagehtml);
 
-        $sessions = $seminarevent->get_sessions();
-        foreach ($sessions as $session) {
+        $assertions = function ($sessiondate, $session, $duration) use ($fullmessage, $fullmessagehtml) {
             $timestart = $session->get_timestart();
             $timefinish = $session->get_timefinish();
+            $this->assertEquals($sessiondate->timestart, $timestart);
+            $this->assertEquals($sessiondate->timefinish, $timefinish);
             $this->assertContains('session:starttime '.ltrim(date_format_string($timestart, "%l:%M %p", 'Pacific/Auckland')), $fullmessage);
             $this->assertContains('session:starttime '.ltrim(date_format_string($timestart, "%l:%M %p", 'Pacific/Auckland')), $fullmessagehtml);
             $this->assertContains('session:startdate '.ltrim(date_format_string($timestart, "%e %B %Y", 'Pacific/Auckland')), $fullmessage);
@@ -2619,9 +2621,21 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
             $this->assertContains('session:finishtime '.ltrim(date_format_string($timefinish, "%l:%M %p", 'Pacific/Auckland')), $fullmessagehtml);
             $this->assertContains('session:finishdate '.ltrim(date_format_string($timefinish, "%e %B %Y", 'Pacific/Auckland')), $fullmessage);
             $this->assertContains('session:finishdate '.ltrim(date_format_string($timefinish, "%e %B %Y", 'Pacific/Auckland')), $fullmessagehtml);
+            $this->assertContains('session:duration '.$duration, $fullmessage);
+            $this->assertContains('session:duration '.$duration, $fullmessagehtml);
             $this->assertContains('session:timezone Pacific/Auckland', $fullmessage);
             $this->assertContains('session:timezone Pacific/Auckland', $fullmessagehtml);
-        }
+        };
+
+        $sessions = $seminarevent->get_sessions();
+        $this->assertCount(3, $sessions);
+        // seminar_event::get_sessions() and seminar_session_list::from_seminar_event() sort sessions by future-first
+        $sessions->rewind();
+        $assertions($sessiondate1, $sessions->current(), '2 days');
+        $sessions->next();
+        $assertions($sessiondate3, $sessions->current(), '1 hour');
+        $sessions->next();
+        $assertions($sessiondate2, $sessions->current(), '3 hours');
 
         // sessiondate2 is the earliest of the three session dates.
         $firstsessiondate = ltrim(date_format_string($sessiondate2->timestart, "%e %B %Y", 'Pacific/Auckland'));
@@ -2653,8 +2667,6 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         // As per duration setting in $sessiondata, durations is a setting that is not currently automatically adjusted
         // by generator when known session dates are added, so duration is not expected to equal difference between starttime
         // and finishtime in this case.
-        $this->assertContains('duration 1 day 3 hours', $fullmessage);
-        $this->assertContains('duration 1 day 3 hours', $fullmessagehtml);
     }
 
     function test_facetoface_take_attendance() {

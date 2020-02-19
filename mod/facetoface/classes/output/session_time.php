@@ -410,4 +410,23 @@ class session_time {
         }
         return ['date', $value, $dateformat];
     }
+
+    /**
+     * Format the duration time in a friendly way rather than just subtraction.
+     * If the duration is longer than $cutoff i.e. working time, then the duration is round up to the nearest days.
+     *
+     * @param integer       $timestart      Start time in Unix timestamp
+     * @param integer       $timefinish     Finish time in Unix timestamp
+     * @param integer       $cutoff         Cut off time in seconds, 8 hours by default
+     * @param stdClass|null $str            Should be a time object for format_time()
+     * @return string       Duration string.
+     */
+    public static function format_duration(int $timestart, int $timefinish, int $cutoff = HOURSECS * 8, \stdClass $str = null): string {
+        $duration = (int)abs($timefinish - $timestart);    // Call abs() like format_time
+        if ($duration > $cutoff) {
+            // Round up to the nearest days.
+            $duration += DAYSECS - $duration % DAYSECS;
+        }
+        return format_time($duration, $str);
+    }
 }
