@@ -46,7 +46,7 @@ class activity {
     }
 
     /**
-     * Actually fetch activities
+     * Fetch activities that can be managed by the logged in user.
      *
      * @return $this
      */
@@ -57,7 +57,10 @@ class activity {
         $this->items = [];
 
         foreach ($entities as $entity) {
-            $this->items[] = activity_model::load_by_entity($entity);
+            $item = activity_model::load_by_entity($entity);
+            if ($item->can_manage()) {
+                $this->items[] = $item;
+            }
         }
         return $this;
     }

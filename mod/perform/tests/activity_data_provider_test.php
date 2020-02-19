@@ -43,6 +43,35 @@ class mod_perform_activity_data_provider_testcase extends advanced_testcase {
         );
     }
 
+    public function test_fetch_filter_capabilities() {
+        $data_generator = $this->getDataGenerator();
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $data_generator->get_plugin_generator('mod_perform');
+        $data_provider = new activity();
+
+        $user1 = $data_generator->create_user();
+        $user2 = $data_generator->create_user();
+
+        $this->setUser($user1);
+        $activity_user1_1 = $perform_generator->create_activity_in_container(['activity_name' => 'User1 One']);
+        $activity_user1_2 = $perform_generator->create_activity_in_container(['activity_name' => 'User1 Two']);
+
+        $this->setUser($user2);
+        $activity_user2_1 = $perform_generator->create_activity_in_container(['activity_name' => 'User2 One']);
+
+        $activities = $data_provider->fetch()->get();
+        $this->assertCount(1, $activities);
+        $this->assertEquals('User2 One', $activities[0]->get_entity()->name);
+
+        $this->setUser($user1);
+        $activities = $data_provider->fetch()->get();
+        $this->assertCount(2, $activities);
+        $this->assertEqualsCanonicalizing(
+            ['User1 One', 'User1 Two'],
+            [$activities[0]->get_entity()->name, $activities[1]->get_entity()->name]
+        );
+    }
+
     private function create_test_data(): stdClass {
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');

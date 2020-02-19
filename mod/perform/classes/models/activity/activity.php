@@ -103,6 +103,20 @@ class activity {
             perform_container::can_create_instance($userid, $context);
     }
 
+    /**
+     * Checks whether the logged in (or given) user has the capability to manage this activity.
+     *
+     * @param int|null $userid
+     * @return bool
+     */
+    public function can_manage(int $userid = null): bool {
+        global $USER;
+
+        $userid = $userid ?? $USER->id;
+
+        return has_capability('mod/perform:manage_activity', $this->get_context(), $userid);
+    }
+
     public static function create(\stdClass $data, perform_container $container): self {
         global $DB;
 
