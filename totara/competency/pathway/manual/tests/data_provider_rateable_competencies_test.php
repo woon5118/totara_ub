@@ -256,46 +256,6 @@ class pathway_manual_data_provider_user_rateable_competencies_testcase extends p
     }
 
     /**
-     * Check that get_by_role() returns the correct competencies.
-     *
-     * @dataProvider get_by_role_data_provider
-     */
-    public function test_get_by_role(
-        array $pathway_roles_comp1,
-        array $pathway_roles_comp2,
-        array $role_filters,
-        array $expected_results
-    ) {
-        $this->generator->assignment_generator()->create_assignment([
-            'user_group_type' => user_groups::USER,
-            'user_group_id' => $this->user1->id,
-            'competency_id' => $this->competency1->id,
-        ]);
-        $this->generator->assignment_generator()->create_assignment([
-            'user_group_type' => user_groups::USER,
-            'user_group_id' => $this->user1->id,
-            'competency_id' => $this->competency2->id,
-        ]);
-        (new expand_task(builder::get_db()))->expand_all();
-
-        if ($pathway_roles_comp1) {
-            $this->generator->create_manual($this->competency1, $pathway_roles_comp1);
-        }
-        if ($pathway_roles_comp2) {
-            $this->generator->create_manual($this->competency2, $pathway_roles_comp2);
-        }
-        $provider = (new user_rateable_competencies())
-            ->add_filters(['roles' => $role_filters]);
-        foreach ($expected_results as $role_name => $expected_result) {
-            $expected_comps = [];
-            foreach ($expected_result as $comp_number) {
-                $expected_comps[] = $this->{"competency" . $comp_number};
-            }
-            $this->assert_has_competencies($provider->get_by_role($role_name)->all(), $expected_comps);
-        }
-    }
-
-    /**
      * Make sure the provider has the same competency data as expected.
      *
      * @param rateable_competency[]|competency[] $actual_competencies

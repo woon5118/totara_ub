@@ -44,8 +44,6 @@ use totara_competency\entities\pathway;
  */
 class rateable_competencies extends provider {
 
-    private const ROLE_CONCAT_SEPARATOR = '|';
-
     /**
      * Only get competencies that the user is assigned to.
      *
@@ -62,7 +60,6 @@ class rateable_competencies extends provider {
 
     /**
      * Only get competencies that have at least one of the specified pathway roles enabled.
-     * Adds "manual_roles" field which is a concatenated list of activated pathway roles for each competency.
      *
      * @param repository $repository
      * @param string[] $roles
@@ -70,16 +67,15 @@ class rateable_competencies extends provider {
     protected function filter_by_roles(repository $repository, array $roles) {
         role_factory::roles_exist($roles, true);
 
-        $repository
-            ->join([pathway::TABLE, 'path'], 'id', 'competency_id')
-            ->join([role::TABLE, 'manual_role'], 'path.path_instance_id', 'path_manual_id')
-            ->add_select(new raw_field(
-                $repository->group_concat('manual_role.role', self::ROLE_CONCAT_SEPARATOR) . ' as manual_roles'
-            ))
+        $roles = role::repository()
+            ->select('id')
+            ->join([pathway::TABLE, 'path'], 'path_manual_id', 'path_instance_id')
             ->where('path.path_type', 'manual')
             ->where('path.status', manual::PATHWAY_STATUS_ACTIVE)
-            ->where_in('manual_role.role', $roles)
-            ->group_by('id');
+            ->where('role', $roles)
+            ->where_field('path.competency_id', new field('id', $repository->get_builder()));
+
+        $repository->where_exists($roles->get_builder());
     }
 
     /**
@@ -89,7 +85,6 @@ class rateable_competencies extends provider {
      */
     protected function build_query(): repository {
         $repository = competency::repository();
-        $repository->select('*');
         $this->apply_filters($repository);
 
         return $repository;
@@ -127,26 +122,5 @@ class rateable_competencies extends provider {
         } else {
             return $this->build_query()->count();
         }
-    }
-
-    /**
-     * When we have results filtered by roles, narrow them down to one role.
-     *
-     * @param string $role
-     * @return collection
-     */
-    public function get_by_role(string $role): collection {
-        if (!array_key_exists('roles', $this->filters)) {
-            throw new \coding_exception("Can only get by role when roles filter is set.");
-        }
-        if ($this->fetched) {
-            $items = $this->items;
-        } else {
-            $items = $this->fetch_from_query();
-        }
-        return $items->filter(function ($item) use ($role) {
-            $roles = explode(self::ROLE_CONCAT_SEPARATOR, $item->manual_roles);
-            return in_array($role, $roles);
-        });
     }
 }

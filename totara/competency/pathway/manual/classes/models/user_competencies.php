@@ -113,21 +113,17 @@ class user_competencies {
     public static function can_rate_competencies(int $for_user) {
         /** @var role[] $roles */
         $roles = roles::get_current_user_roles($for_user);
-        $role_names = array_map(function (role $role) {
-            return $role::get_name();
-        }, $roles);
-
-        $rateable_competencies = (new rateable_competencies())->add_filters([
-            'user_id' => $for_user,
-            'roles' => $role_names,
-        ]);
 
         /** @var role $role */
         foreach ($roles as $role) {
-            if ($role->has_capability($for_user)
-                && $rateable_competencies->get_by_role($role::get_name())->count() > 0
-            ) {
-                return true;
+            if ($role->has_capability($for_user)) {
+                $rateable_competencies = (new rateable_competencies())->add_filters([
+                    'user_id' => $for_user,
+                    'roles' => [$role::get_name()],
+                ]);
+                if ($rateable_competencies->count() > 0) {
+                    return true;
+                }
             }
         }
         return false;
