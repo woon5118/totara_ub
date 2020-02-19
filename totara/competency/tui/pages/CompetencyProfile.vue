@@ -61,13 +61,13 @@
 <script>
 import FlexIcon from 'totara_core/components/icons/FlexIcon';
 import ProgressAssignmentFilters from 'totara_competency/components/ProgressAssignmentFilters';
-import CompetencyList from 'totara_competency/components/Profile/CompetencyList/List';
-import CompetencyCharts from 'totara_competency/components/Profile/CompetencyCharts';
+import CompetencyList from 'totara_competency/components/profile/competency_list/List';
+import CompetencyCharts from 'totara_competency/components/profile/CompetencyCharts';
 
 import ProgressQuery from '../../webapi/ajax/progress_for_user.graphql';
 import Preloader from 'totara_competency/components/Preloader';
-import NoCompetencyAssignments from 'totara_competency/components/Profile/NoCompetencyAssignments';
-import ProfileHeader from 'totara_competency/components/Profile/Header';
+import NoCompetencyAssignments from 'totara_competency/components/profile/NoCompetencyAssignments';
+import ProfileHeader from 'totara_competency/components/profile/Header';
 
 const ACTIVE_ASSIGNMENT = 1;
 // const ARCHIVED_ASSIGNMENT = 2;
