@@ -519,7 +519,7 @@ function dp_get_rol_tabs_visible($userid) {
     }
 
     $sql =
-        "SELECT COUNT(DISTINCT comp_id) as ncompetency
+        "SELECT COUNT(DISTINCT competency_id) as ncompetency
            FROM {totara_competency_achievement}
           WHERE user_id = :userid
             AND status = :activestatus";

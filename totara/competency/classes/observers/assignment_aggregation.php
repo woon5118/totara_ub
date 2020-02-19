@@ -87,14 +87,14 @@ class assignment_aggregation {
                 AND pathway_id IN ( 
                     SELECT id
                       FROM {totara_competency_pathway}
-                     WHERE comp_id = :compid)";
+                     WHERE competency_id = :competencyid)";
 
         $params = [
             'archived' => pathway_achievement::STATUS_ARCHIVED,
             'now' => $now,
             'currentstatus' => pathway_achievement::STATUS_CURRENT,
             'userid' => $user_id,
-            'compid' => $competency_id,
+            'competencyid' => $competency_id,
         ];
 
         $DB->execute($sql, $params);
@@ -104,11 +104,11 @@ class assignment_aggregation {
             "UPDATE {totara_competency_achievement}
                 SET status = :archived,
                     time_status = :timestatus
-              WHERE comp_id = :compid
+              WHERE competency_id = :competencyid
                 AND status = :currentstatus
                 AND user_id = :userid";
         $params = [
-            'compid' => $competency_id,
+            'competencyid' => $competency_id,
             'archived' => competency_achievement::ARCHIVED_ASSIGNMENT,
             'currentstatus' => competency_achievement::ACTIVE_ASSIGNMENT,
             'timestatus' => $now,

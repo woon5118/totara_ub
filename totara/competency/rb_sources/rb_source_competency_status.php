@@ -86,7 +86,7 @@ class rb_source_competency_status extends rb_base_source {
                 'competency',
                 'LEFT',
                 '{comp}',
-                'competency.id = base.comp_id',
+                'competency.id = base.competency_id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
@@ -205,7 +205,7 @@ class rb_source_competency_status extends rb_base_source {
                 'competency',
                 'id',
                 get_string('competencyid', 'rb_source_competency_status'),
-                'base.comp_id',
+                'base.competency_id',
                 [
                     'displayfunc' => 'integer'
                 ]
@@ -324,7 +324,7 @@ class rb_source_competency_status extends rb_base_source {
             ),
             new rb_param_option(
                 'compid',
-                'base.comp_id'
+                'base.competency_id'
             ),
         );
 
@@ -416,7 +416,7 @@ class rb_source_competency_status extends rb_base_source {
         $assignment->save();
 
         $achievement = new competency_achievement();
-        $achievement->comp_id = 100;
+        $achievement->competency_id = 100;
         $achievement->user_id = 200;
         $achievement->assignment_id = $assignment->id;
         $achievement->scale_value_id = 400;

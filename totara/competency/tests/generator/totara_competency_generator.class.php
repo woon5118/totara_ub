@@ -280,7 +280,7 @@ class totara_competency_generator extends component_generator_base {
         $competency = isset($competency->id) ? $competency->id : $competency;
 
         $rating = new rating([
-            'comp_id' => $competency,
+            'competency_id' => $competency,
             'user_id' => $subject_id,
             'scale_value_id' => $scale_value,
             'date_assigned' => $time ?? time(),

@@ -75,7 +75,7 @@ class manual_evaluator_user_source extends pathway_evaluator_user_source {
                         ON tcpa.pathway_id = :pathwayid
                            AND tcpa.user_id = pmr.user_id
                            AND tcpa.status = :activestatus
-                    WHERE pmr.comp_id = :competencyid
+                    WHERE pmr.competency_id = :competencyid
                         AND (tcpa.id IS NULL OR pmr.date_assigned >= tcpa.last_aggregated)
                 )
         ";
@@ -100,7 +100,7 @@ class manual_evaluator_user_source extends pathway_evaluator_user_source {
                  {$temp_user_id_column} NOT IN (
                     SELECT pmr.user_id
                     FROM {pathway_manual_rating} pmr
-                    WHERE pmr.comp_id = :competencyid
+                    WHERE pmr.competency_id = :competencyid
                 )
                 AND {$temp_user_id_column} NOT IN (
                     SELECT tcpa.user_id

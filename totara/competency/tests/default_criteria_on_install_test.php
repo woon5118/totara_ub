@@ -377,18 +377,18 @@ class totara_competency_default_criteria_on_install_testcase extends advanced_te
         $task = new default_criteria_on_install();
         $task->execute();
 
-        $aggregation = $DB->get_records('totara_competency_scale_aggregation', ['comp_id' => $comp->id]);
+        $aggregation = $DB->get_records('totara_competency_scale_aggregation', ['competency_id' => $comp->id]);
         $this->assertCount(1, $aggregation);
 
         $aggregation = array_shift($aggregation);
         $this->assertEquals('first', $aggregation->type);
-        $this->assertEquals($comp->id, $aggregation->comp_id);
+        $this->assertEquals($comp->id, $aggregation->competency_id);
 
-        $pathways = $DB->get_records('totara_competency_pathway', ['comp_id' => $comp->id], 'sortorder ASC');
+        $pathways = $DB->get_records('totara_competency_pathway', ['competency_id' => $comp->id], 'sortorder ASC');
         $this->assertCount(3, $pathways);
 
         foreach ($pathways as $pathway) {
-            $this->assertEquals($comp->id, $pathway->comp_id);
+            $this->assertEquals($comp->id, $pathway->competency_id);
         }
 
         $lp_pathway = array_shift($pathways);

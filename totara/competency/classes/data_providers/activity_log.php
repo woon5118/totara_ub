@@ -145,7 +145,7 @@ class activity_log {
         $assignment_log = $assignment_log->get();
 
         $achievements = competency_achievement::repository()
-            ->where('comp_id', $this->competency_id)
+            ->where('competency_id', $this->competency_id)
             ->where('user_id', $this->user_id)
             ->with([
                 'assignment' => function (repository $repository) {
@@ -171,7 +171,7 @@ class activity_log {
         }
 
         $config_changes = configuration_change::repository()
-            ->where('comp_id', $this->competency_id)
+            ->where('competency_id', $this->competency_id)
             ->where('time_changed', '>', $assignment_log->last()->created_at)
             ->order_by('time_changed', 'desc')
             ->order_by('id', 'desc')

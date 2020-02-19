@@ -53,20 +53,20 @@ class pathway_manual_webapi_resolver_mutation_create_manual_ratings_testcase ext
         $scale_value_id_1 = $this->get_scale_value_id('11');
         $scale_value_id_2 = $this->get_scale_value_id('22');
 
-        $this->assertFalse($DB->record_exists('pathway_manual_rating', ['comp_id' => $this->competency1->id]));
-        $this->assertFalse($DB->record_exists('pathway_manual_rating', ['comp_id' => $this->competency2->id]));
+        $this->assertFalse($DB->record_exists('pathway_manual_rating', ['competency_id' => $this->competency1->id]));
+        $this->assertFalse($DB->record_exists('pathway_manual_rating', ['competency_id' => $this->competency2->id]));
 
         $args = [
             'user_id' => $this->user1->id,
             'role' => manager::class,
             'ratings' => [
                 [
-                    'comp_id' => $this->competency1->id,
+                    'competency_id' => $this->competency1->id,
                     'scale_value_id' => $scale_value_id_1,
                     'comment' => 'Test comment 1',
                 ],
                 [
-                    'comp_id' => $this->competency2->id,
+                    'competency_id' => $this->competency2->id,
                     'scale_value_id' => $scale_value_id_2,
                     'comment' => 'Test comment 2',
                 ],
@@ -76,7 +76,7 @@ class pathway_manual_webapi_resolver_mutation_create_manual_ratings_testcase ext
         create_manual_ratings::resolve($args, $this->get_execution_context());
 
         $record = $DB->get_record('pathway_manual_rating', [
-            'comp_id' => $this->competency1->id,
+            'competency_id' => $this->competency1->id,
             'user_id' => $this->user1->id,
             'scale_value_id' => $scale_value_id_1,
             'assigned_by' => $this->user2->id,
@@ -85,7 +85,7 @@ class pathway_manual_webapi_resolver_mutation_create_manual_ratings_testcase ext
         $this->assertEquals('Test comment 1', $record->comment);
 
         $record = $DB->get_record('pathway_manual_rating', [
-            'comp_id' => $this->competency2->id,
+            'competency_id' => $this->competency2->id,
             'user_id' => $this->user1->id,
             'scale_value_id' => $scale_value_id_2,
             'assigned_by' => $this->user2->id,
@@ -112,12 +112,12 @@ class pathway_manual_webapi_resolver_mutation_create_manual_ratings_testcase ext
             'role' => manager::class,
             'ratings' => [
                 [
-                    'comp_id' => $this->competency1->id,
+                    'competency_id' => $this->competency1->id,
                     'scale_value_id' => $scale_value_id_1,
                     'comment' => 'Test comment 1',
                 ],
                 [
-                    'comp_id' => $this->competency2->id,
+                    'competency_id' => $this->competency2->id,
                     'scale_value_id' => $scale_value_id_2,
                     'comment' => 'Test comment 2',
                 ],
@@ -132,7 +132,7 @@ class pathway_manual_webapi_resolver_mutation_create_manual_ratings_testcase ext
         $this->assertTrue($result->data['pathway_manual_create_manual_ratings']);
 
         $record = $DB->get_record('pathway_manual_rating', [
-            'comp_id' => $this->competency1->id,
+            'competency_id' => $this->competency1->id,
             'user_id' => $this->user1->id,
             'scale_value_id' => $scale_value_id_1,
             'assigned_by' => $this->user2->id,
@@ -141,7 +141,7 @@ class pathway_manual_webapi_resolver_mutation_create_manual_ratings_testcase ext
         $this->assertEquals('Test comment 1', $record->comment);
 
         $record = $DB->get_record('pathway_manual_rating', [
-            'comp_id' => $this->competency2->id,
+            'competency_id' => $this->competency2->id,
             'user_id' => $this->user1->id,
             'scale_value_id' => $scale_value_id_2,
             'assigned_by' => $this->user2->id,
@@ -170,12 +170,12 @@ class pathway_manual_webapi_resolver_mutation_create_manual_ratings_testcase ext
             'role' => manager::class,
             'ratings' => [
                 [
-                    'comp_id' => $this->competency1->id,
+                    'competency_id' => $this->competency1->id,
                     'scale_value_id' => $scale_value_id_1,
                     'comment' => 'Test comment 1',
                 ],
                 [
-                    'comp_id' => $this->competency2->id,
+                    'competency_id' => $this->competency2->id,
                     // Provoke exception (scale_value_id_1 doesn't belong to comp2).
                     'scale_value_id' => $scale_value_id_1,
                     'comment' => 'Test comment 2',
@@ -192,7 +192,7 @@ class pathway_manual_webapi_resolver_mutation_create_manual_ratings_testcase ext
         $this->assertContains('Invalid scale value', $result->errors[0]->message);
 
         // None of the records should exist, even though only one had bad data.
-        $this->assertFalse($DB->record_exists('pathway_manual_rating', ['comp_id' => $this->competency1->id]));
-        $this->assertFalse($DB->record_exists('pathway_manual_rating', ['comp_id' => $this->competency2->id]));
+        $this->assertFalse($DB->record_exists('pathway_manual_rating', ['competency_id' => $this->competency1->id]));
+        $this->assertFalse($DB->record_exists('pathway_manual_rating', ['competency_id' => $this->competency2->id]));
     }
 }

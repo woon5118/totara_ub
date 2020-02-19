@@ -43,7 +43,7 @@ class achievement {
         // the item_record(s) for this user
 
         $achievement = $hook->get_achievement();
-        $child_competency_id = $achievement['comp_id'];
+        $child_competency_id = $achievement['competency_id'];
         $user_id = $achievement['user_id'];
 
         competency_item_helper::achievement_updated($user_id, $child_competency_id, 'childcompetency');

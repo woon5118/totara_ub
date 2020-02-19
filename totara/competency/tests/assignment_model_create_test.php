@@ -45,17 +45,17 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
 
         $this->setUser($data->user1->id);
 
-        $comp_id = $data->comp1->id;
+        $competency_id = $data->comp1->id;
         $type = assignment_entity::TYPE_ADMIN;
         $user_group_type = user_groups::USER;
         $user_group_id = $data->user1->id;
         $status = assignment_entity::STATUS_ACTIVE;
 
-        $assignment = assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        $assignment = assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
 
         $this->assertInstanceOf(assignment_model::class, $assignment);
 
-        $this->assertEquals($comp_id, $assignment->get_field('competency_id'));
+        $this->assertEquals($competency_id, $assignment->get_field('competency_id'));
         $this->assertEquals($type, $assignment->get_field('type'));
         $this->assertEquals($user_group_type, $assignment->get_field('user_group_type'));
         $this->assertEquals($user_group_id, $assignment->get_field('user_group_id'));
@@ -72,7 +72,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
 
         $this->setUser($expected_data->user1->id);
 
-        $comp_id = $expected_data->comp1->id;
+        $competency_id = $expected_data->comp1->id;
         $type = assignment_entity::TYPE_ADMIN;
         $user_group_type = user_groups::USER;
         $user_group_id = $expected_data->user1->id;
@@ -80,7 +80,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
 
         $event_sink = $this->redirectEvents();
 
-        $assignment = assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        $assignment = assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
         $this->assertInstanceOf(assignment_model::class, $assignment);
 
         $events = $event_sink->get_events();
@@ -106,13 +106,13 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
 
         $this->setUser($data->user1->id);
 
-        $comp_id = $data->comp1->id;
+        $competency_id = $data->comp1->id;
         $type = assignment_entity::TYPE_ADMIN;
         $user_group_type = user_groups::USER;
         $user_group_id = $data->user1->id;
         $status = assignment_entity::STATUS_ACTIVE;
 
-        $assignment = assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        $assignment = assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
         $this->assertInstanceOf(assignment_model::class, $assignment);
         $this->assertEquals(assignment_entity::STATUS_ACTIVE, $assignment->get_status());
     }
@@ -122,13 +122,13 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
 
         $this->setUser($data->user1->id);
 
-        $comp_id = $data->comp1->id;
+        $competency_id = $data->comp1->id;
         $type = assignment_entity::TYPE_ADMIN;
         $user_group_type = user_groups::USER;
         $user_group_id = $data->user1->id;
         $status = assignment_entity::STATUS_DRAFT;
 
-        $assignment = assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        $assignment = assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
         $this->assertInstanceOf(assignment_model::class, $assignment);
         $this->assertEquals($status, $assignment->get_status());
         $this->assertFalse($assignment->should_expand());
@@ -139,7 +139,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
 
         $this->setUser($data->user1->id);
 
-        $comp_id = $data->comp1->id;
+        $competency_id = $data->comp1->id;
         $type = assignment_entity::TYPE_ADMIN;
         $user_group_type = user_groups::USER;
         $user_group_id = $data->user1->id;
@@ -148,7 +148,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $this->expectException(assignment_create_exception::class);
         $this->expectExceptionMessage('Invalid assignment status supplied');
 
-        assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
     }
 
     public function test_cannot_create_with_invalid_status_given() {
@@ -156,7 +156,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
 
         $this->setUser($data->user1->id);
 
-        $comp_id = $data->comp1->id;
+        $competency_id = $data->comp1->id;
         $type = assignment_entity::TYPE_ADMIN;
         $user_group_type = user_groups::USER;
         $user_group_id = 1;
@@ -165,13 +165,13 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $this->expectException(assignment_create_exception::class);
         $this->expectExceptionMessage('Invalid assignment status supplied');
 
-        assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
     }
 
     public function test_caanot_create_with_non_existent_competency() {
         $this->setAdminUser();
 
-        $comp_id = 9999;
+        $competency_id = 9999;
         $type = assignment_entity::TYPE_ADMIN;
         $user_group_type = user_groups::USER;
         $user_group_id = 1;
@@ -180,7 +180,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $this->expectException(assignment_create_exception::class);
         $this->expectExceptionMessage('Non-existent or invisible competency id given');
 
-        assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
     }
 
     public function test_cannot_create_with_invisible_competency() {
@@ -192,7 +192,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $comp->visible = false;
         $comp->save();
 
-        $comp_id = $comp->id;
+        $competency_id = $comp->id;
         $type = assignment_entity::TYPE_ADMIN;
         $user_group_type = user_groups::USER;
         $user_group_id = 1;
@@ -201,7 +201,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $this->expectException(assignment_create_exception::class);
         $this->expectExceptionMessage('Non-existent or invisible competency id given');
 
-        assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
     }
 
     public function test_cannot_create_with_non_existent_user_group() {
@@ -209,7 +209,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
 
         $data = $this->create_data();
 
-        $comp_id = $data->comp1->id;
+        $competency_id = $data->comp1->id;
         $type = assignment_entity::TYPE_ADMIN;
         $user_group_type = user_groups::USER;
         $user_group_id = 9999;
@@ -218,7 +218,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $this->expectException(assignment_create_exception::class);
         $this->expectExceptionMessage('User group not found');
 
-        assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
     }
 
     public function test_cannot_create_with_non_existent_user_group_type() {
@@ -226,7 +226,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
 
         $data = $this->create_data();
 
-        $comp_id = $data->comp1->id;
+        $competency_id = $data->comp1->id;
         $type = assignment_entity::TYPE_ADMIN;
         $user_group_type = 'foobar';
         $user_group_id = 9999;
@@ -235,7 +235,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $this->expectException(assignment_create_exception::class);
         $this->expectExceptionMessage('Invalid user group has been passed');
 
-        assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
     }
 
     public function test_cannot_create_with_invalid_type() {
@@ -243,7 +243,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
 
         $data = $this->create_data();
 
-        $comp_id = $data->comp1->id;
+        $competency_id = $data->comp1->id;
         $type = 'foobar';
         $user_group_type = user_groups::USER;
         $user_group_id = $data->user1->id;
@@ -252,7 +252,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $this->expectException(assignment_create_exception::class);
         $this->expectExceptionMessage('Invalid assignment type supplied');
 
-        assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
     }
 
     public function test_can_create_with_other_type_if_assignable() {
@@ -260,7 +260,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
 
         $data = $this->create_data();
 
-        $comp_id = $data->comp1->id;
+        $competency_id = $data->comp1->id;
         $this->set_other_assignable($data->comp1->id);
 
         $type = assignment_entity::TYPE_OTHER;
@@ -268,7 +268,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $user_group_id = $data->user1->id;
         $status = assignment_entity::STATUS_ACTIVE;
 
-        $assignment = assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        $assignment = assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
         $this->assertInstanceOf(assignment_model::class, $assignment);
     }
 
@@ -277,7 +277,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
 
         $data = $this->create_data();
 
-        $comp_id = $data->comp1->id;
+        $competency_id = $data->comp1->id;
         $type = assignment_entity::TYPE_OTHER;
         $user_group_type = user_groups::USER;
         $user_group_id = $data->user1->id;
@@ -286,7 +286,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $this->expectException(assignment_create_exception::class);
         $this->expectExceptionMessage('Competency cannot be be assigned by given type');
 
-        assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
     }
 
     public function test_can_create_with_self_type_if_assignable() {
@@ -294,7 +294,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
 
         $data = $this->create_data();
 
-        $comp_id = $data->comp1->id;
+        $competency_id = $data->comp1->id;
         $this->set_self_assignable($data->comp1->id);
 
         $type = assignment_entity::TYPE_SELF;
@@ -302,7 +302,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $user_group_id = $data->user1->id;
         $status = assignment_entity::STATUS_ACTIVE;
 
-        $assignment = assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        $assignment = assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
         $this->assertInstanceOf(assignment_model::class, $assignment);
     }
 
@@ -311,7 +311,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
 
         $data = $this->create_data();
 
-        $comp_id = $data->comp1->id;
+        $competency_id = $data->comp1->id;
         $type = assignment_entity::TYPE_SELF;
         $user_group_type = user_groups::USER;
         $user_group_id = $data->user1->id;
@@ -320,7 +320,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $this->expectException(assignment_create_exception::class);
         $this->expectExceptionMessage('Competency cannot be be assigned by given type');
 
-        assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
     }
 
     public function test_cannot_create_for_deleted_user() {
@@ -330,7 +330,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
 
         delete_user($data->user1);
 
-        $comp_id = $data->comp1->id;
+        $competency_id = $data->comp1->id;
         $type = assignment_entity::TYPE_ADMIN;
         $user_group_type = user_groups::USER;
         $user_group_id = $data->user1->id;
@@ -339,7 +339,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $this->expectException(assignment_create_exception::class);
         $this->expectExceptionMessage('User group not found');
 
-        assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
     }
 
     public function test_invalid_combination_of_type_and_user_group_type() {
@@ -347,7 +347,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
 
         $this->setUser($data->user1->id);
 
-        $comp_id = $data->comp1->id;
+        $competency_id = $data->comp1->id;
         $user_group_id = $data->user1->id;
         $status = assignment_entity::STATUS_ACTIVE;
 
@@ -356,7 +356,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
             $disallowed_user_types = [user_groups::POSITION, user_groups::COHORT, user_groups::ORGANISATION];
             foreach ($disallowed_user_types as $disallowed_type) {
                 try {
-                    assignment_model::create($comp_id, $user_only_type, $disallowed_type, $user_group_id, $status);
+                    assignment_model::create($competency_id, $user_only_type, $disallowed_type, $user_group_id, $status);
                     $this->fail('Expected fail due to invalid type and user_group_type combination');
                 } catch (assignment_create_exception $e) {
                     $this->assertRegExp('/Invalid combination of type and user_group_type given/', $e->getMessage());
@@ -370,32 +370,32 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
 
         $this->setAdminUser();
 
-        $comp_id = $data->comp1->id;
+        $competency_id = $data->comp1->id;
         $type = assignment_entity::TYPE_ADMIN;
         $user_group_type = user_groups::USER;
         $user_group_id = $data->user1->id;
         $status = assignment_entity::STATUS_ACTIVE;
 
-        $assignment = assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        $assignment = assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
         $this->assertInstanceOf(assignment_model::class, $assignment);
         $this->assertEquals(1, assignment_entity::repository()->count());
 
         // Try again, no duplicate should be created
-        $assignment = assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        $assignment = assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
         $this->assertEmpty($assignment);
         $this->assertEquals(1, assignment_entity::repository()->count());
 
         // Now change the type which should result in a new assignment
         $type = assignment_entity::TYPE_OTHER;
 
-        $this->set_other_assignable($comp_id);
+        $this->set_other_assignable($competency_id);
 
-        $assignment = assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        $assignment = assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
         $this->assertInstanceOf(assignment_model::class, $assignment);
         $this->assertEquals(2, assignment_entity::repository()->count());
 
         // Try again, no duplicate should be created
-        $assignment = assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        $assignment = assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
         $this->assertEmpty($assignment);
         $this->assertEquals(2, assignment_entity::repository()->count());
 
@@ -404,7 +404,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $this->setUser($data->user2->id);
 
         // A new assignment created by another user should have been created
-        $assignment = assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        $assignment = assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
         $this->assertInstanceOf(assignment_model::class, $assignment);
         $this->assertEquals(3, assignment_entity::repository()->count());
     }
@@ -418,13 +418,13 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $fw = $hierarchy_generator->create_pos_frame([]);
         $pos = $hierarchy_generator->create_pos(['frameworkid' => $fw->id]);
 
-        $comp_id = $data->comp1->id;
+        $competency_id = $data->comp1->id;
         $type = assignment_entity::TYPE_ADMIN;
         $user_group_type = user_groups::POSITION;
         $user_group_id = $pos->id;
         $status = assignment_entity::STATUS_ACTIVE;
 
-        $assignment = assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        $assignment = assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
         $this->assertInstanceOf(assignment_model::class, $assignment);
 
         $this->assertEquals($type, $assignment->get_field('type'));
@@ -451,7 +451,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $pos->visible = 0;
         $pos->save();
 
-        $comp_id = $data->comp1->id;
+        $competency_id = $data->comp1->id;
         $type = assignment_entity::TYPE_ADMIN;
         $user_group_type = user_groups::POSITION;
         $user_group_id = $pos->id;
@@ -460,7 +460,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $this->expectException(assignment_create_exception::class);
         $this->expectExceptionMessage('User group not found');
 
-        assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
     }
 
     public function test_create_organisation_assignment() {
@@ -472,13 +472,13 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $fw = $hierarchy_generator->create_org_frame([]);
         $org = $hierarchy_generator->create_org(['frameworkid' => $fw->id]);
 
-        $comp_id = $data->comp1->id;
+        $competency_id = $data->comp1->id;
         $type = assignment_entity::TYPE_ADMIN;
         $user_group_type = user_groups::ORGANISATION;
         $user_group_id = $org->id;
         $status = assignment_entity::STATUS_ACTIVE;
 
-        $assignment = assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        $assignment = assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
         $this->assertInstanceOf(assignment_model::class, $assignment);
 
         $this->assertEquals($type, $assignment->get_field('type'));
@@ -505,7 +505,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $org->visible = 0;
         $org->save();
 
-        $comp_id = $data->comp1->id;
+        $competency_id = $data->comp1->id;
         $type = assignment_entity::TYPE_ADMIN;
         $user_group_type = user_groups::ORGANISATION;
         $user_group_id = $org->id;
@@ -514,7 +514,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $this->expectException(assignment_create_exception::class);
         $this->expectExceptionMessage('User group not found');
 
-        assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
     }
 
     public function test_create_cohort_assignment() {
@@ -530,13 +530,13 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
             'idnumber' => 'the_first',
         ]);
 
-        $comp_id = $data->comp1->id;
+        $competency_id = $data->comp1->id;
         $type = assignment_entity::TYPE_ADMIN;
         $user_group_type = user_groups::COHORT;
         $user_group_id = $cohort->id;
         $status = assignment_entity::STATUS_ACTIVE;
 
-        $assignment = assignment_model::create($comp_id, $type, $user_group_type, $user_group_id, $status);
+        $assignment = assignment_model::create($competency_id, $type, $user_group_type, $user_group_id, $status);
         $this->assertInstanceOf(assignment_model::class, $assignment);
 
         $this->assertEquals($type, $assignment->get_field('type'));
@@ -550,18 +550,18 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         $this->assertFalse($user_group->is_deleted());
     }
 
-    private function set_self_assignable($comp_id) {
+    private function set_self_assignable($competency_id) {
         builder::table('comp_assign_availability')
             ->insert([
-                'comp_id' => $comp_id,
+                'comp_id' => $competency_id,
                 'availability' => \totara_competency\entities\competency::ASSIGNMENT_CREATE_SELF
             ]);
     }
 
-    private function set_other_assignable($comp_id) {
+    private function set_other_assignable($competency_id) {
         builder::table('comp_assign_availability')
             ->insert([
-                'comp_id' => $comp_id,
+                'comp_id' => $competency_id,
                 'availability' => \totara_competency\entities\competency::ASSIGNMENT_CREATE_OTHER
             ]);
     }

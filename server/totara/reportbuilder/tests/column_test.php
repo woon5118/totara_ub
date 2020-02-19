@@ -579,7 +579,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
     );
 
     protected $totara_competency_achievement_data = array(
-        'id' => 1, 'user_id' => 2, 'comp_id' => 1, 'assignment_id' => 1, 'scale_value_id' => 1, 'proficient' => 0, 'status' => 0,
+        'id' => 1, 'user_id' => 2, 'competency_id' => 1, 'assignment_id' => 1, 'scale_value_id' => 1, 'proficient' => 0, 'status' => 0,
         'time_created' =>  1332153671, 'time_status' => 1332153671,
     );
 

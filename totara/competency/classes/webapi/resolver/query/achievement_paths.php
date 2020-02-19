@@ -98,7 +98,7 @@ class achievement_paths implements query_resolver {
     private static function get_active_pathway_types(int $assignment_id): array {
         return builder::table(pathway_entity::TABLE)
             ->select(['id', 'path_type'])
-            ->join([assignment::TABLE, 'ass'], 'comp_id', 'competency_id')
+            ->join([assignment::TABLE, 'ass'], 'competency_id', 'competency_id')
             ->where('status', pathway::PATHWAY_STATUS_ACTIVE)
             ->where('ass.id', $assignment_id)
             ->group_by(['id', 'path_type'])

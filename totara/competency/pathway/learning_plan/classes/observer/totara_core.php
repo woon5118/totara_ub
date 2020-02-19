@@ -61,11 +61,11 @@ class totara_core {
     private static function get_competencies_with_learning_plan_pathways(): array {
         return pathway_entity::repository()
             ->as('pw')
-            ->select_raw('DISTINCT pw.comp_id AS comp_id')
+            ->select_raw('DISTINCT pw.competency_id AS competency_id')
             ->where('pw.path_type', 'learning_plan')
             ->where('pw.status', pathway::PATHWAY_STATUS_ACTIVE)
             ->get()
-            ->pluck('comp_id');
+            ->pluck('competency_id');
     }
 
     /**

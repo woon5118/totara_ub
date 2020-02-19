@@ -6,6 +6,8 @@ Feature: Test competencies achieved is updated
 
   Background:
     Given I am on a totara site
+    And the following config values are set as admin:
+      | enablecompetency_assignment    | 3           |
     And the following "users" exist:
       | username | firstname | lastname | email                        | role         | context |
       | bilbo    | Bilbo     | Baggins  | bilbo.baggins@example.com    |              |         |

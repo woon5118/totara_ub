@@ -187,7 +187,7 @@ class manual extends pathway {
     public function aggregate_current_value(int $user_id): base_achievement_detail {
         /** @var null|rating $rating */
         $rating = rating::repository()
-            ->where('comp_id', $this->get_competency()->id)
+            ->where('competency_id', $this->get_competency()->id)
             ->where('user_id', $user_id)
             ->where_in('assigned_by_role', $this->get_role_names())
             ->order_by('id', 'desc')

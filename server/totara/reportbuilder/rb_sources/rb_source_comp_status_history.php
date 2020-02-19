@@ -72,7 +72,7 @@ class rb_source_comp_status_history extends rb_base_source {
                 'competency',
                 'LEFT',
                 '{comp}',
-                'competency.id = base.comp_id',
+                'competency.id = base.competency_id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
@@ -98,7 +98,7 @@ class rb_source_comp_status_history extends rb_base_source {
                 'competency',
                 'competencyid',
                 get_string('compidcolumn', 'rb_source_comp_status_history'),
-                'base.comp_id',
+                'base.competency_id',
                 array('selectable' => false)
             ),
             new rb_column_option(
@@ -207,7 +207,7 @@ class rb_source_comp_status_history extends rb_base_source {
             ),
             new rb_param_option(
                 'competencyid',
-                'base.comp_id'
+                'base.competency_id'
             ),
         );
 

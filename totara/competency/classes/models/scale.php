@@ -124,7 +124,7 @@ class scale extends entity_model {
     public function is_in_use(): bool {
         $has_achievement = competency_achievement::repository()
             ->where_not_null('scale_value_id')
-            ->join(['comp', 'c'], 'comp_id', 'id')
+            ->join(['comp', 'c'], 'competency_id', 'id')
             ->join(['comp_scale_assignments', 'sca'], 'c.frameworkid', 'sca.frameworkid')
             ->where('sca.scaleid', $this->id)
             ->exists();

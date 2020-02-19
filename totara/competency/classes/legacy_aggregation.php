@@ -136,7 +136,7 @@ class legacy_aggregation {
             ->join([criteria_group_criterion_entity::TABLE, 'cgc'], 'id', 'criterion_id')
             ->join([pathway_entity::TABLE, 'pw'], 'cgc.criteria_group_id', 'pw.path_instance_id')
             ->where('plugin_type', $criterion->get_plugin_type())
-            ->where('pw.comp_id', $this->competency->id)
+            ->where('pw.competency_id', $this->competency->id)
             ->where('pw.status', pathway::PATHWAY_STATUS_ACTIVE)
             ->get();
     }
@@ -157,7 +157,7 @@ class legacy_aggregation {
                 (new childcompetency())->get_plugin_type(),
                 (new linkedcourses())->get_plugin_type()
             ])
-            ->where('pw.comp_id', $this->competency->id)
+            ->where('pw.competency_id', $this->competency->id)
             ->where('pw.status', pathway::PATHWAY_STATUS_ACTIVE)
             ->get();
 

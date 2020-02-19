@@ -189,7 +189,7 @@ class user_rateable_competencies extends rateable_competencies {
         }
 
         $number_of_competencies_with_rating = rating::repository()
-            ->where_in('comp_id', $competencies)
+            ->where_in('competency_id', $competencies)
             ->where('user_id', $this->user->id)
             ->where('assigned_by_role', $this->role::get_name())
             ->where('assigned_by', user::logged_in()->id)
@@ -208,7 +208,7 @@ class user_rateable_competencies extends rateable_competencies {
     protected function filter_by_rating_history(competency_repository $repository, bool $has_rated) {
         $rating_subquery = rating::repository()
             ->select('id')
-            ->where_field('comp_id', new field('id', $repository->get_builder()))
+            ->where_field('competency_id', new field('id', $repository->get_builder()))
             ->where('user_id', $this->user->id)
             ->where('assigned_by_role', $this->role::get_name())
             ->where('assigned_by', user::logged_in()->id);

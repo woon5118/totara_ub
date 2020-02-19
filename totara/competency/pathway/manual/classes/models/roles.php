@@ -44,7 +44,7 @@ class roles {
         $roles = role_entity::repository()
             ->select_raw('DISTINCT role')
             ->join([pathway::TABLE, 'pathway'], 'path_manual_id', 'pathway.path_instance_id')
-            ->where('pathway.comp_id', $competency_id)
+            ->where('pathway.competency_id', $competency_id)
             ->get()
             ->pluck('role');
 
@@ -63,7 +63,7 @@ class roles {
         $role = role_entity::repository()
             ->join([pathway::TABLE, 'pathway'], 'path_manual_id', 'path_instance_id')
             ->where('role', $role::get_name())
-            ->where_field('pathway.comp_id', new field('id', $competency->get_builder()));
+            ->where_field('pathway.competency_id', new field('id', $competency->get_builder()));
 
         return $competency
             ->where_exists($role->get_builder())

@@ -152,7 +152,7 @@ function create_item_records($user_ids, $competency_ids) {
             AND tcp.path_type = :pathtype
             AND tcp.status = :pathstatus
            JOIN {comp} comp
-             ON comp.id = tcp.comp_id
+             ON comp.id = tcp.competency_id
            {$comp_id_sql}";
     $item_params = array_merge(
         [
@@ -210,7 +210,7 @@ function create_manual_ratings($user_ids, $competency_ids) {
     //        Multiple runs will result in multiple ratings
     $insert_sql =
         "INSERT INTO {pathway_manual_rating}
-        (user_id, comp_id, scale_value_id, date_assigned, assigned_by, assigned_by_role)
+        (user_id, competency_id, scale_value_id, date_assigned, assigned_by, assigned_by_role)
         SELECT :userid, scalecomp.id, scale.minproficiencyid, :dateassigned, :assignedby, :assignedbyrole
           FROM {comp} scalecomp
           JOIN {comp_scale_assignments} csa
@@ -221,7 +221,7 @@ function create_manual_ratings($user_ids, $competency_ids) {
                 SELECT comp.id
                   FROM {comp} comp
                   JOIN {totara_competency_pathway} tcp      
-                    ON tcp.comp_id = comp.id
+                    ON tcp.competency_id = comp.id
                    AND tcp.path_type = :pathtype
                    AND tcp.status = :pathstatus
                 {$comp_id_sql})";
@@ -266,7 +266,7 @@ function create_pathway_achievements($user_ids, $competency_ids) {
         SELECT tcp.id, :userid, scale.minproficiencyid, :dateachieved, :lastaggregated, :currentstatus
           FROM {totara_competency_pathway} tcp
           JOIN {comp} comp
-            ON comp.id = tcp.comp_id
+            ON comp.id = tcp.competency_id
           JOIN {comp_scale_assignments} csa
             ON csa.frameworkid = comp.frameworkid
           JOIN {comp_scale} scale
@@ -296,7 +296,7 @@ function create_pathway_achievements($user_ids, $competency_ids) {
         SELECT tcp.id, :userid, pcg.scale_value_id, :dateachieved, :lastaggregated, :currentstatus
           FROM {totara_competency_pathway} tcp
           JOIN {comp} comp
-            ON comp.id = tcp.comp_id
+            ON comp.id = tcp.competency_id
           JOIN tst_pathway_criteria_group pcg
             ON pcg.id = tcp.path_instance_id
          WHERE tcp.path_type = :pathtype
@@ -328,7 +328,7 @@ function create_competency_achievements($user_ids, $competency_ids) {
 
     if (!empty($competency_ids)) {
         [$comp_id_sql, $comp_id_params] = $DB->get_in_or_equal($competency_ids, SQL_PARAMS_NAMED);
-        $comp_id_sql = 'tcp.comp_id ' . $comp_id_sql;
+        $comp_id_sql = 'tcp.competency_id ' . $comp_id_sql;
     } else {
         $comp_id_sql = '';
         $comp_id_params = [];
@@ -342,18 +342,18 @@ function create_competency_achievements($user_ids, $competency_ids) {
     //        proficiency - marked as proficient for all manual but not checked for criteria_group at the moment
     $sql =
         "INSERT INTO {totara_competency_achievement}
-        (comp_id, user_id, assignment_id, scale_value_id, proficient, status, time_created, time_status)
-        SELECT minscale.comp_id, minscale.user_id, :assignment_id, minscale.scale_value_id, :proficient, :status, :timecreated, :timestatus
+        (competency_id, user_id, assignment_id, scale_value_id, proficient, status, time_created, time_status)
+        SELECT minscale.competency_id, minscale.user_id, :assignment_id, minscale.scale_value_id, :proficient, :status, :timecreated, :timestatus
           FROM (
-               SELECT tcp.comp_id, tcpa.user_id, MIN(tcpa.scale_value_id) as scale_value_id
+               SELECT tcp.competency_id, tcpa.user_id, MIN(tcpa.scale_value_id) as scale_value_id
 		         FROM {totara_competency_pathway_achievement} tcpa
 		         JOIN {totara_competency_pathway} tcp
                    ON tcp.id = tcpa.pathway_id
    	            WHERE tcpa.status = :tcpa_status
                   AND tcpa.user_id = :tcpa_userid
-             GROUP BY tcp.comp_id, tcpa.user_id) minscale      
+             GROUP BY tcp.competency_id, tcpa.user_id) minscale      
      LEFT JOIN {totara_competency_achievement} tca
-            ON tca.comp_id = minscale.comp_id
+            ON tca.competency_id = minscale.competency_id
            AND tca.status = :tca_status
            AND tca.user_id = :tca_userid     
          WHERE tca.id IS NULL";
@@ -361,7 +361,7 @@ function create_competency_achievements($user_ids, $competency_ids) {
         [
             'assignment_id' => 1,
             'proficient' => 0,
-            'status' => \totara_competency\entities\competency_achievement::ACTIVE_ASSIGNMENT,
+            'status' => competency_achievement::ACTIVE_ASSIGNMENT,
             'timecreated' => $now,
             'timestatus' => $now,
             'tca_status' => competency_achievement::ACTIVE_ASSIGNMENT,

@@ -215,7 +215,7 @@ class totara_competency_pathway_evaluator_user_source_testcase extends advanced_
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
         $params = [
-            'comp_id' => $data->competency->id,
+            'competency_id' => $data->competency->id,
             'sortorder' => 1,
             'criteria' => [$data->criteria[1]],
         ];

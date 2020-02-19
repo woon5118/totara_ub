@@ -116,7 +116,7 @@ class pathway_learning_plan_learning_plan_testcase extends advanced_testcase {
 
         $count = competency_achievement::repository()
             ->where('user_id', '=', $user->id)
-            ->where('comp_id', '=', $comp->id)
+            ->where('competency_id', '=', $comp->id)
             ->count();
         $this->assertEquals(0, $count);
 
@@ -156,7 +156,7 @@ class pathway_learning_plan_learning_plan_testcase extends advanced_testcase {
 
         $achievements = competency_achievement::repository()
             ->where('user_id', '=', $user->id)
-            ->where('comp_id', '=', $comp->id)
+            ->where('competency_id', '=', $comp->id)
             ->get();
         $this->assertCount(1, $achievements);
         $this->assertEquals($great->id, $achievements->first()->scale_value_id);

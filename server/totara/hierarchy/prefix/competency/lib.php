@@ -786,7 +786,7 @@ class competency extends hierarchy {
 
         // We store achievements per assignment - need DISTINCT
         return $DB->get_fieldset_sql(
-            "SELECT DISTINCT comp_id
+            "SELECT DISTINCT competency_id
                  FROM {totara_competency_achievement}
                  WHERE user_id = :userid
                    AND status = :status
@@ -998,7 +998,7 @@ class competency extends hierarchy {
 
             // number of achievement records
             $data['user_achievement'] = competency_achievement_entity::repository()
-                ->where('comp_id', $ids)
+                ->where('competency_id', $ids)
                 ->where('status', competency_achievement_entity::ACTIVE_ASSIGNMENT)
                 ->count();
 
@@ -1049,7 +1049,7 @@ class competency extends hierarchy {
 
         // It's not really called user achievement anywhere.
         $data['user_achievement'] = competency_achievement_entity::repository()
-            ->where('comp_id', $ids)
+            ->where('competency_id', $ids)
             ->where('status', competency_achievement_entity::ACTIVE_ASSIGNMENT)
             ->count();
 

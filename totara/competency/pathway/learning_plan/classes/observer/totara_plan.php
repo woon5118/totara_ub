@@ -48,7 +48,7 @@ class totara_plan {
             SELECT 1
               FROM {totara_competency_assignment_users} tcau
               JOIN {totara_competency_pathway} tcp
-                ON tcp.comp_id = tcau.competency_id
+                ON tcp.competency_id = tcau.competency_id
              WHERE tcau.competency_id = :compid
                AND tcau.user_id = :userid
                AND tcp.path_type = :pathtype

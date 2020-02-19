@@ -64,8 +64,8 @@ class criteria_linkedcourses_items_processor_testcase extends advanced_testcase 
         items_processor::update_items($comp->id);
 
         // Ensure no history or configuration change entries were logged
-        $this->assertSame(0, $DB->count_records('totara_competency_configuration_change', ['comp_id' => $comp->id]));
-        $this->assertSame(0, $DB->count_records('totara_competency_configuration_history', ['comp_id' => $comp->id]));
+        $this->assertSame(0, $DB->count_records('totara_competency_configuration_change', ['competency_id' => $comp->id]));
+        $this->assertSame(0, $DB->count_records('totara_competency_configuration_history', ['competency_id' => $comp->id]));
         $this->assertSame(0, $sink->count());
 
         $sink->close();
@@ -96,8 +96,8 @@ class criteria_linkedcourses_items_processor_testcase extends advanced_testcase 
         items_processor::update_items($competency->id);
 
         $this->assertCount(0, $DB->get_records('totara_criteria_item'));
-        $this->assertSame(0, $DB->count_records('totara_competency_configuration_change', ['comp_id' => $comp->id]));
-        $this->assertSame(0, $DB->count_records('totara_competency_configuration_history', ['comp_id' => $comp->id]));
+        $this->assertSame(0, $DB->count_records('totara_competency_configuration_change', ['competency_id' => $comp->id]));
+        $this->assertSame(0, $DB->count_records('totara_competency_configuration_history', ['competency_id' => $comp->id]));
         $this->assertSame(0, $sink->count());
 
         $sink->close();
@@ -135,8 +135,8 @@ class criteria_linkedcourses_items_processor_testcase extends advanced_testcase 
         $this->assertEquals($course->id, $item->item_id);
         $this->assertEquals($criterion_record->id, $item->criterion_id);
 
-        $this->assertSame(1, $DB->count_records('totara_competency_configuration_change', ['comp_id' => $comp->id]));
-        $this->assertSame(1, $DB->count_records('totara_competency_configuration_history', ['comp_id' => $comp->id]));
+        $this->assertSame(1, $DB->count_records('totara_competency_configuration_change', ['competency_id' => $comp->id]));
+        $this->assertSame(1, $DB->count_records('totara_competency_configuration_history', ['competency_id' => $comp->id]));
 
         $sink->close();
     }

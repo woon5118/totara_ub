@@ -94,7 +94,7 @@ input pathway_manual_user_rateable_competencies_filters {
 Individual rating
 """
 input pathway_manual_rating_input {
-  comp_id: core_id!
+  competency_id: core_id!
   scale_value_id: core_id
   comment: param_text
 }

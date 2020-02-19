@@ -450,7 +450,7 @@ class criteria_childcompetency_webapi_query_achievements_testcase extends advanc
             'status' => 0,
             'proficient' => $scale_value->proficient,
             'user_id' => $user_id,
-            'comp_id' => $assignment->competency_id,
+            'competency_id' => $assignment->competency_id,
             'scale_value_id' => $scale_value->id,
             'time_created' => time(),
             'time_status' => time(),

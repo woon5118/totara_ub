@@ -202,7 +202,7 @@ function(str, notification, templates, ajax) {
             }
 
             if (!idWgt) {
-                // New pw - we also need the comp_id and scalevalue
+                // New pw - we also need the competency_id and scalevalue
                 var compIdWgt = document.querySelector('[data-comp-id]'),
                     compId = 1,
                     svWgt = this.widget.closest('[data-pw-scalevalue]'),
@@ -363,7 +363,7 @@ function(str, notification, templates, ajax) {
          */
         createEmptyPw: function(compId, scalevalue) {
             return {
-                comp_id: compId,
+                competency_id: compId,
                 scalevalue: scalevalue,
                 criteria: [],
             };

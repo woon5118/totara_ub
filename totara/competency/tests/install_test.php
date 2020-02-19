@@ -32,11 +32,11 @@ class totara_competency_install_testcase extends advanced_testcase {
         require_once($CFG->dirroot . '/totara/competency/db/upgradelib.php');
     }
 
-    private function add_comp_record($comp_id, $user_id, $proficiency, $timecreated, $timemodified) {
+    private function add_comp_record($competency_id, $user_id, $proficiency, $timecreated, $timemodified) {
         global $DB;
 
         $comp_record = new stdClass();
-        $comp_record->competencyid = $comp_id;
+        $comp_record->competencyid = $competency_id;
         $comp_record->userid = $user_id;
         $comp_record->proficiency = $proficiency;
         $comp_record->timecreated = $timecreated;
@@ -46,11 +46,11 @@ class totara_competency_install_testcase extends advanced_testcase {
         return $comp_record;
     }
 
-    private function add_comp_record_history($comp_id, $user_id, $proficiency, $timemodified) {
+    private function add_comp_record_history($competency_id, $user_id, $proficiency, $timemodified) {
         global $DB;
 
         $comp_record_history = new stdClass();
-        $comp_record_history->competencyid = $comp_id;
+        $comp_record_history->competencyid = $competency_id;
         $comp_record_history->userid = $user_id;
         $comp_record_history->proficiency = $proficiency;
         $comp_record_history->timemodified = $timemodified;
@@ -109,7 +109,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         $this->assertCount(1, $achievements);
         $achievement = array_pop($achievements);
         $this->assertEquals($comp_record_history->userid, $achievement->user_id);
-        $this->assertEquals($comp_record_history->competencyid, $achievement->comp_id);
+        $this->assertEquals($comp_record_history->competencyid, $achievement->competency_id);
         $this->assertNull($achievement->scale_value_id);
         $this->assertEquals(0, $achievement->proficient);
         $this->assertEquals(competency_achievement::ARCHIVED_ASSIGNMENT, $achievement->status);
@@ -148,7 +148,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         $this->assertCount(1, $achievements);
         $achievement = array_pop($achievements);
         $this->assertEquals($comp_record_history->userid, $achievement->user_id);
-        $this->assertEquals($comp_record_history->competencyid, $achievement->comp_id);
+        $this->assertEquals($comp_record_history->competencyid, $achievement->competency_id);
         $this->assertEquals(10, $achievement->scale_value_id);
         $this->assertEquals(0, $achievement->proficient);
         $this->assertEquals(competency_achievement::ARCHIVED_ASSIGNMENT, $achievement->status);
@@ -220,7 +220,7 @@ class totara_competency_install_testcase extends advanced_testcase {
 
         $achievement1 = array_pop($achievements);
         $this->assertEquals($comp_record_history1->userid, $achievement1->user_id);
-        $this->assertEquals($comp_record_history1->competencyid, $achievement1->comp_id);
+        $this->assertEquals($comp_record_history1->competencyid, $achievement1->competency_id);
         $this->assertEquals($assignment->id, $achievement1->assignment_id);
         $this->assertEquals($comp_record_history1->proficiency, $achievement1->scale_value_id);
         $this->assertEquals(0, $achievement1->proficient);
@@ -233,7 +233,7 @@ class totara_competency_install_testcase extends advanced_testcase {
 
         $achievement2 = array_pop($achievements);
         $this->assertEquals($comp_record_history2->userid, $achievement2->user_id);
-        $this->assertEquals($comp_record_history2->competencyid, $achievement2->comp_id);
+        $this->assertEquals($comp_record_history2->competencyid, $achievement2->competency_id);
         $this->assertEquals($assignment->id, $achievement2->assignment_id);
         $this->assertEquals($comp_record_history2->proficiency, $achievement2->scale_value_id);
         $this->assertEquals(0, $achievement2->proficient);
@@ -326,7 +326,7 @@ class totara_competency_install_testcase extends advanced_testcase {
 
         /* Bob / Talking */
 
-        $bob_talking_achievements = $DB->get_records('totara_competency_achievement', ['comp_id' => $talking, 'user_id' => $bob], 'time_created desc');
+        $bob_talking_achievements = $DB->get_records('totara_competency_achievement', ['competency_id' => $talking, 'user_id' => $bob], 'time_created desc');
         $this->assertCount(3, $bob_talking_achievements);
 
         $achievement = array_shift($bob_talking_achievements);
@@ -342,7 +342,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         $this->assertEquals('user', $assignment->user_group_type); // User group type is user
         $this->assertEquals(0, $assignment->optional); // Can't remember what optional means
         $this->assertEquals(2, $assignment->status); // Assignment archived
-        $this->assertEquals($achievement->comp_id, $assignment->competency_id);
+        $this->assertEquals($achievement->competency_id, $assignment->competency_id);
         $this->assertEquals($achievement->assignment_id, $assignment->id);
         $this->assertEquals(0, $assignment->created_by); // TODO this should be null
         $this->assertEquals($achievement->time_created, $assignment->created_at);
@@ -366,7 +366,7 @@ class totara_competency_install_testcase extends advanced_testcase {
 
         /* Bob / Listening */
 
-        $bob_listening_achievements = $DB->get_records('totara_competency_achievement', ['comp_id' => $listening, 'user_id' => $bob], 'time_created desc');
+        $bob_listening_achievements = $DB->get_records('totara_competency_achievement', ['competency_id' => $listening, 'user_id' => $bob], 'time_created desc');
         $this->assertCount(1, $bob_listening_achievements);
 
         $achievement = array_shift($bob_listening_achievements);
@@ -382,7 +382,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         $this->assertEquals('user', $assignment->user_group_type); // User group type is user
         $this->assertEquals(0, $assignment->optional); // Can't remember what optional means
         $this->assertEquals(2, $assignment->status); // Assignment archived
-        $this->assertEquals($achievement->comp_id, $assignment->competency_id);
+        $this->assertEquals($achievement->competency_id, $assignment->competency_id);
         $this->assertEquals($achievement->assignment_id, $assignment->id);
         $this->assertEquals(0, $assignment->created_by); // TODO this should be null
         $this->assertEquals($achievement->time_created, $assignment->created_at);
@@ -390,7 +390,7 @@ class totara_competency_install_testcase extends advanced_testcase {
 
         /* Alice / Talking */
 
-        $alice_talking_achievements = $DB->get_records('totara_competency_achievement', ['comp_id' => $talking, 'user_id' => $alice], 'time_created desc');
+        $alice_talking_achievements = $DB->get_records('totara_competency_achievement', ['competency_id' => $talking, 'user_id' => $alice], 'time_created desc');
         $this->assertCount(2, $alice_talking_achievements);
 
         $achievement = array_shift($alice_talking_achievements);
@@ -406,7 +406,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         $this->assertEquals('user', $assignment->user_group_type); // User group type is user
         $this->assertEquals(0, $assignment->optional); // Can't remember what optional means
         $this->assertEquals(2, $assignment->status); // Assignment archived
-        $this->assertEquals($achievement->comp_id, $assignment->competency_id);
+        $this->assertEquals($achievement->competency_id, $assignment->competency_id);
         $this->assertEquals($achievement->assignment_id, $assignment->id);
         $this->assertEquals(0, $assignment->created_by); // TODO this should be null
         $this->assertEquals($achievement->time_created, $assignment->created_at);
@@ -422,7 +422,7 @@ class totara_competency_install_testcase extends advanced_testcase {
 
         /* Alice / Listening */
 
-        $alice_listening_achievements = $DB->get_records('totara_competency_achievement', ['comp_id' => $listening, 'user_id' => $alice], 'time_created desc');
+        $alice_listening_achievements = $DB->get_records('totara_competency_achievement', ['competency_id' => $listening, 'user_id' => $alice], 'time_created desc');
         $this->assertCount(3, $alice_listening_achievements);
         $achievement = array_shift($alice_listening_achievements);
         $this->assertEquals($listening_alice_latest->timemodified, $achievement->time_created);
@@ -437,7 +437,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         $this->assertEquals('user', $assignment->user_group_type); // User group type is user
         $this->assertEquals(0, $assignment->optional); // Can't remember what optional means
         $this->assertEquals(2, $assignment->status); // Assignment archived
-        $this->assertEquals($achievement->comp_id, $assignment->competency_id);
+        $this->assertEquals($achievement->competency_id, $assignment->competency_id);
         $this->assertEquals($achievement->assignment_id, $assignment->id);
         $this->assertEquals(0, $assignment->created_by); // TODO this should be null
         $this->assertEquals($achievement->time_created, $assignment->created_at);
@@ -461,7 +461,7 @@ class totara_competency_install_testcase extends advanced_testcase {
 
         /* Eve / Listening */
 
-        $eve_listening_achievements = $DB->get_records('totara_competency_achievement', ['comp_id' => $listening, 'user_id' => $eve], 'time_created desc');
+        $eve_listening_achievements = $DB->get_records('totara_competency_achievement', ['competency_id' => $listening, 'user_id' => $eve], 'time_created desc');
         $this->assertCount(1, $eve_listening_achievements);
 
         $achievement = array_shift($eve_listening_achievements);
@@ -477,7 +477,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         $this->assertEquals('user', $assignment->user_group_type); // User group type is user
         $this->assertEquals(0, $assignment->optional); // Can't remember what optional means
         $this->assertEquals(2, $assignment->status); // Assignment archived
-        $this->assertEquals($achievement->comp_id, $assignment->competency_id);
+        $this->assertEquals($achievement->competency_id, $assignment->competency_id);
         $this->assertEquals($achievement->assignment_id, $assignment->id);
         $this->assertEquals(0, $assignment->created_by); // TODO this should be null
         $this->assertEquals($achievement->time_created, $assignment->created_at);
@@ -539,7 +539,7 @@ class totara_competency_install_testcase extends advanced_testcase {
 
         $achievement1 = array_pop($achievements);
         $this->assertEquals($comp_record_history1->userid, $achievement1->user_id);
-        $this->assertEquals($comp_record_history1->competencyid, $achievement1->comp_id);
+        $this->assertEquals($comp_record_history1->competencyid, $achievement1->competency_id);
         $this->assertEquals($assignment->id, $achievement1->assignment_id);
         $this->assertEquals($comp_record_history1->proficiency, $achievement1->scale_value_id);
         $this->assertEquals(0, $achievement1->proficient);
@@ -552,7 +552,7 @@ class totara_competency_install_testcase extends advanced_testcase {
 
         $achievement2 = array_pop($achievements);
         $this->assertEquals($comp_record_history2->userid, $achievement2->user_id);
-        $this->assertEquals($comp_record_history2->competencyid, $achievement2->comp_id);
+        $this->assertEquals($comp_record_history2->competencyid, $achievement2->competency_id);
         $this->assertEquals($assignment->id, $achievement2->assignment_id);
         $this->assertEquals($comp_record_history2->proficiency, $achievement2->scale_value_id);
         $this->assertEquals(0, $achievement2->proficient);

@@ -97,7 +97,7 @@ class totara_competency_generator_testcase extends \advanced_testcase {
         $cg = $this->generator()->create_criteria_group($data->comp, $data->cc[1], $data->scalevalues[3]);
 
         $this->validate_criteria_group($cg, [
-            'comp_id' => $data->comp->id,
+            'competency_id' => $data->comp->id,
             'scale_value_id' => $data->scalevalues[4]->id,
             'criteria' => [$data->cc[1]],
         ]);
@@ -112,7 +112,7 @@ class totara_competency_generator_testcase extends \advanced_testcase {
         $cg = $this->generator()->create_criteria_group($data->comp, [$data->cc[1], $data->cc[2]], $data->scalevalues[3]);
 
         $this->validate_criteria_group($cg, [
-            'comp_id' => $data->comp->id,
+            'competency_id' => $data->comp->id,
             'scale_value_id' => $data->scalevalues[3]->id,
             'status' => pathway::PATHWAY_STATUS_ACTIVE,
             'criteria' => [$data->cc[1], $data->cc[2]],

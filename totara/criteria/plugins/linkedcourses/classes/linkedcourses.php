@@ -81,12 +81,12 @@ class linkedcourses extends criterion {
      * An item is added for each currently linked course - This is in anticipation of merging of TL-22455
      */
     public function update_items(): criterion {
-        $comp_id = $this->get_competency_id();
-        if (is_null($comp_id)) {
+        $competency_id = $this->get_competency_id();
+        if (is_null($competency_id)) {
             throw new coding_exception('Competency id must be set before items are updated');
         }
 
-        $linked_courses = linked_courses::get_linked_course_ids($comp_id);
+        $linked_courses = linked_courses::get_linked_course_ids($competency_id);
         $this->set_item_ids($linked_courses);
 
         return $this;

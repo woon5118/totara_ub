@@ -57,7 +57,7 @@ class pathway_competency_services_testcase extends advanced_testcase {
 
         $res = \external_api::call_external_function(
             'totara_competency_link_default_preset',
-            ['comp_id' => $data->comp->id]
+            ['competency_id' => $data->comp->id]
         );
 
         $result = $res['data'] ?? null;

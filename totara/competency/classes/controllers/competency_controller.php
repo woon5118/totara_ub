@@ -127,7 +127,7 @@ class competency_controller extends admin_controller {
         $config = new achievement_configuration($this->competency);
 
         $data = [
-            'comp_id' => $this->competency->id,
+            'competency_id' => $this->competency->id,
             'scale_id' => $this->competency->scale->id,
             'heading' => $heading,
             'tabs' => \totara_hierarchy_renderer::get_competency_tabs($this->competency->id, "edit$section"),

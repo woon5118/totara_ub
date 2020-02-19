@@ -33,7 +33,7 @@ use core\orm\entity\relations\has_many_through;
  * Class competency_achievement
  *
  * @property-read int $id ID
- * @property int $comp_id
+ * @property int $competency_id
  * @property int $user_id
  * @property int $assignment_id
  * @property int $scale_value_id
@@ -69,7 +69,7 @@ class competency_achievement extends entity {
      * @return belongs_to
      */
     public function competency(): belongs_to {
-        return $this->belongs_to(competency::class, 'comp_id');
+        return $this->belongs_to(competency::class, 'competency_id');
     }
 
     /**

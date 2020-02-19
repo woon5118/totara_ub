@@ -236,8 +236,8 @@ class totara_competency_achievement_configuration_testcase extends advanced_test
         $config->link_default_preset();
 
         // Retrieve the competency from the db and validate that the pathways have been linked
-        $comp_id = $competency->id;
-        $competency = new competency($comp_id);
+        $competency_id = $competency->id;
+        $competency = new competency($competency_id);
         $config = new achievement_configuration($competency);
         $pathways = $config->get_active_pathways();
 

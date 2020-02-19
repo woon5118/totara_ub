@@ -216,7 +216,7 @@ class criteria_childcompetency_watchers_testcase extends advanced_testcase {
 
         // We need to have a valid competency_achievement record for the event
         $new_comp_achievement = new competency_achievement_entity();
-        $new_comp_achievement->comp_id = $competency_id;
+        $new_comp_achievement->competency_id = $competency_id;
         $new_comp_achievement->user_id = $user_id;
         $new_comp_achievement->assignment_id = $assignment->id;
         $new_comp_achievement->scale_value_id = 1;

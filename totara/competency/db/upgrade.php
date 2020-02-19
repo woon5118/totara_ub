@@ -409,5 +409,47 @@ function xmldb_totara_competency_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020011600, 'totara', 'competency');
     }
 
+    if ($oldversion < 2020021800) {
+        // Change comp_id columns to competency_id
+
+        // totara_competency_pathway
+        $table = new xmldb_table('totara_competency_pathway');
+        $field = new xmldb_field('comp_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->rename_field($table, $field, 'competency_id');
+        }
+
+        // totara_competency_scale_aggregation
+        $table = new xmldb_table('totara_competency_scale_aggregation');
+        $field = new xmldb_field('comp_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->rename_field($table, $field, 'competency_id');
+        }
+
+        // totara_competency_achievement
+        $table = new xmldb_table('totara_competency_achievement');
+        $field = new xmldb_field('comp_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->rename_field($table, $field, 'competency_id');
+        }
+
+        // totara_competency_configuration_change
+        $table = new xmldb_table('totara_competency_configuration_change');
+        $field = new xmldb_field('comp_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->rename_field($table, $field, 'competency_id');
+        }
+
+        // totara_competency_configuration_history
+        $table = new xmldb_table('totara_competency_configuration_history');
+        $field = new xmldb_field('comp_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->rename_field($table, $field, 'competency_id');
+        }
+
+        // Competency savepoint reached.
+        upgrade_plugin_savepoint(true, 2020021800, 'totara', 'competency');
+    }
+
     return true;
 }

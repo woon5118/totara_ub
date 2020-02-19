@@ -268,18 +268,18 @@ class totara_competency_webapi_resolver_mutation_create_user_assignments_testcas
         return $this->getDataGenerator()->get_plugin_generator('totara_competency');
     }
 
-    private function set_self_assignable($comp_id) {
+    private function set_self_assignable($competency_id) {
         builder::table('comp_assign_availability')
             ->insert([
-                'comp_id' => $comp_id,
+                'comp_id' => $competency_id,
                 'availability' => competency_entity::ASSIGNMENT_CREATE_SELF
             ]);
     }
 
-    private function set_other_assignable($comp_id) {
+    private function set_other_assignable($competency_id) {
         builder::table('comp_assign_availability')
             ->insert([
-                'comp_id' => $comp_id,
+                'comp_id' => $competency_id,
                 'availability' => competency_entity::ASSIGNMENT_CREATE_OTHER
             ]);
     }

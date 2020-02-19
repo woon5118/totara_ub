@@ -172,7 +172,7 @@ class external extends \external_api {
     public static function create_parameters() {
         return new \external_function_parameters(
             [
-                'comp_id' => new \external_value(PARAM_INT, 'Competency id'),
+                'competency_id' => new \external_value(PARAM_INT, 'Competency id'),
                 'sortorder' => new \external_value(PARAM_INT, 'Sortorder'),
                 'roles' => new \external_multiple_structure(
                     new \external_value(PARAM_ALPHA, 'Role name'),
@@ -184,10 +184,10 @@ class external extends \external_api {
         );
     }
 
-    public static function create(int $comp_id, int $sortorder, array $roles, string $action_time) {
+    public static function create(int $competency_id, int $sortorder, array $roles, string $action_time) {
         advanced_feature::require('competency_assignment');
 
-        $competency = new competency($comp_id);
+        $competency = new competency($competency_id);
         $config = new achievement_configuration($competency);
 
         // Save history before making any changes - for now the action_time is used to ensure we do this only once per user 'Apply changes' action

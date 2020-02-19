@@ -102,19 +102,19 @@ class competency {
 
         $DB->transaction(function () use ($competency_id) {
             configuration_change::repository()
-                ->where('comp_id', $competency_id)
+                ->where('competency_id', $competency_id)
                 ->delete();
 
             configuration_history::repository()
-                ->where('comp_id', $competency_id)
+                ->where('competency_id', $competency_id)
                 ->delete();
 
             scale_aggregation::repository()
-                ->where('comp_id', $competency_id)
+                ->where('competency_id', $competency_id)
                 ->delete();
 
             competency_achievement::repository()
-                ->where('comp_id', $competency_id)
+                ->where('competency_id', $competency_id)
                 ->delete();
         });
     }

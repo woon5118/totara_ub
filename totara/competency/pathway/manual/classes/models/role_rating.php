@@ -111,7 +111,7 @@ class role_rating {
      */
     public function get_latest_rating(): ?rating {
         return rating::repository()
-            ->where('comp_id', $this->competency->id)
+            ->where('competency_id', $this->competency->id)
             ->where('user_id', $this->user->id)
             ->where('assigned_by_role', $this->role::get_name())
             ->order_by('date_assigned', 'desc')

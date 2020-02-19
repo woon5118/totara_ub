@@ -36,7 +36,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
         }
         this.widget = '';
 
-        this.comp_id = '';
+        this.competency_id = '';
         this.scale_id = '';
         this.pathways = [];
         this.scalevalues = [];
@@ -269,9 +269,8 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          */
         initData: function() {
             var that = this;
-
             if (this.widget.hasAttribute('data-comp-id')) {
-                this.comp_id = this.widget.getAttribute('data-comp-id');
+                this.competency_id = this.widget.getAttribute('data-comp-id');
             }
 
             this.setScale().then(function() {
@@ -293,7 +292,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          * Update the detail on this page
          */
         updatePage: function() {
-            if (!this.comp_id || this.scalevalues.length == 0) {
+            if (!this.competency_id || this.scalevalues.length == 0) {
                 return;
             }
 
@@ -305,7 +304,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
 
                 that.getCriteriaTypes().then(function() {
                     apiArgs = {
-                        'args': {comp_id: that.comp_id},
+                        'args': {competency_id: that.competency_id},
                         'methodname': that.endpoints.pathways};
 
                     // Get all the pathways and its detail
@@ -414,12 +413,12 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     });
                 } else {
                     // Get from competency
-                    if (!that.comp_id) {
+                    if (!that.competency_id) {
                         reject('Competency or scale id is required');
                     }
 
                     var apiArgs = {
-                        'args': {comp_id: that.comp_id},
+                        'args': {competency_id: that.competency_id},
                         'methodname': that.endpoints.competencyScale
                     };
 
@@ -736,14 +735,14 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 }
 
                 apiArgs = {
-                    'args': {comp_id: this.comp_id, pathways: toDelete, actiontime: actionTime},
+                    'args': {competency_id: this.competency_id, pathways: toDelete, actiontime: actionTime},
                     'methodname': this.endpoints.deletePathways};
                 promiseArr.push(ajax.getData(apiArgs));
             }
 
             // Overall aggregation
             apiArgs = {
-                'args': {comp_id: this.comp_id, type: this.aggType, actiontime: actionTime},
+                'args': {competency_id: this.competency_id, type: this.aggType, actiontime: actionTime},
                 'methodname': this.endpoints.setOverallAggregation};
             promiseArr.push(ajax.getData(apiArgs));
 
@@ -846,7 +845,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
         linkDefaultPreset: function() {
             var that = this,
                 apiArgs = {
-                    'args': {comp_id: this.comp_id},
+                    'args': {competency_id: this.competency_id},
                     'methodname': this.endpoints.defaultpreset};
 
             // Get all the pathways and its detail
@@ -994,7 +993,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
 
             return new Promise(function (resolve) {
                 var apiArgs = {
-                    args: {comp_id: that.comp_id},
+                    args: {competency_id: that.competency_id},
                     methodname: that.endpoints.getOverallAggregation
                 };
 

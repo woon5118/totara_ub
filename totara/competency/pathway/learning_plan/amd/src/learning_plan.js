@@ -75,7 +75,7 @@ define([],
                 target = wgt;
 
                 if (pwId === 0) {
-                    // New pw - we need the comp_id
+                    // New pw - we need the competency_id
                     var compIdWgt = document.querySelector('[data-comp-id]'),
                         compId = 1;
 
@@ -83,7 +83,7 @@ define([],
                         compId = compIdWgt.getAttribute('data-comp-id') ? compIdWgt.getAttribute('data-comp-id') : 1;
                     }
 
-                    that.pathway.comp_id = compId;
+                    that.pathway.competency_id = compId;
                     delete that.pathway.id;
 
                     target.setAttribute('data-pw-save-endpoint', that.endpoints.create);

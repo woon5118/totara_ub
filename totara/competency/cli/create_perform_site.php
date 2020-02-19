@@ -3887,7 +3887,7 @@ function create_achievement_record($user, $assignment, $value) {
 
     builder::table('totara_competency_achievement')
         ->insert([
-            'comp_id' => $comp->id,
+            'competency_id' => $comp->id,
             'user_id' => $user->id,
             'assignment_id' => $assignment->id,
             'scale_value_id' => $value->id,
@@ -4113,7 +4113,7 @@ function create_manual_ratings($manual_ratings, $data) {
 
             (new \pathway_manual\entities\rating([
                 'user_id' => $user->id,
-                'comp_id' => $comp->id,
+                'competency_id' => $comp->id,
                 'assigned_by' => get_user($rating[1], $data)->id,
                 'assigned_by_role' => $rating[0],
                 'scale_value_id' => $scale_value_id,
@@ -4281,7 +4281,7 @@ function mark_competencies_self_assignable($frameworks, $data) {
             }
 
             $record = [
-                'comp_id' => get_competency($key, $competency[0] ?? '', $data)->id ?? null,
+                'competency_id' => get_competency($key, $competency[0] ?? '', $data)->id ?? null,
                 'availability' => $competency[1] ?? 2,
             ];
 

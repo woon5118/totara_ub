@@ -37,7 +37,7 @@ use totara_competency\entities\scale_value;
  * Acts as a record of a user having rated another user, or themselves, along a scale for a given competency.
  *
  * @property-read int $id ID
- * @property int $comp_id
+ * @property int $competency_id
  * @property int $user_id
  * @property int $scale_value_id
  * @property int $date_assigned
@@ -68,7 +68,7 @@ class rating extends entity {
      * @return belongs_to
      */
     public function competency(): belongs_to {
-        return $this->belongs_to(competency::class, 'comp_id');
+        return $this->belongs_to(competency::class, 'competency_id');
     }
 
     /**

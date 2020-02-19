@@ -164,7 +164,7 @@ class achievement extends item {
             /** @var competency_achievement $achievement */
             $data[] = [
                 'id'               => (int) $achievement->id,
-                'competency_id'    => (int) $achievement->comp_id,
+                'competency_id'    => (int) $achievement->competency_id,
                 'competency_name'  => \core_text::entities_to_utf8(format_string($achievement->competency->fullname)),
                 'assignment_id'    => (int) $achievement->assignment_id,
                 'scale_value_id'   => (int) $achievement->value->id,

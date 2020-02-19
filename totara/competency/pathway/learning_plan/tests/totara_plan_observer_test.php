@@ -60,7 +60,7 @@ class pathway_learning_plan_totara_plan_observer_testcase extends advanced_testc
 
         $count = competency_achievement::repository()
             ->where('user_id', '=', $data->user->id)
-            ->where('comp_id', '=', $data->competency->id)
+            ->where('competency_id', '=', $data->competency->id)
             ->count();
         $this->assertEquals(0, $count);
 
@@ -120,7 +120,7 @@ class pathway_learning_plan_totara_plan_observer_testcase extends advanced_testc
 
         $count = competency_achievement::repository()
             ->where('user_id', '=', $data->user->id)
-            ->where('comp_id', '=', $data->competency->id)
+            ->where('competency_id', '=', $data->competency->id)
             ->count();
         $this->assertEquals(0, $count);
 
@@ -202,7 +202,7 @@ class pathway_learning_plan_totara_plan_observer_testcase extends advanced_testc
 
         $count = competency_achievement::repository()
             ->where('user_id', '=', $data->user->id)
-            ->where('comp_id', '=', $data->competency->id)
+            ->where('competency_id', '=', $data->competency->id)
             ->count();
         $this->assertEquals(0, $count);
 

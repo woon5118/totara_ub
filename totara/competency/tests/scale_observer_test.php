@@ -336,7 +336,7 @@ class totara_competency_scale_observer_testcase extends advanced_testcase {
         /** @var configuration_change $change */
         $configuration_changes = configuration_change::repository()->get();
         $this->assertEquals(2, $configuration_changes->count());
-        $this->assertEqualsCanonicalizing([$comp1->id, $comp2->id], $configuration_changes->pluck('comp_id'));
+        $this->assertEqualsCanonicalizing([$comp1->id, $comp2->id], $configuration_changes->pluck('competency_id'));
         $this->assertEquals(
             [configuration_change::CHANGED_MIN_PROFICIENCY],
             array_unique($configuration_changes->pluck('change_type'))

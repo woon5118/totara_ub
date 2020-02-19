@@ -29,7 +29,7 @@ use core\orm\entity\relations\belongs_to;
 /**
  * Pathway per competency
  *
- * @property int $comp_id
+ * @property int $competency_id
  * @property int $sortorder
  * @property string $path_type
  * @property int $path_instance_id
@@ -52,7 +52,7 @@ class pathway extends entity {
      * @return belongs_to
      */
     public function competency(): belongs_to {
-        return $this->belongs_to(competency::class, 'comp_id');
+        return $this->belongs_to(competency::class, 'competency_id');
     }
 
 }

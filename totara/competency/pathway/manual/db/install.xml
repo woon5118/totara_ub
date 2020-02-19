@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="totara/hierarchy/pathway/criteria_group/db" VERSION="20191002" COMMENT="Database layer definition for a criteria_manual pathway"
+<XMLDB PATH="totara/hierarchy/pathway/criteria_group/db" VERSION="20200217" COMMENT="Database layer definition for a criteria_manual pathway"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
 >
@@ -28,7 +28,7 @@
     <TABLE NAME="pathway_manual_rating" COMMENT="Values given for a user on a manual pathway">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="comp_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="competency_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="user_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of user that is the subject of this rating"/>
         <FIELD NAME="scale_value_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="date_assigned" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -38,7 +38,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="patmanrat_fk_compid" TYPE="foreign" FIELDS="comp_id" REFTABLE="comp" REFFIELDS="id"/>
+        <KEY NAME="patmanrat_fk_compid" TYPE="foreign" FIELDS="competency_id" REFTABLE="comp" REFFIELDS="id"/>
         <KEY NAME="patmanrat_fk_userid" TYPE="foreign" FIELDS="user_id" REFTABLE="user" REFFIELDS="id"/>
         <KEY NAME="patmanrat_fk_scavalid" TYPE="foreign" FIELDS="scale_value_id" REFTABLE="comp_scale_values" REFFIELDS="id"/>
         <KEY NAME="patmanrat_fk_assiby" TYPE="foreign" FIELDS="assigned_by" REFTABLE="user" REFFIELDS="id"/>

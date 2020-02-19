@@ -62,7 +62,7 @@ class competency_item_evaluator extends item_evaluator {
                     FROM {totara_competency_achievement} tca
                    WHERE tca.status = :achievementstatus 
                       AND tca.proficient = :isproficient
-                      AND tca.comp_id = tci.item_id 
+                      AND tca.competency_id = tci.item_id 
                       AND tca.user_id = tcir.user_id
                )
                ";
@@ -113,7 +113,7 @@ class competency_item_evaluator extends item_evaluator {
                               FROM {totara_competency_achievement} tca
                              WHERE tca.status = :achievementstatus
                                 AND tca.proficient = :isproficient
-                                AND tca.comp_id = tci.item_id
+                                AND tca.competency_id = tci.item_id
                                 AND tca.user_id = tcir.user_id
                       )
             ";

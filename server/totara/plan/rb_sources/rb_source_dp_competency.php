@@ -62,11 +62,11 @@ class rb_source_dp_competency extends rb_base_source {
         $global_restriction_join_cr = $this->get_global_report_restriction_join('cr', 'userid');
         $global_restriction_join_p1 = $this->get_global_report_restriction_join('p1', 'userid');
 
-        $tcajoin = $DB->sql_concat_join("','", array($DB->sql_cast_2char('tca.user_id'), $DB->sql_cast_2char('tca.comp_id')));
+        $tcajoin = $DB->sql_concat_join("','", array($DB->sql_cast_2char('tca.user_id'), $DB->sql_cast_2char('tca.competency_id')));
         $pjoin  = $DB->sql_concat_join("','", array($DB->sql_cast_2char('p1.userid'), $DB->sql_cast_2char('pca1.competencyid')));
 
         $this->base = "(
-            SELECT DISTINCT {$tcajoin} AS id, tca.user_id AS userid, tca.comp_id AS competencyid
+            SELECT DISTINCT {$tcajoin} AS id, tca.user_id AS userid, tca.competency_id AS competencyid
             FROM {totara_competency_achievement} tca
             {$global_restriction_join_cr}
             WHERE tca.scale_value_id IS NOT NULL
@@ -204,7 +204,7 @@ from
                 'achievement',
                 'LEFT',
                 '{totara_competency_achievement}',
-                '(base.competencyid = achievement.comp_id
+                '(base.competencyid = achievement.competency_id
                   AND achievement.user_id = base.userid
                   AND achievement.status = ' . competency_achievement::ACTIVE_ASSIGNMENT . ')',
                   REPORT_BUILDER_RELATION_MANY_TO_ONE

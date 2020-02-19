@@ -63,7 +63,7 @@ class achievement_configuration {
      */
     public function has_aggregation_type(string $aggregation_type = null): bool {
         return scale_aggregation::repository()
-            ->where('comp_id', $this->get_competency()->id)
+            ->where('competency_id', $this->get_competency()->id)
             ->when(!empty($aggregation_type), function (repository $repository) use ($aggregation_type) {
                 $repository->where('type', $aggregation_type);
             })
@@ -79,7 +79,7 @@ class achievement_configuration {
         if (empty($this->aggregation_type)) {
             /** @var scale_aggregation $aggregation */
             $aggregation = scale_aggregation::repository()
-                ->where('comp_id', $this->get_competency()->id)
+                ->where('competency_id', $this->get_competency()->id)
                 ->one();
 
             if ($aggregation) {
@@ -222,12 +222,12 @@ class achievement_configuration {
 
             /** @var scale_aggregation $aggregation */
             $aggregation = scale_aggregation::repository()
-                ->where('comp_id', $this->get_competency()->id)
+                ->where('competency_id', $this->get_competency()->id)
                 ->one();
 
             if (!$aggregation) {
                 $aggregation = new scale_aggregation();
-                $aggregation->comp_id = $this->get_competency()->id;
+                $aggregation->competency_id = $this->get_competency()->id;
             } else if ($type == $aggregation->type) {
                 // In case it did not change don't do anything
                 return;
@@ -280,7 +280,7 @@ class achievement_configuration {
 
         if (!is_null($action_time)) {
             $saved = configuration_history::repository()
-                ->where('comp_id', '=', $this->competency->id)
+                ->where('competency_id', '=', $this->competency->id)
                 ->where('active_from', '=', $action_time)
                 ->one();
 
@@ -296,7 +296,7 @@ class achievement_configuration {
 
         // First set the last dump's 'active_to' timestamp
         $last_history = configuration_history::repository()
-            ->where('comp_id', '=', $this->competency->id)
+            ->where('competency_id', '=', $this->competency->id)
             ->where('active_to', '=', null)
             ->one();
 
@@ -308,7 +308,7 @@ class achievement_configuration {
         $configuration_dump = $configuration_dump ?? self::get_current_configuration_dump($this->competency->id);
 
         $entry = new configuration_history();
-        $entry->comp_id = $this->competency->id;
+        $entry->competency_id = $this->competency->id;
         $entry->active_from = $action_time ?? time();
         $entry->configuration = $configuration_dump;
         $entry->save();
@@ -323,17 +323,17 @@ class achievement_configuration {
      * Data is read from the database and not the instance as the instance may
      * already have been updated
      *
-     * @param int $comp_id Competency id
+     * @param int $competency_id Competency id
      * @return string Configuration dump
      */
-    public static function get_current_configuration_dump(int $comp_id): string {
+    public static function get_current_configuration_dump(int $competency_id): string {
         global $DB;
 
-        $params = ['comp_id' => $comp_id];
+        $params = ['competency_id' => $competency_id];
 
         $dumpobj = [
             'aggregation' => $DB->get_field('totara_competency_scale_aggregation', 'type', $params),
-            'pathways' => pathway::dump_competency_pathways($comp_id),
+            'pathways' => pathway::dump_competency_pathways($competency_id),
         ];
 
         if ($dumpobj['aggregation'] === false) {

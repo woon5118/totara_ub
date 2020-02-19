@@ -37,7 +37,7 @@ class competency {
         $competency_id = $event->get_data()['objectid'];
 
         rating::repository()
-            ->where('comp_id', $competency_id)
+            ->where('competency_id', $competency_id)
             ->delete();
     }
 

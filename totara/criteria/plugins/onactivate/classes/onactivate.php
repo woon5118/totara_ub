@@ -95,12 +95,12 @@ class onactivate extends criterion {
      * to work in the same manner as all other plugins
      */
     public function update_items(): criterion {
-        $comp_id = $this->get_competency_id();
-        if (is_null($comp_id)) {
+        $competency_id = $this->get_competency_id();
+        if (is_null($competency_id)) {
             throw new coding_exception('Competency id must be set before items are updated');
         }
 
-        $this->set_item_ids([$comp_id]);
+        $this->set_item_ids([$competency_id]);
 
         return $this;
     }

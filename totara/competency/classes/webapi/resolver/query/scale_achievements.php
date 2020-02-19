@@ -87,7 +87,7 @@ class scale_achievements implements query_resolver {
         return pathway_entity::repository()
             ->where('path_type', $single_value_types)
             ->where('status', pathway::PATHWAY_STATUS_ACTIVE)
-            ->join([assignment::TABLE, 'ass'], 'comp_id', 'competency_id')
+            ->join([assignment::TABLE, 'ass'], 'competency_id', 'competency_id')
             ->where('ass.id', $assignment_id)
             ->with('competency')
             ->order_by('sortorder', 'asc')

@@ -160,7 +160,7 @@ class totara_competency_webapi_resolver_query_achievement_paths_testcase extends
         ];
 
         $pathway1 = new pathway();
-        $pathway1->comp_id = $data->assignment1->competency_id;
+        $pathway1->competency_id = $data->assignment1->competency_id;
         $pathway1->sortorder = 1;
         $pathway1->path_type = 'manual';
         $pathway1->path_instance_id = 0;
@@ -168,7 +168,7 @@ class totara_competency_webapi_resolver_query_achievement_paths_testcase extends
         $pathway1->save();
 
         $pathway2 = new pathway();
-        $pathway2->comp_id = $data->assignment1->competency_id;
+        $pathway2->competency_id = $data->assignment1->competency_id;
         $pathway2->sortorder = 2;
         $pathway2->path_type = 'criteria_group';
         $pathway2->path_instance_id = 0;
@@ -203,7 +203,7 @@ class totara_competency_webapi_resolver_query_achievement_paths_testcase extends
         ];
 
         $pathway1 = new pathway();
-        $pathway1->comp_id = $data->assignment1->competency_id;
+        $pathway1->competency_id = $data->assignment1->competency_id;
         $pathway1->sortorder = 1;
         $pathway1->path_type = 'fake_multivalue_type';
         $pathway1->path_instance_id = 0;
@@ -211,7 +211,7 @@ class totara_competency_webapi_resolver_query_achievement_paths_testcase extends
         $pathway1->save();
 
         $pathway2 = new pathway();
-        $pathway2->comp_id = $data->assignment1->competency_id;
+        $pathway2->competency_id = $data->assignment1->competency_id;
         $pathway2->sortorder = 2;
         $pathway2->path_type = 'criteria_group';
         $pathway2->path_instance_id = 0;
@@ -219,7 +219,7 @@ class totara_competency_webapi_resolver_query_achievement_paths_testcase extends
         $pathway2->save();
 
         $pathway3 = new pathway();
-        $pathway3->comp_id = $data->assignment1->competency_id;
+        $pathway3->competency_id = $data->assignment1->competency_id;
         $pathway3->sortorder = 3;
         $pathway3->path_type = 'learning_plan';
         $pathway3->path_instance_id = 0;
@@ -227,7 +227,7 @@ class totara_competency_webapi_resolver_query_achievement_paths_testcase extends
         $pathway3->save();
 
         $pathway4 = new pathway();
-        $pathway4->comp_id = $data->assignment1->competency_id;
+        $pathway4->competency_id = $data->assignment1->competency_id;
         $pathway4->sortorder = 4;
         $pathway4->path_type = 'fake_singlevalue_type';
         $pathway4->path_instance_id = 0;

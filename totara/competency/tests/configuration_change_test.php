@@ -52,7 +52,7 @@ class totara_competency_configuration_change_testcase extends advanced_testcase 
         /** @var configuration_change $change */
         $configuration_changes = configuration_change::repository()->get();
         $this->assertEquals(2, $configuration_changes->count());
-        $this->assertEqualsCanonicalizing([$comp1->id, $comp2->id], $configuration_changes->pluck('comp_id'));
+        $this->assertEqualsCanonicalizing([$comp1->id, $comp2->id], $configuration_changes->pluck('competency_id'));
         $this->assertEquals(
             [configuration_change::CHANGED_MIN_PROFICIENCY],
             array_unique($configuration_changes->pluck('change_type'))
@@ -75,7 +75,7 @@ class totara_competency_configuration_change_testcase extends advanced_testcase 
         $configuration_changes = configuration_change::repository()->get();
         $this->assertEquals(1, $configuration_changes->count());
         $configuration_change = $configuration_changes->first();
-        $this->assertEquals($comp1->id, $configuration_change->comp_id);
+        $this->assertEquals($comp1->id, $configuration_change->competency_id);
         $this->assertEquals(configuration_change::CHANGED_AGGREGATION, $configuration_change->change_type);
         $this->assertEmpty($configuration_change->related_info);
         $this->assertEquals($test_time, $configuration_change->time_changed);
@@ -86,7 +86,7 @@ class totara_competency_configuration_change_testcase extends advanced_testcase 
         $configuration_changes = configuration_change::repository()->get();
         $this->assertEquals(1, $configuration_changes->count());
         $configuration_change = $configuration_changes->first();
-        $this->assertEquals($comp1->id, $configuration_change->comp_id);
+        $this->assertEquals($comp1->id, $configuration_change->competency_id);
         $this->assertEquals(configuration_change::CHANGED_AGGREGATION, $configuration_change->change_type);
         $this->assertEmpty($configuration_change->related_info);
         $this->assertEquals($test_time, $configuration_change->time_changed);

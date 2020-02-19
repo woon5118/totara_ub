@@ -82,8 +82,8 @@ class totara_competency_competency_deletion_testcase extends advanced_testcase {
      * Test scale aggregation options for a competency are deleted too.
      */
     public function test_scale_aggregation_deleted() {
-        $scale_agg_1 = (new scale_aggregation(['comp_id' => $this->comp_1->id, 'type' => 'A']))->save();
-        $scale_agg_2 = (new scale_aggregation(['comp_id' => $this->comp_2->id, 'type' => 'B']))->save();
+        $scale_agg_1 = (new scale_aggregation(['competency_id' => $this->comp_1->id, 'type' => 'A']))->save();
+        $scale_agg_2 = (new scale_aggregation(['competency_id' => $this->comp_2->id, 'type' => 'B']))->save();
 
         $this->assert_exists($scale_agg_1);
         $this->assert_exists($scale_agg_2);
@@ -108,9 +108,9 @@ class totara_competency_competency_deletion_testcase extends advanced_testcase {
             'time_changed' => 0,
             'change_type' => 0,
         ];
-        $config_change_1 = (new configuration_change(array_merge($config_change_attributes, ['comp_id' => $this->comp_1->id])))
+        $config_change_1 = (new configuration_change(array_merge($config_change_attributes, ['competency_id' => $this->comp_1->id])))
             ->save();
-        $config_change_2 = (new configuration_change(array_merge($config_change_attributes, ['comp_id' => $this->comp_2->id])))
+        $config_change_2 = (new configuration_change(array_merge($config_change_attributes, ['competency_id' => $this->comp_2->id])))
             ->save();
 
         $config_history_attributes = [
@@ -119,9 +119,9 @@ class totara_competency_competency_deletion_testcase extends advanced_testcase {
             'active_to' => 0,
             'configuration' => 0,
         ];
-        $config_history_1 = (new configuration_history(array_merge($config_history_attributes, ['comp_id' => $this->comp_1->id])))
+        $config_history_1 = (new configuration_history(array_merge($config_history_attributes, ['competency_id' => $this->comp_1->id])))
             ->save();
-        $config_history_2 = (new configuration_history(array_merge($config_history_attributes, ['comp_id' => $this->comp_2->id])))
+        $config_history_2 = (new configuration_history(array_merge($config_history_attributes, ['competency_id' => $this->comp_2->id])))
             ->save();
 
         $this->assert_exists($config_change_1);
@@ -154,8 +154,8 @@ class totara_competency_competency_deletion_testcase extends advanced_testcase {
             'status' => 0,
             'pathway_modified' => 0,
         ];
-        $path_1 = (new pathway(array_merge($path_attributes, ['comp_id' => $this->comp_1->id])))->save();
-        $path_2 = (new pathway(array_merge($path_attributes, ['comp_id' => $this->comp_2->id])))->save();
+        $path_1 = (new pathway(array_merge($path_attributes, ['competency_id' => $this->comp_1->id])))->save();
+        $path_2 = (new pathway(array_merge($path_attributes, ['competency_id' => $this->comp_2->id])))->save();
 
         $path_achievement_attributes = [
             'user_id' => 0,
@@ -184,10 +184,10 @@ class totara_competency_competency_deletion_testcase extends advanced_testcase {
             'time_scale_value' => 0,
             'last_aggregated' => 0,
         ];
-        $achievement_1 = (new competency_achievement(array_merge($achievement_attributes, ['comp_id' => $this->comp_1->id])))
+        $achievement_1 = (new competency_achievement(array_merge($achievement_attributes, ['competency_id' => $this->comp_1->id])))
             ->save();
         $achievement_2 = (new competency_achievement(array_merge($achievement_attributes, [
-            'comp_id' => $this->comp_2->id,
+            'competency_id' => $this->comp_2->id,
             'assignment_id' => $another_assignment->id,
         ])))
             ->save();

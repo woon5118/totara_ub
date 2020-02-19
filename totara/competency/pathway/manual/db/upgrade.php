@@ -158,5 +158,19 @@ function xmldb_pathway_manual_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019110700, 'pathway', 'manual');
     }
 
+    if ($oldversion < 2020021700) {
+        // Change comp_id columns to competency_id
+
+        // pathway_manual_rating
+        $table = new xmldb_table('pathway_manual_rating');
+        $field = new xmldb_field('comp_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->rename_field($table, $field, 'competency_id');
+        }
+
+        // Competency savepoint reached.
+        upgrade_plugin_savepoint(true, 2020021700, 'pathway', 'manual');
+    }
+
     return true;
 }

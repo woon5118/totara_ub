@@ -123,10 +123,10 @@ class dp_competency_component extends dp_base_component {
             //           When implementing criteria per assignment in future we will need to decide what to do here
             $status = "
                 LEFT JOIN (
-                    SELECT DISTINCT user_id, comp_id, scale_value_id
+                    SELECT DISTINCT user_id, competency_id, scale_value_id
                       FROM {totara_competency_achievement}
                      WHERE status = :activeachievement) cr
-                 ON a.competencyid = cr.comp_id
+                 ON a.competencyid = cr.competency_id
                 AND cr.user_id = :planuserid
                 LEFT JOIN
                     {comp_scale_values} csv
@@ -265,10 +265,10 @@ class dp_competency_component extends dp_base_component {
             //           When implementing criteria per assignment in future we will need to decide what to do here
             $status = "
                 LEFT JOIN (
-                    SELECT DISTINCT user_id, comp_id, scale_value_id
+                    SELECT DISTINCT user_id, competency_id, scale_value_id
                       FROM {totara_competency_achievement}
                      WHERE status = :activeachievement) cr
-                 ON a.competencyid = cr.comp_id
+                 ON a.competencyid = cr.competency_id
                 AND cr.user_id = :planuserid
                 LEFT JOIN
                     {comp_scale_values} csv
@@ -637,7 +637,7 @@ class dp_competency_component extends dp_base_component {
         $priorityscaleid = ($this->get_setting('priorityscale')) ? $this->get_setting('priorityscale') : -1;
 
         $params = array();
-        $select = 'SELECT ca.*, c.fullname, csv.name AS  status, csv.sortorder AS profsort,
+        $select = 'SELECT ca.*, c.fullname, csv.name AS status, csv.sortorder AS profsort,
                    psv.name AS priorityname ';
 
         // get competencies assigned to this plan
@@ -653,12 +653,12 @@ class dp_competency_component extends dp_base_component {
             //           For now all will have the same achieved value
             //           When implementing criteria per assignment in future we will need to decide what to do here
             $from .= "LEFT JOIN (
-                        SELECT DISTINCT user_id, comp_id, scale_value_id
+                        SELECT DISTINCT user_id, competency_id, scale_value_id
                           FROM {totara_competency_achievement}
                          WHERE status = ?) cr
-                             ON ca.competencyid = cr.comp_id AND cr.user_id = ?
+                             ON ca.competencyid = cr.competency_id AND cr.user_id = ?
                       LEFT JOIN {comp_scale_values} csv
-                             ON cr.proficiency = csv.id ";
+                             ON cr.scale_value_id = csv.id ";
             $params[] = competency_achievement_entity::ACTIVE_ASSIGNMENT;
             $params[] = $this->plan->userid;
         }
@@ -1753,10 +1753,10 @@ class dp_competency_component extends dp_base_component {
             //           When implementing criteria per assignment in future we will need to decide what to do here
             $sql .= "
                 LEFT JOIN (
-                    SELECT DISTINCT user_id, comp_id, scale_value_id
+                    SELECT DISTINCT user_id, competency_id, scale_value_id
                       FROM {totara_competency_achievement}
                      WHERE status = ?) cr
-                 ON ca.competencyid = cr.comp_id
+                 ON ca.competencyid = cr.competency_id
                 AND cr.user_id = ?
                 LEFT JOIN
                     {comp_scale_values} csv

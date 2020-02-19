@@ -84,7 +84,7 @@ class competency_aggregation_all extends scheduled_task {
              SELECT DISTINCT tcau.user_id, tcau.competency_id {$has_changed_column_value}
               FROM {$assignment_users_table} tcau
               JOIN {totara_competency_pathway} pw
-                ON tcau.competency_id = pw.comp_id
+                ON tcau.competency_id = pw.competency_id
         ";
 
         $DB->execute($sql, []);

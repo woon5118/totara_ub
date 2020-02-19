@@ -457,7 +457,7 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
         $competency = $competency_generator->create_competency();
 
         $configuration_change = new configuration_change();
-        $configuration_change->comp_id = $competency->id;
+        $configuration_change->competency_id = $competency->id;
         $configuration_change->change_type = configuration_change::CHANGED_MIN_PROFICIENCY;
         $configuration_change->time_changed = time() - 5;
         $configuration_change->save();
@@ -474,7 +474,7 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
         $this->waitForSecond();
 
         $configuration_change = new configuration_change();
-        $configuration_change->comp_id = $competency->id;
+        $configuration_change->competency_id = $competency->id;
         $configuration_change->change_type = configuration_change::CHANGED_AGGREGATION;
         $configuration_change->time_changed = time();
         $configuration_change->save();
@@ -494,7 +494,7 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
         (new assignment_actions())->activate([$pos_assignment->id, $competency->id]);
 
         $configuration_change = new configuration_change();
-        $configuration_change->comp_id = $competency->id;
+        $configuration_change->competency_id = $competency->id;
         $configuration_change->change_type = configuration_change::CHANGED_AGGREGATION;
         $configuration_change->time_changed = time() + 5;
         $configuration_change->save();
@@ -549,7 +549,7 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
         $achievement->time_created = $time;
         $achievement->scale_value_id = null;
         $achievement->assignment_id = $assignment_id;
-        $achievement->comp_id = $competency_id;
+        $achievement->competency_id = $competency_id;
         $achievement->user_id = $user_id;
         $achievement->proficient = 1;
         $achievement->status = 1;
@@ -560,7 +560,7 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
         $achievement->time_created = $time + 1;
         $achievement->scale_value_id = $great->id;
         $achievement->assignment_id = $assignment_id;
-        $achievement->comp_id = $competency_id;
+        $achievement->competency_id = $competency_id;
         $achievement->user_id = $user_id;
         $achievement->proficient = 1;
         $achievement->status = 1;
@@ -571,7 +571,7 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
         $achievement->time_created = $time + 2;
         $achievement->scale_value_id = null;
         $achievement->assignment_id = $assignment_id;
-        $achievement->comp_id = $competency_id;
+        $achievement->competency_id = $competency_id;
         $achievement->user_id = $user_id;
         $achievement->proficient = 0;
         $achievement->status = 1;

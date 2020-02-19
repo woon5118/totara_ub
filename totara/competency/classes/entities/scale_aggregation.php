@@ -33,7 +33,7 @@ require_once($CFG->dirroot . '/totara/hierarchy/prefix/competency/lib.php');
  * Class competency scale aggregation
  *
  * @property-read int $id ID
- * @property int $comp_id
+ * @property int $competency_id
  * @property string $type
  * @property int $timemodified
  */

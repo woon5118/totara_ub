@@ -91,7 +91,7 @@ class competency_aggregator_user_source {
             $sql = "
                 UPDATE {totara_competency_achievement}
                 SET status = :newstatus, time_status = :timestatus
-                WHERE comp_id = :compid
+                WHERE competency_id = :competencyid
                     AND status = :currentstatus
                     AND user_id NOT IN (
                         SELECT {$temp_user_id_column}
@@ -101,7 +101,7 @@ class competency_aggregator_user_source {
             ";
             $params = array_merge(
                 [
-                    'compid' => $competency_id,
+                    'competencyid' => $competency_id,
                     'newstatus' => competency_achievement::ARCHIVED_ASSIGNMENT,
                     'currentstatus' => competency_achievement::ACTIVE_ASSIGNMENT,
                     'timestatus' => $aggregation_time,
@@ -116,7 +116,7 @@ class competency_aggregator_user_source {
         $sql = "
             UPDATE {totara_competency_achievement}
             SET status = :newstatus, time_status = :timestatus
-            WHERE comp_id = :compid
+            WHERE competency_id = :competencyid
                 AND status = :currentstatus
                 AND user_id IN (
                     SELECT {$temp_user_id_column}
@@ -126,14 +126,14 @@ class competency_aggregator_user_source {
                 AND assignment_id NOT IN (
                     SELECT assignment_id
                     FROM {totara_competency_assignment_users}
-                    WHERE competency_id = :compid2
+                    WHERE competency_id = :competencyid2
                 )
         ";
 
         $params = array_merge(
             [
-                'compid' => $competency_id,
-                'compid2' => $competency_id,
+                'competencyid' => $competency_id,
+                'competencyid2' => $competency_id,
                 'newstatus' => competency_achievement::ARCHIVED_ASSIGNMENT,
                 'currentstatus' => competency_achievement::ACTIVE_ASSIGNMENT,
                 'timestatus' => $aggregation_time,
@@ -295,7 +295,7 @@ class competency_aggregator_user_source {
         // the active achievements. This reduces the number of queries
         // down to only two and avoids the N+1 problem here
         $achievements = competency_achievement::repository()
-            ->where('comp_id', $competency_id)
+            ->where('competency_id', $competency_id)
             ->where('user_id', 'in', $assignments->pluck('user_id'))
             ->where('status', competency_achievement::ACTIVE_ASSIGNMENT)
             ->get();

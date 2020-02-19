@@ -284,7 +284,7 @@ class totara_competency_competency_aggregator_users_source_testcase extends \adv
 
     protected function create_achievement(int $competency_id, int $user_id, int $assignment_id, scale_value $scale_value) {
         $achievement = new competency_achievement();
-        $achievement->comp_id = $competency_id;
+        $achievement->competency_id = $competency_id;
         $achievement->user_id = $user_id;
         $achievement->assignment_id = $assignment_id;
         $achievement->scale_value_id = $scale_value->id;

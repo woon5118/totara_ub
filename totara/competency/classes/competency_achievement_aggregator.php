@@ -140,7 +140,7 @@ final class competency_achievement_aggregator {
                     }
 
                     $new_comp_achievement = new competency_achievement();
-                    $new_comp_achievement->comp_id = $competency_id;
+                    $new_comp_achievement->competency_id = $competency_id;
                     $new_comp_achievement->user_id = $user_id;
                     $new_comp_achievement->assignment_id = $user_assignment_record->assignment_id;
                     $new_comp_achievement->scale_value_id = $scale_value_id;

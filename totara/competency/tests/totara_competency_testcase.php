@@ -302,7 +302,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
         }
 
         $achievement = new competency_achievement([
-            'comp_id' => $assignment->competency_id,
+            'competency_id' => $assignment->competency_id,
             'user_id' => $user->id,
             'assignment_id' => $assignment->id,
             'scale_value_id' => $value->id,

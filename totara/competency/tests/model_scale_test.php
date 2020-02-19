@@ -148,7 +148,7 @@ class totara_competency_model_scale_testcase extends advanced_testcase {
         // Creating a record with a null scale_value_id value
         $achievement = new competency_achievement();
         $achievement->user_id = $user->id;
-        $achievement->comp_id = $comp->id;
+        $achievement->competency_id = $comp->id;
         $achievement->assignment_id = $assignment->id;
         $achievement->scale_value_id = null;
         $achievement->proficient = 0;

@@ -56,7 +56,7 @@ class default_criteria_on_install extends adhoc_task {
          */
         $competencies = competency::repository()
             ->with('scale')
-            ->left_join([scale_aggregation::TABLE, 'sa'], 'id', 'comp_id')
+            ->left_join([scale_aggregation::TABLE, 'sa'], 'id', 'competency_id')
             ->where('sa.id', null)
             ->get();
 

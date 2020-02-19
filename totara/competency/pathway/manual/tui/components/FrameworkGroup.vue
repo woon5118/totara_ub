@@ -151,12 +151,12 @@ export default {
   methods: {
     /**
      * Notify the parent of a new/updated rating.
-     * @param {Number} compId
+     * @param {Number} competencyId
      * @param {Object} ratingData
      */
-    updateRating(compId, ratingData) {
+    updateRating(competencyId, ratingData) {
       this.$emit('update-rating', {
-        comp_id: compId,
+        competency_id: competencyId,
         scale_value_id: ratingData.scale_value_id,
         comment: ratingData.comment,
       });
@@ -164,19 +164,21 @@ export default {
 
     /**
      * Notify the parent of a deleted rating.
-     * @param {Number} compId
+     * @param {Number} competencyId
      */
-    deleteRating(compId) {
-      this.$emit('delete-rating', compId);
+    deleteRating(competencyId) {
+      this.$emit('delete-rating', competencyId);
     },
 
     /**
      * Get the rating made for a specific competency.
-     * @param {Number} compId
+     * @param {Number} competencyId
      * @returns {Object}
      */
-    getRating(compId) {
-      return this.selectedRatings.find(compData => compData.comp_id === compId);
+    getRating(competencyId) {
+      return this.selectedRatings.find(
+        compData => compData.competency_id === competencyId
+      );
     },
   },
 };

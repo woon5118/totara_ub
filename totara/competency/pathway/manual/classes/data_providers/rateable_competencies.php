@@ -71,7 +71,7 @@ class rateable_competencies extends provider {
         role_factory::roles_exist($roles, true);
 
         $repository
-            ->join([pathway::TABLE, 'path'], 'id', 'comp_id')
+            ->join([pathway::TABLE, 'path'], 'id', 'competency_id')
             ->join([role::TABLE, 'manual_role'], 'path.path_instance_id', 'path_manual_id')
             ->add_select(new raw_field(
                 $repository->group_concat('manual_role.role', self::ROLE_CONCAT_SEPARATOR) . ' as manual_roles'

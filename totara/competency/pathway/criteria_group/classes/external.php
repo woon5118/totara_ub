@@ -69,7 +69,7 @@ class external extends \external_api {
     public static function create_parameters() {
         return new \external_function_parameters(
             [
-                'comp_id' => new \external_value(PARAM_INT, 'Competency id'),
+                'competency_id' => new \external_value(PARAM_INT, 'Competency id'),
                 'sortorder' => new \external_value(PARAM_INT, 'Sortorder'),
                 'scalevalue' => new \external_value(PARAM_INT, 'Scale value id.'),
                 'criteria' => new \external_multiple_structure(
@@ -105,7 +105,7 @@ class external extends \external_api {
     }
 
     // TODO: Make this part of the graphQL configuration mutators
-    public static function create(int $comp_id, int $sortorder, int $scalevalue, array $criteria, int $action_time) {
+    public static function create(int $competency_id, int $sortorder, int $scalevalue, array $criteria, int $action_time) {
         advanced_feature::require('competency_assignment');
 
         // If there are no criteria linked to this pathway, don't create
@@ -113,7 +113,7 @@ class external extends \external_api {
             return 0;
         }
 
-        $competency = new competency($comp_id);
+        $competency = new competency($competency_id);
         $config = new achievement_configuration($competency);
 
         // Save history before making any changes - for now the action_time is used to ensure we do this only once per user 'Apply changes' action

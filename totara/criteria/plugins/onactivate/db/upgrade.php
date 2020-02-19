@@ -43,7 +43,7 @@ function xmldb_criteria_onactivate_upgrade($oldversion) {
         $sql =
             "INSERT INTO {totara_criteria_metadata}
              (criterion_id, metakey, metavalue)
-             SELECT tc.id, :metadatakey, tcp.comp_id
+             SELECT tc.id, :metadatakey, tcp.competency_id
                FROM {totara_criteria} tc
                JOIN {pathway_criteria_group_criterion} pcgc
                  ON pcgc.criterion_type = tc.plugin_type

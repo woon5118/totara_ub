@@ -390,7 +390,7 @@ class pathway_criteria_group_aggregation_helper_testcase extends advanced_testca
         $rows = $DB->get_records('totara_competency_aggregation_queue');
         $this->assertSame(count($expected_rows), count($rows));
 
-        // Just checking user_id and comp_id
+        // Just checking user_id and competency_id
         foreach ($rows as $row) {
             foreach ($expected_rows as $key => $expected) {
                 if ($row->competency_id == $expected['competency_id'] && $row->user_id == $expected['user_id']) {

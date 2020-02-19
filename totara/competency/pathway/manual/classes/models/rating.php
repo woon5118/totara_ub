@@ -84,7 +84,7 @@ class rating {
         string $comment = null
     ) {
         $this->create_multiple([
-            ['comp_id' => $competency_id, 'scale_value_id' => $scale_value_id, 'comment' => $comment]
+            ['competency_id' => $competency_id, 'scale_value_id' => $scale_value_id, 'comment' => $comment]
         ]);
     }
 
@@ -96,9 +96,9 @@ class rating {
     public function create_multiple(array $ratings) {
         $this->require_can_rate_user();
         self::validate_scale_values_for_competencies(
-            array_combine(array_column($ratings, 'comp_id'), array_column($ratings, 'scale_value_id'))
+            array_combine(array_column($ratings, 'competency_id'), array_column($ratings, 'scale_value_id'))
         );
-        $this->validate_role_for_competencies(array_column($ratings, 'comp_id'));
+        $this->validate_role_for_competencies(array_column($ratings, 'competency_id'));
 
         $rating_record = [
             'user_id' => $this->subject_user->id,
@@ -120,7 +120,7 @@ class rating {
 
                 $queue_data[] = [
                     'user_id' => $rating_record['user_id'],
-                    'competency_id' => $rating['comp_id']
+                    'competency_id' => $rating['competency_id']
                 ];
             }
             (new aggregation_users_table())->queue_multiple_for_aggregation($queue_data);

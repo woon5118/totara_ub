@@ -82,18 +82,19 @@ class rateable_users extends provider {
     private function get_competency_count_query(user_repository $repository): subquery {
         $competency_count = new subquery(function (builder $builder) use ($repository) {
             $builder
-                ->select_raw('COUNT(DISTINCT(competency_id))')
-                ->from(competency_assignment_user::TABLE)
+                ->select_raw('COUNT(DISTINCT(cau.competency_id))')
+                ->from(competency_assignment_user::TABLE, 'cau')
                 ->where_field('user_id', new field('id', $repository->get_builder()));
         });
 
         $valid_manual_pathways = pathway::repository()
+            ->as('pw')
             ->select('id')
             ->join([role_entity::TABLE, 'role'], 'path_instance_id', 'path_manual_id')
             ->where('path_type', 'manual')
             ->where('status', manual::PATHWAY_STATUS_ACTIVE)
             ->where('role.role', $this->role::get_name())
-            ->where_field('comp_id', new field('competency_id', $competency_count->get_builder()));
+            ->where_field('pw.competency_id', new field('cau.competency_id', $competency_count->get_builder()));
 
         $competency_count
             ->get_subquery()

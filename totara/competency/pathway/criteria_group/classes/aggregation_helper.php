@@ -60,7 +60,7 @@ class aggregation_helper {
                        tcau.user_id
                   FROM {$assignment_users_table} tcau
                   JOIN {totara_competency_pathway} tcp
-                    ON tcau.competency_id = tcp.comp_id
+                    ON tcau.competency_id = tcp.competency_id
                   JOIN {pathway_criteria_group_criterion} pcgc
                     ON pcgc.criteria_group_id = tcp.path_instance_id
                  WHERE tcp.path_type = :pathtype

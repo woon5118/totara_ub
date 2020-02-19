@@ -111,24 +111,22 @@ class pathway_manual_userdata_testcase extends advanced_testcase {
         $expected = array_merge(
             rating::repository()->where('comment', 'Rating On Self 1')->one()->to_array(),
             [
-                'competency_id' => $this->competency->id,
                 'competency_name' => $this->competency->fullname,
                 'scale_value_name' => $this->scale_value->name,
             ]
         );
-        unset($expected['comp_id'], $expected['user_id']);
+        unset($expected['user_id']);
 
         $this->assertEquals([$expected], $this->export_self($this->user1));
 
         $expected = array_merge(
             rating::repository()->where('comment', 'Rating On Self 2')->one()->to_array(),
             [
-                'competency_id' => $this->competency->id,
                 'competency_name' => $this->competency->fullname,
                 'scale_value_name' => $this->scale_value->name,
             ]
         );
-        unset($expected['comp_id'], $expected['user_id']);
+        unset($expected['user_id']);
 
         $this->assertEquals([$expected], $this->export_self($this->user2));
     }
@@ -138,12 +136,11 @@ class pathway_manual_userdata_testcase extends advanced_testcase {
         $expected = array_merge(
             rating::repository()->where('comment', 'Rating On Other 1')->one()->to_array(),
             [
-                'competency_id' => $this->competency->id,
                 'competency_name' => $this->competency->fullname,
                 'scale_value_name' => $this->scale_value->name,
             ]
         );
-        unset($expected['comp_id'], $expected['user_id']);
+        unset($expected['user_id']);
 
         $this->assertEquals([$expected], $export_other_1);
 
@@ -151,12 +148,11 @@ class pathway_manual_userdata_testcase extends advanced_testcase {
         $expected = array_merge(
             rating::repository()->where('comment', 'Rating On Other 2')->one()->to_array(),
             [
-                'competency_id' => $this->competency->id,
                 'competency_name' => $this->competency->fullname,
                 'scale_value_name' => $this->scale_value->name,
             ]
         );
-        unset($expected['comp_id'], $expected['user_id']);
+        unset($expected['user_id']);
 
         $this->assertEquals([$expected], $export_other_2);
     }
@@ -178,7 +174,7 @@ class pathway_manual_userdata_testcase extends advanced_testcase {
 
     private function create_rating(stdClass $user_for, stdClass $assigned_by, string $comment = null): rating {
         $rating = new rating();
-        $rating->comp_id = $this->competency->id;
+        $rating->competency_id = $this->competency->id;
         $rating->user_id = $user_for->id;
         $rating->scale_value_id = $this->scale_value->id;
         $rating->date_assigned = time();

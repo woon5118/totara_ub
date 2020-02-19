@@ -68,8 +68,8 @@ class childcompetency extends criterion {
      * @return string|null Error description
      */
     protected function validate_attributes(): ?string {
-        $comp_id = $this->get_competency_id();
-        return is_null($comp_id) ? 'Competency id metadata is required in childcompetency criteria' : null;
+        $competency_id = $this->get_competency_id();
+        return is_null($competency_id) ? 'Competency id metadata is required in childcompetency criteria' : null;
     }
 
     /**
@@ -79,12 +79,12 @@ class childcompetency extends criterion {
     public function update_items(): criterion {
         global $DB;
 
-        $comp_id = $this->get_competency_id();
-        if (is_null($comp_id)) {
+        $competency_id = $this->get_competency_id();
+        if (is_null($competency_id)) {
             throw new coding_exception('Competency id must be set before items are updated');
         }
 
-        $child_competencies = $DB->get_fieldset_select('comp', 'id', 'parentid = :parentid', ['parentid' => $comp_id]);
+        $child_competencies = $DB->get_fieldset_select('comp', 'id', 'parentid = :parentid', ['parentid' => $competency_id]);
         $this->set_item_ids($child_competencies);
 
         return $this;

@@ -102,7 +102,7 @@ class competency extends hierarchy_item {
      * @return has_one
      */
     public function achievement(): has_one {
-        return $this->has_one(competency_achievement::class, 'comp_id')
+        return $this->has_one(competency_achievement::class, 'competency_id')
             ->where_in('status', [competency_achievement::ACTIVE_ASSIGNMENT, competency_achievement::ARCHIVED_ASSIGNMENT]);
     }
 
@@ -175,7 +175,7 @@ class competency extends hierarchy_item {
      * @return has_one
      */
     public function scale_aggregation(): has_one {
-        return $this->has_one(scale_aggregation::class, 'comp_id');
+        return $this->has_one(scale_aggregation::class, 'competency_id');
     }
 
     /**
@@ -246,7 +246,7 @@ class competency extends hierarchy_item {
      * @return has_many
      */
     public function pathways(): has_many {
-        return $this->has_many(pathway::class, 'comp_id');
+        return $this->has_many(pathway::class, 'competency_id');
     }
 
     /**

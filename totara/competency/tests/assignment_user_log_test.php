@@ -240,7 +240,7 @@ class totara_competency_user_log_testcase extends totara_competency_assignment_a
         );
     }
 
-    private function create_position_assignment(int $user_id, int $pos_id, int $comp_id): assignment {
+    private function create_position_assignment(int $user_id, int $pos_id, int $competency_id): assignment {
         $job_data = [
             'userid' => $user_id,
             'idnumber' => 'dev1',
@@ -250,7 +250,7 @@ class totara_competency_user_log_testcase extends totara_competency_assignment_a
         job_assignment::create($job_data);
 
         $record = $this->generator()->assignment_generator()->create_position_assignment(
-            $comp_id,
+            $competency_id,
             $pos_id,
             ['status' => assignment::STATUS_ACTIVE]
         );

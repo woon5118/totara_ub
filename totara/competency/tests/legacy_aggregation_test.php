@@ -183,7 +183,7 @@ class totara_competency_legacy_aggregation_testcase extends advanced_testcase {
 
         $this->assertFalse(
             configuration_change::repository()
-                ->where('comp_id', $data->competency->id)
+                ->where('competency_id', $data->competency->id)
                 ->where('change_type', configuration_change::CHANGED_COMPETENCY_AGGREGATION)
                 ->exists()
         );
@@ -202,7 +202,7 @@ class totara_competency_legacy_aggregation_testcase extends advanced_testcase {
 
         $this->assertTrue(
             configuration_change::repository()
-                ->where('comp_id', $data->competency->id)
+                ->where('competency_id', $data->competency->id)
                 ->where('change_type', configuration_change::CHANGED_COMPETENCY_AGGREGATION)
                 ->exists()
         );
@@ -469,7 +469,7 @@ class totara_competency_legacy_aggregation_testcase extends advanced_testcase {
             ->join([criteria_group_criterion_entity::TABLE, 'cgc'], 'id', 'criterion_id')
             ->join([pathway_entity::TABLE, 'pw'], 'cgc.criteria_group_id', 'pw.path_instance_id')
             ->where('plugin_type', $plugin_types)
-            ->where('pw.comp_id', $competency_id)
+            ->where('pw.competency_id', $competency_id)
             ->where('pw.status', pathway::PATHWAY_STATUS_ACTIVE)
             ->get();
     }
@@ -479,7 +479,7 @@ class totara_competency_legacy_aggregation_testcase extends advanced_testcase {
         $this->assertCount(2, $this->get_criteria($competency->id));
 
         $has_learning_plan = pathway_entity::repository()
-            ->where('comp_id', $competency->id)
+            ->where('competency_id', $competency->id)
             ->where('path_type', 'learning_plan')
             ->where('sortorder', 1)
             ->exists();

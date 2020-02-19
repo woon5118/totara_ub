@@ -105,7 +105,7 @@ function totara_competency_install_migrate_achievements() {
         }
 
         $comp_achievement = new stdClass();
-        $comp_achievement->comp_id = $history->competencyid;
+        $comp_achievement->competency_id = $history->competencyid;
         $comp_achievement->user_id = $history->userid;
         $comp_achievement->assignment_id = $comp_assignment['id'] ?? 0; // This should not be 0
         $comp_achievement->scale_value_id = $history->proficiency;

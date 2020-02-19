@@ -185,7 +185,7 @@ class totara_competency_competency_observer_testcase extends advanced_testcase {
                 (new linkedcourses())->get_plugin_type(),
                 (new childcompetency())->get_plugin_type(),
             ])
-            ->where('pw.comp_id', $competency_id)
+            ->where('pw.competency_id', $competency_id)
             ->where('pw.status', pathway::PATHWAY_STATUS_ACTIVE)
             ->get();
     }

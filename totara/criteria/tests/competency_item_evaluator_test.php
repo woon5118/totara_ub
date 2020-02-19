@@ -81,7 +81,7 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
 
     /**
      * Create a totara_competency_achieved row
-     * @param  int $comp_id
+     * @param  int $competency_id
      * @param  int $user_id
      * @param int $assignment_id
      * @param  int $proficient
@@ -89,7 +89,7 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
      * @return int Id of inserted row
      */
     private function create_achievement(
-        int $comp_id,
+        int $competency_id,
         int $user_id,
         ?int $assignment_id = null,
         int $proficient = 0,
@@ -97,7 +97,7 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
     ): int {
         $achievement = new competency_achievement([
             'user_id' => $user_id,
-            'comp_id' => $comp_id,
+            'competency_id' => $competency_id,
             'assignment_id' => $assignment_id,
             'proficient' => $proficient,
             'status' => $status ?? competency_achievement::ACTIVE_ASSIGNMENT,
@@ -274,7 +274,7 @@ class totara_criteria_competency_item_evaluator_testcase extends advanced_testca
      * Test update_item_records with totara_competency_achievement row but no totara_criteria_item_record
      *
      * @dataProvider achievement_no_item_record_data_provider
-     * @param int $comp_id
+     * @param int $competency_id
      * @param int $user_id
      * @param array[] $achievements
      * @param bool $expected_is_met

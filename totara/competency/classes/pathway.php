@@ -157,13 +157,13 @@ abstract class pathway {
         if (empty($this->sortorder)) {
             $sql = "SELECT MAX(sortorder)
                       FROM {totara_competency_pathway}
-                     WHERE comp_id = :comp_id
+                     WHERE competency_id = :competency_id
                        AND status = :active";
             // Todo: Once we're properly implementing sortorder, we'll need to consider whether draft should be
             // included as well or instead of.
             $highest_current = $DB->get_field_sql(
                 $sql,
-                ['comp_id' => $this->get_competency()->id, 'active' => static::PATHWAY_STATUS_ACTIVE]
+                ['competency_id' => $this->get_competency()->id, 'active' => static::PATHWAY_STATUS_ACTIVE]
             );
 
             // Explicit check of false since the value could be 0.
@@ -209,7 +209,7 @@ abstract class pathway {
 
         // If we get here, we have either a new pathway or something changed
         $record = new stdClass();
-        $record->comp_id = $this->competency->id;
+        $record->competency_id = $this->competency->id;
         $record->sortorder = $this->get_sortorder();
         $record->path_type = $this->get_path_type();
         $record->path_instance_id = $this->get_path_instance_id();
@@ -302,7 +302,7 @@ abstract class pathway {
         global $DB;
         $DB->transaction(function () use ($competency) {
             $pathways = pathway_entity::repository()
-                ->where('comp_id', $competency->id ?? $competency);
+                ->where('competency_id', $competency->id ?? $competency);
 
             foreach ($pathways->get() as $pathway) {
                 static::fetch($pathway->id)->delete_configuration();
@@ -757,13 +757,13 @@ abstract class pathway {
     /**
      * Get the current configurations for all active pathways belonging to the specified competency in an associative array
      *
-     * @param int $comp_id Competency id
+     * @param int $competency_id Competency id
      * @return array
      */
-    public static function dump_competency_pathways(int $comp_id) {
+    public static function dump_competency_pathways(int $competency_id) {
         global $DB;
 
-        $result = $DB->get_records('totara_competency_pathway', ['comp_id' => $comp_id, 'status' => static::PATHWAY_STATUS_ACTIVE]);
+        $result = $DB->get_records('totara_competency_pathway', ['competency_id' => $competency_id, 'status' => static::PATHWAY_STATUS_ACTIVE]);
         foreach ($result as $id => $pathway) {
             if (!is_null($pathway->path_instance_id)) {
                 $pathway->detail = pathway_factory::dump_pathway_configuration($pathway->path_type, $pathway->path_instance_id);

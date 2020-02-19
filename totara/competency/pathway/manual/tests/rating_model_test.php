@@ -154,14 +154,14 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
         $this->generator->create_manual($this->competency1, [manager::class]);
         $scale_value_id = $this->get_scale_value_id('11');
 
-        $this->assertFalse($DB->record_exists('pathway_manual_rating', ['comp_id' => $this->competency1->id]));
+        $this->assertFalse($DB->record_exists('pathway_manual_rating', ['competency_id' => $this->competency1->id]));
         rating_model::for_user_and_role($this->user1->id, manager::class)->create(
             $this->competency1->id,
             $scale_value_id,
             'comment text'
         );
         $record = $DB->get_record('pathway_manual_rating', [
-            'comp_id' => $this->competency1->id,
+            'competency_id' => $this->competency1->id,
             'user_id' => $this->user1->id,
             'scale_value_id' => $scale_value_id,
             'assigned_by' => $this->user2->id,
@@ -176,7 +176,7 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
             'comment text 2'
         );
         $record = $DB->get_record('pathway_manual_rating', [
-            'comp_id' => $this->competency1->id,
+            'competency_id' => $this->competency1->id,
             'user_id' => $this->user1->id,
             'scale_value_id' => null,
             'assigned_by' => $this->user2->id,
@@ -198,12 +198,12 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
 
         $ratings = [
             [
-                'comp_id' => $this->competency1->id,
+                'competency_id' => $this->competency1->id,
                 'scale_value_id' => $scale_value_id_1,
                 'comment' => 'Test comment 1',
             ],
             [
-                'comp_id' => $this->competency2->id,
+                'competency_id' => $this->competency2->id,
                 'scale_value_id' => $scale_value_id_2,
                 'comment' => 'Test comment 2',
             ],
@@ -214,7 +214,7 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
         rating_model::for_user_and_role($this->user1->id, manager::class)->create_multiple($ratings);
 
         $record = $DB->get_record('pathway_manual_rating', [
-            'comp_id' => $this->competency1->id,
+            'competency_id' => $this->competency1->id,
             'user_id' => $this->user1->id,
             'scale_value_id' => $scale_value_id_1,
             'assigned_by' => $this->user2->id,
@@ -223,7 +223,7 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
         $this->assertEquals('Test comment 1', $record->comment);
 
         $record = $DB->get_record('pathway_manual_rating', [
-            'comp_id' => $this->competency2->id,
+            'competency_id' => $this->competency2->id,
             'user_id' => $this->user1->id,
             'scale_value_id' => $scale_value_id_2,
             'assigned_by' => $this->user2->id,

@@ -220,7 +220,7 @@ export default {
      */
     updateRating(ratingData) {
       let previousRating = this.selectedRatings.find(
-        ratingObj => ratingObj.comp_id === ratingData.comp_id
+        ratingObj => ratingObj.competency_id === ratingData.competency_id
       );
 
       if (previousRating) {
@@ -241,7 +241,7 @@ export default {
      */
     deleteRating(compId) {
       this.selectedRatings = this.selectedRatings.filter(
-        previousRating => previousRating.comp_id !== compId
+        previousRating => previousRating.competency_id !== compId
       );
 
       this.updateUnloadHandler();
@@ -267,7 +267,7 @@ export default {
      */
     updateComment(newComment) {
       let rating = this.selectedRatings.find(
-        ratingData => ratingData.comp_id === newComment.comp_id
+        ratingData => ratingData.competency_id === newComment.competency_id
       );
       if (rating) {
         rating.comment = newComment.comment;
@@ -292,11 +292,11 @@ export default {
 
     /**
      * Get rating data for sending to GQL mutation.
-     * @returns {{scale_value_id: (null|*), comment: (string|*), comp_id: *}[]}
+     * @returns {{scale_value_id: (null|*), comment: (string|*), competency_id: *}[]}
      */
     getRatingsForSaving() {
       return this.selectedRatings.map(rating => ({
-        comp_id: rating.comp_id,
+        competency_id: rating.competency_id,
         // Map "None" to null.
         scale_value_id:
           parseInt(rating.scale_value_id) === NONE_OPTION_VALUE

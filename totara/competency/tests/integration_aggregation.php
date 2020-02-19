@@ -331,7 +331,7 @@ class totara_competency_integration_aggregation extends advanced_testcase {
 
         foreach ($actual_rows as $actual_row) {
             foreach ($expected_rows as $key => $expected_row) {
-                if ((int)$actual_row->comp_id == $expected_row['competency_id']
+                if ((int)$actual_row->competency_id == $expected_row['competency_id']
                     && (int)$actual_row->user_id == $expected_row['user_id']
                     && (int)$actual_row->status == $expected_row['status']
                     && (int)$actual_row->scale_value_id == $expected_row['scale_value_id']

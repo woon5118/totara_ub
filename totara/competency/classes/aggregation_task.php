@@ -145,7 +145,7 @@ class aggregation_task {
 
         // Make sure that we only query competencies which have an active pathway
         $pathway_builder = builder::table(pathway_entity::TABLE)
-            ->where_field('comp_id', "c.id")
+            ->where_field('competency_id', "c.id")
             ->where('path_type', $pathway_types)
             ->where('status', pathway::PATHWAY_STATUS_ACTIVE);
 
@@ -173,7 +173,7 @@ class aggregation_task {
         // We are looking for competencies with archived pathways which have still active pathway_achievements
         $pathway_builder = builder::table(pathway_entity::TABLE)
             ->join([pathway_achievement::TABLE, 'pwa'], 'id', 'pathway_id')
-            ->where_field('comp_id', "c.id")
+            ->where_field('competency_id', "c.id")
             ->where('pwa.status', pathway_achievement::STATUS_CURRENT)
             ->where('status', pathway::PATHWAY_STATUS_ARCHIVED);
 

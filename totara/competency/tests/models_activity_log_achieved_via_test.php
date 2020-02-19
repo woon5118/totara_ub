@@ -31,7 +31,7 @@ class totara_competency_models_activity_log_achieved_via_testcase extends advanc
     public function test_get_methods() {
         // Dummy values
         $user_id = 100;
-        $comp_id = 200;
+        $competency_id = 200;
         $achievement_time = 300;
 
         /** @var totara_hierarchy_generator $hierarchy_generator */
@@ -49,7 +49,7 @@ class totara_competency_models_activity_log_achieved_via_testcase extends advanc
         $great = scale_value::repository()->where('name', '=', 'Great')->one();
 
         $assignment = new assignment();
-        $assignment->competency_id = $comp_id;
+        $assignment->competency_id = $competency_id;
         $assignment->user_group_id = 300;
         $assignment->user_group_type = 'test';
         $assignment->created_by = 400;
@@ -57,7 +57,7 @@ class totara_competency_models_activity_log_achieved_via_testcase extends advanc
 
         $achievement = new competency_achievement();
         $achievement->user_id = $user_id;
-        $achievement->comp_id = $comp_id;
+        $achievement->competency_id = $competency_id;
         $achievement->scale_value_id = $great->id;
         $achievement->time_created = $achievement_time;
         $achievement->assignment_id = $assignment->id;

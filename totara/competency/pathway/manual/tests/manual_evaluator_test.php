@@ -230,7 +230,7 @@ class pathway_manual_evaluator_testcase extends advanced_testcase {
     private function create_rating_records(int $competency_id, array $ratings) {
         foreach ($ratings as $to_create) {
             $rating = new \pathway_manual\entities\rating();
-            $rating->comp_id = $competency_id;
+            $rating->competency_id = $competency_id;
             $rating->user_id = $to_create['subject'];
             $rating->scale_value_id = $to_create['scalevalue'];
             $rating->assigned_by = $to_create['rater'];

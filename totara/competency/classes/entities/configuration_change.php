@@ -10,7 +10,7 @@ use totara_competency\hook\competency_configuration_changed;
 
 /**
  * @property-read int $id ID
- * @property int $comp_id
+ * @property int $competency_id
  * @property int $assignment_id
  * @property int $time_changed
  * @property string $change_type
@@ -57,7 +57,7 @@ class configuration_change extends entity {
 
         if (!is_null($action_time)) {
             $logged = configuration_change::repository()
-                ->where('comp_id', '=', $competency_id)
+                ->where('competency_id', '=', $competency_id)
                 ->where('change_type', '=', $change_type)
                 ->where('time_changed', '=', $action_time)
                 ->one();
@@ -77,7 +77,7 @@ class configuration_change extends entity {
         }
 
         $entry = new configuration_change();
-        $entry->comp_id = $competency_id;
+        $entry->competency_id = $competency_id;
         $entry->change_type = $change_type;
         $entry->time_changed = $action_time ?? time();
         $entry->save();
@@ -107,7 +107,7 @@ class configuration_change extends entity {
 
         foreach ($competencies as $competency) {
             $entry = new \stdClass();
-            $entry->comp_id = $competency->id;
+            $entry->competency_id = $competency->id;
             $entry->change_type = self::CHANGED_MIN_PROFICIENCY;
             $entry->time_changed = $time;
             $entry->related_info = $related_info;
@@ -147,7 +147,7 @@ class configuration_change extends entity {
      * @return belongs_to
      */
     public function competency(): belongs_to {
-        return $this->belongs_to(competency::class, 'comp_id');
+        return $this->belongs_to(competency::class, 'competency_id');
     }
 
     /**

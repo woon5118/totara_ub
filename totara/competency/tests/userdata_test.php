@@ -142,7 +142,7 @@ class totara_competency_userdata_testcase extends advanced_testcase {
 
     private function expected_achievements_exported(competency_achievement $record): array {
         return array_merge($record->to_array(), [
-            'competency_id'    => $record->comp_id,
+            'competency_id'    => $record->competency_id,
             'competency_name'  => $record->competency->fullname,
             'scale_value_name' => $record->value->name,
         ]);
@@ -164,7 +164,7 @@ class totara_competency_userdata_testcase extends advanced_testcase {
         for ($i = 0; $i < $records_to_create; $i++) {
             $achievement = new competency_achievement();
             $achievement->user_id = $user->id;
-            $achievement->comp_id = $this->competency->id;
+            $achievement->competency_id = $this->competency->id;
             $achievement->assignment_id = $assignment->id;
             $achievement->scale_value_id = $this->scale_value->id;
             $achievement->proficient = 1;

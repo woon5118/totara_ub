@@ -106,7 +106,7 @@ class pathway_criteria_group_services_testcase extends advanced_testcase {
         $this->assertEquals(0, $DB->count_records('totara_competency_configuration_change'));
 
         $params = [
-            'comp_id' => $data->comp->id,
+            'competency_id' => $data->comp->id,
             'criteria' => [
                 [
                     'aggregation' => [
@@ -155,7 +155,7 @@ class pathway_criteria_group_services_testcase extends advanced_testcase {
         $this->assertEquals(0, $DB->count_records('totara_competency_configuration_change'));
 
         $params = [
-            'comp_id' => $data->comp->id,
+            'competency_id' => $data->comp->id,
             'criteria' => [
                 [
                     'aggregation' => [
@@ -209,7 +209,7 @@ class pathway_criteria_group_services_testcase extends advanced_testcase {
         $this->assertEquals(0, $DB->count_records('totara_competency_configuration_change'));
 
         $params = [
-            'comp_id' => $data->comp->id,
+            'competency_id' => $data->comp->id,
             'criteria' => [
                 [
                     'aggregation' => [

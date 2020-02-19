@@ -41,16 +41,16 @@ class external extends \external_api {
     public static function get_scale_parameters() {
         return new \external_function_parameters(
             [
-                'comp_id' => new \external_value(PARAM_INT, 'Id of the competency'),
+                'competency_id' => new \external_value(PARAM_INT, 'Id of the competency'),
             ]
         );
     }
 
-    public static function get_scale(int $comp_id): int {
+    public static function get_scale(int $competency_id): int {
         // TODO could be competency generic
         advanced_feature::require('competency_assignment');
 
-        $competency = new competency($comp_id);
+        $competency = new competency($competency_id);
         return $competency->scale->id;
     }
 
@@ -111,15 +111,15 @@ class external extends \external_api {
     public static function get_pathways_parameters() {
         return new \external_function_parameters(
             [
-                'comp_id' => new \external_value(PARAM_INT, 'Id of the competency'),
+                'competency_id' => new \external_value(PARAM_INT, 'Id of the competency'),
             ]
         );
     }
 
-    public static function get_pathways(int $comp_id) {
+    public static function get_pathways(int $competency_id) {
         advanced_feature::require('competency_assignment');
 
-        $config = new achievement_configuration(new competency($comp_id));
+        $config = new achievement_configuration(new competency($competency_id));
         $pathways = $config->get_active_pathways();
 
         $results = [];
@@ -365,15 +365,15 @@ class external extends \external_api {
     public static function link_default_preset_parameters() {
         return new \external_function_parameters(
             [
-                'comp_id' => new \external_value(PARAM_INT, 'Id of the competency'),
+                'competency_id' => new \external_value(PARAM_INT, 'Id of the competency'),
             ]
         );
     }
 
-    public static function link_default_preset(int $comp_id): string {
+    public static function link_default_preset(int $competency_id): string {
         advanced_feature::require('competency_assignment');
 
-        $config = new achievement_configuration(new competency($comp_id));
+        $config = new achievement_configuration(new competency($competency_id));
         $config->link_default_preset();
 
         return 1;
@@ -442,7 +442,7 @@ class external extends \external_api {
     public static function delete_pathways_parameters() {
         return new \external_function_parameters(
             [
-                'comp_id' => new \external_value(PARAM_INT, 'Id of the competency'),
+                'competency_id' => new \external_value(PARAM_INT, 'Id of the competency'),
                 'pathways' => new \external_multiple_structure(
                     new \external_single_structure([
                         'type' => new \external_value(PARAM_ALPHAEXT, 'Pathway type'),
@@ -454,10 +454,10 @@ class external extends \external_api {
         );
     }
 
-    public static function delete_pathways(string $comp_id, array $pathways, int $action_time) {
+    public static function delete_pathways(string $competency_id, array $pathways, int $action_time) {
         advanced_feature::require('competency_assignment');
 
-        $config = new achievement_configuration(new competency($comp_id));
+        $config = new achievement_configuration(new competency($competency_id));
         return $config->delete_pathways($pathways, $action_time);
     }
 
@@ -472,15 +472,15 @@ class external extends \external_api {
     public static function has_singleuse_criteria_parameters() {
         return new \external_function_parameters(
             [
-                'comp_id' => new \external_value(PARAM_INT, 'Id of the competency'),
+                'competency_id' => new \external_value(PARAM_INT, 'Id of the competency'),
             ]
         );
     }
 
-    public static function has_singleuse_criteria(int $comp_id): string {
+    public static function has_singleuse_criteria(int $competency_id): string {
         advanced_feature::require('competency_assignment');
 
-        $config = new achievement_configuration(new competency($comp_id));
+        $config = new achievement_configuration(new competency($competency_id));
         return $config->has_singleuse_criteria();
     }
 
@@ -494,17 +494,17 @@ class external extends \external_api {
     public static function set_overall_aggregation_parameters() {
         return new \external_function_parameters(
             [
-                'comp_id' => new \external_value(PARAM_INT, 'Id of the competency'),
+                'competency_id' => new \external_value(PARAM_INT, 'Id of the competency'),
                 'type' => new \external_value(PARAM_ALPHANUMEXT, 'Aggregation type'),
                 'actiontime' => new \external_value(PARAM_INT, 'Time user initiated the action. It is used to group changes done in single user action together'),
             ]
         );
     }
 
-    public static function set_overall_aggregation(int $comp_id, string $type, int $action_time): string {
+    public static function set_overall_aggregation(int $competency_id, string $type, int $action_time): string {
         advanced_feature::require('competency_assignment');
 
-        $config = new achievement_configuration(new competency($comp_id));
+        $config = new achievement_configuration(new competency($competency_id));
         $old_type = $config->get_aggregation_type();
 
         if ($old_type !== $type) {
@@ -522,15 +522,15 @@ class external extends \external_api {
     public static function get_overall_aggregation_parameters() {
         return new \external_function_parameters(
             [
-                'comp_id' => new \external_value(PARAM_INT, 'Id of the competency'),
+                'competency_id' => new \external_value(PARAM_INT, 'Id of the competency'),
             ]
         );
     }
 
-    public static function get_overall_aggregation(int $comp_id): string {
+    public static function get_overall_aggregation(int $competency_id): string {
         advanced_feature::require('competency_assignment');
 
-        $config = new achievement_configuration(new competency($comp_id));
+        $config = new achievement_configuration(new competency($competency_id));
         return $config->get_aggregation_type();
     }
 
