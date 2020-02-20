@@ -28,6 +28,7 @@ $string['pluginname'] = 'Competencies';
 
 $string['achievementpathsetup'] = 'Achievement paths setup';
 $string['achievementpaths'] = 'Achievement paths';
+$string['achievementpath_group_label_single'] = 'Fulfil criteria';
 $string['achievement_level'] = 'Achievement level';
 $string['active'] = 'Active';
 $string['activity_log'] = 'Activity log';

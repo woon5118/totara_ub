@@ -130,16 +130,19 @@ class totara_competency_webapi_resolver_query_achievement_paths_testcase extends
         $this->assertEquals(
             [
                 [
-                    'class' => 'MULTIVALUE',
-                    'type' => 'manual',
-                ],
-                [
                     'class' => 'SINGLEVALUE',
                     'type' => null,
+                    'name' => get_string('achievementpath_group_label_single', 'totara_competency'),
+                ],
+                [
+                    'class' => 'MULTIVALUE',
+                    'type' => 'manual',
+                    'name' => get_string('achievementpath_group_label', 'pathway_manual'),
                 ],
                 [
                     'class' => 'MULTIVALUE',
                     'type' => 'learning_plan',
+                    'name' => get_string('achievementpath_group_label', 'pathway_learning_plan'),
                 ],
             ],
             $result
@@ -178,6 +181,7 @@ class totara_competency_webapi_resolver_query_achievement_paths_testcase extends
                 [
                     'class' => 'SINGLEVALUE',
                     'type' => null,
+                    'name' => get_string('achievementpath_group_label_single', 'totara_competency'),
                 ]
             ],
             $result
@@ -237,14 +241,17 @@ class totara_competency_webapi_resolver_query_achievement_paths_testcase extends
                 [
                     'class' => 'SINGLEVALUE',
                     'type' => null,
+                    'name' => get_string('achievementpath_group_label_single', 'totara_competency'),
                 ],
                 [
                     'class' => 'MULTIVALUE',
                     'type' => 'learning_plan',
+                    'name' => get_string('achievementpath_group_label', 'pathway_learning_plan'),
                 ],
                 [
                     'class' => 'MULTIVALUE',
                     'type' => 'fake_multivalue_type',
+                    'name' => 'fake multi value label',
                 ]
             ],
             $result

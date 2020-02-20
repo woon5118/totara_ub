@@ -23,6 +23,7 @@
 
 $string['pluginname'] = 'Manual rating';
 
+$string['achievementpath_group_label'] = 'Be rated by an assessor';
 $string['add_comment'] = 'Add optional comment';
 $string['add_rating'] = 'Add rating';
 $string['addraters'] = 'Add raters';

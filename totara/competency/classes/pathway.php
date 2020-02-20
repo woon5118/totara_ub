@@ -536,6 +536,21 @@ abstract class pathway {
     }
 
     /**
+     * Get human readable label for this pathway.
+     * All pathways of classification single will have the same label if this is not overriden
+     *
+     * @return string
+     */
+    public static function get_label(): string {
+        if ((new static())->get_classification() === static::PATHWAY_SINGLE_VALUE) {
+            return get_string('achievementpath_group_label_single', 'totara_competency');
+        }
+        // overwrite in children
+        debugging('This pathway does not have a label. Every pathway needs a label so that it shows up correctly in the interface.', DEBUG_DEVELOPER);
+        return 'na';
+    }
+
+    /**
      * Returns the scale value associated with this instance of this pathway.
      *
      * Override this method for pathways that can be set to correspond to particular value.

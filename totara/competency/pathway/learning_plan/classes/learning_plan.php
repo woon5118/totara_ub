@@ -118,4 +118,12 @@ class learning_plan extends pathway {
     public function get_view_template(): string {
         return 'pathway_learning_plan/view';
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_label(): string {
+        return get_string('achievementpath_group_label', 'pathway_learning_plan');
+    }
+
 }

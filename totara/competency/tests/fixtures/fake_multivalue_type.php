@@ -76,4 +76,11 @@ class fake_multivalue_type extends pathway {
     public function aggregate_current_value(int $user_id): base_achievement_detail {
         // TODO: Implement aggregate_current_value() method.
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_label(): string {
+        return 'fake multi value label';
+    }
 }

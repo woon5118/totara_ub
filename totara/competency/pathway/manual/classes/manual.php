@@ -288,6 +288,13 @@ class manual extends pathway {
         return !empty($this->roles);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public static function get_label(): string {
+        return get_string('achievementpath_group_label', 'pathway_manual');
+    }
+
 
 
     /*******************************************************************************************************

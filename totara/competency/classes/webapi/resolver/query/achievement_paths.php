@@ -55,8 +55,8 @@ class achievement_paths implements query_resolver {
 
         // For now this is hardcoded, any additional paths will come after those
         $order = [
-            'manual',
             'criteria_group',
+            'manual',
             'learning_plan'
         ];
         // All single_value class pathways should be grouped together
@@ -66,14 +66,15 @@ class achievement_paths implements query_resolver {
 
         $paths = [];
         foreach ($pathway_types as $pathway_type) {
-            /** @var pathway $pathway_classname */
+            /** @var pathway $pathway */
             $pathway_classname = pathway_factory::get_classname($pathway_type);
+            $pathway = new $pathway_classname();
             // We want all single value pathways grouped together
-            if ($pathway_classname::CLASSIFICATION === pathway::PATHWAY_SINGLE_VALUE) {
+            if ($pathway::CLASSIFICATION === pathway::PATHWAY_SINGLE_VALUE) {
                 $paths[$single_value_key] = [
                     'class' => $classification_enums[pathway::PATHWAY_SINGLE_VALUE],
                     'type' => null,
-                    'name' => 'criteria'
+                    'name' => $pathway::get_label()
                 ];
             } else {
                 $order_key = array_search($pathway_type, $order);
@@ -82,9 +83,9 @@ class achievement_paths implements query_resolver {
                     $order_key = max(count($order) + 1, count($paths) + 1);
                 }
                 $paths[$order_key] = [
-                    'class' => $classification_enums[$pathway_classname::CLASSIFICATION],
+                    'class' => $classification_enums[$pathway::CLASSIFICATION],
                     'type' => $pathway_type,
-                    'name' => $pathway_type
+                    'name' => $pathway::get_label()
                 ];
             }
         }

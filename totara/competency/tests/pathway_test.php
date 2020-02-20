@@ -24,8 +24,22 @@
 use totara_competency\entities\scale;
 use totara_competency\entities\scale_value;
 use totara_competency\pathway;
+use totara_competency\pathway_factory;
 
 class totara_competency_pathway_testcase extends \advanced_testcase {
+
+    /**
+     * Test whether each pathway returns a label
+     */
+    public function test_labels() {
+        $types = pathway_factory::get_pathway_types();
+        foreach ($types as $type) {
+            $pathway = pathway_factory::create($type);
+            $label = $pathway::get_label();
+            $this->assertNotEmpty($label);
+        }
+        $this->assertDebuggingNotCalled('This pathway does not have a label. Every pathway needs a label so that it shows up correctly in the interface.');
+    }
 
     /**
      * Test leads_to_proficiency with a MULTI_VALUE type pathway
