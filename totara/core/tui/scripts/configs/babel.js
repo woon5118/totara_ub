@@ -28,7 +28,7 @@ module.exports = {
       [
         'transform-async-to-promises',
         {
-          externalHelpers: true,
+          inlineHelpers: true,
         },
       ],
     ],
