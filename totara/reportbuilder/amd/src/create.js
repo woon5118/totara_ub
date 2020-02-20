@@ -319,12 +319,9 @@ define(['core/templates', 'core/webapi', 'core/flex_icon', 'core/config', 'core/
                 });
 
                 if (tiles.length < data.totalcount) {
-                    that.loadContainer.removeAttribute('data-tw-report-create-disabled');
                     that.currentIndex += limit;
                 } else {
-                    // We're out of records, so mark that we shouldn't load anymore
                     that.currentIndex = 0;
-                    that.loadContainer.setAttribute('data-tw-report-create-disabled', true);
                 }
 
                 var template = templates.render('totara_core/grid', {
@@ -337,6 +334,13 @@ define(['core/templates', 'core/webapi', 'core/flex_icon', 'core/config', 'core/
             }).then(function(html) {
                 // If this request isn't the most recent request, bail
                 if (request !== that.currentRequest) { return ''; }
+
+                if (that.currentIndex === 0) {
+                    // We're out of records, so mark that we shouldn't load anymore
+                    that.loadContainer.setAttribute('data-tw-report-create-disabled', true);
+                } else {
+                    that.loadContainer.removeAttribute('data-tw-report-create-disabled');
+                }
 
                 // update results string
                 that.widget.querySelector('[data-totara_reportbuilder-create_report-results_count]').innerHTML = html[1];
