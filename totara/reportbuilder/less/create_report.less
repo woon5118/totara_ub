@@ -32,7 +32,7 @@
 @createReports_base-border-color: @createReports_base-color_neutral_5;
 @createReports_base-image-background: #f0f0f0; // taken from svg
 
-@createReports_base-title_font-size: @totara_style-font_body_medium_size;
+@createReports_base-title_font-size: @totara_style-font_heading_x_small_size;
 @createReports-primaryFilter-size: @totara_style-size_18;
 
 @createReports_base-spacing_x_small: @totara_style-spacing_x_small;
@@ -130,7 +130,7 @@
         display: block;
 
         // Hover animation
-        transition-property: transform, box-shadow;
+        transition-property: box-shadow;
         transition-duration: @createReports_base-transition_speed;
         transition-timing-function: ease-in-out;
 
@@ -145,7 +145,6 @@
         &:focus,
         .tw-grid__item_active & {
             box-shadow: @totara_style-shadow_1;
-            transform: scale(1.01);
         }
 
         &_title {
@@ -190,8 +189,8 @@
     .totara_reportbuilder__createreport_label {
         &--primary {
             position: absolute; // Sit over the top of the image
-            left: 0.7em;
-            top: 0.5em;
+            left: @createReports_base-spacing_small;
+            top: @createReports_base-spacing_small;
         }
 
         &--container {
@@ -203,20 +202,14 @@
 
         &_item {
             border: 1px solid @createReports_grid-border-color;
-            display: flex;
-            flex-direction: column;
-            max-height: @createReports_grid-card-height;
-            min-height: @createReports_grid-card-height / 2;
+            min-width: 140px;
 
             &_info {
-                flex: 1 1 auto;
-                padding: 0 0.5em 0.7em;
+                padding: 0 @createReports_base-spacing_small @createReports_base-spacing_small;
             }
 
             &_image {
-                flex: 1 0 50%;
                 background-color: @createReports_base-image-background;
-
                 padding: 0.7em 0.5em 0;
                 position: relative;
 
@@ -233,14 +226,12 @@
             }
 
             &_title {
-                padding: @createReports_grid-padding;
-                font-size: @createReports_grid-title_font-size;
+                .totara_style-heading_x_small;
+                
+                height: 5.55rem;
 
                 overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-
-                flex: 0 0 auto;
+                padding: @createReports_base-spacing_small 0;
             }
         }
     }
@@ -250,7 +241,6 @@
 //  TABLE VIEW
 // ------------------------------
 
-@createReports_table-row-height: 5em;
 @createReports_table-padding: @totara_style-spacing_small;
 
 @createReports_table-title_font-size: @createReports_base-title_font-size;
@@ -261,8 +251,13 @@
     // Override width from grid css
     .tw-grid__item {
         flex-basis: 100%;
-        padding-top: 0;
-        padding-bottom: 0;
+        margin: 0 @totara_style-spacing_small;
+        padding: 0;
+        border-bottom: 1px solid @createReports_table-border-color;
+
+        &:first-child {
+            border-top: 1px solid @createReports_table-border-color;
+        }
     }
 
     .totara_reportbuilder__createreport_label {
@@ -289,10 +284,12 @@
     & .totara_reportbuilder__createreport_list {
         &_item {
             box-sizing: content-box;
-            height: @createReports_table-row-height;
+            height: 50px;
             clear: both;
 
-            border-bottom: 1px solid @createReports_table-border-color;
+            @media screen and (min-width: @createReports_Toggle-screen_xsm_min) {
+                height: 70px;
+            }
 
             &_image {
                 max-height: 100%;
@@ -313,13 +310,24 @@
                 }
             }
 
-            &_title {
-                padding: @createReports_table-padding;
-                font-size: @createReports_table-title_font-size;
 
+            &:hover,
+            &:focus,
+            .tw-grid__item_active & {
+                position: relative; // lift the image above the shadow
+            }
+
+            &_title {
+                .totara_style-heading_x_small;
+
+                padding: 0 @createReports_table-padding @createReports_table-padding;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+
+                @media screen and (min-width: @createReports_Toggle-screen_xsm_min) {
+                    padding: @createReports_table-padding;
+                }
 
             }
         }

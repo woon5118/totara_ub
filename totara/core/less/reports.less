@@ -8,7 +8,7 @@
 @myReports_base-border-color: @myReports_base-color_neutral_5;
 @myReports_base-image-background: #f0f0f0; // taken from svg
 
-@myReports_base-title_font-size: @totara_style-font_body_medium_size;
+@myReports_base-title_font-size: @totara_style-font_body_x_small_size;
 @myReports_base-description_font-size: 1.2rem;
 @myReports_base-controls_font-size: 1.2em;
 
@@ -35,7 +35,7 @@
 
         &__content {
             // Hover animation
-            transition-property: transform, box-shadow;
+            transition-property: box-shadow;
             transition-duration: 200ms;
             transition-timing-function: ease-in-out;
 
@@ -46,13 +46,9 @@
             &:active,
             &:focus {
                 box-shadow: @totara_style-shadow_1;
-                transform: scale(1.01);
                 text-decoration: none;
                 color: @myReports_base-color_neutral_7;
-            }
-
-            &__title {
-                font-weight: 600;
+                position: relative; // this lifts the shadow above the image
             }
         }
     }
@@ -63,15 +59,14 @@
 // ------------------------------
 
 @myReports_grid-card-width: 18em;
-@myReports_grid-card-height: 20em;
 
-@myReports_grid-padding: 0.5rem;
+@myReports_grid-padding: @totara_style-spacing_small;
 
 @myReports_grid-title_font-size: @myReports_base-title_font-size;
 @myReports_grid-description_font-size: @myReports_base-description_font-size;
 @myReports_grid-controls_font-size: @myReports_base-controls_font-size;
 
-@myReports_grid-spacing: @totara_style-spacing_medium;
+@myReports_grid-spacing: @totara_style-spacing_small;
 @myReports_grid-border-color: @myReports_base-border-color;
 
 .totara_core__myreports__list--grid {
@@ -82,6 +77,7 @@
 
         &__item {
             width: 100%;
+            min-width: 140px;
 
             @media (min-width: @myReports_base-screen_xsm_min) {
                 & {
@@ -116,30 +112,25 @@
 
                     img.icon {
                         display: block;
-                        max-width: 100%;
-                        max-height: 100%;
-
-                        width: auto;
-                        height: 100%;
+                        width: 100%;
+                        height: 120px;
 
                         margin: 0 auto;
                     }
                 }
 
                 &__title {
-                    padding: @myReports_grid-padding;
-                    font-size: @myReports_grid-title_font-size;
-
+                    .totara_style-heading_x_small;
+                    height: 4.6rem;
+                    margin: @myReports_grid-padding;
                     overflow: hidden;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
-                    width: 100%;
+                    font-weight: 600;
                 }
 
                 &__description {
-                    margin: @myReports_grid-padding;
+                    margin: 0 @myReports_grid-padding @myReports_grid-padding;
                     font-size: @myReports_grid-description_font-size;
-                    height: @myReports_grid-card-height / 2;
+                    height: 8.4rem;
                     overflow: hidden;
                 }
             }
@@ -151,10 +142,8 @@
 //  TABLE VIEW
 // ------------------------------
 
-@myReports_table-row-height: 3.5em;
-@myReports_table-padding: 0.6rem;
+@myReports_table-padding: @totara_style-spacing_small;
 
-@myReports_table-title_font-size: @myReports_base-title_font-size;
 @myReports_table-description_font-size: @myReports_base-description_font-size;
 @myReports_table-controls_font-size: @myReports_base-controls_font-size;
 
@@ -164,15 +153,19 @@
 
     & .totara_core__myreports__list {
         &__item {
+            // not  working correctly
+            &:first-child {
+                border-top: 1px solid @myReports_table-border-color;
+            }
+            border-bottom: 1px solid @myReports_table-border-color;
 
             &__content {
                 display: flex;
-                height: @myReports_table-row-height;
+                height: 50px;
 
-                &:first-of-type {
-                    border-top: 1px solid @myReports_table-border-color;
+                @media screen and (min-width: @myReports_base-screen_xsm_min) {
+                    height: 70px;                
                 }
-                border-bottom: 1px solid @myReports_table-border-color;
 
                 &__image {
                     max-height: 100%;
@@ -195,36 +188,29 @@
                 }
 
                 &__title {
-                    padding: @myReports_table-padding;
-                    line-height: @myReports_table-row-height - (2 * @myReports_table-padding);
-                    font-size: @myReports_table-title_font-size;
-
+                    margin: @myReports_table-padding;
                     overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
 
                     /* Shorthand flex doesn't work in IE11 with flex-basis being set to 0 */
                     flex-grow: 1;
                     flex-shrink: 1;
                     flex-basis: 0;
+                    font-size: @myReports_table-description_font-size;
+
+                    @media screen and (min-width: @myReports_base-screen_xsm_min) {
+                        .totara_style-heading_x_small;
+                        font-weight: 600;                    
+                    }
                 }
 
                 &__description {
-                    margin: @myReports_table-padding (2*@myReports_table-padding);
+                    margin: @myReports_table-padding auto;
                     overflow: hidden;
                     /* Shorthand flex doesn't work in IE11 with flex-basis being set to 0 */
                     flex-grow: 1;
                     flex-shrink: 1;
                     flex-basis: 0;
                     font-size: @myReports_table-description_font-size;
-                }
-
-                &__controls {
-                    text-align: right;
-                    font-size: @myReports_table-controls_font-size;
-                    padding: @myReports_table-padding;
-                    line-height: 0.7 * (@myReports_table-row-height - (2 * @myReports_table-padding));
-                    flex: 0 0 auto;
                 }
             }
         }
