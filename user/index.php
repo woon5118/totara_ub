@@ -668,7 +668,7 @@ if ($mode === MODE_USERDETAILS) {    // Print simple listing.
                     $checked = '';
                 }
                 // TL-6296: added aria-label
-                $data[] = '<input type="checkbox" class="usercheckbox" name="user'.$user->id.'" ' . $checked .' aria-label="' . get_string('select', 'grades', fullname($user)) . '"/>';
+                $data[] = '<input type="checkbox" class="usercheckbox" name="user'.$user->id.'" ' . $checked .' aria-label="' . s(get_string('select', 'grades', fullname($user))) . '"/>';
             }
             $data[] = $OUTPUT->user_picture($user, array('size' => 35, 'courseid' => $course->id, 'link' => !empty($profileurl)));
             $data[] = $profilelink;
