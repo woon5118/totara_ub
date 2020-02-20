@@ -299,7 +299,6 @@ export default {
       });
     },
 
-
     /**
      * True if we're not loading and there are no filter options.
      */
