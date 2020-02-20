@@ -55,4 +55,31 @@ function xmldb_scorm_totara_postupgrade($version) {
     if ($dbman->index_exists($table, $index)) {
         $dbman->drop_index($table, $index);
     }
+
+    // TL-20799 tracking of known trusted SCORM packages
+    $table = new xmldb_table('scorm_trusted_packages');
+    $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+    $table->add_field('contenthash', XMLDB_TYPE_CHAR, '40', null, XMLDB_NOTNULL, null, null);
+    $table->add_field('uploadedby', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+    $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+    $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+    $table->add_key('uploadedby', XMLDB_KEY_FOREIGN, array('uploadedby'), 'user', array('id'));
+    $table->add_index('contenthash', XMLDB_INDEX_UNIQUE, array('contenthash'));
+    if (!$dbman->table_exists($table)) {
+        $dbman->create_table($table);
+
+        // Mark all existing local packages as trusted, ignore synced packages though.
+        $sql = 'INSERT INTO "ttr_scorm_trusted_packages" (contenthash, timecreated)
+
+                SELECT f.contenthash, MIN(f.timecreated) AS timecreated
+                  FROM "ttr_files" f
+                  JOIN "ttr_context" ctx ON ctx.id = f.contextid AND ctx.contextlevel = 70
+                  JOIN "ttr_course_modules" cm ON cm.id = ctx.instanceid
+                  JOIN "ttr_modules" md ON md.id = cm.module AND md.name = \'scorm\'
+                  JOIN "ttr_scorm" s ON s.id = cm.instance
+                 WHERE f.component = \'mod_scorm\' AND f.filearea = \'package\' AND f.itemid = 0 AND f.filepath = \'/\' AND LOWER(f.filename) <> \'imsmanifest.xml\'
+                       AND s.scormtype = \'local\' AND s.reference = f.filename AND f.referencefileid IS NULL
+              GROUP BY f.contenthash';
+        $DB->execute($sql);
+    }
 }

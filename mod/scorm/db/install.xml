@@ -223,5 +223,20 @@
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
+    <TABLE NAME="scorm_trusted_packages" COMMENT="Whitelist of known trusted SCORM packages">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="contenthash" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" COMMENT="SHA 1 hash of file content"/>
+        <FIELD NAME="uploadedby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="First user that uploaded the package, NULL means unknown"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Time when record was added"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="uploadedby" TYPE="foreign" FIELDS="uploadedby" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="contenthash" UNIQUE="true" FIELDS="contenthash"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>

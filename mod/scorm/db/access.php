@@ -60,7 +60,7 @@ $capabilities = array(
     ),
 
     'mod/scorm:addinstance' => array(
-        'riskbitmask' => RISK_XSS | RISK_ALLOWXSS, // TODO: TL-20799 we need to add new capabilty for uploading of scorm packages and move the RISK_ALLOWXSS there
+        'riskbitmask' => RISK_XSS,
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
@@ -70,6 +70,33 @@ $capabilities = array(
             'tenantdomainmanager' => CAP_ALLOW,
         ),
         'clonepermissionsfrom' => 'moodle/course:manageactivities'
+    ),
+
+    // Required for adding of untrusted package to SCORM activity
+    // via standard mod_edit form. All local packages that are
+    // added to SCORM activities are automatically marked as trusted
+    // which allows them to be later reused by users without this capability.
+    'mod/scorm:addnewpackage' => array(
+        'riskbitmask' => RISK_XSS | RISK_ALLOWXSS,
+
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
+        ),
+        'clonepermissionsfrom' => 'mod/scorm:addinstance'
+    ),
+
+    // Manage a system-wide list of known trusted SCORM packages.
+    'mod/scorm:managetrustedpackages' => array(
+        'riskbitmask' => RISK_XSS | RISK_ALLOWXSS,
+
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+        ),
     ),
 
     'mod/scorm:viewreport' => array(

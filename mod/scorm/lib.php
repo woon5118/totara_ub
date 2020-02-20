@@ -136,10 +136,19 @@ function scorm_add_instance($scorm, $mform=null) {
                 0, array('subdirs' => 0, 'maxfiles' => 1));
             // Get filename of zip that was uploaded.
             $files = $fs->get_area_files($context->id, 'mod_scorm', 'package', 0, '', false);
+            if (!$files) {
+                throw new coding_exception('Missing SCORM package file');
+            }
             $file = reset($files);
             $filename = $file->get_filename();
             if ($filename !== false) {
                 $record->reference = $filename;
+            }
+            // Totara: Record package as trusted, it must have passed form validation or validation in whatever called this function.
+            if (strtolower($filename) !== 'imsmanifest.xml' && !$file->get_referencefileid()) {
+                if (has_capability('mod/scorm:addnewpackage', $context)) {
+                    scorm_add_trusted_package_contenthash($file->get_contenthash());
+                }
             }
         }
 
@@ -215,15 +224,31 @@ function scorm_update_instance($scorm, $mform=null) {
     if ($scorm->scormtype === SCORM_TYPE_LOCAL) {
         if (!empty($scorm->packagefile)) {
             $fs = get_file_storage();
+            $oldfile = null;
+            $oldfiles = $fs->get_area_files($context->id, 'mod_scorm', 'package', 0, '', false);
+            if ($oldfiles) {
+                $oldfile = reset($oldfiles);
+            }
             $fs->delete_area_files($context->id, 'mod_scorm', 'package');
             file_save_draft_area_files($scorm->packagefile, $context->id, 'mod_scorm', 'package',
                 0, array('subdirs' => 0, 'maxfiles' => 1));
             // Get filename of zip that was uploaded.
             $files = $fs->get_area_files($context->id, 'mod_scorm', 'package', 0, '', false);
+            if (!$files) {
+                throw new coding_exception('Missing SCORM package file');
+            }
             $file = reset($files);
             $filename = $file->get_filename();
             if ($filename !== false) {
                 $scorm->reference = $filename;
+            }
+            // Totara: Record package as trusted, it must have passed form validation or validation in whatever called this function.
+            if (!$oldfile || $oldfile->get_contenthash() !== $file->get_contenthash()) {
+                if (strtolower($filename) !== 'imsmanifest.xml' && !$file->get_referencefileid()) {
+                    if ($file->get_contenthash() !== $scorm->sha1hash && has_capability('mod/scorm:addnewpackage', $context)) {
+                        scorm_add_trusted_package_contenthash($file->get_contenthash());
+                    }
+                }
             }
         }
 
@@ -325,6 +350,27 @@ function scorm_delete_instance($id) {
     scorm_grade_item_delete($scorm);
 
     return $result;
+}
+
+/**
+ * Mark package content hash as trusted.
+ *
+ * @param string $contenthash
+ * @return bool true if hash added, false if already trusted
+ */
+function scorm_add_trusted_package_contenthash(string $contenthash): bool {
+    global $DB, $USER;
+
+    if ($DB->record_exists('scorm_trusted_packages', ['contenthash' => $contenthash])) {
+        return false;
+    }
+    $record = [
+        'contenthash' => $contenthash,
+        'uploadedby' => ($USER->id ?? null),
+        'timecreated' => time(),
+    ];
+    $DB->insert_record('scorm_trusted_packages', $record);
+    return true;
 }
 
 /**

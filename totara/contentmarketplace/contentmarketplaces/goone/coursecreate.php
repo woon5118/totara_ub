@@ -152,7 +152,9 @@ function add_scorm_module($course, $name, $itemid, $descriptionhtml, $assessable
 
     $api = new \contentmarketplace_goone\api();
     $scormzip = $api->get_scorm($itemid);
-    $moduleinfo->packagefile = storedfile($name, $itemid, $scormzip)->get_itemid();
+    $packagefile = storedfile($name, $itemid, $scormzip);
+    $moduleinfo->packagefile = $packagefile->get_itemid();
+    scorm_add_trusted_package_contenthash($packagefile->get_contenthash());
 
     if ($assessable) {
         $moduleinfo->grademethod = GRADEHIGHEST;

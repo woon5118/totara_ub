@@ -110,6 +110,9 @@ if ($mform->is_cancelled()) {
     $fs = get_file_storage();
     $packagefile = $fs->get_file($syscontext->id, 'repository_opensesame', 'packages', $package->id, '/', $package->zipfilename);
 
+    // We trust all packages from OpenSesame.
+    scorm_add_trusted_package_contenthash($packagefile->get_contenthash());
+
     $file = array('contextid' => $context->id, 'component' => 'mod_scorm', 'filearea' => 'package', 'itemid' => 0);
     $fs->create_file_from_storedfile($file, $packagefile);
 

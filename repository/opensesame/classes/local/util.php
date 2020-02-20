@@ -103,7 +103,8 @@ class util {
      * @return bool|int false on error, integer is number of packages downloaded
      */
     public static function fetch_packages($type) {
-        global $DB;
+        global $DB, $CFG;
+        require_once("$CFG->dirroot/mod/scorm/lib.php");
 
         error_log('opensesame: starting import of packages');
 
@@ -209,7 +210,10 @@ class util {
                 'filepath' => '/',
                 'filename' => $pkg->zipfilename,
             );
-            $fs->create_file_from_pathname($file, $coursesdir . '/' . $pkg->zipfilename);
+            $packagefile = $fs->create_file_from_pathname($file, $coursesdir . '/' . $pkg->zipfilename);
+
+            // We trust all packages from OpenSesame.
+            scorm_add_trusted_package_contenthash($packagefile->get_contenthash());
 
             $bundlename = clean_param($metadata['bundleName'], PARAM_NOTAGS);
             self::add_package_to_bundle($bundlename, $pkg->id);

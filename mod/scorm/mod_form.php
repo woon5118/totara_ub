@@ -355,7 +355,7 @@ class mod_scorm_mod_form extends moodleform_mod {
     }
 
     public function validation($data, $files) {
-        global $CFG, $USER;
+        global $CFG, $USER, $DB;
         $errors = parent::validation($data, $files);
 
         $type = $data['scormtype'];
@@ -379,12 +379,13 @@ class mod_scorm_mod_form extends moodleform_mod {
                     $errors['packagefile'] = get_string('required');
                     return $errors;
                 }
+                /** @var stored_file $file */
                 $file = reset($files);
                 if (!$file->is_external_file() && !empty($data['updatefreq'])) {
                     // Make sure updatefreq is not set if using normal local file.
                     $errors['updatefreq'] = get_string('updatefreq_error', 'mod_scorm');
                 }
-                if (strtolower($file->get_filename()) == 'imsmanifest.xml') {
+                if (strtolower($file->get_filename()) === 'imsmanifest.xml') {
                     if (!$file->is_external_file()) {
                         $errors['packagefile'] = get_string('aliasonly', 'mod_scorm');
                     } else {
@@ -393,11 +394,31 @@ class mod_scorm_mod_form extends moodleform_mod {
                             $errors['packagefile'] = get_string('repositorynotsupported', 'mod_scorm');
                         }
                     }
-                } else if (strtolower(substr($file->get_filename(), -3)) == 'xml') {
+                } else if (strtolower(substr($file->get_filename(), -3)) === 'xml') {
                     $errors['packagefile'] = get_string('invalidmanifestname', 'mod_scorm');
                 } else {
                     // Validate this SCORM package.
                     $errors = array_merge($errors, scorm_validate_package($file));
+                    if (empty($errors['packagefile']) && !has_capability('mod/scorm:addnewpackage', $this->context)) {
+                        // Totara: make sure all new packages are properly whitelisted!
+                        if (!$DB->record_exists('scorm_trusted_packages', ['contenthash' => $file->get_contenthash()])) {
+                            if (empty($this->current->id) || $this->current->scormtype !== SCORM_TYPE_LOCAL) {
+                                // New SCORM activity or changing type.
+                                $errors['packagefile'] = get_string('errornoaddnewpackage', 'mod_scorm');
+                            } else {
+                                // Do not show errors for existing packages that are not trusted.
+                                $oldfiles = $fs->get_area_files($this->context->id, 'mod_scorm', 'package', 0, '', false);
+                                if (!$oldfiles) {
+                                    $errors['packagefile'] = get_string('errornoaddnewpackage', 'mod_scorm');
+                                } else {
+                                    $oldfile = reset($oldfiles);
+                                    if ($oldfile->get_contenthash() !== $file->get_contenthash()) {
+                                        $errors['packagefile'] = get_string('errornoaddnewpackage', 'mod_scorm');
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
@@ -414,8 +435,8 @@ class mod_scorm_mod_form extends moodleform_mod {
                 }
             }
 
-        } else if ($type === 'packageurl') {
-            $reference = $data['reference'];
+        } else if ($type === SCORM_TYPE_LOCALSYNC) {
+            $reference = $data['packageurl'];
             // Syntax check.
             if (!preg_match('/(http:\/\/|https:\/\/|www).*(\.zip|\.pif)$/i', $reference)) {
                 $errors['packageurl'] = get_string('invalidurl', 'scorm');
@@ -424,6 +445,12 @@ class mod_scorm_mod_form extends moodleform_mod {
                 $result = scorm_check_url($reference);
                 if (is_string($result)) {
                     $errors['packageurl'] = $result;
+                }
+            }
+            if (empty($errors['packageurl']) && !has_capability('mod/scorm:addnewpackage', $this->context)) {
+                // Totara: external package URLs are always risky because they are fetched from random external sources and may change later.
+                if (empty($this->current->id) || $this->current->reference !== $reference || $this->current->scormtype !== SCORM_TYPE_LOCALSYNC) {
+                    $errors['packageurl'] = get_string('errornoaddnewpackage', 'mod_scorm');
                 }
             }
 

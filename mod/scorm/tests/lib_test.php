@@ -45,9 +45,8 @@ class mod_scorm_lib_testcase extends externallib_advanced_testcase {
     /**
      * Set up for every test
      */
-    public function setUp() {
+    private function create_one_instance() {
         global $DB;
-        $this->resetAfterTest();
         $this->setAdminUser();
 
         // Setup test data.
@@ -73,6 +72,7 @@ class mod_scorm_lib_testcase extends externallib_advanced_testcase {
      */
     public function test_scorm_check_mode() {
         global $CFG;
+        $this->create_one_instance();
 
         $newattempt = 'on';
         $attempt = 1;
@@ -115,6 +115,7 @@ class mod_scorm_lib_testcase extends externallib_advanced_testcase {
      */
     public function test_scorm_view() {
         global $CFG;
+        $this->create_one_instance();
 
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
@@ -140,6 +141,7 @@ class mod_scorm_lib_testcase extends externallib_advanced_testcase {
      */
     public function test_scorm_check_and_require_available() {
         global $DB;
+        $this->create_one_instance();
 
         // Set to the student user.
         self::setUser($this->student);
@@ -231,6 +233,7 @@ class mod_scorm_lib_testcase extends externallib_advanced_testcase {
      * @return void
      */
     public function test_scorm_get_last_completed_attempt() {
+        $this->create_one_instance();
         $this->assertEquals(1, scorm_get_last_completed_attempt($this->scorm->id, $this->student->id));
     }
 
@@ -239,6 +242,7 @@ class mod_scorm_lib_testcase extends externallib_advanced_testcase {
      */
     public function test_scorm_print_overview() {
         global $CFG;
+        $this->create_one_instance();
 
         $this->resetAfterTest();
 
@@ -275,6 +279,7 @@ class mod_scorm_lib_testcase extends externallib_advanced_testcase {
     public function test_scorm_get_completion_progress_and_state() {
         global $CFG;
         require_once($CFG->libdir . '/gradelib.php');
+        $this->create_one_instance();
 
         /** @var core_grades_generator $grade_generator */
         $grade_generator = self::getDataGenerator()->get_plugin_generator('core_grades');
@@ -418,5 +423,28 @@ class mod_scorm_lib_testcase extends externallib_advanced_testcase {
 
         self::assertTrue(scorm_get_completion_state($this->course, $cm4, $student2->id, true));
         self::assertEqualsCanonicalizing(['Scored 70', 'Passed'], scorm_get_completion_progress($cm4, $student2->id));
+    }
+
+    public function test_scorm_add_trusted_package_contenthash() {
+        global $DB, $USER;
+
+        $this->setAdminUser();
+
+        $this->assertEquals(0, $DB->count_records('scorm_trusted_packages'));
+
+        $hash1 = sha1('xyz');
+        $this->setCurrentTimeStart();
+        scorm_add_trusted_package_contenthash($hash1);
+        $this->assertEquals(1, $DB->count_records('scorm_trusted_packages'));
+        $record = $DB->get_record('scorm_trusted_packages', ['contenthash' => $hash1], '*', MUST_EXIST);
+        $this->assertSame($USER->id, $record->uploadedby);
+        $this->assertTimeCurrent($record->timecreated);
+
+        $hash2 = sha1('abc');
+        scorm_add_trusted_package_contenthash($hash2);
+        $this->assertEquals(2, $DB->count_records('scorm_trusted_packages'));
+
+        scorm_add_trusted_package_contenthash($hash1);
+        $this->assertEquals(2, $DB->count_records('scorm_trusted_packages'));
     }
 }
