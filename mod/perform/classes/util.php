@@ -23,6 +23,8 @@
 
 namespace mod_perform;
 
+use container_perform\perform as perform_container;
+
 class util {
 
     /**
@@ -80,5 +82,9 @@ class util {
                 }
             }
         }
+    }
+
+    public static function get_default_categoryid(): int {
+        return perform_container::get_default_categoryid();
     }
 }

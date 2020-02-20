@@ -23,7 +23,7 @@
 
 namespace mod_perform\controllers\activity;
 
-use container_perform\perform;
+use mod_perform\util;
 use totara_mvc\controller;
 use totara_mvc\tui_view;
 
@@ -33,7 +33,7 @@ class activities extends controller {
      * @inheritDoc
      */
     protected function setup_context(): \context {
-        $category_id = perform::get_default_categoryid();
+        $category_id = util::get_default_categoryid();
         return \context_coursecat::instance($category_id);
     }
 

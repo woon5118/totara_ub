@@ -24,10 +24,11 @@
 namespace mod_perform\webapi\resolver\mutation;
 
 use container_perform\create_exception;
-use container_perform\perform;
+use container_perform\perform as perform_container;
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use mod_perform\models\activity\activity;
+use mod_perform\util;
 
 class create_activity implements mutation_resolver {
 
@@ -35,25 +36,25 @@ class create_activity implements mutation_resolver {
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        $context = \context_coursecat::instance(perform::get_default_categoryid());
-        if (!perform::can_create_instance(null, $context)) {
+        global $DB;
+
+        if (!activity::can_create()) {
             throw new create_exception(get_string('error:create_permission_missing', 'mod_perform'));
         }
 
         $courseinfo = new \stdClass();
         $courseinfo->fullname = $args['name'];
-        $courseinfo->category = $context->instanceid;
 
-        $container = perform::create($courseinfo);
+        return $DB->transaction(function () use ($courseinfo, $args) {
+            $container = perform_container::create($courseinfo);
 
-        // Create a performance activity inside the new performance container.
-        $activity_data = new \stdClass();
-        $activity_data->name = $args['name'];
-        $activity_data->status = $args['status'] ?? activity::STATUS_ACTIVE;
+            // Create a performance activity inside the new performance container.
+            $activity_data = new \stdClass();
+            $activity_data->name = $args['name'];
+            $activity_data->status = $args['status'] ?? activity::STATUS_ACTIVE;
 
-        /** @var perform $container */
-        activity::create($activity_data, $container);
-
-        return true;
+            /** @var perform_container $container */
+            return activity::create($activity_data, $container);
+        });
     }
 }

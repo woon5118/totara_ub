@@ -21,7 +21,7 @@
  * @package mod_perform
  */
 
-use container_perform\perform;
+use container_perform\perform as perform_container;
 use core_container\module\module;
 use mod_perform\models\activity\activity;
 
@@ -37,24 +37,28 @@ class mod_perform_generator extends component_generator_base {
      * @return activity
      */
     public function create_activity_in_container($data = []): activity {
+        global $DB;
+
         $container_data = new stdClass();
         $container_data->name = $data['container_name'] ?? "test performance container";
-        $container_data->category = perform::get_default_categoryid();
+        $container_data->category = \mod_perform\util::get_default_categoryid();
 
-        $container = perform::create($container_data);
+        return $DB->transaction(function () use ($data, $container_data) {
+            $container = perform_container::create($container_data);
 
-        // Create a performance activity inside the new performance container.
-        $activity_data = new \stdClass();
-        $activity_data->name = $data['activity_name'] ?? "test performance activity";
-        $activity_data->status = $data['activity_status'] ?? activity::STATUS_ACTIVE;
+            // Create a performance activity inside the new performance container.
+            $activity_data = new \stdClass();
+            $activity_data->name = $data['activity_name'] ?? "test performance activity";
+            $activity_data->status = $data['activity_status'] ?? activity::STATUS_ACTIVE;
 
-        /** @var perform $container */
-        activity::create($activity_data, $container);
+            /** @var perform_container $container */
+            activity::create($activity_data, $container);
 
-        $modules = $container->get_section(0)->get_all_modules();
-        $module = reset($modules);
+            $modules = $container->get_section(0)->get_all_modules();
+            $module = reset($modules);
 
-        return activity::load_by_id($module->instance);
+            return activity::load_by_id($module->instance);
+        });
     }
 
     /**
@@ -70,9 +74,9 @@ class mod_perform_generator extends component_generator_base {
         $activity_data->name = $data['name'] ?? "test performance activity";
         $activity_data->status = $data['status'] ?? activity::STATUS_ACTIVE;
 
-        $container = perform::from_id($data['course']);
+        $container = perform_container::from_id($data['course']);
 
-        /** @var perform $container */
+        /** @var perform_container $container */
         activity::create($activity_data, $container);
 
         $modules = $container->get_section(0)->get_all_modules();

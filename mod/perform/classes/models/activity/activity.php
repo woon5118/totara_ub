@@ -24,9 +24,9 @@
 
 namespace mod_perform\models\activity;
 
-use Exception;
-use mod_perform\entities\activity\activity as activity_entity;
 use container_perform\perform as perform_container;
+use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\util;
 
 class activity {
 
@@ -90,7 +90,7 @@ class activity {
 
 
         if (null == $context) {
-            $categoryid = perform_container::get_default_categoryid();
+            $categoryid = util::get_default_categoryid();
             if (0 == $categoryid) {
                 // Nope, this user is not able to add a performance activity.
                 return false;
@@ -104,7 +104,7 @@ class activity {
     }
 
     public static function create(\stdClass $data, perform_container $container): self {
-        global $CFG, $DB, $USER;
+        global $DB;
 
         $modinfo = new \stdClass();
         $modinfo->modulename = 'perform';
@@ -122,8 +122,9 @@ class activity {
         $entity->name = $data->name;
         $entity->status = $data->status;
 
-        $transaction = $DB->start_delegated_transaction();
-        try {
+        return $DB->transaction(function () use ($entity, $modinfo, $container) {
+            global $CFG, $USER;
+
             $entity->save();
 
             $modinfo->instanceid = $entity->id;
@@ -134,14 +135,8 @@ class activity {
                 role_assign($CFG->performanceactivitycreatornewroleid, $USER->id, $container_context);
             }
 
-            $transaction->allow_commit();
-        } catch (Exception $e) {
-            $DB->rollback_delegated_transaction($transaction);
-
-            throw $e;
-        }
-
-        return self::load_by_entity($entity);
+            return self::load_by_entity($entity);
+        });
     }
 
     /**
