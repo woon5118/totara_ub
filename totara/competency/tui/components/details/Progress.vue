@@ -25,6 +25,7 @@
     <ProgressTracker
       :items="formattedForTracker"
       :current-id="myValue"
+      :popover-trigger-type="['click']"
       :target-id="minProficientValueId"
     />
   </div>

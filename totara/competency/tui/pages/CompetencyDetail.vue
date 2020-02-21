@@ -38,9 +38,10 @@
     <!-- Competency description & archived / activity log button -->
     <Grid :stack-at="700">
       <GridItem :units="7">
-        <div class="tui-competencyDetail__description">
-          {{ data.competency.description }}
-        </div>
+        <div
+          class="tui-competencyDetail__description"
+          v-html="data.competency.description"
+        />
       </GridItem>
       <GridItem :units="5" :class="'tui-competencyDetail__buttons'">
         <Button
@@ -271,6 +272,10 @@ export default {
           return !assignment.archived;
         });
 
+      if (activeAssignmentList.length) {
+        this.updateAssignmentFilterValue(activeAssignmentList[0].id);
+      }
+
       return activeAssignmentList;
     },
   },
@@ -302,6 +307,13 @@ export default {
      */
     closeArchivedAssignmentModal() {
       this.archivedAssignmentModalOpen = false;
+    },
+
+    /**
+     * Update default assignment filter value
+     */
+    updateAssignmentFilterValue(n) {
+      this.assignmentFilter = n;
     },
   },
 };

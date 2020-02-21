@@ -33,11 +33,11 @@
         />
       </div>
 
-      <!-- And seperator -->
+      <!-- And separator -->
       <div
         v-if="!isLastItem(id, achievements)"
-        :key="id + 'andseperator'"
-        class="tui-pathwayCriteriaGroupAchievement__seperator"
+        :key="id + 'andseparator'"
+        class="tui-pathwayCriteriaGroupAchievement__separator"
       >
         <AchievementLayout :no-borders="true">
           <template v-slot:left>
@@ -67,6 +67,9 @@ export default {
     assignmentId: {
       required: true,
       type: Number,
+    },
+    dateAchieved: {
+      type: String,
     },
     instanceId: {
       required: true,
@@ -103,6 +106,7 @@ export default {
             component: tui.asyncComponent(compPath),
             props: {
               assignmentId: this.assignmentId,
+              dateAchieved: this.dateAchieved,
               instanceId: parseInt(achievement.instance_id),
               userId: this.userId,
             },

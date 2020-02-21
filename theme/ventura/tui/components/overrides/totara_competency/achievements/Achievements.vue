@@ -24,6 +24,11 @@
 .tui-competencyAchievements {
   margin-top: var(--tui-gap-7);
 
+  &__empty {
+    font-size: var(--tui-font-size-16);
+    @include tui-font-hint();
+  }
+
   &__tabs {
     margin-top: var(--tui-gap-5);
   }

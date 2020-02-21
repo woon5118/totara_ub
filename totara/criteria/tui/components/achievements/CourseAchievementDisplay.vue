@@ -35,24 +35,15 @@
           </h5>
 
           <!-- Proficiency progress circle -->
-          <div
-            class="tui-criteriaCourseAchievement__progressCircle"
-            :class="{
-              'tui-criteriaCourseAchievement__progressCircle-complete': criteriaFulfilled,
-            }"
-          >
-            <span class="tui-criteriaCourseAchievement__progressCircle-text">
-              {{
-                $str('achieved_n_out_of_n', 'totara_criteria', {
-                  current:
-                    completedNumberOfCourses >= targetNumberOfCourses
-                      ? targetNumberOfCourses
-                      : completedNumberOfCourses,
-                  target: targetNumberOfCourses,
-                })
-              }}
-            </span>
-          </div>
+          <ProgressCircle
+            :complete="criteriaFulfilled"
+            :completed="
+              completedNumberOfCourses >= targetNumberOfCourses
+                ? targetNumberOfCourses
+                : completedNumberOfCourses
+            "
+            :target="targetNumberOfCourses"
+          />
         </div>
       </template>
 
@@ -148,6 +139,7 @@ import Cell from 'totara_core/components/datatable/Cell';
 import CheckIcon from 'totara_core/components/icons/common/CheckSuccess';
 import ExpandCell from 'totara_core/components/datatable/ExpandCell';
 import Progress from 'totara_core/components/progress/Progress';
+import ProgressCircle from 'totara_competency/components/achievements/ProgressCircle';
 import Table from 'totara_core/components/datatable/Table';
 
 export default {
@@ -158,6 +150,7 @@ export default {
     CheckIcon,
     ExpandCell,
     Progress,
+    ProgressCircle,
     Table,
   },
 
@@ -259,7 +252,6 @@ export default {
   {
     "totara_criteria": [
       "achieve_proficiency_in_linked_courses",
-      "achieved_n_out_of_n",
       "complete",
       "completion",
       "course_link",

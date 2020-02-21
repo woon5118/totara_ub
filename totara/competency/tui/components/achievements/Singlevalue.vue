@@ -53,11 +53,11 @@
             />
           </div>
 
-          <!-- Or seperator if multiple paths to fulfilling criteria-->
+          <!-- Or separator if multiple paths to fulfilling criteria-->
           <div
             v-if="!isLastItem(itemid, achievement.items)"
-            :key="itemid + 'orseperator'"
-            class="tui-competencyAchievementsScale__seperator"
+            :key="itemid + 'orseparator'"
+            class="tui-competencyAchievementsScale__separator"
           >
             <AchievementLayout :no-borders="true">
               <template v-slot:left>
@@ -138,6 +138,7 @@ export default {
                 assignmentId: this.assignmentId,
                 instanceId: parseInt(item.pathway.instance_id),
                 userId: this.userId,
+                dateAchieved: item.date_achieved,
               },
             });
 

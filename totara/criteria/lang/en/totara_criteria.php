@@ -24,8 +24,7 @@
 
 $string['pluginname'] = 'Totara criteria';
 
-$string['achieved_n_out_of_n'] = '{$a->current} / {$a->target}';
-$string['achieve_proficiency_in_linked_courses'] = 'Achieve proficiency in linked courses';
+$string['achieve_proficiency_in_linked_courses'] = 'Achieve proficiency in courses';
 $string['addroles'] = 'Add roles';
 $string['aggregate_all'] = 'ALL';
 $string['aggregate_any'] = 'Complete any {$a->x}';

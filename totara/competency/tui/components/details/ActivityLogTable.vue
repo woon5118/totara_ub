@@ -31,7 +31,7 @@
         {{ $str('description', 'moodle') }}
       </HeaderCell>
       <HeaderCell size="3">
-        {{ $str('activitylog_proficientstatus', 'totara_competency') }}
+        {{ $str('proficiency_status', 'totara_competency') }}
       </HeaderCell>
       <HeaderCell size="3">
         {{ $str('assignment', 'totara_competency') }}
@@ -83,9 +83,7 @@
       <!-- Proficient column -->
       <Cell
         size="3"
-        :column-header="
-          $str('activitylog_proficientstatus', 'totara_competency')
-        "
+        :column-header="$str('proficiency_status', 'totara_competency')"
       >
         <span
           class="tui-competencyDetailActivityLog__proficient"
@@ -159,7 +157,7 @@ export default {
     ],
     "totara_competency": [
       "assignment",
-      "activitylog_proficientstatus",
+      "proficiency_status",
       "progress_name_by_user",
       "not_proficient",
       "proficient"

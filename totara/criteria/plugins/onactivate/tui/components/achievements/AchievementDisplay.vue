@@ -29,6 +29,9 @@
           {{ $str('achievement_display', 'criteria_onactivate') }}
         </h5>
       </template>
+      <template v-slot:right>
+        {{ $str('achieved_on', 'totara_competency', { date: dateAchieved }) }}
+      </template>
     </AchievementLayout>
   </div>
 </template>
@@ -45,6 +48,9 @@ export default {
     assignmentId: {
       required: true,
       type: Number,
+    },
+    dateAchieved: {
+      type: String,
     },
     instanceId: {
       required: true,
@@ -66,6 +72,9 @@ export default {
 {
   "criteria_onactivate": [
     "achievement_display"
+  ],
+  "totara_competency" : [
+    "achieved_on"
   ]
 }
 </lang-strings>

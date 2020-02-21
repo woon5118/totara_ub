@@ -28,11 +28,19 @@
         {{ $str('ways_to_achieve_proficiency', 'totara_competency') }}
       </h4>
 
+      <div
+        v-if="!achievements.length"
+        class="tui-competencyAchievements__empty"
+      >
+        {{ $str('no_achievement_criteria', 'totara_competency') }}
+      </div>
+
       <!-- Output tabs showing paths to achieve proficiency (e.g. manual rating, criteria, leraing plan) -->
       <Tabs
-        v-if="achievements.length"
+        v-else
         v-show="!loading"
         :key="assignmentId"
+        :transparent-tabs="true"
         class="tui-competencyAchievements__tabs"
       >
         <Tab
@@ -116,7 +124,7 @@ export default {
 
         // Make sure event is fired even if there are no items
         if (newAchievementComponents.length === 0) {
-          this.$emit('loaded');
+          this.loading = false;
         }
 
         return newAchievementComponents;
@@ -153,7 +161,6 @@ export default {
     itemsLoaded: function(loadedItems) {
       if (loadedItems === this.numberOfItems) {
         this.loading = false;
-        this.$emit('loaded');
       }
     },
 
@@ -191,6 +198,7 @@ export default {
 <lang-strings>
   {
     "totara_competency" : [
+      "no_achievement_criteria",
       "ways_to_achieve_proficiency"
     ]
   }

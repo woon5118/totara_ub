@@ -23,7 +23,8 @@
 
 $string['pluginname'] = 'Learning plan';
 
-$string['achievementpath_group_label'] = 'Via a Learning Plan';
+$string['achievementpath_group_label'] = 'Learning Plan';
+$string['achievement'] = 'Achievement';
 $string['aggregatetask'] = 'Update learning plan pathway achievements';
 $string['learning_plans'] = 'Learning plans';
 $string['no_available_learning_plans'] = 'No available learning plans';

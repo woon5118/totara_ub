@@ -27,7 +27,7 @@
         <!-- Competency assignment select list -->
         <SelectFilter
           v-model="selectedAssignment"
-          :label="'select assignement'"
+          :label="$str('assignement', 'totara_competency')"
           :large="true"
           :options="activeAssignmentList"
           @input="input"
@@ -45,6 +45,7 @@
             {{ $str('achievement_level', 'totara_competency') }}
             <InfoIconButton
               :aria-label="$str('more_information', 'totara_competency')"
+              :class="'tui-competencyDetailAssignment__level-infoBtn'"
             >
               ...
             </InfoIconButton>
@@ -60,7 +61,13 @@
           :target="selectedAssignmentProficiencyState !== 'complete'"
         />
 
-        <span class="tui-competencyDetailAssignment__status-text">
+        <span
+          class="tui-competencyDetailAssignment__status-text"
+          :class="{
+            'tui-competencyDetailAssignment__status-text-complete':
+              selectedAssignmentProficiencyState === 'complete',
+          }"
+        >
           {{
             $str(
               selectedAssignmentProficiency.proficient
@@ -143,6 +150,7 @@ export default {
   {
     "totara_competency": [
       "achievement_level",
+      "assignement",
       "more_information",
       "not_proficient",
       "proficient"

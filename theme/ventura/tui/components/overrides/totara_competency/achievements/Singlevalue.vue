@@ -38,7 +38,7 @@
     }
   }
 
-  &__seperator {
+  &__separator {
     margin: var(--tui-gap-4) var(--tui-gap-4) 0;
   }
 }

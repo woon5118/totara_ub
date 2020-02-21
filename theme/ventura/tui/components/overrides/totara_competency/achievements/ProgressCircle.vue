@@ -21,52 +21,25 @@
 -->
 
 <style lang="scss">
-.tui-criteriaCourseAchievement {
-  &__title {
-    margin: 0;
-    hyphens: manual;
-    @include tui-font-heading-x-small();
-  }
-
-  &__goal {
+.tui-progressCircle {
+  &__circle {
     display: flex;
-    flex-direction: column;
-    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    width: 70px;
+    height: 70px;
+    margin: var(--tui-gap-6) auto 0;
+    background: var(--tui-color-neutral-4);
+    border-radius: 100%;
   }
 
-  &__progress {
-    margin: auto 0;
-
-    &-bar {
-      width: 100%;
-    }
+  &__label {
+    margin-top: var(--tui-gap-1);
+    text-align: center;
   }
 
-  &__summary {
-    padding: var(--tui-gap-2) var(--tui-gap-2) 0;
-
-    &-header {
-      margin: 0;
-      @include tui-font-heading-x-small();
-    }
-
-    &-body {
-      margin-top: var(--tui-gap-4);
-    }
-
-    &-button {
-      margin-top: var(--tui-gap-4);
-    }
-  }
-}
-
-@media (min-width: $tui-screen-xs) {
-  .tui-criteriaCourseAchievement {
-    &__completion {
-      &-notComplete {
-        @include sr-only();
-      }
-    }
+  &--complete &__circle {
+    background: var(--tui-color-primary);
   }
 }
 </style>

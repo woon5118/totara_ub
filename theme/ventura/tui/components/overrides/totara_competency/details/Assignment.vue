@@ -42,6 +42,10 @@
       @include tui-font-body-small();
     }
 
+    &-infoBtn {
+      padding-left: var(--tui-gap-1);
+    }
+
     &-text {
       @include tui-font-heading-label-small();
     }
@@ -62,7 +66,7 @@
       }
 
       &-complete {
-        border-color: var(--tui-color-neutral-3);
+        border-color: var(--tui-color-secondary);
       }
 
       &-achieved {
@@ -82,6 +86,14 @@
 
       .dir-rtl & {
         margin: 0 var(--tui-gap-2) 0 0;
+      }
+
+      &-complete {
+        margin-left: var(--tui-gap-1);
+
+        .dir-rtl & {
+          margin: 0 var(--tui-gap-1) 0 0;
+        }
       }
     }
   }
