@@ -29,7 +29,8 @@ use core\entities\user;
 
 class behat_totara_competency extends behat_base {
 
-    private const COMPETENCY_PROFILE_LIST_VIEW_TOGGLE_LOCATOR = '.tui-CompetencyProfile__tabs .fa-bars';
+    private const COMPETENCY_PROFILE_LIST_VIEW_TOGGLE_LOCATOR = '.tui-iconBtn--toggle .fa-th-list';
+
     private const TOTARA_COMPETENCY_PROFILE_PATH = 'totara/competency/profile/';
     private const TOTARA_COMPETENCY_USER_ASSIGNMENT_PATH = 'totara/competency/profile/assign/';
 

@@ -24,17 +24,14 @@ Feature: Test competencies can be user assigned
       | competency | user_group_type | user_group |
       | sa1        | user            | admin      |
     And I run the scheduled task "totara_competency\task\expand_assignments_task"
-    And I set the site theme to "ventura"
     And I navigate to my competency profile
 
-    # css animation, can't wait for element to be visible
-    # TODO remove when comp profile polish is merged (animations are being removed)
-    And I wait "1" seconds
     When I change the competency profile to list view
-    Then I should see "Self assignable" in the ".totara_competency-list__rows" "css_element"
-    And I should not see "Self assignable no description" in the ".totara_competency-list__rows" "css_element"
+    And I should see the tui datatable contains:
+      | Competency name |
+      | Self assignable |
 
-    When I click on "Assign competencies" "link"
+    When I click on "Self-assign competencies" "link"
 
     # Should have "self-assignment" title/heading/nav
     Then I should see "Self assignment" in the ".breadcrumb" "css_element"
@@ -111,25 +108,22 @@ Feature: Test competencies can be user assigned
     When I click on "OK" "button"
     Then I should be on my competency profile
 
-    # css animation, can't wait for element to be visible
-    # TODO remove when comp profile polish is merged (animations are being removed)
-    And I wait "1" seconds
     When I change the competency profile to list view
-    Then I should see "Self assignable" in the ".totara_competency-list__rows" "css_element"
-    And I should see "Self assignable no description" in the ".totara_competency-list__rows" "css_element"
-
+    Then I should see the tui datatable contains:
+      | Competency name                |
+      | Self assignable                |
+      | Self assignable no description |
 
   Scenario: I can return from and clear selections
     Given I log in as "admin"
     And the following "competency" hierarchy exists:
       | framework | fullname                       | idnumber | assignavailability | type        | description |
-      | CFrame    | Self assignable                | sa1      | any            | Comp type 1 |             |
-      | CFrame    | Self assignable no description | sa2      | any            | Comp type 2 |             |
+      | CFrame    | Self assignable                | sa1      | any                | Comp type 1 |             |
+      | CFrame    | Self assignable no description | sa2      | any                | Comp type 2 |             |
     And the following "assignments" exist in "totara_competency" plugin:
       | competency | user_group_type | user_group |
       | sa1        | user            | admin      |
     And I run the scheduled task "totara_competency\task\expand_assignments_task"
-    And I set the site theme to "ventura"
     And I navigate to the competency self assignment page
 
     When I select "Currently assigned" from the "Status" singleselect
@@ -168,34 +162,33 @@ Feature: Test competencies can be user assigned
       | framework | fullname                | idnumber | assignavailability | type        |
 
       # First page
-      | CFrame    | AA First of first page  | sa1      | any            | Comp type 1 |
-      | CFrame    | AB Self assignable 2    | sa2      | any            | Comp type 1 |
-      | CFrame    | AB Self assignable 3    | sa3      | any            | Comp type 1 |
-      | CFrame    | AB Self assignable 4    | sa4      | any            | Comp type 1 |
-      | CFrame    | AB Self assignable 5    | sa5      | any            | Comp type 1 |
-      | CFrame    | AB Self assignable 6    | sa6      | any            | Comp type 1 |
-      | CFrame    | AB Self assignable 7    | sa7      | any            | Comp type 1 |
-      | CFrame    | AB Self assignable 8    | sa8      | any            | Comp type 1 |
-      | CFrame    | AB Self assignable 9    | sa9      | any            | Comp type 1 |
-      | CFrame    | AB Self assignable 10   | sa10     | any            | Comp type 1 |
-      | CFrame    | AB Self assignable 11   | sa11     | any            | Comp type 1 |
-      | CFrame    | AB Self assignable 12   | sa12     | any            | Comp type 1 |
-      | CFrame    | AB Self assignable 13   | sa13     | any            | Comp type 1 |
-      | CFrame    | AB Self assignable 14   | sa14     | any            | Comp type 1 |
-      | CFrame    | AB Self assignable 15   | sa15     | any            | Comp type 1 |
-      | CFrame    | AB Self assignable 16   | sa16     | any            | Comp type 1 |
-      | CFrame    | AB Self assignable 17   | sa17     | any            | Comp type 1 |
-      | CFrame    | AB Self assignable 18   | sa18     | any            | Comp type 1 |
-      | CFrame    | AB Self assignable 19   | sa19     | any            | Comp type 1 |
-      | CFrame    | AZ Last of first page   | sa20     | any            | Comp type 1 |
+      | CFrame    | AA First of first page  | sa1      | any                | Comp type 1 |
+      | CFrame    | AB Self assignable 2    | sa2      | any                | Comp type 1 |
+      | CFrame    | AB Self assignable 3    | sa3      | any                | Comp type 1 |
+      | CFrame    | AB Self assignable 4    | sa4      | any                | Comp type 1 |
+      | CFrame    | AB Self assignable 5    | sa5      | any                | Comp type 1 |
+      | CFrame    | AB Self assignable 6    | sa6      | any                | Comp type 1 |
+      | CFrame    | AB Self assignable 7    | sa7      | any                | Comp type 1 |
+      | CFrame    | AB Self assignable 8    | sa8      | any                | Comp type 1 |
+      | CFrame    | AB Self assignable 9    | sa9      | any                | Comp type 1 |
+      | CFrame    | AB Self assignable 10   | sa10     | any                | Comp type 1 |
+      | CFrame    | AB Self assignable 11   | sa11     | any                | Comp type 1 |
+      | CFrame    | AB Self assignable 12   | sa12     | any                | Comp type 1 |
+      | CFrame    | AB Self assignable 13   | sa13     | any                | Comp type 1 |
+      | CFrame    | AB Self assignable 14   | sa14     | any                | Comp type 1 |
+      | CFrame    | AB Self assignable 15   | sa15     | any                | Comp type 1 |
+      | CFrame    | AB Self assignable 16   | sa16     | any                | Comp type 1 |
+      | CFrame    | AB Self assignable 17   | sa17     | any                | Comp type 1 |
+      | CFrame    | AB Self assignable 18   | sa18     | any                | Comp type 1 |
+      | CFrame    | AB Self assignable 19   | sa19     | any                | Comp type 1 |
+      | CFrame    | AZ Last of first page   | sa20     | any                | Comp type 1 |
 
       # Second page
-      | CFrame    | BA First of second page | sa21     | any            | Comp type 1 |
-      | CFrame    | BB Self assignable 22   | sa22     | any            | Comp type 1 |
-      | CFrame    | BB Self assignable 23   | sa23     | any            | Comp type 1 |
-      | CFrame    | BB Self assignable 24   | sa24     | any            | Comp type 1 |
-      | CFrame    | BZ Last of second page  | sa25     | any            | Comp type 1 |
-    And I set the site theme to "ventura"
+      | CFrame    | BA First of second page | sa21     | any                | Comp type 1 |
+      | CFrame    | BB Self assignable 22   | sa22     | any                | Comp type 1 |
+      | CFrame    | BB Self assignable 23   | sa23     | any                | Comp type 1 |
+      | CFrame    | BB Self assignable 24   | sa24     | any                | Comp type 1 |
+      | CFrame    | BZ Last of second page  | sa25     | any                | Comp type 1 |
     And I navigate to the competency self assignment page
 
     Then I should see "Load more"
@@ -215,10 +208,10 @@ Feature: Test competencies can be user assigned
 
   Scenario: I am shown an empty list when there is no competencies to self assign
     Given I log in as "admin"
-    And I set the site theme to "ventura"
     And I navigate to the competency self assignment page
 
     Then I should see the tui datatable is empty
+
     And I should see "No items to display"
     And I should see "Self assignment" in the ".breadcrumb" "css_element"
     And I should see "Back to your competency profile"
@@ -232,7 +225,6 @@ Feature: Test competencies can be user assigned
 
   Scenario: Labels are generic when assigning competencies to someone else
     Given I log in as "admin"
-    And I set the site theme to "ventura"
     When I navigate to the competency user assignment page for guest user
 
     Then I should see "Competency assignment" in the ".breadcrumb" "css_element"
