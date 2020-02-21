@@ -322,7 +322,7 @@ Feature: Course archive completions  for seminar sessions
     And I set the following fields to these values:
       | timestart[year]    | ## next year ## Y ## |
       | timefinish[year]   | ## next year ## Y ## |
-    And I press "OK"
+    And I click on "OK" "button" in the "Select date" "totaradialogue"
     And I press "Save changes"
     Then I should see "Upcoming" in the "5:00 AM - 6:00 AM" "table_row"
     And I log out
