@@ -32,6 +32,15 @@ $capabilities = [
             'performanceactivitycreator' => CAP_ALLOW,
         ]
     ],
+    // Create a performance activity. Additonally requires the capability to access the management page and create
+    // a performance container.
+    'mod/perform:create_activity' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSECAT,
+        'archetypes' => [
+            'performanceactivitycreator' => CAP_ALLOW,
+        ]
+    ],
     // Manage a performance activity. Automatically granted when a user creates a performance activity.
     // Addtionally requires 'mod/perform:view_manage_activities' to access the page where creation is
     // done - if a user created a performance activity themselves then they must already have the capability
