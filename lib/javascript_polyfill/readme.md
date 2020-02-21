@@ -37,7 +37,7 @@ The polyfill code was copied from https://developer.mozilla.org/en-US/docs/
 * CustomEvent
 * Element - closest, matches, remove
 * Object - assign
-* String - startsWith, endsWith, includes
+* String - startsWith, endsWith, includes, fromCodePoint
 * Array - find, findIndex, includes
 * NodeList - forEach
 * Object - entries, values
