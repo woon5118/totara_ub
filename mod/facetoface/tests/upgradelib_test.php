@@ -431,4 +431,53 @@ class mod_facetoface_upgradelib_testcase extends advanced_testcase {
         $this->assertEquals($newsessionattendance, $globalsessionattendance);
         $this->assertEquals($attendancetime, $globalattendancetime);
     }
+
+    public function test_facetoface_upgradelib_delete_orphaned_events() {
+        global $DB;
+
+        $gen = $this->getDataGenerator();
+        $course = $gen->create_course();
+
+        /** @var mod_facetoface_generator $f2fgen */
+        $f2fgen = $gen->get_plugin_generator('mod_facetoface');
+        $this->assertDebuggingNotCalled();
+        $f2f = $f2fgen->create_instance(['course' => $course->id]);
+        $this->resetDebugging(); // Just swallow gracious debugging messages here
+
+        $this->setAdminUser();
+
+        $now = time();
+
+        // Add two seminar events
+        for ($s = 1; $s < 3; $s++) {
+            $sessiondates = array();
+            for ($i = 0; $i < 3; $i++) {
+                $sessiondates[$i] = new stdClass();
+                $sessiondates[$i]->timestart = $now + $i * WEEKSECS;
+                $sessiondates[$i]->timefinish = $sessiondates[$i]->timestart + 3 * HOURSECS;
+                $sessiondates[$i]->sessiontimezone = '99';
+                $sessiondates[$i]->assetids = array();
+            }
+            ${'sid' . $s} = $f2fgen->add_session(array('facetoface' => $f2f->id, 'sessiondates' => $sessiondates));
+
+            // We still need to add the calendar entries.
+            ${'seminarevent' . $s} = new \mod_facetoface\seminar_event(${'sid' . $s});
+            \mod_facetoface\calendar::update_entries(${'seminarevent' . $s});
+        }
+
+        $events = $DB->get_records('event', array('modulename' => 'facetoface'),'timestart');
+
+        // Each seminar event adds 6 dates to the calendar (three course, three user)
+        $this->assertEquals(12, count($events));
+
+        // Hack-delete the second seminar event
+        $DB->delete_records('facetoface_sessions', ['id' => $sid2]);
+
+        // Run the upgrade query to delete the orphaned calendar events
+        facetoface_upgradelib_delete_orphaned_events();
+
+        // Make sure only the orphaned 6 events were deleted
+        $events = $DB->get_records('event', array('modulename' => 'facetoface'),'timestart');
+        $this->assertEquals(6, count($events));
+    }
 }

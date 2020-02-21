@@ -222,3 +222,19 @@ function facetoface_upgradelib_fixup_seminar_sessionattendance() {
     [ $sql, $params ] = $DB->get_in_or_equal([0, 1, 2], SQL_PARAMS_QM, 'param', false);
     $DB->execute('UPDATE {facetoface} SET sessionattendance = 0 WHERE sessionattendance = 1 AND attendancetime ' . $sql, $params);
 }
+
+/**
+ * Do what seminar::fix_up_session_attendance_time() do.
+ */
+function facetoface_upgradelib_delete_orphaned_events() {
+    global $DB;
+
+    // Delete seminar event orphan records from calendar.
+    $id_cast = $DB->sql_cast_2char('id');
+    $sql = "DELETE FROM {event}
+                      WHERE modulename = 'facetoface'
+                        AND uuid NOT IN (
+                                 SELECT {$id_cast} FROM {facetoface_sessions}
+                        )";
+    $DB->execute($sql);
+}
