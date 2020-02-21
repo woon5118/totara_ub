@@ -305,10 +305,10 @@ class aggregation_users_table {
     /**
      * Reset the has_changed flag for all users
      *
-     * @param int $new_has_changed_value Value to set the has_changed_column to
+     * @param multi $new_has_changed_value Value to set the has_changed_column to
      * @return $this
      */
-    public function reset_has_changed(int $new_has_changed_value): self {
+    public function reset_has_changed($new_has_changed_value): self {
         global $DB;
 
         if (empty($this->has_changed_column)) {
@@ -358,7 +358,7 @@ class aggregation_users_table {
      *
      * @param int $user_id_value Value to insert in the user_id column
      * @param int $competency_id_value Value to insert in the competency_id column
-     * @param mixed|null $has_changed_value Value to insert in the has_changed column
+     * @param multi|null $has_changed_value Value to set the has_changed_column to
      * @return array
      */
     public function get_insert_record(
@@ -465,7 +465,8 @@ class aggregation_users_table {
         string $table_alias = '',
         bool $include_update_operation = true,
         $has_change_value = null,
-        string $param_prefix = 'autbl'
+        string $param_prefix = 'autbl',
+        ?string $process_key = null
     ) {
         $sql_parts = [];
         $params = [];
@@ -518,23 +519,35 @@ class aggregation_users_table {
      *
      * @param int $user_id
      * @param int $competency_id
+     * @param mixed|null $has_changed_value Value to insert in the has_changed column
      * @return $this
      */
-    public function queue_for_aggregation(int $user_id, int $competency_id): self {
+    public function queue_for_aggregation(int $user_id, int $competency_id, $has_changed_value = null): self {
         global $DB;
 
-        $exists = $DB->record_exists(
-            $this->table_name,
-            [
-                $this->user_id_column => $user_id,
-                $this->competency_id_column => $competency_id,
-                $this->process_key_column => null
-            ]
-        );
+        $wh = "{$this->user_id_column} = :qfa_userid 
+                AND {$this->competency_id_column} = :qfa_competencyid
+                AND {$this->process_key_column} IS NULL";
+        $params = [
+            'qfa_userid' => $user_id,
+            'qfa_competencyid' => $competency_id,
+        ];
+
+        $exists = $DB->record_exists_select($this->table_name, $wh, $params);
 
         if (!$exists) {
-            $record = $this->get_insert_record($user_id, $competency_id);
+            $record = $this->get_insert_record($user_id, $competency_id, $has_changed_value);
             $DB->insert_record($this->table_name, $record);
+        } else {
+            if (!is_null($has_changed_value) && !empty($this->has_changed_column)) {
+                // No need to take operation_key, etc. into consideration - busy queuing
+                $sql =
+                    "UPDATE {{$this->table_name}}
+                       SET {$this->has_changed_column} = :qfa_haschanged
+                      WHERE {$wh}";
+                $params['qfa_haschanged'] = $has_changed_value;
+                $DB->execute ($sql, $params);
+            }
         }
 
         return $this;
@@ -544,14 +557,17 @@ class aggregation_users_table {
      * Queue aggregation to be processed in the background for all assigned users
      *
      * @param array $data List of ['user_id' => , 'competency_id' => ] pairs to queue
+     * @param multi}null $has_changed_value Has changed value to set
      * @return array all combinations added to the table (userid, competency_id)
      */
-    public function queue_multiple_for_aggregation(array $data): array {
+    public function queue_multiple_for_aggregation(array $data, $has_changed_value = null): array {
         global $DB;
 
         if (empty($data)) {
             return [];
         }
+
+        $has_changed_select = !empty($has_changed_value) && !empty($this->has_changed_column) ? ", {$this->has_changed_column} as has_changed " : '';
 
         $wh_parts = [];
         $params = [];
@@ -575,7 +591,7 @@ class aggregation_users_table {
         }
 
         $sql = "
-            SELECT id, {$this->get_user_id_column()}, {$this->get_competency_id_column()}
+            SELECT id, {$this->get_user_id_column()}, {$this->get_competency_id_column()} {$has_changed_select}
             FROM {{$this->get_table_name()}}
             WHERE {$user_competency_condition} {$process_key_wh}
         ";
@@ -590,26 +606,65 @@ class aggregation_users_table {
             }
         });
 
-        // Prepare insert array, ensuring that only user and competency id is there
-        $to_add = array_map(function ($item) {
-            $add_el = (object)$this->get_insert_record($item->user_id, $item->competency_id);
-            // We are queuing - process key is not needed
-            unset($add_el->{$this->process_key_column});
-            return $add_el;
-        }, $to_add);
+        $to_update = [];
 
-        $DB->insert_records_via_batch($this->table_name, $to_add);
+        if (!empty($has_changed_value) && !empty($this->has_changed_column)) {
+            $to_update = array_udiff($existing_rows, $to_add, function ($existing, $new) {
+                if ($existing->user_id == $new->{$this->get_user_id_column()}) {
+                    return $existing->competency_id <=> $new->{$this->get_competency_id_column()};
+                } else {
+                    return $existing->user_id <=> $new->{$this->get_user_id_column()};
+                }
+            });
 
-        return $to_add;
+            $to_update = array_filter($to_update, function($v) use($has_changed_value) {
+                return $v->has_changed != $has_changed_value;
+            });
+        }
+
+        if (!empty($to_add)) {
+            // Prepare insert array, ensuring that only user, competency id and has_changed are there
+            $to_add = array_map(function ($item) {
+                $add_el = (object)$this->get_insert_record($item->user_id, $item->competency_id, $item->has_changed ?? null);
+                // We are queuing - process key is not needed
+                unset($add_el->{$this->process_key_column});
+                return $add_el;
+            }, $to_add);
+
+            $DB->insert_records_via_batch($this->table_name, $to_add);
+        }
+
+        if (!empty($to_update)) {
+            $wh_parts = [];
+            $params = ['haschanged' => $has_changed_value];
+
+            foreach ($to_update as $idx => $item) {
+                $wh_parts[] = "{$this->user_id_column} = :userid_{$idx} AND {$this->competency_id_column} = :compid_{$idx}";
+                $params["userid_{$idx}"] = $item->user_id;
+                $params["compid_{$idx}"] = $item->competency_id;
+            }
+            $update_wh = "((" . implode(') OR (', $wh_parts) . "))";
+
+            $DB->execute(
+                "UPDATE {{$this->table_name}} 
+                         SET {$this->has_changed_column} = :haschanged 
+                       WHERE {$update_wh}
+                         AND {$this->process_key_column} IS NULL",
+                $params
+            );
+        }
+
+        return array_merge($to_add, $to_update);
     }
 
     /**
      * Queue aggregation to be processed in the background for all assigned users
      *
      * @param int $competency_id
+     * @param multi|null $has_changed_value Value to set the has_changed_column to
      * @return $this
      */
-    public function queue_all_assigned_users_for_aggregation(int $competency_id): self {
+    public function queue_all_assigned_users_for_aggregation(int $competency_id, $has_changed_value = null): self {
         global $DB;
 
         $process_key_wh = '';
@@ -621,7 +676,7 @@ class aggregation_users_table {
         $assignment_users_table = aggregation_helper::get_assigned_users_sql_table();
 
         $sql =
-            "INSERT INTO {{$this->get_table_name()}} 
+            "INSERT INTO {{$this->get_table_name()}}
                 (user_id, competency_id)
                 SELECT DISTINCT tcau.user_id, tcau.competency_id
                        FROM {$assignment_users_table} tcau
@@ -633,6 +688,16 @@ class aggregation_users_table {
                         AND agg_queue.id IS NULL";
 
         $DB->execute($sql, ['compid' => $competency_id]);
+
+        if (!empty($has_changed_value) && !empty($this->has_changed_column)) {
+            $DB->execute(
+                "UPDATE {{$this->table_name}}
+                         SET {$this->has_changed_column} = :haschanged
+                       WHERE {$this->competency_id_column} = :compid
+                         AND {$this->process_key_column} IS NULL",
+                ['haschanged' => $has_changed_value, 'compid' => $competency_id]
+            );
+        }
 
         return $this;
     }

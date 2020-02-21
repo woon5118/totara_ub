@@ -223,6 +223,41 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
         // Without process value it should not be added
         $data->tbl->queue_for_aggregation(3, 8);
         $this->assertSame($original_count + 2, $DB->count_records($data->tbl->get_table_name()));
+
+        // New with has_changed
+        $data->tbl->queue_for_aggregation(345, 543, 1);
+        $rows = $DB->get_records($data->tbl->get_table_name(),
+            [
+                $data->tbl->get_user_id_column() => 345,
+                $data->tbl->get_competency_id_column() => 543,
+                $data->tbl->get_process_key_column() => null,
+            ]
+        );
+        $this->assertSame(1, count($rows));
+        $row = reset($rows);
+        $this->assertEquals(1, $row->{$data->tbl->get_has_changed_column()});
+
+        // Existing without process value, with has_changed should update has_changed
+        $row = $DB->get_record($data->tbl->get_table_name(),
+            [
+                $data->tbl->get_user_id_column() => 3,
+                $data->tbl->get_competency_id_column() => 8,
+                $data->tbl->get_process_key_column() => null,
+            ]
+        );
+        $this->assertEquals(0, $row->{$data->tbl->get_has_changed_column()});
+
+        $data->tbl->queue_for_aggregation(3, 8, 1);
+        $rows = $DB->get_records($data->tbl->get_table_name(),
+            [
+                $data->tbl->get_user_id_column() => 3,
+                $data->tbl->get_competency_id_column() => 8,
+                $data->tbl->get_process_key_column() => null,
+            ]
+        );
+        $this->assertSame(1, count($rows));
+        $row = reset($rows);
+        $this->assertEquals(1, $row->{$data->tbl->get_has_changed_column()});
     }
 
     public function test_claim_process() {
@@ -428,8 +463,8 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
             ['user_id' => 2, 'competency_id' => 2, 'has_changed' => 0, 'process_key' => 'proc2'],
             ['user_id' => 3, 'competency_id' => 2, 'has_changed' => 0, 'process_key' => null],
             ['user_id' => 1, 'competency_id' => 3, 'has_changed' => 0, 'process_key' => null],
-            ['user_id' => 2, 'competency_id' => 3, 'has_changed' => 0, 'process_key' => null],
-            ['user_id' => 3, 'competency_id' => 3, 'has_changed' => 0, 'process_key' => null],
+            ['user_id' => 2, 'competency_id' => 3, 'has_changed' => 1, 'process_key' => null],
+            ['user_id' => 3, 'competency_id' => 3, 'has_changed' => 1, 'process_key' => null],
         ];
 
         $DB->insert_records($table->get_table_name(), $records);
@@ -465,6 +500,17 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
         }
 
         $this->assertEmpty($expected_rows);
+
+        // Now we also specify the has_changed value
+        $result = $table->queue_multiple_for_aggregation($to_queue, 1);
+        $this->assertCount(7, $result);
+
+        // Ensure the has_changed flag was not updated on claimed queue entries
+        $this->assertSame(9, $DB->count_records($table->get_table_name(),
+            [$table->get_has_changed_column() => 1]));
+
+        $this->assertSame(3, $DB->count_records($table->get_table_name(),
+            [$table->get_has_changed_column() => 0]));
     }
 
     /**
@@ -511,6 +557,7 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
         $competencies = [];
         $competencies[1] = $competency_generator->create_competency();
         $competencies[2] = $competency_generator->create_competency();
+        $competencies[3] = $competency_generator->create_competency();
 
         $users = [];
         $user_ids_all = [];
@@ -527,6 +574,9 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
                 $assignment = $assignment_generator->create_user_assignment($competencies[2]->id, $users[$i]->id);
                 $assignment_ids[] = $assignment->id;
             }
+
+            $assignment = $assignment_generator->create_user_assignment($competencies[3]->id, $users[$i]->id);
+            $assignment_ids[] = $assignment->id;
         }
 
         (new assignment_actions())->activate($assignment_ids);
@@ -561,6 +611,54 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
         $actual_user_ids = $DB->get_records_sql_menu($sql, ['compid' => $competencies[1]->id]);
         $this->assertSame(count($user_ids_all), count($actual_user_ids));
         $this->assertEqualsCanonicalizing($user_ids_all, $actual_user_ids);
+
+
+        // Specify a has_changed valued when queuing
+
+        // First manually add some rows for competency3 and set the process_key for some
+        for ($i = 1; $i <= 5; $i++) {
+            $user_table->queue_for_aggregation($users[$i]->id, $competencies[3]->id, $i % 2);
+        }
+
+        $sql = "UPDATE {{$user_table->get_table_name()}}
+                   SET {$user_table->get_process_key_column()} = :key
+                 WHERE {$user_table->get_competency_id_column()} = :compid
+                   AND {$user_table->get_user_id_column()} = :userid";
+        $params = [
+            'key' => 'sometest',
+            'compid' => $competencies[3]->id,
+            'userid' => $users[2]->id,
+        ];
+        $DB->execute($sql, $params);
+
+        $params = [
+            $user_table->get_competency_id_column() => $competencies[3]->id,
+            $user_table->get_has_changed_column() => 0,
+            $user_table->get_process_key_column() => 'sometest',
+        ];
+        $this->assertSame(1, $DB->count_records($user_table->get_table_name(), $params));
+
+        // Now queue and test that each user appear only once. Also ensure that records with a process_key is not updated
+        $user_table->queue_all_assigned_users_for_aggregation($competencies[3]->id, 1);
+
+        $sql =
+            "SELECT id, {$user_table->get_user_id_column()}
+               FROM {{$user_table->get_table_name()}}
+              WHERE {$user_table->get_competency_id_column()} = :compid
+                AND {$user_table->get_has_changed_column()} = :haschanged
+                AND {$user_table->get_process_key_column()} IS NULL";
+        $params = ['compid' => $competencies[3]->id, 'haschanged' => 1];
+
+        $actual_user_ids = $DB->get_records_sql_menu($sql, $params);
+        $this->assertSame(count($user_ids_all), count($actual_user_ids));
+        $this->assertEqualsCanonicalizing($user_ids_all, $actual_user_ids);
+
+        $params = [
+            $user_table->get_competency_id_column() => $competencies[3]->id,
+            $user_table->get_has_changed_column() => 0,
+            $user_table->get_process_key_column() => 'sometest',
+        ];
+        $this->assertSame(1, $DB->count_records($user_table->get_table_name(), $params));
 
         $sink->close();
     }
