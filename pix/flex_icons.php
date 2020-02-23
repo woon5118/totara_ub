@@ -334,6 +334,13 @@ $icons = array(
                     'classes' => 'fa-check',
                 ),
         ),
+    'check-circle' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-check-circle',
+                ),
+        ),
     'check-circle-o' =>
         array(
             'data' =>
@@ -857,6 +864,13 @@ $icons = array(
                             'fa-user ft-stack-main',
                             'fa-pause ft-stack-suffix',
                         ),
+                ),
+        ),
+    'error-circle' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-minus-circle',
                 ),
         ),
     'event-course' =>
@@ -2166,6 +2180,13 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'fa-warning ft-state-warning',
+                ),
+        ),
+    'warning-sign' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-warning',
                 ),
         ),
 );

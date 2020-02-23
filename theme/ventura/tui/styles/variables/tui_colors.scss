@@ -56,6 +56,9 @@
   // Visual prompt colours
   //
 
+  // Used to indicate an informational message
+  --tui-color-prompt-info: #007ab8;
+  --tui-color-prompt-info-bg: #daf3fe;
   // Used to indicate an important message (error, danger)
   --tui-color-prompt-alert: #cc2428;
   --tui-color-prompt-alert-bg: #fedada;

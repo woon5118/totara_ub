@@ -1,0 +1,152 @@
+<!--
+  This file is part of Totara Learn
+
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  @author Simon Chester <simon.chester@totaralearning.com>
+  @package totara_core
+-->
+
+<template>
+  <div
+    v-if="!dismissed"
+    class="tui-notificationBanner"
+    :class="{
+      ['tui-notificationBanner--' + type]: type,
+      'tui-notificationBanner--toast': toast,
+    }"
+  >
+    <div class="tui-notificationBanner__icon">
+      <component
+        :is="iconForType"
+        :alt="labelForIconType + ': '"
+        :title="labelForIconType"
+        :size="200"
+      />
+    </div>
+    <div class="tui-notificationBanner__message" v-html="message" />
+    <div
+      v-if="isDismissable"
+      class="tui-notificationBanner__dismiss"
+      aria-hidden="true"
+    >
+      <CloseButton
+        class="tui-notificationBanner__dismiss_button"
+        @click="dismiss"
+      />
+    </div>
+  </div>
+</template>
+
+<script>
+// Components
+import CloseButton from 'totara_core/components/buttons/CloseIcon';
+import ErrorIcon from 'totara_core/components/icons/common/Error';
+import InfoIcon from 'totara_core/components/icons/common/Info';
+import SuccessIcon from 'totara_core/components/icons/common/Success';
+import WarningIcon from 'totara_core/components/icons/common/Warning';
+
+const icons = {
+  error: ErrorIcon,
+  info: InfoIcon,
+  success: SuccessIcon,
+  warning: WarningIcon,
+};
+
+export default {
+  components: {
+    CloseButton,
+  },
+
+  props: {
+    dismissable: Boolean,
+    message: String,
+    selfDismiss: Boolean,
+    toast: {
+      type: Boolean,
+    },
+    type: {
+      type: String,
+      default: 'info',
+      validator: val => ['info', 'success', 'warning', 'error'].includes(val),
+    },
+  },
+
+  data() {
+    return {
+      dismissed: false,
+    };
+  },
+
+  computed: {
+    /**
+     * Check if the notification can be manualy closed
+     *
+     * @returns {boolean}
+     */
+    isDismissable() {
+      return this.dismissable || this.selfDismiss;
+    },
+
+    /**
+     * Return icon component for the type of notification
+     *
+     * @returns {Component}
+     */
+    iconForType() {
+      return icons[this.type];
+    },
+
+    /**
+     * Text to display for type icon.
+     *
+     * @returns {string}
+     */
+    labelForIconType() {
+      switch (this.type) {
+        case 'info':
+        case 'success':
+        case 'warning':
+        case 'error':
+          return this.$str(this.type);
+        default:
+          return null;
+      }
+    },
+  },
+
+  methods: {
+    /**
+     * Dismiss the notification
+     *
+     */
+    dismiss() {
+      if (this.dismissable) {
+        this.$emit('dismiss');
+      }
+      if (this.selfDismiss) {
+        this.dismissed = true;
+      }
+    },
+  },
+};
+</script>
+
+<lang-strings>
+{
+  "moodle": ["info", "success", "warning", "error"]
+}
+</lang-strings>

@@ -167,7 +167,7 @@ const tui = {
    * https://vuejs.org/v2/guide/render-function.html#The-Data-Object-In-Depth
    * @param {(Element|string)} el Element to mount at, or selector.
    *   This element will be *replaced* in the DOM.
-   * @return {Promise} Promise resolving once component is mounted.
+   * @return {Promise<Vue>} Promise resolving once component is mounted.
    */
   async mount(component, data, el) {
     // warn for incorrect usage
@@ -197,7 +197,7 @@ const tui = {
       await this.loadRequirements(component);
     }
 
-    mount(component, data, el);
+    return mount(component, data, el);
   },
 
   /**
@@ -403,6 +403,7 @@ const tui = {
  * @param {object} component
  * @param {?object} data
  * @param {(Element|string)} el
+ * @returns {Vue} Vue VM.
  */
 function mount(component, data, el) {
   const ErrorBoundary = tui.defaultExport(
@@ -421,6 +422,7 @@ function mount(component, data, el) {
     },
   });
   vm.$mount(el);
+  return vm.$children[0].$children[0];
 }
 
 export default tui;
