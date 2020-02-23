@@ -22,90 +22,105 @@
 -->
 
 <template>
-  <div>
-    <div
-      v-if="hasPlans"
-      class="tui-pathwayLearningPlan-achievementDisplay__container"
-    >
-      <Table
-        :data="plans.learning_plans"
-        :expandable-rows="true"
-        class="tui-pathwayLearningPlan-achievementDisplay__plans"
-      >
-        <template v-slot:row="{ row, expand, expandState }">
-          <!-- learning plan expand cell -->
-          <ExpandCell
-            v-if="row.can_view"
-            size="1"
-            :expand-state="expandState"
-            @click="expand()"
-          />
-          <Cell v-else size="1" />
-
-          <Cell>
-            <span v-if="row.can_view">
-              {{ row.name }}
-            </span>
-            <span>
-              {{ $str('no_permission_view_plan', 'pathway_learning_plan') }}
-            </span>
-          </Cell>
-        </template>
-
-        <!-- Expanded row content -->
-        <template v-slot:expand-content="{ row }">
-          <h4>{{ row.name }}</h4>
-
-          <div>
-            <span v-if="hasDescription(row)" v-html="row.description" />
-            <span
-              v-else
-              class="tui-pathwayLearningPlan-achievementDisplay--none"
-            >
-              {{ $str('no_description_available', 'pathway_learning_plan') }}
-            </span>
-          </div>
-
-          <a
-            :href="getPlanUrl(row.id)"
-            class="tui-pathwayLearningPlan-achievementDisplay--padTop btn btn-primary"
-          >
-            {{ $str('view_plan', 'pathway_learning_plan') }}
-          </a>
-        </template>
-      </Table>
-      <div class="tui-pathwayLearningPlan-achievementDisplay__value">
-        <div
-          v-if="hasValue"
-          class="tui-pathwayLearningPlan-achievementDisplay__value_text"
-        >
-          {{ plans.date }}
-        </div>
-        <div
-          v-if="hasValue"
-          class="tui-pathwayLearningPlan-achievementDisplay__value_text tui-pathwayLearningPlan-achievementDisplay__value_name"
-        >
-          {{ plans.scale_value.name }}
-        </div>
-        <div
-          v-if="!hasValue"
-          class="tui-pathwayLearningPlan-achievementDisplay__value_text tui-pathwayLearningPlan-achievementDisplay--none"
-        >
-          {{ $str('no_rating_set', 'pathway_learning_plan') }}
-        </div>
-      </div>
-    </div>
-    <div
-      v-else
-      class="tui-pathwayLearningPlan-achievementDisplay--padTop tui-pathwayLearningPlan-achievementDisplay--none"
-    >
+  <div class="tui-pathwayLearningPlanAchievement">
+    <!-- String if no plans available -->
+    <div v-if="!hasPlans" class="tui-pathwayLearningPlanAchievement__empty">
       {{ $str('no_available_learning_plans', 'pathway_learning_plan') }}
+    </div>
+
+    <!-- Learning plan proficiency content -->
+    <div v-else class="tui-pathwayLearningPlanAchievement__content">
+      <AchievementLayout>
+        <!-- Learning plan proficiency left content -->
+        <template v-slot:left>
+          <div class="tui-pathwayLearningPlanAchievement__overview">
+            <h5 class="tui-pathwayLearningPlanAchievement__title">
+              {{ $str('achievement', 'pathway_learning_plan') }}
+            </h5>
+            <template v-if="hasValue">
+              <div class="tui-pathwayLearningPlanAchievement__value">
+                <span class="tui-pathwayLearningPlanAchievement__value-title">
+                  {{ plans.scale_value.name }}
+                </span>
+                {{ $str('set_on', 'pathway_learning_plan', plans.date) }}
+              </div>
+            </template>
+            <template v-else>
+              <div class="tui-pathwayLearningPlanAchievement__noValue">
+                {{ $str('no_rating_set', 'pathway_learning_plan') }}
+              </div>
+            </template>
+          </div>
+        </template>
+
+        <template v-slot:right>
+          <Table
+            :data="plans.learning_plans"
+            :expandable-rows="true"
+            class="tui-pathwayLearningPlanAchievement__list"
+          >
+            <template v-slot:row="{ row, expand, expandState }">
+              <!-- learning plan, that can't be viewed -->
+              <template v-if="!row.can_view">
+                <Cell size="1" />
+                <Cell size="11">
+                  {{ $str('no_permission_view_plan', 'pathway_learning_plan') }}
+                </Cell>
+              </template>
+
+              <template v-else>
+                <!-- learning plan expand cell -->
+                <ExpandCell
+                  v-if="row.can_view"
+                  size="1"
+                  :expand-state="expandState"
+                  @click="expand()"
+                />
+
+                <!-- learning plan name cell -->
+                <Cell
+                  size="11"
+                  :column-header="$str('name', 'pathway_learning_plan')"
+                >
+                  {{ row.name }}
+                </Cell>
+              </template>
+            </template>
+
+            <!-- Expanded row content -->
+            <template v-slot:expand-content="{ row }">
+              <div class="tui-pathwayLearningPlanAchievement__summary">
+                <h6 class="tui-pathwayLearningPlanAchievement__summary-header">
+                  {{ row.name }}
+                </h6>
+                <div
+                  v-if="row.description"
+                  class="tui-pathwayLearningPlanAchievement__summary-body"
+                  v-html="row.description"
+                />
+
+                <ActionLink
+                  :href="getPlanUrl(row.id)"
+                  :text="$str('view_plan', 'pathway_learning_plan')"
+                  :class="'tui-pathwayLearningPlanAchievement__summary-button'"
+                  :styleclass="{
+                    primary: true,
+                    small: true,
+                  }"
+                />
+              </div>
+            </template>
+          </Table>
+        </template>
+      </AchievementLayout>
     </div>
   </div>
 </template>
 
 <script>
 // Components
+import AchievementLayout from 'totara_competency/components/achievements/AchievementLayout';
+import ActionLink from 'totara_core/components/links/ActionLink';
 import Cell from 'totara_core/components/datatable/Cell';
 import ExpandCell from 'totara_core/components/datatable/ExpandCell';
 import Table from 'totara_core/components/datatable/Table';
@@ -114,6 +129,8 @@ import CompetencyPlansQuery from 'pathway_learning_plan/graphql/competency_plans
 
 export default {
   components: {
+    AchievementLayout,
+    ActionLink,
     Cell,
     ExpandCell,
     Table,
@@ -142,8 +159,8 @@ export default {
       context: { batch: true },
       variables() {
         return {
-          user_id: this.userId,
           assignment_id: this.assignmentId,
+          user_id: this.userId,
         };
       },
       update({ pathway_learning_plan_competency_plans: plans }) {
@@ -154,84 +171,53 @@ export default {
   },
 
   computed: {
+    /**
+     * Check if data contains learning plan
+     *
+     * @return {Boolean}
+     */
     hasPlans() {
-      return this.plans.learning_plans && this.plans.learning_plans.length > 0;
+      return this.plans.learning_plans;
     },
 
+    /**
+     * Check if a scale value has been set
+     *
+     * @return {Boolean}
+     */
     hasValue() {
       return this.hasPlans && this.plans.scale_value != null;
     },
   },
 
   methods: {
-    hasDescription(plan) {
-      return plan.description && plan.description.length > 0;
-    },
-
+    /**
+     * Return URL for plan
+     *
+     * @param {Integer} planId
+     * @return {String}
+     */
     getPlanUrl(planId) {
       return this.$url('/totara/plan/component.php', {
-        id: planId,
         c: 'competency',
+        id: planId,
       });
     },
   },
 };
 </script>
 
-<style lang="scss">
-.tui-pathwayLearningPlan-achievementDisplay {
-  &__container {
-    @media (min-width: $tui-screen-sm) {
-      display: flex;
-    }
-  }
-
-  &__plans {
-    @media (min-width: $tui-screen-sm) {
-      flex-grow: 1;
-    }
-  }
-
-  &__value {
-    @media (min-width: $tui-screen-sm) {
-      min-width: 20%;
-      max-width: 40%;
-      margin-top: var(--tui-gap-2);
-      margin-left: auto;
-      padding-left: var(--tui-gap-2);
-
-      &_text {
-        text-align: right;
-      }
-    }
-
-    @media (max-width: $tui-screen-sm) {
-      padding-top: var(--tui-gap-2);
-    }
-
-    &_name {
-      font-weight: bold;
-    }
-  }
-
-  &--none {
-    font-style: italic;
-  }
-
-  &--padTop {
-    margin-top: var(--tui-gap-2);
-  }
-}
-</style>
-
 <lang-strings>
   {
     "pathway_learning_plan" : [
+      "achievement",
+      "name",
       "no_available_learning_plans",
-      "no_description_available",
       "no_rating_set",
       "no_permission_view_plan",
-      "view_plan"
+      "set_on",
+      "view_plan",
+      "work_towards_level"
     ]
   }
 </lang-strings>
