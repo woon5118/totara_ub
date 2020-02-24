@@ -306,7 +306,7 @@
       border-top: 1px solid var(--tui-nav-quick-border-top-color);
       //Open/Close animation properties
       box-shadow: var(--tui-shadow-3);
-      transform-origin: top;
+      transform-origin: top center;
 
       [dir='rtl'] & {
         transform: scaleY(1) translateX(50%);
