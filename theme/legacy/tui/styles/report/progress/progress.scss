@@ -65,15 +65,15 @@
   vertical-align: middle;
 }
 
-/*rtl:begin:ignore*/
 #page-report-progress-index.dir-ltr .rotated-text {
+  /*rtl:ignore*/
   transform: translate(0, 100%) rotate(-90deg);
 }
 
 #page-report-progress-index.dir-rtl .rotated-text {
+  /*rtl:ignore*/
   transform: translate(0, 100%) rotate(90deg);
 }
-/*rtl:begin:ignore*/
 
 #page-report-progress-index .rotated-text:after {
   content: '';

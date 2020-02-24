@@ -21,7 +21,6 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @package   theme_legacy
 
-/*!rtl:begin:ignore*/
 .block_addblock {
   border: 0;
   box-shadow: unset;
@@ -30,6 +29,7 @@
   .popover {
     max-width: 302px;
     padding: 0;
+    /*rtl:ignore*/
     right: unset;
 
     .popover-content {
@@ -37,7 +37,6 @@
     }
   }
 }
-/*!rtl:end:ignore*/
 
 .addBlock {
   text-align: center;

@@ -138,19 +138,20 @@ $catalogResultsShare-screen_xsm_min: 500px !default;
   }
 }
 
-/*!rtl:begin:ignore*/
 @media (min-width: $catalogResultsShare-screen_xsm_min) {
   .tw-catalogResultsShare {
+    /*rtl:ignore*/
     margin-right: var(--tui-gap-1);
 
     &__expanded {
+      /*rtl:ignore*/
       margin-left: 50%;
+      /*rtl:ignore*/
       right: initial;
       transform: translateX(-50%);
     }
   }
 }
-/*!rtl:end:ignore*/
 
 @media (min-width: $tui-screen-sm) {
   .tw-catalogResultsShare {

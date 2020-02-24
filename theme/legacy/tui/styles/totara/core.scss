@@ -2051,10 +2051,9 @@ a.comments-icon-none {
 }
 
 .dir-rtl .comment-list .comment-others-post .comment-userpicture {
-  /*rtl:begin:ignore*/
+  /*rtl:ignore*/
   background: url([[pix:totara_core|comment-point-grey-rtl]]) no-repeat scroll
     right center transparent;
-  /*rtl:end:ignore*/
 }
 
 .comment-list .comment-own-post .comment-userpicture {
@@ -2065,10 +2064,9 @@ a.comments-icon-none {
 }
 
 .dir-rtl .comment-list .comment-own-post .comment-userpicture {
-  /*rtl:begin:ignore*/
+  /*rtl:ignore*/
   background: url([[pix:totara_core|my-comment-rtl]]) no-repeat scroll left
     center transparent;
-  /*rtl:end:ignore*/
 }
 
 .comment-list .comment-delete {

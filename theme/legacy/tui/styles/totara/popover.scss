@@ -30,17 +30,21 @@
   color: var(--tui-color-text);
 }
 
-/*!rtl:begin:ignore*/
 .popover {
+  /*rtl:ignore*/
   right: auto;
+  /*rtl:ignore*/
   left: 0;
 
   &.top > .arrow,
   &.bottom > .arrow {
+    /*rtl:ignore*/
     right: auto;
+    /*rtl:ignore*/
     left: 50%;
+    /*rtl:ignore*/
     margin-left: -$popover-arrow-outer-width;
+    /*rtl:ignore*/
     margin-right: auto;
   }
 }
-/*rtl:end:ignore*/

@@ -42,7 +42,6 @@
 }
 
 // Calendar restyling.
-/*!rtl:begin:ignore*/
 .path-calendar {
   .calendartable {
     width: 100%;
@@ -59,10 +58,12 @@
     .next,
     .current {
       display: block;
+      /*rtl:ignore*/
       float: left;
       width: 12%;
     }
     .previous {
+      /*rtl:ignore*/
       text-align: left;
     }
     .current {
@@ -70,6 +71,7 @@
       width: 76%;
     }
     .next {
+      /*rtl:ignore*/
       text-align: right;
     }
   }
@@ -137,7 +139,7 @@
       border-color: $calendar-event-group-border-color;
     }
     .calendar_event_user {
-      border-color: $calendar-event-user-border-color
+      border-color: $calendar-event-user-border-color;
     }
     .calendar-event-panel {
       background-color: $calendar-event-panel-bg-color;
@@ -165,7 +167,9 @@
         padding: 5px;
       }
       li {
+        /*rtl:ignore*/
         padding-left: 10px;
+        /*rtl:ignore*/
         text-align: left;
       }
     }
@@ -173,6 +177,7 @@
       overflow: hidden;
       margin-bottom: 2em;
       .buttons {
+        /*rtl:ignore*/
         float: right;
       }
     }
@@ -195,6 +200,7 @@
             font-size: var(--tui-font-size-18);
             font-weight: 200;
             line-height: 24px;
+            /*rtl:ignore*/
             float: left;
           }
           .name,
@@ -202,6 +208,7 @@
             margin-bottom: 5px;
           }
           .date {
+            /*rtl:ignore*/
             float: right;
           }
         }
@@ -213,6 +220,7 @@
           padding: 5px;
           .commands {
             position: absolute;
+            /*rtl:ignore*/
             right: 0;
             top: 0;
             margin: 3px;
@@ -221,6 +229,7 @@
         .commands {
           position: absolute;
           top: 19px;
+          /*rtl:ignore*/
           right: 19px;
           a {
             margin: 0 3px;
@@ -231,39 +240,44 @@
   }
 }
 
-/*!rtl:end:ignore*/
-
 // RTL overrides for main calendar.
-/*!rtl:begin:ignore*/
 .dir-rtl.path-calendar {
   .maincalendar {
     .calendar_event_course,
     .calendar_event_global,
     .calendar_event_group,
     .calendar_event_user {
+      /*rtl:ignore*/
       border-left-width: 1px;
+      /*rtl:ignore*/
       border-right-width: 12px;
     }
     .calendar-controls {
       .next {
+        /*rtl:ignore*/
         text-align: left;
       }
       .previous {
+        /*rtl:ignore*/
         text-align: right;
       }
     }
     .calendartable {
       td,
       li {
+        /*rtl:ignore*/
         text-align: right;
       }
       li {
+        /*rtl:ignore*/
         padding-right: 10px;
+        /*rtl:ignore*/
         padding-left: 5px;
       }
     }
     .header {
       .buttons {
+        /*rtl:ignore*/
         float: left;
       }
     }
@@ -271,15 +285,19 @@
       .event {
         .topic {
           .name {
+            /*rtl:ignore*/
             float: right;
           }
           .date {
+            /*rtl:ignore*/
             float: left;
           }
         }
         .description {
           .commands {
+            /*rtl:ignore*/
             right: inherit;
+            /*rtl:ignore*/
             left: 0;
           }
         }
@@ -287,8 +305,6 @@
     }
   }
 }
-
-/*!rtl:end:ignore*/
 
 // Calendar export.
 #page-calendar-export {

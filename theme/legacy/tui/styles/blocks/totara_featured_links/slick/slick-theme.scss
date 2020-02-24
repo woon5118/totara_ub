@@ -79,10 +79,7 @@ $slick-opacity-not-active: 0.25 !default;
 
 .slick-prev {
   left: 25px;
-  [dir='rtl'] & {
-    left: auto;
-    right: 25px;
-  }
+
   &:before {
     content: $slick-prev-character;
     [dir='rtl'] & {
@@ -91,13 +88,9 @@ $slick-opacity-not-active: 0.25 !default;
   }
 }
 
-/*!rtl:begin:ignore*/
 .slick-next {
   right: 25px;
-  [dir='rtl'] & {
-    left: 25px;
-    right: auto;
-  }
+
   &:before {
     content: $slick-next-character;
     [dir='rtl'] & {
@@ -105,7 +98,6 @@ $slick-opacity-not-active: 0.25 !default;
     }
   }
 }
-/*!rtl:end:ignore*/
 
 /* Dots */
 
@@ -172,9 +164,8 @@ $slick-opacity-not-active: 0.25 !default;
   }
 }
 
-/*!rtl:begin:ignore*/
 // override rtl autoflipping in slick.less
 [dir='rtl'] .slick-slide {
+  /*rtl:ignore*/
   float: right;
 }
-/*!rtl:end:ignore*/

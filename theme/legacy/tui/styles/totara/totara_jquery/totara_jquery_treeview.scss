@@ -25,7 +25,6 @@
   &.collapsable-hitarea {
     background-position: -64px -23px;
 
-    /*rtl:ignore*/
     .dir-rtl & {
       background-position-x: -16px;
     }
@@ -34,7 +33,6 @@
   &.expandable-hitarea {
     background-position: -32px -68px;
 
-    /*rtl:ignore*/
     .dir-rtl & {
       background-position-x: -48px;
     }
@@ -42,7 +40,6 @@
 
   &.lastCollapsable-hitarea {
     background-position: 0 -112px;
-    /*rtl:ignore*/
     .dir-rtl & {
       background-position-x: -80px;
     }
@@ -50,7 +47,6 @@
 
   &.lastExpandable-hitarea {
     background-position: -32px -68px;
-    /*rtl:ignore*/
     .dir-rtl & {
       background-position-x: -48px;
     }
