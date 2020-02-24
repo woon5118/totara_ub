@@ -31,7 +31,6 @@ class achievement_detail extends base_achievement_detail {
      * @inheritDoc
      */
     public function get_achieved_via_strings(): array {
-        // Todo: What the string below says to do.
-        return ['Learning plan - TODO: design to advise on this string, then make into a lang string'];
+        return [get_string('achievement_detail', 'pathway_learning_plan')];
     }
 }

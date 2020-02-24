@@ -90,6 +90,7 @@ $string['activitylog_assignedself'] = 'Assigned: Self-assigned';
 $string['activitylog_competencyaggregationchanged'] = 'Aggregation method on the competency changed';
 $string['activitylog_criteriachange'] = 'Criteria change';
 $string['activitylog_criteriamet'] = 'Criteria met: {$a->criteria_met}. Achieved \'{$a->scale_value_name}\' rating.';
+$string['activitylog_criteriamet_multidivider'] = '{$a->critera_met_one}; {$a->critera_met_two}';
 $string['activitylog_filter'] = 'Filter activity log';
 $string['activitylog_minprofchanged'] = 'Minimum required proficient value changed to \'{$a->scale_value_name}\'';
 $string['activitylog_no_rating'] = 'Rating: None';

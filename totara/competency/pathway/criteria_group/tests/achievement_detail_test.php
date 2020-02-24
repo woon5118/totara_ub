@@ -98,4 +98,20 @@ class pathway_criteria_group_achievement_detail_testcase extends advanced_testca
         $this->assertContains('A', $detail->get_achieved_via_strings());
         $this->assertContains('C', $detail->get_achieved_via_strings());
     }
+
+    /**
+     * For the activity log, we need an end-user understandable string to identify how a competency was achieved via the criteria.
+     */
+    public function test_all_criteria_plugins_have_achieved_via_string() {
+        $criteria_plugins = array_keys(core_component::get_plugin_list('criteria'));
+        foreach ($criteria_plugins as $plugin) {
+            $this->assertTrue(
+                get_string_manager()->string_exists('achievementvia', 'criteria_' . $plugin),
+                "Must define \$string['achievementvia'] = 'xyz'; in the criteria_{$plugin} lang string file!\n" .
+                "This is needed for displaying how a competency value was achieved in the activity log."
+            );
+            $this->assertNotEmpty((new achievement_detail())->get_achievement_via_string($plugin));
+        }
+    }
+
 }

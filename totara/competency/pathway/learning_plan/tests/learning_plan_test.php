@@ -21,6 +21,7 @@
  * @package pathway_learning_plan
  */
 
+use pathway_learning_plan\achievement_detail;
 use totara_competency\expand_task;
 use totara_competency\models\assignment_actions;
 use totara_competency\achievement_configuration;
@@ -179,6 +180,11 @@ class pathway_learning_plan_learning_plan_testcase extends advanced_testcase {
         $this->assertFalse($learning_plan->is_valid());
     }
 
+    public function test_achievement_detail_string() {
+        $strings = (new achievement_detail())->get_achieved_via_strings();
+        $this->assertCount(1, $strings);
+        $this->assertEquals(get_string('achievement_detail', 'pathway_learning_plan'), reset($strings));
+    }
 
     private function run_aggregation_task() {
         (new aggregation_task(new aggregation_users_table(), false))->execute();

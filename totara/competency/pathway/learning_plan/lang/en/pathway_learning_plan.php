@@ -23,6 +23,7 @@
 
 $string['pluginname'] = 'Learning plan';
 
+$string['achievement_detail'] = 'Competency achievement within a Learning Plan';
 $string['achievementpath_group_label'] = 'Learning Plan';
 $string['achievement'] = 'Achievement';
 $string['aggregatetask'] = 'Update learning plan pathway achievements';

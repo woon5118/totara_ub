@@ -21,6 +21,7 @@
  * @package criteria_othercompetency
  */
 
+$string['achievementvia'] = 'Proficiency in other competencies';
 $string['addcompetencies'] = "Add competencies";
 $string['allframeworks'] = 'All frameworks';
 $string['competencies'] = 'Competencies';

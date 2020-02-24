@@ -24,10 +24,9 @@
 namespace totara_competency\models\activity_log;
 
 use core\orm\entity\entity;
-use totara_competency\entities\scale_value;
+use totara_competency\entities\competency_achievement as competency_achievement_entity;
 use totara_competency\models\activity_log;
 use totara_competency\pathway;
-use totara_competency\entities;
 
 class competency_achieved_via extends activity_log {
 
@@ -38,7 +37,7 @@ class competency_achieved_via extends activity_log {
      * @return activity_log
      */
     public static function load_by_entity(entity $entity): activity_log {
-        if (!($entity instanceof entities\competency_achievement)) {
+        if (!($entity instanceof competency_achievement_entity)) {
             throw new \coding_exception('Invalid entity', 'Entity must be instance of competency_achievement');
         }
 
@@ -60,16 +59,29 @@ class competency_achieved_via extends activity_log {
      * @return string
      */
     public function get_description(): string {
-        /** @var entities\competency_achievement $achievement */
-        $achievement = $this->get_entity();
-        $scale_value = $achievement->value;
+        /** @var competency_achievement_entity $achievement */
+        $scale_value = $this->get_entity()->value;
 
         if (!$scale_value) {
             return get_string('activitylog_rating_value_reset', 'totara_competency');
         }
 
+        return get_string('activitylog_criteriamet', 'totara_competency', [
+            'scale_value_name' => $scale_value->name,
+            'criteria_met' => $this->join_criteria_met_strings(
+                $this->get_unique_criteria_met_strings()
+            ),
+        ]);
+    }
+
+    /**
+     * Get the unique set of strings that describe how this competency achievement was reached.
+     *
+     * @return string[]
+     */
+    private function get_unique_criteria_met_strings(): array {
         $criteria_met = [];
-        foreach ($achievement->achieved_via as $via) {
+        foreach ($this->get_entity()->achieved_via as $via) {
             $achievement_detail_strings = pathway::from_entity($via->pathway)
                 ->get_achievement_detail()
                 ->set_related_info((array) json_decode($via->related_info))
@@ -77,12 +89,41 @@ class competency_achieved_via extends activity_log {
 
             $criteria_met = array_merge($criteria_met, $achievement_detail_strings);
         }
-        $criteria_met = implode(', ', array_unique($criteria_met));
 
-        return get_string('activitylog_criteriamet', 'totara_competency', [
-            'criteria_met' => $criteria_met,
-            'scale_value_name' => $scale_value->name,
+        // Deliberately remove duplicate strings (since they don't add any extra info) and alphabetically order them.
+        $criteria_met = array_unique($criteria_met);
+        sort($criteria_met);
+        return $criteria_met;
+    }
+
+    /**
+     * Join multiple criteria met strings together with a separator defined in the language strings file.
+     *
+     * We need to use this function instead of simply using implode() as other languages can have different syntax
+     * rules around how to separate entries in a list. In english we just separate each entry with a semicolon.
+     *
+     * @param string[] $strings
+     * @return string
+     */
+    private function join_criteria_met_strings(array $strings): string {
+        if (count($strings) < 2) {
+            return reset($strings);
+        }
+
+        $string_one = array_shift($strings);
+        $string_two = array_shift($strings);
+
+        $joined_string = get_string('activitylog_criteriamet_multidivider', 'totara_competency', [
+            'critera_met_one' => $string_one,
+            'critera_met_two' => $string_two,
         ]);
+
+        if (empty($strings)) {
+            return $joined_string;
+        }
+
+        // If there are more strings left, we join them with the original string recursively.
+        return $this->join_criteria_met_strings(array_merge([$joined_string], $strings));
     }
 
 }

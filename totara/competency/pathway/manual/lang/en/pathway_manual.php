@@ -24,8 +24,8 @@
 $string['pluginname'] = 'Manual rating';
 
 $string['achievementpath_group_label'] = 'Assessment';
-$string['activity_log_rating_by'] = 'rating by {$a->name} ({$a->role})';
-$string['activity_log_rating_by_removed'] = 'rating by {$a} <i>(rater details removed)</i>';
+$string['activity_log_rating_by'] = 'Rating by {$a->name} ({$a->role})';
+$string['activity_log_rating_by_removed'] = 'Rating by {$a} <i>(rater details removed)</i>';
 $string['add_comment'] = 'Add optional comment';
 $string['add_rating'] = 'Add rating';
 $string['addraters'] = 'Add raters';

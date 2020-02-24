@@ -21,6 +21,7 @@
  * @package totara_criteria
  */
 
+$string['achievementvia'] = 'Proficiency in child competencies';
 $string['assign_competency'] = 'Assign competency';
 $string['competencies'] = 'Competencies';
 $string['no_competencies'] = 'There are no child competencies available to view';
