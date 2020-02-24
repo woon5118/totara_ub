@@ -21,6 +21,7 @@
  * @package totara_competency
  */
 
+use criteria_coursecompletion\coursecompletion;
 use pathway_learning_plan\learning_plan;
 use pathway_manual\manual;
 use pathway_manual\models\roles\manager;
@@ -144,6 +145,36 @@ class totara_competency_integration_aggregation_single_type_multi_run_testcase e
         $this->learning_plan_multi_run_1($data, $task_to_execute);
         $this->learning_plan_multi_run_2($data, $task_to_execute);
     }
+
+    /**
+     * Test aggregation task with a combination of criteria_groups and multiple runs
+     * @dataProvider task_to_execute_data_provider
+     */
+    public function test_coursecompletion_remove_non_completed(string $task_to_execute) {
+        $data = $this->setup_data();
+
+        $data->criteria[1] = $data->criteria_generator->create_coursecompletion([
+            'courseids' => [
+                $data->courses[1]->id,
+            ]
+        ]);
+
+        $data->pathway = $data->competency_generator->create_criteria_group($data->competencies[1],
+            [$data->criteria[1]], $data->scalevalues[1]->id
+        );
+
+        // Assign users 1 and 2 to competencies 3, 4 and 5
+        $to_assign = [
+            ['user_id' => $data->users[1]->id, 'competency_id' => $data->competencies[1]->id],
+        ];
+        $this->assign_users_to_competencies($to_assign);
+
+        // Splitting the function for readability
+        $this->coursecompletion_remove_non_completed_run_1($data, $task_to_execute);
+        $this->coursecompletion_remove_non_completed_run_2($data, $task_to_execute);
+        $this->coursecompletion_remove_non_completed_run_3($data, $task_to_execute);
+    }
+
 
     /**
      * Setup data and return created criteria and pathways
@@ -298,7 +329,7 @@ class totara_competency_integration_aggregation_single_type_multi_run_testcase e
         $data->pathways = $pathways;
 
         // Criteria configuration is done through the webapi which triggers the competency_configuration_changed hook
-        // Simulating this here to ensure childcompetency watchers are triggered
+        // Simulating this here to ensure watchers are triggered
         /** @var competency_configuration_changed $hook */
         $hook = new competency_configuration_changed($data->competencies[3]->id);
         $hook->execute();
@@ -1842,6 +1873,200 @@ class totara_competency_integration_aggregation_single_type_multi_run_testcase e
                 'via' => [
                     $pw_achievement_records['run1-2-4'],
                 ],
+            ],
+        ]);
+    }
+
+
+    /**
+     * Execute first coursecompletion_remove_non_completed run
+     *
+     * @param stdClass $data
+     * @param string $task_to_execute
+     */
+    private function coursecompletion_remove_non_completed_run_1($data, string $task_to_execute) {
+        // user1 completes course1
+        // aggregation_all
+
+        $completion = new completion_completion(['course' => $data->courses[1]->id, 'userid' => $data->users[1]->id]);
+        $completion->mark_complete();
+
+        $this->waitForSecond();
+
+        (new $task_to_execute())->execute();
+
+        $this->verify_item_records([
+            ['item_id' => $data->courses[1]->id, 'user_id' => $data->users[1]->id, 'criterion_met' => 1, 'num_occurrences' => 1],
+        ]);
+
+        $pw_achievement_records = $this->verify_pathway_achievements([
+            '1-1' => [
+                'pathway_id' => $data->pathway->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[1]->id,
+                'related_info' => ['coursecompletion'],
+            ],
+        ]);
+
+        $this->verify_competency_achievements([
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[1]->id,
+                'proficient' => 1,
+                'via' => [$pw_achievement_records['1-1']],
+            ],
+        ]);
+    }
+
+    /**
+     * Execute second coursecompletion_remove_non_completed run
+     *
+     * @param stdClass $data
+     * @param string $task_to_execute
+     */
+    private function coursecompletion_remove_non_completed_run_2($data, string $task_to_execute) {
+        // Add course2 to the coursecompletion criterion
+
+        // We need to ensure that the last modified and last evaluated times are differennt
+        $this->waitForSecond();
+
+        /** @var criterion $criterion */
+        $data->criteria[1]->add_items([$data->courses[2]->id]);
+        $data->criteria[1]->save();
+
+        // Criteria configuration is done through the webapi which triggers the competency_configuration_changed hook
+        // Simulating this here to ensure watchers are triggered
+        /** @var competency_configuration_changed $hook */
+        $hook = new competency_configuration_changed($data->competencies[1]->id);
+        $hook->execute();
+
+        $this->waitForSecond();
+
+        (new $task_to_execute())->execute();
+
+        $this->verify_item_records([
+            ['item_id' => $data->courses[1]->id, 'user_id' => $data->users[1]->id, 'criterion_met' => 1, 'num_occurrences' => 1],
+            ['item_id' => $data->courses[2]->id, 'user_id' => $data->users[1]->id, 'criterion_met' => 0, 'num_occurrences' => 1],
+        ]);
+
+        $pw_achievement_records = $this->verify_pathway_achievements([
+            '1-1' => [
+                'pathway_id' => $data->pathway->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement::STATUS_ARCHIVED,
+                'scale_value_id' => $data->scalevalues[1]->id,
+                'related_info' => ['coursecompletion'],
+            ],
+            '2-1' => [
+                'pathway_id' => $data->pathway->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'scale_value_id' => null,
+                'related_info' => [],
+            ],
+        ]);
+
+        $this->verify_competency_achievements([
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::SUPERSEDED,
+                'scale_value_id' => $data->scalevalues[1]->id,
+                'proficient' => 1,
+                'via' => [$pw_achievement_records['1-1']],
+            ],
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => null,
+                'proficient' => 0,
+                'via' => [],
+            ],
+        ]);
+    }
+
+    /**
+     * Execute third coursecompletion_remove_non_completed run
+     *
+     * @param stdClass $data
+     * @param string $task_to_execute
+     */
+    private function coursecompletion_remove_non_completed_run_3($data, string $task_to_execute) {
+        // Remove course2 to the coursecompletion criterion
+
+        // We need to ensure that the last modified and last evaluated times are differennt
+        $this->waitForSecond();
+
+        /** @var criterion $criterion */
+        $data->criteria[1]->remove_items([$data->courses[2]->id]);
+        $data->criteria[1]->save();
+
+        // Criteria configuration is done through the webapi which triggers the competency_configuration_changed hook
+        // Simulating this here to ensure watchers are triggered
+        /** @var competency_configuration_changed $hook */
+        $hook = new competency_configuration_changed($data->competencies[1]->id);
+        $hook->execute();
+
+        $this->waitForSecond();
+
+        (new $task_to_execute())->execute();
+
+        $this->verify_item_records([
+            ['item_id' => $data->courses[1]->id, 'user_id' => $data->users[1]->id, 'criterion_met' => 1, 'num_occurrences' => 1],
+        ]);
+
+        $pw_achievement_records = $this->verify_pathway_achievements([
+            '1-1' => [
+                'pathway_id' => $data->pathway->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement::STATUS_ARCHIVED,
+                'scale_value_id' => $data->scalevalues[1]->id,
+                'related_info' => ['coursecompletion'],
+            ],
+            '2-1' => [
+                'pathway_id' => $data->pathway->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement::STATUS_ARCHIVED,
+                'scale_value_id' => null,
+                'related_info' => [],
+            ],
+            '3-1' => [
+                'pathway_id' => $data->pathway->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[1]->id,
+                'related_info' => ['coursecompletion'],
+            ],
+        ]);
+
+        $this->verify_competency_achievements([
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::SUPERSEDED,
+                'scale_value_id' => $data->scalevalues[1]->id,
+                'proficient' => 1,
+                'via' => [$pw_achievement_records['1-1']],
+            ],
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::SUPERSEDED,
+                'scale_value_id' => null,
+                'proficient' => 0,
+                'via' => [],
+            ],
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[1]->id,
+                'proficient' => 1,
+                'via' => [$pw_achievement_records['3-1']],
             ],
         ]);
     }

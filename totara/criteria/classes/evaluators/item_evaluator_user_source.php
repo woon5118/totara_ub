@@ -168,20 +168,24 @@ class item_evaluator_user_source {
             $temp_wh .= ' AND ';
         }
 
+        // Include all if the criterion was updated since the last time we evaluated
         $sql = "
             SELECT tcir.user_id
-              FROM {totara_criteria_item} tci
+              FROM {totara_criteria} tc
+              JOIN {totara_criteria_item} tci
+                ON tci.criterion_id = tc.id
               JOIN {totara_criteria_item_record} tcir
                 ON tcir.criterion_item_id = tci.id
-               AND tcir.timeevaluated > :checkfrom
-             WHERE tci.criterion_id = :criterionid
-        ";
+             WHERE tc.id = :criterionid
+               AND (tcir.timeevaluated > :checkfrom
+                OR tc.criterion_modified > :checkfrom2)";
 
         $user_ids = $DB->get_fieldset_sql(
             $sql,
             [
                 'criterionid' => $criterion_id,
                 'checkfrom' => $checkfrom,
+                'checkfrom2' => $checkfrom,
             ]
         );
 

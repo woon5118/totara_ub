@@ -74,17 +74,26 @@ class competency_aggregation_all extends scheduled_task {
         $has_changed_column_sql = '';
         $has_changed_column_value = '';
         if ($table->get_has_changed_column()) {
+            // We need to join with default queue to ensure that we pick up any has_changed flag that is already set
+            $queue_table = new aggregation_users_table();
+
             $has_changed_column_sql = ", {$table->get_has_changed_column()})";
-            $has_changed_column_value = ", 0";
+            $has_changed_join =
+                "LEFT JOIN {{$queue_table->get_table_name()}} as qt 
+                        ON tcau.user_id = qt.{$queue_table->get_user_id_column()}
+                       AND tcau.competency_id = qt.{$queue_table->get_competency_id_column()}";
+            $has_changed_column_value = ", COALESCE(MAX(qt.{$queue_table->get_has_changed_column()}), 0)";
         }
 
         $sql = "
             INSERT INTO {{$table->get_table_name()}}
             (user_id, competency_id {$has_changed_column_sql}
-             SELECT DISTINCT tcau.user_id, tcau.competency_id {$has_changed_column_value}
+             SELECT tcau.user_id, tcau.competency_id {$has_changed_column_value}
               FROM {$assignment_users_table} tcau
               JOIN {totara_competency_pathway} pw
                 ON tcau.competency_id = pw.competency_id
+              {$has_changed_join}  
+          GROUP BY tcau.user_id, tcau.competency_id       
         ";
 
         $DB->execute($sql, []);
