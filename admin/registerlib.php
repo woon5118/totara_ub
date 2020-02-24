@@ -137,6 +137,19 @@ function get_registration_data() {
     $data['issuedbadgesnumber'] = $DB->count_records('badge_issued');
     $data['debugstatus'] = (isset($CFG->debug) ? $CFG->debug : DEBUG_NONE); // Support needs to know what errors users see.
     $data['lastcron'] = $DB->get_field_sql('SELECT MAX(lastruntime) FROM {task_scheduled}'); // Support needs to know if cron is configured and running.
+    $data['tenantsenabled'] = $CFG->tenantsenabled ? get_string('settingenabled', 'admin'): get_string('settingdisabled', 'admin');
+    $data['tenantisolationmode'] = $CFG->tenantsisolated ? get_string('settingenabled', 'admin'): get_string('settingdisabled', 'admin');
+    if ($CFG->tenantsenabled) {
+        $tenantmembers = $DB->count_records_sql("SELECT COUNT('x') FROM {user} WHERE tenantid IS NOT NULL AND deleted = 0");
+        $tenantparticipants =  $DB->count_records_sql("
+                                  SELECT COUNT('x') FROM {cohort_members} cm 
+                                  INNER JOIN {tenant} t ON t.cohortid = cm.cohortid
+                               ");
+        $data['numberoftenants'] = $DB->count_records('tenant');
+        $data['tenantmembers'] = $tenantmembers;
+        // Non-member participants.
+        $data['tenantparticipants'] = $tenantparticipants - $tenantmembers;
+    }
     $data['addons'] = implode(',', $addons); // Support needs to know if there are plugins that might be incompatible with Totara.
     $data['installedlangs'] = implode(',', array_keys(get_string_manager()->get_list_of_translations())); // Language pack usage informs translation effort.
     if ($flavour = get_config('totara_flavour', 'currentflavour')) {
