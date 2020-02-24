@@ -1062,6 +1062,7 @@ class tool_uploadcourse_course {
      * @return array $coursedata
      */
     private function set_format_properties($coursedata) {
+        global $CFG;
         $format = $coursedata['format'];
         $courseconfig = get_config('moodlecourse');
         if (in_array($format, array('demo', 'topics', 'weeks'))) {
@@ -1087,6 +1088,7 @@ class tool_uploadcourse_course {
                 $coursedata['numdiscussions'] = 10;
             }
         } else if ($format == 'singleactivity') {
+            require_once($CFG->dirroot. '/course/format/singleactivity/lib.php');
             $availabletypes = format_singleactivity::get_supported_activities();
             if (isset($this->rawdata['activitytype']) && array_key_exists($this->rawdata['activitytype'], $availabletypes)) {
                 $coursedata['activitytype'] = (string)$this->rawdata['activitytype'];

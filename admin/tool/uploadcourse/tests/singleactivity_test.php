@@ -28,13 +28,10 @@
  * Class tool_uploadcourse_singleactivity_testcase
  */
 class tool_uploadcourse_singleactivity_testcase extends advanced_testcase {
-    /**
-     * @return void
-     */
+
     public function test_upload_course_with_singleactivity(): void {
         global $DB;
 
-        $this->resetAfterTest();
         $this->setAdminUser();
         $gen = $this->getDataGenerator();
 
@@ -78,5 +75,37 @@ class tool_uploadcourse_singleactivity_testcase extends advanced_testcase {
 
         $this->assertFalse($DB->record_exists_sql($sql, [1]));
         $this->assertTrue($DB->record_exists_sql($sql, [0]));
+    }
+
+    public function test_upload_course_with_singleactivity_defaults(): void {
+        global $DB;
+
+        $this->setAdminUser();
+
+        $this->assertFalse($DB->record_exists('course', ['shortname' => 'SAC']));
+
+        // Set default course format as 'singleactivity'.
+        set_config('format', 'singleactivity', 'moodlecourse');
+
+        $tooluploadcourse = new tool_uploadcourse_course(
+            tool_uploadcourse_processor::MODE_CREATE_OR_UPDATE,
+            tool_uploadcourse_processor::UPDATE_NOTHING,
+            [
+                'fullname'  => 'Single Activity course',
+                'category'  => 1,
+                'shortname' => 'SAC',
+            ],
+            (array) get_config('moodlecourse'),
+            ['restoredir' => tool_uploadcourse_helper::get_restore_content_dir(null, 'course_1')]
+        );
+
+        $rs = $tooluploadcourse->prepare();
+        if (!$rs) {
+            $this->fail(implode("\n", $tooluploadcourse->get_errors()));
+        }
+
+        $tooluploadcourse->proceed();
+
+        $this->assertTrue($DB->record_exists('course', ['shortname' => 'SAC']));
     }
 }
