@@ -22,6 +22,7 @@
  */
 
 $string['create_activity'] = 'Add activity';
+$string['error:create_permission_missing'] = 'Error creating a new performance activity';
 $string['modulename'] = 'Performance activity';
 $string['modulenameplural'] = 'Performance activities';
 $string['perform:create_activity'] = 'Create performance activities';
