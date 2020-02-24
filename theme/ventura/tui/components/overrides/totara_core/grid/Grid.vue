@@ -89,9 +89,6 @@
 
     &-gap {
       @include grid-item-generate-gutters(left, var(--tui-grid-gutter));
-      .dir-rtl & {
-        @include grid-item-generate-gutters(right, var(--tui-grid-gutter));
-      }
     }
   }
 
