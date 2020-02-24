@@ -4281,7 +4281,7 @@ function mark_competencies_self_assignable($frameworks, $data) {
             }
 
             $record = [
-                'competency_id' => get_competency($key, $competency[0] ?? '', $data)->id ?? null,
+                'comp_id' => get_competency($key, $competency[0] ?? '', $data)->id ?? null,
                 'availability' => $competency[1] ?? 2,
             ];
 
