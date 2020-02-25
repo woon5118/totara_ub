@@ -88,7 +88,7 @@ Feature: Tenant role assignments
 
     When I navigate to "Manage tenants" node in "Site administration > Tenants"
     And I follow "First Tenant"
-    And I navigate to "Assign roles" node in "Tenant"
+    And I navigate to "Assign roles" node in "First Tenant"
     And I follow "Tenant user manager"
     Then I should not see "manager0@example.com"
     And I should see "manager1@example.com"
@@ -118,7 +118,7 @@ Feature: Tenant role assignments
 
     When I navigate to "Manage tenants" node in "Site administration > Tenants"
     And I follow "Second Tenant"
-    And I navigate to "Assign roles" node in "Tenant"
+    And I navigate to "Assign roles" node in "Second Tenant"
     And I follow "Tenant user manager"
     Then I should not see "manager0@example.com"
     And I should not see "manager1@example.com"
@@ -223,7 +223,7 @@ Feature: Tenant role assignments
 
     When I navigate to "Manage tenants" node in "Site administration > Tenants"
     And I follow "First Tenant"
-    And I navigate to "Assign roles" node in "Tenant"
+    And I navigate to "Assign roles" node in "First Tenant"
     And I follow "Tenant user manager"
     Then I should not see "manager0@example.com"
     And I should see "manager1@example.com"
@@ -253,7 +253,7 @@ Feature: Tenant role assignments
 
     When I navigate to "Manage tenants" node in "Site administration > Tenants"
     And I follow "Second Tenant"
-    And I navigate to "Assign roles" node in "Tenant"
+    And I navigate to "Assign roles" node in "Second Tenant"
     And I follow "Tenant user manager"
     Then I should not see "manager0@example.com"
     And I should not see "manager1@example.com"

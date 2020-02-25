@@ -11,7 +11,7 @@ Feature: Tenant domain manager with isolation enabled
     And the following config values are set as admin:
       | passwordpolicy | 0 |
 
-  Scenario: Administrator may assing tenant domain management to non-member with tenant isolation
+  Scenario: Administrator may assign tenant domain management to non-member with tenant isolation
     Given the following "users" exist:
       | username            | firstname       | lastname |
       | tenantdomainmanager | Tenant Domain   | Manager  |
@@ -67,7 +67,7 @@ Feature: Tenant domain manager with isolation enabled
     And I should see "Second T Category"
     And I follow "First T Category"
 
-    When I navigate to "Tenant participants" node in "Tenant"
+    When I navigate to "Tenant participants" node in "First tenant"
     Then I should see "Tenant participants: 1 record shown"
 
     When I navigate to "Manage this category" node in "Category: First T Category"
@@ -81,7 +81,7 @@ Feature: Tenant domain manager with isolation enabled
     Then I should see "Course and category management"
     And I should see "First course"
 
-  Scenario: Administrator may assing tenant domain management to member with tenant isolation
+  Scenario: Administrator may assign tenant domain management to member with tenant isolation
     And I log in as "admin"
     And I click on "[aria-label='Show admin menu window']" "css_element"
     And I click on "Tenants" "link" in the "#quickaccess-popover-content" "css_element"

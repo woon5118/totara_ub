@@ -11,7 +11,7 @@ Feature: Tenant user manager with isolation enabled
     And the following config values are set as admin:
       | passwordpolicy | 0 |
 
-  Scenario: Administrator may assing tenant user management to non-member with tenant isolation
+  Scenario: Administrator may assign tenant user management to non-member with tenant isolation
     Given the following "users" exist:
       | username          | firstname     | lastname |
       | tenantusermanager | Tenant User   | Manager  |
@@ -64,11 +64,11 @@ Feature: Tenant user manager with isolation enabled
     And "tenantusermanager" row "Actions" column of "tenant_participants" table should contain "Manage login of Tenant User Manager"
     And "tenantusermanager" row "Actions" column of "tenant_participants" table should contain "User data"
     And "tenantusermanager" row "Actions" column of "tenant_participants" table should contain "Delete Tenant User Manager"
-    And I navigate to "Assign roles" node in "Tenant"
+    And I navigate to "Assign roles" node in "First tenant"
     And I click on "Tenant user manager" "link"
     And I set the field "addselect" to "Tenant User Manager"
     And I press "Add"
-    And I navigate to "Tenant participants" node in "Tenant"
+    And I navigate to "Tenant participants" node in "First tenant"
     And I log out
 
     When I log in as "tenantusermanager"
@@ -109,7 +109,7 @@ Feature: Tenant user manager with isolation enabled
     Then I should see "Tenant participants: 1 record shown"
     And I should not see "Testovaci Uzivatel"
 
-  Scenario: Administrator may assing tenant user management to member with tenant isolation
+  Scenario: Administrator may assign tenant user management to member with tenant isolation
     And I log in as "admin"
     And I click on "[aria-label='Show admin menu window']" "css_element"
     And I click on "Tenants" "link" in the "#quickaccess-popover-content" "css_element"
@@ -151,11 +151,11 @@ Feature: Tenant user manager with isolation enabled
     And "tenantusermanager" row "Actions" column of "tenant_participants" table should contain "Manage login of Tenant User Manager"
     And "tenantusermanager" row "Actions" column of "tenant_participants" table should contain "User data"
     And "tenantusermanager" row "Actions" column of "tenant_participants" table should contain "Delete Tenant User Manager"
-    And I navigate to "Assign roles" node in "Tenant"
+    And I navigate to "Assign roles" node in "First tenant"
     And I click on "Tenant user manager" "link"
     And I set the field "addselect" to "Tenant User Manager"
     And I press "Add"
-    And I navigate to "Tenant participants" node in "Tenant"
+    And I navigate to "Tenant participants" node in "First tenant"
     And I log out
 
     When I log in as "tenantusermanager"

@@ -43,6 +43,7 @@ if (empty($CFG->tenantsenabled)) {
 $tenant = \core\record\tenant::fetch($id);
 $categorycontext = context_coursecat::instance($tenant->categoryid);
 $PAGE->set_context($categorycontext);
+$PAGE->set_title(get_string('participantsother', 'totara_tenant'));
 
 $returnurl = new moodle_url('/totara/tenant/participants.php', ['id' => $id]);
 

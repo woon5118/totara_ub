@@ -11,7 +11,7 @@ Feature: Tenant user manager without isolation
     And the following config values are set as admin:
       | passwordpolicy | 0 |
 
-  Scenario: Administrator may assing tenant user management to non-member without tenant isolation
+  Scenario: Administrator may assign tenant user management to non-member without tenant isolation
     Given the following "users" exist:
       | username          | firstname     | lastname |
       | tenantusermanager | Tenant User   | Manager  |
@@ -64,11 +64,11 @@ Feature: Tenant user manager without isolation
     And "tenantusermanager" row "Actions" column of "tenant_participants" table should contain "Manage login of Tenant User Manager"
     And "tenantusermanager" row "Actions" column of "tenant_participants" table should contain "User data"
     And "tenantusermanager" row "Actions" column of "tenant_participants" table should contain "Delete Tenant User Manager"
-    And I navigate to "Assign roles" node in "Tenant"
+    And I navigate to "Assign roles" node in "First tenant"
     And I click on "Tenant user manager" "link"
     And I set the field "addselect" to "Tenant User Manager"
     And I press "Add"
-    And I navigate to "Tenant participants" node in "Tenant"
+    And I navigate to "Tenant participants" node in "First tenant"
     And I log out
 
     When I log in as "tenantusermanager"
@@ -104,18 +104,18 @@ Feature: Tenant user manager without isolation
     And "member1" row "Actions" column of "tenant_participants" table should contain "Edit Testovaci Uzivatel"
     And "member1" row "Actions" column of "tenant_participants" table should contain "Delete Testovaci Uzivatel"
 
-    When I navigate to "Assign roles" node in "Tenant"
+    When I navigate to "Assign roles" node in "First tenant"
     And I follow "Tenant user manager"
     And I set the field "addselect" to "Testovaci Uzivatel"
     And I press "Add"
-    Then I navigate to "Tenant participants" node in "Tenant"
+    Then I navigate to "Tenant participants" node in "First tenant"
 
     When I click on "Delete Testovaci Uzivatel" "link" in the "Testovaci Uzivatel" "table_row"
     And I press "Delete"
     Then I should see "Tenant participants: 1 record shown"
     And I should not see "Testovaci Uzivatel"
 
-  Scenario: Administrator may assing tenant user management to member without tenant isolation
+  Scenario: Administrator may assign tenant user management to member without tenant isolation
     Given I log in as "admin"
     And I click on "[aria-label='Show admin menu window']" "css_element"
     And I click on "Tenants" "link" in the "#quickaccess-popover-content" "css_element"
@@ -157,11 +157,11 @@ Feature: Tenant user manager without isolation
     And "tenantusermanager" row "Actions" column of "tenant_participants" table should contain "Manage login of Tenant User Manager"
     And "tenantusermanager" row "Actions" column of "tenant_participants" table should contain "User data"
     And "tenantusermanager" row "Actions" column of "tenant_participants" table should contain "Delete Tenant User Manager"
-    And I navigate to "Assign roles" node in "Tenant"
+    And I navigate to "Assign roles" node in "First tenant"
     And I click on "Tenant user manager" "link"
     And I set the field "addselect" to "Tenant User Manager"
     And I press "Add"
-    And I navigate to "Tenant participants" node in "Tenant"
+    And I navigate to "Tenant participants" node in "First tenant"
     And I log out
 
     When I log in as "tenantusermanager"
@@ -206,4 +206,3 @@ Feature: Tenant user manager without isolation
     And I press "Delete"
     Then I should see "Users: 1 record shown"
     And I should not see "Testovaci Uzivatel"
-

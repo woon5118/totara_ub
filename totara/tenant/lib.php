@@ -60,7 +60,7 @@ function totara_tenant_extend_navigation_category_settings($navigation, $context
             $navigation->text = format_string($categoryname);
         }
     } else {
-        $strtenant = get_string('tenant', 'totara_tenant');
+        $strtenant = format_string($tenant->name);
     }
     $tenantnode = navigation_node::create($strtenant, null, $navigation::TYPE_CATEGORY, null, null);
     $tenantnode->nodetype = navigation_node::NODETYPE_BRANCH;
