@@ -26,6 +26,7 @@ use criteria_childcompetency\childcompetency;
 use criteria_coursecompletion\coursecompletion;
 use criteria_linkedcourses\linkedcourses;
 use criteria_onactivate\onactivate;
+use criteria_othercompetency\othercompetency;
 use totara_competency\linked_courses;
 use totara_criteria\criterion;
 
@@ -308,6 +309,71 @@ class totara_criteria_generator_testcase extends advanced_testcase {
         $this->validate_childcompetency($cc, $record);
     }
 
+    /**
+     * Test othercompetency generator with single competency
+     */
+    public function test_othercompetency_generator_all_single_competency() {
+        /** @var totara_competency_generator $comp_generator */
+        $comp_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+        $comp1 = $comp_generator->create_competency();
+
+        /** @var totara_criteria_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        $record = ['competencyids' => [$comp1->id]];
+        $oc = $generator->create_othercompetency($record);
+
+        $this->validate_othercompetency($oc, $record);
+    }
+
+    /**
+     * Test othercompetency generator with multiple competencies - ALL aggregation
+     */
+    public function test_othercompetency_generator_all_multi_competencies() {
+        /** @var totara_competency_generator $comp_generator */
+        $comp_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+        $comp1 = $comp_generator->create_competency();
+        $comp2 = $comp_generator->create_competency();
+        $comp3 = $comp_generator->create_competency();
+
+        /** @var totara_criteria_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        $record = [
+            'aggregation' => ['method' => criterion::AGGREGATE_ALL],
+            'competencyids' => [$comp1->id, $comp2->id, $comp3->id],
+        ];
+
+        $oc = $generator->create_othercompetency($record);
+
+        $this->validate_othercompetency($oc, $record);
+    }
+
+    /**
+     * Test othercompetency generator with multiple courses - ANY aggregation
+     */
+    public function test_othercompetency_generator_any_multi_courses() {
+        /** @var totara_competency_generator $comp_generator */
+        $comp_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+        $comp1 = $comp_generator->create_competency();
+        $comp2 = $comp_generator->create_competency();
+        $comp3 = $comp_generator->create_competency();
+
+        /** @var totara_criteria_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        $record = [
+            'aggregation' => [
+                'method' => criterion::AGGREGATE_ANY_N,
+                'req_items' => 2,
+            ],
+            'competencyids' => [$comp1->id, $comp2->id, $comp3->id],
+        ];
+
+        $oc = $generator->create_othercompetency($record);
+
+        $this->validate_othercompetency($oc, $record);
+    }
 
 
      /**
@@ -423,6 +489,40 @@ class totara_criteria_generator_testcase extends advanced_testcase {
             $this->validate_items($record['items']);
         }
     }
+
+     /**
+     * Validate the generated othercompetency against the source record
+     *
+     * @param  othercompetency $oc Generated othercompetency
+     * @param  array Srecord Source record
+     */
+    private function validate_othercompetency(othercompetency $oc, array $record) {
+        global $DB;
+
+        $rows = $DB->get_records('totara_criteria');
+        $this->assertEquals(1, count($rows));
+        $row = reset($rows);
+        $this->assertEquals($oc->get_id(), $row->id);
+
+        // Aggregation
+        if (isset($record['aggregation'])) {
+            $this->assertEquals($record['aggregation']['method'] ?? criterion::AGGREGATE_ALL, $oc->get_aggregation_method());
+
+            if (isset($record['aggregation']['req_items'])) {
+                $this->assertEquals(['req_items' => $record['aggregation']['req_items']], $oc->get_aggregation_params());
+            }
+        }
+
+        $rows = $DB->get_records('totara_criteria_item');
+        $this->assertEquals(count($record['competencyids']), count($rows));
+
+        foreach ($rows as $row) {
+            $this->assertEquals('competency', $row->item_type);
+            $this->assertTrue(in_array($row->item_id, $record['competencyids']));
+            $this->assertEquals($oc->get_id(), $row->criterion_id);
+        }
+    }
+
 
     /**
      * Validate that the expected records were created in totara_criteria_item

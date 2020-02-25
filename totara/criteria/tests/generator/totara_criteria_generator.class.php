@@ -27,6 +27,7 @@ use criteria_childcompetency\childcompetency;
 use criteria_coursecompletion\coursecompletion;
 use criteria_linkedcourses\linkedcourses;
 use criteria_onactivate\onactivate;
+use criteria_othercompetency\othercompetency;
 use totara_competency\entities\competency;
 use totara_competency\entities\course;
 use totara_competency\plugin_types;
@@ -156,6 +157,37 @@ class totara_criteria_generator extends component_generator_base {
     }
 
     /**
+     * Create a othercompetency criterion
+     *
+     *  Data
+     *  [
+     *      'aggregation' => [
+     *          'method' => criterion::AGGREGATE_ALL, // Optional Aggregation method - defaults to ALL
+     *          'req_items' => 1, // Optional number of required items. Only used with AGGREGATE_ANY_N. Defaults to 1
+     *      ]
+     *      'competencyids' => [], // Ids of competencies to be completed. PHPUnit only.
+     *      'number_required' => 'all', // Either 'all' or the number of items required for aggregation. Behat only.
+     *      'competencies' => [], // Shortnames of courses to be completed. Behat only.
+     *      'idnumber' => '...', // ID number of the criterion.
+     *  ]
+     *
+     * @param array $data Criterion data
+     * @return criterion
+     */
+    public function create_othercompetency(array $data = []) {
+        /** @var othercompetency $instance */
+        $instance = new othercompetency();
+
+        $instance->set_idnumber($data['idnumber'] ?? null);
+        $this->set_aggregation($instance, $data);
+        $this->set_competencies($instance, $data);
+
+        $instance->save();
+
+        return $instance;
+    }
+
+    /**
      * Create a test criterion
      *
      * @return criterion
@@ -263,6 +295,31 @@ class totara_criteria_generator extends component_generator_base {
         } else {
             // None specified.
             throw new Exception("Must specify either courseids or courses when creating {$instance->get_plugin_type()} criteria.");
+        }
+    }
+
+    /**
+     * Set the competency items for a criterion.
+     * Intended to be compatible with both unit and behat tests.
+     *
+     * @param criterion $instance
+     * @param array|null $data
+     * @throws Exception
+     */
+    private function set_competencies(criterion $instance, $data) {
+        if (isset($data['competencyids'])) {
+            $instance->add_items($data['competencyids']);
+        } else if (isset($data['competencies'])) {
+            $idnumbers = explode(',', $data['competencies']);
+            $competency_ids = competency::repository()
+                ->select('id')
+                ->where_in('idnumber', $idnumbers)
+                ->get()
+                ->pluck('id');
+            $instance->add_items($competency_ids);
+        } else {
+            // None specified.
+            throw new Exception("Must specify either competencyids or competencies when creating {$instance->get_plugin_type()} criteria.");
         }
     }
 
