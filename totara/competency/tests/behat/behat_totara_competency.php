@@ -23,7 +23,9 @@
 
 use Behat\Gherkin\Node\TableNode as TableNode;
 use totara_competency\achievement_configuration;
+use totara_competency\entities\assignment;
 use totara_competency\entities\competency;
+use totara_competency\models\assignment as assignment_model;
 use Behat\Mink\Exception\ExpectationException;
 use core\entities\user;
 
@@ -133,6 +135,25 @@ class behat_totara_competency extends behat_base {
         $competency_id = $DB->get_field(competency::TABLE, 'id', ['idnumber' => $competency]);
         $config = new achievement_configuration(new competency($competency_id));
         $config->link_default_preset();
+    }
+
+    /**
+     * Archive all assignments for a given competency.
+     *
+     * @Given /^all assignments for the "(?P<competency_string>(?:[^"]|\\")*)" competency are archived$/
+     * @param string $competency
+     */
+    public function all_assignments_for_the_competency_are_archived($competency) {
+        \behat_hooks::set_step_readonly(true); // Backend action.
+
+        $assignments = assignment::repository()
+            ->filter_by_active()
+            ->join([competency::TABLE, 'comp'], 'competency_id', 'id')
+            ->where('comp.idnumber', $competency)
+            ->get_lazy();
+        foreach ($assignments as $assignment) {
+            assignment_model::load_by_entity($assignment)->archive();
+        }
     }
 
     /**
