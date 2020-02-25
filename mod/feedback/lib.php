@@ -3459,11 +3459,11 @@ function feedback_archive_get_list($filters, &$totalcount) {
 
     $offset = $filters['page'] * $filters['perpage'];
 
+    $usernamefields = get_all_user_name_fields(true, 'u');
     $sql = "SELECT c.id,
                     u.id userid,
                     u.username,
-                    u.firstname,
-                    u.lastname,
+                    {$usernamefields},
                     course.id AS courseid,
                     course.fullname AS coursename,
                     f.id AS feedbackid,
