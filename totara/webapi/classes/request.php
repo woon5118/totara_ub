@@ -84,7 +84,7 @@ class request {
             throw new webapi_request_exception('Invalid request, request cannot be empty');
         }
 
-        if (!array_key_exists('operationName', $this->params)) {
+        if (!array_key_exists('operationName', $this->params) && !array_key_exists('query', $this->params)) {
             $this->batched = true;
             $params = $this->params;
         } else {
