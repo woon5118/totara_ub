@@ -131,7 +131,7 @@ final class util {
     public static function log_exception($ex) {
         global $CFG;
         // For now just logging if on developer mode to not flood the logs if someone sends a whole lot of invalid requests
-        if ($CFG->debugdeveloper) {
+        if ($CFG->debugdeveloper && (!defined('PHPUNIT_TEST') || !PHPUNIT_TEST)) {
             $message = $ex->getMessage();
             $info = get_exception_info($ex);
             error_log(
