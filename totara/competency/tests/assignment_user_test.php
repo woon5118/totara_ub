@@ -75,6 +75,33 @@ class totara_competency_assignment_user_testcase extends advanced_testcase {
         );
     }
 
+    public function test_has_assignment() {
+        ['assignments' => $assignments] = $this->generate_assignments();
+
+        $assignment1 = new entities\assignment($assignments[0]);
+
+        $user_id = $assignment1->user_group_id;
+
+        $assignment_user = new assignment_user($user_id);
+
+        $this->expand();
+
+        $this->assertTrue($assignment_user->has_assignment($assignment1->id));
+        $this->assertFalse($assignment_user->has_assignment(999));
+
+        $gen = $this->generator();
+        $cohort = $gen->assignment_generator()->create_cohort();
+        $assignment2 = $gen->assignment_generator()->create_cohort_assignment($assignment1->competency_id, $cohort->id);
+        cohort_add_member($cohort->id, $user_id);
+
+        $this->assertFalse($assignment_user->has_assignment($assignment2->id));
+
+        $this->expand();
+
+        $this->assertTrue($assignment_user->has_assignment($assignment1->id));
+        $this->assertTrue($assignment_user->has_assignment($assignment2->id));
+    }
+
     public function test_active_assignments() {
         ['assignments' => $assignments] = $this->generate_assignments();
 

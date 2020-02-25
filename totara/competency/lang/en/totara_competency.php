@@ -116,6 +116,7 @@ $string['enablecompetency_assignment_desc'] = 'This option will let you: Enable(
 $string['enabled'] = 'Enabled';
 $string['editcompetency'] = 'Edit competency: {$a}';
 $string['error:filter_assignment_not_supported'] = 'Filtering by "{$a}" is currently not supported';
+$string['error:invalid_assignment'] = 'Invalid assignment';
 $string['event:linked_courses_updated'] = 'Linked courses updated';
 
 // Expand task related

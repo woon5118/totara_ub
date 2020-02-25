@@ -268,4 +268,19 @@ class assignment_user {
         $repo->delete();
     }
 
+    /**
+     * Returns true if the user is assigned to the specified assignment
+     *
+     * @param $assignment_id
+     * @return bool
+     */
+    public function has_assignment($assignment_id): bool {
+        $assignments = competency_assignment_user::repository()
+            ->where('user_id', $this->user_id)
+            ->where('assignment_id', $assignment_id)
+            ->get();
+
+        return $assignments->count() > 0;
+    }
+
 }

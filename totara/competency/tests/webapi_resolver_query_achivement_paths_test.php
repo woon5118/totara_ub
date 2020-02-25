@@ -42,7 +42,7 @@ class totara_competency_webapi_resolver_query_achievement_paths_testcase extends
         return execution_context::create($type, $operation);
     }
 
-    public function test_load_for_non_existing_assignment() {
+    public function test_non_existing_assignment() {
         $this->setAdminUser();
 
         $generator = $this->getDataGenerator();
@@ -54,9 +54,26 @@ class totara_competency_webapi_resolver_query_achievement_paths_testcase extends
             'user_id' => $user1->id
         ];
 
-        $result = achievement_paths::resolve($args, $this->get_execution_context());
-        $this->assertIsArray($result);
-        $this->assertEmpty($result);
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Invalid assignment');
+
+        achievement_paths::resolve($args, $this->get_execution_context());
+    }
+
+    public function test_non_existing_user() {
+        $this->setAdminUser();
+
+        $data = $this->create_data();
+
+        $args = [
+            'assignment_id' => $data->assignment1->id,
+            'user_id' => 666
+        ];
+
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Invalid user');
+
+        achievement_paths::resolve($args, $this->get_execution_context());
     }
 
     public function test_load_for_assignment_with_no_pathways_present() {
@@ -72,6 +89,28 @@ class totara_competency_webapi_resolver_query_achievement_paths_testcase extends
         $result = achievement_paths::resolve($args, $this->get_execution_context());
         $this->assertIsArray($result);
         $this->assertEmpty($result);
+    }
+
+    public function test_invalid_capability() {
+        $this->setAdminUser();
+
+        $data = $this->create_data();
+
+        $generator = $this->getDataGenerator();
+
+        $user1 = $generator->create_user();
+
+        $this->setUser($user1);
+
+        $args = [
+            'assignment_id' => $data->assignment1->id,
+            'user_id' => $data->assignment1->user_group_id
+        ];
+
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Invalid assignment');
+
+        achievement_paths::resolve($args, $this->get_execution_context());
     }
 
     public function test_load_for_assignment_with_pathways_present() {

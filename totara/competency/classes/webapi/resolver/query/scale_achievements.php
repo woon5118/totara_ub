@@ -23,12 +23,16 @@
 
 namespace totara_competency\webapi\resolver\query;
 
+use core\entities\user;
 use core\orm\collection;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
+use moodle_exception;
 use totara_competency\entities\assignment;
 use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\entities\pathway_achievement;
+use totara_competency\helpers\capability_helper;
+use totara_competency\models\assignment_user;
 use totara_competency\pathway;
 use totara_competency\pathway_factory;
 use totara_core\advanced_feature;
@@ -46,9 +50,7 @@ class scale_achievements implements query_resolver {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('competency_assignment');
-
-        require_login(null, false, null, false, true);
+        self::authorize($args, $ec);
 
         $pathways = self::get_active_single_value_types($args['assignment_id']);
 
@@ -73,6 +75,32 @@ class scale_achievements implements query_resolver {
         }
 
         return array_values($scale_result);
+    }
+
+    /**
+     * Check required features, login, capabilities and whether it's a valid assignment or user
+     *
+     * @param array $args
+     * @param execution_context $ec
+     */
+    private static function authorize(array $args, execution_context $ec) {
+        advanced_feature::require('competency_assignment');
+
+        require_login(null, false, null, false, true);
+
+        // Check if the user exists
+        if (!user::repository()->find($args['user_id'])) {
+            throw new moodle_exception('invaliduser');
+        }
+
+        $has_capability = capability_helper::can_view_profile($args['user_id']);
+        $has_assignment = (new assignment_user($args['user_id']))->has_assignment($args['assignment_id']);
+        // Throwing a bit more generic error message here to not expose too much information
+        // This should only be the exception as the query should only be called when the user
+        // accessed it via the profile page
+        if (!$has_capability || !$has_assignment) {
+            throw new moodle_exception('error:invalid_assignment', 'totara_competency');
+        }
     }
 
     /**
