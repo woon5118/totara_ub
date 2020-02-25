@@ -244,6 +244,86 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020022508, 'perform');
     }
 
+    if ($oldversion < 2020022600) {
+        // Define table perform_track to be created.
+        $table = new xmldb_table('perform_track');
+
+        // Adding fields to table perform_track.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('perform_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('description', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('updated_at', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('archived_at', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+
+        // Adding keys to table perform_track.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('perform_id', XMLDB_KEY_FOREIGN, array('perform_id'), 'perform', array('id'), 'cascade');
+
+        // Adding indexes to table perform_track.
+        $table->add_index('status', XMLDB_INDEX_NOTUNIQUE, array('status'));
+
+        // Conditionally launch create table for perform_track.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table perform_track_assignment to be created.
+        $table = new xmldb_table('perform_track_assignment');
+
+        // Adding fields to table perform_track_assignment.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('track_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('type', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('user_group_type', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('user_group_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('created_by', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('updated_at', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('archived_at', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('expand', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table perform_track_assignment.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('track_id', XMLDB_KEY_FOREIGN, array('track_id'), 'perform_track', array('id'), 'cascade');
+
+        // Adding indexes to table perform_track_assignment.
+        $table->add_index('status', XMLDB_INDEX_NOTUNIQUE, array('status'));
+        $table->add_index('user_group_type', XMLDB_INDEX_NOTUNIQUE, array('user_group_type'));
+        $table->add_index('user_group_id', XMLDB_INDEX_NOTUNIQUE, array('user_group_id'));
+
+        // Conditionally launch create table for perform_track_assignment.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table perform_track_user_assignment to be created.
+        $table = new xmldb_table('perform_track_user_assignment');
+
+        // Adding fields to table perform_track_user_assignment.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('track_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('subject_user_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('deleted', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('updated_at', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+
+        // Adding keys to table perform_track_user_assignment.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('fk_track_id', XMLDB_KEY_FOREIGN, array('track_id'), 'perform_track', array('id'), 'cascade');
+        $table->add_key('fk_user_id', XMLDB_KEY_FOREIGN, array('subject_user_id'), 'user', array('id'));
+
+        // Conditionally launch create table for perform_track_user_assignment.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020022600, 'perform');
+    }
+
     return true;
 }
 
