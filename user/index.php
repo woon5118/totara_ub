@@ -703,7 +703,10 @@ $perpageurl->remove_params('perpage');
 if ($perpage == SHOW_ALL_PAGE_SIZE) {
     $perpageurl->param('perpage', DEFAULT_PAGE_SIZE);
     echo $OUTPUT->container(html_writer::link($perpageurl, get_string('showperpage', '', DEFAULT_PAGE_SIZE)), array(), 'showall');
-
+    // Totara: link to show 5000 participants per page instead of show all
+} else if ($matchcount >= SHOW_ALL_PAGE_SIZE && $perpage < $matchcount) {
+    $perpageurl->param('perpage', SHOW_ALL_PAGE_SIZE);
+    echo $OUTPUT->container(html_writer::link($perpageurl, get_string('showperpage', '', SHOW_ALL_PAGE_SIZE)), array(), 'showall');
 } else if ($matchcount > 0 && $perpage < $matchcount) {
     $perpageurl->param('perpage', SHOW_ALL_PAGE_SIZE);
     echo $OUTPUT->container(html_writer::link($perpageurl, get_string('showall', '', $matchcount)), array(), 'showall');
@@ -723,7 +726,12 @@ if ($bulkoperations) {
     }
 
     echo html_writer::start_tag('div', array('class' => 'btn-group'));
-    if ($perpage < $matchcount) {
+    // Totara: change button view if more than 5000 users
+    if ($perpage < $matchcount && $matchcount >= SHOW_ALL_PAGE_SIZE) {
+        // Select all users and mark all users on page as selected.
+        echo html_writer::tag('input', "", array('type' => 'button', 'id' => 'checkallonpage', 'class' => 'btn btn-secondary',
+            'value' => get_string('selectallusersonpage')));
+    } else if ($perpage < $matchcount) {
         // Select all users, refresh page showing all users and mark them all selected.
         $label = get_string('selectalluserswithcount', 'moodle', $matchcount);
         echo html_writer::tag('input', "", array('type' => 'button', 'id' => 'checkall', 'class' => 'btn btn-secondary',
