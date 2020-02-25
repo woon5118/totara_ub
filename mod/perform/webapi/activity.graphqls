@@ -6,8 +6,52 @@ type mod_perform_activity {
   name(format: core_format = HTML): String!
   description(format: core_format = HTML): String
   updated_at(format: core_date_format = TIMESTAMP): core_date
+  sections: [mod_perform_section!]!
 }
 
+"""
+An element plugin which can be used to create an element
+"""
+type mod_perform_element_plugin {
+  plugin_name: String!
+  # could have properties like admin_vue_component and participant_vue_component?
+  name: String!
+}
+
+"""
+An element in the element library
+"""
+type mod_perform_element {
+  id: core_id!
+  element_plugin: mod_perform_element_plugin!
+  title: String!
+  identifier: String
+  data: String
+}
+
+"""
+A section
+"""
+type mod_perform_section {
+  id: core_id!
+  title: String!
+  activity: mod_perform_activity!
+  section_elements: [mod_perform_section_element!]!
+}
+
+"""
+An element used in a section
+"""
+type mod_perform_section_element {
+  id: core_id!
+  section: mod_perform_section!
+  element: mod_perform_element!
+  sort_order: Int!
+}
+
+"""
+A list of possible states that a performance activity can be in
+"""
 enum mod_perform_activity_status {
   ACTIVE
   INACTIVE
@@ -19,16 +63,24 @@ type mod_perform_activity_result {
 
 extend type Query {
   """
-  This query returns all performance activities
+  Alist of all performance activities that the current user can see
   """
   mod_perform_activities: [mod_perform_activity!]!
-}
 
-extend type Query {
   """
   This query returns a single performance activity
   """
   mod_perform_activity(activity_id: core_id!): mod_perform_activity
+
+  """
+  A list of all element types that can be used to create elements
+  """
+  mod_perform_element_plugins: [mod_perform_element_plugin!]!
+
+  """
+  The specified section
+  """
+  mod_perform_section(section_id: core_id!): mod_perform_section
 }
 
 extend type Mutation {
@@ -37,9 +89,7 @@ extend type Mutation {
     description: param_text
     status: mod_perform_activity_status
   ): mod_perform_activity_result!
-}
 
-extend type Mutation {
   mod_perform_update_activity_general_info(
     activity_id: core_id!
     name: param_text!

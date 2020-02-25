@@ -67,19 +67,19 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
 
         $activity = $this->create_activity($original_data);
 
-        $this->assertEquals($activity->get_entity()->name, $original_data->name);
-        $this->assertEquals($activity->get_entity()->description, $original_data->description);
+        $this->assertEquals($activity->name, $original_data->name);
+        $this->assertEquals($activity->description, $original_data->description);
 
         $activity->update_general_info('New name for existing activity', 'New description');
 
         // Assert in memory state is correct
-        $this->assertEquals($activity->get_entity()->name, 'New name for existing activity');
-        $this->assertEquals($activity->get_entity()->description, 'New description');
+        $this->assertEquals($activity->name, 'New name for existing activity');
+        $this->assertEquals($activity->description, 'New description');
 
         // Assert persisted state is correct
         $from_database = activity::load_by_id($activity->get_id());
-        $this->assertEquals($from_database->get_entity()->name, 'New name for existing activity');
-        $this->assertEquals($from_database->get_entity()->description, 'New description');
+        $this->assertEquals($from_database->name, 'New name for existing activity');
+        $this->assertEquals($from_database->description, 'New description');
     }
 
     public function test_update_general_info_accepts_null_description(): void {
@@ -89,19 +89,19 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
 
         $activity = $this->create_activity($original_data);
 
-        $this->assertEquals($activity->get_entity()->name, $original_data->name);
-        $this->assertEquals($activity->get_entity()->description, $original_data->description);
+        $this->assertEquals($activity->name, $original_data->name);
+        $this->assertEquals($activity->description, $original_data->description);
 
         $activity->update_general_info('New name for existing activity', null);
 
         // Assert in memory state is correct
-        $this->assertEquals($activity->get_entity()->name, 'New name for existing activity');
-        $this->assertNull($activity->get_entity()->description);
+        $this->assertEquals($activity->name, 'New name for existing activity');
+        $this->assertNull($activity->description);
 
         // Assert persisted state is correct
         $from_database = activity::load_by_id($activity->get_id());
-        $this->assertEquals($from_database->get_entity()->name, 'New name for existing activity');
-        $this->assertNull($from_database->get_entity()->description);
+        $this->assertEquals($from_database->name, 'New name for existing activity');
+        $this->assertNull($from_database->description);
     }
 
     /**
@@ -149,6 +149,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
             }
         };
 
+        /** @var activity $activity */
         $activity = activity::load_by_entity($new_entity);
 
         $this->expectException(coding_exception::class);
@@ -172,20 +173,5 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         /** @noinspection CallableParameterUseCaseInTypeContextInspection */
         $entity = activity_entity::repository()->create_entity($entity);
         return activity::load_by_entity($entity);
-    }
-
-    public function test_create_without_name() {
-        $courseinfo = new \stdClass();
-        $courseinfo->fullname = 'test';
-        $courseinfo->category = perform_container::get_default_categoryid();
-
-        $container = perform_container::create($courseinfo);
-
-        // Create a performance activity inside the new performance container.
-        $activity_data = new \stdClass();
-
-        $this->expectException(\coding_exception::class);
-        $this->expectExceptionMessage("Coding error detected, it must be fixed by a programmer: Name property does not exist");
-        activity::create($activity_data, $container);
     }
 }

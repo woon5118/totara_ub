@@ -57,6 +57,7 @@ class activity {
         $this->items = [];
 
         foreach ($entities as $entity) {
+            /** @var activity_model $item */
             $item = activity_model::load_by_entity($entity);
             if ($item->can_manage()) {
                 $this->items[] = $item;

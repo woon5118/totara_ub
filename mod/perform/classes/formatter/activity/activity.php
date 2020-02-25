@@ -23,23 +23,26 @@
 
 namespace mod_perform\formatter\activity;
 
+use core\orm\formatter\entity_model_formatter;
 use totara_core\formatter\field\date_field_formatter;
 use totara_core\formatter\field\string_field_formatter;
 use totara_core\formatter\field\text_field_formatter;
-use totara_core\formatter\formatter;
 
-class activity extends formatter {
+/**
+ * Class activity
+ *
+ * @package mod_perform\formatter\activity
+ */
+class activity extends entity_model_formatter {
 
     protected function get_map(): array {
         return [
-            'id'           => null,
-            'name'         => string_field_formatter::class,
-            'description'  => string_field_formatter::class, // This will throw an error when we change this to html
+            'id' => null,
+            'name' => string_field_formatter::class,
+            'description' => string_field_formatter::class,
             'updated_at' => date_field_formatter::class,
+            'sections' => null,
         ];
     }
 
-    protected function has_field(string $field): bool {
-        return true;
-    }
 }

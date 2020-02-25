@@ -1,0 +1,6 @@
+query mod_perform_element_plugins {
+  mod_perform_element_plugins {
+    plugin_name
+    name
+  }
+}

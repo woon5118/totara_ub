@@ -79,7 +79,7 @@ if (!$scale = $DB->get_record('comp_scale', array('id' => $id))) {
     print_error('incorrectcompetencyscaleid', 'totara_hierarchy');
 }
 
-$scale_model = scale::find_by_id($scale->id);
+$scale_model = scale::load_by_id_with_values($scale->id);
 
 $scale_assigned_to_framework = $scale_model->is_assigned();
 $scale_used_by_users = $scale_model->is_in_use();

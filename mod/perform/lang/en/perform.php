@@ -54,11 +54,11 @@ $string['perform:view:status'] = 'Status';
 $string['perform:view:status:active'] = 'Active';
 $string['perform:view:status:inactive'] = 'Inactive';
 $string['perform:view_manage_activities'] = 'Access the performance activities management interface';
+$string['perform:section:add_element'] = 'Add Element';
 $string['pluginadministration'] = 'Performance activity administration';
 $string['pluginname'] = 'Performance activity';
 $string['save_changes'] = 'Save changes';
-
+$string['short_text'] = 'Short text';
 $string['toast:error:create_activity'] = 'An error occurred while saving, and the activity could not be created.';
 $string['toast:error:generic_update'] = 'An error occurred, and your latest changes have not been saved.';
-
 $string['toast:success:activity_update'] = 'Activity saved.';

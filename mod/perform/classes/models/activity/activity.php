@@ -24,16 +24,31 @@
 
 namespace mod_perform\models\activity;
 
-use coding_exception;
 use container_perform\perform as perform_container;
-use core_text;
+use core\orm\entity\model;
+use core\orm\collection;
 use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\models\activity\section as section_model;
 use mod_perform\util;
+use \coding_exception;
+use \core_text;
+use \context_module;
 
-class activity {
+/**
+ * Class activity
+ *
+ * This class contains the methods related to performance activity
+ * All the activity entity properties accessible via this class
+ *
+ * @method static self load_by_entity(activity_entity $entity)
+ * @method static self load_by_id(int $id)
+ *
+ * @package mod_perform\models\activity
+ */
+class activity extends model {
 
-    public const STATUS_ACTIVE = 1;
-    public const STATUS_INACTIVE = 1;
+    public const STATUS_ACTIVE   = 1;
+    public const STATUS_INACTIVE = 2;
 
     public const NAME_MAX_LENGTH = 255;
 
@@ -42,49 +57,26 @@ class activity {
      */
     protected $entity;
 
-    /**
-     * activity constructor.
-     * @param activity_entity $entity
-     */
-    private function __construct(activity_entity $entity) {
-        $this->entity = $entity;
-    }
-
-    // TODO consider a base model class for some of the methods below?
-
-    public static function load_by_id(int $id): self {
-        /** @var activity_entity $entity */
-        $entity = activity_entity::repository()->find_or_fail($id);
-        return new static($entity);
+    public static function get_entity_class(): string {
+        return activity_entity::class;
     }
 
     public static function load_by_container_id(int $container_id): self {
         $entity = activity_entity::repository()
             ->where('course', $container_id)
-            ->one(true);
+            ->get()->first();
+
         return self::load_by_entity($entity);
     }
 
-    public static function load_by_entity(activity_entity $entity): self {
-        if (!$entity->exists()) {
-            throw new coding_exception('Can load only existing entities');
-        }
-        return new static($entity);
-    }
-
-    public function get_id(): int {
-        return $this->entity->id;
-    }
-
     /**
-     * Get underlying entity
+     * Checks whether the logged in (or given) user has the capability to create the activity.
      *
-     * @return activity_entity
+     * @param int|null                $userid
+     * @param \context_coursecat|null $context
+     *
+     * @return bool
      */
-    public function get_entity(): activity_entity {
-        return $this->entity;
-    }
-
     public static function can_create(int $userid = null, \context_coursecat $context = null): bool {
         global $USER;
 
@@ -92,7 +84,6 @@ class activity {
             // Including zero check
             $userid = $USER->id;
         }
-
 
         if (null == $context) {
             $categoryid = util::get_default_categoryid();
@@ -112,6 +103,7 @@ class activity {
      * Checks whether the logged in (or given) user has the capability to manage this activity.
      *
      * @param int|null $userid
+     *
      * @return bool
      */
     public function can_manage(int $userid = null): bool {
@@ -122,16 +114,28 @@ class activity {
         return has_capability('mod/perform:manage_activity', $this->get_context(), $userid);
     }
 
-    public static function create(\stdClass $data, perform_container $container): self {
+    /**
+     * Create activity on perform container
+     *
+     * @param perform_container $container
+     * @param string            $name
+     * @param string|null       $description
+     * @param int               $status
+     *
+     * @return static
+     */
+    public static function create(
+        perform_container $container,
+        string $name,
+        string $description = null,
+        int $status = self::STATUS_ACTIVE
+    ): self {
         global $DB;
 
-        if (!isset($data->name)) {
-            throw new \coding_exception('Name property does not exist');
-        }
         $modinfo = new \stdClass();
         $modinfo->modulename = 'perform';
         $modinfo->course = $container->id;
-        $modinfo->name = $data->name;
+        $modinfo->name = $name;
         $modinfo->timemodified = time();
         $modinfo->visible = true;
         $modinfo->section = 0;
@@ -141,11 +145,9 @@ class activity {
         $entity = new activity_entity();
 
         $entity->course = $container->id;
-        $entity->name = $data->name;
-        $entity->description = $data->description ?? null;
-        $entity->status = $data->status ?? self::STATUS_ACTIVE;
-
-        self::validate($entity);
+        $entity->name = $name;
+        $entity->description = $description;
+        $entity->status = $status;
 
         return $DB->transaction(function () use ($entity, $modinfo, $container) {
             global $CFG, $USER;
@@ -167,18 +169,26 @@ class activity {
     /**
      * Return the context object for this activity.
      */
-    public function get_context(): \context_module {
-        $cm = get_coursemodule_from_instance('perform', $this->entity->id, $this->entity->course, false, MUST_EXIST);
-        return \context_module::instance($cm->id);
+    public function get_context(): context_module {
+
+        $cm = get_coursemodule_from_instance(
+            'perform',
+            $this->entity->id,
+            $this->entity->course,
+            false,
+            MUST_EXIST
+        );
+        return context_module::instance($cm->id);
     }
 
     public function update_general_info(string $name, ?string $description): self {
-        $this->entity->name = $name;
-        $this->entity->description = $description;
+        $entity = $this->entity;
+        $entity->name = $name;
+        $entity->description = $description;
 
-        self::validate($this->entity);
+        self::validate($entity);
 
-        $this->entity->update();
+        $entity->update();
 
         return $this;
     }
@@ -225,5 +235,39 @@ class activity {
      */
     protected static function format_validation_problems(array $problems): string {
         return '"' . implode('", "', $problems) . '"';
+    }
+
+    /**
+     * get collection
+     *
+     * @return array
+     */
+    public function get_sections() {
+        $section_models = [];
+        foreach ($this->entity->sections as $section_entity) {
+            $section_models[] = section_model::load_by_entity($section_entity);
+        }
+        return $section_models;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __get($name) {
+        switch ($name) {
+            case 'sections':
+                return $this->get_sections();
+            default:
+                return parent::__get($name);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function to_array(): array {
+        $result = parent::to_array();
+        $result['sections'] = $this->get_sections();
+        return $result;
     }
 }

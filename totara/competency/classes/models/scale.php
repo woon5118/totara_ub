@@ -24,6 +24,7 @@
 namespace totara_competency\models;
 
 use core\orm\collection;
+use core\orm\entity\model;
 use core\orm\entity\repository;
 use totara_competency\entities\competency;
 use totara_competency\entities\competency_achievement;
@@ -47,7 +48,7 @@ use totara_core\advanced_feature;
  *
  * @package totara_competency\models
  */
-class scale extends entity_model {
+class scale extends model {
 
     /**
      * Scale constructor. It's here for the purpose of type-hint
@@ -58,15 +59,18 @@ class scale extends entity_model {
         parent::__construct($entity);
     }
 
+    public static function get_entity_class(): string {
+        return scale_entity::class;
+    }
+
     /**
-     * Load scale by ID
+     * Load scale by ID including values
      *
      * @param int $id Ids to load scales by
-     * @param bool $with_values A flag to load scale values
      * @return scale
      */
-    public static function find_by_id(int $id, $with_values = true): self {
-        return static::find_by_ids([$id], $with_values)->first();
+    public static function load_by_id_with_values(int $id): self {
+        return static::load_by_ids([$id], true)->first();
     }
 
     /**
@@ -76,7 +80,7 @@ class scale extends entity_model {
      * @param bool $with_values A flag to load scale values
      * @return collection
      */
-    public static function find_by_ids(array $ids, bool $with_values = true): collection {
+    public static function load_by_ids(array $ids, bool $with_values = true): collection {
         return scale_entity::repository()
             ->where('id', 'in', static::sanitize_ids($ids))
             ->when($with_values, function (repository $repository) {
@@ -101,7 +105,7 @@ class scale extends entity_model {
             ->pluck('scale');
 
         $scales = new collection($scales);
-        return static::find_by_ids($scales->pluck('id'), $with_values);
+        return static::load_by_ids($scales->pluck('id'), $with_values);
     }
 
     /**

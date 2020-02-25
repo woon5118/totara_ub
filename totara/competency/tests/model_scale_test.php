@@ -37,8 +37,9 @@ use totara_core\advanced_feature;
 class totara_competency_model_scale_testcase extends advanced_testcase {
 
     /**
-     * @covers ::find_by_id
-     * @covers ::find_by_ids
+     * @covers ::load_by_id
+     * @covers ::load_by_id_with_values
+     * @covers ::load_by_ids
      * @covers ::__construct
      */
     public function test_it_loads_scales_using_ids() {
@@ -46,7 +47,7 @@ class totara_competency_model_scale_testcase extends advanced_testcase {
 
         $expected = $data['scales'];
 
-        $scales = scale::find_by_ids([$expected->item(0)->id, $expected->item(2)->id, 'bottom', 'bogus', -5], false);
+        $scales = scale::load_by_ids([$expected->item(0)->id, $expected->item(2)->id, 'bottom', 'bogus', -5], false);
 
         $this->assertEqualsCanonicalizing(['Scale 1', 'Scale 3'], $scales->pluck('name'));
 
@@ -54,17 +55,17 @@ class totara_competency_model_scale_testcase extends advanced_testcase {
 
         // Let's also check that it loaded values correctly
         $this->assert_scale_is_good(
-            scale::find_by_ids([$expected->item(0)->id, $expected->item(2)->id], true),
+            scale::load_by_ids([$expected->item(0)->id, $expected->item(2)->id], true),
             true
         );
 
         $this->assertEqualsCanonicalizing(
             (new scale_entity($expected->item(1)->id))->to_array(),
-            scale::find_by_id($expected->item(1)->id, false)->to_array()
+            scale::load_by_id($expected->item(1)->id)->to_array()
         );
 
         // Let's also check that it loaded values correctly
-        $this->assert_scale_is_good(new collection([scale::find_by_id($expected->item(1)->id, true)]), true);
+        $this->assert_scale_is_good(new collection([scale::load_by_id_with_values($expected->item(1)->id)]), true);
     }
 
     /**
@@ -116,7 +117,7 @@ class totara_competency_model_scale_testcase extends advanced_testcase {
 
         $scale = $generator->create_scale('comp', ['name' => 'Scale 1']);
 
-        $scale_model = scale::find_by_id($scale->id);
+        $scale_model = scale::load_by_id_with_values($scale->id);
 
         $this->assertFalse($scale_model->is_assigned());
 
@@ -136,7 +137,7 @@ class totara_competency_model_scale_testcase extends advanced_testcase {
 
         $comp = $generator->create_comp(['frameworkid' => $framework->id]);
 
-        $scale_model = scale::find_by_id($scale->id);
+        $scale_model = scale::load_by_id_with_values($scale->id);
 
         $this->assertFalse($scale_model->is_in_use());
 
@@ -177,7 +178,7 @@ class totara_competency_model_scale_testcase extends advanced_testcase {
 
         $comp = $generator->create_comp(['frameworkid' => $framework->id]);
 
-        $scale_model = scale::find_by_id($scale->id);
+        $scale_model = scale::load_by_id_with_values($scale->id);
 
         $this->assertFalse($scale_model->is_in_use());
 
@@ -214,7 +215,7 @@ class totara_competency_model_scale_testcase extends advanced_testcase {
 
         $comp = $generator->create_comp(['frameworkid' => $framework->id]);
 
-        $scale_model = scale::find_by_id($scale->id);
+        $scale_model = scale::load_by_id_with_values($scale->id);
 
         $this->assertFalse($scale_model->is_in_use());
 

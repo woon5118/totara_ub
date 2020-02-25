@@ -70,7 +70,7 @@ $deleteparams = array('id' => $value->id, 'delete' => md5($value->timemodified),
 $deleteurl = new moodle_url('/totara/hierarchy/prefix/competency/scale/deletevalue.php', $deleteparams);
 
 // Can't delete if the scale is in use
-if (scale::find_by_id($value->scaleid)->is_in_use()) {
+if (scale::load_by_id_with_values($value->scaleid)->is_in_use()) {
     \core\notification::error(get_string('error:nodeletescalevalueinuse', 'totara_hierarchy'));
     redirect($returnurl);
 }

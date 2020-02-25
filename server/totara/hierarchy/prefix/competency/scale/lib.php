@@ -47,7 +47,7 @@ use totara_competency\models\scale;
  */
 function competency_scale_is_assigned($scaleid) {
     debugging('competency_scale_is_assigned() is deprecated. Use the is_assigned() method in '.scale::class, DEBUG_DEVELOPER);
-    return scale::find_by_id($scaleid)->is_assigned();
+    return scale::load_by_id_with_values($scaleid)->is_assigned();
 }
 
 
@@ -69,7 +69,7 @@ function competency_scale_is_assigned($scaleid) {
  */
 function competency_scale_is_used(int $scaleid) {
     debugging('competency_scale_is_used() is deprecated. Use the is_in_use() method in '.scale::class, DEBUG_DEVELOPER);
-    return scale::find_by_id($scaleid)->is_in_use();
+    return scale::load_by_id_with_values($scaleid)->is_in_use();
 }
 
 /**
@@ -171,7 +171,7 @@ function competency_scale_display_table($scales) {
 
         $table->data = array();
         foreach ($scales as $scale) {
-            $scale_model = scale::find_by_id($scale->id);
+            $scale_model = scale::load_by_id_with_values($scale->id);
 
             $scale_used = $scale_model->is_in_use();
             $scale_assigned = $scale_model->is_assigned();

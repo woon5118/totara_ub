@@ -1,0 +1,19 @@
+query mod_perform_section_details($section_id: core_id!) {
+  mod_perform_section(section_id: $section_id) {
+    title
+    section_elements {
+      id
+      element {
+        id
+        element_plugin {
+          plugin_name
+          name
+        }
+        title
+        identifier
+        data
+      }
+      sort_order
+    }
+  }
+}

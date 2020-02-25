@@ -40,7 +40,7 @@ class update_activity_general_info implements mutation_resolver {
      * @see activity
      */
     public static function resolve(array $args, execution_context $ec) {
-        require_login();
+        require_login(null, false, null, false, true);
 
         $activity = activity_model::load_by_id($args['activity_id']);
 

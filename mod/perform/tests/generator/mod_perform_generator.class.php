@@ -24,6 +24,9 @@
 use container_perform\perform as perform_container;
 use core_container\module\module;
 use mod_perform\models\activity\activity;
+use mod_perform\models\activity\section;
+use mod_perform\models\activity\element;
+use mod_perform\models\activity\section_element;
 
 /**
  * Perform generator
@@ -48,12 +51,14 @@ class mod_perform_generator extends component_generator_base {
 
             // Create a performance activity inside the new performance container.
             $activity_data = new \stdClass();
-            $activity_data->name = $data['activity_name'] ?? "test performance activity";
-            $activity_data->description = $data['description'] ?? "test description";
-            $activity_data->status = $data['activity_status'] ?? activity::STATUS_ACTIVE;
+            $name = $data['activity_name'] ?? "test performance activity";
+            $description = $data['description'] ?? "test description";
+            $status = $data['activity_status'] ?? activity::STATUS_ACTIVE;
 
             /** @var perform_container $container */
-            activity::create($activity_data, $container);
+            $activity = activity::create($container, $name, $description, $status);
+
+            section::create($activity, 'placeholder_title');
 
             $modules = $container->get_section(0)->get_all_modules();
             $module = reset($modules);
@@ -71,15 +76,14 @@ class mod_perform_generator extends component_generator_base {
      * @return module
      */
     public function create_instance($data = []): module {
-        $activity_data = new \stdClass();
-        $activity_data->name = $data['name'] ?? "test performance activity";
-        $activity_data->description = $data['description'] ?? "test description";
-        $activity_data->status = $data['status'] ?? activity::STATUS_ACTIVE;
+        $name = $data['name'] ?? "test performance activity";
+        $description = $data['description'] ?? "test description";
+        $status = $data['status'] ?? activity::STATUS_ACTIVE;
 
         $container = perform_container::from_id($data['course']);
 
         /** @var perform_container $container */
-        activity::create($activity_data, $container);
+        activity::create($container, $name, $description, $status);
 
         $modules = $container->get_section(0)->get_all_modules();
         $module = reset($modules);
@@ -87,4 +91,20 @@ class mod_perform_generator extends component_generator_base {
         return $module;
     }
 
+    public function create_section(activity $activity, $data = []) {
+        $title =  $data['title'] ?? "test Section";
+        return section::create($activity, $title);
+    }
+
+    public function create_section_element(section $section, element $element) {
+        return section_element::create($section, $element);
+    }
+
+    public function create_element($data = []) {
+        $title = $data['title'] ?? "test title";
+        $plugin_name = $data['plugin_name'] ?? "short_text";
+        $identifier = $data['identifier'] ?? 1;
+
+        return element::create($plugin_name, $title, $identifier);
+    }
 }

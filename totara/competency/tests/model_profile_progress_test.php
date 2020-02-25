@@ -44,8 +44,8 @@ require_once($CFG->dirroot . '/totara/competency/tests/totara_competency_testcas
 class totara_competency_model_profile_progress_testcase extends totara_competency_testcase {
 
     /**
-     * @covers ::find_by_id
-     * @covers ::find_by_ids
+     * @covers ::load_by_id_with_values
+     * @covers ::load_by_ids
      * @covers ::__construct
      */
     public function test_it_loads_scales_using_ids(): void {

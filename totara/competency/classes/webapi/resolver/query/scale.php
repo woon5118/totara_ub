@@ -52,7 +52,7 @@ class scale implements query_resolver {
         require_capability('totara/hierarchy:viewcompetency', context_system::instance());
 
         if (isset($args['id'])) {
-            $model = scale_model::find_by_id($args['id']);
+            $model = scale_model::load_by_id_with_values($args['id']);
         } else {
             $model = scale_model::find_by_competency_id($args['competency_id']);
         }

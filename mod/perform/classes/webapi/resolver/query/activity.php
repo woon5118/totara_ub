@@ -23,11 +23,9 @@
 
 namespace mod_perform\webapi\resolver\query;
 
-use context_system;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use mod_perform\models\activity\activity as activity_model;
-use mod_perform\entities\activity\activity as activity_entity;
 
 class activity implements query_resolver {
 
@@ -39,11 +37,24 @@ class activity implements query_resolver {
      * @return activity_model
      */
     public static function resolve(array $args, execution_context $ec) {
-        require_login();
+        require_login(null, false, null, false, true);
 
+        // This may be opened up later, but for now user needs manage capability.
+        /** @var activity_model $activity */
         $activity = activity_model::load_by_id($args['activity_id']);
 
-        require_capability('mod/perform:manage_activity', $activity->get_context());
+        $activity_context = $activity->get_context();
+
+        if (!$activity->can_manage()) {
+            throw new \required_capability_exception(
+                $activity_context,
+                'mod/perform:manage_activity',
+                'nopermission',
+                ''
+            );
+        }
+
+        $ec->set_relevant_context($activity_context);
 
         return $activity;
     }

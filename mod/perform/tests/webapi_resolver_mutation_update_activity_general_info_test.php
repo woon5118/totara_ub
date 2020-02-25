@@ -56,18 +56,11 @@ class webapi_resolver_mutation_update_activity_general_info_test extends advance
 
         ['activity' => $activity] = update_activity_general_info::resolve($args, $this->get_execution_context());
 
-        $entity = $activity->get_entity();
 
         // Return values should be updated
-        self::assertEquals($entity->id, $args['activity_id']);
-        self::assertEquals($entity->name, $args['name']);
-        self::assertEquals($entity->description, $args['description']);
-
-        // Database should also have the correct values
-        $entity->refresh();
-        self::assertEquals($entity->id, $args['activity_id']);
-        self::assertEquals($entity->name, $args['name']);
-        self::assertEquals($entity->description, $args['description']);
+        self::assertEquals($activity->id, $args['activity_id']);
+        self::assertEquals($activity->name, $args['name']);
+        self::assertEquals($activity->description, $args['description']);
     }
 
     public function test_activity_must_belong_to_user(): void {
@@ -84,7 +77,7 @@ class webapi_resolver_mutation_update_activity_general_info_test extends advance
         ['activity' => $returned_activity] = update_activity_general_info::resolve($args, $this->get_execution_context());
 
         $this->assertEquals($created_activity->get_id(), $returned_activity->get_id());
-        $this->assertEquals($created_activity->get_entity()->name, $returned_activity->get_entity()->name);
+        $this->assertEquals($created_activity->name, $returned_activity->name);
 
         self::setUser($user2);
         $this->expectException(moodle_exception::class);
@@ -104,8 +97,8 @@ class webapi_resolver_mutation_update_activity_general_info_test extends advance
     private function to_args_payload(activity $activity): array {
         return [
             'activity_id' => $activity->get_id(),
-            'name' => $activity->get_entity()->name,
-            'description' => $activity->get_entity()->description,
+            'name' => $activity->name,
+            'description' => $activity->description,
         ];
     }
 

@@ -38,8 +38,8 @@ class mod_perform_activity_data_provider_testcase extends advanced_testcase {
 
         $this->assertCount(2, $performs);
         $this->assertEqualsCanonicalizing(
-            [$data->activity1->get_entity()->name, $data->activity2->get_entity()->name],
-            [$performs[0]->get_entity()->name, $performs[1]->get_entity()->name]
+            [$data->activity1->name, $data->activity2->name],
+            [$performs[0]->name, $performs[1]->name]
         );
     }
 
@@ -61,14 +61,14 @@ class mod_perform_activity_data_provider_testcase extends advanced_testcase {
 
         $activities = $data_provider->fetch()->get();
         $this->assertCount(1, $activities);
-        $this->assertEquals('User2 One', $activities[0]->get_entity()->name);
+        $this->assertEquals('User2 One', $activities[0]->name);
 
         $this->setUser($user1);
         $activities = $data_provider->fetch()->get();
         $this->assertCount(2, $activities);
         $this->assertEqualsCanonicalizing(
             ['User1 One', 'User1 Two'],
-            [$activities[0]->get_entity()->name, $activities[1]->get_entity()->name]
+            [$activities[0]->name, $activities[1]->name]
         );
     }
 

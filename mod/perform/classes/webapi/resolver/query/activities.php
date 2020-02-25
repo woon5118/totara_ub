@@ -23,16 +23,28 @@
 
 namespace mod_perform\webapi\resolver\query;
 
+use context_coursecat;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use mod_perform\data_providers\activity;
+use mod_perform\util;
 
 class activities implements query_resolver {
 
     public static function resolve(array $args, execution_context $ec) {
-        require_login();
-        require_capability('mod/perform:view_manage_activities', \context_system::instance());
+        require_login(null, false, null, false, true);
+
+        $context = self::get_context();
+        $ec->set_relevant_context($context);
+
+        require_capability('mod/perform:view_manage_activities', $context);
 
         return (new activity\activity())->fetch()->get();
     }
+
+    protected static function get_context(): \context {
+        $category_id = util::get_default_categoryid();
+        return context_coursecat::instance($category_id);
+    }
+
 }

@@ -28,6 +28,7 @@ use container_perform\perform as perform_container;
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use mod_perform\models\activity\activity;
+use mod_perform\models\activity\section;
 
 class create_activity implements mutation_resolver {
 
@@ -36,6 +37,7 @@ class create_activity implements mutation_resolver {
      */
     public static function resolve(array $args, execution_context $ec) {
         global $DB;
+        require_login(null, false, null, false, true);
 
         if (!activity::can_create()) {
             throw new create_exception(get_string('error:create_permission_missing', 'mod_perform'));
@@ -55,13 +57,17 @@ class create_activity implements mutation_resolver {
             $container = perform_container::create($courseinfo);
 
             // Create a performance activity inside the new performance container.
-            $activity_data = new \stdClass();
-            $activity_data->name = $args['name'];
-            $activity_data->description = $args['description'] ?? null;
-            $activity_data->status = $args['status'] ?? activity::STATUS_ACTIVE;
+            $name = $args['name'];
+            $description = $args['description'] ?? null;
+            $status = $args['status'] ?? activity::STATUS_ACTIVE;
 
             /** @var perform_container $container */
-            return activity::create($activity_data, $container);
+            $activity = activity::create($container, $name, $description, $status);
+
+            // Create the first section for the entity.
+            section::create($activity, 'placeholder_title');
+
+            return $activity;
         });
 
         return ['activity' => $activity];

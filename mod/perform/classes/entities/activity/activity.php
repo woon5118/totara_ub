@@ -23,8 +23,9 @@
 
 namespace mod_perform\entities\activity;
 
+use core\orm\collection;
 use core\orm\entity\entity;
-use mod_perform\entities\activity\activity_repository;
+use core\orm\entity\relations\has_many;
 
 /**
  * Activity entity
@@ -35,6 +36,7 @@ use mod_perform\entities\activity\activity_repository;
  * @property string $name Activity name
  * @property int $status
  * @property int $updated_at
+ * @property-read collection|section[] $sections
  *
  * @method static activity_repository repository()
  *
@@ -45,4 +47,13 @@ class activity extends entity {
 
     public const UPDATED_TIMESTAMP = 'updated_at';
     public const SET_UPDATED_WHEN_CREATED = true;
+
+    /**
+     * get activity sections
+     *
+     * @return has_many
+     */
+    public function sections(): has_many {
+        return $this->has_many(section::class, 'activity_id');
+    }
 }

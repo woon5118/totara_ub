@@ -44,8 +44,8 @@ class webapi_resolver_mutation_create_activity_testcase extends advanced_testcas
 
         /** @type activity $result */
         ['activity' => $result] = create_activity::resolve($args, $this->get_execution_context());
-        $this->assertSame('Mid year performance review', $result->get_entity()->name);
-        $this->assertSame('Test Description', $result->get_entity()->description);
+        $this->assertSame('Mid year performance review', $result->name);
+        $this->assertSame('Test Description', $result->description);
     }
 
     public function test_create_activity_for_non_admin_user(): void {
@@ -80,8 +80,8 @@ class webapi_resolver_mutation_create_activity_testcase extends advanced_testcas
         ];
 
         ['activity' => $result] = create_activity::resolve($args, $this->get_execution_context());
-        $this->assertSame('Mid year performance review', $result->get_entity()->name);
-        $this->assertSame('', $result->get_entity()->description);
+        $this->assertSame('Mid year performance review', $result->name);
+        $this->assertSame('', $result->description);
 
         $args = [
             'name' => 'Mid year performance review',
@@ -89,7 +89,7 @@ class webapi_resolver_mutation_create_activity_testcase extends advanced_testcas
         ];
 
         ['activity' => $result] = create_activity::resolve($args, $this->get_execution_context());
-        $this->assertSame('Mid year performance review', $result->get_entity()->name);
-        $this->assertNull($result->get_entity()->description);
+        $this->assertSame('Mid year performance review', $result->name);
+        $this->assertNull($result->description);
     }
 }

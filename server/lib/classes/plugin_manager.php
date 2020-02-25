@@ -1451,6 +1451,10 @@ class core_plugin_manager {
                 'criteria_group', 'learning_plan', 'manual'
             ),
 
+            'performelement' => array(
+                'short_text',
+            ),
+
             'plagiarism' => array(
             ),
 

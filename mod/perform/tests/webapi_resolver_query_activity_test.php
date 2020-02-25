@@ -39,7 +39,7 @@ class webapi_resolver_query_activity_test extends advanced_testcase {
         $returned_activity = activity_resolver::resolve(['activity_id' => $id], $this->get_execution_context());
 
         $this->assertEquals($id, $returned_activity->get_id());
-        $this->assertEquals($created_activity->get_entity()->name, $returned_activity->get_entity()->name);
+        $this->assertEquals($created_activity->name, $returned_activity->name);
     }
 
     public function test_activity_must_belong_to_user(): void {
@@ -55,7 +55,7 @@ class webapi_resolver_query_activity_test extends advanced_testcase {
         // Returns the activity for the user that created it
         $returned_activity = activity_resolver::resolve(['activity_id' => $id], $this->get_execution_context());
         $this->assertEquals($id, $returned_activity->get_id());
-        $this->assertEquals($created_activity->get_entity()->name, $returned_activity->get_entity()->name);
+        $this->assertEquals($created_activity->name, $returned_activity->name);
 
         self::setUser($user2);
         $this->expectException(moodle_exception::class);

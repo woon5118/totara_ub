@@ -64,7 +64,7 @@ abstract class formatter {
     protected $format_map = [];
 
     /**
-     * @param array|stdClass $object
+     * @param array|object $object
      * @param context $context
      */
     public function __construct($object, context $context) {

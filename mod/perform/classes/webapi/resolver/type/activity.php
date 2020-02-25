@@ -23,10 +23,11 @@
 
 namespace mod_perform\webapi\resolver\type;
 
+use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use mod_perform\models\activity\activity as activity_model;
 use mod_perform\formatter\activity\activity as activity_formatter;
+use mod_perform\models\activity\activity as activity_model;
 
 /**
  * Note: It is the responsibility of the query to ensure the user is permitted to see an activity.
@@ -34,20 +35,20 @@ use mod_perform\formatter\activity\activity as activity_formatter;
 class activity implements type_resolver {
 
     /**
-     * @param string            $field
-     * @param activity_model  $activity
-     * @param array             $args
+     * @param string $field
+     * @param activity_model $activity
+     * @param array $args
      * @param execution_context $ec
      *
      * @return mixed
      */
     public static function resolve(string $field, $activity, array $args, execution_context $ec) {
         if (!$activity instanceof activity_model) {
-            throw new \coding_exception('Accepting only activity model.');
+            throw new \coding_exception('Expected activity model');
         }
 
-        $format = $args['format'] ?? null;
-        $formatter = new activity_formatter($activity->get_entity(), \context_system::instance());
+        $format = $args['format'] ?? format::FORMAT_HTML;
+        $formatter = new activity_formatter($activity, $activity->get_context());
         return $formatter->format($field, $format);
     }
 }

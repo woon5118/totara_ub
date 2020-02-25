@@ -51,7 +51,7 @@ class mod_perform_webapi_resolver_query_activities_testcase extends advanced_tes
         $this->assertCount(2, $activities);
         $this->assertEqualsCanonicalizing(
             ['Mid year performance', 'End year performance'],
-            [$activities[0]->get_entity()->name, $activities[1]->get_entity()->name]
+            [$activities[0]->name, $activities[1]->name]
         );
     }
 
