@@ -13,7 +13,7 @@ query totara_competency_scale_achievements(
     }
     items {
       achieved: has_scale_value
-      date_achieved
+      date_achieved(format: DATE)
       pathway {
         instance_id
         pathway_type
