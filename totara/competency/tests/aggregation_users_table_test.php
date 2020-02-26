@@ -258,6 +258,32 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
         $this->assertSame(1, count($rows));
         $row = reset($rows);
         $this->assertEquals(1, $row->{$data->tbl->get_has_changed_column()});
+
+        // Existing without process value or has_changed should not update has_changed
+        $data->tbl->queue_for_aggregation(3, 8);
+        $rows = $DB->get_records($data->tbl->get_table_name(),
+            [
+                $data->tbl->get_user_id_column() => 3,
+                $data->tbl->get_competency_id_column() => 8,
+                $data->tbl->get_process_key_column() => null,
+            ]
+        );
+        $this->assertSame(1, count($rows));
+        $row = reset($rows);
+        $this->assertEquals(1, $row->{$data->tbl->get_has_changed_column()});
+
+        // Explicitly queueing with has_changed = 0 should update the persisted has_changed value
+        $data->tbl->queue_for_aggregation(3, 8, 0);
+        $rows = $DB->get_records($data->tbl->get_table_name(),
+            [
+                $data->tbl->get_user_id_column() => 3,
+                $data->tbl->get_competency_id_column() => 8,
+                $data->tbl->get_process_key_column() => null,
+            ]
+        );
+        $this->assertSame(1, count($rows));
+        $row = reset($rows);
+        $this->assertEquals(0, $row->{$data->tbl->get_has_changed_column()});
     }
 
     public function test_claim_process() {
@@ -511,6 +537,29 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
 
         $this->assertSame(3, $DB->count_records($table->get_table_name(),
             [$table->get_has_changed_column() => 0]));
+
+        // Queue without specifying a value - should not overwrite the existing has_changed values
+        $result = $table->queue_multiple_for_aggregation($to_queue);
+        $this->assertCount(0, $result);
+
+        // Ensure the has_changed flag was not updated on claimed queue entries
+        $this->assertSame(9, $DB->count_records($table->get_table_name(),
+            [$table->get_has_changed_column() => 1]));
+
+        $this->assertSame(3, $DB->count_records($table->get_table_name(),
+            [$table->get_has_changed_column() => 0]));
+
+        // Now queue and specify the has_changed value explicitly as 0.
+        // This should overwrite the existing has_changed values
+        $result = $table->queue_multiple_for_aggregation($to_queue, 0);
+        $this->assertCount(9, $result);
+
+        // Ensure the has_changed flag was not updated on claimed queue entries
+        $this->assertSame(0, $DB->count_records($table->get_table_name(),
+            [$table->get_has_changed_column() => 1]));
+
+        $this->assertSame(12, $DB->count_records($table->get_table_name(),
+            [$table->get_has_changed_column() => 0]));
     }
 
     /**
@@ -615,7 +664,7 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
 
         // Specify a has_changed valued when queuing
 
-        // First manually add some rows for competency3 and set the process_key for some
+        // First manually add some rows for competency3 and set the has_changed field for some
         for ($i = 1; $i <= 5; $i++) {
             $user_table->queue_for_aggregation($users[$i]->id, $competencies[3]->id, $i % 2);
         }
@@ -656,9 +705,57 @@ class totara_competency_aggregation_users_table_testcase extends \advanced_testc
         $params = [
             $user_table->get_competency_id_column() => $competencies[3]->id,
             $user_table->get_has_changed_column() => 0,
+        ];
+        $this->assertSame(1, $DB->count_records($user_table->get_table_name(), $params));
+
+        // Now queue without specifying a has_changed value. Nothing should be changed in the table
+        $user_table->queue_all_assigned_users_for_aggregation($competencies[3]->id);
+
+        $sql =
+            "SELECT id, {$user_table->get_user_id_column()}
+               FROM {{$user_table->get_table_name()}}
+              WHERE {$user_table->get_competency_id_column()} = :compid
+                AND {$user_table->get_has_changed_column()} = :haschanged
+                AND {$user_table->get_process_key_column()} IS NULL";
+        $params = ['compid' => $competencies[3]->id, 'haschanged' => 1];
+
+        $actual_user_ids = $DB->get_records_sql_menu($sql, $params);
+        $this->assertSame(count($user_ids_all), count($actual_user_ids));
+        $this->assertEqualsCanonicalizing($user_ids_all, $actual_user_ids);
+
+        $params = [
+            $user_table->get_competency_id_column() => $competencies[3]->id,
+            $user_table->get_has_changed_column() => 0,
+        ];
+        $this->assertSame(1, $DB->count_records($user_table->get_table_name(), $params));
+
+        // And then queue with an explicit has_changed value of 0 - this should overwrite the existing has_changed value
+        $user_table->queue_all_assigned_users_for_aggregation($competencies[3]->id, 0);
+
+        $sql =
+            "SELECT id, {$user_table->get_user_id_column()}
+               FROM {{$user_table->get_table_name()}}
+              WHERE {$user_table->get_competency_id_column()} = :compid
+                AND {$user_table->get_has_changed_column()} = :haschanged
+                AND {$user_table->get_process_key_column()} IS NULL";
+
+        $params = ['compid' => $competencies[3]->id, 'haschanged' => 1];
+        $actual_user_ids = $DB->get_records_sql_menu($sql, $params);
+        $this->assertSame(0, count($actual_user_ids));
+
+        $params = ['compid' => $competencies[3]->id, 'haschanged' => 0];
+        $actual_user_ids = $DB->get_records_sql_menu($sql, $params);
+        $this->assertSame(count($user_ids_all), count($actual_user_ids));
+
+        $this->assertEqualsCanonicalizing($user_ids_all, $actual_user_ids);
+
+        $params = [
+            $user_table->get_competency_id_column() => $competencies[3]->id,
+            $user_table->get_has_changed_column() => 0,
             $user_table->get_process_key_column() => 'sometest',
         ];
         $this->assertSame(1, $DB->count_records($user_table->get_table_name(), $params));
+
 
         $sink->close();
     }
