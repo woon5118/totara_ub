@@ -26,7 +26,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="activity_id" TYPE="foreign" FIELDS="activity_id" REFTABLE="perform" REFFIELDS="id"/>
+        <KEY NAME="activity_id" TYPE="foreign" FIELDS="activity_id" REFTABLE="perform" REFFIELDS="id" ONDELETE="cascade"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="perform_relationship" COMMENT="Identifies the type of relationships between users used by each performance activity">
@@ -37,7 +37,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="activity_id" TYPE="foreign" FIELDS="activity_id" REFTABLE="perform" REFFIELDS="id"/>
+        <KEY NAME="activity_id" TYPE="foreign" FIELDS="activity_id" REFTABLE="perform" REFFIELDS="id" ONDELETE="cascade"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="activity_id_classname" UNIQUE="true" FIELDS="activity_id, classname" COMMENT="Each relationship classname is only declared as used by a performance activity once"/>
@@ -47,19 +47,19 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="section_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="relationship_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="perform_relationship_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="can_view" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="can_answer" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="section_id" TYPE="foreign" FIELDS="section_id" REFTABLE="perform_section" REFFIELDS="id"/>
-        <KEY NAME="relationship_id" TYPE="foreign" FIELDS="relationship_id" REFTABLE="perform_relationship" REFFIELDS="id"/>
+        <KEY NAME="section_id" TYPE="foreign" FIELDS="section_id" REFTABLE="perform_section" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="perform_relationship_id" TYPE="foreign" FIELDS="perform_relationship_id" REFTABLE="perform_relationship" REFFIELDS="id" ONDELETE="cascade"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="can_view" UNIQUE="false" FIELDS="can_view"/>
         <INDEX NAME="can_answer" UNIQUE="false" FIELDS="can_answer"/>
-        <INDEX NAME="section_relationship" UNIQUE="true" FIELDS="section_id, relationship_id" COMMENT="Each available relationship can only be used once per section"/>
+        <INDEX NAME="section_perform_relationship" UNIQUE="true" FIELDS="section_id, perform_relationship_id" COMMENT="Each available relationship can only be used once per section"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="perform_element" COMMENT="An element used within a section of a performance activity">
@@ -83,8 +83,8 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="section_id" TYPE="foreign" FIELDS="section_id" REFTABLE="perform_section" REFFIELDS="id"/>
-        <KEY NAME="element_id" TYPE="foreign" FIELDS="element_id" REFTABLE="perform_element" REFFIELDS="id"/>
+        <KEY NAME="section_id" TYPE="foreign" FIELDS="section_id" REFTABLE="perform_section" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="element_id" TYPE="foreign" FIELDS="element_id" REFTABLE="perform_element" REFFIELDS="id" ONDELETE="cascade"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="sort_order" UNIQUE="false" FIELDS="sort_order"/>
@@ -104,15 +104,15 @@
     <TABLE NAME="perform_participant_instance" COMMENT="Each participant instance represents a form to be completed by a a single participant">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="relationship_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="perform_relationship_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="participant_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Identifies the actual user who is participating in this case"/>
         <FIELD NAME="subject_instance_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Status of the participant instance. 0 - active, 1 - complete, 2 - closed"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="relationship_id" TYPE="foreign" FIELDS="relationship_id" REFTABLE="perform_relationship" REFFIELDS="id"/>
-        <KEY NAME="subject_instance_id" TYPE="foreign" FIELDS="subject_instance_id" REFTABLE="perform_subject_instance" REFFIELDS="id"/>
+        <KEY NAME="perform_relationship_id" TYPE="foreign" FIELDS="perform_relationship_id" REFTABLE="perform_relationship" REFFIELDS="id"/>
+        <KEY NAME="subject_instance_id" TYPE="foreign" FIELDS="subject_instance_id" REFTABLE="perform_subject_instance" REFFIELDS="id" ONDELETE="cascade"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="perform_element_response" COMMENT="Contains a single response to a single performance activity element">
@@ -131,12 +131,11 @@
         <INDEX NAME="element_participant_instance" UNIQUE="true" FIELDS="section_element_id, participant_instance_id" COMMENT="Each participant instance should only respond to an element once"/>
       </INDEXES>
     </TABLE>
-
-    <TABLE NAME="perform_track" COMMENT="activity 'instance'">
+    <TABLE NAME="perform_track" COMMENT="Each performance activity can have multiple tracks, each with their own independent assignments and config">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="perform_id" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="activity_id" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="updated_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
@@ -144,22 +143,21 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="perform_id" TYPE="foreign" FIELDS="perform_id" REFTABLE="perform" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="activity_id" TYPE="foreign" FIELDS="activity_id" REFTABLE="perform" REFFIELDS="id" ONDELETE="cascade"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="status" UNIQUE="false" FIELDS="status"/>
       </INDEXES>
     </TABLE>
-
-    <TABLE NAME="perform_track_assignment" COMMENT="mapping of tracks to user group assignments">
+    <TABLE NAME="perform_track_assignment" COMMENT="Mapping of tracks to user group assignments">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="track_id" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="type" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="user_group_type" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="user_group_id"  TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="created_by"  TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="user_group_id" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="created_by" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="updated_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="archived_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
@@ -175,8 +173,7 @@
         <INDEX NAME="user_group_id" UNIQUE="false" FIELDS="user_group_id"/>
       </INDEXES>
     </TABLE>
-
-    <TABLE NAME="perform_track_user_assignment" COMMENT="Individual track assignments for users">
+    <TABLE NAME="perform_track_user_assignment" COMMENT="Individual track assignments for real users">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="track_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -187,10 +184,9 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="fk_track_id" TYPE="foreign" FIELDS="track_id" REFTABLE="perform_track" REFFIELDS="id" ONDELETE="cascade"/>
-        <KEY NAME="fk_user_id" TYPE="foreign" FIELDS="subject_user_id" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="track_id" TYPE="foreign" FIELDS="track_id" REFTABLE="perform_track" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="subject_user_id" TYPE="foreign" FIELDS="subject_user_id" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-
   </TABLES>
 </XMLDB>

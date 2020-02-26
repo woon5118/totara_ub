@@ -47,7 +47,7 @@ function xmldb_perform_upgrade($oldversion) {
 
         // Adding keys to table perform_section.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_key('activity_id', XMLDB_KEY_FOREIGN, array('activity_id'), 'perform', array('id'));
+        $table->add_key('activity_id', XMLDB_KEY_FOREIGN, array('activity_id'), 'perform', array('id'), 'cascade');
 
         // Conditionally launch create table for perform_section.
         if (!$dbman->table_exists($table)) {
@@ -70,7 +70,7 @@ function xmldb_perform_upgrade($oldversion) {
 
         // Adding keys to table perform_relationship.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_key('activity_id', XMLDB_KEY_FOREIGN, array('activity_id'), 'perform', array('id'));
+        $table->add_key('activity_id', XMLDB_KEY_FOREIGN, array('activity_id'), 'perform', array('id'), 'cascade');
 
         // Adding indexes to table perform_relationship.
         $table->add_index('activity_id_classname', XMLDB_INDEX_UNIQUE, array('activity_id', 'classname'));
@@ -92,19 +92,19 @@ function xmldb_perform_upgrade($oldversion) {
         // Adding fields to table perform_section_relationship.
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('section_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('relationship_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('perform_relationship_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('can_view', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null);
         $table->add_field('can_answer', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null);
 
         // Adding keys to table perform_section_relationship.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_key('section_id', XMLDB_KEY_FOREIGN, array('section_id'), 'perform_section', array('id'));
-        $table->add_key('relationship_id', XMLDB_KEY_FOREIGN, array('relationship_id'), 'perform_relationship', array('id'));
+        $table->add_key('section_id', XMLDB_KEY_FOREIGN, array('section_id'), 'perform_section', array('id'), 'cascade');
+        $table->add_key('perform_relationship_id', XMLDB_KEY_FOREIGN, array('perform_relationship_id'), 'perform_relationship', array('id'), 'cascade');
 
         // Adding indexes to table perform_section_relationship.
         $table->add_index('can_view', XMLDB_INDEX_NOTUNIQUE, array('can_view'));
         $table->add_index('can_answer', XMLDB_INDEX_NOTUNIQUE, array('can_answer'));
-        $table->add_index('section_relationship', XMLDB_INDEX_UNIQUE, array('section_id', 'relationship_id'));
+        $table->add_index('section_perform_relationship', XMLDB_INDEX_UNIQUE, array('section_id', 'perform_relationship_id'));
 
         // Conditionally launch create table for perform_section_relationship.
         if (!$dbman->table_exists($table)) {
@@ -152,8 +152,8 @@ function xmldb_perform_upgrade($oldversion) {
 
         // Adding keys to table perform_section_element.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_key('section_id', XMLDB_KEY_FOREIGN, array('section_id'), 'perform_section', array('id'));
-        $table->add_key('element_id', XMLDB_KEY_FOREIGN, array('element_id'), 'perform_element', array('id'));
+        $table->add_key('section_id', XMLDB_KEY_FOREIGN, array('section_id'), 'perform_section', array('id'), 'cascade');
+        $table->add_key('element_id', XMLDB_KEY_FOREIGN, array('element_id'), 'perform_element', array('id'), 'cascade');
 
         // Adding indexes to table perform_section_element.
         $table->add_index('sort_order', XMLDB_INDEX_NOTUNIQUE, array('sort_order'));
@@ -197,15 +197,15 @@ function xmldb_perform_upgrade($oldversion) {
 
         // Adding fields to table perform_participant_instance.
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-        $table->add_field('relationship_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('perform_relationship_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('participant_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('subject_instance_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('status', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0');
 
         // Adding keys to table perform_participant_instance.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_key('relationship_id', XMLDB_KEY_FOREIGN, array('relationship_id'), 'perform_relationship', array('id'));
-        $table->add_key('subject_instance_id', XMLDB_KEY_FOREIGN, array('subject_instance_id'), 'perform_subject_instance', array('id'));
+        $table->add_key('perform_relationship_id', XMLDB_KEY_FOREIGN, array('perform_relationship_id'), 'perform_relationship', array('id'));
+        $table->add_key('subject_instance_id', XMLDB_KEY_FOREIGN, array('subject_instance_id'), 'perform_subject_instance', array('id'), 'cascade');
 
         // Conditionally launch create table for perform_participant_instance.
         if (!$dbman->table_exists($table)) {
@@ -250,8 +250,8 @@ function xmldb_perform_upgrade($oldversion) {
 
         // Adding fields to table perform_track.
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-        $table->add_field('perform_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
-        $table->add_field('description', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('activity_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
         $table->add_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null);
         $table->add_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('updated_at', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
@@ -259,7 +259,7 @@ function xmldb_perform_upgrade($oldversion) {
 
         // Adding keys to table perform_track.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_key('perform_id', XMLDB_KEY_FOREIGN, array('perform_id'), 'perform', array('id'), 'cascade');
+        $table->add_key('activity_id', XMLDB_KEY_FOREIGN, array('activity_id'), 'perform', array('id'), 'cascade');
 
         // Adding indexes to table perform_track.
         $table->add_index('status', XMLDB_INDEX_NOTUNIQUE, array('status'));
@@ -312,8 +312,8 @@ function xmldb_perform_upgrade($oldversion) {
 
         // Adding keys to table perform_track_user_assignment.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_key('fk_track_id', XMLDB_KEY_FOREIGN, array('track_id'), 'perform_track', array('id'), 'cascade');
-        $table->add_key('fk_user_id', XMLDB_KEY_FOREIGN, array('subject_user_id'), 'user', array('id'));
+        $table->add_key('track_id', XMLDB_KEY_FOREIGN, array('track_id'), 'perform_track', array('id'), 'cascade');
+        $table->add_key('subject_user_id', XMLDB_KEY_FOREIGN, array('subject_user_id'), 'user', array('id'));
 
         // Conditionally launch create table for perform_track_user_assignment.
         if (!$dbman->table_exists($table)) {
