@@ -24,7 +24,9 @@
 
 $string['pluginname'] = 'Totara criteria';
 
+$string['achieve_proficiency_in_competencies'] = 'Achieve proficiency in competencies';
 $string['achieve_proficiency_in_linked_courses'] = 'Achieve proficiency in courses';
+$string['achievement_level'] = 'Achievement level';
 $string['addroles'] = 'Add roles';
 $string['aggregate_all'] = 'ALL';
 $string['aggregate_any'] = 'Complete any {$a->x}';
@@ -34,6 +36,7 @@ $string['approve_none'] = 'Approval: None';
 $string['approve_list'] = 'Approval: {$a}';
 $string['assign_competency'] = 'Assign competency';
 $string['cancel'] = 'Cancel';
+$string['competencies'] = 'Competencies';
 $string['complete'] = 'Complete';
 $string['completeall'] = 'Complete all';
 $string['completeany'] = 'Complete';

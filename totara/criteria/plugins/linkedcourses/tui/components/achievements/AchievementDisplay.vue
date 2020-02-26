@@ -17,6 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
   @package criteria_linkedcourses
 -->
 
@@ -25,8 +26,10 @@
 </template>
 
 <script>
-import AchievementsQuery from '../../../webapi/ajax/achievements.graphql';
+// Components
 import CourseAchievementDisplay from 'totara_criteria/components/achievements/CourseAchievementDisplay';
+// GraphQL
+import AchievementsQuery from 'criteria_linkedcourses/graphql/achievements';
 
 export default {
   components: { CourseAchievementDisplay },
@@ -50,6 +53,11 @@ export default {
   },
 
   apollo: {
+    /**
+     * Fetch a criteria set for linked course completion
+     *
+     * @return {Object}
+     */
     achievements: {
       query: AchievementsQuery,
       context: { batch: true },
@@ -65,7 +73,5 @@ export default {
       },
     },
   },
-
-  methods: {},
 };
 </script>

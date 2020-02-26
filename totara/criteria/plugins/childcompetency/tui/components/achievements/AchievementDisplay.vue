@@ -1,7 +1,7 @@
 <!--
   This file is part of Totara Learn
 
-  Copyright (C) 2019 onwards Totara Learning Solutions LTD
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -17,26 +17,33 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
   @package criteria_childcompetency
 -->
 
 <template>
   <CompetencyAchievementDisplay
+    type="childCompetency"
     :achievements="achievements"
-    :no-competency-msg="$str('no_competencies', 'criteria_childcompetency')"
     :user-id="userId"
     @self-assigned="$apollo.queries.achievements.refetch()"
   />
 </template>
 
 <script>
-import AchievementsQuery from '../../../webapi/ajax/achievements.graphql';
-import CompetencyAchievementDisplay from 'totara_criteria/components/CompetencyAchievementDisplay';
+// Components
+import CompetencyAchievementDisplay from 'totara_criteria/components/achievements/CompetencyAchievementDisplay';
+// GraphQL
+import AchievementsQuery from 'criteria_childcompetency/graphql/achievements';
 
 export default {
   components: { CompetencyAchievementDisplay },
 
   props: {
+    assignmentId: {
+      required: true,
+      type: Number,
+    },
     instanceId: {
       required: true,
       type: Number,
@@ -45,13 +52,9 @@ export default {
       required: true,
       type: Number,
     },
-    assignmentId: {
-      required: true,
-      type: Number,
-    },
   },
 
-  data: function() {
+  data() {
     return {
       achievements: {
         items: [],
@@ -60,14 +63,19 @@ export default {
   },
 
   apollo: {
+    /**
+     * Fetch a criteria set for child competency completion
+     *
+     * @return {Object}
+     */
     achievements: {
       query: AchievementsQuery,
       context: { batch: true },
       variables() {
         return {
+          assignment_id: this.assignmentId,
           instance_id: this.instanceId,
           user_id: this.userId,
-          assignment_id: this.assignmentId,
         };
       },
       update({ criteria_childcompetency_achievements: achievements }) {
@@ -76,16 +84,5 @@ export default {
       },
     },
   },
-
-  methods: {},
 };
 </script>
-
-<lang-strings>
-  {
-    "criteria_childcompetency": [
-      "no_competencies"
-    ]
-  }
-
-</lang-strings>
