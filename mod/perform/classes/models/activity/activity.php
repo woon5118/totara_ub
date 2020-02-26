@@ -24,7 +24,9 @@
 
 namespace mod_perform\models\activity;
 
+use coding_exception;
 use container_perform\perform as perform_container;
+use core_text;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\util;
 
@@ -32,6 +34,8 @@ class activity {
 
     public const STATUS_ACTIVE = 1;
     public const STATUS_INACTIVE = 1;
+
+    public const NAME_MAX_LENGTH = 255;
 
     /**
      * @var activity_entity
@@ -49,7 +53,8 @@ class activity {
     // TODO consider a base model class for some of the methods below?
 
     public static function load_by_id(int $id): self {
-        $entity = new activity_entity($id);
+        /** @var activity_entity $entity */
+        $entity = activity_entity::repository()->find_or_fail($id);
         return new static($entity);
     }
 
@@ -62,7 +67,7 @@ class activity {
 
     public static function load_by_entity(activity_entity $entity): self {
         if (!$entity->exists()) {
-            throw new \coding_exception('Can load only existing entities');
+            throw new coding_exception('Can load only existing entities');
         }
         return new static($entity);
     }
@@ -140,6 +145,8 @@ class activity {
         $entity->description = $data->description ?? null;
         $entity->status = $data->status ?? self::STATUS_ACTIVE;
 
+        self::validate($entity);
+
         return $DB->transaction(function () use ($entity, $modinfo, $container) {
             global $CFG, $USER;
 
@@ -163,5 +170,60 @@ class activity {
     public function get_context(): \context_module {
         $cm = get_coursemodule_from_instance('perform', $this->entity->id, $this->entity->course, false, MUST_EXIST);
         return \context_module::instance($cm->id);
+    }
+
+    public function update_general_info(string $name, ?string $description): self {
+        $this->entity->name = $name;
+        $this->entity->description = $description;
+
+        self::validate($this->entity);
+
+        $this->entity->update();
+
+        return $this;
+    }
+
+    /**
+     * @param activity_entity $entity
+     * @return void
+     * @throws coding_exception
+     */
+    protected static function validate(activity_entity $entity): void {
+        $problems = self::get_validation_problems($entity);
+
+        if (count($problems) === 0) {
+            return;
+        }
+
+        $formatted_problems = self::format_validation_problems($problems);
+
+        throw new coding_exception('The following errors need to be fixed: ' . $formatted_problems);
+    }
+
+    /**
+     * TODO use/write a library or make this generic, or at least move this to it's own class.
+     * @param activity_entity $entity
+     * @return string[]
+     */
+    protected static function get_validation_problems(activity_entity $entity): array {
+        $problems = [];
+
+        if (empty($entity->name)) {
+            $problems[] = 'Name is required';
+        }
+
+        if (core_text::strlen($entity->name) > self::NAME_MAX_LENGTH) {
+            $problems[] = 'Name must be less than ' . self::NAME_MAX_LENGTH . ' characters';
+        }
+
+        return $problems;
+    }
+
+    /**
+     * @param string[] $problems
+     * @return string
+     */
+    protected static function format_validation_problems(array $problems): string {
+        return '"' . implode('", "', $problems) . '"';
     }
 }

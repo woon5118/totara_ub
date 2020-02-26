@@ -17,30 +17,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Coggins <simon.coggins@totaralearning.com>
+ * @author Jaron Steenson <jaron.steenson@totaralearning.com>
  * @package mod_perform
  */
 
-namespace mod_perform\controllers\activity;
+namespace mod_perform\webapi\resolver\query;
 
-use totara_mvc\tui_view;
+use context_system;
+use core\webapi\execution_context;
+use core\webapi\query_resolver;
 use mod_perform\models\activity\activity as activity_model;
+use mod_perform\entities\activity\activity as activity_entity;
 
-class activities extends base {
+class activity implements query_resolver {
 
     /**
-     * @return tui_view
+     * Get a specific perform activity by id.
+     *
+     * @param array $args
+     * @param execution_context $ec
+     * @return activity_model
      */
-    public function action(): tui_view {
-        $this->require_capability('mod/perform:view_manage_activities', $this->get_context());
+    public static function resolve(array $args, execution_context $ec) {
+        require_login();
 
-        $props = [
-            'edit-url' => (string) $this->get_edit_url(),
-            'can-add' => activity_model::can_create(),
-        ];
+        $activity = activity_model::load_by_id($args['activity_id']);
 
-        return tui_view::create('mod_perform/pages/Activities', $props)
-            ->set_title(get_string('perform:manage_activity', 'mod_perform'));
+        require_capability('mod/perform:manage_activity', $activity->get_context());
+
+        return $activity;
     }
-
 }

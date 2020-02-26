@@ -13,6 +13,10 @@ enum mod_perform_activity_status {
   INACTIVE
 }
 
+type mod_perform_activity_result {
+  activity: mod_perform_activity!
+}
+
 extend type Query {
   """
   This query returns all performance activities
@@ -20,10 +24,27 @@ extend type Query {
   mod_perform_activities: [mod_perform_activity!]!
 }
 
+extend type Query {
+  """
+  This query returns a single performance activity
+  """
+  mod_perform_activity(
+    activity_id: core_id!
+  ): mod_perform_activity
+}
+
 extend type Mutation {
   mod_perform_create_activity(
     name: param_text!
     description: param_text
     status: mod_perform_activity_status
-  ): Boolean!
+  ): mod_perform_activity_result!
+}
+
+extend type Mutation {
+  mod_perform_update_activity_general_info(
+    activity_id: core_id!,
+    name: param_text!
+    description: param_text
+  ): mod_perform_activity_result!
 }

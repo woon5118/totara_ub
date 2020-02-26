@@ -26,6 +26,7 @@
  */
 
 use mod_perform\webapi\resolver\mutation\create_activity;
+use mod_perform\models\activity\activity as activity;
 use core\webapi\execution_context;
 
 class webapi_resolver_mutation_create_activity_testcase extends advanced_testcase {
@@ -41,7 +42,8 @@ class webapi_resolver_mutation_create_activity_testcase extends advanced_testcas
             'description' => "Test Description",
         ];
 
-        $result = create_activity::resolve($args, $this->get_execution_context());
+        /** @type activity $result */
+        ['activity' => $result] = create_activity::resolve($args, $this->get_execution_context());
         $this->assertSame('Mid year performance review', $result->get_entity()->name);
         $this->assertSame('Test Description', $result->get_entity()->description);
     }

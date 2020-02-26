@@ -17,30 +17,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Coggins <simon.coggins@totaralearning.com>
+ * @author Jaron Steenson <jaron.steenson@totaralearning.com>
  * @package mod_perform
  */
 
 namespace mod_perform\controllers\activity;
 
+use context;
+use mod_perform\models\activity\activity;
 use totara_mvc\tui_view;
-use mod_perform\models\activity\activity as activity_model;
 
-class activities extends base {
+class edit_activity extends base {
+
+    /**
+     * @inheritDoc
+     */
+    protected function setup_context(): context {
+        return activity::load_by_id($this->get_activity_id())->get_context();
+    }
 
     /**
      * @return tui_view
      */
     public function action(): tui_view {
-        $this->require_capability('mod/perform:view_manage_activities', $this->get_context());
+        $this->require_capability('mod/perform:manage_activity', $this->get_context());
 
         $props = [
-            'edit-url' => (string) $this->get_edit_url(),
-            'can-add' => activity_model::can_create(),
+            'activity-id' => $this->get_activity_id(),
+            'go-back-link' => (string) $this->get_activity_list_url(),
         ];
 
-        return tui_view::create('mod_perform/pages/Activities', $props)
-            ->set_title(get_string('perform:manage_activity', 'mod_perform'));
+        return tui_view::create('mod_perform/pages/ManageActivity', $props)
+            ->set_title(get_string('perform:manage_activity_page_title', 'mod_perform'));
+    }
+
+    private function get_activity_id(): int {
+        return required_param('activity_id', PARAM_INT);
     }
 
 }

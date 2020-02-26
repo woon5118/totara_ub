@@ -23,6 +23,7 @@
 
 use container_perform\perform as perform_container;
 use mod_perform\models\activity\activity;
+use mod_perform\entities\activity\activity as activity_entity;
 
 /**
  * @group perform
@@ -57,6 +58,120 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $this->setUser($user1);
         $this->assertTrue($activity_user1->can_manage());
         $this->assertFalse($activity_user2->can_manage());
+    }
+
+    public function test_update_general_info(): void {
+        $original_data = new activity_entity();
+        $original_data->name = 'Existing activity name';
+        $original_data->description = 'Existing activity description';
+
+        $activity = $this->create_activity($original_data);
+
+        $this->assertEquals($activity->get_entity()->name, $original_data->name);
+        $this->assertEquals($activity->get_entity()->description, $original_data->description);
+
+        $activity->update_general_info('New name for existing activity', 'New description');
+
+        // Assert in memory state is correct
+        $this->assertEquals($activity->get_entity()->name, 'New name for existing activity');
+        $this->assertEquals($activity->get_entity()->description, 'New description');
+
+        // Assert persisted state is correct
+        $from_database = activity::load_by_id($activity->get_id());
+        $this->assertEquals($from_database->get_entity()->name, 'New name for existing activity');
+        $this->assertEquals($from_database->get_entity()->description, 'New description');
+    }
+
+    public function test_update_general_info_accepts_null_description(): void {
+        $original_data = new activity_entity();
+        $original_data->name = 'Existing activity name';
+        $original_data->description = 'Existing activity description';
+
+        $activity = $this->create_activity($original_data);
+
+        $this->assertEquals($activity->get_entity()->name, $original_data->name);
+        $this->assertEquals($activity->get_entity()->description, $original_data->description);
+
+        $activity->update_general_info('New name for existing activity', null);
+
+        // Assert in memory state is correct
+        $this->assertEquals($activity->get_entity()->name, 'New name for existing activity');
+        $this->assertNull($activity->get_entity()->description);
+
+        // Assert persisted state is correct
+        $from_database = activity::load_by_id($activity->get_id());
+        $this->assertEquals($from_database->get_entity()->name, 'New name for existing activity');
+        $this->assertNull($from_database->get_entity()->description);
+    }
+
+    /**
+     * @dataProvider update_general_should_validate_new_attributes
+     * @param string $new_name
+     * @param string $expected_message
+     * @throws coding_exception
+     */
+    public function test_update_general_should_validate_new_attributes(string $new_name, string $expected_message): void {
+        $original_data = new activity_entity();
+        $original_data->name = 'Existing activity name';
+        $original_data->description = 'Existing activity description';
+
+        $activity = $this->create_activity($original_data);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage($expected_message);
+
+        $activity->update_general_info($new_name, 'New description');
+    }
+
+    public function update_general_should_validate_new_attributes(): array {
+        return [
+            'Name not present' => [
+                '',
+                'Name is required',
+            ],
+            'Name too long' => [
+                random_string(activity::NAME_MAX_LENGTH + 1),
+                'Name must be less than 255 characters',
+            ],
+        ];
+    }
+
+    public function test_update_general_should_fail_on_new_activity(): void {
+        $original_data = new activity_entity();
+        $original_data->name = 'Existing activity name';
+        $original_data->description = 'Existing activity description';
+
+        $new_entity = new class extends activity_entity {
+            public $exists_now = true;
+
+            public function exists(): bool {
+                return $this->exists_now;
+            }
+        };
+
+        $activity = activity::load_by_entity($new_entity);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('You can not update a entity that does not exist yet or was deleted.');
+
+        $new_entity->exists_now = false;
+        $activity->update_general_info('name', 'description');
+    }
+
+    /**
+     * Create just the activity entity without any container.
+     *
+     * @param activity_entity $entity
+     * @return activity
+     * @throws coding_exception
+     */
+    private function create_activity(activity_entity $entity): activity {
+        $entity->status = activity::STATUS_ACTIVE;
+
+        /** @var activity_entity $entity */
+        /** @noinspection CallableParameterUseCaseInTypeContextInspection */
+        $entity = activity_entity::repository()->create_entity($entity);
+        return activity::load_by_entity($entity);
     }
 
     public function test_create_without_name() {

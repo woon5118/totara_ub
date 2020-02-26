@@ -17,32 +17,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @author Jaron Steenson <jaron.steenson@totaralearning.com>
  * @package mod_perform
  */
 
-namespace mod_perform\entities\activity;
+namespace mod_perform\controllers\activity;
 
-use core\orm\entity\entity;
-use mod_perform\entities\activity\activity_repository;
+use mod_perform\util;
+use moodle_url;
+use totara_mvc\controller;
 
-/**
- * Activity entity
- *
- * @property-read int $id ID
- * @property int $course ID of parent course
- * @property string $description
- * @property string $name Activity name
- * @property int $status
- * @property int $timemodified
- *
- * @method static activity_repository repository()
- *
- * @package mod_perform\entities
- */
-class activity extends entity {
-    public const TABLE = 'perform';
+class base extends controller {
 
-    public const UPDATED_TIMESTAMP = 'timemodified';
-    public const SET_UPDATED_WHEN_CREATED = true;
+    /**
+     * @inheritDoc
+     */
+    protected function setup_context(): \context {
+        $category_id = util::get_default_categoryid();
+        return \context_coursecat::instance($category_id);
+    }
+
+    protected function get_edit_url(): moodle_url {
+        return new moodle_url('/mod/perform/manage/activity/edit.php');
+    }
+
+    protected function get_activity_list_url(): moodle_url {
+        return new moodle_url('/mod/perform/manage/activity');
+    }
+
 }

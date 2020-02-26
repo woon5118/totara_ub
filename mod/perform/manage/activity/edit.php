@@ -17,32 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @author Jaron Steenson <jaron.steenson@totaralearning.com>
  * @package mod_perform
  */
 
-namespace mod_perform\entities\activity;
+require_once(__DIR__ . '/../../../../config.php');
 
-use core\orm\entity\entity;
-use mod_perform\entities\activity\activity_repository;
-
-/**
- * Activity entity
- *
- * @property-read int $id ID
- * @property int $course ID of parent course
- * @property string $description
- * @property string $name Activity name
- * @property int $status
- * @property int $timemodified
- *
- * @method static activity_repository repository()
- *
- * @package mod_perform\entities
- */
-class activity extends entity {
-    public const TABLE = 'perform';
-
-    public const UPDATED_TIMESTAMP = 'timemodified';
-    public const SET_UPDATED_WHEN_CREATED = true;
-}
+(new \mod_perform\controllers\activity\edit_activity())->process();

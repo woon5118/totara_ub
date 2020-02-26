@@ -50,7 +50,8 @@ class create_activity implements mutation_resolver {
         $courseinfo->description = $args['description'] ?? null;
         $courseinfo->category = perform_container::get_default_categoryid();
 
-        return $DB->transaction(function () use ($courseinfo, $args) {
+        /** @var activity $activity */
+        $activity =  $DB->transaction(function () use ($courseinfo, $args) {
             $container = perform_container::create($courseinfo);
 
             // Create a performance activity inside the new performance container.
@@ -62,5 +63,7 @@ class create_activity implements mutation_resolver {
             /** @var perform_container $container */
             return activity::create($activity_data, $container);
         });
+
+        return ['activity' => $activity];
     }
 }
