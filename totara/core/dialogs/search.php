@@ -101,6 +101,32 @@ switch ($searchtype) {
             $formdata['hidden']['userid'] = $userid;
         }
 
+        $context = context_system::instance();
+        if (!empty($this->customdata['instancetype']) and !empty($this->customdata['instanceid'])) {
+            $instancetype = $this->customdata['instancetype'];
+            $instanceid = $this->customdata['instanceid'];
+            if ($instancetype == COHORT_ASSN_ITEMTYPE_COURSE) {
+                $context = context_course::instance($instanceid);
+            } else if ($instancetype == COHORT_ASSN_ITEMTYPE_CATEGORY) {
+                $context = context_coursecat::instance($instanceid);
+            } else if ($instancetype == COHORT_ASSN_ITEMTYPE_PROGRAM || $instancetype == COHORT_ASSN_ITEMTYPE_CERTIF) {
+                $context = context_program::instance($instanceid);
+            }
+        }
+
+        $tenantjoin = '';
+        $tenantwhere = '';
+        if (!empty($CFG->tenantsenabled)) {
+            if ($context->tenantid) {
+                $tenant = \core\record\tenant::fetch($context->tenantid);
+                $tenantjoin = "JOIN {cohort_members} tp ON tp.userid = u.id AND tp.cohortid = " . $tenant->cohortid;
+            } else {
+                if (!empty($CFG->tenantsisolated)) {
+                    $tenantwhere = 'AND u.tenantid IS NULL';
+                }
+            }
+        }
+
         // Generate search SQL
         $keywords = totara_search_parse_keywords($query);
         $fields = get_all_user_name_fields();
@@ -116,12 +142,14 @@ switch ($searchtype) {
 
         $search_info->sql = "
             FROM
-                {user}
+                {user} u
+                {$tenantjoin}
             WHERE
                 {$searchsql}
-                AND deleted = 0
-                AND suspended = 0
-                AND id != ?
+                {$tenantwhere}
+                AND u.deleted = 0
+                AND u.suspended = 0
+                AND u.id != ?
         ";
         $params[] = $guest->id;
 
@@ -130,8 +158,9 @@ switch ($searchtype) {
             $params[] = $userid;
         }
 
-        $search_info->order = " ORDER BY firstname, lastname, email";
+        $search_info->order = " ORDER BY u.firstname, u.lastname, u.email";
         $search_info->params = $params;
+        $search_info->id = 'u.id';
         break;
 
     /**
@@ -334,6 +363,7 @@ switch ($searchtype) {
         if (!empty($this->customdata['instanceid'])) {
             $formdata['hidden']['instanceid'] = $this->customdata['instanceid'];
         }
+
         // Generate search SQL.
         $keywords = totara_search_parse_keywords($query);
         $fields = array('idnumber', 'name');
@@ -352,6 +382,14 @@ switch ($searchtype) {
                 $context = context_program::instance($instanceid);
             }
         }
+
+        $tenantcondition = '';
+        if ($CFG->tenantsenabled) {
+            if ($context->tenantid) {
+                $tenantcondition = " AND ctx.tenantid = {$context->tenantid}";
+            }
+        }
+
         $contextids = array_filter($context->get_parent_context_ids(true),
             function($a) {return has_capability("moodle/cohort:view", context::instance_by_id($a));});
         $equal = true;
@@ -362,33 +400,36 @@ switch ($searchtype) {
         }
 
         $search_info->fullname = "(
-            CASE WHEN {cohort}.idnumber IS NULL
-                OR {cohort}.idnumber = ''
-                OR {cohort}.idnumber = '0'
+            CASE WHEN c.idnumber IS NULL
+                OR c.idnumber = ''
+                OR c.idnumber = '0'
             THEN
-                {cohort}.name
+                c.name
             ELSE " .
-                $DB->sql_concat("{cohort}.name", "' ('", "{cohort}.idnumber", "')'") .
+                $DB->sql_concat("c.name", "' ('", "c.idnumber", "')'") .
             "END)";
         $search_info->sql = "
             FROM
-                {cohort}
+                {cohort} c
+            JOIN
+                {context} ctx ON ctx.id = c.contextid
             WHERE
-                {$searchsql}
+                {$searchsql} {$tenantcondition}
         ";
 
         if (!empty($contextids)) {
             list($contextssql, $contextparams) = $DB->get_in_or_equal($contextids, SQL_PARAMS_QM, 'param', $equal);
-            $search_info->sql .= $searchsql ? "AND {cohort}.contextid {$contextssql}" : "{cohort}.contextid {$contextssql}";
+            $search_info->sql .= $searchsql ? "AND c.contextid {$contextssql}" : "c.contextid {$contextssql}";
             $params = array_merge($params, $contextparams);
         }
 
         if (!empty($this->customdata['current_cohort_id'])) {
-            $search_info->sql .= ' AND {cohort}.id != ? ';
+            $search_info->sql .= ' AND c.id != ? ';
             $params[] = $this->customdata['current_cohort_id'];
         }
-        $search_info->order = ' ORDER BY name ASC';
+        $search_info->order = ' ORDER BY c.name ASC';
         $search_info->params = $params;
+        $search_info->id = 'c.id';
         break;
 
     /**

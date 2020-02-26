@@ -40,9 +40,27 @@ $selectedids = totara_prog_removed_selected_ids($programid, $selected, $removed,
 
 // Get all users
 $guest = guest_user();
-$usernamefields = get_all_user_name_fields(true);
-$items = $DB->get_records_select('user', 'deleted = 0 AND suspended = 0 AND id != ?', array($guest->id), '',
-    'id, ' . $usernamefields . ', email', 0, TOTARA_DIALOG_MAXITEMS + 1);
+$usernamefields = get_all_user_name_fields(true, 'u');
+
+// Restrict to tenant participants
+$tenantjoin = '';
+$tenantwhere = '';
+if (!empty($CFG->tenantsenabled)) {
+    if ($program_context->tenantid) {
+        $tenant = \core\record\tenant::fetch($program_context->tenantid);
+        $tenantjoin = "JOIN {cohort_members} tp ON tp.userid = u.id AND tp.cohortid = " . $tenant->cohortid;
+    } else {
+        if (!empty($CFG->tenantsisolated)) {
+            $tenantwhere = 'AND u.tenantid IS NULL';
+        }
+    }
+}
+
+$fields = 'SELECT u.id,'. $usernamefields . ', u.email';
+$sql = "$fields FROM {user} u $tenantjoin WHERE u.deleted = 0 AND u.suspended = 0 and u.id != :guestid $tenantwhere";
+$params = ['guestid' => $guest->id];
+
+$items = $DB->get_records_sql($sql, $params, 0, TOTARA_DIALOG_MAXITEMS + 1);
 
 // We'll remove users from $selected whose id is not in $selectedids.
 foreach ($items as $item) {
@@ -92,6 +110,8 @@ $dialog->unremovable_items = $unremovable;
 // Set title
 $dialog->selected_title = 'itemstoadd';
 $dialog->searchtype = 'user';
+$dialog->customdata['instancetype'] = COHORT_ASSN_ITEMTYPE_PROGRAM;
+$dialog->customdata['instanceid'] = $programid;
 
 // Addition url parameters
 $dialog->urlparams = array('programid' => $programid);

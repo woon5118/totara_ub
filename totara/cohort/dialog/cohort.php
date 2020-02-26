@@ -88,17 +88,17 @@ if (!empty($selected)) {
     $selected = $DB->get_records_select('cohort', "id {$selectedsql}", $selectedparams, 'name, idnumber', 'id, name as fullname');
 }
 
-$tenantcontition = '';
+$tenantcondition = '';
 if ($CFG->tenantsenabled) {
     if ($context->tenantid) {
-        $tenantcontition = " AND ctx.tenantid = {$context->tenantid}";
+        $tenantcondition = " AND ctx.tenantid = {$context->tenantid}";
     }
 }
 
 $sql = "SELECT c.*
           FROM {cohort} c
           JOIN {context} ctx ON ctx.id = c.contextid
-         WHERE (c.contextid {$contextssql} {$tenantcontition})";
+         WHERE (c.contextid {$contextssql} {$tenantcondition})";
 
 if ($selected) {
 // Add all current cohorts even if user would not be able to select them again - changed permissions or moved cohort.
