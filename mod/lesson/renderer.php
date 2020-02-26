@@ -482,6 +482,8 @@ class mod_lesson_renderer extends plugin_renderer_base {
      * @return string
      */
     public function progress_bar(lesson $lesson, $progress = null) {
+        global $OUTPUT;
+
         $context = context_module::instance($this->page->cm->id);
 
         // lesson setting to turn progress bar on or off
@@ -498,9 +500,11 @@ class mod_lesson_renderer extends plugin_renderer_base {
             $progress = $lesson->calculate_progress();
         }
 
-        // print out the Progress Bar.  Attempted to put as much as possible in the style sheets.
-        $content = '<br />' . html_writer::tag('div', $progress . '%', array('class' => 'progress_bar_completed', 'style' => 'width: '. $progress . '%;'));
-        $printprogress = html_writer::tag('div', get_string('progresscompleted', 'lesson', $progress) . $content, array('class' => 'progress_bar'));
+        $progressbar = new \static_progress_bar();
+        $progressbar->set_progress($progress);
+        $progressbaroutput = $OUTPUT->render_from_template('core/progress_bar', $progressbar->export_for_template($OUTPUT));
+
+        $printprogress = html_writer::tag('div', get_string('progresscompleted', 'lesson', $progress) . $progressbaroutput, array('class' => 'progress_bar'));
 
         return $this->output->box($printprogress, 'progress_bar');
     }
