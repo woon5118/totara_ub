@@ -256,4 +256,87 @@ class block_current_learning_course_data_testcase extends block_current_learning
         $this->assertNotTrue($this->course_in_learning_data($this->course1->id, $learning_data));
     }
 
+    public function test_course_in_current_learning_with_tenants_enabled() {
+        /** @var totara_tenant_generator $multitenancy */
+        $multitenancy = $this->generator->get_plugin_generator('totara_tenant');
+
+        $multitenancy->enable_tenants();
+
+        // Test 1: Disable tenant isolation.
+        set_config('tenantsisolated', 0);
+
+        // Create tenants.
+        $tenant1 = $multitenancy->create_tenant();
+        $tenant2 = $multitenancy->create_tenant();
+        $tenant3 = $multitenancy->create_tenant(['suspended' => 1]);
+
+        // Create users.
+        $user1 = $this->generator->create_user(['tenantmember' => $tenant1->idnumber]);
+        $user2 = $this->generator->create_user(['tenantmember' => $tenant2->idnumber]);
+        $user3 = $this->generator->create_user(['tenantmember' => $tenant3->idnumber]);
+        $participant = $this->generator->create_user(['tenantparticipant' => "{$tenant1->idnumber}, {$tenant3->idnumber}"]);
+
+        // Create courses.
+        $c0A = $this->generator->create_course(['fullname' => 'Course 0A', 'shortname' => 'COURSE0A']);
+        $c0B = $this->generator->create_course(['fullname' => 'Course 0B', 'shortname' => 'COURSE0B']);
+        $c1A = $this->generator->create_course(['fullname' => 'Course 1A', 'shortname' => 'COURSE1A', 'category' => $tenant1->categoryid]);
+        $c1B = $this->generator->create_course(['fullname' => 'Course 1B', 'shortname' => 'COURSE1B', 'category' => $tenant1->categoryid]);
+        $c2A = $this->generator->create_course(['fullname' => 'Course 2A', 'shortname' => 'COURSE2A', 'category' => $tenant2->categoryid]);
+        $c2B = $this->generator->create_course(['fullname' => 'Course 2B', 'shortname' => 'COURSE2B', 'category' => $tenant2->categoryid]);
+        $c3A = $this->generator->create_course(['fullname' => 'Course 3A', 'shortname' => 'COURSE3A', 'category' => $tenant3->categoryid]);
+        $c3B = $this->generator->create_course(['fullname' => 'Course 3B', 'shortname' => 'COURSE3B', 'category' => $tenant3->categoryid]);
+
+        // Enrol users into courses.
+        $this->generator->enrol_user($user1->id, $c0A->id, 'student');
+        $this->generator->enrol_user($user1->id, $c1A->id, 'student');
+        $this->generator->enrol_user($user1->id, $c3A->id, 'student');
+        $this->generator->enrol_user($user2->id, $c2A->id, 'student');
+        $this->generator->enrol_user($participant->id, $c0B->id, 'student');
+        $this->generator->enrol_user($participant->id, $c1B->id, 'student');
+        $this->generator->enrol_user($participant->id, $c2B->id, 'student');
+        $this->generator->enrol_user($participant->id, $c3B->id, 'student');
+
+        $learning_data = $this->get_learning_data($user1->id);
+        $this->assertTrue($this->course_in_learning_data($c0A->id, $learning_data));
+        $this->assertFalse($this->course_in_learning_data($c0B->id, $learning_data));
+        $this->assertTrue($this->course_in_learning_data($c1A->id, $learning_data));
+        $this->assertFalse($this->course_in_learning_data($c1B->id, $learning_data));
+        $this->assertFalse($this->course_in_learning_data($c2A->id, $learning_data));
+        $this->assertFalse($this->course_in_learning_data($c2B->id, $learning_data));
+        $this->assertFalse($this->course_in_learning_data($c3A->id, $learning_data));
+        $this->assertFalse($this->course_in_learning_data($c3B->id, $learning_data));
+
+        $learning_data = $this->get_learning_data($participant->id);
+        $this->assertFalse($this->course_in_learning_data($c0A->id, $learning_data));
+        $this->assertTrue($this->course_in_learning_data($c0B->id, $learning_data));
+        $this->assertFalse($this->course_in_learning_data($c1A->id, $learning_data));
+        $this->assertTrue($this->course_in_learning_data($c1B->id, $learning_data));
+        $this->assertFalse($this->course_in_learning_data($c2A->id, $learning_data));
+        $this->assertTrue($this->course_in_learning_data($c2B->id, $learning_data));
+        $this->assertFalse($this->course_in_learning_data($c3A->id, $learning_data));
+        $this->assertFalse($this->course_in_learning_data($c3B->id, $learning_data));
+
+        // Test 2: enable tenant isolation.
+        set_config('tenantsisolated', 1);
+
+        $learning_data = $this->get_learning_data($user1->id);
+        $this->assertFalse($this->course_in_learning_data($c0A->id, $learning_data));
+        $this->assertFalse($this->course_in_learning_data($c0B->id, $learning_data));
+        $this->assertTrue($this->course_in_learning_data($c1A->id, $learning_data));
+        $this->assertFalse($this->course_in_learning_data($c1B->id, $learning_data));
+        $this->assertFalse($this->course_in_learning_data($c2A->id, $learning_data));
+        $this->assertFalse($this->course_in_learning_data($c2B->id, $learning_data));
+        $this->assertFalse($this->course_in_learning_data($c3A->id, $learning_data));
+        $this->assertFalse($this->course_in_learning_data($c3B->id, $learning_data));
+
+        $learning_data = $this->get_learning_data($participant->id);
+        $this->assertFalse($this->course_in_learning_data($c0A->id, $learning_data));
+        $this->assertTrue($this->course_in_learning_data($c0B->id, $learning_data));
+        $this->assertFalse($this->course_in_learning_data($c1A->id, $learning_data));
+        $this->assertTrue($this->course_in_learning_data($c1B->id, $learning_data));
+        $this->assertFalse($this->course_in_learning_data($c2A->id, $learning_data));
+        $this->assertTrue($this->course_in_learning_data($c2B->id, $learning_data));
+        $this->assertFalse($this->course_in_learning_data($c3A->id, $learning_data));
+        $this->assertFalse($this->course_in_learning_data($c3B->id, $learning_data));
+    }
 }

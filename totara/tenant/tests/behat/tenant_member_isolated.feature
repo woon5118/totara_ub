@@ -46,16 +46,7 @@ Feature: Tenant member access with full tenant isolation
 
   Scenario: Tenant member may log in and access their courses with full tenant isolation
     When I log in as "user1"
-    Then I should not see "Course 0A"
-    And I should not see "Course 0B"
-    And I should see "Course 1A"
-    And I should not see "Course 1B"
-    And I should not see "Course 2A"
-    And I should not see "Course 2B"
-    And I should not see "Course 3A"
-    And I should not see "Course 3B"
-
-    And I should not see "Home" in the totara menu
+    Then I should not see "Home" in the totara menu
 
     When I click on "Find Learning" in the totara menu
     Then I should not see "Course 0A"

@@ -46,36 +46,8 @@ Feature: Tenant participant access with full tenant isolation
 
   Scenario: Tenant participant may log in and access their courses with full tenant isolation
     When I log in as "participant"
-    Then I should not see "Course 0A"
-    And I should see "Course 0B"
-    And I should not see "Course 1A"
-    And I should see "Course 1B"
-    And I should not see "Course 2A"
-    And I should see "Course 2B"
-    And I should not see "Course 3A"
-    And I should not see "Course 3B"
-    And I should not see "Second T Dashboard"
+    Then I should not see "Second T Dashboard"
     And I should not see "Third T Dashboard"
-
-    When I click on "First T Dashboard" "link"
-    Then I should not see "Course 0A"
-    And I should see "Course 0B"
-    And I should not see "Course 1A"
-    And I should see "Course 1B"
-    And I should not see "Course 2A"
-    And I should see "Course 2B"
-    And I should not see "Course 3A"
-    And I should not see "Course 3B"
-
-    When I click on "Home" in the totara menu
-    Then I should see "Course 0A"
-    And I should see "Course 0B"
-    And I should see "Course 1A"
-    And I should see "Course 1B"
-    And I should see "Course 2A"
-    And I should see "Course 2B"
-    And I should not see "Course 3A"
-    And I should not see "Course 3B"
 
     When I click on "Find Learning" in the totara menu
     Then I should see "Course 0A"

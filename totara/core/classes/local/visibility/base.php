@@ -98,6 +98,7 @@ abstract class base implements resolver {
      * @return sql
      */
     final public function sql_where_visible(int $userid, string $tablealias) : sql {
+        global $CFG;
 
         $usercontext = false;
         if ($userid) {
@@ -121,14 +122,15 @@ abstract class base implements resolver {
         $visibility = $this->get_visibility_sql($userid, $field_id, $field_visible);
         $availability = $this->get_availability_sql($userid, $tablealias);
 
-        // For audience visibility, include mutlitenancy as a separate sql clause.
+        if ($usercontext && !empty($CFG->tenantsenabled)) {
+            $multitenancy = $this->get_multitenancy_sql($usercontext, $tablealias);
+        } else {
+            $multitenancy = new sql('');
+        }
+
+        // For audience visibility, don't include multitenancy in capability sql.
         if ($visibilitytype == 'audiencevisible') {
             $capability = $this->sql_view_hidden($userid, $field_id, false);
-            if ($usercontext) {
-                $multitenancy = $this->get_multitenancy_sql($usercontext, $tablealias);
-            } else {
-                $multitenancy = new sql('');
-            }
         } else {
             // For traditional visibility, multitenancy should be included in capability sql.
             $capability = $this->sql_view_hidden($userid, $field_id, $usercontext);
@@ -136,9 +138,7 @@ abstract class base implements resolver {
 
         $sql = sql::wrap([$visibility, $availability], ' AND ');
         $sql = sql::wrap([$capability, $sql], ' OR ');
-        if ($visibilitytype == 'audiencevisible') {
-            $sql = sql::wrap([$sql, $multitenancy], ' AND ');
-        }
+        $sql = sql::wrap([$sql, $multitenancy], ' AND ');
         return $sql;
     }
 
