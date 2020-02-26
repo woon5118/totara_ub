@@ -145,7 +145,7 @@ class scale_value_test extends \advanced_testcase {
         foreach ($this->data['competency_list'] as $competency) {
             $this->set_and_create_criterion(
                 [
-                    'criterion_class' => coursecompletion::class,
+                    'criterion_class' => 'coursecompletion',
                     'competency' => $competency,
                     'aggregation_method' => criterion::AGGREGATE_ALL,
                     'item_ids' => $course_ids,

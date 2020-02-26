@@ -29,6 +29,7 @@ use totara_competency\entities\competency as competency_entity;
 use totara_competency\entities\competency_achievement as competency_achievement_entity;
 use totara_competency\entities\scale;
 use totara_competency\hook\competency_achievement_updated;
+use totara_competency\hook\competency_achievement_updated_bulk;
 use totara_competency\hook\competency_configuration_changed;
 use totara_criteria\criterion;
 use totara_criteria\entities\criteria_item as item_entity;
@@ -101,6 +102,77 @@ class criteria_childcompetency_watchers_testcase extends advanced_testcase {
         // Parent with criteria
         $test_hook = $this->create_achievement_hook($competencies['Comp A']->id, $user->id);
         achievement::updated($test_hook);
+        $this->assertSame(0, $sink->count());
+
+        $sink->close();
+    }
+
+    /**
+     * Test watcher when a user's competency achievement changes
+     */
+    public function test_competency_achievement_updated_bulk() {
+        /** @var totara_competency_generator $competency_generator */
+        $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+        /** @var totara_criteria_generator $criteria_generator */
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        $framework = $competency_generator->create_framework();
+
+        // Create 2 competencies, each with 1 child. First one has childcompetency criteria
+        $competencies = [];
+        foreach (['Comp A', 'Comp B'] as $name) {
+            $competencies[$name] = $competency_generator->create_competency($name, $framework);
+
+            $childname = $name . '-1';
+            $competencies[$childname] = $competency_generator->create_competency(
+                $childname,
+                $framework,
+                ['parentid' => $competencies[$name]->id]
+            );
+        }
+        $criterion = $criteria_generator->create_childcompetency(['competency' => $competencies['Comp A']->id]);
+
+        // Verify generated data
+        $this->assertSame(4, competency_entity::repository()->count());
+        $this->assertSame(1, criterion_entity::repository()->count());
+
+        // The competency_created observer should have created the necessary items
+        $this->verify_items($competencies['Comp A']->id, [$competencies['Comp A-1']->id]);
+        $this->assertSame(0, item_record_entity::repository()->count());
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        // Now for the test :- We only check that the correct hooks are executed
+        $sink = $this->redirectHooks();
+
+        // Parent with criteria
+        $test_hook = new competency_achievement_updated_bulk($competencies['Comp A']->id);
+        $test_hook->add_user_id($user1->id, 1);
+        $test_hook->add_user_id($user2->id, 0);
+        achievement::updated_bulk($test_hook);
+        $this->assertSame(0, $sink->count());
+
+        // Parent without criteria
+        $test_hook = new competency_achievement_updated_bulk($competencies['Comp B']->id);
+        $test_hook->add_user_id($user1->id, 1);
+        $test_hook->add_user_id($user2->id, 0);
+        achievement::updated_bulk($test_hook);
+        $this->assertSame(0, $sink->count());
+
+        // Child competency of parent with criteria
+        $test_hook = new competency_achievement_updated_bulk($competencies['Comp A-1']->id);
+        $test_hook->add_user_id($user1->id, 1);
+        $test_hook->add_user_id($user2->id, 0);
+        achievement::updated_bulk($test_hook);
+        $this->verify_hook($sink, [$user1->id => [$criterion->get_id()], $user2->id => [$criterion->get_id()]]);
+        $sink->clear();
+
+        // Child competency of parent without criteria
+        $test_hook = new competency_achievement_updated_bulk($competencies['Comp B-1']->id);
+        $test_hook->add_user_id($user1->id, 1);
+        $test_hook->add_user_id($user2->id, 0);
+        achievement::updated_bulk($test_hook);
         $this->assertSame(0, $sink->count());
 
         $sink->close();

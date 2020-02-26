@@ -22,7 +22,7 @@
  */
 
 define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_list'],
-    function(templates, notification, ajax, ModalList) {
+function (templates, notification, ajax, ModalList) {
 
     /**
      * Class constructor for PwManual.
@@ -72,10 +72,10 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
          * Add event listeners for PwManual
          *
          */
-        events: function() {
+        events: function () {
             var that = this;
 
-            this.widget.addEventListener('click', function(e) {
+            this.widget.addEventListener('click', function (e) {
                 if (!e.target) {
                     return;
                 }
@@ -103,7 +103,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
          *
          * @param {node} parent
          */
-        setParent: function(parent) {
+        setParent: function (parent) {
             this.widget = parent;
         },
 
@@ -112,7 +112,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
          *
          * @param {node}
          */
-        initData: function(wgt) {
+        initData: function (wgt) {
             var that = this,
                 pwWgt = this.widget.closest('[data-pw-key]'),
                 pwKey = 0,
@@ -190,16 +190,16 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
                 // Init the picker
                 rolesPromises.push(that.initRolesPicker());
 
-                Promise.all(rolesPromises).then(function() {
+                Promise.all(rolesPromises).then(function () {
                     that.triggerEvent('update', {pathway: that.pathway});
-                }).catch(function(e) {
+                }).catch(function (e) {
                     notification.exception({
                         fileName: that.filename,
                         message: e[0] + ' modal: ' + e[1],
                         name: 'Error initialising manual data'
                     });
                 });
-            }).catch(function(e) {
+            }).catch(function (e) {
                 e.fileName = that.filename;
                 e.name = 'Error retrieving manual detail';
                 notification.exception(e);
@@ -211,10 +211,10 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
          *
          * @return {Promise}
          */
-        initRolesPicker: function() {
+        initRolesPicker: function () {
             var that = this;
 
-            return new Promise(function(resolve) {
+            return new Promise(function (resolve) {
                 var pickerData = {
                     key: 'pwManualRolesPicker_' + that.pwKey,
                     title: [{
@@ -233,15 +233,15 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
                         },
                         service: that.endpoints.allroles,
                     },
-                    onSaved: function(picker, items, itemData) {
+                    onSaved: function (picker, items, itemData) {
                         that.updateRoles(itemData);
                     },
                 };
 
-                ModalList.adder(pickerData).then(function(modal) {
+                ModalList.adder(pickerData).then(function (modal) {
                     that.rolesPicker = modal;
                     resolve(modal);
-                }).catch(function(e) {
+                }).catch(function (e) {
                     notification.exception({
                         fileName: that.filename,
                         message: e[0] + ' modal: ' + e[1],
@@ -259,9 +259,9 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
             var that = this;
 
             if (!this.rolesPicker) {
-                this.initRolesPicker().then(function(modal) {
+                this.initRolesPicker().then(function (modal) {
                     modal.show(that.roleIds);
-                }).catch(function(e) {
+                }).catch(function (e) {
                     notification.exception({
                         fileName: that.filename,
                         message: e[0] + ' modal: ' + e[1],
@@ -273,7 +273,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
             }
         },
 
-        updateRoles: function(roles) {
+        updateRoles: function (roles) {
             var that = this,
                 target = this.widget.querySelector('.pw_roles'),
                 promiseArr = [],
@@ -296,10 +296,10 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
             that.showHideNoRaters();
 
             if (promiseArr.length > 0) {
-                Promise.all(promiseArr).then(function() {
+                Promise.all(promiseArr).then(function () {
                     that.triggerEvent('update', {pathway: that.pathway});
                     that.triggerEvent('dirty', {});
-                }).catch(function(e) {
+                }).catch(function (e) {
                     e.fileName = that.filename;
                     e.name = 'Error showing updated roles';
                     notification.exception(e);
@@ -307,7 +307,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
             }
         },
 
-        removeRole: function(id) {
+        removeRole: function (id) {
             id = parseInt(id);
 
             var idIndex = this.roleIds.indexOf(id),
@@ -345,8 +345,8 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
          * @param {int} key
          * @return {Promise}
          */
-        createEmptyPw: function() {
-            return new Promise(function(resolve) {
+        createEmptyPw: function () {
+            return new Promise(function (resolve) {
                 resolve({
                     results: {
                         roles: [],
@@ -358,7 +358,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
         /**
          * Show or hide the No Raters warning depending on the number of raters
          */
-        showHideNoRaters: function() {
+        showHideNoRaters: function () {
             var target = this.widget.querySelector('.pw_manual_error_noraters');
             if (this.roleIds.length == 0) {
                 target.classList.remove('cc_hidden');
@@ -373,7 +373,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
          * @param {string} eventName
          * @param {object} data
          */
-        triggerEvent: function(eventName, data) {
+        triggerEvent: function (eventName, data) {
             data.key = this.pwKey;
 
             var propagateEvent = new CustomEvent('totara_competency/pathway:' + eventName, {
@@ -391,8 +391,8 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
      * @param {node} parent
      * @returns {Object} promise
      */
-    var init = function(parent) {
-        return new Promise(function(resolve) {
+    var init = function (parent) {
+        return new Promise(function (resolve) {
             var wgt = new PwManual();
             wgt.setParent(parent);
             wgt.events();

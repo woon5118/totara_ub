@@ -24,7 +24,6 @@
 use core\orm\collection;
 use core\orm\query\builder;
 use core\webapi\query_resolver;
-use criteria_othercompetency\othercompetency;
 use criteria_othercompetency\webapi\resolver\query\achievements;
 use totara_competency\user_groups;
 use totara_criteria\criterion;
@@ -172,19 +171,15 @@ class criteria_othercompetency_webapi_query_achievements_testcase extends totara
 
         $other_competency_ids = array_column($this->other_competency_items, 'id');
 
-        $criterion = $this->competency_generator->create_criterion(
-            othercompetency::class,
-            $competency,
-            criterion::AGGREGATE_ALL,
-            $other_competency_ids
-        );
+        // Ensure othercompetency plugin is enabled
+        $enabled_setting = 'criteria_types_enabled';
+        set_config($enabled_setting, 'othercompetency', 'totara_criteria');
 
-        $criterion_with_no_competency = $this->competency_generator->create_criterion(
-            othercompetency::class,
-            $competency,
-            criterion::AGGREGATE_ALL,
-            []
-        );
+        /** @var totara_criteria_generator $criteria_generator */
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        $criterion = $criteria_generator->create_othercompetency(['competencyids' => $other_competency_ids]);
+        $criterion_with_no_competency = $criteria_generator->create_othercompetency(['competencyids' => []]);
 
         $assignment = $this->competency_generator->assignment_generator()->create_assignment(
             [

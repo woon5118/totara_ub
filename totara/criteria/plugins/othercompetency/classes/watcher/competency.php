@@ -18,23 +18,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Marco Song <marco.song@totaralearning.com>
+
  * @package criteria_othercompetency
  */
 
-use criteria_othercompetency\watcher\competency;
-use criteria_othercompetency\watcher\achievement;
-use totara_competency\hook\competency_achievement_updated_bulk;
+namespace criteria_othercompetency\watcher;
+
 use totara_competency\hook\competency_configuration_changed;
+use totara_criteria\competency_item_helper;
 
-defined('MOODLE_INTERNAL') || die();
+class competency {
 
-$watchers = [
-    [
-        'hookname' => competency_achievement_updated_bulk::class,
-        'callback' => achievement::class.'::updated_bulk',
-    ],
-    [
-        'hookname' => competency_configuration_changed::class,
-        'callback' => competency::class.'::configuration_changed',
-    ],
-];
+    /**
+     * @param competency_configuration_changed $hook
+     */
+    public static function configuration_changed(competency_configuration_changed $hook) {
+        $competency_id = $hook->get_competency_id();
+        competency_item_helper::configuration_changed($competency_id, 'othercompetency');
+    }
+
+}

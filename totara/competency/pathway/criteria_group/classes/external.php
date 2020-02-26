@@ -243,8 +243,8 @@ class external extends \external_api {
                 $criterion = criterion_factory::fetch($crit['type'], $crit['id']);
             }
 
-            if (!empty($crit['itemids'])) {
-                $criterion->set_item_ids($crit['itemids']);
+            if ($criterion->has_items()) {
+                $criterion->set_item_ids($crit['itemids'] ?? []);
             }
 
             if (!empty($crit['aggregation'])) {

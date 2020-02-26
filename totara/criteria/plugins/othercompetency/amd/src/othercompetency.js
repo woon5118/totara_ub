@@ -21,7 +21,7 @@
  */
 
 define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_list', 'totara_core/loader_manager','totara_competency/list_framework_hierarchy_events'],
-    function(templates, notification,ajax, ModalList, Loader,HierarchyEvents) {
+    function (templates, notification,ajax, ModalList, Loader,HierarchyEvents) {
 
         /**
          * Class constructor for CriterionOtherCompetency.
@@ -59,7 +59,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
             };
 
             this.domClasses = {
-                hidden: 'crit_hidden',
+                hidden: 'tw-criterion-hidden',
             };
 
             this.filename = 'othercompetency.js';
@@ -69,10 +69,10 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
             /**
              * Add event listeners for CriterionOtherCompetency
              */
-            events: function() {
+            events: function () {
                 var that = this;
 
-                this.widget.addEventListener('click', function(e) {
+                this.widget.addEventListener('click', function (e) {
                     if (!e.target) {
                         return;
                     }
@@ -98,7 +98,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
                     }
                 });
 
-                this.widget.addEventListener('change', function(e) {
+                this.widget.addEventListener('change', function (e) {
                     if (!e.target) {
                         return;
                     }
@@ -136,7 +136,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
              * Set parent
              * @param {node} parent
              */
-            setParent: function(parent) {
+            setParent: function (parent) {
                 this.widget = parent;
             },
 
@@ -144,7 +144,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
              * Retrieve the criterion detail
              * @return {Promise}
              */
-            getDetail: function() {
+            getDetail: function () {
                 var that = this,
                     criterionNode = this.widget.closest('[data-tw-criterion-key]'),
                     key = 0,
@@ -152,7 +152,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
                     apiArgs,
                     detailPromise = null;
 
-                return new Promise(function(resolve) {
+                return new Promise(function (resolve) {
                     if (criterionNode) {
                         key = criterionNode.hasAttribute('data-tw-criterion-key') ? criterionNode.getAttribute('data-tw-criterion-key') : 0;
                         id = criterionNode.hasAttribute('data-tw-criterion-id') ? criterionNode.getAttribute('data-tw-criterion-id') : 0;
@@ -160,7 +160,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
 
                     if (id == 0) {
                         // New criterion - no detail yet
-                        detailPromise = new Promise(function(resolve) {
+                        detailPromise = new Promise(function (resolve) {
                             resolve(that.createEmptyCriterion());
                         });
 
@@ -173,7 +173,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
                         detailPromise = ajax.getData(apiArgs);
                     }
 
-                    detailPromise.then(function(responses) {
+                    detailPromise.then(function (responses) {
                         var instance = responses.results;
 
                         // We want only the data required for saving in that.criterion
@@ -186,11 +186,11 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
                         that.setAggregationMethod(instance.aggregation.method);
                         that.setAggregationCount(instance.aggregation.reqitems);
 
-                        Promise.all([that.setCompetencies(instance.items), that.initCompetencyAdder()]).then(function() {
+                        Promise.all([that.setCompetencies(instance.items), that.initCompetencyAdder()]).then(function () {
                             that.triggerEvent('update', {criterion: that.criterion});
                             resolve();
                         });
-                    }).catch(function(e) {
+                    }).catch(function (e) {
                         e.fileName = that.filename;
                         e.name = 'Error retrieving detail';
                         notification.exception(e);
@@ -202,7 +202,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
              * Set the aggregation method
              * @param {int} method New aggregation method (method constant as defined in totara/criteria/classes/criterion.php)
              */
-            setAggregationMethod: function(method) {
+            setAggregationMethod: function (method) {
                 var methodNode = this.widget.querySelector('[data-tw-criterionOtherCompetency-aggregationMethod="' + method + '"]'),
                     methodInput = methodNode.querySelector('[data-tw-criterionOtherCompetency-aggregationMethod-changed]'),
                     countInput = this.widget.querySelector('[data-tw-criterionOtherCompetency-aggregationCount-changed]'),
@@ -226,7 +226,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
              * Set the aggregation required item
              * @param {int} reqItems Required item count
              */
-            setAggregationCount: function(reqItems) {
+            setAggregationCount: function (reqItems) {
                 var countInput = this.widget.querySelector('[data-tw-criterionOtherCompetency-aggregationCount-changed]');
 
                 this.criterion.aggregation.reqitems = reqItems;
@@ -242,32 +242,35 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
              * @param {Object} competencies Array of competencies
              * @return {Promise}
              */
-            setCompetencies: function(competencies) {
+            setCompetencies: function (competencies) {
                 var that = this,
                     competenciesTarget = this.widget.querySelector('[data-tw-criterionOtherCompetency-competencies]'),
                     competenciesPromiseArr = [],
                     templateData = {};
 
-                return new Promise(function(resolve) {
+                return new Promise(function (resolve) {
                     // We want to index the items with the ids for easy adder results processing
                     that.competencies = [];
                     that.criterion.itemids = [];
 
                     if (competencies.length == 0 || !competenciesTarget) {
-                        that.showHideNoCompetencies();
+                        that.showHideNotEnoughCompetency();
                         resolve();
                     } else {
                         for (var a = 0; a < competencies.length; a++) {
                             that.competencies[competencies[a].id] = competencies[a];
                             that.criterion.itemids.push(competencies[a].id);
                             templateData = {item_parent: 'criterionOtherCompetency', value: competencies[a].id, text: competencies[a].name};
+                            if (competencies[a].error) {
+                                templateData.error = competencies[a].error;
+                            }
                             competenciesPromiseArr.push(templates.renderAppend('totara_criteria/partial_item', templateData, competenciesTarget));
                         }
 
-                        Promise.all(competenciesPromiseArr).then(function() {
-                            that.showHideNoCompetencies();
+                        Promise.all(competenciesPromiseArr).then(function () {
+                            that.showHideNotEnoughCompetency();
                             resolve();
-                        }).catch(function(e) {
+                        }).catch(function (e) {
                             e.fileName = that.filename;
                             e.name = 'Error showing competencies';
                             notification.exception(e);
@@ -282,9 +285,9 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
              * @param {int} key
              * @return {Promise}
              */
-            createEmptyCriterion: function() {
+            createEmptyCriterion: function () {
                 // Ensure the basket is empty
-                return new Promise(function(resolve) {
+                return new Promise(function (resolve) {
                     resolve({
                         results: {
                             id: 0,
@@ -303,11 +306,11 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
              *
              * @return {Promise}
              */
-            initCompetencyAdder: function() {
+            initCompetencyAdder: function () {
                 var that = this;
 
-                return new Promise(function(resolve) {
-                    HierarchyEvents.init().then(function(eventData) {
+                return new Promise(function (resolve) {
+                    HierarchyEvents.init().then(function (eventData) {
                         var adderData = {
                             // externalBasket: that.baskets.positions,
                             key: 'competencies',
@@ -379,7 +382,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
                             }],
                         };
 
-                        ModalList.adder(adderData).then(function(modal) {
+                        ModalList.adder(adderData).then(function (modal) {
                             that.competencyAdder = modal;
                             resolve(modal);
                         });
@@ -390,13 +393,13 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
             /**
              * Open the adder to add competencies
              */
-            addCompetencies: function() {
+            addCompetencies: function () {
                 var that = this;
 
                 if (!this.competencyAdder) {
-                    this.initCompetencyAdder().then(function() {
+                    this.initCompetencyAdder().then(function () {
                         that.competencyAdder.show(that.criterion.itemids);
-                    }).catch(function(e) {
+                    }).catch(function (e) {
                         e.fileName = that.filename;
                         e.name = 'Error initialsing the competency adder';
                         notification.exception(e);
@@ -411,7 +414,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
              *
              * @param  {[Object]} items Selected competencies
              */
-            updateCompetencies: function(competencies) {
+            updateCompetencies: function (competencies) {
                 var that = this,
                     competenciesTarget = that.widget.querySelector('[data-tw-criterionOtherCompetency-competencies]'),
                     id,
@@ -430,17 +433,20 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
                         this.criterion.itemids.push(id);
 
                         templateData = {item_parent: 'criterionOtherCompetency', value: id, text: fullname};
+                        if (competencies[a].error) {
+                            templateData.error = competencies[a].error;
+                        }
                         competenciesPromiseArr.push(templates.renderAppend('totara_criteria/partial_item', templateData, competenciesTarget));
                     }
                 }
 
                 if (competenciesPromiseArr.length > 0) {
-                    Promise.all(competenciesPromiseArr).then(function() {
-                        that.showHideNoCompetencies();
+                    Promise.all(competenciesPromiseArr).then(function () {
+                        that.showHideNotEnoughCompetency();
 
                         that.triggerEvent('update', {criterion: that.criterion});
                         that.triggerEvent('dirty', {});
-                    }).catch(function(e) {
+                    }).catch(function (e) {
                         e.fileName = that.filename;
                         e.name = 'Showing competencies';
                         notification.exception(e);
@@ -449,7 +455,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
             },
 
 
-            removeCompetency: function(id) {
+            removeCompetency: function (id) {
                 id = parseInt(id);
 
                 var that = this,
@@ -468,7 +474,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
                 }
 
                 // Show nocompetencies warning
-                that.showHideNoCompetencies();
+                that.showHideNotEnoughCompetency();
 
                 that.triggerEvent('update', {criterion: that.criterion});
                 that.triggerEvent('dirty', {});
@@ -477,8 +483,8 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
             /**
              * Show or hide the No Criteria warning depending on the number of items
              */
-            showHideNoCompetencies: function() {
-                var target = this.widget.querySelector('[data-tw-criterionOtherCompetency-error="nocompetencies"]');
+            showHideNotEnoughCompetency: function () {
+                var target = this.widget.querySelector('[data-tw-criterionOtherCompetency-error="notenoughothercompetency"]');
                 if (!target) {
                     return;
                 }
@@ -497,7 +503,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
              * @param {string} eventName
              * @param {object} data
              */
-            triggerEvent: function(eventName, data) {
+            triggerEvent: function (eventName, data) {
                 data.key = this.criterionKey;
 
                 var propagateEvent = new CustomEvent('totara_criteria/criterion:' + eventName, {
@@ -516,8 +522,8 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
          * @param {node} parent
          * @returns {Object} promise
          */
-        var init = function(parent) {
-            return new Promise(function(resolve) {
+        var init = function (parent) {
+            return new Promise(function (resolve) {
                 var wgt = new CriterionOtherCompetency();
                 wgt.setParent(parent);
                 wgt.events();
@@ -526,7 +532,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_l
                 resolve(wgt);
 
                 M.util.js_pending('criterionOtherCompetency');
-                wgt.getDetail().then(function() {
+                wgt.getDetail().then(function () {
                     wgt.loader.hide();
                     M.util.js_complete('criterionOtherCompetency');
                 });

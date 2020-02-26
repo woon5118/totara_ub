@@ -26,10 +26,9 @@ namespace totara_criteria\validators;
 global $CFG;
 require_once($CFG->dirroot . '/lib/completionlib.php');
 
-use completion_info;
+use Dompdf\Exception;
 use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
-use totara_competency\entities\course as course_entity;
 
 
 /**
@@ -43,9 +42,13 @@ class competency_item_validator implements criteria_item_validator_interface {
      * @return bool
      */
     public static function validate_item(int $item_id): bool {
-        $competency = new competency($item_id);
-        $config = new achievement_configuration($competency);
-        return $config->user_can_become_proficient();
+        try {
+            $competency = new competency($item_id);
+            $config = new achievement_configuration($competency);
+            return $config->user_can_become_proficient();
+        } catch (Exception $e) {
+            return false;
+        }
     }
 
 }

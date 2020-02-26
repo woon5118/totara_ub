@@ -48,6 +48,11 @@ class criteria_coursecompletion_testcase extends advanced_testcase {
             [
                 'plugin_type' => 'coursecompletion',
                 'aggregation_method' => coursecompletion::AGGREGATE_ALL,
+                'item_ids' => [],
+            ],
+            [
+                'plugin_type' => 'coursecompletion',
+                'aggregation_method' => coursecompletion::AGGREGATE_ALL,
                 'item_ids' => [100, 101, 102],
             ],
             [
@@ -71,7 +76,7 @@ class criteria_coursecompletion_testcase extends advanced_testcase {
             $criterion_id = $DB->insert_record("totara_criteria", $tst, true, false);
 
             if (!empty($tst['item_ids'])) {
-                // Add non-existins criterion_items
+                // Add non-existing criterion_items
                 foreach ($tst['item_ids'] as $course_id) {
                     $DB->insert_record(
                         'totara_criteria_item',
@@ -118,11 +123,12 @@ class criteria_coursecompletion_testcase extends advanced_testcase {
      * @param stdClass $expected
      * @param linkedcourses $actual
      */
-    private function verify_instance($expected, $actual) {
+    private function verify_instance($expected, coursecompletion $actual) {
         $this->assertEquals($expected->id ?? 0, $actual->get_id());
         $this->assertEquals($expected->plugin_type ?? 'coursecompletion', $actual->get_plugin_type());
         $this->assertEquals($expected->aggregation_method ?? criterion::AGGREGATE_ALL, $actual->get_aggregation_method());
         $this->assertSame($expected->aggregation_params ?? [], $actual->get_aggregation_params());
+        $this->assertSame('course', $actual->get_items_type());
 
         $ids = $actual->get_item_ids();
         $this->assertEqualsCanonicalizing($expected->item_ids, $ids);
@@ -140,7 +146,6 @@ class criteria_coursecompletion_testcase extends advanced_testcase {
             'plugin_type' => 'coursecompletion',
             'aggregation_method' => coursecompletion::AGGREGATE_ALL,
             'aggregation_params' => [],
-            'items_type' => 'course',
             'item_ids' => [],
             'metadata' => [],
         ];
@@ -161,8 +166,7 @@ class criteria_coursecompletion_testcase extends advanced_testcase {
                 'plugin_type' => 'coursecompletion',
                 'aggregation_method' => $row->aggregation_method,
                 'aggregation_params' => json_decode($row->aggregation_params, true) ?? [],
-                'items_type' => 'course',
-                'item_ids' => $data->itemids[$row->id],
+                'item_ids' => $data->itemids[$row->id] ?? [],
                 'metadata' => [],
             ];
 
@@ -181,7 +185,7 @@ class criteria_coursecompletion_testcase extends advanced_testcase {
 
         // Ensure we start without archived rows
         $rows = $DB->get_records('totara_criteria');
-        $this->assertSame(3, count($rows));
+        $this->assertSame(4, count($rows));
 
         $instancerow = end($data->instancerows);
         $expected = (object)[
@@ -189,7 +193,6 @@ class criteria_coursecompletion_testcase extends advanced_testcase {
             'plugin_type' => 'coursecompletion',
             'aggregation_method' => $instancerow->aggregation_method,
             'aggregation_params' => json_decode($instancerow->aggregation_params, true) ?? [],
-            'items_type' => 'course',
             'item_ids' => $data->itemids[$instancerow->id],
             'metadata' => [],
         ];
@@ -214,7 +217,7 @@ class criteria_coursecompletion_testcase extends advanced_testcase {
         $this->assertEquals($instancerow->id, $cc->get_id());
         $this->verify_saved_items($cc->get_id(), $expected->item_ids);
         $rows = $DB->get_records('totara_criteria');
-        $this->assertSame(3, count($rows));
+        $this->assertSame(4, count($rows));
 
         // Now remove some items
         $cc->remove_items([304, 876]);
@@ -228,7 +231,7 @@ class criteria_coursecompletion_testcase extends advanced_testcase {
         $this->verify_instance($expected, $cc);
         $this->verify_saved_items($cc->get_id(), $expected->item_ids);
         $rows = $DB->get_records('totara_criteria');
-        $this->assertSame(3, count($rows));
+        $this->assertSame(4, count($rows));
 
         // Add some and remove others and then save
         $cc->add_items([555, 666]);
@@ -240,7 +243,7 @@ class criteria_coursecompletion_testcase extends advanced_testcase {
         $this->verify_saved_items($cc->get_id(), $expected->item_ids);
 
         $rows = $DB->get_records('totara_criteria');
-        $this->assertSame(3, count($rows));
+        $this->assertSame(4, count($rows));
     }
 
      /**
@@ -261,7 +264,7 @@ class criteria_coursecompletion_testcase extends advanced_testcase {
         $this->assertEquals(0, $cc->get_id());
 
         $rows = $DB->get_records('totara_criteria');
-        $this->assertSame(2, count($rows));
+        $this->assertSame(3, count($rows));
 
         $row = $DB->get_record('totara_criteria', ['id' => $id]);
         $this->assertFalse($row);
@@ -289,7 +292,7 @@ class criteria_coursecompletion_testcase extends advanced_testcase {
         $this->assertEquals(0, $cc->get_id());
 
         $rows = $DB->get_records('totara_criteria');
-        $this->assertSame(1, count($rows));
+        $this->assertSame(2, count($rows));
 
         $row = $DB->get_record('totara_criteria', ['id' => $id]);
         $this->assertFalse($row);
@@ -376,7 +379,7 @@ class criteria_coursecompletion_testcase extends advanced_testcase {
 
         foreach ($data->instancerows as $id => $row) {
             $expected = $row;
-            $expected->items = $data->itemrows[$id];
+            $expected->items = $data->itemrows[$id] ?? [];
             $expected->metadata = [];
 
             $actual = coursecompletion::dump_criterion_configuration($id);

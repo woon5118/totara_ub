@@ -23,7 +23,9 @@
 
 namespace criteria_othercompetency;
 
-use totara_competency\entities\competency as competency_entity;
+use Exception;
+use totara_competency\achievement_configuration;
+use totara_competency\entities\competency;
 use totara_criteria\criterion_display;
 
 /**
@@ -48,11 +50,34 @@ class othercompetency_display extends criterion_display {
      * @return string[]
      */
     protected function get_display_configuration_items(): array {
-        $items = [];
 
-        foreach ($this->criterion->get_item_ids() as $competency_id) {
-            $competency = new competency_entity($competency_id);
-            $items[] = $competency->fullname;
+        $competency_ids = $this->criterion->get_item_ids();
+        if (empty($competency_ids)) {
+            return [
+                (object)[
+                    'description' => '',
+                    'error' => get_string('error:notenoughothercompetency', 'criteria_othercompetency'),
+                ],
+            ];
+        }
+
+        $items = [];
+        foreach ($competency_ids as $competency_id) {
+            $item_detail = [];
+            try {
+                $competency = new competency($competency_id);
+                $config = new achievement_configuration($competency);
+                $item_detail['description'] = $competency->fullname;
+
+                if (!$config->user_can_become_proficient()) {
+                    $item_detail['error'] = get_string('error:competencycannotproficient', 'criteria_othercompetency');
+                }
+            } catch (Exception $e) {
+                $item_detail['description'] = '';
+                $item_detail['error'] = get_string('error:nocompetency', 'criteria_othercompetency');
+            }
+
+            $items[] = (object)$item_detail;
         }
 
         return $items;

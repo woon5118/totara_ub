@@ -25,6 +25,7 @@
 use criteria_childcompetency\watcher\achievement;
 use criteria_childcompetency\watcher\competency;
 use totara_competency\hook\competency_achievement_updated;
+use totara_competency\hook\competency_achievement_updated_bulk;
 use totara_competency\hook\competency_configuration_changed;
 
 defined('MOODLE_INTERNAL') || die();
@@ -39,7 +40,7 @@ $watchers = [
         'callback' => competency::class.'::configuration_changed',
     ],
     [
-        'hookname' => \totara_competency\hook\competency_achievement_updated_bulk::class,
-        'callback' => \criteria_childcompetency\watcher\achievement::class.'::updated_bulk',
+        'hookname' => competency_achievement_updated_bulk::class,
+        'callback' => achievement::class.'::updated_bulk',
     ],
 ];

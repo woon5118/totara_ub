@@ -23,9 +23,12 @@
 
 namespace criteria_othercompetency;
 
+use totara_competency\achievement_configuration;
 use totara_competency\entities\competency as competency_entity;
 use totara_criteria\criterion;
 use totara_criteria\evaluators\competency_item_evaluator;
+use totara_criteria\validators\competency_item_validator;
+use Exception;
 
 /**
  * Class containing information of other competencies criteria instances
@@ -71,6 +74,12 @@ class othercompetency extends criterion {
         return $this;
     }
 
+    /**
+     * @return string|null Class name of item_validator for this criteria type.
+     */
+    public static function get_item_validator_class(): ?string {
+        return competency_item_validator::class;
+    }
 
     /************************************************************************************
      * Evaluation
@@ -85,6 +94,17 @@ class othercompetency extends criterion {
      * Data exporting
      * TODO - remove once all APIs have been replaced by GraphQL
      ************************************************************************************/
+
+    /**
+     * @return string
+     */
+    public function export_configuration_error_description(): string {
+        if ($this->is_valid()) {
+            return '';
+        }
+
+        return get_string('error:notenoughothercompetency', 'criteria_othercompetency');
+    }
 
     /**
      * Return the name of the template for defining this criterion
@@ -113,12 +133,25 @@ class othercompetency extends criterion {
         $items = [];
 
         foreach ($this->get_item_ids() as $competency_id) {
-            $competency = new competency_entity($competency_id);
-            $items[] = [
+            $item_detail = [
                 'type' => $this->get_items_type(),
-                'id' => $competency_id,
-                'name' => format_string($competency->fullname),
+                'id'   => $competency_id,
             ];
+
+            try {
+                $competency = new competency_entity($competency_id);
+                $config = new achievement_configuration($competency);
+                $item_detail['name'] = format_string($competency->fullname);
+
+                if (!$config->user_can_become_proficient()) {
+                    $item_detail['error'] = get_string('error:competencycannotproficient', 'criteria_othercompetency');
+                }
+            } catch (Exception $e) {
+                $item_detail['name'] = '';
+                $item_detail['error'] = get_string('error:nocompetency', 'criteria_othercompetency');
+            }
+
+            $items[] = $item_detail;
         }
 
         return $items;

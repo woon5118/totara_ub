@@ -344,20 +344,25 @@ class totara_competency_generator extends component_generator_base {
     /**
      * Create an individual criterion for use in a pathway
      *
-     * @param string $criterion_class Criterion subclass, e.g. onactivate::class, linkedcourses::class, coursecompletion::class etc.
-     * @param competency|stdClass|int $competency Competency entity, record or ID.
+     * @param string $criterion_type Type of criterion, e.g. onactivate::class, linkedcourses::class, coursecompletion::class etc.
+     * @param competency|stdClass|int|null $competency Competency entity, record or ID.
      * @param int|null $aggregation_method Aggregation method, either criterion::AGGREGATE_ALL or criterion::AGGREGATE_ANY_N
      * @param int[]|null $items Array of IDs for this criterion - e.g. for coursecompletion, it would be an array of course IDs
      * @param int|null $required_items The number of items that need to be completed for this criteria to be met (ANY_N aggregation)
      *
      * @return criterion
      */
-    public function create_criterion(string $criterion_class, $competency, int $aggregation_method = criterion::AGGREGATE_ALL,
+    public function create_criterion(string $criterion_type, $competency = null, int $aggregation_method = criterion::AGGREGATE_ALL,
         array $items = [], int $required_items = 1): criterion {
         /** @var criterion $criterion */
-        $criterion = new $criterion_class();
+        $criterion = criterion_factory::create($criterion_type);
 
-        $criterion->set_competency_id($competency->id ?? $competency);
+        if (!is_null($competency)) {
+            if (!is_number($competency)) {
+                $competency = $competency->id;
+            }
+            $criterion->set_competency_id($competency);
+        }
         $criterion->set_aggregation_method($aggregation_method);
         $criterion->set_aggregation_params(['req_items' => $required_items]);
 

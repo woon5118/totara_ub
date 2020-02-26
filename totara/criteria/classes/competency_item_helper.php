@@ -31,16 +31,20 @@ use totara_criteria\hook\criteria_validity_changed;
 class competency_item_helper {
 
     /**
-     * @param int $user_id
+     * @param int|array $user_ids
      * @param int $competency_id
      * @param string|null $plugin_type
      */
-    public static function achievement_updated(int $user_id, int $competency_id, ?string $plugin_type = null) {
+    public static function achievement_updated($user_ids, int $competency_id, ?string $plugin_type = null) {
         // Find all criteria with this competency as item
         // As the criterion has no knowledge whether this user's satisfaction of the criteria is to be tracked,
         // it simply generates an criteria_achievement_changed event with the relevant criterion ids and this user's id.
         // Modules that use these criteria are responsible for initiating the relevant processes to create/update
         // the item_record(s) for this user
+
+        if (!is_array($user_ids)) {
+            $user_ids = [$user_ids];
+        }
 
         $criteria_ids = criterion_entity::repository()
             ->from_item_ids('competency', $competency_id)
@@ -51,7 +55,8 @@ class competency_item_helper {
             ->pluck('id');
 
         if (!empty($criteria_ids)) {
-            $hook = new criteria_achievement_changed([$user_id => $criteria_ids]);
+            $user_criteria_ids = array_fill_keys($user_ids, $criteria_ids);
+            $hook = new criteria_achievement_changed($user_criteria_ids);
             $hook->execute();
         }
     }

@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Riana Rossouw <riana.rossouw@totaralearning.com>
- * @package totara_competency
+ * @author Brendan Cox <brendan.cox@totaralearning.com>
+ * @author Marco Song <marco.song@totaralearning.com>
+ * @package criteria_othercompetency
  */
+
+use criteria_othercompetency\observer\competency as competency_observer;
+use hierarchy_competency\event\competency_deleted;
+
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2020030200;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'totara_competency'; // To check on upgrade, that module sits in correct place
+$observers = [
+    [
+        'eventname' => competency_deleted::class,
+        'callback' => competency_observer::class.'::competency_deleted',
+    ],
+];

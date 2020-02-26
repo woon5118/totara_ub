@@ -30,6 +30,7 @@ use criteria_childcompetency\childcompetency;
 use totara_competency\entities\competency;
 use totara_criteria\criterion;
 use totara_criteria\webapi\resolver\query\competency_achievements;
+use totara_competency\entities\competency_achievement;
 
 /**
  * Fetches all achievments for the childcompetency criteria type
@@ -57,6 +58,7 @@ class achievements extends competency_achievements {
                     'achievement' => function (repository $repository) use ($user_id) {
                         $repository->where('user_id', $user_id)
                             ->where('proficient', 1)
+                            ->where('status', competency_achievement::ACTIVE_ASSIGNMENT)
                             ->with('value');
                     },
                 ]

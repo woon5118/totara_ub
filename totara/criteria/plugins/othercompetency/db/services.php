@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2018 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,9 +21,11 @@
  * @package criteria_othercompetency
  */
 
+use criteria_othercompetency\external;
+
 $functions = [
     'criteria_othercompetency_get_detail' => [
-        'classname' => \criteria_othercompetency\external::class,
+        'classname' => external::class,
         'methodname' => 'get_detail',
         'description' => 'Get the detail of the othercompetency criterion',
         'type' => 'get',
