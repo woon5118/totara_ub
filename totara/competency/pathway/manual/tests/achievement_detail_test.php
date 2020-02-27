@@ -67,7 +67,12 @@ class pathway_manual_achievement_detail_testcase extends pathway_manual_base_tes
 
         $this->validate_and_run_aggregation_task();
 
-        $this->assert_achieved_via_string($this->user1->id, 'rating by ' . $this->user1->fullname . ' (Self)');
+        $expected_string = get_string('rating_by', 'pathway_manual', [
+                'name' => $this->user1->fullname,
+                'role' => 'Self',
+        ]);
+
+        $this->assert_achieved_via_string($this->user1->id, $expected_string);
     }
 
     /**
@@ -90,7 +95,12 @@ class pathway_manual_achievement_detail_testcase extends pathway_manual_base_tes
         );
         $this->validate_and_run_aggregation_task();
 
-        $this->assert_achieved_via_string($this->user1->id, 'rating by ' . $this->user2->fullname . ' (Manager)');
+        $expected_string = get_string('rating_by', 'pathway_manual', [
+                'name' => $this->user2->fullname,
+                'role' => 'Manager',
+        ]);
+
+        $this->assert_achieved_via_string($this->user1->id, $expected_string);
     }
 
     /**
@@ -111,7 +121,12 @@ class pathway_manual_achievement_detail_testcase extends pathway_manual_base_tes
         );
         $this->validate_and_run_aggregation_task();
 
-        $this->assert_achieved_via_string($this->user1->id, 'rating by ' . $this->user2->fullname . ' (Appraiser)');
+        $expected_string = get_string('rating_by', 'pathway_manual', [
+                'name' => $this->user2->fullname,
+                'role' => 'Appraiser',
+        ]);
+
+        $this->assert_achieved_via_string($this->user1->id, $expected_string);
     }
 
     /**
