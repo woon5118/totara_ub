@@ -7,7 +7,7 @@ mutation mod_perform_create_activity(
     name: $name
     description: $description
     status: $status
-  ){
+  ) {
     activity {
       id
       name

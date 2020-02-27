@@ -28,9 +28,7 @@ extend type Query {
   """
   This query returns a single performance activity
   """
-  mod_perform_activity(
-    activity_id: core_id!
-  ): mod_perform_activity
+  mod_perform_activity(activity_id: core_id!): mod_perform_activity
 }
 
 extend type Mutation {
@@ -43,7 +41,7 @@ extend type Mutation {
 
 extend type Mutation {
   mod_perform_update_activity_general_info(
-    activity_id: core_id!,
+    activity_id: core_id!
     name: param_text!
     description: param_text
   ): mod_perform_activity_result!

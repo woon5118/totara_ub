@@ -23,7 +23,7 @@
 <template>
   <Card class="mod-perform-activitySection">
     <Grid>
-      <GridItem :units="8"/>
+      <GridItem :units="8" />
       <GridItem :units="4">
         <div class="mod-perform-activitySection__action-buttons">
           <Button

@@ -44,7 +44,11 @@
     }}</a>
 
     <Loader :loading="$apollo.loading">
-      <Grid v-if="activity" :stack-at="768" class="tui-performManageActivity__top-bar">
+      <Grid
+        v-if="activity"
+        :stack-at="768"
+        class="tui-performManageActivity__topBar"
+      >
         <GridItem :units="6">
           <h2>{{ pageHeading }}</h2>
         </GridItem>

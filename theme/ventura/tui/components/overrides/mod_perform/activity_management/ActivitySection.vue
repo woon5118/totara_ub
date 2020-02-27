@@ -32,7 +32,7 @@
     text-align: right;
   }
 
-  &__participant-heading{
+  &__participant-heading {
     @include totara-style-heading-label-small;
     border-bottom: 1px solid var(--tui-card-border-color);
   }
