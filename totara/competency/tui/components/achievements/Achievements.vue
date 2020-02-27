@@ -103,6 +103,7 @@ export default {
       variables() {
         return {
           assignment_id: this.assignmentId,
+          user_id: this.userId,
         };
       },
       update({ totara_competency_achievement_paths: paths }) {

@@ -138,6 +138,7 @@ extend type Query {
   """
   totara_competency_achievement_paths(
     assignment_id: core_id!
+    user_id: core_id!
   ): [totara_competency_achievement_path]
 
   totara_competency_scale_achievements(
