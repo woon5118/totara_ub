@@ -29,7 +29,7 @@
     <template v-else>
       <!-- Self rating collapsible group -->
       <Collapsible
-        v-if="selfRate"
+        v-if="selfRate.length"
         :label="$str('self_assessment', 'pathway_manual')"
         :initial-state="true"
       >
