@@ -31,14 +31,14 @@ use core\webapi\execution_context;
 
 class webapi_resolver_mutation_create_activity_testcase extends advanced_testcase {
 
-    private function get_execution_context(string $type = 'dev', ?string $operation = null) {
+    private function get_execution_context(string $type = 'dev', ?string $operation = null): execution_context {
         return execution_context::create($type, $operation);
     }
 
-    public function test_create_activity() {
+    public function test_create_activity(): void {
         $this->setAdminUser();
         $args = [
-            'name'        => "Mid year performance review",
+            'name' => "Mid year performance review",
             'description' => "Test Description",
         ];
 
@@ -48,46 +48,47 @@ class webapi_resolver_mutation_create_activity_testcase extends advanced_testcas
         $this->assertSame('Test Description', $result->get_entity()->description);
     }
 
-
-    public function test_create_activity_for_non_admin_user() {
+    public function test_create_activity_for_non_admin_user(): void {
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
         $args = [
-            'name'        => "Mid year performance review",
-            'description' => "Test Description",
+            'name' => 'Mid year performance review',
+            'description' => 'Test Description',
         ];
 
         $this->expectException(\container_perform\create_exception::class);
-        $this->expectExceptionMessage("You do not have the permission to create a performance activity");
+        $this->expectExceptionMessage('Create Permission Missing');
         create_activity::resolve($args, $this->get_execution_context());
     }
 
-    public function test_create_activity_with_empty_name() {
+    public function test_create_activity_with_empty_name(): void {
         $this->setAdminUser();
         $args = [
-            'name'        => "",
-            'description' => "Test Description",
+            'name' => '',
+            'description' => 'Test Description',
         ];
         $this->expectException(\container_perform\create_exception::class);
-        $this->expectExceptionMessage("You are not allowed to create an activity with an empty name");
+        $this->expectExceptionMessage('You are not allowed to create an activity with an empty name');
         create_activity::resolve($args, $this->get_execution_context());
     }
 
-    public function test_create_activity_with_empty_description() {
+    public function test_create_activity_with_empty_description(): void {
         $this->setAdminUser();
         $args = [
-            'name'        => "Mid year performance review",
+            'name' => 'Mid year performance review',
             'description' => "",
         ];
-        $result = create_activity::resolve($args, $this->get_execution_context());
+
+        ['activity' => $result] = create_activity::resolve($args, $this->get_execution_context());
         $this->assertSame('Mid year performance review', $result->get_entity()->name);
         $this->assertSame('', $result->get_entity()->description);
 
         $args = [
-            'name'        => "Mid year performance review",
+            'name' => 'Mid year performance review',
             'description' => null,
         ];
-        $result = create_activity::resolve($args, $this->get_execution_context());
+
+        ['activity' => $result] = create_activity::resolve($args, $this->get_execution_context());
         $this->assertSame('Mid year performance review', $result->get_entity()->name);
         $this->assertNull($result->get_entity()->description);
     }

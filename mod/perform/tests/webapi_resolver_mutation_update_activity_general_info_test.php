@@ -34,17 +34,16 @@ defined('MOODLE_INTERNAL') || die();
 class webapi_resolver_mutation_update_activity_general_info_test extends advanced_testcase {
 
     public function test_user_cannot_update_without_permission(): void {
-        $user = self::getDataGenerator()->create_user();
-        self::setUser($user);
+        self::setAdminUser();
 
         $activity = $this->create_activity();
         $args = $this->to_args_payload($activity);
 
-        $this->expectException(required_capability_exception::class);
+        $user = self::getDataGenerator()->create_user();
+        self::setUser($user);
 
-        $expected_message = 'Sorry, but you do not currently have permissions to do that ';
-        $expected_message .= '(Access the performance activities management interface)';
-        $this->expectExceptionMessage($expected_message);
+        $this->expectException(required_capability_exception::class);
+        $this->expectExceptionMessage('Manage performance activities');
 
         update_activity_general_info::resolve($args, $this->get_execution_context());
     }
