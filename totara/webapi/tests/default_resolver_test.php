@@ -31,96 +31,83 @@ use totara_webapi\graphql;
 class totara_webapi_default_resolver_test extends advanced_testcase {
 
     public function test_query_resolver() {
-        $object_type_mock = $this->getMockBuilder(ObjectType::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $result = $this->resolve_graphql_query('totara_webapi_status');
 
-        $object_type_mock->name = 'Query';
-
-        $resolve_info_mock = $this->getMockBuilder(ResolveInfo::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $resolve_info_mock->parentType = $object_type_mock;
-        $resolve_info_mock->fieldName = 'totara_webapi_status';
-
-        $execution_context = execution_context::create(graphql::TYPE_AJAX, 'totara_webapi_status');
-
-        $resolver = new default_resolver();
-        $result = $resolver(null, [], $execution_context, $resolve_info_mock);
         $this->assertIsArray($result);
         $this->assertArrayHasKey('status', $result);
         $this->assertArrayHasKey('timestamp', $result);
     }
 
     public function test_query_resolver_unknown_query() {
-        $object_type_mock = $this->getMockBuilder(ObjectType::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $object_type_mock->name = 'Query';
-
-        $resolve_info_mock = $this->getMockBuilder(ResolveInfo::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $resolve_info_mock->parentType = $object_type_mock;
-        $resolve_info_mock->fieldName = 'idonot_exist';
-
-        $execution_context = execution_context::create(graphql::TYPE_AJAX, 'idonot_exist');
-
-        $resolver = new default_resolver();
-
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('GraphQL query name is invalid');
-        $resolver(null, [], $execution_context, $resolve_info_mock);
+
+        $this->resolve_graphql_query('idonot_exist');
     }
 
     public function test_query_resolver_resolver_class_missing() {
-        $object_type_mock = $this->getMockBuilder(ObjectType::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $object_type_mock->name = 'Query';
-
-        $resolve_info_mock = $this->getMockBuilder(ResolveInfo::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $resolve_info_mock->parentType = $object_type_mock;
-        $resolve_info_mock->fieldName = 'totara_webapi_idonotexist';
-
-        $execution_context = execution_context::create(graphql::TYPE_AJAX, 'totara_webapi_idonotexist');
-
-        $resolver = new default_resolver();
-
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('GraphQL query resolver class is missing');
-        $resolver(null, [], $execution_context, $resolve_info_mock);
+
+        $this->resolve_graphql_query('totara_webapi_idonotexist');
     }
 
-    public function test_mutation_resolver() {
-        // TODO: Come up with a mutation we can use for this test
-        $this->markTestIncomplete('This cannot be completed now without a mutation we can use.');
+    public function test_query_resolver_with_middleware() {
+        global $CFG;
+        require_once $CFG->dirroot.'/totara/webapi/tests/fixtures/resolver/query/test_middleware_query_resolver.php';
+
+        $result = $this->resolve_graphql_query('totara_webapi_test_middleware_query_resolver', ['arg1' => 'value1']);
+
+        $this->assertArrayHasKey('success', $result);
+        $this->assertEquals(true, $result['success']);
+        $this->assertArrayHasKey('args', $result);
+        $this->assertEqualsCanonicalizing([
+            'arg1' => 'newvalue1',
+            'arg2' => 'value2'
+        ], $result['args']);
+
+        $this->assertArrayHasKey('result1', $result);
+        $this->assertArrayHasKey('result2', $result);
+    }
+
+    public function test_query_resolver_with_invalid_middleware() {
+        global $CFG;
+        require_once $CFG->dirroot.'/totara/webapi/tests/fixtures/resolver/query/test_middleware_query_resolver_with_invalid_middleware.php';
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Expecting an array of middleware instances only');
+
+        $this->resolve_graphql_query('totara_webapi_test_middleware_query_resolver_with_invalid_middleware');
+    }
+
+    public function test_query_resolver_with_broken_middleware() {
+        global $CFG;
+        require_once $CFG->dirroot.'/totara/webapi/tests/fixtures/resolver/query/test_middleware_query_resolver_with_broken_middleware.php';
+
+        $this->expectExceptionMessage('Return value of totara_webapi\webapi\resolver\middleware\test_request_2_broken::handle() must be an instance of core\webapi\resolver\result');
+
+        $this->resolve_graphql_query('totara_webapi_test_middleware_query_resolver_with_broken_middleware');
+    }
+
+    public function test_mutation_resolver_with_middleware() {
+        global $CFG;
+        require_once $CFG->dirroot.'/totara/webapi/tests/fixtures/resolver/mutation/test_middleware_mutation_resolver.php';
+
+        $result = $this->resolve_graphql_mutation('totara_webapi_test_middleware_mutation_resolver');
+
+        $this->assertArrayHasKey('mutation_success', $result);
+        $this->assertEquals(true, $result['mutation_success']);
+        $this->assertArrayHasKey('args', $result);
+        $this->assertEqualsCanonicalizing([
+            'arg1' => 'newvalue1',
+            'arg2' => 'value2'
+        ], $result['args']);
+
+        $this->assertArrayHasKey('result1', $result);
+        $this->assertArrayHasKey('result2', $result);
     }
 
     public function test_type_resolver() {
-        $object_type_mock = $this->getMockBuilder(ObjectType::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $object_type_mock->name = 'totara_webapi_status';
-
-        $resolve_info_mock = $this->getMockBuilder(ResolveInfo::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $resolve_info_mock->parentType = $object_type_mock;
-
-        $execution_context = execution_context::create(graphql::TYPE_AJAX, 'totara_webapi_status');
-
-        $resolver = new default_resolver();
-
         $timestamp = time();
 
         $source = [
@@ -131,68 +118,31 @@ class totara_webapi_default_resolver_test extends advanced_testcase {
         $args = ['format' => date_format::FORMAT_ISO8601];
 
         // First let's query the status column
-        $resolve_info_mock->fieldName = 'status';
-
-        $result = $resolver($source, $args, $execution_context, $resolve_info_mock);
+        $result = $this->resolve_graphql_type('totara_webapi_status', 'status', $source, $args);
         $this->assertEquals('green', $result);
 
         // Then the timestamp
-        $resolve_info_mock->fieldName = 'timestamp';
-
         $date = new DateTime('@' . $timestamp);
         $date->setTimezone(core_date::get_user_timezone_object());
         $expected_timestamp_result = $date->format(DateTime::ISO8601);
 
-        $result = $resolver($source, $args, $execution_context, $resolve_info_mock);
+        $result = $this->resolve_graphql_type('totara_webapi_status', 'timestamp', $source, $args);
         $this->assertEquals($expected_timestamp_result, $result);
     }
 
     public function test_type_resolver_with_invalid_name() {
-        $object_type_mock = $this->getMockBuilder(ObjectType::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $object_type_mock->name = 'totara_idontexist';
-
-        $resolve_info_mock = $this->getMockBuilder(ResolveInfo::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $resolve_info_mock->parentType = $object_type_mock;
-        $resolve_info_mock->fieldName = 'status';
-
         $source = [
             'status' => 'green',
             'timestamp' => 123
         ];
 
-        $execution_context = execution_context::create(graphql::TYPE_AJAX, 'totara_idontexist');
-
-        $resolver = new default_resolver();
-
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('Type resolvers must be named as component_name, e.g. totara_job_job');
 
-        $resolver($source, [], $execution_context, $resolve_info_mock);
+        $this->resolve_graphql_type('totara_idontexist', 'status', $source);
     }
 
     public function test_no_existing_type_resolver_class_hits_graphql_default_resolver() {
-        $object_type_mock = $this->getMockBuilder(ObjectType::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $object_type_mock->name = 'totara_webapi_mystatus';
-
-        $resolve_info_mock = $this->getMockBuilder(ResolveInfo::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $resolve_info_mock->parentType = $object_type_mock;
-
-        $execution_context = execution_context::create(graphql::TYPE_AJAX, 'totara_webapi_mystatus');
-
-        $resolver = new default_resolver();
-
         $source = [
             'status' => 'red',
             'timestamp' => 123
@@ -201,39 +151,106 @@ class totara_webapi_default_resolver_test extends advanced_testcase {
         $args = ['format' => date_format::FORMAT_ISO8601];
 
         // First let's query the status column
-        $resolve_info_mock->fieldName = 'status';
-
-        $result = $resolver($source, $args, $execution_context, $resolve_info_mock);
+        $result = $this->resolve_graphql_type('totara_webapi_mystatus', 'status', $source, $args);
         $this->assertEquals('red', $result);
 
         // Then the timestamp. This time the format is ignored as its not going through the normal type resolver
-        $resolve_info_mock->fieldName = 'timestamp';
-
-        $result = $resolver($source, $args, $execution_context, $resolve_info_mock);
+        $result = $this->resolve_graphql_type('totara_webapi_mystatus', 'timestamp', $source, $args);
         $this->assertEquals(123, $result);
     }
 
     public function test_introspection_type() {
+        // We make sure the default resolver does not brake on introspection types
+        $result = $this->resolve_graphql_type('__schema', 'types', null, []);
+
+        // This is empty as it's usually handled internally
+        $this->assertNull($result);
+    }
+
+    /**
+     * Explicitly not depending on the webapi_phpunit_helper to make sure even if it
+     * changes these tests here still test what they should test.
+     *
+     * @param string $query_name
+     * @param array $variables
+     * @return mixed|null
+     */
+    protected function resolve_graphql_query(string $query_name, array $variables = []) {
         $object_type_mock = $this->getMockBuilder(ObjectType::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $object_type_mock->name = '__schema';
+        $object_type_mock->name = 'Query';
 
         $resolve_info_mock = $this->getMockBuilder(ResolveInfo::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $resolve_info_mock->parentType = $object_type_mock;
-        $resolve_info_mock->fieldName = 'types';
+        $resolve_info_mock->fieldName = $query_name;
 
-        $execution_context = execution_context::create(graphql::TYPE_AJAX, '__schema');
+        $execution_context = execution_context::create(graphql::TYPE_AJAX, $query_name);
 
-        // We make sure the default resolver does not brake on introspection types
         $resolver = new default_resolver();
-        $result = $resolver(null, [], $execution_context, $resolve_info_mock);
-        // This is empty as it's usually handled internally
-        $this->assertNull($result);
+        return $resolver(null, $variables, $execution_context, $resolve_info_mock);
+    }
+
+    /**
+     * Explicitly not depending on the webapi_phpunit_helper to make sure even if it
+     * changes these tests here still test what they should test.
+     *
+     * @param string $mutation_name
+     * @param array $variables
+     * @return mixed|null
+     */
+    protected function resolve_graphql_mutation(string $mutation_name, array $variables = []) {
+        $object_type_mock = $this->getMockBuilder(ObjectType::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $object_type_mock->name = 'Mutation';
+
+        $resolve_info_mock = $this->getMockBuilder(ResolveInfo::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $resolve_info_mock->parentType = $object_type_mock;
+        $resolve_info_mock->fieldName = $mutation_name;
+
+        $execution_context = execution_context::create(graphql::TYPE_AJAX, $mutation_name);
+
+        $resolver = new default_resolver();
+        return $resolver(null, $variables, $execution_context, $resolve_info_mock);
+    }
+
+    /**
+     * Explicitly not depending on the webapi_phpunit_helper to make sure even if it
+     * changes these tests here still test what they should test.
+     *
+     * @param string $type_name
+     * @param string $field_name
+     * @param $source
+     * @param array $variables
+     * @return mixed|null
+     */
+    protected function resolve_graphql_type(string $type_name, string $field_name, $source, array $variables = []) {
+        $object_type_mock = $this->getMockBuilder(ObjectType::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $object_type_mock->name = $type_name;
+
+        $resolve_info_mock = $this->getMockBuilder(ResolveInfo::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $resolve_info_mock->parentType = $object_type_mock;
+        $resolve_info_mock->fieldName = $field_name;
+
+        $execution_context = execution_context::create(graphql::TYPE_AJAX, null);
+
+        $resolver = new default_resolver();
+        return $resolver($source, $variables, $execution_context, $resolve_info_mock);
     }
 
 }

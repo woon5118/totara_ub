@@ -25,8 +25,12 @@
 namespace totara_webapi;
 
 use core\webapi\execution_context;
+use core\webapi\middleware;
 use core\webapi\mutation_resolver;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
+use core\webapi\resolver\payload;
+use core\webapi\resolver\result;
 use core_component;
 use GraphQL\Executor\Executor;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -45,18 +49,18 @@ class default_resolver {
      * This class can be used as a callable. The GraphQL library will call it when it tries
      * to resolve the operation given to it.
      *
-     * @param $source
-     * @param $args
+     * @param mixed $source
+     * @param mixed $variables
      * @param execution_context $ec
      * @param ResolveInfo $info
      *
      * @return mixed|null
      */
-    public function __invoke($source, $args, execution_context $ec, ResolveInfo $info) {
+    public function __invoke($source, $variables, execution_context $ec, ResolveInfo $info) {
         // phpcs:disable Totara.NamingConventions.ValidVariableName.LowerCaseUnderscores
         $ec->set_resolve_info($info);
 
-        $args = (array)$args;
+        $variables = (array) $variables;
         if ($info->parentType->name === 'Query' or $info->parentType->name === 'Mutation') {
             $otype = ($info->parentType->name === 'Query') ? 'query' : 'mutation';
 
@@ -64,12 +68,13 @@ class default_resolver {
             if (empty($component)) {
                 throw new \coding_exception('GraphQL ' . $otype . ' name is invalid', $info->fieldName);
             }
+            /** @var query_resolver|mutation_resolver $classname */
             $classname = "{$component}\\webapi\\resolver\\{$otype}\\{$name}";
             if (!class_exists($classname)) {
                 throw new \coding_exception('GraphQL ' . $otype . ' resolver class is missing', $info->fieldName);
             }
-            /** @var query_resolver|mutation_resolver $classname */
-            return $classname::resolve($args, $ec);
+
+            return self::resolve_query_mutation($classname, $variables, $ec);
         }
 
         // Regular data type.
@@ -82,11 +87,11 @@ class default_resolver {
             $classname = "{$component}\\webapi\\resolver\\type\\{$name}";
             if (class_exists($classname)) {
                 /** @var \core\webapi\type_resolver $classname */
-                return $classname::resolve($info->fieldName, $source, $args, $ec);
+                return $classname::resolve($info->fieldName, $source, $variables, $ec);
             }
         }
 
-        return Executor::defaultFieldResolver($source, $args, $ec, $info);
+        return Executor::defaultFieldResolver($source, $variables, $ec, $info);
         // phpcs:enable
     }
 
@@ -142,6 +147,55 @@ class default_resolver {
         }
 
         return [null, null];
+    }
+
+    /**
+     * Resolve a query or mutation by either generating and applying a middleware chain
+     * or if no middleware is specified calling the resolver directly.
+     *
+     * @param string $classname
+     * @param mixed $variables
+     * @param execution_context $ec
+     * @return mixed
+     */
+    protected function resolve_query_mutation(string $classname, $variables, execution_context $ec) {
+        if (is_subclass_of($classname, has_middleware::class)) {
+            /** @var middleware[] $middleware */
+            $middleware = $classname::get_middleware();
+
+            if (!empty($middleware)) {
+                $middleware = array_values(array_reverse($middleware));
+
+                // Wrapping the request to be more flexible in the future,
+                // adding new things will be easier compared to having fixed arguments for args and the ec
+                $payload = payload::create($variables, $ec);
+
+                $middleware_chain = function (payload $payload) use ($classname) {
+                    $result = $classname::resolve($payload->get_variables(), $payload->get_execution_context());
+                    // Wrapping the result to make sure the middleware has a specific return type
+                    return new result($result);
+                };
+
+                foreach ($middleware as $current_middleware) {
+                    // Middleware can be instances of class names both would work
+                    if (!is_subclass_of($current_middleware, middleware::class)) {
+                        throw new \coding_exception('Expecting an array of middleware instances only');
+                    }
+
+                    $middleware_chain = function (payload $payload) use ($middleware_chain, $current_middleware) {
+                        // This is just the class name, so let's instantiate it
+                        if (is_string($current_middleware)) {
+                            $current_middleware = new $current_middleware();
+                        }
+                        return $current_middleware->handle($payload, $middleware_chain);
+                    };
+                }
+
+                return $middleware_chain($payload)->get_data();
+            }
+        }
+
+        return $classname::resolve($variables, $ec);
     }
 
 }
