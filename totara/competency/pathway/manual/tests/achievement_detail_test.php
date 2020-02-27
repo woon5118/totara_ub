@@ -67,7 +67,7 @@ class pathway_manual_achievement_detail_testcase extends pathway_manual_base_tes
 
         $this->validate_and_run_aggregation_task();
 
-        $expected_string = get_string('rating_by', 'pathway_manual', [
+        $expected_string = get_string('activity_log_rating_by', 'pathway_manual', [
                 'name' => $this->user1->fullname,
                 'role' => 'Self',
         ]);
@@ -95,7 +95,7 @@ class pathway_manual_achievement_detail_testcase extends pathway_manual_base_tes
         );
         $this->validate_and_run_aggregation_task();
 
-        $expected_string = get_string('rating_by', 'pathway_manual', [
+        $expected_string = get_string('activity_log_rating_by', 'pathway_manual', [
                 'name' => $this->user2->fullname,
                 'role' => 'Manager',
         ]);
@@ -121,7 +121,7 @@ class pathway_manual_achievement_detail_testcase extends pathway_manual_base_tes
         );
         $this->validate_and_run_aggregation_task();
 
-        $expected_string = get_string('rating_by', 'pathway_manual', [
+        $expected_string = get_string('activity_log_rating_by', 'pathway_manual', [
                 'name' => $this->user2->fullname,
                 'role' => 'Appraiser',
         ]);
