@@ -28,7 +28,6 @@ use coding_exception;
 use Countable;
 use Iterator;
 use JsonSerializable;
-use stdClass;
 
 /**
  * This is a generic collection accepting an array of items. It provides a set of convenience method to work with the data.
@@ -304,7 +303,7 @@ class collection implements Iterator, JsonSerializable, Countable {
     /**
      * Returns the last item
      *
-     * @return array|stdClass|null
+     * @return mixed|null
      */
     public function last() {
         $items = $this->all();
@@ -324,7 +323,7 @@ class collection implements Iterator, JsonSerializable, Countable {
     /**
      * Return first item in the collection
      *
-     * @return array|stdClass|null
+     * @return mixed|null
      */
     public function first() {
         return $this->all()[0] ?? null;
