@@ -82,6 +82,10 @@ class competency_aggregation_all extends scheduled_task {
                 "LEFT JOIN {{$queue_table->get_table_name()}} as qt 
                         ON tcau.user_id = qt.{$queue_table->get_user_id_column()}
                        AND tcau.competency_id = qt.{$queue_table->get_competency_id_column()}";
+            if ($table->get_process_key_column()) {
+                $has_changed_join .= " AND {$table->get_process_key_column()} IS NULL";
+            }
+
             $has_changed_column_value = ", COALESCE(MAX(qt.{$queue_table->get_has_changed_column()}), 0)";
         }
 
