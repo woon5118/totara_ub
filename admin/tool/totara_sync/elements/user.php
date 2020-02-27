@@ -443,8 +443,15 @@ class totara_sync_element_user extends totara_sync_element {
                     continue;
                 }
 
-                // Do multitenancy updates.
-                $this->set_multitenancy($user, $suser);
+                try {
+                    // Do multitenancy updates.
+                    $this->set_multitenancy($user, $suser);
+                } catch (Exception $e) {
+                    $this->addlog(get_string('tenantuserxproblem', 'tool_totara_sync', $suser->idnumber) . ': ' .
+                        $e->getMessage(), 'warn', 'updateusers');
+                    $problemswhileapplying = true;
+                    // Try to continue with other operations to this user.
+                }
 
                 // Update user password.
                 if ($updatepassword) {
@@ -514,6 +521,7 @@ class totara_sync_element_user extends totara_sync_element {
      */
     function create_user($suser, $unused = false) {
         global $CFG, $DB;
+        require_once($CFG->dirroot . '/cohort/lib.php');
 
         if ($unused !== false) {
             debugging('The second parameter of create_user is deprecated', DEBUG_DEVELOPER);
@@ -532,23 +540,39 @@ class totara_sync_element_user extends totara_sync_element {
             $user->lang = $CFG->lang;
             $user->timecreated = time();
             $user->auth = isset($suser->auth) ? $suser->auth : 'manual';
+            try {
+                // Make sure auth is valid before creating users.
+                $userauth = get_auth_plugin($user->auth);
+            } catch (Exception $e) {
+                // Throws exception which will be captured by caller.
+                $transaction->rollback(new totara_sync_exception('user', 'createusers', 'invalidauthforuserx', $user->auth));
+            }
+
             $this->set_sync_user_fields($user, $suser);
 
             // Add user default fields where appropriate
             $user->maildisplay = core_user::get_property_default('maildisplay');
 
-            try {
-                $user->id = $DB->insert_record('user', $user);  // Insert user.
-            } catch (Exception $e) {
-                // Throws exception which will be captured by caller.
-                $transaction->rollback(new totara_sync_exception('user', 'createusers', 'cannotcreateuserx', $user->idnumber));
+            // We must create user in correct tenant, moving them around may create problems.
+            if (!$CFG->tenantsenabled || !isset($suser->tenantmember) || $suser->tenantmember === '') {
+                $user->tenantid = null;
+            } else {
+                $user->tenantid = $DB->get_field('tenant', 'id', array('idnumber' => $suser->tenantmember), MUST_EXIST);
             }
 
             try {
-                $userauth = get_auth_plugin($user->auth);
+                $user->id = $DB->insert_record('user', $user);  // Insert user.
+                $user = $DB->get_record('user', ['id' => $user->id]); // Reload to get DB defaults.
+                $usercontext = context_user::instance($user->id);
+                // HACK: It is illegal to insert records into the user table directly - this needs fixing!
+                //       For now we must at least copy the tenant init code from user_create_user().
+                if ($user->tenantid) {
+                    $tenant = $DB->get_record('tenant', ['id' => $user->tenantid], '*', MUST_EXIST);
+                    cohort_add_member($tenant->cohortid, $user->id);
+                }
             } catch (Exception $e) {
                 // Throws exception which will be captured by caller.
-                $transaction->rollback(new totara_sync_exception('user', 'createusers', 'invalidauthforuserx', $user->auth));
+                $transaction->rollback(new totara_sync_exception('user', 'createusers', 'cannotcreateuserx', $user->idnumber));
             }
 
             if ($userauth->can_change_password()) {
@@ -578,8 +602,6 @@ class totara_sync_element_user extends totara_sync_element {
             // Update custom field data.
             $user = $this->put_custom_field_data($user, $suser);
 
-            // Do multitenancy updates.
-            $this->set_multitenancy($user, $suser);
         } catch (totara_sync_exception $e) {
             // One of the totara sync exceptions above was triggered. Rollback has already occurred. Just pass on the exception.
             throw $e;
@@ -587,8 +609,6 @@ class totara_sync_element_user extends totara_sync_element {
             // Some other exception has occurred. Rollback, which in turn passes on the exception.
             $transaction->rollback(new totara_sync_exception('user', 'createusers', 'cannotcreateuserx', $suser->idnumber));
         }
-
-        $transaction->allow_commit();
 
         $event = \core\event\user_created::create(
             array(
@@ -598,44 +618,84 @@ class totara_sync_element_user extends totara_sync_element {
         );
         $event->trigger();
 
+        try {
+            // Update tenant participation here because we need to trigger cohort events after user creation event.
+            $this->set_multitenancy($user, $suser);
+        } catch (Exception $e) {
+            $transaction->rollback(new totara_sync_exception('user', 'createusers', 'cannotcreateuserx', $suser->idnumber));
+        }
+
+        $transaction->allow_commit();
+
         return true;
     }
 
     /**
-     * @param stdClass $user existing user object
+     * Update tenant membership and participation.
+     *
+     * @param stdClass $user existing user object, tenantid is updated if changed
      * @param stdClass $suser sync user object
-     * @return bool
      */
     public function set_multitenancy($user, $suser) {
         global $CFG, $DB;
 
         if (!$CFG->tenantsenabled) {
-            return false;
+            return;
         }
 
-        if (isset($suser->tenantmember)) {
-            if ($suser->tenantmember === '') {
-                $tenantid = 0; // Remove tenant membership.
-            } else {
-                // Set the tenant membership.
-                $tenantid = $DB->get_field('tenant', 'id', array('idnumber' => $suser->tenantmember), MUST_EXIST);
-            }
-        } else {
+        if (!property_exists($suser, 'tenantmember') || is_null($suser->tenantmember)) {
+            // Keep current value.
+            $tenantid = $user->tenantid;
+        } else if ($suser->tenantmember === '') {
+            // Not a member.
             $tenantid = null;
+        } else {
+            // This is a tenant member.
+            $tenantid = $DB->get_field('tenant', 'id', array('idnumber' => $suser->tenantmember), MUST_EXIST);
         }
 
-        $tenantparticipant = isset($suser->tenantparticipant) ? $suser->tenantparticipant : null;
+        if ($tenantid) {
+            if ($tenantid === $user->tenantid) {
+                // Nothing to change, participation info must be ignored.
+                return;
+            }
+            // Move user into the requested new tenant,
+            // this removed participation in all other tenants if user was global.
+            totara_tenant\local\util::migrate_user_to_tenant($user->id, $tenantid);
+            $user->tenantid = $tenantid;
+            return;
+        }
 
-        if (!is_null($tenantid) || !is_null($tenantparticipant)) {
-            if ($tenantid) {
-                totara_tenant\local\util::migrate_user_to_tenant($user->id, $tenantid);
-            } else if (!is_null($tenantparticipant) || $tenantid === 0) {
-                $tenantids = empty($tenantparticipant) ? [] : explode(',', $tenantparticipant);
-                totara_tenant\local\util::set_user_participation($user->id, $tenantids);
+        // Update participation of non-member (aka global user).
+        if (!property_exists($suser, 'tenantparticipant') || is_null($suser->tenantparticipant)) {
+            if (!$user->tenantid) {
+                // User is not member of any tenant already, keep current participation.
+                return;
+            } else {
+                // Migrate tenant member to global user, do not set any participation.
+                totara_tenant\local\util::set_user_participation($user->id, []);
+                $user->tenantid = null;
+                return;
             }
         }
 
-        return true;
+        // Update tenant participation.
+        if ($suser->tenantparticipant === '') {
+            // Remove participation.
+            $tenantids = [];
+        } else {
+            // Use the list of pre-processed tenant ids.
+            $tenantids = explode(',', $suser->tenantparticipant);
+        }
+        foreach ($tenantids as $k => $v) {
+            if ($v === '') {
+                unset($tenantids[$k]);
+                continue;
+            }
+        }
+
+        totara_tenant\local\util::set_user_participation($user->id, $tenantids);
+        $user->tenantid = null;
     }
 
     /**

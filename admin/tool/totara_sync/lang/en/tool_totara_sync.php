@@ -245,6 +245,7 @@ $string['tenantparticipant_help'] = 'A comma separated list of tenant idnumbers 
 NOTE: A user can only be set as a member or a participant of a tenant, not both.';
 $string['tenantparticipantidnumberxnotexist'] = 'Tenant participant idnumber {$a->tenantmember} does not exist. Skipped user {$a->idnumber}';
 $string['tenantparticipantidnumbersxnotexist'] = 'Tenant participants idnumbers {$a->tenantmembers} do not exist. Skipped user {$a->idnumber}';
+$string['tenantuserxproblem'] = 'User {$a->idnumber} tenant related update failed';
 
 // Database sources
 $string['dbtype'] = 'Database type';

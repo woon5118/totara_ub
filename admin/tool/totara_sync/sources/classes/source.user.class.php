@@ -319,7 +319,7 @@ abstract class totara_sync_source_user extends totara_sync_source {
             $table->add_field('tenantmember', XMLDB_TYPE_CHAR, '100');
         }
         if (!empty($this->config->import_tenantparticipant)) {
-            $table->add_field('tenantparticipant', XMLDB_TYPE_TEXT, 'medium');
+            $table->add_field('tenantparticipant', XMLDB_TYPE_TEXT);
         }
         $table->add_field('customfields', XMLDB_TYPE_TEXT, 'big');
 

@@ -382,8 +382,6 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
         foreach($row as $key => $value) {
             switch ($key) {
                 case 'idnumber':
-                case 'tenantmember':
-                case 'tenantparticipant':
                 case 'timemodified':
                 case 'username':
                 case 'firstname':
@@ -411,6 +409,8 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
                     break;
                 case 'description':
                 case 'password':
+                case 'tenantmember':      // Do not modify idnumbers!
+                case 'tenantparticipant': // Do not modify idnumbers!
                     $cleaned[$key] = clean_param(trim($value), PARAM_RAW);
                     break;
                 default:
