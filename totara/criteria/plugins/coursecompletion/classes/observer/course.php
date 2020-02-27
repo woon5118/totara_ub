@@ -31,6 +31,7 @@ use core\event\course_completed;
 use core\event\course_deleted;
 use core\event\course_restored;
 use core\event\course_updated;
+use totara_completioneditor\event\course_completion_edited;
 use totara_completionimport\event\bulk_course_completionimport;
 use totara_criteria\course_item_helper;
 
@@ -98,7 +99,7 @@ class course {
      * determine that some course settings have been changed. When this happens we re-evaluate the validity
      * of  all criteria that uses the course
      *
-     * @param course_update $event
+     * @param course_updated $event
      */
     public static function course_updated(course_updated $event) {
         course_item_helper::course_settings_changed($event->objectid, 'coursecompletion');
