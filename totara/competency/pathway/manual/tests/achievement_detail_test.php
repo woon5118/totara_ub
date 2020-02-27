@@ -132,7 +132,7 @@ class pathway_manual_achievement_detail_testcase extends pathway_manual_base_tes
         );
         manual_rating_other::execute_purge(new target_user((object) $this->user2->to_array()), context_system::instance());
 
-        $expected_string = get_string('rating_by_removed', 'pathway_manual', 'an appraiser');
+        $expected_string = get_string('activity_log_rating_by_removed', 'pathway_manual', 'an appraiser');
         $this->validate_and_run_aggregation_task();
         $this->assert_achieved_via_string($this->user1->id, $expected_string);
     }
@@ -157,7 +157,7 @@ class pathway_manual_achievement_detail_testcase extends pathway_manual_base_tes
         delete_user((object) $this->user2->to_array());
         $this->validate_and_run_aggregation_task();
 
-        $expected_string = get_string('rating_by_removed', 'pathway_manual', 'a manager');
+        $expected_string = get_string('activity_log_rating_by_removed', 'pathway_manual', 'a manager');
         $this->assert_achieved_via_string($this->user1->id, $expected_string);
     }
 

@@ -39,14 +39,14 @@ class achievement_detail extends base_achievement_detail {
         $rating = new rating($this->related_info['rating_id']);
         $rater = $rating->assigned_by_user;
         if ($rater) {
-            $string = get_string('rating_by', 'pathway_manual', [
+            $string = get_string('activity_log_rating_by', 'pathway_manual', [
                 'name' => fullname((object) $rater->to_array()),
                 'role' => $rating->get_role()::get_display_name(),
             ]);
         } else {
             // The user data for the rater has been purged or user has been deleted.
             $role = get_string("role_{$rating->assigned_by_role}_prefix", 'pathway_manual');
-            $string = get_string('rating_by_removed', 'pathway_manual', $role);
+            $string = get_string('activity_log_rating_by_removed', 'pathway_manual', $role);
         }
 
         return [$string];
