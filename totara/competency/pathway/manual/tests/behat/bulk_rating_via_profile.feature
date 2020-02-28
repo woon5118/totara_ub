@@ -33,7 +33,6 @@ Feature: Test rating a competency for a user as different roles via the user's c
     Given I log in as "user1"
     When I am on profile page for user "user1"
     And I click on "Competency profile" "link" in the ".userprofile" "css_element"
-    And I wait until ".tui-Preloader" "css_element" does not exist
     And I click on "Rate competencies" "link"
     Then I should see "Rate competencies" in the "#page h2" "css_element"
     And I should not see the "User One" image in the ".tui-bulkManualRatingPageHeader" "css_element"
@@ -51,7 +50,6 @@ Feature: Test rating a competency for a user as different roles via the user's c
     Given I log in as "user2"
     When I am on profile page for user "user1"
     And I click on "Competency profile" "link" in the ".userprofile" "css_element"
-    And I wait until ".tui-Preloader" "css_element" does not exist
     And I click on "Rate competencies" "link"
     Then I should see "Rate User One" in the "#page h2" "css_element"
     And I should see the "User One" image in the ".tui-bulkManualRatingPageHeader" "css_element"
@@ -69,7 +67,6 @@ Feature: Test rating a competency for a user as different roles via the user's c
     Given I log in as "user3"
     When I am on profile page for user "user1"
     And I click on "Competency profile" "link" in the ".userprofile" "css_element"
-    And I wait until ".tui-Preloader" "css_element" does not exist
     And I click on "Rate competencies" "link"
     Then I should see "Rate User One" in the "#page h2" "css_element"
     And I should see the "User One" image in the ".tui-bulkManualRatingPageHeader" "css_element"

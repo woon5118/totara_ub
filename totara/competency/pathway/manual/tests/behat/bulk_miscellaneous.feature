@@ -32,7 +32,6 @@ Feature: Test miscellaneous bulk manual rating features.
     Given I log in as "user1"
     When I am on profile page for user "user1"
     And I click on "Competency profile" "link" in the ".userprofile" "css_element"
-    And I wait until ".tui-Preloader" "css_element" does not exist
     And I click on "Rate competencies" "link"
 
     Then I should see "Previous rating"
@@ -65,7 +64,6 @@ Feature: Test miscellaneous bulk manual rating features.
     Given I log in as "user1"
     When I am on profile page for user "user1"
     And I click on "Competency profile" "link" in the ".userprofile" "css_element"
-    And I wait until ".tui-Preloader" "css_element" does not exist
     And I click on "Rate competencies" "link"
 
     Then I should see "New rating"

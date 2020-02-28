@@ -31,13 +31,8 @@ Feature: Test rating a single competency via the competency detail page.
     When I log in as "user1"
     When I am on profile page for user "user1"
     And I click on "Competency profile" "link" in the ".userprofile" "css_element"
-    And I wait until ".tui-Preloader" "css_element" does not exist
-    # TODO: The following step should be changed with TL-21782.
-    # The intention of the step is to change to the list view of competencies on the competency profile main page.
-    And I click on ".tui-CompetencyProfile__tab-toggle-link:not(.active)" "css_element"
-    And I wait until ".tui-Preloader" "css_element" does not exist
+    And I change the competency profile to list view
     And I click on "Comp1" "link"
-    And I wait until ".tui-Preloader" "css_element" does not exist
     And I click on "Add rating" "link"
 
   Scenario: Remove single competency filter

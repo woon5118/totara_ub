@@ -54,7 +54,6 @@ Feature: Test filtering by users, roles, assignments etc. functions as expected.
     And I should not see "User 2-Two"
 
     When I set the field with xpath "//select[@class='tui-select__input']" to "appraiser"
-    And I wait until ".tui-Preloader" "css_element" does not exist
     Then I should see "User 2-Two" in the "//div[@class='tui-dataTableRow'][1]" "xpath_element"
     And I should see "2" in the "//div[@class='tui-dataTableRow'][1]" "xpath_element"
     And I should see "User 3-Three" in the "//div[@class='tui-dataTableRow'][2]" "xpath_element"
@@ -63,7 +62,6 @@ Feature: Test filtering by users, roles, assignments etc. functions as expected.
 
     When I set the field with xpath "//div[@class='tui-searchBox']/input" to "Three"
     And I click on "//div[@class='tui-searchBox']/button" "xpath_element"
-    And I wait until ".tui-Preloader" "css_element" does not exist
     Then I should see "User 3-Three" in the "//div[@class='tui-dataTableRow'][1]" "xpath_element"
     And I should see "3" in the "//div[@class='tui-dataTableRow'][1]" "xpath_element"
     And I should not see "User 1-One"
@@ -72,7 +70,6 @@ Feature: Test filtering by users, roles, assignments etc. functions as expected.
   Scenario: Rate competencies for a user and switch roles
     When I am on profile page for user "user3"
     And I click on "Competency profile" "link" in the ".userprofile" "css_element"
-    And I wait until ".tui-Preloader" "css_element" does not exist
     And I click on "Rate competencies" "link"
 
     # Select manager role
@@ -113,7 +110,6 @@ Feature: Test filtering by users, roles, assignments etc. functions as expected.
   Scenario: Filter the list of competencies when rating a user
     When I am on profile page for user "user3"
     And I click on "Competency profile" "link" in the ".userprofile" "css_element"
-    And I wait until ".tui-Preloader" "css_element" does not exist
     And I click on "Rate competencies" "link"
     When I set the field with xpath "//select[@class='tui-select__input']" to "manager"
 
