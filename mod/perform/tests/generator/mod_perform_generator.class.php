@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -18,16 +18,24 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @author Murali Nair <murali.nair@totaralearning.com>
  * @package mod_perform
  */
 
 use container_perform\perform as perform_container;
+
+use core\collection;
 use core_container\module\module;
+
 use mod_perform\models\activity\section_relationship as section_relationship_model;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\element;
 use mod_perform\models\activity\section_element;
+use mod_perform\models\activity\track;
+use mod_perform\models\activity\track_assignment_type;
+
+use mod_perform\user_groups\grouping;
 
 /**
  * Perform generator
@@ -108,5 +116,130 @@ class mod_perform_generator extends component_generator_base {
 
     public function create_section_relationship(section $section, array $data): section_relationship_model {
         return section_relationship_model::create($section->get_id(), $data['class_name']);
+    }
+
+    /**
+     * Creates a set of tracks for the given activity.
+     *
+     * @param activity $activity parent activity.
+     * @param int $track_count no of tracks to generate
+     *
+     * @return collection $tracks the generated tracks.
+     */
+    public function create_activity_tracks(activity $activity, int $track_count=1): collection {
+        return collection::new(range(0, $track_count - 1))
+            ->map_to(
+                function (int $i) use ($activity): track {
+                    return track::create($activity, "track #$i");
+                }
+            );
+    }
+
+    /**
+     * Creates one track with one cohort assignment for the given activity.
+     *
+     * @param activity $activity parent activity.
+     *
+     * @return track $track the generated track.
+     */
+    public function create_single_activity_track_and_assignment(activity $activity): track {
+        $track = track::create($activity, "test track");
+        return $this->create_track_assignments($track, 1, 0, 0, 0);
+    }
+
+    /**
+     * Creates a set of track assignments for the given track.
+     *
+     * @param track $track parent track.
+     * @param int $cohort_count no of cohorts to generate for assignments.
+     * @param int $org_count no of organizations to generate for assignments.
+     * @param int $pos_count no of positions to generate for assignments.
+     * @param int $user_count no of users to generate for assignments.
+     *
+     * @return track the updated track.
+     */
+    public function create_track_assignments(
+        track $track,
+        int $cohort_count=1,
+        int $org_count=1,
+        int $pos_count=1,
+        int $user_count=1
+    ): track {
+        $pos = [];
+        $hierarchies = $this->datagenerator->get_plugin_generator('totara_hierarchy');
+        if ($pos_count > 0) {
+            $data = ['frameworkid' => $hierarchies->create_pos_frame([])->id];
+
+            foreach (range(0, $pos_count - 1) as $unused) {
+                $pos[] = $hierarchies->create_pos($data)->id;
+            }
+        }
+
+        $orgs = [];
+        if ($org_count > 0) {
+            $data = ['frameworkid' => $hierarchies->create_org_frame([])->id];
+
+            foreach (range(0, $org_count - 1) as $unused) {
+                $orgs[] = $hierarchies->create_org($data)->id;
+            }
+        }
+
+        $cohorts = [];
+        if ($cohort_count > 0) {
+            foreach (range(0, $cohort_count - 1) as $unused) {
+                $cohorts[] = $this->datagenerator->create_cohort()->id;
+            }
+        }
+
+        $users = [];
+        if ($user_count > 0) {
+            foreach (range(0, $user_count - 1) as $unused) {
+                $users[] = $this->datagenerator->create_user()->id;
+            }
+        }
+
+        return $this->create_track_assignments_with_existing_groups($track, $cohorts, $orgs, $pos, $users);
+    }
+
+    /**
+     * Creates a set of track assignments (of admin type) for the given track.
+     *
+     * @param track $track parent track.
+     * @param int[] $cohorts cohort ids to assign.
+     * @param int[] $orgs organization ids to assign.
+     * @param int[] $pos position ids to assign.
+     * @param int[] $users user ids to assign.
+     *
+     * @return track the updated track.
+     */
+    public function create_track_assignments_with_existing_groups(
+        track $track,
+        array $cohorts = [],
+        array $orgs = [],
+        array $pos = [],
+        array $users = []
+    ): track {
+        $assignments = [];
+        foreach ($cohorts as $id) {
+            $assignments[] = grouping::cohort($id);
+        }
+        foreach ($orgs as $id) {
+            $assignments[] = grouping::org($id);
+        }
+        foreach ($pos as $id) {
+            $assignments[] = grouping::pos($id);
+        }
+        foreach ($users as $id) {
+            $assignments[] = grouping::user($id);
+        }
+
+        $assign_type = track_assignment_type::ADMIN;
+        return collection::new($assignments)
+            ->reduce(
+                function (track $interim, grouping $group) use ($assign_type): track {
+                    return $interim->add_assignment($assign_type, $group);
+                },
+                $track
+            );
     }
 }

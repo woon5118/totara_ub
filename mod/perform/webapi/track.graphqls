@@ -1,0 +1,49 @@
+type mod_perform_track_assignment {
+  track_id: core_id!
+  type: Int!
+  group: mod_perform_user_grouping!
+}
+
+type mod_perform_track {
+  id: core_id!
+  description(format: core_format = HTML): String!
+  status: Int!
+  assignments: [mod_perform_track_assignment!]!
+}
+
+input mod_perform_track_assignments_input {
+  track_id: core_id!
+  type: Int!
+  groups: [mod_perform_user_grouping_input!]!
+}
+
+input mod_perform_create_track_input {
+  activity_id: param_integer!
+  description: param_text
+}
+
+extend type Query {
+  mod_perform_tracks(activity_id: param_integer!): [mod_perform_track!]!
+
+  mod_perform_track(track_id: param_integer!): mod_perform_track!
+
+  """
+  TODO temporary query. To be removed and replaced by mod_perform_track when
+  multiple tracks per activity gets implemented in the front end.
+  """
+  mod_perform_default_track(activity_id: param_integer!): mod_perform_track!
+}
+
+extend type Mutation {
+  mod_perform_create_track(
+    details: mod_perform_create_track_input!
+  ): mod_perform_track!
+
+  mod_perform_add_track_assignments(
+    assignments: mod_perform_track_assignments_input!
+  ): mod_perform_track!
+
+  mod_perform_remove_track_assignments(
+    assignments: mod_perform_track_assignments_input!
+  ): mod_perform_track!
+}

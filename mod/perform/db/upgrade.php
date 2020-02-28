@@ -653,5 +653,79 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020030904, 'perform');
     }
 
+    if ($oldversion < 2020031300) {
+        // Change perform_track.status to integer
+        $table = new xmldb_table('perform_track');
+        $index = new xmldb_index('status', XMLDB_INDEX_NOTUNIQUE, array('status'));
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, 2, null, XMLDB_NOTNULL, null, 0);
+        $dbman->change_field_type($table, $field);
+
+        $dbman->add_index($table, $index);
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020031300, 'perform');
+    }
+
+    if ($oldversion < 2020031301) {
+        // Change perform_track_assignment.type to integer
+        $table = new xmldb_table('perform_track_assignment');
+        $index = new xmldb_index(
+            'track_id_type_group_type_group_id',
+            XMLDB_INDEX_UNIQUE,
+            ['track_id', 'type', 'user_group_type', 'user_group_id']
+        );
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        $field = new xmldb_field('type', XMLDB_TYPE_INTEGER, 2, null, XMLDB_NOTNULL, null, 0);
+        $dbman->change_field_type($table, $field);
+
+        $dbman->add_index($table, $index);
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020031301, 'perform');
+    }
+
+    if ($oldversion < 2020031302) {
+        // Change perform_track_assignment.user_group_type to integer
+        $index_track_grp_type_id = new xmldb_index(
+            'track_id_type_group_type_group_id',
+            XMLDB_INDEX_UNIQUE,
+            ['track_id', 'type', 'user_group_type', 'user_group_id']
+        );
+        if ($dbman->index_exists($table, $index_track_grp_type_id)) {
+            $dbman->drop_index($table, $index_track_grp_type_id);
+        }
+
+        $index_grp_type = new xmldb_index('user_group_type', XMLDB_INDEX_NOTUNIQUE, ['user_group_type']);
+        if ($dbman->index_exists($table, $index_grp_type)) {
+            $dbman->drop_index($table, $index_grp_type);
+        }
+
+        $index_grp_type_id = new xmldb_index(
+            'user_group_type_user_group_id',
+            XMLDB_INDEX_NOTUNIQUE,
+            ['user_group_type', 'user_group_id']
+        );
+        if ($dbman->index_exists($table, $index_grp_type_id)) {
+            $dbman->drop_index($table, $index_grp_type_id);
+        }
+
+        $field = new xmldb_field('user_group_type', XMLDB_TYPE_INTEGER, 2, null, XMLDB_NOTNULL, null, 0);
+        $dbman->change_field_type($table, $field);
+
+        $dbman->add_index($table, $index_grp_type_id);
+        $dbman->add_index($table, $index_grp_type);
+        $dbman->add_index($table, $index_track_grp_type_id);
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020031302, 'perform');
+    }
+
     return true;
 }

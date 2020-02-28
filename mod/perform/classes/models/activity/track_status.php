@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -17,13 +17,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @author Murali Nair <murali.nair@totaralearning.com>
  * @package mod_perform
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace mod_perform\models\activity;
 
-$plugin->version  = 2020031302;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'mod_perform'; // To check on upgrade, that module sits in correct place
-$plugin->dependencies = ['container_perform' => 2020012400];
+/**
+ * Convenience enum to represent a track status.
+ */
+final class track_status {
+    public const ACTIVE = 1;
+    public const PAUSED = 2;
+
+    /**
+     * Get all allowed statuses.
+     *
+     * @return string[] the allowed statuses.
+     */
+    public static function get_allowed(): array {
+        return [
+            self::ACTIVE,
+            self::PAUSED
+        ];
+    }
+}

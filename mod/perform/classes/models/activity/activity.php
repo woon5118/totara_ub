@@ -163,7 +163,10 @@ class activity extends model {
                 role_assign($CFG->performanceactivitycreatornewroleid, $USER->id, $container_context);
             }
 
-            return self::load_by_entity($entity);
+            $activity = self::load_by_entity($entity);
+            track::create($activity, 'default track');
+
+            return $activity;
         });
     }
 

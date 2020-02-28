@@ -1,0 +1,9 @@
+query mod_perform_user_grouping_users {
+  mod_perform_user_grouping_users {
+    id
+    firstname
+    lastname
+    fullname
+    idnumber
+  }
+}

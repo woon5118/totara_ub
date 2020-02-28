@@ -24,7 +24,6 @@
 
 namespace mod_perform\entities\activity;
 
-use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many_through;
@@ -34,24 +33,35 @@ use core\orm\entity\relations\has_many_through;
  *
  * @property-read int $id record id
  * @property int $track_id parent track record id
- * @property string $type assignment type enum eg admin, self, other
- * @property string $user_group_type grouping type eg org, pos, cohort, user
+ * @property int $type assignment type enum
+ * @property int $user_group_type grouping type
  * @property int $user_group_id grouping record id
  * @property int $created_by userid who did assignment
  * @property int $created_at record creation time
  * @property int $updated_at record modification time
  * @property int $expand if the assignment should be expanded on the next expand
- *
  * @property-read collection|track_user_assignment[] $user_assignments All user assignments linked to this particular assignment
  * @property-read track $track The track this assignment belongs to
- *
  * @method static track_assignment_repository repository()
  */
-final class track_assignment extends entity {
-
+class track_assignment extends entity {
     public const TABLE = 'perform_track_assignment';
     public const CREATED_TIMESTAMP = 'created_at';
     public const UPDATED_TIMESTAMP = 'updated_at';
+
+    /**
+     * Group id getter. Needed because the read from the DB _returns strings and
+     * the ORM does not convert the value_.
+     *
+     * TBD: to remove once the base_entity handles this.
+     *
+     * @param $value incoming id.
+     *
+     * @return string the converted value.
+     */
+    public function get_user_group_id_attribute(?int $value = null): int {
+        return (int)$value;
+    }
 
     /**
      * Establishes the relationship with track entities.

@@ -48,6 +48,7 @@
           <component
             :is="component"
             v-model="activity"
+            :activity-id="activityId"
             @mutation-error="showMutationErrorNotification"
             @mutation-success="showMutationSuccessNotification"
           />
@@ -58,6 +59,7 @@
 </template>
 
 <script>
+import AssignmentsForm from 'mod_perform/components/manage_activity/AssignmentsForm';
 import ContentForm from 'mod_perform/components/manage_activity/ContentForm';
 import FlexIcon from 'totara_core/components/icons/FlexIcon';
 import GeneralInfoForm from 'mod_perform/components/manage_activity/GeneralInfoForm';
@@ -73,6 +75,7 @@ const TOAST_DURATION = 10 * 1000; // in microseconds.
 
 export default {
   components: {
+    AssignmentsForm,
     ContentForm,
     FlexIcon,
     Tab,
@@ -105,7 +108,7 @@ export default {
           name: this.$str('manage_activities_tabs:content', 'mod_perform'),
         },
         {
-          component: 'Loader',
+          component: 'AssignmentsForm',
           name: this.$str('manage_activities_tabs:assignment', 'mod_perform'),
         },
       ],

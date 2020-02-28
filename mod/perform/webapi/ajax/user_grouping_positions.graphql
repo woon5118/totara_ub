@@ -1,0 +1,9 @@
+query mod_perform_user_grouping_positions {
+  mod_perform_user_grouping_positions {
+    id
+    shortname
+    fullname
+    idnumber
+    description
+  }
+}

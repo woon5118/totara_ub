@@ -1,0 +1,16 @@
+mutation mod_perform_create_track($details: mod_perform_create_track_input!) {
+  mod_perform_create_track(details: $details) {
+    id
+    description
+    status
+    assignments {
+      type
+      group {
+        id
+        type
+        type_label
+        name
+      }
+    }
+  }
+}

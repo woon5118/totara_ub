@@ -23,7 +23,6 @@
 
 namespace mod_perform\entities\activity;
 
-use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many;
@@ -35,16 +34,14 @@ use core\orm\entity\relations\has_many_through;
  * @property-read int $id record id
  * @property int $activity_id parent activity record id
  * @property string $description track description
- * @property string $status track status eg active, archived
+ * @property int $status track status
  * @property int $created_at record creation time
  * @property int $updated_at record modification time
- *
  * @property-read collection|subject_instance[] $subject_instances
  * @property-read activity $activity
  * @property-read collection|track_assignment[] $assignments
  */
-final class track extends entity {
-
+class track extends entity {
     public const TABLE = 'perform_track';
     public const CREATED_TIMESTAMP = 'created_at';
     public const UPDATED_TIMESTAMP = 'updated_at';
@@ -82,5 +79,4 @@ final class track extends entity {
             'track_user_assignment_id'
         );
     }
-
 }

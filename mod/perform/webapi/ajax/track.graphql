@@ -1,0 +1,16 @@
+query mod_perform_track($track_id: param_integer!) {
+  mod_perform_track(track_id: $track_id) {
+    id
+    description
+    status
+    assignments {
+      type
+      group {
+        id
+        type
+        type_label
+        name
+      }
+    }
+  }
+}

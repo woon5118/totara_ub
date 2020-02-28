@@ -1,0 +1,9 @@
+query mod_perform_user_grouping_organisations {
+  mod_perform_user_grouping_organisations {
+    id
+    shortname
+    fullname
+    idnumber
+    description
+  }
+}
