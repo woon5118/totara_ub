@@ -29,11 +29,14 @@ use contentmarketplace_goone\contentmarketplace;
 use contentmarketplace_goone\form\create_course_form;
 use contentmarketplace_goone\form\create_course_controller;
 
-$category = optional_param('category', 0, PARAM_INT);
 $selection = required_param_array('selection', PARAM_ALPHANUMEXT);
 $create = optional_param('create', create_course_form::CREATE_COURSE_MULTI_ACTIVITY, PARAM_INT);
-$category = optional_param('category', 0, PARAM_INT);
 $mode = optional_param('mode', \totara_contentmarketplace\explorer::MODE_CREATE_COURSE, PARAM_ALPHAEXT);
+
+$category = optional_param('category', 0, PARAM_INT);
+if (!$category) {
+    $category = isset($selection[0]) ? optional_param('category_' . $selection[0], 0, PARAM_INT) : 0;
+}
 
 if ($category === 0) {
     $context = context_system::instance();

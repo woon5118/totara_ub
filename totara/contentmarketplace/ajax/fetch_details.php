@@ -28,8 +28,10 @@ require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 
 $id = required_param('id', PARAM_ALPHANUMEXT);
 $marketplace = required_param('marketplace', PARAM_ALPHA);
+$category = optional_param('category', 0, PARAM_INT);
 
-$context = context_system::instance();
+$context = $category ? context_coursecat::instance($category) : context_system::instance();
+
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/totara/contentmarketplace/ajax/fetch_details.php', ['id' => $id, 'marketplace' => $marketplace]));
 
