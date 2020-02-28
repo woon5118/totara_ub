@@ -86,7 +86,11 @@ $layouts = array(
     'secure' => array(
         'name' => 'Secure',
         'description' => 'This is the layout used when in a secure environment.'
-    )
+    ),
+    'legacynolayout' => array(
+        'name' => 'Legacy no layout',
+        'description' => 'This should only be used when using Vue layout components',
+    ),
 );
 
 if (!array_key_exists($layout, $layouts)) {

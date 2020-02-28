@@ -140,6 +140,10 @@ $THEME->layouts = array(
         'file' => 'general.php',
         'regions' => array(),
     ),
+    'legacynolayout' => array(
+        'file' => 'general.php',
+        'regions' => array(),
+    )
 );
 
 // We don't want the base theme to be shown on the theme selection screen, by setting
