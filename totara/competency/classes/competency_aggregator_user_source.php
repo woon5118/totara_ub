@@ -50,7 +50,7 @@ class competency_aggregator_user_source {
     }
 
     public function set_competency_id(?int $competency_id) {
-        $this->temp_user_table->set_comptency_id_value($competency_id);
+        $this->temp_user_table->set_competency_id_value($competency_id);
     }
 
     public function get_competency_id(): ?int {

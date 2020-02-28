@@ -1135,19 +1135,19 @@ class totara_competency_user_assignable_competencies_data_provider_testcase exte
         return $comp;
     }
 
-    private function activate_self_assignable(int $comptency_id) {
+    private function activate_self_assignable(int $competency_id) {
         global $DB;
         $DB->insert_record(
             'comp_assign_availability',
-            ['comp_id' => $comptency_id, 'availability' => competency_entity::ASSIGNMENT_CREATE_SELF]
+            ['comp_id' => $competency_id, 'availability' => competency_entity::ASSIGNMENT_CREATE_SELF]
         );
     }
 
-    private function activate_other_assignable(int $comptency_id) {
+    private function activate_other_assignable(int $competency_id) {
         global $DB;
         $DB->insert_record(
             'comp_assign_availability',
-            ['comp_id' => $comptency_id, 'availability' => competency_entity::ASSIGNMENT_CREATE_OTHER]
+            ['comp_id' => $competency_id, 'availability' => competency_entity::ASSIGNMENT_CREATE_OTHER]
         );
     }
 

@@ -263,11 +263,11 @@ class aggregation_users_table {
     /**
      * Set the competency_id value to filter rows on
      *
-     * @param int|null $comptency_id
+     * @param int|null $competency_id
      * @return $this
      */
-    public function set_comptency_id_value(?int $comptency_id): self {
-        $this->competency_id_value = $comptency_id;
+    public function set_competency_id_value(?int $competency_id): self {
+        $this->competency_id_value = $competency_id;
         return $this;
     }
 
@@ -276,8 +276,8 @@ class aggregation_users_table {
      *
      * @return $this
      */
-    public function reset_comptency_id_value(): self {
-        $this->set_comptency_id_value(null);
+    public function reset_competency_id_value(): self {
+        $this->set_competency_id_value(null);
         return $this;
     }
 

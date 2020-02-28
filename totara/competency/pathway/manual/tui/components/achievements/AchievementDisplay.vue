@@ -43,7 +43,7 @@
       <!-- Rating from other collapsible group -->
       <Collapsible
         v-if="assessors.length"
-        :label="$str('recieve_a_rating', 'pathway_manual')"
+        :label="$str('receive_a_rating', 'pathway_manual')"
         :initial-state="true"
       >
         <AchievementDisplayRater
@@ -145,7 +145,7 @@ export default {
   {
     "pathway_manual" : [
       "no_assessors_can_rate",
-      "recieve_a_rating",
+      "receive_a_rating",
       "self_assessment"
     ]
   }

@@ -27,7 +27,7 @@
         <!-- Competency assignment select list -->
         <SelectFilter
           v-model="selectedAssignment"
-          :label="$str('assignement', 'totara_competency')"
+          :label="$str('assignment', 'totara_competency')"
           :large="true"
           :options="activeAssignmentList"
           @input="input"
@@ -150,7 +150,7 @@ export default {
   {
     "totara_competency": [
       "achievement_level",
-      "assignement",
+      "assignment",
       "more_information",
       "not_proficient",
       "proficient"

@@ -121,7 +121,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
     };
 
     /**
-    * Show confirmation modal on create assignements button
+    * Show confirmation modal on create assignments button
     */
     SaveAssignments.prototype.showSaveModal = function() {
         var count = this.getTotalCount(),

@@ -69,7 +69,7 @@
           v-if="!activeAssignmentList.length"
           class="tui-competencyDetail__body-empty"
         >
-          {{ $str('no_active_assignements', 'totara_competency') }}
+          {{ $str('no_active_assignments', 'totara_competency') }}
         </div>
 
         <div v-else>
@@ -325,7 +325,7 @@ export default {
       "activity_log",
       "archived_assignments",
       "current_assignment_details",
-      "no_active_assignements"
+      "no_active_assignments"
     ]
   }
 </lang-strings>

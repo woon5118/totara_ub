@@ -294,7 +294,7 @@ $string['assigned_user_groups'] = 'Assigned user groups';
 $string['assigner_role:admin'] = 'Admin';
 $string['assigner_role:manager'] = 'Manager';
 
-$string['assignment:back_to_assignments'] = '<< Back to manage competency assignments';
+$string['assignment:back_to_assignments'] = '« Back to manage competency assignments';
 $string['assignment:createnew'] = 'Create assignments';
 $string['assignment:viewcurrent'] = 'Currently assigned user report';
 
@@ -439,7 +439,7 @@ $string['archived_assignments'] = 'Archived assignments';
 $string['assignment_date_archived'] = 'Date archived';
 $string['current_assignment_details'] = 'Current assignment details';
 $string['more_information'] = 'more information';
-$string['no_active_assignements'] = 'There are no active assignments';
+$string['no_active_assignments'] = 'There are no active assignments';
 $string['work_towards_level'] = 'Work towards level';
 $string['ways_to_achieve_proficiency'] = 'Ways to achieve proficiency in this competency';
 $string['achieved_n_out_of_n'] = '{$a->current} / {$a->target}';
