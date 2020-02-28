@@ -25,6 +25,10 @@
   margin-bottom: var(--tui-gap-2);
   box-shadow: var(--tui-shadow-2);
 
+  .pagelayout-legacynolayout & {
+    margin-bottom: 0;
+  }
+
   nav {
     position: relative;
     font-size: var(--tui-font-size-14);

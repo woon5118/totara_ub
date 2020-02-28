@@ -206,6 +206,16 @@ $THEME->layouts = array(
         'regions' => array(),
         'options' => array('noblocks' => true, 'langmenu' => true),
     ),
+    'legacynolayout' => array(
+        'file' => 'default.php',
+        'regions' => array(),
+        'options' => array(
+            'noblocks' => true,
+            'langmenu' => true,
+            'nonavbar' => true,
+            'nosubnav' => true,
+        ),
+    )
 );
 
 $THEME->hidefromselector = true;

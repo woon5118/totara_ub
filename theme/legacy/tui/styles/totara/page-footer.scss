@@ -28,6 +28,10 @@
   padding: 0;
   border-top: 1px solid var(--tui-color-neutral-5);
 
+  .pagelayout-legacynolayout & {
+    margin-top: 0;
+  }
+
   .page-footer-main-content {
     a:link,
     a:visited,
