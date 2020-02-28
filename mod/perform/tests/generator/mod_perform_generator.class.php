@@ -26,7 +26,6 @@ use container_perform\perform as perform_container;
 
 use core\collection;
 use core_container\module\module;
-
 use mod_perform\models\activity\section_relationship as section_relationship_model;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\section;
@@ -34,7 +33,6 @@ use mod_perform\models\activity\element;
 use mod_perform\models\activity\section_element;
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment_type;
-
 use mod_perform\user_groups\grouping;
 
 /**

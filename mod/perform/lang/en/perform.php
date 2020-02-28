@@ -33,6 +33,7 @@ $string['edit_content'] = 'Edit content';
 $string['error:create_permission_missing'] = 'You do not have the permission to create a performance activity';
 $string['error:activity_name_missing'] = 'You are not allowed to create an activity with an empty name';
 $string['error:create_permission_missing'] = 'Create Permission Missing';
+$string['expand_assignments_task'] = 'Expand performance activity track assignments';
 $string['general_info_label:activity_description'] = 'Description';
 $string['general_info_label:activity_title'] = 'Activity title';
 $string['get_started'] = 'Get started';

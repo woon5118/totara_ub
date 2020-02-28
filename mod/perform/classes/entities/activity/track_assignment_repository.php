@@ -24,6 +24,8 @@
 namespace mod_perform\entities\activity;
 
 use core\orm\entity\repository;
+use mod_perform\models\activity\activity as activity_model;
+use mod_perform\models\activity\track_status;
 
 /**
  * Repository for track assignment entities
@@ -49,6 +51,18 @@ final class track_assignment_repository extends repository {
         $this->where('expand', true);
 
         return $this;
+    }
+
+    /**
+     * Return only assignments which have an active track and an active activity
+     *
+     * @return $this
+     */
+    public function filter_by_active_track_and_activity(): self {
+        return $this->join([track::TABLE, 't'], 'track_id', 'id')
+            ->join([activity::TABLE, 'a'], 't.activity_id', 'id')
+            ->where('t.status', track_status::ACTIVE)
+            ->where('a.status', activity_model::STATUS_ACTIVE);
     }
 
 }
