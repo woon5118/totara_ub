@@ -42,7 +42,7 @@
 
       <!-- Rating from other collapsible group -->
       <Collapsible
-        v-if="assessors"
+        v-if="assessors.length"
         :label="$str('recieve_a_rating', 'pathway_manual')"
         :initial-state="true"
       >
