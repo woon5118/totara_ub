@@ -23,6 +23,8 @@
 
 namespace mod_facetoface;
 
+require_once("{$CFG->dirroot}/mod/facetoface/lib.php");
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
