@@ -814,4 +814,58 @@ class totara_reportbuilder_scheduled_export_testcase extends advanced_testcase {
             }
         }
     }
+
+    public function test_get_scheduled_reports_add_options() {
+        global $DB, $CFG;
+        require_once("$CFG->dirroot/totara/reportbuilder/lib.php");
+
+        $this->setAdminUser(); // We need permissions to access all reports.
+
+        $rid = $this->create_report('user', 'Test user report 1');
+        $config = (new rb_config())->set_nocache(true);
+        $report1 = reportbuilder::create($rid, $config);
+        $this->add_column($report1, 'user', 'id', null, null, null, 0);
+        $this->add_column($report1, 'user', 'username', null, null, null, 0);
+
+        $rid = $this->create_report('user', 'Test user report 2');
+        $config = (new rb_config())->set_nocache(true);
+        $report2 = reportbuilder::create($rid, $config);
+        $this->add_column($report1, 'user', 'id', null, null, null, 0);
+        $this->add_column($report1, 'user', 'username', null, null, null, 0);
+
+        reportbuilder::reset_caches();
+        $report1 = reportbuilder::create($report1->_id, $config);
+        $report2 = reportbuilder::create($report2->_id, $config);
+
+        $globaloptions = reportbuilder::get_all_general_export_options(false);
+        $this->assertNotEmpty($globaloptions);
+
+        $reportselect = reportbuilder::get_scheduled_reports_add_options();
+        $this->assertSame([$report1->_id => $report1->fullname, $report2->_id => $report2->fullname], $reportselect);
+
+        // Disable export of second report - nothing is enabled by default.
+        $DB->set_field('report_builder', 'overrideexportoptions', '1', array('id' => $report2->_id));
+        reportbuilder::reset_caches();
+        $this->assertSame([], reportbuilder::get_all_settings($report1->_id, 'exportoption'));
+        $reportselect = reportbuilder::get_scheduled_reports_add_options();
+        $this->assertSame([$report1->_id => $report1->fullname], $reportselect);
+
+        // Enable custom option for second report.
+        $this->set_setting($report2->_id, 'exportoption', 'csv', '1');
+        reportbuilder::reset_caches();
+        $reportselect = reportbuilder::get_scheduled_reports_add_options();
+        $this->assertSame([$report1->_id => $report1->fullname, $report2->_id => $report2->fullname], $reportselect);
+
+        // Disable global options.
+        set_config('exportoptions', '', 'reportbuilder');
+        reportbuilder::reset_caches();
+        $reportselect = reportbuilder::get_scheduled_reports_add_options();
+        $this->assertSame([$report2->_id => $report2->fullname], $reportselect);
+
+        // Disable custom option in second report.
+        $this->set_setting($report2->_id, 'exportoption', 'csv', '0');
+        reportbuilder::reset_caches();
+        $reportselect = reportbuilder::get_scheduled_reports_add_options();
+        $this->assertSame([], $reportselect);
+    }
 }

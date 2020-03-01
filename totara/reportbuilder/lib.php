@@ -1481,6 +1481,63 @@ class reportbuilder {
     }
 
     /**
+     * Create report options for scheduled_reports_add_form
+     *
+     * @return array
+     */
+    public static function get_scheduled_reports_add_options() {
+        $globaloptions = self::get_all_general_export_options();
+        $alloptions = self::get_all_general_export_options(true);
+
+        $reportselect = [];
+
+        $sources = [];
+
+        $reports = reportbuilder::get_user_permitted_reports();
+        foreach ($reports as $report) {
+            if (!isset($sources[$report->source])) {
+                $sources[$report->source] = reportbuilder::get_source_object($report->source);
+            }
+            if (!$sources[$report->source]->scheduleable) {
+                continue;
+            }
+
+            if ($report->embedded) {
+                try {
+                    $reportobject = reportbuilder::create($report->id);
+                } catch (Throwable $e) {
+                    // Ignore broken embedded reports here, this should not happen.
+                    continue;
+                }
+            }
+
+            // Now make sure there is some export option available.
+            if ($report->overrideexportoptions) {
+                $settings = reportbuilder::get_all_settings($report->id, 'exportoption');
+                $found = false;
+                foreach ($alloptions as $shortname => $exportoption) {
+                    if (!empty($settings[$shortname])) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if (!$found) {
+                    continue;
+                }
+
+            } else {
+                if (!$globaloptions) {
+                    continue;
+                }
+            }
+
+            $reportselect[$report->id] = format_string($report->fullname);
+        }
+
+        return $reportselect;
+    }
+
+    /**
      * Get report specific export option settings for this report
      *
      * NOTE: these settings are only applied if overrideexportoptions is set

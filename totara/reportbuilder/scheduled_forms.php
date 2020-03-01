@@ -315,32 +315,7 @@ class scheduled_reports_add_form extends moodleform {
 
         $mform =& $this->_form;
 
-        $sources = array();
-
-        //Report type options
-        $reports = reportbuilder::get_user_permitted_reports();
-        $reportselect = array();
-        foreach ($reports as $report) {
-            if (!isset($sources[$report->source])) {
-                $sources[$report->source] = reportbuilder::get_source_object($report->source);
-            }
-
-            if ($sources[$report->source]->scheduleable) {
-                try {
-                    $reportobject = reportbuilder::create($report->id);
-                    if (!empty($reportobject->get_report_export_options())) {
-                        $reportselect[$report->id] = format_string($report->fullname);
-                    }
-                } catch (moodle_exception $e) {
-                    if ($e->errorcode != "nopermission") {
-                        // The embedded report creation failed, almost certainly due to a failed is_capable check.
-                        // In this case, we just don't add it to $reportselect.
-                    } else {
-                        throw ($e);
-                    }
-                }
-            }
-        }
+        $reportselect = reportbuilder::get_scheduled_reports_add_options();
 
         if (!empty($reportselect)) {
             $elements = array ();
