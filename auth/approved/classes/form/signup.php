@@ -57,7 +57,7 @@ final class signup extends \moodleform {
 
         $instructions = get_config('auth_approved', 'instructions');
         if ($instructions) {
-            $instructions = clean_text($instructions);
+            $instructions = format_text($instructions, FORMAT_HTML, ['noclean' => true]);
             $mform->addElement('header', 'instructions', get_string('instructions', 'auth_approved'));
             $mform->addElement('html',\html_writer::tag('div', $instructions, array('class' => 'auth_approved-instructions')));
         }
