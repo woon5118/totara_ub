@@ -63,7 +63,7 @@ function core_login_process_password_reset_request() {
         }
 
         // Totara: do not allow resetting of password when their tenant is disabled.
-        if ($user->tenantid) {
+        if ($user && $user->tenantid) {
             if (!$CFG->tenantsenabled) {
                 $user = false;
             } else {
