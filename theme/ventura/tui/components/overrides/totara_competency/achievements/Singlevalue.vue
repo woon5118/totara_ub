@@ -23,7 +23,7 @@
 <style lang="scss">
 .tui-competencyAchievementsScale {
   & > * + * {
-    margin-top: var(--tui-gap-2);
+    margin-top: var(--tui-gap-3);
   }
 
   &__title {

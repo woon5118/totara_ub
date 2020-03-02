@@ -40,7 +40,10 @@
 
         <!-- Collapsible bar criteria fulfilled UI -->
         <template v-if="achievement.achieved" v-slot:collapsible-side-content>
-          <Tag :primary="true" text="Criteria fulfilled" />
+          <Lozenge
+            :text="$str('criteria_fulfilled', 'totara_competency')"
+            type="success"
+          />
         </template>
 
         <!-- Proficiency criteria content -->
@@ -75,8 +78,9 @@
 // Components
 import AchievementLayout from 'totara_competency/components/achievements/AchievementLayout';
 import Collapsible from 'totara_core/components/collapsible/Collapsible';
+import Lozenge from 'totara_core/components/lozenge/Lozenge';
 import OrBox from 'totara_core/components/decor/OrBox';
-import Tag from 'totara_core/components/tag/Tag';
+
 // GraphQL
 import ScaleAchievementsQuery from 'totara_competency/graphql/scale_achievements';
 
@@ -84,8 +88,8 @@ export default {
   components: {
     AchievementLayout,
     Collapsible,
+    Lozenge,
     OrBox,
-    Tag,
   },
 
   props: {
@@ -217,6 +221,7 @@ export default {
 <lang-strings>
   {
     "totara_competency" : [
+      "criteria_fulfilled",
       "work_towards_level"
     ]
   }

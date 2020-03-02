@@ -28,7 +28,8 @@
   }
 
   &__actions {
-    padding: var(--tui-gap-4);
+    padding: var(--tui-gap-4) var(--tui-gap-2);
+    text-align: right;
   }
 
   .tui-grid--stacked {

@@ -24,6 +24,7 @@
 .tui-criteriaCourseAchievement {
   &__title {
     margin: 0;
+    text-align: center;
     hyphens: manual;
     @include tui-font-heading-x-small();
   }

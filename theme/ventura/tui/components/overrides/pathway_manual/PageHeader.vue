@@ -27,10 +27,9 @@
 
   &__title {
     margin: 0;
-
-    &-withPhoto {
-      padding-left: var(--tui-gap-3);
-    }
+    padding: var(--tui-gap-2) var(--tui-gap-4);
+    text-transform: uppercase;
+    @include tui-font-heading-label();
   }
 }
 </style>

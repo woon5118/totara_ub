@@ -27,19 +27,51 @@
       :current-id="myValue"
       :popover-trigger-type="['click']"
       :target-id="minProficientValueId"
-    />
+    >
+      <!-- Popover content -->
+      <template v-slot:custom-popover-content="{ description, label, target }">
+        <div class="tui-competencyDetailProgress__popover">
+          <div
+            v-if="target"
+            class="tui-competencyDetailProgress__popover-target"
+          >
+            <Lozenge
+              :text="$str('proficient_level', 'totara_competency')"
+              type="success"
+            />
+          </div>
+
+          <h5 class="tui-competencyDetailProgress__popover-header">
+            {{ label }}
+          </h5>
+
+          <div
+            v-if="description"
+            class="tui-competencyDetailProgress__popover-body"
+            v-html="description"
+          />
+          <div v-else class="tui-competencyDetailProgress__popover-body">
+            {{ $str('no_description', 'totara_competency') }}
+          </div>
+        </div>
+      </template>
+    </ProgressTracker>
   </div>
 </template>
 
 <script>
 // Components
+import Lozenge from 'totara_core/components/lozenge/Lozenge';
 import ProgressTracker from 'totara_core/components/progresstracker/ProgressTracker';
 
 // GraphQL
 import ScaleDetailsQuery from 'totara_competency/graphql/scale';
 
 export default {
-  components: { ProgressTracker },
+  components: {
+    Lozenge,
+    ProgressTracker,
+  },
   props: {
     myValue: {
       type: [Number, String],
@@ -101,3 +133,12 @@ export default {
   },
 };
 </script>
+
+<lang-strings>
+  {
+    "totara_competency": [
+      "no_description",
+      "proficient_level"
+    ]
+  }
+</lang-strings>

@@ -24,6 +24,7 @@
 .tui-criteriaCompetencyAchievement {
   &__title {
     margin: 0;
+    text-align: center;
     hyphens: manual;
     @include tui-font-heading-x-small();
   }
@@ -53,7 +54,7 @@
 }
 
 @media (min-width: $tui-screen-xs) {
-  .tui-criteriaCourseAchievement {
+  .tui-criteriaCompetencyAchievement {
     &__completion {
       &-notComplete {
         @include sr-only();

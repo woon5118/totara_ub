@@ -29,14 +29,14 @@
         <div class="tui-criteriaCompetencyAchievement__goal">
           <!-- Proficiency goal title -->
           <h5 class="tui-criteriaCompetencyAchievement__title">
-            {{ $str('achieve_proficiency_in_competencies', 'totara_criteria') }}
+            {{ criteriaHeading }}
           </h5>
 
           <!-- Proficiency progress circle -->
           <ProgressCircle
-            :complete="true"
+            :complete="criteriaComplete"
             :completed="
-              achievedCompetencies >= numberOfRequiredCompetencies
+              criteriaComplete
                 ? numberOfRequiredCompetencies
                 : achievedCompetencies
             "
@@ -190,6 +190,7 @@ import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
 import ExpandCell from 'totara_core/components/datatable/ExpandCell';
 import ProgressCircle from 'totara_competency/components/achievements/ProgressCircle';
 import Table from 'totara_core/components/datatable/Table';
+import { notify } from 'totara_core/notifications';
 // GraphQL
 import CreateUserAssignmentMutation from 'totara_competency/graphql/create_user_assignments';
 
@@ -240,6 +241,33 @@ export default {
     },
 
     /**
+     * Check if the criteria has been completed
+     *
+     * @return {Boolean}
+     */
+    criteriaComplete() {
+      return this.achievedCompetencies >= this.numberOfRequiredCompetencies;
+    },
+
+    /**
+     * Return criteria header strings based on competency type
+     *
+     * @return {String}
+     */
+    criteriaHeading() {
+      if (this.type === 'otherCompetency') {
+        return this.$str(
+          'achieve_proficiency_in_other_competencies',
+          'totara_criteria'
+        );
+      }
+      return this.$str(
+        'achieve_proficiency_in_child_competencies',
+        'totara_criteria'
+      );
+    },
+
+    /**
      * Return no competency strings based on competency type
      *
      * @return {String}
@@ -286,14 +314,30 @@ export default {
             if (result.length > 0) {
               this.$emit('self-assigned');
             } else {
-              // TODO Handle case when no result is returned
+              this.triggerErrorNotification(
+                this.$str('network_error', 'totara_criteria')
+              );
             }
           }
         })
         .catch(error => {
           console.error(error);
+          this.triggerErrorNotification(
+            this.$str('error_something_went_wrong', 'totara_criteria')
+          );
         })
         .finally(() => this.closeModal());
+    },
+
+    /**
+     * Display error messages when competency assignment fails
+     *
+     */
+    triggerErrorNotification(message) {
+      notify({
+        message: message,
+        type: 'error',
+      });
     },
 
     /**
@@ -324,13 +368,16 @@ export default {
       "no_competencies"
     ],
     "totara_criteria": [
-      "achieve_proficiency_in_competencies",
+      "achieve_proficiency_in_child_competencies",
+      "achieve_proficiency_in_other_competencies",
       "assign_competency",
       "competencies",
       "complete",
       "completion",
       "confirm_assign_competency_body",
       "confirm_assign_competency_title",
+      "error_competency_assignment",
+      "network_error",
       "not_available",
       "not_complete",
       "achievement_level",

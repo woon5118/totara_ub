@@ -24,8 +24,8 @@
 
 $string['pluginname'] = 'Totara criteria';
 
-$string['achieve_proficiency_in_competencies'] = 'Achieve proficiency in competencies';
-$string['achieve_proficiency_in_linked_courses'] = 'Achieve proficiency in courses';
+$string['achieve_proficiency_in_child_competencies'] = 'Achieve proficiency in child competencies';
+$string['achieve_proficiency_in_other_competencies'] = 'Achieve proficiency in other competencies';
 $string['achievement_level'] = 'Achievement level';
 $string['addroles'] = 'Add roles';
 $string['aggregate_all'] = 'ALL';
@@ -41,6 +41,7 @@ $string['complete'] = 'Complete';
 $string['completeall'] = 'Complete all';
 $string['completeany'] = 'Complete';
 $string['completion'] = 'Completion';
+$string['complete_courses'] = 'Complete courses';
 $string['confirm_assign_competency_body'] = 'The competency {$a} will be added to your profile and your achievement on it will be tracked. Are you sure you would like to assign this competency to yourself?';
 $string['confirm_assign_competency_title'] = 'Confirm assignment';
 $string['course_link'] = 'Go to course';
@@ -50,9 +51,11 @@ $string['criteria'] = 'Criteria';
 $string['criterion_not_found'] = 'Criteria not found';
 $string['criterion'] = 'Criterion';
 $string['done'] = 'Done';
+$string['error_competency_assignment'] = 'There was an error and the assignment could not be created.';
 $string['error:invalidconfiguration'] = 'The criterion configuration is invalid';
 $string['hidden_course'] = 'This course is not available to view';
 $string['managetypes'] = 'Manage criteria types';
+$string['network_error'] = 'Network error';
 $string['no'] = 'No';
 $string['no_courses'] = 'There are no courses available to view';
 $string['not_available'] = 'Not available';

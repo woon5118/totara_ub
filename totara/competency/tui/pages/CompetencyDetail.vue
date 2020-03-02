@@ -73,8 +73,8 @@
 
           <!-- No active assignment, can happen when all assignments are archived -->
           <div
-            class="tui-competencyDetail__body-empty"
             v-if="!activeAssignmentList.length"
+            class="tui-competencyDetail__body-empty"
           >
             {{ $str('no_active_assignments', 'totara_competency') }}
           </div>

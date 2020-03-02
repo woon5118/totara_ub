@@ -89,7 +89,7 @@
 
   &__content {
     padding: var(--tui-gap-4);
-    border: var(--tui-border-width-thin) dashed var(--tui-color-neutral-6);
+    border: var(--tui-border-width-thin) solid var(--tui-color-neutral-5);
     border-radius: 6px;
   }
 }

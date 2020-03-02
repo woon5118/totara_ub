@@ -24,5 +24,20 @@
 .tui-competencyDetailProgress {
   min-height: 65px;
   margin-top: var(--tui-gap-7);
+
+  &__popover {
+    &-header {
+      margin-top: 0;
+      @include tui-font-heading-label();
+    }
+
+    &-body {
+      color: var(--tui-color-neutral-6);
+    }
+
+    & > * + * {
+      margin-top: var(--tui-gap-2);
+    }
+  }
 }
 </style>

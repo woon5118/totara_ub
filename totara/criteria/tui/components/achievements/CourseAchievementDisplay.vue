@@ -29,9 +29,7 @@
         <div class="tui-criteriaCourseAchievement__goal">
           <!-- Proficiency goal title -->
           <h5 class="tui-criteriaCourseAchievement__title">
-            {{
-              $str('achieve_proficiency_in_linked_courses', 'totara_criteria')
-            }}
+            {{ $str('complete_courses', 'totara_criteria') }}
           </h5>
 
           <!-- Proficiency progress circle -->
@@ -251,9 +249,9 @@ export default {
 <lang-strings>
   {
     "totara_criteria": [
-      "achieve_proficiency_in_linked_courses",
       "complete",
       "completion",
+      "complete_courses",
       "course_link",
       "courses",
       "hidden_course",

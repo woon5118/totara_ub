@@ -45,12 +45,14 @@
           >
             <h5 class="tui-competencyDetailAssignment__level-header">
               {{ $str('achievement_level', 'totara_competency') }}
+              <!--
+              This will be implemented in a later ticket, once a string has been decided on
               <InfoIconButton
                 :aria-label="$str('more_information', 'totara_competency')"
                 :class="'tui-competencyDetailAssignment__level-infoBtn'"
               >
                 ...
-              </InfoIconButton>
+              </InfoIconButton> -->
             </h5>
             <div class="tui-competencyDetailAssignment__level-text">
               {{ selectedAssignmentProficiency.name }}
@@ -100,6 +102,8 @@
     <div class="tui-competencyDetailAssignment__actions">
       <ButtonIcon
         v-if="showCanArchiveButton"
+        aria-label=""
+        :styleclass="{ small: true }"
         :text="$str('action:archive_this', 'totara_competency')"
         @click="showArchiveConfirmDialog"
       >
@@ -116,7 +120,6 @@ import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
 import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
 import Grid from 'totara_core/components/grid/Grid';
 import GridItem from 'totara_core/components/grid/GridItem';
-import InfoIconButton from 'totara_core/components/buttons/InfoIconButton';
 import ProgressTrackerCircle from 'totara_core/components/progresstracker/ProgressTrackerCircle';
 import SelectFilter from 'totara_core/components/filters/SelectFilter';
 import { notify } from 'totara_core/notifications';
@@ -131,7 +134,6 @@ export default {
     ConfirmationModal,
     Grid,
     GridItem,
-    InfoIconButton,
     ProgressTrackerCircle,
     SelectFilter,
   },
