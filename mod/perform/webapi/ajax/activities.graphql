@@ -2,6 +2,6 @@ query mod_perform_activities {
   mod_perform_activities {
     id
     name
-    timemodified
+    updated_at
   }
 }

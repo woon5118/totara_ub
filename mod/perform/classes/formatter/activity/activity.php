@@ -35,7 +35,7 @@ class activity extends formatter {
             'id'           => null,
             'name'         => string_field_formatter::class,
             'description'  => string_field_formatter::class, // This will throw an error when we change this to html
-            'timemodified' => date_field_formatter::class,
+            'updated_at' => date_field_formatter::class,
         ];
     }
 

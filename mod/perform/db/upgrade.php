@@ -327,6 +327,112 @@ function xmldb_perform_upgrade($oldversion) {
         }
         upgrade_mod_savepoint(true, 2020022601, 'perform');
     }
+
+    if ($oldversion < 2020030300) {
+
+        // Rename field updated_at on table perform to updated_at.
+        $table = new xmldb_table('perform');
+        $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'description');
+
+        // Launch rename field updated_at.
+        $dbman->rename_field($table, $field, 'updated_at');
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020030300, 'perform');
+    }
+
+    if ($oldversion < 2020030301) {
+
+        // Define field archived_at to be dropped from perform_track.
+        $table = new xmldb_table('perform_track');
+        $field = new xmldb_field('archived_at');
+
+        // Conditionally launch drop field updated_at.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020030301, 'perform');
+    }
+
+    if ($oldversion < 2020030302) {
+
+        // Define index user_group_type_user_group_id (not unique) to be added to perform_track_assignment.
+        $table = new xmldb_table('perform_track_assignment');
+        $index = new xmldb_index('user_group_type_user_group_id', XMLDB_INDEX_NOTUNIQUE, array('user_group_type', 'user_group_id'));
+
+        // Conditionally launch add index user_group_type_user_group_id.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020030302, 'perform');
+    }
+
+    if ($oldversion < 2020030303) {
+
+        // Define index track_id_type_group_type_group_id (unique) to be added to perform_track_assignment.
+        $table = new xmldb_table('perform_track_assignment');
+        $index = new xmldb_index('track_id_type_group_type_group_id', XMLDB_INDEX_UNIQUE, array('track_id', 'type', 'user_group_type', 'user_group_id'));
+
+        // Conditionally launch add index track_id_type_group_type_group_id.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020030303, 'perform');
+    }
+
+    if ($oldversion < 2020030304) {
+
+        // Define field archived_at to be dropped from perform_track_assignment.
+        $table = new xmldb_table('perform_track_assignment');
+        $field = new xmldb_field('archived_at');
+
+        // Conditionally launch drop field updated_at.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020030304, 'perform');
+    }
+
+    if ($oldversion < 2020030305) {
+
+        // Define index status (not unique) to be dropped form perform_track_assignment.
+        $table = new xmldb_table('perform_track_assignment');
+        $index = new xmldb_index('status', XMLDB_INDEX_NOTUNIQUE, array('status'));
+
+        // Conditionally launch drop index status.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020030305, 'perform');
+    }
+
+
+    if ($oldversion < 2020030306) {
+
+        // Define field status to be dropped from perform_track_assignment.
+        $table = new xmldb_table('perform_track_assignment');
+        $field = new xmldb_field('status');
+
+        // Conditionally launch drop field status.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020030306, 'perform');
+    }
+
+
     return true;
 }
 

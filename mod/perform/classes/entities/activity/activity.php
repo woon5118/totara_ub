@@ -34,7 +34,7 @@ use mod_perform\entities\activity\activity_repository;
  * @property string $description
  * @property string $name Activity name
  * @property int $status
- * @property int $timemodified
+ * @property int $updated_at
  *
  * @method static activity_repository repository()
  *
@@ -43,6 +43,6 @@ use mod_perform\entities\activity\activity_repository;
 class activity extends entity {
     public const TABLE = 'perform';
 
-    public const UPDATED_TIMESTAMP = 'timemodified';
+    public const UPDATED_TIMESTAMP = 'updated_at';
     public const SET_UPDATED_WHEN_CREATED = true;
 }

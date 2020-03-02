@@ -11,7 +11,7 @@
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false" COMMENT="perform status"/>
         <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="perform activity description"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="updated_at" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -140,7 +140,6 @@
         <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="updated_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="archived_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -154,14 +153,12 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="track_id" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="type" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="user_group_type" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="user_group_id" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="created_by" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="updated_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="archived_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="expand" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Flag whether the assignment should be expanded on the next expand task run"/>
       </FIELDS>
       <KEYS>
@@ -169,9 +166,10 @@
         <KEY NAME="track_id" TYPE="foreign" FIELDS="track_id" REFTABLE="perform_track" REFFIELDS="id" ONDELETE="cascade"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="status" UNIQUE="false" FIELDS="status"/>
         <INDEX NAME="user_group_type" UNIQUE="false" FIELDS="user_group_type"/>
         <INDEX NAME="user_group_id" UNIQUE="false" FIELDS="user_group_id"/>
+        <INDEX NAME="user_group_type_user_group_id" UNIQUE="false" FIELDS="user_group_type, user_group_id" COMMENT="These two fields will commonly be queried together"/>
+        <INDEX NAME="track_id_type_group_type_group_id" UNIQUE="true" FIELDS="track_id, type, user_group_type, user_group_id" COMMENT="For a given track and type, each unique group instance should only be assigned once."/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="perform_track_user_assignment" COMMENT="Individual track assignments for real users">
@@ -188,6 +186,9 @@
         <KEY NAME="track_id" TYPE="foreign" FIELDS="track_id" REFTABLE="perform_track" REFFIELDS="id" ONDELETE="cascade"/>
         <KEY NAME="subject_user_id" TYPE="foreign" FIELDS="subject_user_id" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="track_id_subject_user_id" UNIQUE="true" FIELDS="track_id, subject_user_id" COMMENT="Within a specific track, each user should only be assigned once."/>
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>
