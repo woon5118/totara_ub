@@ -23,23 +23,6 @@
 
 <template>
   <div class="tui-performManageActivityList">
-    <!-- TODO use alert component when created -->
-    <div
-      v-if="mutationError"
-      class="alert alert-danger alert-with-icon alert-dismissable fade-in"
-      role="alert"
-    >
-      <button type="button" class="close" data-dismiss="alert">
-        <FlexIcon icon="delete-ns" />
-      </button>
-      <div class="alert-icon">
-        <FlexIcon icon="notification-error" />
-      </div>
-      <div class="alert-message">
-        {{ $str('error_generic_mutation', 'mod_perform') }}
-      </div>
-    </div>
-
     <h2 v-text="$str('perform:manage_activity', 'mod_perform')" />
     <Button
       v-if="canAdd"
@@ -94,23 +77,24 @@
 </template>
 
 <script>
-import Table from 'totara_core/components/datatable/Table';
-import Cell from 'totara_core/components/datatable/Cell';
-import FlexIcon from 'totara_core/components/icons/FlexIcon';
-import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-import performActivitiesQuery from 'mod_perform/graphql/activities.graphql';
 import Button from 'totara_core/components/buttons/Button';
-import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
+import Cell from 'totara_core/components/datatable/Cell';
+import GeneralInfoForm from 'mod_perform/components/manage_activity/GeneralInfoForm';
+import HeaderCell from 'totara_core/components/datatable/HeaderCell';
+import Loader from 'totara_core/components/loader/Loader';
 import Modal from 'totara_core/components/modal/Modal';
 import ModalContent from 'totara_core/components/modal/ModalContent';
-import GeneralInfoForm from 'mod_perform/components/manage_activity/GeneralInfoForm';
-import Loader from 'totara_core/components/loader/Loader';
+import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
+import Table from 'totara_core/components/datatable/Table';
+import performActivitiesQuery from 'mod_perform/graphql/activities.graphql';
+import { notify } from 'totara_core/notifications';
+
+const TOAST_DURATION = 10 * 1000; // in microseconds.
 
 export default {
   components: {
     Button,
     Cell,
-    FlexIcon,
     HeaderCell,
     Table,
     ModalPresenter,
@@ -133,18 +117,19 @@ export default {
     return {
       activities: [],
       modalOpen: false,
-      mutationError: null,
     };
   },
   methods: {
     /**
      * Handler for a create mutation error.
-     *
-     * @param {Error} e
+     * Shows a generic saving error toast.
      */
-    creationError(e) {
-      this.mutationError = e;
-      this.modalOpen = false;
+    creationError() {
+      notify({
+        duration: TOAST_DURATION,
+        message: this.$str('toast:error:create_activity', 'mod_perform'),
+        type: 'error',
+      });
     },
 
     /**
@@ -189,12 +174,13 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "perform:add_activity",
       "get_started",
+      "perform:add_activity",
       "perform:manage_activity",
       "perform:view:name",
+      "perform:view:status",
       "perform:view:status:active",
-      "perform:view:status"
+      "toast:error:create_activity"
     ]
   }
 </lang-strings>

@@ -22,23 +22,6 @@
 
 <template>
   <div class="tui-performManageActivity">
-    <!-- TODO use alert component when created -->
-    <div
-      v-if="mutationError"
-      class="alert alert-danger alert-with-icon alert-dismissable fade-in"
-      role="alert"
-    >
-      <button type="button" class="close" data-dismiss="alert">
-        <FlexIcon icon="delete-ns" />
-      </button>
-      <div class="alert-icon">
-        <FlexIcon icon="notification-error" />
-      </div>
-      <div class="alert-message">
-        {{ $str('error_generic_mutation', 'mod_perform') }}
-      </div>
-    </div>
-
     <a :href="goBackLink">{{
       $str('perform:back_to_all_activities', 'mod_perform')
     }}</a>
@@ -65,8 +48,8 @@
           <component
             :is="component"
             v-model="activity"
-            @mutation-error="mutationError = $event"
-            @mutation-success="mutationError = null"
+            @mutation-error="showMutationErrorNotification"
+            @mutation-success="showMutationSuccessNotification"
           />
         </Tab>
       </Tabs>
@@ -75,15 +58,18 @@
 </template>
 
 <script>
+import ContentForm from 'mod_perform/components/manage_activity/ContentForm';
 import FlexIcon from 'totara_core/components/icons/FlexIcon';
 import GeneralInfoForm from 'mod_perform/components/manage_activity/GeneralInfoForm';
-import ContentForm from 'mod_perform/components/manage_activity/ContentForm';
 import Grid from 'totara_core/components/grid/Grid';
 import GridItem from 'totara_core/components/grid/GridItem';
 import Loader from 'totara_core/components/loader/Loader';
 import Tab from 'totara_core/components/tabs/Tab';
 import Tabs from 'totara_core/components/tabs/Tabs';
 import activityQuery from 'mod_perform/graphql/activity.graphql';
+import { notify } from 'totara_core/notifications';
+
+const TOAST_DURATION = 10 * 1000; // in microseconds.
 
 export default {
   components: {
@@ -109,7 +95,6 @@ export default {
   data() {
     return {
       activity: null,
-      mutationError: null,
       tabs: [
         {
           component: 'GeneralInfoForm',
@@ -150,6 +135,29 @@ export default {
       );
     },
   },
+  methods: {
+    /**
+     * Show a generic success toast.
+     */
+    showMutationSuccessNotification() {
+      notify({
+        duration: TOAST_DURATION,
+        message: this.$str('toast:success:activity_update', 'mod_perform'),
+        type: 'success',
+      });
+    },
+
+    /**
+     * Show a generic saving error toast.
+     */
+    showMutationErrorNotification() {
+      notify({
+        duration: TOAST_DURATION,
+        message: this.$str('toast:error:generic_update', 'mod_perform'),
+        type: 'error',
+      });
+    },
+  },
 };
 </script>
 
@@ -160,7 +168,9 @@ export default {
       "manage_activities_tabs:content",
       "manage_activities_tabs:general",
       "perform:back_to_all_activities",
-      "perform:manage_edit_draft_heading"
+      "perform:manage_edit_draft_heading",
+      "toast:error:generic_update",
+      "toast:success:activity_update"
     ]
   }
 </lang-strings>

@@ -28,7 +28,6 @@ $string['edit_content'] = 'Edit content';
 $string['error:create_permission_missing'] = 'You do not have the permission to create a performance activity';
 $string['error:activity_name_missing'] = 'You are not allowed to create an activity with an empty name';
 $string['error:create_permission_missing'] = 'Create Permission Missing';
-$string['error_generic_mutation'] = 'An error occurred while saving.';
 $string['general_info_label:activity_description'] = 'Description';
 $string['general_info_label:activity_title'] = 'Activity title';
 $string['get_started'] = 'Get started';
@@ -58,3 +57,8 @@ $string['perform:view_manage_activities'] = 'Access the performance activities m
 $string['pluginadministration'] = 'Performance activity administration';
 $string['pluginname'] = 'Performance activity';
 $string['save_changes'] = 'Save changes';
+
+$string['toast:error:create_activity'] = 'An error occurred while saving, and the activity could not be created.';
+$string['toast:error:generic_update'] = 'An error occurred, and your latest changes have not been saved.';
+
+$string['toast:success:activity_update'] = 'Activity saved.';

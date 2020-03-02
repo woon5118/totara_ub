@@ -174,13 +174,16 @@ export default {
         const savedActivity = await this.save();
         this.updateActivity(savedActivity);
         this.$emit('mutation-success', savedActivity);
-      } catch (e) {
-        this.$emit('mutation-error', e);
-      } finally {
+
         // On create (from the modal) we keep the submit button disabled while the redirect is processing.
         if (!this.disableAfterSave) {
           this.isSaving = false;
         }
+      } catch (e) {
+        this.$emit('mutation-error', e);
+
+        // If something goes wrong during create, allow the user to try again.
+        this.isSaving = false;
       }
     },
 
@@ -224,7 +227,6 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "error_generic_mutation",
       "general_info_label:activity_description",
       "general_info_label:activity_title",
       "save_changes"
