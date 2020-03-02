@@ -42,6 +42,25 @@ use tool_usertours\step;
  */
 class tour extends external_api {
     /**
+     * Special context validation for tours.
+     *
+     * This is intended to work around special access control in areas such as enrolment page.
+     *
+     * @param \context $context
+     * @param string $pageurl
+     */
+    public static function validate_tour_context(\context $context, string $pageurl) {
+        global $CFG;
+
+        if (strpos($pageurl, $CFG->wwwroot . '/enrol/index.php') === 0) {
+            // Enrolment page does not required regular course login.
+            $context = $context->get_parent_context();
+        }
+
+        parent::validate_context($context);
+    }
+
+    /**
      * Fetch the tour configuration for the specified tour.
      *
      * @param   int     $tourid     The ID of the tour to fetch.
@@ -59,7 +78,7 @@ class tour extends external_api {
             ]);
 
         $context = \context_helper::instance_by_id($params['context']);
-        self::validate_context($context);
+        self::validate_tour_context($context, $pageurl);
 
         $tour = tourinstance::instance($params['tourid']);
         if (!$tour->should_show_for_user()) {
@@ -132,7 +151,7 @@ class tour extends external_api {
             ]);
 
         $context = \context_helper::instance_by_id($params['context']);
-        self::validate_context($context);
+        self::validate_tour_context($context, $pageurl);
 
         $tour = tourinstance::instance($params['tourid']);
         $tour->request_user_reset();
@@ -201,7 +220,7 @@ class tour extends external_api {
             ]);
 
         $context = \context_helper::instance_by_id($params['context']);
-        self::validate_context($context);
+        self::validate_tour_context($context, $pageurl);
 
         $tour = tourinstance::instance($params['tourid']);
         $tour->mark_user_completed();
@@ -263,7 +282,7 @@ class tour extends external_api {
             ]);
 
         $context = \context_helper::instance_by_id($params['context']);
-        self::validate_context($context);
+        self::validate_tour_context($context, $pageurl);
 
         $step = step::instance($params['stepid']);
         if ($step->get_tourid() != $params['tourid']) {
