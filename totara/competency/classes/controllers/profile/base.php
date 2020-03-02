@@ -24,39 +24,34 @@
 namespace totara_competency\controllers\profile;
 
 use context;
-use context_system;
 use context_user;
+use core\entities\user;
 use moodle_exception;
 use moodle_url;
-use core\entities\user;
-use pathway_manual\models\roles\appraiser;
-use pathway_manual\models\roles\self_role;
-use required_capability_exception;
 use totara_competency\helpers\capability_helper;
 use totara_core\advanced_feature;
 use totara_mvc\controller;
-use totara_mvc\view;
-
 
 /**
  * Base competency profile controller encapsulating the functionality that we need to display competency profile pages
  */
 abstract class base extends controller {
 
+    public const LOGGED_IN_USER = 0;
+
     /**
      * User id passed through the attribute
      *
      * @var user
      */
-    protected $user = null;
+    protected $user;
 
     protected function setup_context(): context {
         require_login();
 
         // Let's make sure that we've tried to get user id off the query parameters
         // and if not we get a user id off the logged in user.
-        $this->get_user()
-            ->must_be_logged_in();
+        $this->setup_user()->must_be_logged_in();
 
         return context_user::instance($this->user->id);
     }
@@ -93,20 +88,21 @@ abstract class base extends controller {
      *
      * @return $this
      */
-    protected function get_user() {
-        // TODO this is ugly and should be civilized in the controller somewhere
+    protected function setup_user(): self {
+        if ($this->user !== null) {
+            return $this;
+        }
 
-        if (is_null($this->user)) {
-            $id = $this->get_param('user_id', PARAM_INT, 0);
+        $id = $this->get_param('user_id', PARAM_INT, self::LOGGED_IN_USER);
 
-            if ($id === 0) {
-                $id = $this->currently_logged_in_user()->id;
-            }
-            $this->user = new user($id);
+        if ($id === self::LOGGED_IN_USER) {
+            $id = $this->currently_logged_in_user()->id;
+        }
 
-            if (!$this->user) {
-                throw new moodle_exception('Can not fetch user from the database');
-            }
+        $this->user = user::repository()->find($id);
+
+        if (!$this->user) {
+            throw new moodle_exception('invaliduser', 'error');
         }
 
         return $this;

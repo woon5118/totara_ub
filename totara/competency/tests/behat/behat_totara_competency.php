@@ -34,6 +34,7 @@ class behat_totara_competency extends behat_base {
     private const COMPETENCY_PROFILE_LIST_VIEW_TOGGLE_LOCATOR = '.tui-iconBtn--toggle .fa-th-list';
 
     private const TOTARA_COMPETENCY_PROFILE_PATH = 'totara/competency/profile/';
+    private const TOTARA_COMPETENCY_PROFILE_DETAIL_PATH = 'totara/competency/profile/details';
     private const TOTARA_COMPETENCY_USER_ASSIGNMENT_PATH = 'totara/competency/profile/assign/';
 
     /**
@@ -157,6 +158,50 @@ class behat_totara_competency extends behat_base {
     }
 
     /**
+     * @Given /^I navigate to the competency profile details page for the "([^"]*)" competency$/
+     * @Given /^I navigate to the competency profile details page for competency id "([^"]*)"$/
+     * @Given /^I navigate to the competency profile details page for the "([^"]*)" competency and user "([^"]*)"$/
+     * @param string|int $competency
+     * @param string|int|null $user
+     * @throws moodle_exception
+     */
+    public function i_navigate_to_the_competency_profile_details_page_for($competency, $user = null): void {
+        $competency_id = $this->resolve_competency_id($competency);
+        $query_params = ['competency_id' => $competency_id];
+
+        if ($user) {
+            $query_params['user_id'] = $this->resolve_user_id($user);
+        }
+
+        $detail_page_url = new moodle_url(self::TOTARA_COMPETENCY_PROFILE_DETAIL_PATH, $query_params);
+
+        $this->getSession()->visit($this->locate_path($detail_page_url->out(false)));
+        $this->wait_for_pending_js();
+    }
+
+    private function resolve_competency_id($competency): int {
+        if (is_numeric($competency)) {
+            return $competency;
+        }
+
+        /** @var competency $competency */
+        $competency = competency::repository()->where('fullname', $competency)->get()->first();
+
+        return $competency->id;
+    }
+
+    private function resolve_user_id($user): int {
+        if (is_numeric($user)) {
+            return $user;
+        }
+
+        /** @var user $user_entity */
+        $user_entity = user::repository()->where('name', $user)->get()->first();
+
+        return $user_entity->id;
+    }
+
+    /**
      * Turn the table into an array of key=>value records.
      *
      * @param TableNode $table
@@ -213,4 +258,5 @@ class behat_totara_competency extends behat_base {
     private function normalize_index_url(string $url): string {
         return str_replace($url, 'index.php', '');
     }
+
 }

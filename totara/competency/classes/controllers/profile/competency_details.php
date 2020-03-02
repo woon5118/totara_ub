@@ -33,13 +33,13 @@ class competency_details extends base {
         // Add breadcrumbs.
         $this->add_navigation(get_string('competencydetails', 'totara_hierarchy'));
 
-        $competency = competency::repository()->find_or_fail((int) $this->get_param('competency_id', PARAM_INT, null, true));
+        $competency_id = $this->get_param('competency_id', PARAM_INT, null, true);
 
         $props = [
             'user-id' => $this->user->id,
-            'competency-id' => $competency->id,
+            'competency-id' => $competency_id,
             'base-url' => (string) $this->get_base_url(),
-            'go-back-link' => (string)$this->get_profile_url(),
+            'go-back-link' => (string) $this->get_profile_url(),
             'go-back-text' => $this->get_back_to_profile_text(),
         ];
 

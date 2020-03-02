@@ -30,70 +30,78 @@
       </a>
     </div>
 
-    <!-- Title -->
-    <h2 class="tui-competencyDetail__title">
-      {{ data.competency.fullname }}
-    </h2>
+    <Loader :loading="$apollo.loading">
+      <NotificationBanner
+        v-if="!data.competency && !$apollo.loading"
+        :dismissable="false"
+        :message="$str('competency_does_not_exist', 'totara_competency')"
+        type="error"
+      />
+      <template v-else-if="data.competency">
+        <!-- Title -->
+        <h2 class="tui-competencyDetail__title">
+          {{ data.competency.fullname }}
+        </h2>
 
-    <!-- Competency description & archived / activity log button -->
-    <Grid :stack-at="700">
-      <GridItem :units="7">
-        <div
-          class="tui-competencyDetail__description"
-          v-html="data.competency.description"
-        />
-      </GridItem>
-      <GridItem :units="5" :class="'tui-competencyDetail__buttons'">
-        <Button
-          :text="$str('archived_assignments', 'totara_competency')"
-          :styleclass="{ small: true }"
-          @click="openArchivedAssignmentModal"
-        />
+        <!-- Competency description & archived / activity log button -->
+        <Grid :stack-at="700">
+          <GridItem :units="7">
+            <div
+              class="tui-competencyDetail__description"
+              v-html="data.competency.description"
+            />
+          </GridItem>
+          <GridItem :class="'tui-competencyDetail__buttons'" :units="5">
+            <Button
+              :styleclass="{ small: true }"
+              :text="$str('archived_assignments', 'totara_competency')"
+              @click="openArchivedAssignmentModal"
+            />
 
-        <Button
-          :text="$str('activity_log', 'totara_competency')"
-          :styleclass="{ small: true }"
-          @click="openActivityLogModal"
-        />
-      </GridItem>
-    </Grid>
+            <Button
+              :styleclass="{ small: true }"
+              :text="$str('activity_log', 'totara_competency')"
+              @click="openActivityLogModal"
+            />
+          </GridItem>
+        </Grid>
 
-    <div class="tui-competencyDetail__body">
-      <h3 class="tui-competencyDetail__body-title">
-        {{ $str('current_assignment_details', 'totara_competency') }}
-      </h3>
+        <div class="tui-competencyDetail__body">
+          <h3 class="tui-competencyDetail__body-title">
+            {{ $str('current_assignment_details', 'totara_competency') }}
+          </h3>
 
-      <Loader :loading="$apollo.loading">
-        <!-- No active assignment, can happen when all assignments are archived -->
-        <div
-          v-if="!activeAssignmentList.length"
-          class="tui-competencyDetail__body-empty"
-        >
-          {{ $str('no_active_assignments', 'totara_competency') }}
+          <!-- No active assignment, can happen when all assignments are archived -->
+          <div
+            class="tui-competencyDetail__body-empty"
+            v-if="!activeAssignmentList.length"
+          >
+            {{ $str('no_active_assignments', 'totara_competency') }}
+          </div>
+
+          <div v-else>
+            <!-- Assignment selector & overview -->
+            <Assignment
+              :active-assignment-list="activeAssignmentList"
+              :selected-assignment-proficiency="selectedAssignmentProficiency"
+              v-model="assignmentFilter"
+            />
+
+            <!-- Progress overview -->
+            <Progress
+              :competency-id="competencyId"
+              :my-value="selectedAssignmentProficiencyValue"
+            />
+
+            <!-- Scale achievement details -->
+            <Achievements
+              :assignment="selectedAssignmentData"
+              :user-id="userId"
+            />
+          </div>
         </div>
-
-        <div v-else>
-          <!-- Assignment selector & overview -->
-          <Assignment
-            v-model="assignmentFilter"
-            :active-assignment-list="activeAssignmentList"
-            :selected-assignment-proficiency="selectedAssignmentProficiency"
-          />
-
-          <!-- Progress overview -->
-          <Progress
-            :competency-id="competencyId"
-            :my-value="selectedAssignmentProficiencyValue"
-          />
-
-          <!-- Scale achievement details -->
-          <Achievements
-            :user-id="userId"
-            :assignment="selectedAssignmentData"
-          />
-        </div>
-      </Loader>
-    </div>
+      </template>
+    </Loader>
 
     <!-- Activity log modal -->
     <ModalPresenter
@@ -129,6 +137,7 @@ import GridItem from 'totara_core/components/grid/GridItem';
 import Loader from 'totara_core/components/loader/Loader';
 import Modal from 'totara_core/components/modal/Modal';
 import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
+import NotificationBanner from 'totara_core/components/notifications/NotificationBanner';
 import Progress from 'totara_competency/components/details/Progress';
 // GraphQL
 import CompetencyDetailsQuery from 'totara_competency/graphql/competency_details';
@@ -145,6 +154,7 @@ export default {
     Loader,
     Modal,
     ModalPresenter,
+    NotificationBanner,
     Progress,
   },
 
@@ -173,9 +183,7 @@ export default {
       archivedAssignmentModalOpen: false,
       assignmentFilter: 0,
       data: {
-        competency: {
-          fullname: '',
-        },
+        competency: null,
         items: [],
       },
     };
@@ -190,10 +198,14 @@ export default {
           competency_id: this.competencyId,
         };
       },
-      update({
-        totara_competency_profile_competency_details: { competency, items },
-      }) {
-        return { competency, items };
+      update({ totara_competency_profile_competency_details }) {
+        const details = totara_competency_profile_competency_details;
+
+        if (details === null) {
+          return { competency: null, items: [] };
+        }
+
+        return { competency: details.competency, items: details.items };
       },
     },
   },
@@ -325,6 +337,7 @@ export default {
       "activity_log",
       "archived_assignments",
       "current_assignment_details",
+      "competency_does_not_exist",
       "no_active_assignments"
     ]
   }

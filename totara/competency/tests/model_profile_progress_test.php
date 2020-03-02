@@ -30,6 +30,7 @@ use totara_competency\models\profile\competency_progress;
 use totara_competency\models\profile\filter;
 use totara_competency\models\profile\item;
 use totara_competency\models\profile\progress;
+use totara_competency\models\profile\unassigned_competency_progress;
 
 global $CFG;
 
@@ -47,7 +48,7 @@ class totara_competency_model_profile_progress_testcase extends totara_competenc
      * @covers ::find_by_ids
      * @covers ::__construct
      */
-    public function test_it_loads_scales_using_ids() {
+    public function test_it_loads_scales_using_ids(): void {
         $data = $this->create_sorting_testing_data(true);
 
         // Let's build data for a user
@@ -87,7 +88,7 @@ class totara_competency_model_profile_progress_testcase extends totara_competenc
         $this->assertEquals($data['competencies']->first()->fullname, $progress->latest_achievement);
     }
 
-    public function test_build_progress_items_from_assignments() {
+    public function test_build_progress_items_from_assignments(): void {
         $fw = $this->generator()->create_framework();
         $comp1 = $this->generator()->create_competency(null, $fw);
         $comp2 = $this->generator()->create_competency(null, $fw);
@@ -127,7 +128,6 @@ class totara_competency_model_profile_progress_testcase extends totara_competenc
             $self_ass3,
             $self_ass4,
         ]);
-
         $collection = competency_progress::build_from_assignments($assignments);
 
         // Expecting 2 items as there are two competencies
@@ -158,6 +158,22 @@ class totara_competency_model_profile_progress_testcase extends totara_competenc
                 })->pluck('id')
             );
         }
+    }
+
+    /**
+     * When building for a competency, we want a null object with the competency attached rather than literal null.
+     */
+    public function test_build_for_competency_no_assignments(): void {
+        $competency_framework = $this->generator()->create_framework();
+        $competency = $this->generator()->create_competency(null, $competency_framework);
+
+        $user1 = $this->create_user();
+
+        $progress = competency_progress::build_for_competency($user1, $competency->id);
+
+        self::assertInstanceOf(unassigned_competency_progress::class, $progress);
+        self::assertCount(0, $progress->assignments);
+        self::assertEquals($competency->id, $progress->competency->id);
     }
 
 }

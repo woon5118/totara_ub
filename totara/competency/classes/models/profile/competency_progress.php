@@ -40,6 +40,7 @@ use totara_competency\entities\scale_value;
  *  - Overall progress -> int - Overall progress value per this group
  *
  * @property-read collection $assignments Collection of assignments for this user group
+ * @property-read competency $competency The competency this progress is related to
  * @property-read collection $items Collection of assignments for this user group
  * @property-read collection $filters Collection of filters
  * @property-read string $latest_achievement Latest achieved competency name (if any)
@@ -106,10 +107,10 @@ class competency_progress {
      * @param collection $assignments
      * @return collection
      */
-    public static function build_from_assignments(collection $assignments) {
+    public static function build_from_assignments(collection $assignments): collection {
         $progress = new collection();
 
-        $assignments->map(function (assignment $assignment) use ($progress) {
+        foreach ($assignments as $assignment) {
             if (!$progress->item($assignment->competency_id)) {
                 $progress->set(new static($assignment), $assignment->competency_id);
             } else {
@@ -117,7 +118,7 @@ class competency_progress {
                 $item = $progress->item($assignment->competency_id);
                 $item->append_assignment($assignment);
             }
-        });
+        }
 
         return $progress;
     }
@@ -130,11 +131,25 @@ class competency_progress {
      * @return competency_progress|null
      */
     public static function build_for_competency($user, int $competency_id): ?self {
-        return static::build_from_assignments(
-            assignments::for($user)->set_filters([
-                'competency_id' => $competency_id,
-            ])->fetch()->get()
-        )->first();
+        $assignments = assignments::for($user)->set_filters([
+            'competency_id' => $competency_id,
+        ])->fetch()->get();
+
+        // An in progress competency was found, return it.
+        if ($assignments->count() > 0) {
+            return static::build_from_assignments($assignments)->first();
+        }
+
+        /** @var competency $competency */
+        $competency = competency::repository()->find($competency_id);
+
+        // The requested competency exits, but it has no progress/assignments linked to it.
+        if ($competency !== null) {
+            return new unassigned_competency_progress($competency);
+        }
+
+        // The competency was not found at all.
+        return null;
     }
 
     /**
