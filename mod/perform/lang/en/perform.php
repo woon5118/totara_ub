@@ -36,6 +36,7 @@ $string['manage_activities_tabs:content'] = 'Content';
 $string['manage_activities_tabs:general'] = 'General';
 $string['manage_activities_tabs:notifications'] = 'Notifications';
 $string['manage_activities_tabs:sharing'] = 'Sharing';
+$string['menu_title_activity_management'] = 'Activity Management';
 $string['modulename'] = 'Performance activity';
 $string['modulenameplural'] = 'Performance activities';
 $string['perform:menu:activities'] = 'Activities';

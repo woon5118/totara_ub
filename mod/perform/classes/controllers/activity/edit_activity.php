@@ -25,9 +25,11 @@ namespace mod_perform\controllers\activity;
 
 use context;
 use mod_perform\models\activity\activity;
+use moodle_url;
+use totara_mvc\controller;
 use totara_mvc\tui_view;
 
-class edit_activity extends base {
+class edit_activity extends controller {
 
     /**
      * @inheritDoc
@@ -44,15 +46,20 @@ class edit_activity extends base {
 
         $props = [
             'activity-id' => $this->get_activity_id(),
-            'go-back-link' => (string) $this->get_activity_list_url(),
+            'go-back-link' => (string) activities::get_url(),
         ];
 
         return tui_view::create('mod_perform/pages/ManageActivity', $props)
+            ->set_url(self::get_url())
             ->set_title(get_string('perform:manage_activity_page_title', 'mod_perform'));
     }
 
     private function get_activity_id(): int {
         return required_param('activity_id', PARAM_INT);
+    }
+
+    public static function get_url(): moodle_url {
+        return new moodle_url('/mod/perform/manage/activity/edit.php');
     }
 
 }

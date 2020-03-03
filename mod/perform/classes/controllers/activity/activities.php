@@ -23,10 +23,23 @@
 
 namespace mod_perform\controllers\activity;
 
-use totara_mvc\tui_view;
 use mod_perform\models\activity\activity as activity_model;
+use mod_perform\util;
+use moodle_url;
+use totara_mvc\admin_controller;
+use totara_mvc\tui_view;
 
-class activities extends base {
+class activities extends admin_controller {
+
+    protected $admin_external_page_name = 'mod_perform_manage_activities';
+
+    /**
+     * @inheritDoc
+     */
+    protected function setup_context(): \context {
+        $category_id = util::get_default_categoryid();
+        return \context_coursecat::instance($category_id);
+    }
 
     /**
      * @return tui_view
@@ -35,12 +48,15 @@ class activities extends base {
         $this->require_capability('mod/perform:view_manage_activities', $this->get_context());
 
         $props = [
-            'edit-url' => (string) $this->get_edit_url(),
+            'edit-url' => (string) edit_activity::get_url(),
             'can-add' => activity_model::can_create(),
         ];
 
-        return tui_view::create('mod_perform/pages/Activities', $props)
-            ->set_title(get_string('perform:manage_activity', 'mod_perform'));
+        return tui_view::create('mod_perform/pages/Activities', $props);
+    }
+
+    public static function get_url(): moodle_url {
+        return new moodle_url('/mod/perform/manage/activity');
     }
 
 }

@@ -858,6 +858,7 @@ $string['pathtounoconv_help'] = 'Path to unoconv document converter. This is an 
 $string['pcreunicodewarning'] = 'It is strongly recommended to use PCRE PHP extension that is compatible with Unicode characters.';
 $string['perfdebug'] = 'Performance info';
 $string['performance'] = 'Performance';
+$string['performactivities'] = 'Performance activities';
 $string['performanceactivitycreatornewroleid'] = 'Performance activity creator\'s role in new performance activity';
 $string['performanceactivitycreatornewroleid_help'] = 'If the user creating a performance activity does not already have the permissions to manage the new activity, they are automatically assigned this role in the performance activity\'s context.';
 $string['pgcluster'] = 'PostgreSQL Cluster';
