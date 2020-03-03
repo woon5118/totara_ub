@@ -18,31 +18,14 @@
 //
 // @copyright 2019 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-// @author    Simon Chester <simon.chester@totaralearning.com>
+// @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @package   theme_ventura
 
-// use map-merge to override
-$totara_style_transitions: (
-  'form': (
-    function: linear,
-    duration: 0s,
-  ),
-  'modal': (
-    function: ease-out,
-    duration: 0.15s,
-  ),
-);
-
-@function transition($type, $property) {
-  $tv: map-get($totara_style_transitions, $type);
-  @return $property map-get($tv, 'function') map-get($tv, 'duration');
-}
-
-:root {
-  --tui-transition-form-function: linear;
-  --tui-transition-form-duration: 0s;
-  --tui-transition-modal-function: ease-out;
-  --tui-transition-modal-duration: 0.15s;
-  --tui-transition-progress-function: ease-out;
-  --tui-transition-progress-duration: 0.3s;
-}
+//
+// Progress
+//
+--tui-progress-value-bg-color: var(--tui-color-secondary);
+--tui-progress-container-bg-color: var(--tui-color-neutral-4);
+--tui-progress-border-color: var(--tui-color-neutral-1);
+--tui-progress-container-text-color: var(--tui-color-neutral-7);
+--tui-progress-value-text-color: var(--tui-color-neutral-1);
