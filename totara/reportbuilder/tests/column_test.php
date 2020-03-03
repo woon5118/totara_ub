@@ -38,6 +38,18 @@ require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_t
  * @group totara_reportbuilder
  */
 class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase {
+    /**
+     * @returm int
+     */
+    protected static function get_facetoface_module_id() {
+        global $DB;
+        static $id;
+        if (is_null($id)) {
+            $id = $DB->get_field('modules', 'id', ['name' => 'facetoface']);
+        }
+        return $id;
+    }
+
     // Warning: Massive amount of test data ahead.
     protected $user_info_field_data = array(
        'id' => 1, 'shortname' => 'datejoined', 'name' => 'Date Joined', 'datatype' => 'text', 'description' => '', 'categoryid' => 1,
@@ -283,10 +295,6 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
 
     protected $course_info_data_data = array(
         'id' => 1, 'fieldid' => 1, 'courseid' => 1, 'data' => 'test',
-    );
-
-    protected $course_modules_data = array(
-        'id' => 1, 'course' => 1, 'module' => 8, 'instance' => 1,
     );
 
     protected $block_totara_stats_data = array(
@@ -655,7 +663,6 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         $this->scorm_scoes_track_data = null;
         $this->course_info_field_data = null;
         $this->course_info_data_data = null;
-        $this->course_modules_data = null;
         $this->block_totara_stats_data = null;
         $this->message_working_data = null;
         $this->message_data = null;
@@ -790,7 +797,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             'tag_instance' => array($this->tag_instance_data),
             'course_info_field' => array($this->course_info_field_data),
             'course_info_data' => array($this->course_info_data_data),
-            'course_modules' => array($this->course_modules_data),
+            'course_modules' => array(array('id' => 1, 'course' => 1, 'module' => self::get_facetoface_module_id(), 'instance' => 1)), // Module id depends on installed plugins.
             'block_totara_stats' => array($this->block_totara_stats_data),
             'message' => array($this->message_data),
             'message_working' => array($this->message_working_data),
