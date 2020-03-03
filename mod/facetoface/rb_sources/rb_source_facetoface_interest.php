@@ -162,14 +162,6 @@ class rb_source_facetoface_interest extends rb_base_source {
         $this->add_totara_job_columns($columnoptions);
         $this->add_core_course_columns($columnoptions);
         $this->add_core_course_category_columns($columnoptions);
-        // Redirect the display of 'user' columns (to insert 'unassigned' when needed).
-        foreach ($columnoptions as $key => $columnoption) {
-            if (!($columnoption->type == 'user' && $columnoption->value == 'fullname')) {
-                continue;
-            }
-            $columnoptions[$key]->extrafields = array('user_id' => 'auser.id');
-            $columnoptions[$key]->displayfunc = 'user';
-        }
 
         return $columnoptions;
     }
