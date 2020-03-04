@@ -217,8 +217,24 @@ if ($interested) {
     ";
 }
 
+// Restrict to tenant participants
+$tenantjoin = '';
+$tenantwhere = '';
+if (!empty($CFG->tenantsenabled)) {
+    if ($context->tenantid) {
+        $tenant = \core\record\tenant::fetch($context->tenantid);
+        $tenantjoin = "JOIN {cohort_members} tp ON tp.userid = u.id AND tp.cohortid = ?";
+        $params[] = $tenant->cohortid;
+    } else {
+        if (!empty($CFG->tenantsisolated)) {
+            $tenantwhere = 'AND u.tenantid IS NULL';
+        }
+    }
+}
+
 $usercountrow = $DB->get_record_sql("SELECT COUNT(u.id) as num
                                                FROM {user} u
+                                               {$tenantjoin}
                                                LEFT JOIN {facetoface_signups} su
                                                  ON u.id = su.userid
                                                 AND su.sessionid = {$seminareventid}
@@ -226,7 +242,7 @@ $usercountrow = $DB->get_record_sql("SELECT COUNT(u.id) as num
                                                  ON su.id = ss.signupid
                                                 AND ss.superceded != 1
                                                $joininterest
-                                      WHERE {$where} ", $params);
+                                      WHERE {$where} {$tenantwhere} ", $params);
 
 $usercount = $usercountrow->num;
 
@@ -236,6 +252,7 @@ if ($usercount <= MAX_USERS_PER_PAGE) {
     $useridentityfields = get_extra_user_fields_sql(true, 'u', '', get_all_user_name_fields());
     $availableusers = $DB->get_recordset_sql("SELECT u.id, {$usernamefields} {$useridentityfields}, u.email, ss.statuscode, su.archived
                                         FROM {user} u
+                                        {$tenantjoin}
                                         LEFT JOIN {facetoface_signups} su
                                           ON u.id = su.userid
                                          AND su.sessionid = {$seminareventid}
@@ -243,7 +260,7 @@ if ($usercount <= MAX_USERS_PER_PAGE) {
                                           ON su.id = ss.signupid
                                          AND ss.superceded != 1
                                        $joininterest
-                                       WHERE {$where}
+                                       WHERE {$where} {$tenantwhere}
                                        ORDER BY u.lastname ASC, u.firstname ASC", $params);
 }
 
