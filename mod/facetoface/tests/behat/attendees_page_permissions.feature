@@ -213,6 +213,11 @@ Feature: Check attendees actions are performed by users with the right permissio
     And I should see "This is to advise that Sam1 Student1 has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
     And I click on "Attendees" "link"
     Then I should see "Sam1 Student1"
+    And I follow "Sam1 Student1"
+    Then I should see "User details"
+    And I press the "back" button in the browser
+    Then I should see "Decide Later"
+    And I should see "Sam1 Student1"
     And I should not see "Cancellations" in the "div.tabtree" "css_element"
     And I should not see "Take attendance" in the "div.tabtree" "css_element"
     And I should not see "Message users" in the "div.tabtree" "css_element"
@@ -227,6 +232,31 @@ Feature: Check attendees actions are performed by users with the right permissio
     And I am on "Course 1" course homepage
     And I follow "Go to event"
     Then I should see "Cancel booking" in the ".mod_facetoface__eventinfo__sidebar__cancellation" "css_element"
+
+  Scenario: Check trainer ability to view user profiles before and after prohibition
+    Given I log in as "trainer1"
+    And I am on "Course 1" course homepage
+    And I click on "View all events" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
+    And I follow "Sam1 Student1"
+    Then I should see "User details"
+    And I press the "back" button in the browser
+    And I click on "Take attendance" "link"
+    And I follow "Sam1 Student1"
+    Then I should see "User details"
+    And I log out
+    Given the following "permission overrides" exist:
+      | capability               | permission | role           | contextlevel | reference |
+      | moodle/user:viewdetails  | Prohibit   | editingteacher | Course       |        C1 |
+    And I log in as "trainer1"
+    And I am on "Course 1" course homepage
+    And I click on "View all events" "link"
+    And I click on the seminar event action "Attendees" in row "#1"
+    Then I should see "Sam1 Student1"
+    And "Sam1 Student1" "link" should not exist
+    And I click on "Take attendance" "link"
+    Then I should see "Sam1 Student1"
+    And "Sam1 Student1" "link" should not exist
 
   Scenario: Check trainer actions on attendees page after removing send message capability
     Given the following "permission overrides" exist:

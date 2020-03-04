@@ -111,12 +111,11 @@ final class event_content extends content_generator {
         $table = $this->do_create_table($url);
 
         $seminar = $this->seminarevent->get_seminar();
-        $courseid = $seminar->get_course();
+        $course = get_course($seminar->get_course());
         $isessionattendance = $seminar->get_sessionattendance();
 
         $helper = new attendance_helper();
         $stats = $helper->get_calculated_session_attendance_status($this->seminarevent->get_id());
-        $context = \context_course::instance($courseid);
 
         foreach ($rows as $attendee) {
             if ($attendee === null) {
@@ -127,8 +126,12 @@ final class event_content extends content_generator {
 
             $this->reset_attendee_statuscode($attendee);
             $data[] = $this->create_checkbox($attendee);
-            $url = user_get_profile_url($attendee->id);
-            $data[] = $url ? html_writer::link($url, fullname($attendee)) : html_writer::span(fullname($attendee));
+            $url = user_get_profile_url($attendee->id, $course);
+            if ($url) {
+                $data[] = html_writer::link($url, fullname($attendee));
+            } else {
+                $data[] = fullname($attendee);
+            }
 
             if ($isessionattendance) {
                 $stat = isset($stats[$attendee->id]) ? $stats[$attendee->id] : [];

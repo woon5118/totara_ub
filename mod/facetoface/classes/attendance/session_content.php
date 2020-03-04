@@ -92,8 +92,7 @@ final class session_content extends content_generator {
         $table = $this->do_create_table($url);
 
         $seminar = $this->seminarevent->get_seminar();
-        $courseid = $seminar->get_course();
-        $context = \context_course::instance($courseid);
+        $course = get_course($seminar->get_course());
 
         foreach ($rows as $row) {
             $data = [];
@@ -110,11 +109,12 @@ final class session_content extends content_generator {
 
             $data[] = $this->create_checkbox($attendee);
 
-            $url = user_get_profile_url($attendee->id);
-            if ($courseid != SITEID && is_enrolled($context, $attendee->id) && $url) {
-                $url->param('course', $courseid);
+            $url = user_get_profile_url($attendee->id, $course);
+            if ($url) {
+                $data[] = html_writer::link($url, fullname($attendee));
+            } else {
+                $data[] = fullname($attendee);
             }
-            $data[] = $url ? html_writer::link($url, fullname($attendee)) : html_writer::span(fullname($attendee));
 
             // Attendance's status of the single attendee
             $data[] = $this->create_attendance_status($attendee);

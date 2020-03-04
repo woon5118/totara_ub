@@ -7,6 +7,7 @@ Feature: Users are forced to get manager approval where required
       | username | firstname | lastname | email                |
       | teacher1 | Teacher   | 1        | teacher1@example.com |
       | student1 | Student   | 1        | student1@example.com |
+      | manager1 | Manager   | 1        | manager1@example.com |
     And the following "courses" exist:
       | fullname | shortname | format | summary |
       | Course 1 | C1        | topics |         |
@@ -100,3 +101,40 @@ Feature: Users are forced to get manager approval where required
     And I log in as "student1"
     And I am on "Course 1" course homepage
     Then I should see "Topic 1"
+
+  Scenario: A manager who is not enrolled in the course can nevertheless approve a signup
+    Given the following "position" frameworks exist:
+      | fullname      | idnumber |
+      | PosHierarchy1 | FW001    |
+    And the following "position" hierarchy exists:
+      | framework | idnumber | fullname   |
+      | FW001     | POS001   | Position1  |
+    And the following job assignments exist:
+      | user     | position | manager  |
+      | student1 | POS001   | manager1 |
+    When I log in as "student1"
+    And I am on "Course 1" course homepage
+    And I click on the link "Go to event" in row 1
+    And I press "Request approval"
+    Then I should see "Your request was sent to your manager for approval."
+    And I run all adhoc tasks
+    And I log out
+    When I log in as "manager1"
+    And I click on "Dashboard" in the totara menu
+    And I click on "View all tasks" "link"
+    And I should see "This is to advise that Student 1 has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
+    And I click on "Attendees" "link"
+    Then I should see "Student 1"
+    And I follow "Student 1"
+    Then I should see "User details"
+    And I press the "back" button in the browser
+    Then I should see "Decide Later"
+    And I should see "Student 1"
+    And I set the following fields to these values:
+      | Approve Student 1 for this event | 1 |
+    And I press "Update requests"
+    And I log out
+    When I log in as "student1"
+    And I am on "Course 1" course homepage
+    And I follow "Go to event"
+    Then I should see "Cancel booking"

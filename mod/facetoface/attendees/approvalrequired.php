@@ -185,14 +185,16 @@ $table->head = $headings;
 $table->align = array('left', 'center', 'center', 'center', 'center', 'center');
 $pix = new pix_icon('t/edit', get_string('edit'));
 $params = ['s' => $seminarevent->get_id(), 'sesskey' => sesskey(), 'return' => $action];
+$course = get_course($seminar->get_course());
 foreach ($requests as $attendee) {
     $attendeefullname = format_string(fullname($attendee));
     $data = array();
-    $attendee_link = user_get_profile_url($attendee->id);
+    $attendee_link = user_get_profile_url($attendee->id, $course);
     if ($attendee_link) {
-        $attendee_link->param('course', $seminar->get_course());
+        $data[] = html_writer::link($attendee_link, $attendeefullname);
+    } else {
+        $data[] = $attendeefullname;
     }
-    $data[] = $attendee_link ? html_writer::link($attendee_link, $attendeefullname) : html_writer::span($attendeefullname);
     $data[] = userdate($attendee->timecreated, get_string('strftimedatetime'));
 
     // Get signup note.
