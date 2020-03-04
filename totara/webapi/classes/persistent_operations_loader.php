@@ -92,7 +92,7 @@ class persistent_operations_loader {
             throw new \coding_exception('Invalid operation type');
         }
 
-        if ($CFG->debugdeveloper) {
+        if (isset($CFG->cache_graphql_schema) && $CFG->cache_graphql_schema == false) {
             return self::build_persisted_operations_array($type);
         }
 

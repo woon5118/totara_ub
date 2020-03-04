@@ -1,0 +1,6 @@
+This files describes API changes in the webapi plugin,
+information provided here is intended especially for developers.
+
+=== 13 ===
+
+* Introduced a new config flag $CFG->cache_graphql_schema to control caching of the schema. By default caching is on and can be turned off using the flag

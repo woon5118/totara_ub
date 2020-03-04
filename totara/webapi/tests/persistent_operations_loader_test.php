@@ -105,4 +105,35 @@ class totara_webapi_persistent_operations_loader_test extends \advanced_testcase
         $this->assertStringEqualsFile($CFG->dirroot.'/totara/webapi/webapi/ajax/status_nosession.graphql', $schema_string);
     }
 
+    public function test_caching_of_operations() {
+        set_config('cache_graphql_schema', false);
+
+        $query_id = 'totara_webapi_status_nosession';
+
+        $params = OperationParams::create([
+            'querId' => $query_id,
+            'webapi_type' => graphql::TYPE_AJAX,
+        ]);
+
+        $cache = \cache::make('totara_webapi', 'persistedoperations');
+        $cached_operations = $cache->get(graphql::TYPE_AJAX);
+
+        $this->assertEmpty($cached_operations);
+
+        $loader = new persistent_operations_loader();
+
+        $schema_string = $loader($query_id, $params);
+        $this->assertNotEmpty($schema_string);
+
+        // Now try the same thing with caching enabled
+        set_config('cache_graphql_schema', true);
+
+        $schema_string2 = $loader($query_id, $params);
+        $this->assertSame($schema_string, $schema_string2);
+
+        // There should be something in the cache now
+        $cached_operations = $cache->get(graphql::TYPE_AJAX);
+        $this->assertNotEmpty($cached_operations);
+    }
+
 }

@@ -769,6 +769,9 @@ $CFG->directorypermissions = 02777;
 // Prevent JS caching
 // $CFG->cachejs = false; // NOT FOR PRODUCTION SERVERS!
 //
+// Prevent GraphQL schema caching
+// $CFG->cache_graphql_schema = false; // NOT FOR PRODUCTION SERVERS!
+//
 // Restrict which YUI logging statements are shown in the browser console.
 // For details see the upstream documentation:
 //   http://yuilibrary.com/yui/docs/api/classes/config.html#property_logInclude

@@ -188,8 +188,8 @@ class schema_builder {
      */
     protected function get_parsed_schema(): Schema {
         global $CFG;
-        // In debug mode we skip the caching
-        if ($CFG->debugdeveloper) {
+        // The caching can be turned off by setting a config flag
+        if (isset($CFG->cache_graphql_schema) && $CFG->cache_graphql_schema == false) {
             return $this->do_build();
         }
 

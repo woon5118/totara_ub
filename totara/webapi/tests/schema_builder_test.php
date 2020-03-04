@@ -28,6 +28,55 @@ use totara_webapi\schema_file_loader;
 class totara_webapi_schema_builder_test  extends \advanced_testcase {
 
     public function test_build_schema() {
+        set_config('cache_graphql_schema', false);
+
+        $schema = $this->build_schema();
+
+        $this->assertInstanceOf(Schema::class, $schema);
+        $this->assertEmpty($schema->validate());
+
+        // Test some of the core types, testing all types is overkill
+        $this->assertTrue($schema->hasType('core_user'));
+        $this->assertTrue($schema->hasType('param_alpha'));
+        $this->assertTrue($schema->hasType('core_date'));
+        $this->assertTrue($schema->hasType('totara_webapi_status'));
+
+        // Test some of the test schemas
+        $this->assertTrue($schema->hasType('test_schema_type1'));
+        $this->assertTrue($schema->hasType('test_schema_type2'));
+        $this->assertTrue($schema->hasType('test_schema_type3'));
+
+        // Test some of the queries
+        $queries = $schema->getQueryType()->getFields();
+        $this->assertArrayHasKey('totara_webapi_status', $queries);
+        $this->assertArrayHasKey('core_template', $queries);
+        $this->assertArrayHasKey('core_my_courses', $queries);
+    }
+
+    public function test_caching_of_schema() {
+        set_config('cache_graphql_schema', false);
+
+        $cache = \cache::make('totara_webapi', 'schema');
+        $parsed_schema = $cache->get('parsed_schema');
+
+        $this->assertEmpty($parsed_schema);
+
+        $this->build_schema();
+
+        // It's still empty
+        $parsed_schema = $cache->get('parsed_schema');
+        $this->assertEmpty($parsed_schema);
+
+        set_config('cache_graphql_schema', true);
+
+        $this->build_schema();
+
+        // It's still empty
+        $parsed_schema = $cache->get('parsed_schema');
+        $this->assertNotEmpty($parsed_schema);
+    }
+
+    protected function build_schema(): Schema {
         global $CFG;
 
         $schema_files = [
@@ -52,28 +101,7 @@ class totara_webapi_schema_builder_test  extends \advanced_testcase {
             ->willReturn($schema_files);
 
         $builder = new schema_builder($file_loader);
-        $schema = $builder->build();
-
-        $this->assertInstanceOf(Schema::class, $schema);
-        $this->assertEmpty($schema->validate());
-
-        // Test some of the core types, testing all types is overkill
-        $this->assertTrue($schema->hasType('core_user'));
-        $this->assertTrue($schema->hasType('param_alpha'));
-        $this->assertTrue($schema->hasType('core_date'));
-        $this->assertTrue($schema->hasType('totara_webapi_status'));
-
-        // Test some of the test schemas
-        $this->assertTrue($schema->hasType('test_schema_type1'));
-        $this->assertTrue($schema->hasType('test_schema_type2'));
-        $this->assertTrue($schema->hasType('test_schema_type3'));
-
-        // Test some of the queries
-        $queries = $schema->getQueryType()->getFields();
-        $this->assertArrayHasKey('totara_webapi_status', $queries);
-        $this->assertArrayHasKey('core_template', $queries);
-        $this->assertArrayHasKey('core_my_courses', $queries);
+        return $builder->build();
     }
-
 
 }
