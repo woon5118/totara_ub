@@ -24,6 +24,7 @@ import apollo from '../apollo_client';
 import bundleQuery from 'totara_core/graphql/tui_bundles_nosession';
 import { globalConfig } from '../config';
 import pending from '../pending';
+import { pull } from '../util';
 
 /**
  * Possible states for a bundle
@@ -278,6 +279,7 @@ export default class BundleLoader {
       this._loadQueue.push(() => {
         return Promise.resolve(fn()).then(resolve, reject);
       });
+      // only item in queue, begin
       if (this._loadQueue.length == 1) {
         this._nextLoadTask();
       }
@@ -293,8 +295,11 @@ export default class BundleLoader {
     if (this._loadQueue.length == 0) {
       return;
     }
-    const task = this._loadQueue.shift();
-    task().then(() => this._nextLoadTask());
+    const task = this._loadQueue[0];
+    task().then(() => {
+      pull(this._loadQueue, task);
+      this._nextLoadTask();
+    });
   }
 
   /**
