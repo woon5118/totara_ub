@@ -137,7 +137,7 @@ trait report_trait {
             array('joins' => $join,
                   'dbdatatype' => 'char',
                   'outputformat' => 'text',
-                  'extrafields' => $allnamefields,
+                  'extrafields' => array_merge(['id' => "$join.id"], $allnamefields),
                   'displayfunc' => 'user',
                   'addtypetoheading' => $addtypetoheading
             )
