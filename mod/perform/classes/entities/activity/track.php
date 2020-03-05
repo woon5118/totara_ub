@@ -40,6 +40,8 @@ use core\orm\entity\relations\has_many_through;
  * @property int $updated_at record modification time
  *
  * @property-read collection|subject_instance[] $subject_instances
+ * @property-read activity $activity
+ * @property-read collection|track_assignment[] $assignments
  */
 final class track extends entity {
 

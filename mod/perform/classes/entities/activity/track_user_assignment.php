@@ -40,6 +40,7 @@ use core\orm\entity\relations\has_many_through;
  * @property int $updated_at record modification time
  *
  * @property-read user $subject_user subject user relation entity
+ * @property-read track $track the track this user assignment belongs to
  * @property-read collection|track_assignment[] $assignments All assignments this user assignments is linked to
  *
  * @method static track_user_assignment_repository repository()

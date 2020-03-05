@@ -41,7 +41,9 @@ use core\orm\entity\relations\has_many_through;
  * @property int $created_at record creation time
  * @property int $updated_at record modification time
  * @property int $expand if the assignment should be expanded on the next expand
+ *
  * @property-read collection|track_user_assignment[] $user_assignments All user assignments linked to this particular assignment
+ * @property-read track $track The track this assignment belongs to
  *
  * @method static track_assignment_repository repository()
  */
