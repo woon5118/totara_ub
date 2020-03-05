@@ -17,41 +17,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Nathan Lewis <nathan.lewis@totaralearning.com>
+ * @author Matthias Bonk <matthias.bonk@totaralearning.com>
  * @package mod_perform
  */
 
-namespace mod_perform\webapi\resolver\query;
+namespace mod_perform\webapi\resolver\mutation;
 
+use core\orm\query\exceptions\record_not_found_exception;
 use core\webapi\execution_context;
-use core\webapi\query_resolver;
-use mod_perform\models\activity\section as section_model;
+use core\webapi\mutation_resolver;
+use mod_perform\models\activity\section;
 
-class section implements query_resolver {
+class update_section_relationships implements mutation_resolver {
 
+    /**
+     * This updates the list of relationships for a specified section.
+     *
+     * {@inheritdoc}
+     */
     public static function resolve(array $args, execution_context $ec) {
-        require_login(null, false, null, false, true);
+        require_login();
 
-        $section_id = $args['section_id'];
+        $args = $args['input'];
 
-        /** @var section_model $section */
-        $section = section_model::load_by_id($section_id);
-
-        $activity = $section->get_activity();
-
-        $activity_context = $activity->get_context();
-
-        if (!$activity->can_manage()) {
-            throw new \required_capability_exception(
-                $activity_context,
-                'mod/perform:manage_activity',
-                'nopermission',
-                ''
-            );
+        try {
+            $section = section::load_by_id($args['section_id']);
+        } catch (record_not_found_exception $e) {
+            throw new \coding_exception('Specified section id does not exist');
         }
-
+        $activity_context = $section->get_activity()->get_context();
         $ec->set_relevant_context($activity_context);
+        require_capability('mod/perform:manage_activity', $activity_context);
 
-        return $section;
+        return $section->update_relationships($args['names']);
     }
 }

@@ -21,7 +21,6 @@
  * @package mod_perform
  */
 
-use container_perform\perform as perform_container;
 use mod_perform\models\activity\activity;
 use mod_perform\entities\activity\activity as activity_entity;
 

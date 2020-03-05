@@ -36,5 +36,15 @@
     @include totara-style-heading-label-small;
     border-bottom: 1px solid var(--tui-card-border-color);
   }
+
+  &__participant-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--tui-gap-2);
+    padding: var(--tui-gap-2);
+    border: var(--tui-border-width-thin) solid var(--tui-color-neutral-5);
+    border-radius: var(--tui-border-radius-normal);
+  }
 }
 </style>

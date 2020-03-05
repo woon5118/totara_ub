@@ -29,7 +29,9 @@ use mod_perform\webapi\resolver\query\activity as activity_resolver;
 use \mod_perform\models\activity\activity;
 use totara_webapi\graphql;
 
-class webapi_resolver_query_activity_test extends advanced_testcase {
+require_once(__DIR__.'/relationship_testcase.php');
+
+class webapi_resolver_query_activity_test extends mod_perform_relationship_testcase {
 
     public function test_get_activity(): void {
         self::setAdminUser();
@@ -70,6 +72,65 @@ class webapi_resolver_query_activity_test extends advanced_testcase {
         $id = $created_activity->get_id();
 
         activity_resolver::resolve(['activity_id' => $id], $this->get_execution_context());
+    }
+
+    /**
+     * Test the query through the GraphQL stack.
+     */
+    public function test_ajax_query_successful() {
+        self::setAdminUser();
+        $data = $this->create_test_data();
+
+        $id = $data->activity1->get_id();
+        $args = [
+            'activity_id' => $id,
+        ];
+
+        $result = graphql::execute_operation(
+            $this->get_execution_context('ajax', 'mod_perform_activity'),
+            $args
+        );
+        $this->assertEquals([], $result->errors);
+
+        // Assert result structure.
+        $result = $result->data['mod_perform_activity'];
+        $this->assertEquals($data->activity1->get_id(), $result['id']);
+        $this->assertEquals('Activity 1', $result['name']);
+        $this->assertEquals('test description', $result['description']);
+        $section1 = array_filter($result['sections'], function ($section) use ($data) {
+            return (int)$section['id'] === $data->section1_1->get_id();
+        });
+        $section1_result = reset($section1);
+        $this->assertEquals('Test section 1 1',  $section1_result['title']);
+        $section1_expected_relationships = [
+            [
+                'id' => $data->relationship1_1_1->get_id(),
+                'can_view' => true,
+                'can_answer' => true,
+                'name' => 'appraiser',
+            ],
+            [
+                'id' => $data->relationship1_1_2->get_id(),
+                'can_view' => true,
+                'can_answer' => true,
+                'name' => 'manager',
+            ],
+        ];
+        $this->assertEqualsCanonicalizing($section1_expected_relationships, $section1_result['section_relationships']);
+
+        $section2 = array_filter($result['sections'], function ($section) use ($data) {
+            return (int)$section['id'] === $data->section1_2->get_id();
+        });
+        $section2_result = reset($section2);
+        $this->assertEquals('Test section 1 2',  $section2_result['title']);
+        $section2_expected_relationships = [
+            'id' => $data->relationship1_2_1->get_id(),
+            'can_view' => true,
+            'can_answer' => true,
+            'name' => 'subject',
+        ];
+        $this->assertCount(1, $section2_result['section_relationships']);
+        $this->assertEquals($section2_expected_relationships, reset($section2_result['section_relationships']));
     }
 
     private function create_activity(): activity {

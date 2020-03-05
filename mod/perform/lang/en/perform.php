@@ -23,6 +23,11 @@
 
 
 $string['activity_content_tab:heading'] = 'Content';
+$string['activity_participants:add'] = 'Add participants';
+$string['activity_participants:heading'] = 'Participants';
+$string['activity_participants:select_heading'] = 'Select participants';
+$string['activity_participants:select_done'] = 'Done';
+$string['activity_section:save_changes'] = 'Save changes';
 $string['create_activity'] = 'Add activity';
 $string['edit_content'] = 'Edit content';
 $string['error:create_permission_missing'] = 'You do not have the permission to create a performance activity';

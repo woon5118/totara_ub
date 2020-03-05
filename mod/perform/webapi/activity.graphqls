@@ -30,6 +30,16 @@ type mod_perform_element {
 }
 
 """
+A relationship joined to a section
+"""
+type mod_perform_section_relationship {
+  id: core_id!
+  can_answer: Boolean!
+  can_view: Boolean!
+  name: String!
+}
+
+"""
 A section
 """
 type mod_perform_section {
@@ -37,6 +47,7 @@ type mod_perform_section {
   title: String!
   activity: mod_perform_activity!
   section_elements: [mod_perform_section_element!]!
+  section_relationships: [mod_perform_section_relationship!]!
 }
 
 """
@@ -59,6 +70,11 @@ enum mod_perform_activity_status {
 
 type mod_perform_activity_result {
   activity: mod_perform_activity!
+}
+
+input update_section_relationships_input {
+  section_id: core_id!
+  names: [String!]!
 }
 
 extend type Query {
@@ -95,4 +111,8 @@ extend type Mutation {
     name: param_text!
     description: param_text
   ): mod_perform_activity_result!
+
+  mod_perform_update_section_relationships(
+    input: update_section_relationships_input!
+  ): mod_perform_section!
 }

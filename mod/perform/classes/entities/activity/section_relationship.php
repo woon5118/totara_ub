@@ -44,7 +44,16 @@ use core\orm\entity\relations\belongs_to;
 class section_relationship extends entity {
     public const TABLE = 'perform_section_relationship';
     public const CREATED_TIMESTAMP = 'created_at';
-    
+
+    /**
+     * Temp solution for name attribute. Must be updated when relationship classes are implemented in TL-24046.
+     *
+     * @return mixed|null
+     */
+    protected function get_name_attribute() {
+        return $this->activity_relationship->class_name;
+    }
+
     /**
      * Relationship with section entities.
      *

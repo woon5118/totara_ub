@@ -23,6 +23,7 @@
 
 use container_perform\perform as perform_container;
 use core_container\module\module;
+use mod_perform\models\activity\section_relationship as section_relationship_model;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\element;
@@ -58,12 +59,7 @@ class mod_perform_generator extends component_generator_base {
             /** @var perform_container $container */
             $activity = activity::create($container, $name, $description, $status);
 
-            section::create($activity, 'placeholder_title');
-
-            $modules = $container->get_section(0)->get_all_modules();
-            $module = reset($modules);
-
-            return activity::load_by_id($module->instance);
+            return activity::load_by_id($activity->get_id());
         });
     }
 
@@ -91,7 +87,7 @@ class mod_perform_generator extends component_generator_base {
         return $module;
     }
 
-    public function create_section(activity $activity, $data = []) {
+    public function create_section(activity $activity, $data = []): section {
         $title =  $data['title'] ?? "test Section";
         return section::create($activity, $title);
     }
@@ -106,5 +102,9 @@ class mod_perform_generator extends component_generator_base {
         $identifier = $data['identifier'] ?? 1;
 
         return element::create($plugin_name, $title, $identifier);
+    }
+
+    public function create_section_relationship(section $section, array $data): section_relationship_model {
+        return section_relationship_model::create($section->get_id(), $data['class_name']);
     }
 }

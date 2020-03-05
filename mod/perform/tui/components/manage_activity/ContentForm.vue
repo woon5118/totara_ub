@@ -22,15 +22,16 @@
 
 <template>
   <div>
-    <h3>{{ $str('activity_content_tab:heading', 'perform') }}</h3>
+    <h3>{{ $str('activity_content_tab:heading', 'mod_perform') }}</h3>
 
     <ActivitySection
-      v-for="(section, i) in [{}]"
+      v-for="(section, i) in value.sections"
       :key="i"
-      :value="section"
+      :section="section"
       @input="updateSection($event, i)"
+      @mutation-success="$emit('mutation-success')"
+      @mutation-error="$emit('mutation-error')"
     />
-    <!--    <ActivitySection v-for="(section, i) in value.sections" :key="i" :value="section"/>-->
   </div>
 </template>
 
@@ -55,9 +56,12 @@ export default {
   },
   methods: {
     updateSection(updatedSection, sectionIndex) {
-      const valueCopy = Object.assign({}, this.value);
+      const sectionsCopy = this.value.sections.slice();
+      sectionsCopy[sectionIndex] = updatedSection;
 
-      valueCopy.sections[sectionIndex] = updatedSection;
+      const valueCopy = Object.assign({}, this.value, {
+        sections: sectionsCopy,
+      });
 
       this.updateActivity(valueCopy);
     },

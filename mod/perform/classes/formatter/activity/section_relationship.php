@@ -17,29 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Nathan Lewis <nathan.lewis@totaralearning.com>
+ * @author Matthias Bonk <matthias.bonk@totaralearning.com>
  * @package mod_perform
  */
 
 namespace mod_perform\formatter\activity;
-
 use core\orm\formatter\entity_model_formatter;
 use totara_core\formatter\field\string_field_formatter;
 
-/**
- * Class section
- *
- * @package mod_perform\formatter\activity
- */
-class section extends entity_model_formatter {
+class section_relationship extends entity_model_formatter {
 
     protected function get_map(): array {
         return [
             'id' => null,
-            'title' => string_field_formatter::class,
-            'activity' => null,
-            'section_elements' => null,
-            'section_relationships' => null,
+            'can_view' => null,
+            'can_answer' => null,
+            'name' => string_field_formatter::class,
         ];
     }
 }

@@ -3,5 +3,15 @@ query mod_perform_activity($activity_id: core_id!) {
     id
     name
     description
+    sections {
+      id
+      title
+      section_relationships {
+        id
+        can_view
+        can_answer
+        name
+      }
+    }
   }
 }
