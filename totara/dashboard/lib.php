@@ -38,7 +38,6 @@ class totara_dashboard {
     /**
      * Dashboard availability
      */
-    const GUEST = 3;
     const ALL = 2;
     const AUDIENCE = 1;
     const NONE = 0;
@@ -129,14 +128,6 @@ class totara_dashboard {
         $cache = cache::make_from_params(cache_store::MODE_REQUEST, 'totara_core', 'dashboard');
         if ($cache->has('user_' . $userid)) {
             return $cache->get('user_' . $userid);
-        }
-
-        // Get guests.
-        if (isguestuser()) {
-            // Check relevant dashboards.
-            $results = $DB->get_records('totara_dashboard', ['published' => self::GUEST], 'sortorder');
-            $cache->set('user_' . $userid, $results);
-            return $results;
         }
 
         // Get user cohorts.

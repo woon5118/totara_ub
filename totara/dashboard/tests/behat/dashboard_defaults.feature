@@ -57,7 +57,6 @@ Feature: Test Dashboard defaults
 
   Scenario: Home is default page for admin by default
     When I log in as "admin"
-    And I click on "Home" in the totara menu
     Then I should see "Latest announcements"
     And I should not see "Current Learning"
 

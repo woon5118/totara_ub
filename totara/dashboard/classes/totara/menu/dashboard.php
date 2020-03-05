@@ -42,7 +42,7 @@ class dashboard extends \totara_core\totara\menu\item {
     protected function check_visibility() {
         global $CFG, $USER;
 
-        if (!isloggedin()) {
+        if (!isloggedin() or isguestuser()) {
             return false;
         }
 
