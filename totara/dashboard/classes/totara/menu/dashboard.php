@@ -47,7 +47,7 @@ class dashboard extends \totara_core\totara\menu\item {
         }
 
         static $cache = null;
-        if (isset($cache) && !PHPUNIT_TEST) {
+        if (isset($cache)) {
             return $cache;
         }
 
