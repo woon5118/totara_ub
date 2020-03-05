@@ -459,5 +459,41 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020030500, 'perform');
     }
 
+    if ($oldversion < 2020030501) {
+        // Define field track_user_assignment_id to be added to perform_subject_instance.
+        $table = new xmldb_table('perform_subject_instance');
+        $field = new xmldb_field('track_user_assignment_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'id');
+
+        // Conditionally launch add field track_user_assignment_id.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'subject_user_id');
+
+        // Conditionally launch add field created_at.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('updated_at', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'created_at');
+
+        // Conditionally launch add field updated_at.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $key = new xmldb_key('track_user_assignment_id', XMLDB_KEY_FOREIGN, array('track_user_assignment_id'), 'perform_track_user_assignment', array('id'), 'cascade');
+
+        // Launch add key track_user_assignment_id.
+        if (!$dbman->key_exists($table, $key)) {
+            $dbman->add_key($table, $key);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020030501, 'perform');
+    }
+
     return true;
 }
+

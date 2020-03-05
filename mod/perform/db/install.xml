@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/perform/db" VERSION="20200122" COMMENT="XMLDB file for perform module"
+<XMLDB PATH="mod/perform/db" VERSION="20200305" COMMENT="XMLDB file for perform module"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -95,10 +95,14 @@
     <TABLE NAME="perform_subject_instance" COMMENT="Represents a single activity for one subject user">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="track_user_assignment_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="subject_user_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="updated_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="track_user_assignment_id" TYPE="foreign" FIELDS="track_user_assignment_id" REFTABLE="perform_track_user_assignment" REFFIELDS="id" ONDELETE="cascade"/>
         <KEY NAME="subject_user_id" TYPE="foreign" FIELDS="subject_user_id" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>

@@ -23,9 +23,11 @@
 
 namespace mod_perform\entities\activity;
 
+use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many;
+use core\orm\entity\relations\has_many_through;
 
 /**
  * Represents an activity track record in the repository.
@@ -36,6 +38,8 @@ use core\orm\entity\relations\has_many;
  * @property string $status track status eg active, archived
  * @property int $created_at record creation time
  * @property int $updated_at record modification time
+ *
+ * @property-read collection|subject_instance[] $subject_instances
  */
 final class track extends entity {
 
@@ -60,4 +64,21 @@ final class track extends entity {
     public function assignments(): has_many {
         return $this->has_many(track_assignment::class, 'track_id');
     }
+
+    /**
+     * Get all subject instance for this track
+     *
+     * @return has_many_through
+     */
+    public function subject_instances(): has_many_through {
+        return $this->has_many_through(
+            track_user_assignment::class,
+            subject_instance::class,
+            'id',
+            'track_id',
+            'id',
+            'track_user_assignment_id'
+        );
+    }
+
 }
