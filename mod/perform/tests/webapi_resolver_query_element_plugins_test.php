@@ -49,6 +49,8 @@ class mod_perform_webapi_resolver_query_element_plugins_testcase extends advance
             $this->assertInstanceOf('mod_perform\models\activity\element_plugin', $element);
             $this->assertNotEmpty($element::get_plugin_name());
             $this->assertNotEmpty($element::get_name());
+            $this->assertNotEmpty($element::get_admin_form_component());
+            $this->assertNotEmpty($element::get_admin_display_component());
         }
     }
 }

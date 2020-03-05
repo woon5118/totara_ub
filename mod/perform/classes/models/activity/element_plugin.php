@@ -71,4 +71,33 @@ abstract class element_plugin {
     final public static function get_name(): string {
         return get_string('name', 'performelement_' . static::get_plugin_name());
     }
+
+    /**
+     * This method return element's admin form vue component name
+     * @return string
+     */
+    public static function get_admin_form_component(): string {
+        return self::get_component_name_prefix() . 'ElementAdminForm';
+    }
+
+    /**
+     * This method return element's admin display vue component name
+     * @return string
+     */
+    public static function get_admin_display_component(): string {
+        return self::get_component_name_prefix().'ElementAdminDisplay';
+    }
+
+    /**
+     * This method return element's default component name prefix
+     * @return string
+     */
+    protected static function get_component_name_prefix(): string {
+        $prefix = '';
+        foreach (explode('_', self::get_plugin_name()) as $name) {
+            $prefix .= ucfirst($name);
+        }
+
+        return $prefix;
+    }
 }

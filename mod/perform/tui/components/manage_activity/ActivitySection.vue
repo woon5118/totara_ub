@@ -86,7 +86,7 @@
     </Grid>
 
     <ModalPresenter :open="modelOpen" @request-close="modalRequestClose">
-      <EditSectionContentModal />
+      <EditSectionContentModal :section-id="section.id" />
     </ModalPresenter>
   </Card>
 </template>

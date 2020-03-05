@@ -26,4 +26,5 @@ namespace performelement_short_text;
 use mod_perform\models\activity\element_plugin;
 
 class short_text extends element_plugin {
+
 }

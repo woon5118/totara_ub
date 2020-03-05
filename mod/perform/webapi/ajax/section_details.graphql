@@ -8,6 +8,8 @@ query mod_perform_section_details($section_id: core_id!) {
         element_plugin {
           plugin_name
           name
+          admin_form_component
+          admin_display_component
         }
         title
         identifier

@@ -14,8 +14,9 @@ An element plugin which can be used to create an element
 """
 type mod_perform_element_plugin {
   plugin_name: String!
-  # could have properties like admin_vue_component and participant_vue_component?
   name: String!
+  admin_form_component: String!
+  admin_display_component: String!
 }
 
 """

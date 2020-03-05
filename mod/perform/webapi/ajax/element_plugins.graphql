@@ -2,5 +2,7 @@ query mod_perform_element_plugins {
   mod_perform_element_plugins {
     plugin_name
     name
+    admin_form_component
+    admin_display_component
   }
 }

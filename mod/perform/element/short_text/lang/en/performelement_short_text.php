@@ -18,8 +18,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Nathan Lewis <nathan.lewis@totaralearning.com>
- * @package mod_perform
+ * @package performelement_short_text
  */
 
+$string['error:question_required'] = 'Question is required';
 $string['pluginname'] = 'Short text element';
 $string['name'] = 'Short text';
+$string['short_text:answer:placeholder'] = 'Long text answer field';
+$string['short_text:button:cancel'] = 'Cancel';
+$string['short_text:button:done'] = 'Done';
+$string['short_text:title'] = 'Question Text';
+
