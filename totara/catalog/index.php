@@ -30,7 +30,7 @@ require_login();
 $pageurl = new moodle_url('/totara/catalog/index.php');
 // Set grid catalog as homepage for user when user home page preference is enabled.
 if (optional_param('setdefaulthome', 0, PARAM_BOOL)) {
-    if (!empty($CFG->allowdefaultpageselection) && $CFG->catalogtype === 'totara') {
+    if (!empty($CFG->allowdefaultpageselection) && $CFG->catalogtype === 'totara' && !isguestuser()) {
         require_sesskey();
         set_user_preference('user_home_page_preference', HOMEPAGE_TOTARA_GRID_CATALOG);
         \core\notification::success(get_string('userhomepagechanged', 'totara_dashboard'));

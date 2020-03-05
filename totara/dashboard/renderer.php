@@ -42,7 +42,7 @@ class totara_dashboard_renderer extends plugin_renderer_base {
     /**
      * Renders a table containing dashboard list
      *
-     * @param array $dashboards array of totara_dashboard object
+     * @param totara_dashboard[] $dashboards array of totara_dashboard object
      * @return string HTML table
      */
     public function dashboard_manage_table($dashboards) {
@@ -52,6 +52,7 @@ class totara_dashboard_renderer extends plugin_renderer_base {
         }
 
         $tableheader = array(get_string('name', 'totara_dashboard'),
+                             get_string('allowguest', 'totara_dashboard'),
                              get_string('availability', 'totara_dashboard'));
         if (!empty($CFG->tenantsenabled)) {
             $tableheader[] = get_string('tenant', 'totara_tenant');
@@ -69,6 +70,8 @@ class totara_dashboard_renderer extends plugin_renderer_base {
         $strdelete = get_string('delete', 'totara_dashboard');
         $stredit = get_string('editdashboard', 'totara_dashboard');
         $strclone = get_string('clonedashboard', 'totara_dashboard');
+        $stryes = get_string('yes');
+        $strno = get_string('no');
 
         $data = array();
         foreach ($dashboards as $dashboard) {
@@ -85,6 +88,16 @@ class totara_dashboard_renderer extends plugin_renderer_base {
 
             $row = array();
             $row[] = html_writer::link($urllayout, $name);
+
+            if ($dashboard->tenantid) {
+                $row[] = $strno;
+            } else {
+                if ($dashboard->allowguest) {
+                    $row[] = $stryes;
+                } else {
+                    $row[] = $strno;
+                }
+            }
 
             switch ($dashboard->get_published()) {
                 case totara_dashboard::NONE:

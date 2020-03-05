@@ -55,6 +55,8 @@ class totara_dashboard_edit_form extends moodleform {
                 $tenantname = $DB->get_field('tenant', 'name', ['id' => $dashboard->tenantid]);
                 $tenantname = format_string($tenantname);
                 $mform->addElement('static', 'tenantname', get_string('tenant', 'totara_tenant'), $tenantname);
+            } else {
+                $mform->addElement('advcheckbox', 'allowguest', get_string('allowguest', 'totara_dashboard'));
             }
         } else {
             if (!empty($CFG->tenantsenabled)) {
@@ -65,15 +67,10 @@ class totara_dashboard_edit_form extends moodleform {
                     $mform->addElement('select', 'tenantid', get_string('tenant', 'totara_tenant'), $tenants);
                 }
             }
+            $mform->addElement('advcheckbox', 'allowguest', get_string('allowguest', 'totara_dashboard'));
+            $mform->hideIf('allowguest', 'tenantid', 'noteq', '');
         }
 
-        // Cohorts.
-        $mform->addElement('header', 'assignedcohortshdr', get_string('assignedcohorts', 'totara_dashboard'));
-        if (empty($dashboard->id)) {
-            $cohorts = '';
-        } else {
-            $cohorts = $dashboard->cohorts;
-        }
         // Availability.
         $availopts = array();
         $availopts[] = $mform->createElement('radio', 'published', '', get_string('availablenone', 'totara_dashboard'), totara_dashboard::NONE);
@@ -88,6 +85,14 @@ class totara_dashboard_edit_form extends moodleform {
             $defaultpublished = totara_dashboard::ALL;
         }
         $mform->setDefault('published[published]', $defaultpublished);
+
+        // Cohorts.
+        $mform->addElement('header', 'assignedcohortshdr', get_string('assignedcohorts', 'totara_dashboard'));
+        if (empty($dashboard->id)) {
+            $cohorts = '';
+        } else {
+            $cohorts = $dashboard->cohorts;
+        }
 
         $mform->addElement('hidden', 'cohorts', $cohorts);
         $mform->setType('cohorts', PARAM_SEQUENCE);

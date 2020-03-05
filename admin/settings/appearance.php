@@ -166,6 +166,18 @@ preferences,moodle|/user/preferences.php|preferences',
         HOMEPAGE_TOTARA_DASHBOARD,
         $choices
      ));
+    $choices = [];
+    $choices[HOMEPAGE_SITE] = new lang_string('site');
+    if (advanced_feature::is_enabled('totaradashboard')) {
+        $choices[HOMEPAGE_TOTARA_DASHBOARD] = new lang_string('totaradashboard', 'admin');
+    }
+    $temp->add(new admin_setting_configselect(
+        'guesthomepage',
+        new lang_string('guesthomepage', 'admin'),
+        new lang_string('configguesthomepage', 'admin'),
+        HOMEPAGE_SITE,
+        $choices
+    ));
     // Allow default page selection.
     $temp->add(new admin_setting_configcheckbox('allowdefaultpageselection', new lang_string('allowdefaultpageselection', 'totara_dashboard'),
         new lang_string('allowdefaultpageselection_desc', 'totara_dashboard'), '0'));

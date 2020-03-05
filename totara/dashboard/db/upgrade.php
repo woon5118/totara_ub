@@ -166,5 +166,20 @@ function xmldb_totara_dashboard_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019083001, 'totara', 'dashboard');
     }
 
+    if ($oldversion < 2020030500) {
+
+        // Define field allowguest to be added to totara_dashboard.
+        $table = new xmldb_table('totara_dashboard');
+        $field = new xmldb_field('allowguest', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'published');
+
+        // Conditionally launch add field allowguest.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Dashboard savepoint reached.
+        upgrade_plugin_savepoint(true, 2020030500, 'totara', 'dashboard');
+    }
+
     return true;
 }

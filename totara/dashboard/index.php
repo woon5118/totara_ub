@@ -33,10 +33,6 @@ $reset  = optional_param('reset', null, PARAM_BOOL);
 $id =  optional_param('id', 0, PARAM_INT);
 
 require_login(null, false);
-if (isguestuser()) {
-    // No dashboards for guests!
-    redirect(new moodle_url('/'));
-}
 
 // Check Totara Dashboard is enable.
 totara_dashboard::check_feature_enabled();
@@ -98,7 +94,7 @@ if (!$id) {
 
     // Set dashboard as homepage for user when user home page preference is enabled.
     $homebutton = '';
-    if (!empty($CFG->allowdefaultpageselection)) {
+    if (!empty($CFG->allowdefaultpageselection) && !isguestuser()) {
         if (optional_param('setdefaulthome', 0, PARAM_BOOL)) {
             require_sesskey();
             set_user_preference('user_home_page_preference', HOMEPAGE_TOTARA_DASHBOARD);

@@ -25,6 +25,7 @@
 
 $string['allowdefaultpageselection'] = "Allow default page selection";
 $string['allowdefaultpageselection_desc'] = "Allow users to select their default page - it can be the Home page or their Dashboard or Find Learning.";
+$string['allowguest'] = 'Allow guest access';
 $string['assigncohorts'] = 'Assign new audiences';
 $string['assignedcohorts'] = 'Assigned audiences';
 $string['availability'] = 'Availability';

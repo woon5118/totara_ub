@@ -57,6 +57,13 @@ class totara_dashboard {
     public $name = '';
 
     /**
+     * Can guest account access the dashboard?
+     *
+     * @var int 0|1
+     */
+    public $allowguest = 0;
+
+    /**
      * How dashboard published: 0 - hidden, 1 - to selected audiences, 2 - to all logged in users
      *
      * @var int 0|1|2
@@ -124,6 +131,10 @@ class totara_dashboard {
             return array();
         }
 
+        if (!$userid) {
+            return [];
+        }
+
         //Create a cache to store user dashbaords
         $cache = cache::make_from_params(cache_store::MODE_REQUEST, 'totara_core', 'dashboard');
         if ($cache->has('user_' . $userid)) {
@@ -161,7 +172,19 @@ class totara_dashboard {
             $tenantwhere = "AND td.tenantid IS NULL";
         }
 
-        // Check relevant dashboards.
+        if (isguestuser($userid)) {
+            // Check relevant dashboards for guests.
+            $sql = "SELECT td.*
+                      FROM {totara_dashboard} td
+                     WHERE td.allowguest = 1 AND td.tenantid IS NULL
+                  ORDER BY td.sortorder";
+            $results = $DB->get_records_sql($sql);
+
+            $cache->set('user_' . $userid, $results);
+            return $results;
+        }
+
+        // Check relevant dashboards for logged in users.
         $sql = "SELECT DISTINCT td.*
                   FROM {totara_dashboard} td
              LEFT JOIN {totara_dashboard_cohort} tdc ON (tdc.dashboardid = td.id)
@@ -203,6 +226,7 @@ class totara_dashboard {
         $record = $DB->get_record('totara_dashboard', array('id' => $id));
         $this->id = $record->id;
         $this->name = $record->name;
+        $this->allowguest = $record->allowguest;
         $this->published = $record->published;
         $this->locked = $record->locked;
         $this->sortorder = $record->sortorder;
@@ -308,6 +332,7 @@ class totara_dashboard {
         $instance = new stdClass();
         $instance->id = $this->id;
         $instance->name = $this->name;
+        $instance->allowguest = (int)(bool)$this->allowguest;
         $instance->published = (int)$this->published;
         $instance->locked = (int)$this->locked;
         $instance->sortorder = (int)$this->sortorder;
@@ -326,6 +351,7 @@ class totara_dashboard {
     public function set_from_form(stdClass $data) {
         $this->name = '';
         $this->locked = 0;
+        $this->allowguest = 0;
         $this->published = 0;
         $this->set_cohorts(array());
 
@@ -334,6 +360,9 @@ class totara_dashboard {
         }
         if (isset($data->locked)) {
             $this->locked = (bool)$data->locked;
+        }
+        if (isset($data->allowguest)) {
+            $this->allowguest = (int)(bool)$data->allowguest;
         }
         if (isset($data->published)) {
             $this->published = (int)$data->published;
@@ -357,6 +386,7 @@ class totara_dashboard {
         if (empty($data->id)) {
             if (!empty($data->tenantid)) {
                 $this->tenantid = $data->tenantid;
+                $this->allowguest = 0;
             } else {
                 $this->tenantid = null;
             }
@@ -494,6 +524,7 @@ class totara_dashboard {
         $dashboard->tenantid = $tenant ? $tenant->id : null;
         if ($tenant) {
             $dashboard->published = totara_dashboard::AUDIENCE;
+            $dashboard->allowguest = 0;
         }
         // Add to the end.
         $dashboard->sortorder = $DB->get_field('totara_dashboard', "MAX(sortorder) + 1", []);

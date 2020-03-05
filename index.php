@@ -88,7 +88,7 @@ $homepage = get_home_page();
 if (in_array($homepage, [HOMEPAGE_TOTARA_DASHBOARD, HOMEPAGE_TOTARA_GRID_CATALOG])) {
     // Totara: the only other option is HOMEPAGE_SITE
     //         and only real logged in users may have dashboards.
-    if (!empty($CFG->allowdefaultpageselection)) {
+    if (!empty($CFG->allowdefaultpageselection) && !isguestuser()) {
         if (optional_param('setdefaulthome', 0, PARAM_BOOL)) {
             require_sesskey();
             set_user_preference('user_home_page_preference', HOMEPAGE_SITE);
@@ -111,7 +111,7 @@ if (in_array($homepage, [HOMEPAGE_TOTARA_DASHBOARD, HOMEPAGE_TOTARA_GRID_CATALOG
         // Else redirect to Totara grid catalog.
         redirect(new moodle_url('/totara/catalog/index.php'));
     }
-    if (!empty($CFG->allowdefaultpageselection)) {
+    if (!empty($CFG->allowdefaultpageselection) && !isguestuser()) {
         $newhomeurl = new moodle_url('/', array('setdefaulthome' => 1, 'sesskey' => sesskey()));
         $PAGE->settingsnav->add(get_string('makehomepage', 'totara_core'), $newhomeurl, navigation_node::TYPE_SETTING);
     }
