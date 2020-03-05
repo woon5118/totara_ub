@@ -494,6 +494,60 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020030501, 'perform');
     }
 
+    if ($oldversion < 2020030600) {
+        // Add field perform.created_at
+        $table = new xmldb_table('perform');
+        $field = new xmldb_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'description');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Change of nullability for field perform.updated_at.
+        $field = new xmldb_field('updated_at', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+        $dbman->change_field_notnull($table, $field);
+
+        // Add field perform_section.created_at
+        $field = new xmldb_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Add field perform_section.updated_at
+        $field = new xmldb_field('updated_at', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Drop classname index.
+        $index = new xmldb_index('activity_id_classname', XMLDB_INDEX_UNIQUE, ['activity_id', 'classname']);
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Rename perform_relationship.classname to class_name
+        $table = new xmldb_table('perform_relationship');
+        $field = new xmldb_field('classname', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->rename_field($table, $field, 'class_name');
+        }
+
+        // Re-add index with proper names
+        $index = new xmldb_index('activity_id_class_name', XMLDB_INDEX_UNIQUE, ['activity_id', 'class_name']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Add field perform_section_relationship.created_at
+        $table = new xmldb_table('perform_section_relationship');
+        $field = new xmldb_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020030600, 'perform');
+    }
+
+
     return true;
 }
 

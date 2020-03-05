@@ -17,45 +17,49 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @author Matthias Bonk <matthias.bonk@totaralearning.com>
  * @package mod_perform
  */
 
 namespace mod_perform\entities\activity;
 
-use core\orm\collection;
 use core\orm\entity\entity;
-use core\orm\entity\relations\has_many;
+use core\orm\entity\relations\belongs_to;
 
 /**
- * Activity entity
+ * Activity section relationship entity
  *
  * @property-read int $id ID
- * @property int $course ID of parent course
- * @property string $description
- * @property string $name Activity name
- * @property int $status
+ * @property int $section_id ID of activity section
+ * @property int $activity_relationship_id ID of activity relationship
+ * @property int $can_view Flag indicating whether relationship is able to view
+ * @property int $can_answer Flag indicating whether relationship is able to answer
  * @property int $created_at
- * @property int $updated_at
- * @property-read collection|section[] $sections
  *
- * @method static activity_repository repository()
+ * @property-read section $section
+ * @property-read activity_relationship $activity_relationship
  *
  * @package mod_perform\entities
  */
-class activity extends entity {
-    public const TABLE = 'perform';
-
+class section_relationship extends entity {
+    public const TABLE = 'perform_section_relationship';
     public const CREATED_TIMESTAMP = 'created_at';
-    public const UPDATED_TIMESTAMP = 'updated_at';
-    public const SET_UPDATED_WHEN_CREATED = true;
-
+    
     /**
      * Relationship with section entities.
      *
-     * @return has_many
+     * @return belongs_to
      */
-    public function sections(): has_many {
-        return $this->has_many(section::class, 'activity_id');
+    public function section(): belongs_to {
+        return $this->belongs_to(section::class, 'section_id');
+    }
+
+    /**
+     * Relationship with activity_relationship entities.
+     *
+     * @return belongs_to
+     */
+    public function activity_relationship(): belongs_to {
+        return $this->belongs_to(activity_relationship::class, 'activity_relationship_id');
     }
 }

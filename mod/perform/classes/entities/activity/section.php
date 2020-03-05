@@ -23,26 +23,33 @@
 
 namespace mod_perform\entities\activity;
 
+use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many;
+use core\orm\entity\relations\has_many_through;
 
 /**
- * Activity section entity
+ * Represents an activity section record.
  *
  * @property-read int $id ID
- * @property string $title
- * @property int $activity_id ID of activity
- * @property-read activity $activity
- * @property-read collection|section_element[] $section_elements
+ * @property string $title Title of the section
+ * @property int $activity_id ID of linked activity
+ * @property int $created_at
+ * @property int $updated_at
  *
- * @package mod_perform\entities
+ * @property-read activity $activity
+ * @property-read collection|activity_relationship[] $activity_relationships
+ * @property-read collection|section_element[] $section_elements
+ * @property-read collection|section_relationship[] $section_relationships
  */
 class section extends entity {
     public const TABLE = 'perform_section';
+    public const CREATED_TIMESTAMP = 'created_at';
+    public const UPDATED_TIMESTAMP = 'updated_at';
 
     /**
-     * get section activity
+     * Relationship with activity entities.
      *
      * @return belongs_to
      */
@@ -51,11 +58,36 @@ class section extends entity {
     }
 
     /**
-     * get section elements
+     * Relationship with section elements.
      *
      * @return has_many
      */
     public function section_elements(): has_many {
         return $this->has_many(section_element::class, 'element_id');
+    }
+
+    /**
+     * Relationship with activity_relationship entities.
+     *
+     * @return has_many_through
+     */
+    public function activity_relationships(): has_many_through {
+        return $this->has_many_through(
+            section_relationship::class,
+            activity_relationship::class,
+            'id',
+            'section_id',
+            'activity_relationship_id',
+            'id'
+        );
+    }
+
+    /**
+     * Relationship with section_relationship entities.
+     *
+     * @return has_many
+     */
+    public function section_relationships(): has_many {
+        return $this->has_many(section_relationship::class, 'section_id');
     }
 }

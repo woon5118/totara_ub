@@ -17,13 +17,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @author Matthias Bonk <matthias.bonk@totaralearning.com>
  * @package mod_perform
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace mod_perform\entities\activity;
 
-$plugin->version  = 2020030600;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'mod_perform'; // To check on upgrade, that module sits in correct place
-$plugin->dependencies = ['container_perform' => 2020012400];
+use core\orm\entity\entity;
+use core\orm\entity\relations\belongs_to;
+
+/**
+ * Activity relationship entity
+ *
+ * @property-read int $id ID
+ * @property int $activity_id ID of activity
+ * @property string $class_name Name of relationship class.
+ * @property int $created_at
+ *
+ * @property-read activity $activity
+ */
+class activity_relationship extends entity {
+    public const TABLE = 'perform_relationship';
+    public const CREATED_TIMESTAMP = 'created_at';
+
+    /**
+     * Relationship with activity entities.
+     *
+     * @return belongs_to
+     */
+    public function activity(): belongs_to {
+        return $this->belongs_to(activity::class, 'activity_id');
+    }
+}
