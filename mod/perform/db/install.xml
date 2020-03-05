@@ -92,34 +92,6 @@
         <INDEX NAME="section_sort_order" UNIQUE="true" FIELDS="section_id, sort_order" COMMENT="Each sort order should only be used once with a section"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="perform_subject_instance" COMMENT="Represents a single activity for one subject user">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="track_user_assignment_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="subject_user_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="updated_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="track_user_assignment_id" TYPE="foreign" FIELDS="track_user_assignment_id" REFTABLE="perform_track_user_assignment" REFFIELDS="id" ONDELETE="cascade"/>
-        <KEY NAME="subject_user_id" TYPE="foreign" FIELDS="subject_user_id" REFTABLE="user" REFFIELDS="id"/>
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="perform_participant_instance" COMMENT="Each participant instance represents a form to be completed by a a single participant">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="perform_relationship_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="participant_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Identifies the actual user who is participating in this case"/>
-        <FIELD NAME="subject_instance_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Status of the participant instance. 0 - active, 1 - complete, 2 - closed"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="perform_relationship_id" TYPE="foreign" FIELDS="perform_relationship_id" REFTABLE="perform_relationship" REFFIELDS="id"/>
-        <KEY NAME="subject_instance_id" TYPE="foreign" FIELDS="subject_instance_id" REFTABLE="perform_subject_instance" REFFIELDS="id" ONDELETE="cascade"/>
-      </KEYS>
-    </TABLE>
     <TABLE NAME="perform_element_response" COMMENT="Contains a single response to a single performance activity element">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
@@ -209,6 +181,34 @@
       <INDEXES>
         <INDEX NAME="unique_ids" UNIQUE="true" FIELDS="track_assignment_id, track_user_assignment_id" COMMENT="Each user assignment can be linked to one assignment only once"/>
       </INDEXES>
+    </TABLE>
+    <TABLE NAME="perform_subject_instance" COMMENT="Represents a single activity for one subject user">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="track_user_assignment_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="subject_user_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="updated_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="track_user_assignment_id" TYPE="foreign" FIELDS="track_user_assignment_id" REFTABLE="perform_track_user_assignment" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="subject_user_id" TYPE="foreign" FIELDS="subject_user_id" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="perform_participant_instance" COMMENT="Each participant instance represents a form to be completed by a a single participant">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="perform_relationship_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="participant_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Identifies the actual user who is participating in this case"/>
+        <FIELD NAME="subject_instance_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Status of the participant instance. 0 - active, 1 - complete, 2 - closed"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="perform_relationship_id" TYPE="foreign" FIELDS="perform_relationship_id" REFTABLE="perform_relationship" REFFIELDS="id"/>
+        <KEY NAME="subject_instance_id" TYPE="foreign" FIELDS="subject_instance_id" REFTABLE="perform_subject_instance" REFFIELDS="id" ONDELETE="cascade"/>
+      </KEYS>
     </TABLE>
   </TABLES>
 </XMLDB>
