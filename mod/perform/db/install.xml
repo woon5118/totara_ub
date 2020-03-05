@@ -190,5 +190,21 @@
         <INDEX NAME="track_id_subject_user_id" UNIQUE="true" FIELDS="track_id, subject_user_id" COMMENT="Within a specific track, each user should only be assigned once."/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="perform_track_user_assignment_via" COMMENT="This table links the assignment with the user assignment table">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="track_assignment_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="track_user_assignment_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="track_assignment_id" TYPE="foreign" FIELDS="track_assignment_id" REFTABLE="perform_track_assignment" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="track_user_assignment_id" TYPE="foreign" FIELDS="track_user_assignment_id" REFTABLE="perform_track_user_assignment" REFFIELDS="id" ONDELETE="cascade"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="unique_ids" UNIQUE="true" FIELDS="track_assignment_id, track_user_assignment_id" COMMENT="Each user assignment can be linked to one assignment only once"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>

@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -17,13 +17,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package mod_perform
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace mod_perform\entities\activity;
 
-$plugin->version  = 2020030500;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'mod_perform'; // To check on upgrade, that module sits in correct place
-$plugin->dependencies = ['container_perform' => 2020012400];
+use core\orm\entity\repository;
+
+/**
+ * Repository for track user assignment entities
+ */
+final class track_user_assignment_repository extends repository {
+
+    /**
+     * @param int $track_id
+     * @return $this
+     */
+    public function filter_by_track_id(int $track_id): self {
+        $this->where('track_id', $track_id);
+
+        return $this;
+    }
+
+    /**
+     * Filter for active records, essentially those which are not deleted
+     *
+     * @return $this
+     */
+    public function filter_by_active(): self {
+        $this->where('deleted', false);
+
+        return $this;
+    }
+
+}

@@ -432,7 +432,32 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020030306, 'perform');
     }
 
+    if ($oldversion < 2020030500) {
+        // Define table perform_track_user_assignment_via to be created.
+        $table = new xmldb_table('perform_track_user_assignment_via');
+
+        // Adding fields to table perform_track_user_assignment_via.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('track_assignment_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('track_user_assignment_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table perform_track_user_assignment_via.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('track_assignment_id', XMLDB_KEY_FOREIGN, array('track_assignment_id'), 'perform_track_assignment', array('id'), 'cascade');
+        $table->add_key('track_user_assignment_id', XMLDB_KEY_FOREIGN, array('track_user_assignment_id'), 'perform_track_user_assignment', array('id'), 'cascade');
+
+        // Adding indexes to table perform_track_user_assignment_via.
+        $table->add_index('unique_ids', XMLDB_INDEX_UNIQUE, array('track_assignment_id', 'track_user_assignment_id'));
+
+        // Conditionally launch create table for perform_track_user_assignment_via.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020030500, 'perform');
+    }
 
     return true;
 }
-
