@@ -21,7 +21,6 @@ information provided here is intended especially for developers.
   * build_nojs_breadcrumbs()
   * build_nojs_frameworkpicker()
   * build_nojs_jobassignmentpicker()
-* Removed deprecated totara/hierarchy/prefix/competency/template/lib.php file
 * Function goal::create_user_assignments has been deprecated. Use update_user_assignments instead.
 * The following functions related to displaying delete confirmations messages have been deprecated:
   * hierarchy::get_item_stats() and overrides
@@ -29,6 +28,17 @@ information provided here is intended especially for developers.
   * hierarchy::output_delete_message() and overrides
   Please use hierarchy::delete_item_confirmation_modal(), hierarchy::delete_bulk_confirmation_modal()
   or hierarchy::get_all_related_data() instead of hierarchy::get_item_stats().
+* The following mustache templates have been deprecated:
+  * totara/hierarchy/templates/competency_view_evidence.mustache
+  * totara/hierarchy/templates/competency_view_related.mustache
+* totara_hierarchy_renderer::competency_view_evidence has been deprecated. See the new Totara Competency API.
+  Display and management of courses linked to a competency is now handled by the totara/competency/classes/controllers/competency_controller
+  controller and totara/competency/classes/linked_courses class.
+  Information is passes to totara/competency/templates/competency_edit_linkedcourses.mustache.
+* totara_hierarchy_renderer::competency_view_related has been deprecated. The functionality is no longer supported. See the new Totara Competency API.
+* hierarchy_can_add_competency_evidence has been moved to from totara/hierarchy/prefix/competency/evidence/lib.php to totara/hierarchy/lib.php.
+* competencyuseresourcelevelevidence global setting has been deprecated.
+
 
 === 12.0 ===
 

@@ -21,6 +21,8 @@
  * @author Aaron Barnes <aaron.barnes@totaralms.com>
  * @package totara
  * @subpackage totara_hierarchy
+ *
+ * @deprecated since Totara 13
  */
 
 require_once("{$CFG->dirroot}/completion/data_object.php");
@@ -41,6 +43,11 @@ $COMPETENCY_EVIDENCE_TYPES = array(
     COMPETENCY_EVIDENCE_TYPE_ACTIVITY_COMPLETION    => 'activitycompletion',
     COMPETENCY_EVIDENCE_TYPE_COURSE_COMPLETION      => 'coursecompletion',
     COMPETENCY_EVIDENCE_TYPE_COURSE_GRADE           => 'coursegrade',
+);
+
+global $deprecated_COMPETENCY_EVIDENCE_TYPES;
+$deprecated_COMPETENCY_EVIDENCE_TYPES = array(
+    COMPETENCY_EVIDENCE_TYPE_ACTIVITY_COMPLETION => COMPETENCY_EVIDENCE_TYPE_ACTIVITY_COMPLETION,
 );
 
 /**
@@ -77,7 +84,7 @@ abstract class competency_evidence_type extends data_object {
      * @return  object  comptency_evidence_type_*
      */
     public static function factory($data) {
-        global $CFG, $DB, $COMPETENCY_EVIDENCE_TYPES;
+        global $CFG, $DB, $COMPETENCY_EVIDENCE_TYPES, $deprecated_COMPETENCY_EVIDENCE_TYPES;
 
         // If supplied an ID, load record
         if (is_numeric($data)) {
@@ -87,6 +94,10 @@ abstract class competency_evidence_type extends data_object {
         // Check this competency evidence type is installed
         if (!isset($data['itemtype']) || !isset($COMPETENCY_EVIDENCE_TYPES[$data['itemtype']])) {
             print_error('invalidevidencetype', 'totara_hierarchy');
+        }
+
+        if (in_array($data['itemtype'], $deprecated_COMPETENCY_EVIDENCE_TYPES)) {
+            debugging('Evidence item type ' . $data['itemtype'] . ' has been deprecated since Totara 13.', DEBUG_DEVELOPER);
         }
 
         // Load class file

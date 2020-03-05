@@ -44,6 +44,13 @@ class pathway_manual_configuration_testcase extends advanced_testcase {
         return $data;
     }
 
+    /**
+     * Test returned pathway type
+     */
+    public function test_pathway_type() {
+        $this->assertSame('manual', manual::pathway_type());
+    }
+
     public function test_setting_roles_overwrites() {
         $data = $this->setup_data();
 

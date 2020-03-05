@@ -20,60 +20,14 @@
  * @author Aaron Wells <aaronw@catalyst.net.nz>
  * @package totara
  * @subpackage hierarchy
+ *
+ * @deprecated since Totara 13
  */
+
+debugging('totara/hierarchy/prefix/competency/evidence/lib.php has been deprecated, please remove all includes.', DEBUG_DEVELOPER);
+
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/evidence/evidence.php');
 require_once($CFG->dirroot.'/blocks/totara_stats/locallib.php');
-
-/**
- * Determine whether the current logged-in user is able to rate a competency proficiency for the given competency
- *
- * If a null competencyid is given, just does basic permission checks to ensure they
- * can modify evidence in this plan. Without checking individual competencies.
- *
- * @access  public
- * @param   object      $plan       Development plan object
- * @param   object      $component  Full plan component class instance
- * @param   int         $userid     Plan owner (checked)
- * @param   int         $competencyid
- * @return  true|array  True if you can add it, and if false an array where the first element is a lang
- *                      string name and the second element is the lang string file
- */
-function hierarchy_can_add_competency_evidence($plan, $component, $userid, $competencyid) {
-    global $DB;
-
-    $systemcontext = context_system::instance();
-    if (!has_capability('totara/plan:accessanyplan', $systemcontext) && (empty($plan->role) || ($plan->get_setting('view') < DP_PERMISSION_ALLOW))) {
-        return array('error:nopermissions', 'totara_plan');
-    }
-
-    if (empty($plan->role) || $component->get_setting('setproficiency') != DP_PERMISSION_ALLOW) {
-        return array('error:competencystatuspermission', 'totara_plan');
-    }
-
-    // Validate whether the plan belongs to the specified user
-    if (!$plan->userid == $userid) {
-        return array('error:usernotfound','totara_plan');
-    }
-
-    //no competency specified, they generally have permission so that's okay
-    if (is_null($competencyid)) {
-        return true;
-    }
-
-    // Validate whether this competency is even in the plan
-    $compassign = $DB->get_record('dp_plan_competency_assign', array('planid' => $plan->id, 'competencyid' => $competencyid), 'id, approved');
-    if (!$compassign) {
-        return array('error:competencynotfound','totara_plan');
-    }
-
-    // Check whether the plan's competencies can still be updated
-    if (empty($plan->role) || !$component->can_update_competency_evidence($compassign)) {
-        return array('error:cannotupdatecompetencies','totara_plan');
-    }
-
-    return true;
-}
-
 
 /**
  * Add competency evidence records
@@ -172,9 +126,13 @@ function hierarchy_add_competency_evidence($competencyid, $userid, $prof, $compo
  *
  * @param $courseid ID of the course that is no longer required
  * @return boolean True if all delete operations succeeded, false otherwise
+ *
+ * @deprecated since Totara 13
  */
 function hierarchy_delete_competency_evidence($courseid) {
     global $DB;
+
+    debugging('hierarchy_delete_competency_evidence() has been deprecated since Totara 13. See the new Totara Competency API.');
 
     if (empty($courseid)) {
         return false;

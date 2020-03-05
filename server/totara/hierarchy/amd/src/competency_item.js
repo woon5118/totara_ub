@@ -46,159 +46,70 @@ define(['jquery', 'core/config', 'core/str'], function ($, config, strings) {
             );
         });
 
-        if (typeof competencyuseresourcelevelevidence !== 'undefined' && competencyuseresourcelevelevidence) {
+        // Create handler for the dialog
+        totaraDialog_handler_compEvidence.prototype = new totaraDialog_handler_treeview_multiselect();
 
-            // Create handler for the assign evidence dialog
-            totaraDialog_handler_assignEvidence.prototype = new totaraDialog_handler_treeview();
+        /**
+         * Add a row to a table on the calling page
+         * Also hides the dialog and any no item notice
+         *
+         * @param string    HTML response
+         * @return void
+         */
+        totaraDialog_handler_compEvidence.prototype._update = function(response) {
 
-            totaraDialog_handler_assignEvidence.prototype._handle_update_hierarchy = function(list) {
-                var handler = this;
-                $('span', list).click(function() {
-                    var par = $(this).parent();
+            // Hide dialog
+            this._dialog.hide();
 
-                    // Get the id in format item_list_XX
-                    var id = par.attr('id').substr(10);
+            // Remove no item warning (if exists)
+            $('.noitems-' + this._title).remove();
 
-                    // Check it's not a category
-                    if (id.substr(0, 3) == 'cat') {
-                        return;
-                    }
+            //Split response into table and div
+            var new_table = $(response).find('#list-evidence');
 
-                    handler._handle_course_click(id);
-                });
-            };
+            // Grab table
+            var table = $('#list-evidence');
 
-            totaraDialog_handler_assignEvidence.prototype._handle_course_click = function(courseid) {
-                // Load course details
-                var url = this.baseurl+'course.php?id=' + courseid + '&competency=' + id;
+            // If table found
+            if (table.length) {
+                table.replaceWith(new_table);
+            }
+            else {
+                // Add new table
+                $('div#evidence-list-container').append(new_table);
+            }
+        };
 
-                // Indicate loading...
-                this._dialog.showLoading();
+        var url = config.wwwroot + '/totara/hierarchy/prefix/competency/evidenceitem/';
+        var saveurl = url + 'add.php?sesskey=' + config.sesskey + '&competency=' + id + '&type=coursecompletion&instance=0&deleteexisting=1&update=';
+        var buttonsObj = {};
+        var handler = new totaraDialog_handler_compEvidence();
+        handler.baseurl = url;
+        var requiredstrings = [];
+        requiredstrings.push({key: 'save', component: 'totara_core'});
+        requiredstrings.push({key: 'cancel', component: 'moodle'});
+        requiredstrings.push({key: 'assigncoursecompletions', component: 'totara_hierarchy'});
 
-                this._dialog._request(url, {object: this, method: '_display_evidence'});
-            };
+        strings.get_strings(requiredstrings).done(function (translated) {
+            var tstr = [];
+            for (var i = 0; i < requiredstrings.length; i++) {
+                tstr[requiredstrings[i].key] = translated[i];
+            }
+            buttonsObj[tstr.save] = function() { handler._save(saveurl);};
+            buttonsObj[tstr.cancel] = function() { handler._cancel();};
 
-            /**
-             * Display course evidence items
-             *
-             * @param string    HTML response
-             */
-            totaraDialog_handler_assignEvidence.prototype._display_evidence = function(response) {
-                this._dialog.hideLoading();
+            totaraDialogs.evidence = new totaraDialog(
+                'evidence',
+                'show-evidence-dialog',
+                {
+                     buttons: buttonsObj,
+                     title: '<h2>' +  tstr.assigncoursecompletions + '</h2>'
+                },
+                url + 'edit.php?id=' + id,
+                handler
+            );
+        });
 
-                $('.selected', this._dialog.dialog).html(response);
-
-                var handler = this;
-
-                // Bind click event
-                $('#available-evidence', this._dialog.dialog).find('.addbutton').click(function(e) {
-                    e.preventDefault();
-                    var type = $(this).parent().attr('type');
-                    var instance = $(this).parent().attr('id');
-                    var url = handler.baseurl + 'add.php?sesskey=' + config.sesskey + '&competency=' + id + '&type=' + type + '&instance=' + instance;
-                    handler._dialog._request(url, {object: handler, method: '_update'});
-                });
-
-            };
-
-        } else { // use course-level dialog
-
-            // Create handler for the dialog
-            totaraDialog_handler_compEvidence.prototype = new totaraDialog_handler_treeview_multiselect();
-
-            /**
-             * Add a row to a table on the calling page
-             * Also hides the dialog and any no item notice
-             *
-             * @param string    HTML response
-             * @return void
-             */
-            totaraDialog_handler_compEvidence.prototype._update = function(response) {
-
-                // Hide dialog
-                this._dialog.hide();
-
-                // Remove no item warning (if exists)
-                $('.noitems-' + this._title).remove();
-
-                //Split response into table and div
-                var new_table = $(response).find('#list-evidence');
-
-                // Grab table
-                var table = $('#list-evidence');
-
-                // If table found
-                if (table.length) {
-                    table.replaceWith(new_table);
-                }
-                else {
-                    // Add new table
-                    $('div#evidence-list-container').append(new_table);
-                }
-            };
-
-            var url = config.wwwroot + '/totara/hierarchy/prefix/competency/evidenceitem/';
-            var saveurl = url + 'add.php?sesskey=' + config.sesskey + '&competency=' + id + '&type=coursecompletion&instance=0&deleteexisting=1&update=';
-            var buttonsObj = {};
-            var handler = new totaraDialog_handler_compEvidence();
-            handler.baseurl = url;
-            var requiredstrings = [];
-            requiredstrings.push({key: 'save', component: 'totara_core'});
-            requiredstrings.push({key: 'cancel', component: 'moodle'});
-            requiredstrings.push({key: 'assigncoursecompletions', component: 'totara_hierarchy'});
-
-            strings.get_strings(requiredstrings).done(function (translated) {
-                var tstr = [];
-                for (var i = 0; i < requiredstrings.length; i++) {
-                    tstr[requiredstrings[i].key] = translated[i];
-                }
-                buttonsObj[tstr.save] = function() { handler._save(saveurl);};
-                buttonsObj[tstr.cancel] = function() { handler._cancel();};
-
-                totaraDialogs.evidence = new totaraDialog(
-                    'evidence',
-                    'show-evidence-dialog',
-                    {
-                         buttons: buttonsObj,
-                         title: '<h2>' +  tstr.assigncoursecompletions + '</h2>'
-                    },
-                    url + 'edit.php?id=' + id,
-                    handler
-                );
-            });
-        }
-
-        if (typeof competencyuseresourcelevelevidence !== 'undefined' && competencyuseresourcelevelevidence) {
-            // Assign evidence item dialog (resource-level).
-            var requiredstrings = [];
-            requiredstrings.push({key: 'cancel', component: 'moodle'});
-            requiredstrings.push({key: 'assignnewevidenceitem', component: 'totara_hierarchy'});
-
-            strings.get_strings(requiredstrings).done(function (translated) {
-                var tstr = [];
-                for (var i = 0; i < requiredstrings.length; i++) {
-                    tstr[requiredstrings[i].key] = translated[i];
-                }
-                // Assign evidence item dialog (resource-level).
-                var url = config.wwwroot + '/totara/hierarchy/prefix/competency/evidenceitem/';
-                var buttonsObj = {};
-                var handler = new totaraDialog_handler_assignEvidence();
-                handler.baseurl = url;
-
-                buttonsObj[tstr.cancel] = function() { handler._cancel();};
-
-                totaraDialogs.evidence = new totaraDialog(
-                    'evidence',
-                    'show-evidence-dialog',
-                    {
-                        buttons: buttonsObj,
-                        title: '<h2>' + tstr.assignnewevidenceitem + '</h2>'
-                    },
-                    url + 'edit.php?id=' + id,
-                    handler
-                );
-            });
-        }
     };
 
     return {

@@ -21,7 +21,7 @@
  */
 
 define(['core/str', 'core/templates', 'totara_core/modal_list', 'core/ajax', 'core/notification', 'totara_core/loader_manager'],
-function(str, templates, ModalList, ajax, notification, Loader) {
+function (str, templates, ModalList, ajax, notification, Loader) {
 
     /**
      * Class constructor for managing LinkedCourses.
@@ -50,10 +50,10 @@ function(str, templates, ModalList, ajax, notification, Loader) {
          * Add event listeners
          *
          */
-        events: function() {
+        events: function () {
             var that = this;
 
-            this.widget.addEventListener('click', function(e) {
+            this.widget.addEventListener('click', function (e) {
                 if (!e.target) {
                     return;
                 }
@@ -87,7 +87,7 @@ function(str, templates, ModalList, ajax, notification, Loader) {
                 }
             });
 
-            this.widget.addEventListener('totara_core/lists:action', function(e) {
+            this.widget.addEventListener('totara_core/lists:action', function (e) {
                 var actionKey = e.detail.key,
                     id = parseInt(e.detail.val);
 
@@ -118,7 +118,7 @@ function(str, templates, ModalList, ajax, notification, Loader) {
          * @param {Object} course
          * @return {Object}
          */
-        getRowData: function(course) {
+        getRowData: function (course) {
             var actionBtn,
                 ariaLabel,
                 customClass;
@@ -166,7 +166,7 @@ function(str, templates, ModalList, ajax, notification, Loader) {
          * @param {int} id for course
          * @return {Object|null}
          */
-        getCourseById: function(id) {
+        getCourseById: function (id) {
             for (var i = 0; i < this.courses.length; i++) {
                 if (this.courses[i].id == id) {
                     return this.courses[i];
@@ -179,11 +179,11 @@ function(str, templates, ModalList, ajax, notification, Loader) {
          * Get ids of linked courses
          * @return {Array}
          */
-        getCourseIds: function() {
+        getCourseIds: function () {
             if (this.courses.length === 0) {
                 return [];
             }
-            return this.courses.map(function(course) {
+            return this.courses.map(function (course) {
                 return course.id;
             });
         },
@@ -192,7 +192,7 @@ function(str, templates, ModalList, ajax, notification, Loader) {
          * Get existing linked courses
          * @return {Promise}
          */
-        getLinkedCourses: function() {
+        getLinkedCourses: function () {
             var that = this;
             var webserviceRequestObject = {
                 args: {'competency_id': this.competencyID},
@@ -200,8 +200,8 @@ function(str, templates, ModalList, ajax, notification, Loader) {
             };
             that.existingCourses = [];
 
-            return new Promise(function(resolve) {
-                ajax.getData(webserviceRequestObject).then(function(data) {
+            return new Promise(function (resolve) {
+                ajax.getData(webserviceRequestObject).then(function (data) {
                     that.courses = data.results.items;
 
                     // Crate an array of pre-exising linked course ids
@@ -218,7 +218,7 @@ function(str, templates, ModalList, ajax, notification, Loader) {
          * Get data for creating course modal list
          * @return {Object}
          */
-        getModalListData: function() {
+        getModalListData: function () {
             var that = this;
 
             return {
@@ -239,7 +239,7 @@ function(str, templates, ModalList, ajax, notification, Loader) {
                     },
                     service: 'totara_competency_get_courses',
                 },
-                onSaved: function(modal, items, data) {
+                onSaved: function (modal, items, data) {
                     var coursesToAdd = [];
 
                     if (document.querySelector('#user-notifications')) {
@@ -286,13 +286,13 @@ function(str, templates, ModalList, ajax, notification, Loader) {
          * Create course modal list added
          * @return {Promise}
          */
-        loadCourseModalList: function() {
+        loadCourseModalList: function () {
             var that = this;
-            return new Promise(function(resolve) {
-                ModalList.adder(that.getModalListData()).then(function(modal) {
+            return new Promise(function (resolve) {
+                ModalList.adder(that.getModalListData()).then(function (modal) {
                     that.courseAdderModal = modal;
                     resolve();
-                }).catch(function(e) {
+                }).catch(function (e) {
                     notification.exception({message: 'Error adding course modal list adder' + e[0] + ' ' + e[1]});
                 });
             });
@@ -302,7 +302,7 @@ function(str, templates, ModalList, ajax, notification, Loader) {
          * Render required icons
          * @return {Promise}
          */
-        loadIcons: function() {
+        loadIcons: function () {
 
             var promises = [];
             var that = this;
@@ -320,14 +320,14 @@ function(str, templates, ModalList, ajax, notification, Loader) {
                 string: this.strings.undoRemoveLinkedCourse
             }];
 
-            return new Promise(function(resolve) {
+            return new Promise(function (resolve) {
                 for (var i = 0; i < iconData.length; i++) {
                     var data = iconData[i];
                     promises.push(templates.renderIcon(data.name, data.string, data.classes));
                 }
 
                 // Only if all icons are loaded then continue
-                Promise.all(promises).then(function(s) {
+                Promise.all(promises).then(function (s) {
                     for (var i = 0; i < iconData.length; i++) {
                         that.iconList[iconData[i].key] = s[i];
                     }
@@ -340,7 +340,7 @@ function(str, templates, ModalList, ajax, notification, Loader) {
          * Render required strings
          * @return {Promise}
          */
-        loadStrings: function() {
+        loadStrings: function () {
             var that = this;
             var stringData = [
                 {
@@ -373,8 +373,8 @@ function(str, templates, ModalList, ajax, notification, Loader) {
                 }
             ];
 
-            return new Promise(function(resolve, reject) {
-                str.get_strings(stringData).then(function(stringList) {
+            return new Promise(function (resolve, reject) {
+                str.get_strings(stringData).then(function (stringList) {
                     that.strings = {
                         savedMsg: stringList[0],
                         mandatory: stringList[1],
@@ -384,15 +384,15 @@ function(str, templates, ModalList, ajax, notification, Loader) {
                         undoRemoveLinkedCourse: stringList[5],
                         noResults: stringList[6],
                     };
-                }).then(function() {
+                }).then(function () {
                     resolve();
-                }).catch(function() {
+                }).catch(function () {
                     reject();
                 });
             });
         },
 
-        refreshRowsDisplay: function() {
+        refreshRowsDisplay: function () {
             var that = this,
                 listNode = this.widget.querySelector('[data-tw-list]');
 
@@ -416,7 +416,7 @@ function(str, templates, ModalList, ajax, notification, Loader) {
                 templateData.rows.push(this.getRowData(this.courses[i]));
             }
 
-            templates.renderReplace('totara_core/lists_rows', templateData, listNode).then(function() {
+            templates.renderReplace('totara_core/lists_rows', templateData, listNode).then(function () {
                 that.loader.hide();
             });
         },
@@ -426,7 +426,7 @@ function(str, templates, ModalList, ajax, notification, Loader) {
          *
          * @param {int} id
          */
-        removeSavedRow: function(id) {
+        removeSavedRow: function (id) {
             this.removedCourses.push(id);
             this.loader.show();
             this.refreshRowsDisplay();
@@ -437,7 +437,7 @@ function(str, templates, ModalList, ajax, notification, Loader) {
          *
          * @param {int} id
          */
-        removeUnsavedRow: function(id) {
+        removeUnsavedRow: function (id) {
             var courseID;
 
             for (var i = 0; i < this.courses.length; i++) {
@@ -453,7 +453,7 @@ function(str, templates, ModalList, ajax, notification, Loader) {
          * Save changes
          *
          */
-        saveChanges: function() {
+        saveChanges: function () {
             var that = this,
                 i;
 
@@ -484,8 +484,8 @@ function(str, templates, ModalList, ajax, notification, Loader) {
                     courses: toSend
                 },
                 methodname: 'totara_competency_set_linked_courses',
-            }).then(function() {
-                that.getLinkedCourses().then(function() {
+            }).then(function () {
+                that.getLinkedCourses().then(function () {
                     that.refreshRowsDisplay();
                     that.loader.hide();
                     notification.addNotification({
@@ -499,7 +499,7 @@ function(str, templates, ModalList, ajax, notification, Loader) {
         /**
          * Set competency
          */
-        setCompetency: function() {
+        setCompetency: function () {
             var comp = this.widget.closest('[data-tw-editLinkedCourses-comp-id]');
             if (comp) {
                 this.competencyID = comp.getAttribute('data-tw-editLinkedCourses-comp-id');
@@ -511,7 +511,7 @@ function(str, templates, ModalList, ajax, notification, Loader) {
          *
          * @param {node} parent
          */
-        setParent: function(parent) {
+        setParent: function (parent) {
             this.widget = parent;
         },
 
@@ -520,7 +520,7 @@ function(str, templates, ModalList, ajax, notification, Loader) {
          *
          * @param {int} id
          */
-        undoRemoveSavedRow: function(id) {
+        undoRemoveSavedRow: function (id) {
             var index = this.removedCourses.indexOf(id);
             if (index > -1) {
                 this.removedCourses.splice(index, 1);
@@ -537,8 +537,8 @@ function(str, templates, ModalList, ajax, notification, Loader) {
      * @param {node} parent
      * @returns {Object} promise
      */
-    var init = function(parent) {
-        return new Promise(function(resolve) {
+    var init = function (parent) {
+        return new Promise(function (resolve) {
             var wgt = new LinkedCourses();
             wgt.setParent(parent);
             wgt.setCompetency();
@@ -548,8 +548,8 @@ function(str, templates, ModalList, ajax, notification, Loader) {
             resolve(wgt);
 
             M.util.js_pending('linkedCourses');
-            Promise.all([wgt.loadStrings(), wgt.getLinkedCourses(), wgt.loadCourseModalList()]).then(function() {
-                wgt.loadIcons().then(function() {
+            Promise.all([wgt.loadStrings(), wgt.getLinkedCourses(), wgt.loadCourseModalList()]).then(function () {
+                wgt.loadIcons().then(function () {
                     wgt.refreshRowsDisplay();
                     M.util.js_complete('linkedCourses');
                 });

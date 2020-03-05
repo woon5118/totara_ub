@@ -20,11 +20,9 @@
  * @author Simon Coggins <simon.coggins@totaralms.com>
  * @package totara
  * @subpackage totara_hierarchy
- *
- * @deprecated since Totara 13
  */
 
-debugging('totara/hierarchy/prefix/competency/evidenceitem/remove.php has been deprecated, please remove all includes.', DEBUG_DEVELOPER);
+use totara_competency\linked_courses;
 
 require_once(__DIR__ . '/../../../../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
@@ -48,20 +46,27 @@ $course = optional_param('course', 0, PARAM_INT);
 // Check if Competencies are enabled.
 competency::check_feature_enabled();
 
-// Load data
-$hierarchy         = new competency();
-$item              = competency_evidence_type::factory($id);
-
-// Load competency
-if (!$competency = $DB->get_record('comp', array('id' => $item->competencyid))) {
-    print_error('incorrectcompetencyid', 'totara_hierarchy');
-}
+$sql =
+    "SELECT cc.id as criteria_id,
+            cc.itemtype as criteria_type,
+            cc.iteminstance as course_id,
+            cc.timemodified,
+            comp.id as competency_id,
+            comp.fullname as competency_name,
+            course.fullname as course_name
+       FROM {comp_criteria} cc 
+       JOIN {comp} comp
+         ON cc.competencyid = comp.id
+       JOIN {course} course
+         ON cc.iteminstance = course.id
+      WHERE cc.id = :criteriaid";
+$item = $DB->get_record_sql($sql, ['criteriaid' => $id], MUST_EXIST);
 
 // Check capabilities
-require_capability('totara/hierarchy:update'.$hierarchy->prefix, $sitecontext);
+require_capability('totara/hierarchy:updatecompetency', $sitecontext);
 
 // Setup page and check permissions
-admin_externalpage_setup($hierarchy->prefix.'manage');
+admin_externalpage_setup('competencymanage');
 
 
 ///
@@ -72,31 +77,21 @@ $return = optional_param('returnurl', '', PARAM_LOCALURL);
 
 // Cancel/return url
 if (empty($return)) {
-    if (!$course) {
-        $return = new moodle_url('/totara/hierarchy/item/view.php', array('prefix' => $hierarchy->prefix, 'id' => $item->competencyid));
-    } else {
-        $return = new moodle_url('/course/competency.php', array('id' => $course));
-    }
+    $return = new moodle_url('/course/competency.php', array('id' => $$item->course));
 }
 
 
-$compname = $DB->get_field('comp', 'fullname', array('id' => $item->competencyid));
 if (!$delete) {
-    if (!$course) {
-        $message = get_string('evidenceitemremovecheck', 'totara_hierarchy', $compname) . html_writer::empty_tag('br') . html_writer::empty_tag('br');
-        $message .= $item->get_name() .' ('. $item->get_type().')';
-    } else {
-        $message = get_string('evidenceitemremovecheck', 'totara_hierarchy', $item->get_name()) . html_writer::empty_tag('br') . html_writer::empty_tag('br');
-        $message .= format_string($compname .' ('. $item->get_type().')');
-    }
+    $message = get_string('evidenceitemremovecheck', 'totara_hierarchy', format_string($item->course_name)) . html_writer::empty_tag('br') . html_writer::empty_tag('br');
+        $message .= format_string($item->competency_name .' ('. $item->criteria_type.')');
 
-    $actionurlparams = array('id' => $item->id, 'delete' => md5($item->timemodified), 'sesskey' => $USER->sesskey, 'returnurl' => $return);
+    $actionurlparams = array('id' => $id, 'delete' => md5($item->timemodified), 'sesskey' => $USER->sesskey, 'returnurl' => $return);
 
     // If called from the course view
     if ($course) {
         $actionurlparams['course'] = $course;
     }
-    $action = new moodle_url("/totara/hierarchy/prefix/{$hierarchy->prefix}/evidenceitem/remove.php", $actionurlparams);
+    $action = new moodle_url("/totara/hierarchy/prefix/competency/course/remove.php", $actionurlparams);
 
     echo $OUTPUT->header();
 
@@ -119,9 +114,9 @@ if (!confirm_sesskey()) {
     print_error('confirmsesskeybad', 'error');
 }
 
-$item->delete($competency);
+linked_courses::remove_linked_course($id);
 
-$message = get_string('removed'.$hierarchy->prefix.'evidenceitem', 'totara_hierarchy', format_string($compname .' ('. $item->get_type().')'));
+$message = get_string('removedcompetencyevidenceitem', 'totara_hierarchy', format_string($item->competency_name .' ('. $item->criteria_type.')'));
 
 \core\notification::success($message);
 redirect($return);

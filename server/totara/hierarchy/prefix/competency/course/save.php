@@ -22,9 +22,12 @@
  * @subpackage totara_hierarchy
  */
 
+use totara_competency\linked_courses;
+
 require_once(__DIR__ . '/../../../../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
+require_once($CFG->dirroot . '/totara/plan/lib.php');
 
 require_login();
 require_sesskey();
@@ -34,19 +37,13 @@ require_sesskey();
 ///
 
 // Competency id
-if (!empty($CFG->competencyuseresourcelevelevidence)) {
-    // Only assigning one competency
-    $idlist = required_param('competency', PARAM_INT);
-    $idlist = array($idlist);
-} else {
-    // Competencies list
-    $idlist = optional_param('update', null, PARAM_SEQUENCE);
-    if ($idlist == null) {
-        $idlist = array();
-    }
-    else {
-        $idlist = explode(',', $idlist);
-    }
+// Competencies list
+$idlist = optional_param('update', null, PARAM_SEQUENCE);
+if ($idlist == null) {
+    $idlist = array();
+}
+else {
+    $idlist = explode(',', $idlist);
 }
 
 // Evidence type
@@ -55,16 +52,20 @@ $type = required_param('type', PARAM_TEXT);
 $instance = required_param('instance', PARAM_INT);
 // Id of the course to return to
 $courseid = optional_param('course', 0, PARAM_INT);
+$courseid = !empty($courseid) ? $courseid : $instance;
 
-// Indicates whether current related items, not in $relidlist, should be deleted
+// Indicates whether current related items, not in $lidlist, should be deleted
 $deleteexisting = optional_param('deleteexisting', 0, PARAM_BOOL);
 
 // Check perms
-admin_externalpage_setup('competencymanage', '', array(), '/totara/hierarchy/item/edit.php');
+admin_externalpage_setup('competencymanage', '', array(), '/course/competency.php?id='.$courseid);
 
 $sitecontext = context_system::instance();
 require_capability('totara/hierarchy:updatecompetency', $sitecontext);
 
+foreach ($idlist as $competency_id) {
+    linked_courses::add_linked_courses($competency_id, [['id' => $courseid, 'linktype' => PLAN_LINKTYPE_OPTIONAL]]);
+}
 
 $hierarchy = new competency();
 
@@ -104,7 +105,6 @@ if ($deleteexisting) {
 
     $assignedcomps = array();
     foreach ($oldassigned as $i => $o) {
-        // competencyid => evidenceitemid
         $assignedcomps[$o->id] = $i;
     }
 

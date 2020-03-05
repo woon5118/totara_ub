@@ -22,7 +22,7 @@
  * @subpackage totara_hierarchy
  */
 
-require_once(__DIR__ . '/../../../config.php');
+require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/adminsettings_form.php');
 
@@ -39,13 +39,7 @@ echo $OUTPUT->heading(get_string('globalsettings', 'totara_hierarchy'));
 
 $form = new competency_global_settings_form();
 
-if ($data = $form->get_data()) {
-    // Save settings
-    set_config('competencyuseresourcelevelevidence', empty($data->competencyuseresourcelevelevidence) ? 0 : $data->competencyuseresourcelevelevidence);
-}
-
 $data = new stdClass();
-$data->competencyuseresourcelevelevidence = get_config(null, 'competencyuseresourcelevelevidence');
 
 $form->set_data($data);
 

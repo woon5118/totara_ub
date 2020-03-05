@@ -20,7 +20,11 @@
  * @author Simon Coggins <simon.coggins@totaralms.com>
  * @package totara
  * @subpackage totara_hierarchy
+ *
+ * @deprecated since Totara 13
  */
+
+debugging('totara/hierarchy/prefix/competency/evidenceitem/add.php has been deprecated, please remove all includes.', DEBUG_DEVELOPER);
 
 use totara_core\advanced_feature;
 
@@ -51,16 +55,13 @@ if (advanced_feature::is_disabled('competencies')) {
     die();
 }
 
-if (empty($CFG->competencyuseresourcelevelevidence)) {
-
-    // Updated course lists
-    $idlist = optional_param('update', null, PARAM_SEQUENCE);
-    if ($idlist == null) {
-        $idlist = array();
-    }
-    else {
-        $idlist = explode(',', $idlist);
-    }
+// Updated course lists
+$idlist = optional_param('update', null, PARAM_SEQUENCE);
+if ($idlist == null) {
+    $idlist = array();
+}
+else {
+    $idlist = explode(',', $idlist);
 }
 
 // Check perms
@@ -78,15 +79,6 @@ $avail_types = array('coursecompletion', 'coursegrade', 'activitycompletion');
 
 if (!in_array($type, $avail_types)) {
     die('type unavailable');
-}
-
-if (!empty($CFG->competencyuseresourcelevelevidence)) {
-    $data = new stdClass();
-    $data->itemtype = $type;
-    $evidence = competency_evidence_type::factory((array)$data);
-    $evidence->iteminstance = $instance;
-
-    $newevidenceid = $evidence->add($competency);
 }
 
 ///
@@ -110,46 +102,20 @@ if ($deleteexisting && !empty($idlist)) {
 }
 
 // HTML to return for JS version
-if (empty($CFG->competencyuseresourcelevelevidence)) {
-    foreach ($idlist as $instance) {
-        $data = new stdClass();
-        $data->itemtype = $type;
-        $evidence = competency_evidence_type::factory((array)$data);
-        $evidence->iteminstance = $instance;
+foreach ($idlist as $instance) {
+    $data = new stdClass();
+    $data->itemtype = $type;
+    $evidence = competency_evidence_type::factory((array)$data);
+    $evidence->iteminstance = $instance;
 
-        $newevidenceid = $evidence->add($competency);
-    }
-
-    $editingon = 1;
-    $evidence = $DB->get_records('comp_criteria', array('competencyid' => $id));
-    $str_edit = get_string('edit');
-    $str_remove = get_string('remove');
-    $item = $competency;
-
-    $renderer = $PAGE->get_renderer('totara_hierarchy');
-    echo $renderer->competency_view_evidence($item, $evidence, $can_edit);
-
-} else {  //resource-level evidence functionality
-    // If $newevidenceid is false, it means the evidence item wasn't added, so
-    // return nothing
-    if ($newevidenceid !== false) {
-
-        $row = new html_table_row(array($evidence->get_name(), $evidence->get_type(), $evidence->get_activity_type()));
-
-        if ($can_edit) {
-
-            $str_edit = get_string('edit');
-            $str_remove = get_string('remove');
-
-            $link = $OUTPUT->action_icon(new moodle_url('prefix/competency/evidenceitem/remove.php', array('id' => $evidence->id, 'title' => $str_remove)),
-                new pix_icon('t/delete'), array('class' => 'iconsmall', 'alt' => '$str_remove'));
-
-            $cell4 = new html_table_cell($link);
-            $cell4->attributes['style'] = 'text-align: center';
-
-            $row->cells[] = $cell4;
-            $data = array($row);
-        }
-    }
-    echo $OUTPUT->table($data);
+    $newevidenceid = $evidence->add($competency);
 }
+
+$editingon = 1;
+$evidence = $DB->get_records('comp_criteria', array('competencyid' => $id));
+$str_edit = get_string('edit');
+$str_remove = get_string('remove');
+$item = $competency;
+
+$renderer = $PAGE->get_renderer('totara_hierarchy');
+echo $renderer->competency_view_evidence($item, $evidence, $can_edit);

@@ -1,6 +1,6 @@
 
 define([],
-    function() {
+    function () {
 
         /**
          * Class constructor for PwLearningPlan.
@@ -44,7 +44,7 @@ define([],
              *
              * @param {node} parent
              */
-            setParent: function(parent) {
+            setParent: function (parent) {
                 this.widget = parent;
             },
 
@@ -53,7 +53,7 @@ define([],
              *
              * @param {node}
              */
-            initData: function(wgt) {
+            initData: function (wgt) {
                 var that = this,
                     pwWgt = this.widget.closest('[data-pw-key]'),
                     pwKey = 0,
@@ -101,7 +101,7 @@ define([],
              * @param {string} eventName
              * @param {object} data
              */
-            triggerEvent: function(eventName, data) {
+            triggerEvent: function (eventName, data) {
                 data.key = this.pwKey;
 
                 var propagateEvent = new CustomEvent('totara_competency/pathway:' + eventName, {
@@ -119,8 +119,8 @@ define([],
          * @param {node} parent
          * @returns {Object} promise
          */
-        var init = function(parent) {
-            return new Promise(function(resolve) {
+        var init = function (parent) {
+            return new Promise(function (resolve) {
                 var wgt = new PwLearningPlan();
                 wgt.setParent(parent);
                 wgt.initData(parent);
@@ -131,4 +131,5 @@ define([],
         return {
             init: init
         };
-    });
+    }
+);

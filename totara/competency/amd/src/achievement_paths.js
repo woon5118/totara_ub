@@ -22,7 +22,7 @@
 
 define(['core/templates', 'core/ajax',
         'core/modal_factory', 'core/modal_events', 'core/notification', 'core/str'],
-function(templates, ajax, modalFactory, modalEvents, notification, str) {
+function (templates, ajax, modalFactory, modalEvents, notification, str) {
 
     /**
      * Class constructor for the AchievementPaths.
@@ -76,10 +76,10 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          * Add event listeners for AchievementPathss
          *
          */
-        events: function() {
+        events: function () {
             var that = this;
 
-            this.widget.addEventListener('click', function(e) {
+            this.widget.addEventListener('click', function (e) {
                 if (!e.target) {
                     return;
                 }
@@ -95,7 +95,6 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     } else if (action === 'cancelchanges') {
                         that.cancelChanges();
                     }
-
                 } else if (e.target.closest('[data-scalevalue-action')) {
                     var action = e.target.closest('[data-scalevalue-action]').getAttribute('data-scalevalue-action'),
                         svWgt = e.target.closest('[data-scalevalue-id]');
@@ -103,7 +102,6 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     if (action === 'add-pw') {
                         that.showCriteriaTypeOptions(svWgt);
                     }
-
                 } else if (e.target.closest('[data-scalevalue-crit-type-option]')) {
                     var critType = e.target.closest('[data-scalevalue-crit-type-option]').getAttribute('data-scalevalue-crit-type-option');
                         svWgt = e.target.closest('[data-scalevalue-id]');
@@ -113,7 +111,6 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     // implementation must be enhanced to cater for that
 
                     that.addSinglevaluePath(svWgt, 'criteria_group', critType);
-
                 } else if (e.target.closest('[data-pw-action')) {
                     var wgt = e.target.closest('[data-pw-action]'),
                         action = wgt.getAttribute('data-pw-action'),
@@ -124,7 +121,6 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     } else if (action === 'undo') {
                         that.undoRemovePathway(pwKey);
                     }
-
                 } else if (e.target.closest('[data-cc-agg-action')) {
                     var action = e.target.closest('[data-cc-agg-action]').getAttribute('data-cc-agg-action');
 
@@ -136,7 +132,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 }
             });
 
-            this.widget.addEventListener('change', function(e) {
+            this.widget.addEventListener('change', function (e) {
                 if (!e.target) {
                     return;
                 }
@@ -150,7 +146,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 }
             });
 
-            this.widget.addEventListener('dragstart', function(e) {
+            this.widget.addEventListener('dragstart', function (e) {
                 if (e.target.closest('[data-cc-orderable]')) {
                     var wgt = e.target.closest('[data-cc-orderable]'),
                         moveKey = wgt.getAttribute('data-cc-orderable');
@@ -158,11 +154,11 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 }
             });
 
-            this.widget.addEventListener('dragover', function(e) {
+            this.widget.addEventListener('dragover', function (e) {
                 e.preventDefault();
             });
 
-            this.widget.addEventListener('drop', function(e) {
+            this.widget.addEventListener('drop', function (e) {
                 e.preventDefault();
 
                 if (e.target.closest('[data-cc-orderable]')) {
@@ -175,7 +171,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 }
             });
 
-            window.addEventListener('beforeunload', function(e) {
+            window.addEventListener('beforeunload', function (e) {
                 if (that.dirty) {
                     e.preventDefault();
                     // TODO: Test in IE
@@ -186,11 +182,11 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
         },
 
         // Listen for propagated events
-        bubbledEventsListener: function() {
+        bubbledEventsListener: function () {
             var that = this,
                 pwEvents = 'totara_competency/pathway:';
 
-            this.widget.addEventListener(pwEvents + 'dirty', function(e) {
+            this.widget.addEventListener(pwEvents + 'dirty', function (e) {
                 var key = e.detail.key;
 
                 if (that.pathways[key]) {
@@ -200,7 +196,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 that.dirty = true;
             });
 
-            this.widget.addEventListener(pwEvents + 'update', function(e) {
+            this.widget.addEventListener(pwEvents + 'update', function (e) {
                 var key = e.detail.key,
                     pw = e.detail.pathway;
 
@@ -213,13 +209,13 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 that.pathways[key].detail = pw;
             });
 
-            this.widget.addEventListener(pwEvents + 'remove', function(e) {
+            this.widget.addEventListener(pwEvents + 'remove', function (e) {
                 var pwKey = e.detail.key;
 
                 that.removePathway(pwKey);
             });
 
-            this.widget.addEventListener(pwEvents + 'singleuse', function(e) {
+            this.widget.addEventListener(pwEvents + 'singleuse', function (e) {
                 var isUsed = e.detail.used;
 
                 that.widget.setAttribute('data-singleuse', isUsed ? '1' : '0');
@@ -233,7 +229,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          *
          * @param {node} parent
          */
-        setParent: function(parent) {
+        setParent: function (parent) {
             this.widget = parent;
         },
 
@@ -245,14 +241,14 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          * @param {String} messageComponent used for get_string
          * @param {Object} messageParams used for get_string, optional
          */
-        showNotification: function(type, messageStringKey, messageComponent, messageParams) {
+        showNotification: function (type, messageStringKey, messageComponent, messageParams) {
             if (typeof messageParams === 'undefined') {
                 messageParams = {};
             }
             // Clear old notifications.
             notification.clearNotifications();
 
-            str.get_string(messageStringKey, messageComponent, messageParams).done(function(message) {
+            str.get_string(messageStringKey, messageComponent, messageParams).done(function (message) {
                 notification.addNotification({
                     message: message,
                     type: type
@@ -267,13 +263,13 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
         /**
          * Retrieve the pathways, store the data in the
          */
-        initData: function() {
+        initData: function () {
             var that = this;
             if (this.widget.hasAttribute('data-comp-id')) {
                 this.competency_id = this.widget.getAttribute('data-comp-id');
             }
 
-            this.setScale().then(function() {
+            this.setScale().then(function () {
                 that.updatePage();
             });
         },
@@ -283,7 +279,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          *
          * @return {string} Next key
          */
-        getNextKey: function() {
+        getNextKey: function () {
             this.lastKey++;
             return 'pw_' + this.lastKey;
         },
@@ -291,7 +287,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
         /**
          * Update the detail on this page
          */
-        updatePage: function() {
+        updatePage: function () {
             if (!this.competency_id || this.scalevalues.length == 0) {
                 return;
             }
@@ -300,15 +296,15 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 templatePromises = [],
                 apiArgs;
 
-            this.getOverallAggregation().then(function() {
+            this.getOverallAggregation().then(function () {
 
-                that.getCriteriaTypes().then(function() {
+                that.getCriteriaTypes().then(function () {
                     apiArgs = {
                         'args': {competency_id: that.competency_id},
                         'methodname': that.endpoints.pathways};
 
                     // Get all the pathways and its detail
-                    ajax.getData(apiArgs).then(function(responses) {
+                    ajax.getData(apiArgs).then(function (responses) {
                         var pwData = responses.results;
 
                         // Clean out all previous pathway data
@@ -360,7 +356,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                         // Add the scalevalues template
                         templatePromises.push(that.showSinglevaluePaths());
 
-                        Promise.all(templatePromises).then(function() {
+                        Promise.all(templatePromises).then(function () {
                             that.calculateSortorderFromDisplay();
                             // We've just read all from the database.
                             // The sortorder calculation may have changed the
@@ -374,17 +370,17 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                             templates.runTemplateJS('');
 
                             that.showHideNoPaths();
-                        }).catch(function(e) {
+                        }).catch(function (e) {
                             e.fileName = that.filename;
                             e.name = 'Error displaying pathways';
                             notification.exception(e);
                         });
-                    }).catch(function(e) {
+                    }).catch(function (e) {
                         e.fileName = that.filename;
                         e.name = 'Error retrieving pathways';
                         notification.exception(e);
                     });
-                }).catch(function(e) {
+                }).catch(function (e) {
                     e.fileName = that.filename;
                     e.name = 'Error retrieving criteria types';
                     notification.exception(e);
@@ -398,17 +394,17 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          *
          * @return {Promise}
          */
-        setScale: function() {
+        setScale: function () {
             var that = this;
 
-            return new Promise(function(resolve, reject) {
+            return new Promise(function (resolve, reject) {
                 // Get the scale id first
                 if (!that.scale_id && that.widget.hasAttribute('data-scale-id')) {
                     that.scale_id = that.widget.getAttribute('data-scale-id');
                 }
 
                 if (that.scale_id) {
-                    that.setScaleValues().then(function() {
+                    that.setScaleValues().then(function () {
                         resolve();
                     });
                 } else {
@@ -422,16 +418,16 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                         'methodname': that.endpoints.competencyScale
                     };
 
-                    ajax.getData(apiArgs).then(function(responses) {
+                    ajax.getData(apiArgs).then(function (responses) {
                         that.scale_id = responses.results;
-                        that.setScaleValues().then(function() {
+                        that.setScaleValues().then(function () {
                             resolve();
-                        }).catch(function(e) {
+                        }).catch(function (e) {
                             e.fileName = that.filename;
                             e.name = 'Error setting scalevalues';
                             notification.exception(e);
                         });
-                    }).catch(function(e) {
+                    }).catch(function (e) {
                         e.fileName = that.filename;
                         e.name = 'Error retrieving scale';
                         notification.exception(e);
@@ -446,10 +442,10 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          *
          * @return {Promise } [description]
          */
-        setScaleValues: function() {
+        setScaleValues: function () {
             var that = this;
 
-            return new Promise(function(resolve, reject) {
+            return new Promise(function (resolve, reject) {
                 if (!that.scale_id) {
                     reject('Scale id not set');
                 }
@@ -458,7 +454,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     'args': {scale_id: that.scale_id},
                     'methodname': that.endpoints.scalevalues};
 
-                ajax.getData(apiArgs).then(function(responses) {
+                ajax.getData(apiArgs).then(function (responses) {
                     that.scalevalues = [];
 
                     for (var a = 0; a < responses.results.length; a++) {
@@ -469,7 +465,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     }
 
                     resolve();
-                }).catch(function(e) {
+                }).catch(function (e) {
                     e.fileName = that.filename;
                     e.name = 'Error retrieving scalevalues';
                     notification.exception(e);
@@ -480,7 +476,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
         /**
          * Clear all pathway data
          */
-        clearPathways: function() {
+        clearPathways: function () {
             this.pathways = [];
             this.nPaths = 0;
 
@@ -507,7 +503,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          *
          * @return {Promise}
          */
-        showSinglevaluePaths: function() {
+        showSinglevaluePaths: function () {
             var target = this.widget.querySelector('[data-pw-singlevalues]'),
                 templatename = 'totara_competency/scalevalue_pathways_edit',
                 templatedata = {scalevalues: []};
@@ -536,7 +532,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 templatedata.scalevalues.push(toadd);
             }
 
-            templatedata.scalevalues.sort(function(a, b) {
+            templatedata.scalevalues.sort(function (a, b) {
                 return a.sortorder - b.sortorder;
             });
 
@@ -550,7 +546,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          *
          * @param {string} Type of path to add
          */
-        addPath: function(pathType) {
+        addPath: function (pathType) {
             if (pathType == '0') {
                 return;
             }
@@ -570,7 +566,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     'methodname': this.endpoints.definitionTemplate},
                 target;
 
-            ajax.getData(apiArgs).then(function(responses) {
+            ajax.getData(apiArgs).then(function (responses) {
                 var key = that.getNextKey(),
                     templatename = 'totara_competency/partial_pathway',
                     pw = responses.results;
@@ -590,17 +586,17 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 }
 
                 // Display the pathway in the correct div
-                templates.renderAppend(templatename, that.pathways[key], target).then(function() {
+                templates.renderAppend(templatename, that.pathways[key], target).then(function () {
                     that.calculateSortorderFromDisplay();
                     that.dirty = true;
                     that.showHideNoPaths();
                     templates.runTemplateJS('');
-                }).catch(function(e) {
+                }).catch(function (e) {
                     e.fileName = that.filename;
                     e.name = 'Error displayin ' + pathType;
                     notification.exception(e);
                 });
-            }).catch(function(e) {
+            }).catch(function (e) {
                 e.fileName = that.filename;
                 e.name = 'Error retrieving definition template for ' + pathType;
                 notification.exception(e);
@@ -610,7 +606,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
         /**
          * Hide all criteria type selectors
          */
-        hideCritTypeSelectors: function() {
+        hideCritTypeSelectors: function () {
             var critTypeNodes = this.widget.querySelectorAll('[data-crit-type-toggle]');
 
             for (var a = 0; a < critTypeNodes.length; a++) {
@@ -623,7 +619,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          *
          * @param {node} svWgt Scalevalue widget
          */
-        showCriteriaTypeOptions: function(svWgt) {
+        showCriteriaTypeOptions: function (svWgt) {
             var toOpen = svWgt.querySelector('[data-crit-type-toggle="scalevalue"]'),
                 expanded = toOpen ? !toOpen.classList.contains('cc_hidden') : false;
 
@@ -642,7 +638,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          * @param {string} Type of path to add
          * @param {string} Type of criterion to add
          */
-        addSinglevaluePath: function(svWgt, pathType, critType) {
+        addSinglevaluePath: function (svWgt, pathType, critType) {
             var that = this,
                 scalevalue = svWgt.getAttribute('data-scalevalue-id'),
                 apiArgs = {
@@ -650,7 +646,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     'methodname': this.endpoints.definitionTemplate},
                 target = svWgt.querySelector('[data-cc-scalevalue-pw-list]');
 
-            ajax.getData(apiArgs).then(function(responses) {
+            ajax.getData(apiArgs).then(function (responses) {
                 var key = that.getNextKey(),
                     templatename = 'totara_competency/partial_pathway',
                     pw = responses.results;
@@ -667,17 +663,17 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 that.nPaths += 1;
 
                 // Display the pathway in the correct div
-                templates.renderAppend(templatename, that.pathways[key], target).then(function() {
+                templates.renderAppend(templatename, that.pathways[key], target).then(function () {
                     that.hideCritTypeSelectors();
                     that.calculateSortorderFromDisplay();
                     that.dirty = true;
                     templates.runTemplateJS('');
-                }).catch(function(e) {
+                }).catch(function (e) {
                     e.fileName = that.filename;
                     e.name = 'Error displaying template for ' + pathType;
                     notification.exception(e);
                 });
-            }).catch(function(e) {
+            }).catch(function (e) {
                 e.fileName = that.filename;
                 e.name = 'Error retrieving definition template for ' + pathType;
                 notification.exception(e);
@@ -692,7 +688,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          *     - Call the save api endpoint
          *
          */
-        applyChanges: function() {
+        applyChanges: function () {
             var that = this,
                 pwList = this.widget.querySelectorAll('[data-pw-save-endpoint]'),
                 apiEndpoint,
@@ -751,14 +747,14 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             promiseArr.push(ajax.getData(apiArgs));
 
             if (promiseArr.length > 0) {
-                Promise.all(promiseArr).then(function() {
+                Promise.all(promiseArr).then(function () {
                     that.showNotification('success', 'applysuccess', 'totara_competency', {});
                     that.dirty = false;
 
                     // TODO: This will reread everything! Can we somehow only re-read the changed ones?
                     //       Main thing to look for - save endpoint of new pws
                     that.updatePage();
-                }).catch(function(e) {
+                }).catch(function (e) {
                     e.fileName = that.filename;
                     e.name = 'Error applying changes';
                     notification.exception(e);
@@ -769,7 +765,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
         /**
          * Show / hide sections depending on the presence of paths
          */
-        showHideNoPaths: function() {
+        showHideNoPaths: function () {
             var aggDiv = this.widget.querySelector('[data-cc-pw-aggregation]'),
                 noPathsDiv = this.widget.querySelector('.pw_none'),
                 singlevalDiv = this.widget.querySelector('[data-pw-singlevalues]'),
@@ -818,7 +814,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
         /**
          * Calculate and set the sortorders from the order the pathways appear on the screen
          */
-        calculateSortorderFromDisplay: function() {
+        calculateSortorderFromDisplay: function () {
             var pwNodes = this.widget.querySelectorAll('[data-pw-key]'),
                 lastOrder = 0,
                 pwKey,
@@ -846,16 +842,16 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
         /**
          * Link the pathways in the default preset to this competency
          */
-        linkDefaultPreset: function() {
+        linkDefaultPreset: function () {
             var that = this,
                 apiArgs = {
                     'args': {competency_id: this.competency_id},
                     'methodname': this.endpoints.defaultpreset};
 
             // Get all the pathways and its detail
-            ajax.getData(apiArgs).then(function() {
+            ajax.getData(apiArgs).then(function () {
                 that.updatePage();
-            }).catch(function(e) {
+            }).catch(function (e) {
                 e.fileName = that.filename;
                 e.name = 'Error linking default preset pathways';
                 notification.exception(e);
@@ -866,7 +862,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          * Discard changes and navigate to the applicable url
          * Confirmation is handled through the 'beforeunload' event handler
          */
-        cancelChanges: function() {
+        cancelChanges: function () {
             if (this.widget.querySelector('[data-cc-cancel-href]')) {
                 var backUrl = this.widget.querySelector('[data-cc-cancel-href]').getAttribute('data-cc-cancel-href');
                 window.location.href = backUrl;
@@ -878,7 +874,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          * If it has an id (exists on the database), show summary detail
          * to indicate that final removal will only happen when changes are applied
          */
-        removePathway: function(pwKey) {
+        removePathway: function (pwKey) {
             var pwTarget = this.widget.querySelector('[data-pw-key="' + pwKey + '"]'),
                 pwOrTarget = this.widget.querySelector('[data-pw-or="' + pwKey + '"]');
 
@@ -912,7 +908,6 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                         undoWgt = pwTarget.querySelector('[data-pw-action="undo"]');
                     removeWgt.classList.add('cc_hidden');
                     undoWgt.classList.remove('cc_hidden');
-
                 } else {
                     // Remove it totally
                     if (this.pathways[pwKey].scalevalue) {
@@ -955,7 +950,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
         /**
          * Undo the removal of a specific pathway
          */
-        undoRemovePathway: function(pwKey) {
+        undoRemovePathway: function (pwKey) {
             var pwTarget = this.widget.querySelector('[data-pw-key="' + pwKey + '"]'),
                 copyObj = {};
 
@@ -991,17 +986,17 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          *
          * @return {Promise}
          */
-        getOverallAggregation: function() {
+        getOverallAggregation: function () {
             var that = this,
               aggWgt = this.widget.querySelector('[data-cc-pw-agg-changed]');
 
-            return new Promise(function(resolve) {
+            return new Promise(function (resolve) {
                 var apiArgs = {
                     args: {competency_id: that.competency_id},
                     methodname: that.endpoints.getOverallAggregation
                 };
 
-                ajax.getData(apiArgs).then(function(responses) {
+                ajax.getData(apiArgs).then(function (responses) {
                     var aggType = responses.results;
 
                     aggWgt.querySelector('option:checked').removeAttribute('selected');
@@ -1010,7 +1005,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     that.setOverallAggregation();
 
                     resolve();
-                }).catch(function(e) {
+                }).catch(function (e) {
                     e.fileName = that.filename;
                     e.name = 'Error getting overall aggregation';
                     notification.exception(e);
@@ -1023,20 +1018,20 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          *
          * @return {Promise}
          */
-        getCriteriaTypes: function() {
+        getCriteriaTypes: function () {
             var that = this,
                 hasSingleUse = this.widget.hasAttribute('data-singleuse') ? this.widget.getAttribute('data-singleuse') : '0';
 
-            return new Promise(function(resolve) {
+            return new Promise(function (resolve) {
                 if (that.critTypes && that.critTypes.length > 0) {
                     resolve();
                 } else {
                     var apiArgs = {
-                            args: {},
-                            methodname: that.endpoints.criteriaTypes
-                        };
+                        args: {},
+                        methodname: that.endpoints.criteriaTypes
+                    };
 
-                    ajax.getData(apiArgs).then(function(responses) {
+                    ajax.getData(apiArgs).then(function (responses) {
                         var critTypes = responses.results;
 
                         that.critTypes = [];
@@ -1046,7 +1041,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                         }
 
                         resolve();
-                    }).catch(function(e) {
+                    }).catch(function (e) {
                         e.fileName = that.filename;
                         e.name = 'Error getting criteria types';
                         notification.exception(e);
@@ -1060,7 +1055,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          *
          * @param {bool} allowSingleUse
          */
-        toggleSingleUseCritTypes: function(allowSingleUse) {
+        toggleSingleUseCritTypes: function (allowSingleUse) {
             var critTypeNodes = this.widget.querySelectorAll('[data-crit-type-toggle="scalevalue"]'),
                 singleUseActiveNodes,
                 singleUseDisabledNodes,
@@ -1122,7 +1117,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             }
         },
 
-        setOverallAggregation: function() {
+        setOverallAggregation: function () {
             var aggWgt = this.widget.querySelector('[data-cc-pw-agg-changed]'),
                 selectedType = aggWgt.querySelector('option:checked'),
                 aggActions = this.widget.querySelector('[data-cc-pw-agg-actions]');
@@ -1150,7 +1145,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          *
          * Draggable items should have the data attribute data-cc-orderable
          */
-        enableOrdering: function() {
+        enableOrdering: function () {
             var editWgt = this.widget.querySelector('[data-cc-agg-action="edit"]'),
                 moveWgt = this.widget.querySelector('[data-cc-agg-action="move"]'),
                 orderableItems = this.widget.querySelectorAll('[data-cc-orderable]'),
@@ -1192,7 +1187,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          *
          * @return {[type]} [description]
          */
-        disableOrdering: function() {
+        disableOrdering: function () {
             var editWgt = this.widget.querySelector('[data-cc-agg-action="edit"]'),
                 moveWgt = this.widget.querySelector('[data-cc-agg-action="move"]'),
                 orderableItems = this.widget.querySelectorAll('[data-cc-orderable]'),
@@ -1238,8 +1233,8 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
      * @param {node} parent
      * @returns {Object} promise
      */
-    var init = function(parent) {
-        return new Promise(function(resolve) {
+    var init = function (parent) {
+        return new Promise(function (resolve) {
             var wgt = new AchievementPaths();
             wgt.setParent(parent);
             wgt.events();
@@ -1252,4 +1247,4 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
     return {
         init: init,
     };
- });
+});

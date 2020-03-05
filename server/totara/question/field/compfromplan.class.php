@@ -28,7 +28,7 @@ use totara_competency\entities\competency_achievement;
 use totara_core\advanced_feature;
 
 require_once('reviewrating.class.php');
-require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/evidence/lib.php');
+require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
 require_once($CFG->dirroot.'/totara/plan/development_plan.class.php');
 
 class question_compfromplan extends reviewrating {

@@ -23,7 +23,6 @@
  * @subpackage totara_hierarchy
  */
 
-require_once $CFG->dirroot.'/totara/hierarchy/prefix/competency/evidenceitem/type/record.php';
 
 /**
  * Course completion competency evidence type

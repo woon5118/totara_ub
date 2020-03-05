@@ -38,6 +38,14 @@ use totara_core\advanced_feature;
 
 class pathway_learning_plan_learning_plan_testcase extends advanced_testcase {
 
+    /**
+     * Test returned pathway type
+     */
+    public function test_pathway_type() {
+        $this->assertSame('learning_plan', learning_plan::pathway_type());
+    }
+
+
     public function test_aggregate_current_value() {
         global $DB;
 

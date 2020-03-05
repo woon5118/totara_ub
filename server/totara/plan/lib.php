@@ -1772,7 +1772,6 @@ function plan_mark_competency_default($competencyid, $userid, $component) {
 
     $rec = array_pop($records);
     $default = $rec->defaultid;
-    require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/evidence/lib.php');
 
     $details = new stdClass();
     $details->assessmenttype = get_string('automateddefault', 'totara_plan');

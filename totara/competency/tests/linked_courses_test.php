@@ -29,7 +29,6 @@ use totara_competency\linked_courses;
 class totara_competency_linked_courses_testcase extends advanced_testcase {
 
     public function test_get_linked_courses_none() {
-
         $this->getDataGenerator()->create_course();
 
         /** @var totara_hierarchy_generator $hierarchy_generator */
@@ -57,9 +56,6 @@ class totara_competency_linked_courses_testcase extends advanced_testcase {
     }
 
     public function test_get_and_set_linked_courses_some() {
-        global $CFG;
-        require_once($CFG->dirroot . '/totara/plan/lib.php');
-
         $course1 = $this->getDataGenerator()->create_course();
         $course2 = $this->getDataGenerator()->create_course();
         $course3 = $this->getDataGenerator()->create_course();
@@ -166,6 +162,30 @@ class totara_competency_linked_courses_testcase extends advanced_testcase {
         $event = array_shift($events);
         $this->assertInstanceOf(linked_courses_updated::class, $event);
         $this->assertEquals($comp1->id, $event->get_data()['objectid']);
+        $sink->clear();
+
+        // No delete some
+        linked_courses::set_linked_courses(
+            $comp1->id,
+            [
+                ['id' => $course1->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+            ]
+        );
+
+        $events = $sink->get_events();
+        $this->assertCount(2, $events);
+        foreach($events as $idx => $event) {
+            if ($event instanceof linked_courses_updated) {
+                $this->assertEquals($comp1->id, $event->objectid);
+                unset($events[$idx]);
+            } else if ($event instanceof evidence_deleted) {
+                $this->assertEquals($comp1->id, $event->other['competencyid']);
+                $this->assertEquals('coursecompletion', $event->other['itemtype']);
+                $this->assertEquals($course2->id, $event->other['instanceid']);
+            }
+        }
+
+        $sink->close();
     }
 
     /**
@@ -271,6 +291,208 @@ class totara_competency_linked_courses_testcase extends advanced_testcase {
 
         $this->assertEqualsCanonicalizing($competency_course_ids, array_column($evidence_deleted_events, 'objectid'), 'The events should contain the competency_criteria ids');
     }
+
+    public function test_update_linktype() {
+        global $DB;
+
+        $course1 = $this->getDataGenerator()->create_course();
+        $course2 = $this->getDataGenerator()->create_course();
+
+        /** @var totara_hierarchy_generator $hierarchy_generator */
+        $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $compfw = $hierarchy_generator->create_comp_frame([]);
+        $comp1 = $hierarchy_generator->create_comp(['frameworkid' => $compfw->id]);
+
+        linked_courses::set_linked_courses(
+            $comp1->id,
+            [
+                ['id' => $course1->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+                ['id' => $course2->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY]
+            ]
+        );
+
+        $orig_rows = $DB->get_records('comp_criteria', ['competencyid' => $comp1->id, 'itemtype' => 'coursecompletion']);
+        $this->assertSame(2, count($orig_rows));
+
+        $mandatory = array_filter($orig_rows, function ($row) {
+            return $row->linktype == linked_courses::LINKTYPE_MANDATORY;
+        });
+
+        $optional = array_filter($orig_rows, function ($row) {
+            return $row->linktype == linked_courses::LINKTYPE_OPTIONAL;
+        });
+
+        $this->assertSame(2, count($mandatory));
+        $this->assertSame(0, count($optional));
+
+        // Now for the tests
+        $first = reset($orig_rows);
+
+        $event_sink = $this->redirectEvents();
+
+        // No changes - no expected event
+        linked_courses::update_linktype($first->id, linked_courses::LINKTYPE_MANDATORY);
+
+        $rows = $DB->get_records('comp_criteria', ['competencyid' => $comp1->id, 'itemtype' => 'coursecompletion']);
+        $this->assertSame(2, count($rows));
+
+        $mandatory = array_filter($orig_rows, function ($row) {
+            return $row->linktype == linked_courses::LINKTYPE_MANDATORY;
+        });
+
+        $optional = array_filter($orig_rows, function ($row) {
+            return $row->linktype == linked_courses::LINKTYPE_OPTIONAL;
+        });
+
+        $this->assertSame(2, count($mandatory));
+        $this->assertSame(0, count($optional));
+        $this->assertSame(0, $event_sink->count());
+
+        // Change type
+        linked_courses::update_linktype($first->id, linked_courses::LINKTYPE_OPTIONAL);
+        $rows = $DB->get_records('comp_criteria', ['competencyid' => $comp1->id, 'itemtype' => 'coursecompletion']);
+        $this->assertSame(2, count($rows));
+        foreach ($rows as $row) {
+            if ($row->id == $first->id) {
+                $this->assertEquals(linked_courses::LINKTYPE_OPTIONAL, $row->linktype);
+            } else {
+                $this->assertEquals(linked_courses::LINKTYPE_MANDATORY, $row->linktype);
+            }
+        }
+
+        $events = $event_sink->get_events();
+        $this->assertSame(1, count($events));
+        $event = reset($events);
+        $this->assertTrue($event instanceof linked_courses_updated);
+        $this->assertEquals($comp1->id, $event->objectid);
+
+        $event_sink->clear();
+
+        // Now try to set it to something illegal
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Invalid linktype');
+        linked_courses::update_linktype($first->id, -5);
+
+        $event_sink->close();
+    }
+
+    public function test_add_linked_courses() {
+        global $DB;
+
+        $course1 = $this->getDataGenerator()->create_course();
+        $course2 = $this->getDataGenerator()->create_course();
+        $course3 = $this->getDataGenerator()->create_course();
+        $course4 = $this->getDataGenerator()->create_course();
+        $course5 = $this->getDataGenerator()->create_course();
+
+        /** @var totara_hierarchy_generator $hierarchy_generator */
+        $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $compfw = $hierarchy_generator->create_comp_frame([]);
+        $comp1 = $hierarchy_generator->create_comp(['frameworkid' => $compfw->id]);
+
+        linked_courses::set_linked_courses(
+            $comp1->id,
+            [
+                ['id' => $course1->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+                ['id' => $course2->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY]
+            ]
+        );
+
+        $rows = $DB->get_records('comp_criteria', ['competencyid' => $comp1->id, 'itemtype' => 'coursecompletion']);
+        $this->assertSame(2, count($rows));
+
+        $event_sink = $this->redirectEvents();
+
+        // Add already linked course - should have no effect
+        linked_courses::add_linked_courses($comp1->id,
+            [
+                ['id' => $course1->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+            ]
+        );
+
+        $rows = $DB->get_records('comp_criteria', ['competencyid' => $comp1->id, 'itemtype' => 'coursecompletion']);
+        $this->assertSame(2, count($rows));
+        $this->assertSame(0, $event_sink->count());
+
+        // Update linktype of some, add new ones
+        linked_courses::add_linked_courses($comp1->id,
+            [
+                ['id' => $course2->id, 'linktype' => linked_courses::LINKTYPE_OPTIONAL],
+                ['id' => $course3->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+                ['id' => $course4->id, 'linktype' => linked_courses::LINKTYPE_OPTIONAL],
+            ]
+        );
+
+        $rows = $DB->get_records('comp_criteria', ['competencyid' => $comp1->id, 'itemtype' => 'coursecompletion']);
+        $this->assertSame(4, count($rows));
+
+        foreach ($rows as $row) {
+            if ($row->iteminstance == $course1->id || $row->iteminstance == $course3->id) {
+                $this->assertEquals(linked_courses::LINKTYPE_MANDATORY, $row->linktype);
+            } else {
+                $this->assertEquals(linked_courses::LINKTYPE_OPTIONAL, $row->linktype);
+            }
+        }
+
+        $events = $event_sink->get_events();
+        $this->assertSame(1, count($events));
+        $event = reset($events);
+        $this->assertTrue($event instanceof linked_courses_updated);
+        $this->assertEquals($comp1->id, $event->objectid);
+        $event_sink->clear();
+
+        // Now only add new one
+        linked_courses::add_linked_courses($comp1->id,
+            [
+                ['id' => $course5->id, 'linktype' => linked_courses::LINKTYPE_OPTIONAL],
+            ]
+        );
+
+        $rows = $DB->get_records('comp_criteria', ['competencyid' => $comp1->id, 'itemtype' => 'coursecompletion']);
+        $this->assertSame(5, count($rows));
+
+        foreach ($rows as $row) {
+            if ($row->iteminstance == $course1->id || $row->iteminstance == $course3->id) {
+                $this->assertEquals(linked_courses::LINKTYPE_MANDATORY, $row->linktype);
+            } else {
+                $this->assertEquals(linked_courses::LINKTYPE_OPTIONAL, $row->linktype);
+            }
+        }
+
+        $events = $event_sink->get_events();
+        $this->assertSame(1, count($events));
+        $event = reset($events);
+        $this->assertTrue($event instanceof linked_courses_updated);
+        $this->assertEquals($comp1->id, $event->objectid);
+        $event_sink->clear();
+
+        // Now only update one
+        linked_courses::add_linked_courses($comp1->id,
+            [
+                ['id' => $course5->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+            ]
+        );
+
+        $rows = $DB->get_records('comp_criteria', ['competencyid' => $comp1->id, 'itemtype' => 'coursecompletion']);
+        $this->assertSame(5, count($rows));
+
+        foreach ($rows as $row) {
+            if ($row->iteminstance == $course1->id || $row->iteminstance == $course3->id || $row->iteminstance == $course5->id) {
+                $this->assertEquals(linked_courses::LINKTYPE_MANDATORY, $row->linktype);
+            } else {
+                $this->assertEquals(linked_courses::LINKTYPE_OPTIONAL, $row->linktype);
+            }
+        }
+
+        $events = $event_sink->get_events();
+        $this->assertSame(1, count($events));
+        $event = reset($events);
+        $this->assertTrue($event instanceof linked_courses_updated);
+        $this->assertEquals($comp1->id, $event->objectid);
+
+        $event_sink->close();
+    }
+
 
     private function link_course_to_multiple_competencies(): array {
         $course = self::getDataGenerator()->create_course();

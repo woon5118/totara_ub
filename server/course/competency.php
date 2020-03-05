@@ -74,11 +74,7 @@ local_js(array(
 $PAGE->requires->string_for_js('cancel', 'moodle');
 $PAGE->requires->string_for_js('save', 'totara_core');
 $PAGE->requires->string_for_js('assigncoursecompletiontocompetencies', 'totara_hierarchy');
-$jargs = '{"id":'.$course->id;
-if (!empty($CFG->competencyuseresourcelevelevidence)) {
-    $jargs .= ', "competencyuseresourcelevelevidence":true';
-}
-$jargs .= '}';
+$jargs = '{"id":'.$course->id.'}';
 $args = array('args'=>$jargs);
 $jsmodule = array(
         'name' => 'totara_coursecompetency',
@@ -100,7 +96,6 @@ $PAGE->set_pagelayout('standard');
 echo $OUTPUT->header();
 echo $OUTPUT->heading($strcompetenciesusedincourse);
 
-
 echo '<div id="coursecompetency-table-container">';
 echo $hierarchy->print_linked_evidence_list($id);
 echo '</div>';
@@ -121,11 +116,7 @@ if ($can_edit) {
 <div class="singlebutton centerbutton">
     <form action="<?php echo $CFG->wwwroot ?>/totara/hierarchy/prefix/competency/course/add.php?id=<?php echo $id ?>" method="get">
         <div>
-            <?php if (!empty($CFG->competencyuseresourcelevelevidence)) { ?>
-                <input type="submit" id="show-coursecompetency-dialog" value="<?php echo get_string('addcourseevidencetocompetencies', 'totara_hierarchy'); ?>" />
-            <?php } else { ?>
-                <input type="submit" id="show-coursecompetency-dialog" value="<?php echo get_string('assigncoursecompletiontocompetencies', 'totara_hierarchy'); ?>" />
-            <?php } ?>
+            <input type="submit" id="show-coursecompetency-dialog" value="<?php echo get_string('assigncoursecompletiontocompetencies', 'totara_hierarchy'); ?>" />
             <input type="hidden" name="id" value="<?php echo $id ?>">
         </div>
     </form>

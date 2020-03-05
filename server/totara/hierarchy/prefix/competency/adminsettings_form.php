@@ -26,11 +26,10 @@ require_once($CFG->libdir.'/formslib.php');
 
 class competency_global_settings_form extends moodleform
 {
+    /**
+     * @deprecated since Totara 13
+     */
     function definition() {
-        $mform =& $this->_form;
-        $mform->addElement('checkbox', 'competencyuseresourcelevelevidence', get_string('useresourcelevelevidence', 'totara_hierarchy'));
-        $mform->setDefault('competencyuseresourcelevelevidence', 0);
-
-        $this->add_action_buttons(false);
+        // The use of the competencyuseresourcelevelevidence has been deprecated since Totara 13.
     }
 }

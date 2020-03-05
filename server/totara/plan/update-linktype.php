@@ -22,6 +22,8 @@
  * @subpackage totara_plan
  */
 
+use totara_competency\linked_courses;
+
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/totara/plan/lib.php');
 
@@ -38,11 +40,7 @@ if (!in_array($linkval, $PLAN_AVAILABLE_LINKTYPES)) {
 }
 
 if ($component == 'course') {
-    $todb = new stdClass();
-    $todb->id = $compevid;
-    $todb->linktype = $linkval;
-    $result = $DB->update_record('comp_criteria', $todb);
-
+    $result = linked_courses::update_linktype($compevid, $linkval);
 } else if ($component == 'pos') {
     $todb = new stdClass();
     $todb->id = $compevid;

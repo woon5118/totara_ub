@@ -27,7 +27,6 @@ if (!defined('MOODLE_INTERNAL')) {
 
 global $CFG;
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/competency/lib.php');
-require_once($CFG->dirroot . '/totara/hierarchy/prefix/competency/evidence/lib.php');
 
 class totara_hierarchy_competency_lib_testcase extends advanced_testcase {
 

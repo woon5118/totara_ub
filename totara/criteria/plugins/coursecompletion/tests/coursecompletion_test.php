@@ -136,6 +136,14 @@ class criteria_coursecompletion_testcase extends advanced_testcase {
         $this->assertEqualsCanonicalizing((array)$expected->metadata, (array)$actual->get_metadata());
     }
 
+    /**
+     * Test returned criterion type
+     */
+    public function test_criterion_type() {
+        $this->assertSame('coursecompletion', coursecompletion::criterion_type());
+    }
+
+
      /**
      * Test constructor without attributes
      */

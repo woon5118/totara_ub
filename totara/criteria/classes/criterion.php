@@ -86,6 +86,11 @@ abstract class criterion {
         $this->plugin_type = $reflect->getShortName();
     }
 
+    static public function criterion_type(): string {
+        $reflect = new \ReflectionClass(static::class);
+        return $reflect->getShortName();
+    }
+
     /**
      * Fetch specific criterion from the database
      *

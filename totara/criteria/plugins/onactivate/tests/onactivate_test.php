@@ -83,6 +83,13 @@ class criteria_onactivate_testcase extends advanced_testcase {
         $this->assertEqualsCanonicalizing($expected->metadata, $actual->get_metadata());
     }
 
+    /**
+     * Test returned criterion type
+     */
+    public function test_criterion_type() {
+        $this->assertSame('onactivate', onactivate::criterion_type());
+    }
+
      /**
      * Test constructor without attributes
      */

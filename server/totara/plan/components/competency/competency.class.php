@@ -26,7 +26,6 @@
 use totara_competency\entities\competency_achievement as competency_achievement_entity;
 
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
-require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/evidence/lib.php');
 require_once($CFG->dirroot.'/totara/plan/component.class.php');
 
 
@@ -38,7 +37,6 @@ class dp_competency_component extends dp_base_component {
 
     public static $permissions = array(
         'updatecompetency' => true,
-        //'commenton' => false,
         'setpriority' => false,
         'setduedate' => false,
         'setproficiency' => false,

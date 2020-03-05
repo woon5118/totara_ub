@@ -432,9 +432,6 @@ class competency extends hierarchy {
                 if (!empty($item->id)) {
                     $args['id'] = $item->id;
                 }
-                if (!empty($CFG->competencyuseresourcelevelevidence)) {
-                    $args['competencyuseresourcelevelevidence'] = true;
-                }
                 // Include competency item js module
                 $PAGE->requires->strings_for_js(array('assignrelatedcompetencies',
                         'assignnewevidenceitem','assigncoursecompletions'), 'totara_hierarchy');
@@ -662,13 +659,6 @@ class competency extends hierarchy {
         $heading1->header = true;
         $head[] = $heading1;
 
-        if (!empty($CFG->competencyuseresourcelevelevidence)) {
-            $heading2 = new html_table_cell();
-            $heading2->text = get_string('evidence', 'totara_hierarchy');
-            $heading2->header = true;
-            $head[] = $heading2;
-        }
-
         if ($can_edit) {
             require_once($CFG->dirroot.'/totara/plan/lib.php');
             $heading3 = new html_table_cell();
@@ -718,19 +708,6 @@ class competency extends hierarchy {
                 $evidence->iteminstance = $competency->evidenceinstance;
                 $evidence->itemmodule = $competency->evidencemodule;
 
-                if (!empty($CFG->competencyuseresourcelevelevidence)) {
-                    $cell = new html_table_cell();
-
-                    $evidence = competency_evidence_type::factory((array)$evidence);
-
-                    $cell->text = $evidence->get_type();
-                    if ($evidence->itemtype == 'activitycompletion') {
-                        $cell->text .= ' - '.$evidence->get_name();
-                    }
-
-                    $row->cells[] = $cell;
-                }
-
                 // Options column
                 if ($can_edit) {
                     $cell = new html_table_cell();
@@ -751,7 +728,7 @@ class competency extends hierarchy {
                     $row->cells[] = $cell;
 
                     $cell = new html_table_cell();
-                    $cell->text = $OUTPUT->action_icon(new moodle_url('/totara/hierarchy/prefix/competency/evidenceitem/remove.php',
+                    $cell->text = $OUTPUT->action_icon(new moodle_url('/totara/hierarchy/prefix/competency/course/remove.php',
                             array('id' => $evidence->id, 'course' => $courseid, 'returnurl' => $PAGE->url->out())),
                         new pix_icon('t/delete', $str_remove), null, array('class' => 'iconsmall', 'alt' => $str_remove, 'title' => $str_remove));
                     $row->cells[] = $cell;

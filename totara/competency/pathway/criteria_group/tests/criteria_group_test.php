@@ -108,6 +108,13 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
     }
 
     /**
+     * Test returned pathway type
+     */
+    public function test_pathway_type() {
+        $this->assertSame('criteria_group', criteria_group::pathway_type());
+    }
+
+    /**
      * Test save new
      */
     public function test_save_new() {

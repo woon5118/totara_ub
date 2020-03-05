@@ -21,9 +21,14 @@
  * @author Aaron Barnes <aaron.barnes@totaralms.com>
  * @package totara
  * @subpackage totara_hierarchy
+ *
+ * @deprecated since Totara 13
  */
 
+debugging('totara/hierarchy/prefix/competency/evidence/competency_evidence has been deprecated, please remove all includes.', DEBUG_DEVELOPER);
+
 require_once("{$CFG->dirroot}/completion/data_object.php");
+
 
 /**
  * Competency evidence
@@ -58,6 +63,10 @@ class competency_evidence extends data_object {
     public $timecreated;
     public $timemodified;
     public $reaggregate;
+
+    final public function __construct($params = null, $fetch = true) {
+        debugging('\competency_evidence has been deprecated, please use totara_competency/linked_courses.', DEBUG_DEVELOPER);
+    }
 
     /**
      * Finds and returns a data_object instance based on params.

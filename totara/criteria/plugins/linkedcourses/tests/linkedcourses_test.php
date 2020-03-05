@@ -135,6 +135,13 @@ class criteria_linkedcourses_testcase extends advanced_testcase {
         $this->assertEqualsCanonicalizing($expected->metadata ?? [], $actual->get_metadata());
     }
 
+    /**
+     * Test returned criterion type
+     */
+    public function test_criterion_type() {
+        $this->assertSame('linkedcourses', linkedcourses::criterion_type());
+    }
+
      /**
      * Test constructor without attributes
      */

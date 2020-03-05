@@ -67,15 +67,15 @@ class pathway_criteria_group_external_testcase extends \advanced_testcase {
      */
     public function test_create_linkedcoursed_update_add_coursecompletion() {
         $data = $this->setup_data();
-        $compA = $data->competencies['Comp A'];
-        $scalevalue = $compA->scale->default_value;
+        $comp_a = $data->competencies['Comp A'];
+        $scalevalue = $comp_a->scale->default_value;
 
-        linked_courses::set_linked_courses($compA->id, [
+        linked_courses::set_linked_courses($comp_a->id, [
             ['id' => $data->courses[1]->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
             ['id' => $data->courses[2]->id, 'linktype' => linked_courses::LINKTYPE_OPTIONAL],
         ]);
 
-        $pw_id = external::create($compA->id,
+        $pw_id = external::create($comp_a->id,
             1,
             $scalevalue->id,
             [
@@ -86,7 +86,7 @@ class pathway_criteria_group_external_testcase extends \advanced_testcase {
                     'metadata' => [
                         [
                             'metakey' => "competency_id",
-                            'metavalue' => $compA->id,
+                            'metavalue' => $comp_a->id,
                         ],
                     ],
                     'type' => "linkedcourses",
@@ -127,7 +127,7 @@ class pathway_criteria_group_external_testcase extends \advanced_testcase {
                     'metadata' => [
                         [
                             'metakey' => "competency_id",
-                            'metavalue' => $compA->id,
+                            'metavalue' => $comp_a->id,
                         ],
                     ],
                     'type' => "linkedcourses",
@@ -171,17 +171,17 @@ class pathway_criteria_group_external_testcase extends \advanced_testcase {
      */
     public function test_create_childcompetency_update_add_coursecompletion() {
         $data = $this->setup_data();
-        $compA = $data->competencies['Comp A'];
-        $compB = $data->competencies['Comp B'];
-        $scalevalue = $compA->scale->default_value;
+        $comp_a = $data->competencies['Comp A'];
+        $comp_b = $data->competencies['Comp B'];
+        $scalevalue = $comp_a->scale->default_value;
 
         // Adding a manual pathway to CompB (the child) to ensure that users can achieve proficiency
 
         /** @var totara_competency_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
-        $generator->create_manual($compB->id, [manager::class]);
+        $generator->create_manual($comp_b->id, [manager::class]);
 
-        $pw_id = external::create($compA->id,
+        $pw_id = external::create($comp_a->id,
             1,
             $scalevalue->id,
             [
@@ -192,7 +192,7 @@ class pathway_criteria_group_external_testcase extends \advanced_testcase {
                     'metadata' => [
                         [
                             'metakey' => "competency_id",
-                            'metavalue' => $compA->id,
+                            'metavalue' => $comp_a->id,
                         ],
                     ],
                     'type' => "childcompetency",
@@ -233,7 +233,7 @@ class pathway_criteria_group_external_testcase extends \advanced_testcase {
                     'metadata' => [
                         [
                             'metakey' => "competency_id",
-                            'metavalue' => $compA->id,
+                            'metavalue' => $comp_a->id,
                         ],
                     ],
                     'type' => "childcompetency",

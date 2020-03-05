@@ -20,7 +20,11 @@
  * @author Simon Coggins <simon.coggins@totaralms.com>
  * @package totara
  * @subpackage totara_hierarchy
+ *
+ * @deprecated since Totara 13
  */
+
+debugging('totara/hierarchy/prefix/competency/evidenceitem/edit.php has been deprecated, please remove all includes.', DEBUG_DEVELOPER);
 
 use totara_core\advanced_feature;
 
@@ -55,21 +59,19 @@ if (!$competency = $DB->get_record('comp', array('id' => $id))) {
     print_error('incorrectcompetencyid', 'totara_hierarchy');
 }
 
-if (empty($CFG->competencyuseresourcelevelevidence)) {
-    ///
-    /// Load data
-    ///
-    $selected = array();
-    $sql = "SELECT c.* FROM
-        {comp_criteria} cc
-        INNER JOIN {course} c ON cc.iteminstance = c.id
-        WHERE cc.competencyid = ?";
-    $assigned = $DB->get_records_sql($sql, array($id));
-    $assigned = !empty($assigned) ? $assigned : array();
-    foreach ($assigned as $item) {
-        $item->id = $item->id;
-        $selected[$item->id] = $item;
-    }
+///
+/// Load data
+///
+$selected = array();
+$sql = "SELECT c.* FROM
+    {comp_criteria} cc
+    INNER JOIN {course} c ON cc.iteminstance = c.id
+    WHERE cc.competencyid = ?";
+$assigned = $DB->get_records_sql($sql, array($id));
+$assigned = !empty($assigned) ? $assigned : array();
+foreach ($assigned as $item) {
+    $item->id = $item->id;
+    $selected[$item->id] = $item;
 }
 
 
@@ -94,10 +96,8 @@ $dialog->selected_title = 'itemstoadd';
 $dialog->requirecompletion = true;
 $dialog->load_data();
 
-if (empty($CFG->competencyuseresourcelevelevidence)) {
-    // Set selected items
-    $dialog->selected_items = $selected;
-}
+// Set selected items
+$dialog->selected_items = $selected;
 
 // Addition url parameters
 $dialog->urlparams = array('id' => $id);

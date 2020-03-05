@@ -33,6 +33,10 @@ use totara_competency\pathway_evaluator_user_source;
 
 class aggregation_highest_aggregation_testcase extends advanced_testcase {
 
+    public function test_aggregation_type() {
+        $this->assertSame('highest', highest::aggregation_type());
+    }
+
     public function test_with_empty_pathways() {
         $user = $this->getDataGenerator()->create_user();
 

@@ -60,145 +60,74 @@ M.totara_coursecompetency = M.totara_coursecompetency || {
             throw new Error('M.totara_competencyadd.init()-> jQuery dependency required for this module to function.');
         }
 
-        if (typeof this.config.competencyuseresourcelevelevidence !== 'undefined' &&
-                   this.config.competencyuseresourcelevelevidence) {
+        ///
+        /// non resource-level dialog
+        ///
+        // Create handler for the dialog
+        totaraDialog_handler_courseEvidence = function() {
+            // Base url
+            var baseurl = '';
+        };
 
-            // Create handler for the assign evidence dialog
-            totaraDialog_handler_assignCourseEvidence = function() {
-                // Base url
-                var baseurl = '';
-            };
+        totaraDialog_handler_courseEvidence.prototype = new totaraDialog_handler_treeview_multiselect();
 
-            totaraDialog_handler_assignCourseEvidence.prototype = new totaraDialog_handler_treeview_singleselect(null, null, dualpane=true);
+        /**
+         * Add a row to a table on the calling page
+         * Also hides the dialog and any no item notice
+         *
+         * @param string    HTML response
+         * @return void
+         */
+        totaraDialog_handler_courseEvidence.prototype._update = function(response) {
 
-            totaraDialog_handler_assignCourseEvidence.prototype.handle_click = function(clicked) {
+            // Hide dialog
+            this._dialog.hide();
 
-                // Get id, format item_XX
-                var id = clicked.attr('id');
-                var url = this.baseurl+'evidence.php?id='+module.config.id+'&add='+id;
+            // Remove no item warning (if exists)
+            $('.noitems-'+this._title).remove();
 
-                // Indicate loading...
-                this._dialog.showLoading();
+            //Split response into table and div
+            var new_table = $(response).filter('table');
 
-                this._dialog._request(url, {object: this, method: 'display_evidence'});
-            };
+            // Grab table
+            var table = $('table#list-coursecompetency');
 
-            totaraDialog_handler_assignCourseEvidence.prototype.display_evidence = function(response) {
+            // If table found
+            if (table.length) {
+                table.replaceWith(new_table);
+            }
+            else {
+                // Add new table
+                $('div#coursecompetency-table-container').append(new_table);
+            }
+        };
 
-                var handler = this;
+        (function() {
+            var url = M.cfg.wwwroot+'/totara/hierarchy/prefix/competency/course/';
+            var saveurl = url + 'save.php?sesskey='+M.cfg.sesskey+'&course='+module.config.id+'&type=coursecompletion&instance='+module.config.id+'&deleteexisting=1&update=';
 
-                // Hide loading animation
-                this._dialog.hideLoading();
+            var handler = new totaraDialog_handler_courseEvidence();
+            handler.baseurl = url;
 
-                $('.selected', this._dialog.dialog).html(response);
+            var buttonsObj = {};
+            buttonsObj[M.util.get_string('save', 'totara_core')] = function() { handler._save(saveurl) };
+            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
 
-                // Bind click event
-                $('#available-evidence', this._dialog.dialog).find('.addbutton').click(function(e) {
-                    e.preventDefault();
-                    var competency_id=$('#evitem_competency_id').val();
-                    var type = $(this).parent().attr('type');
-                    var instance = $(this).parent().attr('id');
-                    var url = handler.baseurl+'save.php?competency='+competency_id+'&course='+module.config.id+'&type='+type+'&instance='+instance;
-                    handler._dialog._request(url, {object: handler, method: '_update'});
-                });
+            totaraDialogs['evidence'] = new totaraDialog(
+                'coursecompetency',
+                'show-coursecompetency-dialog',
+                {
+                    buttons: buttonsObj,
+                    title: '<h2>'+M.util.get_string('assigncoursecompletiontocompetencies', 'totara_hierarchy')+'</h2>'
+                },
+                url+'add.php?sesskey='+M.cfg.sesskey+'&id='+module.config.id,
+                handler
+            );
+        })();
 
-                return false;
-            };
-
-            ///
-            /// Add course evidence to competency dialog
-            ///
-            (function() {
-                var url = M.cfg.wwwroot+'/totara/hierarchy/prefix/competency/course/';
-
-                var handler = new totaraDialog_handler_assignCourseEvidence();
-                handler.baseurl = url;
-
-                var buttonsObj = {};
-                buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel() };
-
-                totaraDialogs['coursecompetency'] = new totaraDialog(
-                    'coursecompetency',
-                    'show-coursecompetency-dialog',
-                    {
-                        buttons: buttonsObj,
-                        title: '<h2>'+M.util.get_string('addcourseevidencetocompetencies', 'totara_hierarchy')+'</h2>'
-                    },
-                    url+'add.php?sesskey='+M.cfg.sesskey+'&id='+this.config.id,
-                    handler
-                );
-            })();
-
-        } else {
-            ///
-            /// non resource-level dialog
-            ///
-            // Create handler for the dialog
-            totaraDialog_handler_courseEvidence = function() {
-                // Base url
-                var baseurl = '';
-            };
-
-            totaraDialog_handler_courseEvidence.prototype = new totaraDialog_handler_treeview_multiselect();
-
-            /**
-             * Add a row to a table on the calling page
-             * Also hides the dialog and any no item notice
-             *
-             * @param string    HTML response
-             * @return void
-             */
-            totaraDialog_handler_courseEvidence.prototype._update = function(response) {
-
-                // Hide dialog
-                this._dialog.hide();
-
-                // Remove no item warning (if exists)
-                $('.noitems-'+this._title).remove();
-
-                //Split response into table and div
-                var new_table = $(response).filter('table');
-
-                // Grab table
-                var table = $('table#list-coursecompetency');
-
-                // If table found
-                if (table.length) {
-                    table.replaceWith(new_table);
-                }
-                else {
-                    // Add new table
-                    $('div#coursecompetency-table-container').append(new_table);
-                }
-            };
-
-            (function() {
-                var url = M.cfg.wwwroot+'/totara/hierarchy/prefix/competency/course/';
-                var saveurl = url + 'save.php?sesskey='+M.cfg.sesskey+'&course='+module.config.id+'&type=coursecompletion&instance='+module.config.id+'&deleteexisting=1&update=';
-
-                var handler = new totaraDialog_handler_courseEvidence();
-                handler.baseurl = url;
-
-                var buttonsObj = {};
-                buttonsObj[M.util.get_string('save', 'totara_core')] = function() { handler._save(saveurl) };
-                buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
-
-                totaraDialogs['evidence'] = new totaraDialog(
-                    'coursecompetency',
-                    'show-coursecompetency-dialog',
-                    {
-                        buttons: buttonsObj,
-                        title: '<h2>'+M.util.get_string('assigncoursecompletiontocompetencies', 'totara_hierarchy')+'</h2>'
-                    },
-                    url+'add.php?sesskey='+M.cfg.sesskey+'&id='+module.config.id,
-                    handler
-                );
-            })();
-
-            // TODO SCANMSG: when this component is rewritten as a component action
-            // select, the following fix will need to be applied to re-assign
-            // Moodle auto-submission. Until then, inline jQuery onChange does the
-            // work.
-        }
+        // TODO SCANMSG: when this component is rewritten as a component action
+        // select, the following fix will need to be applied to re-assign
+        // Moodle auto-submission. Until then, inline jQuery onChange does the
+        // work.
     }
 };

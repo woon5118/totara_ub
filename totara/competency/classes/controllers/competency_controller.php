@@ -25,6 +25,7 @@
 namespace totara_competency\controllers;
 
 use context;
+use hierarchy_competency\event\competency_viewed;
 use moodle_url;
 use totara_competency\entities\competency;
 use totara_competency\entities\competency_framework;
@@ -96,6 +97,9 @@ class competency_controller extends admin_controller {
         $this->page->set_url($url);
         $this->page->set_title($title);
         $this->page->navbar->add(format_string($this->competency->display_name));
+
+        // This event is triggered for 3rd party backwards compatibility with the hierarchy plugin
+        competency_viewed::create_from_instance((object)$this->competency->to_array())->trigger();
 
         return new tui_view('totara_competency/pages/CompetencySummary', [
             'competency-id' => $this->competency->id,

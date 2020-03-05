@@ -98,6 +98,13 @@ class criteria_childcompetency_testcase extends advanced_testcase {
     }
 
     /**
+     * Test returned criterion type
+     */
+    public function test_criterion_type() {
+        $this->assertSame('childcompetency', childcompetency::criterion_type());
+    }
+
+    /**
      * Test constructor without attributes
      */
     public function test_constructor_no_attributes() {

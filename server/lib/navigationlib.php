@@ -4215,7 +4215,8 @@ class settings_navigation extends navigation_node {
         }
 
         if ($adminoptions->update) {
-            if (advanced_feature::is_enabled('competencies')) {
+            // TOTARA CHANGE - Not available when Perform is enabled.
+            if (advanced_feature::is_enabled('competencies') && advanced_feature::is_disabled('competency_assignment')) {
                 // Add the course competencies link.
                 $url = new moodle_url('/course/competency.php', array('id' => $course->id));
                 $coursenode->add(get_string('competencies', 'totara_hierarchy'), $url, self::TYPE_SETTING, null, null, new pix_icon('i/settings', ''));

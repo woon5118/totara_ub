@@ -57,10 +57,8 @@ if ($showhidden && !has_capability('totara/hierarchy:updatecompetencyframeworks'
 // Check if Competencies are enabled.
 competency::check_feature_enabled();
 
-if (empty($CFG->competencyuseresourcelevelevidence)) {
-    $hierarchy = new competency();
-    $selected = $hierarchy->get_course_evidence($id);
-}
+$hierarchy = new competency();
+$selected = $hierarchy->get_course_evidence($id);
 
 // Setup page
 admin_externalpage_setup('competencymanage', '', array(), '/totara/hierarchy/prefix/competency/course/add.php');
@@ -81,13 +79,8 @@ $dialog->show_treeview_only = $treeonly;
 // Load items to display
 $dialog->load_items($parentid);
 
-if (empty($CFG->competencyuseresourcelevelevidence)) {
-    // Set disabled/selected items
-    $dialog->selected_items = $selected;
-} else {
-    // Set selected id
-    $dialog->selected_id = 'available-evidence';
-}
+// Set disabled/selected items
+$dialog->selected_items = $selected;
 
 // Selected title
 $dialog->selected_title = 'itemstoadd';

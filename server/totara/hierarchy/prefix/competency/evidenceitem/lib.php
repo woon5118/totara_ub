@@ -21,6 +21,8 @@
  * @author Aaron Wells <aaronw@catalyst.net.nz>
  * @package totara
  * @subpackage totara_hierarchy
+ *
+ * @deprecated since Totara 13
  */
 /**
  * competency/evidenceitem/lib.php
@@ -31,6 +33,8 @@
  * in order to avoid name collisions
  *
  */
+
+debugging('totara/hierarchy/prefix/competency/evidenceitem/lib.php has been deprecated, please remove all includes.', DEBUG_DEVELOPER);
 
 /**
  * Return a lookup array of the existing evidence items for a competency, for
@@ -44,9 +48,12 @@
  *
  * @param int $competency_id
  * @return array
+ * @deprecated since Totara 13
  */
 function comp_evitem_get_lookup($competency_id) {
     global $DB;
+
+    debugging('comp_evitem_get_lookup() has been deprecated since Totara 13. See the new Totara Competency API.');
 
     // Get a list of all the existing evidence items, to grey out the duplicates
     // below. For ease of checking, we'll just pull the itemtype and iteminstance
@@ -75,6 +82,8 @@ function comp_evitem_get_lookup($competency_id) {
  */
 function comp_evitem_print_course_evitems($course, $competency_id, $addurl ) {
     global $DB;
+
+    debugging('comp_evitem_print_course_evitems() has been deprecated since Totara 13. See the new Totara Competency API.');
 
     $alreadystr = get_string('alreadyselected', 'totara_core');
     $existingevidencelookup = comp_evitem_get_lookup($competency_id);

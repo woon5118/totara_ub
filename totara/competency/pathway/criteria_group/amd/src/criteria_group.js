@@ -21,7 +21,7 @@
  */
 
 define(['core/str', 'core/notification', 'core/templates', 'core/ajax'],
-function(str, notification, templates, ajax) {
+function (str, notification, templates, ajax) {
 
     /**
      * Class constructor for the PwCriteriaGroup.
@@ -78,10 +78,10 @@ function(str, notification, templates, ajax) {
          * Add event listeners for PwCriteriaGroups
          *
          */
-        events: function() {
+        events: function () {
             var that = this;
 
-            this.widget.addEventListener('click', function(e) {
+            this.widget.addEventListener('click', function (e) {
                 if (!e.target) {
                     return false;
                 }
@@ -92,13 +92,11 @@ function(str, notification, templates, ajax) {
                     if (action === 'addcrit') {
                         that.showCriteriaTypeOptions();
                     }
-
                 } else if (e.target.closest('[data-criteria_group-crit-type-option]')) {
                     var selectedType = e.target.closest('[data-criteria_group-crit-type-option]').getAttribute('data-criteria_group-crit-type-option');
 
                     that.hideCritTypeSelectors();
                     that.addCriterion(that.pwKey, selectedType);
-
                 } else if (e.target.closest('[data-crit-action]')) {
                     var wgt = e.target.closest('[data-crit-action]'),
                         action = wgt.getAttribute('data-crit-action'),
@@ -132,11 +130,11 @@ function(str, notification, templates, ajax) {
         },
 
         // Listen for propagated events
-        bubbledEventsListener: function() {
+        bubbledEventsListener: function () {
             var that = this,
                 criteriaEvents = 'totara_criteria/criterion:';
 
-            this.widget.addEventListener(criteriaEvents + 'update', function(e) {
+            this.widget.addEventListener(criteriaEvents + 'update', function (e) {
                 var critKey = e.detail.key,
                     criterion = e.detail.criterion;
 
@@ -164,7 +162,7 @@ function(str, notification, templates, ajax) {
                 that.showHideNoCriteria();
             });
 
-            this.widget.addEventListener(criteriaEvents + 'dirty', function(e) {
+            this.widget.addEventListener(criteriaEvents + 'dirty', function (e) {
                 var critKey = e.detail.key;
 
                 if (that.criteria[critKey]) {
@@ -182,14 +180,14 @@ function(str, notification, templates, ajax) {
          *
          * @param {node} parent
          */
-        setParent: function(parent) {
+        setParent: function (parent) {
             this.widget = parent;
         },
 
         /**
          * Initialise the data and display it
          */
-        initData: function() {
+        initData: function () {
             var that = this,
                 pwWgt = this.widget.closest('[data-pw-key]'),
                 pwKey = 0,
@@ -275,12 +273,12 @@ function(str, notification, templates, ajax) {
                 templates.renderAppend('pathway_criteria_group/partial_group_criteria', {criteria: promiseData}, target).then(function () {
                     templates.runTemplateJS('');
                     that.showHideNoCriteria();
-                }).catch(function(e) {
+                }).catch(function (e) {
                     e.fileName = that.filename;
                     e.name = 'Error showing criteria detail';
                     notification.exception(e);
                 });
-            }).catch(function(e) {
+            }).catch(function (e) {
                 e.fileName = that.filename;
                 e.name = 'Error getting criteria';
                 notification.exception(e);
@@ -294,7 +292,7 @@ function(str, notification, templates, ajax) {
          *
          * @return {string} Next key
          */
-        getNextCritKey: function() {
+        getNextCritKey: function () {
             this.lastCritKey++;
             return this.pwKey + '_crit_' + this.lastCritKey;
         },
@@ -304,7 +302,7 @@ function(str, notification, templates, ajax) {
          * Pack the pathway criteria data to ensure that it will be serialize as expected
          * when sent to the save api endpoint
          */
-        packCriteria: function() {
+        packCriteria: function () {
             this.pathway.criteria = [];
 
             for (var critKey in this.criteria) {
@@ -317,7 +315,7 @@ function(str, notification, templates, ajax) {
         /**
          * Show or hide the 'No Criteria' message
          */
-        showHideNoCriteria: function() {
+        showHideNoCriteria: function () {
             var nCrit = this.pathway.criteria.length,
                 nDeletedCrit = 0;
 
@@ -337,7 +335,7 @@ function(str, notification, templates, ajax) {
         /**
          * Hide the bottom actions
          */
-        hideBottomActions: function() {
+        hideBottomActions: function () {
             var wgt = this.widget.closest('[data-pw-key]').querySelector('.critgrp_bottom_action');
             wgt.classList.add('cc_hidden');
 
@@ -347,7 +345,7 @@ function(str, notification, templates, ajax) {
         /**
          * Show the bottom actions
          */
-        showBottomActions: function() {
+        showBottomActions: function () {
             var wgt = this.widget.closest('[data-pw-key]').querySelector('.critgrp_bottom_action');
             wgt.classList.remove('cc_hidden');
 
@@ -361,7 +359,7 @@ function(str, notification, templates, ajax) {
          * @param {int} scalevalue
          * @return {Object}
          */
-        createEmptyPw: function(compId, scalevalue) {
+        createEmptyPw: function (compId, scalevalue) {
             return {
                 competency_id: compId,
                 scalevalue: scalevalue,
@@ -372,7 +370,7 @@ function(str, notification, templates, ajax) {
         /**
          * Hide all criteria type selectors
          */
-        hideCritTypeSelectors: function() {
+        hideCritTypeSelectors: function () {
             // We also want to close the options lists in parent templates
             var critTypeNodes = document.querySelectorAll('[data-crit-type-toggle]');
 
@@ -386,7 +384,7 @@ function(str, notification, templates, ajax) {
         /**
          * Show the criteria type dropdown for the specific scalevalue
          */
-        showCriteriaTypeOptions: function() {
+        showCriteriaTypeOptions: function () {
             var toOpen = this.widget.querySelector('[data-crit-type-toggle="criteria_group"]'),
                 expanded = toOpen ? !toOpen.classList.contains('cc_hidden') : false;
 
@@ -406,14 +404,14 @@ function(str, notification, templates, ajax) {
          * @param {string} pwKey Key of pathway to add the new criterion to
          * @param {string} critType Type of criterion to add
          */
-        addCriterion: function(pwKey, critType) {
+        addCriterion: function (pwKey, critType) {
             var that = this,
                 apiArgs = {
                     'args': {type: critType},
                     'methodname': this.endpoints.criteriatemplate},
                 target = this.widget.querySelector('.critgrp_criteria');
 
-            ajax.getData(apiArgs).then(function(responses) {
+            ajax.getData(apiArgs).then(function (responses) {
                 var templatename = 'pathway_criteria_group/partial_criterion',
                     crit = responses.results;
 
@@ -438,15 +436,15 @@ function(str, notification, templates, ajax) {
 
                 // Display the criterion
                 templates.renderAppend(templatename, crit, target).then(
-                    function() {
+                    function () {
                         templates.runTemplateJS('');
                         that.triggerEvent('dirty', {});
                     },
-                    function(error) {
+                    function (error) {
                         alert(error);
                     }
                 );
-            }).catch(function(e) {
+            }).catch(function (e) {
                 e.fileName = that.filename;
                 e.name = 'Error getting criteria template';
                 notification.exception(e);
@@ -460,7 +458,7 @@ function(str, notification, templates, ajax) {
          *
          * @param {bool} allowSingleUse
          */
-        toggleSingleUse: function(allowSingleUse) {
+        toggleSingleUse: function (allowSingleUse) {
             var singleUseActiveNodes = this.widget.querySelectorAll('[data-crit-type-singleuse-active]'),
                 singleUseDisabledNodes = this.widget.querySelectorAll('[data-crit-type-singleuse-disabled]');
 
@@ -491,7 +489,7 @@ function(str, notification, templates, ajax) {
          *
          * @param {bool} allowSingleUse
          */
-        toggleAllSingleUse: function(allowSingleUse) {
+        toggleAllSingleUse: function (allowSingleUse) {
             var critTypeNodes = document.querySelectorAll('[data-crit-type-toggle="criteria_group"]'),
                 singleUseActiveNodes,
                 singleUseDisabledNodes,
@@ -546,7 +544,7 @@ function(str, notification, templates, ajax) {
          *
          * @param  {String} critKey Key of criterion whose detail display should be toggled
          */
-        toggleCriterionDetail: function(critKey) {
+        toggleCriterionDetail: function (critKey) {
             var critTarget = this.widget.querySelector('[data-tw-criterion-key="' + critKey + '"]'),
                 expandTarget = this.widget.querySelector('[data-crit-detail="' + critKey + '"]'),
                 isExpanded = critTarget.hasAttribute('data-crit-detail-expanded') ? critTarget.getAttribute('data-crit-detail-expanded') : 0,
@@ -575,7 +573,7 @@ function(str, notification, templates, ajax) {
          *
          * @param  {String} critKey Key of criterion to remove
          */
-        removeCriterion: function(critKey) {
+        removeCriterion: function (critKey) {
             var that = this,
                 critTarget = this.widget.querySelector('[data-tw-criterion-key="' + critKey + '"]'),
                 critAndTarget = this.widget.querySelector('[data-pw-and="' + critKey + '"]'),
@@ -612,7 +610,7 @@ function(str, notification, templates, ajax) {
                     delete this.criteria[critKey];
                     this.packCriteria();
 
-                    templates.renderReplace('pathway_criteria_group/partial_criterion_detail', templateData, detailTarget).then(function() {
+                    templates.renderReplace('pathway_criteria_group/partial_criterion_detail', templateData, detailTarget).then(function () {
                         // Show undo action
                         var removeWgt = critTarget.querySelector('[data-crit-action="remove"]'),
                             undoWgt = critTarget.querySelector('[data-crit-action="undo"]');
@@ -662,7 +660,7 @@ function(str, notification, templates, ajax) {
          *
          * @param  {String} critKey Key of criterion to remove
          */
-        undoCriterionRemoval: function(critKey) {
+        undoCriterionRemoval: function (critKey) {
             if (!this.markedForDeletionCriteria[critKey]) {
                 return;
             }
@@ -686,7 +684,7 @@ function(str, notification, templates, ajax) {
                 if (hasSingleUse == '1') {
                     notification.clearNotifications();
 
-                    str.get_string('error:cant_undo_singleuse', 'pathway_criteria_group').done(function(message) {
+                    str.get_string('error:cant_undo_singleuse', 'pathway_criteria_group').done(function (message) {
                         notification.addNotification({
                             message: message,
                             type: 'error'
@@ -718,7 +716,7 @@ function(str, notification, templates, ajax) {
             templateData = this.criteria[critKey];
             templateData.deleted = false;
 
-            templates.renderReplace('pathway_criteria_group/partial_criterion_detail', templateData, detailTarget).then(function() {
+            templates.renderReplace('pathway_criteria_group/partial_criterion_detail', templateData, detailTarget).then(function () {
                 // Show delete action
                 var removeWgt = critTarget.querySelector('[data-crit-action="remove"]'),
                     undoWgt = critTarget.querySelector('[data-crit-action="undo"]');
@@ -738,7 +736,7 @@ function(str, notification, templates, ajax) {
          * @param {string} eventName
          * @param {object} data
          */
-        triggerEvent: function(eventName, data) {
+        triggerEvent: function (eventName, data) {
             data.key = this.pwKey;
 
             var propagateEvent = new CustomEvent('totara_competency/pathway:' + eventName, {
@@ -757,8 +755,8 @@ function(str, notification, templates, ajax) {
      * @param {node} parent
      * @returns {Object} promise
      */
-    var init = function(parent) {
-        return new Promise(function(resolve) {
+    var init = function (parent) {
+        return new Promise(function (resolve) {
             var wgt = new PwCriteriaGroup();
             wgt.setParent(parent);
             wgt.events();
