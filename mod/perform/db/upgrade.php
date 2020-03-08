@@ -586,6 +586,50 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020030902, 'perform');
     }
 
+    if ($oldversion < 2020030903) {
+
+        // Define field participant_source to be added to perform_participant_instance.
+        $table = new xmldb_table('perform_participant_instance');
+
+        $key = new xmldb_key('participant_id', XMLDB_KEY_FOREIGN, array('participant_id'), 'user', array('id'), 'cascade');
+
+        // Launch add key participant_id.
+        $dbman->add_key($table, $key);
+
+        // Add created_at
+        $table->add_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Add updated_at
+        $table->add_field('updated_at', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+
+        // Define table perform_participant_section to be created.
+        $table = new xmldb_table('perform_participant_section');
+
+        // Adding fields to table perform_participant_section.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('section_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('participant_instance_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('status', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('updated_at', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+
+        // Adding keys to table perform_participant_section.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('section_id', XMLDB_KEY_FOREIGN, array('section_id'), 'perform_section', array('id'), 'cascade');
+        $table->add_key('participant_instance_id', XMLDB_KEY_FOREIGN, array('participant_instance_id'), 'perform_participant_instance', array('id'), 'cascade');
+
+        // Adding indexes to table perform_participant_section.
+        $table->add_index('section_participant_instance', XMLDB_INDEX_UNIQUE, array('section_id', 'participant_instance_id'));
+
+        // Conditionally launch create table for perform_participant_section.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020030903, 'perform');
+    }
+
     return true;
 }
 
