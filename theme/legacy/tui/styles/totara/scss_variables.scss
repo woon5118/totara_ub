@@ -195,7 +195,7 @@ $facetoface-session-bg-color-ended: #ffffc0 !default;
 $facetoface-session-bg-color-full: #b3dab6 !default;
 $facetoface-session-bg-color-started: #b3dab6 !default;
 $facetoface-dialog-bg: #ffffff;
-$facetoface-dialog-tab-top-shadow: lighten($brand-primary, 10%);
+$facetoface-dialog-tab-top-shadow: #e5eb77; // 10% lighter than $brand-primary
 $facetoface-dialog-tab-top-shadow-secondary: rgba(0, 0, 0, 0.03);
 $facetoface-table-border-color: var(--tui-color-neutral-5) !default;
 $facetoface-table-bg-accent: var(--tui-color-neutral-2) !default;
