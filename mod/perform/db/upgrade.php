@@ -547,6 +547,44 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020030600, 'perform');
     }
 
+    if ($oldversion < 2020030900) {
+
+        // Define key perform_relationship_id (foreign) to be dropped form perform_participant_instance.
+        $table = new xmldb_table('perform_participant_instance');
+        $key = new xmldb_key('perform_relationship_id', XMLDB_KEY_FOREIGN, array('perform_relationship_id'), 'perform_relationship', array('id'));
+
+        // Launch drop key perform_relationship_id.
+        $dbman->drop_key($table, $key);
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020030900, 'perform');
+    }
+
+    if ($oldversion < 2020030901) {
+
+        // Rename field perform_relationship_id on table perform_participant_instance to activity_relationship_id.
+        $table = new xmldb_table('perform_participant_instance');
+        $field = new xmldb_field('perform_relationship_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'id');
+
+        // Launch rename field perform_relationship_id.
+        $dbman->rename_field($table, $field, 'activity_relationship_id');
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020030901, 'perform');
+    }
+
+    if ($oldversion < 2020030902) {
+
+        // Define key activity_relationship_id (foreign) to be added to perform_participant_instance.
+        $table = new xmldb_table('perform_participant_instance');
+        $key = new xmldb_key('activity_relationship_id', XMLDB_KEY_FOREIGN, array('activity_relationship_id'), 'perform_relationship', array('id'));
+
+        // Launch add key activity_relationship_id.
+        $dbman->add_key($table, $key);
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020030902, 'perform');
+    }
 
     return true;
 }
