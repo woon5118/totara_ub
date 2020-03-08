@@ -433,6 +433,8 @@ select.menuf2f-select {
       @extend .table;
       // Override .table
       margin-bottom: 0;
+      max-width: none;
+
       > thead,
       > tbody,
       > tfoot {
