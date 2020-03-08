@@ -27,8 +27,10 @@
 //
 
 // Font families
-$font-family-sans-serif: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !default;
-$font-family-monospace: Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace !default;
+$font-family-sans-serif: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+  'Helvetica Neue', Arial, sans-serif !default;
+$font-family-monospace: Menlo, Monaco, Consolas, 'Liberation Mono',
+  'Courier New', monospace !default;
 // Panel
 $panel-default-border: var(--tui-color-border) !default;
 // Spacing
@@ -126,7 +128,9 @@ $calendar-border-radius: 4px !default;
 $calendar-event-course-bg-color: var(--tui-color-prompt-alert-bg) !default;
 $calendar-event-course-border-color: var(--tui-color-prompt-alert-bg) !default;
 $calendar-event-global-bg-color: var(--tui-color-prompt-success-bg) !default;
-$calendar-event-global-border-color: var(--tui-color-prompt-success-bg) !default;
+$calendar-event-global-border-color: var(
+  --tui-color-prompt-success-bg
+) !default;
 $calendar-event-group-bg-color: var(--tui-color-prompt-warning-bg) !default;
 $calendar-event-group-border-color: var(--tui-color-prompt-warning-bg) !default;
 $calendar-event-panel-bg-color: var(--tui-color-neutral-2) !default;
@@ -183,7 +187,9 @@ $totara-style-screen-xl-min: 1400px !default;
 //
 $facetoface-border-color: var(--tui-color-border) !default;
 $facetoface-border-color-error: var(--tui-color-prompt-alert) !default;
-$facetoface-bulk-select-option-before-text-color: var(--tui-color-prompt-alert) !default;
+$facetoface-bulk-select-option-before-text-color: var(
+  --tui-color-prompt-alert
+) !default;
 $facetoface-text-color-error: var(--tui-color-prompt-alert) !default;
 // Session state backgrounds
 $facetoface-session-bg-color-overbooked: #f2d9b3 !default;
@@ -194,9 +200,9 @@ $facetoface-session-bg-color-underbooked: #ffffc0 !default;
 $facetoface-session-bg-color-ended: #ffffc0 !default;
 $facetoface-session-bg-color-full: #b3dab6 !default;
 $facetoface-session-bg-color-started: #b3dab6 !default;
-$facetoface-dialog-bg: #ffffff;
-$facetoface-dialog-tab-top-shadow: #e5eb77; // 10% lighter than $brand-primary
-$facetoface-dialog-tab-top-shadow-secondary: rgba(0, 0, 0, 0.03);
+$facetoface-dialog-bg: #ffffff !default;
+$facetoface-dialog-tab-top-shadow: #e5eb77 !default; // 10% lighter than $brand-primary
+$facetoface-dialog-tab-top-shadow-secondary: rgba(165, 70, 70, 0.03) !default;
 $facetoface-table-border-color: var(--tui-color-neutral-5) !default;
 $facetoface-table-bg-accent: var(--tui-color-neutral-2) !default;
 $facetoface-border-radius: 4px !default;
@@ -226,12 +232,22 @@ $myReports-toggle-spacing-bottom: var(--tui-gap-1) !default;
 $myReports-toggle-btn-border-radius: 6px !default;
 $myReports-toggle-btn-text-size: var(--tui-font-size-13) !default;
 $myReports-toggle-btn-spacing: var(--tui-gap-2) !default;
-$myReports-toggle-btn-bg-color:  var(--tui-catalog-togglebtn-bg-color) !default;
-$myReports-toggle-btn-bg-color-focus: var(--tui-catalog-togglebtn-bg-color-focus) !default;
-$myReports-toggle-btn-bg-color-selected: var(--tui-catalog-togglebtn-bg-color-selected) !default;
-$myReports-toggle-btn-border-color: var(--tui-catalog-togglebtn-border-color) !default;
-$myReports-toggle-btn-text-color: var(--tui-catalog-togglebtn-text-color) !default;
-$myReports-toggle-btn-text-color-selected: var(--tui-catalog-togglebtn-text-color) !default;
+$myReports-toggle-btn-bg-color: var(--tui-catalog-togglebtn-bg-color) !default;
+$myReports-toggle-btn-bg-color-focus: var(
+  --tui-catalog-togglebtn-bg-color-focus
+) !default;
+$myReports-toggle-btn-bg-color-selected: var(
+  --tui-catalog-togglebtn-bg-color-selected
+) !default;
+$myReports-toggle-btn-border-color: var(
+  --tui-catalog-togglebtn-border-color
+) !default;
+$myReports-toggle-btn-text-color: var(
+  --tui-catalog-togglebtn-text-color
+) !default;
+$myReports-toggle-btn-text-color-selected: var(
+  --tui-catalog-togglebtn-text-color
+) !default;
 // Spacing
 $myReports-spacing-small: var(--tui-gap-2) !default;
 $myReports-spacing-med: var(--tui-gap-4) !default;
@@ -258,15 +274,21 @@ $quickAccessMenu-screen-sm-max: ($totara-style-screen-sm-min - 1px) !default;
 // Quick access menu settings
 //
 $quickAccessSettings-accordion-border-color: var(--tui-color-border) !default;
-$quickAccessSettings-accordion-header-bg-color: var(--tui-color-neutral-3) !default;
+$quickAccessSettings-accordion-header-bg-color: var(
+  --tui-color-neutral-3
+) !default;
 $quickAccessSettings-accordion-icon-size: var(--tui-font-size-18) !default;
-$quickAccessSettings-accordion-item-border-color: var(--tui-color-border) !default;
+$quickAccessSettings-accordion-item-border-color: var(
+  --tui-color-border
+) !default;
 $quickAccessSettings-accordion-item-reorder-transition: 200ms !default;
 // Spacing
 $quickAccessSettings-spacing-medium: var(--tui-gap-4) !default;
 $quickAccessSettings-accordion-updown-offset: 4.2rem;
 // Breakpoints
-$quickAccessSettings-screen-sm-max: ($totara-style-screen-sm-min - 1px) !default;
+$quickAccessSettings-screen-sm-max: (
+  $totara-style-screen-sm-min - 1px
+) !default;
 
 //
 // Add block trigger and popover
@@ -285,10 +307,14 @@ $addBlock-spacing-xx-large: var(--tui-gap-10) !default;
 // Totara forms
 //
 $totara-form-input-bg-color: var(--tui-color-neutral-1) !default;
-$totara-form-input-bg-color-disabled: var(--tui-form-input-bg-color-disabled) !default;
+$totara-form-input-bg-color-disabled: var(
+  --tui-form-input-bg-color-disabled
+) !default;
 $totara-form-input-border-color: var(--tui-color-border) !default;
 $totara-form-input-text-color: var(--tui-form-text-color) !default;
-$totara-form-input-text-color-placeholder: var(--tui-form-input-text-placeholder-color) !default;
+$totara-form-input-text-color-placeholder: var(
+  --tui-form-input-text-placeholder-color
+) !default;
 // Error at top of form
 $totara-form-error-top-bg-color: var(--tui-color-neutral-2) !default;
 $totara-form-error-top-border-color: var(--tui-color-neutral-4) !default;
@@ -309,13 +335,19 @@ $current-learning-bg-color: var(--tui-color-neutral-5) !default;
 $current-learning-bg-color-default: var(--tui-color-neutral-1) !default;
 $current-learning-bg-color-light: var(--tui-color-neutral-3) !default;
 $current-learning-bg-color-lightish: var(--tui-color-neutral-4) !default;
-$current-learning-border-color-complete: var(--tui-color-prompt-success) !default;
-$current-learning-border-color-unavailable: var(--tui-color-prompt-alert) !default;
+$current-learning-border-color-complete: var(
+  --tui-color-prompt-success
+) !default;
+$current-learning-border-color-unavailable: var(
+  --tui-color-prompt-alert
+) !default;
 $current-learning-border-radius: 4px !default;
 $current-learning-border-radius-large: 8px !default;
 $current-learning-text-color: var(--tui-color-neutral-7) !default;
 $current-learning-text-color-complete: var(--tui-color-prompt-success) !default;
-$current-learning-text-color-unavailable: var(--tui-color-prompt-alert) !default;
+$current-learning-text-color-unavailable: var(
+  --tui-color-prompt-alert
+) !default;
 $current-learning-text-size-small: 12px !default;
 $current-learning-title-text-size: 16px !default;
 // Spacing
@@ -539,4 +571,3 @@ $totara-style-font-line-height-large: 1.63 !default;
   top: var(--tui-font-size-11);
   left: var(--tui-gap-2);
 }
-
