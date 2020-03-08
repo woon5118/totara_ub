@@ -292,6 +292,12 @@ class assignment {
     }
 
     /**
+     * Does an active or draft (not archived) assignment exist with the same competency
+     * and assignment method (type and user group).
+     *
+     * For the case of "other assigment" (TYPE_OTHER), assignments of the same competency are not considered
+     * duplicates if they have been assigned by different people (created_by).
+     *
      * @param string $type
      * @param int $competency_id
      * @param string $user_group_type
@@ -311,7 +317,10 @@ class assignment {
             ->where('type', $type)
             ->where('competency_id', $competency_id)
             ->where('user_group_type', $user_group_type)
-            ->where('user_group_id', $user_group_id);
+            ->where('user_group_id', $user_group_id)
+            // Exclude rows with an archived status to allow recreation of previously archived assignments
+            ->where('status', '!=', assignment_entity::STATUS_ARCHIVED);
+
         // There can be multiple other assignments from different creators
         if ($type === assignment_entity::TYPE_OTHER) {
             $assignment->where('created_by', $user_id);

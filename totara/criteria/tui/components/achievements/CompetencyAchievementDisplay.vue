@@ -311,11 +311,14 @@ export default {
         .then(({ data }) => {
           if (data && data.totara_competency_create_user_assignments) {
             let result = data.totara_competency_create_user_assignments;
+
+            // Due to this being a batch api designed to tolerate partial success,
+            // single assignment can silently fail, indicated by no results being returned.
             if (result.length > 0) {
               this.$emit('self-assigned');
             } else {
               this.triggerErrorNotification(
-                this.$str('network_error', 'totara_criteria')
+                this.$str('error_competency_assignment', 'totara_criteria')
               );
             }
           }
@@ -323,7 +326,7 @@ export default {
         .catch(error => {
           console.error(error);
           this.triggerErrorNotification(
-            this.$str('error_something_went_wrong', 'totara_criteria')
+            this.$str('error_competency_assignment', 'totara_criteria')
           );
         })
         .finally(() => this.closeModal());

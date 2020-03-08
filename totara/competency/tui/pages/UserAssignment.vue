@@ -398,6 +398,10 @@ export default {
       try {
         await this.assign();
 
+        // TODO when adding proper notifications in please note:
+        // Due to this being a batch api designed to tolerate partial success,
+        // single assignment can silently fail, indicated by no results being returned.
+        // We may want to warn the user of only partial success.
         window.location.href = this.goBackLink;
       } catch (e) {
         this.mutationError = e;
