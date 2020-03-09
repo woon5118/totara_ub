@@ -60,7 +60,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="section_id" TYPE="foreign" FIELDS="section_id" REFTABLE="perform_section" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="section_id" TYPE="foreign" FIELDS="section_id" REFTABLE="perform_section" REFFIELDS="id" ONDELETE="restrict"/>
         <KEY NAME="activity_relationship_id" TYPE="foreign" FIELDS="activity_relationship_id" REFTABLE="perform_relationship" REFFIELDS="id" ONDELETE="cascade"/>
       </KEYS>
       <INDEXES>
