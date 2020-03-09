@@ -87,6 +87,7 @@ class external extends \external_api {
                 'id' => $scalevalue->get_attribute('id'),
                 'name' => $formatter->format($scalevalue->get_attribute('name')),
                 'proficient' => $scalevalue->get_attribute('proficient'),
+                'sortorder' => $scalevalue->get_attribute('sortorder'),
             ];
         }
 
@@ -100,6 +101,7 @@ class external extends \external_api {
                     'id' => new \external_value(PARAM_INT, 'Scalevalue id'),
                     'name' => new \external_value(PARAM_TEXT, 'Scalevalue name'),
                     'proficient' => new \external_value(PARAM_BOOL, 'Proficient'),
+                    'sortorder' => new \external_value(PARAM_INT, 'sortorder'),
                 ]
             )
         );

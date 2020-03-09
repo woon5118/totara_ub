@@ -245,7 +245,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          * @param {String} messageComponent used for get_string
          * @param {Object} messageParams used for get_string, optional
          */
-        showNotification : function(type, messageStringKey, messageComponent, messageParams) {
+        showNotification: function(type, messageStringKey, messageComponent, messageParams) {
             if (typeof messageParams === 'undefined') {
                 messageParams = {};
             }
@@ -398,7 +398,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          *
          * @return {Promise}
          */
-        setScale : function() {
+        setScale: function() {
             var that = this;
 
             return new Promise(function(resolve, reject) {
@@ -458,7 +458,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     'args': {scale_id: that.scale_id},
                     'methodname': that.endpoints.scalevalues};
 
-                ajax.getData(apiArgs).then(function (responses) {
+                ajax.getData(apiArgs).then(function(responses) {
                     that.scalevalues = [];
 
                     for (var a = 0; a < responses.results.length; a++) {
@@ -519,6 +519,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     toadd = {
                         id: svalue.id,
                         name: svalue.name,
+                        sortorder: svalue.sortorder,
                         proficient: svalue.proficient,
                         criteriaTypes: this.critTypes,
                         critTypeLevel: 'scalevalue',
@@ -530,11 +531,14 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     this.pathways[svalue.pathways[a]].orderable = false;
                     this.pathways[svalue.pathways[a]].critTypeLevel = this.pathways[svalue.pathways[a]].type;
                     toadd.pathways.push(this.pathways[svalue.pathways[a]]);
-
                 }
 
                 templatedata.scalevalues.push(toadd);
             }
+
+            templatedata.scalevalues.sort(function(a, b) {
+                return a.sortorder - b.sortorder;
+            });
 
             // Display the pathway in the correct div
             return templates.renderReplace(templatename, templatedata, target);
@@ -991,7 +995,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             var that = this,
               aggWgt = this.widget.querySelector('[data-cc-pw-agg-changed]');
 
-            return new Promise(function (resolve) {
+            return new Promise(function(resolve) {
                 var apiArgs = {
                     args: {competency_id: that.competency_id},
                     methodname: that.endpoints.getOverallAggregation
