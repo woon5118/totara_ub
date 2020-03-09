@@ -181,8 +181,8 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="track_assignment_id" TYPE="foreign" FIELDS="track_assignment_id" REFTABLE="perform_track_assignment" REFFIELDS="id" ONDELETE="cascade"/>
-        <KEY NAME="track_user_assignment_id" TYPE="foreign" FIELDS="track_user_assignment_id" REFTABLE="perform_track_user_assignment" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="track_assignment_id" TYPE="foreign" FIELDS="track_assignment_id" REFTABLE="perform_track_assignment" REFFIELDS="id" ONDELETE="restrict"/>
+        <KEY NAME="track_user_assignment_id" TYPE="foreign" FIELDS="track_user_assignment_id" REFTABLE="perform_track_user_assignment" REFFIELDS="id" ONDELETE="restrict"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="unique_ids" UNIQUE="true" FIELDS="track_assignment_id, track_user_assignment_id" COMMENT="Each user assignment can be linked to one assignment only once"/>
