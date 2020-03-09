@@ -76,7 +76,13 @@ class perform extends container {
     }
 
     /**
-     * @inheritDoc
+     * Get the default category for performance activities.
+     * If multi tenancy is turned on and the current user is part of a tenant
+     * it will get the category of the tenant.
+     *
+     * If the category does not exist yet it will automatically create it.
+     *
+     * @return int
      */
     public static function get_default_categoryid(): int {
         global $CFG, $DB, $USER;

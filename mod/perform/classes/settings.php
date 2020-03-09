@@ -43,22 +43,39 @@ use moodle_url;
 class settings {
 
     public static function init_public_settings(\admin_root $admin_root) {
-        // TODO For true multi-tenancy support we need to take the categoryid of the tenant into account
-        //      For now, we just use the default category id
-        $category_id = util::get_default_categoryid();
-        $category_context = context_coursecat::instance($category_id);
+        $context = null;
+        $system_context = \context_system::instance();
+        // If the user has the capability on the system level he should be able to access the pages
+        // otherwise we need to check the capability on the category level.
+        // We check the system context first as to avoid unintentionally creating the default category.
+        // TODO Technically this is not the right way of doing it as there could be an override in the category,
+        //      see TL-24324 for more details what happens if the category is
+        //      automatically created by util::get_default_categoryid();
+        //      Find a better solution to have the default category not auto created.
+        if (has_capability('mod/perform:view_manage_activities', $system_context)) {
+            $context = $system_context;
+        } else {
+            $category_id = util::get_default_categoryid();
+            $category_context = context_coursecat::instance($category_id);
 
-        $admin_root->add(
-            'performactivities',
-            new admin_externalpage(
-                'mod_perform_manage_activities',
-                get_string('menu_title_activity_management', 'mod_perform'),
-                new moodle_url("/mod/perform/manage/activity/index.php"),
-                'mod/perform:view_manage_activities',
-                false,
-                $category_context
-            )
-        );
+            if (has_capability('mod/perform:view_manage_activities', $category_context)) {
+                $context = $category_context;
+            }
+        }
+
+        if ($context) {
+            $admin_root->add(
+                'performactivities',
+                new admin_externalpage(
+                    'mod_perform_manage_activities',
+                    get_string('menu_title_activity_management', 'mod_perform'),
+                    new moodle_url("/mod/perform/manage/activity/index.php"),
+                    'mod/perform:view_manage_activities',
+                    false,
+                    $context
+                )
+            );
+        }
     }
 
 }
