@@ -50,6 +50,8 @@ class mod_survey_external_testcase extends externallib_advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
+        $DB->set_field('modules', 'visible', '1', ['name' => 'survey']);
+
         // Setup test data.
         $this->course = $this->getDataGenerator()->create_course();
         $this->survey = $this->getDataGenerator()->create_module('survey', array('course' => $this->course->id));

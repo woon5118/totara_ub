@@ -44,6 +44,8 @@ class mod_survey_userdata_answers_testcase extends externallib_advanced_testcase
      * @return object
      */
     public function setup_data() {
+        global $DB;
+
         $data = new class() {
             /**
              * @var totara_userdata\userdata\target_user
@@ -75,6 +77,8 @@ class mod_survey_userdata_answers_testcase extends externallib_advanced_testcase
              */
             public $survey1, $survey2, $survey3;
         };
+
+        $DB->set_field('modules', 'visible', '1', ['name' => 'survey']);
 
         // Create users.
         $data->learner1 = self::getDataGenerator()->create_user();

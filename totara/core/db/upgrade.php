@@ -1041,5 +1041,15 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020031301, 'totara', 'core');
     }
 
+    if ($oldversion < 2020031700) {
+        $recordcount = $DB->count_records('survey');
+
+        if ($recordcount <= 0) {
+            $DB->set_field('modules', 'visible', '0', ['name' => 'survey']);
+        }
+
+        upgrade_plugin_savepoint(true, 2020031700, 'totara', 'core');
+    }
+
     return true;
 }

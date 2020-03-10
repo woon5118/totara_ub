@@ -51,7 +51,6 @@ Feature: User can self complete an activity from within an activity
       | Page          | Name            | Page content    | lorum ipsum     |
      #| Quiz          | Name            | Description     | lorum ipsum     | This has been purposefully left out as a user should require a passing grade
       | Seminar       | Name            | Description     | lorum ipsum     |
-      | Survey        | Name            | Survey type     | Critical incidents |
       | Folder        | Name            | Description     | lorum ipsum     |
       | URL           | Name            | External URL    | www.example.com |
       | Wiki          | Wiki name       | First page name | lorum ipsum     |

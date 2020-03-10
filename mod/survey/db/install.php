@@ -99,4 +99,8 @@ function xmldb_survey_install() {
         $DB->insert_record('survey_questions', $record, false);
     }
 
+    // Deprecated - disable module on new install
+    $DB->set_field('modules', 'visible', '0', ['name' => 'survey']);
+
+    return true;
 }

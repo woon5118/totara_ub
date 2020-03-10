@@ -184,7 +184,6 @@ Feature: Set up contextual data for tests
       | quiz       | Test quiz name         | Test quiz description         | C1     | quiz1       |
       | resource   | Test resource name     | Test resource description     | C1     | resource1   |
       | scorm      | Test scorm name        | Test scorm description        | C1     | scorm1      |
-      | survey     | Test survey name       | Test survey description       | C1     | survey1     |
       | url        | Test url name          | Test url description          | C1     | url1        |
       | wiki       | Test wiki name         | Test wiki description         | C1     | wiki1       |
       | workshop   | Test workshop name     | Test workshop description     | C1     | workshop1   |
@@ -215,7 +214,6 @@ Feature: Set up contextual data for tests
     And I should see "Test quiz name"
     And I should see "Test resource name"
     And I should see "Test scorm name"
-    And I should see "Test survey name"
     And I should see "Test url name"
     And I should see "Test wiki name"
     And I should see "Test workshop name"

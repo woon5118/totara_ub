@@ -17,10 +17,9 @@ Feature: Block region moving
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Turn editing on"
-    And I add a "Survey" to section "1" and I fill the form with:
-      | Name | Test survey name |
-      | Survey type | ATTLS (20 item version) |
-      | Description | Test survey description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name | Test seminar name |
+      | Description | Test seminar description |
     And I add a "Book" to section "1" and I fill the form with:
       | Name | Test book name |
       | Description | Test book description |

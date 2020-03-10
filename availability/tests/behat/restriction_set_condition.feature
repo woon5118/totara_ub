@@ -56,7 +56,9 @@ Feature: Restriction set of course's restriction is appearing when user editing 
 
   @mod @mod_survey
   Scenario: User is adding the restriction to survey and going to edit restriction set afterward
-    Given I am on "c101" course homepage with editing mode on
+    Given I navigate to "Manage activities" node in "Site administration > Plugins > Activity modules"
+    And I click on "Show Survey" "link" in the "Survey" "table_row"
+    And I am on "c101" course homepage with editing mode on
     And I follow "Add an activity or resource"
     When I click on "Survey" "radio" in the "Add an activity or resource" "dialogue"
     And I click on "Add" "button" in the "Add an activity or resource" "dialogue"

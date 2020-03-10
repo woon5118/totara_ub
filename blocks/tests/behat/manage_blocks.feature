@@ -17,10 +17,9 @@ Feature: Block appearances
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Turn editing on"
-    And I add a "Survey" to section "1" and I fill the form with:
-      | Name | Test survey name |
-      | Survey type | ATTLS (20 item version) |
-      | Description | Test survey description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name | Test seminar name |
+      | Description | Test seminar description |
     And I add a "Book" to section "1" and I fill the form with:
       | Name | Test book name |
       | Description | Test book description |
@@ -40,7 +39,7 @@ Feature: Block appearances
     And I press "Save changes"
 
   Scenario: Block settings can be modified so that a block apprears on any page
-    When I follow "Test survey name"
+    When I follow "Test seminar name"
     Then I should see "Comments" in the "Comments" "block"
     And I follow "Course 1"
     And I configure the "Comments" block
@@ -48,7 +47,7 @@ Feature: Block appearances
       | Display on page types | Any course page |
     And I press "Save changes"
     And I follow "Turn editing off"
-    And I follow "Test survey name"
+    And I follow "Test seminar name"
     And I should not see "Comments"
 
   Scenario: Block settings can be modified so that a block can be hidden

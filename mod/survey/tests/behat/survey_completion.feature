@@ -14,6 +14,10 @@ Feature: A teacher can use activity completion to track a student progress
     And the following "course enrolments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
+    And I log in as "admin"
+    And I navigate to "Manage activities" node in "Site administration > Plugins > Activity modules"
+    And I click on "Show Survey" "link" in the "Survey" "table_row"
+    And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
 

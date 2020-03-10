@@ -116,10 +116,9 @@ Feature: Correct results are shown in the recent activity screen
     And I add a "Chat" to section "1" and I fill the form with:
       | Name of this chat room | Chat room |
       | Description | Chat description |
-    And I add a "Survey" to section "1" and I fill the form with:
-      | Name | Test survey name |
-      | Survey type | ATTLS (20 item version) |
-      | Description | Test survey description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name | Test seminar name |
+      | Description | Test seminar description |
     And I add a "Wiki" to section "1" and I fill the form with:
       | Wiki name       | Test wiki name        |
       | Description     | Test wiki description |
@@ -135,7 +134,7 @@ Feature: Correct results are shown in the recent activity screen
     And I should see "Added Assignment"
     And I should see "Added Workshop"
     And I should see "Added Chat"
-    And I should see "Added Survey"
+    And I should see "Added Seminar"
     And I should see "Added Wiki"
 
     #Check that all the links go to the right place
@@ -171,8 +170,8 @@ Feature: Correct results are shown in the recent activity screen
     Then I should see "Chat description"
 
     When I click on "C1" "link"
-    And I click on "Test survey name" "text" in the "Recent activity" "block"
-    Then I should see "Test survey description"
+    And I click on "Test seminar name" "text" in the "Recent activity" "block"
+    Then I should see "Test seminar description"
 
     When I click on "C1" "link"
     And I click on "Test wiki name" "text" in the "Recent activity" "block"
@@ -200,10 +199,9 @@ Feature: Correct results are shown in the recent activity screen
     And I add a "Chat" to section "1" and I fill the form with:
       | Name of this chat room | Chat room |
       | Description | Chat description |
-    And I add a "Survey" to section "1" and I fill the form with:
-      | Name | Test survey name |
-      | Survey type | ATTLS (20 item version) |
-      | Description | Test survey description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name | Test seminar name |
+      | Description | Test seminar description |
     And I add a "Wiki" to section "1" and I fill the form with:
       | Wiki name       | Test wiki name        |
       | Description     | Test wiki description |
@@ -221,7 +219,7 @@ Feature: Correct results are shown in the recent activity screen
     And I should see "Test assignment 1"
     And I should see "Workshop 1"
     And I should see "Chat room"
-    And I should see "Test survey name"
+    And I should see "Test seminar name"
     And I should see "Test wiki name"
 
   @javascript
@@ -248,10 +246,9 @@ Feature: Correct results are shown in the recent activity screen
     And I add a "Chat" to section "1" and I fill the form with:
       | Name of this chat room | Chat room |
       | Description | Chat description |
-    And I add a "Survey" to section "1" and I fill the form with:
-      | Name | Test survey name |
-      | Survey type | ATTLS (20 item version) |
-      | Description | Test survey description |
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name | Test seminar name |
+      | Description | Test seminar description |
     And I add a "Wiki" to section "1" and I fill the form with:
       | Wiki name       | Test wiki name        |
       | Description     | Test wiki description |
@@ -423,42 +420,12 @@ Feature: Correct results are shown in the recent activity screen
 
     # Chat is unable to be tested because multiple browser tabs is needed
 
-    # Check Survey
+    # Seminar doesn't show any entries in the recent activity block
+
+    # Check Wiki
     And I log out
     And I log in as "user2"
     And I am on "Course 1" course homepage
-    And I click on "Test survey name" "link"
-    And I set the field "q45_1" to "1"
-    And I set the field "q46_1" to "1"
-    And I set the field "q47_1" to "1"
-    And I set the field "q48_1" to "1"
-    And I set the field "q49_1" to "1"
-    And I set the field "q50_1" to "1"
-    And I set the field "q51_1" to "1"
-    And I set the field "q52_1" to "1"
-    And I set the field "q53_1" to "1"
-    And I set the field "q54_1" to "1"
-    And I set the field "q55_1" to "1"
-    And I set the field "q56_1" to "1"
-    And I set the field "q57_1" to "1"
-    And I set the field "q58_1" to "1"
-    And I set the field "q59_1" to "1"
-    And I set the field "q60_1" to "1"
-    And I set the field "q61_1" to "1"
-    And I set the field "q62_1" to "1"
-    And I set the field "q63_1" to "1"
-    And I set the field "q64_1" to "1"
-    And I click on "Click here to continue" "button"
-    And I click on "Continue" "button"
-    And I log out
-    And I log in as "admin"
-    And I am on "Course 1" course homepage
-
-    Then I should see "New survey responses:"
-    When I click on "Test survey name" "link" in the "Recent activity" "block"
-    Then I should see "View 1 survey responses"
-
-    # Check Wiki
     And I click on "C1" "link"
     And I click on "Test wiki name" "link"
     And I click on "Create page" "button"
