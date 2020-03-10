@@ -64,9 +64,6 @@ Feature: The student can navigate to their grades page and user grade report.
   @javascript
   Scenario: Log in as a parent and view a childs grades.
     When I log in as "admin"
-    And I am on site homepage
-    And I turn editing mode on
-    And I add the "Mentees" block
     And I navigate to "Define roles" node in "Site administration > Permissions"
     And I click on "Add a new role" "button"
     And I click on "Continue" "button"
@@ -88,8 +85,7 @@ Feature: The student can navigate to their grades page and user grade report.
     And I click on "Add" "button" in the "#page-content" "css_element"
     And I log out
     And I log in as "parent1"
-    And I am on site homepage
-    And I follow "Student 1"
+    And I am on profile page for user "student1"
     And I follow "Grades overview"
     Then the following should exist in the "overview-grade" table:
     | Course name | Grade |

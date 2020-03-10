@@ -54,9 +54,6 @@ Feature: Access to preferences page
   @javascript
   Scenario: A user with the appropriate permissions can view another user's permissions page.
     Given I log in as "admin"
-    And I am on site homepage
-    And I follow "Turn editing on"
-    And I add the "Mentees" block
     And I navigate to "Define roles" node in "Site administration > Permissions"
     And I click on "Add a new role" "button"
     And I click on "Continue" "button"
@@ -78,6 +75,5 @@ Feature: Access to preferences page
     And I click on "Add" "button" in the "#page-content" "css_element"
     And I log out
     And I log in as "parent"
-    And I am on site homepage
-    When I follow "Student 1"
+    When I am on profile page for user "student1"
     Then I should see "Preferences" in the "region-main" "region"

@@ -1028,5 +1028,18 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020022701, 'totara', 'core');
     }
 
+    if ($oldversion < 2020031200) {
+        global $DB;
+
+        $instancecount = $DB->count_records('block_instances', array('blockname' => 'mentees'));
+
+        if ($instancecount <= 0) {
+            $DB->set_field('block', 'visible', 0, ['name' => 'mentees']);
+        }
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2020031200, 'totara', 'core');
+    }
+
     return true;
 }
