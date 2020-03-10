@@ -32,6 +32,9 @@ Feature: Seminar calendar publishing to course, site, and user calendars
       | kbomba    | course3 | student |
       | kbomba    | course4 | student |
       | kbomba    | course6 | student |
+    And the following "activities" exist:
+      | activity   | name                     | shortname                | course  | idnumber  |
+      | quiz       | OTL Quiz                 | OTL Quiz                 | course1 | quiz1     |
     And the following "seminars" exist in "mod_facetoface" plugin:
       | name               | shortname          | course  | showoncalendar | usercalentry |
       | OTL Seminar        | OTL Seminar        | course1 | 2              | 0            |
@@ -63,6 +66,9 @@ Feature: Seminar calendar publishing to course, site, and user calendars
       | kbomba | event 4      |
       | kbomba | event 6      |
     And I log in as "admin"
+    And I am on "OTL Course" course homepage with editing mode on
+    And I delete "OTL Quiz" activity
+    And I turn editing mode off
 
   Scenario: Normal visibility, seminars set to site calendar, check calendar event view
     Given I click on "Dashboard" in the totara menu

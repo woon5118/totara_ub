@@ -832,15 +832,15 @@ function calendar_get_events($tstart, $tend, $users, $groups, $courses, $withdur
 
         $sql = "SELECT e.*
                   FROM {event} e
-                  JOIN {facetoface} sem ON sem.id = e.instance
-                  JOIN {course} course ON course.id = sem.course
                   JOIN {modules} m ON e.modulename = m.name AND m.visible = 1
-                  JOIN {context} ctx ON sem.id = ctx.instanceid AND contextlevel = :contextlevel
+                  JOIN {course_modules} cmod ON cmod.instance = e.instance AND cmod.module = m.id
+                  JOIN {course} course ON course.id = cmod.course
+                  JOIN {context} ctx ON cmod.id = ctx.instanceid AND contextlevel = :contextlevel
                  WHERE e.modulename = 'facetoface' AND e.courseid = :siteid AND $twhere
                        AND $whereclause";
         $params = array_merge($params, $tparams);
         $semevents = $DB->get_records_sql($sql, $params);
-        
+
         if ($semevents) {
             foreach ($semevents as $e) {
                 $events[$e->id] = $e;
