@@ -704,6 +704,7 @@ $string['started'] = 'Started';
 $string['strftimedateshortmonth'] = '%d %b %Y';
 $string['stricttransportsecurity'] = 'Strict transport security';
 $string['stricttransportsecurity_desc'] = 'When enabled browsers are instructed to always use https:// protocol when accessing the server and users cannot ignore SSL negotiation warnings. Please note that if enabled browsers will remember this setting for six months and will prevent access via http:// even if this setting is later disabled.';
+$string['subject'] = 'Subject';
 $string['subnavigation'] = 'Secondary navigation';
 $string['subplugintype_tabexport'] = 'Tabular export plugin';
 $string['subplugintype_tabexport_plural'] = 'Tabular exports';
