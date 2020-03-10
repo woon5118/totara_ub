@@ -234,8 +234,6 @@ export default {
           return acc;
         }, {});
 
-      console.log(params);
-
       this.totaraComponent = params.tc || null;
       const key = params.component;
       this.sample = this.samples.find(x => x.key == key);

@@ -69,7 +69,6 @@ export default {
 
   data() {
     return {
-      size: '200',
       typography: [
         {
           class: 'tui-typographySamples__heading-large',
