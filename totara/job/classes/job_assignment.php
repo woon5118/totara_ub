@@ -23,6 +23,7 @@
 
 namespace totara_job;
 
+use \Exception;
 use totara_job\event\job_assignment_created;
 use totara_job\event\job_assignment_viewed;
 use totara_job\event\job_assignment_updated;
@@ -1103,12 +1104,12 @@ class job_assignment {
                 $follower->update_internal(array('sortorder' => ($followrec->sortorder - 1)));
             }
 
+            $transaction->allow_commit();
+
             \totara_job\event\job_assignment_deleted::create_from_instance(
                 $jobassignment,
                 \context_system::instance()
             )->trigger();
-
-            $transaction->allow_commit();
         } catch (Exception $e) {
             $transaction->rollback($e);
         }
