@@ -610,6 +610,15 @@ class reportbuilder {
     }
 
     /**
+     * Returns the id of the report
+     *
+     * @return int|null
+     */
+    public function get_id(): ?int {
+        return $this->_id;
+    }
+
+    /**
      * Can report user access this report?
      *
      * NOTE: the result is cached for performance reasons.
@@ -1639,6 +1648,13 @@ class reportbuilder {
         }
 
         return $select;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function get_saved_search_id(): ?int {
+        return $this->_sid;
     }
 
     /**
