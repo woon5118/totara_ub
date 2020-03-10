@@ -44,13 +44,13 @@ class mod_perform_webapi_resolver_query_element_plugins_testcase extends advance
     public function test_get_element_plugins() {
         $this->setAdminUser();
 
-        $elements = element_plugins::resolve([], $this->get_execution_context());
-        foreach ($elements as $element) {
-            $this->assertInstanceOf('mod_perform\models\activity\element_plugin', $element);
-            $this->assertNotEmpty($element::get_plugin_name());
-            $this->assertNotEmpty($element::get_name());
-            $this->assertNotEmpty($element::get_admin_form_component());
-            $this->assertNotEmpty($element::get_admin_display_component());
+        $element_plugins = element_plugins::resolve([], $this->get_execution_context());
+        foreach ($element_plugins as $element_plugin) {
+            $this->assertInstanceOf('mod_perform\models\activity\element_plugin', $element_plugin);
+            $this->assertNotEmpty($element_plugin->get_plugin_name());
+            $this->assertNotEmpty($element_plugin->get_name());
+            $this->assertNotEmpty($element_plugin->get_admin_form_component());
+            $this->assertNotEmpty($element_plugin->get_admin_display_component());
         }
     }
 }

@@ -31,7 +31,7 @@ use totara_webapi\graphql;
 
 require_once(__DIR__.'/relationship_testcase.php');
 
-class webapi_resolver_query_activity_test extends mod_perform_relationship_testcase {
+class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_relationship_testcase {
 
     public function test_get_activity(): void {
         self::setAdminUser();

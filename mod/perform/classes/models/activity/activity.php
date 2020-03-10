@@ -25,14 +25,10 @@
 namespace mod_perform\models\activity;
 
 use container_perform\perform as perform_container;
-use core\orm\entity\model;
 use core\orm\collection;
+use core\orm\entity\model;
 use mod_perform\entities\activity\activity as activity_entity;
-use mod_perform\models\activity\section as section_model;
 use mod_perform\util;
-use \coding_exception;
-use \core_text;
-use \context_module;
 
 /**
  * Class activity
@@ -40,14 +36,19 @@ use \context_module;
  * This class contains the methods related to performance activity
  * All the activity entity properties accessible via this class
  *
- * @method static self load_by_entity(activity_entity $entity)
- * @method static self load_by_id(int $id)
- *
+ * @property-read int $id ID
+ * @property-read int $container the container that this activity exists within
+ * @property-read string $name the name given to this activity
+ * @property-read string $description
+ * @property-read int $status
+ * @property-read int $updated_at
+ * @property-read collection|section[] $sections
+ * @property-read \context $context
  * @package mod_perform\models\activity
  */
 class activity extends model {
 
-    public const STATUS_ACTIVE   = 1;
+    public const STATUS_ACTIVE = 1;
     public const STATUS_INACTIVE = 2;
 
     public const NAME_MAX_LENGTH = 255;
@@ -169,8 +170,7 @@ class activity extends model {
     /**
      * Return the context object for this activity.
      */
-    public function get_context(): context_module {
-
+    public function get_context(): \context_module {
         $cm = get_coursemodule_from_instance(
             'perform',
             $this->entity->id,
@@ -178,7 +178,7 @@ class activity extends model {
             false,
             MUST_EXIST
         );
-        return context_module::instance($cm->id);
+        return \context_module::instance($cm->id);
     }
 
     public function update_general_info(string $name, ?string $description): self {
@@ -196,7 +196,7 @@ class activity extends model {
     /**
      * @param activity_entity $entity
      * @return void
-     * @throws coding_exception
+     * @throws \coding_exception
      */
     protected static function validate(activity_entity $entity): void {
         $problems = self::get_validation_problems($entity);
@@ -207,7 +207,7 @@ class activity extends model {
 
         $formatted_problems = self::format_validation_problems($problems);
 
-        throw new coding_exception('The following errors need to be fixed: ' . $formatted_problems);
+        throw new \coding_exception('The following errors need to be fixed: ' . $formatted_problems);
     }
 
     /**
@@ -222,7 +222,7 @@ class activity extends model {
             $problems[] = 'Name is required';
         }
 
-        if (core_text::strlen($entity->name) > self::NAME_MAX_LENGTH) {
+        if (\core_text::strlen($entity->name) > self::NAME_MAX_LENGTH) {
             $problems[] = 'Name must be less than ' . self::NAME_MAX_LENGTH . ' characters';
         }
 
@@ -245,7 +245,7 @@ class activity extends model {
     public function get_sections() {
         $section_models = [];
         foreach ($this->entity->sections as $section_entity) {
-            $section_models[] = section_model::load_by_entity($section_entity);
+            $section_models[] = section::load_by_entity($section_entity);
         }
         return $section_models;
     }
@@ -253,8 +253,15 @@ class activity extends model {
     /**
      * @inheritDoc
      */
+    public function has_attribute(string $name): bool {
+        $attributes = ['context', 'sections'];
+        return in_array($name, $attributes) || parent::has_attribute($name);
+    }
+
     public function __get($name) {
         switch ($name) {
+            case 'context':
+                return \context_course::instance($this->entity->course);
             case 'sections':
                 return $this->get_sections();
             default:

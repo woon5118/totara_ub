@@ -23,15 +23,22 @@
 
 namespace mod_perform\webapi\resolver\query;
 
+use core\orm\collection;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
-use mod_perform\data_providers\activity\element_plugin;
+use mod_perform\data_providers\activity\element_plugin as element_plugin_data_provider;
+use mod_perform\models\activity\element_plugin as element_plugin_model;
 
 class element_plugins implements query_resolver {
 
+    /**
+     * @param array $args
+     * @param execution_context $ec
+     * @return collection|element_plugin_model[]
+     */
     public static function resolve(array $args, execution_context $ec) {
         require_login(null, false, null, false, true);
 
-        return (new element_plugin())->fetch()->get();
+        return (new element_plugin_data_provider())->fetch()->get();
     }
 }

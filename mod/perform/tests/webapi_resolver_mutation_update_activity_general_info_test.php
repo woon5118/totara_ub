@@ -31,7 +31,7 @@ defined('MOODLE_INTERNAL') || die();
  * @group perform
  * Tests the mutation to create assignments for self or other
  */
-class webapi_resolver_mutation_update_activity_general_info_test extends advanced_testcase {
+class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase extends advanced_testcase {
 
     public function test_user_cannot_update_without_permission(): void {
         self::setAdminUser();

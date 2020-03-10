@@ -21,8 +21,8 @@
  * @package mod_perform
  */
 
+use container_perform\perform;
 use mod_perform\models\activity\element;
-use mod_perform\models\activity\element_plugin;
 
 /**
  * @group perform
@@ -31,7 +31,9 @@ class mod_perform_element_model_testcase extends advanced_testcase {
 
     public function test_create() {
 
-        $element = element::create('short_text', 'test element 1 title', 123);
+        $context = context_coursecat::instance(perform::get_default_categoryid());
+
+        $element = element::create($context, 'short_text', 'test element 1 title', 123);
         $id = $element->get_id();
 
         // Reload, just to make sure that we're getting it out of the DB.

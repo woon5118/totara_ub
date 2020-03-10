@@ -96,12 +96,14 @@ class mod_perform_generator extends component_generator_base {
         return section_element::create($section, $element);
     }
 
-    public function create_element($data = []) {
-        $title = $data['title'] ?? "test title";
-        $plugin_name = $data['plugin_name'] ?? "short_text";
-        $identifier = $data['identifier'] ?? 1;
-
-        return element::create($plugin_name, $title, $identifier);
+    public function create_element(array $data = []) {
+        return element::create(
+            $data['context'] ?? context_coursecat::instance(perform_container::get_default_categoryid()),
+            $data['plugin_name'] ?? 'short_text',
+            $data['title'] ?? 'test element title',
+            $data['identifier'] ?? 0,
+            $data['data'] ?? null
+        );
     }
 
     public function create_section_relationship(section $section, array $data): section_relationship_model {

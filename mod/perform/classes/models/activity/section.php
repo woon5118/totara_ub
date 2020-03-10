@@ -27,8 +27,6 @@ use core\orm\collection;
 use core\orm\entity\model;
 use mod_perform\entities\activity\section as section_entity;
 use mod_perform\entities\activity\section_relationship as section_relationship_entity;
-use mod_perform\models\activity\activity as activity_model;
-use mod_perform\models\activity\section_element as section_element_model;
 
 /**
  * Class section
@@ -36,10 +34,13 @@ use mod_perform\models\activity\section_element as section_element_model;
  * This class contains the methods related to performance activity section
  * All the activity section entity properties accessible via this class
  *
+ * @property-read int $id ID
+ * @property-read string $title
+ * @property-read activity $activity
+ * @property-read section_element[] $section_elements
  * @package mod_perform\models\activity
  */
 class section extends model {
-
     /**
      * @var section_entity
      */
@@ -58,7 +59,7 @@ class section extends model {
      *
      * @return static
      */
-    public static function create(activity_model $activity, string $title): self {
+    public static function create(activity $activity, string $title): self {
         $entity = new section_entity();
         $entity->activity_id = $activity->id;
         $entity->title = $title;
@@ -68,23 +69,26 @@ class section extends model {
     }
 
     /**
-     * @return activity_model
+     * @return activity
      */
-    public function get_activity(): activity_model {
-        /** @var activity_model $model */
-        $model = activity::load_by_entity($this->entity->activity);
-        return $model;
+    public function get_activity(): activity {
+        return activity::load_by_entity($this->entity->activity);
     }
 
     /**
+     * Get any array of all section elements in this section, indexed and sorted by sort_order
+     *
      * @return array
      */
     public function get_section_elements(): array {
         $section_element_models = [];
 
         foreach ($this->entity->section_elements as $section_element_entity) {
-            $section_element_models[] = section_element_model::load_by_entity($section_element_entity);
+            $section_element_models[$section_element_entity->sort_order] =
+                section_element::load_by_entity($section_element_entity);
         }
+
+        ksort($section_element_models);
 
         return $section_element_models;
     }
@@ -116,6 +120,7 @@ class section extends model {
     }
 
     /**
+<<<<<<< Updated upstream
      * @return collection
      */
     public function get_activity_relationships(): collection {
@@ -160,7 +165,7 @@ class section extends model {
                 section_relationship::create($this->get_id(),  $create_class_name);
             }
             foreach ($to_delete as $delete_class_name) {
-                section_relationship::delete($this->get_id(), $delete_class_name);
+                section_relationship::delete_with_properties($this->get_id(), $delete_class_name);
             }
         });
 
@@ -168,5 +173,113 @@ class section extends model {
         $this->entity->load_relation('activity_relationships');
         $this->entity->load_relation('section_relationships');
         return $this;
+    }
+
+    /**
+     * Check if the sort orders on the section elements are valid and throw an exception if not
+     *
+     * @throws \coding_exception when the ordering is not valid
+     */
+    private function validate_sort_orders(): void {
+        $section_elements = $this->get_section_elements();
+
+        // If there are no items then sorting can't be invalid.
+        if (empty($section_elements)) {
+            return;
+        }
+
+        $sort_orders = array_unique(array_column($section_elements, 'sort_order'));
+
+        if (count($sort_orders) != count($section_elements)) {
+            throw new \coding_exception('Section element sort orders are not unique!');
+        }
+
+        sort($sort_orders);
+
+        if (reset($sort_orders) != 1 or end($sort_orders) != count($sort_orders)) {
+            throw new \coding_exception('Section element sort orders are not consecutive starting at 1!');
+        }
+    }
+
+    /**
+     * Add the given element to this section
+     *
+     * Note that the element will be added at the end of the list of existing elements. To position it elsewhere,
+     * move the element after adding it.
+     *
+     * @param element $element
+     * @return section_element
+     */
+    public function add_element(element $element): section_element {
+        $section_element = section_element::create(
+            $this,
+            $element,
+            count($this->get_section_elements()) + 1
+        );
+
+        return $section_element;
+    }
+
+    /**
+     * Remove the given section elements from this section
+     *
+     * Will automatically re-order all remaining section elements.
+     *
+     * @param section_element[] $remove_section_elements
+     */
+    public function remove_section_elements(array $remove_section_elements): void {
+        global $DB;
+
+        if (empty($remove_section_elements)) {
+            return;
+        }
+
+        $DB->transaction(function () use ($remove_section_elements) {
+            foreach ($remove_section_elements as $section_element) {
+                if ($section_element->get_section()->id != $this->id) {
+                    throw new \coding_exception('Cannot delete a section element that does not belong to this section');
+                }
+                $section_element->delete();
+            }
+
+            // Reorder the remaining section elements.
+            $section_elements = $this->get_section_elements();
+
+            $i = 0;
+            foreach ($section_elements as $section_element) {
+                $i++;
+                if ($section_element->sort_order != $i) {
+                    $section_element->update_sort_order($i);
+                }
+            }
+
+            // No need to validate sort orders because we've just resorted everything.
+        });
+    }
+
+    /**
+     * Move the specified set of section elements
+     *
+     * Will fail if the resulting sorting is not valid (all unique and sequential from 1).
+     *
+     * @param section_element[] $move_section_elements where $key is the new sort order and $value is the section element
+     */
+    public function move_section_elements(array $move_section_elements): void {
+        global $DB;
+
+        if (empty($move_section_elements)) {
+            return;
+        }
+
+        $DB->transaction(function () use ($move_section_elements) {
+            foreach ($move_section_elements as $sort_order => $section_element) {
+                if ($section_element->get_section()->id != $this->id) {
+                    throw new \coding_exception('Cannot move a section element that does not belong to this section');
+                }
+                $section_element->update_sort_order($sort_order);
+            }
+
+            $this->validate_sort_orders();
+        });
     }
 }

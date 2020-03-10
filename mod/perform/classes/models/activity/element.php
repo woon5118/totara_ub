@@ -25,7 +25,6 @@ namespace mod_perform\models\activity;
 
 use core\orm\entity\model;
 use mod_perform\entities\activity\element as element_entity;
-use mod_perform\models\activity\element_plugin as element_plugin_model;
 
 /**
  * Class element
@@ -33,6 +32,14 @@ use mod_perform\models\activity\element_plugin as element_plugin_model;
  * This class contains the methods related to performance activity element
  * All the activity element entity properties accessible via this class
  *
+ * @property-read int $id ID
+ * @property-read int $context_id
+ * @property-read string $plugin_name name of the element plugin that controls this element - immutable
+ * @property-read string $title a user-defined title to identify and describe this element
+ * @property-read int $identifier used to match elements that share the same identifier
+ * @property-read string $data specific configuration data for this type of element
+ * @property-read element_plugin $element_plugin
+ * @property-read \context $context
  * @package mod_perform\models\activity
  */
 class element extends model {
@@ -50,19 +57,27 @@ class element extends model {
     }
 
     /**
+     * @param \context $context
      * @param string $plugin_name
      * @param string $title
-     * @param string $identifier
-     * @param array  $data
+     * @param int $identifier
+     * @param string $data
      *
      * @return static
      */
-    public static function create(string $plugin_name, string $title, string $identifier='', array $data=[]): self {
+    public static function create(
+        \context $context,
+        string $plugin_name,
+        string $title,
+        int $identifier = 0,
+        string $data = null
+    ): self {
         $entity = new element_entity();
+        $entity->context_id = $context->id;
         $entity->plugin_name = $plugin_name;
         $entity->title = $title;
         $entity->identifier = $identifier ;
-        $entity->data = json_encode($data ?? null);
+        $entity->data = $data;
         $entity->save();
 
         /** @var self $model */
@@ -71,30 +86,12 @@ class element extends model {
     }
 
     /**
-     * get json decode data
-     *
-     * @return mixed
-     */
-    public function get_data() {
-        return json_decode($this->entity->data);
-    }
-
-    /**
-     * set json encode data
-     *
-     * @param \stdClass $data
-     */
-    public function set_data(\stdClass $data): void {
-        $this->entity->data = json_encode($data);
-    }
-
-    /**
      * get elelment plugin
      *
      * @return element_plugin
      */
-    public function get_element_plugin(): element_plugin_model {
-        return element_plugin_model::load_by_plugin($this->entity->plugin_name);
+    public function get_element_plugin(): element_plugin {
+        return element_plugin::load_by_plugin($this->entity->plugin_name);
     }
 
     /**
@@ -103,7 +100,7 @@ class element extends model {
      * @return bool
      */
     public function has_attribute(string $name): bool {
-        $attributes = ['element_plugin'];
+        $attributes = ['element_plugin', 'context'];
         return in_array($name, $attributes) || parent::has_attribute($name);
     }
 
@@ -113,21 +110,35 @@ class element extends model {
     public function __get($name) {
         switch ($name) {
             case 'element_plugin':
-                return $this->get_element_plugin();
-            case 'data':
-                return $this->get_data();
+                return element_plugin::load_by_plugin($this->entity->plugin_name);
+            case 'context':
+                return \context_helper::instance_by_id($this->entity->context_id);
             default:
                 return parent::__get($name);
         }
     }
 
     /**
-     * @inheritDoc
+     * Set the context for this element
+     *
+     * An element is "owned" by the context it belongs to. Setting a new context effectively "moves" the element.
+     *
+     * @param \context $context
      */
-    public function to_array(): array {
-        $result = parent::to_array();
-        $result['element_plugin'] = static::get_element_plugin();
-        $result['data'] = $this->get_data();
-        return $result;
+    public function update_context(\context $context) {
+        $this->entity->context_id = $context->id;
+        $this->entity->save();
+    }
+
+    /**
+     * Update the standard properties that define this element
+     *
+     * @param string $title
+     * @param string $data
+     */
+    public function update_details(string $title, string $data = null) {
+        $this->entity->title = $title;
+        $this->entity->data = $data;
+        $this->entity->save();
     }
 }

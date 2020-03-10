@@ -25,9 +25,6 @@ namespace mod_perform\models\activity;
 
 use core\orm\entity\model;
 use mod_perform\entities\activity\section_element as section_element_entity;
-use mod_perform\models\activity\element as element_model;
-use mod_perform\models\activity\section as section_model;
-use mod_perform\models\activity\section_element as section_element_model;
 
 /**
  * Class section_element
@@ -35,6 +32,10 @@ use mod_perform\models\activity\section_element as section_element_model;
  * This class contains the methods related to performance activity section element
  * All the activity section element entity properties accessible via this class
  *
+ * @property-read int $id ID
+ * @property-read section $section immutable
+ * @property-read element $element immutable
+ * @property-read int $sort_order
  * @package mod_perform\models\activity
  */
 class section_element extends model {
@@ -58,16 +59,14 @@ class section_element extends model {
      *
      * @return static
      */
-    public static function create(section_model $section, element_model $element, int $sort_order = 1): self {
+    public static function create(section $section, element $element, int $sort_order = 1): self {
         $entity = new section_element_entity();
         $entity->section_id = $section->id;
         $entity->element_id = $element->id;
         $entity->sort_order = $sort_order;
         $entity->save();
 
-        /** @var section_element_model $model */
-        $model = static::load_by_entity($entity);
-        return $model;
+        return static::load_by_entity($entity);
     }
 
     /**
@@ -76,7 +75,6 @@ class section_element extends model {
      * @return section
      */
     public function get_section(): section {
-        /** @var section $section */
         $section = section::load_by_entity($this->entity->section);
         return $section;
     }
@@ -86,9 +84,7 @@ class section_element extends model {
      *
      * @return element
      */
-    public function element(): element {
-
-        /** @var element $element */
+    public function get_element(): element {
         $element = element::load_by_entity($this->entity->element);
         return $element;
     }
@@ -101,7 +97,7 @@ class section_element extends model {
             case 'section':
                 return $this->get_section();
             case 'element':
-                return $this->element();
+                return $this->get_element();
             default:
                 return parent::__get($name);
         }
@@ -113,7 +109,21 @@ class section_element extends model {
     public function to_array(): array {
         $result = parent::to_array();
         $result['section'] = $this->get_section();
-        $result['element'] = $this->element();
+        $result['element'] = $this->get_element();
         return $result;
+    }
+
+    public function update_sort_order(int $sort_order) {
+        $this->entity->sort_order = $sort_order;
+        $this->entity->save();
+    }
+
+    /**
+     * Delete the section element link
+     *
+     * This does not automatically delete the element.
+     */
+    public function delete(): void {
+        $this->entity->delete();
     }
 }

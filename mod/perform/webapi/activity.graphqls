@@ -100,6 +100,64 @@ extend type Query {
   mod_perform_section(section_id: core_id!): mod_perform_section
 }
 
+"""
+Create a new element and add it to a section
+"""
+input mod_perform_create_new_element_input {
+  plugin_name: param_text!
+  title: param_text!
+  data: param_text
+  sort_order: param_integer!
+}
+
+"""
+Link to an existing element
+"""
+input mod_perform_create_link_element_input {
+  element_id: core_id!
+  sort_order: param_integer!
+}
+
+"""
+Update an existing element
+"""
+input mod_perform_update_element_input {
+  element_id: core_id!
+  title: param_text!
+  data: param_text!
+}
+
+"""
+Delete an existing section element
+"""
+input mod_perform_delete_section_element_input {
+  section_element_id: core_id!
+}
+
+"""
+Move an existing section element
+"""
+input mod_perform_move_section_element_input {
+  section_element_id: core_id!
+  sort_order: param_integer!
+}
+
+"""
+Update a section
+"""
+input mod_perform_update_section_elements_input {
+  section_id: core_id!
+  create_new: [mod_perform_create_new_element_input!]
+  create_link: [mod_perform_create_link_element_input!]
+  update: [mod_perform_update_element_input!]
+  delete: [mod_perform_delete_section_element_input!]
+  move: [mod_perform_move_section_element_input!]
+}
+
+type mod_perform_update_section_elements_result {
+  section: mod_perform_section!
+}
+
 extend type Mutation {
   mod_perform_create_activity(
     name: param_text!
@@ -116,4 +174,11 @@ extend type Mutation {
   mod_perform_update_section_relationships(
     input: update_section_relationships_input!
   ): mod_perform_section!
+
+  """
+  Update the elements in a section
+  """
+  mod_perform_update_section_elements(
+    input: mod_perform_update_section_elements_input!
+  ): mod_perform_update_section_elements_result!
 }

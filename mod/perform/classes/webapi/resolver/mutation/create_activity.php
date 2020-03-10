@@ -70,6 +70,8 @@ class create_activity implements mutation_resolver {
             return $activity;
         });
 
+        $ec->set_relevant_context($activity->get_context());
+
         return ['activity' => $activity];
     }
 }

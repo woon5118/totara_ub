@@ -63,7 +63,7 @@ class section extends entity {
      * @return has_many
      */
     public function section_elements(): has_many {
-        return $this->has_many(section_element::class, 'element_id');
+        return $this->has_many(section_element::class, 'section_id');
     }
 
     /**

@@ -48,7 +48,7 @@ class activity implements type_resolver {
         }
 
         $format = $args['format'] ?? format::FORMAT_HTML;
-        $formatter = new activity_formatter($activity, $activity->get_context());
+        $formatter = new activity_formatter($activity, $ec->get_relevant_context());
         return $formatter->format($field, $format);
     }
 }

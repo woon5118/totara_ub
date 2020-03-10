@@ -26,7 +26,6 @@ namespace mod_perform\formatter\activity;
 use core\orm\formatter\entity_model_formatter;
 use totara_core\formatter\field\date_field_formatter;
 use totara_core\formatter\field\string_field_formatter;
-use totara_core\formatter\field\text_field_formatter;
 
 /**
  * Class activity

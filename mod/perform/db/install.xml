@@ -72,10 +72,11 @@
     <TABLE NAME="perform_element" COMMENT="An element used within a section of a performance activity">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="context_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The context which owns this element, either a perform activity or a category/tenant"/>
         <FIELD NAME="plugin_name" TYPE="char" LENGTH="1024" NOTNULL="true" SEQUENCE="false" COMMENT="Name of plugin that manages element of this type"/>
         <FIELD NAME="title" TYPE="char" LENGTH="1024" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="identifier" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Secondary identifier used to allow distinct questions to be aggregated together for reporting purposes."/>
-        <FIELD NAME="data" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON encoded configuration data, format specific to element plugin"/>
+        <FIELD NAME="data" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="configuration data, format specific to element plugin"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -95,7 +96,6 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="sort_order" UNIQUE="false" FIELDS="sort_order"/>
-        <INDEX NAME="section_sort_order" UNIQUE="true" FIELDS="section_id, sort_order" COMMENT="Each sort order should only be used once with a section"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="perform_element_response" COMMENT="Contains a single response to a single performance activity element">
@@ -103,7 +103,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="section_element_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="participant_instance_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="response_data" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON encoded response data, format specific to element type"/>
+        <FIELD NAME="response_data" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="response data, format specific to element type"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

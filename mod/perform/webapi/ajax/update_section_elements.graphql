@@ -1,0 +1,24 @@
+mutation mod_perform_update_section_elements(
+  $input: mod_perform_update_section_elements_input!
+) {
+  mod_perform_update_section_elements(input: $input) {
+    section {
+      id
+      title
+      section_elements {
+        id
+        element {
+          id
+          element_plugin {
+            plugin_name
+            name
+          }
+          title
+          identifier
+          data
+        }
+        sort_order
+      }
+    }
+  }
+}

@@ -25,10 +25,8 @@ namespace mod_perform\models\activity;
 
 use core\orm\entity\model;
 use mod_perform\entities\activity\activity_relationship as activity_relationship_entity;
-use mod_perform\entities\activity\section;
+use mod_perform\entities\activity\section as section_entity;
 use mod_perform\entities\activity\section_relationship as section_relationship_entity;
-use mod_perform\models\activity\activity as activity_model;
-use mod_perform\models\activity\section as section_model;
 
 class section_relationship extends model {
 
@@ -57,11 +55,11 @@ class section_relationship extends model {
         if (!in_array($class_name, self::get_all_class_names())) {
             throw new \coding_exception("Invalid class_name: {$class_name}");
         }
-        $section = section::repository()->find($section_id);
+        $section = section_entity::repository()->find($section_id);
         if (!$section) {
             throw new \coding_exception('Specified section id does not exist');
         }
-        $activity = activity_model::load_by_id($section->activity_id);
+        $activity = activity::load_by_id($section->activity_id);
         require_capability('mod/perform:manage_activity', $activity->get_context());
 
         return $DB->transaction(function () use ($section_id, $class_name, $activity) {
@@ -103,17 +101,17 @@ class section_relationship extends model {
      * @param string $class_name
      * @return bool
      */
-    public static function delete(int $section_id, string $class_name): bool {
+    public static function delete_with_properties(int $section_id, string $class_name): bool {
         global $DB;
 
         if (!in_array($class_name, self::get_all_class_names())) {
             throw new \coding_exception("Invalid class_name: {$class_name}");
         }
-        $section = section::repository()->find($section_id);
+        $section = section_entity::repository()->find($section_id);
         if (!$section) {
             throw new \coding_exception('Specified section id does not exist');
         }
-        $activity = activity_model::load_by_id($section->activity_id);
+        $activity = activity::load_by_id($section->activity_id);
         require_capability('mod/perform:manage_activity', $activity->get_context());
 
         /** @var activity_relationship_entity $activity_relationship_entity */

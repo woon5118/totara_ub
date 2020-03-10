@@ -29,18 +29,20 @@ namespace mod_perform\models\activity;
  * This class contains the methods related to performance activity element plugin
  * All the activity element plugin entity properties accessible via this class
  *
+ * @property-read string $plugin_name
+ * @property-read string $name
  * @package mod_perform\models\activity
  */
 abstract class element_plugin {
 
     /**
-     * element plugin constructor
+     * Element plugin constructor
      */
     private function __construct() {
     }
 
     /**
-     * load by plugin name
+     * Load by plugin name
      *
      * @param string $plugin_name
      *
@@ -55,44 +57,55 @@ abstract class element_plugin {
     }
 
     /**
-     * get plugin name
+     * Get plugin name, used as a key
      *
      * @return string
      */
-    final public static function get_plugin_name(): string {
+    final public function get_plugin_name(): string {
         return explode('\\', static::class)[1];
     }
 
     /**
-     * get name
+     * Get name
      *
      * @return string
      */
-    final public static function get_name(): string {
-        return get_string('name', 'performelement_' . static::get_plugin_name());
+    final public function get_name(): string {
+        return get_string('name', 'performelement_' . $this->get_plugin_name());
+    }
+
+    public function __get(string $name) {
+        switch ($name) {
+            case 'plugin_name':
+                return $this->get_plugin_name();
+            case 'name':
+                return $this->get_name();
+            default:
+                throw new \coding_exception('Tried to access a property that does not exist');
+        }
     }
 
     /**
      * This method return element's admin form vue component name
      * @return string
      */
-    public static function get_admin_form_component(): string {
-        return self::get_component_name_prefix() . 'ElementAdminForm';
+    public function get_admin_form_component(): string {
+        return $this->get_component_name_prefix() . 'ElementAdminForm';
     }
 
     /**
      * This method return element's admin display vue component name
      * @return string
      */
-    public static function get_admin_display_component(): string {
-        return self::get_component_name_prefix().'ElementAdminDisplay';
+    public function get_admin_display_component(): string {
+        return $this->get_component_name_prefix().'ElementAdminDisplay';
     }
 
     /**
      * This method return element's default component name prefix
      * @return string
      */
-    protected static function get_component_name_prefix(): string {
+    protected function get_component_name_prefix(): string {
         $prefix = '';
         foreach (explode('_', self::get_plugin_name()) as $name) {
             $prefix .= ucfirst($name);

@@ -125,7 +125,7 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('Invalid class_name');
 
-        section_relationship::delete($section1->get_id(), 'non-existent-classname');
+        section_relationship::delete_with_properties($section1->get_id(), 'non-existent-classname');
     }
 
     public function test_delete_invalid_section_id() {
@@ -137,7 +137,7 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('Specified section id does not exist');
 
-        section_relationship::delete($non_existent_section_id, 'subject');
+        section_relationship::delete_with_properties($non_existent_section_id, 'subject');
     }
 
     public function test_delete_missing_capability() {
@@ -152,7 +152,7 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
         $this->expectException(required_capability_exception::class);
         $this->expectExceptionMessage('you do not currently have permissions to do that (Manage performance activities)');
 
-        section_relationship::delete($section1->get_id(), 'subject');
+        section_relationship::delete_with_properties($section1->get_id(), 'subject');
     }
 
     public function test_delete_invalid_db_state() {
@@ -184,7 +184,7 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
             . "section_id {$correct_section_id}, activity_relationship_id {$activity_relationship_entity->id}"
         );
 
-        section_relationship::delete($section1->get_id(), 'manager');
+        section_relationship::delete_with_properties($section1->get_id(), 'manager');
     }
 
     public function test_delete_successful() {
@@ -210,13 +210,13 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
         $this->assert_section_relationships($section1, ['manager', 'subject', 'appraiser']);
         $this->assert_section_relationships($section2, ['appraiser']);
 
-        section_relationship::delete($section1->get_id(), 'appraiser');
+        section_relationship::delete_with_properties($section1->get_id(), 'appraiser');
         $this->assert_activity_relationships($activity1, ['manager', 'subject', 'appraiser']);
         $this->assert_activity_relationships($activity2, []);
         $this->assert_section_relationships($section1, ['manager', 'subject']);
         $this->assert_section_relationships($section2, ['appraiser']);
 
-        section_relationship::delete($section2->get_id(), 'appraiser');
+        section_relationship::delete_with_properties($section2->get_id(), 'appraiser');
         $this->assert_activity_relationships($activity1, ['manager', 'subject']);
         $this->assert_activity_relationships($activity2, []);
         $this->assert_section_relationships($section1, ['manager', 'subject']);

@@ -29,7 +29,7 @@ use mod_perform\webapi\resolver\mutation\create_activity;
 use mod_perform\models\activity\activity as activity;
 use core\webapi\execution_context;
 
-class webapi_resolver_mutation_create_activity_testcase extends advanced_testcase {
+class mod_perform_webapi_resolver_mutation_create_activity_testcase extends advanced_testcase {
 
     private function get_execution_context(string $type = 'dev', ?string $operation = null): execution_context {
         return execution_context::create($type, $operation);
