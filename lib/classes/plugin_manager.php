@@ -1167,6 +1167,7 @@ class core_plugin_manager {
 
             // Totara 13 removals.
             'block_community',
+            'block_quiz_results',
             'block_messages',
             'gradeexport_fusion',
             'repository_picasa',
@@ -1274,7 +1275,7 @@ class core_plugin_manager {
                 'course_summary', 'feedback', 'globalsearch', 'glossary_random', 'html',
                 'login', 'mentees', 'mnet_hosts', 'myprofile',
                 'navigation', 'news_items', 'online_users', 'participants',
-                'private_files', 'quiz_results', 'recent_activity',
+                'private_files', 'recent_activity',
                 'rss_client', 'search_forums', 'section_links',
                 'selfcompletion', 'settings', 'site_main_menu',
                 'social_activities', 'tag_flickr', 'tag_youtube', 'tags'

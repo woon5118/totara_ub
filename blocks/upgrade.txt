@@ -12,6 +12,7 @@ information provided here is intended especially for developers.
   works only for blocks located directly on course pages or site home page). See the HTML block for
   an example.
 * Block block_messages is no longer a part of core.
+* The deprecated block quiz_results has now been fully removed.
 
 === 12.0 ===
 

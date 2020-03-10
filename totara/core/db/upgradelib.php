@@ -387,6 +387,7 @@ function totara_core_upgrade_delete_moodle_plugins() {
 
         // Totara 13 removals.
         'block_community',
+        'block_quiz_results',
         'gradeexport_fusion',
         'repository_picasa',
         'portfolio_picasa',
