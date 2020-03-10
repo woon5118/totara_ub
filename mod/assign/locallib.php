@@ -8070,11 +8070,13 @@ class assign {
     /**
      * This function is a static wrapper around can_upgrade.
      *
+     * @deprecated since Totara 13
      * @param string $type The plugin type
      * @param int $version The plugin version
      * @return bool
      */
     public static function can_upgrade_assignment($type, $version) {
+        debugging(__METHOD__ . ' has been deprecated and should no longer be used', DEBUG_DEVELOPER);
         $assignment = new assign(null, null, null);
         return $assignment->can_upgrade($type, $version);
     }
@@ -8082,11 +8084,13 @@ class assign {
     /**
      * This function returns true if it can upgrade an assignment from the 2.2 module.
      *
+     * @deprecated since Totara 13
      * @param string $type The plugin type
      * @param int $version The plugin version
      * @return bool
      */
     public function can_upgrade($type, $version) {
+        debugging(__METHOD__ . ' has been deprecated and should no longer be used', DEBUG_DEVELOPER);
         if ($type == 'offline' && $version >= 2011112900) {
             return true;
         }

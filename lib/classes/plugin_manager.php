@@ -1160,12 +1160,14 @@ class core_plugin_manager {
             'block_recentlyaccesseditems',
             'block_starredcourses',
             'block_timeline',
+            'tool_assignmentupgrade',
 
             // Moodle 3.5.x premigration removals.
             'atto_recordrtc',
             'search_simpledb',
 
             // Totara 13 removals.
+            'mod_assignment',
             'block_community',
             'block_quiz_results',
             'block_messages',
@@ -1409,7 +1411,7 @@ class core_plugin_manager {
             ),
 
             'mod' => array(
-                'assign', 'assignment', 'book', 'chat', 'choice', 'data', 'feedback', 'folder',
+                'assign', 'book', 'chat', 'choice', 'data', 'feedback', 'folder',
                 'forum', 'glossary', 'imscp', 'label', 'lesson', 'lti', 'page',
                 'quiz', 'resource', 'scorm', 'survey', 'url', 'wiki', 'workshop'
                 // Totara
@@ -1492,7 +1494,7 @@ class core_plugin_manager {
             ),
 
             'tool' => array(
-                'assignmentupgrade', 'availabilityconditions', 'behat', 'capability', 'customlang',
+                'availabilityconditions', 'behat', 'capability', 'customlang',
                 'dbtransfer', 'filetypes', 'generator', 'health', 'innodb',
                 'langimport', 'log', 'messageinbound', 'mobile', 'multilangupgrade', 'monitor', 'oauth2',
                 'phpunit', 'profiling', 'recyclebin', 'replace', 'spamcleaner', 'task', 'templatelibrary',

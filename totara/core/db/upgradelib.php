@@ -83,8 +83,6 @@ function totara_core_fix_old_upgraded_mssql() {
         'qtype_match_subquestions' => array('questiontext'),
         'question_multianswer' => array('sequence'),
         'qtype_multichoice_options' => array('correctfeedback', 'partiallycorrectfeedback', 'incorrectfeedback'),
-        'assignment' => array('intro'),
-        'assignment_submissions' => array('submissioncomment'),
         'book_chapters' => array('content'),
         'chat' => array('intro'),
         'chat_messages' => array('message'),
@@ -380,12 +378,14 @@ function totara_core_upgrade_delete_moodle_plugins() {
         'block_recentlyaccesseditems',
         'block_starredcourses',
         'block_timeline',
+        'tool_assignmentupgrade',
 
         // Moodle 3.5.x premigration removals.
         'atto_recordrtc',
         'search_simpledb',
 
         // Totara 13 removals.
+        'mod_assignment',
         'block_community',
         'block_quiz_results',
         'gradeexport_fusion',
@@ -467,6 +467,11 @@ function totara_core_upgrade_delete_moodle_plugins() {
         }
         if ($deleteplugin === 'repository_onedrive') {
             if ($DB->record_exists('repository_onedrive_access', array())) {
+                continue;
+            }
+        }
+        if ($deleteplugin === 'mod_assignment') {
+            if ($DB->record_exists('assignment', [])) {
                 continue;
             }
         }

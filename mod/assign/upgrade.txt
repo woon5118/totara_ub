@@ -3,6 +3,15 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* Class assign_upgrade_manager has been deprecated and should no longer be used.
+* Deprecated the following method:
+    * assign_plugin::upgrade()
+    * assign_plugin::upgrade_settings()
+    * assign_plugin::can_upgrade()
+    * assign::can_upgrade_assignment()
+    * assign::can_upgrade()
+  These methods have no replacement and should no longer be used.
+
 === 12.0 ===
 
 * Modified mod_assign_renderer::render_assign_submission_status_compact removing incorrect use alert-error CSS class

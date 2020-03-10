@@ -238,11 +238,11 @@ class core_plugin_manager_testcase extends advanced_testcase {
         global $CFG;
 
         // Any standard plugin that is required by some other standard plugin is ok.
-        $this->assertFileExists("$CFG->dirroot/$CFG->admin/tool/assignmentupgrade", 'assign upgrade tool is not present');
-        $this->assertFileExists("$CFG->dirroot/mod/assign", 'assign module is not present');
+        $this->assertFileExists("$CFG->dirroot/blocks/feedback", 'feedback block is not present');
+        $this->assertFileExists("$CFG->dirroot/mod/feedback", 'feedback module is not present');
 
-        $this->assertFalse(core_plugin_manager::instance()->can_uninstall_plugin('mod_assign'));
-        $this->assertTrue(core_plugin_manager::instance()->can_uninstall_plugin('tool_assignmentupgrade'));
+        $this->assertFalse(core_plugin_manager::instance()->can_uninstall_plugin('mod_feedback'));
+        $this->assertTrue(core_plugin_manager::instance()->can_uninstall_plugin('block_feedback'));
     }
 
     public function test_plugin_states() {

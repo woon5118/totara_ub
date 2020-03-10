@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* Removed deprecated mod_assignment activity plugin
 * Removed deprecated (plugin_name)_print_recent_activity() from all activity plugins
 * Modules that provide their own interactive content and call cm_info::set_content() from [MODULENAME]_cm_info_view()
   callback should format all user input and call set_content() with parameter $isformatted=true . Otherwise

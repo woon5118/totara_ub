@@ -38,6 +38,7 @@ define('ASSIGN_MAX_UPGRADE_TIME_SECS', 300);
 /**
  * Class to manage upgrades from mod_assignment to mod_assign
  *
+ * @deprecated since Totara 13
  * @package   mod_assign
  * @copyright 2012 NetSpot {@link http://www.netspot.com.au}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

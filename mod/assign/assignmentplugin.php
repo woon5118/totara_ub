@@ -479,23 +479,29 @@ abstract class assign_plugin {
      * Return true if this plugin can upgrade an old Moodle 2.2 assignment of this type
      * and version.
      *
+     * @deprecated since Totara 13
      * @param string $type The old assignment subtype
      * @param int $version The old assignment version
      * @return bool True if upgrade is possible
      */
     public function can_upgrade($type, $version) {
+        debugging(__METHOD__ . ' has been deprecated and should no longer be used', DEBUG_DEVELOPER);
+
         return false;
     }
 
     /**
      * Upgrade the settings from the old assignment to the new one
      *
+     * @deprecated since Totara 13
      * @param context $oldcontext The context for the old assignment module
      * @param stdClass $oldassignment The data record for the old assignment
      * @param string $log Record upgrade messages in the log
      * @return bool true or false - false will trigger a rollback
      */
     public function upgrade_settings(context $oldcontext, stdClass $oldassignment, & $log) {
+        debugging(__METHOD__ . ' has been deprecated and should no longer be used', DEBUG_DEVELOPER);
+
         $params = array('type'=>$this->type, 'subtype'=>$this->get_subtype());
         $log .= ' ' . get_string('upgradenotimplemented', 'mod_assign', $params);
         return false;
@@ -504,6 +510,7 @@ abstract class assign_plugin {
     /**
      * Upgrade the submission from the old assignment to the new one
      *
+     * @deprecated since Totara 13
      * @param context $oldcontext The data record for the old context
      * @param stdClass $oldassignment The data record for the old assignment
      * @param stdClass $oldsubmissionorgrade The data record for the old submission
@@ -516,6 +523,9 @@ abstract class assign_plugin {
                             stdClass $oldsubmissionorgrade,
                             stdClass $submissionorgrade,
                             & $log) {
+
+        debugging(__METHOD__ . ' has been deprecated and should no longer be used', DEBUG_DEVELOPER);
+
         $params = array('type'=>$this->type, 'subtype'=>$this->get_subtype());
         $log = $log . ' ' . get_string('upgradenotimplemented', 'mod_assign', $params);
         return false;
