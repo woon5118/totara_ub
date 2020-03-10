@@ -21,6 +21,7 @@
  * @package mod_perform
  */
 
+use mod_perform\task\create_subject_instance_task;
 use mod_perform\task\expand_assignments_task;
 
 defined('MOODLE_INTERNAL') || die();
@@ -28,6 +29,15 @@ defined('MOODLE_INTERNAL') || die();
 $tasks = [
     [
         'classname' => expand_assignments_task::class,
+        'blocking' => 0,
+        'minute' => '*',
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ],
+    [
+        'classname' => create_subject_instance_task::class,
         'blocking' => 0,
         'minute' => '*',
         'hour' => '*',

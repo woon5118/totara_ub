@@ -24,6 +24,8 @@
 namespace mod_perform\entities\activity;
 
 use core\orm\entity\repository;
+use mod_perform\models\activity\activity as activity_model;
+use mod_perform\models\activity\track_status;
 
 /**
  * Repository for track user assignment entities
@@ -47,6 +49,36 @@ final class track_user_assignment_repository extends repository {
      */
     public function filter_by_active(): self {
         $this->where('deleted', false);
+
+        return $this;
+    }
+
+    /**
+     * Return all user assignments which do not have any subject instances
+     *
+     * @return $this
+     */
+    public function filter_by_no_subject_instances(): self {
+        if (!$this->has_join(subject_instance::TABLE, 'fbnsi')) {
+            $this->left_join([subject_instance::TABLE, 'fbnsi'], 'id', 'track_user_assignment_id')
+               ->where_null('fbnsi.id');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Return all user assignment which have an active track and an active activity
+     *
+     * @return $this
+     */
+    public function filter_by_active_track_and_activity(): self {
+        if (!$this->has_join(track::TABLE, 'fbat')) {
+            $this->join([track::TABLE, 'fbat'], 'track_id', 'id')
+                ->join([activity::TABLE, 'fbaa'], 'fbat.activity_id', 'id')
+                ->where('fbat.status', track_status::ACTIVE)
+                ->where('fbaa.status', activity_model::STATUS_ACTIVE);
+        }
 
         return $this;
     }

@@ -21,19 +21,24 @@
  * @package mod_perform
  */
 
+
 namespace mod_perform\task;
 
-use core\lock\lock;
-use core\lock\lock_config;
+use core\task\scheduled_task;
+use mod_perform\task\service\subject_instance_creation;
 
-trait expand_task_trait {
+/**
+ * Update competency user assignment table
+ */
+class create_subject_instance_task extends scheduled_task {
 
-    private function get_expand_task_lock(): lock {
-        $cron_lock_factory = lock_config::get_lock_factory('mod_perform');
-        if (!$cron_lock = $cron_lock_factory->get_lock('expand_assignments', 10)) {
-            throw new \moodle_exception('locktimeout');
-        }
-        return $cron_lock;
+    public function get_name() {
+        return get_string('create_subject_instance_task', 'mod_perform');
+    }
+
+    public function execute() {
+        $expand_task = new subject_instance_creation();
+        $expand_task->generate_instances();
     }
 
 }

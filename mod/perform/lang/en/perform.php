@@ -29,6 +29,7 @@ $string['activity_participants:select_heading'] = 'Select participants';
 $string['activity_participants:select_done'] = 'Done';
 $string['activity_section:save_changes'] = 'Save changes';
 $string['create_activity'] = 'Add activity';
+$string['create_subject_instance_task'] = 'Create subject instance for performance activities';
 $string['edit_content'] = 'Edit content';
 $string['error:create_permission_missing'] = 'You do not have the permission to create a performance activity';
 $string['error:activity_name_missing'] = 'You are not allowed to create an activity with an empty name';
