@@ -168,7 +168,7 @@
 }
 
 @mixin tui-font-heading-label {
-  font-weight: 500;
+  font-weight: bold;
   font-size: var(--tui-font-size-15);
   line-height: 1.2;
 }
