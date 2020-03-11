@@ -408,7 +408,9 @@ class behat_hooks extends behat_base {
 
         // Reset mink session between the scenarios.
         try {
-            $session->reset();
+            if ($this->getMink()->isSessionStarted()) {
+                $session->reset();
+            }
             // Totara: go to neutral page to reset stuff and set cookie to identify behat browsers.
             $session->visit($this->locate_path('/admin/tool/behat/start.php'));
             $session->setCookie('BEHAT', 1);
