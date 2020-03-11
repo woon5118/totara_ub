@@ -18,6 +18,8 @@
 /**
  * Basic email protection filter.
  *
+ * @deprecated Since Totara 13.0
+ *
  * @package    filter
  * @subpackage emailprotect
  * @copyright  2004 Mike Churchward
