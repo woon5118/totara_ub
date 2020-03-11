@@ -57,7 +57,9 @@ module.exports = function(source, map) {
       `\ncomponent.options.__hasBlocks = ` + `${JSON.stringify(hasBlocks)};`;
 
     // process theme overrides
-    const themeOverrideMatch = themeOverrideRegex.exec(this.resourcePath);
+    const themeOverrideMatch = themeOverrideRegex.exec(
+      this.resourcePath.replace(/\\/g, '/')
+    );
     // skip if we're not loading an override component or if the file is not in a subfolder
     if (themeOverrideMatch && themeOverrideMatch[2].indexOf('/') !== -1) {
       const folder = themeOverrideMatch[1];
