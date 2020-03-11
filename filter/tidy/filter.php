@@ -18,6 +18,8 @@
 /**
  * HTML  tidy text filter.
  *
+ * @deprecated Since Totara 13.0
+ *
  * @package    filter
  * @subpackage tiny
  * @copyright  2004 Hannes Gassert <hannes at mediagonal dot ch>
