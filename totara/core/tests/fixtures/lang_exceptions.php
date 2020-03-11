@@ -49,9 +49,6 @@ $exceptions = array(
         'error:cannotupgradefromnewermoodle', 'moodlecore', 'totaracopyright',
     ),
     'tool_behat' => array('fieldvalueargument_help'), // Docs link.
-    'message_airnotifier' => array( // Broken mobile stuff.
-        'configairnotifiermobileappname', 'errorretrievingkey', 'nodevices', 'sitemustberegistered'
-    ),
     'enrol_ldap' => array('autocreate'),
     'mod_facetoface' => array('mincapacity_help'),
     'auth_ldap' => array('auth_ntlmsso_enabled'),

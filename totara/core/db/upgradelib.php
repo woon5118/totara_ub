@@ -391,6 +391,7 @@ function totara_core_upgrade_delete_moodle_plugins() {
         'gradeexport_fusion',
         'repository_picasa',
         'portfolio_picasa',
+        'message_airnotifier',
         // Moodle 3.4 merge skipped.
         'tool_analytics', 'tool_httpsreplace', 'report_insights', 'mlbackend_php', 'mlbackend_python',
 
@@ -488,6 +489,11 @@ function totara_core_upgrade_delete_moodle_plugins() {
                 set_config('texteditors', implode(',', array_keys($editors)));
             }
             // NOTE: there is no need to update user preference, if editor is not found the default is used instead.
+        }
+        if ($deleteplugin === 'message_airnotifier') {
+            if ($DB->record_exists('message_airnotifier_devices', [])) {
+                continue;
+            }
         }
         uninstall_plugin($plugintype, $pluginname);
     }

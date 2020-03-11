@@ -54,12 +54,7 @@ class core_user_userdata_devices_testcase extends advanced_testcase {
         $deviceid2 = $this->create_user_device($user2);
         $deviceid3 = $this->create_user_device($user3);
 
-        $DB->insert_record('message_airnotifier_devices', (object)['userdeviceid' => $deviceid1, 'enable' => 1]);
-        $DB->insert_record('message_airnotifier_devices', (object)['userdeviceid' => $deviceid2, 'enable' => 1]);
-        $DB->insert_record('message_airnotifier_devices', (object)['userdeviceid' => $deviceid3, 'enable' => 1]);
-
         $this->assertEquals(3, $DB->count_records('user_devices'));
-        $this->assertEquals(3, $DB->count_records('message_airnotifier_devices'));
 
         $targetuser = new target_user($user1);
         // Purge data.
@@ -67,14 +62,10 @@ class core_user_userdata_devices_testcase extends advanced_testcase {
         $this->assertEquals(item::RESULT_STATUS_SUCCESS, $result);
 
         $this->assertEquals(2, $DB->count_records('user_devices'));
-        $this->assertEquals(2, $DB->count_records('message_airnotifier_devices'));
 
         // User 1's entry should be gone.
-        $this->assertEmpty($DB->get_record('message_airnotifier_devices', ['userdeviceid' => $deviceid1]));
         $this->assertEmpty($DB->get_record('user_devices', ['userid' => $user1->id]));
         // User 2 and 3's data should still be there.
-        $this->assertNotEmpty($DB->get_record('message_airnotifier_devices', ['userdeviceid' => $deviceid2]));
-        $this->assertNotEmpty($DB->get_record('message_airnotifier_devices', ['userdeviceid' => $deviceid3]));
         $this->assertNotEmpty($DB->get_record('user_devices', ['userid' => $user2->id]));
         $this->assertNotEmpty($DB->get_record('user_devices', ['userid' => $user3->id]));
     }
@@ -98,13 +89,6 @@ class core_user_userdata_devices_testcase extends advanced_testcase {
         $deviceid31 = $this->create_user_device($user3);
         $deviceid32 = $this->create_user_device($user3);
         $deviceid33 = $this->create_user_device($user3);
-
-        $DB->insert_record('message_airnotifier_devices', (object)['userdeviceid' => $deviceid11, 'enable' => 1]);
-        $DB->insert_record('message_airnotifier_devices', (object)['userdeviceid' => $deviceid21, 'enable' => 1]);
-        $DB->insert_record('message_airnotifier_devices', (object)['userdeviceid' => $deviceid22, 'enable' => 1]);
-        $DB->insert_record('message_airnotifier_devices', (object)['userdeviceid' => $deviceid31, 'enable' => 1]);
-        $DB->insert_record('message_airnotifier_devices', (object)['userdeviceid' => $deviceid32, 'enable' => 1]);
-        $DB->insert_record('message_airnotifier_devices', (object)['userdeviceid' => $deviceid33, 'enable' => 1]);
 
         // Count data.
         $targetuser = new target_user($user1);

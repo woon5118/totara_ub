@@ -741,11 +741,6 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019100300, 'totara', 'core');
     }
 
-    if ($oldversion < 2019101700) {
-        totara_core_upgrade_delete_moodle_plugins();
-        upgrade_plugin_savepoint(true, 2019101700, 'totara', 'core');
-    }
-
     if ($oldversion < 2020012301) {
         // Define table oauth2_access_token to be created.
         $table = new xmldb_table('oauth2_access_token');
@@ -1039,6 +1034,11 @@ function xmldb_totara_core_upgrade($oldversion) {
 
         // Core savepoint reached.
         upgrade_plugin_savepoint(true, 2020031200, 'totara', 'core');
+    }
+
+    if ($oldversion < 2020031300) {
+        totara_core_upgrade_delete_moodle_plugins();
+        upgrade_plugin_savepoint(true, 2020031300, 'totara', 'core');
     }
 
     return true;

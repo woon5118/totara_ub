@@ -1172,6 +1172,7 @@ class core_plugin_manager {
             'gradeexport_fusion',
             'repository_picasa',
             'portfolio_picasa',
+            'message_airnotifier',
             // Moodle 3.4 merge skipped.
             'tool_analytics', 'tool_httpsreplace', 'report_insights', 'mlbackend_php', 'mlbackend_python',
 
@@ -1398,7 +1399,7 @@ class core_plugin_manager {
             ),
 
             'message' => array(
-                'airnotifier', 'email', 'jabber', 'popup'
+                'email', 'jabber', 'popup'
                 // Totara
                 , 'totara_alert', 'totara_task'
             ),

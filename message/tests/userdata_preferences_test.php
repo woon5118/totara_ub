@@ -40,8 +40,8 @@ class core_message_userdata_preferences_testcase extends \core_user_userdata_plu
     protected function get_preferences(): array {
         return [
             'message_blocknoncontacts' => [true, false],
-            'message_provider_moodle_instantmessage_loggedin' => ['airnotifier', 'email'],
-            'message_provider_mod_forum_posts_loggedoff' => ['email', 'airnotifier'],
+            'message_provider_moodle_instantmessage_loggedin' => ['email'],
+            'message_provider_mod_forum_posts_loggedoff' => ['email'],
         ];
     }
 
