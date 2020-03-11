@@ -187,9 +187,12 @@ class rb_source_scorm extends rb_base_source {
                 'sco',
                 'scoreraw',
                 get_string('score', 'rb_source_scorm'),
-                $DB->sql_compare_text('sco_scoreraw.value', 1024),
-                array('joins' => 'sco_scoreraw',
-                      'displayfunc' => 'plaintext')
+                $DB->sql_cast_char2float('sco_scoreraw.value'),
+                array(
+                    'joins' => 'sco_scoreraw',
+                    'displayfunc' => 'round2',
+                    'dbdatatype' => 'decimal'
+                )
             ),
             new rb_column_option(
                 'sco',
@@ -205,17 +208,23 @@ class rb_source_scorm extends rb_base_source {
                 'sco',
                 'scoremin',
                 get_string('minscore', 'rb_source_scorm'),
-                $DB->sql_compare_text('sco_scoremin.value', 1024),
-                array('joins' => 'sco_scoremin',
-                      'displayfunc' => 'plaintext')
+                $DB->sql_cast_char2float('sco_scoremin.value'),
+                array(
+                    'joins' => 'sco_scoremin',
+                    'displayfunc' => 'round2',
+                    'dbdatatype' => 'decimal'
+                )
             ),
             new rb_column_option(
                 'sco',
                 'scoremax',
                 get_string('maxscore', 'rb_source_scorm'),
-                $DB->sql_compare_text('sco_scoremax.value', 1024),
-                array('joins' => 'sco_scoremax',
-                      'displayfunc' => 'plaintext')
+                $DB->sql_cast_char2float('sco_scoremax.value'),
+                array(
+                    'joins' => 'sco_scoremax',
+                    'displayfunc' => 'round2',
+                    'dbdatatype' => 'decimal'
+                )
             ),
             new rb_column_option(
                 'sco',
