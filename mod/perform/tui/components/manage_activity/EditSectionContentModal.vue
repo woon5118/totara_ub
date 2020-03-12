@@ -45,28 +45,36 @@
         />
 
         <ContentAddElementButton @add-element-item="add" />
-        <SubmitCancelGroup @submit="submit" @cancel="cancel" />
+        <ButtonGroup>
+          <ButtonSubmit :disabled="!canSubmit()" @click.prevent="trySave" />
+          <ButtonCancel @click="cancel" />
+        </ButtonGroup>
       </div>
     </ModalContent>
   </Modal>
 </template>
 
 <script>
+import Button from 'totara_core/components/buttons/Button';
+import ButtonCancel from 'totara_core/components/buttons/Cancel';
+import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
+import ButtonSubmit from 'totara_core/components/buttons/Submit';
+import ContentAddElementButton from 'mod_perform/components/manage_activity/ContentAddElementButton';
 import Modal from 'totara_core/components/modal/Modal';
 import ModalContent from 'totara_core/components/modal/ModalContent';
-import ContentAddElementButton from 'mod_perform/components/manage_activity/ContentAddElementButton';
-import SubmitCancelGroup from 'totara_core/components/buttons/SubmitCancelGroup';
-import Button from 'totara_core/components/buttons/Button';
 import sectionDetailQuery from 'mod_perform/graphql/section_details';
+import updateSectionElementMutation from 'mod_perform/graphql/update_section_elements.graphql';
 import { pull, uniqueId } from 'totara_core/util';
 
 export default {
   components: {
+    Button,
+    ButtonCancel,
+    ButtonGroup,
+    ButtonSubmit,
+    ContentAddElementButton,
     Modal,
     ModalContent,
-    ContentAddElementButton,
-    SubmitCancelGroup,
-    Button,
   },
   props: {
     sectionId: {
@@ -81,9 +89,11 @@ export default {
         title: '',
         section_elements: [],
       },
-      sectionElements: null,
+      sectionElements: [],
       editingIds: [],
+      removeIds: [],
       errors: {},
+      isSaving: false,
     };
   },
 
@@ -94,6 +104,7 @@ export default {
         return { section_id: this.sectionId };
       },
       update: data => data.mod_perform_section,
+      fetchPolicy: 'network-only',
       result({ data }) {
         this.sectionElements = data.mod_perform_section.section_elements.map(
           item => {
@@ -102,11 +113,12 @@ export default {
               clientId: uniqueId(),
               element: {
                 id: item.element.id,
-                type: item.element.element_type,
-                name: item.element.name,
+                type: item.element.element_plugin,
+                name: item.element.title,
                 identifier: item.element.identifier,
                 data: JSON.parse(item.element.data),
               },
+              sort_order: item.sort_order,
             };
           }
         );
@@ -115,6 +127,9 @@ export default {
   },
 
   methods: {
+    /**
+     * Add new plugin element
+     */
     add(plugin) {
       const sectionElement = {
         id: this.sectionId,
@@ -126,6 +141,7 @@ export default {
           identifier: null,
           data: {},
         },
+        sort_order: this.sectionElements.length + 1,
         creating: true,
       };
 
@@ -133,6 +149,9 @@ export default {
       this.edit(sectionElement);
     },
 
+    /**
+     * update existing elements and shows display view of the element
+     */
     update(sectionElement, { name, data }) {
       sectionElement.element.name = name;
       sectionElement.element.data = data;
@@ -140,10 +159,17 @@ export default {
       this.display(sectionElement);
     },
 
+    /**
+     * Add element into edit list
+     */
     edit(sectionElement) {
       this.editingIds.push(sectionElement.clientId);
     },
 
+    /**
+     * Display section element
+     * Remove creating view if section element move to display mode
+     */
     display(sectionElement) {
       pull(this.editingIds, sectionElement.clientId);
       if (sectionElement.creating) {
@@ -151,14 +177,29 @@ export default {
       }
     },
 
+    /**
+     * Remove section element
+     * if section element already saved update remove list
+     */
     remove(sectionElement) {
       pull(this.sectionElements, sectionElement);
+      if (sectionElement.element.id) {
+        this.removeIds.push({
+          section_element_id: sectionElement.element.id,
+        });
+      }
     },
 
+    /**
+     * check element is editing
+     */
     isEditing(sectionElement) {
       return this.editingIds.includes(sectionElement.clientId);
     },
 
+    /**
+     * if the element is editing shows the Form component else shows element display component
+     */
     componentFor(sectionElement) {
       const { type } = sectionElement.element;
       const isEditing = this.editingIds.includes(sectionElement.clientId);
@@ -170,13 +211,97 @@ export default {
       );
     },
 
-    submit() {
-      console.log('submit');
-      console.log(JSON.parse(JSON.stringify(this.sectionElements)));
-    },
-
+    /**
+     * Close the modal if cancel
+     */
     cancel() {
       this.$emit('request-close');
+    },
+
+    /**
+     * Try to persist the activity elements to the back end
+     * Emitting events on success/failure.
+     *
+     * @returns {Promise<void>}
+     */
+    async trySave() {
+      this.isSaving = true;
+
+      try {
+        await this.save();
+        this.$emit('mutation-success');
+        this.isSaving = false;
+        this.$emit('request-close');
+      } catch (e) {
+        this.$emit('mutation-error', e);
+        // If something goes wrong during create, allow the user to try again.
+        this.isSaving = false;
+      } finally {
+        this.isSaving = false;
+      }
+    },
+
+    /**
+     * Extract section elements into new. update , delete and move
+     * and call the GQL mutation to save section elements
+     * @returns {Promise<any>}
+     */
+    async save() {
+      let variables,
+        createNew = [],
+        createLink = [],
+        update = [],
+        move = [];
+
+      this.sectionElements.forEach(function(item, index) {
+        let sortOrder = index + 1;
+        if (!item.element.id) {
+          createNew.push({
+            plugin_name: item.element.type.plugin_name,
+            title: item.element.name,
+            data: JSON.stringify(item.element.data),
+            sort_order: sortOrder,
+          });
+        } else {
+          update.push({
+            element_id: item.element.id,
+            title: item.element.name,
+            data: JSON.stringify(item.element.data),
+          });
+          move.push({
+            section_element_id: item.id,
+            sort_order: sortOrder,
+          });
+        }
+      });
+      variables = {
+        input: {
+          section_id: this.sectionId,
+          create_new: createNew,
+          create_link: createLink,
+          update: update,
+          delete: this.removeIds,
+          move: move,
+        },
+      };
+
+      const { data: resultData } = await this.$apollo.mutate({
+        mutation: updateSectionElementMutation,
+        variables: variables,
+        refetchAll: false,
+      });
+
+      return resultData;
+    },
+
+    canSubmit() {
+      const lastSectionElement = [...this.sectionElements].pop();
+      return (
+        !this.isSaving &&
+        Object.keys(this.errors).length === 0 &&
+        this.sectionElements.length > 0 &&
+        !lastSectionElement.creating
+      );
     },
   },
 };

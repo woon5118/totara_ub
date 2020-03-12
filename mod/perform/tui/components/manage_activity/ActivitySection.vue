@@ -86,7 +86,11 @@
     </Grid>
 
     <ModalPresenter :open="modelOpen" @request-close="modalRequestClose">
-      <EditSectionContentModal :section-id="section.id" />
+      <EditSectionContentModal
+        :section-id="section.id"
+        @mutation-success="showMutationSuccessNotification"
+        @mutation-error="showMutationErrorNotification"
+      />
     </ModalPresenter>
   </Card>
 </template>
@@ -169,6 +173,14 @@ export default {
     },
     resetSectionChanges() {
       this.displayedParticipants = this.getLastSavedParticipants();
+    },
+
+    showMutationSuccessNotification() {
+      this.$emit('mutation-success');
+    },
+
+    showMutationErrorNotification() {
+      this.$emit('mutation-error');
     },
 
     async trySave() {

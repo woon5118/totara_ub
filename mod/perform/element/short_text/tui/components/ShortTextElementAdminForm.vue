@@ -137,6 +137,12 @@ export default {
           'performelement_short_text'
         );
       }
+      if (values.name.trim().length > 1024) {
+        errors.name = this.$str(
+          'error:question_length_exceed',
+          'performelement_short_text'
+        );
+      }
     },
 
     handleSubmit(values) {
@@ -156,6 +162,7 @@ export default {
   {
     "performelement_short_text": [
         "error:question_required",
+        "error:question_length_exceed",
         "short_text:title",
         "short_text:answer:placeholder",
         "short_text:button:done",

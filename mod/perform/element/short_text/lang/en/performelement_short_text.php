@@ -22,6 +22,7 @@
  */
 
 $string['error:question_required'] = 'Question is required';
+$string['error:question_length_exceed'] = 'Question text exceeds the maximum length';
 $string['pluginname'] = 'Short text element';
 $string['name'] = 'Short text';
 $string['short_text:answer:placeholder'] = 'Long text answer field';
