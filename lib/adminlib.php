@@ -223,6 +223,11 @@ function uninstall_plugin($type, $name) {
     // delete message provider
     message_provider_uninstall($component);
 
+    // Delete message processors.
+    if ($type === 'message') {
+        $DB->delete_records('message_processors', ['name' => $name]);
+    }
+
     // delete the plugin tables
     $xmldbfilepath = $plugindirectory . '/db/install.xml';
     drop_plugin_tables($component, $xmldbfilepath, false);
