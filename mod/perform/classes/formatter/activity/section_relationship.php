@@ -23,7 +23,6 @@
 
 namespace mod_perform\formatter\activity;
 use core\orm\formatter\entity_model_formatter;
-use totara_core\formatter\field\string_field_formatter;
 
 class section_relationship extends entity_model_formatter {
 
@@ -32,6 +31,7 @@ class section_relationship extends entity_model_formatter {
             'id' => null,
             'can_view' => null,
             'can_answer' => null,
+            'relationship' => null,
         ];
     }
 }

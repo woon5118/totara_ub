@@ -23,22 +23,29 @@
  */
 
 use container_perform\perform as perform_container;
-
 use core\collection;
 use core_container\module\module;
 use mod_perform\models\activity\activity;
-use mod_perform\models\activity\section;
 use mod_perform\models\activity\element;
+use mod_perform\models\activity\section;
 use mod_perform\models\activity\section_element;
+use mod_perform\models\activity\section_relationship as section_relationship_model;
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment_type;
 use mod_perform\user_groups\grouping;
 use mod_perform\util;
+use totara_core\entities\relationship_resolver;
+use totara_core\relationship\relationship;
 
 /**
  * Perform generator
  */
 class mod_perform_generator extends component_generator_base {
+
+    /**
+     * @var array
+     */
+    private $cache;
 
     /**
      * Create a performance activity and a performance container to contain it
@@ -109,6 +116,32 @@ class mod_perform_generator extends component_generator_base {
             $data['identifier'] ?? 0,
             $data['data'] ?? null
         );
+    }
+
+    public function create_section_relationship(section $section, array $data): section_relationship_model {
+        $relationship = $this->get_relationship($data['class_name']);
+        return section_relationship_model::create($section->get_id(), $relationship->id);
+    }
+
+    public function get_relationship(string $class_name): relationship {
+        if (!isset($this->cache['relationships'][$class_name])) {
+            /** @var relationship_resolver|null $resolver */
+            $resolver = relationship_resolver::repository()
+                ->with('relationship')
+                ->where('class_name', $class_name)
+                ->order_by('id')
+                ->first();
+
+            if (isset($resolver)) {
+                $relationship = relationship::load_by_entity($resolver->relationship);
+            } else {
+                $relationship = relationship::create([$class_name]);
+            }
+
+            $this->cache['relationships'][$class_name] = $relationship;
+        }
+
+        return $this->cache['relationships'][$class_name];
     }
 
     /**
@@ -235,4 +268,5 @@ class mod_perform_generator extends component_generator_base {
                 $track
             );
     }
+
 }

@@ -28,8 +28,8 @@ use container_perform\perform as perform_container;
 use core\orm\collection;
 use core\orm\entity\model;
 use mod_perform\entities\activity\activity as activity_entity;
-use mod_perform\entities\activity\section as section_entity;
 use mod_perform\util;
+use totara_core\relationship\relationship;
 
 /**
  * Class activity
@@ -44,6 +44,7 @@ use mod_perform\util;
  * @property-read int $created_at
  * @property-read int $updated_at
  * @property-read collection|section[] $sections
+ * @property-read collection|relationship[] $relationships
  *
  * @package mod_perform\models\activity
  */
@@ -61,6 +62,7 @@ class activity extends model {
 
     protected $model_accessor_whitelist = [
         'sections',
+        'relationships',
     ];
 
     public const STATUS_ACTIVE = 1;
@@ -256,13 +258,21 @@ class activity extends model {
     }
 
     /**
-     * Get a collection of all sections that belong to this activity
+     * Get the sections for this activity.
      *
      * @return collection|section[]
      */
     public function get_sections(): collection {
-        return $this->entity->sections->map(function (section_entity $section_entity) {
-            return section::load_by_entity($section_entity);
-        });
+        return $this->entity->sections->transform_to(section::class);
     }
+
+    /**
+     * Get the relationships for this activity.
+     *
+     * @return collection|relationship[]
+     */
+    public function get_relationships(): collection {
+        return $this->entity->relationships->transform_to(relationship::class);
+    }
+
 }

@@ -37,6 +37,7 @@ type mod_perform_section_relationship {
   id: core_id!
   can_answer: Boolean!
   can_view: Boolean!
+  relationship: totara_core_relationship!
 }
 
 """
@@ -70,7 +71,7 @@ enum mod_perform_activity_status {
 
 input update_section_relationships_input {
   section_id: core_id!
-  names: [String!]!
+  relationship_ids: [Int]!
 }
 
 extend type Query {

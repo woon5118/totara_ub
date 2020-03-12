@@ -22,26 +22,36 @@
  */
 
 use mod_perform\entities\activity\activity_relationship;
-use mod_perform\entities\activity\section_relationship as section_relationship_entity;
-use mod_perform\models\activity\activity_relationship as activity_relationship_model;
+use mod_perform\entities\activity\section_relationship;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\section;
-use mod_perform\models\activity\section_relationship as section_relationship_model;
+use totara_core\entities\relationship_resolver;
+use totara_core\relationship\resolvers\subject;
+use totara_job\relationship\resolvers\appraiser;
+use totara_job\relationship\resolvers\manager;
 
 abstract class mod_perform_relationship_testcase extends advanced_testcase {
 
-    protected function perform_generator(): mod_perform_generator {
-        /** @var mod_perform_generator $perform_generator */
-        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-        return $perform_generator;
+    /**
+     * @var component_generator_base|mod_perform_generator
+     */
+    private $perform_generator;
+
+    /**
+     * @return component_generator_base|mod_perform_generator
+     */
+    protected function perform_generator() {
+        if (!isset($this->perform_generator)) {
+            $this->perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        }
+        return $this->perform_generator;
     }
 
     /**
      * @return object
      */
     protected function create_test_data() {
-        /** @var mod_perform_generator $perform_generator */
-        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $perform_generator = $this->perform_generator();
 
         $data = new stdClass();
 
@@ -73,31 +83,26 @@ abstract class mod_perform_relationship_testcase extends advanced_testcase {
         // Section without relationship.
         $data->activity2_section2 = $perform_generator->create_section($data->activity2, ['title' => 'Activity 2 section 2']);
 
-        $data->activity1_relationship1 = activity_relationship_model::create_with_class_name($data->activity1, 'appraiser');
-        $data->activity1_relationship2 = activity_relationship_model::create_with_class_name($data->activity1, 'manager');
-        $data->activity1_relationship3 = activity_relationship_model::create_with_class_name($data->activity1, 'subject');
-        $data->activity2_relationship1 = activity_relationship_model::create_with_class_name($data->activity2, 'subject');
-
         // Two relationships for activity 1, section 1
-        $data->activity1_section1_relationship1 = section_relationship_model::create(
+        $data->activity1_section1_relationship1 = $perform_generator->create_section_relationship(
             $data->activity1_section1,
-            $data->activity1_relationship1
+            ['class_name' => appraiser::class]
         );
-        $data->activity1_section1_relationship2 = section_relationship_model::create(
+        $data->activity1_section1_relationship2 = $perform_generator->create_section_relationship(
             $data->activity1_section1,
-            $data->activity1_relationship2
+            ['class_name' => manager::class]
         );
 
         // One relationship for activity 1, section 2
-        $data->activity1_section2_relationship1 = section_relationship_model::create(
+        $data->activity1_section2_relationship1 = $perform_generator->create_section_relationship(
             $data->activity1_section2,
-            $data->activity1_relationship3
+            ['class_name' => subject::class]
         );
 
         // One relationship for activity 2's first section.
-        $data->activity2_section1_relationship1 = section_relationship_model::create(
+        $data->activity2_section1_relationship1 = $perform_generator->create_section_relationship(
             $data->activity2_section1,
-            $data->activity2_relationship1
+            ['class_name' => subject::class]
         );
 
         return $data;
@@ -108,10 +113,13 @@ abstract class mod_perform_relationship_testcase extends advanced_testcase {
      * @param array $expected_class_names
      */
     protected function assert_section_relationships(section $section, array $expected_class_names): void {
-        $section_relationships = section_relationship_entity::repository()->where('section_id', $section->id)->get();
-        $actual_class_names = $section_relationships->map(function (section_relationship_entity $section_relationship) {
-            return $section_relationship->activity_relationship()->one(true)->get_attribute('class_name');
-        })->all();
+        $actual_class_names = relationship_resolver::repository()
+            ->select_raw('DISTINCT class_name')
+            ->join([activity_relationship::TABLE, 'activity_relationship'], 'relationship_id', 'relationship_id')
+            ->join([section_relationship::TABLE, 'section_relationships'], 'activity_relationship.id', 'activity_relationship_id')
+            ->where('section_relationships.section_id', $section->id)
+            ->get()
+            ->pluck('class_name');
 
         $this->assertEqualsCanonicalizing($expected_class_names, $actual_class_names);
     }
@@ -121,11 +129,14 @@ abstract class mod_perform_relationship_testcase extends advanced_testcase {
      * @param array $expected_class_names
      */
     protected function assert_activity_relationships(activity $activity, array $expected_class_names): void {
-        $actual_class_names = activity_relationship::repository()
-            ->where('activity_id', $activity->id)
+        $actual_class_names = relationship_resolver::repository()
+            ->select_raw('DISTINCT class_name')
+            ->join([activity_relationship::TABLE, 'activity_relationship'], 'relationship_id', 'relationship_id')
+            ->where('activity_relationship.activity_id', $activity->id)
             ->get()
             ->pluck('class_name');
 
         $this->assertEqualsCanonicalizing($expected_class_names, $actual_class_names);
     }
+
 }

@@ -50,6 +50,6 @@ class update_section_relationships implements mutation_resolver {
         $ec->set_relevant_context($activity_context);
         require_capability('mod/perform:manage_activity', $activity_context);
 
-        return ['section' => $section->update_relationships($args['names'])];
+        return ['section' => $section->update_relationships($args['relationship_ids'])];
     }
 }

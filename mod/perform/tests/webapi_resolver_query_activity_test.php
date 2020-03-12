@@ -24,9 +24,13 @@
 /**
  * @group perform
  */
+
 use core\webapi\execution_context;
+use mod_perform\models\activity\activity;
 use mod_perform\webapi\resolver\query\activity as activity_resolver;
-use \mod_perform\models\activity\activity;
+use totara_core\relationship\resolvers\subject;
+use totara_job\relationship\resolvers\appraiser;
+use totara_job\relationship\resolvers\manager;
 use totara_webapi\graphql;
 
 require_once(__DIR__.'/relationship_testcase.php');
@@ -80,6 +84,9 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
     public function test_ajax_query_successful() {
         self::setAdminUser();
         $data = $this->create_test_data();
+        $appraiser_id = $this->perform_generator()->get_relationship(appraiser::class);
+        $manager_id = $this->perform_generator()->get_relationship(manager::class);
+        $subject_id = $this->perform_generator()->get_relationship(subject::class);
 
         $id = $data->activity1->id;
         $args = [
@@ -107,16 +114,26 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
                 'id' => $data->activity1_section1_relationship1->id,
                 'can_view' => true,
                 'can_answer' => true,
-                // TODO check that the correct relationship is linked.
+                'relationship' => [
+                    'id' => $appraiser_id->get_id(),
+                    'name' => $appraiser_id->get_name(),
+                ],
             ],
             [
                 'id' => $data->activity1_section1_relationship2->id,
                 'can_view' => true,
                 'can_answer' => true,
-                // TODO check that the correct relationship is linked.
+                'relationship' => [
+                    'id' => $manager_id->get_id(),
+                    'name' => $manager_id->get_name(),
+                ],
             ],
         ];
-        $this->assertEqualsCanonicalizing($section1_expected_relationships, $section1_result['section_relationships']);
+        // Order of results doesn't matter.
+        usort($section1_result['section_relationships'], static function ($a, $b) {
+            return $a['id'] - $b['id'];
+        });
+        $this->assertEquals($section1_expected_relationships, $section1_result['section_relationships']);
 
         $section2 = array_filter($result['sections'], function ($section) use ($data) {
             return (int)$section['id'] === $data->activity1_section2->id;
@@ -127,7 +144,10 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
             'id' => $data->activity1_section2_relationship1->id,
             'can_view' => true,
             'can_answer' => true,
-            // TODO check that the correct relationship is linked.
+            'relationship' => [
+                'id' => $subject_id->get_id(),
+                'name' => $subject_id->get_name(),
+            ],
         ];
         $this->assertCount(1, $section2_result['section_relationships']);
         $this->assertEquals($section2_expected_relationships, reset($section2_result['section_relationships']));

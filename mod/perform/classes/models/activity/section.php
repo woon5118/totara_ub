@@ -25,8 +25,9 @@ namespace mod_perform\models\activity;
 
 use core\orm\collection;
 use core\orm\entity\model;
+use core\orm\query\builder;
+use mod_perform\entities\activity\activity_relationship;
 use mod_perform\entities\activity\section as section_entity;
-use mod_perform\entities\activity\section_relationship as section_relationship_entity;
 
 /**
  * Class section
@@ -114,68 +115,37 @@ class section extends model {
      * @return collection|section_relationship[]
      */
     public function get_section_relationships(): collection {
-        return $this->entity->section_relationships->map(function (section_relationship_entity $section_relationship_entity) {
-            return section_relationship::load_by_entity($section_relationship_entity);
-        });
+        return $this->entity->section_relationships->transform_to(section_relationship::class);
     }
 
     /**
-     * Set section relationships to the specified list of relationships
+     * Get the activity relationships that exist due to this section (not for all sections)
      *
-     * TODO Currently, relationships are specified by class name. In the near future, this will change to relationship id.
+     * @return collection|activity_relationship[]
+     */
+    public function get_activity_relationships(): collection {
+        return $this->entity->activity_relationships;
+    }
+
+    /**
+     * Update section relationships by a list of class names.
      *
-     * @param string[] $relationships_to_set
+     * @param int[] $relationship_ids
      * @return section
      */
-    public function update_relationships(array $relationships_to_set): self {
-        global $DB;
-
+    public function update_relationships(array $relationship_ids): self {
         // Figure out which relationships to remove and which to add.
-        $current_section_relationships = $this->get_section_relationships()->all();
-        $current_activity_relationship_class_names = array_map(
-            function (section_relationship $relationship) {
-                return $relationship->get_activity_relationship()->class_name;
-            },
-            $current_section_relationships
-        );
+        $current_relationship_ids = $this->get_activity_relationships()->pluck('relationship_id');
 
-        $relationship_class_names_to_add = [];
-        foreach ($relationships_to_set as $class_name) {
-            if (!in_array($class_name, $current_activity_relationship_class_names)) {
-                $relationship_class_names_to_add[] = $class_name;
-            }
-        }
-
-        /** @var section_relationship[] $section_relationships_to_delete */
-        $section_relationships_to_delete = [];
-        foreach ($current_section_relationships as $section_relationship) {
-            /** @var section_relationship $section_relationship */
-            if (!in_array($section_relationship->get_activity_relationship()->class_name, $relationships_to_set)) {
-                $section_relationships_to_delete[] = $section_relationship;
-            }
-        }
-
-        $DB->transaction(function () use ($relationship_class_names_to_add, $section_relationships_to_delete) {
-            foreach ($relationship_class_names_to_add as $create_class_name) {
-                // Find or create the activity relationship.
-                $activity_relationship = activity_relationship::find_with_class_name(
-                    $this->get_activity(),
-                    $create_class_name
-                );
-                if (!$activity_relationship) {
-                    $activity_relationship = activity_relationship::create_with_class_name(
-                        $this->get_activity(),
-                        $create_class_name
-                    );
+        builder::get_db()->transaction(function () use ($current_relationship_ids, $relationship_ids) {
+            foreach ($relationship_ids as $relationship_id) {
+                if (!in_array($relationship_id, $current_relationship_ids)) {
+                    section_relationship::create($this->get_id(), $relationship_id);
                 }
-
-                section_relationship::create($this,  $activity_relationship);
             }
-            foreach ($section_relationships_to_delete as $section_relationship) {
-                $activity_relationship = $section_relationship->get_activity_relationship();
-                $section_relationship->delete();
-                if (!$activity_relationship->has_section_relationships()) {
-                    $activity_relationship->delete();
+            foreach ($current_relationship_ids as $relationship_id) {
+                if (!in_array($relationship_id, $relationship_ids)) {
+                    section_relationship::delete_with_properties($this->get_id(), $relationship_id);
                 }
             }
         });

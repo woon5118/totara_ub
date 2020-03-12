@@ -27,6 +27,7 @@ use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many;
+use totara_core\entities\relationship;
 
 /**
  * Activity relationship entity
@@ -34,12 +35,13 @@ use core\orm\entity\relations\has_many;
  * Properties:
  * @property-read int $id ID
  * @property int $activity_id ID of activity
- * @property string $class_name Name of relationship class.
+ * @property int $relationship_id ID of relationship
  * @property int $created_at
  *
  * Relationships:
  * @property-read activity $activity
  * @property-read collection|section_relationship[] $section_relationships
+ * @property-read relationship $relationship
  */
 class activity_relationship extends entity {
     public const TABLE = 'perform_relationship';
@@ -57,4 +59,14 @@ class activity_relationship extends entity {
     public function section_relationships(): has_many {
         return $this->has_many(section_relationship::class, 'activity_relationship_id');
     }
+
+    /**
+     * Relationship with relationship entities.
+     *
+     * @return belongs_to
+     */
+    public function relationship(): belongs_to {
+        return $this->belongs_to(relationship::class, 'relationship_id');
+    }
+
 }

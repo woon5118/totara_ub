@@ -23,6 +23,9 @@
  */
 
 use mod_perform\models\activity\section;
+use totara_core\relationship\resolvers\subject;
+use totara_job\relationship\resolvers\appraiser;
+use totara_job\relationship\resolvers\manager;
 
 require_once(__DIR__.'/relationship_testcase.php');
 
@@ -49,33 +52,37 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
         $this->assert_section_relationships($section1, []);
         $this->assert_section_relationships($section2, []);
 
+        $appraiser_id = $perform_generator->get_relationship(appraiser::class)->id;
+        $manager_id = $perform_generator->get_relationship(manager::class)->id;
+        $subject_id = $perform_generator->get_relationship(subject::class)->id;
+
         // Add three relationships to section1.
-        $returned_section = $section1->update_relationships(['appraiser', 'manager', 'subject']);
+        $returned_section = $section1->update_relationships([$appraiser_id, $manager_id, $subject_id]);
         $this->assertEquals($section1, $returned_section);
-        $this->assert_section_relationships($section1, ['appraiser', 'manager', 'subject']);
+        $this->assert_section_relationships($section1, [appraiser::class, manager::class, subject::class]);
         $this->assert_section_relationships($section2, []);
-        $this->assert_activity_relationships($activity1, ['appraiser', 'manager', 'subject']);
+        $this->assert_activity_relationships($activity1, [appraiser::class, manager::class, subject::class]);
         $this->assert_activity_relationships($activity2, []);
 
         // Remove one relationship.
-        $section1->update_relationships(['appraiser', 'manager']);
-        $this->assert_section_relationships($section1, ['appraiser', 'manager']);
+        $section1->update_relationships([$appraiser_id, $manager_id]);
+        $this->assert_section_relationships($section1, [appraiser::class, manager::class]);
         $this->assert_section_relationships($section2, []);
-        $this->assert_activity_relationships($activity1, ['appraiser', 'manager']);
+        $this->assert_activity_relationships($activity1, [appraiser::class, manager::class]);
         $this->assert_activity_relationships($activity2, []);
 
         // Add to section2.
-        $section2->update_relationships(['manager', 'subject']);
-        $this->assert_section_relationships($section1, ['appraiser', 'manager']);
-        $this->assert_section_relationships($section2, ['manager', 'subject']);
-        $this->assert_activity_relationships($activity1, ['appraiser', 'manager', 'subject']);
+        $section2->update_relationships([$manager_id, $subject_id]);
+        $this->assert_section_relationships($section1, [appraiser::class, manager::class]);
+        $this->assert_section_relationships($section2, [manager::class, subject::class]);
+        $this->assert_activity_relationships($activity1, [appraiser::class, manager::class, subject::class]);
         $this->assert_activity_relationships($activity2, []);
 
         // Remove all from section1.
         $section1->update_relationships([]);
         $this->assert_section_relationships($section1, []);
-        $this->assert_section_relationships($section2, ['manager', 'subject']);
-        $this->assert_activity_relationships($activity1, ['manager', 'subject']);
+        $this->assert_section_relationships($section2, [manager::class, subject::class]);
+        $this->assert_activity_relationships($activity1, [manager::class, subject::class]);
         $this->assert_activity_relationships($activity2, []);
 
         // Remove all from section2.

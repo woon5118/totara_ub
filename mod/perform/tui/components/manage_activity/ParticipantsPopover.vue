@@ -29,16 +29,16 @@
       {{ $str('activity_participants:select_heading', 'mod_perform') }}
     </label>
     <Checkbox
-      v-for="(participant, key) in availableParticipants"
-      :key="key"
-      :value="participant.key"
-      :name="participant.key"
-      :checked="isActiveParticipant(participant.key)"
-      :disabled="isActiveParticipant(participant.key)"
-      @change="isChecked => handleChange(isChecked, participant.key)"
+      v-for="participant in availableParticipants"
+      :key="participant.id"
+      :value="participant.id"
+      :name="participant.name"
+      :checked="isActiveParticipant(participant)"
+      :disabled="isActiveParticipant(participant)"
+      @change="isChecked => handleChange(isChecked, participant)"
     >
       <template>
-        {{ participant.displayName }}
+        {{ participant.name }}
       </template>
     </Checkbox>
     <template v-slot:buttons="{ close }">
@@ -60,8 +60,9 @@
 </template>
 <script>
 import Button from 'totara_core/components/buttons/Button';
-import Popover from 'totara_core/components/popover/Popover';
 import Checkbox from 'totara_core/components/form/Checkbox';
+import Popover from 'totara_core/components/popover/Popover';
+import RelationshipsQuery from 'totara_core/graphql/relationships.graphql';
 
 export default {
   components: {
@@ -79,17 +80,10 @@ export default {
 
   data() {
     return {
-      // TODO: Make this dynamic when relationships are implemented.
-      availableParticipants: [
-        { key: 'subject', displayName: 'Subject' },
-        { key: 'manager', displayName: 'Manager' },
-        { key: 'appraiser', displayName: 'Appraiser' },
-      ],
+      availableParticipants: [],
       checkedParticipants: [],
     };
   },
-
-  computed: {},
 
   methods: {
     /**
@@ -102,18 +96,27 @@ export default {
       this.checkedParticipants = [];
     },
 
-    isActiveParticipant(participantKey) {
-      return this.activeParticipants.includes(participantKey);
+    isActiveParticipant(participant) {
+      return this.activeParticipants
+        .map(participant => participant.id)
+        .includes(participant.id);
     },
 
-    handleChange(isChecked, participantKey) {
+    handleChange(isChecked, participant) {
       if (isChecked) {
-        this.checkedParticipants.push(participantKey);
+        this.checkedParticipants.push(participant);
       } else {
         this.checkedParticipants = this.checkedParticipants.filter(
-          value => value !== participantKey
+          value => value !== participant
         );
       }
+    },
+  },
+
+  apollo: {
+    availableParticipants: {
+      query: RelationshipsQuery,
+      update: data => data.totara_core_relationships,
     },
   },
 };

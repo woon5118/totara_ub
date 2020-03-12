@@ -727,5 +727,58 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020031302, 'perform');
     }
 
+    if ($oldversion < 2020031700) {
+        $DB->delete_records('perform_relationship');
+
+        // Define index activity_id_class_name (unique) to be dropped form perform_relationship.
+        $table = new xmldb_table('perform_relationship');
+        $index = new xmldb_index('activity_id_class_name', XMLDB_INDEX_UNIQUE, array('activity_id', 'class_name'));
+
+        // Conditionally launch drop index activity_id_class_name.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Rename field class_name on table perform_relationship to name.
+        $table = new xmldb_table('perform_relationship');
+        $field = new xmldb_field('class_name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'activity_id');
+
+        // Launch rename field class_name.
+        $dbman->rename_field($table, $field, 'relationship_id');
+
+        // Changing type of field relationship_id on table perform_relationship to int.
+        $table = new xmldb_table('perform_relationship');
+        $field = new xmldb_field('relationship_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'activity_id');
+
+        // Launch change of type for field relationship_id.
+        $dbman->change_field_type($table, $field);
+
+        // Changing precision of field relationship_id on table perform_relationship to (10).
+        $table = new xmldb_table('perform_relationship');
+        $field = new xmldb_field('relationship_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'activity_id');
+
+        // Launch change of precision for field relationship_id.
+        $dbman->change_field_precision($table, $field);
+
+        // Define key relationship_id (foreign) to be added to perform_relationship.
+        $table = new xmldb_table('perform_relationship');
+        $key = new xmldb_key('relationship_id', XMLDB_KEY_FOREIGN, array('relationship_id'), 'totara_core_relationship', array('id'), 'restrict');
+
+        // Launch add key relationship_id.
+        $dbman->add_key($table, $key);
+
+        // Define index activity_id_relationship_id (unique) to be added to perform_relationship.
+        $table = new xmldb_table('perform_relationship');
+        $index = new xmldb_index('activity_id_relationship_id', XMLDB_INDEX_UNIQUE, array('activity_id', 'relationship_id'));
+
+        // Conditionally launch add index activity_id_relationship_id.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020031700, 'perform');
+    }
+
     return true;
 }

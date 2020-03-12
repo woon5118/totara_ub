@@ -25,11 +25,14 @@
  * @group perform
  */
 
-use mod_perform\entities\activity\section as section_entity;
-use mod_perform\webapi\resolver\mutation\update_section_relationships;
 use core\webapi\execution_context;
-use totara_webapi\graphql;
+use mod_perform\entities\activity\section as section_entity;
 use mod_perform\models\activity\section;
+use mod_perform\webapi\resolver\mutation\update_section_relationships;
+use totara_core\relationship\resolvers\subject;
+use totara_job\relationship\resolvers\appraiser;
+use totara_job\relationship\resolvers\manager;
+use totara_webapi\graphql;
 
 require_once(__DIR__.'/relationship_testcase.php');
 
@@ -41,6 +44,7 @@ class webapi_resolver_mutation_update_section_relationships_testcase extends mod
 
     public function test_update_invalid_section_id() {
         $this->setAdminUser();
+        $relationship_id = $this->perform_generator()->get_relationship(subject::class)->id;
         $non_existent_section_id = 1234;
         while (section_entity::repository()->where('id', $non_existent_section_id)->exists()) {
             $non_existent_section_id ++;
@@ -50,7 +54,7 @@ class webapi_resolver_mutation_update_section_relationships_testcase extends mod
 
         $args = [
             'section_id' => $non_existent_section_id,
-            'names' => ['appraiser', 'manager', 'subject'],
+            'relationship_ids' => [$relationship_id],
         ];
         update_section_relationships::resolve(['input' => $args], $this->get_execution_context());
     }
@@ -58,6 +62,7 @@ class webapi_resolver_mutation_update_section_relationships_testcase extends mod
     public function test_update_missing_capability() {
         $this->setAdminUser();
         $perform_generator = $this->perform_generator();
+        $relationship_id = $this->perform_generator()->get_relationship(subject::class)->id;
         $activity1 = $perform_generator->create_activity_in_container();
         /** @var section $section1 */
         $section1 = $perform_generator->create_section($activity1);
@@ -70,7 +75,7 @@ class webapi_resolver_mutation_update_section_relationships_testcase extends mod
 
         $args = [
             'section_id' => $section1->id,
-            'names' => ['appraiser', 'manager', 'subject'],
+            'relationship_ids' => [$relationship_id],
         ];
         update_section_relationships::resolve(['input' => $args], $this->get_execution_context());
     }
@@ -78,6 +83,9 @@ class webapi_resolver_mutation_update_section_relationships_testcase extends mod
     public function test_update_successful() {
         self::setAdminUser();
         $perform_generator = $this->perform_generator();
+        $subject_id = $perform_generator->get_relationship(subject::class)->id;
+        $manager_id = $perform_generator->get_relationship(manager::class)->id;
+        $appraiser_id = $perform_generator->get_relationship(appraiser::class)->id;
         $activity1 = $perform_generator->create_activity_in_container(['activity_name' => 'Activity 1']);
         $activity2 = $perform_generator->create_activity_in_container(['activity_name' => 'Activity 2']);
         /** @var section $section1 */
@@ -89,21 +97,21 @@ class webapi_resolver_mutation_update_section_relationships_testcase extends mod
         // Add three relationships to section1.
         $args = [
             'section_id' => $section1->id,
-            'names' => ['appraiser', 'manager', 'subject'],
+            'relationship_ids' => [$subject_id, $manager_id, $appraiser_id],
         ];
         $result = update_section_relationships::resolve(['input' => $args], $this->get_execution_context());
         /** @var section $returned_section */
         $returned_section = $result['section'];
         $this->assertEquals($section1->id, $returned_section->id);
-        $this->assert_section_relationships($section1, ['appraiser', 'manager', 'subject']);
+        $this->assert_section_relationships($section1, [subject::class, manager::class, appraiser::class]);
         $this->assert_section_relationships($section2, []);
-        $this->assert_activity_relationships($activity1, ['appraiser', 'manager', 'subject']);
+        $this->assert_activity_relationships($activity1, [subject::class, manager::class, appraiser::class]);
         $this->assert_activity_relationships($activity2, []);
 
         // Remove all relationships.
         $args = [
             'section_id' => $section1->id,
-            'names' => [],
+            'relationship_ids' => [],
         ];
         update_section_relationships::resolve(['input' => $args], $this->get_execution_context());
         $this->assert_section_relationships($section1, []);
@@ -120,10 +128,11 @@ class webapi_resolver_mutation_update_section_relationships_testcase extends mod
         $data = $this->create_test_data();
         // Section without relationships.
         $section_id = $data->activity2_section2->id;
+        $appraiser_id = $this->perform_generator()->get_relationship(appraiser::class)->id;
 
         $args = [
             'section_id' => $section_id,
-            'names' => ["appraiser"],
+            'relationship_ids' => [$appraiser_id],
         ];
 
         $result = graphql::execute_operation(

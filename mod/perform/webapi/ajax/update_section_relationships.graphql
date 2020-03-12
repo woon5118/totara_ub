@@ -9,6 +9,10 @@ mutation mod_perform_update_section_relationships(
         id
         can_view
         can_answer
+        relationship {
+          id
+          name
+        }
       }
     }
   }

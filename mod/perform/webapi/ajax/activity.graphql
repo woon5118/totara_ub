@@ -10,6 +10,10 @@ query mod_perform_activity($activity_id: core_id!) {
         id
         can_view
         can_answer
+        relationship {
+          id
+          name
+        }
       }
     }
   }

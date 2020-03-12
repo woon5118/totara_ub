@@ -41,11 +41,11 @@
           {{ $str('activity_participants:heading', 'mod_perform') }}
         </h3>
         <div
-          v-for="(participant, key) in displayedParticipants"
-          :key="key"
+          v-for="participant in displayedParticipantsSorted"
+          :key="participant.id"
           class="mod-perform-activitySection__participant-row"
         >
-          {{ participant }}
+          {{ participant.name }}
           <ButtonIcon
             :styleclass="{ small: true, transparent: true }"
             :aria-label="$str('delete')"
@@ -130,27 +130,38 @@ export default {
   data() {
     return {
       modelOpen: false,
-      displayedParticipants: this.getLastSavedParticipants(),
+      savedSection: this.section,
+      displayedParticipants: this.getParticipantsFromSection(this.section),
       isSaving: false,
     };
   },
   computed: {
+    savedParticipants() {
+      return this.getParticipantsFromSection(this.savedSection);
+    },
     // Has anything changed compared to last saved state?
     // Checks for difference between displayed & last saved participants arrays.
     hasChanges: function() {
-      const lastSavedParticipants = this.getLastSavedParticipants();
       return !(
-        this.displayedParticipants.length === lastSavedParticipants.length &&
-        this.displayedParticipants.every(value =>
-          lastSavedParticipants.includes(value)
+        this.displayedParticipants.length === this.savedParticipants.length &&
+        this.displayedParticipantIds.every(value =>
+          this.savedParticipants
+            .map(participant => participant.id)
+            .includes(value)
         )
       );
     },
+    displayedParticipantIds() {
+      return this.displayedParticipants.map(participant => participant.id);
+    },
+    displayedParticipantsSorted() {
+      return this.displayedParticipants.slice().sort((a, b) => a.id - b.id);
+    },
   },
   methods: {
-    getLastSavedParticipants() {
-      if (this.section.section_relationships) {
-        return this.section.section_relationships.map(value => value.name);
+    getParticipantsFromSection(section) {
+      if (section.section_relationships) {
+        return section.section_relationships.map(value => value.relationship);
       }
       return [];
     },
@@ -168,11 +179,13 @@ export default {
     },
     removeDisplayedParticipant(participant) {
       this.displayedParticipants = this.displayedParticipants.filter(
-        value => value !== participant
+        value => value.id !== participant.id
       );
     },
     resetSectionChanges() {
-      this.displayedParticipants = this.getLastSavedParticipants();
+      this.displayedParticipants = this.getParticipantsFromSection(
+        this.savedSection
+      );
     },
 
     showMutationSuccessNotification() {
@@ -203,13 +216,15 @@ export default {
         variables: {
           input: {
             section_id: this.section.id,
-            names: this.displayedParticipants,
+            relationship_ids: this.displayedParticipantIds,
           },
         },
         refetchAll: false, // Don't refetch all the data again
       });
 
-      return resultData['mod_perform_update_section_relationships'];
+      const result = resultData['mod_perform_update_section_relationships'];
+      this.savedSection = result.section;
+      return result;
     },
   },
 };
