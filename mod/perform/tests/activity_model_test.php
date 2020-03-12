@@ -76,7 +76,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $this->assertEquals($activity->description, 'New description');
 
         // Assert persisted state is correct
-        $from_database = activity::load_by_id($activity->get_id());
+        $from_database = activity::load_by_id($activity->id);
         $this->assertEquals($from_database->name, 'New name for existing activity');
         $this->assertEquals($from_database->description, 'New description');
     }
@@ -98,7 +98,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $this->assertNull($activity->description);
 
         // Assert persisted state is correct
-        $from_database = activity::load_by_id($activity->get_id());
+        $from_database = activity::load_by_id($activity->id);
         $this->assertEquals($from_database->name, 'New name for existing activity');
         $this->assertNull($from_database->description);
     }

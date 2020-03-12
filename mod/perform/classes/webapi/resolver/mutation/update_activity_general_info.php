@@ -48,6 +48,8 @@ class update_activity_general_info implements mutation_resolver {
 
         $activity->update_general_info($args['name'], $args['description'] ?? null);
 
+        $ec->set_relevant_context($activity->get_context());
+
         return ['activity' => $activity];
     }
 

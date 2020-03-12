@@ -70,7 +70,7 @@ class element_plugin {
     /**
      * Get items for the model
      *
-     * @return collection
+     * @return collection|element_plugin_model[]
      */
     public function get() {
         return $this->items;

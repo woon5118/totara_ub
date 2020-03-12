@@ -28,25 +28,40 @@ use container_perform\perform as perform_container;
 use core\orm\collection;
 use core\orm\entity\model;
 use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\entities\activity\section as section_entity;
 use mod_perform\util;
 
 /**
  * Class activity
  *
- * This class contains the methods related to performance activity
- * All the activity entity properties accessible via this class
+ * The core performance activity object. It defines questions and users who can answer them.
  *
  * @property-read int $id ID
- * @property-read int $container the container that this activity exists within
- * @property-read string $name the name given to this activity
+ * @property-read int $course
+ * @property-read string $name
  * @property-read string $description
  * @property-read int $status
+ * @property-read int $created_at
  * @property-read int $updated_at
  * @property-read collection|section[] $sections
- * @property-read \context $context
+ *
  * @package mod_perform\models\activity
  */
 class activity extends model {
+
+    protected $entity_attribute_whitelist = [
+        'id',
+        'course',
+        'name',
+        'description',
+        'status',
+        'created_at',
+        'updated_at',
+    ];
+
+    protected $model_accessor_whitelist = [
+        'sections',
+    ];
 
     public const STATUS_ACTIVE = 1;
     public const STATUS_INACTIVE = 2;
@@ -58,7 +73,7 @@ class activity extends model {
      */
     protected $entity;
 
-    public static function get_entity_class(): string {
+    protected static function get_entity_class(): string {
         return activity_entity::class;
     }
 
@@ -241,43 +256,13 @@ class activity extends model {
     }
 
     /**
-     * get collection
+     * Get a collection of all sections that belong to this activity
      *
-     * @return array
+     * @return collection|section[]
      */
-    public function get_sections() {
-        $section_models = [];
-        foreach ($this->entity->sections as $section_entity) {
-            $section_models[] = section::load_by_entity($section_entity);
-        }
-        return $section_models;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function has_attribute(string $name): bool {
-        $attributes = ['context', 'sections'];
-        return in_array($name, $attributes) || parent::has_attribute($name);
-    }
-
-    public function __get($name) {
-        switch ($name) {
-            case 'context':
-                return \context_course::instance($this->entity->course);
-            case 'sections':
-                return $this->get_sections();
-            default:
-                return parent::__get($name);
-        }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function to_array(): array {
-        $result = parent::to_array();
-        $result['sections'] = $this->get_sections();
-        return $result;
+    public function get_sections(): collection {
+        return $this->entity->sections->map(function (section_entity $section_entity) {
+            return section::load_by_entity($section_entity);
+        });
     }
 }

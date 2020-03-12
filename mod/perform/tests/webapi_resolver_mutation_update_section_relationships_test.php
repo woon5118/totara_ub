@@ -69,7 +69,7 @@ class webapi_resolver_mutation_update_section_relationships_testcase extends mod
         $this->expectExceptionMessage('you do not currently have permissions to do that (Manage performance activities)');
 
         $args = [
-            'section_id' => $section1->get_id(),
+            'section_id' => $section1->id,
             'names' => ['appraiser', 'manager', 'subject'],
         ];
         update_section_relationships::resolve(['input' => $args], $this->get_execution_context());
@@ -88,11 +88,13 @@ class webapi_resolver_mutation_update_section_relationships_testcase extends mod
 
         // Add three relationships to section1.
         $args = [
-            'section_id' => $section1->get_id(),
+            'section_id' => $section1->id,
             'names' => ['appraiser', 'manager', 'subject'],
         ];
-        $returned_section = update_section_relationships::resolve(['input' => $args], $this->get_execution_context());
-        $this->assertEquals($section1->get_id(), $returned_section->get_id());
+        $result = update_section_relationships::resolve(['input' => $args], $this->get_execution_context());
+        /** @var section $returned_section */
+        $returned_section = $result['section'];
+        $this->assertEquals($section1->id, $returned_section->id);
         $this->assert_section_relationships($section1, ['appraiser', 'manager', 'subject']);
         $this->assert_section_relationships($section2, []);
         $this->assert_activity_relationships($activity1, ['appraiser', 'manager', 'subject']);
@@ -100,7 +102,7 @@ class webapi_resolver_mutation_update_section_relationships_testcase extends mod
 
         // Remove all relationships.
         $args = [
-            'section_id' => $section1->get_id(),
+            'section_id' => $section1->id,
             'names' => [],
         ];
         update_section_relationships::resolve(['input' => $args], $this->get_execution_context());
@@ -117,7 +119,7 @@ class webapi_resolver_mutation_update_section_relationships_testcase extends mod
         $this->setAdminUser();
         $data = $this->create_test_data();
         // Section without relationships.
-        $section_id = $data->section2_2->get_id();
+        $section_id = $data->activity2_section2->id;
 
         $args = [
             'section_id' => $section_id,
@@ -129,6 +131,6 @@ class webapi_resolver_mutation_update_section_relationships_testcase extends mod
             ['input' => $args]
         );
         $this->assertEquals([], $result->errors);
-        $this->assertEquals($section_id, $result->data['mod_perform_update_section_relationships']['id']);
+        $this->assertEquals($section_id, $result->data['mod_perform_update_section_relationships']['section']['id']);
     }
 }

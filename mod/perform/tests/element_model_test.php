@@ -30,15 +30,13 @@ use mod_perform\models\activity\element;
 class mod_perform_element_model_testcase extends advanced_testcase {
 
     public function test_create() {
+        $default_context = context_coursecat::instance(perform::get_default_categoryid());
 
-        $context = context_coursecat::instance(perform::get_default_categoryid());
-
-        $element = element::create($context, 'short_text', 'test element 1 title', 123);
-        $id = $element->get_id();
+        $element = element::create($default_context, 'short_text', 'test element 1 title', 123);
 
         // Reload, just to make sure that we're getting it out of the DB.
         /** @var element $actual_element */
-        $element_model = element::load_by_id($id);
+        $element_model = element::load_by_id($element->id);
 
         $this->assertSame('short_text', $element_model->plugin_name);
         $this->assertSame('test element 1 title', $element_model->title);

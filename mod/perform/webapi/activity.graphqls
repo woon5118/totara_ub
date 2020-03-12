@@ -37,7 +37,6 @@ type mod_perform_section_relationship {
   id: core_id!
   can_answer: Boolean!
   can_view: Boolean!
-  name: String!
 }
 
 """
@@ -67,10 +66,6 @@ A list of possible states that a performance activity can be in
 enum mod_perform_activity_status {
   ACTIVE
   INACTIVE
-}
-
-type mod_perform_activity_result {
-  activity: mod_perform_activity!
 }
 
 input update_section_relationships_input {
@@ -154,7 +149,17 @@ input mod_perform_update_section_elements_input {
   move: [mod_perform_move_section_element_input!]
 }
 
-type mod_perform_update_section_elements_result {
+"""
+Mutation return type including an activity
+"""
+type mod_perform_activity_result {
+  activity: mod_perform_activity!
+}
+
+"""
+Mutation return type including a section
+"""
+type mod_perform_section_result {
   section: mod_perform_section!
 }
 
@@ -173,12 +178,12 @@ extend type Mutation {
 
   mod_perform_update_section_relationships(
     input: update_section_relationships_input!
-  ): mod_perform_section!
+  ): mod_perform_section_result!
 
   """
   Update the elements in a section
   """
   mod_perform_update_section_elements(
     input: mod_perform_update_section_elements_input!
-  ): mod_perform_update_section_elements_result!
+  ): mod_perform_section_result!
 }

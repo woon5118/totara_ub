@@ -29,6 +29,7 @@ use core\orm\entity\relations\belongs_to;
 /**
  * Activity section relationship entity
  *
+ * Properties:
  * @property-read int $id ID
  * @property int $section_id ID of activity section
  * @property int $activity_relationship_id ID of activity relationship
@@ -36,6 +37,7 @@ use core\orm\entity\relations\belongs_to;
  * @property int $can_answer Flag indicating whether relationship is able to answer
  * @property int $created_at
  *
+ * Relationships:
  * @property-read section $section
  * @property-read activity_relationship $activity_relationship
  *

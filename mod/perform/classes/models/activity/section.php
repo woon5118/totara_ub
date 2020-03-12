@@ -31,16 +31,31 @@ use mod_perform\entities\activity\section_relationship as section_relationship_e
 /**
  * Class section
  *
- * This class contains the methods related to performance activity section
- * All the activity section entity properties accessible via this class
+ * A section of an activity, which defines the layout of elements (question) and the participants that can answer them.
  *
  * @property-read int $id ID
+ * @property-read int $activity_id
  * @property-read string $title
  * @property-read activity $activity
- * @property-read section_element[] $section_elements
+ * @property-read collection|section_element[] $section_elements
+ * @property-read collection|section_relationship[] $section_relationships
+ *
  * @package mod_perform\models\activity
  */
 class section extends model {
+
+    protected $entity_attribute_whitelist = [
+        'id',
+        'activity_id',
+        'title',
+    ];
+
+    protected $model_accessor_whitelist = [
+        'activity',
+        'section_elements',
+        'section_relationships',
+    ];
+
     /**
      * @var section_entity
      */
@@ -49,7 +64,7 @@ class section extends model {
     /**
      * @inheritDoc
      */
-    public static function get_entity_class(): string {
+    protected static function get_entity_class(): string {
         return section_entity::class;
     }
 
@@ -78,7 +93,7 @@ class section extends model {
     /**
      * Get any array of all section elements in this section, indexed and sorted by sort_order
      *
-     * @return array
+     * @return section_element[]
      */
     public function get_section_elements(): array {
         $section_element_models = [];
@@ -94,78 +109,74 @@ class section extends model {
     }
 
     /**
-     * @inheritDoc
-     */
-    public function __get($name) {
-        switch ($name) {
-            case 'activity':
-                return $this->get_activity();
-            case 'section_elements':
-                return $this->get_section_elements();
-            case 'section_relationships':
-                return $this->get_section_relationships();
-            default:
-                return parent::__get($name);
-        }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function to_array(): array {
-        $result = parent::to_array();
-        $result['activity'] = $this->get_activity();
-        $result['section_elements'] = $this->get_section_elements();
-        return $result;
-    }
-
-    /**
-<<<<<<< Updated upstream
-     * @return collection
-     */
-    public function get_activity_relationships(): collection {
-        return $this->entity->activity_relationships;
-    }
-
-    /**
-     * @return array
-     */
-    public function get_section_relationships(): array {
-        return $this->entity->section_relationships->map(function (section_relationship_entity $section_relationship) {
-            return section_relationship::load_by_entity($section_relationship);
-        })->all();
-    }
-
-    /**
-     * Update section relationships by a list of class names.
+     * Get a list of all section relationships that this section has
      *
-     * @param array $update_relationships_class_names
+     * @return collection|section_relationship[]
+     */
+    public function get_section_relationships(): collection {
+        return $this->entity->section_relationships->map(function (section_relationship_entity $section_relationship_entity) {
+            return section_relationship::load_by_entity($section_relationship_entity);
+        });
+    }
+
+    /**
+     * Set section relationships to the specified list of relationships
+     *
+     * TODO Currently, relationships are specified by class name. In the near future, this will change to relationship id.
+     *
+     * @param string[] $relationships_to_set
      * @return section
      */
-    public function update_relationships(array $update_relationships_class_names): self {
+    public function update_relationships(array $relationships_to_set): self {
         global $DB;
 
         // Figure out which relationships to remove and which to add.
-        $current_relationships_class_names = $this->get_activity_relationships()->pluck('class_name');
-        $to_create = [];
-        $to_delete = [];
-        foreach ($update_relationships_class_names as $class_name) {
-            if (!in_array($class_name, $current_relationships_class_names)) {
-                $to_create[] = $class_name;
-            }
-        }
-        foreach ($current_relationships_class_names as $class_name) {
-            if (!in_array($class_name, $update_relationships_class_names)) {
-                $to_delete[] = $class_name;
+        $current_section_relationships = $this->get_section_relationships()->all();
+        $current_activity_relationship_class_names = array_map(
+            function (section_relationship $relationship) {
+                return $relationship->get_activity_relationship()->class_name;
+            },
+            $current_section_relationships
+        );
+
+        $relationship_class_names_to_add = [];
+        foreach ($relationships_to_set as $class_name) {
+            if (!in_array($class_name, $current_activity_relationship_class_names)) {
+                $relationship_class_names_to_add[] = $class_name;
             }
         }
 
-        $DB->transaction(function () use ($to_create, $to_delete) {
-            foreach ($to_create as $create_class_name) {
-                section_relationship::create($this->get_id(),  $create_class_name);
+        /** @var section_relationship[] $section_relationships_to_delete */
+        $section_relationships_to_delete = [];
+        foreach ($current_section_relationships as $section_relationship) {
+            /** @var section_relationship $section_relationship */
+            if (!in_array($section_relationship->get_activity_relationship()->class_name, $relationships_to_set)) {
+                $section_relationships_to_delete[] = $section_relationship;
             }
-            foreach ($to_delete as $delete_class_name) {
-                section_relationship::delete_with_properties($this->get_id(), $delete_class_name);
+        }
+
+        $DB->transaction(function () use ($relationship_class_names_to_add, $section_relationships_to_delete) {
+            foreach ($relationship_class_names_to_add as $create_class_name) {
+                // Find or create the activity relationship.
+                $activity_relationship = activity_relationship::find_with_class_name(
+                    $this->get_activity(),
+                    $create_class_name
+                );
+                if (!$activity_relationship) {
+                    $activity_relationship = activity_relationship::create_with_class_name(
+                        $this->get_activity(),
+                        $create_class_name
+                    );
+                }
+
+                section_relationship::create($this,  $activity_relationship);
+            }
+            foreach ($section_relationships_to_delete as $section_relationship) {
+                $activity_relationship = $section_relationship->get_activity_relationship();
+                $section_relationship->delete();
+                if (!$activity_relationship->has_section_relationships()) {
+                    $activity_relationship->delete();
+                }
             }
         });
 
@@ -236,7 +247,7 @@ class section extends model {
 
         $DB->transaction(function () use ($remove_section_elements) {
             foreach ($remove_section_elements as $section_element) {
-                if ($section_element->get_section()->id != $this->id) {
+                if ($section_element->section_id != $this->id) {
                     throw new \coding_exception('Cannot delete a section element that does not belong to this section');
                 }
                 $section_element->delete();
@@ -273,7 +284,7 @@ class section extends model {
 
         $DB->transaction(function () use ($move_section_elements) {
             foreach ($move_section_elements as $sort_order => $section_element) {
-                if ($section_element->get_section()->id != $this->id) {
+                if ($section_element->section_id != $this->id) {
                     throw new \coding_exception('Cannot move a section element that does not belong to this section');
                 }
                 $section_element->update_sort_order($sort_order);

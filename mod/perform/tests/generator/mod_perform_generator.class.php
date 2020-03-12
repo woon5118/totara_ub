@@ -26,7 +26,6 @@ use container_perform\perform as perform_container;
 
 use core\collection;
 use core_container\module\module;
-use mod_perform\models\activity\section_relationship as section_relationship_model;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\element;
@@ -34,6 +33,7 @@ use mod_perform\models\activity\section_element;
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment_type;
 use mod_perform\user_groups\grouping;
+use mod_perform\util;
 
 /**
  * Perform generator
@@ -51,13 +51,12 @@ class mod_perform_generator extends component_generator_base {
 
         $container_data = new stdClass();
         $container_data->name = $data['container_name'] ?? "test performance container";
-        $container_data->category = \mod_perform\util::get_default_categoryid();
+        $container_data->category = util::get_default_categoryid();
 
         return $DB->transaction(function () use ($data, $container_data) {
             $container = perform_container::create($container_data);
 
             // Create a performance activity inside the new performance container.
-            $activity_data = new \stdClass();
             $name = $data['activity_name'] ?? "test performance activity";
             $description = $data['description'] ?? "test description";
             $status = $data['activity_status'] ?? activity::STATUS_ACTIVE;
@@ -65,7 +64,7 @@ class mod_perform_generator extends component_generator_base {
             /** @var perform_container $container */
             $activity = activity::create($container, $name, $description, $status);
 
-            return activity::load_by_id($activity->get_id());
+            return activity::load_by_id($activity->id);
         });
     }
 
@@ -110,10 +109,6 @@ class mod_perform_generator extends component_generator_base {
             $data['identifier'] ?? 0,
             $data['data'] ?? null
         );
-    }
-
-    public function create_section_relationship(section $section, array $data): section_relationship_model {
-        return section_relationship_model::create($section->get_id(), $data['class_name']);
     }
 
     /**

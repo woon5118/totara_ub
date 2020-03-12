@@ -33,7 +33,7 @@ use mod_perform\models\activity\section_element;
 class update_section_elements implements mutation_resolver {
 
     /**
-     * {@inheritdoc}
+     * @return section
      */
     public static function resolve(array $args, execution_context $ec) {
         global $DB;
@@ -61,7 +61,7 @@ class update_section_elements implements mutation_resolver {
 
             // Create new elements and add them to this section.
             if (!empty($section_form_data['create_new'])) {
-                $context = $section->activity->context;
+                $context = $section->get_activity()->get_context();
 
                 foreach ($section_form_data['create_new'] as $create_new_form_data) {
                     $element = element::create(
@@ -94,7 +94,7 @@ class update_section_elements implements mutation_resolver {
             }
         });
 
-        $ec->set_relevant_context($section->activity->context);
+        $ec->set_relevant_context($section->get_activity()->get_context());
 
         return [
             'section' => section::load_by_id($section->id)

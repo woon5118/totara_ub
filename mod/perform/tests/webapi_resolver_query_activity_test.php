@@ -36,11 +36,11 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
     public function test_get_activity(): void {
         self::setAdminUser();
         $created_activity = $this->create_activity();
-        $id = $created_activity->get_id();
+        $id = $created_activity->id;
 
         $returned_activity = activity_resolver::resolve(['activity_id' => $id], $this->get_execution_context());
 
-        $this->assertEquals($id, $returned_activity->get_id());
+        $this->assertEquals($id, $returned_activity->id);
         $this->assertEquals($created_activity->name, $returned_activity->name);
     }
 
@@ -52,11 +52,11 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
 
         self::setUser($user1);
         $created_activity = $this->create_activity();
-        $id = $created_activity->get_id();
+        $id = $created_activity->id;
 
         // Returns the activity for the user that created it
         $returned_activity = activity_resolver::resolve(['activity_id' => $id], $this->get_execution_context());
-        $this->assertEquals($id, $returned_activity->get_id());
+        $this->assertEquals($id, $returned_activity->id);
         $this->assertEquals($created_activity->name, $returned_activity->name);
 
         self::setUser($user2);
@@ -69,7 +69,7 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
         self::setGuestUser();
 
         $created_activity = $this->create_activity();
-        $id = $created_activity->get_id();
+        $id = $created_activity->id;
 
         activity_resolver::resolve(['activity_id' => $id], $this->get_execution_context());
     }
@@ -81,7 +81,7 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
         self::setAdminUser();
         $data = $this->create_test_data();
 
-        $id = $data->activity1->get_id();
+        $id = $data->activity1->id;
         $args = [
             'activity_id' => $id,
         ];
@@ -94,40 +94,40 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
 
         // Assert result structure.
         $result = $result->data['mod_perform_activity'];
-        $this->assertEquals($data->activity1->get_id(), $result['id']);
+        $this->assertEquals($data->activity1->id, $result['id']);
         $this->assertEquals('Activity 1', $result['name']);
         $this->assertEquals('test description', $result['description']);
         $section1 = array_filter($result['sections'], function ($section) use ($data) {
-            return (int)$section['id'] === $data->section1_1->get_id();
+            return (int)$section['id'] === $data->activity1_section1->id;
         });
         $section1_result = reset($section1);
-        $this->assertEquals('Test section 1 1',  $section1_result['title']);
+        $this->assertEquals('Activity 1 section 1',  $section1_result['title']);
         $section1_expected_relationships = [
             [
-                'id' => $data->relationship1_1_1->get_id(),
+                'id' => $data->activity1_section1_relationship1->id,
                 'can_view' => true,
                 'can_answer' => true,
-                'name' => 'appraiser',
+                // TODO check that the correct relationship is linked.
             ],
             [
-                'id' => $data->relationship1_1_2->get_id(),
+                'id' => $data->activity1_section1_relationship2->id,
                 'can_view' => true,
                 'can_answer' => true,
-                'name' => 'manager',
+                // TODO check that the correct relationship is linked.
             ],
         ];
         $this->assertEqualsCanonicalizing($section1_expected_relationships, $section1_result['section_relationships']);
 
         $section2 = array_filter($result['sections'], function ($section) use ($data) {
-            return (int)$section['id'] === $data->section1_2->get_id();
+            return (int)$section['id'] === $data->activity1_section2->id;
         });
         $section2_result = reset($section2);
-        $this->assertEquals('Test section 1 2',  $section2_result['title']);
+        $this->assertEquals('Activity 1 section 2',  $section2_result['title']);
         $section2_expected_relationships = [
-            'id' => $data->relationship1_2_1->get_id(),
+            'id' => $data->activity1_section2_relationship1->id,
             'can_view' => true,
             'can_answer' => true,
-            'name' => 'subject',
+            // TODO check that the correct relationship is linked.
         ];
         $this->assertCount(1, $section2_result['section_relationships']);
         $this->assertEquals($section2_expected_relationships, reset($section2_result['section_relationships']));

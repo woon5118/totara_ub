@@ -43,5 +43,4 @@ class activity extends entity_model_formatter {
             'sections' => null,
         ];
     }
-
 }

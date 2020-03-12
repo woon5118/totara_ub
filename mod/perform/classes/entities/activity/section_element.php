@@ -29,10 +29,13 @@ use core\orm\entity\relations\belongs_to;
 /**
  * Section element entity
  *
+ * Properties:
  * @property-read int $id ID
  * @property int $section_id ID of the section that this element appears in
  * @property int $element_id ID of the element that appears in the section
  * @property int $sort_order the position within the section where the element should appear
+ *
+ * Relationships:
  * @property-read section $section
  * @property-read element $element
  *

@@ -30,6 +30,7 @@ use core\orm\entity\relations\has_many;
 /**
  * Activity entity
  *
+ * Properties:
  * @property-read int $id ID
  * @property int $course ID of parent course
  * @property string $description
@@ -37,6 +38,8 @@ use core\orm\entity\relations\has_many;
  * @property int $status
  * @property int $created_at
  * @property int $updated_at
+ *
+ * Relationships:
  * @property-read collection|section[] $sections
  *
  * @method static activity_repository repository()

@@ -28,6 +28,7 @@ use core\orm\entity\entity;
 /**
  * Section element entity
  *
+ * Properties:
  * @property-read int $id ID
  * @property int $context_id the context which owns this element, a performance activity or category/tenant
  * @property string $plugin_name name of the element plugin that controls this element

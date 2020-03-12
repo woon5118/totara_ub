@@ -29,20 +29,34 @@ use mod_perform\entities\activity\element as element_entity;
 /**
  * Class element
  *
- * This class contains the methods related to performance activity element
- * All the activity element entity properties accessible via this class
+ * Represents a question or other type of element which can be displayed to users within a performance activity.
  *
  * @property-read int $id ID
  * @property-read int $context_id
- * @property-read string $plugin_name name of the element plugin that controls this element - immutable
+ * @property-read string $plugin_name name of the element plugin that controls this element
  * @property-read string $title a user-defined title to identify and describe this element
  * @property-read int $identifier used to match elements that share the same identifier
  * @property-read string $data specific configuration data for this type of element
- * @property-read element_plugin $element_plugin
  * @property-read \context $context
+ * @property-read element_plugin $element_plugin
+ *
  * @package mod_perform\models\activity
  */
 class element extends model {
+
+    protected $entity_attribute_whitelist = [
+        'id',
+        'context_id',
+        'plugin_name',
+        'title',
+        'identifier',
+        'data',
+    ];
+
+    protected $model_accessor_whitelist = [
+        'context',
+        'element_plugin',
+    ];
 
     /**
      * @var element_entity
@@ -52,7 +66,7 @@ class element extends model {
     /**
      * @inheritDoc
      */
-    public static function get_entity_class(): string {
+    protected static function get_entity_class(): string {
         return element_entity::class;
     }
 
@@ -86,7 +100,7 @@ class element extends model {
     }
 
     /**
-     * get elelment plugin
+     * Get the element plugin that this element is based on
      *
      * @return element_plugin
      */
@@ -95,31 +109,16 @@ class element extends model {
     }
 
     /**
-     * @param string $name
+     * Get the context that this element belongs to
      *
-     * @return bool
+     * @return \context
      */
-    public function has_attribute(string $name): bool {
-        $attributes = ['element_plugin', 'context'];
-        return in_array($name, $attributes) || parent::has_attribute($name);
+    public function get_context(): \context {
+        return \context_helper::instance_by_id($this->entity->context_id);
     }
 
     /**
-     * @inheritDoc
-     */
-    public function __get($name) {
-        switch ($name) {
-            case 'element_plugin':
-                return element_plugin::load_by_plugin($this->entity->plugin_name);
-            case 'context':
-                return \context_helper::instance_by_id($this->entity->context_id);
-            default:
-                return parent::__get($name);
-        }
-    }
-
-    /**
-     * Set the context for this element
+     * Update the context for this element
      *
      * An element is "owned" by the context it belongs to. Setting a new context effectively "moves" the element.
      *
@@ -134,11 +133,12 @@ class element extends model {
      * Update the standard properties that define this element
      *
      * @param string $title
-     * @param string $data
+     * @param $data
      */
     public function update_details(string $title, string $data = null) {
         $this->entity->title = $title;
         $this->entity->data = $data;
         $this->entity->save();
     }
+
 }

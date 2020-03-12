@@ -26,11 +26,8 @@ namespace mod_perform\models\activity;
 /**
  * Class element_plugin
  *
- * This class contains the methods related to performance activity element plugin
- * All the activity element plugin entity properties accessible via this class
+ * Base class for defining a type of element, including it's specific behaviour.
  *
- * @property-read string $plugin_name
- * @property-read string $name
  * @package mod_perform\models\activity
  */
 abstract class element_plugin {
@@ -74,17 +71,6 @@ abstract class element_plugin {
         return get_string('name', 'performelement_' . $this->get_plugin_name());
     }
 
-    public function __get(string $name) {
-        switch ($name) {
-            case 'plugin_name':
-                return $this->get_plugin_name();
-            case 'name':
-                return $this->get_name();
-            default:
-                throw new \coding_exception('Tried to access a property that does not exist');
-        }
-    }
-
     /**
      * This method return element's admin form vue component name
      * @return string
@@ -113,4 +99,5 @@ abstract class element_plugin {
 
         return $prefix;
     }
+
 }

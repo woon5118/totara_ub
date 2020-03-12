@@ -41,13 +41,13 @@ class mod_perform_section_element_model_testcase extends advanced_testcase {
         $sort_order = 123;
 
         $section_element = section_element::create($section, $element, $sort_order);
-        $id = $section_element->get_id();
+        $id = $section_element->id;
 
         // Reload, just to make sure that we're getting it out of the DB.
         $actual_section_element = section_element::load_by_id($id);
 
-        $this->assertSame($section->title, $actual_section_element->section->title);
-        $this->assertSame($element->title, $actual_section_element->element->title);
+        $this->assertEquals($section->id, $actual_section_element->section_id);
+        $this->assertEquals($element->id, $actual_section_element->element_id);
     }
 
 }

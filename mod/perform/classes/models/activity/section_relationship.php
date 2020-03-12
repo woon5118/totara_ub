@@ -24,11 +24,37 @@
 namespace mod_perform\models\activity;
 
 use core\orm\entity\model;
-use mod_perform\entities\activity\activity_relationship as activity_relationship_entity;
-use mod_perform\entities\activity\section as section_entity;
 use mod_perform\entities\activity\section_relationship as section_relationship_entity;
 
+/**
+ * Class section_relationship
+ *
+ * A relationship is used to define which participants should participate in a section.
+ *
+ * @property-read int $id ID
+ * @property-read int $section_id
+ * @property-read int $activity_relationship_id
+ * @property-read bool $can_view
+ * @property-read bool $can_answer
+ * @property-read section $section
+ * @property-read activity_relationship $activity_relationship
+ *
+ * @package mod_perform\models\activity
+ */
 class section_relationship extends model {
+
+    protected $entity_attribute_whitelist = [
+        'id',
+        'section_id',
+        'activity_relationship_id',
+        'can_view',
+        'can_answer',
+    ];
+
+    protected $model_accessor_whitelist = [
+        'section',
+        'activity_relationship',
+    ];
 
     /**
      * @var section_relationship_entity
@@ -38,125 +64,54 @@ class section_relationship extends model {
     /**
      * @return string
      */
-    public static function get_entity_class(): string {
+    protected static function get_entity_class(): string {
         return section_relationship_entity::class;
     }
 
     /**
-     * Create a section relationship and keep the activity_relationship records in sync.
+     * Create a section relationship
      *
-     * @param int $section_id
-     * @param string $class_name
+     * @param section $section
+     * @param activity_relationship $activity_relationship
      * @return static
      */
-    public static function create(int $section_id, string $class_name): self {
-        global $DB;
+    public static function create(section $section, activity_relationship $activity_relationship): self {
+        $section_relationship_entity = new section_relationship_entity();
+        $section_relationship_entity->section_id = $section->id;
+        $section_relationship_entity->activity_relationship_id = $activity_relationship->id;
+        // Can view/answer always set to true for now.
+        $section_relationship_entity->can_view = 1;
+        $section_relationship_entity->can_answer = 1;
+        $section_relationship_entity->save();
 
-        if (!in_array($class_name, self::get_all_class_names())) {
-            throw new \coding_exception("Invalid class_name: {$class_name}");
-        }
-        $section = section_entity::repository()->find($section_id);
-        if (!$section) {
-            throw new \coding_exception('Specified section id does not exist');
-        }
-        $activity = activity::load_by_id($section->activity_id);
-        require_capability('mod/perform:manage_activity', $activity->get_context());
-
-        return $DB->transaction(function () use ($section_id, $class_name, $activity) {
-            $relationship_entity = activity_relationship_entity::repository()
-                ->where('activity_id', $activity->get_id())
-                ->where('class_name', $class_name)
-                ->get()
-                ->first();
-            // Create relationship record only if it doesn't exist already.
-            if (!$relationship_entity) {
-                $relationship_entity = new activity_relationship_entity();
-                $relationship_entity->activity_id = $activity->get_id();
-                $relationship_entity->class_name = $class_name;
-                $relationship_entity->save();
-            }
-            $section_relationship_entity = section_relationship_entity::repository()
-                ->where('section_id', $section_id)
-                ->where('activity_relationship_id', $relationship_entity->id)
-                ->get()
-                ->first();
-            // Create section_relationship record only if it doesn't exist already.
-            if (!$section_relationship_entity) {
-                $section_relationship_entity = new section_relationship_entity();
-                $section_relationship_entity->section_id = $section_id;
-                $section_relationship_entity->activity_relationship_id = $relationship_entity->id;
-                // Can view/answer always set to true for now.
-                $section_relationship_entity->can_view = 1;
-                $section_relationship_entity->can_answer = 1;
-                $section_relationship_entity->save();
-            }
-            return self::load_by_entity($section_relationship_entity);
-        });
+        return self::load_by_entity($section_relationship_entity);
     }
 
     /**
-     * Delete a section relationship and keep the activity_relationship records in sync.
+     * Delete a section relationship
      *
-     * @param int $section_id
-     * @param string $class_name
-     * @return bool
+     * Management of the activity relationship is NOT handled here. These must be manually cleaned up if no longer needed.
      */
-    public static function delete_with_properties(int $section_id, string $class_name): bool {
-        global $DB;
-
-        if (!in_array($class_name, self::get_all_class_names())) {
-            throw new \coding_exception("Invalid class_name: {$class_name}");
-        }
-        $section = section_entity::repository()->find($section_id);
-        if (!$section) {
-            throw new \coding_exception('Specified section id does not exist');
-        }
-        $activity = activity::load_by_id($section->activity_id);
-        require_capability('mod/perform:manage_activity', $activity->get_context());
-
-        /** @var activity_relationship_entity $activity_relationship_entity */
-        $activity_relationship_entity = activity_relationship_entity::repository()
-            ->where('activity_id', $activity->get_id())
-            ->where('class_name', $class_name)
-            ->get()
-            ->first();
-        if (!$activity_relationship_entity) {
-            // Nothing to delete.
-            return false;
-        }
-        /** @var section_relationship_entity $section_relationship_entity */
-        $section_relationship_entity = section_relationship_entity::repository()
-            ->where('section_id', $section_id)
-            ->where('activity_relationship_id', $activity_relationship_entity->id)
-            ->get()
-            ->first();
-        if (!$section_relationship_entity) {
-            // This should never happen.
-            throw new \invalid_state_exception(
-                "Record found in perform_relationship without corresponding section_relationship record. "
-                . "section_id {$section_id}, activity_relationship_id {$activity_relationship_entity->id}"
-            );
-        }
-
-        return $DB->transaction(function () use ($activity_relationship_entity, $section_relationship_entity) {
-            $section_relationship_entity->delete();
-
-            // Delete relationship record only if it's not in any other section.
-            if (!section_relationship_entity::repository()
-                ->where('activity_relationship_id', $activity_relationship_entity->id)
-                ->exists()) {
-                $activity_relationship_entity->delete();
-            }
-            return true;
-        });
+    public function delete() {
+        $this->entity->delete();
     }
 
-    // TODO: Change this when we have relationship classes.
-    private static function get_all_class_names(): array {
-        return [
-            'subject',
-            'manager',
-            'appraiser',
-        ];
+    /**
+     * Get the section that this section relationship belongs to
+     *
+     * @return section
+     */
+    public function get_section(): section {
+        return section::load_by_entity($this->entity->section);
     }
+
+    /**
+     * Get the activity relationship which is being linked to the section
+     *
+     * @return activity_relationship
+     */
+    public function get_activity_relationship(): activity_relationship {
+        return activity_relationship::load_by_entity($this->entity->activity_relationship);
+    }
+
 }

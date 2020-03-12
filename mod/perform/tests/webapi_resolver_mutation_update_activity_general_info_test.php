@@ -76,7 +76,7 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
         /** @type activity $returned_activity */
         ['activity' => $returned_activity] = update_activity_general_info::resolve($args, $this->get_execution_context());
 
-        $this->assertEquals($created_activity->get_id(), $returned_activity->get_id());
+        $this->assertEquals($created_activity->id, $returned_activity->id);
         $this->assertEquals($created_activity->name, $returned_activity->name);
 
         self::setUser($user2);
@@ -96,7 +96,7 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
 
     private function to_args_payload(activity $activity): array {
         return [
-            'activity_id' => $activity->get_id(),
+            'activity_id' => $activity->id,
             'name' => $activity->name,
             'description' => $activity->description,
         ];

@@ -22,14 +22,18 @@
  */
 
 use mod_perform\entities\activity\activity_relationship;
-use mod_perform\entities\activity\section_relationship;
+use mod_perform\entities\activity\section_relationship as section_relationship_entity;
+use mod_perform\models\activity\activity_relationship as activity_relationship_model;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\section;
+use mod_perform\models\activity\section_relationship as section_relationship_model;
 
 abstract class mod_perform_relationship_testcase extends advanced_testcase {
 
-    protected function perform_generator() {
-        return $this->getDataGenerator()->get_plugin_generator('mod_perform');
+    protected function perform_generator(): mod_perform_generator {
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        return $perform_generator;
     }
 
     /**
@@ -63,31 +67,37 @@ abstract class mod_perform_relationship_testcase extends advanced_testcase {
         $data->activity2 = $perform_generator->create_activity_in_container(['activity_name' => 'Activity 2']);
         $data->activity3 = $perform_generator->create_activity_in_container(['activity_name' => 'Activity 3']);
 
-        $data->section1_1 = $perform_generator->create_section($data->activity1, ['title' => 'Test section 1 1']);
-        $data->section1_2 = $perform_generator->create_section($data->activity1, ['title' => 'Test section 1 2']);
-        $data->section2_1 = $perform_generator->create_section($data->activity2, ['title' => 'Test section 2 1']);
+        $data->activity1_section1 = $perform_generator->create_section($data->activity1, ['title' => 'Activity 1 section 1']);
+        $data->activity1_section2 = $perform_generator->create_section($data->activity1, ['title' => 'Activity 1 section 2']);
+        $data->activity2_section1 = $perform_generator->create_section($data->activity2, ['title' => 'Activity 2 section 1']);
         // Section without relationship.
-        $data->section2_2 = $perform_generator->create_section($data->activity2, ['title' => 'Test section 2 2']);
+        $data->activity2_section2 = $perform_generator->create_section($data->activity2, ['title' => 'Activity 2 section 2']);
+
+        $data->activity1_relationship1 = activity_relationship_model::create_with_class_name($data->activity1, 'appraiser');
+        $data->activity1_relationship2 = activity_relationship_model::create_with_class_name($data->activity1, 'manager');
+        $data->activity1_relationship3 = activity_relationship_model::create_with_class_name($data->activity1, 'subject');
+        $data->activity2_relationship1 = activity_relationship_model::create_with_class_name($data->activity2, 'subject');
 
         // Two relationships for activity 1, section 1
-        $data->relationship1_1_1 = $perform_generator->create_section_relationship(
-            $data->section1_1,
-            ['class_name' => 'appraiser']
+        $data->activity1_section1_relationship1 = section_relationship_model::create(
+            $data->activity1_section1,
+            $data->activity1_relationship1
         );
-        $data->relationship1_1_2 = $perform_generator->create_section_relationship(
-            $data->section1_1,
-            ['class_name' => 'manager']
+        $data->activity1_section1_relationship2 = section_relationship_model::create(
+            $data->activity1_section1,
+            $data->activity1_relationship2
         );
+
         // One relationship for activity 1, section 2
-        $data->relationship1_2_1 = $perform_generator->create_section_relationship(
-            $data->section1_2,
-            ['class_name' => 'subject']
+        $data->activity1_section2_relationship1 = section_relationship_model::create(
+            $data->activity1_section2,
+            $data->activity1_relationship3
         );
 
         // One relationship for activity 2's first section.
-        $data->relationship2_1_1 = $perform_generator->create_section_relationship(
-            $data->section2_1,
-            ['class_name' => 'subject']
+        $data->activity2_section1_relationship1 = section_relationship_model::create(
+            $data->activity2_section1,
+            $data->activity2_relationship1
         );
 
         return $data;
@@ -98,8 +108,8 @@ abstract class mod_perform_relationship_testcase extends advanced_testcase {
      * @param array $expected_class_names
      */
     protected function assert_section_relationships(section $section, array $expected_class_names): void {
-        $section_relationships = section_relationship::repository()->where('section_id', $section->get_id())->get();
-        $actual_class_names = $section_relationships->map(function (section_relationship $section_relationship) {
+        $section_relationships = section_relationship_entity::repository()->where('section_id', $section->id)->get();
+        $actual_class_names = $section_relationships->map(function (section_relationship_entity $section_relationship) {
             return $section_relationship->activity_relationship()->one(true)->get_attribute('class_name');
         })->all();
 
@@ -112,7 +122,7 @@ abstract class mod_perform_relationship_testcase extends advanced_testcase {
      */
     protected function assert_activity_relationships(activity $activity, array $expected_class_names): void {
         $actual_class_names = activity_relationship::repository()
-            ->where('activity_id', $activity->get_id())
+            ->where('activity_id', $activity->id)
             ->get()
             ->pluck('class_name');
 

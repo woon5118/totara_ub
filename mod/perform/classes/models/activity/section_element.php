@@ -29,16 +29,30 @@ use mod_perform\entities\activity\section_element as section_element_entity;
 /**
  * Class section_element
  *
- * This class contains the methods related to performance activity section element
- * All the activity section element entity properties accessible via this class
+ * The presence of an element within a section.
  *
  * @property-read int $id ID
- * @property-read section $section immutable
- * @property-read element $element immutable
+ * @property-read int $section_id
+ * @property-read int $element_id
  * @property-read int $sort_order
+ * @property-read section $section
+ * @property-read element $element
+ *
  * @package mod_perform\models\activity
  */
 class section_element extends model {
+
+    protected $entity_attribute_whitelist = [
+        'id',
+        'section_id',
+        'element_id',
+        'sort_order',
+    ];
+
+    protected $model_accessor_whitelist = [
+        'section',
+        'element',
+    ];
 
     /**
      * @var section_element_entity
@@ -48,11 +62,13 @@ class section_element extends model {
     /**
      * @inheritDoc
      */
-    public static function get_entity_class(): string {
+    protected static function get_entity_class(): string {
         return section_element_entity::class;
     }
 
     /**
+     * Create a new section element, by joining the section and element
+     *
      * @param section $section
      * @param element $element
      * @param int $sort_order
@@ -70,7 +86,7 @@ class section_element extends model {
     }
 
     /**
-     * get section
+     * Get the section
      *
      * @return section
      */
@@ -80,7 +96,7 @@ class section_element extends model {
     }
 
     /**
-     * get Element
+     * Get the element
      *
      * @return element
      */
@@ -90,29 +106,12 @@ class section_element extends model {
     }
 
     /**
-     * @inheritDoc
+     * Update this section element to the specified location in the section
+     *
+     * Note that the section should be responsible for making sure that sort orders are managed correctly.
+     *
+     * @param int $sort_order
      */
-    public function __get($name) {
-        switch ($name) {
-            case 'section':
-                return $this->get_section();
-            case 'element':
-                return $this->get_element();
-            default:
-                return parent::__get($name);
-        }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function to_array(): array {
-        $result = parent::to_array();
-        $result['section'] = $this->get_section();
-        $result['element'] = $this->get_element();
-        return $result;
-    }
-
     public function update_sort_order(int $sort_order) {
         $this->entity->sort_order = $sort_order;
         $this->entity->save();

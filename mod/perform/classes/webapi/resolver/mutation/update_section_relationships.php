@@ -45,10 +45,11 @@ class update_section_relationships implements mutation_resolver {
         } catch (record_not_found_exception $e) {
             throw new \coding_exception('Specified section id does not exist');
         }
+
         $activity_context = $section->get_activity()->get_context();
         $ec->set_relevant_context($activity_context);
         require_capability('mod/perform:manage_activity', $activity_context);
 
-        return $section->update_relationships($args['names']);
+        return ['section' => $section->update_relationships($args['names'])];
     }
 }

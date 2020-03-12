@@ -24,6 +24,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 use core\webapi\execution_context;
+use mod_perform\models\activity\section;
 use mod_perform\webapi\resolver\mutation\update_section_elements;
 use totara_webapi\graphql;
 
@@ -92,8 +93,10 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
         $this->assertEquals(2, $section_elements[2]->sort_order);
 
         // Check that the result is correct (good enough).
-        $this->assertEquals($section->id, $result['section']->id);
-        $this->assertCount(2, $result['section']->section_elements);
+        /** @var section $result_section */
+        $result_section = $result['section'];
+        $this->assertEquals($section->id, $result_section->id);
+        $this->assertCount(2, $result_section->get_section_elements());
     }
 
     public function test_create_linked_section_elements(): void {
@@ -161,8 +164,10 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
         $this->assertEquals(2, $section_elements[2]->sort_order);
 
         // Check that the result is correct (good enough).
-        $this->assertEquals($section->id, $result['section']->id);
-        $this->assertCount(2, $result['section']->section_elements);
+        /** @var section $result_section */
+        $result_section = $result['section'];
+        $this->assertEquals($section->id, $result_section->id);
+        $this->assertCount(2, $result_section->get_section_elements());
     }
 
     public function test_update_elements(): void {
@@ -252,8 +257,10 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
         $this->assertEquals(2, $section_elements[2]->sort_order);
 
         // Check that the result is correct (good enough).
-        $this->assertEquals($section->id, $result['section']->id);
-        $this->assertCount(2, $result['section']->section_elements);
+        /** @var section $result_section */
+        $result_section = $result['section'];
+        $this->assertEquals($section->id, $result_section->id);
+        $this->assertCount(2, $result_section->get_section_elements());
     }
 
     public function test_delete_section_elements(): void {
@@ -353,8 +360,10 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
         $this->assertEquals(2, $section_elements[2]->sort_order);
 
         // Check that the result is correct (good enough).
-        $this->assertEquals($section->id, $result['section']->id);
-        $this->assertCount(2, $result['section']->section_elements);
+        /** @var section $result_section */
+        $result_section = $result['section'];
+        $this->assertEquals($section->id, $result_section->id);
+        $this->assertCount(2, $result_section->get_section_elements());
     }
 
     public function test_move_section_elements(): void {
@@ -466,8 +475,10 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
         $this->assertEquals(4, $section_elements[4]->sort_order);
 
         // Check that the result is correct (good enough).
-        $this->assertEquals($section->id, $result['section']->id);
-        $this->assertCount(4, $result['section']->section_elements);
+        /** @var section $result_section */
+        $result_section = $result['section'];
+        $this->assertEquals($section->id, $result_section->id);
+        $this->assertCount(4, $result_section->get_section_elements());
     }
 
     /**

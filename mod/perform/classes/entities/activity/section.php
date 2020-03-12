@@ -32,12 +32,14 @@ use core\orm\entity\relations\has_many_through;
 /**
  * Represents an activity section record.
  *
+ * Properties:
  * @property-read int $id ID
  * @property string $title Title of the section
  * @property int $activity_id ID of linked activity
  * @property int $created_at
  * @property int $updated_at
  *
+ * Relationships:
  * @property-read activity $activity
  * @property-read collection|activity_relationship[] $activity_relationships
  * @property-read collection|section_element[] $section_elements

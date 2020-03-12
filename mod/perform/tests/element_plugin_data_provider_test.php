@@ -44,7 +44,6 @@ class mod_perform_element_plugin_data_provider_testcase extends advanced_testcas
 
         $actual_plugin_names = [];
         foreach ($element_plugins as $element_plugin) {
-            /** @var element_plugin_model $element_plugin */
             $actual_plugin_names[] = $element_plugin->get_plugin_name();
         }
 
