@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -25,5 +25,13 @@ $watchers = [
     [
         'hookname' => '\core_container\hook\module_supported_in_container',
         'callback' => ['\mod_perform\watcher\activity', 'filter_module'],
-    ]
+    ],
+    [
+        'hookname' => '\mod_perform\hook\subject_instances_created',
+        'callback' => ['\mod_perform\watcher\participant_instances', 'create_participants'],
+    ],
+    [
+        'hookname' => '\mod_perform\hook\participant_instances_created',
+        'callback' => ['\mod_perform\watcher\participant_sections', 'create_participant_sections'],
+    ],
 ];

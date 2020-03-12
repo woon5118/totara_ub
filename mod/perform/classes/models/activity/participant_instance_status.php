@@ -17,13 +17,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @author Kunle Odusan <kunle.odusan@totaralearning.com>
  * @package mod_perform
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace mod_perform\models\activity;
 
-$plugin->version  = 2020032001;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'mod_perform'; // To check on upgrade, that module sits in correct place
-$plugin->dependencies = ['container_perform' => 2020012400];
+/**
+ * Class participant_instance_status
+ *
+ * @package mod_perform\models\activity
+ */
+final class participant_instance_status {
+
+    /**
+     * Value for active participant instance status.
+     */
+    public const ACTIVE = 1;
+}
