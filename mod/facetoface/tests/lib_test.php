@@ -2631,7 +2631,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->assertCount(3, $sessions);
         // seminar_event::get_sessions() and seminar_session_list::from_seminar_event() sort sessions by future-first
         $sessions->rewind();
-        $assertions($sessiondate1, $sessions->current(), '2 days');
+        $assertions($sessiondate1, $sessions->current(), '1 day 3 hours');
         $sessions->next();
         $assertions($sessiondate3, $sessions->current(), '1 hour');
         $sessions->next();

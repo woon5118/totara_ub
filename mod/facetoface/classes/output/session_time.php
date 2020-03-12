@@ -423,10 +423,15 @@ class session_time {
      */
     public static function format_duration(int $timestart, int $timefinish, int $cutoff = HOURSECS * 8, \stdClass $str = null): string {
         $duration = (int)abs($timefinish - $timestart);    // Call abs() like format_time
-        if ($duration > $cutoff) {
-            // Round up to the nearest days.
-            $duration += DAYSECS - $duration % DAYSECS;
+        // Subtract full days from duration, we'll add them back later.
+        $days = floor($duration / DAYSECS);
+        $duration = $duration - ($days * DAYSECS);
+        // If duration is greater that cutoff, round up to a full day.
+        if ($duration >= $cutoff) {
+            $duration = DAYSECS;
         }
+        // Add full days back in to duration.
+        $duration = $duration + ($days * DAYSECS);
         return format_time($duration, $str);
     }
 }
