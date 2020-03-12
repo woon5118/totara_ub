@@ -62,7 +62,11 @@ class core_message_renderer extends plugin_renderer_base {
             $row->attributes['class'] = 'messageoutputs';
 
             // Name
-            $name = new html_table_cell(get_string('pluginname', 'message_'.$processor->name));
+            if (get_string_manager()->string_exists('pluginname', 'message_' . $processor->name)) {
+                $name = new html_table_cell(get_string('pluginname', 'message_' . $processor->name));
+            } else {
+                $name = $processor->name;
+            }
 
             // Enable
             $enable = new html_table_cell();
