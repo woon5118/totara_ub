@@ -21,7 +21,29 @@
 -->
 
 <template>
-  <form class="tui-form" @submit="$emit('submit', $event)">
+  <form
+    class="tui-form"
+    :class="[
+      !vertical && 'tui-form--horizontal',
+      vertical && 'tui-form--vertical',
+      'tui-form--inputWidth-' + inputWidth,
+    ]"
+    @submit="$emit('submit', $event)"
+  >
     <slot />
   </form>
 </template>
+
+<script>
+export default {
+  props: {
+    vertical: Boolean,
+
+    inputWidth: {
+      type: String,
+      validator: x => ['full', 'limited'].includes(x),
+      default: 'limited',
+    },
+  },
+};
+</script>

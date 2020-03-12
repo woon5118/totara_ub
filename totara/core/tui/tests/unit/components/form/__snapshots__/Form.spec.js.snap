@@ -2,6 +2,6 @@
 
 exports[`presentation/form/Form.vue Checks snapshot 1`] = `
 <form
-  class="tui-form"
+  class="tui-form tui-form--horizontal tui-form--inputWidth-limited"
 />
 `;

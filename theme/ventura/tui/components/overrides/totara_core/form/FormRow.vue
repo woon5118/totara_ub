@@ -24,7 +24,7 @@
 .tui-formRow {
   display: flex;
   flex-direction: column;
-  margin-bottom: var(--tui-gap-3);
+  margin-bottom: var(--tui-gap-4);
 
   &__action {
     display: flex;
@@ -38,6 +38,12 @@
     overflow-wrap: break-word;
   }
 
+  .tui-formLabel {
+    padding-top: var(--tui-gap-1);
+  }
+}
+
+.tui-form--inputWidth-limited .tui-formRow {
   input[type='email'].tui-formInput,
   input[type='number'].tui-formInput,
   input[type='password'].tui-formInput,
@@ -46,18 +52,15 @@
   input[type='text'].tui-formInput,
   input[type='url'].tui-formInput,
   .tui-select,
-  .tui-formTextarea {
+  .tui-formTextarea,
+  .tui-formFieldError {
     width: 280px;
     max-width: 280px;
-  }
-
-  .tui-formLabel {
-    padding-top: var(--tui-gap-1);
   }
 }
 
 @media screen and (min-width: $tui-screen-sm) {
-  .tui-formRow {
+  .tui-form--horizontal .tui-formRow {
     flex-direction: row;
 
     &__action {
