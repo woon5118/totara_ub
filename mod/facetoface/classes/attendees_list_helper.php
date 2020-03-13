@@ -200,6 +200,7 @@ final class attendees_list_helper {
         $requiredcfnames = $formdata->requiredcfnames;
         $seminarevent = new seminar_event($formdata->s);
         $seminar = $seminarevent->get_seminar();
+        $context = context_module::instance($seminar->get_coursemodule()->id);
         $currenturl = new \moodle_url('/mod/facetoface/attendees/list/addfile.php', array('s' => $seminarevent->get_id(), 'listid' => $listid));
         $list = new bulk_list($listid, $currenturl, 'addfile');
 
@@ -316,6 +317,11 @@ final class attendees_list_helper {
                     $usersnotexist[] = $data[$idfield];
                     continue;
                 } else {
+                    // Prevent adding non-participants as attendees in tenant contexts via CSV.
+                    if ($tenanterror = self::user_in_tenant_context_validation($user, $context)) {
+                        $validationerrors[] = $tenanterror;
+                    }
+
                     $signup = signup::create($user->id, $seminarevent);
                     $signup->set_ignoreconflicts($formdata->ignoreconflicts);
 
@@ -382,6 +388,8 @@ final class attendees_list_helper {
         global $DB;
 
         $seminarevent = new seminar_event($data->s);
+        $seminar = $seminarevent->get_seminar();
+        $context = context_module::instance($seminar->get_coursemodule()->id);
         $listid = $data->listid;
         $currenturl = new \moodle_url('/mod/facetoface/attendees/list/addlist.php', array('s' => $seminarevent->get_id(), 'listid' => $listid));
         $list = new bulk_list($listid, $currenturl, 'addlist');
@@ -425,6 +433,11 @@ final class attendees_list_helper {
             list($insql, $params) = $DB->get_in_or_equal($addusers, SQL_PARAMS_NAMED);
             $availableusers = $DB->get_records_sql("SELECT * FROM {user} WHERE {$field} " . $insql, $params);
             foreach ($availableusers as $id => $user) {
+                // Prevent adding non-participants as attendees in tenant contexts via list of IDs.
+                if ($tenanterror = self::user_in_tenant_context_validation($user, $context)) {
+                    $validationerrors[] = $tenanterror;
+                }
+
                 $added[] = $user->{$field};
                 $userstoadd[] = $user->id;
                 $signup = signup::create($user->id, $seminarevent);
@@ -711,5 +724,37 @@ final class attendees_list_helper {
             }
         }
         return $out;
+    }
+
+    /**
+     * Checks if the user needs to be evaluated in the context based on multitenancy settings and
+     * returns an array with the error (if found) resulting after the validation.
+     *
+     * @param object $user
+     * @param \context $context.
+     * @return array
+     */
+    public static function user_in_tenant_context_validation($user, \context $context): array {
+        global $DB, $CFG;
+
+        $validationerrors = array();
+        if (!empty($CFG->tenantsenabled)) {
+            if ($context->tenantid) {
+                $tenant = \core\record\tenant::fetch($context->tenantid);
+                $sql = "SELECT id FROM {cohort_members} WHERE userid = ? AND cohortid = ?";
+                $params = [$user->id, $tenant->cohortid];
+                if (!$DB->record_exists_sql($sql, $params)) {
+                    $error = get_string('nottenantparticipant', 'mod_facetoface');
+                    $validationerrors = ['idnumber' => $user->idnumber, 'name' => fullname($user), 'result' => $error];
+                }
+            } else {
+                if (!empty($CFG->tenantsisolated) && ($user->tenantid != NULL)) {
+                    $error = get_string('tenantmemberisolationmode', 'mod_facetoface');
+                    $validationerrors = ['idnumber' => $user->idnumber, 'name' => fullname($user), 'result' => $error];
+                }
+            }
+        }
+
+        return $validationerrors;
     }
 }
