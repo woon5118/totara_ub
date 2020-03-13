@@ -140,8 +140,8 @@ $THEME->layouts = array(
     // My public page.
     'mypublic' => array(
         'file' => 'default.php',
-        'regions' => array('top', 'bottom', 'side-pre', 'side-post'),
-        'defaultregion' => 'side-pre',
+        'regions' => array('top', 'bottom', 'main', 'side-pre', 'side-post'),
+        'defaultregion' => 'main',
     ),
     'login' => array(
         'file' => 'default.php',

@@ -166,7 +166,8 @@ Feature: Verify competencies are automatically added to plan according to job as
 
   Scenario: Create a learning plan that has more than one job assignment for the same position.
 
-    Given the following job assignments exist:
+    Given the "mylearning" user profile block exists
+    And the following job assignments exist:
       | user     | fullname | position |
       | learner3 | Job 1    | P1       |
       | learner3 | Job 2    | P1       |
@@ -200,7 +201,7 @@ Feature: Verify competencies are automatically added to plan according to job as
     # Check that learner3 has a single competency assigned in their learning plan.
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob3 Learner3"
-    And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I follow "Competencies (1)"
     Then I should see "Competency 1"
     And I should not see "Competency 2"
@@ -242,7 +243,8 @@ Feature: Verify competencies are automatically added to plan according to job as
 
   Scenario: Create a learning plan that has more than one job assignment for the same organisation.
 
-    Given the following job assignments exist:
+    Given the "mylearning" user profile block exists
+    And the following job assignments exist:
       | user     | fullname | organisation |
       | learner3 | Job 1    | O3           |
       | learner3 | Job 2    | O3           |
@@ -276,7 +278,7 @@ Feature: Verify competencies are automatically added to plan according to job as
     # Check that learner3 has a single competency assigned in their learning plan.
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob3 Learner3"
-    And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I follow "Competencies (1)"
     Then I should see "Competency 3"
     And I should not see "Competency 1"

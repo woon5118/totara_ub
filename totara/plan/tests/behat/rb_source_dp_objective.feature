@@ -37,9 +37,10 @@ Feature: Verify the columns of the Record of Learning objectives report source.
 
   Scenario: Verify the objective date updated column is present and correct.
 
+    Given the "mylearning" user profile block exists
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
-    And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I follow "Objectives (1)"
     And I set the field "menuproficiencies1" to "In Progress"
     And I navigate to "Manage user reports" node in "Site administration > Reports"

@@ -30,7 +30,7 @@ Feature: User can change their password
     And I follow "Profile" in the user menu
     Then I should see "learner 1"
 
-    When I click on "Preferences" "link" in the ".userprofile" "css_element"
+    When I click on "Preferences" "link" in the ".block_totara_user_profile_category_administration" "css_element"
     Then I should see "Preferences"
     And I should see "User account"
 

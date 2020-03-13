@@ -2,6 +2,9 @@
 Feature: Atto tables
   To format text in Atto, I need to create tables
 
+  Background:
+    Given the "miscellaneous" user profile block exists
+
   @javascript
   Scenario: Create a table
     Given I log in as "admin"

@@ -25,7 +25,8 @@ Feature: Check Record of Learning feature visibility
     And I should not see "Record of Learning" in the totara menu
 
   Scenario: Verify Record of Learning can still be loaded if teams are disabled
-    Given I am on a totara site
+    Given the "mylearning" user profile block exists
+    And I am on a totara site
     And the following "users" exist:
       | username | firstname | lastname | email          |
       | user     | test      | user     | test@test.test |
@@ -37,5 +38,5 @@ Feature: Check Record of Learning feature visibility
 
     And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "test user" "link"
-    And I click on "Record of Learning" "link" in the ".userprofile" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "0 records shown"

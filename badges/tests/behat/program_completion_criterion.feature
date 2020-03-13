@@ -2,7 +2,8 @@
 Feature: Verify badge issue based on program completion criterion.
 
   Background:
-    Given I am on a totara site
+    Given the "badges" user profile block exists
+    And I am on a totara site
     And the following "courses" exist:
       | fullname | shortname | enablecompletion |
       | Course 1 | C1        | 1                |

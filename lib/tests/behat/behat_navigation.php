@@ -566,7 +566,7 @@ class behat_navigation extends behat_base {
         // Skodak: Moodle developers are crazy, there is no way you could use $USER or has_capability() here!
 
         $this->execute('behat_navigation::i_follow_in_the_user_menu', array('Profile'));
-        $this->execute('behat_general::click_link', array('Edit profile'));
+        $this->execute('behat_general::i_click_on_in_the', array('Edit profile', 'link', '.block_totara_user_profile_category_contact', 'css_element'));
     }
 
     /**

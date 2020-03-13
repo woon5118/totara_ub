@@ -13,7 +13,8 @@ Feature: Verify standard and audience-based visibility in record of learning cou
   # Course 8 - not started and never enrolled
 
   Background:
-    Given I am on a totara site
+    Given the "mylearning" user profile block exists
+    And I am on a totara site
     And the following "users" exist:
       | username | firstname | lastname | email                |
       | learner1 | Bob1      | Learner1 | learner1@example.com |
@@ -84,7 +85,7 @@ Feature: Verify standard and audience-based visibility in record of learning cou
     # Create a learning plan for the learner and allocate Course 5 to it.
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
-    And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I follow "Learning Plan 1"
     And I switch to "Courses" tab
     And I press "Add course"

@@ -5,7 +5,8 @@ Feature: Verify the case insensitive shortnames for course completion imports wo
   In order to test the case insensitive shortname setting
 
   Background:
-    Given I am on a totara site
+    Given the "mylearning" user profile block exists
+    And I am on a totara site
     And the following "users" exist:
       | username  | firstname  | lastname  | email                |
       | learner01 | Bob1       | Learner1  | learner01@example.com |
@@ -71,14 +72,14 @@ Feature: Verify the case insensitive shortnames for course completion imports wo
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Record of Learning for Bob1 Learner1 : All Courses"
     And "Course 1" row "Progress" column of "plan_courses" table should contain "100%"
     And "Course 2" row "Progress" column of "plan_courses" table should contain "100%"
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob4 Learner4"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Record of Learning for Bob4 Learner4 : All Courses"
     And "Course 1" row "Progress" column of "plan_courses" table should contain "100%"
     And "Course 2" row "Progress" column of "plan_courses" table should contain "Not tracked"
@@ -88,7 +89,7 @@ Feature: Verify the case insensitive shortnames for course completion imports wo
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob8 Learner8"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Record of Learning for Bob8 Learner8 : All Courses"
     And "Course 1" row "Progress" column of "plan_courses" table should contain "Not tracked"
     And "Course 2" row "Progress" column of "plan_courses" table should contain "Not tracked"
@@ -135,7 +136,7 @@ Feature: Verify the case insensitive shortnames for course completion imports wo
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Record of Learning for Bob1 Learner1 : All Courses"
     And "Course 1" row "Progress" column of "plan_courses" table should contain "Not tracked"
     And "Course 2" row "Progress" column of "plan_courses" table should contain "Not tracked"
@@ -145,7 +146,7 @@ Feature: Verify the case insensitive shortnames for course completion imports wo
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob4 Learner4"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Record of Learning for Bob4 Learner4 : All Courses"
     And "Course 1" row "Progress" column of "plan_courses" table should contain "Not tracked"
     And "Course 2" row "Progress" column of "plan_courses" table should contain "Not tracked"
@@ -155,7 +156,7 @@ Feature: Verify the case insensitive shortnames for course completion imports wo
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob8 Learner8"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Record of Learning for Bob8 Learner8 : All Courses"
     And "Course 1" row "Progress" column of "plan_courses" table should contain "Not tracked"
     And "Course 2" row "Progress" column of "plan_courses" table should contain "Not tracked"

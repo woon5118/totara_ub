@@ -4,6 +4,8 @@ Feature: In a report, admin can see current sessions
   As a admin
   I need to view usersessions report and see if the current session is listed
 
+  Background:
+    Given the "reports" user profile block exists
   @javascript
   Scenario: Check usersessions report shows current session
     Given I log in as "admin"

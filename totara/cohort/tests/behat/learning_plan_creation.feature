@@ -324,6 +324,7 @@ Feature: Learning plans can be created for members of an audience.
 
   Scenario: Learning plans are not created within an audience when 'have a completed plan based on this template' is set.
 
+    Given the "mylearning" user profile block exists
     # As admin create an approved plan for a user.
     Given the following "cohorts" exist:
       | name    | idnumber | cohorttype  |
@@ -338,7 +339,7 @@ Feature: Learning plans can be created for members of an audience.
     # Complete the plan.
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "learner1 learner1"
-    And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I follow "Learning plan template 1"
     And I press "Approve"
     And I press "Complete plan"

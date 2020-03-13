@@ -68,7 +68,7 @@ Feature: Access to preferences page
     And I click on "Create this role" "button"
     And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Student 1"
-    And I click on "Preferences" "link" in the ".profile_tree" "css_element"
+    And I click on "Preferences" "link" in the ".block_totara_user_profile_category_administration" "css_element"
     And I follow "Assign roles relative to this user"
     And I follow "Parent"
     And I set the field "Potential users" to "Parent 1 (parent1@example.com)"
@@ -76,4 +76,4 @@ Feature: Access to preferences page
     And I log out
     And I log in as "parent"
     When I am on profile page for user "student1"
-    Then I should see "Preferences" in the "region-main" "region"
+    Then I should see "Preferences" in the ".block_totara_user_profile_category_administration" "css_element"

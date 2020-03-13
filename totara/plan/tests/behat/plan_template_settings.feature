@@ -27,7 +27,8 @@ Feature: Test plan teamplate settings
     And I log out
 
   Scenario: Test Update plan setting on template
-    Given I log in as "learner1"
+    Given the "mylearning" user profile block exists
+    And I log in as "learner1"
     And I click on "Dashboard" in the totara menu
     And I click on "Learning Plans" "link"
     And I press "Create new learning plan"
@@ -95,7 +96,7 @@ Feature: Test plan teamplate settings
     When I log in as "admin"
     And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "firstname1 lastname1" "link"
-    And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I should see "You are viewing firstname1 lastname1's plans."
     And I click on "template 1" "link"
     And I switch to "Courses" tab

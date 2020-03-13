@@ -5,7 +5,8 @@ Feature: Verify the case insensitive shortnames for certification completion imp
   In order to test the case insensitive shortname setting
 
   Background:
-    Given I am on a totara site
+    Given the "mylearning" user profile block exists
+    And I am on a totara site
     And the following "users" exist:
       | username  | firstname  | lastname  | email                |
       | learner01 | Bob1       | Learner1  | learner01@example.com |
@@ -69,7 +70,7 @@ Feature: Verify the case insensitive shortnames for certification completion imp
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Record of Learning for Bob1 Learner1 : Other Evidence"
     And I should see "0 records shown"
 
@@ -79,7 +80,7 @@ Feature: Verify the case insensitive shortnames for certification completion imp
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob4 Learner4"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Record of Learning for Bob4 Learner4 : Other Evidence"
     And I should see "Completed certification : CP102"
 
@@ -89,7 +90,7 @@ Feature: Verify the case insensitive shortnames for certification completion imp
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob8 Learner8"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Record of Learning for Bob8 Learner8 : Other Evidence"
     And I should see "Completed certification : CP101"
 
@@ -134,7 +135,7 @@ Feature: Verify the case insensitive shortnames for certification completion imp
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Record of Learning for Bob1 Learner1 : Other Evidence"
     And I should see "0 records shown"
 
@@ -144,7 +145,7 @@ Feature: Verify the case insensitive shortnames for certification completion imp
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob4 Learner4"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Record of Learning for Bob4 Learner4 : Other Evidence"
     And I should see "Completed certification : CP102"
 
@@ -154,7 +155,7 @@ Feature: Verify the case insensitive shortnames for certification completion imp
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob8 Learner8"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Record of Learning for Bob8 Learner8 : Other Evidence"
     And I should see "0 records shown"
 

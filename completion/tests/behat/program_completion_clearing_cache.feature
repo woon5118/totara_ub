@@ -1,7 +1,8 @@
 @totara @core @core_completion @javascript
 Feature: Program completion cache should be cleared after deletion
   Background:
-    Given the following "courses" exist:
+    Given the "mylearning" user profile block exists
+    And the following "courses" exist:
       | fullname  | shortname | category |
       | course101 | c101      | 0        |
     And the following "users" exist:
@@ -23,7 +24,7 @@ Feature: Program completion cache should be cleared after deletion
   Scenario: User untick the completion mark and it should clear the cache when the action has been completed
     Given I navigate to "Users > Manage users" in site administration
     And I follow "Sa Rang Kim"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I follow "prog_completion"
     And I follow "Not completed: course101. Select to mark as complete."
     And I click on "Save changes" "button"

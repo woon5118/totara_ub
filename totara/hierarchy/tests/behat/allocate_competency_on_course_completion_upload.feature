@@ -2,7 +2,8 @@
 Feature: Verify competencies completion status is updated when the associated course completions happen before the competency creation
 
   Background:
-    Given I am on a totara site
+    Given the "mylearning" user profile block exists
+    And I am on a totara site
     And the following "users" exist:
       | username | firstname  | lastname  | email                |
       | learner1 | Bob1       | Learner1  | learner1@example.com |
@@ -98,7 +99,7 @@ Scale 1
     # Create a learning plan using the new template for the learner.
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
-    And I click on "Learning Plans" "link" in the ".profile_tree" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I press "Create new learning plan"
     Then I should see "You are viewing Bob1 Learner1's plans."
     And I should see "Create new learning plan"

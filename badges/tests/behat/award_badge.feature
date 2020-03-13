@@ -4,6 +4,10 @@ Feature: Award badges
   As an admin
   I need to add criteria to badges in the system
 
+  Background:
+    Given the "badges" user profile block exists
+    And the "coursedetails" user profile block exists
+
   @javascript
   Scenario: Award profile badge
     Given I log in as "admin"
@@ -109,7 +113,7 @@ Feature: Award badges
     And I log out
     And I log in as "student1"
     And I follow "Profile" in the user menu
-    And I click on "Course 1" "link" in the "region-main" "region"
+    And I click on "Course 1" "link" in the ".block_totara_user_profile_category_coursedetails" "css_element"
     And I should see "Course Badge"
     # Student 1 should have both badges also in the Badges navigation section.
     When I follow "Badges"
@@ -171,12 +175,12 @@ Feature: Award badges
     And I log out
     And I log in as "student1"
     And I follow "Profile" in the user menu
-    And I click on "Course 1" "link" in the "region-main" "region"
+    And I click on "Course 1" "link" in the ".block_totara_user_profile_category_coursedetails" "css_element"
     Then I should not see "badges"
     And I am on "Course 1" course homepage
     And I set the field "Manual completion of Test assignment name" to "1"
     And I follow "Profile" in the user menu
-    And I click on "Course 1" "link" in the "region-main" "region"
+    And I click on "Course 1" "link" in the ".block_totara_user_profile_category_coursedetails" "css_element"
     Then I should see "Course Badge"
     And I log out
     # Ensure the badge is still awarded and visible after the course has been deleted.
@@ -241,7 +245,7 @@ Feature: Award badges
     And I log out
     And I log in as "student1"
     And I follow "Profile" in the user menu
-    And I click on "Course 1" "link" in the "region-main" "region"
+    And I click on "Course 1" "link" in the ".block_totara_user_profile_category_coursedetails" "css_element"
     Then I should not see "badges"
     And I am on "Course 1" course homepage
     And I set the field "Manual completion of Test assignment name" to "1"
@@ -345,14 +349,14 @@ Feature: Award badges
     # Student 1 should have just course badge 1.
     And I log in as "student1"
     And I follow "Profile" in the user menu
-    When I click on "Course 1" "link" in the "region-main" "region"
+    When I click on "Course 1" "link" in the ".block_totara_user_profile_category_coursedetails" "css_element"
     Then I should see "Course Badge 1"
     And I should not see "Course Badge 2"
     And I log out
     # Student 2 should have just course badge 2.
     And I log in as "student2"
     And I follow "Profile" in the user menu
-    When I click on "Course 1" "link" in the "region-main" "region"
+    When I click on "Course 1" "link" in the ".block_totara_user_profile_category_coursedetails" "css_element"
     Then I should see "Course Badge 2"
     Then I should not see "Course Badge 1"
 

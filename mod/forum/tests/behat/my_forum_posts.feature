@@ -4,6 +4,8 @@ Feature: A user can view their posts and discussions
   As a student
   I need to view my post and discussions
 
+  Background:
+    Given the "miscellaneous" user profile block exists
   Scenario: View the student's posts and discussions
     Given the following "users" exist:
       | username | firstname | lastname | email |

@@ -5,7 +5,8 @@ Feature: View the user page for the outline report
   I need to log in as a student and view the user page for the outline report
 
   Background:
-    Given the following "courses" exist:
+    Given the "coursedetails" user profile block exists
+    And the following "courses" exist:
       | fullname | shortname | format | showreports |
       | Course 1 | C1 | topics | 1 |
     And the following "users" exist:
@@ -46,12 +47,12 @@ Feature: View the user page for the outline report
     And I follow "URL name"
     And I follow "URL name"
     And I follow "Profile" in the user menu
-    And I click on "Course 1" "link" in the "region-main" "region"
+    And I click on "Course 1" "link" in the ".block_totara_user_profile_category_coursedetails" "css_element"
     When I follow "Outline report"
     Then I should see "4 views" in the "Folder name" "table_row"
     And I should see "3 views" in the "URL name" "table_row"
     And I follow "Profile" in the user menu
-    And I click on "Course 1" "link" in the "region-main" "region"
+    And I click on "Course 1" "link" in the ".block_totara_user_profile_category_coursedetails" "css_element"
     And I follow "Complete report"
     And I should see "4 views"
     And I should see "3 views"
@@ -74,12 +75,12 @@ Feature: View the user page for the outline report
     And I follow "URL name"
     And I follow "URL name"
     And I follow "Profile" in the user menu
-    And I click on "Course 1" "link" in the "region-main" "region"
+    And I click on "Course 1" "link" in the ".block_totara_user_profile_category_coursedetails" "css_element"
     When I follow "Outline report"
     Then I should see "4 views" in the "Folder name" "table_row"
     And I should see "3 views" in the "URL name" "table_row"
     And I follow "Profile" in the user menu
-    And I click on "Course 1" "link" in the "region-main" "region"
+    And I click on "Course 1" "link" in the ".block_totara_user_profile_category_coursedetails" "css_element"
     When I follow "Complete report"
     And I should see "4 views"
     And I should see "3 views"
@@ -104,12 +105,12 @@ Feature: View the user page for the outline report
     And I follow "URL name"
     And I follow "URL name"
     And I follow "Profile" in the user menu
-    And I click on "Course 1" "link" in the "region-main" "region"
+    And I click on "Course 1" "link" in the ".block_totara_user_profile_category_coursedetails" "css_element"
     When I follow "Outline report"
     Then I should see "4 views" in the "Folder name" "table_row"
     And I should see "3 views" in the "URL name" "table_row"
     And I follow "Profile" in the user menu
-    And I click on "Course 1" "link" in the "region-main" "region"
+    And I click on "Course 1" "link" in the ".block_totara_user_profile_category_coursedetails" "css_element"
     When I follow "Complete report"
     And I should see "4 views"
     And I should see "3 views"

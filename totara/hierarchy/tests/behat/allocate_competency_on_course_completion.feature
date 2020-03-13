@@ -81,11 +81,12 @@ Feature: Verify completion of a course triggers assigning a competency.
 
   Scenario: Verify that a minimum competency proficiency is allocated on course completion and the manager is able to award a higher proficiency.
 
+    Given the "mylearning" user profile block exists
     # Create a learning plan using the new template for the learner.
     Given I log in as "admin"
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
-    And I click on "Learning Plans" "link" in the ".profile_tree" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I press "Create new learning plan"
     Then I should see "You are viewing Bob1 Learner1's plans."
     And I should see "Create new learning plan"
@@ -126,7 +127,7 @@ Feature: Verify completion of a course triggers assigning a competency.
     When I log in as "admin"
     And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
-    And I click on "Learning Plans" "link" in the ".profile_tree" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I follow "Bob's Learning Plan"
     And I click on "Competencies" "link" in the "#dp-plan-content" "css_element"
     # Not competent. Needs to be set by a cron run.
@@ -138,7 +139,7 @@ Feature: Verify completion of a course triggers assigning a competency.
     And I am on homepage
     And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
-    And I click on "Learning Plans" "link" in the ".profile_tree" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I follow "Bob's Learning Plan"
     And I click on "Competencies" "link" in the "#dp-plan-content" "css_element"
     # Minimum competency set by the course.
@@ -151,7 +152,7 @@ Feature: Verify completion of a course triggers assigning a competency.
     And I am on homepage
     And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
-    And I click on "Learning Plans" "link" in the ".profile_tree" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I follow "Bob's Learning Plan"
     And I click on "Competencies" "link" in the "#dp-plan-content" "css_element"
 

@@ -2,7 +2,8 @@
 Feature: Verify capability accessanyplan.
 
   Background:
-    Given I am on a totara site
+    Given the "mylearning" user profile block exists
+    And I am on a totara site
     And the following "users" exist:
       | username | firstname  | lastname  | email                |
       | learner1 | firstname1 | lastname1 | learner1@example.com |
@@ -98,7 +99,7 @@ Feature: Verify capability accessanyplan.
     When I log in as "manager2"
     And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "firstname1 lastname1"
-    And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     # Access the learners plans and verify it hasn't been approved.
     And I click on "learner1 Learning Plan" "link"
     Then I should see "You are viewing firstname1 lastname1's plan"
@@ -112,7 +113,7 @@ Feature: Verify capability accessanyplan.
     Given I log in as "manager2"
     And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "firstname1 lastname1"
-    And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     # Access the learners plan.
     When I click on "learner1 Learning Plan" "link"
     Then I should see "You are viewing firstname1 lastname1's plan"
@@ -137,7 +138,7 @@ Feature: Verify capability accessanyplan.
     Given I log in as "manager2"
     And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "firstname1 lastname1"
-    And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     # Access the learners plan.
     When I click on "learner1 Learning Plan" "link"
     Then I should see "You are viewing firstname1 lastname1's plan"
@@ -163,7 +164,7 @@ Feature: Verify capability accessanyplan.
     Given I log in as "manager2"
     And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "firstname1 lastname1"
-    And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     # Access the learners plan.
     When I click on "learner1 Learning Plan" "link"
     Then I should see "You are viewing firstname1 lastname1's plan"
@@ -188,7 +189,7 @@ Feature: Verify capability accessanyplan.
     Given I log in as "manager2"
     And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "firstname1 lastname1"
-    And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     # Access the learners plan.
     When I click on "learner1 Learning Plan" "link"
     Then I should see "You are viewing firstname1 lastname1's plan"
@@ -221,7 +222,7 @@ Feature: Verify capability accessanyplan.
     # Admin can view and create plans.
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "firstname1 lastname1"
-    And I click on "Learning Plans" "link" in the ".profile_tree" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "You are viewing firstname1 lastname1's plans."
     And I should see "firstname1 lastname1's current and completed learning plans are shown below."
     When I press "Create new learning plan"
@@ -235,7 +236,7 @@ Feature: Verify capability accessanyplan.
     When I log in as "manager2"
     And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "firstname1 lastname1"
-    And I click on "Learning Plans" "link" in the ".profile_tree" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "You are viewing firstname1 lastname1's plans."
     And I should see "firstname1 lastname1's current and completed learning plans are shown below."
     And I should not see "Nothing to display"
@@ -260,7 +261,7 @@ Feature: Verify capability accessanyplan.
     When I log in as "manager3"
     And I click on "Team" in the totara menu
     And I follow "firstname1 lastname1"
-    And I click on "Learning Plans" "link" in the ".profile_tree" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "You are viewing firstname1 lastname1's plans."
     And I should see "firstname1 lastname1's current and completed learning plans are shown below."
     And I should not see "Active Plans"
@@ -283,7 +284,7 @@ Feature: Verify capability accessanyplan.
     And I log in as "manager3"
     And I click on "Team" in the totara menu
     And I follow "firstname1 lastname1"
-    And I click on "Learning Plans" "link" in the ".profile_tree" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "You are viewing firstname1 lastname1's plans."
     And I should see "firstname1 lastname1's current and completed learning plans are shown below."
     And I should see "learner1 Learning Plan"

@@ -2,7 +2,8 @@
 Feature: Verify certification completion data can be successfully uploaded.
 
   Background:
-    Given I am on a totara site
+    Given the "mylearning" user profile block exists
+    And I am on a totara site
     And the following "users" exist:
       | username | firstname  | lastname  | email                |
       | learner1 | Bob1       | Learner1  | learner1@example.com |
@@ -24,7 +25,7 @@ Feature: Verify certification completion data can be successfully uploaded.
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I switch to "Certifications" tab
     Then I should see "Certified" in the "Certification 1" "table_row"
 
@@ -66,7 +67,7 @@ Feature: Verify certification completion data can be successfully uploaded.
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I switch to "Certifications" tab
     Then I should see "Certified" in the "Certification 1" "table_row"
 
@@ -93,7 +94,7 @@ Feature: Verify certification completion data can be successfully uploaded.
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I switch to "Certifications" tab
     Then I should see "Certified" in the "Certification 1" "table_row"
 
@@ -116,7 +117,7 @@ Feature: Verify certification completion data can be successfully uploaded.
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I switch to "Certifications" tab
     Then I should see "Certified" in the "Certification 1" "table_row"
 

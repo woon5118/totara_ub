@@ -847,8 +847,9 @@ class block_manager {
      * @param boolean $showinsubcontexts whether this block appears in subcontexts, or just the current context.
      * @param string|null $pagetypepattern which page types this block should appear on. Defaults to just the current page type.
      * @param string|null $subpagepattern which subpage this block should appear on. NULL = any (the default), otherwise only the specified subpage.
+     * @param mixed $configdata optional configuration data of block
      */
-    public function add_block($blockname, $region, $weight, $showinsubcontexts, $pagetypepattern = NULL, $subpagepattern = NULL) {
+    public function add_block($blockname, $region, $weight, $showinsubcontexts, $pagetypepattern = null, $subpagepattern = null, $configdata = '') {
         global $DB;
         // Allow invisible blocks because this is used when adding default page blocks, which
         // might include invisible ones if the user makes some default blocks invisible
@@ -858,7 +859,7 @@ class block_manager {
         if (empty($pagetypepattern)) {
             $pagetypepattern = $this->page->pagetype;
         }
-
+        $configdatastring = empty($configdata) ? '' : base64_encode(serialize($configdata));
         $blockinstance = new stdClass;
         $blockinstance->blockname = $blockname;
         $blockinstance->parentcontextid = $this->page->context->id;
@@ -867,7 +868,7 @@ class block_manager {
         $blockinstance->subpagepattern = $subpagepattern;
         $blockinstance->defaultregion = $region;
         $blockinstance->defaultweight = $weight;
-        $blockinstance->configdata = '';
+        $blockinstance->configdata = $configdatastring;
         $blockinstance->timecreated = time();
         $blockinstance->timemodified = $blockinstance->timecreated;
         $blockinstance->id = $DB->insert_record('block_instances', $blockinstance);

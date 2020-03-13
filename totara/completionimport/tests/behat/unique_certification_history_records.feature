@@ -4,7 +4,8 @@ Feature: Certification history can be imported as long as records are considered
   Allowing an admin to create valid data
 
   Scenario: Certification history records are added where due date matches and completion does not
-    Given I am on a totara site
+    Given the "mylearning" user profile block exists
+    And I am on a totara site
     And the following "users" exist:
       | username | firstname  | lastname  | email                |
       | learner1 | Learner    | One       | learner1@example.com |
@@ -23,7 +24,7 @@ Feature: Certification history can be imported as long as records are considered
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner One"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I switch to "Certifications" tab
     And I click on "2" "link" in the "Certification One" "table_row"
     And the following should exist in the "plan_certifications_history" table:
@@ -66,7 +67,7 @@ Feature: Certification history can be imported as long as records are considered
     And I run the scheduled task "\totara_certification\task\update_certification_task"
     And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner One"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I switch to "Certifications" tab
     And I click on "3" "link" in the "Certification One" "table_row"
     Then the following should exist in the "plan_certifications_history" table:
@@ -77,6 +78,7 @@ Feature: Certification history can be imported as long as records are considered
       | Certification One   | No        | 17 Jul 2015     | 12 Feb 2031     |
 
   Scenario: Only one history record is added when the due date, completion, certification and user all match
+    Given the "mylearning" user profile block exists
     Given I am on a totara site
     And the following "users" exist:
       | username | firstname  | lastname  | email                |
@@ -95,7 +97,7 @@ Feature: Certification history can be imported as long as records are considered
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner One"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I switch to "Certifications" tab
     And I click on "1" "link" in the "Certification One" "table_row"
     And the following should exist in the "plan_certifications_history" table:

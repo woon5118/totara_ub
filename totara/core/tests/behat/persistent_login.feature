@@ -121,7 +121,8 @@ Feature: Test persistent login feature
     And I should not see "You are logged in"
 
   Scenario: Test persistent login cookie is deleted when changing own password
-    Given I am on a totara site
+    Given the "reports" user profile block exists
+    And I am on a totara site
     And the following "users" exist:
       | username | firstname | lastname | email          |
       | user1    | Prvni     | Uzivatel | u1@example.com |
@@ -162,7 +163,8 @@ Feature: Test persistent login feature
     And I should see "No" in the "now" "table_row"
 
   Scenario: Test persistent login cookie is deleted when setting new password
-    Given I am on a totara site
+    Given the "reports" user profile block exists
+    And I am on a totara site
     And the following "users" exist:
       | username | firstname | lastname | email          |
       | user1    | Prvni     | Uzivatel | u1@example.com |
@@ -200,7 +202,8 @@ Feature: Test persistent login feature
     And I should see "No" in the "now" "table_row"
 
   Scenario: Test user sessions report without persistent login
-    Given I am on a totara site
+    Given the "reports" user profile block exists
+    And I am on a totara site
     And I log in as "admin"
     And I use magic for persistent login to purge cookies
     And I log in as "admin"
@@ -211,7 +214,8 @@ Feature: Test persistent login feature
     And I should not see "Persistent login"
 
   Scenario: Test user sessions report with persistent login
-    Given I am on a totara site
+    Given the "reports" user profile block exists
+    And I am on a totara site
     And I log in as "admin"
     And I set the following administration settings values:
       | Persistent login | 1 |

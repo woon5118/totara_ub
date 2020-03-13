@@ -24,7 +24,7 @@ Feature: Messaging preferences
       | user1    | User      | 1        | user1@example.com    |
     And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "User 1" "link"
-    And I click on "Preferences" "link" in the ".profile_tree" "css_element"
+    And I click on "Preferences" "link" in the ".block_totara_user_profile_category_administration" "css_element"
     And I click on "Message preferences" "link" in the "region-main" "region"
     And I should see "On" in the "[data-preference-key=message_provider_moodle_instantmessage] [data-processor-name=email] [data-state=loggedoff] .preference-state-status-container" "css_element"
     And I should not see "Off" in the "[data-preference-key=message_provider_moodle_instantmessage] [data-processor-name=email] [data-state=loggedoff] .preference-state-status-container" "css_element"

@@ -5,7 +5,8 @@ Feature: Mark course in a program complete via required learning
   Via required learning
 
   Background:
-    Given I am on a totara site
+    Given the "mylearning" user profile block exists
+    And I am on a totara site
     And the following "users" exist:
       | username       | firstname | lastname | email                      |
       | learner1       | Learner   | One      | learner1@example.com       |
@@ -44,7 +45,7 @@ Feature: Mark course in a program complete via required learning
     And I log in as "manager1"
     And I click on "Team" in the totara menu
     And I click on "Learner One" "link"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I switch to "Programs" tab
     And I click on "Program One" "link"
     Then I should not see "Mark complete"
@@ -56,7 +57,7 @@ Feature: Mark course in a program complete via required learning
     Given I log in as "manager1"
     And I click on "Team" in the totara menu
     And I click on "Learner One" "link"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I switch to "Programs" tab
     And I click on "Program One" "link"
     Then I should see "Mark complete"
@@ -83,7 +84,7 @@ Feature: Mark course in a program complete via required learning
     And I log in as "manager1"
     And I click on "Team" in the totara menu
     And I click on "Learner One" "link"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I switch to "Programs" tab
     And I click on "Program One" "link"
     Then I should see "Mark complete"
@@ -114,7 +115,7 @@ Feature: Mark course in a program complete via required learning
     And I log in as "manager1"
     And I click on "Team" in the totara menu
     And I click on "Learner One" "link"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I switch to "Programs" tab
     And I click on "Program One" "link"
     Then I should see "Mark complete"
@@ -129,7 +130,7 @@ Feature: Mark course in a program complete via required learning
 
     # The capability was only allowed for Learner One. Let's check Learner Two.
     And I click on "Learner Two" "link"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I switch to "Programs" tab
     And I click on "Program One" "link"
     Then I should not see "Mark complete"

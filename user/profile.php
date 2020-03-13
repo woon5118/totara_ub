@@ -87,7 +87,7 @@ if (!user_can_view_profile($user, null)) {
     $PAGE->set_context(context_system::instance());
     $PAGE->set_title("$SITE->shortname: $struser");  // Do not leak the name.
     $PAGE->set_heading($struser);
-    $PAGE->set_pagelayout('mypublic');
+    $PAGE->set_pagelayout('noblocks'); // Prevent showing default blocks.
     $PAGE->set_url('/user/profile.php', array('id' => $userid));
     $PAGE->navbar->add($struser);
     echo $OUTPUT->header();
@@ -110,11 +110,7 @@ if (isguestuser()) {     // Guests can never edit their profile.
     $USER->editing = $edit = 0;  // Just in case.
     $PAGE->set_blocks_editing_capability('moodle/my:configsyspages');  // unlikely :).
 } else {
-    if ($currentuser) {
-        $PAGE->set_blocks_editing_capability('moodle/user:manageownblocks');
-    } else {
-        $PAGE->set_blocks_editing_capability('moodle/user:manageblocks');
-    }
+    $PAGE->set_blocks_editing_capability('moodle/user:manageblocks');
 }
 
 // Start setting up the page.
@@ -221,11 +217,6 @@ if ($user->description && !isset($hiddenfields['description'])) {
 }
 
 echo $OUTPUT->custom_block_region('content');
-
-// Render custom blocks.
-$renderer = $PAGE->get_renderer('core_user', 'myprofile');
-$tree = core_user\output\myprofile\manager::build_tree($user, $currentuser);
-echo $renderer->render($tree);
 
 echo '</div>';  // Userprofile class.
 

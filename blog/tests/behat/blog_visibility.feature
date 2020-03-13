@@ -5,7 +5,8 @@ Feature: Blogs can be set to be only visible by the author.
   I need to set the blog level to Users can only see their own blogs.
 
   Background:
-    Given the following "users" exist:
+    Given the "miscellaneous" user profile block exists
+    And the following "users" exist:
       | username | firstname | lastname | email |
       | testuser | Test | User | moodle@example.com |
       | testuser2 | Test2 | User2 | moodle2@example.com |

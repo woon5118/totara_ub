@@ -134,7 +134,8 @@ Feature: Learner creates learning plan with competencies.
 
   Scenario: Test the competencies are hidden in the learning plan when hidden in hierarchy admin.
 
-    Given I log in as "admin"
+    Given the "mylearning" user profile block exists
+    And I log in as "admin"
 
     # Update the learning plan template so competencies are automatically assigned by position.
     When I navigate to "Manage templates" node in "Site administration > Learning Plans"
@@ -166,7 +167,7 @@ Feature: Learner creates learning plan with competencies.
     # Create a learning plan, Competency 1 should be added to the learning plan.
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
-    And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I press "Create new learning plan"
     And I set the field "Plan name" to "Learning Plan 2"
     And I press "Create plan"
@@ -186,7 +187,7 @@ Feature: Learner creates learning plan with competencies.
     And I click on "Hide" "link" in the "Competency 1" "table_row"
     And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
-    And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I follow "Learning Plan 2"
     And I switch to "Competencies" tab
     Then the following should exist in the "dp-plan-component-items" table:
@@ -203,7 +204,7 @@ Feature: Learner creates learning plan with competencies.
     And I click on "Hide" "link" in the "Competency Framework 1" "table_row"
     And I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
-    And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I press "Create new learning plan"
     And I set the field "Plan name" to "Learning Plan 3"
     And I press "Create plan"

@@ -3,7 +3,8 @@ Feature: See that certification visibility affects Record of Learning: Certifica
   Change the visibility settings of a certification through several states and see that the certification is correctly displayed in the RoL.
 
   Background:
-    Given I am on a totara site
+    Given the "mylearning" user profile block exists
+    And I am on a totara site
     And the following "users" exist:
       | username | firstname | lastname | email               |
       | user001  | fn_001    | ln_001   | user001@example.com |
@@ -46,7 +47,7 @@ Feature: See that certification visibility affects Record of Learning: Certifica
     And I log in as "mana003"
     And I click on "Team" in the totara menu
     And I click on "fn_001 ln_001" "link"
-    And I click on "Record of Learning" "link" in the ".userprofile" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
     Then I should see "Record of Learning for fn_001 ln_001 : All Certifications"
     And I should see "RoLCertVisibility Test Cert 1" in the "#dp-plan-content" "css_element"
@@ -77,7 +78,7 @@ Feature: See that certification visibility affects Record of Learning: Certifica
     And I log in as "mana003"
     And I click on "Team" in the totara menu
     And I click on "fn_001 ln_001" "link"
-    And I click on "Record of Learning" "link" in the ".userprofile" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
     Then I should see "Record of Learning for fn_001 ln_001 : All Certifications"
     # Should be marked hidden.
@@ -109,7 +110,7 @@ Feature: See that certification visibility affects Record of Learning: Certifica
     And I log in as "mana003"
     And I click on "Team" in the totara menu
     And I click on "fn_002 ln_002" "link"
-    And I click on "Record of Learning" "link" in the ".userprofile" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
     Then I should see "Record of Learning for fn_002 ln_002 : All Certifications"
     # Should be marked hidden.
@@ -159,7 +160,7 @@ Feature: See that certification visibility affects Record of Learning: Certifica
     And I log in as "mana003"
     And I click on "Team" in the totara menu
     And I click on "fn_002 ln_002" "link"
-    And I click on "Record of Learning" "link" in the ".userprofile" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
     Then I should see "Record of Learning for fn_002 ln_002 : All Certifications"
     And I should see "RoLCertVisibility Test Cert 1" in the "#dp-plan-content" "css_element"
@@ -187,7 +188,7 @@ Feature: See that certification visibility affects Record of Learning: Certifica
     And I log in as "mana003"
     And I click on "Team" in the totara menu
     And I click on "fn_001 ln_001" "link"
-    And I click on "Record of Learning" "link" in the ".userprofile" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
     Then I should see "Record of Learning for fn_001 ln_001 : All Certifications"
     And I should see "RoLCertVisibility Test Cert 1" in the "#dp-plan-content" "css_element"
@@ -222,7 +223,7 @@ Feature: See that certification visibility affects Record of Learning: Certifica
     And I log in as "mana003"
     And I click on "Team" in the totara menu
     And I click on "fn_001 ln_001" "link"
-    And I click on "Record of Learning" "link" in the ".userprofile" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
     Then I should see "Record of Learning for fn_001 ln_001 : All Certifications"
     And I should see "RoLCertVisibility Test Cert 1" in the "#dp-plan-content" "css_element"
@@ -257,7 +258,7 @@ Feature: See that certification visibility affects Record of Learning: Certifica
     And I log in as "mana003"
     And I click on "Team" in the totara menu
     And I click on "fn_001 ln_001" "link"
-    And I click on "Record of Learning" "link" in the ".userprofile" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
     Then I should see "Record of Learning for fn_001 ln_001 : All Certifications"
     And I should see "RoLCertVisibility Test Cert 1" in the "#dp-plan-content" "css_element"
@@ -289,7 +290,7 @@ Feature: See that certification visibility affects Record of Learning: Certifica
     And I log in as "mana003"
     And I click on "Team" in the totara menu
     And I click on "fn_001 ln_001" "link"
-    And I click on "Record of Learning" "link" in the ".userprofile" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should not see "Certifications" in the "#dp-plan-content" "css_element"
 
   @javascript
@@ -321,7 +322,7 @@ Feature: See that certification visibility affects Record of Learning: Certifica
     And I log in as "mana003"
     And I click on "Team" in the totara menu
     And I click on "fn_002 ln_002" "link"
-    And I click on "Record of Learning" "link" in the ".userprofile" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
     Then I should see "Record of Learning for fn_002 ln_002 : All Certifications"
     And I should not see "RoLCertVisibility Test Cert 1" in the "#dp-plan-content" "css_element"
@@ -364,7 +365,7 @@ Feature: See that certification visibility affects Record of Learning: Certifica
     And I log in as "mana003"
     And I click on "Team" in the totara menu
     And I click on "fn_002 ln_002" "link"
-    And I click on "Record of Learning" "link" in the ".userprofile" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
     Then I should see "Record of Learning for fn_002 ln_002 : All Certifications"
     And I should not see "RoLCertVisibility Test Cert 1" in the "#dp-plan-content" "css_element"
@@ -433,7 +434,7 @@ Feature: See that certification visibility affects Record of Learning: Certifica
     And I log in as "mana003"
     And I click on "Team" in the totara menu
     And I click on "fn_002 ln_002" "link"
-    And I click on "Record of Learning" "link" in the ".userprofile" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
     Then I should see "Record of Learning for fn_002 ln_002 : All Certifications"
     And I should see "RoLCertVisibility Test Cert 1" in the "#dp-plan-content" "css_element"
@@ -503,7 +504,7 @@ Feature: See that certification visibility affects Record of Learning: Certifica
     And I log in as "mana003"
     And I click on "Team" in the totara menu
     And I click on "fn_002 ln_002" "link"
-    And I click on "Record of Learning" "link" in the ".userprofile" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
     Then I should see "Record of Learning for fn_002 ln_002 : All Certifications"
     And I should see "RoLCertVisibility Test Cert 1" in the "#dp-plan-content" "css_element"
@@ -557,7 +558,7 @@ Feature: See that certification visibility affects Record of Learning: Certifica
     And I log in as "mana003"
     And I click on "Team" in the totara menu
     And I click on "fn_002 ln_002" "link"
-    And I click on "Record of Learning" "link" in the ".userprofile" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
     Then I should see "Record of Learning for fn_002 ln_002 : All Certifications"
     And I should see "RoLCertVisibility Test Cert 1" in the "#dp-plan-content" "css_element"

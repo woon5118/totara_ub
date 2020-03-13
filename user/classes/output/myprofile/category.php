@@ -100,6 +100,16 @@ class category implements \renderable {
     }
 
     /**
+     * Check if a node already exists in this category.
+     *
+     * @param node $node node object.
+     * @return bool
+     */
+    public function node_exists(node $node) {
+        return isset($this->nodes[$node->name]);
+    }
+
+    /**
      * Sort nodes of the category in the order in which they should be displayed.
      *
      * @see \core_user\output\myprofile\tree::sort_categories()
@@ -195,5 +205,16 @@ class category implements \renderable {
             return $this->$prop;
         }
         throw new \coding_exception('Property "' . $prop . '" doesn\'t exist');
+    }
+
+    /**
+     * Magic isset method.
+     *
+     * @param string $prop property to check.
+     *
+     * @return bool
+     */
+    public function __isset($prop) {
+        return in_array($prop, $this->properties);
     }
 }

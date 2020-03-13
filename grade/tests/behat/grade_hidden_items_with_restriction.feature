@@ -1,7 +1,8 @@
 @core @core_grades @availability @availability_restriction @mod @mod_assign @javascript
 Feature: Grade visibility with audience restriction set
   Background:
-    Given the following "courses" exist:
+    Given the "reports" user profile block exists
+    And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
     And the following "users" exist:
@@ -186,7 +187,7 @@ Feature: Grade visibility with audience restriction set
     When I log in as "staff"
     And I click on "Team" in the totara menu
     And I click on "Profile" "link" in the "Stu Dent" "table_row"
-    And I follow "Grades overview"
+    And I click on "Grades overview" "link" in the ".block_totara_user_profile_category_reports" "css_element"
     And I follow "Course 1"
     Then I should not see "Homework" in the ".user-grade" "css_element"
     And I log out

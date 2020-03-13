@@ -123,10 +123,11 @@ Feature: Generation of program assignment exceptions
 
   @javascript
   Scenario: Already assigned exceptions are generated and overridden
-    Given I log in as "admin"
+    Given the "mylearning" user profile block exists
+    And I log in as "admin"
     And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "fn_001 ln_001" "link"
-    And I click on "Learning Plans" "link" in the "#region-main" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I press "Create new learning plan"
     And I press "Create plan"
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"

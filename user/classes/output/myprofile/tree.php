@@ -113,7 +113,7 @@ class tree implements \renderable {
             $parentcat = $node->parentcat;
             if (!isset($this->categories[$parentcat])) {
                 throw new \coding_exception("Category $parentcat doesn't exist");
-            } else {
+            } else if (!$this->categories[$parentcat]->node_exists($node)) {
                 $this->categories[$parentcat]->add_node($node);
             }
         }

@@ -5,7 +5,8 @@ Feature: Access to full profiles of users
   I need to set global permission or disable forceloginforprofiles
 
   Background:
-    Given the following "users" exist:
+    Given the "loginactivity" user profile block exists
+    And the following "users" exist:
       | username | firstname | lastname | email |
       | student1 | Student | 1 | student1@example.com |
       | student2 | Student | 2 | student2@example.com |

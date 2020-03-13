@@ -2,7 +2,8 @@
 Feature: Verify grade unit and override option when uploading course completion
 
   Background:
-    Given I am on a totara site
+    Given the "mylearning" user profile block exists
+    And I am on a totara site
     And the following "users" exist:
       | username | firstname  | lastname  | email                |
       | learner1 | Bob1       | Learner1  | learner1@example.com |
@@ -108,7 +109,7 @@ Feature: Verify grade unit and override option when uploading course completion
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then the "plan_courses" table should contain the following:
       | Course Title | Previous Completions | Progress | Grade       |
       | Course 1     | 2                    | 100%     | <grade_rol> |
@@ -247,7 +248,7 @@ Feature: Verify grade unit and override option when uploading course completion
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then the "plan_courses" table should contain the following:
       | Course Title | Previous Completions | Progress | Grade       |
       | Course 1     |                      | 100%     | <grade_rol> |
@@ -354,7 +355,7 @@ Feature: Verify grade unit and override option when uploading course completion
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
-    And I click on "Record of Learning" "link" in the ".profile_tree" "css_element"
+    And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then the "plan_courses" table should contain the following:
       | Course Title | Previous Completions | Progress | Grade       |
       | Course 1     | 1                    | 100%     | <grade_rol> |

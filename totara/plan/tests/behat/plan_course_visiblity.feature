@@ -2,7 +2,8 @@
 Feature: See that audience based visibility doesn't effect a course showing in a Learning Plan.
 
   Background:
-    Given I am on a totara site
+    Given the "mylearning" user profile block exists
+    And I am on a totara site
     And the following "users" exist:
       | username | firstname | lastname | email                     |
       | learner1 | Learner   | One      | learner.one@example.com   |
@@ -44,7 +45,7 @@ Feature: See that audience based visibility doesn't effect a course showing in a
     And I press "Save and display"
     And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Learner One" "link"
-    And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Learning Plan 1" "link"
     And I click on "Courses" "link" in the "#dp-plan-content" "css_element"
     And I click on "Add courses" "button"

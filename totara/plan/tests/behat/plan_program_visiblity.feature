@@ -32,7 +32,8 @@ Feature: See that audience based visibility doesn't effect a program showing in 
     Then I should see "Visibility Test Program 1" in the "#dp-component-update-table" "css_element"
 
   Scenario: Audience based visibility where learner can't see program.
-    Given I log in as "admin"
+    Given the "mylearning" user profile block exists
+    And I log in as "admin"
     When I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
@@ -46,7 +47,7 @@ Feature: See that audience based visibility doesn't effect a program showing in 
     And I press "Save changes"
     And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Learner One" "link"
-    And I click on "Learning Plans" "link" in the ".userprofile" "css_element"
+    And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Learning Plan 1" "link"
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
     And I click on "Add programs" "button"
