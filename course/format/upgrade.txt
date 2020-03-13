@@ -8,6 +8,7 @@ Overview of this plugin type at http://docs.moodle.org/dev/Course_formats
   "numsections" is not an option defined by the course format.
 * course/changenumsections.php can now be used to insert sections at any positions
 * format_social has been deprecated.
+* format_demo has been deprecated.
 
 === 12.0 ===
 

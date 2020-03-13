@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Chris Wharton <chrisw@catalyst.net.nz>
- * @package totara
- * @subpackage totara_course_format
+ * @author Simon Player <simon.player@totaralearning.com>
+ * @package format_demo
  */
 
-$string['currentsection'] = 'This section';
-$string['demo'] = 'Demo';
-$string['sectionname'] = 'Demo';
-$string['pluginname'] = 'Demo format (deprecated)';
-$string['demooutline'] = 'Demo Outline';
-$string['demosection'] = 'Demo Section';
-$string['hidefromothers'] = 'Hide Demo Section';
-$string['showfromothers'] = 'Show Demo Section';
+defined('MOODLE_INTERNAL') || die;
+
+function xmldb_format_demo_install() {
+    // Totara: format_demo is deprecated since 13.0 so disable for install.
+    set_config('disabled', 1, 'format_demo');
+
+    return true;
+}
