@@ -1167,6 +1167,10 @@ class core_plugin_manager {
             'search_simpledb',
 
             // Totara 13 removals.
+            'assignment_offline',
+            'assignment_online',
+            'assignment_upload',
+            'assignment_uploadsingle',
             'mod_assignment',
             'block_community',
             'block_quiz_results',
