@@ -29,5 +29,3 @@ $plugin->version   = 2019102300; // The current module version (Date: YYYYMMDDXX
 $plugin->requires  = 2017111309; // Requires this Moodle version
 $plugin->cron      = 0; // Period for cron to check this module (secs)
 $plugin->component = 'mod_certificate';
-
-$plugin->release   = "Stable"; // User-friendly version number
