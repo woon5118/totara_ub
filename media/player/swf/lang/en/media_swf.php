@@ -22,5 +22,5 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Flash animation';
+$string['pluginname'] = 'Flash animation (deprecated)';
 $string['pluginname_help'] = 'For security reasons this format is only embedded within trusted text.';
