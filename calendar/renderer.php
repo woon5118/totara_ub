@@ -730,7 +730,7 @@ class core_calendar_renderer extends plugin_renderer_base {
             // If the user has not signed up before.
             if (!$seminar->has_unarchived_signups() || $seminar->get_multiplesessions() == 1) {
                 $linkurl = new moodle_url('/mod/facetoface/eventinfo.php', array('s' => $seminarevent->get_id()));
-                $output .= get_string('signupforthissession', 'mod_facetoface', $linkurl->out());
+                $output .= get_string('signupforthissessionlink', 'mod_facetoface', $linkurl->out());
             }
         } else {
             $output .= '';
