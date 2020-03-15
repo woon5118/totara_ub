@@ -390,7 +390,7 @@ function message_update_processors($processorname) {
  * @param  string $processorname The optional name of message processor
  */
 function message_set_default_message_preference($component, $messagename, $fileprovider, $processorname='') {
-    global $DB;
+    global $DB, $CFG;
 
     // Fetch message processors
     $condition = null;
@@ -409,6 +409,11 @@ function message_set_default_message_preference($component, $messagename, $filep
     $loggedoffpref = array();
     // set 'permitted' preference first for each messaging processor
     foreach ($processors as $processor) {
+        // Totara: Ignore invalid providers to prevent fatal upgrade errors.
+        if (!file_exists($CFG->dirroot . '/message/output/' . $processor->name.'/message_output_' . $processor->name . '.php')) {
+            continue;
+        }
+
         $preferencename = $processor->name.'_provider_'.$componentproviderbase.'_permitted';
         // if we do not have this setting yet, set it
         if (!isset($defaultpreferences->{$preferencename})) {
