@@ -95,33 +95,9 @@ class block_myprofile extends block_base {
             $this->content->text .= '</div>';
         }
 
-        if(!empty($this->config->display_icq) && !empty($USER->icq)) {
-            $this->content->text .= '<div class="myprofileitem icq">';
-            $this->content->text .= 'ICQ: ' . s($USER->icq);
-            $this->content->text .= '</div>';
-        }
-
         if(!empty($this->config->display_skype) && !empty($USER->skype)) {
             $this->content->text .= '<div class="myprofileitem skype">';
             $this->content->text .= 'Skype: ' . s($USER->skype);
-            $this->content->text .= '</div>';
-        }
-
-        if(!empty($this->config->display_yahoo) && !empty($USER->yahoo)) {
-            $this->content->text .= '<div class="myprofileitem yahoo">';
-            $this->content->text .= 'Yahoo: ' . s($USER->yahoo);
-            $this->content->text .= '</div>';
-        }
-
-        if(!empty($this->config->display_aim) && !empty($USER->aim)) {
-            $this->content->text .= '<div class="myprofileitem aim">';
-            $this->content->text .= 'AIM: ' . s($USER->aim);
-            $this->content->text .= '</div>';
-        }
-
-        if(!empty($this->config->display_msn) && !empty($USER->msn)) {
-            $this->content->text .= '<div class="myprofileitem msn">';
-            $this->content->text .= 'MSN: ' . s($USER->msn);
             $this->content->text .= '</div>';
         }
 

@@ -1980,8 +1980,8 @@ function facetoface_message_substitutions_userfields($msg, $user) {
     static $customfields = null;
 
     $placeholders = array('username' => '[username]', 'email' => '[email]', 'institution' => '[institution]',
-        'department' => '[department]', 'city' => '[city]', 'idnumber' => '[idnumber]', 'icq' => '[icq]', 'skype' => '[skype]',
-        'yahoo' => '[yahoo]', 'aim' => '[aim]', 'msn' => '[msn]', 'phone1' => '[phone1]', 'phone2' => '[phone2]',
+        'department' => '[department]', 'city' => '[city]', 'idnumber' => '[idnumber]', 'skype' => '[skype]',
+        'phone1' => '[phone1]', 'phone2' => '[phone2]',
         'address' => '[address]', 'url' => '[url]', 'description' => '[description]');
     $fields = array_keys($placeholders);
 

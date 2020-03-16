@@ -1965,13 +1965,9 @@ function purify_html($text, $options = array()) {
             'mms' => true,
             'mailto' => true,
             'skype'=>true,
-            'ymsgr'=>true,
             'meet'=>true,
             'sip'=>true,
             'xmpp'=>true,
-            'aim'=>true,
-            'myim'=>true,
-            'msnim'=>true
         ));
         $config->set('Attr.AllowedFrameTargets', array('_blank'));
 
@@ -2147,13 +2143,9 @@ function purify_uri($uri, $httponly = false, $requirescheme = false) {
                 'mms' => true,
                 'mailto' => true,
                 'skype'=>true,
-                'ymsgr'=>true,
                 'meet'=>true,
                 'sip'=>true,
                 'xmpp'=>true,
-                'aim'=>true,
-                'myim'=>true,
-                'msnim'=>true
             ));
         }
 

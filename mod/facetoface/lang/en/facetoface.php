@@ -289,10 +289,6 @@ Available user placeholders:
 * [description] - User\'s description
 * [institution] - User\'s institution
 * [lang] - User\'s language
-* [icq] - User\'s ICQ number
-* [aim] - User\'s AIM ID
-* [msn] - Users\'s MSN ID
-* [yahoo] - User\'s Yahoo ID
 * [skype] - User\'s Skype ID
 * [phone1] - User\'s phone number
 * [phone2] - User\'s mobile phone number
@@ -1078,7 +1074,6 @@ $string['othersession'] = 'Other event(s) in this activity';
 $string['over'] = 'Over';
 $string['place'] = 'Room';
 $string['placeholder:address'] = '[address]';
-$string['placeholder:aim'] = '[aim]';
 $string['placeholder:alternatename'] = '[alternatename]';
 $string['placeholder:booked'] = '[booked]';
 $string['placeholder:capacity'] = '[capacity]';
@@ -1090,7 +1085,6 @@ $string['placeholder:email'] = '[email]';
 $string['placeholder:firstname'] = '[firstname]';
 $string['placeholder:firstnamephonetic'] = '[firstnamephonetic]';
 $string['placeholder:fullname'] = '[fullname]';
-$string['placeholder:icq'] = '[icq]';
 $string['placeholder:idnumber'] = '[idnumber]';
 $string['placeholder:institution'] = '[institution]';
 $string['placeholder:lang'] = '[lang]';
@@ -1098,7 +1092,6 @@ $string['placeholder:lastname'] = '[lastname]';
 $string['placeholder:lastnamephonetic'] = '[lastnamephonetic]';
 $string['placeholder:middlename'] = '[middlename]';
 $string['placeholder:mincapacity'] = '[mincapacity]';
-$string['placeholder:msn'] = '[msn]';
 $string['placeholder:phone1'] = '[phone1]';
 $string['placeholder:phone2'] = '[phone2]';
 $string['placeholder:registrationcutoff'] = '[registrationcutoff]';
@@ -1109,7 +1102,6 @@ $string['placeholder:skype'] = '[skype]';
 $string['placeholder:timezone'] = '[timezone]';
 $string['placeholder:url'] = '[url]';
 $string['placeholder:username'] = '[username]';
-$string['placeholder:yahoo'] = '[yahoo]';
 $string['playlottery'] = 'Play Lottery';
 $string['potentialattendees'] = 'Potential Attendees';
 $string['published'] = 'Published';
@@ -2906,3 +2898,9 @@ Capacity: {$a->booked} / {$a->capacity} (minimum: {$a->mincapacity})
 {$a->link}';
 $string['declareinterestonlyiffull'] = 'Show "Declare Interest" link only if all events are closed';
 $string['declareinterestonlyiffull_help'] = 'Only show the declare interest option if there are no events with spaces or waiting lists.';
+
+// Deprecated since Totara 13.0
+$string['placeholder:icq'] = '[icq]';
+$string['placeholder:msn'] = '[msn]';
+$string['placeholder:yahoo'] = '[yahoo]';
+$string['placeholder:aim'] = '[aim]';

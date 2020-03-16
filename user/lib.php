@@ -89,6 +89,14 @@ function user_create_user($user, $updatepassword = true, $triggerevent = true) {
         $user->lang = core_user::get_property_default('lang');
     }
 
+    foreach (core_user::REMOVED_FIELDS as $fieldname => $unusedname) {
+        if (!property_exists($user, $fieldname)) {
+            continue;
+        }
+        debugging("User field '$fieldname' is not avaialble any more, use custom user profile field instead", DEBUG_DEVELOPER);
+        unset($user->$fieldname);
+    }
+
     $user->timecreated = time();
     $user->timemodified = $user->timecreated;
 
@@ -147,6 +155,14 @@ function user_update_user($user, $updatepassword = true, $triggerevent = true) {
 
     if (!is_object($user)) {
         $user = (object) $user;
+    }
+
+    foreach (core_user::REMOVED_FIELDS as $fieldname => $unusedname) {
+        if (!property_exists($user, $fieldname)) {
+            continue;
+        }
+        debugging("User field '$fieldname' is not avaialble any more, use custom user profile field instead", DEBUG_DEVELOPER);
+        unset($user->$fieldname);
     }
 
     // Totara: prevent tenantid changes.
@@ -406,7 +422,7 @@ function user_get_users_by_id($userids) {
  */
 function user_get_default_fields() {
     return array( 'id', 'username', 'fullname', 'firstname', 'lastname', 'email',
-        'address', 'phone1', 'phone2', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'department',
+        'address', 'phone1', 'phone2', 'skype', 'department',
         'institution', 'interests', 'firstaccess', 'lastaccess', 'auth', 'confirmed',
         'idnumber', 'lang', 'theme', 'timezone', 'mailformat', 'description', 'descriptionformat',
         'city', 'url', 'country', 'profileimageurlsmall', 'profileimageurl', 'imagealt', 'customfields',
@@ -475,11 +491,7 @@ function user_get_user_details($user, $course = null, array $userfields = array(
         'email' => $resolver_isset,
         'institution' => $resolver_notempty,
         'idnumber' => $resolver_isset,
-        'msn' => $resolver_notempty,
-        'aim' => $resolver_notempty,
-        'yahoo' => $resolver_notempty,
         'skype' => $resolver_notempty,
-        'icq' => $resolver_notempty,
         'city' => $resolver_notempty,
         'country' => $resolver_notempty,
         'auth' => $resolver_isset,

@@ -429,8 +429,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
             'policyagreed',         'deleted',          'mnethostid',
             'username',             'password',         'idnumber',
             'firstname',            'lastname',         'email',
-            'emailstop',            'icq',              'skype',
-            'yahoo',                'aim',              'msn',
+            'emailstop',            'skype',
             'phone1',               'phone2',           'institution',
             'department',           'address',          'city',
             'country',              'lang',             'theme',
@@ -2232,8 +2231,8 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         global $DB;
         $this->init_sample_data();
 
-        $fields = array('username', 'email', 'institution', 'department', 'city', 'idnumber', 'icq', 'skype',
-            'yahoo', 'aim', 'msn', 'phone1', 'phone2', 'address', 'url', 'description');
+        $fields = array('username', 'email', 'institution', 'department', 'city', 'idnumber', 'skype',
+            'phone1', 'phone2', 'address', 'url', 'description');
 
         $usernamefields = get_all_user_name_fields();
         $fields = array_merge($fields, array_values($usernamefields));
@@ -2322,8 +2321,8 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         global $CFG, $DB;
         $this->init_sample_data();
 
-        $fields = array('username', 'email', 'institution', 'department', 'city', 'idnumber', 'icq', 'skype',
-            'yahoo', 'aim', 'msn', 'phone1', 'phone2', 'address', 'url', 'description');
+        $fields = array('username', 'email', 'institution', 'department', 'city', 'idnumber','skype',
+            'phone1', 'phone2', 'address', 'url', 'description');
 
         $usernamefields = get_all_user_name_fields();
         $fields = array_merge($fields, array_values($usernamefields));

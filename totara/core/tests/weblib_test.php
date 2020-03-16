@@ -33,6 +33,23 @@ class totara_core_weblib_testcase extends advanced_testcase {
         $html = '<div class="someclass" data-core-autoinitialise="true" data-core-autoinitialise-amd="mod_mymod/myelement" data-x-yyy="2">sometext</div>';
         $expected = '<div class="someclass">sometext</div>';
         $this->assertSame($expected, clean_text($html, FORMAT_HTML));
+
+        // Make sure obsolete messenger schemes are not supported any more.
+        $html = '<a href="ymsgr:im?to=example_user">sometext</a>';
+        $expected = '<a>sometext</a>';
+        $this->assertSame($expected, clean_text($html, FORMAT_HTML));
+
+        $html = '<a href="aim:whatever?go">sometext</a>';
+        $expected = '<a>sometext</a>';
+        $this->assertSame($expected, clean_text($html, FORMAT_HTML));
+
+        $html = '<a href="myim:whatever">sometext</a>';
+        $expected = '<a>sometext</a>';
+        $this->assertSame($expected, clean_text($html, FORMAT_HTML));
+
+        $html = '<a href="msnim:chat?contact=nada@example.com">sometext</a>';
+        $expected = '<a>sometext</a>';
+        $this->assertSame($expected, clean_text($html, FORMAT_HTML));
     }
 
     public function test_purify_uri() {

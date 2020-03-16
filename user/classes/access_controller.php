@@ -393,11 +393,7 @@ class access_controller {
             case 'country':
             case 'city':
             case 'url':
-            case 'icq':
             case 'skype':
-            case 'yahoo':
-            case 'aim':
-            case 'msn':
             case 'suspended':
             case 'firstaccess':
             case 'lastaccess':
@@ -853,11 +849,7 @@ class access_controller {
             // These maps exist because the hidden field name does not match the field on the user record.
             $maps = [
                 'webpage' => 'url',
-                'icqnumber' => 'icq',
                 'skypeid' => 'skype',
-                'yahooid' => 'yahoo',
-                'aimid' => 'aim',
-                'msnid' => 'msn',
             ];
             foreach ($maps as $key => $value) {
                 if (in_array($key, $fields)) {

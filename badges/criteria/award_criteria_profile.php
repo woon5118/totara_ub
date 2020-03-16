@@ -51,8 +51,8 @@ class award_criteria_profile extends award_criteria {
         $missing = array();
 
         // Note: cannot use user_get_default_fields() here because it is not possible to decide which fields user can modify.
-        $dfields = array('firstname', 'lastname', 'email', 'address', 'phone1', 'phone2', 'icq', 'skype', 'yahoo',
-                         'aim', 'msn', 'department', 'institution', 'description', 'city', 'url', 'country');
+        $dfields = array('firstname', 'lastname', 'email', 'address', 'phone1', 'phone2', 'skype',
+                         'department', 'institution', 'description', 'city', 'url', 'country');
 
         $sql = "SELECT uf.id as fieldid, uf.name as name, ic.id as categoryid, ic.name as categoryname, uf.datatype
                 FROM {user_info_field} uf
@@ -138,7 +138,7 @@ class award_criteria_profile extends award_criteria {
             } else {
                 $str = get_user_field_name($p['field']);
             }
-            if (!$str) {
+            if ($str === false) {
                 $output[] = $OUTPUT->error_text(get_string('error:nosuchfield', 'badges'));
             } else {
                 $output[] = $str;
@@ -174,6 +174,8 @@ class award_criteria_profile extends award_criteria {
         $sqlparams = array();
         $rule = ($this->method == BADGE_CRITERIA_AGGREGATION_ANY) ? ' OR ' : ' AND ';
 
+        $userfields = $DB->get_columns('user');
+
         foreach ($this->params as $param) {
             if (is_numeric($param['field'])) {
                 // This is a custom field.
@@ -181,9 +183,11 @@ class award_criteria_profile extends award_criteria {
                 $join .= " LEFT JOIN {user_info_data} uid{$idx} ON uid{$idx}.userid = u.id AND uid{$idx}.fieldid = :fieldid{$idx} ";
                 $sqlparams["fieldid{$idx}"] = $param['field'];
                 $whereparts[] = "uid{$idx}.id IS NOT NULL";
-            } else {
+            } else if (isset($userfields[$param['field']])) {
                 // This is a field from {user} table.
                 $whereparts[] = $DB->sql_isnotempty('u', "u.{$param['field']}", false, true);
+            } else {
+                debugging("Invalid user field '{$param['field']}' detected in award criteria", DEBUG_DEVELOPER);
             }
         }
 
@@ -214,6 +218,8 @@ class award_criteria_profile extends award_criteria {
         $params = array();
         $rule = ($this->method == BADGE_CRITERIA_AGGREGATION_ANY) ? ' OR ' : ' AND ';
 
+        $userfields = $DB->get_columns('user');
+
         foreach ($this->params as $param) {
             if (is_numeric($param['field'])) {
                 // This is a custom field.
@@ -221,7 +227,7 @@ class award_criteria_profile extends award_criteria {
                 $join .= " LEFT JOIN {user_info_data} uid{$idx} ON uid{$idx}.userid = u.id AND uid{$idx}.fieldid = :fieldid{$idx} ";
                 $params["fieldid{$idx}"] = $param['field'];
                 $whereparts[] = "uid{$idx}.id IS NOT NULL";
-            } else {
+            } else if (isset($userfields[$param['field']])) {
                 $whereparts[] = $DB->sql_isnotempty('u', "u.{$param['field']}", false, true);
             }
         }
@@ -244,14 +250,20 @@ class award_criteria_profile extends award_criteria {
         $method = ($this->method == BADGE_CRITERIA_AGGREGATION_ALL);
         $singleparam = (count($this->params) == 1);
 
+        $userfields = $DB->get_columns('user');
+
         foreach ($this->params as $param) {
             // No need to check user table, checking only custom profile fields.
             // Perform check if there only one parameter with any type of aggregation,
             // Or there are more than one parameter with aggregation ALL.
-            if (is_numeric($param['field']) && ($singleparam || $method)) {
-                if (!$DB->record_exists('user_info_field', array('id' => $param['field']))) {
-                    return array(false, get_string('error:invalidparamprofile', 'badges'));
+            if (is_numeric($param['field'])) {
+                if (($singleparam || $method)) {
+                    if (!$DB->record_exists('user_info_field', array('id' => $param['field']))) {
+                        return array(false, get_string('error:invalidparamprofile', 'badges'));
+                    }
                 }
+            } else if (!isset($userfields[$param['field']])) {
+                return array(false, get_string('invaliduserfield', 'error', $param['field']));
             }
         }
 

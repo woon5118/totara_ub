@@ -74,11 +74,7 @@ class unit_test_user_data_object extends data_object {
     public $policyagreed;
     public $mnethostid;
     public $password;
-    public $icq;
     public $skype;
-    public $yahoo;
-    public $aim;
-    public $msn;
     public $phone1;
     public $phone2;
     public $institute;
@@ -132,11 +128,7 @@ class unit_test_user_data_object extends data_object {
         'policyagreed',
         'mnethostid',
         'password',
-        'icq',
         'skype',
-        'yahoo',
-        'aim',
-        'msn',
         'phone1',
         'phone2',
         'institution',

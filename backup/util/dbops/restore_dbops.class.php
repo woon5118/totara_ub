@@ -1231,6 +1231,13 @@ abstract class restore_dbops {
                 $user->timecreated = time();
             }
 
+            // Totara: ignore removed fields.
+            foreach (core_user::REMOVED_FIELDS as $fieldname => $unusedname) {
+                if (property_exists($user, $fieldname)) {
+                    unset($user->$fieldname);
+                }
+            }
+
             // Done, let's create the user and annotate its id
             $newuserid = $DB->insert_record('user', $user);
             self::set_backup_ids_record($restoreid, 'user', $recuser->itemid, $newuserid);

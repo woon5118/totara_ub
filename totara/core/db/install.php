@@ -567,5 +567,8 @@ function xmldb_totara_core_install() {
     require_once($CFG->dirroot . '/badges/upgradelib.php'); // Core install and upgrade related functions only for badges.
     badges_install_default_backpacks();
 
+    // Migrate obsolete user fields.
+    totara_core_upgrade_migrate_removed_user_fields();
+
     return true;
 }

@@ -1099,3 +1099,87 @@ function totara_core_upgrade_fix_role_risks() {
         }
     }
 }
+
+/**
+ * Migrate obsolete user field to custom profile field and delete the data.
+ * @since Totara 13.0
+ */
+function totara_core_upgrade_migrate_removed_user_fields() {
+    global $DB, $CFG;
+    require_once($CFG->dirroot . '/user/lib.php');
+
+    $dbman = $DB->get_manager();
+
+    $fields = core_user::REMOVED_FIELDS;
+    $categoryid = $DB->get_field('user_info_category', 'MIN(id)', []);
+
+    foreach ($fields as $fieldshortname => $fieldlongname) {
+        $table = new xmldb_table('user');
+        $field = new xmldb_field($fieldshortname);
+        if (!$dbman->field_exists($table, $field)) {
+            continue;
+        }
+
+        // Remove column from hidden profile fields.
+        if (isset($CFG->hiddenuserfields) && $CFG->hiddenuserfields !== '') {
+            $hiddenuserfields = explode(',', $CFG->hiddenuserfields);
+            $hiddenuserfields = array_map('trim', $hiddenuserfields);
+            $hiddenuserfields = array_flip($hiddenuserfields);
+            unset($hiddenuserfields[$fieldshortname]);
+            set_config('hiddenuserfields', implode(',', array_keys($hiddenuserfields)));
+        }
+
+        // Add new custom field only if the column was used.
+        if ($DB->record_exists_select('user', "deleted = 0 AND {$fieldshortname} <> ''")) {
+
+            $shortname = $fieldshortname;
+            if ($DB->record_exists('user_info_field', ['shortname' => $shortname])) {
+                $i = 2;
+                $shortname = $shortname . '_' . $i;
+                while ($DB->record_exists('user_info_field', ['shortname' => $shortname])) {
+                    $i++;
+                }
+            }
+            // The custom fields API is weird, better use direct DB inserts here.
+
+            if (!$categoryid) {
+                $defaultcategory = new stdClass();
+                $defaultcategory->name = get_string('profiledefaultcategory', 'admin');
+                $defaultcategory->sortorder = 1;
+                $categoryid = $DB->insert_record('user_info_category', $defaultcategory);
+            }
+
+            $record = new stdClass();
+            $record->shortname = $shortname;
+            $record->name = $fieldlongname;
+            $record->datatype = 'text';
+            $record->description = '';
+            $record->descriptionformat = 1;
+            $record->categoryid = $categoryid;
+            $record->sortorder = 1 + (int)$DB->get_field('user_info_field', 'MAX(sortorder)', ['categoryid' => $record->categoryid]);
+            $record->required = 0;
+            $record->locked = 0;
+            $record->visible = 0;
+            $record->forceunique = 0;
+            $record->signup = 0;
+            $record->defaultdata = '';
+            $record->defaultdataformat = 0;
+            $record->param1 = 30;
+            $record->param2 = 2048;
+            $record->param3 = 0;
+            $record->param4 = '';
+            $record->param5 = '';
+            $record->id = $DB->insert_record('user_info_field', $record);
+
+            $sql = 'INSERT INTO "ttr_user_info_data" (userid, fieldid, data)
+
+                    SELECT id, ' . $record->id . ', ' . $fieldshortname . '
+                      FROM "ttr_user"
+                     WHERE deleted = 0 AND ' . $fieldshortname . ' <> \'\'
+                  ORDER BY id';
+            $DB->execute($sql);
+        }
+
+        $dbman->drop_field($table, $field);
+    }
+}

@@ -91,7 +91,7 @@ $STD_FIELDS = array('id', 'username', 'email',
         'city', 'country', 'lang', 'timezone', 'mailformat',
         'maildisplay', 'maildigest', 'htmleditor', 'autosubscribe',
         'institution', 'department', 'idnumber', 'skype',
-        'msn', 'aim', 'yahoo', 'icq', 'phone1', 'phone2', 'address',
+        'phone1', 'phone2', 'address',
         'url', 'description', 'descriptionformat', 'password',
         'auth',        // watch out when changing auth type or using external auth plugins!
         'oldusername', // use when renaming users - this is the original username

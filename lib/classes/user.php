@@ -82,6 +82,16 @@ class core_user {
         'alternatename'
     ];
 
+    /**
+     * List of fields that were migrated to custom fields and deleted from database.
+     */
+    const REMOVED_FIELDS = [
+        'icq' => 'ICQ',
+        'yahoo' => 'Yahoo',
+        'aim' => 'AIM',
+        'msn' => 'MSN',
+    ];
+
     /** @var stdClass keep record of noreply user */
     public static $noreplyuser = false;
 
@@ -455,11 +465,7 @@ class core_user {
         $fields['surname'] = array('type' => PARAM_NOTAGS, 'null' => NULL_NOT_ALLOWED);
         $fields['email'] = array('type' => PARAM_RAW_TRIMMED, 'null' => NULL_NOT_ALLOWED);
         $fields['emailstop'] = array('type' => PARAM_INT, 'null' => NULL_NOT_ALLOWED);
-        $fields['icq'] = array('type' => PARAM_NOTAGS, 'null' => NULL_NOT_ALLOWED);
         $fields['skype'] = array('type' => PARAM_NOTAGS, 'null' => NULL_ALLOWED);
-        $fields['aim'] = array('type' => PARAM_NOTAGS, 'null' => NULL_NOT_ALLOWED);
-        $fields['yahoo'] = array('type' => PARAM_NOTAGS, 'null' => NULL_NOT_ALLOWED);
-        $fields['msn'] = array('type' => PARAM_NOTAGS, 'null' => NULL_NOT_ALLOWED);
         $fields['phone1'] = array('type' => PARAM_NOTAGS, 'null' => NULL_NOT_ALLOWED);
         $fields['phone2'] = array('type' => PARAM_NOTAGS, 'null' => NULL_NOT_ALLOWED);
         $fields['institution'] = array('type' => PARAM_TEXT, 'null' => NULL_NOT_ALLOWED);

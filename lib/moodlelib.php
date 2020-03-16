@@ -4028,21 +4028,13 @@ function get_user_field_name($field) {
         case 'url' : {
             return get_string('webpage');
         }
-        case 'icq' : {
-            return get_string('icqnumber');
-        }
         case 'skype' : {
             return get_string('skypeid');
         }
-        case 'aim' : {
-            return get_string('aimid');
-        }
-        case 'yahoo' : {
-            return get_string('yahooid');
-        }
-        case 'msn' : {
-            return get_string('msnid');
-        }
+    }
+    // Totara: show errors for removed fields.
+    if (isset(core_user::REMOVED_FIELDS[$field])) {
+        return get_string('invaliduserfield', 'error', $field);
     }
     // Otherwise just use the same lang string.
     return get_string($field);
@@ -4344,7 +4336,6 @@ function truncate_userinfo(array $info) {
         'firstname'   => 100,
         'lastname'    => 100,
         'email'       => 100,
-        'icq'         =>  15,
         'phone1'      =>  20,
         'phone2'      =>  20,
         'institution' => 255,

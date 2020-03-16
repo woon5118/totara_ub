@@ -53,11 +53,7 @@ class core_user_externallib_testcase extends externallib_advanced_testcase {
             'address' => '2 Test Street Perth 6000 WA',
             'phone1' => '01010101010',
             'phone2' => '02020203',
-            'icq' => 'testuser1',
             'skype' => 'testuser1',
-            'yahoo' => 'testuser1',
-            'aim' => 'testuser1',
-            'msn' => 'testuser1',
             'department' => 'Department of user 1',
             'institution' => 'Institution of user 1',
             'description' => 'This is a description for user 1',
@@ -128,20 +124,8 @@ class core_user_externallib_testcase extends externallib_advanced_testcase {
             if (!empty($generateduser->phone2)) {
                 $this->assertEquals($generateduser->phone2, $returneduser['phone2']);
             }
-            if (!empty($generateduser->icq)) {
-                $this->assertEquals($generateduser->icq, $returneduser['icq']);
-            }
             if (!empty($generateduser->skype)) {
                 $this->assertEquals($generateduser->skype, $returneduser['skype']);
-            }
-            if (!empty($generateduser->yahoo)) {
-                $this->assertEquals($generateduser->yahoo, $returneduser['yahoo']);
-            }
-            if (!empty($generateduser->aim)) {
-                $this->assertEquals($generateduser->aim, $returneduser['aim']);
-            }
-            if (!empty($generateduser->msn)) {
-                $this->assertEquals($generateduser->msn, $returneduser['msn']);
             }
             if (!empty($generateduser->department)) {
                 $this->assertEquals($generateduser->department, $returneduser['department']);
@@ -209,11 +193,7 @@ class core_user_externallib_testcase extends externallib_advanced_testcase {
             'address' => '2 Test Street Perth 6000 WA',
             'phone1' => '01010101010',
             'phone2' => '02020203',
-            'icq' => 'testuser1',
             'skype' => 'testuser1',
-            'yahoo' => 'testuser1',
-            'aim' => 'testuser1',
-            'msn' => 'testuser1',
             'department' => 'Department of user 1',
             'institution' => 'Institution of user 1',
             'description' => 'This is a description for user 1',
@@ -289,20 +269,8 @@ class core_user_externallib_testcase extends externallib_advanced_testcase {
                 if (!empty($generateduser->phone2)) {
                     $this->assertEquals($generateduser->phone2, $returneduser['phone2']);
                 }
-                if (!empty($generateduser->icq)) {
-                    $this->assertEquals($generateduser->icq, $returneduser['icq']);
-                }
                 if (!empty($generateduser->skype)) {
                     $this->assertEquals($generateduser->skype, $returneduser['skype']);
-                }
-                if (!empty($generateduser->yahoo)) {
-                    $this->assertEquals($generateduser->yahoo, $returneduser['yahoo']);
-                }
-                if (!empty($generateduser->aim)) {
-                    $this->assertEquals($generateduser->aim, $returneduser['aim']);
-                }
-                if (!empty($generateduser->msn)) {
-                    $this->assertEquals($generateduser->msn, $returneduser['msn']);
                 }
                 if (!empty($generateduser->department)) {
                     $this->assertEquals($generateduser->department, $returneduser['department']);
@@ -377,11 +345,7 @@ class core_user_externallib_testcase extends externallib_advanced_testcase {
             'address' => '2 Test Street Perth 6000 WA',
             'phone1' => '01010101010',
             'phone2' => '02020203',
-            'icq' => 'testuser1',
             'skype' => 'testuser1',
-            'yahoo' => 'testuser1',
-            'aim' => 'testuser1',
-            'msn' => 'testuser1',
             'department' => 'Department of user 1',
             'institution' => 'Institution of user 1',
             'description' => 'This is a description for user 1',
@@ -459,11 +423,7 @@ class core_user_externallib_testcase extends externallib_advanced_testcase {
                 $this->assertEquals($data->user1->address, $enrolleduser['address']);
                 $this->assertEquals($data->user1->phone1, $enrolleduser['phone1']);
                 $this->assertEquals($data->user1->phone2, $enrolleduser['phone2']);
-                $this->assertEquals($data->user1->icq, $enrolleduser['icq']);
                 $this->assertEquals($data->user1->skype, $enrolleduser['skype']);
-                $this->assertEquals($data->user1->yahoo, $enrolleduser['yahoo']);
-                $this->assertEquals($data->user1->aim, $enrolleduser['aim']);
-                $this->assertEquals($data->user1->msn, $enrolleduser['msn']);
                 $this->assertEquals($data->user1->department, $enrolleduser['department']);
                 $this->assertEquals($data->user1->institution, $enrolleduser['institution']);
                 $this->assertEquals($data->user1->description, $enrolleduser['description']);

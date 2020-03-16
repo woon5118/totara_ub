@@ -407,16 +407,6 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
         }
     }
 
-    if ($user->icq && !isset($hiddenfields['icqnumber'])) {
-        $imurl = new moodle_url('http://web.icq.com/wwp', array('uin' => $user->icq) );
-        $iconurl = new moodle_url('http://web.icq.com/whitepages/online', array('icq' => $user->icq, 'img' => '5'));
-        $statusicon = html_writer::tag('img', '',
-                array('src' => $iconurl, 'class' => 'icon icon-post', 'alt' => get_string('status')));
-        $node = new core_user\output\myprofile\node('contact', 'icqnumber', get_string('icqnumber'), null, null,
-            html_writer::link($imurl, s($user->icq) . $statusicon));
-        $tree->add_node($node);
-    }
-
     if ($user->skype && !isset($hiddenfields['skypeid'])) {
         $imurl = 'skype:'.urlencode($user->skype).'?call';
         $iconurl = new moodle_url('http://mystatus.skype.com/smallicon/'.urlencode($user->skype));
@@ -430,27 +420,6 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
 
         $node = new core_user\output\myprofile\node('contact', 'skypeid', get_string('skypeid'), null, null,
             html_writer::link($imurl, s($user->skype) . $statusicon));
-        $tree->add_node($node);
-    }
-    if ($user->yahoo && !isset($hiddenfields['yahooid'])) {
-        $imurl = new moodle_url('http://edit.yahoo.com/config/send_webmesg', array('.target' => $user->yahoo, '.src' => 'pg'));
-        $iconurl = new moodle_url('http://opi.yahoo.com/online', array('u' => $user->yahoo, 'm' => 'g', 't' => '0'));
-        $statusicon = html_writer::tag('img', '',
-            array('src' => $iconurl, 'class' => 'iconsmall icon-post', 'alt' => get_string('status')));
-
-        $node = new core_user\output\myprofile\node('contact', 'yahooid', get_string('yahooid'), null, null,
-            html_writer::link($imurl, s($user->yahoo) . $statusicon));
-        $tree->add_node($node);
-    }
-    if ($user->aim && !isset($hiddenfields['aimid'])) {
-        $imurl = 'aim:goim?screenname='.urlencode($user->aim);
-        $node = new core_user\output\myprofile\node('contact', 'aimid', get_string('aimid'), null, null,
-            html_writer::link($imurl, s($user->aim)));
-        $tree->add_node($node);
-    }
-    if ($user->msn && !isset($hiddenfields['msnid'])) {
-        $node = new core_user\output\myprofile\node('contact', 'msnid', get_string('msnid'), null, null,
-            s($user->msn));
         $tree->add_node($node);
     }
 

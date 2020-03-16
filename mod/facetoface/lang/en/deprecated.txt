@@ -120,3 +120,7 @@ schedule_unit_3_singular,mod_facetoface
 scvtextfile_help,mod_facetoface
 sessionundercapacity,mod_facetoface
 sessionundercapacity_body,mod_facetoface
+placeholder:icq,mod_facetoface
+placeholder:msn,mod_facetoface
+placeholder:yahoo,mod_facetoface
+placeholder:aim,mod_facetoface

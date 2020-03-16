@@ -51,11 +51,7 @@ if ($dataformat) {
                     'phone2'    => 'phone2',
                     'city'      => 'city',
                     'url'       => 'url',
-                    'icq'       => 'icq',
                     'skype'     => 'skype',
-                    'aim'       => 'aim',
-                    'yahoo'     => 'yahoo',
-                    'msn'       => 'msn',
                     'country'   => 'country');
 
     if ($extrafields = $DB->get_records('user_info_field')) {

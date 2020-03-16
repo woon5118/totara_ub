@@ -822,8 +822,8 @@ class core_user_access_controller_testcase extends advanced_testcase {
         self::assertFalse($controller->can_manage_files());
 
         $allowed = [
-            'id', 'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email', 'icq',
-            'skype', 'yahoo', 'aim', 'msn', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
+            'id', 'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email',
+            'skype', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
             'theme', 'timezone', 'firstaccess', 'lastaccess', 'url', 'description', 'descriptionformat', 'mailformat',
             'timecreated', 'timemodified', 'imagealt', 'lastnamephonetic', 'firstnamephonetic', 'middlename',
             'alternatename', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'lastip',
@@ -861,8 +861,8 @@ class core_user_access_controller_testcase extends advanced_testcase {
             'id',
         ];
         $notallowed = [
-            'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email', 'icq',
-            'skype', 'yahoo', 'aim', 'msn', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
+            'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email',
+            'skype', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
             'theme', 'timezone', 'firstaccess', 'lastaccess', 'url', 'description', 'descriptionformat', 'mailformat',
             'timecreated', 'timemodified', 'imagealt', 'lastnamephonetic', 'firstnamephonetic', 'middlename',
             'alternatename', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall',
@@ -889,8 +889,8 @@ class core_user_access_controller_testcase extends advanced_testcase {
         self::assertFalse($controller->can_manage_files());
 
         $allowed = [
-            'id', 'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email', 'icq',
-            'skype', 'yahoo', 'aim', 'msn', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
+            'id', 'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email',
+            'skype', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
             'theme', 'timezone', 'firstaccess', 'lastaccess', 'url', 'description', 'descriptionformat', 'mailformat',
             'timecreated', 'timemodified', 'imagealt', 'lastnamephonetic', 'firstnamephonetic', 'middlename',
             'alternatename', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'lastip',
@@ -919,8 +919,8 @@ class core_user_access_controller_testcase extends advanced_testcase {
         self::assertFalse($controller->can_manage_files());
 
         $allowed = [
-            'id', 'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email', 'icq',
-            'skype', 'yahoo', 'aim', 'msn', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
+            'id', 'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email',
+            'skype', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
             'theme', 'timezone', 'firstaccess', 'lastaccess', 'url', 'description', 'descriptionformat', 'mailformat',
             'timecreated', 'timemodified', 'imagealt', 'lastnamephonetic', 'firstnamephonetic', 'middlename',
             'alternatename', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'lastip',
@@ -950,8 +950,8 @@ class core_user_access_controller_testcase extends advanced_testcase {
             'id',
         ];
         $notallowed = [
-            'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email', 'icq',
-            'skype', 'yahoo', 'aim', 'msn', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
+            'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email',
+            'skype', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
             'theme', 'timezone', 'firstaccess', 'lastaccess', 'url', 'description', 'descriptionformat', 'mailformat',
             'timecreated', 'timemodified', 'imagealt', 'lastnamephonetic', 'firstnamephonetic', 'middlename',
             'alternatename', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall',
@@ -964,7 +964,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'imagealt', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'suspended',
-            'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'url'
+            'skype', 'city', 'country', 'firstaccess', 'url'
         ];
         $notallowed = [
             'auth', 'confirmed', 'username', 'idnumber', 'firstname', 'lastname', 'email',
@@ -996,8 +996,8 @@ class core_user_access_controller_testcase extends advanced_testcase {
             'id',
         ];
         $notallowed = [
-            'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email', 'icq',
-            'skype', 'yahoo', 'aim', 'msn', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
+            'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email',
+            'skype', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
             'theme', 'timezone', 'firstaccess', 'lastaccess', 'url', 'description', 'descriptionformat', 'mailformat',
             'timecreated', 'timemodified', 'imagealt', 'lastnamephonetic', 'firstnamephonetic', 'middlename',
             'alternatename', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall',
@@ -1010,7 +1010,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'imagealt', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'suspended',
-            'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'url'
+            'skype', 'city', 'country', 'firstaccess', 'url'
         ];
         $notallowed = [
             'auth', 'confirmed', 'username', 'idnumber', 'firstname', 'lastname', 'email',
@@ -1040,8 +1040,8 @@ class core_user_access_controller_testcase extends advanced_testcase {
             'id',
         ];
         $notallowed = [
-            'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email', 'icq',
-            'skype', 'yahoo', 'aim', 'msn', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
+            'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email',
+            'skype', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
             'theme', 'timezone', 'firstaccess', 'lastaccess', 'url', 'description', 'descriptionformat', 'mailformat',
             'timecreated', 'timemodified', 'imagealt', 'lastnamephonetic', 'firstnamephonetic', 'middlename',
             'alternatename', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall',
@@ -1054,7 +1054,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'imagealt', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'suspended',
-            'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'url'
+            'skype', 'city', 'country', 'firstaccess', 'url'
         ];
         $notallowed = [
             'auth', 'confirmed', 'username', 'idnumber', 'firstname', 'lastname', 'email',
@@ -1086,8 +1086,8 @@ class core_user_access_controller_testcase extends advanced_testcase {
             'id',
         ];
         $notallowed = [
-            'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email', 'icq',
-            'skype', 'yahoo', 'aim', 'msn', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
+            'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email',
+            'skype', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
             'theme', 'timezone', 'firstaccess', 'lastaccess', 'url', 'description', 'descriptionformat', 'mailformat',
             'timecreated', 'timemodified', 'imagealt', 'lastnamephonetic', 'firstnamephonetic', 'middlename',
             'alternatename', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall',
@@ -1100,7 +1100,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'imagealt', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'suspended',
-            'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'url'
+            'skype', 'city', 'country', 'firstaccess', 'url'
         ];
         $notallowed = [
             'auth', 'confirmed', 'username', 'idnumber', 'firstname', 'lastname', 'email',
@@ -1134,8 +1134,8 @@ class core_user_access_controller_testcase extends advanced_testcase {
         self::assertFalse($controller->can_manage_files());
 
         $allowed = [
-            'id', 'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email', 'icq',
-            'skype', 'yahoo', 'aim', 'msn', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
+            'id', 'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email',
+            'skype', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
             'theme', 'timezone', 'firstaccess', 'lastaccess', 'url', 'description', 'descriptionformat', 'mailformat',
             'timecreated', 'timemodified', 'imagealt', 'lastnamephonetic', 'firstnamephonetic', 'middlename',
             'alternatename', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall',
@@ -1179,8 +1179,8 @@ class core_user_access_controller_testcase extends advanced_testcase {
         self::assertFalse($controller->can_manage_files());
 
         $allowed = [
-            'id', 'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email', 'icq',
-            'skype', 'yahoo', 'aim', 'msn', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
+            'id', 'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email',
+            'skype', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
             'theme', 'timezone', 'firstaccess', 'lastaccess', 'url', 'description', 'descriptionformat', 'mailformat',
             'timecreated', 'timemodified', 'imagealt', 'lastnamephonetic', 'firstnamephonetic', 'middlename',
             'alternatename', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall',
@@ -1212,8 +1212,8 @@ class core_user_access_controller_testcase extends advanced_testcase {
         self::assertFalse($controller->can_manage_files());
 
         $allowed = [
-            'id', 'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email', 'icq',
-            'skype', 'yahoo', 'aim', 'msn', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
+            'id', 'auth', 'confirmed', 'suspended', 'username', 'idnumber', 'firstname', 'lastname', 'email',
+            'skype', 'phone1', 'phone2', 'institution', 'department', 'address', 'city', 'country', 'lang',
             'theme', 'timezone', 'firstaccess', 'lastaccess', 'url', 'description', 'descriptionformat', 'mailformat',
             'timecreated', 'timemodified', 'imagealt', 'lastnamephonetic', 'firstnamephonetic', 'middlename',
             'alternatename', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall',
@@ -1243,7 +1243,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt', 'email',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'description', 'descriptionformat'
+            'lastaccess', 'url', 'skype', 'city', 'country', 'firstaccess', 'description', 'descriptionformat'
         ];
         $notallowed = [
             'auth', 'confirmed', 'username', 'idnumber', 'firstname', 'lastname',
@@ -1290,7 +1290,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt', 'email',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'description', 'descriptionformat'
+            'lastaccess', 'url', 'skype', 'city', 'country', 'firstaccess', 'description', 'descriptionformat'
         ];
         $notallowed = [
             'auth', 'confirmed', 'username', 'idnumber', 'firstname', 'lastname',
@@ -1325,7 +1325,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt', 'email',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'description', 'descriptionformat'
+            'lastaccess', 'url', 'skype', 'city', 'country', 'firstaccess', 'description', 'descriptionformat'
         ];
         $notallowed = [
             'auth', 'confirmed', 'username', 'idnumber', 'firstname', 'lastname',
@@ -1359,7 +1359,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'email'
+            'lastaccess', 'url', 'skype', 'city', 'country', 'firstaccess', 'email'
         ];
         $notallowed = [
             'auth', 'confirmed', 'username', 'idnumber', 'firstname', 'lastname',
@@ -1394,7 +1394,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt', 'email',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess',
+            'lastaccess', 'url', 'skype', 'city', 'country', 'firstaccess',
         ];
         $notallowed = [
             'auth', 'confirmed', 'username', 'idnumber', 'firstname', 'lastname', 'description', 'descriptionformat',
@@ -1426,7 +1426,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt', 'email',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'auth', 'confirmed', 'username',
+            'lastaccess', 'url', 'skype', 'city', 'country', 'firstaccess', 'auth', 'confirmed', 'username',
             'idnumber', 'firstname', 'lastname', 'phone1', 'phone2', 'institution', 'department', 'address', 'lang',
             'theme', 'timezone', 'mailformat',
             'timecreated', 'timemodified', 'lastnamephonetic', 'firstnamephonetic', 'middlename', 'alternatename', 'lastip',
@@ -1442,7 +1442,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt', 'email',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'auth', 'confirmed', 'username',
+            'lastaccess', 'url', 'skype', 'city', 'country', 'firstaccess', 'auth', 'confirmed', 'username',
             'idnumber', 'firstname', 'lastname', 'phone1', 'phone2', 'institution', 'department', 'address', 'lang',
             'theme', 'timezone', 'mailformat', 'description', 'descriptionformat',
             'timecreated', 'timemodified', 'lastnamephonetic', 'firstnamephonetic', 'middlename', 'alternatename', 'lastip',
@@ -1475,7 +1475,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt', 'email',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'firstname', 'lastname',
+            'lastaccess', 'url', 'skype', 'city', 'country', 'firstaccess', 'firstname', 'lastname',
             'phone1', 'phone2', 'description', 'descriptionformat', 'address'
         ];
         $notallowed = [
@@ -1508,7 +1508,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt', 'email',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'firstname', 'lastname',
+            'lastaccess', 'url', 'skype', 'city', 'country', 'firstaccess', 'firstname', 'lastname',
             'phone1', 'phone2', 'description', 'descriptionformat', 'address'
         ];
         $notallowed = [
@@ -1541,7 +1541,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt', 'email',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'firstname', 'lastname',
+            'lastaccess', 'url', 'skype', 'city', 'country', 'firstaccess', 'firstname', 'lastname',
             'phone1', 'phone2', 'description', 'descriptionformat', 'address'
         ];
         $notallowed = [
@@ -1572,7 +1572,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt', 'email',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'description', 'descriptionformat'
+            'lastaccess', 'url', 'skype', 'city', 'country', 'firstaccess', 'description', 'descriptionformat'
         ];
         $notallowed = [
             'auth', 'confirmed', 'username', 'idnumber', 'firstname', 'lastname', 'phone1', 'phone2', 'institution', 'department', 'address', 'lang',
@@ -1603,7 +1603,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt', 'email',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'description', 'descriptionformat'
+            'lastaccess', 'url', 'skype', 'city', 'country', 'firstaccess', 'description', 'descriptionformat'
         ];
         $notallowed = [
             'auth', 'confirmed', 'username', 'idnumber', 'firstname', 'lastname',
@@ -1631,7 +1631,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt', 'email',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'auth', 'confirmed', 'username', 'idnumber', 'firstname', 'lastname',
+            'lastaccess', 'url', 'skype', 'city', 'country', 'firstaccess', 'auth', 'confirmed', 'username', 'idnumber', 'firstname', 'lastname',
             'phone1', 'phone2', 'institution', 'department', 'address', 'lang', 'theme', 'timezone', 'mailformat', 'description', 'descriptionformat',
             'timecreated', 'timemodified', 'lastnamephonetic', 'firstnamephonetic', 'middlename', 'alternatename',
         ];
@@ -1657,7 +1657,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt', 'email',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'auth', 'confirmed', 'username', 'idnumber', 'firstname', 'lastname',
+            'lastaccess', 'url', 'skype', 'city', 'country', 'firstaccess', 'auth', 'confirmed', 'username', 'idnumber', 'firstname', 'lastname',
             'phone1', 'phone2', 'institution', 'department', 'address', 'lang', 'theme', 'timezone', 'mailformat', 'description', 'descriptionformat',
             'timecreated', 'timemodified', 'lastnamephonetic', 'firstnamephonetic', 'middlename', 'alternatename',
         ];
@@ -1692,7 +1692,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt', 'email',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'description', 'descriptionformat',
+            'lastaccess', 'url', 'skype', 'city', 'country', 'firstaccess', 'description', 'descriptionformat',
             'auth', 'confirmed', 'username', 'idnumber', 'institution', 'department', 'lang', 'theme', 'timezone', 'mailformat',
             'timecreated', 'timemodified', 'lastnamephonetic', 'firstnamephonetic', 'middlename', 'alternatename',
         ];
@@ -1704,7 +1704,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
         self::assert_expected_fields($controller, $allowed, $notallowed);
 
         $CFG->hiddenuserfields = join(',', [
-            'mycourses', 'description', 'descriptionformat', 'country', 'city', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'suspended',
+            'mycourses', 'description', 'descriptionformat', 'country', 'city', 'url', 'skype', 'suspended',
             'firstaccess', 'lastaccess'
         ]);
 
@@ -1723,8 +1723,8 @@ class core_user_access_controller_testcase extends advanced_testcase {
             'timecreated', 'timemodified', 'lastnamephonetic', 'firstnamephonetic', 'middlename', 'alternatename',
         ];
         $notallowed = [
-            'firstname', 'lastname', 'phone1', 'phone2', 'address', 'suspended', 'lastaccess', 'url', 'icq', 'skype', 'yahoo',
-            'aim', 'msn', 'city', 'country', 'firstaccess', 'description', 'descriptionformat',
+            'firstname', 'lastname', 'phone1', 'phone2', 'address', 'suspended', 'lastaccess', 'url', 'skype',
+            'city', 'country', 'firstaccess', 'description', 'descriptionformat',
             'policyagreed', 'deleted', 'mnethostid', 'password', 'secret', 'emailstop', 'calendartype', 'lastlogin', 'currentlogin',
             'lastip', 'picture', 'maildigest', 'maildisplay', 'autosubscribe', 'trackforums', 'trustbitmask', 'totarasync'
         ];
@@ -1743,7 +1743,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt', 'email',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'description', 'descriptionformat',
+            'lastaccess', 'url', 'skype', 'city', 'country', 'firstaccess', 'description', 'descriptionformat',
             'auth', 'confirmed', 'username', 'idnumber', 'institution', 'department', 'lang', 'theme', 'timezone', 'mailformat',
             'timecreated', 'timemodified', 'lastnamephonetic', 'firstnamephonetic', 'middlename', 'alternatename', 'phone1', 'phone2', 'address'
         ];
@@ -1780,7 +1780,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt', 'email',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'description', 'descriptionformat',
+            'lastaccess', 'url', 'skype', 'city', 'country', 'firstaccess', 'description', 'descriptionformat',
         ];
         $notallowed = [
             'auth', 'confirmed', 'username', 'idnumber', 'institution', 'department', 'lang', 'theme', 'timezone', 'mailformat',
@@ -1792,7 +1792,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
         self::assert_expected_fields($controller, $allowed, $notallowed);
 
         $CFG->hiddenuserfields = join(',', [
-            'mycourses', 'description', 'descriptionformat', 'country', 'city', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'suspended',
+            'mycourses', 'description', 'descriptionformat', 'country', 'city', 'url', 'skype', 'suspended',
             'firstaccess', 'lastaccess'
         ]);
 
@@ -1811,8 +1811,8 @@ class core_user_access_controller_testcase extends advanced_testcase {
         $notallowed = [
             'auth', 'confirmed', 'username', 'idnumber', 'institution', 'department', 'lang', 'theme', 'timezone', 'mailformat',
             'timecreated', 'timemodified', 'lastnamephonetic', 'firstnamephonetic', 'middlename', 'alternatename',
-            'firstname', 'lastname', 'phone1', 'phone2', 'address', 'suspended', 'lastaccess', 'url', 'icq', 'skype', 'yahoo',
-            'aim', 'msn', 'city', 'country', 'firstaccess', 'description', 'descriptionformat',
+            'firstname', 'lastname', 'phone1', 'phone2', 'address', 'suspended', 'lastaccess', 'url', 'skype',
+            'city', 'country', 'firstaccess', 'description', 'descriptionformat',
             'policyagreed', 'deleted', 'mnethostid', 'password', 'secret', 'emailstop', 'calendartype', 'lastlogin', 'currentlogin',
             'lastip', 'picture', 'maildigest', 'maildisplay', 'autosubscribe', 'trackforums', 'trustbitmask', 'totarasync'
         ];
@@ -1831,7 +1831,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $allowed = [
             'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt', 'email',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'description', 'descriptionformat',
+            'lastaccess', 'url', 'skype', 'city', 'country', 'firstaccess', 'description', 'descriptionformat',
             'phone1', 'phone2', 'address',
         ];
         $notallowed = [
@@ -1864,7 +1864,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
         $this->getDataGenerator()->role_assign($role, $user1->id, $context->id);
 
         $CFG->hiddenuserfields = join(',', [
-            'mycourses', 'description', 'descriptionformat', 'country', 'city', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'suspended',
+            'mycourses', 'description', 'descriptionformat', 'country', 'city', 'url', 'skype', 'suspended',
             'firstaccess', 'lastaccess'
         ]);
 
@@ -1883,7 +1883,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
         ];
         $notallowed = [
             'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt',
-            'lastaccess', 'url', 'icq', 'skype', 'yahoo', 'aim', 'msn', 'city', 'country', 'firstaccess', 'description', 'descriptionformat',
+            'lastaccess', 'url', 'skype', 'city', 'country', 'firstaccess', 'description', 'descriptionformat',
             'auth', 'confirmed', 'username', 'idnumber', 'institution', 'department', 'lang', 'theme', 'timezone', 'mailformat',
             'timecreated', 'timemodified', 'lastnamephonetic', 'firstnamephonetic', 'middlename', 'alternatename',
             'firstname', 'lastname', 'phone1', 'phone2', 'address',

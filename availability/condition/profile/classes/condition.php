@@ -382,6 +382,10 @@ class condition extends \core_availability\condition {
             $field = $this->customfield;
         } else {
             $field = $this->standardfield;
+            // Totara: detect use of removed fields to prevent fatal errors and show activity as unavailable.
+            if (isset(\core_user::REMOVED_FIELDS[$field])) {
+                return false;
+            }
         }
 
         // If its the current user than most likely we will be able to get this information from $USER.

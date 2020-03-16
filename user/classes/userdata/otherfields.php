@@ -179,11 +179,7 @@ class otherfields extends \totara_userdata\userdata\item {
      */
     public static function get_other_fields(): array {
         return [
-            'icq',
             'skype',
-            'yahoo',
-            'aim',
-            'msn',
             'phone1',
             'phone2',
             'institution',

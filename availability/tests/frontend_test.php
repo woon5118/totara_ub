@@ -215,7 +215,7 @@ class frontend_testcase extends advanced_testcase {
                                                             ),
                                                             (object)array(
                                                                 'type' => 'profile',
-                                                                'sf' => 'icq',
+                                                                'sf' => 'skype',
                                                                 'op' => 'startswith',
                                                                 'v' => '123',
                                                             ),
