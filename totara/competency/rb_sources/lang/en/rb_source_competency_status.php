@@ -26,13 +26,16 @@ $string['sourcelabel'] = 'Competency Status (Perform)';
 $string['sourcesummary'] = 'Learners progress on their assigned competencies.';
 $string['sourcetitle'] = 'Competency Status (Perform)';
 
-$string['competencyid'] = 'Competency ID';
-$string['competencyidnumber'] = 'Competency ID Number';
-$string['competencyname'] = 'Competency Name';
-$string['completiondate'] = 'Completion date';
-$string['scalevalue'] = 'Competency rating';
-$string['proficientdate'] = 'Date proficiency';
-$string['timemodified'] = 'Time modified';
+$string['achievement_level_related_id'] = 'Achievement level related ID (Scale value ID number)';
+$string['activity_log_link'] = 'Assignment activity log link';
+$string['assignment_status'] = 'Assignment status';
+$string['competency_id'] = 'Competency ID';
+$string['competency_idnumber'] = 'Competency ID Number';
+$string['competency_name'] = 'Competency Name';
+$string['date_assigned'] = 'Date assigned';
+$string['scale_value_numeric_score'] = 'Scale value numerical value';
+$string['scale_values_name'] = 'Minimum proficiency level';
+$string['time_created'] = 'Date achievement level achieved';
 
 $string['type_assignment'] = 'Competency Assignment';
 $string['type_competency'] = 'Competency';

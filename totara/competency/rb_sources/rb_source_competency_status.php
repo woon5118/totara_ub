@@ -19,7 +19,8 @@
  *
  * @author Brendan Cox <brendan.cox@totaralearning.com>
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
- * @package totara_criteria
+ * @author Oleg Demeshev <oleg.demeshev@totaralearning.com>
+ * @package totara_competency
  */
 
 use totara_competency\entities\assignment;
@@ -79,6 +80,10 @@ class rb_source_competency_status extends rb_base_source {
     //
     //
 
+    /**
+     * Define table join list
+     * @return array
+     */
     protected function define_joinlist() {
 
         $joinlist = array(
@@ -90,6 +95,22 @@ class rb_source_competency_status extends rb_base_source {
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
+                'scale_assignments',
+                'LEFT',
+                '{comp_scale_assignments}',
+                'scale_assignments.frameworkid = competency.frameworkid',
+                REPORT_BUILDER_RELATION_ONE_TO_MANY,
+                'competency'
+            ),
+            new rb_join(
+                'scale',
+                'LEFT',
+                '{comp_scale}',
+                'scale.id = scale_assignments.scaleid',
+                REPORT_BUILDER_RELATION_ONE_TO_MANY,
+                'scale_assignments'
+            ),
+            new rb_join(
                 'scale_values',
                 'LEFT',
                 '{comp_scale_values}',
@@ -97,11 +118,26 @@ class rb_source_competency_status extends rb_base_source {
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
+                'scale_values_2',
+                'LEFT',
+                '{comp_scale_values}',
+                'scale_values_2.id = scale.minproficiencyid',
+                REPORT_BUILDER_RELATION_ONE_TO_ONE,
+                'scale'
+            ),
+            new rb_join(
                 'assignment',
                 'INNER',
                 "{totara_competency_assignments}",
                 "base.assignment_id = assignment.id",
                 REPORT_BUILDER_RELATION_MANY_TO_ONE
+            ),
+            new rb_join(
+                'assignment_users',
+                'LEFT',
+                "{totara_competency_assignment_users}",
+                "assignment_users.assignment_id = base.assignment_id AND assignment_users.user_id = base.user_id",
+                REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
                 'assignment_cohorts',
@@ -152,13 +188,17 @@ class rb_source_competency_status extends rb_base_source {
         return $joinlist;
     }
 
-    protected function define_columnoptions() {
+    /**
+     * Define column options
+     * @return array
+     */
+    protected function define_columnoptions(): array {
 
         $columnoptions = array(
             new rb_column_option(
                 'competency_status',  // Type.
                 'scale_value_name',          // Value.
-                get_string('scalevalue', 'rb_source_competency_status'), // Name.
+                get_string('achievement_level', 'totara_competency'), // Name.
                 'scale_values.name',    // Field.
                 [
                     'joins' => 'scale_values',
@@ -169,18 +209,39 @@ class rb_source_competency_status extends rb_base_source {
             ),
             new rb_column_option(
                 'competency_status',
-                'time_proficient',
-                get_string('proficientdate', 'rb_source_competency_status'),
-                'base.time_proficient',
+                'proficient',
+                get_string('proficiency_status', 'totara_competency'),
+                'base.proficient',
                 [
-                    'displayfunc' => 'nice_date',
-                    'dbdatatype' => 'timestamp'
+                    'displayfunc' => 'competency_status_proficient',
+                    'dbdatatype' => 'integer'
+                ]
+            ),
+            new rb_column_option(
+                'competency_status',
+                'scale_value_numericscore',
+                get_string('scale_value_numeric_score', 'rb_source_competency_status'),
+                'scale_values.numericscore',
+                [
+                    'joins' => 'scale_values',
+                    'dbdatatype' => 'float',
+                    'displayfunc' => 'comp_scale_value_numericscore'
+                ]
+            ),
+            new rb_column_option(
+                'competency_status',
+                'scale_value_id',
+                get_string('achievement_level_related_id', 'rb_source_competency_status'),
+                'base.scale_value_id',
+                [
+                    'displayfunc' => 'integer',
+                    'dbdatatype' => 'integer'
                 ]
             ),
             new rb_column_option(
                 'competency',
                 'fullname',
-                get_string('competencyname', 'rb_source_competency_status'),
+                get_string('competency_name', 'rb_source_competency_status'),
                 'competency.fullname',
                 [
                     'joins' => 'competency',
@@ -192,7 +253,7 @@ class rb_source_competency_status extends rb_base_source {
             new rb_column_option(
                 'competency',
                 'idnumber',
-                get_string('competencyidnumber', 'rb_source_competency_status'),
+                get_string('competency_idnumber', 'rb_source_competency_status'),
                 'competency.idnumber',
                 [
                     'joins' => 'competency',
@@ -204,10 +265,31 @@ class rb_source_competency_status extends rb_base_source {
             new rb_column_option(
                 'competency',
                 'id',
-                get_string('competencyid', 'rb_source_competency_status'),
+                get_string('competency_id', 'rb_source_competency_status'),
                 'base.competency_id',
                 [
                     'displayfunc' => 'integer'
+                ]
+            ),
+            new rb_column_option(
+                'competency',
+                'time_created',
+                get_string('time_created', 'rb_source_competency_status'),
+                'base.time_created',
+                [
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
+                ]
+            ),
+            new rb_column_option(
+                'competency',
+                'name',
+                get_string('scale_values_name', 'rb_source_competency_status'),
+                'scale_values_2.name',
+                [
+                    'joins' => ['scale', 'scale_values_2', 'scale_assignments', 'competency'],
+                    'displayfunc' => 'format_string',
+                    'dbdatatype' => 'text'
                 ]
             ),
         );
@@ -259,14 +341,52 @@ class rb_source_competency_status extends rb_base_source {
                     ]
                 ),
                 new rb_column_option(
-                    'competency_status',
+                    'assignment',
                     'status',
-                    'Assignment status',
-                    'base.status',
+                    get_string('assignment_status', 'rb_source_competency_status'),
+                    'assignment.status',
                     [
-                        'displayfunc' => 'comp_record_status',
+                        'joins' => 'assignment',
+                        'displayfunc' => 'competency_assignments_status',
+                        'dbdatatype' => 'integer'
                     ]
                 ),
+                new rb_column_option(
+                    'assignment',
+                    'archived_at',
+                    get_string('header:archived_date', 'totara_competency'),
+                    'assignment.archived_at',
+                    [
+                        'joins' => 'assignment',
+                        'displayfunc' => 'nice_date',
+                        'dbdatatype' => 'timestamp'
+                    ]
+                ),
+                new rb_column_option(
+                    'assignment',
+                    'created_at',
+                    get_string('date_assigned', 'rb_source_competency_status'),
+                    'assignment_users.created_at',
+                    [
+                        'joins' => ['assignment_users', 'assignment'],
+                        'displayfunc' => 'nice_date',
+                        'dbdatatype' => 'timestamp'
+                    ]
+                ),
+                new rb_column_option(
+                    'assignment',
+                    'userid',
+                    get_string('activity_log_link', 'rb_source_competency_status'),
+                    'auser.id',
+                    [
+                        'joins' => 'auser',
+                        'displayfunc' => 'assignment_activity_log_link',
+                        'dbdatatype' => 'integer',
+                        'extrafields' => [
+                            'competency_id' => 'base.competency_id'
+                        ]
+                    ]
+                )
             ]);
         }
 
@@ -277,28 +397,85 @@ class rb_source_competency_status extends rb_base_source {
         return $columnoptions;
     }
 
-    protected function define_filteroptions() {
+    /**
+     * Define filter options
+     * @return array
+     */
+    protected function define_filteroptions(): array {
         $filteroptions = array(
-            new rb_filter_option(
-                'competency_status',  // type
-                'time_proficient',        // value
-                get_string('proficientdate', 'rb_source_competency_status'),       // label
-                'date',                 // filtertype
-                []                 // options
-            ),
             new rb_filter_option(
                 'competency',
                 'fullname',
-                get_string('competencyname', 'rb_source_competency_status'),
+                get_string('competency_name', 'rb_source_competency_status'),
                 'text'
             ),
             new rb_filter_option(
                 'competency',
                 'idnumber',
-                get_string('competencyid', 'rb_source_competency_status'),
+                get_string('competency_idnumber', 'rb_source_competency_status'),
                 'text'
             ),
+            new rb_filter_option(
+                'competency',
+                'time_created',
+                get_string('time_created', 'rb_source_competency_status'),
+                'date'
+            ),
+            new rb_filter_option(
+                'competency_status',
+                'scale_value_name',
+                get_string('achievement_level', 'totara_competency'),
+                'text'
+            ),
+            new rb_filter_option(
+                'competency_status',
+                'proficient',
+                get_string('proficiency_status', 'totara_competency'),
+                'select',
+                [
+                    'simplemode' => true,
+                    'selectchoices' => [
+                        '0' => get_string('not_proficient', 'totara_competency'),
+                        '1' => get_string('proficient', 'totara_competency')
+                    ]
+                ]
+            ),
         );
+        if (advanced_feature::is_enabled('competency_assignment')) {
+            $filteroptions[] = new rb_filter_option(
+                'assignment',
+                'status',
+                get_string('assignment_status', 'rb_source_competency_status'),
+                'select',
+                [
+                    'simplemode' => true,
+                    'selectchoices' => [
+                        assignment::STATUS_ACTIVE => get_string('status:active', 'totara_competency'),
+                        assignment::STATUS_ARCHIVED => get_string('status:archived', 'totara_competency')
+                    ]
+                ]
+            );
+            $filteroptions[] = new rb_filter_option(
+                'assignment',
+                'assignment_type',
+                get_string('label:assignment_type', 'rb_source_competency_assignment_users'),
+                'select',
+                [
+                    'simplemode' => true,
+                    'selectchoices' => [
+                        user_groups::COHORT => get_string('user_group_type:cohort', 'totara_competency'),
+                        user_groups::ORGANISATION => get_string('user_group_type:organisation', 'totara_competency'),
+                        user_groups::POSITION => get_string('user_group_type:position', 'totara_competency'),
+                        assignment::TYPE_ADMIN => get_string('assignment_type:admin', 'totara_competency'),
+                        assignment::TYPE_LEGACY  => get_string('assignment_type:legacy', 'totara_competency'),
+                        assignment::TYPE_OTHER => get_string('assignment_type:other', 'totara_competency'),
+                        assignment::TYPE_SELF => get_string('assignment_type:self', 'totara_competency'),
+                        assignment::TYPE_SYSTEM => get_string('assignment_type:system', 'totara_competency')
+                    ]
+                ]
+            );
+        }
+
         // include some standard filters
         $this->add_core_user_filters($filteroptions);
         $this->add_totara_job_filters($filteroptions, 'base', 'user_id');
@@ -331,66 +508,80 @@ class rb_source_competency_status extends rb_base_source {
         return $paramoptions;
     }
 
-    protected function define_defaultcolumns() {
+    /**
+     * Define default columns
+     * @return array
+     */
+    protected function define_defaultcolumns(): array {
         $defaultcolumns = array(
+            // User name
             [
-                'type'  => 'user',
+                'type' => 'user',
                 'value' => 'namelink'
             ],
+            // Competency name
             [
-                'type'  => 'competency_status',
+                'type' => 'competency',
+                'value' => 'fullname'
+            ],
+            // Proficiency status
+            [
+                'type' => 'competency_status',
+                'value' => 'proficient',
+            ],
+            // Achievement level
+            [
+                'type' => 'competency_status',
                 'value' => 'scale_value_name',
             ],
+            // Date achievement level achieved
+            [
+                'type' => 'competency',
+                'value' => 'time_created',
+            ],
         );
+        if (advanced_feature::is_enabled('competency_assignment')) {
+            // Link to the assignment Activity log
+            $defaultcolumns[] = [
+                'type' => 'assignment',
+                'value' => 'userid',
+            ];
+            // Assignment status
+            $defaultcolumns[] = [
+                'type' => 'assignment',
+                'value' => 'status',
+
+            ];
+        }
         return $defaultcolumns;
     }
 
-    protected function define_defaultfilters() {
+    /**
+     * Define default filters
+     * @return array
+     */
+    protected function define_defaultfilters(): array {
         $defaultfilters = array(
-            [
-                'type' => 'user',
-                'value' => 'fullname',
-                'advanced' => 0,
-            ],
-            [
-                'type' => 'job_assignment',
-                'value' => 'allorganisations',
-                'advanced' => 1,
-            ],
+            // Competency name.
             [
                 'type' => 'competency',
                 'value' => 'fullname',
-                'advanced' => 1,
+            ],
+            // Proficiency status.
+            [
+                'type' => 'competency_status',
+                'value' => 'proficient',
             ],
         );
-        return $defaultfilters;
-    }
-
-    //
-    //
-    // Source specific column display methods
-    //
-    //
-
-
-    //
-    //
-    // Source specific filter display methods
-    //
-    //
-
-    public function rb_filter_proficiency_list() {
-        global $DB;
-
-        $values = $DB->get_records_menu('comp_scale_values', null, 'scaleid, sortorder', 'id, name');
-
-        $scales = [];
-        foreach ($values as $index => $value) {
-            $scales[$index] = format_string($value);
+        if (advanced_feature::is_enabled('competency_assignment')) {
+            // Assignment status.
+            $defaultfilters[] = [
+                'type' => 'assignment',
+                'value' => 'status',
+            ];
         }
 
-        // include all possible scale values (from every scale)
-        return $scales;
+        return $defaultfilters;
     }
 
     /**
@@ -423,7 +614,6 @@ class rb_source_competency_status extends rb_base_source {
         $achievement->proficient = 1;
         $achievement->status = competency_achievement::ACTIVE_ASSIGNMENT;
         $achievement->time_created = $now;
-        $achievement->time_proficient = $now;
         $achievement->time_scale_value = $now;
         $achievement->time_status = $now;
         $achievement->last_aggregated = $now;
