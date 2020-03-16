@@ -39,8 +39,7 @@ Feature: Restoring Moodle 2 backup restores LTI configuration
     And I backup "Course 1" course using this options:
       | Confirmation | Filename | test_backup.mbz |
     And I restore "test_backup.mbz" backup into a new course using this options:
-    And I am on site homepage
-    And I follow "Course 1 copy 1"
+    And I am on "Course 1 copy 1" course homepage
     And I open "My LTI module" actions menu
     And I choose "Edit settings" in the open action menu
     Then the field "Preconfigured tool" matches value "My site tool"
@@ -69,8 +68,7 @@ Feature: Restoring Moodle 2 backup restores LTI configuration
     And I backup "Course 1" course using this options:
       | Confirmation | Filename | test_backup.mbz |
     And I restore "test_backup.mbz" backup into "Course 2" course using this options:
-    And I am on site homepage
-    And I follow "Course 2"
+    And I am on "Course 2" course homepage
     # Make sure the copy of the preconfigured tool was created in the second course with both encrtypted and non-encrypted properties.
     And I open "Test tool activity 2" actions menu
     And I choose "Edit settings" in the open action menu

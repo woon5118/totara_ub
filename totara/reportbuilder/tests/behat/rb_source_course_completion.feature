@@ -31,8 +31,7 @@ Feature: Check that course completion reports don't show multiple enrolment type
 
   Scenario: User is enrolled in a second course using a different method
     Given I log in as "admin"
-    And I am on site homepage
-    And I follow "Course 2"
+    When I am on "Course 2" course homepage
     And I click on "Edit settings" "link" in the "Administration" "block"
     And I press "Add enrolled audiences"
     And I click on "Audience 1" "link"

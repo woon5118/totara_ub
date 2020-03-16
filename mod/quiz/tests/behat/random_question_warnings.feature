@@ -30,8 +30,7 @@ Feature: Warnings are shown on quiz with random questions and insufficient quest
   @javascript
   Scenario: Warnings shown when creating random question using categories with insufficient questions
     Given I log in as "admin"
-    And I am on site homepage
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I follow "Quiz 1"
     And I press "Edit quiz"
     And I click on "Add" "link" in the "region-main" "region"

@@ -1174,6 +1174,8 @@ class core_plugin_manager {
             'mod_assignment',
             'block_community',
             'block_quiz_results',
+            'block_course_progress_report',
+            'block_frontpage_combolist',
             'block_messages',
             'gradeexport_fusion',
             'repository_picasa',
@@ -1293,7 +1295,7 @@ class core_plugin_manager {
                 'totara_tasks', 'totara_certifications', 'gaccess', 'totara_program_completion',
                 'totara_dashboard', 'totara_report_table', 'last_course_accessed',
                 'current_learning', 'totara_featured_links',
-                'course_search', 'course_progress_report', 'frontpage_combolist',
+                'course_search',
                 'admin_subnav', 'admin_related_pages', 'course_navigation',
             ),
 

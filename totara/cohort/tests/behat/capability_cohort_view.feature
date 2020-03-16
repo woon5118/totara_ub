@@ -84,13 +84,13 @@ Feature: User with moodle/cohort:view can view but not manage audience details
   @javascript
   Scenario: View audience management tabs with moodle/cohort:view capability in category context
     Given I log in as "audviewcat"
-    And I am on site homepage
+    When I click on "Find Learning" in the totara menu
     And I should not see "Audiences"
-    And I follow "CourseThree"
+    And I click on "CourseThree" "text"
+    And I click on "Go to course" "link"
     And I follow "CategoryTwo"
     And I should not see "Audiences"
-    And I am on site homepage
-    And I follow "CourseOne"
+    And I am on "CourseOne" course homepage
     And I follow "CategoryOne"
     And I navigate to "Audiences" node in "Category: CategoryOne"
     And I follow "Category Audience"
@@ -131,8 +131,7 @@ Feature: User with moodle/cohort:view can view but not manage audience details
     And "Delete" "link" in the "CourseTwo" "table_row" should be visible
     And I log out
     And I log in as "audviewcat"
-    And I am on site homepage
-    And I follow "CourseOne"
+    And I am on "CourseOne" course homepage
     And I follow "CategoryOne"
     And I navigate to "Audiences" node in "Category: CategoryOne"
     And I follow "Category Audience"

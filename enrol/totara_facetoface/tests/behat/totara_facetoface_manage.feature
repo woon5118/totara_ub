@@ -19,15 +19,12 @@ Feature: Test add/update/delete actions for Seminar direct enrolment method
     And I log in as "admin"
     And I navigate to "Manage enrol plugins" node in "Site administration > Plugins > Enrolments"
     And I click on "Enable" "link" in the "Seminar direct enrolment" "table_row"
-    And I click on "Home" in the totara menu
-    And I follow "Course 10782"
+    And I am on "Course 10782" course homepage
     And I add "Seminar direct enrolment" enrolment method with:
       | Custom instance name | Test student enrolment |
 
   Scenario: Check Seminar direct enrolment when no users enrolled
-    Given I click on "Home" in the totara menu
-    And I follow "Course 10782"
-    When I navigate to "Enrolment methods" node in "Course administration > Users"
+    Given I navigate to "Enrolment methods" node in "Course administration > Users"
     Then I should see "Test student enrolment"
     And I should see "Delete" in the "Test student enrolment" "table_row"
     And I should see "Disable" in the "Test student enrolment" "table_row"
@@ -64,8 +61,7 @@ Feature: Test add/update/delete actions for Seminar direct enrolment method
     Then I should not see "Seminar enrolment 10782"
 
   Scenario: Check Seminar direct enrolment with users enrolled
-    Given I click on "Home" in the totara menu
-    And I follow "Course 10782"
+    Given I am on "Course 10782" course homepage
     And I follow "Seminar 10782"
     And I follow "Add event"
     And I press "Save changes"

@@ -1,4 +1,4 @@
-@core @core_admin
+@core @core_admin @javascript
 Feature: Display extended course names
   In order to display more info about the courses
   As an admin
@@ -11,6 +11,8 @@ Feature: Display extended course names
       | Course fullname | C_shortname | 0 |
     And I log in as "admin"
     And I am on site homepage
+    And I turn editing mode on
+    And I add the "Courses" block
 
   Scenario: Courses list without extended course names (default value)
     Then I should see "Course fullname"

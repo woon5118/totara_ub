@@ -30,7 +30,7 @@ Feature: Set up contextual data for tests
       | Course 2 | COURSE2 | CAT3 |
       | Course 3 | COURSE3 | 0 |
     When I log in as "admin"
-    And I am on site homepage
+    And I click on "Find Learning" in the totara menu
     Then I should see "Course 1"
     And I should see "Course 2"
     And I should see "Course 3"

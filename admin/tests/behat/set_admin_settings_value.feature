@@ -1,4 +1,4 @@
-@core @core_admin
+@core @core_admin @javascript
 Feature: Set admin settings value
   In order to set admin settings value
   As an admin
@@ -11,6 +11,8 @@ Feature: Set admin settings value
       | Course fullname | C_shortname | 0 |
     And I log in as "admin"
     And I am on site homepage
+    And I turn editing mode on
+    And I add the "Courses" block
     And I should see "Course fullname"
     And I should not see "C_shortname Course fullname"
 

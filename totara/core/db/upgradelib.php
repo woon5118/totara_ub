@@ -392,6 +392,8 @@ function totara_core_upgrade_delete_moodle_plugins() {
         'mod_assignment',
         'block_community',
         'block_quiz_results',
+        'block_course_progress_report',
+        'block_frontpage_combolist',
         'gradeexport_fusion',
         'repository_picasa',
         'portfolio_picasa',
@@ -687,11 +689,6 @@ function totara_core_migrate_frontpage_display() {
     if ($tryupgrade) {
         $blocks = [];
 
-        if (!empty(get_config('core', 'courseprogress'))) {
-            // Add an instance of block_course_progress_report
-            $blocks[] = 'course_progress_report';
-        }
-
         $frontpage = get_config('core', 'frontpageloggedin');
         $frontpagelayout = explode(',', $frontpage);
 
@@ -708,12 +705,6 @@ function totara_core_migrate_frontpage_display() {
                     $blocks[] = 'course_list';
                     break;
 
-                case '6': // FRONTPAGEALLCOURSELIST
-                case '2': // FRONTPAGECATEGORYNAMES
-                case '4': // FRONTPAGECATEGORYCOMBO
-                    // Add frontpage_combolist block.
-                    $blocks[] = 'frontpage_combolist';
-                    break;
                 case '7': // FRONTPAGECOURSESEARCH
                     // Add course_search block
                     $blocks[] = 'course_search';
