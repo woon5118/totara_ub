@@ -97,12 +97,12 @@ Feature: Restore Moodle 2 course backups
     And I expand all fieldsets
     And the field "id_format" matches value "Weekly format"
     And I set the following fields to these values:
-      | id_format | Social format |
+      | id_format | Single activity format |
     And I press "Save and display"
-    And I should see "An open forum for chatting about anything you want to"
+    And I should see "Test forum name"
     And I navigate to "Edit settings" node in "Course administration"
     And I expand all fieldsets
-    And the field "id_format" matches value "Social format"
+    And the field "id_format" matches value "Single activity format"
     And I press "Cancel"
 
   @javascript
