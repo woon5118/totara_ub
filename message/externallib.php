@@ -162,7 +162,7 @@ class core_message_external extends external_api {
             }
             if ($success) {
                 $resultmsg['msgid'] = $success;
-                $resultmsg['msgtext'] = format_text($message['text'], external_validate_format($message['textformat']));
+                $resultmsg['msgtext'] = format_text($message['text'], external_validate_format($message['textformat']), ['para' => false]);
             } else {
                 // WARNINGS: for backward compatibility we return this errormessage.
                 //          We should have thrown exceptions as these errors prevent results to be returned.
