@@ -1475,6 +1475,7 @@ class cm_info implements IteratorAggregate {
         if ($classes) {
             $customdata['classes'] = $classes;
         }
+        $customdata['alt'] = $this->get_module_type_name();
 
         $flexicon = \core\output\flex_icon::create_from_pix_url($iconpixurl, $customdata);
         if ($flexicon) {

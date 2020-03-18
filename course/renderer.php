@@ -624,21 +624,6 @@ class core_course_renderer extends plugin_renderer_base {
             return $output;
         }
 
-        //Accessibility: for files get description via icon, this is very ugly hack!
-        $instancename = $mod->get_formatted_name();
-        $altname = $mod->modfullname;
-        // Avoid unnecessary duplication: if e.g. a forum name already
-        // includes the word forum (or Forum, etc) then it is unhelpful
-        // to include that in the accessible description that is added.
-        if (false !== strpos(core_text::strtolower($instancename),
-                core_text::strtolower($altname))) {
-            $altname = '';
-        }
-        // File type after name, for alphabetic lists (screen reader).
-        if ($altname) {
-            $altname = get_accesshide(' '.$altname);
-        }
-
         // For items which are hidden but available to current user
         // ($mod->uservisible), we show those as dimmed only if the user has
         // viewhiddenactivities, so that teachers see 'items which might not
@@ -674,9 +659,10 @@ class core_course_renderer extends plugin_renderer_base {
 
         // Totara: Display link itself with flex icon.
         global $OUTPUT;
+        $instancename = $mod->get_formatted_name();
         $activitylink  = $mod->render_icon($OUTPUT, 'activityicon');
         $activitylink .= $accesstext;
-        $activitylink .= html_writer::tag('span', $instancename . $altname, array('class' => 'instancename', 'data-movetext' => 'true'));
+        $activitylink .= html_writer::tag('span', $instancename, array('class' => 'instancename', 'data-movetext' => 'true'));
 
         if ($mod->uservisible && empty($displayoptions['nolink'])) {
             $output .= html_writer::link($url, $activitylink, array('class' => $linkclasses, 'onclick' => $onclick)) .

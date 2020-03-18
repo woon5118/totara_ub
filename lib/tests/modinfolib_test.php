@@ -933,6 +933,7 @@ class core_modinfolib_testcase extends advanced_testcase {
         $flexicon = \core\output\flex_icon::create_from_pix_icon($pixicon);
         $this->assertInstanceOf('core\output\flex_icon', $flexicon);
         $flexicon->customdata['classes'] = 'activityicon';
+        $flexicon->customdata['alt'] = 'Forum';
 
         $expected = $OUTPUT->render($flexicon);
         $actual = $cminfo->render_icon($OUTPUT, 'activityicon');
