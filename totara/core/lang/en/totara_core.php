@@ -607,6 +607,7 @@ $string['securereferrers_desc'] = 'When enabled browsers are instructed to not s
 $string['selectallrows'] = 'Select all rows';
 $string['selectanassessor'] = 'Select an assessor...';
 $string['selectaproficiency'] = 'Select a proficiency...';
+$string['selected'] = 'Selected';
 $string['selectionlimited'] = 'There is a maximum limit of {$a} selected managers';
 $string['selectrow'] = 'Select row';
 $string['select_a_tab'] = 'Select a tab';
