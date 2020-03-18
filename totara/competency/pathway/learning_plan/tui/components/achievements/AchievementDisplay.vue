@@ -35,7 +35,9 @@
         <template v-slot:left>
           <div class="tui-pathwayLearningPlanAchievement__overview">
             <h5 class="tui-pathwayLearningPlanAchievement__title">
-              {{ $str('achievement', 'pathway_learning_plan') }}
+              {{
+                $str('achievement_via_learning_plan', 'pathway_learning_plan')
+              }}
             </h5>
             <template v-if="hasValue">
               <div class="tui-pathwayLearningPlanAchievement__value">
@@ -62,7 +64,7 @@
             <template v-slot:row="{ row, expand, expandState }">
               <!-- learning plan, that can't be viewed -->
               <template v-if="!row.can_view">
-                <Cell size="1" />
+                <ExpandCell :header="true" />
                 <Cell size="11">
                   {{ $str('no_permission_view_plan', 'pathway_learning_plan') }}
                 </Cell>
@@ -72,7 +74,6 @@
                 <!-- learning plan expand cell -->
                 <ExpandCell
                   v-if="row.can_view"
-                  size="1"
                   :expand-state="expandState"
                   @click="expand()"
                 />
@@ -210,7 +211,7 @@ export default {
 <lang-strings>
   {
     "pathway_learning_plan" : [
-      "achievement",
+      "achievement_via_learning_plan",
       "name",
       "no_available_learning_plans",
       "no_rating_set",

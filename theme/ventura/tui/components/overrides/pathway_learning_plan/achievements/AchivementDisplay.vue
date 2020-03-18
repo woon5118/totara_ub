@@ -38,6 +38,10 @@
     }
   }
 
+  &__overview {
+    max-width: 100%;
+  }
+
   &__summary {
     &-header {
       margin: 0;
@@ -56,10 +60,11 @@
   &__title {
     margin: 0;
     @include tui-font-heading-x-small();
+    text-align: center;
   }
 
   &__noValue {
-    margin-top: var(--tui-gap-2);
+    margin-top: var(--tui-gap-4);
     @include tui-font-hint();
   }
 
@@ -74,13 +79,18 @@
   &__rating {
     display: flex;
 
+    &-icon {
+      position: relative;
+      top: -1px;
+    }
+
     &-value {
       margin-right: var(--tui-gap-1);
     }
   }
 
   &__value {
-    margin-top: var(--tui-gap-2);
+    margin-top: var(--tui-gap-4);
 
     &-title {
       @include tui-font-heavy();

@@ -37,9 +37,8 @@
       <template v-slot:right>
         <Table
           :data="[rater]"
-          :border-bottom-last-off="true"
-          :border-top-first-off="true"
-          :expandable-rows="true"
+          :border-bottom-hidden="true"
+          :border-top-hidden="true"
           class="tui-pathwayLearningPlanAchievement__list"
         >
           <template v-slot:row="{ row }">
@@ -116,7 +115,9 @@
                           transparent: true,
                         }"
                       >
-                        <CommentIcon />
+                        <CommentIcon
+                          custom-class="tui-pathwayLearningPlanAchievement__rating-icon"
+                        />
                       </ButtonIcon>
                     </template>
                     <h4

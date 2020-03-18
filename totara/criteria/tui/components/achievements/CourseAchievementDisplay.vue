@@ -23,7 +23,7 @@
 
 <template>
   <div class="tui-criteriaCourseAchievement">
-    <!-- Critria overview & course list -->
+    <!-- Criteria overview & course list -->
     <AchievementLayout>
       <template v-slot:left>
         <div class="tui-criteriaCourseAchievement__goal">
@@ -53,11 +53,7 @@
         >
           <template v-slot:row="{ row, expand, expandState }">
             <!-- Course details expand cell -->
-            <ExpandCell
-              size="1"
-              :expand-state="expandState"
-              @click="expand()"
-            />
+            <ExpandCell :expand-state="expandState" @click="expand()" />
 
             <!-- Course name cell -->
             <Cell size="9" :column-header="$str('courses', 'totara_criteria')">
@@ -200,7 +196,7 @@ export default {
     },
 
     /**
-     * Return int for required number of courses completed to fulfill criteria
+     * Return int for required number of courses completed to fulfil criteria
      *
      * @return {Integer}
      */
@@ -215,7 +211,7 @@ export default {
 
   methods: {
     /**
-     * Return course name or unavilable to user string
+     * Return course name or unavailable to user string
      *
      * @return {String}
      */

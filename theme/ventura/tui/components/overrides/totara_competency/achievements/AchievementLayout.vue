@@ -24,6 +24,8 @@
 .tui-achievementLayout {
   &__left {
     display: flex;
+    flex-direction: column;
+    align-items: center;
     height: 100%;
     padding-right: var(--tui-gap-4);
   }

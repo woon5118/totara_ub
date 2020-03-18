@@ -69,15 +69,15 @@
       }
 
       &-pending {
-        border-color: var(--tui-color-neutral-5);
+        border-color: var(--tui-progresstracker-color-pending);
       }
 
       &-complete {
-        border-color: var(--tui-color-secondary);
+        border-color: var(--tui-progresstracker-color-complete);
       }
 
       &-achieved {
-        border-color: var(--tui-color-primary);
+        border-color: var(--tui-progresstracker-color-achieved);
       }
     }
   }

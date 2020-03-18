@@ -24,6 +24,7 @@
 .tui-criteriaOnActiveAchievement {
   &__title {
     @extend .tui-criteriaCourseAchievement__title;
+    max-width: 100%;
   }
 
   &__goal {
