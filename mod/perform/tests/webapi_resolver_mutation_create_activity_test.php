@@ -57,7 +57,7 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
         ];
 
         $this->expectException(\container_perform\create_exception::class);
-        $this->expectExceptionMessage('Create Permission Missing');
+        $this->expectExceptionMessage('You do not have the permission to create a performance activity');
         create_activity::resolve($args, $this->get_execution_context());
     }
 

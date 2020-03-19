@@ -26,11 +26,15 @@ use container_perform\perform as perform_container;
 use core\collection;
 use core_container\module\module;
 use mod_perform\expand_task;
-use mod_perform\models\activity\activity;
-use mod_perform\models\activity\element;
-use mod_perform\models\activity\section;
-use mod_perform\models\activity\section_element;
+use mod_perform\entities\activity\participant_instance;
+use mod_perform\entities\activity\subject_instance;
+use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\models\activity\section_relationship as section_relationship_model;
+use mod_perform\models\activity\activity;
+use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\models\activity\section;
+use mod_perform\models\activity\element;
+use mod_perform\models\activity\section_element;
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment_type;
 use mod_perform\task\service\subject_instance_creation;
@@ -38,6 +42,7 @@ use mod_perform\user_groups\grouping;
 use mod_perform\util;
 use totara_core\entities\relationship_resolver;
 use totara_core\relationship\relationship;
+use mod_perform\models\activity\user_activity;
 
 /**
  * Perform generator
@@ -334,5 +339,99 @@ class mod_perform_generator extends component_generator_base {
 
         return collection::new($activities);
     }
+
+    /**
+     * Creates a user activity (subject_instance) with one participant and optionally the subject participating too.
+     *
+     * The top level perform activity is created if a name (activity_name) or id (activity_id) is not supplied,
+     * otherwise the perform row will be looked id or name if supplied.
+     *
+     * The subject can either be identified by 'subject_user_id' (user.id) or 'subject_name' (user.firstname).
+     *
+     * The (other) participant can either be identified by 'other_participant_id' (user.id) or
+     * 'other_participant_name' (user.firstname).
+     *
+     * @param array $data
+     * @return user_activity
+     * @throws coding_exception
+     */
+    public function create_user_activity(array $data): user_activity {
+        $activity_id = $data['activity_id'] ?? null;
+
+        if ($activity_id) {
+            $activity = activity::load_by_id($activity_id);
+        } else {
+            $activity = $this->find_or_make_perform_activity($data['activity_name'] ?? null);
+        }
+
+        $subject_id = $data['subject_user_id'] ?? null;
+
+        if ($subject_id) {
+            $subject = user::repository()->find($subject_id);
+        } else {
+            /** @var user $subject */
+            $subject = user::repository()->where('firstname', $data['subject_name'])->order_by('id')->first();
+        }
+
+        $other_participant_id = $data['other_participant_id'] ?? null;
+
+        if ($other_participant_id) {
+            $other_participant = user::repository()->find($other_participant_id);
+        } else {
+            /** @var user $other_participant */
+            $other_participant = user::repository()->where('firstname', $data['other_participant_name'])->order_by('id')->first();
+        }
+
+        $subject_is_participating = $data['subject_is_participating'] ?? false;
+
+        $track = new track();
+        $track->activity_id =  $activity->id;
+        $track->description =  $activity->name;
+        $track->status = track::STATUS_ACTIVE;
+        $track->save();
+
+        $user_assignment = new track_user_assignment();
+        $user_assignment->track_id =  $track->id;
+        $user_assignment->subject_user_id = $subject->id;
+        $user_assignment->deleted = false;
+        $user_assignment->save();
+
+        $subject_instance = new subject_instance();
+        $subject_instance->track_user_assignment_id = $user_assignment->id;
+        $subject_instance->subject_user_id = $user_assignment->subject_user_id; // Purposeful denormalization
+        $subject_instance->save();
+
+        if ($subject_is_participating) {
+            $participant_instance = new participant_instance();
+            $participant_instance->activity_relationship_id = 0; // stubbed
+            $participant_instance->participant_id = $subject->id; // Answering on activity about them self
+            $participant_instance->subject_instance_id = $subject_instance->id;
+            $participant_instance->save();
+        }
+
+        $other_participant_instance = new participant_instance();
+        $other_participant_instance->activity_relationship_id = 0; // stubbed
+        $other_participant_instance->participant_id = $other_participant->id;
+        $other_participant_instance->subject_instance_id = $subject_instance->id;
+        $other_participant_instance->save();
+
+        return new user_activity($subject_instance);
+    }
+
+    private function find_or_make_perform_activity($name): activity {
+        if (!$name) {
+            return $this->create_activity_in_container();
+        }
+
+        /** @var activity_entity $activity_entity */
+        $activity_entity = activity_entity::repository()->where('name', $name)->order_by('id')->first();
+
+        if ($activity_entity === null) {
+            return $this->create_activity_in_container(['activity_name' => $name]);
+        }
+
+        return activity::load_by_entity($activity_entity);
+    }
+
 
 }

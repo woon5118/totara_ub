@@ -1,0 +1,17 @@
+query mod_perform_user_activities(
+  $participant_id: core_id
+  $filters: mod_perform_user_activity_filters
+) {
+  mod_perform_user_activities(
+    participant_id: $participant_id
+    filters: $filters
+  ) {
+    status
+    activity {
+      name
+    }
+    subject {
+      fullname
+    }
+  }
+}

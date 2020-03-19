@@ -17,10 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @author Jaron Steenson <jaron.steenson@totaralearning.com>
  * @package mod_perform
  */
 
-require_once(__DIR__ . '/../../../../config.php');
+require_once(__DIR__ . '/../../../config.php');
 
-(new \mod_perform\controllers\activity\manage_activities())->process();
+(new \mod_perform\controllers\activity\user_activities())->process();

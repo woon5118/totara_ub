@@ -26,35 +26,30 @@ namespace mod_perform\webapi\resolver\type;
 use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use mod_perform\formatter\activity\activity as activity_formatter;
-use mod_perform\models\activity\activity as activity_model;
+use mod_perform\formatter\activity\user_activity as user_activity_formatter;
+use mod_perform\models\activity\user_activity as user_activity_model;
 
 /**
  * Note: It is the responsibility of the query to ensure the user is permitted to see an activity.
  */
-class activity implements type_resolver {
+class user_activity implements type_resolver {
 
     /**
      * @param string $field
-     * @param activity_model $activity
+     * @param user_activity_model $user_activity
      * @param array $args
      * @param execution_context $ec
      *
      * @return mixed
      */
-    public static function resolve(string $field, $activity, array $args, execution_context $ec) {
-        if (!$activity instanceof activity_model) {
-            throw new \coding_exception('Expected activity model');
+    public static function resolve(string $field, $user_activity, array $args, execution_context $ec) {
+        if (!$user_activity instanceof user_activity_model) {
+            throw new \coding_exception('Expected user_activity model');
         }
 
         $format = $args['format'] ?? format::FORMAT_HTML;
 
-        // The "user_activity" type is not compatible with relevant context.
-        // As well as this type ("activity") it also has "user" as a child type.
-        // "User" is not compatible with a relevant execution context being set to a perform container.
-        $context = $ec->has_relevant_context() ? $ec->get_relevant_context() : $activity->get_context();
-
-        $formatter = new activity_formatter($activity, $context);
+        $formatter = new user_activity_formatter($user_activity, $user_activity->get_context());
 
         return $formatter->format($field, $format);
     }

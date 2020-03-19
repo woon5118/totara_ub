@@ -1,0 +1,72 @@
+<!--
+  This file is part of Totara Learn
+
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  @author Jaron Steenson <jaron.steenson@totaralearning.com>
+  @package mod_perform
+-->
+
+<template>
+  <div class="tui-performUserActivities">
+    <h2>{{ $str('user_activities:page_title', 'mod_perform') }}</h2>
+
+    <Tabs transparent-tabs>
+      <Tab
+        :id="$id('your-activities-tab')"
+        :name="$str('user_activities:your_activities_title', 'mod_perform')"
+      >
+        <UserActivityList about="self" />
+      </Tab>
+      <Tab
+        :id="$id('activities-about-others-tab')"
+        :name="
+          $str('user_activities:activities_about_others_title', 'mod_perform')
+        "
+      >
+        <UserActivityList about="others" />
+      </Tab>
+    </Tabs>
+  </div>
+</template>
+
+<script>
+import Tab from 'totara_core/components/tabs/Tab';
+import Tabs from 'totara_core/components/tabs/Tabs';
+import UserActivityList from 'mod_perform/components/user_activities/UserActivityList';
+
+export default {
+  components: {
+    Tab,
+    Tabs,
+    UserActivityList,
+  },
+  data() {
+    return {
+      userActivities: [],
+    };
+  },
+};
+</script>
+<lang-strings>
+  {
+    "mod_perform": [
+      "user_activities:activities_about_others_title",
+      "user_activities:page_title",
+      "user_activities:your_activities_title"
+    ]
+  }
+</lang-strings>

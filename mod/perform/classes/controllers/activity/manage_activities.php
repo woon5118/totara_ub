@@ -29,7 +29,7 @@ use moodle_url;
 use totara_mvc\admin_controller;
 use totara_mvc\tui_view;
 
-class activities extends admin_controller {
+class manage_activities extends admin_controller {
 
     protected $admin_external_page_name = 'mod_perform_manage_activities';
 

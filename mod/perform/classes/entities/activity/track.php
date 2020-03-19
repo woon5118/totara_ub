@@ -46,6 +46,9 @@ class track extends entity {
     public const CREATED_TIMESTAMP = 'created_at';
     public const UPDATED_TIMESTAMP = 'updated_at';
 
+    public const STATUS_ACTIVE = 1;
+    public const STATUS_PAUSED = 0;
+
     /**
      * Establishes the relationship with activity entities.
      *

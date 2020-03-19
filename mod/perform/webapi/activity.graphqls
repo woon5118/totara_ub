@@ -62,11 +62,29 @@ type mod_perform_section_element {
 }
 
 """
+Details about perform activity that a user is involved with (either the subject or an answering pariticpent)
+"""
+type mod_perform_user_activity {
+  activity: mod_perform_activity!
+  status: mod_perform_user_activity_status!
+  subject: core_user!
+}
+
+"""
 A list of possible states that a performance activity can be in
 """
 enum mod_perform_activity_status {
   ACTIVE
   INACTIVE
+}
+
+"""
+A list of possible states that a user activity/participant instance can be in
+"""
+enum mod_perform_user_activity_status {
+  NOT_YET_STARTED
+  IN_PROGRESS
+  COMPLETED
 }
 
 input update_section_relationships_input {
@@ -94,6 +112,14 @@ extend type Query {
   The specified section
   """
   mod_perform_section(section_id: core_id!): mod_perform_section
+
+  """
+  A list of all performance activities a user is participating in
+  """
+  mod_perform_user_activities(
+    participant_id: core_id
+    filters: mod_perform_user_activity_filters
+  ): [mod_perform_user_activity!]!
 }
 
 """
@@ -187,4 +213,19 @@ extend type Mutation {
   mod_perform_update_section_elements(
     input: mod_perform_update_section_elements_input!
   ): mod_perform_section_result!
+}
+
+"""
+Competency profile assignment filters
+"""
+input mod_perform_user_activity_filters {
+  about: [mod_perform_user_activity_about_filter]
+}
+
+"""
+A list of possible states that a user activity/participant instance can be in
+"""
+enum mod_perform_user_activity_about_filter {
+  SELF
+  OTHERS
 }

@@ -40,7 +40,7 @@ use core\orm\entity\relations\has_one_through;
  * @property-read track $track
  * @property-read user $subject_user
  *
- * @method static activity_repository repository()
+ * @method static subject_instance_repository repository()
  *
  * @package mod_perform\entities
  */

@@ -21,6 +21,10 @@
  * @package mod_perform
  */
 
+use core_user\output\myprofile\node;
+use core_user\output\myprofile\tree;
+use mod_perform\controllers\activity\user_activities;
+
 /**
  * Required in order to prevent failures in tests.
  */
@@ -33,5 +37,34 @@ function perform_update_instance($data) {
 }
 
 function perform_delete_instance($id) {
+    return true;
+}
+
+/**
+ * Add user performance activity list link to the user profile page
+ *
+ * @param tree $tree Tree object
+ * @param stdClass $user user object
+ * @param bool $this_user
+ * @return bool
+ * @throws coding_exception
+ * @throws moodle_exception
+ */
+function mod_perform_myprofile_navigation(tree $tree, $user, $is_current_user) {
+    // You can only view your own performance activities for now.
+    if (!$is_current_user) {
+        return false;
+    }
+
+    $tree->add_node(
+        new node(
+            'miscellaneous',
+            'performance_activities',
+            get_string('user_activities:page_title', 'mod_perform'),
+            null,
+            user_activities::get_url()
+        )
+    );
+
     return true;
 }
