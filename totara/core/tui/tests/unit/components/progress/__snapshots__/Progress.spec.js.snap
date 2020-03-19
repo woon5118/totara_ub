@@ -6,7 +6,7 @@ exports[`Progress.vue render correctly 1`] = `
   aria-valuemin="100"
   aria-valuenow="500"
   aria-valuetext="44%"
-  class="tui-progress"
+  class="tui-progress tui-progress--hideBackground"
   role="progressbar"
 >
   <div

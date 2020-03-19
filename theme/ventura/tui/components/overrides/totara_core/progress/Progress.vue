@@ -35,6 +35,10 @@
     line-height: 10px;
   }
 
+  &--hideBackground {
+    background: none;
+  }
+
   &__bar {
     display: flex;
     justify-content: flex-end;

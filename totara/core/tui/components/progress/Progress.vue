@@ -24,7 +24,10 @@
   <div
     ref="progress"
     class="tui-progress"
-    :class="small && 'tui-progress--small'"
+    :class="{
+      'tui-progress--small': small,
+      'tui-progress--hideBackground': hideBackground,
+    }"
     :aria-valuetext="valueText"
     :aria-valuenow="value"
     :aria-valuemin="min"
@@ -77,6 +80,14 @@ export default {
     },
     completedText: {
       type: [Boolean, String],
+      default: false,
+    },
+    hideBackground: {
+      type: Boolean,
+      default: false,
+    },
+    showEmptyState: {
+      type: Boolean,
       default: false,
     },
   },
@@ -132,8 +143,20 @@ export default {
       this.insideLabel = labelW < containerW * this.fraction;
     },
     $_setProgressStyle() {
+      let w,
+        bgColor = '';
+
+      //handle empty state styling
+      if (this.showEmptyState && this.value <= this.min) {
+        w = '2%';
+        bgColor = '#e6e4e4';
+      } else {
+        w = `${this.fraction * 100}%`;
+      }
+
       this.progressStyle = {
-        width: `${this.fraction * 100}%`,
+        width: w,
+        backgroundColor: bgColor,
       };
     },
   },

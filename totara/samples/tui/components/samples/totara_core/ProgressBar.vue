@@ -65,6 +65,22 @@
       <Progress :value="100" />
       <br />
       <Progress :value="100" :completed-text="true" />
+      <br />
+      <Progress
+        :value="20"
+        :hide-background="true"
+        :small="true"
+        format="number"
+        :show-empty-state="true"
+      />
+      <br />
+      <Progress
+        :value="0"
+        :hide-background="true"
+        :small="true"
+        format="number"
+        :show-empty-state="true"
+      />
     </div>
   </div>
 </template>

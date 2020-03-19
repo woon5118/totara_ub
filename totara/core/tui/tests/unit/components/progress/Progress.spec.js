@@ -20,11 +20,11 @@
  * @package totara_core
  */
 
-import { shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Progress from 'totara_core/components/progress/Progress';
 
 const factory = propsData => {
-  return shallowMount(Progress, {
+  return mount(Progress, {
     propsData: {
       ...propsData,
     },
@@ -43,6 +43,8 @@ describe('Progress.vue', () => {
       max: 1000,
       format: 'percent',
       completedText: true,
+      hideBackground: true,
+      showEmptyState: true,
     });
     expect(wrapper.element).toMatchSnapshot();
   });
