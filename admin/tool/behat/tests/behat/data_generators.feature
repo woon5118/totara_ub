@@ -168,7 +168,6 @@ Feature: Set up contextual data for tests
     And the following "activities" exist:
       | activity   | name                   | intro                         | course | idnumber    |
       | assign     | Test assignment name   | Test assignment description   | C1     | assign1     |
-      | assignment | Test assignment22 name | Test assignment22 description | C1     | assignment1 |
       | book       | Test book name         | Test book description         | C1     | book1       |
       | chat       | Test chat name         | Test chat description         | C1     | chat1       |
       | choice     | Test choice name       | Test choice description       | C1     | choice1     |
@@ -198,8 +197,6 @@ Feature: Set up contextual data for tests
     When I log in as "admin"
     And I am on "Course 1" course homepage
     Then I should see "Test assignment name"
-    # Assignment 2.2 module type is disabled by default
-    # And I should see "Test assignment22 name"
     And I should see "Test book name"
     And I should see "Test chat name"
     And I should see "Test choice name"
