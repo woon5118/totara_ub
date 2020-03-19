@@ -166,4 +166,13 @@ class scale extends model {
             return $id > 0;
         }));
     }
+
+    /**
+     * Get all entity properties
+     *
+     * @return array
+     */
+    public function to_array(): array {
+        return $this->entity->to_array();
+    }
 }

@@ -573,7 +573,7 @@ abstract class entity implements \JsonSerializable {
     }
 
     /**
-     * Build the setter method name for an attribute aka mutators
+     * Build the getter method name for an attribute aka mutators
      *
      * @param string $name
      * @return string|null
@@ -587,7 +587,7 @@ abstract class entity implements \JsonSerializable {
     }
 
     /**
-     * Build the getter method name for an attribute aka mutators
+     * Build the setter method name for an attribute aka mutators
      *
      * @param string $name
      * @return string|null
