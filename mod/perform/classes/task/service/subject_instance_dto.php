@@ -138,4 +138,8 @@ class subject_instance_dto {
         throw new coding_exception('This dto is ready-only and cannot be modified');
     }
 
+    final public function __isset($name) {
+        return method_exists($this, "get_{$name}");
+    }
+
 }

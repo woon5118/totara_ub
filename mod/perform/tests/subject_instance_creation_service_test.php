@@ -177,6 +177,8 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
 
         $subject_instances = subject_instance::repository()->get();
 
+        $this->assertEqualsCanonicalizing($dtos->pluck('id'), $subject_instances->pluck('id'));
+
         /** @var subject_instance_dto $dto */
         foreach ($dtos as $dto) {
             $this->assertGreaterThan(0, $dto->get_id());
