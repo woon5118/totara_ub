@@ -22,6 +22,10 @@
  * @category test
  */
 
+use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\entities\activity\track_assignment as track_assignment_entity;
+use mod_perform\entities\activity\track_user_assignment as track_user_assignment_entity;
 use mod_perform\models\activity\track_status;
 use mod_perform\models\activity\track_assignment_type;
 
@@ -33,6 +37,7 @@ use mod_perform\user_groups\grouping;
  * @group perform
  */
 class mod_perform_generator_testcase extends advanced_testcase {
+
     /**
      * @covers ::create_activity_in_container
      * @covers ::create_activity_tracks
@@ -40,7 +45,7 @@ class mod_perform_generator_testcase extends advanced_testcase {
      */
     public function test_create_track_assignments(): void {
         $this->setAdminUser();
-        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $generator = $this->generator();
         $activity = $generator->create_activity_in_container();
         $activity_id = $activity->get_id();
 
@@ -105,5 +110,130 @@ class mod_perform_generator_testcase extends advanced_testcase {
             $this->assertEquals($pos_count, $actual_pos_count, 'wrong pos assignment count');
             $this->assertEquals($user_count, $actual_user_count, 'wrong user assignment count');
         }
+    }
+
+    public function test_create_full_activities_with_default_configuration() {
+        $generator = $this->generator();
+
+        // Try with default configuration
+        $activities = $generator->create_full_activities();
+        $this->assertEquals(1, count($activities));
+
+        $activities_in_db = activity_entity::repository()->get();
+        $this->assertCount(1, $activities_in_db);
+        $expected_activity = $activities->first();
+        $actual_activity_entity = $activities_in_db->first();
+        $this->assertEquals($expected_activity->id, $actual_activity_entity->id);
+
+        // Assert that there is the expected amount of assignments in the database
+        $assignments_in_db = track_assignment_entity::repository()->get();
+        $this->assertCount(1, $assignments_in_db);
+
+        // Assert that there is the expected amount of user assignments in the database
+        $user_assignments_in_db = track_user_assignment_entity::repository()->get();
+        $this->assertCount(5, $user_assignments_in_db);
+
+        // Assert that there is the expected amount of subject instances in the database
+        $subject_instances_in_db = subject_instance_entity::repository()->get();
+        $this->assertCount(5, $subject_instances_in_db);
+    }
+
+    public function test_create_full_activities_with_increased_number() {
+        $generator = $this->generator();
+
+        $configuration = mod_perform_activity_generator_configuration::new()
+            ->set_number_of_activities(3)
+            ->set_cohort_assignments_per_activity(4)
+            ->set_number_of_users_per_user_group_type(6);
+
+        // Try with default configuration
+        $activities = $generator->create_full_activities($configuration);
+        $this->assertEquals(3, count($activities));
+
+        $activities_in_db = activity_entity::repository()->get();
+        $this->assertCount(3, $activities_in_db);
+
+        $expected_activity_ids = $activities->pluck('id');
+        $actual_activity_ids = $activities_in_db->pluck('id');
+        $this->assertEqualsCanonicalizing($expected_activity_ids, $actual_activity_ids);
+
+        // Assert that there is the expected amount of assignments in the database
+        $assignments_in_db = track_assignment_entity::repository()->get();
+        $this->assertCount(12, $assignments_in_db);
+
+        // Assert that there is the expected amount of user assignments in the database
+        $user_assignments_in_db = track_user_assignment_entity::repository()->get();
+        $this->assertCount(72, $user_assignments_in_db);
+
+        // Assert that there is the expected amount of subject instances in the database
+        $subject_instances_in_db = subject_instance_entity::repository()->get();
+        $this->assertCount(72, $subject_instances_in_db);
+    }
+
+    public function test_create_full_activities_without_subject_instances() {
+        $generator = $this->generator();
+
+        $configuration = mod_perform_activity_generator_configuration::new()
+            ->disable_subject_instances();
+
+        // Try with default configuration
+        $activities = $generator->create_full_activities($configuration);
+        $this->assertEquals(1, count($activities));
+
+        $activities_in_db = activity_entity::repository()->get();
+        $this->assertCount(1, $activities_in_db);
+        $expected_activity = $activities->first();
+        $actual_activity_entity = $activities_in_db->first();
+        $this->assertEquals($expected_activity->id, $actual_activity_entity->id);
+
+        // Assert that there is the expected amount of assignments in the database
+        $assignments_in_db = track_assignment_entity::repository()->get();
+        $this->assertCount(1, $assignments_in_db);
+
+        // Assert that there is the expected amount of user assignments in the database
+        $user_assignments_in_db = track_user_assignment_entity::repository()->get();
+        $this->assertCount(5, $user_assignments_in_db);
+
+        // No subject instances should have been created
+        $subject_instances_in_db = subject_instance_entity::repository()->get();
+        $this->assertCount(0, $subject_instances_in_db);
+    }
+
+    public function test_create_full_activities_without_user_assignments() {
+        $generator = $this->generator();
+
+        $configuration = mod_perform_activity_generator_configuration::new()
+            ->disable_user_assignments();
+
+        // Try with default configuration
+        $activities = $generator->create_full_activities($configuration);
+        $this->assertEquals(1, count($activities));
+
+        $activities_in_db = activity_entity::repository()->get();
+        $this->assertCount(1, $activities_in_db);
+        $expected_activity = $activities->first();
+        $actual_activity_entity = $activities_in_db->first();
+        $this->assertEquals($expected_activity->id, $actual_activity_entity->id);
+
+        // Assert that there is the expected amount of assignments in the database
+        $assignments_in_db = track_assignment_entity::repository()->get();
+        $this->assertCount(1, $assignments_in_db);
+
+        // No user assignments should have been created
+        $user_assignments_in_db = track_user_assignment_entity::repository()->get();
+        $this->assertCount(0, $user_assignments_in_db);
+
+        // No user assignments - no subject instances
+        $subject_instances_in_db = subject_instance_entity::repository()->get();
+        $this->assertCount(0, $subject_instances_in_db);
+    }
+
+    /**
+     * Gets the generator instance
+     *
+     * @return mod_perform_generator
+     */
+    protected function generator(): mod_perform_generator {
+        return $this->getDataGenerator()->get_plugin_generator('mod_perform');
     }
 }

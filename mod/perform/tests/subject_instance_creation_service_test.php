@@ -239,8 +239,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
 
         $data->activity1 = $generator->create_activity_in_container();
         /** @var track $track1 */
-        $tracks = $generator->create_activity_tracks($data->activity1);
-        $data->track1 = $tracks->first();
+        $data->track1 = track::load_by_activity($data->activity1)->first();
 
         $generator->create_track_assignments($data->track1, 3, 0, 0, 0);
 

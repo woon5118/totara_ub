@@ -25,6 +25,7 @@
 use container_perform\perform as perform_container;
 use core\collection;
 use core_container\module\module;
+use mod_perform\expand_task;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\element;
 use mod_perform\models\activity\section;
@@ -32,6 +33,7 @@ use mod_perform\models\activity\section_element;
 use mod_perform\models\activity\section_relationship as section_relationship_model;
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment_type;
+use mod_perform\task\service\subject_instance_creation;
 use mod_perform\user_groups\grouping;
 use mod_perform\util;
 use totara_core\entities\relationship_resolver;
@@ -46,6 +48,12 @@ class mod_perform_generator extends component_generator_base {
      * @var array
      */
     private $cache;
+
+    public function __construct(testing_data_generator $datagenerator) {
+        require_once __DIR__.'/activity_name_generator.php';
+        require_once __DIR__.'/activity_generator_configuration.php';
+        parent::__construct($datagenerator);
+    }
 
     /**
      * Create a performance activity and a performance container to contain it
@@ -69,9 +77,7 @@ class mod_perform_generator extends component_generator_base {
             $status = $data['activity_status'] ?? activity::STATUS_ACTIVE;
 
             /** @var perform_container $container */
-            $activity = activity::create($container, $name, $description, $status);
-
-            return activity::load_by_id($activity->id);
+            return activity::create($container, $name, $description, $status);
         });
     }
 
@@ -267,6 +273,66 @@ class mod_perform_generator extends component_generator_base {
                 },
                 $track
             );
+    }
+
+    /**
+     * Create full activities including assignments, subject and participant instances
+     *
+     * @param mod_perform_activity_generator_configuration $configuration
+     * @return collection
+     */
+    public function create_full_activities(mod_perform_activity_generator_configuration $configuration = null) {
+        global $USER;
+
+        // Create a default configuration if it wasn't provided
+        if ($configuration === null) {
+            $configuration = mod_perform_activity_generator_configuration::new();
+        }
+
+        $previous_user = clone $USER;
+
+        // For the activity generation we need to make sure the admin user is set
+        \advanced_testcase::setAdminUser();
+
+        $activity_name_generator = new mod_perform_activity_name_generator();
+
+        $activities = [];
+        for ($i = 0; $i < $configuration->get_number_of_activities(); $i++) {
+            $data = [
+                'activity_name' => $activity_name_generator->generate()
+            ];
+
+            $activity = $this->create_activity_in_container($data);
+            $activities[] = $activity;
+        }
+
+        foreach ($activities as $activity) {
+            $cohorts = [];
+            for ($i = 0; $i < $configuration->get_cohort_assignments_per_activity(); $i++) {
+                $cohort = $this->datagenerator->create_cohort();
+                $cohorts[] = $cohort->id;
+                for ($k = 0; $k < $configuration->get_number_of_users_per_user_group_type(); $k++) {
+                    $user = $this->datagenerator->create_user();
+                    cohort_add_member($cohort->id, $user->id);
+                }
+            }
+
+            $track = track::load_by_activity($activity)->first();
+            $this->create_track_assignments_with_existing_groups($track, $cohorts);
+        }
+
+        // Expand assignments to user assignments
+        if ($configuration->should_generate_user_assignments()) {
+            (new expand_task())->expand_all();
+        }
+        if ($configuration->should_generate_subject_instances()) {
+            // Create subject instances for all user assignments
+            (new subject_instance_creation())->generate_instances();
+        }
+
+        \advanced_testcase::setUser($previous_user);
+
+        return collection::new($activities);
     }
 
 }
