@@ -76,7 +76,7 @@ class mod_perform_generator extends component_generator_base {
 
         $container_data = new stdClass();
         $container_data->name = $data['container_name'] ?? "test performance container";
-        $container_data->category = util::get_default_categoryid();
+        $container_data->category = util::get_default_category_id();
 
         return $DB->transaction(function () use ($data, $container_data) {
             $container = perform_container::create($container_data);
@@ -159,7 +159,7 @@ class mod_perform_generator extends component_generator_base {
 
     public function create_element(array $data = []): element {
         return element::create(
-            $data['context'] ?? context_coursecat::instance(perform_container::get_default_categoryid()),
+            $data['context'] ?? context_coursecat::instance(perform_container::get_default_category_id()),
             $data['plugin_name'] ?? 'short_text',
             $data['title'] ?? 'test element title',
             $data['identifier'] ?? 0,

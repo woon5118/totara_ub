@@ -43,7 +43,7 @@ class activities implements query_resolver {
     }
 
     protected static function get_context(): \context {
-        $category_id = util::get_default_categoryid();
+        $category_id = util::get_default_category_id();
         return context_coursecat::instance($category_id);
     }
 

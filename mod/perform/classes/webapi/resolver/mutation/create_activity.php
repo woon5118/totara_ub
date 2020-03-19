@@ -50,7 +50,7 @@ class create_activity implements mutation_resolver {
         $courseinfo = new \stdClass();
         $courseinfo->fullname = $args['name'];
         $courseinfo->description = $args['description'] ?? null;
-        $courseinfo->category = perform_container::get_default_categoryid();
+        $courseinfo->category = perform_container::get_default_category_id();
 
         /** @var activity $activity */
         $activity =  $DB->transaction(function () use ($courseinfo, $args) {

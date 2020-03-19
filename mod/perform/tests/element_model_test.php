@@ -30,7 +30,7 @@ use mod_perform\models\activity\element;
 class mod_perform_element_model_testcase extends advanced_testcase {
 
     public function test_create() {
-        $default_context = context_coursecat::instance(perform::get_default_categoryid());
+        $default_context = context_coursecat::instance(perform::get_default_category_id());
 
         $element = element::create($default_context, 'short_text', 'test element 1 title', 123);
 

@@ -93,7 +93,7 @@ class util {
      *
      * @return int
      */
-    public static function get_default_categoryid(): int {
-        return perform_container::get_default_categoryid();
+    public static function get_default_category_id(): int {
+        return perform_container::get_default_category_id();
     }
 }

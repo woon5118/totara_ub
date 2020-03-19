@@ -104,7 +104,7 @@ class activity extends model {
         }
 
         if (null == $context) {
-            $categoryid = util::get_default_categoryid();
+            $categoryid = util::get_default_category_id();
             if (0 == $categoryid) {
                 // Nope, this user is not able to add a performance activity.
                 return false;

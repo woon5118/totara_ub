@@ -50,12 +50,12 @@ class settings {
         // We check the system context first as to avoid unintentionally creating the default category.
         // TODO Technically this is not the right way of doing it as there could be an override in the category,
         //      see TL-24324 for more details what happens if the category is
-        //      automatically created by util::get_default_categoryid();
+        //      automatically created by util::get_default_category_id();
         //      Find a better solution to have the default category not auto created.
         if (has_capability('mod/perform:view_manage_activities', $system_context)) {
             $context = $system_context;
         } else {
-            $category_id = util::get_default_categoryid();
+            $category_id = util::get_default_category_id();
             $category_context = context_coursecat::instance($category_id);
 
             if (has_capability('mod/perform:view_manage_activities', $category_context)) {

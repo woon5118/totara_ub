@@ -40,13 +40,6 @@ class perform extends container {
     /**
      * @inheritDoc
      */
-    public static function get_type(): string {
-        return 'perform';
-    }
-
-    /**
-     * @inheritDoc
-     */
     public static function get_container_category(): string {
         return category::PERFORM;
     }
@@ -63,7 +56,7 @@ class perform extends container {
         }
 
         if (null == $context) {
-            $categoryid = static::get_default_categoryid();
+            $categoryid = static::get_default_category_id();
             if (0 == $categoryid) {
                 // Nope, this user is not able to add a performance activity container.
                 return false;
@@ -84,7 +77,7 @@ class perform extends container {
      *
      * @return int
      */
-    public static function get_default_categoryid(): int {
+    public static function get_default_category_id(): int {
         global $CFG, $DB, $USER;
         require_once("{$CFG->dirroot}/totara/core/lib.php");
 
@@ -162,5 +155,17 @@ class perform extends container {
 
         // TODO will be able to remove this once it's been implemented in parent method.
         $data->containertype = self::get_type();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function normalise_data_on_create(\stdClass $data): \stdClass {
+        $data = parent::normalise_data_on_create($data);
+
+        // Perform containers do not have formats.
+        $data->format = 'none';
+
+        return $data;
     }
 }
