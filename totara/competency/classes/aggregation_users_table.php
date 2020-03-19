@@ -549,7 +549,7 @@ class aggregation_users_table {
                        SET {$this->has_changed_column} = :qfa_haschanged
                       WHERE {$wh}";
                 $params['qfa_haschanged'] = $has_changed_value;
-                $DB->execute ($sql, $params);
+                $DB->execute($sql, $params);
             }
         }
 
@@ -621,7 +621,7 @@ class aggregation_users_table {
                 }
             });
 
-            $to_update = array_filter($to_update, function($v) use($has_changed_value) {
+            $to_update = array_filter($to_update, function ($v) use ($has_changed_value) {
                 return $v->has_changed != $has_changed_value;
             });
         }

@@ -43,7 +43,7 @@ abstract class overall_aggregation {
         $this->agg_type = $reflect->getShortName();
     }
 
-    static public function aggregation_type(): string {
+    public static function aggregation_type(): string {
         $reflect = new \ReflectionClass(static::class);
         return $reflect->getShortName();
     }

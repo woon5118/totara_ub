@@ -121,6 +121,14 @@ function xmldb_totara_plan_upgrade($oldversion) {
 
         // Adding keys to table dp_plan_competency_value.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('competency_id_fk', XMLDB_KEY_FOREIGN, array('competency_id'), 'comp', array('id'));
+        $table->add_key('user_id_fk', XMLDB_KEY_FOREIGN, array('user_id'), 'user', array('id'));
+        $table->add_key('scale_value_id_fk', XMLDB_KEY_FOREIGN, array('scale_value_id'), 'comp_scale_values', array('id'));
+        $table->add_key('positionid_fk', XMLDB_KEY_FOREIGN, array('positionid'), 'pos', array('id'));
+        $table->add_key('organisationid_fk', XMLDB_KEY_FOREIGN, array('organisationid'), 'org', array('id'));
+        $table->add_key('assessorid_fk', XMLDB_KEY_FOREIGN, array('assessorid'), 'user', array('id'));
+
+        $table->add_index('comp_user_unique', XMLDB_INDEX_UNIQUE, array('competency_id', 'user_id'));
 
         // Conditionally launch create table for dp_plan_competency_value.
         if (!$dbman->table_exists($table)) {
@@ -133,7 +141,7 @@ function xmldb_totara_plan_upgrade($oldversion) {
 
     // TODO Remove this before we release perform
 
-    if ($oldversion < 2019112103) {
+    if ($oldversion < 2020062903) {
         // Define key competency_id_fk (foreign) to be added to dp_plan_competency_value.
         $table = new xmldb_table('dp_plan_competency_value');
 
@@ -175,11 +183,8 @@ function xmldb_totara_plan_upgrade($oldversion) {
         }
 
         // Plan savepoint reached.
-        upgrade_plugin_savepoint(true, 2019112103, 'totara', 'plan');
+        upgrade_plugin_savepoint(true, 2020062903, 'totara', 'plan');
     }
-
-
-
 
     return true;
 }

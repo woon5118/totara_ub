@@ -58,7 +58,6 @@ class linkedcourses_display extends criterion_display {
                 'error' => get_string('error:notenoughcourses', 'criteria_linkedcourses'),
             ],
         ];
-
     }
 
 }

@@ -23,6 +23,7 @@
 
 namespace totara_competency;
 
+use aggregation_latest_achieved\latest_achieved;
 use coding_exception;
 use core\orm\collection;
 use core\orm\query\builder;
@@ -215,7 +216,7 @@ class legacy_aggregation {
             return;
         }
 
-        $configuration->set_aggregation_type('first');
+        $configuration->set_aggregation_type(latest_achieved::aggregation_type());
         $configuration->save_aggregation();
 
         if ($this->should_add_learning_plans()) {

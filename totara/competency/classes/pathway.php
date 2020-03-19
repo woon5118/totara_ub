@@ -84,7 +84,7 @@ abstract class pathway {
         $this->path_type = $reflect->getShortName();
     }
 
-    static public function pathway_type(): string {
+    public static function pathway_type(): string {
         $reflect = new \ReflectionClass(static::class);
         return $reflect->getShortName();
     }

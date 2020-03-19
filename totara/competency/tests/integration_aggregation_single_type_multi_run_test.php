@@ -21,7 +21,6 @@
  * @package totara_competency
  */
 
-use criteria_coursecompletion\coursecompletion;
 use pathway_learning_plan\learning_plan;
 use pathway_manual\manual;
 use pathway_manual\models\roles\manager;

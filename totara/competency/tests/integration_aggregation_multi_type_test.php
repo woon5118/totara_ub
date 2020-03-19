@@ -21,15 +21,10 @@
  * @package totara_competency
  */
 
-use pathway_learning_plan\learning_plan;
-use pathway_manual\manual;
 use pathway_manual\models\roles\manager;
-use pathway_manual\models\roles\self_role;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\pathway_achievement;
 use totara_competency\hook\competency_configuration_changed;
-use totara_competency\linked_courses;
-use totara_criteria\criterion;
 
 global $CFG;
 require_once($CFG->dirroot . '/totara/competency/tests/integration_aggregation.php');
@@ -39,6 +34,19 @@ require_once($CFG->dirroot . '/totara/competency/tests/integration_aggregation.p
  * Integration test file is split because of the sheer size of the file if all integration tests were to be placed in the same file
  */
 class totara_competency_integration_multi_type_testcase extends totara_competency_integration_aggregation {
+
+    /**
+     * Test aggregation task with a typical legacy aggregation using latest_achieved aggregation
+     * @dataProvider task_to_execute_data_provider
+     */
+    public function test_latest_achieved_legacy(string $task_to_execute) {
+        $data = $this->setup_data();
+
+        $this->setup_latest_achieved_legacy_data($data);
+
+        $this->latest_achieved_legacy_run_1($data, $task_to_execute);
+        $this->latest_achieved_legacy_run_2($data, $task_to_execute);
+    }
 
     /**
      * Test aggregation task with a combination of criteria_groups with othercompetency and multiple runs
@@ -54,6 +62,169 @@ class totara_competency_integration_multi_type_testcase extends totara_competenc
         $this->othercompetency_manual_run_2($data, $task_to_execute);
 //        $this->othercompetency_manual_run_3($data, $task_to_execute);
     }
+
+    /**
+     * Setup data and return created criteria and pathways for latest_achieved_legacy test
+     *
+     * @param stdClass &$data
+     */
+    private function setup_latest_achieved_legacy_data(&$data) {
+        // Create learning plans
+        $data->learning_plans = [];
+
+        /** @var totara_plan_generator $plan_generator */
+        $data->learning_plans['1-1'] = [
+            'dplan' => $data->competency_generator->create_learning_plan_with_competencies($data->users[1]->id,
+                [$data->competencies[1]->id => null]
+            ),
+        ];
+
+        foreach ($data->learning_plans as $key => $el) {
+            $data->learning_plans[$key]['component'] = new dp_competency_component($el['dplan']);
+        }
+
+        $data->pathways['lp'] = $data->competency_generator->create_learning_plan_pathway($data->competencies[1], 1);
+
+        $data->criteria['coursecompletion'] = $data->criteria_generator->create_coursecompletion([
+            'courseids' => [
+                $data->courses[1]->id,
+            ]
+        ]);
+        $data->pathways['course'] = $data->competency_generator->create_criteria_group($data->competencies[1],
+            [$data->criteria['coursecompletion']], $data->scalevalues[3]->id, 2);
+
+        $data->criteria['child'] = $data->criteria_generator->create_childcompetency([
+            'competency' => $data->competencies[1]->id
+        ]);
+        $data->pathways['child'] = $data->competency_generator->create_criteria_group($data->competencies[1],
+            [$data->criteria['child']], $data->scalevalues[3]->id, 2);
+
+        $to_assign = [
+            ['user_id' => $data->users[1]->id, 'competency_id' => $data->competencies[1]->id],
+        ];
+        $this->assign_users_to_competencies($to_assign);
+    }
+
+
+    /**
+     * @param $data
+     * @param string $task_to_execute
+     */
+    private function latest_achieved_legacy_run_1($data, string $task_to_execute) {
+        /*
+            lp comp1: - user1: value 5
+        */
+
+        $data->learning_plans['1-1']['component']->set_value($data->competencies[1]->id,
+            $data->users[1]->id,
+            $data->scalevalues[5]->id,
+            (object)['manual' => true]
+        );
+
+        $this->waitForSecond();
+
+        // Now run the task
+        (new $task_to_execute())->execute();
+
+        $this->verify_item_records([
+            ['item_id' => $data->courses[1]->id, 'user_id' => $data->users[1]->id, 'criterion_met' => 0, 'num_occurrences' => 1],
+        ]);
+
+        $pw_achievement_records = $this->verify_pathway_achievements([
+            'run1-lp-1' => [
+                'pathway_id' => $data->pathways['lp']->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+            ],
+            'run1-course-1' => [
+                'pathway_id' => $data->pathways['course']->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'scale_value_id' => null,
+            ],
+        ]);
+
+        $this->verify_competency_achievements([
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'proficient' => 0,
+                'via' => [
+                    $pw_achievement_records['run1-lp-1'],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @param $data
+     * @param string $task_to_execute
+     */
+    private function latest_achieved_legacy_run_2($data, string $task_to_execute) {
+        /*
+            user1 completes course1
+        */
+
+        $completion = new completion_completion(['course' => $data->courses[1]->id, 'userid' => $data->users[1]->id]);
+        $completion->mark_complete();
+
+        $this->waitForSecond();
+
+        // Now run the task
+        (new $task_to_execute())->execute();
+
+        $this->verify_item_records([
+            ['item_id' => $data->courses[1]->id, 'user_id' => $data->users[1]->id, 'criterion_met' => 1, 'num_occurrences' => 1],
+        ]);
+
+        $pw_achievement_records = $this->verify_pathway_achievements([
+            'run1-lp-1' => [
+                'pathway_id' => $data->pathways['lp']->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[5]->id,
+            ],
+            'run1-course-1' => [
+                'pathway_id' => $data->pathways['course']->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement::STATUS_ARCHIVED,
+                'scale_value_id' => null,
+            ],
+            'run2-course-1' => [
+                'pathway_id' => $data->pathways['course']->get_id(),
+                'user_id' => $data->users[1]->id,
+                'status' => pathway_achievement::STATUS_CURRENT,
+                'scale_value_id' => $data->scalevalues[3]->id,
+            ],
+        ]);
+
+        $this->verify_competency_achievements([
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::SUPERSEDED,
+                'scale_value_id' => $data->scalevalues[5]->id,
+                'proficient' => 0,
+                'via' => [
+                    $pw_achievement_records['run1-lp-1'],
+                ],
+            ],
+            [
+                'competency_id' => $data->competencies[1]->id,
+                'user_id' => $data->users[1]->id,
+                'status' => competency_achievement::ACTIVE_ASSIGNMENT,
+                'scale_value_id' => $data->scalevalues[3]->id,
+                'proficient' => 0,
+                'via' => [
+                    $pw_achievement_records['run2-course-1'],
+                ],
+            ],
+        ]);
+    }
+
 
 
     /**

@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Coggins <simon.coggins@totaralms.com>
- * @package totara_plan
+ * @author Riana Rossouw <riana.rossouw@totaralearning.com>
+ * @package totara_competency
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version  = 2020062903;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2017111309;       // Requires this Moodle version.
-$plugin->component = 'totara_plan';   // To check on upgrade, that module sits in correct place
-$plugin->dependencies = array(
-    'totara_evidence' => 2020062600,
-);
+$string['pluginname'] = 'Latest achievement aggregation';
+$string['title'] = 'Latest achievement';
+$string['description'] = "The assigned user's competency rating will reflect the latest value achieved";
