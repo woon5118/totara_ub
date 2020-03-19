@@ -415,6 +415,13 @@ class rb_source_certification_completion extends rb_base_source {
         $filteroptions[] = new rb_filter_option(
             'certcompletion',
             'starteddate',
+            get_string('datestarted', 'rb_source_program_completion'),
+            'date'
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            'certcompletion',
+            'assigneddate',
             get_string('dateassigned', 'rb_source_program_completion'),
             'date'
         );
