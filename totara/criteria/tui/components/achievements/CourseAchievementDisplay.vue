@@ -28,9 +28,9 @@
       <template v-slot:left>
         <div class="tui-criteriaCourseAchievement__goal">
           <!-- Proficiency goal title -->
-          <h5 class="tui-criteriaCourseAchievement__title">
+          <h4 class="tui-criteriaCourseAchievement__title">
             {{ $str('complete_courses', 'totara_criteria') }}
-          </h5>
+          </h4>
 
           <!-- Proficiency progress circle -->
           <ProgressCircle
