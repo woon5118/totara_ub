@@ -43,7 +43,7 @@
                 selectedAssignmentProficiencyState
             "
           >
-            <h5 class="tui-competencyDetailAssignment__level-header">
+            <p class="tui-competencyDetailAssignment__level-header">
               {{ $str('achievement_level', 'totara_competency') }}
               <!--
               This will be implemented in a later ticket, once a string has been decided on
@@ -53,7 +53,7 @@
               >
                 ...
               </InfoIconButton> -->
-            </h5>
+            </p>
             <div class="tui-competencyDetailAssignment__level-text">
               {{ selectedAssignmentProficiency.name }}
             </div>
