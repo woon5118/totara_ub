@@ -24,25 +24,26 @@
 
 use container_perform\perform as perform_container;
 use core\collection;
+use core\entities\user;
 use core_container\module\module;
 use mod_perform\expand_task;
 use mod_perform\entities\activity\participant_instance;
-use mod_perform\entities\activity\subject_instance;
+use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\models\activity\track;
 use mod_perform\entities\activity\track_user_assignment;
-use mod_perform\models\activity\section_relationship as section_relationship_model;
 use mod_perform\models\activity\activity;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\element;
 use mod_perform\models\activity\section_element;
-use mod_perform\models\activity\track;
+use mod_perform\models\activity\section_relationship as section_relationship_model;
 use mod_perform\models\activity\track_assignment_type;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\user_groups\grouping;
+use mod_perform\models\activity\subject_instance;
 use mod_perform\util;
 use totara_core\entities\relationship_resolver;
 use totara_core\relationship\relationship;
-use mod_perform\models\activity\user_activity;
 
 /**
  * Perform generator
@@ -352,10 +353,10 @@ class mod_perform_generator extends component_generator_base {
      * 'other_participant_name' (user.firstname).
      *
      * @param array $data
-     * @return user_activity
+     * @return subject_instance
      * @throws coding_exception
      */
-    public function create_user_activity(array $data): user_activity {
+    public function create_subject_instance(array $data): subject_instance {
         $activity_id = $data['activity_id'] ?? null;
 
         if ($activity_id) {
@@ -384,11 +385,7 @@ class mod_perform_generator extends component_generator_base {
 
         $subject_is_participating = $data['subject_is_participating'] ?? false;
 
-        $track = new track();
-        $track->activity_id =  $activity->id;
-        $track->description =  $activity->name;
-        $track->status = track::STATUS_ACTIVE;
-        $track->save();
+        $track = track::create($activity, "track for {$activity->name}");
 
         $user_assignment = new track_user_assignment();
         $user_assignment->track_id =  $track->id;
@@ -396,7 +393,7 @@ class mod_perform_generator extends component_generator_base {
         $user_assignment->deleted = false;
         $user_assignment->save();
 
-        $subject_instance = new subject_instance();
+        $subject_instance = new subject_instance_entity();
         $subject_instance->track_user_assignment_id = $user_assignment->id;
         $subject_instance->subject_user_id = $user_assignment->subject_user_id; // Purposeful denormalization
         $subject_instance->save();
@@ -415,7 +412,7 @@ class mod_perform_generator extends component_generator_base {
         $other_participant_instance->subject_instance_id = $subject_instance->id;
         $other_participant_instance->save();
 
-        return new user_activity($subject_instance);
+        return new subject_instance($subject_instance);
     }
 
     private function find_or_make_perform_activity($name): activity {

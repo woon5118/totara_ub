@@ -23,34 +23,31 @@
 
 namespace mod_perform\webapi\resolver\query;
 
-use context_system;
 use core\entities\user;
 use core\orm\collection;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
-use mod_perform\data_providers\activity\user_activities as user_activities_data_provider;
-use mod_perform\models\activity\user_activity as user_activity_model;
+use mod_perform\data_providers\activity\subject_instance as subject_instance_data_provider;
+use mod_perform\models\activity\subject_instance as subject_instance_model;
 
-class user_activities implements query_resolver {
+class subject_instances implements query_resolver {
 
     /**
      * Get the subject instances that the logged in user is participating in.
      *
      * @param array $args
      * @param execution_context $ec
-     * @return collection|mixed|user_activity_model[]
+     * @return collection|mixed|subject_instance_model[]
      */
     public static function resolve(array $args, execution_context $ec) {
         require_login(null, false, null, false, true);
 
-        // Only supports the logged in user for now.
-        // $args['participant_id'] ??
-        $participant_id = User::logged_in()->id;
+        $participant_id = user::logged_in()->id;
 
         $filters = $args['filters'] ?? [];
         $about_filter = $filters['about'] ?? [];
 
-        return (new user_activities_data_provider($participant_id))
+        return (new subject_instance_data_provider($participant_id))
             ->set_about_filter($about_filter)
             ->fetch()
             ->get();

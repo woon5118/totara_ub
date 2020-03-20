@@ -25,17 +25,17 @@ namespace mod_perform\formatter\activity;
 
 use coding_exception;
 use totara_core\formatter\formatter;
-use mod_perform\models\activity\user_activity as user_activity_model;
+use mod_perform\models\activity\subject_instance as subject_instance_model;
 
 /**
- * Class user_activity
+ * Class subject_instance
  *
  * @package mod_perform\formatter\activity
  */
-class user_activity extends formatter {
+class subject_instance extends formatter {
 
     /**
-     * @var user_activity_model
+     * @var subject_instance_model
      */
     protected $object;
 
@@ -52,7 +52,7 @@ class user_activity extends formatter {
             case 'activity':
                 return $this->object->get_activity();
             case 'subject':
-                return $this->object->get_subject();
+                return $this->object->subject_user;
             case 'status':
                 return $this->object->get_status();
             default:

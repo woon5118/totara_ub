@@ -26,11 +26,11 @@ namespace mod_perform\data_providers\activity;
 use core\orm\collection;
 use core\orm\query\builder;
 use mod_perform\entities\activity\participant_instance;
-use mod_perform\entities\activity\subject_instance;
-use mod_perform\models\activity\user_activity as user_activity_model;
-use mod_perform\entities\activity\filters\user_activities_about;
+use mod_perform\models\activity\subject_instance as subject_instance_model;
+use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\entities\activity\filters\subject_instances_about;
 
-class user_activities {
+class subject_instance {
 
     /**
      * @var int
@@ -46,9 +46,9 @@ class user_activities {
     private $filters;
 
     /**
-     * user_activity constructor.
+     * subject_instance constructor.
      *
-     * @param int $participant_id The id of the user we would like to get activities they are a participant in
+     * @param int $participant_id The id of the user we would like to get activities that they are participating in
      */
     public function __construct(int $participant_id) {
         $this->participant_id = $participant_id;
@@ -57,24 +57,24 @@ class user_activities {
     /**
      * Set filter for who the activities are about (who is the subject)
      *
-     * @see user_activities_about::VALUE_ABOUT_SELF
-     * @see user_activities_about::VALUE_ABOUT_OTHERS
      * @param array $about
      * @return $this
+     * @see subject_instances_about::VALUE_ABOUT_SELF
+     * @see subject_instances_about::VALUE_ABOUT_OTHERS
      */
     public function set_about_filter(array $about): self {
-        $this->filters[] = (new user_activities_about($this->participant_id, 'si'))->set_value($about);
+        $this->filters[] = (new subject_instances_about($this->participant_id, 'si'))->set_value($about);
 
         return $this;
     }
 
     /**
-     * Fetch user activities from the database
+     * Fetch subject instances that from the database
      *
      * @return $this
      */
     public function fetch(): self {
-        $this->fetch_user_activities();
+        $this->fetch_subject_instances();
 
         return $this;
     }
@@ -84,17 +84,19 @@ class user_activities {
      *
      * @return $this
      */
-    protected function fetch_user_activities(): self {
-        $repo = subject_instance::repository()
+    protected function fetch_subject_instances(): self {
+        $repo = subject_instance_entity::repository()
             ->as('si')
             ->with('subject_user')
             ->with('track.activity')
             ->where_exists($this->get_target_participant_exists())
-            ->order_by('si.created_at', 'desc');
+            ->order_by('si.created_at', 'desc')
+            // Order by id is so that tests wont fail if two rows are inserted within the same second
+            ->order_by('si.id');
 
         $repo->set_filters($this->filters);
 
-        $this->items = $repo->get()->map_to(user_activity_model::class);
+        $this->items = $repo->get()->map_to(subject_instance_model::class);
 
         return $this;
     }
@@ -102,7 +104,7 @@ class user_activities {
     /**
      * get items for the model
      *
-     * @return collection|user_activity_model[]
+     * @return collection|subject_instance_model[]
      */
     public function get(): collection {
         return $this->items;

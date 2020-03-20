@@ -26,30 +26,30 @@ namespace mod_perform\webapi\resolver\type;
 use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use mod_perform\formatter\activity\user_activity as user_activity_formatter;
-use mod_perform\models\activity\user_activity as user_activity_model;
+use mod_perform\formatter\activity\subject_instance as subject_instance_formatter;
+use mod_perform\models\activity\subject_instance as subject_instance_model;
 
 /**
  * Note: It is the responsibility of the query to ensure the user is permitted to see an activity.
  */
-class user_activity implements type_resolver {
+class subject_instance implements type_resolver {
 
     /**
      * @param string $field
-     * @param user_activity_model $user_activity
+     * @param subject_instance_model $subject_instance
      * @param array $args
      * @param execution_context $ec
      *
      * @return mixed
      */
-    public static function resolve(string $field, $user_activity, array $args, execution_context $ec) {
-        if (!$user_activity instanceof user_activity_model) {
-            throw new \coding_exception('Expected user_activity model');
+    public static function resolve(string $field, $subject_instance, array $args, execution_context $ec) {
+        if (!$subject_instance instanceof subject_instance_model) {
+            throw new \coding_exception('Expected subject_instance model');
         }
 
         $format = $args['format'] ?? format::FORMAT_HTML;
 
-        $formatter = new user_activity_formatter($user_activity, $user_activity->get_context());
+        $formatter = new subject_instance_formatter($subject_instance, $subject_instance->get_context());
 
         return $formatter->format($field, $format);
     }

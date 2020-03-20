@@ -26,26 +26,32 @@ namespace mod_perform\models\activity;
 use context_module;
 use core\entities\user;
 use core\orm\entity\model;
-use mod_perform\entities\activity\subject_instance;
+use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 
 /**
- * Class user_activity
+ * Class subject_instance
  *
  * This class represents a specific activity about a specific person (subject_instance)
  *
- * @method static load_by_entity(subject_instance $entity)
+ * @method static load_by_entity(subject_instance_entity $entity)
  * @method static load_by_id(int $id)
+ *
+ * @property-read int $id
+ * @property-read user $subject_user The user that this activity is about
  *
  * @package mod_perform\models\activity
  */
-class user_activity extends model {
+class subject_instance extends model {
 
-    protected $accessible_attributes = [];
+    protected $accessible_attributes = [
+        'id',
+        'subject_user',
+    ];
 
-    /** @var subject_instance */
+    /** @var subject_instance_entity */
     protected $entity;
 
-    public function __construct(subject_instance $subject_instance) {
+    public function __construct(subject_instance_entity $subject_instance) {
         parent::__construct($subject_instance);
     }
 
@@ -53,11 +59,7 @@ class user_activity extends model {
      * @inheritDoc
      */
     protected static function get_entity_class(): string {
-        return subject_instance::class;
-    }
-
-    public function get_subject_instance_id(): int {
-        return $this->entity->id;
+        return subject_instance_entity::class;
     }
 
     /**
@@ -76,13 +78,6 @@ class user_activity extends model {
      */
     public function get_context(): context_module {
         return $this->get_activity()->get_context();
-    }
-
-    /**
-     * @return user The user that this activity is about
-     */
-    public function get_subject(): user {
-        return $this->entity->subject_user;
     }
 
     /**

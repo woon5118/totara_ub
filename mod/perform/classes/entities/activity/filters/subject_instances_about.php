@@ -27,7 +27,7 @@ use coding_exception;
 use core\collection;
 use core\orm\entity\filter\filter;
 
-class user_activities_about extends filter {
+class subject_instances_about extends filter {
 
     public const VALUE_ABOUT_SELF = 'SELF';
     public const VALUE_ABOUT_OTHERS = 'OTHERS';
@@ -44,8 +44,8 @@ class user_activities_about extends filter {
     /**
      * @param string[] $about_values an array of strings with one or more value constants
      * @return filter
-     * @see user_activities_about::VALUE_ABOUT_OTHERS
-     * @see user_activities_about::VALUE_ABOUT_SELF
+     * @see subject_instances_about::VALUE_ABOUT_SELF
+     * @see subject_instances_about::VALUE_ABOUT_OTHERS
      */
     public function set_value($about_values): filter {
         parent::set_value(new collection($about_values));
@@ -70,7 +70,7 @@ class user_activities_about extends filter {
     protected function validate_value(): void {
         foreach ($this->value as $param) {
             if (!$this->is_allowed_value_option($param)) {
-                throw new coding_exception("{$param} is not a valid user activities about filter parameter");
+                throw new coding_exception("{$param} is not a valid subject instances about filter parameter");
             }
         }
     }

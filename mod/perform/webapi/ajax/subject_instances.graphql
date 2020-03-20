@@ -1,8 +1,8 @@
-query mod_perform_user_activities(
+query mod_perform_subject_instances(
   $participant_id: core_id
-  $filters: mod_perform_user_activity_filters
+  $filters: mod_perform_subject_instance_filters
 ) {
-  mod_perform_user_activities(
+  mod_perform_subject_instances(
     participant_id: $participant_id
     filters: $filters
   ) {

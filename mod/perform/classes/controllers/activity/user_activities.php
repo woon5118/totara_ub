@@ -24,7 +24,8 @@
 namespace mod_perform\controllers\activity;
 
 use context;
-use context_system;
+use context_coursecat;
+use mod_perform\util;
 use moodle_url;
 use totara_mvc\controller;
 use totara_mvc\tui_view;
@@ -38,7 +39,8 @@ class user_activities extends controller {
      * @inheritDoc
      */
     protected function setup_context(): context {
-        return context_system::instance();
+        $category_id = util::get_default_categoryid();
+        return context_coursecat::instance($category_id);
     }
 
     /**

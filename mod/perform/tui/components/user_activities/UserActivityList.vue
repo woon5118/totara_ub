@@ -1,6 +1,6 @@
 <template>
   <Loader :loading="$apollo.loading">
-    <Table v-if="!$apollo.loading" :data="userActivities">
+    <Table v-if="!$apollo.loading" :data="subjectInstances">
       <template v-slot:header-row>
         <HeaderCell :size="showSubjectName ? '8' : '10'">
           {{ $str('user_activities:title_header', 'mod_perform') }}
@@ -12,25 +12,25 @@
           {{ $str('perform:view:status', 'mod_perform') }}
         </HeaderCell>
       </template>
-      <template v-slot:row="{ row }">
+      <template v-slot:row="{ row: subjectInstance }">
         <Cell
           :size="showSubjectName ? '8' : '10'"
           :column-header="$str('user_activities:title_header', 'mod_perform')"
         >
-          <a href="view/1">{{ row.activity.name }}</a>
+          <a href="view/1">{{ subjectInstance.activity.name }}</a>
         </Cell>
         <Cell
           v-if="showSubjectName"
           size="2"
           :column-header="$str('user_activities:subject_header', 'mod_perform')"
         >
-          {{ row.subject.fullname }}
+          {{ subjectInstance.subject.fullname }}
         </Cell>
         <Cell
           size="2"
           :column-header="$str('user_activities:status_header', 'mod_perform')"
         >
-          {{ getStatusText(row) }}
+          {{ getStatusText(subjectInstance) }}
         </Cell>
       </template>
     </Table>
@@ -42,7 +42,7 @@ import HeaderCell from 'totara_core/components/datatable/HeaderCell';
 import Loader from 'totara_core/components/loader/Loader';
 import Table from 'totara_core/components/datatable/Table';
 
-import performUserActivitiesQuery from 'mod_perform/graphql/user_activities.graphql';
+import performSubjectInstancesQuery from 'mod_perform/graphql/subject_instances.graphql';
 
 const ABOUT_SELF = 'self';
 const ABOUT_OTHERS = 'others';
@@ -64,12 +64,12 @@ export default {
   },
   data() {
     return {
-      userActivities: [],
+      subjectInstances: [],
     };
   },
   apollo: {
-    userActivities: {
-      query: performUserActivitiesQuery,
+    subjectInstances: {
+      query: performSubjectInstancesQuery,
       fetchPolicy: 'network-only', // Always refetch data on tab change
       variables() {
         return {
@@ -78,7 +78,7 @@ export default {
           },
         };
       },
-      update: data => data['mod_perform_user_activities'],
+      update: data => data['mod_perform_subject_instances'],
     },
   },
   computed: {

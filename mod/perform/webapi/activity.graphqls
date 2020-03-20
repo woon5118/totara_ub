@@ -64,9 +64,9 @@ type mod_perform_section_element {
 """
 Details about perform activity that a user is involved with (either the subject or an answering pariticpent)
 """
-type mod_perform_user_activity {
+type mod_perform_subject_instance {
   activity: mod_perform_activity!
-  status: mod_perform_user_activity_status!
+  status: mod_perform_subject_instance_status!
   subject: core_user!
 }
 
@@ -81,7 +81,7 @@ enum mod_perform_activity_status {
 """
 A list of possible states that a user activity/participant instance can be in
 """
-enum mod_perform_user_activity_status {
+enum mod_perform_subject_instance_status {
   NOT_YET_STARTED
   IN_PROGRESS
   COMPLETED
@@ -116,10 +116,10 @@ extend type Query {
   """
   A list of all performance activities a user is participating in
   """
-  mod_perform_user_activities(
+  mod_perform_subject_instances(
     participant_id: core_id
-    filters: mod_perform_user_activity_filters
-  ): [mod_perform_user_activity!]!
+    filters: mod_perform_subject_instance_filters
+  ): [mod_perform_subject_instance!]!
 }
 
 """
@@ -218,14 +218,11 @@ extend type Mutation {
 """
 Competency profile assignment filters
 """
-input mod_perform_user_activity_filters {
-  about: [mod_perform_user_activity_about_filter]
+input mod_perform_subject_instance_filters {
+  about: [mod_perform_subject_instance_about_filter]
 }
 
-"""
-A list of possible states that a user activity/participant instance can be in
-"""
-enum mod_perform_user_activity_about_filter {
+enum mod_perform_subject_instance_about_filter {
   SELF
   OTHERS
 }
