@@ -22,9 +22,9 @@
 
 <template>
   <div class="tui-andBox">
-    <h6 class="tui-andBox__text">
+    <p class="tui-andBox__text">
       {{ $str('and_separator', 'totara_core') }}
-    </h6>
+    </p>
   </div>
 </template>
 
