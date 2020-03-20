@@ -17,6 +17,8 @@
 /**
  * Legacy log reader.
  *
+ * @deprecated since Totara 13.
+ *
  * @package    logstore_legacy
  * @copyright  2013 Petr Skoda {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,6 +28,10 @@ namespace logstore_legacy\log;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * @deprecated since Totara 13.
+ *
+ */
 class store implements \tool_log\log\store, \core\log\sql_reader {
     use \tool_log\helper\store,
         \tool_log\helper\reader;

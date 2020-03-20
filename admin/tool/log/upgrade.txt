@@ -1,7 +1,9 @@
-This files describes API changes in HR Import,
+This files describes API changes in /admin/tool/log - plugins,
 information provided here is intended especially for developers.
 
 === 13.0 ===
+
+* Deprecated logstore_legacy plugin. Please use one of the other log stores such as "standard" and "database".
 
 === 12.0 ===
 
