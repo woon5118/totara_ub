@@ -2031,6 +2031,13 @@ $icons = array(
                     'classes' => 'fa-square-o',
                 ),
         ),
+    'tasks' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-tasks',
+                ),
+        ),
     'thumbs-down-danger' =>
         array(
             'data' =>

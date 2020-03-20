@@ -6,6 +6,7 @@ type mod_perform_activity {
   name(format: core_format = HTML): String!
   description(format: core_format = HTML): String
   updated_at(format: core_date_format = TIMESTAMP): core_date
+  can_view_participation_reporting: Boolean! # Whether the current user can view the participation tracking for the activity
   sections: [mod_perform_section!]!
 }
 

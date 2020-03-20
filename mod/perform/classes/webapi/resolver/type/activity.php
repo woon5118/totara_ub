@@ -47,6 +47,10 @@ class activity implements type_resolver {
             throw new \coding_exception('Expected activity model');
         }
 
+        if ($field == 'can_view_participation_reporting') {
+            return $activity->can_view_participation_reporting();
+        }
+
         $format = $args['format'] ?? format::FORMAT_HTML;
 
         // The "subject_instance" type is not compatible with relevant context.

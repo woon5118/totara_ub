@@ -53,4 +53,14 @@ $capabilities = [
             'performanceactivitymanager' => CAP_ALLOW,
         ]
     ],
+    // To view the reporting of participation on individual activities
+    // (who's participating and in which status their participation is)
+    'mod/perform:view_participation_reporting' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+            'performanceactivitymanager' => CAP_ALLOW,
+        ]
+    ],
 ];

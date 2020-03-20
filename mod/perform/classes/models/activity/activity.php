@@ -275,4 +275,12 @@ class activity extends model {
         return $this->entity->relationships->transform_to(relationship::class);
     }
 
+    /**
+     * Checks whether the current user can view the participation reporting
+     * @return bool
+     */
+    public function can_view_participation_reporting(): bool {
+        return has_capability('mod/perform:view_participation_reporting', $this->get_context());
+    }
+
 }

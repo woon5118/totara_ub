@@ -50,25 +50,42 @@
     <loader :loading="$apollo.loading">
       <Table v-if="!$apollo.loading" :data="activities">
         <template v-slot:header-row>
-          <HeaderCell size="8">{{
+          <HeaderCell size="9">{{
             $str('perform:view:name', 'mod_perform')
           }}</HeaderCell>
-          <HeaderCell size="4">{{
+          <HeaderCell size="2">{{
             $str('perform:view:status', 'mod_perform')
           }}</HeaderCell>
+          <HeaderCell size="1" />
         </template>
         <template v-slot:row="{ row }">
           <Cell
-            size="8"
+            size="9"
             :column-header="$str('perform:view:name', 'mod_perform')"
           >
             <a :href="getEditActivityUrl(row.id)">{{ row.name }}</a>
           </Cell>
           <Cell
-            size="4"
+            size="2"
             :column-header="$str('perform:view:status', 'mod_perform')"
           >
             {{ $str('perform:view:status:active', 'mod_perform') }}
+          </Cell>
+          <Cell
+            size="1"
+            :column-header="$str('perform:view:actions', 'mod_perform')"
+          >
+            <a
+              v-if="row.can_view_participation_reporting"
+              :href="getParticipationReportingUrl(row.id)"
+              :title="$str('participation_reporting', 'mod_perform')"
+            >
+              <ParticipationReportingIcon
+                :alt="$str('participation_reporting', 'mod_perform')"
+                :title="$str('participation_reporting', 'mod_perform')"
+                size="200"
+              />
+            </a>
           </Cell>
         </template>
       </Table>
@@ -79,6 +96,7 @@
 <script>
 import Button from 'totara_core/components/buttons/Button';
 import Cell from 'totara_core/components/datatable/Cell';
+import ParticipationReportingIcon from 'mod_perform/components/icons/ParticipationReporting';
 import GeneralInfoForm from 'mod_perform/components/manage_activity/GeneralInfoForm';
 import HeaderCell from 'totara_core/components/datatable/HeaderCell';
 import Loader from 'totara_core/components/loader/Loader';
@@ -102,6 +120,7 @@ export default {
     Loader,
     Modal,
     ModalContent,
+    ParticipationReportingIcon,
   },
   props: {
     editUrl: {
@@ -159,6 +178,20 @@ export default {
     getEditActivityUrl(activityId) {
       return `${this.editUrl}?activity_id=${activityId}`;
     },
+
+    /**
+     * Get the url to the participation tracking
+     *
+     * @param activityId
+     * @return {string}
+     */
+    getParticipationReportingUrl(activityId) {
+      const params = { activity_id: activityId };
+      return this.$url(
+        '/mod/perform/reporting/participation/index.php',
+        params
+      );
+    },
   },
   apollo: {
     activities: {
@@ -175,8 +208,10 @@ export default {
   {
     "mod_perform": [
       "get_started",
+      "participation_reporting",
       "perform:add_activity",
       "perform:manage_activity",
+      "perform:view:actions",
       "perform:view:name",
       "perform:view:status",
       "perform:view:status:active",
