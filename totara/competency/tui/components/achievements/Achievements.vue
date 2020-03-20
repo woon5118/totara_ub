@@ -24,9 +24,9 @@
 <template>
   <div class="tui-competencyAchievements">
     <Loader :loading="loading">
-      <h4 class="tui-competencyAchievements__title">
+      <h3 class="tui-competencyAchievements__title">
         {{ $str('ways_to_achieve_proficiency', 'totara_competency') }}
-      </h4>
+      </h3>
 
       <div
         v-if="!achievements.length"
