@@ -32,12 +32,14 @@
             v-model="filter"
             label="Filter components"
             :show-label="true"
+            :stacked="true"
           />
 
           <SelectFilter
             v-model="totaraComponentSelection"
             label="Within plugin"
             :show-label="true"
+            :stacked="true"
             :options="totaraComponentOptions"
           />
 
