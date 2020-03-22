@@ -117,6 +117,11 @@ function(ajax, Filters, BasketManager, Crumb, List, Selectors, Loader, SimpleBas
                 that.crumb.removeClass(that.hideClass);
                 that.crumb.headingRemoveClass(that.hideClass);
             }
+            basketManager.load().then(function() {
+                that.filters.removeFilter('ids');
+                that.filters.removeFilter('basket');
+                that.list.update();
+            });
             that.selectors.primarySearchRemoveClass(that.hideClass);
             that.selectors.primaryTreeRemoveClass(that.hideClass);
         };
