@@ -30,12 +30,15 @@
   >
     <template v-slot:browse-filters>
       <FilterBar :title="'Filter cities'">
-        <SearchFilter
-          v-model="filters.search"
-          label="Filter items by search"
-          :show-label="false"
-          :placeholder="'Search'"
-        />
+        <template v-slot:filters-left="{ stacked }">
+          <SearchFilter
+            v-model="filters.search"
+            label="Filter items by search"
+            :show-label="false"
+            :placeholder="'Search'"
+            :stacked="stacked"
+          />
+        </template>
       </FilterBar>
     </template>
 
