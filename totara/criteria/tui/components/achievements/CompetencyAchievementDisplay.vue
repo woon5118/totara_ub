@@ -166,7 +166,9 @@
             >
               {{
                 $str(
-                  'confirm_assign_competency_body',
+                  achievements.current_user
+                    ? 'confirm_assign_competency_body_by_self'
+                    : 'confirm_assign_competency_body_by_other',
                   'totara_criteria',
                   row.competency.fullname
                 )
@@ -377,7 +379,8 @@ export default {
       "competencies",
       "complete",
       "completion",
-      "confirm_assign_competency_body",
+      "confirm_assign_competency_body_by_other",
+      "confirm_assign_competency_body_by_self",
       "confirm_assign_competency_title",
       "error_competency_assignment",
       "network_error",
