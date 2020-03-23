@@ -42,6 +42,6 @@ $string['mnet_notoken'] = 'Could not find token matching this transfer';
 $string['mnet_wronghost'] = 'Remote host did not match the transfer record for this token';
 $string['pf_description'] = 'Allow users to push Totara content to this host<br />Subscribe to <b>and</b> publish this service to allow authenticated users in your site to push content to {$a}<br /><ul><li><em>Dependency</em>: You must also <strong>publish</strong> the SSO (Identify Provider) service to {$a}.</li><li><em>Dependency</em>: You must also <strong>subscribe</strong> to the SSO (Service Provider) service on {$a}</li><li><em>Dependency</em>: You must also enable the MNet authentication plugin.</li></ul><br />';
 $string['pf_name'] = 'Portfolio services';
-$string['pluginname'] = 'Mahara ePortfolio';
+$string['pluginname'] = 'Mahara ePortfolio (deprecated)';
 $string['senddisallowed'] = 'You cannot transfer files to Mahara at this time';
 $string['url'] = 'URL';
