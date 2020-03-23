@@ -27,6 +27,8 @@ use \coding_exception;
 use \context_course;
 use \context_helper;
 use \context_user;
+use core_user\hook\allow_view_profile;
+use core_user\hook\allow_view_profile_field;
 use \stdClass;
 use \moodle_url;
 
@@ -330,9 +332,14 @@ class access_controller {
      * @return bool
      */
     public function can_view_field(string $field): bool {
+
+        // Always default to no.
+        $result = false;
+
         switch ($field) {
             case 'id':
-                return true;
+                $result = true;
+                break;
             case 'username':
             case 'auth':
             case 'confirmed':
@@ -346,50 +353,55 @@ class access_controller {
             case 'middlename':
             case 'alternatename':
             case 'mailformat':
-                return (
+                $result = (
                     $this->iscurrentuser ||
                     $this->has_view_all_details_capability()
                 );
+                break;
             case 'email':
-                if ($this->userdeleted) {
-                    return false;
+                if (!$this->userdeleted) {
+                    $result = (
+                        $this->usermaildisplay === 1 || // Everyone is allowed to see.
+                        $this::is_current_user_an_admin() || // The admin is allowed the users email.
+                        $this->iscurrentuser || // Of course the current user is as well.
+                        $this->has_course_email_capability() ||  // This is a capability in course context, it will be false in usercontext.
+                        $this->has_plugin_granting_view_profile() || // Those with a plugin or component defined relationship are allowed to see.
+                        in_array('email', $this->get_identify_fields()) || // It's an identify field.
+                        ($this->usermaildisplay === 2 && $this->do_users_share_courses()) // It's available to those who share courses.
+                    );
                 }
-                return (
-                    $this->usermaildisplay === 1 || // Everyone is allowed to see.
-                    $this::is_current_user_an_admin() || // The admin is allowed the users email.
-                    $this->iscurrentuser || // Of course the current user is as well.
-                    $this->has_course_email_capability() ||  // This is a capability in course context, it will be false in usercontext.
-                    $this->has_job_relationship() || // Those with a job relationship are allowed to see.
-                    in_array('email', $this->get_identify_fields()) || // It's an identify field.
-                     ($this->usermaildisplay === 2 && $this->do_users_share_courses()) // It's available to those who share courses.
-                );
+                break;
             case 'firstname':
             case 'lastname':
-                return (
+                $result = (
                     $this->iscurrentuser ||
                     $this->has_view_fullnames_capability()
                 );
+                break;
             case 'fullname':
             case 'profileimageurl':
             case 'profileimageurlsmall':
             case 'profileimagealt': // Special case, this is an alias for imagealt.
             case 'imagealt':
-                return (
+                $result = (
                     $this->iscurrentuser ||
                     $this->can_view_profile()
                 );
+                break;
             case 'address':
-                return (
+                $result = (
                     $this->iscurrentuser ||
                     $this->can_view_hidden_fields()
                 );
+                break;
             case 'phone1':
             case 'phone2':
-                return (
+                $result = (
                     $this->iscurrentuser ||
                     $this->can_view_hidden_fields() ||
                     (in_array($field, $this->get_identify_fields()) && $this->can_view_profile())
                 );
+                break;
             case 'country':
             case 'city':
             case 'url':
@@ -397,7 +409,7 @@ class access_controller {
             case 'suspended':
             case 'firstaccess':
             case 'lastaccess':
-                return (
+                $result = (
                     $this->iscurrentuser ||
                     (
                         $this->can_view_profile() && (
@@ -406,10 +418,11 @@ class access_controller {
                         )
                     )
                 );
+                break;
             case 'idnumber':
             case 'institution':
             case 'department':
-                return (
+                $result = (
                     $this->iscurrentuser ||
                     $this->has_view_all_details_capability() ||
                     (
@@ -417,12 +430,14 @@ class access_controller {
                         $this->can_view_profile()
                     )
                 );
+                break;
             case 'description':
             case 'descriptionformat':
                 if ($this->userdeleted) {
-                    return false;
+                    $result = false;
+                    break;
                 }
-                return (
+                $result = (
                     $this->iscurrentuser ||
                     $this::is_current_user_an_admin() ||
                     (
@@ -435,21 +450,25 @@ class access_controller {
                         )
                     )
                 );
-
+                break;
             case 'customfields':
             case 'preferences':
             case 'enrolledcourses':
             case 'interests':
                 $method = 'can_view_'.$field;
-                return $this->{$method}();
+                $result = $this->{$method}();
+                break;
             case 'lastip':
                 if (!$this->iscurrentuser && !$this->can_view_profile()) {
-                    return false;
+                    $result = false;
+                    break;
                 }
                 if (!$this->context_user || !has_capability('moodle/user:viewlastip', $this->context_user)) {
-                    return false;
+                    $result = false;
+                    break;
                 }
-                return (!in_array('lastip', $this->get_hidden_fields()) || $this->can_view_hidden_fields());
+                $result = (!in_array('lastip', $this->get_hidden_fields()) || $this->can_view_hidden_fields());
+                break;
 
             // The following fields don't have access control - but we know about them so just return false.
             // They aren't there to be displayed, predominantly they are just flags.
@@ -469,10 +488,18 @@ class access_controller {
             case 'autosubscribe':
             case 'trackforums':
             case 'trustbitmask':
-                return false;
+                $result = false;
+                break;
+            default:
+                throw new coding_exception('Unknown user field', $field);
         }
 
-        throw new coding_exception('Unknown user field', $field);
+        // Plugins can override to allow access but not block access if it's already been given.
+        if (!$result) {
+            $result = self::has_plugin_granting_view_field($field);
+        }
+
+        return $result;
     }
 
     /**
@@ -512,7 +539,7 @@ class access_controller {
             $this->iscurrentuser ||
             $this->has_coursecontact_role() ||
             $this->has_view_details_capability() ||
-            $this->has_job_relationship()
+            $this->has_plugin_granting_view_profile()
         );
     }
 
@@ -918,17 +945,33 @@ class access_controller {
     }
 
     /**
-     * Returns true if the current user and the target user share a job relation.
+     * Returns true if the current user and the target user share relationship in a plugin or component.
+     *
+     * @return bool
      */
-    private function has_job_relationship(): bool {
+    private function has_plugin_granting_view_profile(): bool {
         global $USER;
-        if ($this->iscurrentuser) {
-            return true;
-        }
         if (!isset($this->resolutioncache[__METHOD__])) {
-            $this->resolutioncache[__METHOD__] = \totara_job\job_assignment::users_share_relation($this->userid, $USER->id);
+            $hook = new allow_view_profile($this->userid, $USER->id);
+            $this->resolutioncache[__METHOD__] = $hook->execute()->has_permission();
         }
         return $this->resolutioncache[__METHOD__];
+    }
+
+    /**
+     * Returns true if the current user and the target user share relationship in a plugin or component.
+     *
+     * @param string $field
+     * @return bool
+     */
+    private function has_plugin_granting_view_field(string $field): bool {
+        global $USER;
+        $key = __METHOD__ . '::' . $field;
+        if (!isset($this->resolutioncache[$key])) {
+            $hook = new allow_view_profile_field($field, $this->userid, $USER->id);
+            $this->resolutioncache[$key] = $hook->execute()->has_permission();
+        }
+        return $this->resolutioncache[$key];
     }
 
     /**
