@@ -88,23 +88,6 @@ class HTMLPurifier_URIScheme_mms extends HTMLPurifier_URIScheme {
 
 }
 
-
-/**
- * Validates Gopher defined by RFC 4266
- */
-class HTMLPurifier_URIScheme_gopher extends HTMLPurifier_URIScheme {
-
-    public $browsable = true;
-    public $hierarchical = true;
-
-    public function doValidate(&$uri, $config, $context) {
-        $uri->userinfo = null;
-        return true;
-    }
-
-}
-
-
 /**
  * Validates TeamSpeak defined by TeamSpeak
  */

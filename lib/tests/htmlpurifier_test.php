@@ -284,7 +284,7 @@ class core_htmlpurifier_testcase extends basic_testcase {
         $this->assertSame($text, purify_html($text));
 
         $text = '<a href="ftp://user@ftp.example.com/some/file.txt">link</a>';
-        $this->assertSame($text, purify_html($text));
+        $this->assertSame('<a>link</a>', purify_html($text));
 
         $text = '<a href="nntp://example.com/group/123">link</a>';
         $this->assertSame($text, purify_html($text));
@@ -309,7 +309,7 @@ class core_htmlpurifier_testcase extends basic_testcase {
         $this->assertSame($text, purify_html($text));
 
         $text = '<a href="gopher://gopher.example.com/resource">link</a>';
-        $this->assertSame($text, purify_html($text));
+        $this->assertSame('<a>link</a>', purify_html($text));
 
         $text = '<a href="mms://www.example.com/movie.mms">link</a>';
         $this->assertSame($text, purify_html($text));

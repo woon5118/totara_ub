@@ -778,7 +778,6 @@ class totara_core_menu_helper_testcase extends advanced_testcase {
     public function test_validate_item_url() {
         $this->assertNull(helper::validate_item_url('/xx'));
         $this->assertNull(helper::validate_item_url('http://example.com'));
-        $this->assertNull(helper::validate_item_url('ftp://example.com/xx.txt'));
 
         $this->assertSame('Required', helper::validate_item_url(''));
         $this->assertSame('Required', helper::validate_item_url(' '));
@@ -788,6 +787,7 @@ class totara_core_menu_helper_testcase extends advanced_testcase {
         $this->assertSame($error, helper::validate_item_url('ss'));
         $this->assertSame($error, helper::validate_item_url('javascript:xxx'));
         $this->assertSame($error, helper::validate_item_url('http:/xx'));
+        $this->assertSame($error, helper::validate_item_url('ftp://example.com/xx.txt'));
     }
 
     public function test_get_admin_edit_rowid() {

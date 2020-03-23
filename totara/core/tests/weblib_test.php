@@ -50,6 +50,14 @@ class totara_core_weblib_testcase extends advanced_testcase {
         $html = '<a href="msnim:chat?contact=nada@example.com">sometext</a>';
         $expected = '<a>sometext</a>';
         $this->assertSame($expected, clean_text($html, FORMAT_HTML));
+
+        $html = '<a href="ftp://xx.yy.zz">sometext</a>';
+        $expected = '<a>sometext</a>';
+        $this->assertSame($expected, clean_text($html, FORMAT_HTML));
+
+        $html = '<a href="gopher://anything">sometext</a>';
+        $expected = '<a>sometext</a>';
+        $this->assertSame($expected, clean_text($html, FORMAT_HTML));
     }
 
     public function test_purify_uri() {
@@ -75,10 +83,10 @@ class totara_core_weblib_testcase extends advanced_testcase {
 
         // Blocking wrong schemas.
 
-        $this->assertSame('ftp://www.example.com/test.txt', purify_uri('ftp://www.example.com/test.txt'));
+        $this->assertSame('', purify_uri('ftp://www.example.com/test.txt'));
         $this->assertSame('', purify_uri('ftp://www.example.com/test.txt', true));
         $this->assertSame('', purify_uri('ftp://www.example.com/test.txt', true, true));
-        $this->assertSame('ftp://www.example.com/test.txt', purify_uri('ftp://www.example.com/test.txt', false));
+        $this->assertSame('', purify_uri('ftp://www.example.com/test.txt', false));
 
         $this->assertSame('', purify_uri('test: test'));
         $this->assertSame('', purify_uri('test: test', true));

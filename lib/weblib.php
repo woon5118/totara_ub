@@ -1903,8 +1903,9 @@ function purify_html($text, $options = array()) {
     static $purifiers = array();
     static $caches = array();
 
-    // Purifier code can change only during major version upgrade.
-    $version = empty($CFG->version) ? 0 : $CFG->version;
+    // Totara: we need something that gets bumped up regularly so that we can upgrade
+    //         the library and tweak settings.
+    $version = empty($CFG->version) ? 0 : (int)get_config('totara_core', 'version');
     $cachedir = "$CFG->localcachedir/htmlpurifier/$version";
     if (!file_exists($cachedir)) {
         // Purging of caches may remove the cache dir at any time,
@@ -1954,14 +1955,12 @@ function purify_html($text, $options = array()) {
         $config->set('URI.AllowedSchemes', array(
             'http' => true,
             'https' => true,
-            'ftp' => true,
             'irc' => true,
             'nntp' => true,
             'news' => true,
             'rtsp' => true,
             'rtmp' => true,
             'teamspeak' => true,
-            'gopher' => true,
             'mms' => true,
             'mailto' => true,
             'skype'=>true,
@@ -2132,14 +2131,12 @@ function purify_uri($uri, $httponly = false, $requirescheme = false) {
             $config->set('URI.AllowedSchemes', array(
                 'http' => true,
                 'https' => true,
-                'ftp' => true,
                 'irc' => true,
                 'nntp' => true,
                 'news' => true,
                 'rtsp' => true,
                 'rtmp' => true,
                 'teamspeak' => true,
-                'gopher' => true,
                 'mms' => true,
                 'mailto' => true,
                 'skype'=>true,
