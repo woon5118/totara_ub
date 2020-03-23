@@ -35,12 +35,15 @@ class competency_details extends base {
 
         $competency_id = $this->get_param('competency_id', PARAM_INT, null, true);
 
+        $show_activity_log_by_default = $this->get_param('show_activity_log', PARAM_INT, null, false) == 1;
+
         $props = [
             'user-id' => $this->user->id,
             'competency-id' => $competency_id,
             'base-url' => (string) $this->get_base_url(),
             'go-back-link' => (string) $this->get_profile_url(),
             'go-back-text' => $this->get_back_to_profile_text(),
+            'show-activity-log-by-default' => $show_activity_log_by_default,
         ];
 
         return tui_view::create('totara_competency/pages/CompetencyDetail', $props)

@@ -177,6 +177,10 @@ export default {
       required: true,
       type: Number,
     },
+    showActivityLogByDefault: {
+      default: false,
+      type: Boolean,
+    },
   },
 
   data() {
@@ -294,6 +298,10 @@ export default {
 
       return activeAssignmentList;
     },
+  },
+
+  mounted() {
+    this.activityLogModalOpen = this.showActivityLogByDefault;
   },
 
   methods: {
