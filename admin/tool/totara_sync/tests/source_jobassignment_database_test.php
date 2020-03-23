@@ -44,6 +44,9 @@ class tool_totara_sync_source_jobassignment_database_testcase extends advanced_t
     private $dbtable = '';
 
     protected function tearDown() {
+        if (isset($this->ext_dbconnection)) {
+            $this->ext_dbconnection->dispose();
+        }
         $this->ext_dbconnection = null;
         $this->dbtype = $this->dbhost = $this->dbport = $this->dbname = $this->dbuser = $this->dbpass = $this->dbtable = '';
 

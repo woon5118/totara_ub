@@ -125,6 +125,7 @@ class totara_sync_source_org_database extends totara_sync_source_org {
         if (!empty($missingcolumns)) {
             $missingcolumnsstr = implode(', ', $missingcolumns);
             $this->addlog(get_string('dbmissingcolumnx', 'tool_totara_sync', $missingcolumnsstr), 'error', 'importdata');
+            $database_connection->dispose();
             return false;
         }
 
@@ -190,6 +191,7 @@ class totara_sync_source_org_database extends totara_sync_source_org {
                 // bulk insert
                 if (!totara_sync_bulk_insert($temptable, $datarows)) {
                     $this->addlog(get_string('couldnotimportallrecords', 'tool_totara_sync'), 'error', 'populatesynctabledb');
+                    $database_connection->dispose();
                     return false;
                 }
 
@@ -204,12 +206,14 @@ class totara_sync_source_org_database extends totara_sync_source_org {
         // Insert remaining rows
         if (!totara_sync_bulk_insert($temptable, $datarows)) {
             $this->addlog(get_string('couldnotimportallrecords', 'tool_totara_sync'), 'error', 'populatesynctabledb');
+            $database_connection->dispose();
             return false;
         }
 
         // Update temporary table stats once import is done.
         $DB->update_temp_table_stats();
 
+        $database_connection->dispose();
         return true;
     }
 

@@ -259,5 +259,7 @@ class behat_tool_totara_sync extends behat_base {
         foreach ($fields as $setting) {
             set_config('import_' . $setting, 1, "totara_sync_source_{$short_element}_database");
         }
+
+        $dbconnection->dispose();
     }
 }

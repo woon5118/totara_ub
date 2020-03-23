@@ -96,8 +96,9 @@ trait database_trait {
     public function config_save_database_details($data) {
         //Check database connection when saving
         try {
-            setup_sync_DB($data->{'database_dbtype'}, $data->{'database_dbhost'}, $data->{'database_dbname'},
+            $extdb = setup_sync_DB($data->{'database_dbtype'}, $data->{'database_dbhost'}, $data->{'database_dbname'},
                 $data->{'database_dbuser'}, $data->{'database_dbpass'}, array('dbport' => $data->{'database_dbport'}));
+            $extdb->dispose();
         } catch (\Exception $e) {
             \core\notification::error(get_string('cannotconnectdbsettings', 'tool_totara_sync'));
             redirect(qualified_me());
