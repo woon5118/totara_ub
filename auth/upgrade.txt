@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* MNET functionality is deprecated and will be removed in Totara 14
 * get_password_change_info() method is added to the base class and returns an array containing the subject and body of the message
   to the user that contains instructions on how to change their password. Authentication plugins can override this method if needed.
 

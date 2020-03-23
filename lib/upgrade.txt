@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* MNET functionality is deprecated and will be removed in Totara 14
 * Following columns were removed from the "user" database table: icq, yahoo, aim, msn
 * Static fields in legacy forms are now automatically sanitised to prevent XSS,
   if necessary plugins that require unsafe or malformed HTML markup in static fields

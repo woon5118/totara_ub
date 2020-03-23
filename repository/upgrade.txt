@@ -5,6 +5,7 @@ http://docs.moodle.org/dev/Repository_API
 
 === 13 ===
 
+* MNET functionality is deprecated and will be removed in Totara 14
 * Plugin repository_picasa has been removed due to Google Picasa Web Albums Data API being disabled
   and no longer available
 

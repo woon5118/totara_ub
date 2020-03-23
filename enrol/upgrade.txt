@@ -3,6 +3,8 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* MNET functionality is deprecated and will be removed in Totara 14
+
 === 12.0 ===
 
 * External function core_enrol_external::get_users_courses now return the user progress, start and the end course dates.
