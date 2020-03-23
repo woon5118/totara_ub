@@ -22,16 +22,16 @@
 
 <template>
   <ModalPresenter :open="open" @request-close="$emit('cancel')">
-    <Modal size="large" :aria-labelledby="id + 'title'">
+    <Modal size="large" :aria-labelledby="$id('adder')">
       <ModalContent
         :close-button="true"
         :title="title"
-        :title-id="id + 'title'"
+        :title-id="$id('adder')"
         @dismiss="$emit('cancel')"
       >
         <div class="tui-adder">
           <div class="tui-adder__tabs">
-            <Tabs :transparent-tabs="true">
+            <Tabs @input="tabChanged">
               <!-- Browse tab -->
               <Tab id="browse" :name="$str('adder_browse', 'totara_core')">
                 <!-- Browse Filters -->
@@ -39,23 +39,38 @@
                   <slot name="browse-filters" />
                 </div>
 
-                <!-- Browse List -->
-                <div class="tui-adder__list">
-                  <slot
-                    name="browse-list"
-                    :disabled-items="existingItems"
-                    :selected-items="selectedItems"
-                    :update="selectionUpdate"
-                  />
-                </div>
+                <Loader :loading="loading">
+                  <!-- Browse List -->
+                  <div class="tui-adder__list">
+                    <slot
+                      name="browse-list"
+                      :disabled-items="existingItems"
+                      :selected-items="allSelectedItems"
+                      :update="selectionUpdate"
+                    />
+
+                    <div v-if="showLoadMore" class="tui-adder__list-loadMore">
+                      <Button
+                        :text="$str('loadmore', 'totara_core')"
+                        @click="$emit('load-more')"
+                      />
+                    </div>
+                  </div>
+                </Loader>
               </Tab>
 
               <!-- Selection (basket) Tab -->
               <Tab id="basket" :name="basketTabString">
-                <div class="tui-adder__list">
+                <Loader :loading="loading" />
+
+                <!-- Selected List -->
+                <div
+                  v-show="!loading"
+                  class="tui-adder__list tui-adder__listBasket"
+                >
                   <slot
                     name="basket-list"
-                    :selected-items="selectedItems"
+                    :selected-items="allSelectedItems"
                     :update="selectionUpdate"
                   />
                 </div>
@@ -72,7 +87,7 @@
                   :disabled="!count"
                   :text="$str('add', 'totara_core')"
                   :styleclass="{ primary: true }"
-                  @click="$emit('added', selectedItems)"
+                  @click="$emit('added', allSelectedItems)"
                 />
                 <ButtonCancel @click="$emit('cancel')" />
               </ButtonGroup>
@@ -89,6 +104,7 @@
 import Button from 'totara_core/components/buttons/Button';
 import ButtonCancel from 'totara_core/components/buttons/Cancel';
 import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
+import Loader from 'totara_core/components/loader/Loader';
 import Modal from 'totara_core/components/modal/Modal';
 import ModalContent from 'totara_core/components/modal/ModalContent';
 import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
@@ -100,6 +116,7 @@ export default {
     Button,
     ButtonCancel,
     ButtonGroup,
+    Loader,
     Modal,
     ModalContent,
     ModalPresenter,
@@ -108,17 +125,24 @@ export default {
   },
 
   props: {
-    closeButton: {
-      type: Boolean,
-      default: true,
-    },
+    // Pre-selected items
     existingItems: {
       type: Array,
       default: () => [],
     },
+    // Display loading overlay for lists
+    loading: {
+      type: Boolean,
+    },
+    // Display a load more button
+    showLoadMore: {
+      type: [Boolean, String],
+    },
+    // Adder is open
     open: {
       type: Boolean,
     },
+    // Adder title
     title: {
       type: String,
       required: true,
@@ -127,19 +151,28 @@ export default {
 
   data() {
     return {
-      count: 0,
-      selectedItems: [],
+      allSelectedItems: [],
+      basketItems: [],
     };
   },
 
   computed: {
-    id() {
-      return this.$id();
+    /**
+     * Get array of ID's for basket
+     *
+     * @return {Array}
+     */
+    basketIds() {
+      const ids = this.allSelectedItems.filter(
+        item => !this.existingItems.includes(item)
+      );
+      return ids;
     },
 
     /**
      * Update the basket tab string based on selected count
      *
+     * @return {String}
      */
     basketTabString() {
       if (this.count) {
@@ -151,32 +184,57 @@ export default {
       }
       return this.$str('adder_selection', 'totara_core');
     },
+
+    /**
+     * Update selected count
+     *
+     * @return {Int}
+     */
+    count() {
+      const items = this.basketIds;
+      if (!items.length) {
+        return 0;
+      }
+      return items.length;
+    },
+
+    id() {
+      return this.$id();
+    },
   },
 
   watch: {
     /**
-     * On opening of adder
-     * Reset count and include existing items in selection
+     * On opening of added include existing items in selection
      *
      */
     open() {
       if (this.open) {
-        this.count = 0;
-        this.selectedItems = this.existingItems;
+        this.allSelectedItems = this.existingItems;
       }
     },
   },
 
   methods: {
     /**
-     * Selection has changed
-     * Update count & selected items
+     * On Selection change update selected items
      *
      * @param {Array} selection
      */
     selectionUpdate(selection) {
-      this.count = selection.length - this.existingItems.length;
-      this.selectedItems = selection;
+      this.allSelectedItems = selection;
+    },
+
+    /**
+     * When the tab has changed,
+     * check if basket tab is selected and emit an event
+     *
+     * @param {String} tab
+     */
+    tabChanged(tab) {
+      if (tab === 'basket') {
+        this.$emit('selected-tab-active', this.basketIds);
+      }
     },
   },
 };
@@ -188,7 +246,8 @@ export default {
     "add",
     "adder_browse",
     "adder_selection",
-    "adder_selection_with_count"
+    "adder_selection_with_count",
+    "loadmore"
   ]
 }
 </lang-strings>

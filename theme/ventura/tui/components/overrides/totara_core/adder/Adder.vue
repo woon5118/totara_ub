@@ -26,6 +26,11 @@
     height: 280px;
     margin-top: var(--tui-gap-4);
     overflow-y: scroll;
+
+    &-loadMore {
+      margin: var(--tui-gap-1) 0 0;
+      text-align: center;
+    }
   }
 
   &__footer {
@@ -53,6 +58,10 @@
   .tui-adder {
     .tui-tabContent {
       min-height: 380px;
+    }
+
+    &__listBasket {
+      min-height: 350px;
     }
   }
 }

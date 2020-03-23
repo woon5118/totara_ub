@@ -639,6 +639,7 @@ $string['selectfromcohort'] = 'Select members from audience';
 $string['separatemultiplebycommas'] = 'Separate multiple values by commas';
 $string['set'] = 'Set';
 $string['setcompletion'] = 'Set completion';
+$string['shortname'] = 'Short name';
 $string['startdate'] = 'Start date';
 $string['startdate_help'] = 'If a start date is provided, the audience will be treated as empty until the start date.';
 $string['startdatelimited'] = 'Start date';
