@@ -43,20 +43,19 @@ $settings->add(
     )
 );
 
-if (class_exists('Redis')) { // Only if Redis is available.
+// Totara: do not use optional extension classes for default settings,
+//         if they ever decide to change the constant values the db values would break anyway.
+$options = array(1 => get_string('serializer_php', 'cachestore_redis')); // Redis::SERIALIZER_PHP == 1
 
-    $options = array(Redis::SERIALIZER_PHP => get_string('serializer_php', 'cachestore_redis'));
-
-    if (defined('Redis::SERIALIZER_IGBINARY')) {
-        $options[Redis::SERIALIZER_IGBINARY] = get_string('serializer_igbinary', 'cachestore_redis');
-    }
-
-    $settings->add(new admin_setting_configselect(
-            'cachestore_redis/test_serializer',
-            get_string('test_serializer', 'cachestore_redis'),
-            get_string('test_serializer_desc', 'cachestore_redis'),
-            Redis::SERIALIZER_PHP,
-            $options
-        )
-    );
+if (class_exists('Redis') && defined('Redis::SERIALIZER_IGBINARY')) {
+    $options[Redis::SERIALIZER_IGBINARY] = get_string('serializer_igbinary', 'cachestore_redis');
 }
+
+$settings->add(new admin_setting_configselect(
+        'cachestore_redis/test_serializer',
+        get_string('test_serializer', 'cachestore_redis'),
+        get_string('test_serializer_desc', 'cachestore_redis'),
+        1, // Redis::SERIALIZER_PHP == 1
+        $options
+    )
+);
