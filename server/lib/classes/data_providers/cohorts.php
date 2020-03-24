@@ -23,14 +23,14 @@
 
 namespace core\data_providers;
 
+use coding_exception;
 use context;
 use context_system;
-use coding_exception;
+use core\entities\cohort;
+use core\entities\cohort_filters;
 use core\orm\pagination\cursor_paginator;
 use core\pagination\cursor;
 use moodle_exception;
-use core\entities\cohort;
-use core\entities\cohort_filters;
 
 defined('MOODLE_INTERNAL') || die();
 

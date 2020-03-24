@@ -61,6 +61,9 @@ class cohort extends entity implements expandable {
     protected $expand_query_column = 'cohortid';
 
     public const TABLE = 'cohort';
+    public const CREATED_TIMESTAMP = 'timecreated';
+    public const UPDATED_TIMESTAMP = 'timemodified';
+    public const SET_UPDATED_WHEN_CREATED = true;
 
     protected $extra_attributes = [
         'display_name'
