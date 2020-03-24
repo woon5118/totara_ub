@@ -33,6 +33,7 @@ import AchievementsQuery from 'criteria_coursecompletion/graphql/achievements';
 
 export default {
   components: { CourseAchievementDisplay },
+  inheritAttrs: false,
   props: {
     instanceId: {
       required: true,

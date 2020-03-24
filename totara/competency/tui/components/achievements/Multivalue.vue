@@ -33,6 +33,7 @@
 
 <script>
 export default {
+  inheritAttrs: false,
   props: {
     assignmentId: {
       required: true,

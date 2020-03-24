@@ -72,6 +72,7 @@ export default {
     Collapsible,
   },
 
+  inheritAttrs: false,
   props: {
     assignmentId: {
       required: true,

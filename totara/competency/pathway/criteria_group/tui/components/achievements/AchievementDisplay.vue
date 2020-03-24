@@ -63,6 +63,8 @@ export default {
     AndBox,
   },
 
+  inheritAttrs: false,
+
   props: {
     assignmentId: {
       required: true,

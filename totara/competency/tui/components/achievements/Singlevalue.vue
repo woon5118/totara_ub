@@ -92,6 +92,7 @@ export default {
     OrBox,
   },
 
+  inheritAttrs: false,
   props: {
     userId: {
       required: true,

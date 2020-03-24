@@ -137,6 +137,8 @@ export default {
     Table,
   },
 
+  inheritAttrs: false,
+
   props: {
     assignmentId: {
       required: true,
