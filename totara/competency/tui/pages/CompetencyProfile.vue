@@ -89,13 +89,13 @@
                 <ToggleSet v-model="activeTab">
                   <ToggleButtonIcon
                     value="charts"
-                    :label="$str('charts', 'totara_competency')"
+                    :label="$str('toggle_charts', 'totara_competency')"
                   >
                     <BarChartIcon />
                   </ToggleButtonIcon>
                   <ToggleButtonIcon
                     value="table"
-                    :label="$str('table', 'totara_competency')"
+                    :label="$str('toggle_table', 'totara_competency')"
                   >
                     <ListIcon />
                   </ToggleButtonIcon>
@@ -360,8 +360,8 @@ export default {
 {
   "totara_competency": [
     "competency_profile",
-    "charts",
-    "table",
+    "toggle_charts",
+    "toggle_table",
     "assign_competencies",
     "self_assign_competencies",
     "latest_achievement",

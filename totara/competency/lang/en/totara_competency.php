@@ -394,6 +394,8 @@ $string['title:index'] = 'Manage competency assignments';
 $string['title:sync'] = 'Sync assigned users';
 $string['title:tool_menu'] = 'Competency assignments';
 $string['title:users'] = 'Currently assigned users';
+$string['toggle_charts'] = 'Show charts';
+$string['toggle_table'] = 'Show tables';
 $string['type'] = 'Type';
 
 $string['unassigned'] = 'Unassigned';
