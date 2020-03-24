@@ -37,7 +37,7 @@
     { "message": "Your pants are on fire!", "closebutton": 1, "announce": 1, "extraclasses": "foo bar"}
 }}
 <div class="alert alert-warning {{#closebutton}}alert-dismissable{{/closebutton}} fade in {{ extraclasses }}" {{!
-    }}{{# announce }} role="alert"{{/ announce }}{{!
+    }}{{# announce }} role="log"{{/ announce }}{{!
     }}>
     {{# closebutton }}<button type="button" class="close" data-dismiss="alert" aria-label="{{#str}}closebuttontitle, core{{/str}}">{{#flex_icon}}delete-ns, , , ft-size-100{{/flex_icon}}</button>{{/ closebutton }}
     {{{ message }}}
