@@ -49,6 +49,13 @@ class rate_competencies extends controller {
     protected $user;
 
     /**
+     * User assignment entity loaded from URL params.
+     *
+     * @var competency_assignment_user|null
+     */
+    protected $assignment;
+
+    /**
      * @return context_user
      */
     protected function setup_context(): context {
@@ -59,6 +66,10 @@ class rate_competencies extends controller {
         require_login();
         $user_id = $this->get_param('user_id', PARAM_INT);
         $this->user = $user_id ? new user($user_id) : user::logged_in();
+
+        if ($assignment_id = $this->get_param('assignment_id', PARAM_INT)) {
+            $this->assignment = $this->get_assignment($assignment_id);
+        }
 
         parent::__construct();
     }
@@ -76,7 +87,7 @@ class rate_competencies extends controller {
                 'profileimageurl' => $this->get_user_picture_url(),
             ],
             'current-user-id' => (int) $this->currently_logged_in_user()->id,
-            'return-url' => $this->get_return_url()->out(),
+            'return-url' => $this->get_return_url()->out(false),
         ];
 
         if ($this->role) {
@@ -85,8 +96,8 @@ class rate_competencies extends controller {
             $vue_props['specified-role'] = self_role::get_name();
         }
 
-        if ($assignment_id = $this->get_param('assignment_id', PARAM_INT)) {
-            $vue_props['assignment'] = $this->get_assignment($assignment_id)->to_array();
+        if (isset($this->assignment)) {
+            $vue_props['assignment'] = $this->assignment->to_array();
         }
 
         $view = tui_view::create('pathway_manual/pages/RateCompetencies', $vue_props);
@@ -132,11 +143,19 @@ class rate_competencies extends controller {
      * @return moodle_url
      */
     private function get_return_url(): moodle_url {
-        $url = capability_helper::can_view_profile($this->user->id, $this->context)
-            ? '/totara/competency/profile/'
-            : '/totara/competency/rate_users.php';
+        if (isset($this->assignment)) {
+            // Came from competency details page
+            return new moodle_url('/totara/competency/profile/details/', [
+                'user_id' => $this->user->id,
+                'competency_id' => $this->assignment->competency_id,
+            ]);
+        }
 
-        return new moodle_url($url, ['user_id' => $this->user->id]);
+        if (capability_helper::can_view_profile($this->user->id, $this->context)) {
+            new moodle_url('/totara/competency/profile/', ['user_id' => $this->user->id]);
+        }
+
+        return new moodle_url('/totara/competency/rate_users.php', ['user_id' => $this->user->id]);
     }
 
     /**
