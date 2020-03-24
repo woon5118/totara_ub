@@ -23,18 +23,22 @@
 
 
 $string['activity_content_tab:heading'] = 'Content';
+$string['activity_name'] = 'Performance activity name';
 $string['activity_participants:add'] = 'Add participants';
 $string['activity_participants:heading'] = 'Participants';
 $string['activity_participants:select_done'] = 'Done';
 $string['activity_participants:select_heading'] = 'Select participants';
 $string['activity_section:save_changes'] = 'Save changes';
+$string['activity_type'] = 'Activity type';
 $string['create_activity'] = 'Add activity';
 $string['create_subject_instance_task'] = 'Create subject instance for performance activities';
 $string['edit_content'] = 'Edit content';
+$string['embedded_perform_subject_instance'] = 'Subject Instance (Perform)';
+$string['error_activity_id_wrong'] = 'Wrong activity id';
 $string['error:activity_name_missing'] = 'You are not allowed to create an activity with an empty name';
 $string['error:create_permission_missing'] = 'Create Permission Missing';
-$string['expand_assignments_task'] = 'Expand performance activity track assignments';
 $string['error:create_permission_missing'] = 'You do not have the permission to create a performance activity';
+$string['expand_assignments_task'] = 'Expand performance activity track assignments';
 $string['general_info_label:activity_description'] = 'Description';
 $string['general_info_label:activity_title'] = 'Activity title';
 $string['get_started'] = 'Get started';
@@ -96,9 +100,11 @@ $string['pluginadministration'] = 'Performance activity administration';
 $string['pluginname'] = 'Performance activity';
 $string['save_changes'] = 'Save changes';
 $string['short_text'] = 'Short text';
+$string['subject_instance_status'] = 'Status of subject instance';
 $string['toast:error:create_activity'] = 'An error occurred while saving, and the activity could not be created.';
 $string['toast:error:generic_update'] = 'An error occurred, and your latest changes have not been saved.';
 $string['toast:success:activity_update'] = 'Activity saved.';
+$string['track_description'] = 'Track description';
 $string['user_activities:activities_about_others_title'] = 'Activities about others';
 $string['user_activities:activity_does_not_exist'] = 'The requested performance activity could not be found.';
 $string['user_activities:page_title'] = 'Performance activities';
