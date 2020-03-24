@@ -80,6 +80,7 @@ function report_security_get_issue_list() {
     $result = array_flip($result);
     if (empty($CFG->disableconsistentcleaning)) {
         unset($result['report_security_check_riskxss']);
+        unset($result['report_security_check_embed']);
     } else {
         unset($result['report_security_check_riskallowxss']);
         unset($result['report_security_check_resourcesallowxss']);

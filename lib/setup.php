@@ -672,8 +672,10 @@ if (PHPUNIT_TEST) {
     initialise_cfg();
 }
 
-// Totara: disable the old trusttext system completely unless the site has explicitly chosen to allow it.
+// Totara: disable the old trusttext system and object embedding completely
+//         unless the site has explicitly chosen to completely ignore security.
 if (empty($CFG->disableconsistentcleaning)) {
+    $CFG->allowobjectembed = '0';
     $CFG->enabletrusttext = '0';
 }
 if (!empty($CFG->tenantsenabled)) {
