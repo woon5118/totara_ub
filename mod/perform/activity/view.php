@@ -21,30 +21,6 @@
  * @package mod_perform
  */
 
-namespace mod_perform\formatter\activity;
+require_once(__DIR__ . '/../../../config.php');
 
-use core\orm\formatter\entity_model_formatter;
-use mod_perform\models\activity\subject_instance as subject_instance_model;
-
-/**
- * Class subject_instance
- *
- * @package mod_perform\formatter\activity
- */
-class subject_instance extends entity_model_formatter {
-
-    /**
-     * @var subject_instance_model
-     */
-    protected $object;
-
-    protected function get_map(): array {
-        return [
-            'id' => null,
-            'activity' => null,
-            'subject_user' => null,
-            'status' => null,
-        ];
-    }
-
-}
+(new \mod_perform\controllers\activity\view_user_activity())->process();

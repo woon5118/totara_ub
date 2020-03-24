@@ -33,11 +33,13 @@ use mod_perform\entities\activity\subject_instance as subject_instance_entity;
  *
  * This class represents a specific activity about a specific person (subject_instance)
  *
- * @method static load_by_entity(subject_instance_entity $entity)
- * @method static load_by_id(int $id)
+ * @method static self load_by_entity(subject_instance_entity $entity)
+ * @method static self load_by_id(int $id)
  *
  * @property-read int $id
  * @property-read user $subject_user The user that this activity is about
+ * @property-read activity activity The top level perform activity this is an instance of
+ * @property-read string status The string representation of the status
  *
  * @package mod_perform\models\activity
  */
@@ -46,6 +48,11 @@ class subject_instance extends model {
     protected $accessible_attributes = [
         'id',
         'subject_user',
+    ];
+
+    protected $model_accessor_whitelist = [
+        'activity',
+        'status',
     ];
 
     /** @var subject_instance_entity */

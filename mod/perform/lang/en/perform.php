@@ -100,6 +100,7 @@ $string['toast:error:create_activity'] = 'An error occurred while saving, and th
 $string['toast:error:generic_update'] = 'An error occurred, and your latest changes have not been saved.';
 $string['toast:success:activity_update'] = 'Activity saved.';
 $string['user_activities:activities_about_others_title'] = 'Activities about others';
+$string['user_activities:activity_does_not_exist'] = 'The requested performance activity could not be found.';
 $string['user_activities:page_title'] = 'Performance activities';
 $string['user_activities:relationship_to_user_header'] = 'Relationship to user';
 $string['user_activities:status_complete'] = 'Complete';

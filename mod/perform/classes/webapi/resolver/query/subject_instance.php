@@ -21,36 +21,36 @@
  * @package mod_perform
  */
 
-namespace mod_perform\webapi\resolver\type;
+namespace mod_perform\webapi\resolver\query;
 
-use core\format;
+use core\entities\user;
 use core\webapi\execution_context;
-use core\webapi\type_resolver;
-use mod_perform\formatter\activity\subject_instance as subject_instance_formatter;
+use core\webapi\query_resolver;
+use mod_perform\data_providers\activity\subject_instance as subject_instance_data_provider;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 
-/**
- * Note: It is the responsibility of the query to ensure the user is permitted to see an activity.
- */
-class subject_instance implements type_resolver {
+class subject_instance implements query_resolver {
 
     /**
-     * @param string $field
-     * @param subject_instance_model $subject_instance
+     * Get the subject instances that the logged in user is participating in.
+     *
      * @param array $args
      * @param execution_context $ec
-     *
-     * @return mixed
+     * @return mixed|subject_instance_model|null
      */
-    public static function resolve(string $field, $subject_instance, array $args, execution_context $ec) {
-        if (!$subject_instance instanceof subject_instance_model) {
-            throw new \coding_exception('Expected subject_instance model');
-        }
+    public static function resolve(array $args, execution_context $ec) {
+        require_login(null, false, null, false, true);
 
-        $format = $args['format'] ?? format::FORMAT_HTML;
+        $subject_instance_id = $args['subject_instance_id'];
 
-        $formatter = new subject_instance_formatter($subject_instance, $subject_instance->get_context());
+        /** @var user $target_participant */
+        $participant_id = User::logged_in()->id;
 
-        return $formatter->format($field, $format);
+        return (new subject_instance_data_provider($participant_id))
+            ->set_subject_instance_id_filter($subject_instance_id)
+            ->fetch()
+            ->get()
+            ->first();
     }
+
 }

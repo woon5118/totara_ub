@@ -66,9 +66,10 @@ type mod_perform_section_element {
 Details about perform activity that a user is involved with (either the subject or an answering pariticpent)
 """
 type mod_perform_subject_instance {
+  id: core_id!
   activity: mod_perform_activity!
   status: mod_perform_subject_instance_status!
-  subject: core_user!
+  subject_user: core_user!
 }
 
 """
@@ -121,6 +122,13 @@ extend type Query {
     participant_id: core_id
     filters: mod_perform_subject_instance_filters
   ): [mod_perform_subject_instance!]!
+
+  """
+  A specific performance activity (perform_subject_instance) a user is participating in
+  """
+  mod_perform_subject_instance(
+    subject_instance_id: core_id!
+  ): mod_perform_subject_instance
 }
 
 """

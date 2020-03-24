@@ -347,10 +347,10 @@ class mod_perform_generator extends component_generator_base {
      * The top level perform activity is created if a name (activity_name) or id (activity_id) is not supplied,
      * otherwise the perform row will be looked id or name if supplied.
      *
-     * The subject can either be identified by 'subject_user_id' (user.id) or 'subject_name' (user.firstname).
+     * The subject can either be identified by 'subject_user_id' (user.id) or 'subject_username' (user.username).
      *
      * The (other) participant can either be identified by 'other_participant_id' (user.id) or
-     * 'other_participant_name' (user.firstname).
+     * 'other_participant_username' (user.username) or left out.
      *
      * @param array $data
      * @return subject_instance
@@ -371,19 +371,32 @@ class mod_perform_generator extends component_generator_base {
             $subject = user::repository()->find($subject_id);
         } else {
             /** @var user $subject */
-            $subject = user::repository()->where('firstname', $data['subject_name'])->order_by('id')->first();
+            $subject = user::repository()
+                ->where('username', $data['subject_username'])
+                ->order_by('id')
+                ->first();
         }
 
         $other_participant_id = $data['other_participant_id'] ?? null;
+        $other_participant_username = $data['other_participant_username'] ?? null;
+        $other_participant = null;
 
         if ($other_participant_id) {
             $other_participant = user::repository()->find($other_participant_id);
-        } else {
+        } else if ($other_participant_username) {
             /** @var user $other_participant */
-            $other_participant = user::repository()->where('firstname', $data['other_participant_name'])->order_by('id')->first();
+            $other_participant = user::repository()
+                ->where('username', $other_participant_username)
+                ->order_by('id')
+                ->first();
         }
 
         $subject_is_participating = $data['subject_is_participating'] ?? false;
+
+        // String conversion for behat
+        if (is_string($subject_is_participating) && $subject_is_participating !== 'true') {
+            $subject_is_participating = false;
+        }
 
         $track = track::create($activity, "track for {$activity->name}");
 
@@ -406,11 +419,13 @@ class mod_perform_generator extends component_generator_base {
             $participant_instance->save();
         }
 
-        $other_participant_instance = new participant_instance();
-        $other_participant_instance->activity_relationship_id = 0; // stubbed
-        $other_participant_instance->participant_id = $other_participant->id;
-        $other_participant_instance->subject_instance_id = $subject_instance->id;
-        $other_participant_instance->save();
+        if ($other_participant) {
+            $other_participant_instance = new participant_instance();
+            $other_participant_instance->activity_relationship_id = 0; // stubbed
+            $other_participant_instance->participant_id = $other_participant->id;
+            $other_participant_instance->subject_instance_id = $subject_instance->id;
+            $other_participant_instance->save();
+        }
 
         return new subject_instance($subject_instance);
     }

@@ -399,6 +399,12 @@ class behat_totara_data_generators extends behat_base {
                 'age_data' => 'wind_back_timer'
             )
         ),
+        'mod_perform' => array(
+            'subject instances' => array(
+                'datagenerator' => 'subject_instance',
+                'required' => array('activity_name', 'subject_username')
+            ),
+        ),
         'mod_quiz' => array(
             'responses' => array(
                 'age_data' => 'age_quiz_responses'

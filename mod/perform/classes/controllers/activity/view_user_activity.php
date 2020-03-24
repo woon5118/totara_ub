@@ -24,7 +24,7 @@
 namespace mod_perform\controllers\activity;
 
 use context;
-use context_coursecat;
+use mod_perform\models\activity\subject_instance;
 use mod_perform\util;
 use moodle_url;
 use totara_mvc\controller;
@@ -33,14 +33,14 @@ use totara_mvc\tui_view;
 /*
  * This page lists perform activities the logged in user are a participant in.
  */
-class user_activities extends controller {
+class view_user_activity extends controller {
 
     /**
      * @inheritDoc
      */
     protected function setup_context(): context {
         $category_id = util::get_default_categoryid();
-        return context_coursecat::instance($category_id);
+        return \context_coursecat::instance($category_id);
     }
 
     /**
@@ -48,16 +48,20 @@ class user_activities extends controller {
      */
     public function action(): tui_view {
         $props = [
-            'view-activity-url' => (string) view_user_activity::get_url(),
+            'subject-instance-id' => $this->get_subject_instance_id(),
         ];
 
-        return tui_view::create('mod_perform/pages/UserActivities', $props)
+        return tui_view::create('mod_perform/pages/UserActivity', $props)
             ->set_title(get_string('user_activities:page_title', 'mod_perform'))
             ->set_url(self::get_url());
     }
 
     public static function get_url(): moodle_url {
-        return new moodle_url('/mod/perform/activity');
+        return new moodle_url('/mod/perform/activity/view.php');
+    }
+
+    protected function get_subject_instance_id(): int {
+        return required_param('subject_instance_id', PARAM_INT);
     }
 
 }

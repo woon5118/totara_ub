@@ -17,14 +17,16 @@
           :size="showSubjectName ? '8' : '10'"
           :column-header="$str('user_activities:title_header', 'mod_perform')"
         >
-          <a href="view/1">{{ subjectInstance.activity.name }}</a>
+          <a :href="getViewActivityUrl(subjectInstance)">{{
+            subjectInstance.activity.name
+          }}</a>
         </Cell>
         <Cell
           v-if="showSubjectName"
           size="2"
           :column-header="$str('user_activities:subject_header', 'mod_perform')"
         >
-          {{ subjectInstance.subject.fullname }}
+          {{ subjectInstance.subject_user.fullname }}
         </Cell>
         <Cell
           size="2"
@@ -42,7 +44,7 @@ import HeaderCell from 'totara_core/components/datatable/HeaderCell';
 import Loader from 'totara_core/components/loader/Loader';
 import Table from 'totara_core/components/datatable/Table';
 
-import performSubjectInstancesQuery from 'mod_perform/graphql/subject_instances.graphql';
+import SubjectInstancesQuery from 'mod_perform/graphql/subject_instances.graphql';
 
 const ABOUT_SELF = 'self';
 const ABOUT_OTHERS = 'others';
@@ -61,6 +63,10 @@ export default {
         return [ABOUT_SELF, ABOUT_OTHERS].includes(val);
       },
     },
+    viewUrl: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -69,7 +75,7 @@ export default {
   },
   apollo: {
     subjectInstances: {
-      query: performSubjectInstancesQuery,
+      query: SubjectInstancesQuery,
       fetchPolicy: 'network-only', // Always refetch data on tab change
       variables() {
         return {
@@ -90,6 +96,16 @@ export default {
     },
   },
   methods: {
+    /**
+     * Get "view" url for a specific user activity.
+     *
+     * @param id {{Number}}
+     * @returns {string}
+     */
+    getViewActivityUrl({ id }) {
+      return `${this.viewUrl}?subject_instance_id=${id}`;
+    },
+
     /**
      * Get the localized status text for a particular user activity.
      *

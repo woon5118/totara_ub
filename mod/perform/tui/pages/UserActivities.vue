@@ -29,7 +29,7 @@
         :id="$id('your-activities-tab')"
         :name="$str('user_activities:your_activities_title', 'mod_perform')"
       >
-        <UserActivityList about="self" />
+        <UserActivityList about="self" :view-url="viewActivityUrl" />
       </Tab>
       <Tab
         :id="$id('activities-about-others-tab')"
@@ -37,7 +37,7 @@
           $str('user_activities:activities_about_others_title', 'mod_perform')
         "
       >
-        <UserActivityList about="others" />
+        <UserActivityList about="others" :view-url="viewActivityUrl" />
       </Tab>
     </Tabs>
   </div>
@@ -54,10 +54,11 @@ export default {
     Tabs,
     UserActivityList,
   },
-  data() {
-    return {
-      userActivities: [],
-    };
+  props: {
+    viewActivityUrl: {
+      required: true,
+      type: String,
+    },
   },
 };
 </script>

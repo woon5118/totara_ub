@@ -21,7 +21,6 @@
  * @package mod_perform
  */
 
-use mod_perform\entities\activity\filters\subject_instances_about;
 use totara_webapi\graphql;
 
 require_once(__DIR__ . '/subject_instance_testcase.php');
@@ -29,57 +28,48 @@ require_once(__DIR__ . '/subject_instance_testcase.php');
 /**
  * @group perform
  */
-class webapi_resolver_query_subject_instances_testcase extends mod_perform_subject_instance_testcase {
+class webapi_resolver_query_subject_instance_testcase extends mod_perform_subject_instance_testcase {
 
     public function test_query_successful(): void {
         $args = [
-            'filters' => [
-                'about' => [subject_instances_about::VALUE_ABOUT_SELF]
-            ]
+            'subject_instance_id' => self::$about_user_and_participating->get_id()
         ];
 
         $result = graphql::execute_operation(
-            $this->get_execution_context('ajax', 'mod_perform_subject_instances'),
+            $this->get_execution_context('ajax', 'mod_perform_subject_instance'),
             $args
         )->toArray(true);
 
-        $actual = $result['data']['mod_perform_subject_instances'];
+        $actual = $result['data']['mod_perform_subject_instance'];
 
         $expected = [
-            [
-                'id' => self::$about_user_and_participating->id,
-                'status' => self::$about_user_and_participating->get_status(),
-                'activity' => [
-                    'name' => self::$about_user_and_participating->get_activity()->name
-                ],
-                'subject_user' => [
-                    'fullname' => self::$about_user_and_participating->subject_user->fullname
-                ],
+            'id' => self::$about_user_and_participating->id,
+            'status' => self::$about_user_and_participating->get_status(),
+            'activity' => [
+                'name' => self::$about_user_and_participating->get_activity()->name
+            ],
+            'subject_user' => [
+                'fullname' => self::$about_user_and_participating->subject_user->fullname
             ]
         ];
 
         self::assertEquals($expected, $actual);
     }
 
-    public function test_query_invalid_filter(): void {
+    public function test_query_missing_id(): void {
         $args = [
-            'filters' => [
-                'not_real_filter' => 1,
-            ],
+            'subject_instance_id' => null
         ];
 
         $errors = graphql::execute_operation(
-            $this->get_execution_context('ajax', 'mod_perform_subject_instances'),
+            $this->get_execution_context('ajax', 'mod_perform_subject_instance'),
             $args
         )->errors;
 
         self::assertCount(1, $errors);
 
-        $expected_error_message = 'Variable "$filters" got invalid value {"not_real_filter":1}; ';
-        $expected_error_message .= 'Field "not_real_filter" is not defined by type mod_perform_subject_instance_filters.';
-
         self::assertEquals(
-            $expected_error_message,
+            'Variable "$subject_instance_id" got invalid value null; Expected non-nullable type core_id! not to be null.',
             $errors[0]->message
         );
     }

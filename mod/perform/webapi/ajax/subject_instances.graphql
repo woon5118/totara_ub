@@ -6,11 +6,12 @@ query mod_perform_subject_instances(
     participant_id: $participant_id
     filters: $filters
   ) {
+    id
     status
     activity {
       name
     }
-    subject {
+    subject_user {
       fullname
     }
   }

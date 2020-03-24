@@ -25,6 +25,7 @@ namespace mod_perform\data_providers\activity;
 
 use core\orm\collection;
 use core\orm\query\builder;
+use mod_perform\entities\activity\filters\subject_instance_id;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
@@ -43,7 +44,7 @@ class subject_instance {
     protected $items;
 
     /** @var array */
-    private $filters;
+    private $filters = [];
 
     /**
      * subject_instance constructor.
@@ -64,6 +65,12 @@ class subject_instance {
      */
     public function set_about_filter(array $about): self {
         $this->filters[] = (new subject_instances_about($this->participant_id, 'si'))->set_value($about);
+
+        return $this;
+    }
+
+    public function set_subject_instance_id_filter(int ...$subject_instance_ids): self {
+        $this->filters[] = (new subject_instance_id('si'))->set_value($subject_instance_ids);
 
         return $this;
     }

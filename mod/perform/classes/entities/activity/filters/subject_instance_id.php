@@ -15,36 +15,36 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Jaron Steenson <jaron.steenson@totaralearning.com>
  * @package mod_perform
  */
 
-namespace mod_perform\formatter\activity;
+namespace mod_perform\entities\activity\filters;
 
-use core\orm\formatter\entity_model_formatter;
-use mod_perform\models\activity\subject_instance as subject_instance_model;
+use coding_exception;
+use core\orm\entity\filter\filter;
 
-/**
- * Class subject_instance
- *
- * @package mod_perform\formatter\activity
- */
-class subject_instance extends entity_model_formatter {
+class subject_instance_id extends filter {
 
     /**
-     * @var subject_instance_model
+     * @var string
      */
-    protected $object;
+    protected $subject_instance_alias;
 
-    protected function get_map(): array {
-        return [
-            'id' => null,
-            'activity' => null,
-            'subject_user' => null,
-            'status' => null,
-        ];
+    public function __construct(string $subject_instance_alias = 'si') {
+        parent::__construct([]);
+        $this->subject_instance_alias = $subject_instance_alias;
     }
 
+    public function apply(): void {
+        if (!is_array($this->value)) {
+            throw new coding_exception('subject instance id filter but have an array for value');
+        }
+
+        if (count($this->value) > 0) {
+            $this->builder->where_in("{$this->subject_instance_alias}.id", $this->value);
+        }
+    }
 }
