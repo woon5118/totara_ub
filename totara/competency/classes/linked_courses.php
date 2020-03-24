@@ -24,7 +24,7 @@
 
 namespace totara_competency;
 
-use criteria_linkedcourses\task\update_linked_course_items_adhoc;
+use core\orm\query\builder;
 use hierarchy_competency\event\evidence_deleted;
 use stdClass;
 use totara_competency\event\linked_courses_updated;
@@ -298,16 +298,15 @@ class linked_courses {
      *          'to_delete' => comp_criteria records that exists but are not in the list
      */
     private static function check_items(int $competency_id, array $courses) : array {
-        global $DB, $USER;
+        global $USER;
 
         // Have set iteminstance as the first field so that the results are keyed by the course id.
-        $linked_courses_records = $DB->get_records_sql(
-            'SELECT iteminstance, * 
-                   FROM {comp_criteria}
-                  WHERE itemtype = ?
-                    AND competencyid = ?',
-            ['coursecompletion', $competency_id]
-        );
+        $linked_courses_records = builder::table('comp_criteria')
+            ->where('itemtype', 'coursecompletion')
+            ->where('competencyid', $competency_id)
+            ->get()
+            ->key_by('iteminstance')
+            ->all(true);
 
         $to_update = [];
         $to_add = [];
