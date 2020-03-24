@@ -30,16 +30,18 @@ Feature: Configure user source to import job assignment data in HR sync
     And I should not see "\"orgidnumber\""
     And I should not see "\"posidnumber\""
     And I should not see "\"manageridnumber\""
-    And I should not see "\"managerjobassignmentidnumber\""
+    And I should not see "\"managerjaidnumber\""
+    And I should not see "\"tempmanagerjaidnumber\""
     And I should not see "\"appraiseridnumber\""
     When I set the following fields to these values:
-      | Full name    | 1 |
-      | Start date   | 1 |
-      | End date     | 1 |
-      | Organisation | 1 |
-      | Position     | 1 |
-      | Manager      | 1 |
-      | Appraiser    | 1 |
+      | Full name         | 1 |
+      | Start date        | 1 |
+      | End date          | 1 |
+      | Organisation      | 1 |
+      | Position          | 1 |
+      | Manager           | 1 |
+      | Temporary Manager | 1 |
+      | Appraiser         | 1 |
     And I press "Save changes"
     And I should see "\"fullname\""
     And I should see "\"startdate\""
@@ -47,7 +49,10 @@ Feature: Configure user source to import job assignment data in HR sync
     And I should see "\"orgidnumber\""
     And I should see "\"posidnumber\""
     And I should see "\"manageridnumber\""
-    And I should not see "\"managerjobassignmentidnumber\""
+    And I should see "\"tempmanageridnumber\""
+    And I should see "\"tempmanagerexpirydate\""
+    And I should not see "\"managerjaidnumber\""
+    And I should not see "\"tempmanagerjaidnumber\""
     And I should see "\"appraiseridnumber\""
 
   Scenario: Configure HR import source link jaidnumber on
@@ -61,16 +66,19 @@ Feature: Configure user source to import job assignment data in HR sync
     And I should not see "\"orgidnumber\""
     And I should not see "\"posidnumber\""
     And I should not see "\"manageridnumber\""
-    And I should not see "\"managerjobassignmentidnumber\""
+    And I should not see "\"managerjaidnumber\""
+    And I should not see "\"tempmanageridnumber\""
+    And I should not see "\"tempmanagerjaidnumber\""
     And I should not see "\"appraiseridnumber\""
     When I set the following fields to these values:
-      | Full name    | 1 |
-      | Start date   | 1 |
-      | End date     | 1 |
-      | Organisation | 1 |
-      | Position     | 1 |
-      | Manager      | 1 |
-      | Appraiser    | 1 |
+      | Full name         | 1 |
+      | Start date        | 1 |
+      | End date          | 1 |
+      | Organisation      | 1 |
+      | Position          | 1 |
+      | Manager           | 1 |
+      | Temporary Manager | 1 |
+      | Appraiser         | 1 |
     And I press "Save changes"
     And I should see "\"fullname\""
     And I should see "\"startdate\""
@@ -78,25 +86,32 @@ Feature: Configure user source to import job assignment data in HR sync
     And I should see "\"orgidnumber\""
     And I should see "\"posidnumber\""
     And I should see "\"manageridnumber\""
-    And I should see "\"managerjobassignmentidnumber\""
+    And I should see "\"managerjaidnumber\""
+    And I should see "\"tempmanageridnumber\""
+    And I should see "\"tempmanagerjaidnumber\""
+    And I should see "\"tempmanagerexpirydate\""
     And I should see "\"appraiseridnumber\""
 
   Scenario: Configure HR import source link jaidnumber cannot be turned off after run with setting on
     Given the following "users" exist:
       | username | firstname | lastname | email                | idnumber |
       | learner1 | Learner   | One      | learner1@example.com | learner1 |
+      | learner2 | Learner   | Two      | learner2@example.com | learner2 |
       | manager1 | Manager   | One      | manager1@example.com | manager1 |
       | manager2 | Manager   | Two      | manager2@example.com | manager2 |
     And I set the following fields to these values:
       | Update ID numbers | No |
     And I press "Save changes"
     And I navigate to "CSV" node in "Site administration > HR Import > Sources > Job assignment"
-    And I should not see "\"managerjobassignmentidnumber\""
+    And I should not see "\"managerjaidnumber\""
+    And I should not see "\"tempmanagerjaidnumber\""
     When I set the following fields to these values:
-      | Full name    | 1 |
-      | Manager      | 1 |
+      | Full name         | 1 |
+      | Manager           | 1 |
+      | Temporary Manager | 1 |
     And I press "Save changes"
-    And I should see "\"managerjobassignmentidnumber\""
+    And I should see "\"managerjaidnumber\""
+    And I should see "\"tempmanagerjaidnumber\""
 
     # Setting can still be changed before first run with setting on.
     When I navigate to "Job assignment" node in "Site administration > HR Import > Elements"
@@ -124,6 +139,7 @@ Feature: Configure user source to import job assignment data in HR sync
     When I navigate to "HR Import Log" node in "Site administration > HR Import"
     Then I should see "Created job assignment 'learnerjaid1' for user 'learner1'."
     And I should see "Created job assignment 'managerjaid1' for user 'manager1'."
+    And I should see "Created job assignment 'learnerjaid1' for user 'learner2'."
     When I navigate to "Manage users" node in "Site administration > Users"
     And I click on "Learner One" "link"
     And I click on "Learner1 JA1" "link"
@@ -134,6 +150,14 @@ Feature: Configure user source to import job assignment data in HR sync
     When I press "Cancel"
     And I click on "Learner1 JA3" "link"
     Then I should not see "Manager One (manager1@example.com) - Manager1 JA2"
+    When I navigate to "Manage users" node in "Site administration > Users"
+    And I click on "Learner Two" "link"
+    And I click on "Learner2 JA1" "link"
+    Then I should see "Manager One (manager1@example.com) - Manager1 JA2" in the "//div[@id='fitem_id_tempmanagerselector']" "xpath_element"
+    And the following fields match these values:
+      | tempmanagerexpirydate[year]    | 2050     |
+      | tempmanagerexpirydate[month]   | December |
+      | tempmanagerexpirydate[day]     | 25       |
 
     # Change an irrelevant setting in the user element config and save.
     # This is checking for bug TL-12312 where the link to job assigment setting is updated unintentionally.
@@ -147,10 +171,12 @@ Feature: Configure user source to import job assignment data in HR sync
     # Now check that the manager job assignment id number setting is still in the source config.
     # This should be the case if the Link job assignments setting is still what it was when we set it.
     When I navigate to "CSV" node in "Site administration > HR Import > Sources > Job assignment"
-    Then I should see "\"managerjobassignmentidnumber\""
+    Then I should see "\"managerjaidnumber\""
+    And I should see "\"tempmanagerjaidnumber\""
     And the following fields match these values:
-      | Full name  | 1 |
-      | Manager    | 1 |
+      | Full name         | 1 |
+      | Manager           | 1 |
+      | Temporary Manager | 1 |
 
     # Now run HR Import again just to make sure the correct setting is still applied there.
     When I navigate to "Upload HR Import files" node in "Site administration > HR Import > Sources"
@@ -164,6 +190,7 @@ Feature: Configure user source to import job assignment data in HR sync
     # Manager Two should have been created and added to the learner's 3rd job assignment.
     When I navigate to "HR Import Log" node in "Site administration > HR Import"
     Then I should see "Updated job assignment 'learnerjaid1' for user 'learner1'."
+    Then I should see "Updated job assignment 'learnerjaid1' for user 'learner2'."
     And I should see "Updated job assignment 'managerjaid1' for user 'manager1'."
     And I should see "Created job assignment 'managerjaid2' for user 'manager2'."
     When I navigate to "Manage users" node in "Site administration > Users"
@@ -177,3 +204,12 @@ Feature: Configure user source to import job assignment data in HR sync
     When I press "Cancel"
     And I click on "Learner1 JA3" "link"
     Then I should see "Manager Two (manager2@example.com) - Manager2 JA2"
+
+    When I navigate to "Manage users" node in "Site administration > Users"
+    And I click on "Learner Two" "link"
+    And I click on "Learner2 JA1" "link"
+    Then I should see "Manager Two (manager2@example.com) - Manager2 JA2" in the "//div[@id='fitem_id_tempmanagerselector']" "xpath_element"
+    And the following fields match these values:
+      | tempmanagerexpirydate[year]    | 2050     |
+      | tempmanagerexpirydate[month]   | December |
+      | tempmanagerexpirydate[day]     | 26       |

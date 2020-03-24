@@ -39,36 +39,40 @@ Feature: Verify CSV notifications are displayed correctly.
 
     # Check the selected fields are displayed in the file structure information.
     When I set the following fields to these values:
-      | Full name    | 1 |
-      | Start date   | 1 |
-      | End date     | 1 |
-      | Organisation | 1 |
-      | Position     | 1 |
-      | Manager      | 1 |
-      | Appraiser    | 1 |
+      | Full name         | 1 |
+      | Start date        | 1 |
+      | End date          | 1 |
+      | Organisation      | 1 |
+      | Position          | 1 |
+      | Manager           | 1 |
+      | Temporary Manager | 1 |
+      | Appraiser         | 1 |
     And I press "Save changes"
     Then I should see "Settings saved"
     And I should see "The current config requires a CSV file with the following structure:"
     And I should see "\"idnumber\",\"useridnumber\",\"timemodified\",\"deleted\",\"fullname\",\"startdate\","
-    And I should see "\"enddate\",\"orgidnumber\",\"posidnumber\",\"manageridnumber\",\"appraiseridnumber\""
+    And I should see "\"enddate\",\"orgidnumber\",\"posidnumber\",\"appraiseridnumber\",\"manageridnumber\",\"tempmanageridnumber\",\"tempmanagerexpirydate\""
 
     When I set the following fields to these values:
-      | idnumber          | field1  |
-      | useridnumber      | field2  |
-      | timemodified      | field3  |
-      | deleted           | field4  |
-      | fullname          | field5  |
-      | startdate         | field6  |
-      | enddate           | field7  |
-      | orgidnumber       | field8  |
-      | posidnumber       | field9  |
-      | manageridnumber   | field10 |
-      | appraiseridnumber | field11 |
+      | idnumber            | field1  |
+      | useridnumber          | field2  |
+      | timemodified          | field3  |
+      | deleted               | field4  |
+      | fullname              | field5  |
+      | startdate             | field6  |
+      | enddate               | field7  |
+      | orgidnumber           | field8  |
+      | posidnumber           | field9  |
+      | appraiseridnumber     | field10 |
+      | manageridnumber       | field11 |
+      | tempmanageridnumber   | field12 |
+      | tempmanagerexpirydate | field13 |
+
     And I press "Save changes"
     Then I should see "Settings saved"
     And I should see "The current config requires a CSV file with the following structure:"
     And I should see "\"field1\",\"field2\",\"field3\",\"field4\",\"field5\",\"field6\",\"field7\",\"field8\","
-    And I should see "\"field9\",\"field10\",\"field11\""
+    And I should see "\"field9\",\"field10\",\"field11\",\"field12\",\"field13\""
 
   Scenario: Verify Organisation CSV notifications.
 

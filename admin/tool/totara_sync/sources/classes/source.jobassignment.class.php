@@ -64,8 +64,9 @@ abstract class totara_sync_source_jobassignment extends totara_sync_source {
             'enddate',
             'orgidnumber',
             'posidnumber',
+            'appraiseridnumber',
             'manageridnumber',
-            'appraiseridnumber'
+            'tempmanageridnumber'
         );
 
         $this->required_fields = array(
@@ -84,13 +85,31 @@ abstract class totara_sync_source_jobassignment extends totara_sync_source {
         }
 
         if (empty($this->element->config->updateidnumbers)) {
-            $this->fields[] = 'managerjobassignmentidnumber';
-            $this->noform_fields[] = 'managerjobassignmentidnumber';
+            // Manager.
+            $this->fields[] = 'managerjaidnumber';
+            $this->noform_fields[] = 'managerjaidnumber';
             if ($this->is_importing_field('manageridnumber')) {
-                $this->set_config('import_managerjobassignmentidnumber', '1');
+                $this->set_config('import_managerjaidnumber', '1');
+            }
+
+            // Temporary manager.
+            $this->fields[] = 'tempmanagerjaidnumber';
+            $this->noform_fields[] = 'tempmanagerjaidnumber';
+            if ($this->is_importing_field('tempmanageridnumber')) {
+                $this->set_config('import_tempmanagerjaidnumber', '1');
             }
         } else {
-            $this->set_config('import_managerjobassignmentidnumber', '0');
+            $this->set_config('import_managerjaidnumber', '0');
+            $this->set_config('import_tempmanagerjaidnumber', '0');
+        }
+
+        // Temporary manager expiry date is required if importing a temporary manager.
+        if ($this->is_importing_field('tempmanageridnumber')) {
+            $this->fields[] = 'tempmanagerexpirydate';
+            $this->noform_fields[] = 'tempmanagerexpirydate';
+            $this->set_config('import_tempmanagerexpirydate', '1');
+        } else {
+            $this->set_config('import_tempmanagerexpirydate', '0');
         }
 
         if (advanced_feature::is_disabled('positions')) {
@@ -169,11 +188,20 @@ abstract class totara_sync_source_jobassignment extends totara_sync_source {
     }
 
     public function set_config($name, $value) {
+        // Manager specific.
         if ($name === 'import_manageridnumber'
-            and in_array('managerjobassignmentidnumber', $this->fields)) {
+            and in_array('managerjaidnumber', $this->fields)) {
 
-            parent::set_config('import_managerjobassignmentidnumber', $value);
+            parent::set_config('import_managerjaidnumber', $value);
         }
+        // Temporary manager specific.
+        if ($name === 'import_tempmanageridnumber') {
+            if (in_array('tempmanagerjaidnumber', $this->fields)) {
+                parent::set_config('import_tempmanagerjaidnumber', $value);
+            }
+            parent::set_config('import_tempmanagerexpirydate', $value);
+        }
+
         return parent::set_config($name, $value);
     }
 
@@ -230,8 +258,17 @@ abstract class totara_sync_source_jobassignment extends totara_sync_source {
         if ($this->is_importing_field('manageridnumber')) {
             $table->add_field('manageridnumber', XMLDB_TYPE_CHAR, '255');
         }
-        if ($this->is_importing_field('managerjobassignmentidnumber')) {
-            $table->add_field('managerjobassignmentidnumber', XMLDB_TYPE_CHAR, '100');
+        if ($this->is_importing_field('managerjaidnumber')) {
+            $table->add_field('managerjaidnumber', XMLDB_TYPE_CHAR, '100');
+        }
+        if ($this->is_importing_field('tempmanageridnumber')) {
+            $table->add_field('tempmanageridnumber', XMLDB_TYPE_CHAR, '255');
+        }
+        if ($this->is_importing_field('tempmanagerjaidnumber')) {
+            $table->add_field('tempmanagerjaidnumber', XMLDB_TYPE_CHAR, '100');
+        }
+        if ($this->is_importing_field('tempmanageridnumber') || $this->is_importing_field('tempmanagerjaidnumber')) {
+            $table->add_field('tempmanagerexpirydate', XMLDB_TYPE_CHAR, '20');
         }
         if ($this->is_importing_field('appraiseridnumber')) {
             $table->add_field('appraiseridnumber', XMLDB_TYPE_CHAR, '255');
@@ -253,8 +290,14 @@ abstract class totara_sync_source_jobassignment extends totara_sync_source {
         if ($this->is_importing_field('manageridnumber')) {
             $table->add_index('manageridnumber', XMLDB_INDEX_NOTUNIQUE, array('manageridnumber'));
         }
-        if ($this->is_importing_field('managerjobassignmentidnumber')) {
-            $table->add_index('managerjobassignmentidnumber', XMLDB_INDEX_NOTUNIQUE, array('managerjobassignmentidnumber'));
+        if ($this->is_importing_field('managerjaidnumber')) {
+            $table->add_index('managerjaidnumber', XMLDB_INDEX_NOTUNIQUE, array('managerjaidnumber'));
+        }
+        if ($this->is_importing_field('tempmanageridnumber')) {
+            $table->add_index('tempmanageridnumber', XMLDB_INDEX_NOTUNIQUE, array('tempmanageridnumber'));
+        }
+        if ($this->is_importing_field('tempmanagerjaidnumber')) {
+            $table->add_index('tempmanagerjaidnumber', XMLDB_INDEX_NOTUNIQUE, array('tempmanagerjaidnumber'));
         }
         if ($this->is_importing_field('appraiseridnumber')) {
             $table->add_index('appraiseridnumber', XMLDB_INDEX_NOTUNIQUE, array('appraiseridnumber'));

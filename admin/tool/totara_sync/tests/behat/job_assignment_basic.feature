@@ -37,13 +37,14 @@ Feature: Use user source to import basic job assignments data in HR sync
     # Enable all job assignment fields.
     When I navigate to "CSV" node in "Site administration > HR Import > Sources > Job assignment"
     And I set the following fields to these values:
-      | Full name    | 1 |
-      | Start date   | 1 |
-      | End date     | 1 |
-      | Organisation | 1 |
-      | Position     | 1 |
-      | Manager      | 1 |
-      | Appraiser    | 1 |
+      | Full name         | 1 |
+      | Start date        | 1 |
+      | End date          | 1 |
+      | Organisation      | 1 |
+      | Position          | 1 |
+      | Manager           | 1 |
+      | Temporary Manager | 1 |
+      | Appraiser         | 1 |
     And I press "Save changes"
 
   Scenario: Test common notifications in job assignment HR Import
@@ -56,6 +57,7 @@ Feature: Use user source to import basic job assignments data in HR sync
     And I should see "\"orgidnumber\""
     And I should see "\"posidnumber\""
     And I should see "\"manageridnumber\""
+    And I should see "\"tempmanageridnumber\""
     And I should see "\"appraiseridnumber\""
 
     # We're just choosing an arbitrary file to import.

@@ -142,11 +142,11 @@ class totara_sync_source_jobassignment_database extends totara_sync_source_jobas
                 $dbrow['deleted'] = empty($dbrow['deleted']) ? 0 : $dbrow['deleted'];
             }
 
-            // Optional date fields.
-            $datefields = array('startdate', 'enddate');
+            // Date fields.
+            $datefields = array('startdate', 'enddate', 'tempmanagerexpirydate');
             $database_dateformat = get_config('totara_sync_source_jobassignment_database', 'database_dateformat');
             foreach ($datefields as $datefield) {
-                if (!empty($extdbrow[$datefield])) {
+                if ($this->is_importing_field($datefield) && !empty($extdbrow[$datefield])) {
                     // Try to parse the contents - if parse fails assume a unix timestamp and leave unchanged.
                     $parsed_date = totara_date_parse_from_format($database_dateformat, trim($extdbrow[$datefield]), true);
                     if ($parsed_date) {

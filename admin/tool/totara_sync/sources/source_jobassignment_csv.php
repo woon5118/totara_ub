@@ -158,9 +158,10 @@ class totara_sync_source_jobassignment_csv extends totara_sync_source_jobassignm
                 }
             }
 
-            $datefields = array('startdate', 'enddate');
+            // Date fields.
+            $datefields = array('startdate', 'enddate', 'tempmanagerexpirydate');
             foreach ($datefields as $datefield) {
-                if (!empty($csvrow[$datefield])) {
+                if ($this->is_importing_field($datefield) && !empty($csvrow[$datefield])) {
                     // Try to parse the contents - if parse fails assume a unix timestamp and leave unchanged.
                     $parsed_date = totara_date_parse_from_format($csvdateformat, trim($csvrow[$datefield]), true);
                     if ($parsed_date) {
@@ -248,8 +249,11 @@ class totara_sync_source_jobassignment_csv extends totara_sync_source_jobassignm
                 case 'orgidnumber':
                 case 'posidnumber':
                 case 'manageridnumber':
+                case 'tempmanageridnumber':
+                case 'tempmanagerexpirydate':
                 case 'appraiseridnumber':
-                case 'managerjobassignmentidnumber':
+                case 'managerjaidnumber':
+                case 'tempmanagerjaidnumber':
                     $cleaned[$key] = clean_param(trim($value), PARAM_TEXT);
                     break;
                 case 'deleted':

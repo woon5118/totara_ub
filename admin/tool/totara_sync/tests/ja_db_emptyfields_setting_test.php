@@ -135,7 +135,7 @@ class tool_totara_sync_jobassignment_db_emptyfields_setting_testcase extends tot
             'import_posidnumber' => '1',
             'import_manageridnumber' => '1',
             'import_appraiseridnumber' => '1',
-            'import_managerjobassignmentidnumber' => '0'
+            'import_managerjaidnumber' => '0'
 
         );
 

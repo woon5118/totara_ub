@@ -1,4 +1,4 @@
-idnumber,useridnumber,timemodified,deleted,fullname,startdate,enddate,orgidnumber,posidnumber,manageridnumber,managerjobassignmentidnumber,appraiseridnumber
+idnumber,useridnumber,timemodified,deleted,fullname,startdate,enddate,orgidnumber,posidnumber,manageridnumber,managerjaidnumber,appraiseridnumber
 nonexistentposition,user1,0,0,A Full Name,,,orgx,notrealpos,manager2,jaidx,
 nonexistentorganisation,user2,0,0,A Full Name,,,notrealorg,posx,manager2,jaidx,
 nonexistentmanager,user3,0,0,A Full Name,,,orgx,posx,notrealmanager,notreal,

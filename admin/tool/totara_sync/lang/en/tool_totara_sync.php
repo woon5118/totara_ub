@@ -181,7 +181,7 @@ $string['address'] = 'Address';
 $string['orgidnumber'] = 'Organisation';
 $string['posidnumber'] = 'Position';
 $string['manageridnumber'] = 'Manager';
-$string['managerjobassignmentidnumber'] = 'Manager\'s job assignment';
+$string['managerjaidnumber'] = 'Manager\'s job assignment';
 $string['appraiseridnumber'] = 'Appraiser';
 $string['auth'] = 'Auth';
 $string['password'] = 'Password';
@@ -190,6 +190,7 @@ $string['suspended'] = 'Suspended';
 $string['emailstop'] = 'Turn email off';
 $string['customfields'] = 'Custom fields';
 $string['csvimportfilestructinfo'] = 'The current config requires a CSV file with the following structure:<br><pre>{$a}<br>...<br>...<br>...</pre>';
+$string['tempmanageridnumber'] = 'Temporary Manager';
 
 // Organisation
 $string['shortname'] = 'Shortname';
@@ -216,13 +217,14 @@ $string['jobassignmentsyncdisabled'] = 'Skipped job assignment \'{$a->idnumber}\
 $string['managementloop'] = 'Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\' as creating it would generate a circular management structure.';
 $string['manager'] = 'Manager';
 $string['managerxhasnojobassignment'] = 'User \'{$a->manageridnumber}\' does not have a job assignment and was set to be assigned as manager. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
-$string['managerjaxnotexistjobassignment'] = 'Job assignment \'{$a->managerjobassignmentidnumber}\' for manager \'{$a->manageridnumber}\' does not exist. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['managerjaxnotexistjobassignment'] = 'Job assignment \'{$a->managerjaidnumber}\' for manager \'{$a->manageridnumber}\' does not exist. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
 $string['managerxnotexistjobassignment'] = 'User \'{$a->manageridnumber}\' does not exist and was set to be assigned as manager. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
 $string['missingrequiredfieldjobassignment'] = 'Some records are missing their idnumber and/or useridnumber. These records were skipped.';
 $string['multiplejobsdisablednocreate'] ='Tried to create a job assignment but multiple job assignments site setting is disabled and a job assignment already exists. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
 $string['orgxnotexistjobassignment'] = 'Organisation \'{$a->orgidnumber}\' does not exist. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
 $string['posxnotexistjobassignment'] = 'Position \'{$a->posidnumber}\' does not exist. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
 $string['selfassignedmanagerjobassignment'] = 'User \'{$a->useridnumber}\' cannot be their own manager. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['selfassignedtempmanagerjobassignment'] = 'User \'{$a->useridnumber}\' cannot be their own temporary manager. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
 $string['selfassignedappraiserjobassignment'] = 'User \'{$a->useridnumber}\' cannot be their own appraiser. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
 $string['settings:totara_sync_source_jobassignment_csv'] = 'Job assignment - CSV source settings';
 $string['settings:totara_sync_source_jobassignment_database'] = 'Job assignment - external database source settings';
@@ -230,7 +232,13 @@ $string['startdate'] = 'Start date';
 $string['startafterendjobassignment'] = 'Start date cannot be later than end date. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
 $string['unabletomatchuseridnumber'] = 'Unable to match useridnumber \'{$a->useridnumber}\' to a user ID number for job assignment \'{$a->idnumber}\'';
 $string['updatedjobassignmentx'] = 'Updated job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['tempmanagerxnotexistjobassignment'] = 'User \'{$a->tempmanageridnumber}\' does not exist and was set to be assigned as temporary manager. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
 $string['willcreateduplicatejobidnumber'] = 'User \'{$a->useridnumber}\' has another job assignment with the same idnumber as what is being updated. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['tempemptymanagerjobassignmentidnumber'] = 'Missing temporary manager\'s job assignment id number for assigning manager \'{$a->tempmanageridnumber}\'. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['tempmanagerjaxnotexistjobassignment'] = 'Job assignment \'{$a->tempmanagerjaidnumber}\' for temporary manager \'{$a->tempmanageridnumber}\' does not exist. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['tempmanagerxexpirydatenotset'] = 'The expiry date is not set for assigning \'{$a->tempmanageridnumber}\' as temporary manager. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['tempmanagerxexpirydateinthepast'] = 'The expiry date can not be in the past for assigning \'{$a->tempmanageridnumber}\' as temporary manager. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
+$string['tempmanagerxhasnojobassignment'] = 'User \'{$a->tempmanageridnumber}\' does not have a job assignment and was set to be assigned as temporary manager. Skipped job assignment \'{$a->idnumber}\' for user \'{$a->useridnumber}\'.';
 
 // Multitenancy.
 $string['tenantmember'] = 'Tenant member';
@@ -483,3 +491,6 @@ $string['nocsvfilepath'] = 'no CSV filepath specified';
 $string['notifymessagestart'] = '{$a->count} new HR Import log messages ({$a->logtypes}) since {$a->since}. See below for most recent messages:';
 $string['enablescheduledsync'] = 'Enable scheduled HR Importing';
 $string['generalsettings'] = 'General settings';
+
+// Deprecated since 13.0
+$string['managerjobassignmentidnumber'] = 'Manager\'s job assignment';

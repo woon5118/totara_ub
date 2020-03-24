@@ -337,5 +337,35 @@ function xmldb_tool_totara_sync_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020010100, 'tool', 'totara_sync');
     }
 
+    if ($oldversion < 2020042000) {
+        // The Job Assignment import field managerjobassignmentidnumber has been renamed to managerjaidnumber.
+
+        $value = get_config('totara_sync_source_jobassignment_database', 'fieldmapping_managerjobassignmentidnumber');
+        if ($value !== false) {
+            unset_config('fieldmapping_managerjobassignmentidnumber', 'totara_sync_source_jobassignment_database');
+            set_config('fieldmapping_managerjaidnumber', $value, 'totara_sync_source_jobassignment_database');
+        }
+
+        $value = get_config('totara_sync_source_jobassignment_csv', 'fieldmapping_managerjobassignmentidnumber');
+        if ($value !== false) {
+            unset_config('fieldmapping_managerjobassignmentidnumber', 'totara_sync_source_jobassignment_csv');
+            set_config('fieldmapping_managerjaidnumber', $value, 'totara_sync_source_jobassignment_csv');
+        }
+
+        $value = get_config('totara_sync_source_jobassignment_database', 'import_managerjobassignmentidnumber');
+        if ($value !== false) {
+            unset_config('import_managerjobassignmentidnumber', 'totara_sync_source_jobassignment_database');
+            set_config('import_managerjaidnumber', $value, 'totara_sync_source_jobassignment_database');
+        }
+
+        $value = get_config('totara_sync_source_jobassignment_csv', 'import_managerjobassignmentidnumber');
+        if ($value !== false) {
+            unset_config('import_managerjobassignmentidnumber', 'totara_sync_source_jobassignment_csv');
+            set_config('import_managerjaidnumber', $value, 'totara_sync_source_jobassignment_csv');
+        }
+
+        upgrade_plugin_savepoint(true, 2020042000, 'tool', 'totara_sync');
+    }
+
     return true;
 }

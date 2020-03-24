@@ -199,18 +199,41 @@ class totara_sync_element_jobassignment extends totara_sync_element {
         foreach ($rs as $record) {
             $newvalues = (array)$record;
 
+            $doreattempt = false;
+            $continue = false;
+
+            // Manager.
             if (isset($newvalues['managerid'])) {
                 $error = $this->resolve_managerjaid($newvalues);
                 if ($error === 'managerjaxnotexistjobassignment' or $error === 'managerxhasnojobassignment') {
                     // This is the error for when a manager's job assignment doesn't exist.
                     // It might once we retry.
-                    $reattempt[] = $newvalues;
-                    continue;
+                    $doreattempt = true;
                 } else if (!empty($error)) {
                     $this->addlog(get_string($error, 'tool_totara_sync', (object)$newvalues), 'error', 'create/update');
-                    continue;
+                    $continue = true;
                 }
+            }
 
+            // Temporary manager.
+            if (isset($newvalues['tempmanagerid'])) {
+                $error = $this->resolve_tempmanagerjaid($newvalues);
+                if ($error === 'tempmanagerjaxnotexistjobassignment' or $error === 'tempmanagerxhasnojobassignment') {
+                    // This is the error for when a temporary manager's job assignment doesn't exist.
+                    // It might once we retry.
+                    $doreattempt = true;
+                } else if (!empty($error)) {
+                    $this->addlog(get_string($error, 'tool_totara_sync', (object)$newvalues), 'error', 'create/update');
+                    $continue = true;
+                }
+            }
+
+            if ($doreattempt) {
+                $reattempt[] = $newvalues;
+                continue;
+            }
+            if ($continue) {
+                continue;
             }
 
             // $newvalues gets modified internally to take out HR Import only stuff, so we copy
@@ -240,6 +263,13 @@ class totara_sync_element_jobassignment extends totara_sync_element {
         foreach($reattempt as $newvalues) {
             if (isset($newvalues['managerid'])) {
                 $error = $this->resolve_managerjaid($newvalues);
+                if ($error) {
+                    $this->addlog(get_string($error, 'tool_totara_sync', (object)$newvalues), 'error', 'create/update');
+                    continue;
+                }
+            }
+            if (isset($newvalues['tempmanagerid'])) {
+                $error = $this->resolve_tempmanagerjaid($newvalues);
                 if ($error) {
                     $this->addlog(get_string($error, 'tool_totara_sync', (object)$newvalues), 'error', 'create/update');
                     continue;
@@ -275,9 +305,9 @@ class totara_sync_element_jobassignment extends totara_sync_element {
      *   that describes the relevant error.
      */
     private function resolve_managerjaid(&$newvalues) {
-        // If the 'managerjobassignmentidnumber' key is not present, we aren't importing this field.
+        // If the 'managerjaidnumber' key is not present, we aren't importing this field.
         // We don't use isset because it could be null.
-        if (!array_key_exists('managerjobassignmentidnumber', $newvalues)) {
+        if (!array_key_exists('managerjaidnumber', $newvalues)) {
 
             $managerjobassignment = \totara_job\job_assignment::get_first($newvalues['managerid'], false);
             if (!isset($managerjobassignment)) {
@@ -287,20 +317,61 @@ class totara_sync_element_jobassignment extends totara_sync_element {
                 return '';
             }
 
-        } else if (($newvalues['managerjobassignmentidnumber'] === null)
-            or ($newvalues['managerjobassignmentidnumber'] === '')) {
+        } else if (($newvalues['managerjaidnumber'] === null)
+            or ($newvalues['managerjaidnumber'] === '')) {
 
             return 'emptymanagerjobassignmentidnumber';
         }
 
         $managerjobassignment = \totara_job\job_assignment::get_with_idnumber(
-            $newvalues['managerid'], $newvalues['managerjobassignmentidnumber'], false);
+            $newvalues['managerid'], $newvalues['managerjaidnumber'], false);
 
         if (isset($managerjobassignment)) {
             $newvalues['managerjaid'] = $managerjobassignment->id;
             return '';
         } else {
             return 'managerjaxnotexistjobassignment';
+        }
+    }
+
+    /**
+     * Given an array containing data from an HR Import row. This will add the temporary manager's job assignment id if there is
+     * one, under the array key 'tempmanagerjaid'. If there's not, an error corresponding to a lang string will be returned.
+     *
+     * This assumes that we do want to add a temporary manager here. This will return an error if no temporary manager is supposed
+     * to be added, so check if we want to use this method before calling it.
+     *
+     * @param array $newvalues Passed by reference and modified. Contains the data for an HR Import row.
+     * @return string which is empty if managerjaid was added successfully, otherwise and the key for a lang string
+     *   that describes the relevant error.
+     */
+    private function resolve_tempmanagerjaid(&$newvalues) {
+        // If the 'tempmanagerjaidnumber' key is not present, we aren't importing this field.
+        // We don't use isset because it could be null.
+        if (!array_key_exists('tempmanagerjaidnumber', $newvalues)) {
+
+            $managerjobassignment = \totara_job\job_assignment::get_first($newvalues['tempmanagerid'], false);
+            if (!isset($managerjobassignment)) {
+                return 'tempmanagerxhasnojobassignment';
+            } else {
+                $newvalues['tempmanagerjaid'] = $managerjobassignment->id;
+                return '';
+            }
+
+        } else if (($newvalues['tempmanagerjaidnumber'] === null)
+            or ($newvalues['tempmanagerjaidnumber'] === '')) {
+
+            return 'tempemptymanagerjobassignmentidnumber';
+        }
+
+        $managerjobassignment = \totara_job\job_assignment::get_with_idnumber(
+            $newvalues['tempmanagerid'], $newvalues['tempmanagerjaidnumber'], false);
+
+        if (isset($managerjobassignment)) {
+            $newvalues['tempmanagerjaid'] = $managerjobassignment->id;
+            return '';
+        } else {
+            return 'tempmanagerjaxnotexistjobassignment';
         }
     }
 
@@ -313,15 +384,34 @@ class totara_sync_element_jobassignment extends totara_sync_element {
      *  with array_filter().
      */
     private function callback_retry_failures_due_to_manager($newvalues) {
+        $return = null;
+
+        // Manager.
         if (isset($newvalues['managerid'])) {
             $error = $this->resolve_managerjaid($newvalues);
             if ($error === 'managerjaxnotexistjobassignment' or $error === 'managerxhasnojobassignment') {
                 // Return true to keep the value in the array.
-                return true;
+                $return = true;
             } else if (!empty($error)) {
                 $this->addlog(get_string($error, 'tool_totara_sync', (object)$newvalues), 'error', 'create/update');
-                return false;
+                $return = false;
             }
+        }
+
+        // Temporary manager.
+        if (isset($newvalues['tempmanagerid'])) {
+            $error = $this->resolve_tempmanagerjaid($newvalues);
+            if ($error === 'tempmanagerjaxnotexistjobassignment' or $error === 'tempmanagerxhasnojobassignment') {
+                // Return true to keep the value in the array.
+                $return = true;
+            } else if (!empty($error)) {
+                $this->addlog(get_string($error, 'tool_totara_sync', (object)$newvalues), 'error', 'create/update');
+                $return = false;
+            }
+        }
+
+        if (!is_null($return)) {
+            return $return;
         }
 
         // $newvalues gets modified internally to take out HR Import only stuff, so we copy
@@ -410,7 +500,10 @@ class totara_sync_element_jobassignment extends totara_sync_element {
         unset($newvalues['posidnumber']);
         unset($newvalues['managerid']);
         unset($newvalues['manageridnumber']);
-        unset($newvalues['managerjobassignmentidnumber']);
+        unset($newvalues['managerjaidnumber']);
+        unset($newvalues['tempmanagerid']);
+        unset($newvalues['tempmanageridnumber']);
+        unset($newvalues['tempmanagerjaidnumber']);
         unset($newvalues['appraiseridnumber']);
     }
 
@@ -574,6 +667,62 @@ class totara_sync_element_jobassignment extends totara_sync_element {
             $invalidmanagerrecords = $DB->get_recordset_sql($sql);
             foreach ($invalidmanagerrecords as $invalidmanagerrecord) {
                 $this->addlog(get_string('managerxnotexistjobassignment', 'tool_totara_sync', $invalidmanagerrecord), 'error', 'checksanity');
+                $idstodelete[] = $invalidmanagerrecord->id;
+            }
+            $invalidmanagerrecords->close();
+        }
+
+        if ($this->get_source()->is_importing_field('tempmanageridnumber')) {
+
+            $sql = "SELECT id, idnumber, useridnumber
+                      FROM {" . $table . "} s
+                     WHERE useridnumber = tempmanageridnumber
+                       AND tempmanageridnumber IS NOT NULL
+                       AND tempmanageridnumber != ''";
+            $selfmanagers = $DB->get_recordset_sql($sql);
+            foreach ($selfmanagers as $selfmanager) {
+                $this->addlog(get_string('selfassignedtempmanagerjobassignment', 'tool_totara_sync', $selfmanager), 'error', 'checksanity');
+                $idstodelete[] = $selfmanager->id;
+            }
+            $selfmanagers->close();
+
+            // Invalid temporary manager. Checking tempmanageridnumber only so far as tempmanagerjobassignmentid may be added during import.
+            $sql = "SELECT s.id, s.idnumber, s.useridnumber, s.tempmanageridnumber
+                      FROM {" . $table . "} s
+                 LEFT JOIN {user} u  ON s.tempmanageridnumber=u.idnumber
+                     WHERE s.tempmanageridnumber IS NOT NULL
+                       AND s.tempmanageridnumber != ''
+                       AND u.idnumber IS NULL";
+            $invalidmanagerrecords = $DB->get_recordset_sql($sql);
+            foreach ($invalidmanagerrecords as $invalidmanagerrecord) {
+                $this->addlog(get_string('tempmanagerxnotexistjobassignment', 'tool_totara_sync', $invalidmanagerrecord), 'error', 'checksanity');
+                $idstodelete[] = $invalidmanagerrecord->id;
+            }
+            $invalidmanagerrecords->close();
+
+            // Ensure tempmanagerexpirydate is set.
+            $sql = "SELECT s.id, s.idnumber, s.useridnumber, s.tempmanageridnumber
+                      FROM {" . $table . "} s
+                     WHERE s.tempmanageridnumber IS NOT NULL
+                       AND s.tempmanageridnumber != ''
+                       AND (s.tempmanagerexpirydate IS NULL OR s.tempmanagerexpirydate = '')";
+            $invalidmanagerrecords = $DB->get_recordset_sql($sql);
+            foreach ($invalidmanagerrecords as $invalidmanagerrecord) {
+                $this->addlog(get_string('tempmanagerxexpirydatenotset', 'tool_totara_sync', $invalidmanagerrecord), 'error', 'checksanity');
+                $idstodelete[] = $invalidmanagerrecord->id;
+            }
+            $invalidmanagerrecords->close();
+
+            // Ensure tempmanagerexpirydate is not in the past.
+            $sql = "SELECT s.id, s.idnumber, s.useridnumber, s.tempmanageridnumber
+                          FROM {" . $table . "} s
+                         WHERE s.tempmanageridnumber IS NOT NULL
+                           AND s.tempmanageridnumber != ''
+                           AND (s.tempmanagerexpirydate IS NOT NULL OR s.tempmanagerexpirydate != '')
+                           AND s.tempmanagerexpirydate <= :now";
+            $invalidmanagerrecords = $DB->get_recordset_sql($sql, array('now' => time()));
+            foreach ($invalidmanagerrecords as $invalidmanagerrecord) {
+                $this->addlog(get_string('tempmanagerxexpirydateinthepast', 'tool_totara_sync', $invalidmanagerrecord), 'error', 'checksanity');
                 $idstodelete[] = $invalidmanagerrecord->id;
             }
             $invalidmanagerrecords->close();
@@ -750,13 +899,26 @@ class totara_sync_element_jobassignment extends totara_sync_element {
             // the manager job assignment id yet as that may not have been created.
             // We also still fetch the manageridnumber for logging purposes.
             $select[] = "m.id as managerid, s.manageridnumber";
-            if ($this->get_source()->is_importing_field('managerjobassignmentidnumber')) {
-                $select[] = "s.managerjobassignmentidnumber";
+            if ($this->get_source()->is_importing_field('managerjaidnumber')) {
+                $select[] = "s.managerjaidnumber";
             }
             $from[] = "LEFT JOIN {user} m
                               ON s.manageridnumber=m.idnumber
                              AND s.manageridnumber IS NOT NULL
                              AND s.manageridnumber != ''";
+        }
+        if ($this->get_source()->is_importing_field('tempmanageridnumber')) {
+            // We want to get user id of the temporary manager, but we won't go looking for
+            // the temporary manager job assignment id yet as that may not have been created.
+            // We also still fetch the temporarymanageridnumber for logging purposes.
+            $select[] = "tm.id as tempmanagerid, s.tempmanageridnumber, s.tempmanagerexpirydate";
+            if ($this->get_source()->is_importing_field('tempmanagerjaidnumber')) {
+                $select[] = "s.tempmanagerjaidnumber";
+            }
+            $from[] = "LEFT JOIN {user} tm
+                              ON s.tempmanageridnumber=tm.idnumber
+                             AND s.tempmanageridnumber IS NOT NULL
+                             AND s.tempmanageridnumber != ''";
         }
         if ($this->get_source()->is_importing_field('appraiseridnumber')) {
             $select[] = "a.id as appraiserid, s.appraiseridnumber";

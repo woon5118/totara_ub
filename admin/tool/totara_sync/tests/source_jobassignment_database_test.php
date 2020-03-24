@@ -132,7 +132,10 @@ class tool_totara_sync_source_jobassignment_database_testcase extends advanced_t
         $table->add_field('orgidnumber', XMLDB_TYPE_CHAR, '32');
         $table->add_field('appraiseridnumber', XMLDB_TYPE_CHAR, '100');
         $table->add_field('manageridnumber', XMLDB_TYPE_CHAR, '255');
-        $table->add_field('managerjobassignmentidnumber', XMLDB_TYPE_CHAR, '255');
+        $table->add_field('managerjaidnumber', XMLDB_TYPE_CHAR, '255');
+        $table->add_field('tempmanageridnumber', XMLDB_TYPE_CHAR, '255');
+        $table->add_field('tempmanagerjaidnumber', XMLDB_TYPE_CHAR, '255');
+        $table->add_field('tempmanagerexpirydate', XMLDB_TYPE_CHAR, '100');
         $table->add_field('fullname', XMLDB_TYPE_CHAR, '255');
 
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
@@ -358,5 +361,131 @@ class tool_totara_sync_source_jobassignment_database_testcase extends advanced_t
         $this->assertCount(1, $jobassignments);
         $this->assertEquals('dev1', $jobassignments[1]->idnumber);
         $this->assertEquals($tenjune, $jobassignments[1]->startdate);
+    }
+
+    public function test_tempmanagerexpirydate() {
+        global $DB;
+
+        $user1 = $this->getDataGenerator()->create_user(['idnumber' => 'user1']);
+        $user2 = $this->getDataGenerator()->create_user(['idnumber' => 'user2']);
+        $user3 = $this->getDataGenerator()->create_user(['idnumber' => 'user3']);
+        $user4 = $this->getDataGenerator()->create_user(['idnumber' => 'user4']);
+        $user5 = $this->getDataGenerator()->create_user(['idnumber' => 'user4']);
+
+        $manager = $this->getDataGenerator()->create_user(['idnumber' => 'manager1']);
+        $managerja = \totara_job\job_assignment::create(
+            ['userid' => $manager->id, 'idnumber' => 'managerja', 'totarasync' => 1]);
+
+        // User 1 with valid date in date format.
+        $entry = new stdClass();
+        $entry->idnumber = 'user1ja';
+        $entry->useridnumber = 'user1';
+        $entry->timemodified = 0;
+        $entry->deleted = 0;
+        $entry->tempmanageridnumber = $manager->idnumber;
+        $entry->tempmanagerjaidnumber = $managerja->idnumber;
+        $entry->tempmanagerexpirydate = '10/06/2050';
+        $this->ext_dbconnection->insert_record($this->dbtable, $entry);
+
+        // User 2 with valid date as timestamp
+        $entry = new stdClass();
+        $entry->idnumber = 'user2ja';
+        $entry->useridnumber = 'user2';
+        $entry->timemodified = 0;
+        $entry->deleted = 0;
+        $entry->tempmanageridnumber = $manager->idnumber;
+        $entry->tempmanagerjaidnumber = $managerja->idnumber;
+        $entry->tempmanagerexpirydate = '2538432000';
+        $this->ext_dbconnection->insert_record($this->dbtable, $entry);
+
+        // User 3 with invalid date.
+        $entry = new stdClass();
+        $entry->idnumber = 'user3ja';
+        $entry->useridnumber = 'user3';
+        $entry->timemodified = 0;
+        $entry->deleted = 0;
+        $entry->tempmanageridnumber = $manager->idnumber;
+        $entry->tempmanagerjaidnumber = $managerja->idnumber;
+        $entry->tempmanagerexpirydate = '';
+        $this->ext_dbconnection->insert_record($this->dbtable, $entry);
+
+        // User 4 with invalid date.
+        $entry = new stdClass();
+        $entry->idnumber = 'user4ja';
+        $entry->useridnumber = 'user4';
+        $entry->timemodified = 0;
+        $entry->deleted = 0;
+        $entry->tempmanageridnumber = $manager->idnumber;
+        $entry->tempmanagerjaidnumber = $managerja->idnumber;
+        $entry->tempmanagerexpirydate = null;
+        $this->ext_dbconnection->insert_record($this->dbtable, $entry);
+
+        // User 5 with invalid date, in the past.
+        $entry = new stdClass();
+        $entry->idnumber = 'user5ja';
+        $entry->useridnumber = 'user5';
+        $entry->timemodified = 0;
+        $entry->deleted = 0;
+        $entry->tempmanageridnumber = $manager->idnumber;
+        $entry->tempmanagerjaidnumber = $managerja->idnumber;
+        $entry->tempmanagerexpirydate = 0;
+        $this->ext_dbconnection->insert_record($this->dbtable, $entry);
+
+        // User 6 with invalid date, in the past.
+        $entry = new stdClass();
+        $entry->idnumber = 'user6ja';
+        $entry->useridnumber = 'user6';
+        $entry->timemodified = 0;
+        $entry->deleted = 0;
+        $entry->tempmanageridnumber = $manager->idnumber;
+        $entry->tempmanagerjaidnumber = $managerja->idnumber;
+        $entry->tempmanagerexpirydate = '10/01/2020';
+        $this->ext_dbconnection->insert_record($this->dbtable, $entry);
+
+        $source = new totara_sync_source_jobassignment_database();
+        $source->set_config('import_tempmanageridnumber', '1');
+        $source->set_config('import_tempmanagerjaidnumber', '1');
+        $source->set_config('database_dateformat', 'd/m/Y');
+
+        $element = new totara_sync_element_jobassignment();
+        $element->set_config('allow_create', '1');
+        $element->sync();
+
+        // User 1.
+        $jobassignments = \totara_job\job_assignment::get_all($user1->id);
+        $this->assertCount(1, $jobassignments);
+        $this->assertEquals('user1ja', $jobassignments[1]->idnumber);
+        $info = "Created job assignment 'user1ja' for user 'user1'.";
+        $this->assertEquals(1, $DB->count_records('totara_sync_log', ['info' => $info]));
+        $tenjune2050 = totara_date_parse_from_format('d/m/Y', '10/06/2050');
+        $this->assertEquals($tenjune2050, $jobassignments[1]->tempmanagerexpirydate);
+
+        // User 2.
+        $jobassignments = \totara_job\job_assignment::get_all($user2->id);
+        $this->assertCount(1, $jobassignments);
+        $this->assertEquals('user2ja', $jobassignments[1]->idnumber);
+        $info = "Created job assignment 'user2ja' for user 'user2'.";
+        $this->assertEquals(1, $DB->count_records('totara_sync_log', ['info' => $info]));
+        $this->assertEquals('2538432000', $jobassignments[1]->tempmanagerexpirydate);
+
+        // User 3.
+        $this->assertEmpty(\totara_job\job_assignment::get_all($user3->id));
+        $info = "The expiry date is not set for assigning 'manager1' as temporary manager. Skipped job assignment 'user3ja' for user 'user3'.";
+        $this->assertEquals(1, $DB->count_records('totara_sync_log', ['info' => $info]));
+
+        // User 4.
+        $this->assertEmpty(\totara_job\job_assignment::get_all($user3->id));
+        $info = "The expiry date is not set for assigning 'manager1' as temporary manager. Skipped job assignment 'user4ja' for user 'user4'.";
+        $this->assertEquals(1, $DB->count_records('totara_sync_log', ['info' => $info]));
+
+        // User 5.
+        $this->assertEmpty(\totara_job\job_assignment::get_all($user3->id));
+        $info = "The expiry date can not be in the past for assigning 'manager1' as temporary manager. Skipped job assignment 'user5ja' for user 'user5'.";
+        $this->assertEquals(1, $DB->count_records('totara_sync_log', ['info' => $info]));
+
+        // User 6.
+        $this->assertEmpty(\totara_job\job_assignment::get_all($user3->id));
+        $info = "The expiry date can not be in the past for assigning 'manager1' as temporary manager. Skipped job assignment 'user6ja' for user 'user6'.";
+        $this->assertEquals(1, $DB->count_records('totara_sync_log', ['info' => $info]));
     }
 }

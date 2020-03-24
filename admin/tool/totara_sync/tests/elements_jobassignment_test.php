@@ -92,6 +92,7 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
         $users = array();
         $users['user1'] = $this->getDataGenerator()->create_user(['idnumber' => 'user1']);
         $users['user2'] = $this->getDataGenerator()->create_user(['idnumber' => 'user2']);
+        $users['user3'] = $this->getDataGenerator()->create_user(['idnumber' => 'user3']);
         // This job assignment has totarasync=0 so should never be affected by
         // and HR Import operations.
         \totara_job\job_assignment::create(
@@ -952,7 +953,7 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
 
     public function test_manager_valid() {
         global $DB;
-        $this->resetAfterTest(true);
+        $this->setAdminUser();
         $source = $this->prepare_source_table();
         $users = $this->create_test_users();
 
@@ -969,15 +970,29 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
         \totara_job\job_assignment::create(
             ['userid' => $users['user1']->id, 'idnumber' => 'dev1', 'managerjaid' => $manager1job1->id, 'totarasync' => 1]);
 
+        $tenjune2050 = totara_date_parse_from_format('d/m/Y', '10/06/2050');
+        \totara_job\job_assignment::create(
+            ['userid' => $users['user3']->id, 'idnumber' => 'dev2', 'tempmanagerjaid' => $manager1job1->id, 'tempmanagerexpirydate' => $tenjune2050, 'totarasync' => 1]);
+
         $entry = new stdClass();
         $entry->idnumber = 'dev1';
         $entry->useridnumber = 'user1';
         $entry->timemodified = 0;
         $entry->manageridnumber = 'manager2';
-        $entry->managerjobassignmentidnumber = 'job2';
+        $entry->managerjaidnumber = 'job2';
+        $DB->insert_record($source->temptablename, $entry);
+
+        $entry = new stdClass();
+        $entry->idnumber = 'dev2';
+        $entry->useridnumber = 'user3';
+        $entry->timemodified = 0;
+        $entry->tempmanageridnumber = 'manager2';
+        $entry->tempmanagerjaidnumber = 'job2';
+        $entry->tempmanagerexpirydate = $tenjune2050;
         $DB->insert_record($source->temptablename, $entry);
 
         $source->set_config('import_manageridnumber', '1');
+        $source->set_config('import_tempmanageridnumber', '1');
 
         $element = $this->get_element_mock($source);
         $element->set_config('allow_update', '1');
@@ -988,11 +1003,18 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
         $this->assertEquals('dev1', $jobassignments[1]->idnumber);
         $this->assertEquals($manager2->id, $jobassignments[1]->managerid);
         $this->assertEquals($manager2job2->id, $jobassignments[1]->managerjaid);
+
+        $jobassignments = \totara_job\job_assignment::get_all($users['user3']->id);
+        $this->assertCount(1, $jobassignments);
+        $this->assertEquals('dev2', $jobassignments[1]->idnumber);
+        $this->assertEquals($manager2->id, $jobassignments[1]->tempmanagerid);
+        $this->assertEquals($manager2job2->id, $jobassignments[1]->tempmanagerjaid);
+        $this->assertEquals($tenjune2050, $jobassignments[1]->tempmanagerexpirydate);
     }
 
     public function test_manager_no_matching_idnumber() {
         global $DB;
-        $this->resetAfterTest(true);
+        $this->setAdminUser();
         $source = $this->prepare_source_table();
         $users = $this->create_test_users();
 
@@ -1009,15 +1031,29 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
         \totara_job\job_assignment::create(
             ['userid' => $users['user1']->id, 'idnumber' => 'dev1', 'managerjaid' => $manager1job1->id, 'totarasync' => 1]);
 
+        $tenjune2050 = totara_date_parse_from_format('d/m/Y', '10/06/2050');
+        \totara_job\job_assignment::create(
+            ['userid' => $users['user3']->id, 'idnumber' => 'dev2', 'tempmanagerjaid' => $manager1job1->id, 'tempmanagerexpirydate' => $tenjune2050, 'totarasync' => 1]);
+
         $entry = new stdClass();
         $entry->idnumber = 'dev1';
         $entry->useridnumber = 'user1';
         $entry->timemodified = 0;
         $entry->manageridnumber = 'managerX';
-        $entry->managerjobassignmentidnumber = 'job2';
+        $entry->managerjaidnumber = 'job2';
+        $DB->insert_record($source->temptablename, $entry);
+
+        $entry = new stdClass();
+        $entry->idnumber = 'dev2';
+        $entry->useridnumber = 'user3';
+        $entry->timemodified = 0;
+        $entry->tempmanageridnumber = 'managerX';
+        $entry->tempmanagerjaidnumber = 'job2';
+        $entry->tempmanagerexpirydate = $tenjune2050;
         $DB->insert_record($source->temptablename, $entry);
 
         $source->set_config('import_manageridnumber', '1');
+        $source->set_config('import_tempmanageridnumber', '1');
 
         $element = $this->get_element_mock($source);
         $element->set_config('allow_update', '1');
@@ -1033,11 +1069,23 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
             'logtype' => 'error',
             'action' => 'checksanity',
             'info' => 'User \'managerX\' does not exist and was set to be assigned as manager. Skipped job assignment \'dev1\' for user \'user1\'.')));
+
+        $jobassignments = \totara_job\job_assignment::get_all($users['user3']->id);
+        $this->assertCount(1, $jobassignments);
+        $this->assertEquals('dev2', $jobassignments[1]->idnumber);
+        $this->assertEquals($manager1->id, $jobassignments[1]->tempmanagerid);
+        $this->assertEquals($manager1job1->id, $jobassignments[1]->tempmanagerjaid);
+        $this->assertEquals($tenjune2050, $jobassignments[1]->tempmanagerexpirydate);
+        $this->assertEquals(1, $DB->count_records('totara_sync_log', array(
+            'element' => 'jobassignment',
+            'logtype' => 'error',
+            'action' => 'checksanity',
+            'info' => 'User \'managerX\' does not exist and was set to be assigned as temporary manager. Skipped job assignment \'dev2\' for user \'user3\'.')));
     }
 
     public function test_manager_no_matching_jobassignment_idnumber() {
         global $DB;
-        $this->resetAfterTest(true);
+        $this->setAdminUser();
         $source = $this->prepare_source_table();
         $users = $this->create_test_users();
 
@@ -1054,15 +1102,29 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
         \totara_job\job_assignment::create(
             ['userid' => $users['user1']->id, 'idnumber' => 'dev1', 'managerjaid' => $manager1job1->id, 'totarasync' => 1]);
 
+        $tenjune2050 = totara_date_parse_from_format('d/m/Y', '10/06/2050');
+        \totara_job\job_assignment::create(
+            ['userid' => $users['user3']->id, 'idnumber' => 'dev2', 'tempmanagerjaid' => $manager1job1->id, 'tempmanagerexpirydate' => $tenjune2050, 'totarasync' => 1]);
+
         $entry = new stdClass();
         $entry->idnumber = 'dev1';
         $entry->useridnumber = 'user1';
         $entry->timemodified = 0;
         $entry->manageridnumber = 'manager2';
-        $entry->managerjobassignmentidnumber = 'jobX';
+        $entry->managerjaidnumber = 'jobX';
+        $DB->insert_record($source->temptablename, $entry);
+
+        $entry = new stdClass();
+        $entry->idnumber = 'dev2';
+        $entry->useridnumber = 'user3';
+        $entry->timemodified = 0;
+        $entry->tempmanageridnumber = 'manager2';
+        $entry->tempmanagerjaidnumber = 'jobX';
+        $entry->tempmanagerexpirydate = $tenjune2050;
         $DB->insert_record($source->temptablename, $entry);
 
         $source->set_config('import_manageridnumber', '1');
+        $source->set_config('import_tempmanageridnumber', '1');
 
         $element = $this->get_element_mock($source);
         $element->set_config('allow_update', '1');
@@ -1078,11 +1140,23 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
             'logtype' => 'error',
             'action' => 'create/update',
             'info' => 'Job assignment \'jobX\' for manager \'manager2\' does not exist. Skipped job assignment \'dev1\' for user \'user1\'.')));
+
+        $jobassignments = \totara_job\job_assignment::get_all($users['user3']->id);
+        $this->assertCount(1, $jobassignments);
+        $this->assertEquals('dev2', $jobassignments[1]->idnumber);
+        $this->assertEquals($manager1->id, $jobassignments[1]->tempmanagerid);
+        $this->assertEquals($manager1job1->id, $jobassignments[1]->tempmanagerjaid);
+        $this->assertEquals($tenjune2050, $jobassignments[1]->tempmanagerexpirydate);
+        $this->assertEquals(1, $DB->count_records('totara_sync_log', array(
+            'element' => 'jobassignment',
+            'logtype' => 'error',
+            'action' => 'create/update',
+            'info' => 'Job assignment \'jobX\' for temporary manager \'manager2\' does not exist. Skipped job assignment \'dev2\' for user \'user3\'.')));
     }
 
     public function test_managerjobassignmentidnumber_blank() {
         global $DB;
-        $this->resetAfterTest(true);
+        $this->setAdminUser();
         $source = $this->prepare_source_table();
         $users = $this->create_test_users();
 
@@ -1099,15 +1173,29 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
         \totara_job\job_assignment::create(
             ['userid' => $users['user1']->id, 'idnumber' => 'dev1', 'managerjaid' => $manager1job1->id, 'totarasync' => 1]);
 
+        $tenjune2050 = totara_date_parse_from_format('d/m/Y', '10/06/2050');
+        \totara_job\job_assignment::create(
+            ['userid' => $users['user3']->id, 'idnumber' => 'dev2', 'tempmanagerjaid' => $manager1job1->id, 'tempmanagerexpirydate' => $tenjune2050, 'totarasync' => 1]);
+
         $entry = new stdClass();
         $entry->idnumber = 'dev1';
         $entry->useridnumber = 'user1';
         $entry->timemodified = 0;
         $entry->manageridnumber = 'manager2';
-        $entry->managerjobassignmentidnumber = '';
+        $entry->managerjaidnumber = '';
+        $DB->insert_record($source->temptablename, $entry);
+
+        $entry = new stdClass();
+        $entry->idnumber = 'dev2';
+        $entry->useridnumber = 'user3';
+        $entry->timemodified = 0;
+        $entry->tempmanageridnumber = 'manager2';
+        $entry->tempmanagerjaidnumber = '';
+        $entry->tempmanagerexpirydate = $tenjune2050;
         $DB->insert_record($source->temptablename, $entry);
 
         $source->set_config('import_manageridnumber', '1');
+        $source->set_config('import_tempmanageridnumber', '1');
 
         $element = $this->get_element_mock($source);
         $element->set_config('allow_update', '1');
@@ -1123,11 +1211,23 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
             'logtype' => 'error',
             'action' => 'create/update',
             'info' => 'Missing manager\'s job assignment id number for assigning manager \'manager2\'. Skipped job assignment \'dev1\' for user \'user1\'.')));
+
+        $jobassignments = \totara_job\job_assignment::get_all($users['user3']->id);
+        $this->assertCount(1, $jobassignments);
+        $this->assertEquals('dev2', $jobassignments[1]->idnumber);
+        $this->assertEquals($manager1->id, $jobassignments[1]->tempmanagerid);
+        $this->assertEquals($manager1job1->id, $jobassignments[1]->tempmanagerjaid);
+        $this->assertEquals($tenjune2050, $jobassignments[1]->tempmanagerexpirydate);
+        $this->assertEquals(1, $DB->count_records('totara_sync_log', array(
+            'element' => 'jobassignment',
+            'logtype' => 'error',
+            'action' => 'create/update',
+            'info' => 'Missing temporary manager\'s job assignment id number for assigning manager \'manager2\'. Skipped job assignment \'dev2\' for user \'user3\'.')));
     }
 
     public function test_manager_job_assignments_created_later() {
         global $DB;
-        $this->resetAfterTest(true);
+        $this->setAdminUser();
         $source = $this->prepare_source_table();
         $users = $this->create_test_users();
 
@@ -1135,39 +1235,56 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
         $manager2 = $this->getDataGenerator()->create_user(array('idnumber' => 'manager2'));
         $manager3 = $this->getDataGenerator()->create_user(array('idnumber' => 'manager3'));
         $user = $this->getDataGenerator()->create_user(['idnumber' => 'user1']);
+        $user3 = $this->getDataGenerator()->create_user(['idnumber' => 'user3']);
         \totara_job\job_assignment::create(
             ['userid' => $user->id, 'idnumber' => 'dev1', 'totarasync' => 1]);
+
+        \totara_job\job_assignment::create(
+            ['userid' => $user3->id, 'idnumber' => 'dev2', 'totarasync' => 1]);
+
+        $tenjune2050 = totara_date_parse_from_format('d/m/Y', '10/06/2050');
 
         $entry = new stdClass();
         $entry->idnumber = 'dev1';
         $entry->useridnumber = 'user1';
         $entry->timemodified = 0;
         $entry->manageridnumber = 'manager1';
-        $entry->managerjobassignmentidnumber = 'job1';
+        $entry->managerjaidnumber = 'job1';
+        $DB->insert_record($source->temptablename, $entry);
+        $entry = new stdClass();
+        $entry->idnumber = 'dev2';
+        $entry->useridnumber = 'user3';
+        $entry->timemodified = 0;
+        $entry->manageridnumber = 'manager1';
+        $entry->managerjaidnumber = 'job1';
+        $entry->tempmanageridnumber = 'manager2';
+        $entry->tempmanagerjaidnumber = 'job1';
+        $entry->tempmanagerexpirydate = $tenjune2050;
         $DB->insert_record($source->temptablename, $entry);
         $entry = new stdClass();
         $entry->idnumber = 'job1';
         $entry->useridnumber = 'manager1';
         $entry->timemodified = 0;
         $entry->manageridnumber = 'manager2';
-        $entry->managerjobassignmentidnumber = 'job1';
+        $entry->managerjaidnumber = 'job1';
         $DB->insert_record($source->temptablename, $entry);
         $entry = new stdClass();
         $entry->idnumber = 'job1';
         $entry->useridnumber = 'manager2';
         $entry->timemodified = 0;
         $entry->manageridnumber = 'manager3';
-        $entry->managerjobassignmentidnumber = 'jobA';
+        $entry->managerjaidnumber = 'jobA';
         $DB->insert_record($source->temptablename, $entry);
         $entry = new stdClass();
         $entry->idnumber = 'jobA';
         $entry->useridnumber = 'manager3';
         $entry->timemodified = 0;
         $entry->manageridnumber = '';
-        $entry->managerjobassignmentidnumber = '';
+        $entry->managerjaidnumber = '';
         $DB->insert_record($source->temptablename, $entry);
 
         $source->set_config('import_manageridnumber', '1');
+        $source->set_config('import_tempmanageridnumber', '1');
 
         $element = $this->get_element_mock($source);
         $element->set_config('allow_create', '1');
@@ -1178,6 +1295,13 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
         $this->assertCount(1, $jobassignments);
         $this->assertEquals('dev1', $jobassignments[1]->idnumber);
         $this->assertEquals($manager1->id, $jobassignments[1]->managerid);
+
+        $jobassignments = \totara_job\job_assignment::get_all($users['user3']->id);
+        $this->assertCount(1, $jobassignments);
+        $this->assertEquals('dev2', $jobassignments[1]->idnumber);
+        $this->assertEquals($manager1->id, $jobassignments[1]->managerid);
+        $this->assertEquals($manager2->id, $jobassignments[1]->tempmanagerid);
+        $this->assertEquals($tenjune2050, $jobassignments[1]->tempmanagerexpirydate);
 
         $jobassignments = \totara_job\job_assignment::get_all($manager1->id);
         $this->assertCount(1, $jobassignments);
@@ -1197,7 +1321,7 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
 
     public function test_self_assigned_as_manager() {
         global $DB;
-        $this->resetAfterTest(true);
+        $this->setAdminUser();
         $source = $this->prepare_source_table();
         $users = $this->create_test_users();
 
@@ -1209,15 +1333,31 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
         \totara_job\job_assignment::create(
             ['userid' => $users['user1']->id, 'idnumber' => 'job2']);
 
+        $tenjune2050 = totara_date_parse_from_format('d/m/Y', '10/06/2050');
+        \totara_job\job_assignment::create(
+            ['userid' => $users['user3']->id, 'idnumber' => 'dev1', 'tempmanagerjaid' => $manager1job1->id, 'tempmanagerexpirydate' => $tenjune2050, 'totarasync' => 1]);
+        \totara_job\job_assignment::create(
+            ['userid' => $users['user3']->id, 'idnumber' => 'job2']);
+
         $entry = new stdClass();
         $entry->idnumber = 'dev1';
         $entry->useridnumber = 'user1';
         $entry->timemodified = 0;
         $entry->manageridnumber = 'user1';
-        $entry->managerjobassignmentidnumber = 'job2';
+        $entry->managerjaidnumber = 'job2';
+        $DB->insert_record($source->temptablename, $entry);
+
+        $entry = new stdClass();
+        $entry->idnumber = 'dev1';
+        $entry->useridnumber = 'user3';
+        $entry->timemodified = 0;
+        $entry->tempmanageridnumber = 'user3';
+        $entry->tempmanagerjaidnumber = 'job2';
+        $entry->tempmanagerexpirydate = $tenjune2050;
         $DB->insert_record($source->temptablename, $entry);
 
         $source->set_config('import_manageridnumber', '1');
+        $source->set_config('import_tempmanageridnumber', '1');
 
         $element = $this->get_element_mock($source);
         $element->set_config('allow_update', '1');
@@ -1233,6 +1373,17 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
             'logtype' => 'error',
             'action' => 'checksanity',
             'info' => 'User \'user1\' cannot be their own manager. Skipped job assignment \'dev1\' for user \'user1\'.')));
+
+        $jobassignments = \totara_job\job_assignment::get_all($users['user3']->id);
+        $this->assertCount(2, $jobassignments);
+        $this->assertEquals('dev1', $jobassignments[1]->idnumber);
+        $this->assertEquals($manager1->id, $jobassignments[1]->tempmanagerid);
+        $this->assertEquals($manager1job1->id, $jobassignments[1]->tempmanagerjaid);
+        $this->assertEquals(1, $DB->count_records('totara_sync_log', array(
+            'element' => 'jobassignment',
+            'logtype' => 'error',
+            'action' => 'checksanity',
+            'info' => 'User \'user3\' cannot be their own temporary manager. Skipped job assignment \'dev1\' for user \'user3\'.')));
     }
 
     public function test_updateidnumbers_create_when_no_jobs() {
@@ -1333,21 +1484,21 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
         $entry->useridnumber = 'user1';
         $entry->timemodified = 0;
         $entry->manageridnumber = 'manager1';
-        $entry->managerjobassignmentidnumber = 'job1';
+        $entry->managerjaidnumber = 'job1';
         $DB->insert_record($source->temptablename, $entry);
         $entry = new stdClass();
         $entry->idnumber = 'job1';
         $entry->useridnumber = 'manager1';
         $entry->timemodified = 0;
         $entry->manageridnumber = 'manager2';
-        $entry->managerjobassignmentidnumber = 'jobA';
+        $entry->managerjaidnumber = 'jobA';
         $DB->insert_record($source->temptablename, $entry);
         $entry = new stdClass();
         $entry->idnumber = 'jobA';
         $entry->useridnumber = 'manager2';
         $entry->timemodified = 0;
         $entry->manageridnumber = 'user1';
-        $entry->managerjobassignmentidnumber = 'dev1';
+        $entry->managerjaidnumber = 'dev1';
         $DB->insert_record($source->temptablename, $entry);
 
         $element = $this->get_element_mock($source);
@@ -1386,7 +1537,7 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
         $entry->useridnumber = 'user1';
         $entry->timemodified = 0;
         $entry->manageridnumber = 'manager1';
-        $entry->managerjobassignmentidnumber = 'job1';
+        $entry->managerjaidnumber = 'job1';
         $DB->insert_record($source->temptablename, $entry);
 
         // No entry for manager1, that's already in the database. We want the import to be aware of this.
@@ -1396,7 +1547,7 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
         $entry->useridnumber = 'manager2';
         $entry->timemodified = 0;
         $entry->manageridnumber = 'user1';
-        $entry->managerjobassignmentidnumber = 'dev1';
+        $entry->managerjaidnumber = 'dev1';
         $DB->insert_record($source->temptablename, $entry);
 
         $element = $this->get_element_mock($source);
@@ -1416,5 +1567,56 @@ class tool_totara_sync_elements_jobassignment_testcase extends advanced_testcase
         $this->assertEquals($manager1->id, $user1jobassignments[1]->managerid);
         $this->assertEquals($manager2->id, $manager1jobassignments[1]->managerid);
         $this->assertEmpty($manager2jobassignments[1]->managerid);
+    }
+
+    public function test_circular_tempmanager_management_structure() {
+        global $DB;
+        $source = $this->prepare_source_table();
+        $users = $this->create_test_users();
+        $manager1 = $this->getDataGenerator()->create_user(array('idnumber' => 'manager1'));
+        $manager2 = $this->getDataGenerator()->create_user(array('idnumber' => 'manager2'));
+
+        $source->set_config('import_tempmanageridnumber', '1');
+        $source->set_config('database_dateformat', 'd/m/Y');
+
+        // Management loop between user1, manager1 and manager2.
+        $entry = new stdClass();
+        $entry->idnumber = 'dev1';
+        $entry->useridnumber = 'user1';
+        $entry->timemodified = 0;
+        $entry->tempmanageridnumber = 'manager1';
+        $entry->tempmanagerjaidnumber = 'job1';
+        $entry->tempmanagerexpirydate = '10/06/2050';
+        $DB->insert_record($source->temptablename, $entry);
+        $entry = new stdClass();
+        $entry->idnumber = 'job1';
+        $entry->useridnumber = 'manager1';
+        $entry->timemodified = 0;
+        $entry->tempmanageridnumber = 'manager2';
+        $entry->tempmanagerjaidnumber = 'jobA';
+        $entry->tempmanagerexpirydate = '10/06/2050';
+        $DB->insert_record($source->temptablename, $entry);
+        $entry = new stdClass();
+        $entry->idnumber = 'jobA';
+        $entry->useridnumber = 'manager2';
+        $entry->timemodified = 0;
+        $entry->tempmanageridnumber = 'user1';
+        $entry->tempmanagerjaidnumber = 'dev1';
+        $entry->tempmanagerexpirydate = '10/06/2050';
+        $DB->insert_record($source->temptablename, $entry);
+
+        $element = $this->get_element_mock($source);
+        $element->set_config('allow_create', '1');
+        $element->set_config('allow_update', '0');
+        $element->sync();
+
+        // At one point, our old code still created job assignments but just didn't assign the
+        // managers to all of them.
+        // This is not consistent with the general behaviour that if a records wrong, don't
+        // do it at all. But if we do put that back, we need to make sure that it still works if
+        // allow_update is off (because are creating them first and then *updating* them on retries?)
+        $this->assertEmpty(\totara_job\job_assignment::get_all($users['user1']->id));
+        $this->assertEmpty(\totara_job\job_assignment::get_all($manager1->id));
+        $this->assertEmpty(\totara_job\job_assignment::get_all($manager2->id));
     }
 }
