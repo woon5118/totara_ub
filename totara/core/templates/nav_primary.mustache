@@ -62,7 +62,7 @@
         {{#masthead_logo}}{{> totara_core/masthead_logo }}{{/masthead_logo}}
 
         <ul class="totaraNav_prim--list totaraNav_prim--list_hideMobile" role="menubar" data-tw-totaraNav-list="">
-            <li class="totaraNav_prim--list_item">
+            <li class="totaraNav_prim--list_item" role="presentation">
                 <a href="#" class="totaraNav_prim--list_close" data-tw-totaranav-list-close="">
                     {{{close_menu_icon}}}
                 </a>
@@ -75,10 +75,12 @@
                 {{#class_isselected}} totaraNav_prim--list_item_selected{{/class_isselected}}"
                  data-tw-totaraNav-item=""
                 data-tw-totaraNav-topLevelItem=""
-                {{#haschildren}} data-tw-totaraNav-hasChildren=""{{/haschildren}}>
+                {{#haschildren}} data-tw-totaraNav-hasChildren=""{{/haschildren}}
+                role="presentation">
                 <a class="totaraNav_prim--list_item_link" {{#target}}target="{{.}}" rel="noopener"{{/target}}
                     {{^haschildren}} href="{{url}}"{{/haschildren}}
-                    {{#haschildren}} href="#" aria-haspopup="true" aria-expanded="false"{{/haschildren}}>
+                    {{#haschildren}} href="#" aria-haspopup="true" aria-expanded="false"{{/haschildren}}
+                    role="menuitem">
                     <div class="totaraNav--expand_indent" {{#haschildren}}data-tw-totaraNav-chevron=""{{/haschildren}}></div>{{!
                   }}<div class="totaraNav_prim--list_item_label">
                         {{{linktext}}}
