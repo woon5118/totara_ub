@@ -21,7 +21,7 @@
 -->
 
 <template>
-  <div class="tui-assignmentProgress" :aria-labelledby="$id('header')">
+  <div class="tui-assignmentProgress">
     <PercentageDoughnut
       :percentage="progress.overall_progress"
       :label="$str('chart_label:proficient', 'totara_competency')"
@@ -34,7 +34,7 @@
       :background-color="backgroundColor"
       class="tui-assignmentProgress__progress-card"
     />
-    <div :id="$id('header')" class="tui-assignmentProgress__header">
+    <div class="tui-assignmentProgress__header">
       {{ progress.name }}
     </div>
   </div>
