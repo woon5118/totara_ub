@@ -64,6 +64,10 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
 
         $this->badgeid = $generator->create_badge($user->id, ['status' => BADGE_STATUS_INACTIVE]);
 
+        // Set the default Issuer (because OBv2 needs them).
+        set_config('badges_defaultissuername', $fordb->issuername);
+        set_config('badges_defaultissuercontact', $fordb->issuercontact);
+
         // Create a course with activity and auto completion tracking.
         $this->course = $this->getDataGenerator()->create_course(array('enablecompletion' => true));
         $this->user = $this->getDataGenerator()->create_user();
@@ -954,7 +958,7 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
 
         // Get assertion.
         $award = reset($awards);
-        $assertion = new core_badges_assertion($award->uniquehash);
+        $assertion = new core_badges_assertion($award->uniquehash, OPEN_BADGES_V1);
         $testassertion = $this->assertion;
 
         // Make sure JSON strings have the same structure.

@@ -16,8 +16,9 @@ Feature: Add badges to the system
     And I press "Save changes"
     And I follow "Manage badges"
     When I click on "Add a new badge" "button"
-    Then the field "issuercontact" matches value "testuser@example.com"
-    And the field "issuername" matches value "Test Badge Site"
+    And I press "Issuer details"
+    Then I should see "testuser@example.com"
+    And I should see "Test Badge Site"
 
   @javascript
   Scenario: Accessing the badges
@@ -35,8 +36,6 @@ Feature: Add badges to the system
       | Description   | Test badge description                                 |
       | Image author  | http://author.example.com                              |
       | Image caption | Test caption image                                     |
-      | issuername    | Test Badge Site                                        |
-      | issuercontact | testuser@example.com                                   |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     When I press "Create badge"
     Then I should see "Edit details"
@@ -59,8 +58,6 @@ Feature: Add badges to the system
       | Description   | Test badge related description |
       | Image author  | http://author.example.com      |
       | Image caption | Test caption image             |
-      | issuername    | Test Badge Site                |
-      | issuercontact | testuser@example.com           |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     And I press "Create badge"
     And I wait until the page is ready
@@ -74,8 +71,6 @@ Feature: Add badges to the system
       | Description   | Test badge description    |
       | Image author  | http://author.example.com |
       | Image caption | Test caption image        |
-      | issuername    | Test Badge Site           |
-      | issuercontact | testuser@example.com      |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     And I press "Create badge"
     And I follow "Related badges (0)"
@@ -99,8 +94,6 @@ Feature: Add badges to the system
       | Description   | Test badge description    |
       | Image author  | http://author.example.com |
       | Image caption | Test caption image        |
-      | issuername    | Test Badge Site           |
-      | issuercontact | testuser@example.com      |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     When I press "Create badge"
     Then I should see "Edit details"
@@ -130,8 +123,6 @@ Feature: Add badges to the system
       | Description   | Test badge description                                   |
       | Image author  | http://author.example.com                                |
       | Image caption | Test caption image                                       |
-      | issuername    | Test Badge Site                                          |
-      | issuercontact | testuser@example.com                                     |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     And I press "Create badge"
     Then I should see "Edit details"
