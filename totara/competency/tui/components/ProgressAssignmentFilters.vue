@@ -21,17 +21,22 @@
 -->
 
 <template>
-  <SelectFilter
-    v-if="displayFilters"
-    :show-label="true"
-    :label="$str('viewing_by_assignment', 'totara_competency')"
-    :options="
-      filterOptions.map(option => ({ id: option.id, label: option.name }))
-    "
-    :disabled="disable"
-    :value="value && value.key"
-    @input="filterUpdated"
-  />
+  <div>
+    <p class="sr-only">
+      {{ $str('filter:viewing_by_assignment', 'totara_competency') }}
+    </p>
+    <SelectFilter
+      v-if="displayFilters"
+      :show-label="true"
+      :label="$str('viewing_by_assignment', 'totara_competency')"
+      :options="
+        filterOptions.map(option => ({ id: option.id, label: option.name }))
+      "
+      :disabled="disable"
+      :value="value && value.key"
+      @input="filterUpdated"
+    />
+  </div>
 </template>
 
 <script>
@@ -100,6 +105,9 @@ export default {
 
 <lang-strings>
 {
-  "totara_competency": ["viewing_by_assignment"]
+  "totara_competency": [
+    "filter:viewing_by_assignment",
+    "viewing_by_assignment"
+    ]
 }
 </lang-strings>

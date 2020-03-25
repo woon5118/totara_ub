@@ -248,6 +248,7 @@ $string['filter:user_group:cohort'] = 'Audience';
 $string['filter:user_group:organisation'] = 'Organisation';
 $string['filter:user_group:position'] = 'Position';
 $string['filter:user_group:user'] = 'User';
+$string['filter:viewing_by_assignment'] = 'Select an assignment to Filter the list';
 $string['filter_competencies'] = 'Filter competencies';
 $string['framework'] = 'Framework';
 $string['fullname'] = 'Full name';
