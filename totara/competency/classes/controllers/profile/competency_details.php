@@ -30,23 +30,29 @@ class competency_details extends base {
 
     public function action() {
 
-        // Add breadcrumbs.
-        $this->add_navigation(get_string('competencydetails', 'totara_hierarchy'));
-
         $competency_id = $this->get_param('competency_id', PARAM_INT, null, true);
+
+        $title = get_string('competencydetails', 'totara_hierarchy');
+
+        if ($competency = competency::repository()->find($competency_id)) {
+            $title = get_string('competencydetails_competencyname', 'totara_hierarchy', format_string($competency->fullname));
+        }
+
+        // Add breadcrumbs.
+        $this->add_navigation($title);
 
         $show_activity_log_by_default = $this->get_param('show_activity_log', PARAM_INT, null, false) == 1;
 
         $props = [
-            'user-id' => $this->user->id,
-            'competency-id' => $competency_id,
-            'base-url' => (string) $this->get_base_url(),
-            'go-back-link' => (string) $this->get_profile_url(),
-            'go-back-text' => $this->get_back_to_profile_text(),
+            'user-id'                      => $this->user->id,
+            'competency-id'                => $competency_id,
+            'base-url'                     => (string)$this->get_base_url(),
+            'go-back-link'                 => (string)$this->get_profile_url(),
+            'go-back-text'                 => $this->get_back_to_profile_text(),
             'show-activity-log-by-default' => $show_activity_log_by_default,
         ];
 
         return tui_view::create('totara_competency/pages/CompetencyDetail', $props)
-            ->set_title(get_string('competencydetails', 'totara_hierarchy'));
+            ->set_title($title);
     }
 }

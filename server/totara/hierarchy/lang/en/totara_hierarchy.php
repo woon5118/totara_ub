@@ -197,6 +197,7 @@ $string['competencydepthlevelview'] = 'Competency depth level view';
 $string['competencydescription'] = 'Description';
 $string['competencydescription_help'] = 'A free-text field for providing more details about this competency. This data is displayed when viewing the hierarchy listing, and the individual competency page.';
 $string['competencydetails'] = 'Competency Details';
+$string['competencydetails_competencyname'] = 'Competency Details - {$a}';
 $string['competencyeditframework'] = 'Edit competency framework';
 $string['competencyerror:createtype'] = 'Error creating competency type "{$a}"';
 $string['competencyerror:deletedframework'] = 'Error deleting competency framework "{$a}" and its data.';
