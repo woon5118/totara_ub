@@ -22,7 +22,11 @@
 -->
 
 <template>
-  <div class="tui-tabs" :class="['tui-tabs--' + direction]">
+  <div
+    class="tui-tabs"
+    :class="['tui-tabs--' + direction]"
+    :aria-orientation="direction"
+  >
     <OverflowDetector v-slot="{ measuring }" @change="overflowChanged">
       <ul role="tablist" class="tui-tabs__tabs">
         <li
@@ -38,13 +42,15 @@
           role="presentation"
         >
           <a
+            :id="'tab-' + tab.htmlId"
             ref="tabs"
             :aria-selected="tab.active"
             :aria-disabled="tab.disabled"
+            :aria-controls="tab.active ? 'tabpanel-' + tab.htmlId : false"
             href="#"
             class="tui-tabs__link"
             role="tab"
-            :tabindex="tab.active ? 0 : -1"
+            :tabindex="tab.active ? false : -1"
             @click.prevent="selectTab(tab, $event)"
             @keydown="handleTabKeydown"
           >

@@ -21,14 +21,16 @@
 -->
 
 <template>
-  <section
+  <div
     v-if="alwaysRender || (active && $scopedSlots.default)"
     v-show="!alwaysRender || (active && $scopedSlots.default)"
+    :id="'tabpanel-' + htmlId"
     class="tui-tabContent"
     role="tabpanel"
+    :aria-labelledby="'tab-' + htmlId"
   >
     <slot />
-  </section>
+  </div>
 </template>
 
 <script>
@@ -40,8 +42,17 @@ export default {
     },
     disabled: Boolean,
     active: Boolean,
-    name: String,
+    name: {
+      type: String,
+      required: true,
+    },
     alwaysRender: Boolean,
+  },
+
+  computed: {
+    htmlId() {
+      return this.$id();
+    },
   },
 };
 </script>
