@@ -23,8 +23,8 @@
 
 use mod_perform\entities\activity\participant_section;
 use mod_perform\entities\activity\section;
-use mod_perform\models\activity\participant_instance_status;
 use mod_perform\models\activity\section_relationship;
+use mod_perform\state\participant_instance\not_started;
 use mod_perform\task\service\participant_instance_creation;
 use mod_perform\task\service\participant_instance_dto;
 use mod_perform\task\service\participant_section_creation;
@@ -148,7 +148,7 @@ class participant_section_creation_service_test extends advanced_testcase {
                     $participant_instance->subject_instance_id = $subject_instance->id;
                     $participant_instance->participant_id = $participant;
                     $participant_instance->activity_relationship_id = $relationship->get_id();
-                    $participant_instance->status = participant_instance_status::ACTIVE;
+                    $participant_instance->status = not_started::get_code();
                     $participant_instance->save();
                     $participant_instance_dto = participant_instance_dto::create_from_data(
                         [

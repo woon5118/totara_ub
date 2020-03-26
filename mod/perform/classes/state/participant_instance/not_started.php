@@ -17,21 +17,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kunle Odusan <kunle.odusan@totaralearning.com>
+ * @author Matthias Bonk <matthias.bonk@totaralearning.com>
  * @package mod_perform
  */
 
-namespace mod_perform\models\activity;
+namespace mod_perform\state\participant_instance;
 
-/**
- * Class participant_instance_status
- *
- * @package mod_perform\models\activity
- */
-final class participant_instance_status {
+use mod_perform\state\participant_instance\condition\actor_is_participant;
+use mod_perform\state\state;
+use mod_perform\state\transition;
 
-    /**
-     * Value for active participant instance status.
-     */
-    public const ACTIVE = 1;
+defined('MOODLE_INTERNAL') || die();
+
+class not_started extends state {
+
+    public static function get_code(): int {
+        return 10;
+    }
+
+    public function get_transitions(): array {
+        return [
+            // TODO in TL-24541
+        ];
+    }
 }

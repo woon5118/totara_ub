@@ -24,38 +24,34 @@
 namespace mod_perform\models\activity;
 
 use core\orm\entity\model;
-use mod_perform\entities\activity\participant_instance;
-use mod_perform\entities\activity\participant_section as participant_section_entity;
-use mod_perform\entities\activity\section as section_entity;
+use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
 
 /**
- * Class participant_section
+ * Class participant_instance
  *
  * @package mod_perform\models\activity
  *
  * @property-read int $status
- * @property-read participant_instance $participant_instance
- * @property-read section_entity $section
+ * @property-read int $participant_id
  */
-class participant_section extends model {
+class participant_instance extends model {
 
     use state_aware;
 
     protected $entity_attribute_whitelist = [
         'status',
-        'participant_instance',
-        'section'
+        'participant_id',
     ];
 
     /**
-     * @var participant_section_entity
+     * @var participant_instance_entity
      */
     protected $entity;
 
     public static function get_entity_class(): string {
-        return participant_section_entity::class;
+        return participant_instance_entity::class;
     }
 
     public function get_current_state_code(): int {

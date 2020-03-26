@@ -17,21 +17,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kunle Odusan <kunle.odusan@totaralearning.com>
+ * @author Matthias Bonk <matthias.bonk@totaralearning.com>
  * @package mod_perform
  */
 
-namespace mod_perform\models\activity;
+namespace mod_perform\state;
+
+use core\event\base;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class participant_section_status
- *
- * @package mod_perform\models\activity
+ * This interface should be implemented when entering a state should trigger an event.
  */
-final class participant_section_status {
-
+interface state_event {
+    
     /**
-     * Value for not started participant section status.
+     * Get event to trigger when entering state
+     *
+     * @return base
      */
-    public const NOT_STARTED = 0;
+    public function get_event(): base;
 }

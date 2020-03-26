@@ -1,0 +1,113 @@
+<?php
+/**
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Valerii Kuznetsov <valerii.kuznetsov@totaralearning.com>
+ * @author Matthias Bonk <matthias.bonk@totaralearning.com>
+ * @package mod_perform
+ */
+
+namespace mod_perform\state;
+
+use moodle_exception;
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * This class is responsible for definition of all state transitions.
+ */
+abstract class state {
+    /**
+     * @var state_aware
+     */
+    protected $object = null;
+
+    /**
+     * Get conditions and validations of transitions from current state
+     * @return transition[]
+     */
+    abstract public function get_transitions(): array;
+
+    /**
+     * Code of status as it is stored in DB
+     * Status codes must be unique within one object type.
+     *
+     * @return int
+     */
+    abstract public static function get_code(): int;
+
+    /**
+     * state constructor.
+     *
+     * @param object $object Object which this state belongs to
+     */
+    public function __construct(object $object) {
+        $this->object = $object;
+    }
+
+    /**
+     * Get the object which this state belongs to.
+     *
+     * @return object
+     */
+    final public function get_object(): object {
+        return $this->object;
+    }
+
+    /**
+     * Check whether it's possible to switch to the given state class.
+     *
+     * @param string $target_state_class
+     * @return bool
+     */
+    final public function can_switch(string $target_state_class): bool {
+        try {
+            $this->transition_to($target_state_class);
+            return true;
+        } catch (invalid_state_switch_exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Check if transition to the given target state is possible and return a target state object if it is.
+     * This doesn't affect the object's state.
+     *
+     * @param string $target_state_class target state.
+     * @return state new state
+     * @throws invalid_state_switch_exception If not possible to switch
+     */
+    final public function transition_to(string $target_state_class): state {
+        foreach ($this->get_transitions() as $transition) {
+            if ($transition->get_to() instanceof $target_state_class && $transition->is_possible()) {
+                return $transition->get_to();
+            }
+        }
+        throw new invalid_state_switch_exception(get_class($this), $target_state_class);
+    }
+
+    /**
+     * This is called when the object has switched to the current state.
+     * Can be used if triggering an event is not necessary.
+     *
+     * @return void
+     */
+    public function on_enter(): void {
+        // Override if required.
+    }
+}

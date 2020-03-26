@@ -23,15 +23,12 @@
 
 namespace mod_perform\task\service;
 
-use coding_exception;
 use core\collection;
 use core\orm\query\builder;
-use dml_exception;
 use mod_perform\entities\activity\participant_section;
 use mod_perform\entities\activity\section;
-use mod_perform\models\activity\participant_section_status;
+use mod_perform\state\participant_section\not_started;
 use stdClass;
-use Throwable;
 
 /**
  * Class participant_section_creation
@@ -99,7 +96,7 @@ class participant_section_creation {
         foreach ($participant_instance_list as $participant_instance) {
             $data = new stdClass();
             $data->section_id = $section_id;
-            $data->status = participant_section_status::NOT_STARTED;
+            $data->status = not_started::get_code();
             $data->created_at = time();
             $data->participant_instance_id = $participant_instance->id;
             $this->aggregate_participant_section($data);

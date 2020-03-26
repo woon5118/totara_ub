@@ -28,8 +28,7 @@ use core\orm\query\builder;
 use mod_perform\entities\activity\activity_relationship;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\hook\participant_instances_created;
-use mod_perform\models\activity\participant_instance_status;
-use mod_perform\task\service\subject_instance_dto;
+use mod_perform\state\participant_instance\not_started;
 use stdClass;
 use totara_core\relationship\helpers\relationship_collection_manager;
 
@@ -193,7 +192,7 @@ class participant_instance_creation {
         $participant_data = new stdClass();
         $participant_data->activity_relationship_id = $activity_relationship_id;
         $participant_data->subject_instance_id = $subject_instance->id;
-        $participant_data->status = participant_instance_status::ACTIVE;
+        $participant_data->status = not_started::get_code();
         $participant_data->created_at = time();
         $dto['participant_data'] = $participant_data;
         $dto['activity_id'] = $subject_instance->activity_id;

@@ -25,10 +25,13 @@
 use container_perform\perform as perform_container;
 use core\collection;
 use core\entities\user;
+use core\orm\query\builder;
 use core_container\module\module;
+use mod_perform\entities\activity\participant_section;
 use mod_perform\expand_task;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\models\activity\participant_section as participant_section_model;
 use mod_perform\models\activity\track;
 use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\models\activity\activity;
@@ -38,6 +41,8 @@ use mod_perform\models\activity\element;
 use mod_perform\models\activity\section_element;
 use mod_perform\models\activity\section_relationship as section_relationship_model;
 use mod_perform\models\activity\track_assignment_type;
+use mod_perform\state\participant_instance\not_started as instance_not_started;
+use mod_perform\state\participant_section\not_started;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\user_groups\grouping;
 use mod_perform\models\activity\subject_instance;
@@ -114,6 +119,16 @@ class mod_perform_generator extends component_generator_base {
     public function create_section(activity $activity, $data = []): section {
         $title =  $data['title'] ?? "test Section";
         return section::create($activity, $title);
+    }
+
+    public function create_participant_section(int $section_id, int $participant_instance_id): participant_section_model {
+        $data = new stdClass();
+        $data->section_id = $section_id;
+        $data->participant_instance_id = $participant_instance_id;
+        $data->status = not_started::get_code();
+        $data->created_at = time();
+        $new_id = builder::get_db()->insert_record(participant_section::TABLE, $data);
+        return participant_section_model::load_by_id($new_id);
     }
 
     public function create_section_element(section $section, element $element) {
@@ -416,6 +431,7 @@ class mod_perform_generator extends component_generator_base {
             $participant_instance->activity_relationship_id = 0; // stubbed
             $participant_instance->participant_id = $subject->id; // Answering on activity about them self
             $participant_instance->subject_instance_id = $subject_instance->id;
+            $participant_instance->status = instance_not_started::get_code();
             $participant_instance->save();
         }
 
@@ -424,6 +440,7 @@ class mod_perform_generator extends component_generator_base {
             $other_participant_instance->activity_relationship_id = 0; // stubbed
             $other_participant_instance->participant_id = $other_participant->id;
             $other_participant_instance->subject_instance_id = $subject_instance->id;
+            $other_participant_instance->status = instance_not_started::get_code();
             $other_participant_instance->save();
         }
 
