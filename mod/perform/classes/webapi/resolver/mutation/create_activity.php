@@ -65,7 +65,7 @@ class create_activity implements mutation_resolver {
             $activity = activity::create($container, $name, $description, $status);
 
             // Create the first section for the entity.
-            section::create($activity, get_string('perform:section:default_name', 'mod_perform'));
+            section::create($activity);
 
             return $activity;
         });

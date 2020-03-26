@@ -22,6 +22,7 @@
  * @package mod_perform
  */
 
+use mod_perform\entities\activity\section as section_entity;
 use mod_perform\models\activity\section;
 use totara_core\relationship\resolvers\subject;
 use totara_job\relationship\resolvers\appraiser;
@@ -40,6 +41,32 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
 
         $section = section::create($activity, 'section name one');
         $this->assertSame('section name one', $section->title);
+    }
+
+    public function test_get_title() {
+        $this->setAdminUser();
+        $activity = $this->perform_generator()->create_activity_in_container();
+
+        $section1 = section::create($activity, 'Test Section');
+        $section2 = section::create($activity, '   ');
+        $section3 = section::create($activity);
+
+        $this->assertEquals('Test Section', $section1->title);
+        $this->assertEquals('Section 2', $section2->title);
+        $this->assertEquals('Section 3', $section3->title);
+
+        section_entity::repository()->where('id', $section1->id)->delete();
+
+        $this->assertEquals('Section 1', $section2->title);
+        $this->assertEquals('Section 2', $section3->title);
+
+        $section4 = section::create($activity, '');
+        $section5 = section::create($activity, 0);
+        section_entity::repository()->where('id', $section3->id)->delete();
+
+        $this->assertEquals('Section 1', $section2->title);
+        $this->assertEquals('Section 2', $section4->title);
+        $this->assertEquals('0', $section5->title);
     }
 
     public function test_update_relationships() {

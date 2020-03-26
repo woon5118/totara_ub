@@ -48,11 +48,11 @@ class section extends model {
     protected $entity_attribute_whitelist = [
         'id',
         'activity_id',
-        'title',
     ];
 
     protected $model_accessor_whitelist = [
         'activity',
+        'title',
         'section_elements',
         'section_relationships',
     ];
@@ -71,11 +71,11 @@ class section extends model {
 
     /**
      * @param activity $activity
-     * @param string   $title
+     * @param string $title
      *
      * @return static
      */
-    public static function create(activity $activity, string $title): self {
+    public static function create(activity $activity, string $title = ''): self {
         $entity = new section_entity();
         $entity->activity_id = $activity->id;
         $entity->title = $title;
@@ -89,6 +89,25 @@ class section extends model {
      */
     public function get_activity(): activity {
         return activity::load_by_entity($this->entity->activity);
+    }
+
+    /**
+     * Get the title of this section.
+     * If there is no title, then just show what section number this is for the activity.
+     *
+     * @return string
+     */
+    public function get_title(): string {
+        if (trim($this->entity->title) !== '') {
+            return $this->entity->title;
+        }
+
+        $sections_before_this_section = section_entity::repository()
+            ->where('activity_id', $this->activity_id)
+            ->where('id', '<', $this->id)
+            ->count();
+
+        return get_string('perform:section:default_name', 'mod_perform', $sections_before_this_section + 1);
     }
 
     /**
