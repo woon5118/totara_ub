@@ -15,8 +15,9 @@
           :separator="true"
           position="bottom-right"
         >
-          <template v-slot:trigger="{ toggle }">
+          <template v-slot:trigger="{ toggle, isOpen }">
             <Button
+              :aria-expanded="isOpen ? 'true' : 'false'"
               :text="
                 $str('perform:user_group_assignment:add:group', 'mod_perform')
               "
