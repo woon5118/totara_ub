@@ -3582,6 +3582,15 @@ class navbar extends navigation_node {
             debugging('Nav bar items must be printed before $OUTPUT->header() has been called', DEBUG_DEVELOPER);
         }
 
+        // Totara: Link admin overview from nav bar.
+        if (!defined('ADMIN_SEARCH_PAGE') || !ADMIN_SEARCH_PAGE) {
+            if ($action === null && $text === get_string('administrationsite')) {
+                if (has_capability('moodle/site:config', context_system::instance())) {
+                    $action = new moodle_url('/admin/search.php');
+                }
+            }
+        }
+
         // Properties array used when creating the new navigation node
         $itemarray = array(
             'text' => $text,
@@ -3959,7 +3968,14 @@ class settings_navigation extends navigation_node {
 
             // Disable the navigation from automatically finding the active node
             navigation_node::$autofindactive = false;
-            $referencebranch = $this->add(get_string('administrationsite'), null, self::TYPE_SITE_ADMIN, null, 'root');
+            // Totara: Link admin overview from nav bar.
+            $overviewurl = null;
+            if (!defined('ADMIN_SEARCH_PAGE') || !ADMIN_SEARCH_PAGE) {
+                if (has_capability('moodle/site:config', context_system::instance())) {
+                    $overviewurl = new moodle_url('/admin/search.php');
+                }
+            }
+            $referencebranch = $this->add(get_string('administrationsite'), $overviewurl, self::TYPE_SITE_ADMIN, null, 'root');
             foreach ($adminroot->children as $adminbranch) {
                 $this->load_administration_settings($referencebranch, $adminbranch);
             }
