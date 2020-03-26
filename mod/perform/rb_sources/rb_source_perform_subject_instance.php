@@ -87,7 +87,7 @@ class rb_source_perform_subject_instance extends rb_base_source {
         $joinlist = [];
         $this->add_to_joinlist($joinlist);
         $this->add_core_user_tables($joinlist, 'base', 'subject_user_id');
-        $this->add_totara_job_tables($joinlist, 'base', 'job_assignment_id');
+        //$this->add_totara_job_tables($joinlist, 'base', 'job_assignment_id');
 
         return $joinlist;
     }
@@ -147,7 +147,7 @@ class rb_source_perform_subject_instance extends rb_base_source {
 
         $this->add_fields_to_columns($columnoptions, 'base', $global_restriction_join_su);
         $this->add_core_user_columns($columnoptions);
-        $this->add_totara_job_columns($columnoptions);
+        //$this->add_totara_job_columns($columnoptions);
 
         return $columnoptions;
     }
@@ -181,7 +181,7 @@ class rb_source_perform_subject_instance extends rb_base_source {
 
         $this->add_fields_to_filters($filteroptions);
         $this->add_core_user_filters($filteroptions);
-        $this->add_totara_job_filters($filteroptions, 'base', 'job_assignment_id');
+        //$this->add_totara_job_filters($filteroptions, 'base', 'job_assignment_id');
 
         return $filteroptions;
     }
@@ -325,5 +325,29 @@ class rb_source_perform_subject_instance extends rb_base_source {
             )
         ];
         return $paramoptions;
+    }
+
+    /**
+     * Inject column_test data into database.
+     *
+     * @param totara_reportbuilder_column_testcase $testcase
+     */
+    public function phpunit_column_test_add_data(totara_reportbuilder_column_testcase $testcase) {
+        global $CFG;
+
+        if (!PHPUNIT_TEST) {
+            throw new coding_exception('phpunit_column_test_add_data() cannot be used outside of unit tests');
+        }
+
+        require_once($CFG->dirroot.'/lib/testing/generator/component_generator_base.php');
+        require_once($CFG->dirroot.'/lib/testing/generator/data_generator.php');
+        require_once(__DIR__ . '/../tests/generator/mod_perform_generator.class.php');
+
+        $si = (new \mod_perform_generator(new testing_data_generator()))->create_subject_instance([
+            'activity_name' => 'Weekly catchup',
+            'subject_is_participating' => true,
+            'subject_user_id' => \core\entities\user::repository()->get()->last()->id,
+            'other_participant_id' => \core\entities\user::logged_in()->id,
+        ]);
     }
 }
