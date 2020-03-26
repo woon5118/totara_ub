@@ -37,6 +37,8 @@ class cachestore_redis_addinstance_form extends cachestore_addinstance_form {
      * Builds the form for creating an instance.
      */
     protected function configuration_definition() {
+        global $OUTPUT;
+
         $form = $this->_form;
 
         $form->addElement('text', 'server', get_string('server', 'cachestore_redis'), array('size' => 24));
@@ -52,6 +54,8 @@ class cachestore_redis_addinstance_form extends cachestore_addinstance_form {
         $form->setType('prefix', PARAM_TEXT); // We set to text but we have a rule to limit to alphanumext.
         $form->addHelpButton('prefix', 'prefix', 'cachestore_redis');
         $form->addRule('prefix', get_string('prefixinvalid', 'cachestore_redis'), 'regex', '#^[a-zA-Z0-9\-_]+$#');
+
+        $form->addElement('static', 'serwarning', '', $OUTPUT->notification(markdown_to_html(get_string('useserializer_warning', 'cachestore_redis')), \core\output\notification::NOTIFY_WARNING));
 
         $serializeroptions = cachestore_redis::config_get_serializer_options();
         $form->addElement('select', 'serializer', get_string('useserializer', 'cachestore_redis'), $serializeroptions);

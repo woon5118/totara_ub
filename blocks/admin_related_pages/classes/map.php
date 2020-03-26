@@ -74,7 +74,12 @@ final class map implements \cacheable_object {
      * This method resolves all relationships and ensures the map is complete.
      * After this method has been called the map can no longer be altered.
      */
-    private function finalise() {
+    public function finalise() {
+        if ($this->finalised) {
+            // Already finalised.
+            return;
+        }
+
         /** @var item[] $items */
         $items = [];
 
@@ -212,14 +217,14 @@ final class map implements \cacheable_object {
     /**
      * Returns an array of items that have been mapped to the given key.
      *
+     * NOTE: map is marked as finalised
+     *
      * @param string $key
      * @return item[]
      */
     public function get_mapped_items(string $key): array {
 
-        if (!$this->finalised) {
-            $this->finalise();
-        }
+        $this->finalise();
 
         if (isset($this->keymap[$key])) {
             $return = [];

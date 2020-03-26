@@ -62,8 +62,11 @@ final class helper {
         $cache = \cache::make('block_admin_related_pages', 'map');
         $map = $cache->get('fullmap');
         if ($map !== false) {
-            $this->map = $map;
-            return;
+            if ($map instanceof map) {
+                $this->map = $map;
+                return;
+            }
+            debugging('Invalid data returned from \'block_admin_related_pages\', \'map\' cache, serialiser of existing stores must not be changed', DEBUG_DEVELOPER);
         }
 
         $this->map = new map(
@@ -187,6 +190,9 @@ final class helper {
 
         $hook = new hook\map_generated($this->map);
         $hook->execute();
+
+        // No more changes allowed from now on.
+        $this->map->finalise();
 
         $cache->set('fullmap', $this->map);
     }

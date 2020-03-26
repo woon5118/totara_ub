@@ -46,3 +46,4 @@ $string['useserializer'] = 'Use serializer';
 $string['useserializer_help'] = 'Specifies the serializer to use for serializing.
 The valid serializers are Redis::SERIALIZER_PHP or Redis::SERIALIZER_IGBINARY.
 The latter is supported only when phpredis is configured with --enable-redis-igbinary option and the igbinary extension is loaded.';
+$string['useserializer_warning'] = 'Serializer must not be changed if there is any data in the cache already.';
