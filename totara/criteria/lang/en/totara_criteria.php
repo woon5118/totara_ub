@@ -55,7 +55,6 @@ $string['done'] = 'Done';
 $string['error_competency_assignment'] = 'There was an error and the assignment could not be created.';
 $string['error:invalidconfiguration'] = 'The criterion configuration is invalid';
 $string['hidden_course'] = 'This course is not available to view';
-$string['managetypes'] = 'Manage criteria types';
 $string['network_error'] = 'Network error';
 $string['no'] = 'No';
 $string['no_courses'] = 'There are no courses available to view';

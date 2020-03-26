@@ -122,11 +122,8 @@ class criterion_factory {
      * @throws coding_exception if the type is not enabled
      */
     private static function require_enabled($type) {
-        $enabledtypes = plugin_types::get_enabled_plugins('criteria', 'totara_criteria');
-
-        if (!in_array($type, $enabledtypes)) {
-            throw new coding_exception("Invalid type", "Criterion type '{$type}' is not enabled");
-        }
+        // All considered enabled in v1
+        return true;
     }
 
     /**
@@ -137,7 +134,10 @@ class criterion_factory {
      * @return stdClass
      */
     public static function dump_criterion_configuration(string $type, int $id) {
-        static::require_enabled($type);
+        $installed = plugin_types::get_installed_plugins('criteria', 'totara_criteria');
+        if (!array_key_exists($type, $installed)) {
+            throw new coding_exception("Invalid type", "Invalid criterion type '{$type}'");
+        }
 
         /** @var criterion $classname */
         $classname = static::get_classname($type);

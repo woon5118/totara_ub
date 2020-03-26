@@ -36,15 +36,4 @@ if ($hassiteconfig) {
             !advanced_feature::is_enabled('competency_assignment')
         )
     );
-
-    $ADMIN->add(
-        'totara_criteria',
-        new admin_externalpage(
-            'totara_criteria-managetypes',
-            get_string('managetypes', 'totara_criteria'),
-            new moodle_url("/totara/criteria/managetypes.php"),
-            ['moodle/site:config'],
-            !advanced_feature::is_enabled('competency_assignment')
-        )
-    );
 }

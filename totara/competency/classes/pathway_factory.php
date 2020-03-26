@@ -112,13 +112,8 @@ class pathway_factory {
      * @throws \coding_exception if the type is not enabled
      */
     private static function require_enabled($type) {
-        $enabledtypes = plugin_types::get_enabled_plugins('pathway', 'totara_competency');
-        if (!in_array($type, $enabledtypes)) {
-            throw new \coding_exception(
-                "Pathway type '{$type}' not found.",
-                "Pathway type '{$type}' is not enabled"
-            );
-        }
+        // All considered enabled in v1
+        return true;
     }
 
     /**

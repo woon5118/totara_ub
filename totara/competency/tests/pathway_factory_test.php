@@ -105,37 +105,29 @@ class totara_competency_pathway_factory_testcase extends \advanced_testcase {
     }
 
     public function test_get_single_value_types() {
-        $this->activate_additional_pathways();
-
         $types = pathway_factory::get_single_value_types();
 
         $this->assertEqualsCanonicalizing(
             [
                 'criteria_group',
-                'fake_singlevalue_type'
             ],
             $types
         );
     }
 
     public function test_get_multi_value_types() {
-        $this->activate_additional_pathways();
-
         $types = pathway_factory::get_multi_value_types();
 
         $this->assertEqualsCanonicalizing(
             [
                 'manual',
                 'learning_plan',
-                'fake_multivalue_type'
             ],
             $types
         );
     }
 
     public function test_get_pathway_types() {
-        $this->activate_additional_pathways();
-
         $types = pathway_factory::get_pathway_types();
 
         $this->assertEqualsCanonicalizing(
@@ -143,20 +135,9 @@ class totara_competency_pathway_factory_testcase extends \advanced_testcase {
                 'manual',
                 'learning_plan',
                 'criteria_group',
-                'fake_multivalue_type',
-                'fake_singlevalue_type'
             ],
             $types
         );
-    }
-
-    private function activate_additional_pathways() {
-        global $CFG;
-        require_once $CFG->dirroot.'/totara/competency/tests/fixtures/fake_multivalue_type.php';
-        require_once $CFG->dirroot.'/totara/competency/tests/fixtures/fake_singlevalue_type.php';
-
-        plugin_types::enable_plugin('fake_multivalue_type', 'pathway', 'totara_competency');
-        plugin_types::enable_plugin('fake_singlevalue_type', 'pathway', 'totara_competency');
     }
 
 }

@@ -28,7 +28,7 @@ namespace totara_competency;
  */
 class plugin_types {
 
-    private const ENABLE_CONFIG_POSTFIX = '_types_enabled';
+    private const DISABLE_CONFIG_POSTFIX = '_types_disabled';
 
     /**
      * Return information on all installed plugins of this type
@@ -40,21 +40,8 @@ class plugin_types {
      *         attributes for all installed plugins of this type
      */
     public static function get_installed_plugins(string $plugin_type, string $config_scope): array {
-        $enable_setting = $plugin_type . self::ENABLE_CONFIG_POSTFIX;
-
         $plugin_infos = \core_plugin_manager::instance()->get_plugins_of_type($plugin_type);
-
-        $enabled_plugins = get_config($config_scope, $enable_setting);
-
-        // Never set before - mark all as enabled by default
-        if (empty($enabled_plugins)) {
-            $enabled_plugins = array_keys($plugin_infos);
-
-            set_config($enable_setting, implode(',', $enabled_plugins), $config_scope);
-            \core_plugin_manager::reset_caches();
-        } else {
-            $enabled_plugins = explode(',', $enabled_plugins);
-        }
+        $disabled_plugins = static::get_disabled_plugins($plugin_type, $config_scope);
 
         $plugins = [];
 
@@ -63,7 +50,7 @@ class plugin_types {
                 'type' => $plugin,
                 'title' => $info->displayname,
                 'version' => $info->versiondb,
-                'enabled' => in_array($plugin, $enabled_plugins),
+                'enabled' => !in_array($plugin, $disabled_plugins),
             ];
         }
 
@@ -78,27 +65,25 @@ class plugin_types {
      * @return string[] List of plugin names that are currently enabled
      */
     public static function get_enabled_plugins(string $plugin_type, string $config_scope): array {
-        $enable_setting = $plugin_type . self::ENABLE_CONFIG_POSTFIX;
+        $all_types = self::get_installed_plugins($plugin_type, $config_scope);
+        $enabled_types = array_filter($all_types, function ($plugin) {
+            return $plugin->enabled;
+        });
 
-        $enabled_plugins = get_config($config_scope, $enable_setting);
+        return array_keys($enabled_types);
+    }
 
-        // Todo: I propose we ultimately do this on upgrade. And then anything not enabled is not enabled.
-        //       But as it is now might be useful while in dev.
-        // Never set before - mark all as enabled by default
-        if ($enabled_plugins === false) {
-            $all_types = self::get_installed_plugins($plugin_type, $config_scope);
-            $enabled_plugins = array_keys($all_types);
-        } else {
-            if (empty($enabled_plugins)) {
-                // An empty string would represent all plugins having been disabled.
-                $enabled_plugins = [];
-            } else {
-                $enabled_plugins = explode(',', $enabled_plugins);
-            }
-        }
-
-        // TODO: Rather return the same structure as installed_plugins
-        return $enabled_plugins;
+    /**
+     * Get list of disabled plugins of this type
+     *
+     * @param  string $plugin_type Plugin type (e.g. pathway)
+     * @param  string $config_scope Config scope (e.g. totara_competency)
+     * @return string[] List of plugin names that are currently disabled
+     */
+    public static function get_disabled_plugins(string $plugin_type, string $config_scope): array {
+        $disable_setting = $plugin_type . self::DISABLE_CONFIG_POSTFIX;
+        $disabled_plugins = get_config($config_scope, $disable_setting);
+        return !$disabled_plugins ? [] : explode(',', $disabled_plugins);
     }
 
     /**
@@ -110,17 +95,16 @@ class plugin_types {
      * @return array Resulting array of enabled plugins
      */
     public static function enable_plugin(string $plugin, string $plugin_type, string $config_scope): array {
-        $enable_setting = $plugin_type . self::ENABLE_CONFIG_POSTFIX;
+        $disabled_plugins = static::get_disabled_plugins($plugin_type, $config_scope);
 
-        $enabled_plugins = self::get_enabled_plugins($plugin_type, $config_scope);
-
-        if (!in_array($plugin, $enabled_plugins)) {
-            $enabled_plugins[] = $plugin;
-            set_config($enable_setting, implode(',', $enabled_plugins), $config_scope);
+        if (in_array($plugin, $disabled_plugins)) {
+            $disable_setting = $plugin_type . self::DISABLE_CONFIG_POSTFIX;
+            $disabled_plugins = array_diff($disabled_plugins, [$plugin]);
+            set_config($disable_setting, implode(',', $disabled_plugins), $config_scope);
             \core_plugin_manager::reset_caches();
         }
 
-        return $enabled_plugins;
+        return static::get_enabled_plugins($plugin_type, $config_scope);
     }
 
     /**
@@ -132,18 +116,39 @@ class plugin_types {
      * @return array Resulting array of enabled plugins
      */
     public static function disable_plugin(string $plugin, string $plugin_type, string $config_scope): array {
-        $enable_setting = $plugin_type . self::ENABLE_CONFIG_POSTFIX;
+        if (static::is_plugin_enabled($plugin, $plugin_type, $config_scope)) {
+            $disable_setting = $plugin_type . self::DISABLE_CONFIG_POSTFIX;
+            $disabled_plugins = static::get_disabled_plugins($plugin_type, $config_scope);
+            $disabled_plugins[] = $plugin;
 
-        $enabled_plugins = self::get_enabled_plugins($plugin_type, $config_scope);
-
-        $idx = array_search($plugin, $enabled_plugins);
-        if ($idx !== false) {
-            array_splice($enabled_plugins, $idx, 1);
-            set_config($enable_setting, implode(',', $enabled_plugins), $config_scope);
+            set_config($disable_setting, implode(',', $disabled_plugins), $config_scope);
             \core_plugin_manager::reset_caches();
         }
 
-        return $enabled_plugins;
+        return static::get_enabled_plugins($plugin_type, $config_scope);
     }
 
+    /**
+     * @param string $plugin
+     * @param string $plugin_type
+     * @param string $config_scope
+     * @return bool
+     */
+    public static function is_plugin_enabled(string $plugin, string $plugin_type, string $config_scope): bool {
+        $enabled_plugins = self::get_enabled_plugins($plugin_type, $config_scope);
+        return in_array($plugin, $enabled_plugins);
+    }
+
+    /**
+     * @param string $plugin
+     * @param string $plugin_type
+     * @param string $config_scope
+     * @return bool
+     */
+    public static function is_plugin_disabled(string $plugin, string $plugin_type, string $config_scope): bool {
+        $disable_setting = $plugin_type . self::DISABLE_CONFIG_POSTFIX;
+        $disabled_plugins = explode(',', get_config($config_scope, $disable_setting));
+
+        return in_array($plugin, $disabled_plugins);
+    }
 }

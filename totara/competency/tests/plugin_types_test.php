@@ -54,13 +54,13 @@ class totara_competency_plugin_types_testcase extends \advanced_testcase {
      * @param $config_setting
      */
     public function test_get_installed_plugins($plugin_type, $config_setting) {
-        $enabled_setting = $plugin_type . '_types_enabled';
+        $disabled_setting = $plugin_type . '_types_disabled';
 
         $plugininfos = \core_plugin_manager::instance()->get_plugins_of_type($plugin_type);
         $plugins = array_keys($plugininfos);
 
         // Initially there are no config for enabled plugins
-        $configvalue = get_config($config_setting, $enabled_setting);
+        $configvalue = get_config($config_setting, $disabled_setting);
         $this->assertFalse($configvalue);
 
         // Initially all plugins are set to be enabled except learning_plan
@@ -74,84 +74,51 @@ class totara_competency_plugin_types_testcase extends \advanced_testcase {
     }
 
     /**
-     * Test get_enabled_plugins, enable and disable
+     * Test enabling and disabling of plugins
      *
      * @dataProvider data_provider_test_get_all_data
      */
-    public function test_get_enable_and_disable($plugin_type, $config_setting) {
+    public function test_enable_and_disable($plugin_type, $config_setting) {
+        $plugininfos = \core_plugin_manager::instance()->get_plugins_of_type($plugin_type);
+        $all_plugins = array_keys($plugininfos);
 
-        $enabled_setting = $plugin_type . '_types_enabled';
+        $this->assertEqualsCanonicalizing($all_plugins, plugin_types::get_enabled_plugins($plugin_type, $config_setting));
+        $this->assertEmpty(plugin_types::get_disabled_plugins($plugin_type, $config_setting));
 
-        // Set up some dummy enabled type configuration
-        set_config($enabled_setting, 'Type1,Type2,Type3', $config_setting);
+        $to_disable = reset($all_plugins);
+        $updatedtypes = plugin_types::disable_plugin($to_disable, $plugin_type, $config_setting);
+        foreach ($all_plugins as $plugin) {
+            $this->assertEquals($plugin != $to_disable, in_array($plugin, $updatedtypes));
+            $this->assertEquals($plugin != $to_disable, plugin_types::is_plugin_enabled($plugin, $plugin_type, $config_setting));
+            $this->assertEquals($plugin == $to_disable, plugin_types::is_plugin_disabled($plugin, $plugin_type, $config_setting));
+        }
 
-        $enabledtypes = plugin_types::get_enabled_plugins($plugin_type, $config_setting);
+        $expected_enabled = array_diff($all_plugins, [$to_disable]);
+        $this->assertEqualsCanonicalizing($expected_enabled, plugin_types::get_enabled_plugins($plugin_type, $config_setting));
+        $this->assertEquals([$to_disable], plugin_types::get_disabled_plugins($plugin_type, $config_setting));
 
-        $this->assertTrue(in_array('Type1', $enabledtypes));
-        $this->assertTrue(in_array('Type2', $enabledtypes));
-        $this->assertTrue(in_array('Type3', $enabledtypes));
-        $this->assertFalse(in_array('Type4', $enabledtypes));
 
-        $updatedtypes = plugin_types::enable_plugin('Type4', $plugin_type, $config_setting);
-        $this->assertTrue(in_array('Type1', $updatedtypes));
-        $this->assertTrue(in_array('Type2', $updatedtypes));
-        $this->assertTrue(in_array('Type3', $updatedtypes));
-        $this->assertTrue(in_array('Type4', $updatedtypes));
+        // Enable one not disabled
+        $to_enable = reset($expected_enabled);
 
-        // Re-retrieve also
-        $enabledtypes = plugin_types::get_enabled_plugins($plugin_type, $config_setting);
-        $this->assertTrue(in_array('Type1', $enabledtypes));
-        $this->assertTrue(in_array('Type2', $enabledtypes));
-        $this->assertTrue(in_array('Type3', $enabledtypes));
-        $this->assertTrue(in_array('Type4', $enabledtypes));
+        $updatedtypes = plugin_types::enable_plugin($to_enable, $plugin_type, $config_setting);
+        foreach ($all_plugins as $plugin) {
+            $this->assertEquals($plugin != $to_disable, in_array($plugin, $updatedtypes));
+            $this->assertEquals($plugin != $to_disable, plugin_types::is_plugin_enabled($plugin, $plugin_type, $config_setting));
+            $this->assertEquals($plugin == $to_disable, plugin_types::is_plugin_disabled($plugin, $plugin_type, $config_setting));
+        }
 
-        // Disable one-by-one until the last to check edge cases
-        $updatedtypes = plugin_types::disable_plugin('Type1', $plugin_type, $config_setting);
-        $this->assertFalse(in_array('Type1', $updatedtypes));
-        $this->assertTrue(in_array('Type2', $updatedtypes));
-        $this->assertTrue(in_array('Type3', $updatedtypes));
-        $this->assertTrue(in_array('Type4', $updatedtypes));
+        $expected_enabled = array_diff($all_plugins, [$to_disable]);
+        $this->assertEqualsCanonicalizing($expected_enabled, plugin_types::get_enabled_plugins($plugin_type, $config_setting));
+        $this->assertEquals([$to_disable], plugin_types::get_disabled_plugins($plugin_type, $config_setting));
 
-        $enabledtypes = plugin_types::get_enabled_plugins($plugin_type, $config_setting);
-        $this->assertFalse(in_array('Type1', $enabledtypes));
-        $this->assertTrue(in_array('Type2', $enabledtypes));
-        $this->assertTrue(in_array('Type3', $enabledtypes));
-        $this->assertTrue(in_array('Type4', $enabledtypes));
 
-        $updatedtypes = plugin_types::disable_plugin('Type3', $plugin_type, $config_setting);
-        $this->assertFalse(in_array('Type1', $updatedtypes));
-        $this->assertTrue(in_array('Type2', $updatedtypes));
-        $this->assertFalse(in_array('Type3', $updatedtypes));
-        $this->assertTrue(in_array('Type4', $updatedtypes));
-
-        $enabledtypes = plugin_types::get_enabled_plugins($plugin_type, $config_setting);
-        $this->assertFalse(in_array('Type1', $enabledtypes));
-        $this->assertTrue(in_array('Type2', $enabledtypes));
-        $this->assertFalse(in_array('Type3', $enabledtypes));
-        $this->assertTrue(in_array('Type4', $enabledtypes));
-
-        $updatedtypes = plugin_types::disable_plugin('Type4', $plugin_type, $config_setting);
-        $this->assertFalse(in_array('Type1', $updatedtypes));
-        $this->assertTrue(in_array('Type2', $updatedtypes));
-        $this->assertFalse(in_array('Type3', $updatedtypes));
-        $this->assertFalse(in_array('Type4', $updatedtypes));
-
-        $enabledtypes = plugin_types::get_enabled_plugins($plugin_type, $config_setting);
-        $this->assertFalse(in_array('Type1', $enabledtypes));
-        $this->assertTrue(in_array('Type2', $enabledtypes));
-        $this->assertFalse(in_array('Type3', $enabledtypes));
-        $this->assertFalse(in_array('Type4', $enabledtypes));
-
-        $updatedtypes = plugin_types::disable_plugin('Type2', $plugin_type, $config_setting);
-        $this->assertFalse(in_array('Type1', $updatedtypes));
-        $this->assertFalse(in_array('Type2', $updatedtypes));
-        $this->assertFalse(in_array('Type3', $updatedtypes));
-        $this->assertFalse(in_array('Type4', $updatedtypes));
-
-        $enabledtypes = plugin_types::get_enabled_plugins($plugin_type, $config_setting);
-        $this->assertFalse(in_array('Type1', $enabledtypes));
-        $this->assertFalse(in_array('Type2', $enabledtypes));
-        $this->assertFalse(in_array('Type3', $enabledtypes));
-        $this->assertFalse(in_array('Type4', $enabledtypes));
+        // Now enable one previously disabled
+        $updatedtypes = plugin_types::enable_plugin($to_disable, $plugin_type, $config_setting);
+        foreach ($all_plugins as $plugin) {
+            $this->assertTrue(in_array($plugin, $updatedtypes));
+            $this->assertTrue(plugin_types::is_plugin_enabled($plugin, $plugin_type, $config_setting));
+            $this->assertFalse(plugin_types::is_plugin_disabled($plugin, $plugin_type, $config_setting));
+        }
     }
 }

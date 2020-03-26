@@ -40,28 +40,6 @@ if ($hassiteconfig) {
     );
 
     $ADMIN->add(
-        'totara_competency',
-        new admin_externalpage(
-            'totara_competency_aggregation-managetypes',
-            get_string('managetypes_aggregation', 'totara_competency'),
-            new moodle_url("/totara/competency/managetypes.php", ['plugin' => 'aggregation']),
-            ['moodle/site:config'],
-            !advanced_feature::is_enabled('competency_assignment')
-        )
-    );
-
-    $ADMIN->add(
-        'totara_competency',
-        new admin_externalpage(
-            'totara_competency_pathway-managetypes',
-            get_string('managetypes_pathway', 'totara_competency'),
-            new moodle_url("/totara/competency/managetypes.php", ['plugin' => 'pathway']),
-            ['moodle/site:config'],
-            !advanced_feature::is_enabled('competency_assignment')
-        )
-    );
-
-    $ADMIN->add(
         'competencies',
         new admin_externalpage(
             'competency_assignment',

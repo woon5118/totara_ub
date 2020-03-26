@@ -28,28 +28,6 @@ use totara_criteria\criterion_factory;
 class totara_criteria_criterion_factory_testcase extends advanced_testcase {
 
     /**
-     * Test create invalid type
-     */
-    public function test_create_invalid_type() {
-
-        $this->expectException('coding_exception');
-        $this->expectExceptionMessage("Criterion type 'Invalid' is not enabled");
-        criterion_factory::create('Invalid');
-    }
-
-    /**
-     * Test create disabled type
-     */
-    public function test_create_disabled_type() {
-
-        plugin_types::disable_plugin('coursecompletion', 'criteria', 'totara_criteria');
-
-        $this->expectException('coding_exception');
-        $this->expectExceptionMessage("Criterion type 'coursecompletion' is not enabled");
-        criterion_factory::create('coursecompletion');
-    }
-
-    /**
      * Test create
      */
     public function test_create() {
@@ -60,26 +38,6 @@ class totara_criteria_criterion_factory_testcase extends advanced_testcase {
             $this->assertSame($plugin_type, $instance->get_plugin_type());
             $this->assertTrue(is_null($instance->get_id()));
         }
-    }
-
-    /**
-     * Test fetch with invalid type
-     */
-    public function test_fetch_invalid_type() {
-        $this->expectException('coding_exception');
-        $this->expectExceptionMessage("Criterion type 'Invalid' is not enabled");
-        criterion_factory::fetch('Invalid', 1);
-    }
-
-    /**
-     * Test fetch disabled type
-     */
-    public function test_fetch_disabled_type() {
-        plugin_types::disable_plugin('coursecompletion', 'criteria', 'totara_criteria');
-
-        $this->expectException('coding_exception');
-        $this->expectExceptionMessage("Criterion type 'coursecompletion' is not enabled");
-        criterion_factory::fetch('coursecompletion', 1);
     }
 
     /**
@@ -119,19 +77,8 @@ class totara_criteria_criterion_factory_testcase extends advanced_testcase {
      */
     public function test_dump_criterion_configuration_invalid_type() {
         $this->expectException('coding_exception');
-        $this->expectExceptionMessage("Criterion type 'Invalid' is not enabled");
+        $this->expectExceptionMessage("Invalid criterion type 'Invalid'");
         criterion_factory::dump_criterion_configuration('Invalid', 1);
-    }
-
-    /**
-     * Test dump_criterion_configuration disabled type
-     */
-    public function test_dump_criterion_configuration_disabled_type() {
-        plugin_types::disable_plugin('coursecompletion', 'criteria', 'totara_criteria');
-
-        $this->expectException('coding_exception');
-        $this->expectExceptionMessage("Criterion type 'coursecompletion' is not enabled");
-        criterion_factory::dump_criterion_configuration('coursecompletion', 1);
     }
 
     /**

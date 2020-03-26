@@ -279,8 +279,6 @@ $string['linkedcourses_mustsavechange'] = 'Changes must be saved before they wil
 $string['linkedcoursessaved'] = 'Linked courses have been saved';
 $string['loading'] = 'Loading...';
 
-$string['managetypes_aggregation'] = 'Manage aggregation types';
-$string['managetypes_pathway'] = 'Manage pathway types';
 $string['mandatory'] = 'Mandatory';
 $string['messageprovider:expand_task_finished'] = 'Sync assigned users finished';
 $string['more_information'] = 'More information';
