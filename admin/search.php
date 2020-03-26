@@ -14,7 +14,7 @@ $query = trim(optional_param('query', '', PARAM_NOTAGS));  // Search string
 $context = context_system::instance();
 $PAGE->set_context($context);
 
-admin_externalpage_setup('search', '', array('query' => $query)); // now hidden page
+admin_externalpage_setup('search', '', array('query' => $query), '', ['pagelayout' => 'noblocks']);
 require_capability('moodle/site:config', $context); //Totara: this page is really for admins only!
 
 if (moodle_needs_upgrading()) {
