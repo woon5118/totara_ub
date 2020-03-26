@@ -59,7 +59,7 @@ class track extends model {
      * @param activity $parent parent activity.
      * @param string $description track description.
      *
-     * @return the newly created track.
+     * @return track the newly created track.
      */
     public static function create(activity $parent, string $description = ''): track {
         if (!$parent->can_manage()) {
