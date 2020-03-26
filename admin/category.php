@@ -55,6 +55,23 @@ if (!($settingspage->check_access())) {
     print_error('accessdenied', 'admin');
 }
 
+/** @var parentable_part_of_admin_tree[] $navitems */
+$navitems = [];
+$navitems[] = $settingspage;
+$parent = $settingspage;
+do {
+    $parent = $parent->get_parent();
+    if ($parent === $adminroot) {
+        break;
+    }
+    $navitems[] = $parent;
+} while (true);
+$navitems = array_reverse($navitems);
+
+$PAGE->navbar->add(get_string('administrationsite'));
+foreach ($navitems as $navitem) {
+    $PAGE->navbar->add($navitem->visiblename);
+}
 
 $statusmsg = '';
 $errormsg  = '';
@@ -147,13 +164,7 @@ if ($errormsg !== '') {
     echo $OUTPUT->notification($statusmsg, 'notifysuccess');
 }
 
-$path = array_reverse($settingspage->visiblepath);
-if (is_array($path)) {
-    $visiblename = join(' / ', $path);
-} else {
-    $visiblename = $path;
-}
-echo $OUTPUT->heading(get_string('admincategory', 'admin', $visiblename), 2);
+echo $OUTPUT->heading(get_string('admincategory', 'admin', $settingspage->visiblename), 2);
 
 echo html_writer::start_tag('form', array('action' => '', 'method' => 'post', 'id' => 'adminsettings'));
 echo html_writer::start_tag('div');
