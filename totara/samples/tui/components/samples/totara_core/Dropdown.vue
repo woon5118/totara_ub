@@ -40,8 +40,9 @@
       aria-label="firstLabel"
       aria-labelledby="and first labelledby"
     >
-      <template v-slot:trigger="{ toggle }">
+      <template v-slot:trigger="{ toggle, isOpen }">
         <ButtonIcon
+          :aria-expanded="isOpen ? 'true' : 'false'"
           :aria-label="'trigger'"
           :disabled="false"
           :styleclass="{ square: true }"
@@ -60,8 +61,9 @@
       </DropdownItem>
     </Dropdown>
     <Dropdown>
-      <template v-slot:trigger="{ toggle }">
+      <template v-slot:trigger="{ toggle, isOpen }">
         <ButtonIcon
+          :aria-expanded="isOpen ? 'true' : 'false'"
           :aria-label="'trigger'"
           :disabled="false"
           :styleclass="{ square: true }"
@@ -82,8 +84,9 @@
       </DropdownItem>
     </Dropdown>
     <Dropdown position="bottom-left" hoverable>
-      <template v-slot:trigger="{ toggle }">
+      <template v-slot:trigger="{ toggle, isOpen }">
         <ButtonIcon
+          :aria-expanded="isOpen ? 'true' : 'false'"
           :aria-label="'trigger'"
           :disabled="false"
           :styleclass="{ square: true }"
