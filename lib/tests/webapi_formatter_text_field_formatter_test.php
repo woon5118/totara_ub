@@ -130,7 +130,56 @@ class core_webapi_formatter_text_field_formatter_testcase extends advanced_testc
 
         // We should have plain text now
         $this->assertNotEquals($result, $value);
-        $this->assertEquals(html_to_text($value), $result);
+        $this->assertEquals('_)(*&^%$#test', $result);
+    }
+
+    public function test_plain_format_with_long_lines() {
+        $context = context_system::instance();
+        $formatter = new text_field_formatter(format::FORMAT_PLAIN, $context);
+        $formatter->set_pluginfile_url_options($context, 'component', 'filearea', 1, 'file.php');
+
+        $value = '<span class="myhtml">KO WIKITORIA te Kuini o Ingarani i tana mahara atawai ki nga Rangatira me nga Hapu o Nu Tirani</span>';
+        $result = $formatter->format($value);
+
+        $value = format_text($value, FORMAT_HTML, ['context' => $context]);
+        $expected = 'KO WIKITORIA te Kuini o Ingarani i tana mahara atawai ki nga Rangatira me nga Hapu o Nu Tirani';
+
+        // We should have plain text now.
+        $this->assertNotEquals($result, $value);
+        // html_to_text() will have inserted linebreaks.
+        $this->assertNotEquals(html_to_text($value), $result);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_plain_format_with_br() {
+        $context = context_system::instance();
+        $formatter = new text_field_formatter(format::FORMAT_PLAIN, $context);
+        $formatter->set_pluginfile_url_options($context, 'component', 'filearea', 1, 'file.php');
+
+        $value = '<span class="myhtml">KO WIKITORIA te Kuini o Ingarani i tana<br>mahara atawai ki nga Rangatira me nga Hapu o Nu Tirani</span>';
+        $result = $formatter->format($value);
+
+        $expected = "KO WIKITORIA te Kuini o Ingarani i tana\nmahara atawai ki nga Rangatira me nga Hapu o Nu Tirani";
+        $this->assertNotEquals($result, $value);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_plain_format_with_links() {
+        $context = context_system::instance();
+        $formatter = new text_field_formatter(format::FORMAT_PLAIN, $context);
+        $formatter->set_pluginfile_url_options($context, 'component', 'filearea', 1, 'file.php');
+
+        $value = '<span class="myhtml">KO <a href="https://en.wikipedia.org/wiki/Queen_Victoria">WIKITORIA</a> te Kuini o Ingarani</span>';
+        $result = $formatter->format($value);
+
+        $value = format_text($value, FORMAT_HTML, ['context' => $context]);
+        $expected = 'KO WIKITORIA [https://en.wikipedia.org/wiki/Queen_Victoria] te Kuini o Ingarani';
+
+        // We should have plain text now.
+        $this->assertNotEquals($result, $value);
+        // html_to_text() will have made the URL a footnote.
+        $this->assertNotEquals(html_to_text($value), $result);
+        $this->assertEquals($expected, $result);
     }
 
     public function test_raw_format() {
