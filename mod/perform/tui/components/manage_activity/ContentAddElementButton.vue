@@ -31,8 +31,9 @@
     </ButtonIcon>
     <div v-show="isElementsVisible">
       <Dropdown>
-        <template v-slot:trigger="{ toggle }">
+        <template v-slot:trigger="{ toggle, isOpen }">
           <ButtonIcon
+            :aria-expanded="isOpen ? 'true' : 'false'"
             :aria-label="'Add'"
             :text="$str('perform:section:element:questions', 'mod_perform')"
             :caret="true"
