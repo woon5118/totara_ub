@@ -114,6 +114,11 @@ class server {
                 $request = new request($this->type);
             }
 
+            // This is here to make sure there's a session initiated
+            if (!NO_MOODLE_COOKIES && !confirm_sesskey($_SERVER['HTTP_X_TOTARA_SESSKEY'])) {
+                throw new webapi_request_exception('Invalid sesskey, page reload required');
+            }
+
             $request->validate();
 
             $operations = $this->prepare_operations($request);

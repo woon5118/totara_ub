@@ -50,4 +50,65 @@ class totara_webapi_util_testcase extends advanced_testcase {
         );
     }
 
+    public function test_is_nosession_request() {
+        $request = 'foo';
+        $this->assertFalse(util::is_nosession_request($request));
+
+        $request = [];
+        $this->assertFalse(util::is_nosession_request($request));
+
+        $request = [
+            'operationName' => 'my_test_operation',
+            'variables' => []
+        ];
+        $this->assertFalse(util::is_nosession_request($request));
+
+        $request = [
+            'operationName' => 'my_test_operation_nosession',
+            'variables' => []
+        ];
+        $this->assertTrue(util::is_nosession_request($request));
+
+        $request = [
+            'variables' => []
+        ];
+        $this->assertFalse(util::is_nosession_request($request));
+
+        $request = [
+            [
+                'operationName' => 'my_test_operation1',
+                'variables' => []
+            ],
+            [
+                'operationName' => 'my_test_operation2',
+                'variables' => []
+            ],
+        ];
+        $this->assertFalse(util::is_nosession_request($request));
+
+        $request = [
+            [
+                'operationName' => 'my_test_operation1_nosession',
+                'variables' => []
+            ],
+            [
+                'operationName' => 'my_test_operation2',
+                'variables' => []
+            ],
+        ];
+        $this->assertFalse(util::is_nosession_request($request));
+
+        $request = [
+            [
+                'operationName' => 'my_test_operation1_nosession',
+                'variables' => []
+            ],
+            [
+                'operationName' => 'my_test_operation2_nosession',
+                'variables' => []
+            ],
+        ];
+        $this->assertTrue(util::is_nosession_request($request));
+    }
+
 }

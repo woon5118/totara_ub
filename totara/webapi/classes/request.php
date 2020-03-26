@@ -24,6 +24,8 @@
 
 namespace totara_webapi;
 
+use totara_webapi\local\util;
+
 class request {
 
     /**
@@ -44,7 +46,7 @@ class request {
     public function __construct(string $type, array $params = null) {
         $this->type = $type;
         if ($params === null) {
-            $params = $this->parse_http_request();
+            $params = util::parse_http_request();
         }
         $this->params = $params;
     }
@@ -54,24 +56,6 @@ class request {
      */
     public function get_params(): ?array {
         return $this->params;
-    }
-
-    /**
-     * Take the POST raw data and decode it as JSON.
-     *
-     * @return mixed|null
-     */
-    protected function parse_http_request() {
-        $params = file_get_contents('php://input');
-        if (!$params) {
-            return null;
-        }
-        $params = json_decode($params, true);
-        if (json_last_error() !== JSON_ERROR_NONE or $params === null) {
-            return null;
-        }
-
-        return $params;
     }
 
     /**
@@ -104,15 +88,6 @@ class request {
                 if (empty($op['operationName']) || !isset($op['variables']) || !is_array($op['variables'])) {
                     throw new webapi_request_exception('Invalid request, expecting at least operationName and variables');
                 }
-
-                if (substr($op['operationName'], - strlen('_nosession')) !== '_nosession') {
-                    if (!defined('NO_MOODLE_COOKIES')) {
-                        define('NO_MOODLE_COOKIES', false);
-                        if (empty($_SERVER['HTTP_X_TOTARA_SESSKEY'])) {
-                            throw new webapi_request_exception('Invalid request, HTTP_X_TOTARA_SESSKEY must be present');
-                        }
-                    }
-                }
             }
 
             if ($this->type === graphql::TYPE_DEV && empty($op['query'])) {
@@ -122,17 +97,6 @@ class request {
             if (!empty($op['operationName']) && !preg_match('/^[a-z][a-z0-9_]+$/D', $op['operationName'])) {
                 throw new webapi_request_exception('Invalid request, validation of operationName failed');
             }
-        }
-
-        // TODO does setting all those constants here is the best idea? Not sure if there's a better place
-        if (!defined('NO_MOODLE_COOKIES')) {
-            // All operations have nosession suffix, this means we don't have to wait for session lock.
-            define('NO_MOODLE_COOKIES', true);
-        }
-
-        // This is here to make sure there's a session initiated, this should probably be part of the ajax entrypoint
-        if ($this->type === graphql::TYPE_AJAX && !NO_MOODLE_COOKIES && !confirm_sesskey($_SERVER['HTTP_X_TOTARA_SESSKEY'])) {
-            throw new webapi_request_exception('Invalid sesskey, page reload required');
         }
     }
 

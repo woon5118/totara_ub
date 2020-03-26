@@ -61,6 +61,7 @@ if (empty($_SERVER['REQUEST_METHOD']) or $_SERVER['REQUEST_METHOD'] !== 'POST') 
     util::send_error('Invalid webapi request, only POST method is allowed', 400);
 }
 
+define('NO_MOODLE_COOKIES', util::is_nosession_request());
 define('AJAX_SCRIPT', true);
 define('NO_DEBUG_DISPLAY', true);
 

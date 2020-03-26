@@ -194,4 +194,51 @@ final class util {
 
         return $files;
     }
+
+    /**
+     * Take the POST raw data and decode it as JSON.
+     *
+     * @return mixed|null
+     */
+    public static function parse_http_request() {
+        $params = file_get_contents('php://input');
+        if (!$params) {
+            return null;
+        }
+        $params = json_decode($params, true);
+        if (json_last_error() !== JSON_ERROR_NONE or $params === null) {
+            return null;
+        }
+
+        return $params;
+    }
+
+    /**
+     * Returns true if this is a request which should not initiate the session
+     *
+     * @param array|null $request_params
+     * @return bool
+     */
+    public static function is_nosession_request($request_params = null): bool {
+        $nosession = $session = null;
+        $params = !is_null($request_params) ? $request_params : self::parse_http_request();
+
+        if (is_array($params) && !empty($params)) {
+            if (array_key_exists('operationName', $params) || array_key_exists('query', $params)) {
+                $params = [$params];
+            }
+
+            foreach ($params as $op) {
+                if (isset($op['operationName']) && substr($op['operationName'], - strlen('_nosession')) === '_nosession') {
+                    $nosession = true;
+                } else {
+                    $session = true;
+                }
+            }
+        }
+
+        // If one operation does not have the nosession suffix the whole request is treated as session request
+        return $session === null && $nosession === true;
+    }
+
 }

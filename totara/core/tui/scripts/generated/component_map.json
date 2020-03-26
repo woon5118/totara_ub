@@ -77,7 +77,6 @@
         "theme": "theme",
         "assignsubmission": "mod/assign/submission",
         "assignfeedback": "mod/assign/feedback",
-        "assignment": "mod/assignment/type",
         "booktool": "mod/book/tool",
         "datafield": "mod/data/field",
         "datapreset": "mod/data/preset",
