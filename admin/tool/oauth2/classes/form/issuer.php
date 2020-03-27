@@ -165,6 +165,9 @@ class issuer extends persistent {
             // Require confirmation email for new accounts.
             $mform->addElement('advcheckbox', 'requireconfirmation', get_string('issuerrequireconfirmation', 'tool_oauth2'));
             $mform->addHelpButton('requireconfirmation', 'issuerrequireconfirmation', 'tool_oauth2');
+        } else {
+            $mform->addElement('hidden', 'requireconfirmation', $issuer->has_property('requireconfirmation') ? $issuer->get('requireconfirmation') : true);
+            $mform->setType('requireconfirmation', PARAM_BOOL);
         }
 
         $mform->addElement('hidden', 'sortorder');
