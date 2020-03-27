@@ -59,6 +59,7 @@ class endorsement_form extends moodleform {
         $mform->addElement('text', 'claimid', get_string('claimid', 'badges'), array('size' => '70'));
         $mform->setType('claimid', PARAM_URL);
         $mform->addRule('claimid', null, 'required');
+        $mform->addHelpButton('claimid', 'claimid', 'badges');
         $mform->addElement('textarea', 'claimcomment', get_string('claimcomment', 'badges'), 'wrap="virtual" rows="8" cols="70"');
         $mform->setType('claimcomment', PARAM_NOTAGS);
         $endorsement = new stdClass();

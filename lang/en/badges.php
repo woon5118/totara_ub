@@ -174,6 +174,7 @@ $string['imagecaption_help'] = 'Caption for the image.';
 $string['claim'] = 'Claim';
 $string['claimcomment'] = 'Endorsement comment';
 $string['claimid'] = 'Claim URL';
+$string['claimid_help'] = 'Add the URL provided by the endorser to support their claim.';
 $string['choosebadges'] = 'Choose badges';
 $string['clearsettings'] = 'Clear settings';
 $string['completionnotenabled'] = 'Course completion is not enabled for this course, so it cannot be included in badge criteria. Course completion may be enabled in the course settings.';
