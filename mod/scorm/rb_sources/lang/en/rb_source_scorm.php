@@ -25,6 +25,7 @@ $string['currentorg'] = 'The user\'s current organisation';
 $string['theuser'] = 'The user';
 $string['thedate'] = 'The attempt date';
 // list
+$string['browsed'] = 'Browsed';
 $string['passed'] = 'Passed';
 $string['completed'] = 'Completed';
 $string['notattempted'] = 'Not Attempted';

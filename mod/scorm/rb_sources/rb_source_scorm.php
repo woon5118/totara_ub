@@ -480,29 +480,18 @@ class rb_source_scorm extends rb_base_source {
     }
 
     function rb_filter_scorm_status_list() {
-        global $DB;
+        // The list of statuses is defined by SCORM standard,
+        // there is no reason to look for arbitrary values in database.
 
-        // get all available options
-        $records = $DB->get_records_sql("SELECT DISTINCT " .
-            $DB->sql_compare_text("value") . " AS value FROM " .
-            "{scorm_scoes_track} " .
-            "WHERE element = 'cmi.core.lesson_status'");
-        if (!empty($records)) {
-            $statusselect = array();
-            foreach ($records as $record) {
-                $statusselect[$record->value] = ucfirst($record->value);
-            }
-        } else {
-            // a default set of options
-            $statusselect = array(
-                'passed' => get_string('passed', 'rb_source_scorm'),
-                'completed' => get_string('completed', 'rb_source_scorm'),
-                'not attempted' => get_string('notattempted', 'rb_source_scorm'),
-                'incomplete' => get_string('incomplete', 'rb_source_scorm'),
-                'failed' => get_string('failed', 'rb_source_scorm'),
-            );
-        }
-        return $statusselect;
+        // https://scorm.com/scorm-explained/technical-scorm/run-time/run-time-reference/?utm_source=google&utm_medium=natural_search#cmicorelessonstatus1112
+        return array(
+            'passed' => get_string('passed', 'rb_source_scorm'),
+            'completed' => get_string('completed', 'rb_source_scorm'),
+            'not attempted' => get_string('notattempted', 'rb_source_scorm'),
+            'browsed' => get_string('browsed', 'rb_source_scorm'), // This is not used in Totara any more
+            'incomplete' => get_string('incomplete', 'rb_source_scorm'),
+            'failed' => get_string('failed', 'rb_source_scorm'),
+        );
     }
 
 
