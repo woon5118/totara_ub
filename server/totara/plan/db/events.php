@@ -25,6 +25,9 @@
 /**
  * This file should be used for all plan event definitions and handers.
  */
+
+use hierarchy_competency\event\competency_deleted;
+
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    // It must be included from a Moodle page.
 }
@@ -63,7 +66,7 @@ $observers = array(
         'callback'  => 'totara_program_observer::learning_plan_deleted',
     ),
     array(
-        'eventname' => \hierarchy_competency\event\competency_deleted::class,
+        'eventname' => competency_deleted::class,
         'callback'  => 'totara_plan_observer::competency_deleted',
     ),
 );

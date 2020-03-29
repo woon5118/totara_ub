@@ -4,6 +4,7 @@ Feature: Verify capability manageanyplan.
   Background:
     Given the "mylearning" user profile block exists
     And I am on a totara site
+    And Perform is disabled
     And the following "users" exist:
       | username | firstname  | lastname  | email                |
       | learner1 | firstname1 | lastname1 | learner1@example.com |

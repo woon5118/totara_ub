@@ -23,7 +23,6 @@
 
 namespace pathway_learning_plan\observer;
 
-use totara_competency\entities\competency_assignment_user;
 use totara_competency\aggregation_users_table;
 use totara_competency\pathway;
 use totara_core\advanced_feature;

@@ -82,8 +82,8 @@ Feature: The generators create the expected hierarchy elements
     And I follow "Test competency framework"
     And I click on "Edit" "link" in the "First competency" "table_row"
     Then the following fields match these values:
-      | Name                 | First competency     |
-      | Competency ID number | COMP001              |
+      | Full Name | First competency     |
+      | ID Number | COMP001              |
       #| Description          | This is a competency |
 
   Scenario: A hierarchy of competencies can be generated
@@ -99,9 +99,9 @@ Feature: The generators create the expected hierarchy elements
     And I follow "Test competency framework"
     And I click on "Edit" "link" in the "Second competency" "table_row"
     Then the following fields match these values:
-      | Parent               | First competency   |
-      | Name                 | Second competency  |
-      | Competency ID number | COMP002            |
+      | Parent    | First competency   |
+      | Name      | Second competency  |
+      | ID Number | COMP002            |
       #| Description          | Another competency |
 
   Scenario: A goal item can be generated

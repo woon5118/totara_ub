@@ -33,37 +33,43 @@ Feature: Test competency type changes in hierarchies
       | Name | My competency 1 |
       | Type | Competency type 1     |
     And I press "Save changes"
-    And I press "Return to competency framework"
-    And I click on "Edit" "link" in the "My competency 1" "table_row"
+    And I click on "Back to Competency page" "link"
+    And I click on ".tui-competencySummaryGeneral__header_edit" "css_element"
     And I set the following fields to these values:
       | Custom field 1_1 | Some text 1 |
       | Custom field 1_2 | Some text 2 |
     And I press "Save changes"
-    And I press "Return to competency framework"
+    And I click on "Back to Competency page" "link"
+    And I click on "Back to My competency frameworkd 1" "link"
+
     And I press "Add new competency"
     And I set the following fields to these values:
       | Name | My competency 2 |
       | Type | Competency type 1     |
     And I press "Save changes"
-    And I press "Return to competency framework"
+    And I click on "Back to Competency page" "link"
+    And I click on "Back to My competency frameworkd 1" "link"
     And I click on "Edit" "link" in the "My competency 2" "table_row"
     And I set the following fields to these values:
       | Custom field 1_1 | Some text 3 |
       | Custom field 1_2 | Some text 4 |
     And I press "Save changes"
-    And I press "Return to competency framework"
+    And I click on "Back to Competency page" "link"
+    And I click on "Back to My competency frameworkd 1" "link"
     And I press "Add new competency"
     And I set the following fields to these values:
       | Name | My competency 3 |
       | Type | Competency type 1     |
     And I press "Save changes"
-    And I press "Return to competency framework"
+    And I click on "Back to Competency page" "link"
+    And I click on "Back to My competency frameworkd 1" "link"
     And I click on "Edit" "link" in the "My competency 3" "table_row"
     And I set the following fields to these values:
       | Custom field 1_1 | Some text 5 |
       | Custom field 1_2 | Some text 6 |
     And I press "Save changes"
-    And I press "Return to competency framework"
+    And I click on "Back to Competency page" "link"
+    And I click on "Back to My competency frameworkd 1" "link"
     And I should see "Type: Competency type 1" in the "My competency 1" "table_row"
     And I should see "Type: Competency type 1" in the "My competency 2" "table_row"
     And I should see "Type: Competency type 1" in the "My competency 3" "table_row"
@@ -78,7 +84,8 @@ Feature: Test competency type changes in hierarchies
     And I press "Reclassify items and transfer/delete data"
     Then the field "Custom field 2_1" matches value "Some text 1"
     And I press "Save changes"
-    And I press "Return to competency framework"
+    And I click on "Back to Competency page" "link"
+    And I click on "Back to My competency frameworkd 1" "link"
     And I should see "Type: Competency type 2" in the "My competency 1" "table_row"
     And I should see "Type: Competency type 1" in the "My competency 2" "table_row"
     And I should see "Type: Competency type 1" in the "My competency 3" "table_row"

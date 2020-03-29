@@ -83,6 +83,7 @@ Feature: Seminar availability based on activity completion using direct enrolmen
   Scenario: Signup link is not available when availabilty conditions are not met when using seminar direct enrolment
     And I log in as "student1"
     And I click on "Courses" in the totara menu
+    And I follow "Miscellaneous"
     When I follow "Course 1"
     Then I should not see "Sign up"
     And I should see "Available seminar"
@@ -96,6 +97,7 @@ Feature: Seminar availability based on activity completion using direct enrolmen
       | enableavailability  | 0 |
     And I log in as "student1"
     And I click on "Courses" in the totara menu
+    And I follow "Miscellaneous"
     When I follow "Course 1"
     Then I should see "Test seminar 1"
     And I should see "Available seminar"
@@ -111,6 +113,7 @@ Feature: Seminar availability based on activity completion using direct enrolmen
       | student1 | C1     | student        |
     And I log in as "student1"
     And I click on "Courses" in the totara menu
+    And I follow "Miscellaneous"
     When I follow "Course 1"
     Then I should see "Available seminar"
     And I should see "Test seminar 1"

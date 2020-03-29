@@ -25,10 +25,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $watchers = [
     [
-        'hookname' => \totara_competency\hook\competency_achievement_updated::class,
-        'callback' => \block_totara_stats\watcher\competency::class.'::achievement_updated',
-    ],
-    [
         'hookname' => \totara_competency\hook\competency_achievement_updated_bulk::class,
         'callback' => \block_totara_stats\watcher\competency::class.'::achievement_updated_bulk',
     ],

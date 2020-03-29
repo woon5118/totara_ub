@@ -3,6 +3,7 @@ Feature: Learner creates learning plan with competencies.
 
   Background:
     Given I am on a totara site
+    And Perform is disabled
     And the following "users" exist:
       | username | firstname | lastname | email                |
       | learner1 | Bob1      | Learner1 | learner1@example.com |
@@ -83,6 +84,7 @@ Feature: Learner creates learning plan with competencies.
     And I press "Approve"
     Then I should see "You are viewing Bob1 Learner1's plan"
     And I should see "Plan \"Learning Plan 1\" has been approved"
+    And I run the scheduled task "\totara_competency\task\competency_aggregation_queue"
 
     # Make sure the ajax competency update request works
     When I am on "Team" page

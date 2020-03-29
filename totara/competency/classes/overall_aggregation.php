@@ -26,6 +26,7 @@ namespace totara_competency;
 use core\orm\collection;
 use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\scale_value;
+use totara_competency\userdata\achievement;
 
 abstract class overall_aggregation {
 
@@ -129,7 +130,7 @@ abstract class overall_aggregation {
      * @param int $user_id
      * @return pathway_achievement
      */
-    protected function get_or_create_current_pathway_achievement(collection $current_achievements, pathway $pathway, int $user_id) {
+    protected function get_or_create_current_pathway_achievement(collection $current_achievements, pathway $pathway, int $user_id): pathway_achievement {
         $achievements = $current_achievements->filter('pathway_id', $pathway->get_id());
 
         switch ($achievements->count()) {

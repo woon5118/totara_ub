@@ -6,8 +6,7 @@ Feature: Test competencies achieved is updated
 
   Background:
     Given I am on a totara site
-    And the following config values are set as admin:
-      | enablecompetency_assignment    | 3           |
+    And Perform is disabled
     And the following "users" exist:
       | username | firstname | lastname | email                        | role         | context |
       | bilbo    | Bilbo     | Baggins  | bilbo.baggins@example.com    |              |         |
@@ -55,13 +54,15 @@ Feature: Test competencies achieved is updated
     And I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I click on "Reclaim the Lonely Mountain" "link"
     And I click on "Kill the Smaug" "link"
-    And I press "Assign course completions"
-    And I click on "Miscellaneous" "link"
-    And I click on "An Unexpected Journey" "link"
-    And I click on "Save" "button" in the ".totara-dialog[aria-describedby=evidence]" "css_element"
-    And I wait "2" seconds
-    And I press "Return to competency framework"
-    And I log out
+    And I click on ".tui-competencyOverviewLinkedCourses__header_edit" "css_element"
+    And I press "Add linked courses"
+    And I click on "Select" "checkbox"
+    And I click on "Save changes" "button" in the ".modal-container" "css_element"
+    And I click on "Save changes" "button"
+    And I click on "Back to Competency page" "link"
+    Then I should see "An Unexpected Journey"
+
+    When I log out
     And I log in as "bilbo"
     And I click on "An Unexpected Journey" "link"
     And I choose "Join the Dwarves" from "Help to Gandalf the Grey" choice activity
@@ -70,10 +71,7 @@ Feature: Test competencies achieved is updated
     And I click on "Record of Learning" in the totara menu
     And I should see "Complete"
     And I log out
-    And I log in as "admin"
-    # TODO this needs to be updated to use the new task, see TL-22637
-    #And I run the "\totara_hierarchy\task\update_competencies_task" task
-    And I log out
+    And I run the scheduled task "\totara_competency\task\competency_aggregation_queue"
     And I log in as "gandalf"
     And I am on "Team" page
     And I should see "1" in the "td.statistics_competenciesachieved" "css_element"

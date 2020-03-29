@@ -25,7 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 use hierarchy_competency\event\competency_deleted;
-use totara_competency\event\competency_achievement_updated;
 
 class totara_plan_observer {
 

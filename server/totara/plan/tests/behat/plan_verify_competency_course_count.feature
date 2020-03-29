@@ -27,13 +27,13 @@ Feature: Verify competency course count within learning plan
     And I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I follow "Competency Framework 1"
     And I follow "Competency 1"
-    And I click on "Assign course completions" "button"
-    And I follow "Miscellaneous"
-    And I follow "Course 1"
-    And I follow "Course 2"
-    And I follow "Course 3"
-    And I click on "Save" "button" in the "Assign course completions" "totaradialogue"
-    And I wait "1" seconds
+    And I click on ".tui-competencyOverviewLinkedCourses__header_edit" "css_element"
+    And I press "Add linked courses"
+    And I click on ".tw-list > .tw-list__row:nth-child(2) > .tw-list__cell_select" "css_element"
+    And I click on ".tw-list > .tw-list__row:nth-child(3) > .tw-list__cell_select" "css_element"
+    And I click on ".tw-list > .tw-list__row:nth-child(4) > .tw-list__cell_select" "css_element"
+    And I click on "Save changes" "button" in the ".modal-container" "css_element"
+    And I click on "Save changes" "button"
     Then I log out
 
   @javascript

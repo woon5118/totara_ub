@@ -123,8 +123,8 @@ class aggregation_latest_achieved_aggregation_testcase extends advanced_testcase
                     ],
                 ],
                 'expected' => [
-                    'achieved_value' => null,
-                    'achieved_via' => [1],
+                    'achieved_value' => 2,
+                    'achieved_via' => [2],
                 ],
             ],
             [
@@ -164,9 +164,42 @@ class aggregation_latest_achieved_aggregation_testcase extends advanced_testcase
                     'achieved_value' => null,
                     'achieved_via' => [1],
                 ],
+            ],
+            [
+                'pathways' => [
+                    1 => [
+                        [
+                            'achieved_value' => 2,
+                            'status' => pathway_achievement::STATUS_CURRENT,
+                            'date_achieved' => $now + 1,
+                            'last_aggregated' => $now + 1,
+                        ],
+                    ],
+                    2 => [
+                        [
+                            'achieved_value' => 1,
+                            'status' => pathway_achievement::STATUS_CURRENT,
+                            'date_achieved' => $now,
+                            'last_aggregated' => $now,
+                        ]
+                    ],
+                    3 => [
+                        [
+                            'achieved_value' => 2,
+                            'status' => pathway_achievement::STATUS_CURRENT,
+                            'date_achieved' => $now + 1,
+                            'last_aggregated' => $now + 1,
+                        ]
+                    ],
+                ],
+                'expected' => [
+                    'achieved_value' => 2,
+                    'achieved_via' => [1, 3],
+                ],
             ]
         ];
     }
+
     /**
      * @dataProvider do_aggregation_dataprovider
      * @param array $pathways

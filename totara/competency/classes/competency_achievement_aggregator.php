@@ -29,7 +29,7 @@ use stdClass;
 use totara_competency\entities\achievement_via;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency_achievement;
-use totara_competency\event\competency_achievement_updated;
+use totara_competency\hook\competency_achievement_updated_bulk;
 use totara_core\advanced_feature;
 
 /**
@@ -110,7 +110,7 @@ final class competency_achievement_aggregator {
         $user_assignment_records = $this->user_id_source->get_users_to_reaggregate($competency_id);
 
         builder::get_db()->transaction(function () use ($competency_id, $aggregation_time, $user_assignment_records) {
-            $hook = new hook\competency_achievement_updated_bulk($competency_id);
+            $hook = new competency_achievement_updated_bulk($competency_id);
 
             foreach ($user_assignment_records as $user_assignment_record) {
                 $user_id = $user_assignment_record->user_id;

@@ -4,6 +4,7 @@ Feature: Verify competencies completion status is updated when the associated co
   Background:
     Given the "mylearning" user profile block exists
     And I am on a totara site
+    And Perform is disabled
     And the following "users" exist:
       | username | firstname  | lastname  | email                |
       | learner1 | Bob1       | Learner1  | learner1@example.com |
@@ -120,6 +121,8 @@ Scale 1
     When I press "Approve"
     Then I should see "Plan \"Bob's Learning Plan\" has been approved by Admin User"
     And I log out
+    And I trigger cron
+
 
   Scenario: Verify that competency status is not updated if all criteria is not met
     # Check learner's competency record
@@ -131,13 +134,10 @@ Scale 1
     And I log out
 
     # Upload course completion for 1 course with today's date
-    When I log in as "admin"
     And the following courses are completed:
       | user     | course | timecompleted  |
       | learner1 | C1     | today          |
-    # TODO this needs to be updated to use the new task, see TL-22826
-    #And I run the "\totara_hierarchy\task\update_competencies_task" task
-    And I log out
+    And I run the scheduled task "\totara_competency\task\competency_aggregation_queue"
 
     # Check course completion but competency status not updated
     And I log in as "learner1"
@@ -160,15 +160,13 @@ Scale 1
     And the following courses are completed:
       | user     | course | timecompleted  |
       | learner1 | C1     | today          |
-    # TODO this needs to be updated to use the new task, see TL-22826
-    #Then I run the "\totara_hierarchy\task\update_competencies_task" task
+    Then I run the scheduled task "\totara_competency\task\competency_aggregation_queue"
 
     # Upload course completion for other courses with today's date
     When the following courses are completed:
       | user     | course | timecompleted  |
       | learner1 | C2     | today          |
-    # TODO this needs to be updated to use the new task, see TL-22826
-    #And I run the "\totara_hierarchy\task\update_competencies_task" task
+    And I run the scheduled task "\totara_competency\task\competency_aggregation_queue"
     Then I log out
 
     # Check course completion and competency status updated
@@ -192,15 +190,13 @@ Scale 1
     And the following courses are completed:
       | user     | course | timecompleted  |
       | learner1 | C1     | today          |
-    # TODO this needs to be updated to use the new task, see TL-22826
-    #Then I run the "\totara_hierarchy\task\update_competencies_task" task
+    Then I run the scheduled task "\totara_competency\task\competency_aggregation_queue"
 
     # Upload course completion for other courses with last month's date
     When the following courses are completed:
       | user     | course | timecompleted  |
       | learner1 | C2     | last month     |
-    # TODO this needs to be updated to use the new task, see TL-22826
-    #Then I run the "\totara_hierarchy\task\update_competencies_task" task
+    Then I run the scheduled task "\totara_competency\task\competency_aggregation_queue"
     And I log out
 
     # Check course completion and competency status updated
@@ -224,8 +220,7 @@ Scale 1
     And the following courses are completed:
       | user     | course | timecompleted  |
       | learner1 | C1     | today          |
-    # TODO this needs to be updated to use the new task, see TL-22826
-    #Then I run the "\totara_hierarchy\task\update_competencies_task" task
+    Then I run the scheduled task "\totara_competency\task\competency_aggregation_queue"
     And I log out
 
     # Check course completion and competency status is not updated
@@ -249,8 +244,7 @@ Scale 1
     And I click on "Edit" "link" in the "Competency 1" "table_row"
     And I set the field "Aggregation method" to "Any"
     And I press "Save changes"
-    # TODO this needs to be updated to use the new task, see TL-22826
-    #Then I run the "\totara_hierarchy\task\update_competencies_task" task
+    Then I run the scheduled task "\totara_competency\task\competency_aggregation_queue"
     And I log out
 
     # Check competency status is updated

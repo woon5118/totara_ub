@@ -84,11 +84,10 @@ Feature: Test use of images in competencies and competency custom fields
     And I set the field "Describe this image for someone who cannot see it" to "logo2 in competency description"
     And I click on "Save image" "button"
     And I press "Save changes"
-    Then I should see the "logo2 in competency description" image in the "//dd[preceding-sibling::dt[1][. = 'Description']]" "xpath_element"
+    Then I should see the "logo2 in competency description" image in the "#id_description_editoreditable" "css_element"
     And I should see image with alt text "logo2 in competency description"
 
     # Image in the custom field
-    When I click on "Edit" "link"
     And I click on "//button[@class='atto_image_button']" "xpath_element" in the "//div[@id='fitem_id_customfield_CTA1_editor']" "xpath_element"
     And I click on "Browse repositories..." "button"
     And I click on "learninglogo3.jpg" "link"
@@ -103,15 +102,13 @@ Feature: Test use of images in competencies and competency custom fields
 
     # Verify the outcome
     And I press "Save changes"
-    Then I should see the "logo2 in competency description" image in the "//dd[preceding-sibling::dt[1][. = 'Description']]" "xpath_element"
-    And I should see the "logo3 on customfield text area" image in the "//dd[preceding-sibling::dt[1][. = 'Custom text area 1']]" "xpath_element"
+    Then I should see the "logo2 in competency description" image in the "#id_description_editoreditable" "css_element"
+    And I should see the "logo3 on customfield text area" image in the "#id_customfield_CTA1_editoreditable" "css_element"
     And I should see "learninglogo4.jpg"
     And I should see image with alt text "logo2 in competency description"
     And I should see image with alt text "logo3 on customfield text area"
 
-    When I press "Return to competency framework"
-    Then I should see the "logo2 in competency description" image in the "My competency 1" "table_row"
-    And I should see the "logo3 on customfield text area" image in the "Custom text area 1" "table_row"
+    When I follow "Back to Competency page"
     And I should see image with alt text "logo2 in competency description"
     And I should see image with alt text "logo3 on customfield text area"
 
@@ -136,24 +133,24 @@ Feature: Test use of images in competencies and competency custom fields
     And I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I click on "Test Comp Framework" "link"
     And I click on "My competency 1" "link"
-    And I press "Assign course completions"
-    And I click on "Miscellaneous" "link"
-    And I click on "An Unexpected Journey" "link"
-    And I click on "Save" "button" in the ".totara-dialog[aria-describedby=evidence]" "css_element"
-    And I wait "2" seconds
-    And I press "Return to competency framework"
-    And I log out
+    And I click on ".tui-competencyOverviewLinkedCourses__header_edit" "css_element"
+    And I press "Add linked courses"
+    And I click on "Select" "checkbox"
+    And I click on "Save changes" "button" in the ".modal-container" "css_element"
+    And I click on "Save changes" "button"
+    And I click on "Back to Competency page" "link"
+    Then I should see "An Unexpected Journey"
+    When I log out
     And I log in as "learner1"
     And I click on "An Unexpected Journey" "link"
     And I choose "Join the Dwarves" from "Help to Gandalf the Grey" choice activity
     And I should see "Your selection: Join the Dwarves"
     And I am on "Dashboard" page
     And I click on "Record of Learning" in the totara menu
-    Then I should see "Complete"
+    Then I should see "100%"
     And I log out
     And I log in as "admin"
-    # TODO this needs to be updated to use the new task, see TL-22637
-    #And I run the "\totara_hierarchy\task\update_competencies_task" task
+    And I run the scheduled task "\totara_competency\task\competency_aggregation_queue"
 
     When I navigate to "Manage user reports" node in "Site administration > Reports"
     And I follow "Test Competency Status"
@@ -167,11 +164,12 @@ Feature: Test use of images in competencies and competency custom fields
     And I press "Add"
     And I press "Save changes"
     And I follow "View This Report"
-    Then I should see the "logo3 on customfield text area" image in the "My competency 1" "table_row"
+    # TODO: images no longer shown on the report
+    # Then I should see image with alt text "logo3 on customfield text area"
 
     When I follow "My competency 1"
-    Then I should see the "logo2 in competency description" image in the "//dd[preceding-sibling::dt[1][. = 'Description']]" "xpath_element"
-    And I should see the "logo3 on customfield text area" image in the "//dd[preceding-sibling::dt[1][. = 'Custom text area 1']]" "xpath_element"
+    Then I should see the "logo2 in competency description" image in the "#id_description_editoreditable" "css_element"
+    And I should see the "logo3 on customfield text area" image in the "#id_customfield_CTA1_editoreditable" "css_element"
     And I should see image with alt text "logo2 in competency description"
     And I should see image with alt text "logo3 on customfield text area"
 
@@ -187,5 +185,4 @@ Feature: Test use of images in competencies and competency custom fields
     And I press "Add"
     And I press "Save changes"
     And I follow "View This Report"
-    Then I should see the "logo3 on customfield text area" image in the "My competency 1" "table_row"
-    And I should see image with alt text "logo3 on customfield text area"
+    Then I should see image with alt text "logo3 on customfield text area"

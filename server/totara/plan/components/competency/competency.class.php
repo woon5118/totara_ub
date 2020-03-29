@@ -24,6 +24,7 @@
  */
 
 use totara_competency\entities\competency_achievement as competency_achievement_entity;
+use totara_plan\event\competency_value_set;
 
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
 require_once($CFG->dirroot.'/totara/plan/component.class.php');
@@ -1193,10 +1194,17 @@ class dp_competency_component extends dp_base_component {
         // is in two learning plans, either can update the same record. This is to align with behaviour
         // where learning plans used to update the singular value that a user had across the site.
 
+        $old_scale_value_id = null;
         if (!$record) {
             $record = new stdClass();
             $record->competency_id = $competency_id;
             $record->user_id = $subject_id;
+        } else {
+            $old_scale_value_id = $record->scale_value_id;
+        }
+
+        if ($old_scale_value_id == $scale_value_id) {
+            return;
         }
 
         $record->scale_value_id = $scale_value_id;
@@ -1226,7 +1234,7 @@ class dp_competency_component extends dp_base_component {
             $DB->update_record('dp_plan_competency_value', $record);
         }
 
-        \totara_plan\event\competency_value_set::create_from_record($record, $this->plan)->trigger();
+        competency_value_set::create_from_record($record, $this->plan)->trigger();
     }
 
 

@@ -28,6 +28,7 @@
 require_once(__DIR__ . '/../../../lib/behat/behat_base.php');
 
 use Behat\Gherkin\Node\TableNode as TableNode;
+use totara_completionimport\event\bulk_course_completionimport;
 
 /**
  * Steps definitions to deal with course and activities completion.
@@ -209,6 +210,7 @@ class behat_completion extends behat_base {
             }
         }
 
+        $user_courses = [];
         foreach ($data as $row) {
             // Copy values, ready to pass on to the generator.
             $record = array();
@@ -276,7 +278,12 @@ class behat_completion extends behat_base {
             else {
                 $DB->insert_record('course_completions', $params);
             }
+
+            $user_courses[] = ['userid' => $userid, 'courseid' => $courseid];
         }
+
+        // Trigger completion event
+        bulk_course_completionimport::create_from_list($user_courses)->trigger();
 
         // Purge the completion caches
         completion_info::purge_progress_caches();

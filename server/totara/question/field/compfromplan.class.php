@@ -98,7 +98,7 @@ class question_compfromplan extends reviewrating {
         $comprecord = $DB->get_record('totara_competency_achievement',
                 [
                     'user_id' => $this->subjectid,
-                    'comp_id' => $compassign->competencyid,
+                    'competency_id' => $compassign->competencyid,
                     'status' => competency_achievement::ACTIVE_ASSIGNMENT,
                 ],
                 '*',

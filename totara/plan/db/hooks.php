@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2018 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
- * @package criteria_childcompetency
+ * @package totara_plan
  */
 
-use criteria_childcompetency\watcher\achievement;
-use criteria_childcompetency\watcher\competency;
 use totara_competency\hook\competency_achievement_updated_bulk;
-use totara_competency\hook\competency_configuration_changed;
+use totara_plan\watcher\competency;
 
 defined('MOODLE_INTERNAL') || die();
 
 $watchers = [
     [
-        'hookname' => competency_configuration_changed::class,
-        'callback' => competency::class.'::configuration_changed',
-    ],
-    [
         'hookname' => competency_achievement_updated_bulk::class,
-        'callback' => achievement::class.'::updated_bulk',
+        'callback' => competency::class.'::achievement_updated_bulk',
     ],
 ];

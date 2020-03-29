@@ -24,62 +24,66 @@
 namespace aggregation_latest_achieved;
 
 
+use core\collection;
 use totara_competency\entities\pathway_achievement;
 use totara_competency\overall_aggregation;
+use totara_competency\pathway;
 
 class latest_achieved extends overall_aggregation {
 
     /**
      * Aggregate the user and return the latest value achieved by the user
      * If the user achieved a value through multiple paths during the same aggregation cycle (cron run)
-     * the pathways' sortorder is used to determine which value to use
+     * the highest achieved value is used
      *
      * @param int $user_id
      * @return void
      */
     protected function do_aggregation(int $user_id): void {
-        /** @var pathway_achievement|null $highest_achievement */
-        $latest_achievement = null;
-        $latest_value = null;
-        $latest_pw_sortorder = null;
-        $achieved_via = [];
-
         // We load all current achievement for all the pathways in one go
         // to reduce the number of queries
         $current_achievements = $this->get_current_pathway_achievements_for_user($this->pathways, $user_id);
-        foreach ($this->pathways as $pathway) {
-            $achievement = $this->get_or_create_current_pathway_achievement($current_achievements, $pathway, $user_id);
+        $achievements = collection::new($this->pathways)->map(function (pathway $pathway) use ($current_achievements, $user_id) {
+            return $this->get_or_create_current_pathway_achievement($current_achievements, $pathway, $user_id);
+        });
+        $achievements = $achievements->filter(function (pathway_achievement $achievement) {
+            return $achievement->last_aggregated !== null;
+        });
 
-            $value_achieved = $achievement->scale_value;
-
-            if (!is_null($achievement->last_aggregated)) {
-                if (is_null($latest_achievement)) {
-                    $latest_achievement = $achievement;
-                    $latest_value = $value_achieved;
-                    $latest_pw_sortorder = $pathway->get_sortorder();
-                    $achieved_via = [$achievement];
-                } else {
-                    if ($achievement->date_achieved > $latest_achievement->date_achieved) {
-                        $latest_achievement = $achievement;
-                        $latest_value = $value_achieved;
-                        $latest_pw_sortorder = $pathway->get_sortorder();
-                        $achieved_via = [$achievement];
-                    } else if ($achievement->date_achieved == $latest_achievement->date_achieved) {
-                        if ($pathway->get_sortorder() < $latest_pw_sortorder) {
-                            $latest_achievement = $achievement;
-                            $latest_value = $value_achieved;
-                            $latest_pw_sortorder = $pathway->get_sortorder();
-                            $achieved_via = [$achievement];
-                        } else if ($pathway->get_sortorder() == $latest_pw_sortorder) {
-                            $achieved_via[] = $achievement;
-                        }
-                    }
+        $sorted_achievements = $achievements->sort(function (pathway_achievement $a, pathway_achievement $b) {
+            // Achieved on the same date - use highest scale value (i.e. smallest sortorder)
+            if ($a->date_achieved === $b->date_achieved) {
+                // No achieved value
+                if ($a->scale_value === null && $b->scale_value === null) {
+                    return 0;
                 }
-            }
-        }
 
-        if (isset($latest_achievement)) {
-            $this->set_user_achievement($user_id, $achieved_via, $latest_value);
+                // Only 1 achieved a scale value
+                if ($a->scale_value === null && $b->scale_value !== null) {
+                    return -1;
+                }
+                if ($a->scale_value !== null && $b->scale_value === null) {
+                    return 1;
+                }
+
+                // Both achieved a value. Lower sortorder == higher value
+                return $b->scale_value->sortorder - $a->scale_value->sortorder;
+            }
+
+            return $a->date_achieved - $b->date_achieved;
+        });
+
+        /** @var pathway_achievement $latest_achievement */
+        $latest_achievement = $sorted_achievements->last();
+
+        if ($latest_achievement) {
+            // More than one pathway may have resulted in the achievement
+            $achieved_via = $achievements->filter(function (pathway_achievement $achievement) use ($latest_achievement) {
+                return $achievement->date_achieved === $latest_achievement->date_achieved
+                    && $achievement->scale_value === $latest_achievement->scale_value;
+            })->all();
+
+            $this->set_user_achievement($user_id, $achieved_via, $latest_achievement->scale_value);
         }
     }
 

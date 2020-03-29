@@ -3,8 +3,7 @@ Feature: Verify completion of a course triggers assigning a competency.
 
   Background:
     Given I am on a totara site
-    And the following config values are set as admin:
-      | enablecompetency_assignment    | 3           |
+    And Perform is disabled
     And the following "users" exist:
       | username | firstname  | lastname  | email                |
       | learner1 | Bob1       | Learner1  | learner1@example.com |
@@ -119,6 +118,8 @@ Feature: Verify completion of a course triggers assigning a competency.
     When I press "Approve"
     Then I should see "Plan \"Bob's Learning Plan\" has been approved by Admin User"
     And I log out
+    # Triggering the cron to ensure that approval is handled in a different cron cycle
+    And I trigger cron
 
     # Complete the course as the learner.
     When I log in as "learner1"

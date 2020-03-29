@@ -51,7 +51,7 @@ abstract class dp_base_component {
      */
     protected $plan;
 
-    
+
     /**
      * Constructor, add reference to plan object and
      * check required properties are set

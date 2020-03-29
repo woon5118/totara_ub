@@ -61,6 +61,7 @@ Feature: Seminar availability based on activity completion
   Scenario: Signup link is not available until the completion restriction is met
     Given I log in as "student1"
     And I click on "Courses" in the totara menu
+    And I follow "Miscellaneous"
     And I follow "Course 1"
     Then I should see "Not available unless: The activity Certificate 1 is marked complete"
     And I should not see "Sign-up"
@@ -74,6 +75,7 @@ Feature: Seminar availability based on activity completion
   Scenario: Join Waitlist link is not available until the completion restriction is met
     Given I log in as "teacher1"
     And I click on "Courses" in the totara menu
+    And I follow "Miscellaneous"
     And I follow "Course 1"
     And I click on the seminar event action "Edit event" in row "0 / 10"
     And I click on "Delete" "link" in the "1 January" "table_row"
@@ -82,6 +84,7 @@ Feature: Seminar availability based on activity completion
 
     When I log in as "student1"
     And I click on "Courses" in the totara menu
+    And I follow "Miscellaneous"
     And I follow "Course 1"
     Then I should see "Not available unless: The activity Certificate 1 is marked complete"
     And I should not see "Join waitlist"
@@ -109,6 +112,7 @@ Feature: Seminar availability based on activity completion
 
     When I log in as "student1"
     And I click on "Courses" in the totara menu
+    And I follow "Miscellaneous"
     And I follow "Course 1"
     And I click on "Go to event" "link" in the "1 January" "table_row"
     Then I should see "Sign-up" in the ".mod_facetoface__eventinfo__sidebar__signup" "css_element"
@@ -116,6 +120,7 @@ Feature: Seminar availability based on activity completion
 
     When I log in as "student2"
     And I click on "Courses" in the totara menu
+    And I follow "Miscellaneous"
     And I follow "Course 1"
     Then I should not see "Sign-up"
     And I should not see "Go to event"
@@ -141,6 +146,7 @@ Feature: Seminar availability based on activity completion
 
     When I log in as "student1"
     And I click on "Courses" in the totara menu
+    And I follow "Miscellaneous"
     And I follow "Course 1"
     And I click on "Go to event" "link" in the "Wait-listed" "table_row"
     Then I should see "Join waitlist" in the ".mod_facetoface__eventinfo__sidebar__signup" "css_element"
@@ -148,6 +154,7 @@ Feature: Seminar availability based on activity completion
 
     When I log in as "student2"
     And I click on "Courses" in the totara menu
+    And I follow "Miscellaneous"
     And I follow "Course 1"
     Then I should not see "Join waitlist"
     And I should not see "Go to event"

@@ -3,6 +3,7 @@ Feature: Appraisal question: Competencies from Learning Plan - test that changin
 
   Background:
     Given I am on a totara site
+    And Perform is disabled
     And the following "competency" frameworks exist:
       | fullname               | idnumber | description           |
       | Competency Framework 1 | CF1      | Framework description |
@@ -99,6 +100,7 @@ Feature: Appraisal question: Competencies from Learning Plan - test that changin
     Then I should see "Competency 1" in the ".dp-plan-component-items" "css_element"
     And I press "Approve"
     And I log out
+    And I run the scheduled task "\totara_competency\task\competency_aggregation_queue"
 
     # Log in as learner and navigate to the appraisal.
     Given I log in as "learner1"
@@ -142,6 +144,7 @@ Feature: Appraisal question: Competencies from Learning Plan - test that changin
     And I should see "This is learner's answer"
     And I should see "This is manager's answer"
     And I log out
+    And I run the scheduled task "\totara_competency\task\competency_aggregation_queue"
 
     # Make sure manager's manager can see the appraisal but can't change proficiency.
     Given I log in as "teamlead3"

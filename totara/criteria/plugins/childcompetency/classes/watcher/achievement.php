@@ -23,28 +23,10 @@
 
 namespace criteria_childcompetency\watcher;
 
-use totara_competency\hook\competency_achievement_updated;
 use totara_criteria\competency_item_helper;
 use totara_competency\hook\competency_achievement_updated_bulk;
 
 class achievement {
-
-    public static function updated(competency_achievement_updated $hook) {
-        global $DB;
-
-        // Find all criteria items on this competency's parent (i.e. find all criteria with a 'competency' item
-        // with this competency as item_id) (Not expecting there to be more than 1, but who knows what clients will do)
-        // As the criterion has no knowledge whether this user's satisfaction of the criteria is to be tracked,
-        // it simply generates an criteria_achievement_changed event with the relevant criterion ids and this user's id.
-        // Modules that use these criteria are responsible for initiating the relevant processes to create/update
-        // the item_record(s) for this user
-
-        $achievement = $hook->get_achievement();
-        $child_competency_id = $achievement['competency_id'];
-        $user_id = $achievement['user_id'];
-
-        competency_item_helper::achievement_updated($user_id, $child_competency_id, 'childcompetency');
-    }
 
     public static function updated_bulk(competency_achievement_updated_bulk $hook) {
         global $DB;
