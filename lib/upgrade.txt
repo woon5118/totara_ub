@@ -110,6 +110,7 @@ information provided here is intended especially for developers.
   - css_chunk_by_selector_count() has been deprecated and will be removed in a future version.
 * Added IE 11 support for CSS var() and custom properties on :root {} within TUI SCSS.
 * The internal structure of the cache 'core/coursecattree' has been changed; please refer to coursecat::get_tree()
+* Moved formatter classes from \totara_core\formatter to \core\webapi\formatter namespace as they are meant to be used only for GraphQL
 
 === 12.0 ===
 

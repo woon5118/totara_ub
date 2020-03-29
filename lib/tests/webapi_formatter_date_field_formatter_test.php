@@ -18,15 +18,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package totara_core
+ * @package core
  */
 
 use core\date_format;
-use totara_core\formatter\field\date_field_formatter;
+use core\webapi\formatter\field\date_field_formatter;
 
 defined('MOODLE_INTERNAL') || die();
 
-class totara_core_date_field_formatter_testcase extends basic_testcase {
+class core_webapi_formatter_date_field_formatter_testcase extends basic_testcase {
 
     public function test_formats() {
         $formats = date_format::get_available();

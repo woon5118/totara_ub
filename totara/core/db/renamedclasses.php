@@ -32,6 +32,12 @@ defined('MOODLE_INTERNAL') || die();
 // The array must be called $renamedclasses.
 $renamedclasses = array(
     'totara_core\task\update_temporary_managers_task' => 'totara_job\task\update_temporary_managers_task',
+    'totara_core\formatter\formatter' => core\webapi\formatter\formatter::class,
+    'totara_core\formatter\field\base' => core\webapi\formatter\field\base::class,
+    'totara_core\formatter\field\date_field_formatter' => core\webapi\formatter\field\date_field_formatter::class,
+    'totara_core\formatter\field\field_formatter_interface' => core\webapi\formatter\field\field_formatter_interface::class,
+    'totara_core\formatter\field\string_field_formatter' => core\webapi\formatter\field\string_field_formatter::class,
+    'totara_core\formatter\field\text_field_formatter' => core\webapi\formatter\field\text_field_formatter::class,
 );
 
 // Only add these to the map if we're within PHPUnit.

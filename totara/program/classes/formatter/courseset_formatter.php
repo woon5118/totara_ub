@@ -24,8 +24,8 @@
 
 namespace totara_program\formatter;
 
-use totara_core\formatter\formatter;
-use totara_core\formatter\fields\string_field_formatter;
+use core\webapi\formatter\field\string_field_formatter;
+use core\webapi\formatter\formatter;
 
 class courseset_formatter extends formatter {
 

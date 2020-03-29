@@ -37,7 +37,7 @@ class totara_webapi_execution_context_testcase extends advanced_testcase {
     }
 
     public function test_format_core_date() {
-        $debugging_msg = 'format_core_date() in execution_context is deprecated, please use the new \totara_core\formatter\field\date_field_formatter class';
+        $debugging_msg = 'format_core_date() in execution_context is deprecated, please use the new \core\webapi\formatter\field\date_field_formatter class';
 
         $time = 123456;
         $ec = execution_context::create('dev', null);
@@ -70,7 +70,7 @@ class totara_webapi_execution_context_testcase extends advanced_testcase {
     }
 
     public function test_format_text() {
-        $debugging_msg = 'format_text() in execution_context is deprecated, please use the new \totara_core\formatter\field\text_field_formatter class';
+        $debugging_msg = 'format_text() in execution_context is deprecated, please use the new \core\webapi\formatter\field\text_field_formatter class';
 
         $ec = execution_context::create('dev', null);
         $this->assertSame(null, $ec->format_text(null));

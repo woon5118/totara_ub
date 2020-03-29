@@ -18,16 +18,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package totara_core
+ * @package core
  */
 
-namespace totara_core\formatter;
+namespace core\webapi\formatter;
 
 use Closure;
 use coding_exception;
 use context;
+use core\webapi\formatter\field\base;
 use stdClass;
-use totara_core\formatter\field\base;
 
 /**
  * Extend this class to define a formatter for your object (can also be passed as array).
@@ -78,7 +78,7 @@ abstract class formatter {
     /**
      * Returns an array where the keys are the name of the fields
      * and the values can be:
-     * - a field formatter class name, must be a child of \totara_core\formatter\field\base
+     * - a field formatter class name, must be a child of \core\webapi\formatter\field\base
      * - a function name of the current formatter, the function takes value and format as arguments
      * - a simple Closure with the value as first and the format as second parameter
      * - a Closure with the value as first and a typehinted field formatter as second argument

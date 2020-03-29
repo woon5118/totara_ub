@@ -23,14 +23,14 @@
 
 namespace totara_job\webapi\resolver\type;
 
-use \core\date_format;
-use \core\format;
-use \core\webapi\execution_context;
+use core\date_format;
+use core\format;
+use core\webapi\execution_context;
+use core\webapi\formatter\field\date_field_formatter;
+use core\webapi\formatter\field\string_field_formatter;
+use core\webapi\formatter\field\text_field_formatter;
 use totara_core\advanced_feature;
-use \totara_core\formatter\field\date_field_formatter;
-use \totara_core\formatter\field\string_field_formatter;
-use \totara_core\formatter\field\text_field_formatter;
-use \totara_job\job_assignment;
+use totara_job\job_assignment;
 
 /**
  * Job assignment type

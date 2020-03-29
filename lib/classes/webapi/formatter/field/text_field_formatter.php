@@ -18,10 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package totara_core
+ * @package core
  */
 
-namespace totara_core\formatter\field;
+namespace core\webapi\formatter\field;
 
 use coding_exception;
 use context;

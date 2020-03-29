@@ -18,15 +18,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package totara_core
+ * @package core
  */
 
 use core\format;
-use totara_core\formatter\field\string_field_formatter;
+use core\webapi\formatter\field\string_field_formatter;
 
 defined('MOODLE_INTERNAL') || die();
 
-class totara_core_string_field_formatter_testcase extends basic_testcase {
+class core_webapi_formatter_string_field_formatter_testcase extends basic_testcase {
 
     public function test_html_format() {
         $context = context_system::instance();

@@ -25,9 +25,9 @@ namespace core\webapi;
 
 use core\date_format;
 use core\format;
+use core\webapi\formatter\field\date_field_formatter;
+use core\webapi\formatter\field\text_field_formatter;
 use GraphQL\Type\Definition\ResolveInfo;
-use totara_core\formatter\field\date_field_formatter;
-use totara_core\formatter\field\text_field_formatter;
 
 /**
  * GraphQL execution context.
@@ -157,7 +157,7 @@ class execution_context {
      * @return string|null
      */
     public function format_core_date(?int $timestamp, array $args) {
-        debugging('format_core_date() in execution_context is deprecated, please use the new \totara_core\formatter\field\date_field_formatter class', DEBUG_DEVELOPER);
+        debugging('format_core_date() in execution_context is deprecated, please use the new \core\webapi\formatter\field\date_field_formatter class', DEBUG_DEVELOPER);
 
         $format = $args['format'] ?? date_format::FORMAT_TIMESTAMP;
 
@@ -175,7 +175,7 @@ class execution_context {
      * @return string
      */
     public function format_text(?string $text, $format = FORMAT_HTML, array $options = []) {
-        debugging('format_text() in execution_context is deprecated, please use the new \totara_core\formatter\field\text_field_formatter class', DEBUG_DEVELOPER);
+        debugging('format_text() in execution_context is deprecated, please use the new \core\webapi\formatter\field\text_field_formatter class', DEBUG_DEVELOPER);
 
         $context = $options['context'] ?? \context_system::instance();
 

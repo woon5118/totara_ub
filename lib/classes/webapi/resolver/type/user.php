@@ -26,9 +26,9 @@ namespace core\webapi\resolver\type;
 use core\date_format;
 use core\format;
 use core\webapi\execution_context;
+use core\webapi\formatter\field\date_field_formatter;
+use core\webapi\formatter\field\text_field_formatter;
 use core_user\access_controller;
-use totara_core\formatter\field\date_field_formatter;
-use totara_core\formatter\field\text_field_formatter;
 
 class user implements \core\webapi\type_resolver {
 

@@ -23,9 +23,10 @@
 
 namespace totara_core\formatter;
 
+use core\webapi\formatter\field\date_field_formatter;
+use core\webapi\formatter\formatter;
 use core_course\formatter\course_formatter;
 use totara_certification\formatter\certification_formatter;
-use totara_core\formatter\field\date_field_formatter;
 use totara_core\user_learning\item;
 use totara_core\user_learning\item_base;
 use totara_program\formatter\program_formatter;

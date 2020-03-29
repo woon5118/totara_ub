@@ -18,18 +18,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package totara_core
+ * @package core
  */
 
 use core\date_format;
 use core\format;
-use totara_core\formatter\field\date_field_formatter;
-use totara_core\formatter\field\string_field_formatter;
-use totara_core\formatter\formatter;
+use core\webapi\formatter\field\date_field_formatter;
+use core\webapi\formatter\field\string_field_formatter;
+use core\webapi\formatter\formatter;
 
 defined('MOODLE_INTERNAL') || die();
 
-class totara_core_formatter_testcase extends advanced_testcase {
+class core_webapi_formatter_testcase extends advanced_testcase {
 
     public function test_format() {
         // Enable the multilang filter and set it to apply to headings and content.

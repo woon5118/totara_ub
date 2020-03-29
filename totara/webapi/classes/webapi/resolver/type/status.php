@@ -24,8 +24,8 @@
 namespace totara_webapi\webapi\resolver\type;
 
 use core\webapi\execution_context;
+use core\webapi\formatter\field\date_field_formatter;
 use core\webapi\type_resolver;
-use totara_core\formatter\field\date_field_formatter;
 
 /**
  * Simple type representing the status of the webapi
