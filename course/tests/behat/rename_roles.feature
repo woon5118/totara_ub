@@ -19,6 +19,9 @@ Feature: Rename roles within a course
       | teacher1 | C1 | editingteacher |
       | teacher2 | C1 | teacher |
       | student1 | C1 | student |
+    And the following "permission overrides" exist:
+      | capability              | permission | role           | contextlevel | reference |
+      | moodle/role:switchroles | Allow      | editingteacher | System       |           |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     When I navigate to "Edit settings" in current page administration

@@ -794,6 +794,7 @@ $capabilities = array(
         )
     ),
 
+    /* @deprecated since Totara 13.0 */
     'moodle/role:switchroles' => array(
 
         'riskbitmask' => RISK_XSS | RISK_PERSONAL,
@@ -801,8 +802,6 @@ $capabilities = array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
             // NOTE: do not allow this nonsense for tenant roles!!!
         )
     ),

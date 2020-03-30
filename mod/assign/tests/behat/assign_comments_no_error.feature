@@ -11,6 +11,9 @@ Feature: Switch role does not cause an error message in assignsubmission_comment
     And the following "course enrolments" exist:
       | course | user     | role           |
       | C1     | teacher1 | editingteacher |
+    And the following "permission overrides" exist:
+      | capability              | permission | role           | contextlevel | reference |
+      | moodle/role:switchroles | Allow      | editingteacher | System       |           |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:

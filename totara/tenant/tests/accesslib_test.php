@@ -878,6 +878,7 @@ class totara_tenant_accesslib_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         $managerrole = $DB->get_record('role', array('shortname'=>'manager'), '*', MUST_EXIST);
+        assign_capability('moodle/role:switchroles', CAP_ALLOW, $managerrole->id, context_system::instance()); // Capability is deprecated since Totara 13.0.
 
         $category0 = $this->getDataGenerator()->create_category();
         $course0_1 = $this->getDataGenerator()->create_course(['category' => $category0->id]);

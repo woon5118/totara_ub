@@ -1391,6 +1391,7 @@ class core_accesslib_testcase extends advanced_testcase {
         $coursecontext = context_course::instance($course->id);
 
         $teacherrole = $DB->get_record('role', array('shortname'=>'editingteacher'), '*', MUST_EXIST);
+        assign_capability('moodle/role:switchroles', CAP_ALLOW, $teacherrole->id, context_system::instance()); // Capability is deprecated since Totara 13.0.
         $teacher = $this->getDataGenerator()->create_user();
         role_assign($teacherrole->id, $teacher->id, $coursecontext);
         $teacherename = (object)array('roleid'=>$teacherrole->id, 'name'=>'Učitel', 'contextid'=>$coursecontext->id);
@@ -3302,6 +3303,7 @@ class core_accesslib_testcase extends advanced_testcase {
 
         // Role switching.
         $userid = $testusers[9];
+        assign_capability('moodle/role:switchroles', CAP_ALLOW, $allroles['editingteacher'], context_system::instance()); // Capability is deprecated since Totara 13.0.
         $USER = $DB->get_record('user', array('id'=>$userid));
         load_all_capabilities();
         $coursecontext = context_course::instance($course1->id);
