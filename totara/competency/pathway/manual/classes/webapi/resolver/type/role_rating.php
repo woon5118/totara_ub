@@ -27,7 +27,7 @@ use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
 use pathway_manual\models\role_rating as role;
-use totara_core\formatter\field\string_field_formatter;
+use core\webapi\formatter\field\string_field_formatter;
 
 defined('MOODLE_INTERNAL') || die();
 

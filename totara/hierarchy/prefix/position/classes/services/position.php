@@ -30,8 +30,8 @@ use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use totara_core\advanced_feature;
-use totara_core\formatter\field\string_field_formatter;
-use totara_core\formatter\field\text_field_formatter;
+use core\webapi\formatter\field\string_field_formatter;
+use core\webapi\formatter\field\text_field_formatter;
 
 defined('MOODLE_INTERNAL') || die();
 

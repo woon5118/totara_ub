@@ -3,7 +3,7 @@ A role a user might have for another user, e.g. manager
 """
 type pathway_manual_role {
   name: String!
-  display_name(format: core_format = HTML): String!
+  display_name(format: core_format = PLAIN): String!
   display_order: Int!
   has_role: Boolean!
 }
@@ -15,7 +15,7 @@ type pathway_manual_rating {
   rater: core_user # user fullname, picture url, etc.
   scale_value: totara_competency_scale_value # rating value id given
   timestamp(format: core_date_format = TIMESTAMP): core_date! # when the rating was made
-  comment(format: core_format = HTML): String # comment added on rating
+  comment(format: core_format = PLAIN): String # comment added on rating
 }
 
 """

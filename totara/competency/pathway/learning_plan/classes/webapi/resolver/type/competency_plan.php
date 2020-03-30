@@ -28,7 +28,7 @@ use core\date_format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
 use pathway_learning_plan\models\competency_plan as competency_plan_model;
-use totara_core\formatter\field\date_field_formatter;
+use core\webapi\formatter\field\date_field_formatter;
 
 defined('MOODLE_INTERNAL') || die();
 

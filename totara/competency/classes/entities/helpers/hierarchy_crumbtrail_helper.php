@@ -27,7 +27,7 @@ namespace totara_competency\entities\helpers;
 use core\format;
 use totara_hierarchy\entities\hierarchy_item;
 use core\orm\query\builder;
-use totara_core\formatter\field\string_field_formatter;
+use core\webapi\formatter\field\string_field_formatter;
 
 class hierarchy_crumbtrail_helper {
 

@@ -18,8 +18,8 @@ type totara_competency_assignment {
   archived_at(format: core_date_format = TIMESTAMP): core_date
   competency: totara_competency_competency!
   user_group: totara_competency_user_group!
-  progress_name(format: core_format = HTML): String
-  reason_assigned(format: core_format = HTML): String
+  progress_name(format: core_format = PLAIN): String
+  reason_assigned(format: core_format = PLAIN): String
   assigner: core_user
   can_archive: Boolean
 }
@@ -33,17 +33,17 @@ type totara_competency_archive_user_assignment_result {
 
 type totara_competency_user_group {
   id: ID!
-  name(format: core_format = HTML): String!
+  name(format: core_format = PLAIN): String!
   type: String!
   is_deleted: Boolean!
 }
 
 type totara_competency_self_assignable_competency implements totara_competency_competency_interface {
   id: core_id!
-  fullname(format: core_format = HTML): String!
-  idnumber(format: core_format = HTML): String
-  shortname(format: core_format = HTML): String
-  display_name(format: core_format = HTML): String
+  fullname(format: core_format = PLAIN): String!
+  idnumber(format: core_format = PLAIN): String
+  shortname(format: core_format = PLAIN): String
+  display_name(format: core_format = PLAIN): String
   description(format: core_format = HTML): String
   timecreated(format: core_date_format = TIMESTAMP): core_date
   timemodified(format: core_date_format = TIMESTAMP): core_date

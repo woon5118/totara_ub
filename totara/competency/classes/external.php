@@ -30,7 +30,7 @@ use totara_competency\entities\competency_framework;
 use totara_competency\entities\course;
 use totara_competency\entities\scale;
 use totara_core\advanced_feature;
-use totara_core\formatter\field\string_field_formatter;
+use core\webapi\formatter\field\string_field_formatter;
 
 defined('MOODLE_INTERNAL') || die;
 

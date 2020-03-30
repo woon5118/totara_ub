@@ -40,7 +40,7 @@ class user_grouping_cohort implements type_resolver {
      * Default formats.
      */
     private const DEF_FORMATS = [
-        'name' => format::FORMAT_HTML,
+        'name' => format::FORMAT_PLAIN,
         'description' => format::FORMAT_HTML,
         'idnumber' => format::FORMAT_PLAIN
     ];

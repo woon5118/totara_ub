@@ -11,23 +11,23 @@ type mod_perform_user_grouping {
 
 type mod_perform_user_grouping_cohort {
   id: core_id!
-  name(format: core_format = HTML): String!
+  name(format: core_format = PLAIN): String!
   idnumber: String
   description(format: core_format = HTML): String
 }
 
 type mod_perform_user_grouping_organisation {
   id: core_id!
-  shortname(format: core_format = HTML): String!
-  fullname(format: core_format = HTML): String!
+  shortname(format: core_format = PLAIN): String!
+  fullname(format: core_format = PLAIN): String!
   idnumber: String
   description(format: core_format = HTML): String
 }
 
 type mod_perform_user_grouping_position {
   id: core_id!
-  shortname(format: core_format = HTML): String!
-  fullname(format: core_format = HTML): String!
+  shortname(format: core_format = PLAIN): String!
+  fullname(format: core_format = PLAIN): String!
   idnumber: String
   description(format: core_format = HTML): String
 }

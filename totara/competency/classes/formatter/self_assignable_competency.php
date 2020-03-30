@@ -23,10 +23,10 @@
 
 namespace totara_competency\formatter;
 
-use totara_core\formatter\field\date_field_formatter;
-use totara_core\formatter\field\string_field_formatter;
-use totara_core\formatter\field\text_field_formatter;
-use totara_core\formatter\formatter;
+use core\webapi\formatter\field\date_field_formatter;
+use core\webapi\formatter\field\string_field_formatter;
+use core\webapi\formatter\field\text_field_formatter;
+use core\webapi\formatter\formatter;
 
 
 /**

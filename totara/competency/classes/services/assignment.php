@@ -36,7 +36,7 @@ use totara_competency\entities;
 use totara_competency\models;
 use totara_core\advanced_feature;
 use totara_core\basket\session_basket;
-use totara_core\formatter\field\string_field_formatter;
+use core\webapi\formatter\field\string_field_formatter;
 
 defined('MOODLE_INTERNAL') || die();
 

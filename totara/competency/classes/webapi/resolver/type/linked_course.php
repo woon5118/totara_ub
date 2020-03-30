@@ -26,7 +26,7 @@ namespace totara_competency\webapi\resolver\type;
 use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use totara_core\formatter\field\string_field_formatter;
+use core\webapi\formatter\field\string_field_formatter;
 
 class linked_course implements type_resolver {
 
@@ -37,7 +37,7 @@ class linked_course implements type_resolver {
             case 'course_id':
                 return $linked_course->id;
             case 'fullname':
-                $format = $args['format'] ?? format::FORMAT_HTML;
+                $format = $args['format'] ?? format::FORMAT_PLAIN;
                 $formatter = new string_field_formatter($format, \context_system::instance());
                 return $formatter->format($linked_course->fullname);
             case 'is_mandatory':

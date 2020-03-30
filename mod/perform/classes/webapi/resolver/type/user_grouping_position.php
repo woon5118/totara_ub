@@ -41,8 +41,8 @@ class user_grouping_position implements type_resolver {
      * Default formats.
      */
     private const DEF_FORMATS = [
-        'shortname' => format::FORMAT_HTML,
-        'fullname' => format::FORMAT_HTML,
+        'shortname' => format::FORMAT_PLAIN,
+        'fullname' => format::FORMAT_PLAIN,
         'description' => format::FORMAT_HTML,
         'idnumber' => format::FORMAT_PLAIN
     ];

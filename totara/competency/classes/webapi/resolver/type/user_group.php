@@ -26,7 +26,7 @@ namespace totara_competency\webapi\resolver\type;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
 use totara_competency\models\user_group as user_group_model;
-use totara_core\formatter\field\string_field_formatter;
+use core\webapi\formatter\field\string_field_formatter;
 
 /**
  * Note: It is the responsibility of the query to ensure the user is permitted to see an organisation.

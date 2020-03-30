@@ -26,14 +26,14 @@ namespace totara_competency\webapi\resolver\type;
 use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use totara_core\formatter\field\string_field_formatter;
+use core\webapi\formatter\field\string_field_formatter;
 
 class competency_custom_field implements type_resolver {
 
     public static function resolve(string $field, $competency_field, array $args, execution_context $ec) {
         switch ($field) {
             case 'title':
-                return (new string_field_formatter($args['format'] ?? format::FORMAT_HTML, \context_system::instance()))
+                return (new string_field_formatter($args['format'] ?? format::FORMAT_PLAIN, \context_system::instance()))
                     ->format($competency_field->title);
             case 'value':
                 // Formatting of the value is done by the 'display_item_data' function of each custom field type

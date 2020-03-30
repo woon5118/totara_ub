@@ -13,7 +13,7 @@ Competency profile overall progress
 type totara_competency_profile_overall_progress {
   user: core_user
   items: [totara_competency_profile_progress_item!]
-  latest_achievement(format: core_format = HTML): String
+  latest_achievement(format: core_format = PLAIN): String
   filters: [totara_competency_profile_assignment_filter_option!]
 }
 
@@ -23,7 +23,7 @@ To simplify, it is a list of assignments grouped by assignment type, user group 
 """
 type totara_competency_profile_progress_item {
   overall_progress: Int!
-  name(format: core_format = HTML): String!
+  name(format: core_format = PLAIN): String!
   items: [totara_competency_profile_assignment_progress]
 }
 
@@ -52,7 +52,7 @@ Competency profile scale_value progress type that includes extra details (the pe
 type totara_competency_profile_scale_value_progress {
   id: core_id
   scale_id: core_id
-  name(format: core_format = HTML): String!
+  name(format: core_format = PLAIN): String!
   percentage: Int
   proficient: Boolean
 }
@@ -61,12 +61,12 @@ type totara_competency_profile_scale_value_progress {
 Competency profile assignment filter option
 """
 type totara_competency_profile_assignment_filter_option {
-  name(format: core_format = HTML): String!
+  name(format: core_format = PLAIN): String!
   user_group_type: String!
   user_group_id: Int!
   type: String!
   status: Int!
-  status_name(format: core_format = HTML): String!
+  status_name(format: core_format = PLAIN): String!
 }
 
 """

@@ -29,7 +29,7 @@ use core\webapi\type_resolver;
 use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\pathway as pathway_instance;
 use totara_competency\pathway_factory;
-use totara_core\formatter\field\string_field_formatter;
+use core\webapi\formatter\field\string_field_formatter;
 
 /**
  * General totara competency pathway
@@ -74,7 +74,7 @@ class pathway implements type_resolver {
             case 'classification':
                 return $pathway->get_classification_name();
             case 'scale_value':
-                $format = $args['format'] ?? format::FORMAT_HTML;
+                $format = $args['format'] ?? format::FORMAT_PLAIN;
                 $formatter = new string_field_formatter($format, \context_system::instance());
                 $scale_value = $pathway->get_scale_value();
                 return $formatter->format($scale_value ? $scale_value->name : null);
@@ -82,7 +82,7 @@ class pathway implements type_resolver {
                 if ($pathway->is_valid()) {
                     return null;
                 }
-                $format = $args['format'] ?? format::FORMAT_HTML;
+                $format = $args['format'] ?? format::FORMAT_PLAIN;
                 $formatter = new string_field_formatter($format, \context_system::instance());
                 return $formatter->format(get_string('error:invalidconfiguration', 'totara_competency'));
             case 'criteria_summary':

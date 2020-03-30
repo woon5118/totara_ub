@@ -11,7 +11,7 @@ Competency scale
 """
 type totara_competency_scale {
   id: core_id!
-  name(format: core_format = HTML): String!
+  name(format: core_format = PLAIN): String!
   description(format: core_format = HTML): String
   timemodified(format: core_date_format = TIMESTAMP): core_date!
   usermodified: core_id
@@ -24,8 +24,8 @@ Competency scale value
 """
 type totara_competency_scale_value {
   id: core_id!
-  name(format: core_format = HTML): String!
-  idnumber(format: core_format = HTML): String
+  name(format: core_format = PLAIN): String!
+  idnumber(format: core_format = PLAIN): String
   description(format: core_format = HTML): String
   scaleid: core_id!
   numericscore: Int
@@ -42,10 +42,10 @@ NOTE: The query is responsible for ensuring the user can see the competency.
 """
 interface totara_competency_competency_interface {
   id: core_id!
-  fullname(format: core_format = HTML): String!
-  idnumber(format: core_format = HTML): String
-  shortname(format: core_format = HTML): String
-  display_name(format: core_format = HTML): String
+  fullname(format: core_format = PLAIN): String!
+  idnumber(format: core_format = PLAIN): String
+  shortname(format: core_format = PLAIN): String
+  display_name(format: core_format = PLAIN): String
   description(format: core_format = HTML): String
   timecreated(format: core_date_format = TIMESTAMP): core_date
   timemodified(format: core_date_format = TIMESTAMP): core_date
@@ -64,10 +64,10 @@ interface totara_competency_competency_interface {
 
 type totara_competency_competency implements totara_competency_competency_interface {
   id: core_id!
-  fullname(format: core_format = HTML): String!
-  idnumber(format: core_format = HTML): String
-  shortname(format: core_format = HTML): String
-  display_name(format: core_format = HTML): String
+  fullname(format: core_format = PLAIN): String!
+  idnumber(format: core_format = PLAIN): String
+  shortname(format: core_format = PLAIN): String
+  display_name(format: core_format = PLAIN): String
   description(format: core_format = HTML): String
   timecreated(format: core_date_format = TIMESTAMP): core_date
   timemodified(format: core_date_format = TIMESTAMP): core_date
@@ -88,7 +88,7 @@ type totara_competency_competency implements totara_competency_competency_interf
 
 type totara_competency_competency_custom_field {
   type: String
-  title(format: core_format = HTML): String
+  title(format: core_format = PLAIN): String
   value: String
 }
 
@@ -99,10 +99,10 @@ NOTE: The query is responsible for ensuring the user can see the position type
 """
 type totara_competency_competency_type {
   id: core_id!
-  display_name(format: core_format = HTML): String
-  fullname(format: core_format = HTML): String!
-  idnumber(format: core_format = HTML): String
-  shortname(format: core_format = HTML): String
+  display_name(format: core_format = PLAIN): String
+  fullname(format: core_format = PLAIN): String!
+  idnumber(format: core_format = PLAIN): String
+  shortname(format: core_format = PLAIN): String
   description(format: core_format = HTML): String
 }
 
@@ -113,17 +113,17 @@ NOTE: The query is responsible for ensuring the user can see the position framew
 """
 type totara_competency_competency_framework {
   id: core_id!
-  display_name(format: core_format = HTML): String
-  fullname(format: core_format = HTML): String!
-  shortname(format: core_format = HTML): String
-  idnumber(format: core_format = HTML): String
+  display_name(format: core_format = PLAIN): String
+  fullname(format: core_format = PLAIN): String!
+  shortname(format: core_format = PLAIN): String
+  idnumber(format: core_format = PLAIN): String
   description(format: core_format = HTML): String
   competencies: [totara_competency_competency]
 }
 
 type totara_competency_linked_course {
   course_id: core_id!
-  fullname(format: core_format = HTML): String!
+  fullname(format: core_format = PLAIN): String!
   is_mandatory: Boolean!
 }
 

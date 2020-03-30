@@ -29,9 +29,9 @@ use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
 use development_plan;
-use totara_core\formatter\field\date_field_formatter;
-use totara_core\formatter\field\string_field_formatter;
-use totara_core\formatter\field\text_field_formatter;
+use core\webapi\formatter\field\date_field_formatter;
+use core\webapi\formatter\field\string_field_formatter;
+use core\webapi\formatter\field\text_field_formatter;
 
 global $CFG;
 require_once($CFG->dirroot . '/totara/plan/development_plan.class.php');
@@ -61,7 +61,7 @@ class learning_plan implements type_resolver {
                 if (!$plan->can_view()) {
                     return null;
                 }
-                $format = $args['format'] ?? format::FORMAT_HTML;
+                $format = $args['format'] ?? format::FORMAT_PLAIN;
                 $formatter = new string_field_formatter($format, context_system::instance());
                 return $formatter->format($plan->name);
             case 'description':

@@ -18,8 +18,8 @@ enum totara_competency_pathway_status {
 Summarized pathway criteria item
 """
 type totara_competency_summarized_pathway_criterion_item {
-  description(format: core_format = HTML): String
-  error(formcat: core_format = HTML): String
+  description(format: core_format = PLAIN): String
+  error(formcat: core_format = PLAIN): String
 }
 
 """
@@ -28,7 +28,7 @@ Summarized pathway criteria detail
 type totara_competency_summarized_pathway_criteria {
   item_type: String!
   item_aggregation: String
-  error(formcat: core_format = HTML): String
+  error(formcat: core_format = PLAIN): String
   items: [totara_competency_summarized_pathway_criterion_item!]
 }
 
@@ -45,8 +45,8 @@ type totara_competency_pathway {
   sortorder: Int!
   status: totara_competency_pathway_status!
   classification: totara_competency_pathway_classification!
-  scale_value(format: core_format = HTML): String
-  error(format: core_format = HTML): String
+  scale_value(format: core_format = PLAIN): String
+  error(format: core_format = PLAIN): String
   criteria_summary: [totara_competency_summarized_pathway_criteria!]
 }
 

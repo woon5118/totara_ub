@@ -81,7 +81,7 @@ class mod_perform_webapi_type_user_grouping_testcase extends advanced_testcase {
             'type' => ['type', null, $source->get_type()],
             'type_label' => ['type_label', null, $source->get_type_label()],
             'default name' => ['name', null, $plain_name],
-            'html name' => ['name', format::FORMAT_HTML, $plain_name]
+            'html name' => ['name', format::FORMAT_PLAIN, $plain_name]
         ];
 
         foreach ($testcases as $id => $testcase) {

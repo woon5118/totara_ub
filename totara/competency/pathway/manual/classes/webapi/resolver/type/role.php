@@ -27,7 +27,7 @@ use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
 use pathway_manual\models\roles\role as role_model;
-use totara_core\formatter\field\string_field_formatter;
+use core\webapi\formatter\field\string_field_formatter;
 
 class role implements type_resolver {
 
@@ -47,7 +47,7 @@ class role implements type_resolver {
             case 'name':
                 return $role->get_name();
             case 'display_name':
-                $format = $args['format'] ?? format::FORMAT_HTML;
+                $format = $args['format'] ?? format::FORMAT_PLAIN;
                 $formatter = new string_field_formatter($format, \context_system::instance());
                 return $formatter->format($role->get_display_name());
             case 'display_order':

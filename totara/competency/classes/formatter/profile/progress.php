@@ -23,8 +23,8 @@
 
 namespace totara_competency\formatter\profile;
 
-use totara_core\formatter\field\string_field_formatter;
-use totara_core\formatter\formatter;
+use core\webapi\formatter\field\string_field_formatter;
+use core\webapi\formatter\formatter;
 
 /**
  * @property \totara_competency\models\profile\progress $object

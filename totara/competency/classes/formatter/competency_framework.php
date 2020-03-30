@@ -24,9 +24,9 @@
 namespace totara_competency\formatter;
 
 use core\orm\formatter\entity_formatter;
-use totara_core\formatter\field\date_field_formatter;
-use totara_core\formatter\field\string_field_formatter;
-use totara_core\formatter\field\text_field_formatter;
+use core\webapi\formatter\field\date_field_formatter;
+use core\webapi\formatter\field\string_field_formatter;
+use core\webapi\formatter\field\text_field_formatter;
 
 /**
  * @property \totara_competency\entities\competency_framework $object

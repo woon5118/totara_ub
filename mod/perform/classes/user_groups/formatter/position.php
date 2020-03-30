@@ -23,8 +23,8 @@
 
 namespace mod_perform\user_groups\formatter;
 
-use totara_core\formatter\formatter;
-use totara_core\formatter\field\string_field_formatter;
+use core\webapi\formatter\formatter;
+use core\webapi\formatter\field\string_field_formatter;
 
 defined('MOODLE_INTERNAL') || die();
 

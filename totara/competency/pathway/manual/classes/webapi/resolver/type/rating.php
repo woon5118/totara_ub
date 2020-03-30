@@ -29,8 +29,8 @@ use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
 use pathway_manual\entities\rating as rating_entity;
-use totara_core\formatter\field\date_field_formatter;
-use totara_core\formatter\field\string_field_formatter;
+use core\webapi\formatter\field\date_field_formatter;
+use core\webapi\formatter\field\string_field_formatter;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -62,7 +62,7 @@ class rating implements type_resolver {
                 $formatter = new date_field_formatter($format, context_system::instance());
                 return $formatter->format($rating->date_assigned);
             case 'comment':
-                $format = $args['format'] ?? format::FORMAT_HTML;
+                $format = $args['format'] ?? format::FORMAT_PLAIN;
                 $formatter = new string_field_formatter($format, context_system::instance());
                 return $formatter->format($rating->comment);
             default:

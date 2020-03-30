@@ -29,7 +29,7 @@ namespace core\orm\entity;
  * @property entity $object
  * @package core\orm\entity
  */
-abstract class formatter extends \totara_core\formatter\formatter {
+abstract class formatter extends \core\webapi\formatter\formatter {
 
     protected function has_field(string $field): bool {
         return $this->object->has_attribute($field);
