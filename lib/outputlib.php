@@ -551,7 +551,8 @@ class theme_config {
 
         } else {
             // bad luck, the requested theme has some problems - admin see details in theme config
-            if ($themename !== 'boost') { // Totara: do not complain during migration from Moodle
+            // Totara: do not complain during migration from Moodle or during installation and upgrade.
+            if ($themename !== 'boost' && !during_initial_install() && empty($CFG->upgraderunning)) {
                 debugging('This page should be using theme ' . $themename .
                     ' which cannot be initialised. Nor can the site theme ' . $CFG->theme .
                     '. Falling back to ' . theme_config::DEFAULT_THEME, DEBUG_NORMAL);
