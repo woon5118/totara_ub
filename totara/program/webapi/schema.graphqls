@@ -9,11 +9,11 @@ type totara_program_program {
   """
   Program fullname
   """
-  fullname(format: core_format = HTML): String!
+  fullname(format: core_format = PLAIN): String!
   """
   Program shortname
   """
-  shortname(format: core_format = HTML): String!
+  shortname(format: core_format = PLAIN): String!
   """
   Program idnumber
   """
@@ -52,7 +52,7 @@ type totara_program_program_courseset {
   """
   Courseset label
   """
-  label(format: core_format = HTML): String
+  label(format: core_format = PLAIN): String
   """
   Courseset courses
   """

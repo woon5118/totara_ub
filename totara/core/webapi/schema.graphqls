@@ -21,11 +21,11 @@ type totara_core_learning_item {
   """
   Learning item shortname
   """
-  shortname(format: core_format = HTML): String!
+  shortname(format: core_format = PLAIN): String!
   """
   Learning item fullname
   """
-  fullname(format: core_format = HTML): String!
+  fullname(format: core_format = PLAIN): String!
   """
   Learning item description
   """

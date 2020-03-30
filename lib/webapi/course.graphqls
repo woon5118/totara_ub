@@ -10,11 +10,11 @@ type core_course {
   """
   Course fullname
   """
-  fullname(format: core_format = HTML): String!
+  fullname(format: core_format = PLAIN): String!
   """
   Course shortname
   """
-  shortname(format: core_format = HTML): String!
+  shortname(format: core_format = PLAIN): String!
   """
   Course summary
   """
@@ -81,7 +81,7 @@ type core_category {
   """
   Category name.
   """
-  name(format: core_format = HTML): String!
+  name(format: core_format = PLAIN): String!
   """
   Category idnumber
   """

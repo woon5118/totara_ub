@@ -83,9 +83,9 @@ class totara_hierarchy_webapi_resolver_type_position_type_testcase extends advan
         self::assertSame('7', $this->resolve($field, ['id' => 6, $field => 7]));
         self::assertSame('7', $this->resolve($field, ['id' => 6, $field => '7']));
         self::assertSame('Test', $this->resolve($field, ['id' => 6, $field => 'Test']));
-        self::assertSame('Test &#38; Test', $this->resolve($field, ['id' => 6, $field => 'Test & Test']));
+        self::assertSame('Test & Test', $this->resolve($field, ['id' => 6, $field => 'Test & Test']));
         self::assertSame('Test', $this->resolve($field, ['id' => 6, $field => '<p>Test</p>']));
-        self::assertSame('Test &#38; Test', $this->resolve($field, ['id' => 6, $field => '<p>Test & Test</p>']));
+        self::assertSame('Test & Test', $this->resolve($field, ['id' => 6, $field => '<p>Test & Test</p>']));
         self::assertSame(null, $this->resolve($field, ['id' => 6, $field => null]));
         self::assertSame('', $this->resolve($field, ['id' => 6, $field => '']));
 
@@ -134,9 +134,9 @@ class totara_hierarchy_webapi_resolver_type_position_type_testcase extends advan
         self::assertSame('7', $this->resolve($field, ['id' => 6, $field => 7]));
         self::assertSame('7', $this->resolve($field, ['id' => 6, $field => '7']));
         self::assertSame('Test', $this->resolve($field, ['id' => 6, $field => 'Test']));
-        self::assertSame('Test &#38; Test', $this->resolve($field, ['id' => 6, $field => 'Test & Test']));
+        self::assertSame('Test & Test', $this->resolve($field, ['id' => 6, $field => 'Test & Test']));
         self::assertSame('Test', $this->resolve($field, ['id' => 6, $field => '<p>Test</p>']));
-        self::assertSame('Test &#38; Test', $this->resolve($field, ['id' => 6, $field => '<p>Test & Test</p>']));
+        self::assertSame('Test & Test', $this->resolve($field, ['id' => 6, $field => '<p>Test & Test</p>']));
         self::assertSame(null, $this->resolve($field, ['id' => 6, $field => null]));
         self::assertSame('', $this->resolve($field, ['id' => 6, $field => '']));
 

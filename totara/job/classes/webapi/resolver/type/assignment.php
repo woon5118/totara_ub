@@ -79,14 +79,12 @@ class assignment implements \core\webapi\type_resolver {
             return $job->{$field};
         }
 
-        $format = $args['format'] ?? format::FORMAT_HTML;
-
         switch ($field) {
             case 'user':
                 return self::get_user($job->userid);
             case 'fullname':
-                return self::format_string($job, $field, $format, $ec);
             case 'shortname':
+                $format = $args['format'] ?? format::FORMAT_PLAIN;
                 return self::format_string($job, $field, $format, $ec);
             case 'description':
                 $value = $job->description ?? null;

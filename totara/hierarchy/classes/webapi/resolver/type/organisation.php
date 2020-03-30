@@ -77,10 +77,8 @@ class organisation implements \core\webapi\type_resolver {
 
         switch ($field) {
             case 'shortname':
-                $format = $args['format'] ?? format::FORMAT_HTML;
-                return self::format_string($organisation, $field, $format, $ec);
             case 'fullname':
-                $format = $args['format'] ?? format::FORMAT_HTML;
+                $format = $args['format'] ?? format::FORMAT_PLAIN;
                 return self::format_string($organisation, $field, $format, $ec);
             case 'description':
                 if (is_null($organisation->description)) {

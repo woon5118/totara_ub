@@ -13,11 +13,11 @@ type totara_certification_certification {
   """
   Certification fullname
   """
-  fullname(format: core_format = HTML): String!
+  fullname(format: core_format = PLAIN): String!
   """
   Certification shortname
   """
-  shortname(format: core_format = HTML): String!
+  shortname(format: core_format = PLAIN): String!
   """
   Certification idnumber
   """

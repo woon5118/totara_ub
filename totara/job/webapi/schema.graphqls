@@ -7,8 +7,8 @@ type totara_job_assignment {
   id: core_id!
   userid: core_id!
   user: core_user!
-  fullname(format: core_format = HTML): String
-  shortname(format: core_format = HTML): String
+  fullname(format: core_format = PLAIN): String
+  shortname(format: core_format = PLAIN): String
   idnumber: String!
   description(format: core_format = HTML): String
   startdate: core_date

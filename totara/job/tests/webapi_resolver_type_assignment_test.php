@@ -171,9 +171,9 @@ class totara_job_webapi_resolver_type_assignment_testcase extends advanced_testc
         self::assertSame('7', $this->resolve('fullname', self::create_fake_job_assignment(['fullname' => 7])));
         self::assertSame('7', $this->resolve('fullname', self::create_fake_job_assignment(['fullname' => '7'])));
         self::assertSame('Test', $this->resolve('fullname', self::create_fake_job_assignment(['fullname' => 'Test'])));
-        self::assertSame('Test &#38; Test', $this->resolve('fullname', self::create_fake_job_assignment(['fullname' => 'Test & Test'])));
+        self::assertSame('Test & Test', $this->resolve('fullname', self::create_fake_job_assignment(['fullname' => 'Test & Test'])));
         self::assertSame('Test', $this->resolve('fullname', self::create_fake_job_assignment(['fullname' => '<p>Test</p>'])));
-        self::assertSame('Test &#38; Test', $this->resolve('fullname', self::create_fake_job_assignment(['fullname' => '<p>Test & Test</p>'])));
+        self::assertSame('Test & Test', $this->resolve('fullname', self::create_fake_job_assignment(['fullname' => '<p>Test & Test</p>'])));
         self::assertSame('Unnamed job assignment (ID: job_7)', $this->resolve('fullname', self::create_fake_job_assignment(['fullname' => null])));
         self::assertSame('Unnamed job assignment (ID: job_7)', $this->resolve('fullname', self::create_fake_job_assignment(['fullname' => ''])));
 
@@ -221,9 +221,9 @@ class totara_job_webapi_resolver_type_assignment_testcase extends advanced_testc
         self::assertSame('7', $this->resolve('shortname', self::create_fake_job_assignment(['shortname' => 7])));
         self::assertSame('7', $this->resolve('shortname', self::create_fake_job_assignment(['shortname' => '7'])));
         self::assertSame('Test', $this->resolve('shortname', self::create_fake_job_assignment(['shortname' => 'Test'])));
-        self::assertSame('Test &#38; Test', $this->resolve('shortname', self::create_fake_job_assignment(['shortname' => 'Test & Test'])));
+        self::assertSame('Test & Test', $this->resolve('shortname', self::create_fake_job_assignment(['shortname' => 'Test & Test'])));
         self::assertSame('Test', $this->resolve('shortname', self::create_fake_job_assignment(['shortname' => '<p>Test</p>'])));
-        self::assertSame('Test &#38; Test', $this->resolve('shortname', self::create_fake_job_assignment(['shortname' => '<p>Test & Test</p>'])));
+        self::assertSame('Test & Test', $this->resolve('shortname', self::create_fake_job_assignment(['shortname' => '<p>Test & Test</p>'])));
         self::assertSame(null, $this->resolve('shortname', self::create_fake_job_assignment(['shortname' => null])));
         self::assertSame(null, $this->resolve('shortname', self::create_fake_job_assignment(['shortname' => ''])));
 
