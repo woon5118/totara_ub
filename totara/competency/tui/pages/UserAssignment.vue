@@ -99,6 +99,7 @@
             :label="$str('search', 'totara_core')"
             :placeholder="$str('search', 'totara_core')"
             :show-label="false"
+            :stacked="true"
           />
 
           <MultiSelectFilter
@@ -113,6 +114,7 @@
             v-model="filters.assignment_status"
             :label="$str('header:assignment_status', 'totara_competency')"
             :show-label="true"
+            :stacked="true"
             :options="assignmentStatusesOptions"
           />
         </FilterSidePanel>

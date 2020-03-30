@@ -29,14 +29,17 @@
 
     <FilterBar
       v-if="assignments.length > 1"
-      :title="this.$str('activitylog_filter', 'totara_competency')"
+      :title="$str('activity_log_filter', 'totara_competency')"
     >
-      <SelectFilter
-        v-model="assignmentFilter"
-        :label="this.$str('assignment', 'totara_competency')"
-        :show-label="true"
-        :options="assignments"
-      />
+      <template v-slot:filters-left>
+        <SelectFilter
+          v-model="assignmentFilter"
+          :label="$str('assignment', 'totara_competency')"
+          :options="assignments"
+          :show-label="true"
+          :stacked="false"
+        />
+      </template>
     </FilterBar>
 
     <Loader :loading="$apollo.loading">
@@ -196,7 +199,7 @@ export default {
     ],
     "totara_competency": [
       "activity_log",
-      "activitylog_filter",
+      "activity_log_filter",
       "assignment",
       "progress_name_by_user"
     ]

@@ -22,33 +22,34 @@
 
 <template>
   <!-- Filters bar -->
-  <FilterBar
-    v-model="filters"
-    class="tui-competencyProfileListFilters"
-    :styleclass="{
-      lastItemRight: 'true',
-    }"
-  >
-    <SelectFilter
-      v-if="!isForArchived"
-      v-model="filters.proficient"
-      :label="$str('proficiency_status', 'totara_competency')"
-      :show-label="true"
-      :options="proficientOptions"
-      @input="filtersUpdated"
-    />
-    <SearchFilter
-      v-model="filters.search"
-      :label="$str('search')"
-      @input="filtersUpdatedDebounced"
-    />
-    <SelectFilter
-      v-model="order"
-      :label="$str('sortby')"
-      :show-label="true"
-      :options="orderOptions"
-      @input="orderUpdated"
-    />
+  <FilterBar v-model="filters" class="tui-competencyProfileListFilters">
+    <template v-slot:filters-left="{ stacked }">
+      <SelectFilter
+        v-if="!isForArchived"
+        v-model="filters.proficient"
+        :label="$str('proficiency_status', 'totara_competency')"
+        :show-label="true"
+        :options="proficientOptions"
+        :stacked="stacked"
+        @input="filtersUpdated"
+      />
+      <SearchFilter
+        v-model="filters.search"
+        :label="$str('search')"
+        :stacked="stacked"
+        @input="filtersUpdatedDebounced"
+      />
+    </template>
+    <template v-slot:filters-right="{ stacked }">
+      <SelectFilter
+        v-model="order"
+        :label="$str('sortby')"
+        :show-label="true"
+        :stacked="stacked"
+        :options="orderOptions"
+        @input="orderUpdated"
+      />
+    </template>
   </FilterBar>
 </template>
 

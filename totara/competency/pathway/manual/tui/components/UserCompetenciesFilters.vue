@@ -38,45 +38,49 @@
         @click="viewAll"
       />
     </div>
-    <FilterBar
-      v-else-if="hasAnyFilters"
-      v-model="selectedFilters"
-      :styleclass="{
-        lastItemRight: true,
-      }"
-    >
-      <SelectFilter
-        v-if="filterOptions.competency_type"
-        v-model="selectedFilters.competencyType"
-        :label="$str('filter:competency_type', 'totara_competency')"
-        :show-label="true"
-        :options="competencyTypeFilterOptions"
-        @input="filtersSelected = true"
-      />
-      <SelectFilter
-        v-if="filterOptions.assignment_reason"
-        v-model="selectedFilters.assignmentReason"
-        :label="$str('filter:reason_assigned', 'pathway_manual')"
-        :show-label="true"
-        :options="assignmentReasonFilterOptions"
-        @input="filtersSelected = true"
-      />
-      <SelectFilter
-        v-if="filterOptions.rating_history"
-        v-model="selectedFilters.ratingHistory"
-        :label="$str('filter:rating_history', 'pathway_manual')"
-        :show-label="true"
-        :options="ratingHistoryFilterOptions"
-        @input="filtersSelected = true"
-      />
-      <div class="tui-selectFilter" style="flex-shrink: 0">
-        <Button
-          :text="$str('filter:update_selection', 'pathway_manual')"
-          :styleclass="{ small: true }"
-          :disabled="!filtersSelected"
-          @click="updateFiltersWithWarning"
+    <FilterBar v-else-if="hasAnyFilters" v-model="selectedFilters">
+      <!-- Left aligned content -->
+      <template v-slot:filters-left="{ stacked }">
+        <SelectFilter
+          v-if="filterOptions.competency_type"
+          v-model="selectedFilters.competencyType"
+          :label="$str('filter:competency_type', 'totara_competency')"
+          :show-label="true"
+          :options="competencyTypeFilterOptions"
+          :stacked="stacked"
+          @input="filtersSelected = true"
         />
-      </div>
+        <SelectFilter
+          v-if="filterOptions.assignment_reason"
+          v-model="selectedFilters.assignmentReason"
+          :label="$str('filter:reason_assigned', 'pathway_manual')"
+          :show-label="true"
+          :options="assignmentReasonFilterOptions"
+          :stacked="stacked"
+          @input="filtersSelected = true"
+        />
+        <SelectFilter
+          v-if="filterOptions.rating_history"
+          v-model="selectedFilters.ratingHistory"
+          :label="$str('filter:rating_history', 'pathway_manual')"
+          :show-label="true"
+          :options="ratingHistoryFilterOptions"
+          :stacked="stacked"
+          @input="filtersSelected = true"
+        />
+      </template>
+
+      <!-- Right aligned content -->
+      <template v-slot:filters-right="{ stacked }">
+        <ButtonFilter :stacked="stacked">
+          <Button
+            :text="$str('filter:update_selection', 'pathway_manual')"
+            :styleclass="{ small: true }"
+            :disabled="!filtersSelected"
+            @click="updateFiltersWithWarning"
+          />
+        </ButtonFilter>
+      </template>
     </FilterBar>
     <ConfirmationModal
       :open="showConfirmFiltersModal"
@@ -93,6 +97,7 @@
 
 <script>
 import Button from 'totara_core/components/buttons/Button';
+import ButtonFilter from 'totara_core/components/filters/ButtonFilter';
 import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
 import FilterBar from 'totara_core/components/filters/FilterBar';
 import SelectFilter from 'totara_core/components/filters/SelectFilter';
@@ -100,6 +105,7 @@ import SelectFilter from 'totara_core/components/filters/SelectFilter';
 export default {
   components: {
     Button,
+    ButtonFilter,
     ConfirmationModal,
     FilterBar,
     SelectFilter,

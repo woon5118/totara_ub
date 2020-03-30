@@ -24,7 +24,7 @@
   <Collapsible :label="groupTitle" :initial-state="isExpanded">
     <Table :data="group.competencies" :expandable-rows="false">
       <template v-slot:header-row>
-        <HeaderCell size="10">
+        <HeaderCell size="8">
           {{ $str('competency', 'totara_hierarchy') }}
         </HeaderCell>
         <HeaderCell size="4">
@@ -33,7 +33,7 @@
             <LastRatingHelp :is-for-self="role === roleSelf" />
           </div>
         </HeaderCell>
-        <HeaderCell size="6">
+        <HeaderCell size="4">
           <div class="tui-bulkManualRatingFrameworkGroup__headerWithHelp">
             {{ $str('new_rating', 'pathway_manual') }}
             <InfoIconButton
@@ -46,11 +46,16 @@
         </HeaderCell>
       </template>
       <template v-slot:row="{ row }">
-        <Cell size="10" :column-header="$str('competency', 'totara_hierarchy')">
+        <Cell
+          size="8"
+          valign="center"
+          :column-header="$str('competency', 'totara_hierarchy')"
+        >
           {{ row.competency.display_name }}
         </Cell>
         <Cell
           size="4"
+          valign="center"
           :column-header="$str('last_rating_given', 'pathway_manual')"
         >
           <LastRatingBlock
@@ -58,7 +63,11 @@
             :current-user-id="currentUserId"
           />
         </Cell>
-        <Cell size="6" :column-header="$str('new_rating', 'pathway_manual')">
+        <Cell
+          size="4"
+          valign="center"
+          :column-header="$str('new_rating', 'pathway_manual')"
+        >
           <RatingCell
             :comp-id="row.competency.id"
             :scale="group"
