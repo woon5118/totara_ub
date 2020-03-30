@@ -26,7 +26,7 @@ use core\webapi\formatter\field\string_field_formatter;
 
 defined('MOODLE_INTERNAL') || die();
 
-class core_webapi_formatter_string_field_formatter_testcase extends basic_testcase {
+class core_webapi_formatter_string_field_formatter_testcase extends advanced_testcase {
 
     public function test_html_format() {
         $context = context_system::instance();
@@ -80,6 +80,21 @@ class core_webapi_formatter_string_field_formatter_testcase extends basic_testca
         $this->assertRegExp("/span class=/", $result);
     }
 
+    public function test_html_format_with_multi_lang_strings() {
+        // Enable the multilang filter and set it to apply to headings and content.
+        filter_set_global_state('multilang', TEXTFILTER_ON);
+        filter_set_applies_to_strings('multilang', true);
+        filter_manager::reset_caches();
+
+        $context = context_system::instance();
+        $formatter = new string_field_formatter(format::FORMAT_HTML, $context);
+
+        $value = '<span lang="en" class="multilang">Summer</span><span lang="de" class="multilang">Sommer</span>';
+        $result = $formatter->format($value);
+
+        $this->assertEquals('Summer', $result);
+    }
+
     public function test_plain_format() {
         $context = context_system::instance();
         $formatter = new string_field_formatter(format::FORMAT_PLAIN, $context);
@@ -88,17 +103,85 @@ class core_webapi_formatter_string_field_formatter_testcase extends basic_testca
 
         $result = $formatter->format($value);
 
+        $expected = '_)(*&^%$#test';
         $value = format_string($value, true, ['context' => $context]);
 
         // We should have plain text now
         $this->assertNotEquals($result, $value);
-        $this->assertEquals(html_to_text($value), $result);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_plain_format_with_long_lines() {
+        $context = context_system::instance();
+        $formatter = new string_field_formatter(format::FORMAT_PLAIN, $context);
+
+        $value = '<span class="myhtml">KO WIKITORIA te Kuini o Ingarani i tana mahara atawai ki nga Rangatira me nga Hapu o Nu Tirani</span>';
+        $result = $formatter->format($value);
+
+        $expected = 'KO WIKITORIA te Kuini o Ingarani i tana mahara atawai ki nga Rangatira me nga Hapu o Nu Tirani';
+
+        // html_to_text() will have inserted linebreaks.
+        $this->assertNotEquals(html_to_text($value), $result);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_plain_format_with_links() {
+        $context = context_system::instance();
+        $formatter = new string_field_formatter(format::FORMAT_PLAIN, $context);
+
+        $value = '<span class="myhtml">KO <a href="https://en.wikipedia.org/wiki/Queen_Victoria">WIKITORIA</a> te Kuini o Ingarani</span>';
+        $result = $formatter->format($value);
+
+        $expected = 'KO WIKITORIA te Kuini o Ingarani';
+
+        // html_to_text() will have made the URL a footnote.
+        $this->assertNotEquals(html_to_text($value), $result);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_plain_format_with_multi_lang_strings() {
+        // Enable the multilang filter and set it to apply to headings and content.
+        filter_set_global_state('multilang', TEXTFILTER_ON);
+        filter_set_applies_to_strings('multilang', true);
+        filter_manager::reset_caches();
+
+        $context = context_system::instance();
+        $formatter = new string_field_formatter(format::FORMAT_PLAIN, $context);
+
+        $value = '<span lang="en" class="multilang">Summer</span><span lang="de" class="multilang">Sommer</span>';
+        $result = $formatter->format($value);
+
+        $this->assertEquals('Summer', $result);
+    }
+
+    public function test_plain_special_chars_are_not_encoded() {
+        $formatter = new string_field_formatter(format::FORMAT_PLAIN, context_system::instance());
+
+        $value = '';
+        for ($i = 33; $i < 255; $i++) {
+            // Skip < > as strip tags will likely strip them out
+            if ($i == 60 || $i == 62) {
+                continue;
+            }
+            $value .= utf8_encode(chr($i));
+        }
+        $value = trim($value);
+
+        $result = $formatter->format($value);
+
+        // No character should be encoded
+        $this->assertEquals($value, $result);
+
+        $value = "This is a special text &apos;with encoded characters Foo &amp; Special character&quot;s";
+        $expected = 'This is a special text \'with encoded characters Foo & Special character"s';
+        $result = $formatter->format($value);
+        $this->assertEquals($expected, $result);
     }
 
     public function test_raw_format() {
         $formatter = new string_field_formatter(format::FORMAT_RAW, context_system::instance());
 
-        $value = '<span class="myhtml">test</span>';
+        $value = '<span class="myhtml">Foo &amp; Special \' <script></script>character&quot;s</span>';
 
         $result = $formatter->format($value);
 

@@ -122,7 +122,16 @@ class string_field_formatter extends base {
      * @return string
      */
     protected function format_plain(string $value): string {
-        return html_to_text($this->format_html($value));
+        global $CFG;
+
+        require_once($CFG->libdir .'/html2text/lib.php');
+        $options = [
+            'width'     => 0,
+            'do_links'  => 'none',
+        ];
+
+        $h2t = new \core_html2text($this->format_html($value), $options);
+        return $h2t->getText();
     }
 
 }
