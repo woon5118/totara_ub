@@ -116,6 +116,9 @@ class behat_admin extends behat_base {
             $this->find_button(get_string('savechanges'))->press();
             $this->wait_for_pending_js();
         }
+
+        $this->getSession()->visit($this->locate_path('/admin/index.php'));
+        $this->wait_for_pending_js();
     }
 
     /**
