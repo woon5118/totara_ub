@@ -21,21 +21,28 @@
  * @package mod_perform
  */
 
-
+use mod_perform\controllers\activity\manage_activities;
 use mod_perform\controllers\activity\user_activities;
 use mod_perform\controllers\activity\view_user_activity;
 
 class behat_mod_perform extends behat_base {
 
     /**
+     * Navigate to the specified page and wait for JS.
+     *
+     * @param moodle_url $page_url
+     */
+    private function navigate_to_page(moodle_url $page_url): void {
+        $this->getSession()->visit($this->locate_path($page_url->out(false)));
+        $this->wait_for_pending_js();
+    }
+
+    /**
      * @When /^I navigate to the outstanding perform activities list page$/
      * @throws Exception
      */
     public function i_navigate_to_the_outstanding_perform_activities_page(): void {
-        $page_url = user_activities::get_url();
-
-        $this->getSession()->visit($this->locate_path($page_url->out(false)));
-        $this->wait_for_pending_js();
+        $this->navigate_to_page(user_activities::get_url());
     }
 
     /**
@@ -44,11 +51,15 @@ class behat_mod_perform extends behat_base {
      * @throws Exception
      */
     public function i_navigate_to_the_user_activity_profile_details_page_for_id(int $subject_instance_id): void {
-        $page_url = view_user_activity::get_url();
-        $page_url->param('id', $subject_instance_id);
+        $this->navigate_to_page(view_user_activity::get_url(['id' => $subject_instance_id]));
+    }
 
-        $this->getSession()->visit($this->locate_path($page_url->out(false)));
-        $this->wait_for_pending_js();
+    /**
+     * @When /^I navigate to the manage perform activities page$/
+     * @throws Exception
+     */
+    public function i_navigate_to_the_manage_perform_activities_page(): void {
+        $this->navigate_to_page(manage_activities::get_url());
     }
 
 }

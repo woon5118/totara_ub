@@ -25,15 +25,14 @@ namespace mod_perform\controllers\activity;
 
 use context;
 use context_coursecat;
+use mod_perform\controllers\perform_controller;
 use mod_perform\util;
-use moodle_url;
-use totara_mvc\controller;
 use totara_mvc\tui_view;
 
 /*
  * This page lists perform activities the logged in user are a participant in.
  */
-class user_activities extends controller {
+class user_activities extends perform_controller {
 
     /**
      * @inheritDoc
@@ -47,6 +46,8 @@ class user_activities extends controller {
      * @return tui_view
      */
     public function action(): tui_view {
+        parent::action();
+
         $props = [
             'view-activity-url' => (string) view_user_activity::get_url(),
         ];
@@ -56,8 +57,8 @@ class user_activities extends controller {
             ->set_url(self::get_url());
     }
 
-    public static function get_url(): moodle_url {
-        return new moodle_url('/mod/perform/activity');
+    public static function get_base_url(): string {
+        return '/mod/perform/activity';
     }
 
 }

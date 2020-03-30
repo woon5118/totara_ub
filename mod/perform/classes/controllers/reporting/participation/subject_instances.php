@@ -24,14 +24,13 @@
 namespace mod_perform\controllers\reporting\participation;
 
 use context;
+use mod_perform\controllers\perform_controller;
 use mod_perform\models\activity\activity;
 use moodle_exception;
-use moodle_url;
-use totara_mvc\controller;
 use totara_mvc\has_report;
 use totara_mvc\report_view;
 
-class subject_instances extends controller {
+class subject_instances extends perform_controller {
 
     use has_report;
 
@@ -46,10 +45,16 @@ class subject_instances extends controller {
     }
 
     public function action() {
+        parent::action();
         $activity_id = $this->get_param('activity_id', PARAM_INT, null, true);
         $report = $this->load_embedded_report('perform_subject_instance', ['activity_id' => $activity_id]);
         return (new report_view('mod_perform/report', $report))
             ->set_title(get_string('embedded_perform_subject_instance', 'mod_perform'))
-            ->set_url(new moodle_url('/mod/perform/reporting/participation/index.php', ['activity_id' => $activity_id]));
+            ->set_url(static::get_url(['activity_id' => $activity_id]));
     }
+
+    public static function get_base_url(): string {
+        return '/mod/perform/reporting/participation/index.php';
+    }
+
 }

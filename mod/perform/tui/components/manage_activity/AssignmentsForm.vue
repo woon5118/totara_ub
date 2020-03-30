@@ -361,7 +361,6 @@ export default {
 <lang-strings>
   {
     "mod_perform" : [
-      "perform:user_group_assignment:actions",
       "perform:user_group_assignment:add:group",
       "perform:user_group_assignment:confirm:remove",
       "perform:user_group_assignment:confirm:remove:title",

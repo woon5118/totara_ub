@@ -24,12 +24,11 @@
 namespace mod_perform\controllers\activity;
 
 use context;
+use mod_perform\controllers\perform_controller;
 use mod_perform\models\activity\activity;
-use moodle_url;
-use totara_mvc\controller;
 use totara_mvc\tui_view;
 
-class edit_activity extends controller {
+class edit_activity extends perform_controller {
 
     /**
      * @inheritDoc
@@ -42,6 +41,7 @@ class edit_activity extends controller {
      * @return tui_view
      */
     public function action(): tui_view {
+        parent::action();
         $this->require_capability('mod/perform:manage_activity', $this->get_context());
 
         $props = [
@@ -50,7 +50,7 @@ class edit_activity extends controller {
         ];
 
         return tui_view::create('mod_perform/pages/ManageActivity', $props)
-            ->set_url(self::get_url())
+            ->set_url(self::get_url(['activity_id' => $this->get_activity_id()]))
             ->set_title(get_string('perform:manage_activity_page_title', 'mod_perform'));
     }
 
@@ -58,8 +58,8 @@ class edit_activity extends controller {
         return required_param('activity_id', PARAM_INT);
     }
 
-    public static function get_url(): moodle_url {
-        return new moodle_url('/mod/perform/manage/activity/edit.php');
+    public static function get_base_url(): string {
+        return '/mod/perform/manage/activity/edit.php';
     }
 
 }

@@ -24,16 +24,14 @@
 namespace mod_perform\controllers\activity;
 
 use context;
-use mod_perform\models\activity\subject_instance;
+use mod_perform\controllers\perform_controller;
 use mod_perform\util;
-use moodle_url;
-use totara_mvc\controller;
 use totara_mvc\tui_view;
 
 /*
  * This page lists perform activities the logged in user are a participant in.
  */
-class view_user_activity extends controller {
+class view_user_activity extends perform_controller {
 
     /**
      * @inheritDoc
@@ -47,17 +45,19 @@ class view_user_activity extends controller {
      * @return tui_view
      */
     public function action(): tui_view {
+        parent::action();
+
         $props = [
             'subject-instance-id' => $this->get_subject_instance_id(),
         ];
 
         return tui_view::create('mod_perform/pages/UserActivity', $props)
             ->set_title(get_string('user_activities:page_title', 'mod_perform'))
-            ->set_url(self::get_url());
+            ->set_url(static::get_url(['subject_instance_id' => $this->get_subject_instance_id()]));
     }
 
-    public static function get_url(): moodle_url {
-        return new moodle_url('/mod/perform/activity/view.php');
+    public static function get_base_url(): string {
+        return '/mod/perform/activity/view.php';
     }
 
     protected function get_subject_instance_id(): int {

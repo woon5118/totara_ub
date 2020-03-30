@@ -404,6 +404,10 @@ class behat_totara_data_generators extends behat_base {
                 'datagenerator' => 'subject_instance',
                 'required' => array('activity_name', 'subject_username')
             ),
+            'activities' => array(
+                'datagenerator' => 'activity_in_container',
+                'required' => array('activity_name')
+            ),
         ),
         'mod_quiz' => array(
             'responses' => array(

@@ -23,15 +23,12 @@
 
 namespace mod_perform\controllers\activity;
 
+use mod_perform\controllers\perform_controller;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\util;
-use moodle_url;
-use totara_mvc\admin_controller;
 use totara_mvc\tui_view;
 
-class manage_activities extends admin_controller {
-
-    protected $admin_external_page_name = 'mod_perform_manage_activities';
+class manage_activities extends perform_controller {
 
     /**
      * @inheritDoc
@@ -42,9 +39,21 @@ class manage_activities extends admin_controller {
     }
 
     /**
+     * Make this page an admin page.
+     *
+     * @param string $action
+     */
+    public function process(string $action = '') {
+        require_once($this->config->libdir . '/adminlib.php');
+        admin_externalpage_setup('mod_perform_manage_activities');
+        parent::process($action);
+    }
+
+    /**
      * @return tui_view
      */
     public function action(): tui_view {
+        parent::action();
         $this->require_capability('mod/perform:view_manage_activities', $this->get_context());
 
         $props = [
@@ -52,11 +61,13 @@ class manage_activities extends admin_controller {
             'can-add' => activity_model::can_create(),
         ];
 
-        return tui_view::create('mod_perform/pages/Activities', $props);
+        return tui_view::create('mod_perform/pages/Activities', $props)
+            ->set_url(static::get_url())
+            ->set_title(get_string('perform:manage_activity', 'mod_perform'));
     }
 
-    public static function get_url(): moodle_url {
-        return new moodle_url('/mod/perform/manage/activity');
+    public static function get_base_url(): string {
+        return '/mod/perform/manage/activity';
     }
 
 }
