@@ -93,7 +93,7 @@ Feature: Seminar resource management
     And I navigate to "Assets" node in "Site administration > Seminars"
     And I expand all fieldsets
     When I set the field "Sitewide" to "Yes"
-    And I click on "Search" "button_exact" in the "Search by" "fieldset"
+    And I press "id_submitgroupstandard_addfilter"
     Then the "facetoface_assets" table should contain the following:
       | Name                 | Allow booking conflicts | Sitewide | Visible |
       | Light bulb           | No                      | Yes      | Yes     |
@@ -101,7 +101,7 @@ Feature: Seminar resource management
       | Coffee table         | No                      | Yes      | No      |
     And I expand all fieldsets
     When I set the field "Sitewide" to "No"
-    And I click on "Search" "button_exact" in the "Search by" "fieldset"
+    And I press "id_submitgroupstandard_addfilter"
     Then the "facetoface_assets" table should contain the following:
       | Name                 | Allow booking conflicts | Sitewide | Visible |
       | Ad-hoc asset 1       | No                      | No       | Yes     |
@@ -111,7 +111,7 @@ Feature: Seminar resource management
     And I navigate to "Facilitators" node in "Site administration > Seminars"
     And I expand all fieldsets
     When I set the field "Sitewide" to "Yes"
-    And I click on "Search" "button_exact" in the "Search by" "fieldset"
+    And I press "id_submitgroupstandard_addfilter"
     Then the "facetoface_facilitators" table should contain the following:
       | Name                 | Allow booking conflicts | Sitewide | Visible |
       | Volunteer            | No                      | Yes      | Yes     |
@@ -119,7 +119,7 @@ Feature: Seminar resource management
       | Janitor              | No                      | Yes      | No      |
     And I expand all fieldsets
     When I set the field "Sitewide" to "No"
-    And I click on "Search" "button_exact" in the "Search by" "fieldset"
+    And I press "id_submitgroupstandard_addfilter"
     Then the "facetoface_facilitators" table should contain the following:
       | Name                 | Allow booking conflicts | Sitewide | Visible |
       | Ad-hoc facilitator 1 | No                      | No       | Yes     |
@@ -129,7 +129,7 @@ Feature: Seminar resource management
     And I navigate to "Rooms" node in "Site administration > Seminars"
     And I expand all fieldsets
     When I set the field "Sitewide" to "Yes"
-    And I click on "Search" "button_exact" in the "Search by" "fieldset"
+    And I press "id_submitgroupstandard_addfilter"
     Then the "facetoface_rooms" table should contain the following:
       | Name                 | Allow booking conflicts | Sitewide | Visible |
       | Fish tank            | No                      | Yes      | Yes     |
@@ -137,7 +137,7 @@ Feature: Seminar resource management
       | Dance floor          | No                      | Yes      | No      |
     And I expand all fieldsets
     When I set the field "Sitewide" to "No"
-    And I click on "Search" "button_exact" in the "Search by" "fieldset"
+    And I press "id_submitgroupstandard_addfilter"
     Then the "facetoface_rooms" table should contain the following:
       | Name                 | Allow booking conflicts | Sitewide | Visible |
       | Ad-hoc room 1        | No                      | No       | Yes     |

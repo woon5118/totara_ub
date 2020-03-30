@@ -41,11 +41,11 @@ Feature: Manage custom rooms by admin and non-admin user
     And I navigate to "Rooms" node in "Site administration > Seminars"
     And I expand all fieldsets
     When I set the field "Sitewide" to "Yes"
-    And I click on "Search" "button_exact" in the "Search by" "fieldset"
+    And I press "id_submitgroupstandard_addfilter"
     Then I should see "There are no records that match your selected criteria"
     And "facetoface_rooms" "table" should not exist
     When I set the field "Sitewide" to "No"
-    And I click on "Search" "button_exact" in the "Search by" "fieldset"
+    And I press "id_submitgroupstandard_addfilter"
     Then I should not see "There are no records that match your selected criteria"
     And the "facetoface_rooms" table should contain the following:
       | Name         | Building   | Location        | Capacity | Visible | Sitewide |
@@ -69,14 +69,14 @@ Feature: Manage custom rooms by admin and non-admin user
     And I navigate to "Rooms" node in "Site administration > Seminars"
     And I expand all fieldsets
     When I set the field "Sitewide" to "Yes"
-    And I click on "Search" "button_exact" in the "Search by" "fieldset"
+    And I press "id_submitgroupstandard_addfilter"
     Then I should see "There are no records that match your selected criteria"
     And I should not see "Room created"
     And I should not see "Room edited"
     And "facetoface_rooms" "table" should not exist
     And I expand all fieldsets
     When I set the field "Sitewide" to "No"
-    And I click on "Search" "button_exact" in the "Search by" "fieldset"
+    And I press "id_submitgroupstandard_addfilter"
     Then I should not see "There are no records that match your selected criteria"
     And I should not see "Room created"
     And the "facetoface_rooms" table should contain the following:
@@ -103,7 +103,7 @@ Feature: Manage custom rooms by admin and non-admin user
     And I navigate to "Rooms" node in "Site administration > Seminars"
     And I expand all fieldsets
     When I set the field "Sitewide" to "Yes"
-    And I click on "Search" "button_exact" in the "Search by" "fieldset"
+    And I press "id_submitgroupstandard_addfilter"
     Then I should not see "There are no records that match your selected criteria"
     And I should not see "Room created"
     And I should not see "Room edited"
@@ -112,7 +112,7 @@ Feature: Manage custom rooms by admin and non-admin user
       | Room published | That house | 123 here street | 15       | Yes     | Yes      |
     And I expand all fieldsets
     When I set the field "Sitewide" to "No"
-    And I click on "Search" "button_exact" in the "Search by" "fieldset"
+    And I press "id_submitgroupstandard_addfilter"
     Then I should see "There are no records that match your selected criteria"
     And "facetoface_rooms" "table" should not exist
 
@@ -139,7 +139,7 @@ Feature: Manage custom rooms by admin and non-admin user
     And I navigate to "Rooms" node in "Site administration > Seminars"
     And I expand all fieldsets
     When I set the field "Sitewide" to "Yes"
-    And I click on "Search" "button_exact" in the "Search by" "fieldset"
+    And I press "id_submitgroupstandard_addfilter"
     Then I should not see "There are no records that match your selected criteria"
     And I should not see "Room created"
     And I should not see "Room edited"
