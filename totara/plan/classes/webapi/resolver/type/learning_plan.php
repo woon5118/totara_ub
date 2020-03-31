@@ -24,14 +24,12 @@
 namespace totara_plan\webapi\resolver\type;
 
 use context_system;
-use core\date_format;
 use core\format;
 use core\webapi\execution_context;
-use core\webapi\type_resolver;
-use development_plan;
-use core\webapi\formatter\field\date_field_formatter;
 use core\webapi\formatter\field\string_field_formatter;
 use core\webapi\formatter\field\text_field_formatter;
+use core\webapi\type_resolver;
+use development_plan;
 
 global $CFG;
 require_once($CFG->dirroot . '/totara/plan/development_plan.class.php');

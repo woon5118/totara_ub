@@ -24,7 +24,6 @@
 namespace mod_perform\formatter\activity;
 
 use core\webapi\formatter\formatter;
-use core\webapi\formatter\field\string_field_formatter;
 
 defined('MOODLE_INTERNAL') || die();
 
