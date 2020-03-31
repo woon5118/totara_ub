@@ -1,6 +1,6 @@
 type totara_competency_activity_log_row {
   timestamp(format: core_date_format = TIMESTAMP): core_date
-  description(format: core_format = HTML): String
+  description(format: core_format = PLAIN): String
   proficient_status: Boolean
   assignment: totara_competency_assignment
   assignment_action: String
