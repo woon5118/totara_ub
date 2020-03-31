@@ -42,8 +42,13 @@ class data_provider_subject_instances_testcase extends mod_perform_subject_insta
 
         self::assertCount(2, $returned_subject_instances);
 
-        self::assert_same_subject_instance(self::$about_user_and_participating, $returned_subject_instances->first());
-        self::assert_same_subject_instance(self::$about_someone_else_and_participating, $returned_subject_instances->last());
+        self::assert_same_subject_instance(
+            self::$about_someone_else_and_participating, $returned_subject_instances->first()
+        ); // 538003
+
+        self::assert_same_subject_instance(
+            self::$about_user_and_participating, $returned_subject_instances->last()
+        ); // 538001
     }
 
     /**
@@ -98,8 +103,13 @@ class data_provider_subject_instances_testcase extends mod_perform_subject_insta
 
         self::assertCount(2, $returned_subject_instances);
 
-        self::assert_same_subject_instance(self::$about_user_and_participating, $returned_subject_instances->first());
-        self::assert_same_subject_instance(self::$about_someone_else_and_participating, $returned_subject_instances->last());
+        self::assert_same_subject_instance(
+            self::$about_someone_else_and_participating, $returned_subject_instances->first()
+        ); // 538003
+
+        self::assert_same_subject_instance(
+            self::$about_user_and_participating, $returned_subject_instances->last()
+        ); // 538001
     }
 
 }

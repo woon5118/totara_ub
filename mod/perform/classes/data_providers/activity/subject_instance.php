@@ -97,9 +97,10 @@ class subject_instance {
             ->with('subject_user')
             ->with('track.activity')
             ->where_exists($this->get_target_participant_exists())
+            // Newest subject instances at the top of the list
             ->order_by('si.created_at', 'desc')
-            // Order by id is so that tests wont fail if two rows are inserted within the same second
-            ->order_by('si.id');
+            // Order by id as well is so that tests wont fail if two rows are inserted within the same second
+            ->order_by('si.id', 'desc');
 
         $repo->set_filters($this->filters);
 
