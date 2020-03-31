@@ -23,6 +23,9 @@
 
 namespace totara_competency\controllers\profile;
 
+use context_system;
+use core\format;
+use core\webapi\formatter\field\string_field_formatter;
 use totara_competency\entities\competency_framework;
 use totara_competency\entities\competency_type;
 use totara_competency\helpers\capability_helper;
@@ -59,7 +62,8 @@ class user_assignment extends base {
         foreach ($frameworks as $framework) {
             $result[] = [
                 'id' => $framework->id,
-                'name' => format_string($framework->fullname)
+                'name' => (new string_field_formatter(format::FORMAT_PLAIN, context_system::instance()))
+                    ->format($framework->fullname)
             ];
         }
         return $result;
@@ -73,7 +77,8 @@ class user_assignment extends base {
         foreach ($competency_types as $type) {
             $result[] = [
                 'id' => $type->id,
-                'name' => format_string($type->fullname)
+                'name' => (new string_field_formatter(format::FORMAT_PLAIN, context_system::instance()))
+                    ->format($type->fullname)
             ];
         }
         return $result;
