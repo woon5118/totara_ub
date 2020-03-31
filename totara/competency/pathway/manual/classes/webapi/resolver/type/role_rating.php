@@ -53,7 +53,8 @@ class role_rating implements type_resolver {
             case 'default_profile_picture':
                 return $role_rating->get_default_picture();
             case 'role_display_name':
-                return $role_rating->get_role_display_name();
+                $formatter = new string_field_formatter(format::FORMAT_PLAIN, \context_system::instance());
+                return $formatter->format($role_rating->get_role_display_name());
             default:
                 throw new \coding_exception('Unknown field', $field);
         }

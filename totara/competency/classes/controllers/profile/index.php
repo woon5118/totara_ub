@@ -23,6 +23,8 @@
 
 namespace totara_competency\controllers\profile;
 
+use core\format;
+use core\webapi\formatter\field\string_field_formatter;
 use pathway_manual\models\user_competencies;
 use totara_competency\helpers\capability_helper;
 use totara_mvc\tui_view;
@@ -36,11 +38,13 @@ class index extends base {
         // Add breadcrumbs.
         $this->add_navigation();
 
+        $formatter = new string_field_formatter(format::FORMAT_PLAIN, $this->context);
+
         $props = [
             'profile-picture' => $this->get_my_profile_picture_url(),
             'self-assignment-url' => (string) $this->get_user_assignment_url(),
             'user-id' => $this->user->id,
-            'user-name' => $this->user->fullname,
+            'user-name' => $formatter->format($this->user->fullname),
             'is-mine' => $this->is_for_current_user(),
             'base-url' => (string) $this->get_base_url(),
             'can-assign' => capability_helper::can_assign($this->user->id, $this->context),
