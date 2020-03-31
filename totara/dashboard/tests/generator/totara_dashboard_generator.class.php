@@ -52,6 +52,9 @@ class totara_dashboard_generator extends component_generator_base {
         if (!isset($data['published'])) {
             $data['published'] = true;
         }
+        if (!isset($data['allowguest'])) {
+            $data['allowguest'] = false;
+        }
         if (isset($data['cohorts'])) {
             $cohorts = $data['cohorts'];
             if (!is_array($data['cohorts'])) {

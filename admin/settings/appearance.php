@@ -152,7 +152,7 @@ preferences,moodle|/user/preferences.php|preferences',
     $temp = new admin_settingpage('navigation', new lang_string('menuitem:navigationsettings', 'totara_core'), array('totara/core:appearance'));
     // Default home page for users.
     $choices = [];
-    $choices[HOMEPAGE_SITE] = new lang_string('site');
+    $choices[HOMEPAGE_SITE] = new lang_string('frontpage', 'admin');
     if (advanced_feature::is_enabled('totaradashboard')) {
         $choices[HOMEPAGE_TOTARA_DASHBOARD] = new lang_string('totaradashboard', 'admin');
     }
@@ -167,7 +167,7 @@ preferences,moodle|/user/preferences.php|preferences',
         $choices
      ));
     $choices = [];
-    $choices[HOMEPAGE_SITE] = new lang_string('site');
+    $choices[HOMEPAGE_SITE] = new lang_string('frontpage', 'admin');
     if (advanced_feature::is_enabled('totaradashboard')) {
         $choices[HOMEPAGE_TOTARA_DASHBOARD] = new lang_string('totaradashboard', 'admin');
     }

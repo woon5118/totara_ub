@@ -165,10 +165,10 @@ class totara_tenant_totara_dashboard_testcase extends advanced_testcase {
         set_config('tenantsisolated', '0');
 
         $dashboards = totara_dashboard::get_user_dashboards(0);
-        $this->assertSame([(int)$defaultdash->id], array_keys($dashboards));
+        $this->assertEmpty($dashboards);
 
         $dashboards = totara_dashboard::get_user_dashboards($guest->id);
-        $this->assertSame([(int)$defaultdash->id], array_keys($dashboards));
+        $this->assertEmpty($dashboards);
 
         $dashboards = totara_dashboard::get_user_dashboards($admin->id);
         $this->assertSame([(int)$defaultdash->id], array_keys($dashboards));
@@ -189,10 +189,10 @@ class totara_tenant_totara_dashboard_testcase extends advanced_testcase {
         (cache::make_from_params(cache_store::MODE_REQUEST, 'totara_core', 'dashboard'))->purge();
 
         $dashboards = totara_dashboard::get_user_dashboards(0);
-        $this->assertSame([(int)$defaultdash->id], array_keys($dashboards));
+        $this->assertEmpty($dashboards);
 
         $dashboards = totara_dashboard::get_user_dashboards($guest->id);
-        $this->assertSame([(int)$defaultdash->id], array_keys($dashboards));
+        $this->assertEmpty($dashboards);
 
         $dashboards = totara_dashboard::get_user_dashboards($admin->id);
         $this->assertSame([(int)$defaultdash->id], array_keys($dashboards));

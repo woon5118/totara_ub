@@ -14,12 +14,13 @@ Feature: Perform basic dashboard user changes
       | name | idnumber |
       | Cohort 1 | CH1 |
     And the following totara_dashboards exist:
-      | name | locked | published | cohorts |
-      | First dashboard | 1 | 1 | CH1 |
-      | Dashboard locked published | 1 | 1 | CH1 |
-      | Dashboard unlocked published | 0 | 1 | CH1 |
-      | Dashboard unpublished | 1 | 0 | CH1 |
-      | Dashboard unassigned | 1 | 1 | |
+      | name                         | locked | published | cohorts | allowguest |
+      | First dashboard              | 1      | 1         | CH1     | 0          |
+      | Dashboard locked published   | 1      | 1         | CH1     | 0          |
+      | Dashboard unlocked published | 0      | 1         | CH1     | 0          |
+      | Dashboard unpublished        | 1      | 0         | CH1     | 0          |
+      | Dashboard unassigned         | 1      | 1         |         | 0          |
+      | Guest Dashboard              | 1      | 1         |         | 1          |
     And the following "cohort members" exist:
       | user     | cohort |
       | learner1 | CH1    |
@@ -97,3 +98,23 @@ Feature: Perform basic dashboard user changes
     Then I should not see "Dashboard unassigned"
     And I should not see "Dashboard unpublished"
     And I should see "Dashboard locked published"
+
+  Scenario: Guest cannot see dashboard without guestallow
+    When I log in as "admin"
+    And I set the following administration settings values:
+      | Guest login button | Show |
+    Then I log out
+    And I log in as "guest"
+    Then I should not see "Dashboard unassigned"
+    And I should not see "Dashboard unpublished"
+    And I should not see "Dashboard locked published"
+    And I should not see "Dashboard unlocked published"
+    And I should see "Front page" in the "#block-region-side-pre" "css_element"
+    And I follow "Dashboard"
+    Then I should see "Guest Dashboard"
+    And I log in as "admin"
+    And I set the following administration settings values:
+      | Home page for guests | Totara dashboard |
+    And I log out
+    And I log in as "guest"
+    And I should see "Guest Dashboard"

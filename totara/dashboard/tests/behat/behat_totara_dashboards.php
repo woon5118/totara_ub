@@ -58,6 +58,7 @@ class behat_totara_dashboards extends behat_base {
             'locked',
             'published',
             'cohorts',
+            'allowguest',
         );
 
         $data = $table->getHash();

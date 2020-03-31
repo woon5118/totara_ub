@@ -269,12 +269,16 @@ class totara_dashboard_dashboard_testcase extends advanced_testcase {
      *
      */
     public function test_get_user_dashboards() {
+        global $DB;
+
         $this->resetAfterTest(true);
 
         // Create 3 users.
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
         $user3 = $this->getDataGenerator()->create_user();
+
+        $guestuser = guest_user();
 
         $cohorts_gen = $this->getDataGenerator()->get_plugin_generator('totara_cohort');
 
@@ -297,23 +301,47 @@ class totara_dashboard_dashboard_testcase extends advanced_testcase {
         $dashboard1 = $dashboard_gen->create_dashboard(array('cohorts' => array($cohort3)));
         // Second dashboard has audience 2 and 3.
         $dashboard2 = $dashboard_gen->create_dashboard(array('cohorts' => array($cohort2, $cohort3)));
+        // Third dashboard has guestaccess only
+        $dashboard3 = $dashboard_gen->create_dashboard(['name' => 'Guest Dashboard', 'allowguest' => true]);
+        // Fourth dashboard has audience 3 and guestaccess
+        $dashboard4 = $dashboard_gen->create_dashboard(['cohorts' => [$cohort3], 'allowguest' => true]);
 
-        // Check that user is user1 not assigned to either dashboard.
+
+        // Check that user is user1 not assigned to either dashboard but can see guest dashboard.
         $user1dashes = totara_dashboard::get_user_dashboards($user1->id);
-        $this->assertNotContains($dashboard1->get_id(), array_keys($user1dashes));
-        $this->assertNotContains($dashboard2->get_id(), array_keys($user1dashes));
+        $user1dashesids = array_keys($user1dashes);
+        $this->assertCount(1, $user1dashes); // Only My Learning dashboard
+        $this->assertNotContains($dashboard1->get_id(), $user1dashesids);
+        $this->assertNotContains($dashboard2->get_id(), $user1dashesids);
+        $this->assertNotContains($dashboard3->get_id(), $user1dashesids);
+        $this->assertNotContains($dashboard4->get_id(), $user1dashesids);
 
         // Check that user2 assigned to dashboard 2 only.
         $user2dashes = totara_dashboard::get_user_dashboards($user2->id);
-        $this->assertContains($dashboard2->get_id(), array_keys($user2dashes));
-        $this->assertNotContains($dashboard1->get_id(), array_keys($user2dashes));
+        $user2dashesids = array_keys($user2dashes);
+        $this->assertCount(2, $user2dashes);
+        $this->assertContains($dashboard2->get_id(), $user2dashesids);
+        $this->assertNotContains($dashboard1->get_id(), $user2dashesids);
+        $this->assertNotContains($dashboard3->get_id(), $user2dashesids);
+        $this->assertNotContains($dashboard4->get_id(), $user2dashesids);
 
         // Check that user3 assigned to dashboards 1 and 2.
         $user3dashes = totara_dashboard::get_user_dashboards($user3->id);
         $user3dashesids = array_keys($user3dashes);
+        $this->assertCount(4, $user3dashes);
         $this->assertContains($dashboard1->get_id(), $user3dashesids);
         $this->assertContains($dashboard2->get_id(), $user3dashesids);
+        $this->assertContains($dashboard4->get_id(), $user3dashesids);
         $this->assertNotEquals($user3dashesids[0], $user3dashesids[1]);
+
+        // Ensure guest can only access dashboards with guest access enabled
+        $guestdashes = totara_dashboard::get_user_dashboards($guestuser->id);
+        $guestdashesids = array_keys($guestdashes);
+        $this->assertCount(2, $guestdashes);
+        $this->assertContains($dashboard3->get_id(), $guestdashesids);
+        $this->assertContains($dashboard4->get_id(), $guestdashesids);
+        $this->assertNotContains($dashboard1->get_id(), $guestdashesids);
+        $this->assertNotContains($dashboard2->get_id(), $guestdashesids);
     }
 
     /**

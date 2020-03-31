@@ -332,7 +332,7 @@ class totara_dashboard {
         $instance = new stdClass();
         $instance->id = $this->id;
         $instance->name = $this->name;
-        $instance->allowguest = (int)(bool)$this->allowguest;
+        $instance->allowguest = (int)$this->allowguest;
         $instance->published = (int)$this->published;
         $instance->locked = (int)$this->locked;
         $instance->sortorder = (int)$this->sortorder;
@@ -362,7 +362,7 @@ class totara_dashboard {
             $this->locked = (bool)$data->locked;
         }
         if (isset($data->allowguest)) {
-            $this->allowguest = (int)(bool)$data->allowguest;
+            $this->allowguest = (bool)$data->allowguest;
         }
         if (isset($data->published)) {
             $this->published = (int)$data->published;
