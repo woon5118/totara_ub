@@ -17,7 +17,6 @@ Feature: security overview
     Given I navigate to "Security overview" node in "Site administration > Security"
     And I should see "OK" in the "Insecure dataroot" "table_row"
     And I should see "OK" in the "No authentication" "table_row"
-    And I should see "OK" in the "Allow EMBED and OBJECT" "table_row"
     And I should see "OK" in the "Enabled .swf media filter" "table_row"
     And I should see "OK" in the "Open to Google" "table_row"
     And I should see "OK" in the "Password policy" "table_row"
@@ -30,10 +29,18 @@ Feature: security overview
     And I should see "OK" in the "Frontpage role" "table_row"
     And I should see "OK" in the "HTTP only cookies" "table_row"
 
+    # Deprecated stuff hidden by default.
+    And I should not see "Allow EMBED and OBJECT"
+
   # NOTE auth_none was removed in Totara 12, there is no way to test it, but we want to keep the error in case somebody copied it from older branch.
 
   @javascript
   Scenario: Check that Critical status is displayed when required in the security overview for issue, Allow EMBED and OBJECT
+
+    # Disable secure text cleaning, to show this deprecated stuff.
+    Given the following config values are set as admin:
+      | disableconsistentcleaning | 1 |
+      | allowobjectembed          | 0 |
 
     # First, check the status is OK
     Given I navigate to "Security overview" node in "Site administration > Security"
