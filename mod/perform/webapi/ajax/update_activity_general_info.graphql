@@ -11,6 +11,9 @@ mutation mod_perform_update_activity_general_info(
     activity {
       id
       name
+      edit_name: name(format: RAW)
+      description
+      edit_description: description(format: RAW)
       description
     }
   }

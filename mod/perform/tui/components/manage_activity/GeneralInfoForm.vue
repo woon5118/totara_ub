@@ -28,9 +28,9 @@
     >
       <InputText
         :id="id"
-        :value="activity.name"
+        :value="activity.edit_name"
         :placeholder="label"
-        @input="updateActivity({ name: $event })"
+        @input="updateActivity({ edit_name: $event })"
         @submit="trySave"
       />
     </FormRow>
@@ -41,9 +41,9 @@
     >
       <Textarea
         :id="id"
-        :value="activity.description"
+        :value="activity.edit_description"
         :placeholder="label"
-        @input="updateActivity({ description: $event })"
+        @input="updateActivity({ edit_description: $event })"
       />
     </FormRow>
 
@@ -135,7 +135,7 @@ export default {
      * @returns {boolean}
      */
     hasNoTitle() {
-      return !this.activity.name || this.activity.name.length === 0;
+      return !this.activity.edit_name || this.activity.edit_name.length === 0;
     },
 
     /**
@@ -199,16 +199,16 @@ export default {
 
         variables = {
           activity_id: this.activity.id,
-          name: this.activity.name,
-          description: this.activity.description,
+          name: this.activity.edit_name,
+          description: this.activity.edit_description,
         };
       } else {
         mutation = CreateActivityMutation;
         mutationName = 'mod_perform_create_activity';
 
         variables = {
-          name: this.activity.name,
-          description: this.activity.description,
+          name: this.activity.edit_name,
+          description: this.activity.edit_description,
         };
       }
 
