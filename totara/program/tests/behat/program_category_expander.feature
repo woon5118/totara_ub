@@ -24,7 +24,6 @@ Feature: Find learning program category management
     And I log in as "admin"
     And I set the following administration settings values:
         | catalogtype | moodle |
-    And I press "Save changes"
     And I log out
 
   Scenario: Test program expansion as a normal user

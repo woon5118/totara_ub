@@ -9,7 +9,6 @@ Feature: Users can auto-enrol themself via course catalog in courses where self 
     And I log in as "admin"
     And I set the following administration settings values:
       | catalogtype | enhanced |
-    And I press "Save changes"
     And I log out
     And the following "users" exist:
       | username | firstname | lastname | email |

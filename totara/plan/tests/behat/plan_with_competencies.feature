@@ -104,7 +104,6 @@ Feature: Learner creates learning plan with competencies.
 
     And I set the following administration settings values:
       | Enable report restrictions | 1 |
-    And I press "Save changes"
 
     And I navigate to "Global report restrictions" node in "Site administration > Reports"
     And I press "New restriction"

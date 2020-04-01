@@ -56,7 +56,6 @@ Feature: Global report restrictions multiple interactions
       | user5 | ORG001       |
     And I set the following administration settings values:
       | Enable report restrictions | 1 |
-    And I press "Save changes"
     And the following "report_restrictions" exist in "totara_reportbuilder" plugin:
       | name           | description   | active | allrecords | allusers |
       | no restriction | Restriction 1 | 1      | 1          | 1        |

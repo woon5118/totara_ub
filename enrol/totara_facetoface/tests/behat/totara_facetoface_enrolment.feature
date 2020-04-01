@@ -62,7 +62,6 @@ Feature: Users can auto-enrol themself in courses where seminar direct enrolment
     Given I log in as "admin"
     And I set the following administration settings values:
       | catalogtype | enhanced |
-    And I press "Save changes"
     And I log out
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage

@@ -10,7 +10,6 @@ Feature: auth_approved: signup with profile fields
     And I click on "Enable" "link" in the "Self-registration with approval" "table_row"
     And I set the following administration settings values:
       | registerauth | Self-registration with approval |
-    And I press "Save changes"
 
     And I navigate to "User profile fields" node in "Site administration > Users"
     And I set the following fields to these values:

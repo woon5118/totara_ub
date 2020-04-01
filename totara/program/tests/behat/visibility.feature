@@ -157,7 +157,6 @@ Feature: Users visibility of programs can be toggled
     And I set the following administration settings values:
       | Enable audience-based visibility | 1              |
       | catalogtype                      | <Catalog type> |
-    And I press "Save changes"
     And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Visibility Program Tests" "link"
@@ -193,7 +192,6 @@ Feature: Users visibility of programs can be toggled
     And I set the following administration settings values:
       | Enable audience-based visibility | 1              |
       | catalogtype                      | <Catalog type> |
-    And I press "Save changes"
     And I navigate to "Manage programs" node in "Site administration > Programs"
     And I click on "Miscellaneous" "link"
     And I click on "Visibility Program Tests" "link"

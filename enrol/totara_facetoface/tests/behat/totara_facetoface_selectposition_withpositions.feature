@@ -40,7 +40,6 @@ Feature: Users can enrol themself in courses with selected position where semina
 
     And I set the following administration settings values:
       | catalogtype | enhanced |
-    And I press "Save changes"
 
     And I log out
 

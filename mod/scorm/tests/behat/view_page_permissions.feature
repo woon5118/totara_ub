@@ -99,7 +99,6 @@ Feature: mod_scorm: check view SCORM page permissions
 
     Given I set the following administration settings values:
       | guestloginbutton | Show |
-    And I press "Save changes"
 
     When I log out
     And I log in as "guest"
