@@ -31,7 +31,7 @@ class mod_perform_activity_name_generator_testcase extends basic_testcase {
     }
 
     public function test_generate_name() {
-        $name_generator = new activity_name_generator();
+        $name_generator = new mod_perform_activity_name_generator();
 
         $name = $name_generator->generate();
         $this->assertIsString($name);
@@ -39,7 +39,7 @@ class mod_perform_activity_name_generator_testcase extends basic_testcase {
     }
 
     public function test_generate_names() {
-        $name_generator = new activity_name_generator();
+        $name_generator = new mod_perform_activity_name_generator();
 
         $names = $name_generator->generate_multiple(5);
         $this->assertIsArray($names);
@@ -49,6 +49,5 @@ class mod_perform_activity_name_generator_testcase extends basic_testcase {
             $this->assertGreaterThan(0, strlen($name));
         }
     }
-
 
 }

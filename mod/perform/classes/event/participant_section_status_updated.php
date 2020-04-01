@@ -47,12 +47,11 @@ class participant_section_status_updated extends base {
      * @return self|base
      */
     public static function create_from_participant_section(participant_section $participant_section): self {
-        $activity = activity::load_by_entity($participant_section->section->activity);
         $data = [
             'objectid' => $participant_section->get_id(),
             'relateduserid' => $participant_section->participant_instance->participant_id,
             'other' => [],
-            'context' => $activity->get_context(),
+            'context' => $participant_section->get_context(),
         ];
         return static::create($data);
     }

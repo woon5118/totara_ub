@@ -30,7 +30,7 @@ require_once(__DIR__ . '/subject_instance_testcase.php');
 /**
  * @group perform
  */
-class data_provider_subject_instances_testcase extends mod_perform_subject_instance_testcase {
+class mod_perform_data_provider_subject_instances_testcase extends mod_perform_subject_instance_testcase {
 
     /**
      * Even unfiltered must only return activities the user is participating in.

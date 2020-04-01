@@ -27,7 +27,7 @@ use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use mod_perform\models\activity\section as section_model;
 
-class section implements query_resolver {
+class section_admin implements query_resolver {
 
     public static function resolve(array $args, execution_context $ec) {
         require_login(null, false, null, false, true);

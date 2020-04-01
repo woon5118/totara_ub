@@ -18,97 +18,66 @@
 
   @author Simon Chester <simon.chester@totaralearning.com>
   @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
-  @package mod_perform
+  @package performelement_short_text
 -->
 <template>
   <ElementEdit :type="type" :error="error">
     <template v-slot:content>
-      <div>
-        <FormDynamic
-          v-slot="{ values, nativeinput, blur, handleSubmit, formy }"
-          :value="initialValue"
-          :validate="validate"
-          @submit="handleSubmit"
+      <Uniform :initial-values="initialValues" @submit="handleSubmit">
+        <FormRow :label="$str('short_text_title', 'performelement_short_text')">
+          <FormText
+            name="name"
+            :validations="v => [v.required(), v.maxLength(1024)]"
+          />
+        </FormRow>
+        <FormRow
+          :label="
+            $str('short_text_answer_placeholder', 'performelement_short_text')
+          "
+          :hidden="true"
         >
-          <Form @submit="handleSubmit">
-            <FormRow
-              v-slot="{ id, inputName }"
-              name="name"
-              :label="$str('short_text:title', 'performelement_short_text')"
-              :formy="formy"
-            >
-              <InputText
-                :id="id"
-                :name="inputName"
-                :value="values[inputName]"
-                v-on="{ nativeinput, blur }"
-              />
-            </FormRow>
-            <FormRow
-              name="answer"
-              :label="
-                $str(
-                  'short_text:answer:placeholder',
-                  'performelement_short_text'
-                )
+          <Textarea
+            :disabled="true"
+            :placeholder="
+              $str('short_text_answer_placeholder', 'performelement_short_text')
+            "
+          />
+        </FormRow>
+        <FormRow>
+          <ButtonGroup>
+            <Button
+              :styleclass="{ primary: 'true' }"
+              :text="
+                $str('short_text_button_done', 'performelement_short_text')
               "
-              :hidden="true"
-            >
-              <Textarea
-                :disabled="true"
-                :placeholder="
-                  $str(
-                    'short_text:answer:placeholder',
-                    'performelement_short_text'
-                  )
-                "
-              />
-            </FormRow>
-            <FormRow>
-              <ButtonGroup>
-                <Button
-                  :styleclass="{ primary: 'true' }"
-                  :text="
-                    $str('short_text:button:done', 'performelement_short_text')
-                  "
-                  type="submit"
-                  @click="$emit('click', $event)"
-                />
-                <Button
-                  :text="
-                    $str(
-                      'short_text:button:cancel',
-                      'performelement_short_text'
-                    )
-                  "
-                  @click="cancel"
-                />
-              </ButtonGroup>
-            </FormRow>
-          </Form>
-        </FormDynamic>
-      </div>
+              type="submit"
+            />
+            <Button
+              :text="
+                $str('short_text_button_cancel', 'performelement_short_text')
+              "
+              @click="cancel"
+            />
+          </ButtonGroup>
+        </FormRow>
+      </Uniform>
     </template>
   </ElementEdit>
 </template>
 
 <script>
-import ElementEdit from 'mod_perform/components/element/ElementEdit';
-import FormDynamic from 'totara_core/components/form/Formy';
-import Form from 'totara_core/components/form/Form';
-import FormRow from 'totara_core/components/form/FormRow';
-import InputText from 'totara_core/components/form/InputText';
+import { Uniform, FormRow, FormText } from 'totara_core/components/uniform';
 import Textarea from 'totara_core/components/form/Textarea';
+import ElementEdit from 'mod_perform/components/element/ElementEdit';
 import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
 import Button from 'totara_core/components/buttons/Button';
 
 export default {
   components: {
     ElementEdit,
-    FormDynamic,
-    Form,
+    Uniform,
     FormRow,
-    InputText,
+    FormText,
     Textarea,
     ButtonGroup,
     Button,
@@ -122,7 +91,7 @@ export default {
   },
 
   computed: {
-    initialValue() {
+    initialValues() {
       return {
         name: this.name,
       };
@@ -130,21 +99,6 @@ export default {
   },
 
   methods: {
-    validate({ values, errors }) {
-      if (!values.name || values.name.trim() == '') {
-        errors.name = this.$str(
-          'error:question_required',
-          'performelement_short_text'
-        );
-      }
-      if (values.name.trim().length > 1024) {
-        errors.name = this.$str(
-          'error:question_length_exceed',
-          'performelement_short_text'
-        );
-      }
-    },
-
     handleSubmit(values) {
       this.$emit('update', {
         name: values.name,
@@ -161,12 +115,12 @@ export default {
 <lang-strings>
   {
     "performelement_short_text": [
-        "error:question_required",
-        "error:question_length_exceed",
-        "short_text:title",
-        "short_text:answer:placeholder",
-        "short_text:button:done",
-        "short_text:button:cancel"
+        "error_question_required",
+        "error_question_length_exceed",
+        "short_text_title",
+        "short_text_answer_placeholder",
+        "short_text_button_done",
+        "short_text_button_cancel"
     ]
   }
 </lang-strings>

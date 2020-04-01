@@ -17,6 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Jaron Steenson <jaron.steenson@totaralearning.com>
+  @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
   @package mod_perform
 -->
 
@@ -35,6 +36,8 @@
         {{ subjectInstance.activity.name }} ({{
           subjectInstance.subject_user.fullname
         }})
+
+        <ActivityContent :subject-instance-id="subjectInstanceId" />
       </h2>
     </Loader>
   </div>
@@ -44,11 +47,13 @@
 import subjectInstanceQuery from 'mod_perform/graphql/subject_instance.graphql';
 import Loader from 'totara_core/components/loader/Loader';
 import NotificationBanner from 'totara_core/components/notifications/NotificationBanner';
+import ActivityContent from 'mod_perform/components/user_activities/ActivityContent';
 
 export default {
   components: {
     Loader,
     NotificationBanner,
+    ActivityContent,
   },
   props: {
     subjectInstanceId: {
@@ -56,6 +61,7 @@ export default {
       type: Number,
     },
   },
+
   data() {
     return {
       hasLoaded: false,

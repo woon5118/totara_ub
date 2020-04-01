@@ -23,8 +23,10 @@
 
 namespace mod_perform\entities\activity;
 
+use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
+use core\orm\entity\relations\has_many;
 
 /**
  * Participant instance entity
@@ -39,10 +41,12 @@ use core\orm\entity\relations\belongs_to;
  *
  * @property-read activity_relationship $activity_relationship
  * @property-read subject_instance $subject_instance
+ * @property-read collection|participant_section[] $participant_sections
  *
  * @package mod_perform\entities
  */
 class participant_instance extends entity {
+
     public const TABLE = 'perform_participant_instance';
     public const CREATED_TIMESTAMP = 'created_at';
     public const UPDATED_TIMESTAMP = 'updated_at';
@@ -65,5 +69,11 @@ class participant_instance extends entity {
         return $this->belongs_to(subject_instance::class, 'subject_instance_id');
     }
 
+    /**
+     * @return has_many
+     */
+    public function participant_sections(): has_many {
+        return $this->has_many(participant_section::class, 'participant_instance_id');
+    }
 
 }

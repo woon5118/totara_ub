@@ -61,33 +61,39 @@ abstract class mod_perform_subject_instance_testcase extends advanced_testcase {
         $other_subject = self::getDataGenerator()->create_user();
         $other_participant = self::getDataGenerator()->create_user();
 
-        self::$about_user_and_participating = self::perform_generator()->create_subject_instance([
+        self::$about_user_and_participating = subject_instance::load_by_entity( self::perform_generator()->create_subject_instance([
             'activity_name' => 'activity_about_target_user',
             'subject_user_id' => $target_user->id,
             'other_participant_id' => $other_participant->id,
             'subject_is_participating' => true,
-        ]);
+        ]));
 
-        self::$about_user_but_not_participating = self::perform_generator()->create_subject_instance([
-            'activity_name' => 'activity_target_user_is_not_participating_in',
-            'subject_user_id' => $target_user->id,
-            'other_participant_id' => $other_participant->id,
-            'subject_is_participating' => false,
-        ]);
+        self::$about_user_but_not_participating = subject_instance::load_by_entity(
+            self::perform_generator()->create_subject_instance([
+                'activity_name' => 'activity_target_user_is_not_participating_in',
+                'subject_user_id' => $target_user->id,
+                'other_participant_id' => $other_participant->id,
+                'subject_is_participating' => false,
+            ])
+        );
 
-        self::$about_someone_else_and_participating = self::perform_generator()->create_subject_instance([
-            'activity_name' => 'activity_about_someone_else',
-            'subject_user_id' => $other_subject->id,
-            'other_participant_id' => $target_user->id,
-            'subject_is_participating' => false,
-        ]);
+        self::$about_someone_else_and_participating = subject_instance::load_by_entity(
+            self::perform_generator()->create_subject_instance([
+                'activity_name' => 'activity_about_someone_else',
+                'subject_user_id' => $other_subject->id,
+                'other_participant_id' => $target_user->id,
+                'subject_is_participating' => false,
+            ])
+        );
 
-        self::$non_existing = self::perform_generator()->create_subject_instance([
-            'activity_name' => 'subject_instance_will_be_deleted',
-            'subject_user_id' => $other_subject->id,
-            'other_participant_id' => $target_user->id,
-            'subject_is_participating' => false,
-        ]);
+        self::$non_existing = subject_instance::load_by_entity(
+            self::perform_generator()->create_subject_instance([
+                'activity_name' => 'subject_instance_will_be_deleted',
+                'subject_user_id' => $other_subject->id,
+                'other_participant_id' => $target_user->id,
+                'subject_is_participating' => false,
+            ])
+        );
 
         $subject_instance_id = self::$non_existing->id;
 
@@ -155,7 +161,7 @@ abstract class mod_perform_subject_instance_testcase extends advanced_testcase {
         return execution_context::create($type, $operation);
     }
 
-    protected static function perform_generator(): \mod_perform_generator {
+    protected static function perform_generator(): mod_perform_generator {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return self::getDataGenerator()->get_plugin_generator('mod_perform');
     }

@@ -34,7 +34,7 @@ use core\orm\entity\entity;
  * @property string $plugin_name name of the element plugin that controls this element
  * @property string $title a user-defined title to identify and describe this element
  * @property int $identifier used to match elements that share the same identifier
- * @property string $data data specific to this type of entity
+ * @property string $data configuration data specific to this type of element
  *
  * @method static element_repository repository()
  *

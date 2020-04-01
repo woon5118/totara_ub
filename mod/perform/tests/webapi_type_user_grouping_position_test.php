@@ -67,14 +67,14 @@ class mod_perform_webapi_type_user_grouping_position_testcase extends advanced_t
      * @covers ::runposition
      * @dataProvider td_resolve
      *
-     * @param \context $context totara context.
+     * @param context $context totara context.
      * @param stdClass $source raw data source.
      * @param string $field field to resolve.
      * @param string $format field format.
      * @param mixed $expected expected field value.
      */
     public function test_resolve(
-        \context $context,
+        context $context,
         stdClass $source,
         string $field,
         ?string $format,

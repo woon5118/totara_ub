@@ -45,9 +45,12 @@ import Loader from 'totara_core/components/loader/Loader';
 import Table from 'totara_core/components/datatable/Table';
 
 import SubjectInstancesQuery from 'mod_perform/graphql/subject_instances.graphql';
+import { notify } from 'totara_core/notifications';
 
 const ABOUT_SELF = 'self';
 const ABOUT_OTHERS = 'others';
+
+const TOAST_DURATION = 10 * 1000; // in microseconds.
 
 export default {
   components: {
@@ -127,6 +130,27 @@ export default {
           return '';
       }
     },
+    /**
+     * Show a generic success toast.
+     */
+    showSuccessNotification() {
+      notify({
+        duration: TOAST_DURATION,
+        message: this.$str('toast_success_save_response', 'mod_perform'),
+        type: 'success',
+      });
+    },
+
+    /**
+     * Show a generic saving error toast.
+     */
+    showErrorNotification() {
+      notify({
+        duration: TOAST_DURATION,
+        message: this.$str('toast_error_save_response', 'mod_perform'),
+        type: 'error',
+      });
+    },
   },
 };
 </script>
@@ -139,7 +163,9 @@ export default {
       "user_activities:status_in_progress",
       "user_activities:status_not_yet_started",
       "user_activities:subject_header",
-      "user_activities:title_header"
+      "user_activities:title_header",
+      "toast_success_save_response",
+      "toast_error_save_response"
     ]
   }
 </lang-strings>

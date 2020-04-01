@@ -1,0 +1,19 @@
+query mod_perform_participant_section($subject_instance_id: core_id!) {
+  mod_perform_participant_section(subject_instance_id: $subject_instance_id) {
+    id
+    section {
+      title
+      section_elements {
+        id
+        element {
+          element_plugin {
+            participant_form_component
+          }
+          title
+          data
+        }
+        sort_order
+      }
+    }
+  }
+}

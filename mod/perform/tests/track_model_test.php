@@ -24,8 +24,6 @@
 
 use core\collection;
 
-use mod_perform\entities\activity\track as track_entity;
-
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_status;
 

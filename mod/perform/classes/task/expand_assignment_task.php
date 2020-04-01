@@ -30,7 +30,7 @@ use core\task\manager;
 use mod_perform\expand_task;
 
 /**
- * Ad-hoc tack for expanding an assignment to be triggered when the assignment was created or changed.
+ * Ad-hoc task for expanding an assignment to be triggered when the assignment was created or changed.
  */
 class expand_assignment_task extends adhoc_task {
 

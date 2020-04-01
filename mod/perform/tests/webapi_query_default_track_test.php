@@ -37,7 +37,7 @@ use mod_perform\webapi\resolver\type\user_grouping;
 use totara_webapi\graphql;
 
 /**
- * @coversDefaultClass tracks.
+ * @coversDefaultClass track.
  *
  * @group perform
  */

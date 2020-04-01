@@ -23,8 +23,10 @@
 
 namespace mod_perform\entities\activity;
 
+use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
+use core\orm\entity\relations\has_many_through;
 
 /**
  * Participant section entity
@@ -37,6 +39,7 @@ use core\orm\entity\relations\belongs_to;
  *
  * @property-read section $section
  * @property-read participant_instance $participant_instance
+ * @property-read collection|section_element[] $section_elements
  *
  * @package mod_perform\entities
  */
@@ -55,11 +58,28 @@ class participant_section extends entity {
     }
 
     /**
-     * Relationship with participant_instance entities.
+     * Relationship with section entities.
      *
      * @return belongs_to
      */
     public function participant_instance(): belongs_to {
         return $this->belongs_to(participant_instance::class, 'participant_instance_id');
     }
+
+    /**
+     * Relationship with the section elements entities.
+     *
+     * @return has_many_through
+     */
+    public function section_elements(): has_many_through {
+        return $this->has_many_through(
+            section::class,
+            section_element::class,
+            'section_id',
+            'id',
+            'id',
+            'section_id'
+        );
+    }
+
 }

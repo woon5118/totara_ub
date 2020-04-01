@@ -145,8 +145,9 @@ class mod_perform_webapi_mutation_create_track_testcase extends advanced_testcas
     private function setup_env(): activity {
         $this->setAdminUser();
 
-        return $this->getDataGenerator()->get_plugin_generator('mod_perform')
-            ->create_activity_in_container();
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        return $perform_generator->create_activity_in_container();
     }
 
     /**

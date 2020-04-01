@@ -4,5 +4,6 @@ query mod_perform_element_plugins {
     name
     admin_form_component
     admin_display_component
+    participant_form_component
   }
 }

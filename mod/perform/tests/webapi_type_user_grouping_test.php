@@ -47,7 +47,7 @@ class mod_perform_webapi_type_user_grouping_testcase extends advanced_testcase {
 
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessageRegExp("/user_grouping/");
-        user_grouping::resolve('id', new \stdClass(), [], $webapi_context);
+        user_grouping::resolve('id', new stdClass(), [], $webapi_context);
     }
 
     /**

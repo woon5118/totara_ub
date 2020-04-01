@@ -28,7 +28,7 @@ require_once(__DIR__ . '/subject_instance_testcase.php');
 /**
  * @group perform
  */
-class webapi_resolver_query_subject_instance_testcase extends mod_perform_subject_instance_testcase {
+class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_perform_subject_instance_testcase {
 
     public function test_query_successful(): void {
         $args = [

@@ -35,6 +35,7 @@ use mod_perform\webapi\resolver\type\track;
  * @group perform
  */
 class mod_perform_webapi_type_track_testcase extends advanced_testcase {
+
     /**
      * @covers ::resolve
      */
@@ -44,7 +45,7 @@ class mod_perform_webapi_type_track_testcase extends advanced_testcase {
 
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessageRegExp("/track/");
-        track::resolve('id', new \stdClass(), [], $webapi_context);
+        track::resolve('id', new stdClass(), [], $webapi_context);
     }
 
     /**

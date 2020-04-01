@@ -162,7 +162,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->assertEquals([$track1_id, $track1_id], array_column($events, 'objectid'));
         $this->assertEqualsCanonicalizing(
             [$test_data->user1->id, $test_data->user2->id],
-            array_map(function ($event) {
+            array_map(function (track_user_unassigned $event) {
                 return $event->get_user_id();
             }, $events)
         );
@@ -349,9 +349,6 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
     }
 
     private function prepare_assignments() {
-        /** @var totara_hierarchy_generator $hierarchy_generator */
-        $hierarchy_generator = $this->generator()->get_plugin_generator('totara_hierarchy');
-
         $test_data = new class() {
             public $user1;
             public $user2;

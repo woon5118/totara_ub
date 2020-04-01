@@ -134,7 +134,7 @@ class section extends model {
      * @return collection|section_relationship[]
      */
     public function get_section_relationships(): collection {
-        return $this->entity->section_relationships->transform_to(section_relationship::class);
+        return $this->entity->section_relationships->map_to(section_relationship::class);
     }
 
     /**
@@ -281,5 +281,15 @@ class section extends model {
 
             $this->validate_sort_orders();
         });
+    }
+
+    /**
+     * Determine if the given user can response to this section.
+     *
+     * @param int $user_id
+     * @return bool
+     */
+    public function can_respond(int $user_id): bool {
+        return true;
     }
 }

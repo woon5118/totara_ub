@@ -26,7 +26,6 @@
  */
 use core\webapi\execution_context;
 use mod_perform\webapi\resolver\query\element_plugins;
-use totara_webapi\graphql;
 
 class mod_perform_webapi_resolver_query_element_plugins_testcase extends advanced_testcase {
 
@@ -51,6 +50,7 @@ class mod_perform_webapi_resolver_query_element_plugins_testcase extends advance
             $this->assertNotEmpty($element_plugin->get_name());
             $this->assertNotEmpty($element_plugin->get_admin_form_component());
             $this->assertNotEmpty($element_plugin->get_admin_display_component());
+            $this->assertNotEmpty($element_plugin->get_participant_form_component());
         }
     }
 }

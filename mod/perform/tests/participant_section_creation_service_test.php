@@ -46,7 +46,7 @@ use totara_job\relationship\resolvers\manager;
 /**
  * Class participant_section_creation_service_test
  */
-class participant_section_creation_service_test extends advanced_testcase {
+class mod_perform_participant_section_creation_service_testcase extends advanced_testcase {
 
     /**
      * Data of Activity used.

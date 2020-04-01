@@ -23,8 +23,48 @@
 
 namespace performelement_short_text;
 
+use coding_exception;
+use core\collection;
+use core_text;
 use mod_perform\models\activity\element_plugin;
 
 class short_text extends element_plugin {
 
+    public const MAX_ANSWER_LENGTH = 1024;
+
+    protected $answer_text;
+
+    /**
+     * @inheritDoc
+     */
+    public function set_response_data(?array $response_data): element_plugin {
+        if ($response_data === null) {
+            return $this;
+        }
+
+        if (!is_array($response_data) || !array_key_exists('answer_text', $response_data)) {
+            throw new coding_exception('Invalid response data format, expected "answer_text" field');
+        }
+
+        $this->answer_text = $response_data['answer_text'];
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function validate_response(): collection {
+        $errors = new collection();
+
+        if ((string) $this->answer_text === '') {
+            $errors->append(new answer_required_error());
+        }
+
+        if (core_text::strlen($this->answer_text) > self::MAX_ANSWER_LENGTH) {
+            $errors->append(new answer_length_exceeded_error());
+        }
+
+        return $errors;
+    }
 }

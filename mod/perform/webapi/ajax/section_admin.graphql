@@ -1,5 +1,5 @@
-query mod_perform_section_details($section_id: core_id!) {
-  mod_perform_section(section_id: $section_id) {
+query mod_perform_section_admin($section_id: core_id!) {
+  mod_perform_section_admin(section_id: $section_id) {
     title
     section_elements {
       id
@@ -10,6 +10,7 @@ query mod_perform_section_details($section_id: core_id!) {
           name
           admin_form_component
           admin_display_component
+          participant_form_component
         }
         title
         identifier

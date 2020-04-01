@@ -21,12 +21,13 @@
  * @package performelement_short_text
  */
 
-$string['error:question_required'] = 'Question is required';
-$string['error:question_length_exceed'] = 'Question text exceeds the maximum length';
+$string['error_question_required'] = 'Question is required';
+$string['error_question_length_exceed'] = 'Question text exceeds the maximum length';
 $string['pluginname'] = 'Short text element';
 $string['name'] = 'Short text';
-$string['short_text:answer:placeholder'] = 'Long text answer field';
-$string['short_text:button:cancel'] = 'Cancel';
-$string['short_text:button:done'] = 'Done';
-$string['short_text:title'] = 'Question Text';
+$string['short_text_answer_placeholder'] = 'Short text answer field';
+$string['short_text_button_done'] = 'Done';
+$string['short_text_button_cancel'] = 'Cancel';
+$string['short_text_your_response'] = 'Your response';
+$string['short_text_title'] = 'Question Text';
 

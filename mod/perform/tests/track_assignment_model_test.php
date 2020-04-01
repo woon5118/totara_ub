@@ -22,17 +22,13 @@
  * @category test
  */
 
-use core\collection;
-
-use mod_perform\entities\activity\track_assignment as track_assignment_entity;
-
 use mod_perform\models\activity\track_assignment;
 use mod_perform\models\activity\track_assignment_type;
 
 use mod_perform\user_groups\grouping;
 
 /**
- * @coversDefaultClass track_assignments.
+ * @coversDefaultClass track_assignment.
  *
  * @group perform
  */
@@ -44,6 +40,7 @@ class mod_perform_track_assignment_model_testcase extends advanced_testcase {
     public function test_create_assignments(): void {
         $this->setAdminUser();
 
+        /** @var mod_perform_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
         $activity = $generator->create_activity_in_container();
 
@@ -89,6 +86,7 @@ class mod_perform_track_assignment_model_testcase extends advanced_testcase {
     public function test_remove(): void {
         $this->setAdminUser();
 
+        /** @var mod_perform_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
         $activity = $generator->create_activity_in_container();
         $track = $generator->create_single_activity_track_and_assignment($activity);

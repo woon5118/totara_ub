@@ -25,8 +25,7 @@
  * @group perform
  */
 use core\webapi\execution_context;
-use mod_perform\webapi\resolver\query\section;
-use totara_webapi\graphql;
+use mod_perform\webapi\resolver\query\section_admin;
 
 class mod_perform_webapi_resolver_query_section_testcase extends advanced_testcase {
 
@@ -45,15 +44,18 @@ class mod_perform_webapi_resolver_query_section_testcase extends advanced_testca
         $this->setAdminUser();
         $data = $this->get_test_data();
 
-        $section = section::resolve(['section_id' => $data->section1->id], $this->get_execution_context());
+        $section = section_admin::resolve(['section_id' => $data->section1->id], $this->get_execution_context());
         $this->assertSame($section->title, $data->section1->title);
     }
 
     private function get_test_data() {
-        $data = new \stdClass();
+        /** @var mod_perform_generator $perform_generator */
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+
         $activity = $perform_generator->create_activity_in_container();
         $section = $perform_generator->create_section($activity, ['title' => 'Top Section']);
+
+        $data = new \stdClass();
         $data->activity1 = $activity;
         $data->section1 = $section;
 

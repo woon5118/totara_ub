@@ -18,7 +18,7 @@
 
   @author Simon Chester <simon.chester@totaralearning.com>
   @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
-  @package mod_perform
+  @package performelement_short_text
 -->
 <template>
   <ElementEditDisplay

@@ -24,8 +24,6 @@
 
 use core\webapi\execution_context;
 
-use mod_perform\models\activity\track_assignment as track_assignment_model;
-
 use mod_perform\webapi\resolver\type\track_assignment;
 
 /**

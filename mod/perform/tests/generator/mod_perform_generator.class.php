@@ -25,15 +25,14 @@
 use container_perform\perform as perform_container;
 use core\collection;
 use core\entities\user;
-use core\orm\query\builder;
 use core_container\module\module;
 use mod_perform\entities\activity\participant_section;
 use mod_perform\expand_task;
-use mod_perform\entities\activity\participant_instance;
+use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
-use mod_perform\models\activity\participant_section as participant_section_model;
 use mod_perform\models\activity\track;
 use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\models\activity\section;
@@ -45,10 +44,10 @@ use mod_perform\state\participant_instance\not_started as instance_not_started;
 use mod_perform\state\participant_section\not_started;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\user_groups\grouping;
-use mod_perform\models\activity\subject_instance;
 use mod_perform\util;
 use totara_core\entities\relationship_resolver;
 use totara_core\relationship\relationship;
+use totara_core\relationship\resolvers\subject;
 
 /**
  * Perform generator
@@ -121,21 +120,38 @@ class mod_perform_generator extends component_generator_base {
         return section::create($activity, $title);
     }
 
-    public function create_participant_section(int $section_id, int $participant_instance_id): participant_section_model {
-        $data = new stdClass();
-        $data->section_id = $section_id;
-        $data->participant_instance_id = $participant_instance_id;
-        $data->status = not_started::get_code();
-        $data->created_at = time();
-        $new_id = builder::get_db()->insert_record(participant_section::TABLE, $data);
-        return participant_section_model::load_by_id($new_id);
+    public function create_section_element(section $section, element $element, $sort_order = 1): section_element {
+        return section_element::create($section, $element, $sort_order);
     }
 
-    public function create_section_element(section $section, element $element) {
-        return section_element::create($section, $element);
+    public function create_participant_section(
+        activity $activity,
+        participant_instance_entity $participant_instance,
+        $add_elements = true,
+        section $section = null
+    ): participant_section_entity {
+        if ($section === null) {
+            $section = $this->create_section($activity, ['title' => 'Part one']);
+        }
+
+        $participant_section =  new participant_section_entity();
+        $participant_section->section_id = $section->id;
+        $participant_section->participant_instance_id = $participant_instance->id;
+        $participant_section->status = not_started::get_code();
+        $participant_section->save();
+
+        if ($add_elements) {
+            $element = $this->create_element(['title' => 'Question one']);
+            $this->create_section_element($section, $element);
+
+            $element2 = $this->create_element(['title' => 'Question two']);
+            $this->create_section_element($section, $element2, 2);
+        }
+
+        return $participant_section;
     }
 
-    public function create_element(array $data = []) {
+    public function create_element(array $data = []): element {
         return element::create(
             $data['context'] ?? context_coursecat::instance(perform_container::get_default_categoryid()),
             $data['plugin_name'] ?? 'short_text',
@@ -324,6 +340,9 @@ class mod_perform_generator extends component_generator_base {
             ];
 
             $activity = $this->create_activity_in_container($data);
+            $section = $this->create_section($activity, ['title' => $activity->name . ' section']);
+            $this->create_section_relationship($section, ['class_name' => subject::class]);
+            $this->create_activity_tracks($activity);
             $activities[] = $activity;
         }
 
@@ -368,10 +387,10 @@ class mod_perform_generator extends component_generator_base {
      * 'other_participant_username' (user.username) or left out.
      *
      * @param array $data
-     * @return subject_instance
+     * @return subject_instance_entity
      * @throws coding_exception
      */
-    public function create_subject_instance(array $data): subject_instance {
+    public function create_subject_instance(array $data): subject_instance_entity {
         $activity_id = $data['activity_id'] ?? null;
 
         if ($activity_id) {
@@ -426,17 +445,25 @@ class mod_perform_generator extends component_generator_base {
         $subject_instance->subject_user_id = $user_assignment->subject_user_id; // Purposeful denormalization
         $subject_instance->save();
 
-        if ($subject_is_participating) {
-            $participant_instance = new participant_instance();
-            $participant_instance->activity_relationship_id = 0; // stubbed
-            $participant_instance->participant_id = $subject->id; // Answering on activity about them self
-            $participant_instance->subject_instance_id = $subject_instance->id;
-            $participant_instance->status = instance_not_started::get_code();
-            $participant_instance->save();
+        $subject_is_participating = $data['subject_is_participating'] ?? false;
+        // String conversion for behat, defaulting to false.
+        if (is_string($subject_is_participating) && $subject_is_participating !== 'true') {
+            $subject_is_participating = false;
         }
 
+        $subjects_participant_instance = null;
+        if ($subject_is_participating) {
+            $subjects_participant_instance = new participant_instance_entity();
+            $subjects_participant_instance->activity_relationship_id = 0; // stubbed
+            $subjects_participant_instance->participant_id = $subject->id; // Answering on activity about them self
+            $subjects_participant_instance->subject_instance_id = $subject_instance->id;
+            $subjects_participant_instance->status = instance_not_started::get_code();
+            $subjects_participant_instance->save();
+        }
+
+        $other_participant_instance = null;
         if ($other_participant) {
-            $other_participant_instance = new participant_instance();
+            $other_participant_instance = new participant_instance_entity();
             $other_participant_instance->activity_relationship_id = 0; // stubbed
             $other_participant_instance->participant_id = $other_participant->id;
             $other_participant_instance->subject_instance_id = $subject_instance->id;
@@ -444,7 +471,24 @@ class mod_perform_generator extends component_generator_base {
             $other_participant_instance->save();
         }
 
-        return new subject_instance($subject_instance);
+        $include_questions = $data['include_questions'] ?? true;
+
+        // String conversion for behat, defaulting to true.
+        if ($include_questions === 'false') {
+            $include_questions = false;
+        }
+
+        if ($include_questions) {
+            foreach ([$subjects_participant_instance, $other_participant_instance] as $participant_instance) {
+                if ($participant_instance === null) {
+                    continue;
+                }
+
+                $this->create_participant_section($activity, $participant_instance);
+            }
+        }
+
+        return $subject_instance;
     }
 
     private function find_or_make_perform_activity($name): activity {

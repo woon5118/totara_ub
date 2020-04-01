@@ -26,7 +26,6 @@ use mod_perform\entities\activity\activity_relationship as activity_relationship
 use mod_perform\entities\activity\section;
 use mod_perform\entities\activity\section_relationship as section_relationship_entity;
 use mod_perform\models\activity\activity;
-use mod_perform\models\activity\activity_relationship;
 use mod_perform\models\activity\section_relationship;
 use totara_core\relationship\resolvers\subject;
 use totara_job\relationship\resolvers\appraiser;

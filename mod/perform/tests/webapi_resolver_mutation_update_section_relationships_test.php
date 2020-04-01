@@ -36,7 +36,7 @@ use totara_webapi\graphql;
 
 require_once(__DIR__.'/relationship_testcase.php');
 
-class webapi_resolver_mutation_update_section_relationships_testcase extends mod_perform_relationship_testcase {
+class mod_perform_webapi_resolver_mutation_update_section_relationships_testcase extends mod_perform_relationship_testcase {
 
     private function get_execution_context() {
         return execution_context::create('ajax', 'mod_perform_update_section_relationships');

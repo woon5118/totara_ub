@@ -18,6 +18,7 @@ type mod_perform_element_plugin {
   name: String!
   admin_form_component: String!
   admin_display_component: String!
+  participant_form_component: String!
 }
 
 """
@@ -53,6 +54,15 @@ type mod_perform_section {
 }
 
 """
+A participant section
+"""
+type mod_perform_participant_section {
+  id: core_id!
+  section: mod_perform_section!
+  element_responses: [mod_perform_element_response!]!
+}
+
+"""
 An element used in a section
 """
 type mod_perform_section_element {
@@ -60,6 +70,23 @@ type mod_perform_section_element {
   section: mod_perform_section!
   element: mod_perform_element!
   sort_order: Int!
+}
+
+"""
+A response to a question (section element)
+"""
+type mod_perform_element_response {
+  section_element: mod_perform_section_element!
+  response_data: String! # JSON encoded answer, format is specific to the element type
+  validation_errors: [mod_perform_validation_error!]!
+}
+
+"""
+A validation error
+"""
+type mod_perform_validation_error {
+  error_code: String!
+  error_message: String!
 }
 
 """
@@ -96,7 +123,7 @@ input update_section_relationships_input {
 
 extend type Query {
   """
-  Alist of all performance activities that the current user can see
+  A list of all performance activities that the current user can administer
   """
   mod_perform_activities: [mod_perform_activity!]!
 
@@ -111,9 +138,9 @@ extend type Query {
   mod_perform_element_plugins: [mod_perform_element_plugin!]!
 
   """
-  The specified section
+  A section of elements for an admin to configure
   """
-  mod_perform_section(section_id: core_id!): mod_perform_section
+  mod_perform_section_admin(section_id: core_id!): mod_perform_section
 
   """
   A list of all performance activities a user is participating in
@@ -129,6 +156,13 @@ extend type Query {
   mod_perform_subject_instance(
     subject_instance_id: core_id!
   ): mod_perform_subject_instance
+
+  """
+  A section of elements for a user to respond to
+  """
+  mod_perform_participant_section(
+    subject_instance_id: core_id!
+  ): mod_perform_participant_section
 }
 
 """
@@ -159,6 +193,14 @@ input mod_perform_update_element_input {
 }
 
 """
+Update the response for a question
+"""
+input mod_perform_update_element_response_input {
+  section_element_id: core_id!
+  response_data: String! # JSON encoded answer, format is specific to the element type
+}
+
+"""
 Delete an existing section element
 """
 input mod_perform_delete_section_element_input {
@@ -186,6 +228,14 @@ input mod_perform_update_section_elements_input {
 }
 
 """
+Update a section's responses
+"""
+input mod_perform_update_section_responses_input {
+  participant_section_id: core_id!
+  update: [mod_perform_update_element_response_input!]!
+}
+
+"""
 Mutation return type including an activity
 """
 type mod_perform_activity_result {
@@ -197,6 +247,13 @@ Mutation return type including a section
 """
 type mod_perform_section_result {
   section: mod_perform_section!
+}
+
+"""
+Mutation return type including a participant section
+"""
+type mod_perform_participant_section_result {
+  participant_section: mod_perform_section!
 }
 
 extend type Mutation {
@@ -222,6 +279,13 @@ extend type Mutation {
   mod_perform_update_section_elements(
     input: mod_perform_update_section_elements_input!
   ): mod_perform_section_result!
+
+  """
+  Update the responses in a section
+  """
+  mod_perform_update_section_responses(
+    input: mod_perform_update_section_responses_input!
+  ): mod_perform_participant_section
 }
 
 """

@@ -47,7 +47,7 @@ class mod_perform_element_plugin_data_provider_testcase extends advanced_testcas
             $actual_plugin_names[] = $element_plugin->get_plugin_name();
         }
 
-        $expected_plugins = \core_component::get_plugin_list('performelement');
+        $expected_plugins = core_component::get_plugin_list('performelement');
 
         $this->assertEqualsCanonicalizing(array_keys($expected_plugins), $actual_plugin_names);
     }

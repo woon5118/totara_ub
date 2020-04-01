@@ -62,7 +62,7 @@ import ButtonSubmit from 'totara_core/components/buttons/Submit';
 import ContentAddElementButton from 'mod_perform/components/manage_activity/ContentAddElementButton';
 import Modal from 'totara_core/components/modal/Modal';
 import ModalContent from 'totara_core/components/modal/ModalContent';
-import sectionDetailQuery from 'mod_perform/graphql/section_details';
+import sectionDetailQuery from 'mod_perform/graphql/section_admin';
 import updateSectionElementMutation from 'mod_perform/graphql/update_section_elements.graphql';
 import { pull, uniqueId } from 'totara_core/util';
 
@@ -103,10 +103,10 @@ export default {
       variables() {
         return { section_id: this.sectionId };
       },
-      update: data => data.mod_perform_section,
+      update: data => data.mod_perform_section_admin,
       fetchPolicy: 'network-only',
       result({ data }) {
-        this.sectionElements = data.mod_perform_section.section_elements.map(
+        this.sectionElements = data.mod_perform_section_admin.section_elements.map(
           item => {
             return {
               id: item.id,
@@ -204,10 +204,7 @@ export default {
       const { type } = sectionElement.element;
       const isEditing = this.editingIds.includes(sectionElement.clientId);
       return tui.asyncComponent(
-        'performelement_' +
-          type.plugin_name +
-          '/components/' +
-          (isEditing ? type.admin_form_component : type.admin_display_component)
+        isEditing ? type.admin_form_component : type.admin_display_component
       );
     },
 

@@ -18,23 +18,24 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Jaron Steenson <jaron.steenson@totaralearning.com>
+ * @author Nathan Lewis <nathan.lewis@totaralearning.com>
  * @package mod_perform
  */
 
 namespace mod_perform\models\activity;
 
+use coding_exception;
 use context_module;
 use core\entities\user;
 use core\orm\entity\model;
+use mod_perform\entities\activity\participant_instance as participant_instance_entity;
+use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 
 /**
  * Class subject_instance
  *
  * This class represents a specific activity about a specific person (subject_instance)
- *
- * @method static self load_by_entity(subject_instance_entity $entity)
- * @method static self load_by_id(int $id)
  *
  * @property-read int $id
  * @property-read user $subject_user The user that this activity is about
@@ -95,4 +96,28 @@ class subject_instance extends model {
         // TODO get from the subject instance($this->>entity) once implemented
         return 'IN_PROGRESS';
     }
+
+    /**
+     * @param int $participant_id
+     * @return participant_section
+     */
+    public function get_participant_section_for_participant(int $participant_id): participant_section {
+        /** @var participant_instance_entity $participant_instance_entity */
+        $participant_instance_entity = participant_instance_entity::repository()
+            ->with('participant_sections')
+            ->where('subject_instance_id', $this->id)
+            ->where('participant_id', $participant_id)
+            ->order_by('id')
+            ->first();
+
+        /** @var participant_section_entity $first_participant_section */
+        $first_participant_section = $participant_instance_entity->participant_sections->first();
+
+        if (!$first_participant_section) {
+            throw new coding_exception('No participant section found for this subject instance and given participant');
+        }
+
+        return participant_section::load_by_entity($first_participant_section);
+    }
+
 }

@@ -44,6 +44,7 @@ use core\orm\entity\relations\has_many_through;
  * @property-read collection|activity_relationship[] $activity_relationships
  * @property-read collection|section_element[] $section_elements
  * @property-read collection|section_relationship[] $section_relationships
+ * @property-read collection|participant_section[] $participant_sections
  */
 class section extends entity {
     public const TABLE = 'perform_section';
@@ -51,7 +52,7 @@ class section extends entity {
     public const UPDATED_TIMESTAMP = 'updated_at';
 
     /**
-     * Relationship with activity entities.
+     * Each section belongs to a particular activity.
      *
      * @return belongs_to
      */
@@ -60,7 +61,7 @@ class section extends entity {
     }
 
     /**
-     * Relationship with section elements.
+     * A section owns a collection of section elements.
      *
      * @return has_many
      */
@@ -69,7 +70,16 @@ class section extends entity {
     }
 
     /**
-     * Relationship with activity_relationship entities.
+     * A section owns a collection of participant sections.
+     *
+     * @return has_many
+     */
+    public function participant_sections(): has_many {
+        return $this->has_many(participant_section::class, 'section_id');
+    }
+
+    /**
+     * A section relates to a collection of activity relationships, through the activity that it belongs to.
      *
      * @return has_many_through
      */
@@ -85,7 +95,7 @@ class section extends entity {
     }
 
     /**
-     * Relationship with section_relationship entities.
+     * A section own a collection of section relationships.
      *
      * @return has_many
      */
