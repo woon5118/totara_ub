@@ -38,7 +38,11 @@
         @click="viewAll"
       />
     </div>
-    <FilterBar v-else-if="hasAnyFilters" v-model="selectedFilters">
+    <FilterBar
+      v-else-if="hasAnyFilters"
+      v-model="selectedFilters"
+      :title="this.$str('filter_competencies', 'totara_competency')"
+    >
       <!-- Left aligned content -->
       <template v-slot:filters-left="{ stacked }">
         <SelectFilter
@@ -302,7 +306,8 @@ export default {
       "viewing_single_competency"
     ],
     "totara_competency": [
-      "filter:competency_type"
+      "filter:competency_type",
+      "filter_competencies"
     ]
   }
 </lang-strings>
