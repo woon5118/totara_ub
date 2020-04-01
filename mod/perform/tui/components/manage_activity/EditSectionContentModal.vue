@@ -292,13 +292,28 @@ export default {
     },
 
     canSubmit() {
-      const lastSectionElement = [...this.sectionElements].pop();
       return (
-        !this.isSaving &&
-        Object.keys(this.errors).length === 0 &&
-        this.sectionElements.length > 0 &&
-        !lastSectionElement.creating
+        (!this.isSaving &&
+          Object.keys(this.errors).length === 0 &&
+          this.hasElementsToAdd()) ||
+        this.hasElementsToRemove()
       );
+    },
+
+    /**
+     * Runs check if modal has elements to remove.
+     */
+    hasElementsToRemove() {
+      return this.removeIds.length > 0;
+    },
+
+    /**
+     * Runs check if modal has elements to add.
+     */
+    hasElementsToAdd() {
+      const lastSectionElement = [...this.sectionElements].pop();
+
+      return this.sectionElements.length > 0 && !lastSectionElement.creating;
     },
   },
 };

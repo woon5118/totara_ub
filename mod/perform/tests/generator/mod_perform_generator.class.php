@@ -87,7 +87,13 @@ class mod_perform_generator extends component_generator_base {
             $status = $data['activity_status'] ?? activity::STATUS_ACTIVE;
 
             /** @var perform_container $container */
-            return activity::create($container, $name, $description, $status);
+            $activity = activity::create($container, $name, $description, $status);
+
+            if (isset($data['create_section']) && $data['create_section']) {
+                section::create($activity);
+            }
+
+            return $activity;
         });
     }
 
