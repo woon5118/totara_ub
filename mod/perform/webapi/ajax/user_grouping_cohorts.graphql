@@ -1,8 +1,0 @@
-query mod_perform_user_grouping_cohorts {
-  mod_perform_user_grouping_cohorts {
-    id
-    name
-    idnumber
-    description
-  }
-}

@@ -9,48 +9,7 @@ type mod_perform_user_grouping {
   name: String
 }
 
-type mod_perform_user_grouping_cohort {
-  id: core_id!
-  name(format: core_format = PLAIN): String!
-  idnumber: String
-  description(format: core_format = HTML): String
-}
-
-type mod_perform_user_grouping_organisation {
-  id: core_id!
-  shortname(format: core_format = PLAIN): String!
-  fullname(format: core_format = PLAIN): String!
-  idnumber: String
-  description(format: core_format = HTML): String
-}
-
-type mod_perform_user_grouping_position {
-  id: core_id!
-  shortname(format: core_format = PLAIN): String!
-  fullname(format: core_format = PLAIN): String!
-  idnumber: String
-  description(format: core_format = HTML): String
-}
-
-type mod_perform_user_grouping_user {
-  id: core_id!
-  firstname: String!
-  lastname: String!
-  fullname: String!
-  idnumber: String
-}
-
 input mod_perform_user_grouping_input {
   id: core_id!
   type: String!
-}
-
-extend type Query {
-  mod_perform_user_grouping_cohorts: [mod_perform_user_grouping_cohort!]!
-
-  mod_perform_user_grouping_organisations: [mod_perform_user_grouping_organisation!]!
-
-  mod_perform_user_grouping_positions: [mod_perform_user_grouping_position!]!
-
-  mod_perform_user_grouping_users: [mod_perform_user_grouping_user!]!
 }

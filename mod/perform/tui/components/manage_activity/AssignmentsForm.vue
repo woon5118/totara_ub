@@ -28,7 +28,7 @@
               @click="toggle"
             />
           </template>
-          <DropdownItem @click="showCohortModal = true">
+          <DropdownItem @click="openAdder">
             {{
               $str('perform:user_group_assignment:group:cohort', 'mod_perform')
             }}
@@ -84,6 +84,7 @@
           </Cell>
           <Cell size="2" valign="center" align="end">
             <ButtonIcon
+              v-if="row.group.id"
               :aria-label="$str('delete')"
               :styleclass="{
                 small: true,
@@ -97,7 +98,7 @@
                 )
               "
             >
-              <DeleteIcon v-if="row.group.id" />
+              <DeleteIcon />
             </ButtonIcon>
           </Cell>
         </template>
@@ -127,12 +128,12 @@
       </div>
     </div>
 
-    <ModalPresenter
-      :open="showCohortModal"
-      @request-close="updateCohortSelection"
-    >
-      <SelectCohortModal :assigned="getAlreadyAssigned('cohort')" />
-    </ModalPresenter>
+    <AudienceAdder
+      :open="isAdderOpen"
+      :existing-items="addedIds"
+      @added="updateSelectionFromAdder"
+      @cancel="closeAdder"
+    />
 
     <ConfirmationModal
       :title="
@@ -155,6 +156,7 @@
 </template>
 
 <script>
+import AudienceAdder from 'totara_core/components/adder/AudienceAdder';
 import Button from 'totara_core/components/buttons/Button';
 import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
 import Cell from 'totara_core/components/datatable/Cell';
@@ -165,8 +167,6 @@ import DropdownItem from 'totara_core/components/dropdown/DropdownItem';
 import Grid from 'totara_core/components/grid/Grid';
 import GridItem from 'totara_core/components/grid/GridItem';
 import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
-import SelectCohortModal from 'mod_perform/components/manage_activity/SelectCohortModal';
 import Table from 'totara_core/components/datatable/Table';
 
 //GraphQL
@@ -176,6 +176,7 @@ import RemoveTrackAssignmentMutation from 'mod_perform/graphql/remove_track_assi
 
 export default {
   components: {
+    AudienceAdder,
     Button,
     ButtonIcon,
     Cell,
@@ -186,8 +187,6 @@ export default {
     Grid,
     GridItem,
     HeaderCell,
-    ModalPresenter,
-    SelectCohortModal,
     Table,
   },
 
@@ -212,7 +211,8 @@ export default {
           },
         },
       ],
-      showCohortModal: false,
+      addedIds: [],
+      isAdderOpen: false,
       confirmationModalOpen: false,
       assignmentToRemove: null,
       adminEnum: 1,
@@ -227,6 +227,9 @@ export default {
     track() {
       if (this.track) {
         this.assignments = this.track.assignments;
+        this.addedIds = this.assignments
+          .filter(assignment => assignment.group.type === this.cohortEnum)
+          .map(assignment => assignment.group.id);
       }
       this.assignments;
     },
@@ -234,26 +237,44 @@ export default {
 
   methods: {
     /**
+     * Shows the cohort selection dialog.
+     */
+    openAdder() {
+      this.isAdderOpen = true;
+    },
+
+    /**
+     * Hides the cohort selection dialog without any selections.
+     */
+    closeAdder() {
+      this.isAdderOpen = false;
+    },
+
+    /**
      * Saves the assigned cohorts in the repository.
      */
-    updateCohortSelection(items) {
-      if (items.selected) {
-        const selected = {
-          track_id: this.track.id,
-          type: this.adminEnum,
-          groups: items.selected.map(id => {
-            return { id: id, type: this.cohortEnum };
-          }),
-        };
+    updateSelectionFromAdder(selection) {
+      // Filter out previously added.
+      const groups = selection.data
+        .filter(item => this.addedIds.indexOf(item.id) == -1)
+        .map(item => {
+          return { id: item.id, type: this.cohortEnum };
+        });
 
-        this.updateAssignmentsInRepository(
-          AddTrackAssignmentMutation,
-          'mod_perform_add_track_assignments',
-          selected
-        );
-      }
+      const selected = {
+        track_id: this.track.id,
+        type: this.adminEnum,
+        groups: groups,
+      };
 
-      this.showCohortModal = false;
+      this.updateAssignmentsInRepository(
+        AddTrackAssignmentMutation,
+        'mod_perform_add_track_assignments',
+        selected
+      );
+
+      this.addedIds = selection.ids;
+      this.isAdderOpen = false;
     },
 
     /**
@@ -331,16 +352,6 @@ export default {
     hideRemoveConfirmationModal() {
       this.assignmentToRemove = null;
       this.confirmationModalOpen = false;
-    },
-
-    /**
-     * Filters out already assigned groups so that the selection dialog does not
-     * show them.
-     */
-    getAlreadyAssigned() {
-      return this.assignments
-        .filter(assignment => assignment.group.type === this.cohortEnum)
-        .map(assignment => assignment.group.id);
     },
   },
 
