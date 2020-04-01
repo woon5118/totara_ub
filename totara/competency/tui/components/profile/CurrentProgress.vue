@@ -37,11 +37,11 @@
             v-if="latestAchievement"
             class="tui-competencyProfileCurrentProgress__latestAchievement"
           >
-            <div
+            <h4
               class="tui-competencyProfileCurrentProgress__latestAchievement-header"
             >
               {{ $str('latest_achievement', 'totara_competency') }}
-            </div>
+            </h4>
             <div
               class="tui-competencyProfileCurrentProgress__latestAchievement-content"
             >
