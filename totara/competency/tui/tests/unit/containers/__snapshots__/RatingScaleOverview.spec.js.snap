@@ -4,14 +4,14 @@ exports[`components/RatingScaleOverview.vue Checks snapshot - with descriptions:
 <div
   class="tui-competencyRatingScaleOverview"
 >
-  <h3
+  <p
     class="tui-competencyRatingScaleOverview__title"
     id="id-rating-scale-title"
   >
     
     $str('rating_scale', 'totara_competency')
   
-  </h3>
+  </p>
    
   <ol
     aria-labelledby="id-rating-scale-title"
@@ -29,13 +29,13 @@ exports[`components/RatingScaleOverview.vue Checks snapshot - with descriptions:
       <div
         class="tui-competencyRatingScaleOverview__scaleValue"
       >
-        <h4
+        <p
           class="tui-competencyRatingScaleOverview__scaleValue-name"
         >
           
           Extremely competent
         
-        </h4>
+        </p>
          
         <p
           class="tui-competencyRatingScaleOverview__scaleValue-description"
@@ -66,13 +66,13 @@ exports[`components/RatingScaleOverview.vue Checks snapshot - with descriptions:
       <div
         class="tui-competencyRatingScaleOverview__scaleValue"
       >
-        <h4
+        <p
           class="tui-competencyRatingScaleOverview__scaleValue-name"
         >
           
           Competent
         
-        </h4>
+        </p>
          
         <p
           class="tui-competencyRatingScaleOverview__scaleValue-description"
@@ -103,13 +103,13 @@ exports[`components/RatingScaleOverview.vue Checks snapshot - with descriptions:
       <div
         class="tui-competencyRatingScaleOverview__scaleValue"
       >
-        <h4
+        <p
           class="tui-competencyRatingScaleOverview__scaleValue-name"
         >
           
           Competent on Tuesdays
         
-        </h4>
+        </p>
          
         <p
           class="tui-competencyRatingScaleOverview__scaleValue-description"
@@ -140,13 +140,13 @@ exports[`components/RatingScaleOverview.vue Checks snapshot - with descriptions:
       <div
         class="tui-competencyRatingScaleOverview__scaleValue"
       >
-        <h4
+        <p
           class="tui-competencyRatingScaleOverview__scaleValue-name"
         >
           
           Not competent on Tuesdays
         
-        </h4>
+        </p>
          
         <p
           class="tui-competencyRatingScaleOverview__scaleValue-description"
@@ -175,13 +175,13 @@ exports[`components/RatingScaleOverview.vue Checks snapshot - with descriptions:
       <div
         class="tui-competencyRatingScaleOverview__scaleValue"
       >
-        <h4
+        <p
           class="tui-competencyRatingScaleOverview__scaleValue-name"
         >
           
           Below average
         
-        </h4>
+        </p>
          
         <p
           class="tui-competencyRatingScaleOverview__scaleValue-description"
@@ -210,13 +210,13 @@ exports[`components/RatingScaleOverview.vue Checks snapshot - with descriptions:
       <div
         class="tui-competencyRatingScaleOverview__scaleValue"
       >
-        <h4
+        <p
           class="tui-competencyRatingScaleOverview__scaleValue-name"
         >
           
           Not competent
         
-        </h4>
+        </p>
          
         <p
           class="tui-competencyRatingScaleOverview__scaleValue-description"
@@ -241,14 +241,14 @@ exports[`components/RatingScaleOverview.vue Checks snapshot - without descriptio
 <div
   class="tui-competencyRatingScaleOverview"
 >
-  <h3
+  <p
     class="tui-competencyRatingScaleOverview__title"
     id="id-rating-scale-title"
   >
     
     $str('rating_scale', 'totara_competency')
   
-  </h3>
+  </p>
    
   <ol
     aria-labelledby="id-rating-scale-title"
@@ -266,13 +266,13 @@ exports[`components/RatingScaleOverview.vue Checks snapshot - without descriptio
       <div
         class="tui-competencyRatingScaleOverview__scaleValue"
       >
-        <h4
+        <p
           class="tui-competencyRatingScaleOverview__scaleValue-name"
         >
           
           Extremely competent
         
-        </h4>
+        </p>
          
         <!---->
          
@@ -297,13 +297,13 @@ exports[`components/RatingScaleOverview.vue Checks snapshot - without descriptio
       <div
         class="tui-competencyRatingScaleOverview__scaleValue"
       >
-        <h4
+        <p
           class="tui-competencyRatingScaleOverview__scaleValue-name"
         >
           
           Competent
         
-        </h4>
+        </p>
          
         <!---->
          
@@ -328,13 +328,13 @@ exports[`components/RatingScaleOverview.vue Checks snapshot - without descriptio
       <div
         class="tui-competencyRatingScaleOverview__scaleValue"
       >
-        <h4
+        <p
           class="tui-competencyRatingScaleOverview__scaleValue-name"
         >
           
           Competent on Tuesdays
         
-        </h4>
+        </p>
          
         <!---->
          
@@ -361,13 +361,13 @@ exports[`components/RatingScaleOverview.vue Checks snapshot - without descriptio
       <div
         class="tui-competencyRatingScaleOverview__scaleValue"
       >
-        <h4
+        <p
           class="tui-competencyRatingScaleOverview__scaleValue-name"
         >
           
           Not competent on Tuesdays
         
-        </h4>
+        </p>
          
         <!---->
          
@@ -392,13 +392,13 @@ exports[`components/RatingScaleOverview.vue Checks snapshot - without descriptio
       <div
         class="tui-competencyRatingScaleOverview__scaleValue"
       >
-        <h4
+        <p
           class="tui-competencyRatingScaleOverview__scaleValue-name"
         >
           
           Below average
         
-        </h4>
+        </p>
          
         <!---->
          
@@ -423,13 +423,13 @@ exports[`components/RatingScaleOverview.vue Checks snapshot - without descriptio
       <div
         class="tui-competencyRatingScaleOverview__scaleValue"
       >
-        <h4
+        <p
           class="tui-competencyRatingScaleOverview__scaleValue-name"
         >
           
           Not competent
         
-        </h4>
+        </p>
          
         <!---->
          

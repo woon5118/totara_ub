@@ -22,12 +22,12 @@
 
 <template>
   <div class="tui-competencyRatingScaleOverview">
-    <h3
+    <p
       :id="$id('rating-scale-title')"
       class="tui-competencyRatingScaleOverview__title"
     >
       {{ $str('rating_scale', 'totara_competency') }}
-    </h3>
+    </p>
     <ol
       class="tui-competencyRatingScaleOverview__list"
       :aria-labelledby="$id('rating-scale-title')"
@@ -41,9 +41,9 @@
           <CheckSuccess v-if="isMinProficientValue(scaleValue)" size="300" />
         </div>
         <div class="tui-competencyRatingScaleOverview__scaleValue">
-          <h4 class="tui-competencyRatingScaleOverview__scaleValue-name">
+          <p class="tui-competencyRatingScaleOverview__scaleValue-name">
             {{ scaleValue.name }}
-          </h4>
+          </p>
           <p
             v-if="showDescription(scaleValue.description)"
             class="tui-competencyRatingScaleOverview__scaleValue-description"
