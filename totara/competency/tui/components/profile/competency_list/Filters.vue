@@ -22,7 +22,11 @@
 
 <template>
   <!-- Filters bar -->
-  <FilterBar v-model="filters" class="tui-competencyProfileListFilters">
+  <FilterBar
+    v-model="filters"
+    class="tui-competencyProfileListFilters"
+    :title="this.$str('filter_competencies', 'totara_competency')"
+  >
     <template v-slot:filters-left="{ stacked }">
       <SelectFilter
         v-if="!isForArchived"
@@ -167,7 +171,8 @@ export default {
     "sort:alphabetical",
     "sort:recently_archived",
     "sort:recently_assigned",
-    "proficiency_status"
+    "proficiency_status",
+    "filter_competencies"
   ],
   "moodle": ["search", "sortby"],
   "admin": ["filters"]
