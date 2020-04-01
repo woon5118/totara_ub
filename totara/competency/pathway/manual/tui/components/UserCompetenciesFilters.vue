@@ -257,7 +257,7 @@ export default {
       if (this.selectedFilters.competencyType !== 0) {
         filters.competency_type = this.selectedFilters.competencyType;
       }
-      if (this.selectedFilters.assignment !== 0) {
+      if (this.selectedFilters.assignmentReason !== 0) {
         filters.assignment_reason = this.assignmentHashMap[
           this.selectedFilters.assignmentReason
         ];
