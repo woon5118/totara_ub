@@ -107,7 +107,7 @@ class section extends model {
             ->where('id', '<', $this->id)
             ->count();
 
-        return get_string('perform:section:default_name', 'mod_perform', $sections_before_this_section + 1);
+        return get_string('section_default_name', 'mod_perform', $sections_before_this_section + 1);
     }
 
     /**

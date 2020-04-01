@@ -545,7 +545,7 @@ abstract class pathway {
      */
     public static function get_label(): string {
         if ((new static())->get_classification() === static::PATHWAY_SINGLE_VALUE) {
-            return get_string('achievementpath_group_label_single', 'totara_competency');
+            return get_string('achievement_path_group_label_single', 'totara_competency');
         }
         // overwrite in children
         debugging('This pathway does not have a label. Every pathway needs a label so that it shows up correctly in the interface.', DEBUG_DEVELOPER);
@@ -691,7 +691,7 @@ abstract class pathway {
         ];
 
         if (!$this->is_valid()) {
-            $result['error'] = get_string('error:invalidconfiguration', 'totara_competency');
+            $result['error'] = get_string('error_invalid_configuration', 'totara_competency');
         }
 
         if ($this->get_classification() == static::PATHWAY_SINGLE_VALUE) {

@@ -128,7 +128,7 @@ abstract class role {
     final public static function require_for_user(int $subject_user): void {
         if (!static::has_for_user($subject_user)) {
             throw new \moodle_exception(
-                'error:user_lacks_role_for_user',
+                'error_user_lacks_role_for_user',
                 'pathway_manual',
                 new \moodle_url('/totara/competency/profile', ['user_id' => $subject_user]),
                 ['user' => (new user($subject_user))->fullname, 'role' => strtolower(static::get_display_name())]

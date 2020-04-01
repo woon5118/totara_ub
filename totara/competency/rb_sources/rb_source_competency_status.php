@@ -253,7 +253,7 @@ class rb_source_competency_status extends rb_base_source {
             new rb_column_option(
                 'competency',
                 'idnumber',
-                get_string('competency_idnumber', 'rb_source_competency_status'),
+                get_string('competency_id_number', 'rb_source_competency_status'),
                 'competency.idnumber',
                 [
                     'joins' => 'competency',
@@ -299,7 +299,7 @@ class rb_source_competency_status extends rb_base_source {
                 new rb_column_option(
                     'assignment',
                     'assignment_type',
-                    get_string('label:assignment_type', 'rb_source_competency_assignment_users'),
+                    get_string('label_assignment_type', 'rb_source_competency_assignment_users'),
                     "(
                         CASE WHEN type = '".assignment::TYPE_ADMIN."' AND user_group_type <> '".user_groups::USER."'
                         THEN user_group_type
@@ -313,7 +313,7 @@ class rb_source_competency_status extends rb_base_source {
                 new rb_column_option(
                     'assignment',
                     'user_group',
-                    get_string('label:user_group', 'rb_source_competency_assignment_users'),
+                    get_string('label_user_group', 'rb_source_competency_assignment_users'),
                     'assignment.user_group_type',
                     [
                         'joins' => ['assignment_cohorts', 'assignment_positions', 'assignment_organisations', 'auser'],
@@ -354,7 +354,7 @@ class rb_source_competency_status extends rb_base_source {
                 new rb_column_option(
                     'assignment',
                     'archived_at',
-                    get_string('header:archived_date', 'totara_competency'),
+                    get_string('header_archived_date', 'totara_competency'),
                     'assignment.archived_at',
                     [
                         'joins' => 'assignment',
@@ -412,7 +412,7 @@ class rb_source_competency_status extends rb_base_source {
             new rb_filter_option(
                 'competency',
                 'idnumber',
-                get_string('competency_idnumber', 'rb_source_competency_status'),
+                get_string('competency_id_number', 'rb_source_competency_status'),
                 'text'
             ),
             new rb_filter_option(
@@ -450,27 +450,27 @@ class rb_source_competency_status extends rb_base_source {
                 [
                     'simplemode' => true,
                     'selectchoices' => [
-                        assignment::STATUS_ACTIVE => get_string('status:active', 'totara_competency'),
-                        assignment::STATUS_ARCHIVED => get_string('status:archived', 'totara_competency')
+                        assignment::STATUS_ACTIVE => get_string('status_active', 'totara_competency'),
+                        assignment::STATUS_ARCHIVED => get_string('status_archived', 'totara_competency')
                     ]
                 ]
             );
             $filteroptions[] = new rb_filter_option(
                 'assignment',
                 'assignment_type',
-                get_string('label:assignment_type', 'rb_source_competency_assignment_users'),
+                get_string('label_assignment_type', 'rb_source_competency_assignment_users'),
                 'select',
                 [
                     'simplemode' => true,
                     'selectchoices' => [
-                        user_groups::COHORT => get_string('user_group_type:cohort', 'totara_competency'),
-                        user_groups::ORGANISATION => get_string('user_group_type:organisation', 'totara_competency'),
-                        user_groups::POSITION => get_string('user_group_type:position', 'totara_competency'),
-                        assignment::TYPE_ADMIN => get_string('assignment_type:admin', 'totara_competency'),
-                        assignment::TYPE_LEGACY  => get_string('assignment_type:legacy', 'totara_competency'),
-                        assignment::TYPE_OTHER => get_string('assignment_type:other', 'totara_competency'),
-                        assignment::TYPE_SELF => get_string('assignment_type:self', 'totara_competency'),
-                        assignment::TYPE_SYSTEM => get_string('assignment_type:system', 'totara_competency')
+                        user_groups::COHORT => get_string('user_group_type_cohort', 'totara_competency'),
+                        user_groups::ORGANISATION => get_string('user_group_type_organisation', 'totara_competency'),
+                        user_groups::POSITION => get_string('user_group_type_position', 'totara_competency'),
+                        assignment::TYPE_ADMIN => get_string('assignment_type_admin', 'totara_competency'),
+                        assignment::TYPE_LEGACY  => get_string('assignment_type_legacy', 'totara_competency'),
+                        assignment::TYPE_OTHER => get_string('assignment_type_other', 'totara_competency'),
+                        assignment::TYPE_SELF => get_string('assignment_type_self', 'totara_competency'),
+                        assignment::TYPE_SYSTEM => get_string('assignment_type_system', 'totara_competency')
                     ]
                 ]
             );

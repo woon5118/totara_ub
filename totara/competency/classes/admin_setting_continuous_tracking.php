@@ -52,8 +52,8 @@ class admin_setting_continuous_tracking extends admin_setting_configselect {
         }
 
         $this->choices = [
-            self::DISABLED => get_string('settings:continuous_tracking:disabled', 'totara_competency'),
-            self::ENABLED => get_string('settings:continuous_tracking:enabled', 'totara_competency')
+            self::DISABLED => get_string('settings_continuous_tracking_disabled', 'totara_competency'),
+            self::ENABLED => get_string('settings_continuous_tracking_enabled', 'totara_competency')
         ];
         return true;
     }

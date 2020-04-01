@@ -52,7 +52,7 @@ abstract class criterion_display {
         $result->item_type = $this->get_display_items_type();
         $result->item_aggregation = $this->get_display_aggregation();
         if (!$this->criterion->is_valid()) {
-            $result->error = get_string('error:invalidconfiguration', 'totara_criteria');
+            $result->error = get_string('error_invalid_configuration', 'totara_criteria');
         }
 
         $result->items = $this->get_display_configuration_items();
@@ -75,7 +75,7 @@ abstract class criterion_display {
      */
     protected function get_display_aggregation(): string {
         if ($this->criterion->get_aggregation_method() === criterion::AGGREGATE_ALL) {
-            return get_string('completeall', 'totara_criteria');
+            return get_string('complete_all', 'totara_criteria');
         } else {
             $agg_params = $this->criterion->get_aggregation_params();
             return get_string('aggregate_any',

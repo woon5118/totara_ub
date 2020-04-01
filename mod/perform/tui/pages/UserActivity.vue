@@ -28,7 +28,7 @@
         v-if="activityNotFound"
         :dismissable="false"
         :message="
-          $str('user_activities:activity_does_not_exist', 'mod_perform')
+          $str('user_activities_activity_does_not_exist', 'mod_perform')
         "
         type="error"
       />
@@ -101,7 +101,7 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "user_activities:activity_does_not_exist"
+      "user_activities_activity_does_not_exist"
     ]
   }
 </lang-strings>

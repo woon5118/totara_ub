@@ -26,13 +26,13 @@
     <h2 v-text="$str('perform:manage_activity', 'mod_perform')" />
     <Button
       v-if="canAdd"
-      :text="$str('perform:add_activity', 'mod_perform')"
+      :text="$str('add_activity', 'mod_perform')"
       @click="showCreateModal()"
     />
     <ModalPresenter :open="modalOpen" @request-close="modalRequestClose">
       <Modal :aria-labelledby="$id('title')">
         <ModalContent
-          :title="$str('perform:add_activity', 'mod_perform')"
+          :title="$str('add_activity', 'mod_perform')"
           :title-id="$id('title')"
           :close-button="true"
         >
@@ -51,30 +51,21 @@
       <Table v-if="!$apollo.loading" :data="activities">
         <template v-slot:header-row>
           <HeaderCell size="9">{{
-            $str('perform:view:name', 'mod_perform')
+            $str('view_name', 'mod_perform')
           }}</HeaderCell>
           <HeaderCell size="2">{{
-            $str('perform:view:status', 'mod_perform')
+            $str('view_status', 'mod_perform')
           }}</HeaderCell>
           <HeaderCell size="1" />
         </template>
         <template v-slot:row="{ row }">
-          <Cell
-            size="9"
-            :column-header="$str('perform:view:name', 'mod_perform')"
-          >
+          <Cell size="9" :column-header="$str('view_name', 'mod_perform')">
             <a :href="getEditActivityUrl(row.id)">{{ row.name }}</a>
           </Cell>
-          <Cell
-            size="2"
-            :column-header="$str('perform:view:status', 'mod_perform')"
-          >
-            {{ $str('perform:view:status:active', 'mod_perform') }}
+          <Cell size="2" :column-header="$str('view_status', 'mod_perform')">
+            {{ $str('view_status_active', 'mod_perform') }}
           </Cell>
-          <Cell
-            size="1"
-            :column-header="$str('perform:view:actions', 'mod_perform')"
-          >
+          <Cell size="1" :column-header="$str('view_actions', 'mod_perform')">
             <a
               v-if="row.can_view_participation_reporting"
               :href="getParticipationReportingUrl(row.id)"
@@ -146,7 +137,7 @@ export default {
     creationError() {
       notify({
         duration: TOAST_DURATION,
-        message: this.$str('toast:error:create_activity', 'mod_perform'),
+        message: this.$str('toast_error_create_activity', 'mod_perform'),
         type: 'error',
       });
     },
@@ -209,13 +200,13 @@ export default {
     "mod_perform": [
       "get_started",
       "participation_reporting",
-      "perform:add_activity",
+      "add_activity",
       "perform:manage_activity",
-      "perform:view:actions",
-      "perform:view:name",
-      "perform:view:status",
-      "perform:view:status:active",
-      "toast:error:create_activity"
+      "view_actions",
+      "view_name",
+      "view_status",
+      "view_status_active",
+      "toast_error_create_activity"
     ]
   }
 </lang-strings>

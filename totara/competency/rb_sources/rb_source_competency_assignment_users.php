@@ -178,7 +178,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_column_option(
                 'competency',
                 'type',
-                get_string('label:competency_type', 'rb_source_competency_assignment_users'),
+                get_string('label_competency_type', 'rb_source_competency_assignment_users'),
                 'comp_type.fullname',
                 array(
                     'joins' => 'comp_type',
@@ -190,7 +190,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_column_option(
                 'competency',
                 'fullname',
-                get_string('label:competency', 'rb_source_competency_assignment_users'),
+                get_string('label_competency', 'rb_source_competency_assignment_users'),
                 'competency.fullname',
                 [
                     'joins' => 'competency',
@@ -202,19 +202,19 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_column_option(
                 'competency',
                 'competencylink',
-                get_string('label:competency_linkname', 'rb_source_competency_assignment_users'),
+                get_string('label_competency_linkname', 'rb_source_competency_assignment_users'),
                 'competency.fullname',
                 [
                     'joins' => 'competency',
                     'displayfunc' => 'display_competency_link',
-                    'defaultheading' => get_string('label:competency', 'rb_source_competency_assignment_users'),
+                    'defaultheading' => get_string('label_competency', 'rb_source_competency_assignment_users'),
                     'extrafields' => ['competency_id' => 'competency.id'],
                 ]
             ),
             new rb_column_option(
                 'competency',
                 'idnumber',
-                get_string('label:competency_idnumber', 'rb_source_competency_assignment_users'),
+                get_string('label_competency_id_number', 'rb_source_competency_assignment_users'),
                 'competency.idnumber',
                 [
                     'joins' => 'competency',
@@ -226,7 +226,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_column_option(
                 'competency',
                 'type_id',
-                get_string('label:competency_type_id', 'rb_source_competency_assignment_users'),
+                get_string('label_competency_type_id', 'rb_source_competency_assignment_users'),
                 'competency.typeid',
                 array(
                     'joins' => 'competency',
@@ -238,7 +238,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_column_option(
                 'competency',
                 'framework',
-                get_string('label:competency_framework', 'rb_source_competency_assignment_users'),
+                get_string('label_competency_framework', 'rb_source_competency_assignment_users'),
                 'comp_framework.fullname',
                 [
                     'joins' => 'comp_framework',
@@ -250,7 +250,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_column_option(
                 'competency',
                 'framework_idnumber',
-                get_string('label:competency_framework_idnumber', 'rb_source_competency_assignment_users'),
+                get_string('label_competency_framework_id_number', 'rb_source_competency_assignment_users'),
                 'comp_framework.idnumber',
                 [
                     'joins' => 'comp_framework',
@@ -262,7 +262,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_column_option(
                 'competency',
                 'framework_id',
-                get_string('label:competency_framework_id', 'rb_source_competency_assignment_users'),
+                get_string('label_competency_framework_id', 'rb_source_competency_assignment_users'),
                 'competency.frameworkid',
                 array(
                     'joins' => 'competency',
@@ -274,7 +274,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_column_option(
                 'position',
                 'type',
-                get_string('label:position_type', 'rb_source_competency_assignment_users'),
+                get_string('label_position_type', 'rb_source_competency_assignment_users'),
                 'pos_type.fullname',
                 array(
                     'joins' => 'pos_type',
@@ -286,7 +286,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_column_option(
                 'position',
                 'type_id',
-                get_string('label:position_type_id', 'rb_source_competency_assignment_users'),
+                get_string('label_position_type_id', 'rb_source_competency_assignment_users'),
                 'assignment_positions.typeid',
                 array(
                     'joins' => 'assignment_positions',
@@ -298,7 +298,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_column_option(
                 'position',
                 'name',
-                get_string('label:position_name', 'rb_source_competency_assignment_users'),
+                get_string('label_position_name', 'rb_source_competency_assignment_users'),
                 'assignment_positions.fullname',
                 [
                     'joins' => 'assignment_positions',
@@ -310,7 +310,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_column_option(
                 'position',
                 'idnumber',
-                get_string('label:position_idnumber', 'rb_source_competency_assignment_users'),
+                get_string('label_position_id_number', 'rb_source_competency_assignment_users'),
                 'assignment_positions.idnumber',
                 [
                     'joins' => 'assignment_positions',
@@ -322,7 +322,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_column_option(
                 'organisation',
                 'type',
-                get_string('label:organisation_type', 'rb_source_competency_assignment_users'),
+                get_string('label_organisation_type', 'rb_source_competency_assignment_users'),
                 'org_type.fullname',
                 array(
                     'joins' => 'org_type',
@@ -334,7 +334,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_column_option(
                 'organisation',
                 'type_id',
-                get_string('label:organisation_type_id', 'rb_source_competency_assignment_users'),
+                get_string('label_organisation_type_id', 'rb_source_competency_assignment_users'),
                 'assignment_positions.typeid',
                 array(
                     'joins' => 'assignment_positions',
@@ -346,7 +346,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_column_option(
                 'organisation',
                 'name',
-                get_string('label:organisation_name', 'rb_source_competency_assignment_users'),
+                get_string('label_organisation_name', 'rb_source_competency_assignment_users'),
                 'assignment_organisations.fullname',
                 [
                     'joins' => 'assignment_organisations',
@@ -358,7 +358,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_column_option(
                 'organisation',
                 'idnumber',
-                get_string('label:organisation_idnumber', 'rb_source_competency_assignment_users'),
+                get_string('label_organisation_idnumber', 'rb_source_competency_assignment_users'),
                 'assignment_organisations.idnumber',
                 [
                     'joins' => 'assignment_organisations',
@@ -370,7 +370,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_column_option(
                 'assignment',
                 'assignment_type',
-                get_string('label:assignment_type', 'rb_source_competency_assignment_users'),
+                get_string('label_assignment_type', 'rb_source_competency_assignment_users'),
                 "(
                     CASE WHEN type = '".assignment::TYPE_ADMIN."' AND user_group_type <> '".user_groups::USER."'
                     THEN user_group_type
@@ -384,7 +384,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_column_option(
                 'assignment',
                 'user_group_type',
-                get_string('label:user_group_type', 'rb_source_competency_assignment_users'),
+                get_string('label_user_group_type', 'rb_source_competency_assignment_users'),
                 'assignment.user_group_type',
                 [
                     'joins' => 'assignment',
@@ -394,7 +394,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_column_option(
                 'assignment',
                 'user_group',
-                get_string('label:user_group', 'rb_source_competency_assignment_users'),
+                get_string('label_user_group', 'rb_source_competency_assignment_users'),
                 'assignment.user_group_type',
                 [
                     'joins' => ['assignment_cohorts', 'assignment_positions', 'assignment_organisations', 'auser'],
@@ -424,7 +424,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_column_option(
                 'assignment',
                 'created_at',
-                get_string('label:assignment_created_at', 'rb_source_competency_assignment_users'),
+                get_string('label_assignment_created_at', 'rb_source_competency_assignment_users'),
                 'assignment.created_at',
                 [
                     'joins' => 'assignment',
@@ -434,7 +434,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_column_option(
                 'cohort',
                 'name',
-                get_string('label:cohort', 'rb_source_competency_assignment_users'),
+                get_string('label_cohort', 'rb_source_competency_assignment_users'),
                 'assignment_cohorts.name',
                 [
                     'joins' => 'assignment_cohorts',
@@ -446,7 +446,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_column_option(
                 'cohort',
                 'idnumber',
-                get_string('label:cohort_idnumber', 'rb_source_competency_assignment_users'),
+                get_string('label_cohort_id_number', 'rb_source_competency_assignment_users'),
                 'assignment_cohorts.idnumber',
                 [
                     'joins' => 'assignment_cohorts',
@@ -615,19 +615,19 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_filter_option(
                 'competency',
                 'fullname',
-                get_string('label:competency', 'rb_source_competency_assignment_users'),
+                get_string('label_competency', 'rb_source_competency_assignment_users'),
                 'text'
             ),
             new rb_filter_option(
                 'competency',
                 'idnumber',
-                get_string('label:competency_idnumber', 'rb_source_competency_assignment_users'),
+                get_string('label_competency_id_number', 'rb_source_competency_assignment_users'),
                 'text'
             ),
             new rb_filter_option(
                 'competency',
                 'framework_id',
-                get_string('label:competency_framework', 'rb_source_competency_assignment_users'),
+                get_string('label_competency_framework', 'rb_source_competency_assignment_users'),
                 'select',
                 [
                     'selectfunc' => 'competency_frameworks',
@@ -637,13 +637,13 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_filter_option(
                 'competency',
                 'framework_idnumber',
-                get_string('label:competency_framework_idnumber', 'rb_source_competency_assignment_users'),
+                get_string('label_competency_framework_id_number', 'rb_source_competency_assignment_users'),
                 'text'
             ),
             new rb_filter_option(
                 'assignment',
                 'assignment_type',
-                get_string('label:assignment_type', 'rb_source_competency_assignment_users'),
+                get_string('label_assignment_type', 'rb_source_competency_assignment_users'),
                 'select',
                 [
                     'selectfunc' => 'assignment_types',
@@ -653,7 +653,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_filter_option(
                 'assignment',
                 'user_group_type',
-                get_string('label:user_group_type', 'rb_source_competency_assignment_users'),
+                get_string('label_user_group_type', 'rb_source_competency_assignment_users'),
                 'select',
                 [
                     'selectfunc' => 'user_group_types',
@@ -663,7 +663,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_filter_option(
                 'competency',
                 'type_id',
-                get_string('label:competency_type', 'rb_source_competency_assignment_users'),
+                get_string('label_competency_type', 'rb_source_competency_assignment_users'),
                 'select',
                 [
                     'selectfunc' => 'competency_type_list',
@@ -673,7 +673,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_filter_option(
                 'position',
                 'type_id',
-                get_string('label:position_type', 'rb_source_competency_assignment_users'),
+                get_string('label_position_type', 'rb_source_competency_assignment_users'),
                 'select',
                 [
                     'selectfunc' => 'position_type_list',
@@ -683,7 +683,7 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_filter_option(
                 'organisation',
                 'type_id',
-                get_string('label:organisation_type', 'rb_source_competency_assignment_users'),
+                get_string('label_organisation_type', 'rb_source_competency_assignment_users'),
                 'select',
                 array(
                     'selectfunc' => 'organisation_type_list',
@@ -693,43 +693,43 @@ class rb_source_competency_assignment_users extends rb_base_source {
             new rb_filter_option(
                 'cohort',
                 'name',
-                get_string('label:cohort', 'rb_source_competency_assignment_users'),
+                get_string('label_cohort', 'rb_source_competency_assignment_users'),
                 'text'
             ),
             new rb_filter_option(
                 'cohort',
                 'idnumber',
-                get_string('label:cohort_idnumber', 'rb_source_competency_assignment_users'),
+                get_string('label_cohort_id_number', 'rb_source_competency_assignment_users'),
                 'text'
             ),
             new rb_filter_option(
                 'position',
                 'name',
-                get_string('label:position_name', 'rb_source_competency_assignment_users'),
+                get_string('label_position_name', 'rb_source_competency_assignment_users'),
                 'text'
             ),
             new rb_filter_option(
                 'position',
                 'idnumber',
-                get_string('label:position_idnumber', 'rb_source_competency_assignment_users'),
+                get_string('label_position_id_number', 'rb_source_competency_assignment_users'),
                 'text'
             ),
             new rb_filter_option(
                 'organisation',
                 'name',
-                get_string('label:organisation_name', 'rb_source_competency_assignment_users'),
+                get_string('label_organisation_name', 'rb_source_competency_assignment_users'),
                 'text'
             ),
             new rb_filter_option(
                 'organisation',
                 'idnumber',
-                get_string('label:organisation_idnumber', 'rb_source_competency_assignment_users'),
+                get_string('label_organisation_idnumber', 'rb_source_competency_assignment_users'),
                 'text'
             ),
             new rb_filter_option(
                 'assignment',
                 'created_at',
-                get_string('label:assignment_created_at', 'rb_source_competency_assignment_users'),
+                get_string('label_assignment_created_at', 'rb_source_competency_assignment_users'),
                 'date'
             ),
         ];
@@ -885,13 +885,13 @@ class rb_source_competency_assignment_users extends rb_base_source {
     public function rb_filter_assignment_types() {
         // TODO extract this as it can be used by the other filters
         return [
-            user_groups::POSITION     => get_string('filter:user_group:position', 'totara_competency'),
-            user_groups::ORGANISATION => get_string('filter:user_group:organisation', 'totara_competency'),
-            user_groups::COHORT       => get_string('filter:user_group:cohort', 'totara_competency'),
-            assignment::TYPE_ADMIN    => get_string('assignment_type:admin', 'totara_competency'),
-            assignment::TYPE_SELF     => get_string('assignment_type:self', 'totara_competency'),
-            assignment::TYPE_OTHER    => get_string('assignment_type:other', 'totara_competency'),
-            assignment::TYPE_SYSTEM   => get_string('assignment_type:system', 'totara_competency'),
+            user_groups::POSITION     => get_string('filter_user_group_position', 'totara_competency'),
+            user_groups::ORGANISATION => get_string('filter_user_group_organisation', 'totara_competency'),
+            user_groups::COHORT       => get_string('filter_user_group_cohort', 'totara_competency'),
+            assignment::TYPE_ADMIN    => get_string('assignment_type_admin', 'totara_competency'),
+            assignment::TYPE_SELF     => get_string('assignment_type_self', 'totara_competency'),
+            assignment::TYPE_OTHER    => get_string('assignment_type_other', 'totara_competency'),
+            assignment::TYPE_SYSTEM   => get_string('assignment_type_system', 'totara_competency'),
         ];
     }
 

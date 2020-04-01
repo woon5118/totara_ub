@@ -24,7 +24,7 @@
   <div class="tui-competencyOverviewLinkedCourses">
     <div class="tui-competencyOverviewLinkedCourses__header">
       <div class="tui-competencyOverviewLinkedCourses__header_title">
-        {{ $str('linkedcourses', 'totara_competency') }}
+        {{ $str('linked_courses', 'totara_competency') }}
       </div>
       <a
         :href="editUrl"
@@ -38,7 +38,7 @@
       v-if="noCoursesLinked"
       class="tui-competencyOverviewLinkedCourses__noCourses"
     >
-      {{ $str('nocourseslinkedyet', 'totara_competency') }}
+      {{ $str('no_courses_linked_yet', 'totara_competency') }}
     </div>
     <div v-else class="tui-competencyOverviewLinkedCourses__list" role="grid">
       <div
@@ -183,8 +183,8 @@ export default {
       "edit"
     ],
     "totara_competency": [
-      "linkedcourses",
-      "nocourseslinkedyet",
+      "linked_courses",
+      "no_courses_linked_yet",
       "mandatory",
       "optional"
     ]

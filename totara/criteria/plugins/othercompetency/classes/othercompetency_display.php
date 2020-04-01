@@ -41,7 +41,7 @@ class othercompetency_display extends criterion_display {
      * @return string
      */
     public function get_display_items_type(): string {
-        return get_string('othercompetencies', 'criteria_othercompetency');
+        return get_string('other_competencies', 'criteria_othercompetency');
     }
 
     /**
@@ -56,7 +56,7 @@ class othercompetency_display extends criterion_display {
             return [
                 (object)[
                     'description' => '',
-                    'error' => get_string('error:notenoughothercompetency', 'criteria_othercompetency'),
+                    'error' => get_string('error_not_enough_other_competency', 'criteria_othercompetency'),
                 ],
             ];
         }
@@ -70,11 +70,11 @@ class othercompetency_display extends criterion_display {
                 $item_detail['description'] = $competency->fullname;
 
                 if (!$config->user_can_become_proficient()) {
-                    $item_detail['error'] = get_string('error:competencycannotproficient', 'criteria_othercompetency');
+                    $item_detail['error'] = get_string('error_competency_cannot_proficient', 'criteria_othercompetency');
                 }
             } catch (Exception $e) {
                 $item_detail['description'] = '';
-                $item_detail['error'] = get_string('error:nocompetency', 'criteria_othercompetency');
+                $item_detail['error'] = get_string('error_no_competency', 'criteria_othercompetency');
             }
 
             $items[] = (object)$item_detail;

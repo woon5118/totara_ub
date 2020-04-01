@@ -99,7 +99,7 @@ class scale_achievements implements query_resolver {
         // This should only be the exception as the query should only be called when the user
         // accessed it via the profile page
         if (!$has_capability || !$has_assignment) {
-            throw new moodle_exception('error:invalid_assignment', 'totara_competency');
+            throw new moodle_exception('error_invalid_assignment', 'totara_competency');
         }
     }
 

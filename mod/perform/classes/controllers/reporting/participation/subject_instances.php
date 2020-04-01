@@ -51,7 +51,7 @@ class subject_instances extends perform_controller {
             ->set_url(static::get_url(['activity_id' => $this->get_activity()->id]))
             ->set_backto(
                 new \moodle_url('/mod/perform/manage/activity/index.php'),
-                get_string('perform:back_to_all_activities', 'mod_perform')
+                get_string('back_to_all_activities', 'mod_perform')
             );
     }
 

@@ -24,7 +24,7 @@
   <div class="tui-assignmentProgress">
     <PercentageDoughnut
       :percentage="progress.overall_progress"
-      :label="$str('chart_label:proficient', 'totara_competency')"
+      :label="$str('chart_label_proficient', 'totara_competency')"
       :label-font-size="13"
       label-font-weight="bold"
       :percentage-font-size="24"
@@ -67,7 +67,7 @@ export default {
 <lang-strings>
 {
   "totara_competency" : [
-    "chart_label:proficient"
+    "chart_label_proficient"
   ]
 }
 </lang-strings>

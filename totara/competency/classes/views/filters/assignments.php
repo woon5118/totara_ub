@@ -48,24 +48,24 @@ class assignments extends filters {
     public static function create_status_filter(): select_tree {
         return select_tree::create(
             'status',
-            get_string('filter:status', 'totara_competency'),
+            get_string('filter_status', 'totara_competency'),
             true,
             [
                 (object)[
-                    'name' => get_string('filter:status:all', 'totara_competency'),
+                    'name' => get_string('filter_status_all', 'totara_competency'),
                     'key' => '',
                     'default' => true
                 ],
                 (object)[
-                    'name' => get_string('filter:status:draft', 'totara_competency'),
+                    'name' => get_string('filter_status_draft', 'totara_competency'),
                     'key' => assignment::STATUS_DRAFT,
                 ],
                 (object)[
-                    'name' => get_string('filter:status:active', 'totara_competency'),
+                    'name' => get_string('filter_status_active', 'totara_competency'),
                     'key' => assignment::STATUS_ACTIVE,
                 ],
                 (object)[
-                    'name' => get_string('filter:status:archived', 'totara_competency'),
+                    'name' => get_string('filter_status_archived', 'totara_competency'),
                     'key' => assignment::STATUS_ARCHIVED,
                 ],
             ],
@@ -80,9 +80,9 @@ class assignments extends filters {
     public static function create_framework_filter(): select_tree {
         return select_tree::create(
             'framework',
-            get_string('filter:framework', 'totara_competency'),
+            get_string('filter_framework', 'totara_competency'),
             true,
-            self::get_competency_frameworks_options(get_string('filter:framework:all', 'totara_competency')),
+            self::get_competency_frameworks_options(get_string('filter_framework_all', 'totara_competency')),
             null,
             true
         );

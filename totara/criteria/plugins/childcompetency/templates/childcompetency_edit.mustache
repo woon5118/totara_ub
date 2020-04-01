@@ -52,7 +52,7 @@
     <div class="tw-criterion-hidden" data-tw-criterionChildCompetency-error="">
       <span class="tw-criterion-warning">
           {{#flex_icon}}notification-warning{{/flex_icon}}
-          {{#str}}error:notenoughchildren, criteria_childcompetency{{/str}}
+          {{#str}}error_not_enough_children, criteria_childcompetency{{/str}}
       </span>
     </div>
 
@@ -68,7 +68,7 @@
                        name="tw_criterionChildCompetency_agg__{{key}}"
                        value="1"
                        data-tw-criterionChildCompetency-aggregationMethod-changed="all"/>
-                <label for="tw_criterionChildCompetency_agg_all__{{key}}"><span>{{#str}}completeall, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
+                <label for="tw_criterionChildCompetency_agg_all__{{key}}"><span>{{#str}}complete_all, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
             </div>
 
             <div data-tw-criterionChildCompetency-aggregationMethod="2">
@@ -78,7 +78,7 @@
                            name="tw_criterionChildCompetency_agg__{{key}}"
                            value="2"
                            data-tw-criterionChildCompetency-aggregationMethod-changed="any"/>
-                    <label for="tw_criterionChildCompetency_agg_any__{{key}}"><span>{{#str}}completeany, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
+                    <label for="tw_criterionChildCompetency_agg_any__{{key}}"><span>{{#str}}complete_any, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
                 </div>
 
                 <div class="tw-criterion-inline" data-tw-criterionChildCompetency-aggregationCount="">

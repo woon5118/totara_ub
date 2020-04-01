@@ -131,7 +131,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
             return;
         }
 
-        str.get_string('save:modal:body', 'totara_competency', count * this.competenciesCount).then(function(fetchedString) {
+        str.get_string('save_modal_body', 'totara_competency', count * this.competenciesCount).then(function(fetchedString) {
             var templateData = {'count_string': fetchedString};
 
             if (that.saveConfirmationModal) {
@@ -668,7 +668,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
                             dataPath: 'user_group_names',
                             headerString: {
                                 component: 'totara_competency',
-                                key: 'sort:user_group_name',
+                                key: 'sort_user_group_name',
                             }
                         }],
                     },
@@ -759,7 +759,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
         },
         {
             'component': 'totara_competency',
-            'key': 'save:modal:header',
+            'key': 'save_modal_header',
         });
 
         return new Promise(function(resolve) {

@@ -42,9 +42,11 @@
     * totara_competency/overall_aggregation
 
     Strings:
-    * achievementpaths, totara_competency
-    * addachievementpath, totara_competency
-    * addachievementpath, totara_competency
+    * achievement_paths, totara_competency
+    * add_achievement_path, totara_competency
+    * no_paths, totara_competency
+    * apply_changes, totara_competency
+    * cancel, totara_competency
 }}
 
 <div class="cc_achievement_paths"
@@ -56,7 +58,7 @@
 
     <div class="cc_inline cc_title">
         <span class="legend">
-            <strong>{{#str}}achievementpaths, totara_competency{{/str}}</strong>
+            <strong>{{#str}}achievement_paths, totara_competency{{/str}}</strong>
         </span>
     </div>
     <div class="cc_inline cc_actions">
@@ -64,7 +66,7 @@
             <select name="cc_add_pathway_select"
                   data-cc-add-pathway="addpath"
                   data-cc-on-ordering="disable">
-                <option value="0" selected="selected">{{#str}}addachievementpath, totara_competency{{/str}}</option>
+                <option value="0" selected="selected">{{#str}}add_achievement_path, totara_competency{{/str}}</option>
                 {{#pathway_types}}
                     <option value="{{type}}" data-templatename="{{templatename}}">{{name}}</option>
                 {{/pathway_types}}
@@ -75,7 +77,7 @@
     {{> totara_competency/overall_aggregation}}
 
     <div class="pw_none {{#has_pathways}}cc_hidden{{/has_pathways}}">
-        {{#str}}nopaths, totara_competency{{/str}}
+        {{#str}}no_paths, totara_competency{{/str}}
     </div>
 
     <div data-pw-groups="">
@@ -86,7 +88,7 @@
         <input type="submit"
                class="cc_button"
                name="cc_apply_changes_button"
-               value="{{#str}}applychanges, totara_competency{{/str}}"
+               value="{{#str}}apply_changes, totara_competency{{/str}}"
                data-cc-action="applychanges"
                data-cc-on-ordering="disable">
         <input type="submit"

@@ -128,8 +128,8 @@ class expand_assignment_task extends adhoc_task {
 
         $userto = $DB->get_record('user', ['id' => $user_id], '*', MUST_EXIST);
 
-        $subject = get_string('expand_task:notification:subject', 'totara_competency');
-        $body = get_string('expand_task:notification:body', 'totara_competency');
+        $subject = get_string('expand_task_notification_subject', 'totara_competency');
+        $body = get_string('expand_task_notification_body', 'totara_competency');
 
         $message = new message();
         $message->courseid          = 0;
@@ -144,7 +144,7 @@ class expand_assignment_task extends adhoc_task {
         $message->fullmessagehtml   = markdown_to_html($body);
         $message->smallmessage      = $subject;
         $message->contexturl        = new \moodle_url('/totara/competency/assignments/users.php');
-        $message->contexturlname    = get_string('title:users', 'totara_competency');
+        $message->contexturlname    = get_string('title_users', 'totara_competency');
 
         message_send($message);
     }

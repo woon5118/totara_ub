@@ -82,13 +82,13 @@ class criteria_linkedcourses_display_testcase extends advanced_testcase {
         $display_configuration = (new linkedcourses_display($cc))->get_configuration();
 
         $expected = (object)[
-            'item_type' => get_string('linkedcourses', 'criteria_linkedcourses'),
-            'item_aggregation' => get_string('completeall', 'totara_criteria'),
-            'error' => get_string('error:invalidconfiguration', 'totara_criteria'),
+            'item_type' => get_string('linked_courses', 'criteria_linkedcourses'),
+            'item_aggregation' => get_string('complete_all', 'totara_criteria'),
+            'error' => get_string('error_invalid_configuration', 'totara_criteria'),
             'items' => [
                 (object)[
                     'description' => '',
-                    'error' => get_string('error:notenoughcourses', 'criteria_linkedcourses'),
+                    'error' => get_string('error_not_enough_courses', 'criteria_linkedcourses'),
                 ]
             ],
         ];

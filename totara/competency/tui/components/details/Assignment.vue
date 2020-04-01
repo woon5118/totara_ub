@@ -84,14 +84,14 @@
         </GridItem>
       </Grid>
       <ConfirmationModal
-        :title="$str('action:archive_user:modal:header', 'totara_competency')"
+        :title="$str('action_archive_user_modal_header', 'totara_competency')"
         :open="showArchiveConfirmation"
         @confirm="makeArchiveAssignmentMutation"
         @cancel="showArchiveConfirmation = false"
       >
         <p>
           {{
-            $str('action:archive_user_assignment:modal', 'totara_competency')
+            $str('action_archive_user_assignment_modal', 'totara_competency')
           }}
         </p>
         <p>
@@ -104,7 +104,7 @@
         v-if="showCanArchiveButton"
         aria-label=""
         :styleclass="{ small: true }"
-        :text="$str('action:archive_this', 'totara_competency')"
+        :text="$str('action_archive_this', 'totara_competency')"
         @click="showArchiveConfirmDialog"
       >
         <ArchiveIcon />
@@ -225,7 +225,7 @@ export default {
           notify({
             type: 'success',
             message: this.$str(
-              'event:assignment_archived',
+              'event_assignment_archived',
               'totara_competency'
             ),
           });
@@ -259,13 +259,13 @@ export default {
   {
     "totara_competency": [
       "achievement_level",
-      "action:archive_this",
-      "action:archive_user:modal:header",
-      "action:archive_user_assignment:modal",
+      "action_archive_this",
+      "action_archive_user_modal_header",
+      "action_archive_user_assignment_modal",
       "assignment",
       "confirm_generic",
       "error_generic_mutation",
-      "event:assignment_archived",
+      "event_assignment_archived",
       "more_information",
       "not_proficient",
       "proficient"

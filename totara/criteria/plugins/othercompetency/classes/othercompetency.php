@@ -103,7 +103,7 @@ class othercompetency extends criterion {
             return '';
         }
 
-        return get_string('error:notenoughothercompetency', 'criteria_othercompetency');
+        return get_string('error_not_enough_other_competency', 'criteria_othercompetency');
     }
 
     /**
@@ -136,10 +136,10 @@ class othercompetency extends criterion {
                 $item_detail['text'] = format_string($competency->fullname);
                 $item_detail['error'] = $config->user_can_become_proficient()
                     ? ''
-                    : get_string('error:competencycannotproficient', 'criteria_othercompetency');
+                    : get_string('error_competency_cannot_proficient', 'criteria_othercompetency');
             } catch (Exception $e) {
                 $item_detail['name'] = '';
-                $item_detail['error'] = get_string('error:nocompetency', 'criteria_othercompetency');
+                $item_detail['error'] = get_string('error_no_competency', 'criteria_othercompetency');
             }
 
             $items[] = $item_detail;

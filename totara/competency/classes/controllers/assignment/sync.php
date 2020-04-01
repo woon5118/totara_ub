@@ -40,12 +40,12 @@ class sync extends controller {
 
         $back_url = new moodle_url('/totara/competency/assignments/users.php');
         if (expand_assignment_task::is_scheduled()) {
-            $message = get_string('sync:is_scheduled', 'totara_competency');
+            $message = get_string('sync_is_scheduled', 'totara_competency');
             $message_type = notification::NOTIFY_ERROR;
         } else {
             $this->trigger_adhoc_task();
 
-            $message = get_string('sync:success', 'totara_competency');
+            $message = get_string('sync_success', 'totara_competency');
             $message_type = notification::NOTIFY_SUCCESS;
         }
 

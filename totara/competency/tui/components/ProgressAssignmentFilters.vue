@@ -23,7 +23,7 @@
 <template>
   <div>
     <p class="sr-only">
-      {{ $str('filter:viewing_by_assignment', 'totara_competency') }}
+      {{ $str('filter_viewing_by_assignment', 'totara_competency') }}
     </p>
     <SelectFilter
       v-if="displayFilters"
@@ -106,7 +106,7 @@ export default {
 <lang-strings>
 {
   "totara_competency": [
-    "filter:viewing_by_assignment",
+    "filter_viewing_by_assignment",
     "viewing_by_assignment"
     ]
 }

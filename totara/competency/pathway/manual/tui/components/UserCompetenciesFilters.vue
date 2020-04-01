@@ -48,7 +48,7 @@
         <SelectFilter
           v-if="filterOptions.competency_type"
           v-model="selectedFilters.competencyType"
-          :label="$str('filter:competency_type', 'totara_competency')"
+          :label="$str('filter_competency_type', 'totara_competency')"
           :show-label="true"
           :options="competencyTypeFilterOptions"
           :stacked="stacked"
@@ -57,7 +57,7 @@
         <SelectFilter
           v-if="filterOptions.assignment_reason"
           v-model="selectedFilters.assignmentReason"
-          :label="$str('filter:reason_assigned', 'pathway_manual')"
+          :label="$str('filter_reason_assigned', 'pathway_manual')"
           :show-label="true"
           :options="assignmentReasonFilterOptions"
           :stacked="stacked"
@@ -66,7 +66,7 @@
         <SelectFilter
           v-if="filterOptions.rating_history"
           v-model="selectedFilters.ratingHistory"
-          :label="$str('filter:rating_history', 'pathway_manual')"
+          :label="$str('filter_rating_history', 'pathway_manual')"
           :show-label="true"
           :options="ratingHistoryFilterOptions"
           :stacked="stacked"
@@ -78,7 +78,7 @@
       <template v-slot:filters-right="{ stacked }">
         <ButtonFilter :stacked="stacked">
           <Button
-            :text="$str('filter:update_selection', 'pathway_manual')"
+            :text="$str('filter_update_selection', 'pathway_manual')"
             :styleclass="{ small: true }"
             :disabled="!filtersSelected"
             @click="updateFiltersWithWarning"
@@ -88,12 +88,12 @@
     </FilterBar>
     <ConfirmationModal
       :open="showConfirmFiltersModal"
-      :title="$str('modal:confirm_update_filters_title', 'pathway_manual')"
+      :title="$str('modal_confirm_update_filters_title', 'pathway_manual')"
       @confirm="updateFilters"
       @cancel="showConfirmFiltersModal = false"
     >
       <span
-        v-html="$str('modal:confirm_update_filters_body', 'pathway_manual')"
+        v-html="$str('modal_confirm_update_filters_body', 'pathway_manual')"
       />
     </ConfirmationModal>
   </div>
@@ -213,7 +213,7 @@ export default {
         },
         {
           id: 1,
-          label: this.$str('filter:previously_rated', 'pathway_manual'),
+          label: this.$str('filter_previously_rated', 'pathway_manual'),
         },
       ];
     },
@@ -295,18 +295,18 @@ export default {
       "all"
     ],
     "pathway_manual": [
-      "filter:previously_rated",
-      "filter:rating_history",
-      "filter:reason_assigned",
-      "filter:update_selection",
-      "modal:confirm_update_filters_body",
-      "modal:confirm_update_filters_title",
+      "filter_previously_rated",
+      "filter_rating_history",
+      "filter_reason_assigned",
+      "filter_update_selection",
+      "modal_confirm_update_filters_body",
+      "modal_confirm_update_filters_title",
       "never_rated",
       "view_all",
       "viewing_single_competency"
     ],
     "totara_competency": [
-      "filter:competency_type",
+      "filter_competency_type",
       "filter_competencies"
     ]
   }

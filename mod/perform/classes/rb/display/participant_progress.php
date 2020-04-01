@@ -41,8 +41,8 @@ class participant_progress extends base {
      */
     public static function display($code, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         $options = [
-            '20' => get_string('user_activities:status_complete', 'mod_perform'),
-            '10' => get_string('user_activities:status_in_progress', 'mod_perform'),
+            '20' => get_string('user_activities_status_complete', 'mod_perform'),
+            '10' => get_string('user_activities_status_in_progress', 'mod_perform'),
             '0' => get_string('user_activities_status_not_started', 'mod_perform'),
         ];
         if (array_key_exists($code, $options)) {

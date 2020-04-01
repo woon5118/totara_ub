@@ -201,7 +201,7 @@ class assignments extends user_data_provider {
             if (method_exists($this, $method = 'filter_by_' . $key)) {
                 $this->{$method}($repository, $value);
             } else {
-                throw new \moodle_exception('error:filter_assignment_not_supported', 'totara_competency', '', $key);
+                throw new \moodle_exception('error_filter_assignment_not_supported', 'totara_competency', '', $key);
             }
         }
 

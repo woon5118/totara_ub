@@ -38,7 +38,7 @@
     <Grid :stack-at="768">
       <GridItem :units="5">
         <h3 class="mod-perform-activitySection__participant-heading">
-          {{ $str('activity_participants:heading', 'mod_perform') }}
+          {{ $str('activity_participants_heading', 'mod_perform') }}
         </h3>
         <div
           v-for="participant in displayedParticipantsSorted"
@@ -62,7 +62,7 @@
           <template v-slot:rating-trigger>
             <ButtonIcon
               :styleclass="{ small: true }"
-              :aria-label="$str('activity_participants:add', 'mod_perform')"
+              :aria-label="$str('activity_participants_add', 'mod_perform')"
             >
               <AddIcon size="100" />
             </ButtonIcon>
@@ -72,7 +72,7 @@
         <br />
         <Button
           :styleclass="{ primary: true }"
-          :text="$str('activity_section:save_changes', 'mod_perform')"
+          :text="$str('activity_section_save_changes', 'mod_perform')"
           :disabled="isSaving || !hasChanges"
           @click="trySave"
         />
@@ -234,9 +234,9 @@ export default {
   {
     "mod_perform": [
       "edit_content",
-      "activity_participants:add",
-      "activity_participants:heading",
-      "activity_section:save_changes"
+      "activity_participants_add",
+      "activity_participants_heading",
+      "activity_section_save_changes"
     ],
     "moodle": [
       "delete"

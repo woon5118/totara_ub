@@ -296,7 +296,7 @@ class totara_competency_achievement_configuration_testcase extends advanced_test
         $expected = [
             [
                 'id' => 'low-sortorder',
-                'name' => get_string('anyscalevalue', 'totara_competency'),
+                'name' => get_string('any_scale_value', 'totara_competency'),
                 'hidden' => false,
                 'pathways' => [$manual_manager_pw->get_id()],
             ],
@@ -312,7 +312,7 @@ class totara_competency_achievement_configuration_testcase extends advanced_test
             ],
             [
                 'id' => 'high-sortorder',
-                'name' => get_string('anyscalevalue', 'totara_competency'),
+                'name' => get_string('any_scale_value', 'totara_competency'),
                 'hidden' => false,
                 'pathways' => [$manual_self_pw->get_id()],
             ],

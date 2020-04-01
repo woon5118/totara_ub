@@ -122,7 +122,7 @@ class linkedcourses extends criterion {
             return '';
         }
 
-        return get_string('error:notenoughcourses', 'criteria_linkedcourses');
+        return get_string('error_not_enough_courses', 'criteria_linkedcourses');
     }
 
     /**

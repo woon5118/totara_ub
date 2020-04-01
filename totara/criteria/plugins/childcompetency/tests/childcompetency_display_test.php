@@ -46,12 +46,12 @@ class criteria_childcompetency_display_testcase extends advanced_testcase {
 
         $expected = (object)[
             'item_type' => get_string('pluginname', 'criteria_childcompetency'),
-            'item_aggregation' => get_string('completeall', 'totara_criteria'),
-            'error' => get_string('error:invalidconfiguration', 'totara_criteria'),
+            'item_aggregation' => get_string('complete_all', 'totara_criteria'),
+            'error' => get_string('error_invalid_configuration', 'totara_criteria'),
             'items' => [
                 (object)[
                     'description' => '',
-                    'error' => get_string('error:notenoughchildren', 'criteria_childcompetency'),
+                    'error' => get_string('error_not_enough_children', 'criteria_childcompetency'),
                 ]
             ],
         ];
@@ -81,11 +81,11 @@ class criteria_childcompetency_display_testcase extends advanced_testcase {
         $expected = (object)[
             'item_type' => get_string('pluginname', 'criteria_childcompetency'),
             'item_aggregation' => get_string('aggregate_any', 'totara_criteria', (object)['x' => 3]),
-            'error' => get_string('error:invalidconfiguration', 'totara_criteria'),
+            'error' => get_string('error_invalid_configuration', 'totara_criteria'),
             'items' => [
                 (object)[
                     'description' => '',
-                    'error' => get_string('error:notenoughchildren', 'criteria_childcompetency'),
+                    'error' => get_string('error_not_enough_children', 'criteria_childcompetency'),
                 ]
             ],
         ];

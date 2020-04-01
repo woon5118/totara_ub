@@ -188,7 +188,7 @@ class totara_competency_models_activity_log_achieved_via_testcase extends advanc
             get_string('achievement_detail', 'pathway_learning_plan'),
         ];
         foreach ($criteria_plugins as $plugin) {
-            $expected_criteria_strings[] = get_string('achievementvia', 'criteria_' . $plugin);
+            $expected_criteria_strings[] = get_string('achievement_via', 'criteria_' . $plugin);
         }
 
         // There shouldn't be duplicates and only unique strings should be returned.

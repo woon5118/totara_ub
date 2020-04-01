@@ -65,7 +65,7 @@ class save extends base {
         $view = new views\save('totara_competency/save', []);
 
         if (empty($items)) {
-            $message = get_string('basket:empty_basket_can_not_proceed_creating_assignment', 'totara_competency');
+            $message = get_string('basket_empty_basket_can_not_proceed_creating_assignment', 'totara_competency');
             redirect($view->get_absolute_url('create.php'), $message, null, notification::NOTIFY_ERROR);
         }
 
@@ -168,7 +168,7 @@ class save extends base {
             null,
             true,
             false,
-            get_string('action:add_user_groups', 'totara_competency'),
+            get_string('action_add_user_groups', 'totara_competency'),
             true,
             true
         );

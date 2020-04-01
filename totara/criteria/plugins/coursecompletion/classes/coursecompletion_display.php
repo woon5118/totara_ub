@@ -54,7 +54,7 @@ class coursecompletion_display extends criterion_display {
             return [
                 (object)[
                     'description' => '',
-                    'error' => get_string('error:notenoughcourses', 'criteria_coursecompletion'),
+                    'error' => get_string('error_not_enough_courses', 'criteria_coursecompletion'),
                 ],
             ];
         }
@@ -67,11 +67,11 @@ class coursecompletion_display extends criterion_display {
                 $item_detail['description'] = format_string(get_course_display_name_for_list($course));
 
                 if (!$course->enablecompletion) {
-                    $item_detail['error'] = get_string('error:nocoursecompletion', 'criteria_coursecompletion');
+                    $item_detail['error'] = get_string('error_no_course_completion', 'criteria_coursecompletion');
                 }
             } else {
                 $item_detail['description'] = '';
-                $item_detail['error'] = get_string('error:nocourse', 'criteria_coursecompletion');
+                $item_detail['error'] = get_string('error_no_course', 'criteria_coursecompletion');
             }
 
             $items[] = (object)$item_detail;

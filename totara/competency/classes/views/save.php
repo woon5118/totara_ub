@@ -31,7 +31,7 @@ class save extends view {
 
     protected $location = '/totara/competency/assignments/';
 
-    protected $title = ['title:create', 'totara_competency'];
+    protected $title = ['title_create', 'totara_competency'];
 
     protected function prepare_output($output) {
         $output = array_merge($output, [

@@ -102,10 +102,10 @@ class criteria_othercompetency_display_testcase extends advanced_testcase {
         $display_configuration = (new othercompetency_display($cc))->get_configuration();
 
         $expected = (object)[
-            'item_type' => get_string('othercompetencies', 'criteria_othercompetency'),
-            'item_aggregation' => get_string('completeall', 'totara_criteria'),
+            'item_type' => get_string('other_competencies', 'criteria_othercompetency'),
+            'item_aggregation' => get_string('complete_all', 'totara_criteria'),
             'items' => [],
-            'error' => get_string('error:invalidconfiguration', 'totara_criteria'),
+            'error' => get_string('error_invalid_configuration', 'totara_criteria'),
         ];
 
         if ($aggregation['method'] == criterion::AGGREGATE_ANY_N) {
@@ -119,14 +119,14 @@ class criteria_othercompetency_display_testcase extends advanced_testcase {
             foreach ($competencies as $competency_idx) {
                 $expected->items[] = (object)[
                     'description' => $data->other_competency_items[$competency_idx]->fullname,
-                    'error' => get_string('error:competencycannotproficient', 'criteria_othercompetency'),
+                    'error' => get_string('error_competency_cannot_proficient', 'criteria_othercompetency'),
                 ];
             }
         } else {
-            $expected->error = get_string('error:invalidconfiguration', 'totara_criteria');
+            $expected->error = get_string('error_invalid_configuration', 'totara_criteria');
             $expected->items[] = (object)[
                 'description' => '',
-                'error' => get_string('error:notenoughothercompetency', 'criteria_othercompetency'),
+                'error' => get_string('error_not_enough_other_competency', 'criteria_othercompetency'),
             ];
         }
 

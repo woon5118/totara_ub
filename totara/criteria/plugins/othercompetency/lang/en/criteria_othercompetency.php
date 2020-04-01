@@ -21,19 +21,19 @@
  * @package criteria_othercompetency
  */
 
-$string['achievementvia'] = 'Proficiency in other competencies';
-$string['addcompetencies'] = "Add competencies";
-$string['allframeworks'] = 'All frameworks';
+$string['pluginname'] = 'Proficiency in other competencies';
+
+$string['achievement_via'] = 'Proficiency in other competencies';
+$string['add_competencies'] = "Add competencies";
+$string['all_frameworks'] = 'All frameworks';
 $string['competencies'] = 'Competencies';
 $string['competency'] = 'competency';
-$string['error:competencycannotproficient'] = 'Competency can not become proficient';
-$string['error:competencyerror'] = 'One or more competencies have errors';
-$string['error:nocompetency'] = 'Competency no longer exists';
-$string['error:notenoughothercompetency'] = 'No competencies added yet.';
-$string['hierarchy_list:competency:all'] = 'All competencies';
-$string['hierarchy_list:competency:all_in_framework'] = 'All competencies in framework';
-$string['hierarchy_list:competency:select'] = 'Select competencies';
+$string['error_competency_cannot_proficient'] = 'Competency can not become proficient';
+$string['error_no_competency'] = 'Competency no longer exists';
+$string['error_not_enough_other_competency'] = 'No competencies added yet.';
+$string['hierarchy_list_competency_all'] = 'All competencies';
+$string['hierarchy_list_competency_all_in_framework'] = 'All competencies in framework';
+$string['hierarchy_list_competency_select'] = 'Select competencies';
 $string['no_competencies'] = 'There are no other competencies available to view';
-$string['othercompetencies'] = 'Proficiency in other competencies';
-$string['pluginname'] = 'Proficiency in other competencies';
-$string['selectcompetencies'] = "Select competencies";
+$string['other_competencies'] = 'Proficiency in other competencies';
+$string['select_competencies'] = "Select competencies";

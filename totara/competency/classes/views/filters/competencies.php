@@ -61,11 +61,11 @@ class competencies extends filters {
     public static function create_assignment_status_filter(): select_multi {
         return select_multi::create(
             'assignment_status',
-            get_string('filter:assignment_status', 'totara_competency'),
+            get_string('filter_assignment_status', 'totara_competency'),
             true,
             [
-                '1' => get_string('filter:assignment_status:assigned', 'totara_competency'),
-                '0' => get_string('filter:assignment_status:unassigned', 'totara_competency'),
+                '1' => get_string('filter_assignment_status_assigned', 'totara_competency'),
+                '0' => get_string('filter_assignment_status_unassigned', 'totara_competency'),
             ]
         );
     }
@@ -88,7 +88,7 @@ class competencies extends filters {
 
         return select_multi::create(
             'type',
-            get_string('filter:competency_type', 'totara_competency'),
+            get_string('filter_competency_type', 'totara_competency'),
             true,
             $competency_type_options
         );
@@ -102,7 +102,7 @@ class competencies extends filters {
             'framework',
             '',
             true,
-            self::get_competency_frameworks_options(get_string('filter:framework:all_frameworks', 'totara_competency')),
+            self::get_competency_frameworks_options(get_string('filter_framework_all_frameworks', 'totara_competency')),
             null,
             true,
             false,

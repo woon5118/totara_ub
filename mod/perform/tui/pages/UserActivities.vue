@@ -22,19 +22,19 @@
 
 <template>
   <div class="tui-performUserActivities">
-    <h2>{{ $str('user_activities:page_title', 'mod_perform') }}</h2>
+    <h2>{{ $str('user_activities_page_title', 'mod_perform') }}</h2>
 
     <Tabs transparent-tabs>
       <Tab
         :id="$id('your-activities-tab')"
-        :name="$str('user_activities:your_activities_title', 'mod_perform')"
+        :name="$str('user_activities_your_activities_title', 'mod_perform')"
       >
         <UserActivityList about="self" :view-url="viewActivityUrl" />
       </Tab>
       <Tab
         :id="$id('activities-about-others-tab')"
         :name="
-          $str('user_activities:activities_about_others_title', 'mod_perform')
+          $str('user_activities_activities_about_others_title', 'mod_perform')
         "
       >
         <UserActivityList about="others" :view-url="viewActivityUrl" />
@@ -65,9 +65,9 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "user_activities:activities_about_others_title",
-      "user_activities:page_title",
-      "user_activities:your_activities_title"
+      "user_activities_activities_about_others_title",
+      "user_activities_page_title",
+      "user_activities_your_activities_title"
     ]
   }
 </lang-strings>

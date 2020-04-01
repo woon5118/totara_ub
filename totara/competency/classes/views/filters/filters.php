@@ -48,16 +48,16 @@ abstract class filters {
     public static function create_assignment_type_filter(): select_multi {
         return select_multi::create(
             'assignment_type',
-            get_string('header:assignment_type', 'totara_competency'),
+            get_string('header_assignment_type', 'totara_competency'),
             true,
             [
                 user_groups::POSITION     => get_string('position', 'totara_hierarchy'),
                 user_groups::ORGANISATION => get_string('organisation', 'totara_hierarchy'),
                 user_groups::COHORT       => get_string('cohort', 'totara_cohort'),
-                assignment::TYPE_ADMIN    => get_string('assignment_type:admin', 'totara_competency'),
-                assignment::TYPE_SELF     => get_string('assignment_type:self', 'totara_competency'),
-                assignment::TYPE_OTHER    => get_string('assignment_type:other', 'totara_competency'),
-                assignment::TYPE_SYSTEM   => get_string('assignment_type:system', 'totara_competency'),
+                assignment::TYPE_ADMIN    => get_string('assignment_type_admin', 'totara_competency'),
+                assignment::TYPE_SELF     => get_string('assignment_type_self', 'totara_competency'),
+                assignment::TYPE_OTHER    => get_string('assignment_type_other', 'totara_competency'),
+                assignment::TYPE_SYSTEM   => get_string('assignment_type_system', 'totara_competency'),
             ]
         );
     }

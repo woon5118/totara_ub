@@ -60,7 +60,7 @@
         <ConfirmationModal
           :open="showSubmitRatingsModal"
           :title="
-            $str('modal:submit_ratings_confirmation_title', 'pathway_manual')
+            $str('modal_submit_ratings_confirmation_title', 'pathway_manual')
           "
           @confirm="submitRatings"
           @cancel="showSubmitRatingsModal = false"
@@ -69,7 +69,7 @@
           <p>
             {{
               $str(
-                'modal:submit_ratings_confirmation_question',
+                'modal_submit_ratings_confirmation_question',
                 'pathway_manual'
               )
             }}
@@ -83,7 +83,7 @@
     >
       {{
         hasSelectedFilters
-          ? $str('filter:no_competencies', 'pathway_manual')
+          ? $str('filter_no_competencies', 'pathway_manual')
           : $str('no_rateable_competencies', 'pathway_manual')
       }}
     </div>
@@ -364,13 +364,13 @@ export default {
 <lang-strings>
   {
     "pathway_manual": [
-      "filter:no_competencies",
-      "modal:submit_ratings_confirmation_title",
-      "modal:submit_ratings_confirmation_question",
-      "modal:submit_ratings_summary_singular_other",
-      "modal:submit_ratings_summary_singular_self",
-      "modal:submit_ratings_summary_plural_other",
-      "modal:submit_ratings_summary_plural_self",
+      "filter_no_competencies",
+      "modal_submit_ratings_confirmation_title",
+      "modal_submit_ratings_confirmation_question",
+      "modal_submit_ratings_summary_singular_other",
+      "modal_submit_ratings_summary_singular_self",
+      "modal_submit_ratings_summary_plural_other",
+      "modal_submit_ratings_summary_plural_self",
       "no_rateable_competencies",
       "unsaved_ratings_warning"
     ],

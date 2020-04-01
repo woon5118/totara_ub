@@ -90,7 +90,7 @@ class rate_users extends controller {
      * @throws \moodle_exception
      */
     protected function user_lacks_role() {
-        print_error('error:user_lacks_role_for_any', 'pathway_manual');
+        print_error('error_user_lacks_role_for_any', 'pathway_manual');
     }
 
 }

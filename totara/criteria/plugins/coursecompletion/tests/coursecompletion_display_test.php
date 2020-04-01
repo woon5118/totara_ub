@@ -96,7 +96,7 @@ class criteria_coursecompletion_display_testcase extends advanced_testcase {
 
         $expected = (object)[
             'item_type' => get_string('courses', 'criteria_coursecompletion'),
-            'item_aggregation' => get_string('completeall', 'totara_criteria'),
+            'item_aggregation' => get_string('complete_all', 'totara_criteria'),
             'items' => [],
         ];
 
@@ -112,10 +112,10 @@ class criteria_coursecompletion_display_testcase extends advanced_testcase {
                 $expected->items[] = (object)['description' => $data->courses[$course_idx]->fullname];
             }
         } else {
-            $expected->error = get_string('error:invalidconfiguration', 'totara_criteria');
+            $expected->error = get_string('error_invalid_configuration', 'totara_criteria');
             $expected->items[] = (object)[
                 'description' => '',
-                'error' => get_string('error:notenoughcourses', 'criteria_coursecompletion'),
+                'error' => get_string('error_not_enough_courses', 'criteria_coursecompletion'),
             ];
         }
 

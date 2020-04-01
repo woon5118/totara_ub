@@ -53,7 +53,7 @@ class user_activities extends perform_controller {
         ];
 
         return tui_view::create('mod_perform/pages/UserActivities', $props)
-            ->set_title(get_string('user_activities:page_title', 'mod_perform'))
+            ->set_title(get_string('user_activities_page_title', 'mod_perform'))
             ->set_url(self::get_url());
     }
 

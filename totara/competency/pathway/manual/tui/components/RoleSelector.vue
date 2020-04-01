@@ -45,11 +45,11 @@
     </div>
     <ConfirmationModal
       :open="modalVisible"
-      :title="$str('modal:confirm_update_role_title', 'pathway_manual')"
+      :title="$str('modal_confirm_update_role_title', 'pathway_manual')"
       @confirm="selectRole"
       @cancel="hideModal"
     >
-      <span v-html="$str('modal:confirm_update_role_body', 'pathway_manual')" />
+      <span v-html="$str('modal_confirm_update_role_body', 'pathway_manual')" />
     </ConfirmationModal>
   </div>
 </template>
@@ -223,8 +223,8 @@ export default {
 <lang-strings>
   {
     "pathway_manual": [
-      "modal:confirm_update_role_body",
-      "modal:confirm_update_role_title",
+      "modal_confirm_update_role_body",
+      "modal_confirm_update_role_title",
       "rating_as_a",
       "rating_as_appraiser",
       "rating_as_manager",

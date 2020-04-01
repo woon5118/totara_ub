@@ -58,7 +58,7 @@ class linked_courses_updated extends base {
      * @return string
      */
     public static function get_name() {
-        return get_string('event:linked_courses_updated', 'totara_competency');
+        return get_string('event_linked_courses_updated', 'totara_competency');
     }
 
     /**

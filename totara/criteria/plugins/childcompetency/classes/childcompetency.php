@@ -120,7 +120,7 @@ class childcompetency extends criterion {
             return '';
         }
 
-        return get_string('error:notenoughchildren', 'criteria_childcompetency');
+        return get_string('error_not_enough_children', 'criteria_childcompetency');
     }
 
 

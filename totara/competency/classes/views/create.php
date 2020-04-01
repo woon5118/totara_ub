@@ -31,7 +31,7 @@ class create extends base {
 
     protected $content_template = 'totara_competency/_competencies';
 
-    protected $title = ['title:create', 'totara_competency'];
+    protected $title = ['title_create', 'totara_competency'];
 
     public function __construct(array $data = []) {
         parent::__construct('totara_competency/create', $data);
@@ -79,12 +79,12 @@ class create extends base {
             false,
             [
                 (object)[
-                    'name' => get_string('sort:framework_hierarchy', 'totara_competency'),
+                    'name' => get_string('sort_framework_hierarchy', 'totara_competency'),
                     'key' => 'framework_hierarchy',
                     'default' => true
                 ],
                 (object)[
-                    'name' => get_string('sort:competency_name', 'totara_competency'),
+                    'name' => get_string('sort_competency_name', 'totara_competency'),
                     'key' => 'fullname',
                 ],
             ],

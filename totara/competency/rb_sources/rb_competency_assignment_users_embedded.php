@@ -72,7 +72,7 @@ class rb_competency_assignment_users_embedded extends rb_base_embedded {
             [
                 'type' => 'assignment_created_by',
                 'value' => 'namelink',
-                'heading' => get_string('label:assignment_created_by', 'rb_source_competency_assignment_users')
+                'heading' => get_string('label_assignment_created_by', 'rb_source_competency_assignment_users')
             ],
             [
                 'type' => 'assignment',

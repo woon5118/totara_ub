@@ -23,10 +23,10 @@
 <template>
   <Popover :triggers="['click']">
     <h2 class="sr-only">
-      {{ $str('activity_participants:select_heading', 'mod_perform') }}
+      {{ $str('activity_participants_select_heading', 'mod_perform') }}
     </h2>
     <label :id="$id('participants-select-heading')">
-      {{ $str('activity_participants:select_heading', 'mod_perform') }}
+      {{ $str('activity_participants_select_heading', 'mod_perform') }}
     </label>
     <Checkbox
       v-for="participant in availableParticipants"
@@ -44,7 +44,7 @@
     <template v-slot:buttons="{ close }">
       <Button
         :styleclass="{ small: true, primary: true }"
-        :text="$str('activity_participants:select_done', 'mod_perform')"
+        :text="$str('activity_participants_select_done', 'mod_perform')"
         @click="updateParticipants(close)"
       />
       <Button
@@ -125,8 +125,8 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "activity_participants:select_done",
-      "activity_participants:select_heading"
+      "activity_participants_select_done",
+      "activity_participants_select_heading"
     ],
     "moodle": [
       "cancel"

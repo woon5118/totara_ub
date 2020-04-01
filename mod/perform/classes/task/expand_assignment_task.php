@@ -116,8 +116,8 @@ class expand_assignment_task extends adhoc_task {
     private function send_notification(int $user_id) {
         $userto = user::repository()->find_or_fail($user_id);
 
-        $subject = get_string('expand_task:notification:subject', 'mod_perform');
-        $body = get_string('expand_task:notification:body', 'mod_perform');
+        $subject = get_string('expand_task_notification_subject', 'mod_perform');
+        $body = get_string('expand_task_notification_body', 'mod_perform');
 
         $message = new message();
         $message->courseid          = 0;
@@ -132,7 +132,7 @@ class expand_assignment_task extends adhoc_task {
         $message->fullmessagehtml   = markdown_to_html($body);
         $message->smallmessage      = $subject;
         $message->contexturl        = new \moodle_url('/mod/perform/manage/activity/index.php');
-        $message->contexturlname    = get_string('perform:manage_activity_page_title', 'mod_perform');
+        $message->contexturlname    = get_string('manage_activity_page_title', 'mod_perform');
 
         message_send($message);
     }

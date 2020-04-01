@@ -26,10 +26,10 @@ exports[`components/RoleSelector.vue Checks snapshot - has multiple roles: multi
   <confirmationmodal-stub
     closebutton="true"
     size="normal"
-    title="$str('modal:confirm_update_role_title', 'pathway_manual')"
+    title="$str('modal_confirm_update_role_title', 'pathway_manual')"
   >
     <span>
-      $str('modal:confirm_update_role_body', 'pathway_manual')
+      $str('modal_confirm_update_role_body', 'pathway_manual')
     </span>
   </confirmationmodal-stub>
 </div>
@@ -61,10 +61,10 @@ exports[`components/RoleSelector.vue Checks snapshot - has single role: singleRo
   <confirmationmodal-stub
     closebutton="true"
     size="normal"
-    title="$str('modal:confirm_update_role_title', 'pathway_manual')"
+    title="$str('modal_confirm_update_role_title', 'pathway_manual')"
   >
     <span>
-      $str('modal:confirm_update_role_body', 'pathway_manual')
+      $str('modal_confirm_update_role_body', 'pathway_manual')
     </span>
   </confirmationmodal-stub>
 </div>
@@ -88,10 +88,10 @@ exports[`components/RoleSelector.vue Checks snapshot - has specified role: speci
   <confirmationmodal-stub
     closebutton="true"
     size="normal"
-    title="$str('modal:confirm_update_role_title', 'pathway_manual')"
+    title="$str('modal_confirm_update_role_title', 'pathway_manual')"
   >
     <span>
-      $str('modal:confirm_update_role_body', 'pathway_manual')
+      $str('modal_confirm_update_role_body', 'pathway_manual')
     </span>
   </confirmationmodal-stub>
 </div>

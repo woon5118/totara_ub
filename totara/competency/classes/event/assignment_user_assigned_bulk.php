@@ -68,7 +68,7 @@ class assignment_user_assigned_bulk extends assignment_user {
      * @return string
      */
     public static function get_name() {
-        return get_string('event:assignment_user_assigned', 'totara_competency');
+        return get_string('event_assignment_user_assigned', 'totara_competency');
     }
 
     /**

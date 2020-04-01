@@ -65,7 +65,7 @@ function mod_perform_myprofile_navigation(tree $tree, $user, $is_current_user) {
         new node(
             'miscellaneous',
             'performance_activities',
-            get_string('user_activities:page_title', 'mod_perform'),
+            get_string('user_activities_page_title', 'mod_perform'),
             null,
             user_activities::get_url()
         )

@@ -68,12 +68,12 @@
             <div>
                 <a href="#" data-tw-criterionCourseCompletion-addCourses="">
                     <span class="tw-criterion-smalltitle">
-                        {{#str}}addcourses, criteria_coursecompletion{{/str}}
+                        {{#str}}add_courses, criteria_coursecompletion{{/str}}
                     </span>
                 </a>
                 <span class="tw-criterion-warning tw-criterion-hidden" data-tw-criterionCourseCompletion-error="notenoughcourses">
                     {{#flex_icon}}notification-warning{{/flex_icon}}
-                    {{#str}}error:notenoughcourses, criteria_coursecompletion{{/str}}
+                    {{#str}}error_not_enough_courses, criteria_coursecompletion{{/str}}
                 </span>
             </div>
         </div>
@@ -91,7 +91,7 @@
                        name="tw_criterionCourseCompletion_agg__{{key}}"
                        value="1"
                        data-tw-criterionCourseCompletion-aggregationMethod-changed="all"/>
-                <label for="tw_criterionCourseCompletion_agg_all__{{key}}"><span>{{#str}}completeall, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
+                <label for="tw_criterionCourseCompletion_agg_all__{{key}}"><span>{{#str}}complete_all, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
             </div>
 
             <div data-tw-criterionCourseCompletion-aggregationMethod="2">
@@ -101,7 +101,7 @@
                            name="tw_criterionCourseCompletion_agg__{{key}}"
                            value="2"
                            data-tw-criterionCourseCompletion-aggregationMethod-changed="any"/>
-                    <label for="tw_criterionCourseCompletion_agg_any__{{key}}"><span>{{#str}}completeany, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
+                    <label for="tw_criterionCourseCompletion_agg_any__{{key}}"><span>{{#str}}complete_any, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
                 </div>
 
                 <div class="tw-criterion-inline" data-tw-criterionCourseCompletion-aggregationCount="">

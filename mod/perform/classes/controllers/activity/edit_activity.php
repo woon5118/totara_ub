@@ -51,7 +51,7 @@ class edit_activity extends perform_controller {
 
         return tui_view::create('mod_perform/pages/ManageActivity', $props)
             ->set_url(self::get_url(['activity_id' => $this->get_activity_id()]))
-            ->set_title(get_string('perform:manage_activity_page_title', 'mod_perform'));
+            ->set_title(get_string('manage_activity_page_title', 'mod_perform'));
     }
 
     private function get_activity_id(): int {

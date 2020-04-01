@@ -73,7 +73,7 @@
         >
           <div>
             <h3 class="tui-competencyProfile__sectionTitle">
-              {{ $str('header:competencies', 'totara_competency') }}
+              {{ $str('header_competencies', 'totara_competency') }}
             </h3>
             <div
               class="tui-competencyProfile__split tui-competencyProfile__filtersBar"
@@ -366,7 +366,7 @@ export default {
     "self_assign_competencies",
     "latest_achievement",
     "current_assignment_progress",
-    "header:competencies"
+    "header_competencies"
   ],
   "pathway_manual": [
     "rate_competencies"

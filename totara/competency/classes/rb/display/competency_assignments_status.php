@@ -45,9 +45,9 @@ class competency_assignments_status extends base {
      */
     public static function display($value, $format, stdClass $row, rb_column $column, reportbuilder $report) {
         if ($value == assignment::STATUS_ACTIVE) {
-            return get_string('status:active', 'totara_competency');
+            return get_string('status_active', 'totara_competency');
         } else if ($value == assignment::STATUS_ARCHIVED) {
-            return get_string('status:archived', 'totara_competency');
+            return get_string('status_archived', 'totara_competency');
         } else {
             return get_string('unknown');
         }

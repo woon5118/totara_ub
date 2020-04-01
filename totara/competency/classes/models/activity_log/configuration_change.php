@@ -64,16 +64,16 @@ class configuration_change extends activity_log {
 
         switch ($entity->change_type) {
             case entities\configuration_change::CHANGED_COMPETENCY_AGGREGATION:
-                return get_string('activitylog_competencyaggregationchanged', 'totara_competency');
+                return get_string('activity_log_competency_aggregation_changed', 'totara_competency');
             case entities\configuration_change::CHANGED_AGGREGATION:
-                return get_string('activitylog_aggregationchanged', 'totara_competency');
+                return get_string('activity_log_aggregation_changed', 'totara_competency');
             case entities\configuration_change::CHANGED_CRITERIA:
-                return get_string('activitylog_criteriachange', 'totara_competency');
+                return get_string('activity_log_criteria_change', 'totara_competency');
             case entities\configuration_change::CHANGED_MIN_PROFICIENCY:
                 $data = $entity->get_decoded_related_info();
                 $a = new \stdClass();
                 $a->scale_value_name = (new scale_value($data['new_min_proficiency_id']))->name;
-                return get_string('activitylog_minprofchanged', 'totara_competency', $a);
+                return get_string('activity_log_minprof_changed', 'totara_competency', $a);
             default:
                 throw new \coding_exception('Invalid type', 'Invalid change type: ' . $entity->change_type);
         }

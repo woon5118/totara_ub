@@ -23,9 +23,6 @@
 
 $string['pluginname'] = 'Course completion: Linked courses';
 
-$string['achievementvia'] = 'Course completion';
-$string['linkedcourses'] = 'Linked courses';
-$string['requiredcourses'] = 'Required courses';
-$string['updatelinkedcoursecriteria'] = 'Update linkedcourses criteria';
-
-$string['error:notenoughcourses'] = 'Not enough linked courses with completion tracking enabled';
+$string['achievement_via'] = 'Course completion';
+$string['error_not_enough_courses'] = 'Not enough linked courses with completion tracking enabled';
+$string['linked_courses'] = 'Linked courses';

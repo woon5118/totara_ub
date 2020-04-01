@@ -81,7 +81,7 @@
         </template>
       </Table>
       <div v-else class="tui-bulkManualRatingRateUsersList__noUsers">
-        {{ $str('filter:no_users', 'pathway_manual') }}
+        {{ $str('filter_no_users', 'pathway_manual') }}
       </div>
     </Loader>
   </div>
@@ -177,7 +177,7 @@ export default {
       "name"
     ],
     "pathway_manual": [
-      "filter:no_users",
+      "filter_no_users",
       "last_rated",
       "number_of_people",
       "rate_user",

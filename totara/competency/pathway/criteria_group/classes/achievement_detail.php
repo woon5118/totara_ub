@@ -47,7 +47,7 @@ class achievement_detail extends base_achievement_detail {
      * @return string
      */
     public function get_achievement_via_string($criteria_plugin_name): string {
-        return get_string('achievementvia', 'criteria_' . $criteria_plugin_name);
+        return get_string('achievement_via', 'criteria_' . $criteria_plugin_name);
     }
 
     /**

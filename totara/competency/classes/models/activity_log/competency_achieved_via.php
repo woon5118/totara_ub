@@ -63,10 +63,10 @@ class competency_achieved_via extends activity_log {
         $scale_value = $this->get_entity()->value;
 
         if (!$scale_value) {
-            return get_string('activitylog_rating_value_reset', 'totara_competency');
+            return get_string('activity_log_rating_value_reset', 'totara_competency');
         }
 
-        return get_string('activitylog_criteriamet', 'totara_competency', [
+        return get_string('activity_log_criteria_met', 'totara_competency', [
             'scale_value_name' => $scale_value->name,
             'criteria_met' => $this->join_criteria_met_strings(
                 $this->get_unique_criteria_met_strings()
@@ -113,7 +113,7 @@ class competency_achieved_via extends activity_log {
         $string_one = array_shift($strings);
         $string_two = array_shift($strings);
 
-        $joined_string = get_string('activitylog_criteriamet_multidivider', 'totara_competency', [
+        $joined_string = get_string('activity_log_criteria_met_multi_divider', 'totara_competency', [
             'critera_met_one' => $string_one,
             'critera_met_two' => $string_two,
         ]);

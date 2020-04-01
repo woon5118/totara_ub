@@ -1040,7 +1040,7 @@ abstract class criterion {
             'singleuse' => $this->is_singleuse(),
             'criterion_templatename' => $this->get_edit_template(),
             'expandable' => !$this->is_singleuse(),
-            'error' => $this->is_valid() ? '' : get_string('error:invalidconfiguration', 'totara_criteria'),
+            'error' => $this->is_valid() ? '' : get_string('error_invalid_configuration', 'totara_criteria'),
         ];
 
         return $result;

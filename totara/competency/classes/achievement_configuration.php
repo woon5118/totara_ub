@@ -388,7 +388,7 @@ class achievement_configuration {
         $groups = [
             [
                 'id' => 'low-sortorder',
-                'name' => get_string('anyscalevalue', 'totara_competency'),
+                'name' => get_string('any_scale_value', 'totara_competency'),
                 'hidden' => false,
                 'pathways' => array_values($low_multivalue_pathways),
             ],
@@ -400,7 +400,7 @@ class achievement_configuration {
             ],
             [
                 'id' => 'high-sortorder',
-                'name' => get_string('anyscalevalue', 'totara_competency'),
+                'name' => get_string('any_scale_value', 'totara_competency'),
                 'hidden' => false,
                 'pathways' => array_values($high_multivalue_pathways),
             ],

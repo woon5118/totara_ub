@@ -84,7 +84,7 @@ class pathway implements type_resolver {
                 }
                 $format = $args['format'] ?? format::FORMAT_PLAIN;
                 $formatter = new string_field_formatter($format, \context_system::instance());
-                return $formatter->format(get_string('error:invalidconfiguration', 'totara_competency'));
+                return $formatter->format(get_string('error_invalid_configuration', 'totara_competency'));
             case 'criteria_summary':
                 return $pathway->get_summarized_criteria_set();
         }

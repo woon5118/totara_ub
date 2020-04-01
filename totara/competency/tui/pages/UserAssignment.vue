@@ -112,7 +112,7 @@
 
           <SelectFilter
             v-model="filters.assignment_status"
-            :label="$str('header:assignment_status', 'totara_competency')"
+            :label="$str('header_assignment_status', 'totara_competency')"
             :show-label="true"
             :stacked="true"
             :options="assignmentStatusesOptions"
@@ -326,7 +326,7 @@ export default {
       const all = {
         id: null,
         label: this.$str(
-          'filter:framework:all_frameworks',
+          'filter_framework_all_frameworks',
           'totara_competency'
         ),
       };
@@ -490,9 +490,9 @@ export default {
       "confirm_generic",
       "currently_assigned",
       "error_generic_mutation",
-      "filter:framework:all_frameworks",
+      "filter_framework_all_frameworks",
       "filter_competencies",
-      "header:assignment_status",
+      "header_assignment_status",
       "n_competencies_selected",
       "no_competency_to_assign",
       "not_assigned",

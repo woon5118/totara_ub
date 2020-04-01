@@ -288,11 +288,11 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_competency/m
                                 stringList: [
                                     {
                                         component: 'criteria_othercompetency',
-                                        key: 'hierarchy_list:competency:all',
+                                        key: 'hierarchy_list_competency_all',
                                     },
                                     {
                                         component: 'criteria_othercompetency',
-                                        key: 'hierarchy_list:competency:all_in_framework',
+                                        key: 'hierarchy_list_competency_all_in_framework',
                                     }
                                 ]
                             },
@@ -310,7 +310,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_competency/m
                                         expandedViewTrigger: true,
                                         headerString: {
                                             component: 'criteria_othercompetency',
-                                            key: 'selectcompetencies',
+                                            key: 'select_competencies',
                                         },
                                     }],
                                     extraRowData: [{
@@ -332,7 +332,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_competency/m
                                 filterKey: 'framework',
                                 placeholderString: [{
                                     component: 'criteria_othercompetency',
-                                    key: 'allframeworks'
+                                    key: 'all_frameworks'
                                 }],
                                 service: 'totara_competency_get_frameworks',
                                 serviceArgs: {},
@@ -347,7 +347,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_competency/m
                             },
                             title: [{
                                 component: 'criteria_othercompetency',
-                                key: 'hierarchy_list:competency:select',
+                                key: 'hierarchy_list_competency_select',
                             }],
                         };
 

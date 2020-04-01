@@ -85,7 +85,7 @@ function(ListBase, HierarchyEvents) {
                     expandedViewTrigger: true,
                     headerString: {
                         component: 'totara_competency',
-                        key: 'header:competency_name',
+                        key: 'header_competency',
                     },
                 },
                 {

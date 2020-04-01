@@ -108,7 +108,7 @@
         role="row"
       >
         <div class="tui-competencySummaryGeneral__list_label" role="rowheader">
-          {{ $str('assignmentcreationavailability', 'totara_competency') }}
+          {{ $str('assignment_creation_availability', 'totara_competency') }}
         </div>
         <div class="tui-competencySummaryGeneral__list_value" role="gridcell">
           <div v-for="val in competency.assign_availability" :key="val">
@@ -285,10 +285,10 @@ export default {
       "idnumber",
       "description",
       "type",
-      "assignmentcreationavailability",
-      "achievementpaths",
-      "overallratingcalc",
-      "anyscalevalue"
+      "assignment_creation_availability",
+      "achievement_paths",
+      "overall_rating_calc",
+      "any_scale_value"
     ],
     "totara_hierarchy": [
       "aggregationmethod",

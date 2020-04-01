@@ -23,11 +23,5 @@
 
 $string['pluginname'] = 'Criteria fulfillment';
 
-$string['addcriterion'] = 'Add criterion';
-$string['aggregatetask'] = 'Process competency criteria fulfillment';
-$string['aggregationalltobecompleted'] = '<strong>All</strong> of the following must be met in order to achive:';
-$string['criteriaselect:title'] = 'Select criteria type';
-$string['criteriaselect:add'] = 'Add';
-$string['nocriteria'] = 'No criteria added';
-
-$string['error:cant_undo_singleuse'] = 'This criterion type can only be used once per competency. To be able to restore this criterion item, first remove the other item where it is in use.';
+$string['no_criteria'] = 'No criteria added';
+$string['error_cant_undo_single_use'] = 'This criterion type can only be used once per competency. To be able to restore this criterion item, first remove the other item where it is in use.';

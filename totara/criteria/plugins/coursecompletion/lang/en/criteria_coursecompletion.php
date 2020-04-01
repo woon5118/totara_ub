@@ -23,13 +23,11 @@
 
 $string['pluginname'] = 'Course completion: Flexible courses';
 
-$string['achievementvia'] = 'Course completion';
-$string['addcourses'] = "Add courses";
+$string['achievement_via'] = 'Course completion';
+$string['add_courses'] = "Add courses";
 $string['courses'] = 'Courses';
-$string['selectcourses'] = "Select courses";
-
-$string['error:notenoughcourses'] = 'Not enough courses with completion tracking enabled';
-$string['error:courseerror'] = 'One or more courses have errors';
-$string['error:nocoursecompletion'] = 'Completion tracking is disabled';
-$string['error:nocourse'] = 'Course no longer exists';
+$string['error_no_course'] = 'Course no longer exists';
+$string['error_no_course_completion'] = 'Completion tracking is disabled';
+$string['error_not_enough_courses'] = 'Not enough courses with completion tracking enabled';
+$string['select_courses'] = "Select courses";
 

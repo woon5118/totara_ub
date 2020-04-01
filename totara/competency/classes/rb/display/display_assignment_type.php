@@ -47,12 +47,16 @@ class display_assignment_type extends base {
     public static function display($value, $format, stdClass $row, rb_column $column, reportbuilder $report) {
         switch ($value) {
             case user_groups::POSITION:
+                $type_name = get_string('user_group_type_position', 'totara_competency');
+                break;
             case user_groups::ORGANISATION:
+                $type_name = get_string('user_group_type_organisation', 'totara_competency');
+                break;
             case user_groups::COHORT:
-                $type_name = get_string('user_group_type:'.$value, 'totara_competency');
+                $type_name = get_string('user_group_type_cohort', 'totara_competency');
                 break;
             default:
-                $type_name = get_string('assignment_type:'.$value, 'totara_competency');
+                $type_name = get_string('assignment_type_'.$value, 'totara_competency');
                 break;
         }
 

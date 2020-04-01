@@ -86,18 +86,18 @@ class user_assignment extends base {
 
     private function get_page_name(): string {
         if ($this->is_for_current_user()) {
-            return get_string('user_assignment_page_title:self', 'totara_competency');
+            return get_string('user_assignment_page_title_self', 'totara_competency');
         }
 
-        return get_string('user_assignment_page_title:other', 'totara_competency');
+        return get_string('user_assignment_page_title_other', 'totara_competency');
     }
 
     private function get_base_page_heading(): string {
         if ($this->is_for_current_user()) {
-            return get_string('user_assignment_page_heading:self', 'totara_competency');
+            return get_string('user_assignment_page_heading_self', 'totara_competency');
         }
 
-        return get_string('user_assignment_page_heading:other', 'totara_competency');
+        return get_string('user_assignment_page_heading_other', 'totara_competency');
     }
 
 }

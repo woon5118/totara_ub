@@ -262,8 +262,8 @@ class rb_source_perform_participant_instance extends rb_base_source {
      */
     protected function define_filteroptions() {
         $options = [
-            '20' => get_string('user_activities:status_complete', 'mod_perform'),
-            '10' => get_string('user_activities:status_in_progress', 'mod_perform'),
+            '20' => get_string('user_activities_status_complete', 'mod_perform'),
+            '10' => get_string('user_activities_status_in_progress', 'mod_perform'),
             '0' => get_string('user_activities_status_not_started', 'mod_perform'),
         ];
         $filteroptions = [

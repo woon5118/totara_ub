@@ -71,7 +71,7 @@ class track_user_assigned_bulk extends track_user_assignment {
      * @return string
      */
     public static function get_name() {
-        return get_string('event:track_user_assigned', 'mod_perform');
+        return get_string('event_track_user_assigned', 'mod_perform');
     }
 
     /**

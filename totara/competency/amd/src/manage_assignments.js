@@ -66,7 +66,7 @@ function(str, ModalFactory, ModalEvents, ListBase, ajax, notification, templates
                     break;
             }
 
-            var modalType = action + ':bulk';
+            var modalType = action + '_bulk';
 
             var modalEvent = function(e) {
                 var extraData = that.getExtraDataForArchive(e);
@@ -147,7 +147,7 @@ function(str, ModalFactory, ModalEvents, ListBase, ajax, notification, templates
             that = this;
 
         var stringKeys = [
-            {key: 'action:' + modalType + ':modal:header', component: 'totara_competency'}
+            {key: 'action_' + modalType + '_modal_header', component: 'totara_competency'}
         ];
 
         if (that.loader) {
@@ -159,7 +159,7 @@ function(str, ModalFactory, ModalEvents, ListBase, ajax, notification, templates
         if (template !== '') {
             body = templates.render(template, []);
         } else {
-            stringKeys.push({key: 'action:' + modalType + ':modal', component: 'totara_competency'});
+            stringKeys.push({key: 'action_' + modalType + '_modal', component: 'totara_competency'});
         }
 
         str.get_strings(stringKeys).then(function(strings) {
@@ -305,7 +305,7 @@ function(str, ModalFactory, ModalEvents, ListBase, ajax, notification, templates
         var params = {affected: data.length},
             type = data.length > 0 ? "success" : "error";
 
-        this.showNotification(type, 'action:confirm:' + action + ':' + type, 'totara_competency', params);
+        this.showNotification(type, 'action_confirm_' + action + '_' + type, 'totara_competency', params);
     };
 
     /**
@@ -320,9 +320,9 @@ function(str, ModalFactory, ModalEvents, ListBase, ajax, notification, templates
         var params = {affected: data.length, expected: selectedItems.length, skipped: skipped},
             type = data.length > 0 ? "success" : "warning";
 
-        var messageKey = 'action:confirm:' + action + ':bulk';
+        var messageKey = 'action_confirm_' + action + '_bulk';
         if (skipped > 0) {
-            messageKey = messageKey + ':skipped';
+            messageKey = messageKey + '_skipped';
         }
 
         this.showNotification(type, messageKey, 'totara_competency', params);
@@ -429,20 +429,20 @@ function(str, ModalFactory, ModalEvents, ListBase, ajax, notification, templates
         return [{
             key: 'delete',
             name: 'remove',
-            string: 'action:delete',
+            string: 'action_delete',
             component: 'totara_competency',
             classes: 'tw-list__hover_warning'
         },
         {
             key: 'activate',
             name: 'activate',
-            string: 'action:activate',
+            string: 'action_activate',
             component: 'totara_competency',
         },
         {
             key: 'archive',
             name: 'archive',
-            string: 'action:archive',
+            string: 'action_archive',
             component: 'totara_competency',
         }];
     };
@@ -470,14 +470,14 @@ function(str, ModalFactory, ModalEvents, ListBase, ajax, notification, templates
                     dataPath: 'competency_name',
                     headerString: {
                         component: 'totara_competency',
-                        key: 'header:competency_name',
+                        key: 'header_competency',
                     },
                 },
                 {
                     dataPath: 'assignment_type_name',
                     headerString: {
                         component: 'totara_competency',
-                        key: 'header:assignment_type',
+                        key: 'header_assignment_type',
                     },
                 },
                 {
@@ -491,7 +491,7 @@ function(str, ModalFactory, ModalEvents, ListBase, ajax, notification, templates
                     dataPath: 'status_name',
                     headerString: {
                         component: 'totara_competency',
-                        key: 'header:status',
+                        key: 'header_status',
                     },
                     size: 'sm'
                 }

@@ -24,7 +24,7 @@
   <Form class="tui-performManageActivityGeneralInfo">
     <FormRow
       v-slot="{ id, label }"
-      :label="$str('general_info_label:activity_title', 'mod_perform')"
+      :label="$str('general_info_label_activity_title', 'mod_perform')"
     >
       <InputText
         :id="id"
@@ -37,7 +37,7 @@
 
     <FormRow
       v-slot="{ id, label }"
-      :label="$str('general_info_label:activity_description', 'mod_perform')"
+      :label="$str('general_info_label_activity_description', 'mod_perform')"
     >
       <Textarea
         :id="id"
@@ -227,8 +227,8 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "general_info_label:activity_description",
-      "general_info_label:activity_title",
+      "general_info_label_activity_description",
+      "general_info_label_activity_title",
       "save_changes"
     ]
   }

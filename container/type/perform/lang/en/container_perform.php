@@ -23,7 +23,5 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['error:create_permission_missing'] = "Insufficient permission to create performance activity";
-$string['error:name_missing'] = 'Name must be provided';
 $string['pluginname'] = 'Performance activity container';
 $string['perform:create'] = 'Create performance activities';

@@ -54,7 +54,7 @@ class childcompetency_display extends criterion_display {
         return [
             (object)[
                 'description' => '',
-                'error' => get_string('error:notenoughchildren', 'criteria_childcompetency'),
+                'error' => get_string('error_not_enough_children', 'criteria_childcompetency'),
             ],
         ];
     }

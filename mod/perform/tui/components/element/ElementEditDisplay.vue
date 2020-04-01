@@ -28,7 +28,7 @@
         <div class="tui-elementEditDisplay__title">{{ name }}</div>
         <div class="tui-elementEditDisplay__action">
           <ButtonIcon
-            :aria-label="$str('perform:section:delete_element', 'mod_perform')"
+            :aria-label="$str('section_delete_element', 'mod_perform')"
             @click="remove"
           >
             <DeleteIcon size="200" />
@@ -68,7 +68,7 @@ export default {
 <lang-strings>
   {
   "mod_perform": [
-    "perform:section:delete_element"
+    "section_delete_element"
   ]
   }
 </lang-strings>

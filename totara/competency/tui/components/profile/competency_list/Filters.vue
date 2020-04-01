@@ -116,15 +116,15 @@ export default {
       return [
         {
           id: 'alphabetical',
-          label: this.$str('sort:alphabetical', 'totara_competency'),
+          label: this.$str('sort_alphabetical', 'totara_competency'),
         },
         !this.isForArchived && {
           id: 'recently-assigned',
-          label: this.$str('sort:recently_assigned', 'totara_competency'),
+          label: this.$str('sort_recently_assigned', 'totara_competency'),
         },
         this.isForArchived && {
           id: 'recently-archived',
-          label: this.$str('sort:recently_archived', 'totara_competency'),
+          label: this.$str('sort_recently_archived', 'totara_competency'),
         },
       ].filter(Boolean);
     },
@@ -168,9 +168,9 @@ export default {
     "proficient",
     "not_proficient",
     "all",
-    "sort:alphabetical",
-    "sort:recently_archived",
-    "sort:recently_assigned",
+    "sort_alphabetical",
+    "sort_recently_archived",
+    "sort_recently_assigned",
     "proficiency_status",
     "filter_competencies"
   ],

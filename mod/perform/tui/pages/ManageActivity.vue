@@ -23,7 +23,7 @@
 <template>
   <div class="tui-performManageActivity">
     <a :href="goBackLink">{{
-      $str('perform:back_to_all_activities', 'mod_perform')
+      $str('back_to_all_activities', 'mod_perform')
     }}</a>
 
     <Loader :loading="$apollo.loading">
@@ -101,15 +101,15 @@ export default {
       tabs: [
         {
           component: 'GeneralInfoForm',
-          name: this.$str('manage_activities_tabs:general', 'mod_perform'),
+          name: this.$str('manage_activities_tabs_general', 'mod_perform'),
         },
         {
           component: 'ContentForm',
-          name: this.$str('manage_activities_tabs:content', 'mod_perform'),
+          name: this.$str('manage_activities_tabs_content', 'mod_perform'),
         },
         {
           component: 'AssignmentsForm',
-          name: this.$str('manage_activities_tabs:assignment', 'mod_perform'),
+          name: this.$str('manage_activities_tabs_assignment', 'mod_perform'),
         },
       ],
     };
@@ -132,7 +132,7 @@ export default {
     pageHeading() {
       // TODO switching based on status
       return this.$str(
-        'perform:manage_edit_draft_heading',
+        'manage_edit_draft_heading',
         'mod_perform',
         this.activity.name
       );
@@ -145,7 +145,7 @@ export default {
     showMutationSuccessNotification() {
       notify({
         duration: TOAST_DURATION,
-        message: this.$str('toast:success:activity_update', 'mod_perform'),
+        message: this.$str('toast_success_activity_update', 'mod_perform'),
         type: 'success',
       });
     },
@@ -156,7 +156,7 @@ export default {
     showMutationErrorNotification() {
       notify({
         duration: TOAST_DURATION,
-        message: this.$str('toast:error:generic_update', 'mod_perform'),
+        message: this.$str('toast_error_generic_update', 'mod_perform'),
         type: 'error',
       });
     },
@@ -167,13 +167,13 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "manage_activities_tabs:assignment",
-      "manage_activities_tabs:content",
-      "manage_activities_tabs:general",
-      "perform:back_to_all_activities",
-      "perform:manage_edit_draft_heading",
-      "toast:error:generic_update",
-      "toast:success:activity_update"
+      "manage_activities_tabs_assignment",
+      "manage_activities_tabs_content",
+      "manage_activities_tabs_general",
+      "back_to_all_activities",
+      "manage_edit_draft_heading",
+      "toast_error_generic_update",
+      "toast_success_activity_update"
     ]
   }
 </lang-strings>

@@ -77,11 +77,11 @@ class assignment extends activity_log {
             case competency_assignment_user_log::ACTION_ASSIGNED:
                 switch ($assignment_entity->type) {
                     case entities\assignment::TYPE_SYSTEM:
-                        return get_string('activitylog_assignedcontinuous', 'totara_competency');
+                        return get_string('activity_log_assigned_continuous', 'totara_competency');
                     case entities\assignment::TYPE_LEGACY:
-                        return get_string('assignment_type:legacy', 'totara_competency');
+                        return get_string('assignment_type_legacy', 'totara_competency');
                     case entities\assignment::TYPE_SELF:
-                        return get_string('activitylog_assignedself', 'totara_competency');
+                        return get_string('activity_log_assigned_self', 'totara_competency');
                     case entities\assignment::TYPE_ADMIN:
                         // Use the models user group loading functionality
                         $user_group = $assignment_model->get_user_group();
@@ -91,16 +91,16 @@ class assignment extends activity_log {
                         switch ($user_group->get_type()) {
                             case user_groups::USER:
                                 $a->assigner_name = fullname((object)$assignment_entity->assigner->to_array());
-                                return get_string('activitylog_assignedadmin', 'totara_competency', $a);
+                                return get_string('activity_log_assigned_admin', 'totara_competency', $a);
                             case user_groups::COHORT:
                                 $a->audience_name = $name;
-                                return get_string('activitylog_assignedaudience', 'totara_competency', $a);
+                                return get_string('activity_log_assigned_audience', 'totara_competency', $a);
                             case user_groups::POSITION:
                                 $a->position_name = $name;
-                                return get_string('activitylog_assignedposition', 'totara_competency', $a);
+                                return get_string('activity_log_assigned_position', 'totara_competency', $a);
                             case user_groups::ORGANISATION:
                                 $a->organisation_name = $name;
-                                return get_string('activitylog_assignedorganisation', 'totara_competency', $a);
+                                return get_string('activity_log_assigned_organisation', 'totara_competency', $a);
                             default:
                                 throw new \coding_exception(
                                     'Invalid type',
@@ -111,7 +111,7 @@ class assignment extends activity_log {
                     case entities\assignment::TYPE_OTHER:
                         $a = new \stdClass();
                         $a->assigner_name = $assignment_model->get_reason_assigned();
-                        return get_string('activitylog_assignedother', 'totara_competency', $a);
+                        return get_string('activity_log_assigned_other', 'totara_competency', $a);
                     default:
                         throw new \coding_exception(
                             'Invalid type',
@@ -123,9 +123,9 @@ class assignment extends activity_log {
             case competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED:
                 switch ($assignment_entity->type) {
                     case entities\assignment::TYPE_SYSTEM:
-                        return get_string('activitylog_unassignedcontinuous', 'totara_competency');
+                        return get_string('activity_log_unassigned_continuous', 'totara_competency');
                     case entities\assignment::TYPE_SELF:
-                        return get_string('activitylog_unassignedself', 'totara_competency');
+                        return get_string('activity_log_unassigned_self', 'totara_competency');
                     case entities\assignment::TYPE_ADMIN:
                         // Use the models user group loading functionality
                         $user_group = $assignment_model->get_user_group();
@@ -135,16 +135,16 @@ class assignment extends activity_log {
                         switch ($user_group->get_type()) {
                             case user_groups::USER:
                                 $a->assigner_name = fullname((object)$assignment_entity->assigner->to_array());
-                                return get_string('activitylog_unassignedadmin', 'totara_competency', $a);
+                                return get_string('activity_log_unassigned_admin', 'totara_competency', $a);
                             case user_groups::COHORT:
                                 $a->audience_name = $name;
-                                return get_string('activitylog_unassignedaudience', 'totara_competency', $a);
+                                return get_string('activity_log_unassigned_audience', 'totara_competency', $a);
                             case user_groups::POSITION:
                                 $a->position_name = $name;
-                                return get_string('activitylog_unassignedposition', 'totara_competency', $a);
+                                return get_string('activity_log_unassigned_position', 'totara_competency', $a);
                             case user_groups::ORGANISATION:
                                 $a->organisation_name = $name;
-                                return get_string('activitylog_unassignedorganisation', 'totara_competency', $a);
+                                return get_string('activity_log_unassigned_organisation', 'totara_competency', $a);
                             default:
                                 throw new \coding_exception(
                                     'Invalid type',
@@ -155,7 +155,7 @@ class assignment extends activity_log {
                     case entities\assignment::TYPE_OTHER:
                         $a = new \stdClass();
                         $a->assigner_name = $assignment_model->get_reason_assigned();
-                        return get_string('activitylog_unassignedother', 'totara_competency', $a);
+                        return get_string('activity_log_unassigned_other', 'totara_competency', $a);
                     default:
                         throw new \coding_exception(
                             'Invalid type',
@@ -164,9 +164,9 @@ class assignment extends activity_log {
                 }
                 break;
             case competency_assignment_user_log::ACTION_TRACKING_START:
-                return get_string('activitylog_trackingstarted', 'totara_competency');
+                return get_string('activity_log_tracking_started', 'totara_competency');
             case competency_assignment_user_log::ACTION_TRACKING_END:
-                return get_string('activitylog_trackingstopped', 'totara_competency');
+                return get_string('activity_log_tracking_stopped', 'totara_competency');
             default:
                 throw new \coding_exception('Invalid action', 'Invalid action provided: ' . $this->get_entity()->action);
         }

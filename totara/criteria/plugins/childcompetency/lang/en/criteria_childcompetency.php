@@ -21,12 +21,12 @@
  * @package totara_criteria
  */
 
-$string['achievementvia'] = 'Proficiency in child competencies';
+$string['pluginname'] = 'Aggregation of child competencies';
+
+$string['achievement_via'] = 'Proficiency in child competencies';
 $string['assign_competency'] = 'Assign competency';
 $string['competencies'] = 'Competencies';
+$string['error_not_enough_children'] = 'This competency does not have enough child competencies in which the user can become proficient';
 $string['no_competencies'] = 'There are no child competencies available to view';
-$string['pluginname'] = 'Aggregation of child competencies';
 $string['required_only'] = '{$a} required only';
 $string['self_assign_competency'] = 'Self assign competency';
-
-$string['error:notenoughchildren'] = 'This competency does not have enough child competencies in which the user can become proficient';

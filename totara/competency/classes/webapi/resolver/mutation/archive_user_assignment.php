@@ -43,7 +43,7 @@ class archive_user_assignment implements mutation_resolver {
         $assignment = assignment::load_by_id($args['assignment_id']);
 
         if (!$assignment->can_archive($user_id)) {
-            throw new \moodle_exception('error:archive_user_assignment', 'totara_competency');
+            throw new \moodle_exception('error_archive_user_assignment', 'totara_competency');
         }
         $assignment->archive();
 

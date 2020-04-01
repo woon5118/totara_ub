@@ -42,7 +42,7 @@ class track_user_unassigned extends track_user_assignment {
      * @return string
      */
     public static function get_name() {
-        return get_string('event:track_user_unassigned', 'mod_perform');
+        return get_string('event_track_user_unassigned', 'mod_perform');
     }
 
     /**

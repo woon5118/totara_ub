@@ -42,7 +42,7 @@ class assignment_user_unassigned extends assignment_user {
      * @return string
      */
     public static function get_name() {
-        return get_string('event:assignment_user_unassigned', 'totara_competency');
+        return get_string('event_assignment_user_unassigned', 'totara_competency');
     }
 
     /**

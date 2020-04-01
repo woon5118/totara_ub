@@ -101,7 +101,7 @@ class coursecompletion extends criterion {
             return '';
         }
 
-        return get_string('error:notenoughchildren', 'criteria_childcompetency');
+        return get_string('error_not_enough_children', 'criteria_childcompetency');
     }
 
 
@@ -136,10 +136,10 @@ class coursecompletion extends criterion {
                 $item_detail['text'] = format_string(get_course_display_name_for_list($course));
                 $item_detail['error'] = $course->enablecompletion
                     ? ''
-                    : get_string('error:nocoursecompletion', 'criteria_coursecompletion');
+                    : get_string('error_no_course_completion', 'criteria_coursecompletion');
             } else {
                 $item_detail['text'] = '';
-                $item_detail['error'] = get_string('error:nocourse', 'criteria_coursecompletion');
+                $item_detail['error'] = get_string('error_no_course', 'criteria_coursecompletion');
             }
 
             $items[] = $item_detail;

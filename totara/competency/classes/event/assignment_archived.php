@@ -42,7 +42,7 @@ class assignment_archived extends assignment {
      * @return string
      */
     public static function get_name() {
-        return get_string('event:assignment_archived', 'totara_competency');
+        return get_string('event_assignment_archived', 'totara_competency');
     }
 
     /**

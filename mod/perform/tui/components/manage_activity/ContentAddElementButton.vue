@@ -24,7 +24,7 @@
     <ButtonIcon
       v-show="!isElementsVisible"
       :aria-label="'Add'"
-      :text="$str('perform:section:add_element', 'mod_perform')"
+      :text="$str('section_add_element', 'mod_perform')"
       @click.prevent="showElements"
     >
       <AddIcon size="200" />
@@ -35,7 +35,7 @@
           <ButtonIcon
             :aria-expanded="isOpen ? 'true' : 'false'"
             :aria-label="'Add'"
-            :text="$str('perform:section:element:questions', 'mod_perform')"
+            :text="$str('section_element_questions', 'mod_perform')"
             :caret="true"
             @click.prevent="toggle"
           />
@@ -95,8 +95,8 @@ export default {
 <lang-strings>
   {
   "mod_perform": [
-    "perform:section:element:questions",
-    "perform:section:add_element"
+    "section_element_questions",
+    "section_add_element"
   ]
   }
 </lang-strings>

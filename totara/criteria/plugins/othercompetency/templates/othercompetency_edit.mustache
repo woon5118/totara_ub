@@ -67,12 +67,12 @@
             <div>
                 <a href="#" data-tw-criterionOtherCompetency-addCompetencies="">
                     <span class="tw-criterion-smalltitle">
-                        {{#str}}addcompetencies, criteria_othercompetency{{/str}}
+                        {{#str}}add_competencies, criteria_othercompetency{{/str}}
                     </span>
                 </a>
                 <span class="tw-criterion-warning tw-criterion-hidden" data-tw-criterionOtherCompetency-error="notenoughothercompetency">
                     {{#flex_icon}}notification-warning{{/flex_icon}}
-                    {{#str}}error:notenoughothercompetency, criteria_othercompetency{{/str}}
+                    {{#str}}error_not_enough_other_competency, criteria_othercompetency{{/str}}
                 </span>
             </div>
         </div>
@@ -90,7 +90,7 @@
                        name="tw_criterionOtherCompetency_agg__{{key}}"
                        value="1"
                        data-tw-criterionOtherCompetency-aggregationMethod-changed="all"/>
-                <label for="tw_criterionOtherCompetency_agg_all__{{key}}"><span>{{#str}}completeall, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
+                <label for="tw_criterionOtherCompetency_agg_all__{{key}}"><span>{{#str}}complete_all, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
             </div>
 
             <div data-tw-criterionOtherCompetency-aggregationMethod="2">
@@ -100,7 +100,7 @@
                            name="tw_criterionOtherCompetency_agg__{{key}}"
                            value="2"
                            data-tw-criterionOtherCompetency-aggregationMethod-changed="any"/>
-                    <label for="tw_criterionOtherCompetency_agg_any__{{key}}"><span>{{#str}}completeany, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
+                    <label for="tw_criterionOtherCompetency_agg_any__{{key}}"><span>{{#str}}complete_any, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
                 </div>
 
                 <div class="tw-criterion-inline" data-tw-criterionOtherCompetency-aggregationCount="">

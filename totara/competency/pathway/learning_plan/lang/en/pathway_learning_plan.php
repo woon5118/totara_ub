@@ -24,10 +24,8 @@
 $string['pluginname'] = 'Learning plan';
 
 $string['achievement_detail'] = 'Competency achievement within a Learning Plan';
-$string['achievementpath_group_label'] = 'Learning Plan';
+$string['achievement_path_group_label'] = 'Learning Plan';
 $string['achievement_via_learning_plan'] = 'Achievement via learning plan';
-$string['aggregatetask'] = 'Update learning plan pathway achievements';
-$string['learning_plans'] = 'Learning plans';
 $string['learning_plan_pathway_help'] = 'Learning plan pathway enabled for this competency. This template is not following any design.';
 $string['name'] = 'Name';
 $string['no_available_learning_plans'] = 'No available learning plans';

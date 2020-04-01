@@ -25,13 +25,13 @@
   <Table :data="groupedCompetencyData" :group-mode="true" :archived="true">
     <template v-slot:header-row>
       <HeaderCell size="3">
-        {{ $str('header:competency_name', 'totara_competency') }}
+        {{ $str('header_competency', 'totara_competency') }}
       </HeaderCell>
       <HeaderCell size="2">
-        {{ $str('header:reason_assigned', 'totara_competency') }}
+        {{ $str('header_reason_assigned', 'totara_competency') }}
       </HeaderCell>
       <HeaderCell size="2">
-        {{ $str('header:archived_date', 'totara_competency') }}
+        {{ $str('header_archived_date', 'totara_competency') }}
       </HeaderCell>
       <HeaderCell size="2" align="center">
         {{ $str('proficient', 'totara_competency') }}
@@ -43,7 +43,7 @@
     <template v-slot:row="{ row, firstInGroup }">
       <Cell
         size="3"
-        :column-header="$str('header:competency_name', 'totara_competency')"
+        :column-header="$str('header_competency', 'totara_competency')"
         :repeated-header="!firstInGroup"
       >
         <a :href="competencyDetailsLink(row)">{{ row.competency.fullname }}</a>
@@ -51,14 +51,14 @@
 
       <Cell
         size="2"
-        :column-header="$str('header:reason_assigned', 'totara_competency')"
+        :column-header="$str('header_reason_assigned', 'totara_competency')"
       >
         {{ row.assignment && row.assignment.progress_name }}
       </Cell>
 
       <Cell
         size="2"
-        :column-header="$str('header:archived_date', 'totara_competency')"
+        :column-header="$str('header_archived_date', 'totara_competency')"
       >
         {{ row.assignment && row.assignment.archived_at }}
       </Cell>
@@ -90,22 +90,22 @@
 </template>
 
 <script>
-import Table from 'totara_core/components/datatable/Table';
-import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-import Cell from 'totara_core/components/datatable/Cell';
-import MyRatingCell from 'totara_competency/components/profile/MyRatingCell';
+  import Table from 'totara_core/components/datatable/Table';
+  import HeaderCell from 'totara_core/components/datatable/HeaderCell';
+  import Cell from 'totara_core/components/datatable/Cell';
+  import MyRatingCell from 'totara_competency/components/profile/MyRatingCell';
 
-export default {
-  components: {
-    Table,
-    HeaderCell,
-    Cell,
-    MyRatingCell,
-  },
+  export default {
+    components: {
+      Table,
+      HeaderCell,
+      Cell,
+      MyRatingCell,
+    },
 
-  props: {
-    competencies: {
-      required: true,
+    props: {
+      competencies: {
+        required: true,
       type: Array,
     },
     baseUrl: {
@@ -149,9 +149,9 @@ export default {
 {
   "moodle": ["yes", "no"],
   "totara_competency": [
-    "header:competency_name",
-    "header:reason_assigned",
-    "header:archived_date",
+    "header_competency",
+    "header_reason_assigned",
+    "header_archived_date",
     "proficient",
     "achievement_level"
   ]

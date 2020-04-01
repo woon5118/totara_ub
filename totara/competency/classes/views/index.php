@@ -31,7 +31,7 @@ class index extends base {
 
     protected $content_template = 'totara_competency/_assignments';
 
-    protected $title = ['title:index', 'totara_competency'];
+    protected $title = ['title_index', 'totara_competency'];
 
     public function __construct(array $data = []) {
         parent::__construct('totara_competency/index', $data);
@@ -84,16 +84,16 @@ class index extends base {
             false,
             [
                 (object)[
-                    'name' => get_string('sort:competency_name', 'totara_competency'),
+                    'name' => get_string('sort_competency_name', 'totara_competency'),
                     'key' => 'competency_name',
                     'default' => true
                 ],
                 (object)[
-                    'name' => get_string('sort:user_group_name', 'totara_competency'),
+                    'name' => get_string('sort_user_group_name', 'totara_competency'),
                     'key' => 'user_group_name',
                 ],
                 (object)[
-                    'name' => get_string('sort:most_recently_updated', 'totara_competency'),
+                    'name' => get_string('sort_most_recently_updated', 'totara_competency'),
                     'key' => 'most_recently_updated',
                 ],
             ],

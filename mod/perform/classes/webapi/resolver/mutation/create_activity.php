@@ -42,11 +42,11 @@ class create_activity implements mutation_resolver {
         require_login(null, false, null, false, true);
 
         if (!activity::can_create()) {
-            throw new create_exception(get_string('error:create_permission_missing', 'mod_perform'));
+            throw new create_exception(get_string('error_create_permission_missing', 'mod_perform'));
         }
 
         if (empty($args['name'])) {
-            throw new create_exception(get_string('error:activity_name_missing', 'mod_perform'));
+            throw new create_exception(get_string('error_activity_name_missing', 'mod_perform'));
         }
 
         $courseinfo = new \stdClass();

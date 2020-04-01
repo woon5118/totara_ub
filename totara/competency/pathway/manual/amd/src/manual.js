@@ -185,7 +185,7 @@ function (templates, notification, ajax, ModalList) {
                 var pickerData = {
                     key: 'pwManualRolesPicker_' + that.pwKey,
                     title: [{
-                        key: 'selectraters',
+                        key: 'select_raters',
                         component: 'pathway_manual'
                     }],
                     list: {
@@ -193,7 +193,7 @@ function (templates, notification, ajax, ModalList) {
                             cols: [{
                                 dataPath: 'text',
                                 headerString: {
-                                    key: 'selectraters',
+                                    key: 'select_raters',
                                     component: 'pathway_manual',
                                 },
                             }],

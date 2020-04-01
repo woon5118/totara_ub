@@ -38,7 +38,7 @@ class criteria_onactivate_display_testcase extends advanced_testcase {
 
         $expected = (object)[
             'item_type' => get_string('pluginname', 'criteria_onactivate'),
-            'item_aggregation' => get_string('completeall', 'totara_criteria'),
+            'item_aggregation' => get_string('complete_all', 'totara_criteria'),
             'items' => [],
         ];
 

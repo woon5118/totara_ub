@@ -24,4 +24,4 @@
 $string['pluginname'] = 'Assignment Activation';
 
 $string['achievement_display'] = 'Value achieved when the competency is assigned';
-$string['achievementvia'] = 'Competency assignment';
+$string['achievement_via'] = 'Competency assignment';

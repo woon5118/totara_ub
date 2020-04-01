@@ -262,11 +262,11 @@ class manual extends pathway {
         $result = new \stdClass();
         $result->item_type = $this->get_title();
         if (!$this->is_valid()) {
-            $result->error = get_string('error:invalidconfiguration', 'totara_competency');
+            $result->error = get_string('error_invalid_configuration', 'totara_competency');
             $result->items = [
                 (object)[
                     'description' => '',
-                    'error' => get_string('error:noraters', 'pathway_manual'),
+                    'error' => get_string('error_no_raters', 'pathway_manual'),
                 ],
             ];
         } else {
@@ -292,7 +292,7 @@ class manual extends pathway {
      * @inheritDoc
      */
     public static function get_label(): string {
-        return get_string('achievementpath_group_label', 'pathway_manual');
+        return get_string('achievement_path_group_label', 'pathway_manual');
     }
 
 

@@ -225,7 +225,7 @@ function (str, templates, ModalList, ajax, notification, Loader) {
                 key: 'totara_competency_linked_courses',
                 title: [{
                     component: 'totara_competency',
-                    key: 'selectcourses'
+                    key: 'select_courses'
                 }],
                 list: {
                     map: {
@@ -267,7 +267,7 @@ function (str, templates, ModalList, ajax, notification, Loader) {
                     serviceLabelKey: 'fullname',
                     placeholderString: [{
                         component: 'totara_competency',
-                        key: 'allcategories',
+                        key: 'all_categories',
                     }],
                     service: 'totara_competency_get_categories',
                     serviceArgs: {}
@@ -276,7 +276,7 @@ function (str, templates, ModalList, ajax, notification, Loader) {
                     filterKey: 'name',
                     placeholderString: [{
                         component:  'totara_competency',
-                        key: 'searchcourses'
+                        key: 'search_courses'
                     }]
                 }
             };
@@ -345,7 +345,7 @@ function (str, templates, ModalList, ajax, notification, Loader) {
             var stringData = [
                 {
                     component: 'totara_competency',
-                    key: 'linkedcoursessaved',
+                    key: 'linked_courses_saved',
                 },
                 {
                     component: 'totara_competency',
@@ -357,19 +357,19 @@ function (str, templates, ModalList, ajax, notification, Loader) {
                 },
                 {
                     component: 'totara_competency',
-                    key: 'removelinkedcourse',
+                    key: 'remove_linked_course',
                 },
                 {
                     component: 'totara_competency',
-                    key: 'removedlinkedcourse',
+                    key: 'removed_linked_course',
                 },
                 {
                     component: 'totara_competency',
-                    key: 'undoRemoveLinkedCourse',
+                    key: 'undo_remove_linked_course',
                 },
                 {
                     component: 'totara_competency',
-                    key: 'nocourseslinkedyet',
+                    key: 'no_courses_linked_yet',
                 }
             ];
 

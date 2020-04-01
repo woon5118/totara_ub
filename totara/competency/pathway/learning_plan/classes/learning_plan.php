@@ -123,7 +123,7 @@ class learning_plan extends pathway {
      * @inheritDoc
      */
     public static function get_label(): string {
-        return get_string('achievementpath_group_label', 'pathway_learning_plan');
+        return get_string('achievement_path_group_label', 'pathway_learning_plan');
     }
 
 }

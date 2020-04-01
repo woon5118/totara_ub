@@ -555,7 +555,7 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
 
                     // TODO: For now simply reloading all pathways. Try to find a way to update ids for keys
                     that.updatePage().then(function() {
-                        that.showNotification('success', 'applysuccess', 'totara_competency', {});
+                        that.showNotification('success', 'apply_success', 'totara_competency', {});
                     }).catch(function (e) {
                         e.fileName = that.filename;
                         e.name = 'Error updating the page';

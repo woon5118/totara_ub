@@ -3,7 +3,7 @@
     <Grid class="tui-performManageActivityAssignmentsForm__heading">
       <GridItem :grows="true">
         <h3 class="tui-performManageActivityAssignmentsForm__heading-title">
-          {{ $str('perform:user_group_assignment:title', 'mod_perform') }}
+          {{ $str('user_group_assignment_title', 'mod_perform') }}
         </h3>
       </GridItem>
       <GridItem
@@ -18,9 +18,7 @@
           <template v-slot:trigger="{ toggle, isOpen }">
             <Button
               :aria-expanded="isOpen ? 'true' : 'false'"
-              :text="
-                $str('perform:user_group_assignment:add:group', 'mod_perform')
-              "
+              :text="$str('user_group_assignment_add_group', 'mod_perform')"
               :caret="true"
               :styleclass="{
                 primary: true,
@@ -29,9 +27,7 @@
             />
           </template>
           <DropdownItem @click="openAdder">
-            {{
-              $str('perform:user_group_assignment:group:cohort', 'mod_perform')
-            }}
+            {{ $str('user_group_assignment_group_cohort', 'mod_perform') }}
           </DropdownItem>
         </Dropdown>
       </GridItem>
@@ -43,13 +39,13 @@
     >
       <template v-slot:header-row>
         <HeaderCell size="8" valign="center">
-          {{ $str('perform:user_group_assignment:name', 'mod_perform') }}
+          {{ $str('user_group_assignment_name', 'mod_perform') }}
         </HeaderCell>
         <HeaderCell size="4" valign="center">
-          {{ $str('perform:user_group_assignment:type', 'mod_perform') }}
+          {{ $str('user_group_assignment_type', 'mod_perform') }}
         </HeaderCell>
         <HeaderCell size="2" valign="center">
-          {{ $str('perform:user_group_assignment:usercount', 'mod_perform') }}
+          {{ $str('user_group_assignment_usercount', 'mod_perform') }}
         </HeaderCell>
         <HeaderCell size="2" valign="center" />
       </template>
@@ -58,18 +54,14 @@
           <Cell
             size="8"
             valign="center"
-            :column-header="
-              $str('perform:user_group_assignment:name', 'mod_perform')
-            "
+            :column-header="$str('user_group_assignment_name', 'mod_perform')"
           >
             {{ row.group.name }}
           </Cell>
           <Cell
             size="4"
             valign="center"
-            :column-header="
-              $str('perform:user_group_assignment:type', 'mod_perform')
-            "
+            :column-header="$str('user_group_assignment_type', 'mod_perform')"
           >
             {{ row.group.type_label }}
           </Cell>
@@ -77,7 +69,7 @@
             size="2"
             valign="center"
             :column-header="
-              $str('perform:user_group_assignment:usercount', 'mod_perform')
+              $str('user_group_assignment_usercount', 'mod_perform')
             "
           >
             <span v-if="row.group.id">TBD</span>
@@ -108,10 +100,7 @@
     <div>
       <h3>
         {{
-          $str(
-            'perform:user_group_assignment:unique_user_count:title',
-            'mod_perform'
-          )
+          $str('user_group_assignment_unique_user_count_title', 'mod_perform')
         }}
       </h3>
 
@@ -120,10 +109,7 @@
           <span>0</span>
         </span>
         <a href="#TBC">{{
-          $str(
-            'perform:user_group_assignment:unique_user_count:link',
-            'mod_perform'
-          )
+          $str('user_group_assignment_unique_user_count_link', 'mod_perform')
         }}</a>
       </div>
     </div>
@@ -136,20 +122,13 @@
     />
 
     <ConfirmationModal
-      :title="
-        $str(
-          'perform:user_group_assignment:confirm:remove:title',
-          'mod_perform'
-        )
-      "
+      :title="$str('user_group_assignment_confirm_remove_title', 'mod_perform')"
       :open="confirmationModalOpen"
       @confirm="removeAssignment"
       @cancel="hideRemoveConfirmationModal"
     >
       <p>
-        {{
-          $str('perform:user_group_assignment:confirm:remove', 'mod_perform')
-        }}
+        {{ $str('user_group_assignment_confirm_remove', 'mod_perform') }}
       </p>
     </ConfirmationModal>
   </div>
@@ -204,10 +183,7 @@ export default {
       noAssignments: [
         {
           group: {
-            name: this.$str(
-              'perform:user_group_assignment:nousers',
-              'mod_perform'
-            ),
+            name: this.$str('user_group_assignment_no_users', 'mod_perform'),
           },
         },
       ],
@@ -372,17 +348,17 @@ export default {
 <lang-strings>
   {
     "mod_perform" : [
-      "perform:user_group_assignment:add:group",
-      "perform:user_group_assignment:confirm:remove",
-      "perform:user_group_assignment:confirm:remove:title",
-      "perform:user_group_assignment:group:cohort",
-      "perform:user_group_assignment:name",
-      "perform:user_group_assignment:nousers",
-      "perform:user_group_assignment:title",
-      "perform:user_group_assignment:type",
-      "perform:user_group_assignment:unique_user_count:title",
-      "perform:user_group_assignment:unique_user_count:link",
-      "perform:user_group_assignment:usercount"
+      "user_group_assignment_add_group",
+      "user_group_assignment_confirm_remove",
+      "user_group_assignment_confirm_remove_title",
+      "user_group_assignment_group_cohort",
+      "user_group_assignment_name",
+      "user_group_assignment_no_users",
+      "user_group_assignment_title",
+      "user_group_assignment_type",
+      "user_group_assignment_unique_user_count_title",
+      "user_group_assignment_unique_user_count_link",
+      "user_group_assignment_usercount"
     ],
     "moodle": [
       "delete"

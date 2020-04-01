@@ -97,24 +97,24 @@ class overview implements \renderable {
         $components = array(
             'moodle' => array(
                 'feature_organisationalhierarchy' => '1',   // Fake setting to mimic organisational hierarchies.
-                'feature_audiencemanagement' => '1',        // Fake setting to mimic audience management.
-                'feature_facetoface' => '1',                // Fake setting to mimic facetoface.
-                'enablecourserpl' => null,                  // Totara.
-                'enablebadges' => null,                     // Totara.
-                'audiencevisibility' => null,               // Totara.
-                'feature_reportbuilder' => '1',             // Fake setting to mimic Report Builder.
-                'enableglobalrestrictions' => null,         // Totara.
-                'enablegoals' => null,                      // Totara.
-                'enablepositions' => null,                  // Totara.
-                'enablemyteam' => null,                     // Totara.
-                'enablecompetencies' => null,               // Totara.
-                'enablecompetency_assignment' => null,      // Totara.
-                'enableappraisals' => null,                 // Totara.
-                'enablefeedback360' => null,                // Totara.
-                'enablelearningplans' => null,              // Totara.
-                'enableprograms' => null,                   // Totara.
-                'enablecertifications' => null,             // Totara.
-                'enabletotaradashboard' => null,            // Totara.
+                'feature_audiencemanagement'      => '1',   // Fake setting to mimic audience management.
+                'feature_facetoface'              => '1',   // Fake setting to mimic facetoface.
+                'enablecourserpl'                 => null,  // Totara.
+                'enablebadges'                    => null,  // Totara.
+                'audiencevisibility'              => null,  // Totara.
+                'feature_reportbuilder'           => '1',   // Fake setting to mimic Report Builder.
+                'enableglobalrestrictions'        => null,  // Totara.
+                'enablegoals'                     => null,  // Totara.
+                'enablepositions'                 => null,  // Totara.
+                'enablemyteam'                    => null,  // Totara.
+                'enablecompetencies'              => null,  // Totara.
+                'enablecompetency_assignment'     => null,  // Totara.
+                'enableappraisals'                => null,  // Totara.
+                'enablefeedback360'               => null,  // Totara.
+                'enablelearningplans'             => null,  // Totara.
+                'enableprograms'                  => null,  // Totara.
+                'enablecertifications'            => null,  // Totara.
+                'enabletotaradashboard'           => null,  // Totara.
             )
         );
 

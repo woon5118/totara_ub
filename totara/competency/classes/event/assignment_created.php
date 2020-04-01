@@ -44,7 +44,7 @@ class assignment_created extends assignment {
      * @return string
      */
     public static function get_name() {
-        return get_string('event:assignment_created', 'totara_competency');
+        return get_string('event_assignment_created', 'totara_competency');
     }
 
     /**

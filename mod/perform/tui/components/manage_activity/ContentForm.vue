@@ -22,7 +22,7 @@
 
 <template>
   <div>
-    <h3>{{ $str('activity_content_tab:heading', 'mod_perform') }}</h3>
+    <h3>{{ $str('activity_content_tab_heading', 'mod_perform') }}</h3>
 
     <ActivitySection
       v-for="(section, i) in value.sections"
@@ -108,8 +108,8 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "general_info_label:activity_description",
-      "activity_content_tab:heading",
+      "general_info_label_activity_description",
+      "activity_content_tab_heading",
       "save_changes"
     ]
   }

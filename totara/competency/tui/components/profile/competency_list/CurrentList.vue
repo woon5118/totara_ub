@@ -25,7 +25,7 @@
   <Table :data="competencies">
     <template v-slot:header-row>
       <HeaderCell size="10">
-        {{ $str('header:competency_name', 'totara_competency') }}
+        {{ $str('header_competency', 'totara_competency') }}
       </HeaderCell>
       <HeaderCell size="2" align="center">
         {{ $str('proficient', 'totara_competency') }}
@@ -37,7 +37,7 @@
     <template v-slot:row="{ row }">
       <Cell
         size="10"
-        :column-header="$str('header:competency_name', 'totara_competency')"
+        :column-header="$str('header_competency', 'totara_competency')"
       >
         <a :href="competencyDetailsLink(row)">{{ row.competency.fullname }}</a>
       </Cell>
@@ -73,23 +73,23 @@
 </template>
 
 <script>
-import Table from 'totara_core/components/datatable/Table';
-import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-import Cell from 'totara_core/components/datatable/Cell';
-import CheckIcon from 'totara_core/components/icons/common/CheckSuccess';
-import MyRatingCell from 'totara_competency/components/profile/MyRatingCell';
+  import Table from 'totara_core/components/datatable/Table';
+  import HeaderCell from 'totara_core/components/datatable/HeaderCell';
+  import Cell from 'totara_core/components/datatable/Cell';
+  import CheckIcon from 'totara_core/components/icons/common/CheckSuccess';
+  import MyRatingCell from 'totara_competency/components/profile/MyRatingCell';
 
-export default {
-  components: {
-    Table,
-    HeaderCell,
-    Cell,
-    CheckIcon,
-    MyRatingCell,
-  },
+  export default {
+    components: {
+      Table,
+      HeaderCell,
+      Cell,
+      CheckIcon,
+      MyRatingCell,
+    },
 
-  props: {
-    competencies: {
+    props: {
+      competencies: {
       required: true,
       type: Array,
     },
@@ -123,7 +123,7 @@ export default {
 {
   "moodle": ["yes", "no"],
   "totara_competency": [
-    "header:competency_name",
+    "header_competency",
     "achievement_level",
     "proficient"
   ]

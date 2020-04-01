@@ -207,19 +207,19 @@ final class grouping {
         $lang_string_key = null;
         switch ($type) {
             case self::COHORT:
-                $lang_string_key = 'perform:user_group_assignment:group:cohort';
+                $lang_string_key = 'user_group_assignment_group_cohort';
                 break;
 
             case self::ORG:
-                $lang_string_key = 'perform:user_group_assignment:group:org';
+                $lang_string_key = 'user_group_assignment_group_org';
                 break;
 
             case self::POS:
-                $lang_string_key = 'perform:user_group_assignment:group:pos';
+                $lang_string_key = 'user_group_assignment_group_pos';
                 break;
 
             case self::USER:
-                $lang_string_key = 'perform:user_group_assignment:group:user';
+                $lang_string_key = 'user_group_assignment_group_user';
                 break;
         }
 

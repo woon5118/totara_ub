@@ -3,10 +3,10 @@
     <Table v-if="!$apollo.loading" :data="subjectInstances">
       <template v-slot:header-row>
         <HeaderCell :size="showSubjectName ? '6' : '8'">
-          {{ $str('user_activities:title_header', 'mod_perform') }}
+          {{ $str('user_activities_title_header', 'mod_perform') }}
         </HeaderCell>
         <HeaderCell v-if="showSubjectName" size="2">
-          {{ $str('user_activities:subject_header', 'mod_perform') }}
+          {{ $str('user_activities_subject_header', 'mod_perform') }}
         </HeaderCell>
         <HeaderCell size="2">
           {{
@@ -20,7 +20,7 @@
       <template v-slot:row="{ row: subjectInstance }">
         <Cell
           :size="showSubjectName ? '6' : '8'"
-          :column-header="$str('user_activities:title_header', 'mod_perform')"
+          :column-header="$str('user_activities_title_header', 'mod_perform')"
         >
           <a :href="getViewActivityUrl(subjectInstance)">{{
             subjectInstance.activity.name
@@ -29,7 +29,7 @@
         <Cell
           v-if="showSubjectName"
           size="2"
-          :column-header="$str('user_activities:subject_header', 'mod_perform')"
+          :column-header="$str('user_activities_subject_header', 'mod_perform')"
         >
           {{ subjectInstance.subject_user.fullname }}
         </Cell>
@@ -139,9 +139,9 @@ export default {
         case 'NOT_STARTED':
           return this.$str('user_activities_status_not_started', 'mod_perform');
         case 'IN_PROGRESS':
-          return this.$str('user_activities:status_in_progress', 'mod_perform');
+          return this.$str('user_activities_status_in_progress', 'mod_perform');
         case 'COMPLETE':
-          return this.$str('user_activities:status_complete', 'mod_perform');
+          return this.$str('user_activities_status_complete', 'mod_perform');
         default:
           return '';
       }
@@ -173,14 +173,13 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "perform:view:status",
-      "user_activities:status_complete",
+      "user_activities_status_complete",
       "user_activities_status_header_activity",
       "user_activities_status_header_participation",
-      "user_activities:status_in_progress",
+      "user_activities_status_in_progress",
       "user_activities_status_not_started",
-      "user_activities:subject_header",
-      "user_activities:title_header",
+      "user_activities_subject_header",
+      "user_activities_title_header",
       "toast_success_save_response",
       "toast_error_save_response"
     ]

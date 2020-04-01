@@ -284,7 +284,7 @@ function(templates, notification, ajax, ModalList, Loader) {
                 var adderData = {
                     key: 'courseAdder_' + that.criterionKey,
                     title: [{
-                        key: 'selectcourses',
+                        key: 'select_courses',
                         component: 'criteria_coursecompletion'
                     }],
                     list: {
@@ -292,7 +292,7 @@ function(templates, notification, ajax, ModalList, Loader) {
                             cols: [{
                                 dataPath: 'fullname',
                                 headerString: {
-                                    key: 'selectcourses',
+                                    key: 'select_courses',
                                     component: 'totara_competency',
                                 },
                             }],
@@ -304,7 +304,7 @@ function(templates, notification, ajax, ModalList, Loader) {
                         serviceLabelKey: 'fullname',
                         placeholderString: [{
                             component: 'totara_competency',
-                            key: 'allcategories',
+                            key: 'all_categories',
                         }],
                         service: that.endpoints.courseCategories,
                         serviceArgs: {}
@@ -313,7 +313,7 @@ function(templates, notification, ajax, ModalList, Loader) {
                         filterKey: 'name',
                         placeholderString: [{
                             component:  'totara_competency',
-                            key: 'searchcourses'
+                            key: 'search_courses'
                         }]
                     },
                     onSaved: function(adder, courseIds, courseData) {

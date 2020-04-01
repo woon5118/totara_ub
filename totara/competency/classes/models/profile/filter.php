@@ -128,11 +128,11 @@ class filter {
     protected function get_human_status(assignment_model $assignment) {
         switch ($assignment->get_status()) {
             case assignment_entity::STATUS_ACTIVE:
-                return get_string('status:active-alt', 'totara_competency');
+                return get_string('status_active_alt', 'totara_competency');
             case assignment_entity::STATUS_ARCHIVED:
-                return get_string('status:archived-alt', 'totara_competency');
+                return get_string('status_archived_alt', 'totara_competency');
             case assignment_entity::STATUS_DRAFT:
-                return get_string('status:draft', 'totara_competency');
+                return get_string('status_draft', 'totara_competency');
             default:
                 debugging('Unknown assignment status: ' . $assignment->get_status(), DEBUG_DEVELOPER);
                 return 'Unknown';

@@ -24,7 +24,7 @@
   <div class="tui-competencySummaryAchievementConfiguration">
     <div class="tui-competencySummaryAchievementConfiguration__header">
       <div class="tui-competencySummaryAchievementConfiguration__header_title">
-        {{ $str('achievementpaths', 'totara_competency') }}
+        {{ $str('achievement_paths', 'totara_competency') }}
       </div>
       <a
         :href="editUrl"
@@ -40,7 +40,7 @@
       class="tui-competencySummaryAchievementConfiguration__response"
     >
       <div class="tui-competencySummaryAchievementConfiguration__aggregation">
-        <Label :label="$str('overallratingcalc', 'totara_competency')" />
+        <Label :label="$str('overall_rating_calc', 'totara_competency')" />
         <div
           class="tui-competencySummaryAchievementConfiguration__aggregation_title"
         >
@@ -117,7 +117,7 @@
       v-else-if="!$apollo.loading"
       class="tui-competencySummaryAchievementConfiguration__noPaths"
     >
-      {{ $str('nopaths', 'totara_competency') }}
+      {{ $str('no_paths', 'totara_competency') }}
     </div>
   </div>
 </template>
@@ -154,7 +154,7 @@ export default {
   computed: {
     editUrl() {
       return this.$url('/totara/competency/competency_edit.php', {
-        s: 'achievementpaths',
+        s: 'achievement_paths',
         id: this.competencyId,
       });
     },
@@ -188,7 +188,7 @@ export default {
               key: 'group-' + idx,
               scaleValues: [
                 {
-                  value: this.$str('anyscalevalue', 'totara_competency'),
+                  value: this.$str('any_scale_value', 'totara_competency'),
                   paths: [path],
                 },
               ],
@@ -198,7 +198,7 @@ export default {
               key: 'group-' + idx,
               scaleValues: [
                 {
-                  value: this.$str('anyscalevalue', 'totara_competency'),
+                  value: this.$str('any_scale_value', 'totara_competency'),
                   paths: [path],
                 },
               ],
@@ -350,10 +350,10 @@ export default {
     "edit"
   ],
   "totara_competency": [
-    "achievementpaths",
-    "overallratingcalc",
-    "anyscalevalue",
-    "nopaths"
+    "achievement_paths",
+    "overall_rating_calc",
+    "any_scale_value",
+    "no_paths"
   ]
 }
 </lang-strings>

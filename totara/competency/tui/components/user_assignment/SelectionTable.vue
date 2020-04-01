@@ -36,20 +36,20 @@
     >
       <template v-slot:header-row>
         <HeaderCell size="16">{{
-          $str('header:competency_name', 'totara_competency')
+          $str('header_competency', 'totara_competency')
+          }}</HeaderCell>
+        <HeaderCell size="16">{{
+          $str('header_assignment_status', 'totara_competency')
         }}</HeaderCell>
         <HeaderCell size="16">{{
-          $str('header:assignment_status', 'totara_competency')
-        }}</HeaderCell>
-        <HeaderCell size="16">{{
-          $str('header:assignment_reasons', 'totara_competency')
+          $str('header_assignment_reasons', 'totara_competency')
         }}</HeaderCell>
       </template>
 
       <template v-slot:row="{ row, expand }">
         <Cell
           size="16"
-          :column-header="$str('header:competency_name', 'totara_competency')"
+          :column-header="$str('header_competency', 'totara_competency')"
         >
           <a v-if="row.description" href="#" @click.prevent="expand()">{{
             row.display_name
@@ -58,7 +58,7 @@
         </Cell>
         <Cell
           size="16"
-          :column-header="$str('header:assignment_status', 'totara_competency')"
+          :column-header="$str('header_assignment_status', 'totara_competency')"
         >
           {{ getAssignmentStatus(row) }}
         </Cell>
@@ -66,7 +66,7 @@
           size="16"
           :column-header="
             row.user_assignments.length > 0
-              ? $str('header:assignment_reasons', 'totara_competency')
+              ? $str('header_assignment_reasons', 'totara_competency')
               : ''
           "
         >
@@ -91,21 +91,21 @@
 </template>
 
 <script>
-import Cell from 'totara_core/components/datatable/Cell';
-import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-import SelectTable from 'totara_core/components/datatable/SelectTable';
+  import Cell from 'totara_core/components/datatable/Cell';
+  import HeaderCell from 'totara_core/components/datatable/HeaderCell';
+  import SelectTable from 'totara_core/components/datatable/SelectTable';
 
-export default {
-  components: {
-    Cell,
-    HeaderCell,
-    SelectTable,
-  },
-  props: {
-    value: {
-      type: Array,
-      required: true,
+  export default {
+    components: {
+      Cell,
+      HeaderCell,
+      SelectTable,
     },
+    props: {
+      value: {
+        type: Array,
+        required: true,
+      },
     competencies: {
       type: Array,
       required: true,
@@ -147,9 +147,9 @@ export default {
       "currently_assigned",
       "description",
       "competencies",
-      "header:competency_name",
-      "header:assignment_status",
-      "header:assignment_reasons",
+      "header_competency",
+      "header_assignment_status",
+      "header_assignment_reasons",
       "not_assigned"
     ]
   }

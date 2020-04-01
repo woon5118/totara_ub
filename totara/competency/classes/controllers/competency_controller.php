@@ -127,10 +127,10 @@ class competency_controller extends admin_controller {
 
         $exportmethod = "export_{$section}_edit";
         if (!method_exists($this, $exportmethod)) {
-            print_error('invalidsection', 'totara_competency', '', $section);
+            print_error('invalid_section', 'totara_competency', '', $section);
         }
 
-        $heading = get_string('editcompetency', 'totara_competency', format_string($this->competency->display_name));
+        $heading = get_string('edit_competency', 'totara_competency', format_string($this->competency->display_name));
         $this->page->navbar->add($heading);
 
         $this->competency = new competency($this->competency->id);
@@ -223,7 +223,7 @@ class competency_controller extends admin_controller {
         $pathway_types[] =
             [
                 'type' => 'singlevalue',
-                'name' => get_string('singlevaluepaths', 'totara_competency'),
+                'name' => get_string('single_value_paths', 'totara_competency'),
                 'templatename' => 'totara_competency/scalevalue_pathways_edit',
                 'classification' => pathway::PATHWAY_SINGLE_VALUE,
             ];

@@ -647,7 +647,7 @@ function (str, notification, templates) {
                 if (hasSingleUse == '1') {
                     notification.clearNotifications();
 
-                    str.get_string('error:cant_undo_singleuse', 'pathway_criteria_group').done(function (message) {
+                    str.get_string('error_cant_undo_single_use', 'pathway_criteria_group').done(function (message) {
                         notification.addNotification({
                             message: message,
                             type: 'error'

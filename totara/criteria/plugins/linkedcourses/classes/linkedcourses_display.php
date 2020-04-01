@@ -38,7 +38,7 @@ class linkedcourses_display extends criterion_display {
      * @return string
      */
     public function get_display_items_type(): string {
-        return get_string('linkedcourses', 'criteria_linkedcourses');
+        return get_string('linked_courses', 'criteria_linkedcourses');
     }
 
     /**
@@ -55,7 +55,7 @@ class linkedcourses_display extends criterion_display {
         return [
             (object)[
                 'description' => '',
-                'error' => get_string('error:notenoughcourses', 'criteria_linkedcourses'),
+                'error' => get_string('error_not_enough_courses', 'criteria_linkedcourses'),
             ],
         ];
     }
