@@ -114,7 +114,14 @@ $string['chooseplantemplate'] = 'Choose template';
 $string['cleanuptask'] = 'Cleanup audience assign roles';
 $string['clear'] = 'Clear';
 $string['clonecohort'] = 'Clone audience';
-$string['cloneconfirm'] = 'Do you really want to create a copy of the audience \'{$a}\'?';
+$string['cloneconfirm'] = 'Do you really want to create a copy of the audience \'{$a}\'? <br />
+Please note that the following attributes will NOT be copied:
+<ul>
+<li>Enrolled learning</li>
+<li>Learning plans</li>
+<li>Goals</li>
+<li>Assigned roles</li>
+</ul>';
 $string['clonename'] = 'Copy of {$a}';
 $string['clonethiscohort'] = 'Clone this audience';
 $string['cohort'] = 'Audience';
