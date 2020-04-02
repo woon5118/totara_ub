@@ -361,6 +361,7 @@ $string['cancelwaitlistfor'] = 'Cancel place on the waitlist for {$a}';
 $string['capacity'] = 'Capacity';
 $string['capacityallowoverbook'] = '{$a} (waitlist enabled)';
 $string['capacitycurrentofmaximum'] = '{$a->current} / {$a->maximum}';
+$string['capacitycurrentofmaximumwaitlist'] = '{$a->current} / {$a->maximum} ({$a->waitlist} on waitlist)';
 $string['capacityoverbooked'] = ' (Overbooked)';
 $string['capacityoverbookedlong'] = 'This event is overbooked ({$a->current} / {$a->maximum})';
 $string['cancelreservation'] = 'Cancel reservation';

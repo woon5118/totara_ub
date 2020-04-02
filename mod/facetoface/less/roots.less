@@ -539,13 +539,11 @@ select.menuf2f-select {
         }
 
         &__action {
-            // Override Bootstrap.
-            &__buttons.btn-group {
+            &__buttons {
                 display: flex;
                 justify-content: center;
             }
-            // Override Bootstrap.
-            &__buttons.btn-group &__dropdown.dropdown-toggle {
+            &__buttons &__dropdown.dropdown-toggle {
                 padding: @padding-small-vertical @totara_style-spacing_small;
             }
             &__icons {
@@ -556,6 +554,8 @@ select.menuf2f-select {
                 margin-top: @totara_style-spacing_x_small;
             }
             &__dropdown {
+                margin-left: 2px;
+
                 > .flex-icon {
                     font-size: 111%;
                     // This hackery disables font hinting and grid fitting to get a better rendering result of the "..." button.

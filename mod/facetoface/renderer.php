@@ -1466,8 +1466,14 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             $currenthtml = \html_writer::span($signupcount, 'mod_facetoface__capacity__current');
             $maximumhtml = \html_writer::span($seminarevent->get_capacity(), 'mod_facetoface__capacity__maximum');
             $a = array('current' => $currenthtml, 'maximum' => $maximumhtml);
-            $stats = get_string('capacitycurrentofmaximum', 'mod_facetoface', $a);
-            if ($seminarevent->get_allowoverbook()) {
+            $waitlisted = (new attendees_helper($seminarevent))->count_attendees_with_codes([waitlisted::get_code()], $includedeleted, true);
+            if ($waitlisted > 0) {
+                $a['waitlist'] = \html_writer::span($waitlisted, 'mod_facetoface__capacity__waitlist');
+                $stats = get_string('capacitycurrentofmaximumwaitlist', 'mod_facetoface', $a);
+            } else {
+                $stats = get_string('capacitycurrentofmaximum', 'mod_facetoface', $a);
+            }
+            if ($seminarevent->get_allowoverbook() && $waitlisted <= 0) { // NOTE: avoid displaying '(1 on waitlist) (waitlist enabled)'
                 $section->add_detail_unsafe($labeltext, get_string('capacityallowoverbook', 'mod_facetoface', $stats));
             } else {
                 $section->add_detail_unsafe($labeltext, $stats);

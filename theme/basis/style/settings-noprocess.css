@@ -34,7 +34,8 @@ button,
 a.link-as-button,
 a.btn,
 #id_buttonfield,
-#page-footer a:link.btn
+#page-footer a:link.btn,
+.open > .dropdown-toggle.btn-default
 {
     color: [[setting:buttoncolor-readable-text]];
     background-color: [[setting:buttoncolor]];
@@ -50,7 +51,8 @@ button:hover,
 a.link-as-button:hover,
 a.btn:hover,
 #id_buttonfield:hover,
-#page-footer a:link.btn:hover
+#page-footer a:link.btn:hover,
+.open > .dropdown-toggle.btn-default:hover
 {
     color:[[setting:buttoncolor-readable-text]];
     background-color:[[setting:buttoncolor-darker-perc]];
@@ -66,6 +68,7 @@ a.link-as-button:active,
 a.btn:active,
 #id_buttonfield:active,
 #page-footer a:link.btn:active,
+.open > .dropdown-toggle.btn-default:active,
 
 input.submit:focus,
 input[type="submit"]:focus,
@@ -77,6 +80,7 @@ a.link-as-button:focus,
 a.btn:focus,
 #id_buttonfield:focus,
 #page-footer a:link.btn:focus,
+.open > .dropdown-toggle.btn-default:focus,
 
 input.submit:active:focus,
 input[type="submit"]:active:focus,
@@ -88,6 +92,7 @@ a.link-as-button:active:focus,
 a.btn:active:focus,
 #id_buttonfield:active:focus,
 #page-footer a:link.btn:active:focus,
+.open > .dropdown-toggle.btn-default:active:focus,
 
 input.submit:active:hover,
 input[type="submit"]:active:hover,
@@ -98,7 +103,8 @@ button:active:hover,
 a.link-as-button:active:hover,
 a.btn:active:hover,
 #id_buttonfield:active:hover,
-#page-footer a:link.btn:active:hover
+#page-footer a:link.btn:active:hover,
+.open > .dropdown-toggle.btn-default:active:hover
 {
     color:[[setting:buttoncolor-readable-text]];
     background-color:[[setting:buttoncolor-dark-perc]];
