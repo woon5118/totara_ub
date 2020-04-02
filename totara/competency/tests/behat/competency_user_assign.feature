@@ -28,7 +28,7 @@ Feature: Test competencies can be user assigned
 
     When I change the competency profile to list view
     And I should see the tui datatable contains:
-      | Competency name |
+      | Competency      |
       | Self assignable |
 
     When I click on "Self-assign competencies" "link"
@@ -47,44 +47,44 @@ Feature: Test competencies can be user assigned
     And the tui basket should be empty
     And I should see "2 competencies"
     And I should see the tui datatable contains:
-      | Competency name                | Status             | Reason assigned    |
+      | Competency                     | Status             | Reason assigned    |
       | Self assignable                | Currently assigned | Admin User (Admin) |
       | Self assignable no description | Not assigned       |                    |
 
     # Open the expandable content
-    When I click the "Competency name" on row "1" of the tui datatable
+    When I click the "Competency" on row "1" of the tui datatable
     Then I should see "Self assignable" in the ".tui-dataTableExpandableRow__content" "css_element"
     And I should see "Description" in the ".tui-dataTableExpandableRow__content" "css_element"
     # Assert there is an html description that has actually rendered html
     And I should see "Find out more" in the "Find out more" "link"
 
     When I close the tui datatable expandable content
-    And I click "Competency Type One" in the "COMPETENCY TYPES" tui multi select filter
+    And I click "Competency Type One" in the "Competency types" tui multi select filter
     Then I should see "1 competencies"
     And I should see the tui datatable contains:
-      | Competency name | Status             | Reason assigned    |
+      | Competency      | Status             | Reason assigned    |
       | Self assignable | Currently assigned | Admin User (Admin) |
 
 
     # Now both types are selected
-    And I click "Competency Type Two" in the "COMPETENCY TYPES" tui multi select filter
+    And I click "Competency Type Two" in the "Competency types" tui multi select filter
     Then I should see "2 competencies"
     And I should see the tui datatable contains:
-      | Competency name                | Status             | Reason assigned    |
+      | Competency                     | Status             | Reason assigned    |
       | Self assignable                | Currently assigned | Admin User (Admin) |
       | Self assignable no description | Not assigned       |                    |
 
 
     # Unselect type one
-    And I click "Competency Type One" in the "COMPETENCY TYPES" tui multi select filter
+    And I click "Competency Type One" in the "Competency types" tui multi select filter
     Then I should see "1 competencies"
     And I should see the tui datatable contains:
-      | Competency name                | Status       | Reason assigned |
+      | Competency                     | Status       | Reason assigned |
       | Self assignable no description | Not assigned |                 |
 
 
     # Unselect type two, both are unselected
-    And I click "Competency Type Two" in the "COMPETENCY TYPES" tui multi select filter
+    And I click "Competency Type Two" in the "Competency types" tui multi select filter
 
     Then I click the select all checkbox in the tui datatable
     And I should see "2" items in the tui basket
@@ -97,7 +97,7 @@ Feature: Test competencies can be user assigned
     # The filter side panel should not be visible now
     Then I should not see "Filter competencies"
     And I should see the tui datatable contains:
-      | Competency name                | Status             | Reason assigned    |
+      | Competency                     | Status             | Reason assigned    |
       | Self assignable                | Currently assigned | Admin User (Admin) |
       | Self assignable no description | Not assigned       |                    |
 
@@ -110,7 +110,7 @@ Feature: Test competencies can be user assigned
 
     When I change the competency profile to list view
     Then I should see the tui datatable contains:
-      | Competency name                |
+      | Competency                     |
       | Self assignable                |
       | Self assignable no description |
 
@@ -129,19 +129,19 @@ Feature: Test competencies can be user assigned
     When I select "Currently assigned" from the "Status" singleselect
     And I click the select all checkbox in the tui datatable
     Then I should see the tui datatable contains:
-      | Competency name | Status             | Reason assigned    |
+      | Competency      | Status             | Reason assigned    |
       | Self assignable | Currently assigned | Admin User (Admin) |
     And I should see "1" items in the tui basket
 
     When I click on "View selected" "button"
     Then I should see the tui datatable contains:
-      | Competency name | Status             | Reason assigned    |
+      | Competency      | Status             | Reason assigned    |
       | Self assignable | Currently assigned | Admin User (Admin) |
 
     # Going back should not remove the applied assignment status filter
     When I click on "Back to all competencies" "button"
     Then I should see the tui datatable contains:
-      | Competency name | Status             | Reason assigned    |
+      | Competency      | Status             | Reason assigned    |
       | Self assignable | Currently assigned | Admin User (Admin) |
     And I should see "1" items in the tui basket
     And the field "Status" matches value "Currently assigned"
@@ -150,7 +150,7 @@ Feature: Test competencies can be user assigned
     When I click on "View selected" "button"
     And I click on "Clear all" "button"
     Then I should see the tui datatable contains:
-      | Competency name                | Status             | Reason assigned    |
+      | Competency                     | Status             | Reason assigned    |
       | Self assignable                | Currently assigned | Admin User (Admin) |
       | Self assignable no description | Not assigned       |                    |
     And the tui basket should be empty
@@ -195,15 +195,15 @@ Feature: Test competencies can be user assigned
     # The total record count should be indicated before loading all pages
     And I should see "25 competencies"
     And I should see "20" rows in the tui datatable
-    And I should see "AA First of first page" under "Competency name" on row "1" of the tui datatable
-    And I should see "AZ Last of first page" under "Competency name" on row "20" of the tui datatable
+    And I should see "AA First of first page" under "Competency" on row "1" of the tui datatable
+    And I should see "AZ Last of first page" under "Competency" on row "20" of the tui datatable
 
     When I click on "Load more" "button"
     Then I should not see "Load more"
     And I should see "25 competencies"
     And I should see "25" rows in the tui datatable
-    And I should see "BA First of second page" under "Competency name" on row "21" of the tui datatable
-    And I should see "BZ Last of second page" under "Competency name" on row "25" of the tui datatable
+    And I should see "BA First of second page" under "Competency" on row "21" of the tui datatable
+    And I should see "BZ Last of second page" under "Competency" on row "25" of the tui datatable
 
 
   Scenario: I am shown an empty list when there is no competencies to self assign

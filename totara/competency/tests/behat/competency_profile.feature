@@ -37,9 +37,9 @@ Feature: Competency profile landing page - an overview of their progress towards
 
     # Competencies
     And a competency scale called "scale1" exists with the following values:
-      | name          | description        | idnumber     | proficient | default | sortorder |
-      | Competent     | Can do the task.   | competent    | 1          | 0       | 1         |
-      | Not Competent | Can't do the task  | notcompetent | 0          | 1       | 2         |
+      | name          | description       | idnumber     | proficient | default | sortorder |
+      | Competent     | Can do the task.  | competent    | 1          | 0       | 1         |
+      | Not Competent | Can't do the task | notcompetent | 0          | 1       | 2         |
     And the following "competency" frameworks exist:
       | fullname                 | idnumber | description                | scale  |
       | Competency Framework One | fw1      | Framework for Competencies | scale1 |
@@ -156,7 +156,7 @@ Feature: Competency profile landing page - an overview of their progress towards
     When I change the competency profile to list view
     # Sorted Alphabetically by default
     Then I should see the tui datatable contains:
-      | Competency name          | Proficient | Achievement level |
+      | Competency               | Proficient | Achievement level |
       | 001_Pos_NotProficient    | - No       | Not Competent     |
       | 002_Org_Proficient       | Yes        | Competent         |
       | 003_Cohort_Proficient    | Yes        | Competent         |
@@ -176,19 +176,19 @@ Feature: Competency profile landing page - an overview of their progress towards
 
     When I set the field "Proficiency status" to "Proficient"
     Then I should see the tui datatable contains:
-      | Competency name          | Proficient | Achievement level |
-      | 002_Org_Proficient       | Yes        | Competent         |
-      | 003_Cohort_Proficient    | Yes        | Competent         |
-      | 004_User_Proficient      | Yes        | Competent         |
-      | 007_User_Proficient      | Yes        | Competent         |
-      | 008_Cohort_Proficient    | Yes        | Competent         |
-      | 011_Cohort_Proficient    | Yes        | Competent         |
-      | 012_User_Proficient      | Yes        | Competent         |
-      | 016_User_Proficient      | Yes        | Competent         |
+      | Competency            | Proficient | Achievement level |
+      | 002_Org_Proficient    | Yes        | Competent         |
+      | 003_Cohort_Proficient | Yes        | Competent         |
+      | 004_User_Proficient   | Yes        | Competent         |
+      | 007_User_Proficient   | Yes        | Competent         |
+      | 008_Cohort_Proficient | Yes        | Competent         |
+      | 011_Cohort_Proficient | Yes        | Competent         |
+      | 012_User_Proficient   | Yes        | Competent         |
+      | 016_User_Proficient   | Yes        | Competent         |
 
     When I set the field "Proficiency status" to "Not proficient"
     Then I should see the tui datatable contains:
-      | Competency name          | Proficient | Achievement level |
+      | Competency               | Proficient | Achievement level |
       | 001_Pos_NotProficient    | - No       | Not Competent     |
       | 005_Pos_NotProficient    | - No       | Not Competent     |
       | 006_Org_NotProficient    | - No       | Not Competent     |
@@ -201,17 +201,17 @@ Feature: Competency profile landing page - an overview of their progress towards
     When I set the field "Proficiency status" to "All"
     And I set the field "Viewing by assignment" to "Organisation"
     Then I should see the tui datatable contains:
-      | Competency name          | Proficient | Achievement level |
-      | 002_Org_Proficient       | Yes        | Competent         |
-      | 006_Org_NotProficient    | - No       | Not Competent     |
-      | 010_Org_NotProficient    | - No       | Not Competent     |
-      | 014_Org_NotProficient    | - No       | Not Competent     |
+      | Competency            | Proficient | Achievement level |
+      | 002_Org_Proficient    | Yes        | Competent         |
+      | 006_Org_NotProficient | - No       | Not Competent     |
+      | 010_Org_NotProficient | - No       | Not Competent     |
+      | 014_Org_NotProficient | - No       | Not Competent     |
 
     When I set the field "Viewing by assignment" to "Current assignments"
     And I set the field "Search" to "01"
     And I wait "2" seconds
     Then I should see the tui datatable contains:
-      | Competency name          | Proficient | Achievement level |
+      | Competency               | Proficient | Achievement level |
       | 001_Pos_NotProficient    | - No       | Not Competent     |
       | 010_Org_NotProficient    | - No       | Not Competent     |
       | 011_Cohort_Proficient    | Yes        | Competent         |
@@ -230,25 +230,25 @@ Feature: Competency profile landing page - an overview of their progress towards
     When I reload the page
     And I change the competency profile to list view
     Then I should see the tui datatable contains:
-      | Competency name          | Proficient | Achievement level |
-      | 001_Pos_NotProficient    | - No       | Not Competent     |
-      | 002_Org_Proficient       | Yes        | Competent         |
-      | 003_Cohort_Proficient    | Yes        | Competent         |
-      | 004_User_Proficient      | Yes        | Competent         |
-      | 005_Pos_NotProficient    | - No       | Not Competent     |
-      | 006_Org_NotProficient    | - No       | Not Competent     |
-      | 007_User_Proficient      | Yes        | Competent         |
-      | 008_Cohort_Proficient    | Yes        | Competent         |
-      | 009_Pos_NotProficient    | - No       | Not Competent     |
-      | 010_Org_NotProficient    | - No       | Not Competent     |
-      | 011_Cohort_Proficient    | Yes        | Competent         |
-      | 012_User_Proficient      | Yes        | Competent         |
+      | Competency            | Proficient | Achievement level |
+      | 001_Pos_NotProficient | - No       | Not Competent     |
+      | 002_Org_Proficient    | Yes        | Competent         |
+      | 003_Cohort_Proficient | Yes        | Competent         |
+      | 004_User_Proficient   | Yes        | Competent         |
+      | 005_Pos_NotProficient | - No       | Not Competent     |
+      | 006_Org_NotProficient | - No       | Not Competent     |
+      | 007_User_Proficient   | Yes        | Competent         |
+      | 008_Cohort_Proficient | Yes        | Competent         |
+      | 009_Pos_NotProficient | - No       | Not Competent     |
+      | 010_Org_NotProficient | - No       | Not Competent     |
+      | 011_Cohort_Proficient | Yes        | Competent         |
+      | 012_User_Proficient   | Yes        | Competent         |
     When I set the field "Viewing by assignment" to "Archived assignments"
     Then I should see the tui datatable contains:
-      | Competency name          | Reason assigned   | Proficient | Achievement level |
+      | Competency               | Reason assigned   | Proficient | Achievement level |
       | 013_Pos_NotProficient    | Position          | - No       | Not Competent     |
       | 014_Org_NotProficient    | Organisation      | - No       | Not Competent     |
-      | 015_Cohort_NotProficient | Cohort     | - No       | Not Competent     |
+      | 015_Cohort_NotProficient | Cohort            | - No       | Not Competent     |
       | 016_User_Proficient      | Directly assigned | - No       | Competent         |
 
   Scenario: View rating scale detail and navigate to detail page for competency

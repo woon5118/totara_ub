@@ -152,7 +152,7 @@ class rate_competencies extends controller {
         }
 
         if (capability_helper::can_view_profile($this->user->id, $this->context)) {
-            new moodle_url('/totara/competency/profile/', ['user_id' => $this->user->id]);
+            return new moodle_url('/totara/competency/profile/', ['user_id' => $this->user->id]);
         }
 
         return new moodle_url('/totara/competency/rate_users.php', ['user_id' => $this->user->id]);

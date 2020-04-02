@@ -20,7 +20,7 @@ Feature: Competency profile detail page - an overview of their progress (or lack
 
   Scenario: I can navigate directly to the details page of a competency not assigned to me
     When I log in as "admin"
-    And I navigate to the competency profile details page for the "typing slow" competency
+    And I navigate to the competency profile details page for the "Typing slow" competency
 
     Then I should see "Typing slow"
     And I should see "The ability to type slow."
