@@ -93,5 +93,5 @@ $data = [
     'has_checkboxes' => $selectable,
 ];
 
-echo $OUTPUT->render_from_template('totara_core/test_lists_manager', $data);
+echo $OUTPUT->render_from_template('totara_competency/test_lists_manager', $data);
 echo $OUTPUT->footer();

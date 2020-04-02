@@ -20,7 +20,7 @@
  * @package criteria_onactivate
  */
 
-define(['totara_core/loader_manager'],
+define(['totara_competency/loader_manager'],
 function(Loader) {
 
     /**

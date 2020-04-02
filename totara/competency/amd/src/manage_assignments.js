@@ -21,7 +21,7 @@
  * @package totara_competency
  */
 
-define(['core/str', 'core/modal_factory', 'core/modal_events', 'totara_core/basket_list', 'core/ajax', 'core/notification',
+define(['core/str', 'core/modal_factory', 'core/modal_events', 'totara_competency/basket_list', 'core/ajax', 'core/notification',
 'core/templates'],
 function(str, ModalFactory, ModalEvents, ListBase, ajax, notification, templates) {
 

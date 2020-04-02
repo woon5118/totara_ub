@@ -21,7 +21,7 @@
  * @package pathway_manual
  */
 
-define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_list'],
+define(['core/templates', 'core/notification', 'core/ajax', 'totara_competency/modal_list'],
 function (templates, notification, ajax, ModalList) {
 
     /**

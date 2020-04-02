@@ -312,7 +312,7 @@ $list = lists::create(
     $headers,
     $rows,
     $selectable,
-    'totara_core/test_lists_expand',
+    'totara_competency/test_lists_expand',
     '',
     [],
     $has_hierarchy,

@@ -21,7 +21,7 @@
  * @package totara_competency
  */
 
-define(['totara_core/basket_list', 'totara_competency/list_framework_hierarchy_events'],
+define(['totara_competency/basket_list', 'totara_competency/list_framework_hierarchy_events'],
 function(ListBase, HierarchyEvents) {
 
     /**

@@ -20,7 +20,7 @@
  * @package totara_competency
  */
 
-define(['core/str', 'core/templates', 'totara_core/modal_list', 'core/ajax', 'core/notification', 'totara_core/loader_manager'],
+define(['core/str', 'core/templates', 'totara_competency/modal_list', 'core/ajax', 'core/notification', 'totara_competency/loader_manager'],
 function (str, templates, ModalList, ajax, notification, Loader) {
 
     /**
@@ -416,7 +416,7 @@ function (str, templates, ModalList, ajax, notification, Loader) {
                 templateData.rows.push(this.getRowData(this.courses[i]));
             }
 
-            templates.renderReplace('totara_core/lists_rows', templateData, listNode).then(function () {
+            templates.renderReplace('totara_competency/lists_rows', templateData, listNode).then(function () {
                 that.loader.hide();
             });
         },

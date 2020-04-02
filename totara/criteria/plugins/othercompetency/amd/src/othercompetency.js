@@ -20,7 +20,8 @@
  * @package criteria_othercompetency
  */
 
-define(['core/templates', 'core/notification', 'core/ajax', 'totara_core/modal_list', 'totara_core/loader_manager','totara_competency/list_framework_hierarchy_events'],
+define(['core/templates', 'core/notification', 'core/ajax', 'totara_competency/modal_list', 'totara_competency/loader_manager',
+'totara_competency/list_framework_hierarchy_events'],
     function (templates, notification,ajax, ModalList, Loader,HierarchyEvents) {
 
         /**

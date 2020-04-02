@@ -81,6 +81,10 @@
     &:focus {
       border-color: $selectTree-options-border-color-focus;
     }
+
+    &_showBox {
+      border-color: var(--tui-color-neutral-5);
+    }
   }
 
   &__option {

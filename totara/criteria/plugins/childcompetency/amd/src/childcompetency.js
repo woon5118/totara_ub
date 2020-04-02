@@ -20,7 +20,7 @@
  * @package criteria_childcompetency
  */
 
-define(['core/ajax', 'core/notification', 'totara_core/loader_manager'],
+define(['core/ajax', 'core/notification', 'totara_competency/loader_manager'],
 function(ajax, notification, Loader) {
 
     /**

@@ -21,8 +21,8 @@
  * @package totara_competency
  */
 
-define(['core/str', 'core/templates', 'totara_core/modal_list', 'totara_competency/list_framework_hierarchy_events',
-'core/ajax', 'core/notification', 'totara_core/loader_manager', 'core/modal_factory', 'totara_core/session_basket'],
+define(['core/str', 'core/templates', 'totara_competency/modal_list', 'totara_competency/list_framework_hierarchy_events',
+'core/ajax', 'core/notification', 'totara_competency/loader_manager', 'core/modal_factory', 'totara_competency/session_basket'],
 function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, Loader, ModalFactory, SessionBasket) {
 
     /**
