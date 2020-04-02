@@ -24,6 +24,7 @@
 
 namespace totara_competency;
 
+use core\collection;
 use core\orm\entity\repository;
 use core\orm\query\builder;
 use totara_competency\entities\competency;
@@ -360,6 +361,85 @@ class achievement_configuration {
         }
 
         return false;
+    }
+
+    /**
+     * Export detail of all active pathways for the UI.
+     * Pathways are grouped per resulting scale value.
+     * Multi-value pathways (e.g. manual, learning plan) are grouped together in a single scale value with id 0
+     *
+     * @return array
+     */
+    public function export_pathway_groups(): array {
+        $pathways = $this->get_active_pathways();
+        $pathways = array_map(function (pathway $pathway) {
+            return $pathway->export_edit_detail();
+        }, $pathways);
+
+        $singlevalue_pathways = array_filter($pathways, function ($pathway) {
+            return $pathway['classification'] === pathway::PATHWAY_SINGLE_VALUE;
+        });
+
+        // Active pathways are already ordered by sortorder
+        $first_singlevalue_sortorder = 0;
+        if (!empty($singlevalue_pathways)) {
+            $first_singlevalue_pw = reset($singlevalue_pathways);
+            $first_singlevalue_sortorder = $first_singlevalue_pw['sortorder'];
+        }
+
+        /** @var collection $scale_values */
+        $scale_values = $this->competency->scale->sorted_values_high_to_low
+            ->all();
+
+        $scale_values = array_map(function ($scale_value) use ($singlevalue_pathways) {
+            $sv_pathways = array_filter($singlevalue_pathways, function ($pathway) use ($scale_value) {
+                return $pathway['scalevalue'] === $scale_value->id;
+            });
+
+            return [
+                'id' => $scale_value->id,
+                'name' => $scale_value->name,
+                'proficient' => $scale_value->proficient,
+                'sortorder' => $scale_value->sortorder,
+                'pathways' => array_values($sv_pathways),
+                'criteria_type_level' => 'scalevalue',
+            ];
+        }, $scale_values);
+
+        $low_multivalue_pathways = array_filter($pathways, function ($pathway) use ($first_singlevalue_sortorder) {
+            return $pathway['classification'] === pathway::PATHWAY_MULTI_VALUE
+                && ($first_singlevalue_sortorder == 0
+                || $pathway['sortorder'] < $first_singlevalue_sortorder);
+        });
+
+        $high_multivalue_pathways = array_filter($pathways, function ($pathway) use ($first_singlevalue_sortorder) {
+            return $pathway['classification'] === pathway::PATHWAY_MULTI_VALUE
+                && $first_singlevalue_sortorder > 0
+                && $pathway['sortorder'] >= $first_singlevalue_sortorder;
+        });
+
+        $groups = [
+            [
+                'id' => 'low-sortorder',
+                'name' => get_string('anyscalevalue', 'totara_competency'),
+                'hidden' => false,
+                'pathways' => array_values($low_multivalue_pathways),
+            ],
+            [
+                'id' => 'singlevalue',
+                'group_templatename' => 'totara_competency/scalevalue_pathways_edit',
+                'hidden' => count($singlevalue_pathways) == 0,
+                'scale_values' => $scale_values
+            ],
+            [
+                'id' => 'high-sortorder',
+                'name' => get_string('anyscalevalue', 'totara_competency'),
+                'hidden' => false,
+                'pathways' => array_values($high_multivalue_pathways),
+            ],
+        ];
+
+        return $groups;
     }
 
     /**

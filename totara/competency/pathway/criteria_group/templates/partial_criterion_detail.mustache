@@ -40,58 +40,56 @@
     {{> totara_competency/divider_and}}
 {{/showand}}
 
-{{#deleted}}
-    <div class="criterion_title cc_deleted" data-criterion-deleted><span>{{title}}</span></div>
-{{/deleted}}
+    <div class="criterion_title cc_deleted cc_hidden" data-criterion-deleted><span>{{title}}</span></div>
 
-{{^deleted}}
-    {{#expandable}}
-        <div data-criterion-active data-cc-on-ordering="hide">
-            <div class="criterion_title"
-                 data-crit-action="toggle-detail"
-                 {{#expanded}}data-crit-detail-expanded="1"{{/expanded}}>
+{{#expandable}}
+    <div data-criterion-active data-cc-on-ordering="hide">
+        <div class="criterion_title"
+             data-criterion-action="toggle-detail"
+             {{#expanded}}data-criterion-detail-expanded="1"{{/expanded}}>
 
-                <a href="#">
-                    <span data-crit-detail-icon="expanded" {{^expanded}}class="cc_hidden"{{/expanded}}>
-                        {{#flex_icon}}expanded{{/flex_icon}}
+            <a href="#">
+                <span data-criterion-detail-icon="expanded" {{^expanded}}class="cc_hidden"{{/expanded}}>
+                    {{#flex_icon}}expanded{{/flex_icon}}
+                </span>
+                <span data-criterion-detail-icon="collapsed" {{#expanded}}class="cc_hidden"{{/expanded}}>
+                    {{#flex_icon}}collapsed{{/flex_icon}}
+                </span>
+                {{title}}
+                {{#error}}
+                    <span class="cc_warning">
+                      {{#flex_icon}}notification-warning{{/flex_icon}}
+                      {{error}}
                     </span>
-                    <span data-crit-detail-icon="collapsed" {{#expanded}}class="cc_hidden"{{/expanded}}>
-                        {{#flex_icon}}collapsed{{/flex_icon}}
-                    </span>
-                    {{title}}
-                    {{#error}}
-                        <span class="cc_warning">
-                          {{#flex_icon}}notification-warning{{/flex_icon}}
-                          {{error}}
-                        </span>
-                    {{/error}}
-                </a>
-            </div>
-
-            <div data-crit-detail="{{key}}" {{^expanded}}class="cc_hidden"{{/expanded}}>
-                {{#criterion_templatename}}
-                {{> &&criterion_templatename}}
-                {{/criterion_templatename}}
-            </div>
+                {{/error}}
+            </a>
         </div>
 
-        <div class="criterion_title cc_hidden"
-             data-cc-on-ordering="show">
-
-            <span data-crit-detail-icon="collapsed" {{#expanded}}class="cc_hidden"{{/expanded}}>
-                {{#flex_icon}}collapsed{{/flex_icon}}
-            </span>
-            {{title}}
+        <div data-criterion-detail="{{key}}" {{^expanded}}class="cc_hidden"{{/expanded}}>
+            {{#criterion_templatename}}
+            {{> &&criterion_templatename}}
+            {{/criterion_templatename}}
         </div>
-    {{/expandable}}
+    </div>
 
-    {{^expandable}}
+    <div class="criterion_title cc_hidden"
+         data-cc-on-ordering="show">
+
+        <span data-criterion-detail-icon="collapsed" {{#expanded}}class="cc_hidden"{{/expanded}}>
+            {{#flex_icon}}collapsed{{/flex_icon}}
+        </span>
+        {{title}}
+    </div>
+{{/expandable}}
+
+{{^expandable}}
+    <div data-criterion-active>
         <div class="criterion_title {{#deleted}}cc_deleted{{/deleted}}"><span>{{title}}</span></div>
 
         {{#criterion_templatename}}
-            <div data-crit-detail="{{key}}" class="cc_hidden">
+            <div data-criterion-detail="{{key}}" class="cc_hidden">
                 {{> &&criterion_templatename}}
-            </div>
-        {{/criterion_templatename}}
-    {{/expandable}}
-{{/deleted}}
+            {{/criterion_templatename}}
+        </div>
+    </div>
+{{/expandable}}

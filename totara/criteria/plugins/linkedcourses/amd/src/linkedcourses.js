@@ -45,7 +45,12 @@ function(ajax, notification, Loader) {
         this.criterion = {
             type: 'linkedcourses',
             metadata: [],
-            aggregation: {},
+            aggregation: {
+                method: 1,
+                reqitems: 1
+            },
+            singleuse: false,
+            expandable: true
         };
 
         this.criterionKey = '';  // Unique key to use in bubbled event
@@ -119,55 +124,44 @@ function(ajax, notification, Loader) {
         getDetail: function() {
             var that = this,
                 criterionNode = this.widget.closest('[data-tw-criterion-key]'),
-                key = 0,
-                id = 0,
-                detailPromise,
-                apiArgs;
+                aggregationNode = criterionNode.querySelector('[data-tw-criterionLinkedCourses-aggregation]'),
+                compIdWgt = document.querySelector('[data-comp-id]'),
+                compId = 1;
+
 
             return new Promise(function(resolve) {
                 if (criterionNode) {
-                    key = criterionNode.hasAttribute('data-tw-criterion-key') ? criterionNode.getAttribute('data-tw-criterion-key') : 0;
-                    id = criterionNode.hasAttribute('data-tw-criterion-id') ? criterionNode.getAttribute('data-tw-criterion-id') : 0;
+                    that.criterionKey = criterionNode.hasAttribute('data-tw-criterion-key')
+                        ? criterionNode.getAttribute('data-tw-criterion-key')
+                        : 0;
+                    that.criterion.id = criterionNode.hasAttribute('data-tw-criterion-id')
+                        ? criterionNode.getAttribute('data-tw-criterion-id')
+                        : 0;
                 }
 
-                if (id == 0) {
-                    // New criterion - no detail yet
-                    detailPromise = new Promise(function(resolve) {
-                        resolve(that.createEmptyCriterion());
-                    });
+                if (compIdWgt) {
+                    compId = compIdWgt.getAttribute('data-comp-id') ? compIdWgt.getAttribute('data-comp-id') : 1;
 
-                } else {
-                    apiArgs = {
-                        args: {id: id},
-                        methodname: that.endpoints.detail
-                    };
-
-                    detailPromise = ajax.getData(apiArgs);
+                    that.criterion.metadata = [{
+                        metakey: that.competencyKey,
+                        metavalue: compId
+                    }];
                 }
 
-                detailPromise.then(function(responses) {
-                    var instance = responses.results;
+                // Aggregation
+                if (aggregationNode) {
+                    that.criterion.aggregation.method = aggregationNode.getAttribute('data-tw-criterionLinkedCourses-aggregation');
+                    that.criterion.aggregation.reqitems = aggregationNode.hasAttribute('data-tw-criterionLinkedCourses-aggregation-reqitems')
+                        ? aggregationNode.getAttribute('data-tw-criterionLinkedCourses-aggregation-reqitems')
+                        : 1;
+                }
 
-                    // We want only the data required for saving in that.criterion
-                    // Not doing this earlier to prevent setting criterion attributes if
-                    // something went wrong (e.g. invalid id, etc.)
-                    that.criterion.id = id;
-                    that.criterion.metadata = instance.metadata;
-                    that.criterionKey = key;
+                that.setAggregationMethod(that.criterion.aggregation.method);
+                that.setAggregationCount(that.criterion.aggregation.reqitems);
 
-                    that.showHideConfigurationError(instance.error);
 
-                    // Aggregation
-                    that.setAggregationMethod(instance.aggregation.method);
-                    that.setAggregationCount(instance.aggregation.reqitems);
-
-                    that.triggerEvent('update', {criterion: that.criterion});
-                    resolve();
-                }).catch(function(e) {
-                    e.fileName = that.filename;
-                    e.name = 'Error retrieving detail';
-                    notification.exception(e);
-                });
+                that.triggerEvent('update', {criterion: that.criterion});
+                resolve();
             });
         },
 
@@ -175,7 +169,7 @@ function(ajax, notification, Loader) {
          * Create an empty linkedcourses criterion
          * @return {Promise}
          */
-        createEmptyCriterion: function() {
+        oldCreateEmptyCriterion: function() {
             var that = this,
                 compIdWgt = document.querySelector('[data-comp-id]'),
                 compId = 1;
@@ -206,7 +200,7 @@ function(ajax, notification, Loader) {
         /**
          * Show or hide the configuration error warning
          */
-        showHideConfigurationError: function(theError) {
+        oldShowHideConfigurationError: function(theError) {
             var target = this.widget.querySelector('[data-tw-criterionLinkedCourses-error]');
             if (!target) {
                 return;

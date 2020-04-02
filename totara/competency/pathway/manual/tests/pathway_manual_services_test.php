@@ -49,18 +49,18 @@ class pathway_manual_services_testcase extends advanced_testcase {
             'items' => [
                 [
                     'id'   => self_role::get_display_order(),
-                    'role' => self_role::get_name(),
-                    'name' => self_role::get_display_name(),
+                    'value' => self_role::get_name(),
+                    'text' => self_role::get_display_name(),
                 ],
                 [
                     'id'   => manager::get_display_order(),
-                    'role' => manager::get_name(),
-                    'name' => manager::get_display_name(),
+                    'value' => manager::get_name(),
+                    'text' => manager::get_display_name(),
                 ],
                 [
                     'id'   => appraiser::get_display_order(),
-                    'role' => appraiser::get_name(),
-                    'name' => appraiser::get_display_name(),
+                    'value' => appraiser::get_name(),
+                    'text' => appraiser::get_display_name(),
                 ],
             ],
         ];
@@ -82,13 +82,13 @@ class pathway_manual_services_testcase extends advanced_testcase {
             'items' => [
                 [
                     'id'   => self_role::get_display_order(),
-                    'role' => self_role::get_name(),
-                    'name' => self_role::get_display_name(),
+                    'value' => self_role::get_name(),
+                    'text' => self_role::get_display_name(),
                 ],
                 [
                     'id'   => appraiser::get_display_order(),
-                    'role' => appraiser::get_name(),
-                    'name' => appraiser::get_display_name(),
+                    'value' => appraiser::get_name(),
+                    'text' => appraiser::get_display_name(),
                 ],
             ],
         ];
@@ -111,8 +111,8 @@ class pathway_manual_services_testcase extends advanced_testcase {
             'items' => [
                 [
                     'id'   => manager::get_display_order(),
-                    'role' => manager::get_name(),
-                    'name' => manager::get_display_name(),
+                    'value' => manager::get_name(),
+                    'text' => manager::get_display_name(),
                 ],
             ],
         ];

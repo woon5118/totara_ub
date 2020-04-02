@@ -20,8 +20,8 @@
  * @package pathway_criteria_group
  */
 
-define(['core/str', 'core/notification', 'core/templates', 'core/ajax'],
-function (str, notification, templates, ajax) {
+define(['core/str', 'core/notification', 'core/templates'],
+function (str, notification, templates) {
 
     /**
      * Class constructor for the PwCriteriaGroup.
@@ -42,6 +42,9 @@ function (str, notification, templates, ajax) {
          */
         this.pathway = {
             id: 0,
+            type: 'criteria_group',
+            scalevalue: 0,
+            sortorder: 0,
             criteria: [],
         };
 
@@ -49,24 +52,21 @@ function (str, notification, templates, ajax) {
         this.pwKey = '';
 
         // Unique criteria key
-        this.lastCritKey = 0;
+        this.lastCriterionKey = 0;
 
         // Criteria is indexed by the criteria key.
         // The values received via the bubbled events are added in a 'detail' attribute
         // which is packed into the pathway.criteria array as that is the only information
         // we must send when saving the criteria
         this.criteria = {};
+        this.criteriaLength = 0;
         this.markedForDeletionCriteria = {};
 
         this.typeModal = null;
 
         this.endpoints = {
-            criteria: 'pathway_criteria_group_get_criteria',
-            criteriatemplate: 'totara_criteria_get_definition_template',
             create: 'pathway_criteria_group_create',
             update: 'pathway_criteria_group_update',
-            delete: 'pathway_criteria_group_delete',
-            // basketdelete: 'totara_core_basket_delete',
         };
 
         this.filename = 'criteria_group.js';
@@ -79,7 +79,8 @@ function (str, notification, templates, ajax) {
          *
          */
         events: function () {
-            var that = this;
+            var that = this,
+                action;
 
             this.widget.addEventListener('click', function (e) {
                 if (!e.target) {
@@ -87,22 +88,22 @@ function (str, notification, templates, ajax) {
                 }
 
                 if (e.target.closest('[data-cg-action]')) {
-                    var action = e.target.closest('[data-cg-action]').getAttribute('data-cg-action');
+                    action = e.target.closest('[data-cg-action]').getAttribute('data-cg-action');
 
-                    if (action === 'addcrit') {
+                    if (action === 'addcriterion') {
                         that.showCriteriaTypeOptions();
                     }
-                } else if (e.target.closest('[data-criteria_group-crit-type-option]')) {
-                    var selectedType = e.target.closest('[data-criteria_group-crit-type-option]').getAttribute('data-criteria_group-crit-type-option');
+                } else if (e.target.closest('[data-criteria_group-criterion-type]')) {
+                    var selectedOption = e.target.closest('[data-criteria_group-criterion-type]');
 
-                    that.hideCritTypeSelectors();
-                    that.addCriterion(that.pwKey, selectedType);
-                } else if (e.target.closest('[data-crit-action]')) {
-                    var wgt = e.target.closest('[data-crit-action]'),
-                        action = wgt.getAttribute('data-crit-action'),
+                    that.hideCriteriaTypeSelectors();
+                    that.addCriterion(that.pwKey, selectedOption);
+                } else if (e.target.closest('[data-criterion-action]')) {
+                    var wgt = e.target.closest('[data-criterion-action]'),
                         keyWgt = wgt.closest('[data-tw-criterion-key]'),
-                        critKey;
+                        criterionKey;
 
+                    action = wgt.getAttribute('data-criterion-action');
                     if (!keyWgt) {
                         // Something went wrong - we can't determine which criterion to perform the action on
                         notification.exception({
@@ -113,15 +114,15 @@ function (str, notification, templates, ajax) {
                         return;
                     }
 
-                    that.hideCritTypeSelectors();
-                    critKey = keyWgt.getAttribute('data-tw-criterion-key');
+                    that.hideCriteriaTypeSelectors();
+                    criterionKey = keyWgt.getAttribute('data-tw-criterion-key');
 
                     if (action === 'toggle-detail') {
-                        that.toggleCriterionDetail(critKey);
+                        that.toggleCriterionDetail(criterionKey);
                     } else if (action === 'remove') {
-                        that.removeCriterion(critKey);
+                        that.removeCriterion(criterionKey);
                     } else if (action === 'undo') {
-                        that.undoCriterionRemoval(critKey);
+                        that.undoCriterionRemoval(criterionKey);
                     }
                 }
 
@@ -132,27 +133,43 @@ function (str, notification, templates, ajax) {
         // Listen for propagated events
         bubbledEventsListener: function () {
             var that = this,
-                criteriaEvents = 'totara_criteria/criterion:';
+                criteriaEvents = 'totara_criteria/criterion:',
+                criterionKey,
+                criterion;
 
             this.widget.addEventListener(criteriaEvents + 'update', function (e) {
-                var critKey = e.detail.key,
-                    criterion = e.detail.criterion;
+                criterionKey = e.detail.key;
+                criterion = e.detail.criterion;
 
                 if (criterion) {
                     // Using an associative array with the string key.
                     // We store this associative array in a separate variable and ensure that the
                     // pathway contains data that will serialize as expected
 
-                    if (!that.criteria[critKey]) {
-                        that.criteria[critKey] = {};
+                    if (!that.criteria[criterionKey]) {
+                        that.criteria[criterionKey] = {
+                            'id': criterion.id ? criterion.id : 0,
+                            'type': criterion.type ? criterion.type : '',
+                            'title': criterion.title ? criterion.title : '',
+                            'singleuse': criterion.singleuse ? criterion.singleuse : false,
+                            'expandable': criterion.expandable ? criterion.expandable : false
+                        };
 
                         // If previous marked for deletion, remove from that list
-                        if (that.markedForDeletionCriteria[critKey]) {
-                            delete that.markedForDeletionCriteria[critKey];
+                        if (that.markedForDeletionCriteria[criterionKey]) {
+                            delete that.markedForDeletionCriteria[criterionKey];
                         }
+
+                        that.criteriaLength += 1;
                     }
 
-                    that.criteria[critKey].detail = criterion;
+                    if (criterion.singleuse) {
+                        that.triggerEvent('singleuse', {used: true});
+                    }
+                    // Remove attributes not needed for APIs
+                    delete criterion.singleuse;
+                    delete criterion.expandable;
+                    that.criteria[criterionKey].detail = criterion;
                 }
 
                 // Propagate up to achievementPaths
@@ -163,10 +180,10 @@ function (str, notification, templates, ajax) {
             });
 
             this.widget.addEventListener(criteriaEvents + 'dirty', function (e) {
-                var critKey = e.detail.key;
+                criterionKey = e.detail.key;
 
-                if (that.criteria[critKey]) {
-                    that.criteria[critKey].dirty = true;
+                if (that.criteria[criterionKey]) {
+                    that.criteria[criterionKey].dirty = true;
 
                     // Also propagate up
                     that.triggerEvent('dirty', {});
@@ -188,103 +205,42 @@ function (str, notification, templates, ajax) {
          * Initialise the data and display it
          */
         initData: function () {
-            var that = this,
-                pwWgt = this.widget.closest('[data-pw-key]'),
+            var pwWgt = this.widget.closest('[data-pw-key]'),
+                svWgt = this.widget.closest('[data-pw-scalevalue]'),
                 pwKey = 0,
-                pwId = 0,
-                idWgt = this.widget.closest('[data-pw-id]'),
-                apiArgs;
+                pwId = 0;
 
             if (pwWgt) {
                 pwKey = pwWgt.getAttribute('data-pw-key') ? pwWgt.getAttribute('data-pw-key') : 0;
+                pwId = pwWgt.getAttribute('data-pw-id') ? pwWgt.getAttribute('data-pw-id') : 0;
             }
 
-            if (!idWgt) {
+            // Obtain the pathway detail from the dom
+
+            this.pwKey = pwKey;
+            if (svWgt) {
+                this.pathway.scalevalue = svWgt.getAttribute('data-pw-scalevalue') ? svWgt.getAttribute('data-pw-scalevalue') : 1;
+            }
+
+            if (pwId === 0) {
                 // New pw - we also need the competency_id and scalevalue
-                var compIdWgt = document.querySelector('[data-comp-id]'),
-                    compId = 1,
-                    svWgt = this.widget.closest('[data-pw-scalevalue]'),
-                    initialCritType = this.widget.hasAttribute('data-pw-init-criterion') ? this.widget.getAttribute('data-pw-init-criterion') : '',
-                    scalevalue = 1;
+                delete this.pathway.id;
 
-                if (compIdWgt) {
-                    compId = compIdWgt.getAttribute('data-comp-id') ? compIdWgt.getAttribute('data-comp-id') : 1;
+                var compIdNode = document.querySelector('[data-comp-id]');
+
+                if (compIdNode) {
+                    this.pathway.competency_id = compIdNode.getAttribute('data-comp-id')
+                        ? compIdNode.getAttribute('data-comp-id')
+                        : 1;
                 }
 
-                if (svWgt) {
-                    scalevalue = svWgt.getAttribute('data-pw-scalevalue') ? svWgt.getAttribute('data-pw-scalevalue') : 1;
-                }
-
-                that.pathway = that.createEmptyPw(compId, scalevalue);
-                that.pwKey = pwKey;
-
-                that.widget.setAttribute('data-pw-save-endpoint', this.endpoints.create);
-
-                // There should be an initial criterion type
-                if (initialCritType) {
-                    return that.addCriterion(pwKey, initialCritType);
-                } else {
-                    // We need to show 'no criteria', set the save-endpoint and bubble the pathway up
-                    that.showHideNoCriteria();
-                    that.triggerEvent('update', {pathway: that.pathway});
-
-                    return;
-                }
+                this.widget.setAttribute('data-pw-save-endpoint', this.endpoints.create);
+            } else {
+                this.widget.setAttribute('data-pw-save-endpoint', this.endpoints.update);
+                this.pathway.id = pwId;
             }
 
-            // Existing pw
-            pwId = idWgt.getAttribute('data-pw-id') ? idWgt.getAttribute('data-pw-id') : 0;
-            apiArgs = {
-                args: {id: pwId},
-                methodname: this.endpoints.criteria
-            };
-
-            ajax.getData(apiArgs).then(function (responses) {
-                var criteria = responses.results,
-                    target = that.widget.querySelector('.critgrp_criteria'),
-                    promiseData = [];
-
-                that.criteria = [];
-                that.pathway.criteria = [];
-                that.pwKey = pwKey;
-                that.pathway.id = pwId;
-
-                for (var a = 0; a < criteria.length; a++) {
-                    var crit = criteria[a];
-
-                    // Collapsed by default
-                    crit.key = that.getNextCritKey();
-                    crit.expanded = false;
-
-                    if (!crit.singleuse) {
-                        crit.expandable = true;
-                        crit.showand = (a > 0);
-                    } else {
-                        // Hide the add button
-                        crit.expandable = false;
-                        crit.showand = false;
-                        that.hideBottomActions();
-                    }
-                    that.criteria[crit.key] = crit;
-
-                    promiseData.push(crit);
-                }
-
-                templates.renderAppend('pathway_criteria_group/partial_group_criteria', {criteria: promiseData}, target).then(function () {
-                    templates.runTemplateJS('');
-                    that.showHideNoCriteria();
-                }).catch(function (e) {
-                    e.fileName = that.filename;
-                    e.name = 'Error showing criteria detail';
-                    notification.exception(e);
-                });
-            }).catch(function (e) {
-                e.fileName = that.filename;
-                e.name = 'Error getting criteria';
-                notification.exception(e);
-            });
-
-            return false;
+            this.triggerEvent('update', {pathway: this.pathway});
         },
 
         /**
@@ -292,9 +248,9 @@ function (str, notification, templates, ajax) {
          *
          * @return {string} Next key
          */
-        getNextCritKey: function () {
-            this.lastCritKey++;
-            return this.pwKey + '_crit_' + this.lastCritKey;
+        getNextCriterionKey: function () {
+            this.lastCriterionKey++;
+            return this.pwKey + '_new_criterion_' + this.lastCriterionKey;
         },
 
 
@@ -305,9 +261,9 @@ function (str, notification, templates, ajax) {
         packCriteria: function () {
             this.pathway.criteria = [];
 
-            for (var critKey in this.criteria) {
-                if (this.criteria[critKey].detail) {
-                    this.pathway.criteria.push(this.criteria[critKey].detail);
+            for (var criterionKey in this.criteria) {
+                if (this.criteria[criterionKey].detail) {
+                    this.pathway.criteria.push(this.criteria[criterionKey].detail);
                 }
             }
         },
@@ -316,14 +272,14 @@ function (str, notification, templates, ajax) {
          * Show or hide the 'No Criteria' message
          */
         showHideNoCriteria: function () {
-            var nCrit = this.pathway.criteria.length,
-                nDeletedCrit = 0;
+            var nCriteria = this.pathway.criteria.length,
+                nDeletedCriteria = 0;
 
             if (Object.keys(this.markedForDeletionCriteria).length) {
-                nDeletedCrit = 1;
+                nDeletedCriteria = 1;
             }
 
-            if ((nCrit + nDeletedCrit) == 0) {
+            if ((nCriteria + nDeletedCriteria) == 0) {
                 this.widget.querySelector('.critgrp_criteria_none').classList.remove('cc_hidden');
             } else {
                 this.widget.querySelector('.critgrp_criteria_none').classList.add('cc_hidden');
@@ -370,12 +326,12 @@ function (str, notification, templates, ajax) {
         /**
          * Hide all criteria type selectors
          */
-        hideCritTypeSelectors: function () {
+        hideCriteriaTypeSelectors: function () {
             // We also want to close the options lists in parent templates
-            var critTypeNodes = document.querySelectorAll('[data-crit-type-toggle]');
+            var criteriaTypeNodes = document.querySelectorAll('[data-criteria-type-toggle]');
 
-            for (var a = 0; a < critTypeNodes.length; a++) {
-                critTypeNodes[a].classList.add('cc_hidden');
+            for (var a = 0; a < criteriaTypeNodes.length; a++) {
+                criteriaTypeNodes[a].classList.add('cc_hidden');
             }
 
             return false;
@@ -385,10 +341,10 @@ function (str, notification, templates, ajax) {
          * Show the criteria type dropdown for the specific scalevalue
          */
         showCriteriaTypeOptions: function () {
-            var toOpen = this.widget.querySelector('[data-crit-type-toggle="criteria_group"]'),
+            var toOpen = this.widget.querySelector('[data-criteria-type-toggle="criteria_group"]'),
                 expanded = toOpen ? !toOpen.classList.contains('cc_hidden') : false;
 
-            this.hideCritTypeSelectors();
+            this.hideCriteriaTypeSelectors();
 
             // Now show the correct list
             if (toOpen && !expanded) {
@@ -402,53 +358,50 @@ function (str, notification, templates, ajax) {
          * Add a new criterion
          *
          * @param {string} pwKey Key of pathway to add the new criterion to
-         * @param {string} critType Type of criterion to add
+         * @param {string} criterionType Type of criterion to add
+         * @param {string} criterionTemplate Template to display the new criterion
          */
-        addCriterion: function (pwKey, critType) {
+        addCriterion: function (pwKey, criterionOptionNode) {
             var that = this,
-                apiArgs = {
-                    'args': {type: critType},
-                    'methodname': this.endpoints.criteriatemplate},
-                target = this.widget.querySelector('.critgrp_criteria');
+                target = this.widget.querySelector('.critgrp_criteria'),
+                templatename = 'pathway_criteria_group/partial_group_criteria',
+                criterionType = criterionOptionNode.getAttribute('data-criteria_group-criterion-type'),
+                criterionTitle = criterionOptionNode.getAttribute('data-criteria_group-criterion-title'),
+                criterionTemplatename = criterionOptionNode.getAttribute('data-criteria_group-criterion-templatename'),
+                criterionSingleuse = criterionOptionNode.getAttribute('data-criteria_group-criterion-singleuse'),
+                criterionKey;
 
-            ajax.getData(apiArgs).then(function (responses) {
-                var templatename = 'pathway_criteria_group/partial_criterion',
-                    crit = responses.results;
+            criterionKey = that.getNextCriterionKey();
 
-                crit.key = that.getNextCritKey();
-                if (!crit.singleuse) {
-                    crit.expandable = true;
-                    crit.showand = that.pathway.criteria.length > 0;
-                } else {
-                    // Hide the add button
-                    crit.expandable = false;
-                    crit.showand = false;
-                    that.hideBottomActions();
+            this.criteria[criterionKey] = {
+                'key': criterionKey,
+                'type': criterionType,
+                'title': criterionTitle,
+                'criterion_templatename': criterionTemplatename,
+                'singleuse': !!+criterionSingleuse,
+            };
 
-                    // Bubble event up to indicate that we are using a single-use criterion
-                    that.triggerEvent('singleuse', {used: true});
+            // TODO: For now singleuse is used to determine whether there are detail - may need to expand later
+            this.criteria[criterionKey].expandable = !this.criteria[criterionKey].singleuse;
+
+            if (this.criteriaLength > 0) {
+                this.criteria[criterionKey].showand = true;
+            }
+
+            this.criteriaLength += 1;
+
+            // Display the criterion
+            templates.renderAppend(templatename,  {criteria: this.criteria[criterionKey]}, target).then(
+                function () {
+                    templates.runTemplateJS('');
+                    that.triggerEvent('dirty', {});
+                },
+                function (e) {
+                    e.fileName = that.filename;
+                    e.name = 'Error displaying ' + criterionType;
+                    notification.exception(e);
                 }
-
-                // Can never add single use criterion if we have another criterion
-                that.toggleSingleUse(false);
-
-                that.criteria[crit.key] = crit;
-
-                // Display the criterion
-                templates.renderAppend(templatename, crit, target).then(
-                    function () {
-                        templates.runTemplateJS('');
-                        that.triggerEvent('dirty', {});
-                    },
-                    function (error) {
-                        alert(error);
-                    }
-                );
-            }).catch(function (e) {
-                e.fileName = that.filename;
-                e.name = 'Error getting criteria template';
-                notification.exception(e);
-            });
+            );
 
             return false;
         },
@@ -459,8 +412,8 @@ function (str, notification, templates, ajax) {
          * @param {bool} allowSingleUse
          */
         toggleSingleUse: function (allowSingleUse) {
-            var singleUseActiveNodes = this.widget.querySelectorAll('[data-crit-type-singleuse-active]'),
-                singleUseDisabledNodes = this.widget.querySelectorAll('[data-crit-type-singleuse-disabled]');
+            var singleUseActiveNodes = this.widget.querySelectorAll('[data-criteria-type-singleuse-active]'),
+                singleUseDisabledNodes = this.widget.querySelectorAll('[data-criteria-type-singleuse-disabled]');
 
             // Only need to test 1
             if (singleUseActiveNodes.length > 0) {
@@ -490,17 +443,17 @@ function (str, notification, templates, ajax) {
          * @param {bool} allowSingleUse
          */
         toggleAllSingleUse: function (allowSingleUse) {
-            var critTypeNodes = document.querySelectorAll('[data-crit-type-toggle="criteria_group"]'),
+            var criteriaTypeNodes = document.querySelectorAll('[data-criteria-type-toggle="criteria_group"]'),
                 singleUseActiveNodes,
                 singleUseDisabledNodes,
                 pwWgt,
                 criteria,
                 pwAllow;
 
-            for (var a = 0; a < critTypeNodes.length; a++) {
+            for (var a = 0; a < criteriaTypeNodes.length; a++) {
                 pwAllow = allowSingleUse;
-                singleUseActiveNodes = critTypeNodes[a].querySelectorAll('[data-crit-type-singleuse-active]');
-                singleUseDisabledNodes = critTypeNodes[a].querySelectorAll('[data-crit-type-singleuse-disabled]');
+                singleUseActiveNodes = criteriaTypeNodes[a].querySelectorAll('[data-criteria-type-singleuse-active]');
+                singleUseDisabledNodes = criteriaTypeNodes[a].querySelectorAll('[data-criteria-type-singleuse-disabled]');
 
                 // Only need to test 1
                 if (singleUseActiveNodes.length == 0) {
@@ -510,7 +463,7 @@ function (str, notification, templates, ajax) {
                 if (allowSingleUse) {
                     // Before we allow single use in a group,
                     // ensure there are no active criteria in that group (using title)
-                    pwWgt = critTypeNodes[a].closest('[data-pw-key]');
+                    pwWgt = criteriaTypeNodes[a].closest('[data-pw-key]');
                     if (pwWgt) {
                         criteria = pwWgt.querySelectorAll('[data-criterion-active]');
                         if (criteria.length > 0) {
@@ -542,25 +495,27 @@ function (str, notification, templates, ajax) {
         /**
          * Toggle the display of the criterion detail
          *
-         * @param  {String} critKey Key of criterion whose detail display should be toggled
+         * @param  {String} criterionKey Key of criterion whose detail display should be toggled
          */
-        toggleCriterionDetail: function (critKey) {
-            var critTarget = this.widget.querySelector('[data-tw-criterion-key="' + critKey + '"]'),
-                expandTarget = this.widget.querySelector('[data-crit-detail="' + critKey + '"]'),
-                isExpanded = critTarget.hasAttribute('data-crit-detail-expanded') ? critTarget.getAttribute('data-crit-detail-expanded') : 0,
-                expandedIcon = critTarget.querySelector('[data-crit-detail-icon="expanded"]'),
-                collapsedIcon = critTarget.querySelector('[data-crit-detail-icon="collapsed"]');
+        toggleCriterionDetail: function (criterionKey) {
+            var criterionTarget = this.widget.querySelector('[data-tw-criterion-key="' + criterionKey + '"]'),
+                expandTarget = this.widget.querySelector('[data-criterion-detail="' + criterionKey + '"]'),
+                isExpanded = criterionTarget.hasAttribute('data-criterion-detail-expanded')
+                    ? criterionTarget.getAttribute('data-criterion-detail-expanded')
+                    : 0,
+                expandedIcon = criterionTarget.querySelector('[data-criterion-detail-icon="expanded"]'),
+                collapsedIcon = criterionTarget.querySelector('[data-criterion-detail-icon="collapsed"]');
 
             if (isExpanded == 1) {
                 expandTarget.classList.add('cc_hidden');
                 expandedIcon.classList.add('cc_hidden');
                 collapsedIcon.classList.remove('cc_hidden');
-                critTarget.removeAttribute('data-crit-detail-expanded');
+                criterionTarget.removeAttribute('data-criterion-detail-expanded');
             } else {
                 expandTarget.classList.remove('cc_hidden');
                 expandedIcon.classList.remove('cc_hidden');
                 collapsedIcon.classList.add('cc_hidden');
-                critTarget.setAttribute('data-crit-detail-expanded', "1");
+                criterionTarget.setAttribute('data-criterion-detail-expanded', "1");
             }
 
             return false;
@@ -571,75 +526,79 @@ function (str, notification, templates, ajax) {
          * If it has an id (exists on the database), its title will still be shown
          * to indicate that final removal will only happen when changes are applied
          *
-         * @param  {String} critKey Key of criterion to remove
+         * @param  {String} criterionKey Key of criterion to remove
          */
-        removeCriterion: function (critKey) {
-            var that = this,
-                critTarget = this.widget.querySelector('[data-tw-criterion-key="' + critKey + '"]'),
-                critAndTarget = this.widget.querySelector('[data-pw-and="' + critKey + '"]'),
-                templateData;
+        removeCriterion: function (criterionKey) {
+            var criterionTarget = this.widget.querySelector('[data-tw-criterion-key="' + criterionKey + '"]'),
+                criterionAndTarget = this.widget.querySelector('[data-pw-and="' + criterionKey + '"]'),
+                activeNode = criterionTarget.querySelector('[data-criterion-active]'),
+                deletedNode = criterionTarget.querySelector('[data-criterion-deleted]'),
+                removeIconWgt = criterionTarget.querySelector('[data-criterion-action="remove"]'),
+                undoIconWgt = criterionTarget.querySelector('[data-criterion-action="undo"]'),
+                copyObj = {};
 
-            // If it is a single use criterion, bubble event up to indicate that we
-            // are no longer using a single-use criterion
-            if (this.criteria[critKey].singleuse) {
-                this.toggleAllSingleUse(true);
-                this.triggerEvent('singleuse', {used: false});
-                this.showBottomActions();
-            }
+            if (this.criteria[criterionKey]) {
+                // If it is a single use criterion, bubble event up to indicate that we
+                // are no longer using a single-use criterion
+                if (this.criteria[criterionKey].singleuse) {
+                    this.toggleAllSingleUse(true);
+                    this.triggerEvent('singleuse', {used: false});
+                    this.showBottomActions();
+                }
 
-            // If it has an id,
-            //      move the criteria to the 'markedForDeletion' array
-            //      indicate pending deletion through css
-            // else
-            //      simply delete the criterion
+                // If it has an id,
+                //      move the criteria to the 'markedForDeletion' array
+                //      indicate pending deletion through css
+                // else
+                //      simply delete the criterion
 
-            if (this.criteria[critKey]) {
-                if (this.criteria[critKey].id && this.criteria[critKey].id != 0) {
+                if (this.criteria[criterionKey].id && this.criteria[criterionKey].id != 0) {
                     // Existing
                     // Replace content of the criterion div to display deleted name only
 
-                    // Target the detail only
-                    var detailTarget = critTarget.querySelector('[data-criterion-detail]'),
-                        copyObj = {};
-
-                    templateData = this.criteria[critKey];
-                    templateData.deleted = true;
-
-                    copyObj[critKey] = this.criteria[critKey];
+                    copyObj[criterionKey] = this.criteria[criterionKey];
                     Object.assign(this.markedForDeletionCriteria, copyObj);
-                    delete this.criteria[critKey];
+                    delete this.criteria[criterionKey];
                     this.packCriteria();
 
-                    templates.renderReplace('pathway_criteria_group/partial_criterion_detail', templateData, detailTarget).then(function () {
-                        // Show undo action
-                        var removeWgt = critTarget.querySelector('[data-crit-action="remove"]'),
-                            undoWgt = critTarget.querySelector('[data-crit-action="undo"]');
-                        removeWgt.classList.add('cc_hidden');
-                        undoWgt.classList.remove('cc_hidden');
-
-                        that.triggerEvent('update', {pathway: that.pathway});
-                        that.triggerEvent('dirty', {});
-                    });
-                } else {
-                    // Remove the whole criterion and AND divider
-                    if (critTarget) {
-                        critTarget.remove();
+                    if (activeNode) {
+                        activeNode.classList.add('cc_hidden');
                     }
 
-                    if (critAndTarget) {
-                        critAndTarget.remove();
+                    if (deletedNode) {
+                        deletedNode.classList.remove('cc_hidden');
+                    }
+
+                    // Show undo action
+                    if (removeIconWgt) {
+                        removeIconWgt.classList.add('cc_hidden');
+                    }
+                    if (undoIconWgt) {
+                        undoIconWgt.classList.remove('cc_hidden');
+                    }
+
+                    this.triggerEvent('update', {pathway: this.pathway});
+                    this.triggerEvent('dirty', {});
+                } else {
+                    // Remove the whole criterion and AND divider
+                    if (criterionTarget) {
+                        criterionTarget.remove();
+                    }
+
+                    if (criterionAndTarget) {
+                        criterionAndTarget.remove();
                     } else {
                         // If we removed the top criterion and there are more criteria,
                         // we need now to remove the new top criterion's AND
                         if (this.pathway.criteria.length > 1) {
-                            critAndTarget = this.widget.querySelector('[data-pw-and]');
-                            if (critAndTarget) {
-                                critAndTarget.remove();
+                            criterionAndTarget = this.widget.querySelector('[data-pw-and]');
+                            if (criterionAndTarget) {
+                                criterionAndTarget.remove();
                             }
                         }
                     }
 
-                    delete this.criteria[critKey];
+                    delete this.criteria[criterionKey];
                     this.packCriteria();
 
                     if (this.pathway.criteria.length == 0) {
@@ -650,6 +609,8 @@ function (str, notification, templates, ajax) {
 
                     this.triggerEvent('dirty', {});
                 }
+
+                this.criteriaLength -= 1;
             }
 
             return false;
@@ -658,22 +619,24 @@ function (str, notification, templates, ajax) {
         /**
          * Undo the removal of the criterion.
          *
-         * @param  {String} critKey Key of criterion to remove
+         * @param  {String} criterionKey Key of criterion to remove
          */
-        undoCriterionRemoval: function (critKey) {
-            if (!this.markedForDeletionCriteria[critKey]) {
+        undoCriterionRemoval: function (criterionKey) {
+            if (!this.markedForDeletionCriteria[criterionKey]) {
                 return;
             }
 
-            var that = this,
-                critTarget = this.widget.querySelector('[data-tw-criterion-key="' + critKey + '"]'),
-                detailTarget = critTarget.querySelector('[data-criterion-detail]'),
-                templateData,
+            var criterionTarget = this.widget.querySelector('[data-tw-criterion-key="' + criterionKey + '"]'),
+                criterionAndTarget = this.widget.querySelector('[data-pw-and="' + criterionKey + '"]'),
+                activeNode = criterionTarget.querySelector('[data-criterion-active]'),
+                deletedNode = criterionTarget.querySelector('[data-criterion-deleted]'),
+                removeIconWgt = criterionTarget.querySelector('[data-criterion-action="remove"]'),
+                undoIconWgt = criterionTarget.querySelector('[data-criterion-action="undo"]'),
                 copyObj = {};
 
             // Handle the case where an existing single-use has been removed, another one added
             // and then the user tries to undo removal of the original criterion
-            if (this.markedForDeletionCriteria[critKey].singleuse) {
+            if (this.markedForDeletionCriteria[criterionKey].singleuse) {
                 var singleUseWgt = document.querySelector('[data-singleuse]'),
                     hasSingleUse = '0';
 
@@ -698,14 +661,14 @@ function (str, notification, templates, ajax) {
                 }
             }
 
-            copyObj[critKey] = this.markedForDeletionCriteria[critKey];
+            copyObj[criterionKey] = this.markedForDeletionCriteria[criterionKey];
             Object.assign(this.criteria, copyObj);
-            delete this.markedForDeletionCriteria[critKey];
+            delete this.markedForDeletionCriteria[criterionKey];
             this.packCriteria();
 
             // If it is a single use criterion, bubble event up to indicate that we
             // are using a single-use criterion
-            if (this.criteria[critKey].singleuse) {
+            if (this.criteria[criterionKey].singleuse) {
                 this.triggerEvent('singleuse', {used: true});
                 this.toggleAllSingleUse(false);
             } else {
@@ -713,19 +676,26 @@ function (str, notification, templates, ajax) {
                 this.toggleSingleUse(false);
             }
 
-            templateData = this.criteria[critKey];
-            templateData.deleted = false;
+            if (activeNode) {
+                activeNode.classList.remove('cc_hidden');
+            }
 
-            templates.renderReplace('pathway_criteria_group/partial_criterion_detail', templateData, detailTarget).then(function () {
-                // Show delete action
-                var removeWgt = critTarget.querySelector('[data-crit-action="remove"]'),
-                    undoWgt = critTarget.querySelector('[data-crit-action="undo"]');
-                undoWgt.classList.add('cc_hidden');
-                removeWgt.classList.remove('cc_hidden');
+            if (deletedNode) {
+                deletedNode.classList.add('cc_hidden');
+            }
 
-                that.triggerEvent('update', {pathway: that.pathway});
-                that.triggerEvent('dirty', {});
-            });
+            // Hide undo action
+            if (removeIconWgt) {
+                removeIconWgt.classList.remove('cc_hidden');
+            }
+            if (undoIconWgt) {
+                undoIconWgt.classList.add('cc_hidden');
+            }
+
+            this.triggerEvent('update', {pathway: this.pathway});
+            this.triggerEvent('dirty', {});
+
+            this.criteriaLength += 1;
 
             return false;
         },

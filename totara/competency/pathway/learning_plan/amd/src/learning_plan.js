@@ -24,6 +24,7 @@ define([],
             this.pathway = {
                 id: 0,
                 sortorder: 0,
+                type: 'learning_plan'
             };
 
             // Key to use in achievementPath events

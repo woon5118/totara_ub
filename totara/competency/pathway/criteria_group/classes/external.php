@@ -36,35 +36,6 @@ use totara_criteria\criterion_factory;
 
 class external extends \external_api {
 
-    /**
-     * get_detail
-     */
-    public static function get_criteria_parameters() {
-        return new \external_function_parameters(
-            [
-                'id' => new \external_value(PARAM_INT, 'Pathway id'),
-            ]
-        );
-    }
-
-    public static function get_criteria(int $id) {
-        $cg = criteria_group::fetch($id);
-        return $cg->export_criteria();
-    }
-
-    public static function get_criteria_returns() {
-        return new \external_multiple_structure(
-            new \external_single_structure([
-                'type' => new \external_value(PARAM_TEXT, 'Criterion type'),
-                'id' => new \external_value(PARAM_INT, 'Criterion id'),
-                'title' => new \external_value(PARAM_TEXT, 'Criterion name'),
-                'error' => new \external_value(PARAM_TEXT, 'Criterion name', VALUE_OPTIONAL),
-                'criterion_templatename' => new \external_value(PARAM_TEXT, 'Template to use to display and manage instances of this criterion'),
-                'singleuse' => new \external_value(PARAM_BOOL, 'Indication whether this is a single-use criterion', VALUE_OPTIONAL),
-            ])
-        );
-    }
-
     /** create */
     public static function create_parameters() {
         return new \external_function_parameters(
@@ -175,6 +146,7 @@ class external extends \external_api {
             [
                 'id' => new \external_value(PARAM_INT, 'Id of pathway'),
                 'sortorder' => new \external_value(PARAM_INT, 'Sortorder'),
+                'scalevalue' => new \external_value(PARAM_INT, 'Scale value id.'),
                 'criteria' => new \external_multiple_structure(
                     new \external_single_structure([
                         'type' => new \external_value(PARAM_ALPHAEXT, 'Criterion type'),
@@ -209,7 +181,7 @@ class external extends \external_api {
         );
     }
 
-    public static function update(int $id, int $sortorder, array $criteria, int $action_time) {
+    public static function update(int $id, int $sortorder, int $scalevalue, array $criteria, int $action_time) {
         advanced_feature::require('competency_assignment');
 
         $pathway = criteria_group::fetch($id);
@@ -285,21 +257,7 @@ class external extends \external_api {
 
     public static function get_criteria_types() {
         advanced_feature::require('competency_assignment');
-
-        $results = [];
-
-        $types = plugin_types::get_enabled_plugins('criteria', 'totara_criteria');
-
-        foreach ($types as $type) {
-            $criterion = criterion_factory::create($type);
-            $results[] = [
-                'type' => $criterion->get_plugin_type(),
-                'title' => $criterion->get_title(),
-                'singleuse' => $criterion->is_singleuse(),
-            ];
-        }
-
-        return $results;
+        return criteria_group::export_criteria_types();
     }
 
     public static function get_criteria_types_returns() {
@@ -308,6 +266,7 @@ class external extends \external_api {
                 'type' => new \external_value(PARAM_TEXT, 'Criterion type'),
                 'title' => new \external_value(PARAM_TEXT, 'Criterion title'),
                 'singleuse' => new \external_value(PARAM_BOOL, 'Indication whether this is a single-use criterion type'),
+                'criterion_templatename' => new \external_value(PARAM_TEXT, 'Template to use to display and manage instances of this criterion'),
             ])
         );
     }

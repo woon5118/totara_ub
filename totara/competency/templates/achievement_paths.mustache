@@ -66,40 +66,22 @@
                   data-cc-add-pathway="addpath"
                   data-cc-on-ordering="disable">
                 <option value="0" selected="selected">{{#str}}addachievementpath, totara_competency{{/str}}</option>
-                {{#multivalue_types}}
-                    <option value="{{type}}">{{name}}</option>
-                {{/multivalue_types}}
-                <option value="singlevalue" disabled="disabled">{{#str}}singlevaluepaths, totara_competency{{/str}}</option>
+                {{#pathway_types}}
+                    <option value="{{type}}" data-templatename="{{templatename}}">{{name}}</option>
+                {{/pathway_types}}
             </select>
-        </div>
-
-        <div>
-            <button type="submit"
-                    name="cc_link_to_default_button"
-                    data-cc-action="linkdefaultpreset"
-                    data-cc-on-ordering="disable">
-                <span class="pw_item__btn_small_icon">
-                    {{#flex_icon}}undo{{/flex_icon}}
-                    {{#str}}linkdefaultpreset, totara_competency{{/str}}
-                </span>
-            </button>
         </div>
     </div>
 
     {{> totara_competency/overall_aggregation}}
 
-    <div class="pw_none cc_hidden">
+    <div class="pw_none {{#has_pathways}}cc_hidden{{/has_pathways}}">
         {{#str}}nopaths, totara_competency{{/str}}
     </div>
 
-    {{! Placehoder for multi-value pathways with a sortorder < single-value pathways}}
-    <div data-pw-multivalues="low-sortorder"></div>
-
-    {{! Placehoder for single-value pathways}}
-    <div data-pw-singlevalues="singlevalues"></div>
-
-    {{! Placehoder for multi-value pathways with a sortorder > single-value pathways}}
-    <div data-pw-multivalues="high-sortorder"></div>
+    <div data-pw-groups="">
+        {{> totara_competency/partial_pathway_group}}
+    </div>
 
     <div class="cc_group_buttons clearfix">
         <input type="submit"

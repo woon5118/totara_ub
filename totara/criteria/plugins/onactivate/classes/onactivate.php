@@ -129,13 +129,4 @@ class onactivate extends criterion {
         return 'criteria_onactivate/onactivate_edit';
     }
 
-    /**
-     * Return the name of the template for viewing this criterion
-     *
-     * @return string View template's name
-     */
-    public function get_view_template(): string {
-        // Todo
-        return '';
-    }
 }

@@ -23,24 +23,6 @@
  */
 
 $functions = [
-    'totara_competency_get_scale' => [
-        'classname' => \totara_competency\external::class,
-        'methodname' => 'get_scale',
-        'description' => "Return the id of the competency's scale",
-        'type' => 'read',
-        'loginrequired' => true,
-        'ajax' => true,
-    ],
-
-    'totara_competency_get_scale_values' => [
-        'classname' => \totara_competency\external::class,
-        'methodname' => 'get_scale_values',
-        'description' => 'Return a list of scalevalues ordered in sortorder order',
-        'type' => 'read',
-        'loginrequired' => true,
-        'ajax' => true,
-    ],
-
     'totara_competency_get_pathways' => [
         'classname' => \totara_competency\external::class,
         'methodname' => 'get_pathways',
@@ -96,38 +78,10 @@ $functions = [
         'ajax'          => true
     ],
 
-    'totara_competency_get_definition_template' => [
-        'classname' => \totara_competency\external::class,
-        'methodname'    => 'get_definition_template',
-        'description'   => 'Return the definition template name and data for this pathway',
-        'type'          => 'read',
-        'loginrequired' => true,
-        'ajax'          => true
-    ],
-
-    // TODO: Move to plugins ??
-    'totara_competency_get_summary_template' => [
-        'classname' => \totara_competency\external::class,
-        'methodname'    => 'get_summary_template',
-        'description'   => 'Return the summary template name and data for this pathway',
-        'type'          => 'read',
-        'loginrequired' => true,
-        'ajax'          => true
-    ],
-
     'totara_competency_delete_pathways' => [
         'classname' => \totara_competency\external::class,
         'methodname'    => 'delete_pathways',
         'description'   => 'Delete pathways from the competency',
-        'type'          => 'read',
-        'loginrequired' => true,
-        'ajax'          => true
-    ],
-
-    'totara_competency_has_singleuse_criteria' => [
-        'classname' => \totara_competency\external::class,
-        'methodname'    => 'has_singleuse_criteria',
-        'description'   => 'Determine whether any single-use criterion is used in any achievement path',
         'type'          => 'read',
         'loginrequired' => true,
         'ajax'          => true
@@ -138,15 +92,6 @@ $functions = [
         'methodname'    => 'set_overall_aggregation',
         'description'   => 'Save the overall aggregation',
         'type'          => 'push',
-        'loginrequired' => true,
-        'ajax'          => true
-    ],
-
-    'totara_competency_get_overall_aggregation' => [
-        'classname' => \totara_competency\external::class,
-        'methodname'    => 'get_overall_aggregation',
-        'description'   => 'Load the overall aggregation',
-        'type'          => 'read',
         'loginrequired' => true,
         'ajax'          => true
     ],

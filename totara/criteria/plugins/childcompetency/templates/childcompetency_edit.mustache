@@ -56,7 +56,8 @@
       </span>
     </div>
 
-    <div data-tw-criterionChildCompetency-aggregation="">
+    <div data-tw-criterionChildCompetency-aggregation="{{#aggregation}}{{method}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}"
+         data-tw-criterionChildCompetency-aggregation-reqitems="{{#aggregation}}{{reqitems}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}">
         <div class="tw-criterion-label">
             <span>{{#str}}aggregation, totara_criteria{{/str}}</span>
         </div>

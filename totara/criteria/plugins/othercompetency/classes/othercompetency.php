@@ -116,15 +116,6 @@ class othercompetency extends criterion {
     }
 
     /**
-     * Return the name of the template to view this criterion
-     *
-     * @return string Summary template's name
-     */
-    public function get_view_template(): string {
-        return '';
-    }
-
-    /**
      * Export definition item data
      *
      * @return  array Array of item detail
@@ -136,16 +127,16 @@ class othercompetency extends criterion {
             $item_detail = [
                 'type' => $this->get_items_type(),
                 'id'   => $competency_id,
+                'value' => $competency_id,
             ];
 
             try {
                 $competency = new competency_entity($competency_id);
                 $config = new achievement_configuration($competency);
-                $item_detail['name'] = format_string($competency->fullname);
-
-                if (!$config->user_can_become_proficient()) {
-                    $item_detail['error'] = get_string('error:competencycannotproficient', 'criteria_othercompetency');
-                }
+                $item_detail['text'] = format_string($competency->fullname);
+                $item_detail['error'] = $config->user_can_become_proficient()
+                    ? ''
+                    : get_string('error:competencycannotproficient', 'criteria_othercompetency');
             } catch (Exception $e) {
                 $item_detail['name'] = '';
                 $item_detail['error'] = get_string('error:nocompetency', 'criteria_othercompetency');

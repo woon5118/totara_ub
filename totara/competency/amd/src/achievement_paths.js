@@ -39,13 +39,12 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
         this.competency_id = '';
         this.scale_id = '';
         this.pathways = [];
-        this.scalevalues = [];
         this.markedForDeletionPathways = [];
 
         this.nPaths = 0;
         this.nDeletedPaths = 0;
         this.singlevalShown = false;
-        this.critTypes = [];
+        this.criteriaTypes = [];
 
         this.lastKey = 0;
 
@@ -55,16 +54,10 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
         this.dirty = false;
 
         this.endpoints = {
-            competencyScale: 'totara_competency_get_scale',
-            scalevalues: 'totara_competency_get_scale_values',
             criteriaTypes: 'pathway_criteria_group_get_criteria_types',
             pathways: 'totara_competency_get_pathways',
-            pathwaySummary: 'totara_competency_get_summary_template',
-            definitionTemplate: 'totara_competency_get_definition_template',
-            defaultpreset: 'totara_competency_link_default_preset',
             deletePathways: 'totara_competency_delete_pathways',
-            getOverallAggregation: 'totara_competency_get_overall_aggregation',
-            setOverallAggregation: 'totara_competency_set_overall_aggregation',
+            setOverallAggregation: 'totara_competency_set_overall_aggregation'
         };
 
         this.filename = 'achievement_paths.js';
@@ -88,9 +81,7 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
                     var wgt = e.target.closest('[data-cc-action]'),
                         action = wgt.getAttribute('data-cc-action');
 
-                    if (action === 'linkdefaultpreset') {
-                        that.linkDefaultPreset();
-                    } else if (action === 'applychanges') {
+                    if (action === 'applychanges') {
                         that.applyChanges();
                     } else if (action === 'cancelchanges') {
                         that.cancelChanges();
@@ -102,15 +93,11 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
                     if (action === 'add-pw') {
                         that.showCriteriaTypeOptions(svWgt);
                     }
-                } else if (e.target.closest('[data-scalevalue-crit-type-option]')) {
-                    var critType = e.target.closest('[data-scalevalue-crit-type-option]').getAttribute('data-scalevalue-crit-type-option');
+                } else if (e.target.closest('[data-scalevalue-criterion-type]')) {
+                    var optionNode = e.target.closest('[data-scalevalue-criterion-type]');
                         svWgt = e.target.closest('[data-scalevalue-id]');
 
-                    // In v1 we assume the only singlevalue pathway is criteria_group.
-                    // If there is ever a need for additional singlevalue pathways, the
-                    // implementation must be enhanced to cater for that
-
-                    that.addSinglevaluePath(svWgt, 'criteria_group', critType);
+                    that.addSinglevaluePath(svWgt, optionNode);
                 } else if (e.target.closest('[data-pw-action')) {
                     var wgt = e.target.closest('[data-pw-action]'),
                         action = wgt.getAttribute('data-pw-action'),
@@ -138,10 +125,10 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
                 }
 
                 if (e.target.closest('[data-cc-add-pathway]')) {
-                    var pathType = e.target.closest('[data-cc-add-pathway]').querySelector('option:checked').value;
-                        that.addPath(pathType);
+                    var selectedOption = e.target.closest('[data-cc-add-pathway]').querySelector('option:checked');
+                    that.addPath(selectedOption);
                 } else if (e.target.closest('[data-cc-pw-agg-changed]')) {
-                    that.setOverallAggregation();
+                    that.setOverallAggregation(true);
                     that.dirty = true;
                 }
             });
@@ -201,11 +188,18 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
                     pw = e.detail.pathway;
 
                 if (!that.pathways[key]) {
-                    that.pathways[key] = {};
+                    that.pathways[key] = {'id': pw.id ? pw.id: 0, 'type': pw.type ? pw.type : ''};
+                    if (pw.scalevalue) {
+                        that.singlevalShown = true;
+                    }
                     that.nPaths += 1;
                     that.showHideNoPaths();
                 }
 
+                // Not used in APIs
+                if (pw.type) {
+                    delete pw.type;
+                }
                 that.pathways[key].detail = pw;
             });
 
@@ -219,7 +213,7 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
                 var isUsed = e.detail.used;
 
                 that.widget.setAttribute('data-singleuse', isUsed ? '1' : '0');
-                that.toggleSingleUseCritTypes(!isUsed);
+                that.toggleSingleUseCriteriaTypes(!isUsed);
             });
 
         },
@@ -265,12 +259,17 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
          */
         initData: function () {
             var that = this;
+
             if (this.widget.hasAttribute('data-comp-id')) {
                 this.competency_id = this.widget.getAttribute('data-comp-id');
             }
 
-            this.setScale().then(function () {
-                that.updatePage();
+            this.getCriteriaTypes().then(function () {
+                that.setOverallAggregation();
+            }).catch(function (e) {
+                e.fileName = that.filename;
+                e.name = 'Error retrieving criteria types';
+                notification.exception(e);
             });
         },
 
@@ -281,324 +280,107 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
          */
         getNextKey: function () {
             this.lastKey++;
-            return 'pw_' + this.lastKey;
+            return 'pw_new_' + this.lastKey;
         },
 
         /**
          * Update the detail on this page
+         *
+         * return {Promise}
          */
         updatePage: function () {
-            if (!this.competency_id || this.scalevalues.length == 0) {
-                return;
-            }
-
             var that = this,
-                templatePromises = [],
-                apiArgs;
-
-            this.getOverallAggregation().then(function () {
-
-                that.getCriteriaTypes().then(function () {
-                    apiArgs = {
-                        'args': {competency_id: that.competency_id},
-                        'methodname': that.endpoints.pathways};
-
-                    // Get all the pathways and its detail
-                    ajax.getData(apiArgs).then(function (responses) {
-                        var pwData = responses.results;
-
-                        // Clean out all previous pathway data
-                        that.clearPathways();
-
-                        that.nPaths = pwData.length;
-                        that.singlevalShown = false;
-
-                        for (var a = 0; a < pwData.length; a++) {
-                            var pw = pwData[a];
-
-                            // pathway must provide templatename
-                            if (!pw.pathway_templatename) {
-                                notification.exception({
-                                    fileName: that.filename,
-                                    message: 'Templatename for pathway ' + pw.title + ' (' + pw.id + ') is missing',
-                                    name: 'Pathway without templatename'
-                                });
-
-                                return;
-                            }
-
-                            // We add a unique key for all paths as new paths don't have ids
-                            pw.key = that.getNextKey();
-                            that.pathways[pw.key] = pw;
-
-                            if (pw.scalevalue) {
-                                that.singlevalShown = true;
-                                that.scalevalues[pw.scalevalue].pathways.push(pw.key);
-                            } else {
-                                var target;
-
-                                if (that.singlevalShown) {
-                                    target = that.widget.querySelector('[data-pw-multivalues="high-sortorder"]');
-                                } else {
-                                    target = that.widget.querySelector('[data-pw-multivalues="low-sortorder"]');
-                                }
-
-                                var templatename = 'totara_competency/partial_pathway';
-
-                                // Display the pathway in the correct div
-                                pw.outerborder = true;
-                                pw.actions = true;
-                                pw.orderable = true;
-                                templatePromises.push(templates.renderAppend(templatename, pw, target));
-                            }
-                        }
-
-                        // Add the scalevalues template
-                        templatePromises.push(that.showSinglevaluePaths());
-
-                        Promise.all(templatePromises).then(function () {
-                            that.calculateSortorderFromDisplay();
-                            // We've just read all from the database.
-                            // The sortorder calculation may have changed the
-                            // pathways' sortorders, but that was not due to
-                            // any action from the user.
-                            // So - resetting the dirty flag in this case
-                            that.dirty = false;
-
-                            // Manually call init on all templates
-                            // Run global scan
-                            templates.runTemplateJS('');
-
-                            that.showHideNoPaths();
-                        }).catch(function (e) {
-                            e.fileName = that.filename;
-                            e.name = 'Error displaying pathways';
-                            notification.exception(e);
-                        });
-                    }).catch(function (e) {
-                        e.fileName = that.filename;
-                        e.name = 'Error retrieving pathways';
-                        notification.exception(e);
-                    });
-                }).catch(function (e) {
-                    e.fileName = that.filename;
-                    e.name = 'Error retrieving criteria types';
-                    notification.exception(e);
-                });
-            });
-        },
-
-
-        /**
-         * Set the id of the scale to use as well as the scale values
-         *
-         * @return {Promise}
-         */
-        setScale: function () {
-            var that = this;
+                templatename = 'totara_competency/partial_pathway_group',
+                target = this.widget.querySelector('[data-pw-groups]'),
+                apiArgs = {
+                    'args': {competency_id: that.competency_id},
+                    'methodname': that.endpoints.pathways};
 
             return new Promise(function (resolve, reject) {
-                // Get the scale id first
-                if (!that.scale_id && that.widget.hasAttribute('data-scale-id')) {
-                    that.scale_id = that.widget.getAttribute('data-scale-id');
-                }
+                // Get all the pathways and its detail
+                ajax.getData(apiArgs).then(function(responses) {
+                    var pwGroups = responses.results;
 
-                if (that.scale_id) {
-                    that.setScaleValues().then(function () {
+                    that.pathways = [];
+                    that.nPaths = 0;
+
+                    templates.renderReplace(templatename, {'pathway_groups': pwGroups}, target).then(function() {
                         resolve();
-                    });
-                } else {
-                    // Get from competency
-                    if (!that.competency_id) {
-                        reject('Competency or scale id is required');
-                    }
-
-                    var apiArgs = {
-                        'args': {competency_id: that.competency_id},
-                        'methodname': that.endpoints.competencyScale
-                    };
-
-                    ajax.getData(apiArgs).then(function (responses) {
-                        that.scale_id = responses.results;
-                        that.setScaleValues().then(function () {
-                            resolve();
-                        }).catch(function (e) {
-                            e.fileName = that.filename;
-                            e.name = 'Error setting scalevalues';
-                            notification.exception(e);
-                        });
-                    }).catch(function (e) {
+                    }).catch(function(e) {
                         e.fileName = that.filename;
-                        e.name = 'Error retrieving scale';
+                        e.name = 'Error updating pathways';
                         notification.exception(e);
+                        reject();
                     });
-                }
-            });
-        },
-
-
-        /**
-         * Set the scale values of the scale
-         *
-         * @return {Promise } [description]
-         */
-        setScaleValues: function () {
-            var that = this;
-
-            return new Promise(function (resolve, reject) {
-                if (!that.scale_id) {
-                    reject('Scale id not set');
-                }
-
-                var apiArgs = {
-                    'args': {scale_id: that.scale_id},
-                    'methodname': that.endpoints.scalevalues};
-
-                ajax.getData(apiArgs).then(function (responses) {
-                    that.scalevalues = [];
-
-                    for (var a = 0; a < responses.results.length; a++) {
-                        var svalue = responses.results[a];
-                        svalue.pathways = [];
-
-                        that.scalevalues[svalue.id] = svalue;
-                    }
-
-                    resolve();
-                }).catch(function (e) {
+                }).catch(function(e) {
                     e.fileName = that.filename;
-                    e.name = 'Error retrieving scalevalues';
+                    e.name = 'Error retrieving pathways';
                     notification.exception(e);
+                    reject();
                 });
             });
-        },
-
-        /**
-         * Clear all pathway data
-         */
-        clearPathways: function () {
-            this.pathways = [];
-            this.nPaths = 0;
-
-            for (var idx in this.scalevalues) {
-                this.scalevalues[idx].pathways = [];
-            }
-
-            var divs = this.widget.querySelectorAll('[data-pw-multivalues]');
-            for (var a = 0; a < divs.length; a++) {
-                divs[a].innerHTML = '';
-            }
-
-            divs = this.widget.querySelectorAll('[data-pw-singlevalues]');
-            for (var a = 0; a < divs.length; a++) {
-                divs[a].innerHTML = '';
-            }
-
-            this.markedForDeletionPathways = [];
-            this.nDeletedPaths = 0;
-        },
-
-        /**
-         * Show the scalevalues and all the singlevalue pathways
-         *
-         * @return {Promise}
-         */
-        showSinglevaluePaths: function () {
-            var target = this.widget.querySelector('[data-pw-singlevalues]'),
-                templatename = 'totara_competency/scalevalue_pathways_edit',
-                templatedata = {scalevalues: []};
-
-
-            // Mustache doesn't like non-sequencial array indexes
-            for (var id in this.scalevalues) {
-                var svalue = this.scalevalues[id],
-                    toadd = {
-                        id: svalue.id,
-                        name: svalue.name,
-                        sortorder: svalue.sortorder,
-                        proficient: svalue.proficient,
-                        criteriaTypes: this.critTypes,
-                        critTypeLevel: 'scalevalue',
-                        pathways: [],
-                    };
-
-                for (var a = 0; a < svalue.pathways.length; a++) {
-                    this.pathways[svalue.pathways[a]].showor = a > 0;
-                    this.pathways[svalue.pathways[a]].orderable = false;
-                    this.pathways[svalue.pathways[a]].critTypeLevel = this.pathways[svalue.pathways[a]].type;
-                    toadd.pathways.push(this.pathways[svalue.pathways[a]]);
-                }
-
-                templatedata.scalevalues.push(toadd);
-            }
-
-            templatedata.scalevalues.sort(function (a, b) {
-                return a.sortorder - b.sortorder;
-            });
-
-            // Display the pathway in the correct div
-            return templates.renderReplace(templatename, templatedata, target);
         },
 
         /**
          * Add a new pathway
          * If the singlevalue block is shown, new pathways are added below it
          *
-         * @param {string} Type of path to add
+         * @param {node} Selected type option
          */
-        addPath: function (pathType) {
+        addPath: function (selectedOption) {
+            var pathType =  selectedOption.value,
+                pathTitle = selectedOption.text,
+                pathTemplate = '';
+
+            if (selectedOption.hasAttribute('data-templatename')) {
+                pathTemplate = selectedOption.getAttribute('data-templatename');
+            }
+
             if (pathType == '0') {
                 return;
             }
 
             if (pathType === 'singlevalue') {
-                // Just open the scalevalue block.
+                // Just open the singlevalue block.
                 // User has to add the actual path the the appropriate scalevalue
-                // TODO: Confirm with Jen that this is acceptable behaviour
                 this.singlevalShown = true;
                 this.showHideNoPaths();
                 return;
             }
 
             var that = this,
-                apiArgs = {
-                    'args': {type: pathType},
-                    'methodname': this.endpoints.definitionTemplate},
-                target;
+                target,
+                key = that.getNextKey(),
+                templatename = 'totara_competency/partial_pathway',
+                pw;
 
-            ajax.getData(apiArgs).then(function (responses) {
-                var key = that.getNextKey(),
-                    templatename = 'totara_competency/partial_pathway',
-                    pw = responses.results;
+            pw = {
+                'key': key,
+                'id': 0,
+                'type': pathType,
+                'title': pathTitle,
+                'sortorder': 0,
+                'pathway_templatename': pathTemplate,
+            };
 
-                pw.key = key;
-                pw.outerborder = true;
-                pw.actions = true;
-                pw.orderable = true;
+            this.pathways[key] = pw;
+            this.nPaths += 1;
 
-                that.pathways[key] = pw;
-                that.nPaths += 1;
+            if (that.singlevalShown) {
+                target = that.widget.querySelector('[data-pw-group="high-sortorder"]');
+            } else {
+               target = that.widget.querySelector('[data-pw-group="low-sortorder"]');
+            }
 
-                if (that.singlevalShown) {
-                    target = that.widget.querySelector('[data-pw-multivalues="high-sortorder"]');
-                } else {
-                    target = that.widget.querySelector('[data-pw-multivalues="low-sortorder"]');
-                }
-
-                // Display the pathway in the correct div
-                templates.renderAppend(templatename, that.pathways[key], target).then(function () {
-                    that.calculateSortorderFromDisplay();
-                    that.dirty = true;
-                    that.showHideNoPaths();
-                    templates.runTemplateJS('');
-                }).catch(function (e) {
-                    e.fileName = that.filename;
-                    e.name = 'Error displayin ' + pathType;
-                    notification.exception(e);
-                });
+            // Display the pathway in the correct div
+            templates.renderAppend(templatename, this.pathways[key], target).then(function () {
+                that.calculateSortorderFromDisplay();
+                that.dirty = true;
+                that.showHideNoPaths();
+                templates.runTemplateJS('');
             }).catch(function (e) {
                 e.fileName = that.filename;
-                e.name = 'Error retrieving definition template for ' + pathType;
+                e.name = 'Error displayin ' + pathType;
                 notification.exception(e);
             });
         },
@@ -606,11 +388,11 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
         /**
          * Hide all criteria type selectors
          */
-        hideCritTypeSelectors: function () {
-            var critTypeNodes = this.widget.querySelectorAll('[data-crit-type-toggle]');
+        hideCriteriaTypeSelectors: function () {
+            var criteriaTypeNodes = this.widget.querySelectorAll('[data-criteria-type-toggle]');
 
-            for (var a = 0; a < critTypeNodes.length; a++) {
-                critTypeNodes[a].classList.add('cc_hidden');
+            for (var a = 0; a < criteriaTypeNodes.length; a++) {
+                criteriaTypeNodes[a].classList.add('cc_hidden');
             }
         },
 
@@ -620,10 +402,10 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
          * @param {node} svWgt Scalevalue widget
          */
         showCriteriaTypeOptions: function (svWgt) {
-            var toOpen = svWgt.querySelector('[data-crit-type-toggle="scalevalue"]'),
+            var toOpen = svWgt.querySelector('[data-criteria-type-toggle="scalevalue"]'),
                 expanded = toOpen ? !toOpen.classList.contains('cc_hidden') : false;
 
-            this.hideCritTypeSelectors();
+            this.hideCriteriaTypeSelectors();
 
             // Now show the correct list
             if (toOpen && !expanded) {
@@ -635,47 +417,57 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
          * Add a new singlevalue pathway for the specific scalevalue
          *
          * @param {node} svWgt Scalevalue widget to add the path to
-         * @param {string} Type of path to add
-         * @param {string} Type of criterion to add
+         * @param {node} Criterion option node
          */
-        addSinglevaluePath: function (svWgt, pathType, critType) {
+        addSinglevaluePath: function (svWgt, criterionOptionNode) {
+            // In v1 we assume the only singlevalue pathway is criteria_group.
+            // If there is ever a need for additional singlevalue pathways, the
+            // implementation must be enhanced to cater for that
+
             var that = this,
-                scalevalue = svWgt.getAttribute('data-scalevalue-id'),
-                apiArgs = {
-                    'args': {type: pathType},
-                    'methodname': this.endpoints.definitionTemplate},
-                target = svWgt.querySelector('[data-cc-scalevalue-pw-list]');
+                key,
+                pathType = 'criteria_group',
+                target = svWgt.querySelector('[data-cc-scalevalue-pw-list]'),
+                templatename = 'totara_competency/partial_pathway',
+                pw,
+                criterionType = criterionOptionNode.getAttribute('data-scalevalue-criterion-type'),
+                criterionKey,
+                criterion;
 
-            ajax.getData(apiArgs).then(function (responses) {
-                var key = that.getNextKey(),
-                    templatename = 'totara_competency/partial_pathway',
-                    pw = responses.results;
+            key = this.getNextKey();
+            criterionKey = key + '_criterion_1';
+            criterion = this.criteriaTypes.find(function (criterion) {
+                return criterion.type === criterionType;
+            });
+            criterion.key = criterionKey;
+            // TODO: For now singleuse is used to determine whether there are detail - may need to expand later
+            criterion.expandable = !criterion.singleuse;
 
-                pw.key = key;
-                pw.scalevalue = scalevalue;
-                pw.outerborder = false;
-                pw.showor = that.scalevalues[pw.scalevalue].pathways.length > 0;
-                pw.critType = critType;
-                pw.criteriaTypes = that.critTypes;
-                pw.critTypeLevel = pathType;
-                that.pathways[key] = pw;
-                that.scalevalues[scalevalue].pathways.push(key);
-                that.nPaths += 1;
+            pw = {
+                'key': key,
+                'type': pathType,
+                'scalevalue': svWgt.getAttribute('data-scalevalue-id'),
+                'sortorder': 0,
+                'pathway_templatename': 'pathway_criteria_group/pathway_criteria_group_edit',
+                'criteria_type_level': pathType,
+                'criteria_types': this.criteriaTypes,
+                'criteria': [criterion]
+            };
 
-                // Display the pathway in the correct div
-                templates.renderAppend(templatename, that.pathways[key], target).then(function () {
-                    that.hideCritTypeSelectors();
-                    that.calculateSortorderFromDisplay();
-                    that.dirty = true;
-                    templates.runTemplateJS('');
-                }).catch(function (e) {
-                    e.fileName = that.filename;
-                    e.name = 'Error displaying template for ' + pathType;
-                    notification.exception(e);
-                });
+            this.pathways[key] = pw;
+            this.nPaths += 1;
+
+            // templatename = 'totara_competency/test';
+
+            // Display the pathway in the correct div
+            templates.renderAppend(templatename, pw, target).then(function () {
+                that.hideCriteriaTypeSelectors();
+                that.calculateSortorderFromDisplay();
+                that.dirty = true;
+                templates.runTemplateJS('');
             }).catch(function (e) {
                 e.fileName = that.filename;
-                e.name = 'Error retrieving definition template for ' + pathType;
+                e.name = 'Error displayin ' + pathType;
                 notification.exception(e);
             });
         },
@@ -694,6 +486,7 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
                 apiEndpoint,
                 apiReqSortorder,
                 pwKey,
+                pwSortorderWgt,
                 apiArgs,
                 promiseArr = [];
 
@@ -720,7 +513,10 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
 
                     // If the pathway require the sortorder on the save endpoint, add it to args
                     if (apiReqSortorder) {
-                        apiArgs.args.sortorder = this.pathways[pwKey].sortorder;
+                        pwSortorderWgt = pwList[a].closest('[data-pw-sortorder]');
+                        if (pwSortorderWgt) {
+                            apiArgs.args.sortorder = pwSortorderWgt.getAttribute('data-pw-sortorder');
+                        }
                     }
 
                     promiseArr.push(ajax.getData(apiArgs));
@@ -748,12 +544,15 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
 
             if (promiseArr.length > 0) {
                 Promise.all(promiseArr).then(function () {
-                    that.showNotification('success', 'applysuccess', 'totara_competency', {});
-                    that.dirty = false;
-
-                    // TODO: This will reread everything! Can we somehow only re-read the changed ones?
-                    //       Main thing to look for - save endpoint of new pws
-                    that.updatePage();
+                    // TODO: For now simply reloading all pathways. Try to find a way to update ids for keys
+                    that.updatePage().then(function() {
+                        that.showNotification('success', 'applysuccess', 'totara_competency', {});
+                        that.dirty = false;
+                    }).catch(function (e) {
+                        e.fileName = that.filename;
+                        e.name = 'Error updating the page';
+                        notification.exception(e);
+                    });
                 }).catch(function (e) {
                     e.fileName = that.filename;
                     e.name = 'Error applying changes';
@@ -768,9 +567,8 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
         showHideNoPaths: function () {
             var aggDiv = this.widget.querySelector('[data-cc-pw-aggregation]'),
                 noPathsDiv = this.widget.querySelector('.pw_none'),
-                singlevalDiv = this.widget.querySelector('[data-pw-singlevalues]'),
-                singlevalOption = this.widget.querySelector('[name="cc_add_pathway_select"] option[value="singlevalue"]'),
-                presetBtn = this.widget.querySelector('[data-cc-action="linkdefaultpreset"]');
+                singlevalDiv = this.widget.querySelector('[data-pw-group="singlevalue"]'),
+                singlevalOption = this.widget.querySelector('[name="cc_add_pathway_select"] option[value="singlevalue"]');
 
             if (this.nPaths == 0 && !this.singlevalShown) {
                 if (aggDiv) {
@@ -779,18 +577,12 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
                 if (noPathsDiv) {
                     noPathsDiv.classList.remove('cc_hidden');
                 }
-                if (presetBtn) {
-                    presetBtn.classList.remove('cc_hidden');
-                }
             } else {
                 if (aggDiv) {
                     aggDiv.classList.remove('cc_hidden');
                 }
                 if (noPathsDiv) {
                     noPathsDiv.classList.add('cc_hidden');
-                }
-                if (presetBtn) {
-                    presetBtn.classList.add('cc_hidden');
                 }
             }
 
@@ -837,25 +629,6 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
 
                 pwNodes[a].setAttribute('data-pw-sortorder', pw.sortorder);
             }
-        },
-
-        /**
-         * Link the pathways in the default preset to this competency
-         */
-        linkDefaultPreset: function () {
-            var that = this,
-                apiArgs = {
-                    'args': {competency_id: this.competency_id},
-                    'methodname': this.endpoints.defaultpreset};
-
-            // Get all the pathways and its detail
-            ajax.getData(apiArgs).then(function () {
-                that.updatePage();
-            }).catch(function (e) {
-                e.fileName = that.filename;
-                e.name = 'Error linking default preset pathways';
-                notification.exception(e);
-            });
         },
 
         /**
@@ -911,27 +684,28 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
                 } else {
                     // Remove it totally
                     if (this.pathways[pwKey].scalevalue) {
-                        var scalevalue = this.pathways[pwKey].scalevalue,
-                            idx = this.scalevalues[scalevalue].pathways.indexOf(pwKey);
+                        // TODO: fix
+                        // var scalevalue = this.pathways[pwKey].scalevalue,
+                        //     idx = this.scalevalues[scalevalue].pathways.indexOf(pwKey);
+                        //
+                        // if (idx >= 0) {
+                        //     this.scalevalues[scalevalue].pathways.splice(idx, 1);
+                        // }
 
-                        if (idx >= 0) {
-                            this.scalevalues[scalevalue].pathways.splice(idx, 1);
-                        }
-
-                        if (pwOrTarget) {
-                            pwOrTarget.remove();
-                        } else if (this.scalevalues[scalevalue].pathways.length > 0) {
-                            // If we removed the top pathway for the scalevalue and there are more pathways,
-                            // we need now to remove the new top OR
-                            var svWgt = this.widget.querySelector('[data-scalevalue-id="' + scalevalue + '"]');
-
-                            if (svWgt) {
-                                pwOrTarget = svWgt.querySelector('[data-pw-or]');
-                                if (pwOrTarget) {
-                                    pwOrTarget.remove();
-                                }
-                            }
-                        }
+                        // if (pwOrTarget) {
+                        //     pwOrTarget.remove();
+                        // } else if (this.scalevalues[scalevalue].pathways.length > 0) {
+                        //     // If we removed the top pathway for the scalevalue and there are more pathways,
+                        //     // we need now to remove the new top OR
+                        //     var svWgt = this.widget.querySelector('[data-scalevalue-id="' + scalevalue + '"]');
+                        //
+                        //     if (svWgt) {
+                        //         pwOrTarget = svWgt.querySelector('[data-pw-or]');
+                        //         if (pwOrTarget) {
+                        //             pwOrTarget.remove();
+                        //         }
+                        //     }
+                        // }
                     }
 
                     delete this.pathways[pwKey];
@@ -982,38 +756,6 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
         },
 
         /**
-         * Load the overall aggregation value
-         *
-         * @return {Promise}
-         */
-        getOverallAggregation: function () {
-            var that = this,
-              aggWgt = this.widget.querySelector('[data-cc-pw-agg-changed]');
-
-            return new Promise(function (resolve) {
-                var apiArgs = {
-                    args: {competency_id: that.competency_id},
-                    methodname: that.endpoints.getOverallAggregation
-                };
-
-                ajax.getData(apiArgs).then(function (responses) {
-                    var aggType = responses.results;
-
-                    aggWgt.querySelector('option:checked').removeAttribute('selected');
-                    aggWgt.querySelector('option[value=' + aggType + ']').setAttribute('selected', 'selected');
-
-                    that.setOverallAggregation();
-
-                    resolve();
-                }).catch(function (e) {
-                    e.fileName = that.filename;
-                    e.name = 'Error getting overall aggregation';
-                    notification.exception(e);
-                });
-            });
-        },
-
-        /**
          * Retrieve the criteria types if not yet done
          *
          * @return {Promise}
@@ -1022,8 +764,8 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
             var that = this,
                 hasSingleUse = this.widget.hasAttribute('data-singleuse') ? this.widget.getAttribute('data-singleuse') : '0';
 
-            return new Promise(function (resolve) {
-                if (that.critTypes && that.critTypes.length > 0) {
+            return new Promise(function (resolve, reject) {
+                if (that.criteriaTypes && that.criteriaTypes.length > 0) {
                     resolve();
                 } else {
                     var apiArgs = {
@@ -1032,12 +774,12 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
                     };
 
                     ajax.getData(apiArgs).then(function (responses) {
-                        var critTypes = responses.results;
+                        var criteriaTypes = responses.results;
 
-                        that.critTypes = [];
-                        for (var a = 0; a < critTypes.length; a++) {
-                            critTypes[a].disabled = critTypes[a].singleuse && hasSingleUse == '1';
-                            that.critTypes.push(critTypes[a]);
+                        that.criteriaTypes = [];
+                        for (var a = 0; a < criteriaTypes.length; a++) {
+                            criteriaTypes[a].disabled = criteriaTypes[a].singleuse && hasSingleUse == '1';
+                            that.criteriaTypes.push(criteriaTypes[a]);
                         }
 
                         resolve();
@@ -1045,6 +787,7 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
                         e.fileName = that.filename;
                         e.name = 'Error getting criteria types';
                         notification.exception(e);
+                        reject();
                     });
                 }
             });
@@ -1055,8 +798,8 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
          *
          * @param {bool} allowSingleUse
          */
-        toggleSingleUseCritTypes: function (allowSingleUse) {
-            var critTypeNodes = this.widget.querySelectorAll('[data-crit-type-toggle="scalevalue"]'),
+        toggleSingleUseCriteriaTypes: function (allowSingleUse) {
+            var criteriaTypeNodes = this.widget.querySelectorAll('[data-criteria-type-toggle="scalevalue"]'),
                 singleUseActiveNodes,
                 singleUseDisabledNodes,
                 svWgt,
@@ -1065,8 +808,8 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
                 pwKeys;
 
             // Update all criteria type dropdowns on the top level only
-            for (var a = 0; a < critTypeNodes.length; a++) {
-                svWgt = critTypeNodes[a].closest('[data-scalevalue-id]');
+            for (var a = 0; a < criteriaTypeNodes.length; a++) {
+                svWgt = criteriaTypeNodes[a].closest('[data-scalevalue-id]');
                 scalevalue = null;
 
                 if (svWgt) {
@@ -1077,8 +820,8 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
                     continue;
                 }
 
-                singleUseActiveNodes = critTypeNodes[a].querySelectorAll('[data-crit-type-singleuse-active]');
-                singleUseDisabledNodes = critTypeNodes[a].querySelectorAll('[data-crit-type-singleuse-disabled]');
+                singleUseActiveNodes = criteriaTypeNodes[a].querySelectorAll('[data-criteria-type-singleuse-active]');
+                singleUseDisabledNodes = criteriaTypeNodes[a].querySelectorAll('[data-criteria-type-singleuse-disabled]');
 
                 // Only need to test 1
                 if (singleUseActiveNodes.length == 0) {
@@ -1086,18 +829,19 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
                 }
 
                 // You can't add single use criteria if there is already a pathway resulting
-                // in thee scalevalue
+                // in the scalevalue
                 svAllow = allowSingleUse;
-                if (svAllow) {
-                    pwKeys = this.scalevalues[scalevalue].pathways;
-                    for (k = 0; k < pwKeys.length; k++) {
-                        if (this.pathways[pwKeys[k]]) {
-                            // Not deleted
-                            svAllow = false;
-                            break;
-                        }
-                    }
-                }
+                // TODO: Fix
+                // if (svAllow) {
+                //     pwKeys = this.scalevalues[scalevalue].pathways;
+                //     for (k = 0; k < pwKeys.length; k++) {
+                //         if (this.pathways[pwKeys[k]]) {
+                //             // Not deleted
+                //             svAllow = false;
+                //             break;
+                //         }
+                //     }
+                // }
 
                 if (svAllow) {
                     for (var k = 0; k < singleUseActiveNodes.length; k++) {
@@ -1117,12 +861,20 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
             }
         },
 
-        setOverallAggregation: function () {
+        /**
+         *
+         * @param {bool} execAggFunction If true, execute the aggreggation function
+         */
+        setOverallAggregation: function (execAggFunction) {
             var aggWgt = this.widget.querySelector('[data-cc-pw-agg-changed]'),
                 selectedType = aggWgt.querySelector('option:checked'),
                 aggActions = this.widget.querySelector('[data-cc-pw-agg-actions]');
 
             this.aggType = selectedType.value;
+            // if (!execAggFunction) {
+            //     return;
+            // }
+
             if (selectedType.hasAttribute('data-cc-pw-agg-function')) {
                 this.aggFunction = selectedType.getAttribute('data-cc-pw-agg-function');
 

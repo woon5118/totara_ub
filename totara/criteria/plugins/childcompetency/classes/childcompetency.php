@@ -133,31 +133,4 @@ class childcompetency extends criterion {
         return 'criteria_childcompetency/childcompetency_edit';
     }
 
-    /**
-     * Export the view template name and data
-     *
-     * @return string
-     */
-    public function get_view_template(): string {
-        return 'criteria_childcompetency/childcompetency';
-    }
-
-    // TODO:
-    // When exporting for the user profile page, we will
-    // retrieve the child competencies and export them as items
-
-    /**
-     * Export detail for viewing this criterion
-     *
-     * @return array
-     */
-    public function export_view_detail(): array {
-        $result = [
-            'title' => get_string('pluginname', 'criteria_childcompetency'),
-            'aggregation' => $this->export_view_aggregation(),
-        ];
-
-        return $result;
-    }
-
 }

@@ -644,47 +644,12 @@ abstract class pathway {
      *******************************************************************************************************/
 
     /**
-     * Export the template name and data for editing this pathway
-     *
-     * @return array
-     */
-    public function export_pathway_edit_template(): array {
-        $result = $this->export_edit_overview();
-        $result['pathway_templatename'] = $this->get_edit_template();
-
-        return $result;
-    }
-
-    /**
-     * Export the template name and data for viewing this pathway
-     *
-     * @return array
-     */
-    public function export_pathway_view_template(): array {
-        $result = $this->export_view_detail();
-        $result['pathway_templatename'] = $this->get_view_template();
-
-        return $result;
-    }
-
-
-    /**
      * Return the name of the template to use for editing this pathway
      * Plugins should overwrite if required
      *
      * @return string Template name
      */
     public function get_edit_template(): string {
-        return '';
-    }
-
-    /**
-     * Return the name of the template to use for viewing this pathway
-     * Plugins should overwrite if required
-     *
-     * @return string Template name
-     */
-    public function get_view_template(): string {
         return '';
     }
 
@@ -717,11 +682,16 @@ abstract class pathway {
      * @return array
      */
     public function export_edit_overview(): array {
+        $id = $this->get_id();
         $result = [
-            'id' => $this->get_id(),
+            'id' => $id,
+            'key' => "pw_$id",
             'type' => $this->get_path_type(),
             'title' => $this->get_title(),
             'sortorder' => $this->get_sortorder(),
+            'classification' => $this->get_classification(),
+            'pathway_templatename' => $this->get_edit_template(),
+            'criteria_type_level' => $this->get_path_type(),
         ];
 
         if (!$this->is_valid()) {
@@ -744,20 +714,6 @@ abstract class pathway {
      */
     public function export_edit_detail(): array {
         return $this->export_edit_overview();
-    }
-
-    /**
-     * Export detail for viewing this pathway
-     * This contains translated information ready for display only pages
-     * Plugins should overwrite if required
-     *
-     * @return array
-     */
-    public function export_view_detail(): array {
-        return [
-            'id' => $this->get_id(),
-            'title' => $this->get_title(),
-        ];
     }
 
     /**

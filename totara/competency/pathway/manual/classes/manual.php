@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2018 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -311,15 +311,6 @@ class manual extends pathway {
     }
 
     /**
-     * Return the name of the template to use for viewing this pathway
-     *
-     * @return string Template name
-     */
-    public function get_view_template(): string {
-        return 'pathway_manual/pathway_manual';
-    }
-
-    /**
      * Get a short description of the content of this pathway
      *
      * @return string Short description
@@ -353,30 +344,10 @@ class manual extends pathway {
         return array_map(function (role $role) {
             return [
                 'id' => $role::get_display_order(),
-                'role' => $role::get_name(),
-                'name' => $role::get_display_name(),
+                'value' => $role::get_name(),
+                'text' => $role::get_display_name(),
             ];
         }, $this->roles);
-    }
-
-    /**
-     * Export detail for viewing this pathway
-     * This contains translated information ready for display only pages
-     *
-     * @return array
-     */
-    public function export_view_detail(): array {
-        $result = [
-            'title' => $this->get_title(),
-            'items' => [],
-            'name' => get_string('anyscalevalue', 'totara_competency'),
-        ];
-
-        foreach ($this->roles as $role) {
-            $result['items'][] = ['name' => $role::get_display_name()];
-        }
-
-        return $result;
     }
 
     /**

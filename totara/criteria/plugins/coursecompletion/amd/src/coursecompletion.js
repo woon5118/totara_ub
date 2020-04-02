@@ -43,13 +43,18 @@ function(templates, notification, ajax, ModalList, Loader) {
          * The variable names MUST correlate to the save endpoint parameters
          */
         this.criterion = {
+            id: 0,
             type: 'coursecompletion',
             itemids: [],
-            aggregation: {},
+            aggregation: {
+                method: 1,
+                reqitems: 1
+            },
+            singleuse: false,
+            expandable: true
         };
 
         // Saving items from the basket - therefore not stored in criterion
-        this.courses = []; // Courses to complete
         this.criterionKey = ''; // Unique key to use in bubbled events
         this.courseAdder = null; // Initialized adder for courses
 
@@ -85,17 +90,17 @@ function(templates, notification, ajax, ModalList, Loader) {
                     that.addCourses();
 
                 // Item remove link clicked
-                } else if (e.target.closest('[data-tw-criterionCourseCompletion-item-remove]')) {
+                } else if (e.target.closest('[data-tw-course-item-remove]')) {
                     e.preventDefault();
 
-                    var courseNode = e.target.closest('[data-tw-criterionCourseCompletion-item-value]'),
+                    var courseNode = e.target.closest('[data-tw-course-item-value]'),
                         courseId;
 
                     if (!courseNode) {
                         return;
                     }
 
-                    courseId = courseNode.getAttribute('data-tw-criterionCourseCompletion-item-value');
+                    courseId = courseNode.getAttribute('data-tw-course-item-value');
                     that.removeCourse(courseId);
                 }
             });
@@ -144,58 +149,41 @@ function(templates, notification, ajax, ModalList, Loader) {
 
         /**
          * Retrieve the criterion detail
-         * @return {Promise}
+         * @param {node}
          */
-        getDetail: function() {
+        getDetail: function(wgt) {
             var that = this,
-                criterionNode = this.widget.closest('[data-tw-criterion-key]'),
-                key = 0,
-                id = 0,
-                apiArgs,
-                detailPromise = null;
+                criterionNode = wgt.closest('[data-tw-criterion-key]'),
+                aggregationNode = criterionNode.querySelector('[data-tw-criterionCourseCompletion-aggregation]');
 
             return new Promise(function(resolve) {
                 if (criterionNode) {
-                    key = criterionNode.hasAttribute('data-tw-criterion-key') ? criterionNode.getAttribute('data-tw-criterion-key') : 0;
-                    id = criterionNode.hasAttribute('data-tw-criterion-id') ? criterionNode.getAttribute('data-tw-criterion-id') : 0;
+                    that.criterionKey = criterionNode.hasAttribute('data-tw-criterion-key')
+                        ? criterionNode.getAttribute('data-tw-criterion-key')
+                        : '';
+                    that.criterion.id = criterionNode.hasAttribute('data-tw-criterion-id')
+                        ? criterionNode.getAttribute('data-tw-criterion-id')
+                        : 0;
                 }
 
-                if (id == 0) {
-                    // New criterion - no detail yet
-                    detailPromise = new Promise(function(resolve) {
-                        resolve(that.createEmptyCriterion());
-                    });
-
-                } else {
-                    apiArgs = {
-                        args: {id: id},
-                        methodname: that.endpoints.detail
-                    };
-
-                    detailPromise = ajax.getData(apiArgs);
+                // Aggregation
+                if (aggregationNode) {
+                    that.criterion.aggregation.method = aggregationNode.getAttribute('data-tw-criterionCourseCompletion-aggregation');
+                    that.criterion.aggregation.reqitems = aggregationNode.hasAttribute('data-tw-criterionCourseCompletion-aggregation-reqitems')
+                        ? aggregationNode.getAttribute('data-tw-criterionCourseCompletion-aggregation-reqitems')
+                        : 1;
                 }
 
-                detailPromise.then(function(responses) {
-                    var instance = responses.results;
+                that.setAggregationMethod(that.criterion.aggregation.method);
+                that.setAggregationCount(that.criterion.aggregation.reqitems);
 
-                    // We want only the data required for saving in that.criterion
-                    // Not doing this earlier to prevent setting criterion attributes if
-                    // something went wrong (e.g. invalid id, etc.)
-                    that.criterion.id = id;
-                    that.criterionKey = key;
+                // Courses
+                that.setCourses(wgt);
+                that.showHideNotEnoughCourses();
 
-                    // Aggregation
-                    that.setAggregationMethod(instance.aggregation.method);
-                    that.setAggregationCount(instance.aggregation.reqitems);
-
-                    Promise.all([that.setCourses(instance.items), that.initCourseAdder()]).then(function() {
-                        that.triggerEvent('update', {criterion: that.criterion});
-                        resolve();
-                    });
-                }).catch(function(e) {
-                    e.fileName = that.filename;
-                    e.name = 'Error retrieving detail';
-                    notification.exception(e);
+                Promise.all([that.initCourseAdder()]).then(function() {
+                    that.triggerEvent('update', {criterion: that.criterion});
+                    resolve();
                 });
             });
         },
@@ -239,47 +227,25 @@ function(templates, notification, ajax, ModalList, Loader) {
         },
 
         /**
-         * Set and display the courses to be completed
+         * Retrieve course detail from the dom
          *
-         * @param {Object} courses Array of courses
+         * @param {node}
          * @return {Promise}
          */
-        setCourses: function(courses) {
-            var that = this,
-                coursesTarget = this.widget.querySelector('[data-tw-criterionCourseCompletion-courses]'),
-                coursesPromiseArr = [],
-                templateData = {};
+        setCourses: function(wgt) {
+            var courseNodes = wgt.querySelectorAll('[data-tw-course-item-value]'),
+                courseId;
 
-            return new Promise(function(resolve) {
-                // We want to index the items with the ids for easy adder results processing
-                that.courses = [];
-                that.criterion.itemids = [];
+            this.criterion.itemids = [];
 
-                if (courses.length == 0 || !coursesTarget) {
-                    that.showHideNotEnoughCourses();
-                    resolve();
-
-                } else {
-                    for (var a = 0; a < courses.length; a++) {
-                        that.courses[courses[a].id] = courses[a];
-                        that.criterion.itemids.push(courses[a].id);
-                        templateData = {item_parent: 'criterionCourseCompletion', value: courses[a].id, text: courses[a].name};
-                        if (courses[a].error) {
-                            templateData.error = courses[a].error;
-                        }
-                        coursesPromiseArr.push(templates.renderAppend('totara_criteria/partial_item', templateData, coursesTarget));
-                    }
-
-                    Promise.all(coursesPromiseArr).then(function() {
-                        that.showHideNotEnoughCourses();
-                        resolve();
-                    }).catch(function(e) {
-                        e.fileName = that.filename;
-                        e.name = 'Error showing courses';
-                        notification.exception(e);
-                    });
+            for (var a = 0; a < courseNodes.length; a++) {
+                courseId = parseInt(courseNodes[a].getAttribute('data-tw-course-item-value')
+                    ? courseNodes[a].getAttribute('data-tw-course-item-value')
+                    : 0);
+                if (courseId) {
+                    this.criterion.itemids.push(courseId);
                 }
-            });
+            }
         },
 
         /**
@@ -288,7 +254,7 @@ function(templates, notification, ajax, ModalList, Loader) {
          * @param {int} key
          * @return {Promise}
          */
-        createEmptyCriterion: function() {
+        oldCcreateEmptyCriterion: function() {
             // Ensure the basket is empty
             return new Promise(function(resolve) {
                 resolve({
@@ -398,6 +364,7 @@ function(templates, notification, ajax, ModalList, Loader) {
                 coursesTarget = that.widget.querySelector('[data-tw-criterionCourseCompletion-courses]'),
                 id,
                 fullname,
+                idIndex,
                 coursesPromiseArr = [],
                 templateData = {};
 
@@ -405,13 +372,12 @@ function(templates, notification, ajax, ModalList, Loader) {
                 id = courses[a].id;
                 fullname = courses[a].fullname;
 
-                if (!this.courses[id]) {
-                    this.courses[id] = {
-                        id: id,
-                        name: fullname};
+                idIndex = this.criterion.itemids.indexOf(id);
+
+                if (idIndex < 0) {
                     this.criterion.itemids.push(id);
 
-                    templateData = {item_parent: 'criterionCourseCompletion', value: id, text: fullname};
+                    templateData = {type: 'course', value: id, text: fullname};
                     coursesPromiseArr.push(templates.renderAppend('totara_criteria/partial_item', templateData, coursesTarget));
                 }
             }
@@ -434,15 +400,11 @@ function(templates, notification, ajax, ModalList, Loader) {
             id = parseInt(id);
 
             var that = this,
-                coursesTarget = that.widget.querySelector('[data-tw-criterionCourseCompletion-item-value="' + id + '"]'),
+                coursesTarget = that.widget.querySelector('[data-tw-course-item-value="' + id + '"]'),
                 idIndex = this.criterion.itemids.indexOf(id);
 
-            if (this.courses[id]) {
-                delete this.courses[id];
-                if (idIndex >= 0) {
-                    this.criterion.itemids.splice(idIndex, 1);
-                }
-
+            if (idIndex >= 0) {
+                this.criterion.itemids.splice(idIndex, 1);
                 if (coursesTarget) {
                     coursesTarget.remove();
                 }
@@ -507,7 +469,7 @@ function(templates, notification, ajax, ModalList, Loader) {
             resolve(wgt);
 
             M.util.js_pending('criterionCourseCompletion');
-            wgt.getDetail().then(function() {
+            wgt.getDetail(parent).then(function() {
                 wgt.loader.hide();
                 M.util.js_complete('criterionCourseCompletion');
             });

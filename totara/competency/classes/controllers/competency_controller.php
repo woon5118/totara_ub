@@ -27,10 +27,12 @@ namespace totara_competency\controllers;
 use context;
 use hierarchy_competency\event\competency_viewed;
 use moodle_url;
+use pathway_criteria_group\criteria_group;
 use totara_competency\entities\competency;
 use totara_competency\entities\competency_framework;
 use totara_competency\achievement_configuration;
 use totara_competency\achievement_criteria;
+use totara_competency\overall_aggregation;
 use totara_competency\pathway;
 use totara_competency\pathway_factory;
 use totara_competency\plugin_types;
@@ -73,6 +75,7 @@ class competency_controller extends admin_controller {
         $this->competency = competency::repository()
             ->where('id', required_param('id', PARAM_INT))
             ->with('framework')
+            ->with('pathways')
             ->one();
 
         $this->framework = $this->competency->framework;
@@ -117,6 +120,7 @@ class competency_controller extends admin_controller {
         $this->setup();
 
         $section = $this->get_param('s', PARAM_ALPHA, null, true);
+        $notify = $this->get_param('notify', PARAM_INT, 0, false);
 
         $exportmethod = "export_{$section}_edit";
         if (!method_exists($this, $exportmethod)) {
@@ -126,8 +130,7 @@ class competency_controller extends admin_controller {
         $heading = get_string('editcompetency', 'totara_competency', format_string($this->competency->display_name));
         $this->page->navbar->add($heading);
 
-        // TODO: Use one single competency entity instead of using both kinds!
-        $this->competency = new \totara_competency\entities\competency($this->competency->id);
+        $this->competency = new competency($this->competency->id);
         $config = new achievement_configuration($this->competency);
 
         $data = [
@@ -135,10 +138,14 @@ class competency_controller extends admin_controller {
             'scale_id' => $this->competency->scale->id,
             'heading' => $heading,
             'tabs' => \totara_hierarchy_renderer::get_competency_tabs($this->competency->id, "edit$section"),
-            'detail' => $this->$exportmethod(),
+            'detail' => $this->$exportmethod($config),
             'singleuse' => (int)$config->has_singleuse_criteria(),
             'backurl' => new \moodle_url('/totara/competency/competency_summary.php', ['id' => $this->competency->id]),
         ];
+
+        if ($notify) {
+            $data['success'] = true;
+        }
 
         return new \totara_mvc\view(
             'totara_competency/competency_edit',
@@ -189,21 +196,6 @@ class competency_controller extends admin_controller {
             ]
         );
         redirect($url);
-
-        // global $TEXTAREA_OPTIONS;
-
-        // // We are re-using the totara/hierarchy/item/edit_form form as there are only a few changes required for perform
-        // $item = (object)$this->competency->to_array();
-        // $item->framework = $this->competency->framework->fullname;
-        // $item->descriptionformat = FORMAT_HTML;
-        // $item = file_prepare_standard_editor($item, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
-        //     'totara_hierarchy', $this->shortprefix, $item->id);
-
-        // $datatosend = ['prefix' => $this->prefix, 'item' => $item, 'hierarchy' => new \competency()];
-        // $form = new \item_edit_form(null, $datatosend);
-        // $form->set_data($item);
-        // $form->display();
-        // return array_merge(['templatename' => $form->get_template()], $form->export_for_template($this->output));
     }
 
     /**
@@ -221,73 +213,67 @@ class competency_controller extends admin_controller {
      *
      * @return array
      */
-    private function export_achievementpaths_edit() {
+    private function export_achievementpaths_edit(achievement_configuration $config) {
         advanced_feature::require('competency_assignment');
 
-        $comp_agg_type = $this->competency->scale_aggregation->type ?? 'highest';
+        // Mustache requires numeric indexes starting at 0
+        $pathway_types = $this->get_pathway_types();
+        $pathway_types[] =
+            [
+                'type' => 'singlevalue',
+                'name' => get_string('singlevaluepaths', 'totara_competency'),
+                'templatename' => 'totara_competency/scalevalue_pathways_edit',
+                'classification' => pathway::PATHWAY_SINGLE_VALUE,
+            ];
 
         $results = [
             'templatename' => 'totara_competency/achievement_paths',
-            'overall_aggregation' => $comp_agg_type,
-            'multivalue_types' => [],
-            'aggregation_types' => [],
+            'overall_aggregation' => $this->competency->scale_aggregation->type ?? 'highest',
+            'aggregation_types' => $this->get_overall_aggregation_types(),
+            'pathway_types' => $pathway_types,
+            'criteria_types' => criteria_group::export_criteria_types(),
+            'pathway_groups' => $config->export_pathway_groups(),
         ];
-
-        // Pathway types
-        $types = plugin_types::get_enabled_plugins('pathway', 'totara_competency');
-        foreach ($types as $type) {
-            $pw = pathway_factory::create($type);
-            $toadd = [
-                'type' => $type,
-                'name' => $pw->get_title(),
-            ];
-
-            if ($pw->get_classification() == pathway::PATHWAY_MULTI_VALUE) {
-                $results['multivalue_types'][] = $toadd;
-            } else {
-                $results['singlevalue_types'][] = $toadd;
-            }
-        }
-
-        // Get the available pathway aggregation methods
-        $aggmethods = achievement_criteria::get_available_overall_aggregation_methods();
-        foreach ($aggmethods as $method) {
-            $results['aggregation_types'][] = [
-                'type' => $method->get_agg_type(),
-                'title' => $method->get_title(),
-                'description' => $method->get_description(),
-                'editfunction' => $method->get_aggregation_js_function(),
-                'selected' => $method->get_agg_type() == $comp_agg_type,
-            ];
-        }
 
         return $results;
     }
 
     /**
-     * Add navigation to the top of the page
+     * @return array
      */
-    private function add_navigation() {
+    private function get_pathway_types(): array {
+        $types = plugin_types::get_enabled_plugins('pathway', 'totara_competency');
+        $types = array_map(function ($type) {
+            $pw = pathway_factory::create($type);
+            return [
+                'type' => $type,
+                'name' => $pw->get_title(),
+                'templatename' => $pw->get_edit_template(),
+                'classification' => $pw->get_classification(),
+            ];
+        }, $types);
 
-        // TODO this extract is really dodgy...
-        $hierarchy = new \competency();
-        extract($hierarchy->get_permissions());
+        return array_values(array_filter($types, function ($type) {
+            return $type['classification'] == pathway::PATHWAY_MULTI_VALUE;
+        }));
+    }
 
-        // Framework
-        $url = null;
-        if ($canviewframeworks) {
-            $url = new \moodle_url('/totara/hierarchy/index.php',
-                ['prefix' => $this->prefix, 'frameworkid' => $this->competency->frameworkid]
-            );
-        }
-        $this->page->navbar->add(format_string($this->competency->framework->fullname), $url);
+     /**
+     * @return array
+     */
+    private function get_overall_aggregation_types(): array {
+        $competency_agg_type = $this->competency->scale_aggregation->type ?? 'highest';
+        $agg_methods = achievement_criteria::get_available_overall_aggregation_methods();
 
-        $name = $this->competency->fullname ?? $this->competency->shortname ?? '';
-        if (!empty($name)) {
-            $this->page->navbar->add(format_string($name));
-        };
-
-        // TODO: Capabilties, Add
+        return array_map(function (overall_aggregation $method) use ($competency_agg_type) {
+            return [
+                'type' => $method->get_agg_type(),
+                'title' => $method->get_title(),
+                'description' => $method->get_description(),
+                'editfunction' => $method->get_aggregation_js_function(),
+                'selected' => $method->get_agg_type() == $competency_agg_type,
+            ];
+        }, $agg_methods);
     }
 
 }

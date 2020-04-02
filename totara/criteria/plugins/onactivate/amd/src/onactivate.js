@@ -46,6 +46,8 @@ function(Loader) {
             type: 'onactivate',
             metadata: [],
             id: 0,
+            singleuse: true,
+            expandable: false
         };
 
         this.criterionKey = '';
@@ -74,14 +76,21 @@ function(Loader) {
                 compIdNode = document.querySelector('[data-comp-id]'),
                 compId = 1;
 
+
             return new Promise(function(resolve) {
                 if (criterionNode) {
-                    that.criterionKey = criterionNode.hasAttribute('data-tw-criterion-key') ? criterionNode.getAttribute('data-tw-criterion-key') : 0;
-                    that.criterion.id = criterionNode.hasAttribute('data-tw-criterion-id') ? criterionNode.getAttribute('data-tw-criterion-id') : 0;
+                    that.criterionKey = criterionNode.hasAttribute('data-tw-criterion-key')
+                        ? criterionNode.getAttribute('data-tw-criterion-key')
+                        : 0;
+                    that.criterion.id = criterionNode.hasAttribute('data-tw-criterion-id')
+                        ? criterionNode.getAttribute('data-tw-criterion-id')
+                        : 0;
                 }
 
                 if (compIdNode) {
-                    compId = compIdNode.getAttribute('data-comp-id') ? compIdNode.getAttribute('data-comp-id') : 1;
+                    compId = compIdNode.getAttribute('data-comp-id')
+                        ? compIdNode.getAttribute('data-comp-id')
+                        : 1;
                     that.criterion.metadata = [{
                         metakey: that.competencyKey,
                         metavalue: compId
@@ -89,6 +98,7 @@ function(Loader) {
                 }
 
                 that.triggerEvent('update', {criterion: that.criterion});
+                that.triggerEvent('singleuse', {criterion: that.criterion});
                 resolve();
             });
         },

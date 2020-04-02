@@ -1015,47 +1015,12 @@ abstract class criterion {
     }
 
     /**
-     * Export the edit template name and data
-     *
-     * @return array
-     */
-    public function export_criterion_edit_template(): array {
-        $results = $this->export_edit_overview();
-        $results['criterion_templatename'] = $this->get_edit_template();
-
-        return $results;
-    }
-
-    /**
-     * Export the view template name and data
-     *
-     * @return array
-     */
-    public function export_criterion_view_template(): array {
-        $result = $this->export_view_detail();
-        $result['criterion_templatename'] = $this->get_view_template();
-
-        return $result;
-    }
-
-
-    /**
      * Return the name of the template for defining this criterion
      * Plugins should overwrite if required
      *
      * @return string Edit template name
      */
     public function get_edit_template(): string {
-        return '';
-    }
-
-    /**
-     * Return the name of the template to view this criterion
-     * Plugins should overwrite if required
-     *
-     * @return string View template name
-     */
-    public function get_view_template(): string {
         return '';
     }
 
@@ -1069,14 +1034,14 @@ abstract class criterion {
     public function export_edit_overview(): array {
         $result = [
             'id' => $this->get_id() ?? 0,
+            'key' => $this->get_plugin_type() . '_' . $this->get_id() ?? 0,
             'type' => $this->get_plugin_type(),
             'title' => $this->get_title(),
             'singleuse' => $this->is_singleuse(),
+            'criterion_templatename' => $this->get_edit_template(),
+            'expandable' => !$this->is_singleuse(),
+            'error' => $this->is_valid() ? '' : get_string('error:invalidconfiguration', 'totara_criteria'),
         ];
-
-        if (!$this->is_valid()) {
-            $result['error'] = get_string('error:invalidconfiguration', 'totara_criteria');
-        }
 
         return $result;
     }
@@ -1148,68 +1113,6 @@ abstract class criterion {
         }
 
         return $results;
-    }
-
-
-    /**
-     * Export detail for viewing this criterion
-     * This contains translated information ready for display only pages
-     * Plugins should overwrite if required
-     *
-     * @return array
-     */
-    public function export_view_detail(): array {
-        $result = [];
-
-        if ($this->has_items()) {
-            $result['title'] = $this->display_instance()->get_display_items_type();
-            $result['items'] = $this->export_view_items();
-        } else {
-            $result['title'] = $this->get_title();
-        }
-
-        if ($this->has_metadata()) {
-            $result['metadata'] = $this->export_view_metadata();
-        }
-
-        if ($this->has_aggregation()) {
-            $result['aggregation'] = $this->export_view_aggregation();
-        }
-
-        return $result;
-    }
-
-    /**
-     * Export detail for viewing aggregation used in this criterion
-     * Plugins should overwrite if required
-     *
-     * @return string
-     */
-    public function export_view_aggregation(): string {
-        return '';
-    }
-
-
-    /**
-     * Export detail for viewing items associated with this criterion
-     * As this will typically be the item names, each plugin should
-     * overwrite this to export the correct values
-     *
-     * @return string[] Array of item summaries
-     */
-    public function export_view_items(): array {
-        return [];
-    }
-
-    /**
-     * Export detail for viewing metadata associated with this criterion
-     * Plugins will typically interpret the associated metadata and export it accordingly.
-     * Plugins should overwrite this function as needed
-     *
-     * @return string[]
-     */
-    public function export_view_metadata(): array {
-        return [];
     }
 
 }

@@ -57,17 +57,18 @@
       </span>
     </div>
 
-
-    <div data-tw-criterionLinkedCourses-aggregation="">
+    <div data-tw-criterionLinkedCourses-aggregation="{{#aggregation}}{{method}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}"
+         data-tw-criterionLinkedCourses-aggregation-reqitems="{{#aggregation}}{{reqitems}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}">
         <div class="tw-criterion-label">
             <span>{{#str}}aggregation, totara_criteria{{/str}}</span>
         </div>
-        <div class="tw-criterion-value">
+        <div class="tw-criterion-value" >
             <div data-tw-criterionLinkedCourses-aggregationMethod="1">
                 <input type="radio"
                        id="tw_criterionLinkedCourses_agg_all__{{key}}"
                        name="tw_criterionLinkedCourses_agg__{{key}}"
                        value="1"
+
                        data-tw-criterionLinkedCourses-aggregationMethod-changed="all"/>
                 <label for="tw_criterionLinkedCourses_agg_all__{{key}}"><span>{{#str}}completeall, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
             </div>

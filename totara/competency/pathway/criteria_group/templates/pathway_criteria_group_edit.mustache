@@ -46,8 +46,7 @@
      data-core-autoinitialise-amd="pathway_criteria_group/criteria_group"
      data-pw-save-endpoint="pathway_criteria_group_update"
      data-pw-save-req-sortorder="1"
-     data-pw-scalevalue="{{scalevalue}}"
-     {{#critType}}data-pw-init-criterion={{.}}{{/critType}}>
+     data-pw-scalevalue="{{scalevalue}}">
 
     <div class="critgrp_criteria">
         {{> pathway_criteria_group/partial_group_criteria}}
@@ -55,7 +54,7 @@
 
     <div class="critgrp_bottom_action cc_divider_icon">
         <a href="#"
-           data-cg-action="addcrit"
+           data-cg-action="addcriterion"
            data-cc-on-ordering="hide">
             <span class="btn_large_icon">
                 {{#flex_icon}}plus-square-o{{/flex_icon}}

@@ -37,78 +37,6 @@ defined('MOODLE_INTERNAL') || die;
 class external extends \external_api {
 
     /**
-     * get_scale
-     */
-    public static function get_scale_parameters() {
-        return new \external_function_parameters(
-            [
-                'competency_id' => new \external_value(PARAM_INT, 'Id of the competency'),
-            ]
-        );
-    }
-
-    public static function get_scale(int $competency_id): int {
-        // TODO could be competency generic
-        advanced_feature::require('competency_assignment');
-
-        $competency = new competency($competency_id);
-        return $competency->scale->id;
-    }
-
-    public static function get_scale_returns() {
-        return new \external_value(PARAM_INT, 'Scale id');
-    }
-
-
-    /**
-     * get_scale_values
-     */
-    public static function get_scale_values_parameters() {
-        return new \external_function_parameters(
-            [
-                'scale_id' => new \external_value(PARAM_INT, 'Id of the scale'),
-            ]
-        );
-    }
-
-    public static function get_scale_values(int $scale_id): array {
-        // TODO could be competency generic
-        advanced_feature::require('competency_assignment');
-
-        $results = [];
-
-        $scale = new scale($scale_id);
-        $scalevalues = $scale->sorted_values_high_to_low;
-
-        $formatter = new string_field_formatter(format::FORMAT_HTML, \context_system::instance());
-
-        foreach ($scalevalues as $scalevalue) {
-            $results[] = [
-                'id' => $scalevalue->get_attribute('id'),
-                'name' => $formatter->format($scalevalue->get_attribute('name')),
-                'proficient' => $scalevalue->get_attribute('proficient'),
-                'sortorder' => $scalevalue->get_attribute('sortorder'),
-            ];
-        }
-
-        return $results;
-    }
-
-    public static function get_scale_values_returns() {
-        return new \external_multiple_structure(
-            new \external_single_structure(
-                [
-                    'id' => new \external_value(PARAM_INT, 'Scalevalue id'),
-                    'name' => new \external_value(PARAM_TEXT, 'Scalevalue name'),
-                    'proficient' => new \external_value(PARAM_BOOL, 'Proficient'),
-                    'sortorder' => new \external_value(PARAM_INT, 'sortorder'),
-                ]
-            )
-        );
-    }
-
-
-    /**
      * get_pathways
      */
     public static function get_pathways_parameters() {
@@ -123,30 +51,11 @@ class external extends \external_api {
         advanced_feature::require('competency_assignment');
 
         $config = new achievement_configuration(new competency($competency_id));
-        $pathways = $config->get_active_pathways();
-
-        $results = [];
-        foreach ($pathways as $pw) {
-            $results[] = $pw->export_pathway_edit_template();
-        }
-
-        return $results;
+        return $config->export_pathway_groups();
     }
 
     public static function get_pathways_returns() {
-        return new \external_multiple_structure(
-            new \external_single_structure(
-                [
-                    'type' => new \external_value(PARAM_TEXT, 'Pathway type'),
-                    'id' => new \external_value(PARAM_INT, 'Pathway id'),
-                    'title' => new \external_value(PARAM_TEXT, 'Pathway title'),
-                    'sortorder' => new \external_value(PARAM_INT, 'Sortorder'),
-                    'title' => new \external_value(PARAM_TEXT, 'Pathway title', VALUE_OPTIONAL),
-                    'pathway_templatename' => new \external_value(PARAM_TEXT, 'Template for displaying this pathway'),
-                    'scalevalue' => new \external_value(PARAM_INT, 'Scale value id. Ignored for multivalue pathways', VALUE_OPTIONAL),
-                ]
-            )
-        );
+        return null;
     }
 
     public static function get_categories_parameters() {
@@ -387,60 +296,6 @@ class external extends \external_api {
     }
 
 
-    /** get_definition_template */
-    public static function get_definition_template_parameters() {
-        return new \external_function_parameters(
-            [
-                'type' => new \external_value(PARAM_ALPHAEXT, 'Pathway type')
-            ]
-        );
-    }
-
-    public static function get_definition_template(string $type) {
-        advanced_feature::require('competency_assignment');
-
-        return pathway_factory::create($type)
-            -> export_pathway_edit_template();
-    }
-
-    public static function get_definition_template_returns() {
-        return new \external_single_structure(
-            [
-                'type' => new \external_value(PARAM_TEXT, 'Pathway type'),
-                'id' => new \external_value(PARAM_INT, 'Pathway id'),
-                'title' => new \external_value(PARAM_TEXT, 'Pathway name'),
-                'sortorder' => new \external_value(PARAM_INT, 'Sortorder'),
-                'pathway_templatename' => new \external_value(PARAM_TEXT, 'Template for displaying this pathway'),
-                'scalevalue' => new \external_value(PARAM_INT, 'Scale value id. Ignored for multivalue pathways', VALUE_OPTIONAL),
-            ]
-        );
-    }
-
-
-    /** get_summary_template */
-    // TODO: Move to plugins??
-    public static function get_summary_template_parameters() {
-        return new \external_function_parameters(
-            [
-                'type' => new \external_value(PARAM_ALPHAEXT, 'Pathway type'),
-                'id' => new \external_value(PARAM_INT, 'Pathway id')
-            ]
-        );
-    }
-
-    public static function get_summary_template(string $type, int $id) {
-        advanced_feature::require('competency_assignment');
-
-        return pathway_factory::fetch($type, $id)
-            -> export_pathway_view_template();
-    }
-
-    public static function get_summary_template_returns() {
-        // Can only define when we move it down to the plugins
-        return null;
-    }
-
-
     /** delete_pathways */
     public static function delete_pathways_parameters() {
         return new \external_function_parameters(
@@ -470,28 +325,6 @@ class external extends \external_api {
 
 
     /**
-     * has_singleuse_criteria
-     */
-    public static function has_singleuse_criteria_parameters() {
-        return new \external_function_parameters(
-            [
-                'competency_id' => new \external_value(PARAM_INT, 'Id of the competency'),
-            ]
-        );
-    }
-
-    public static function has_singleuse_criteria(int $competency_id): string {
-        advanced_feature::require('competency_assignment');
-
-        $config = new achievement_configuration(new competency($competency_id));
-        return $config->has_singleuse_criteria();
-    }
-
-    public static function has_singleuse_criteria_returns() {
-        return new \external_value(PARAM_BOOL, 'Indication whether any single-use criterion type is linked to this competency');
-    }
-
-    /**
      * set_overall_aggregation
      */
     public static function set_overall_aggregation_parameters() {
@@ -519,25 +352,6 @@ class external extends \external_api {
     }
 
     public static function set_overall_aggregation_returns() {
-        return new \external_value(PARAM_ALPHANUMEXT, 'Aggregation type');
-    }
-
-    public static function get_overall_aggregation_parameters() {
-        return new \external_function_parameters(
-            [
-                'competency_id' => new \external_value(PARAM_INT, 'Id of the competency'),
-            ]
-        );
-    }
-
-    public static function get_overall_aggregation(int $competency_id): string {
-        advanced_feature::require('competency_assignment');
-
-        $config = new achievement_configuration(new competency($competency_id));
-        return $config->get_aggregation_type();
-    }
-
-    public static function get_overall_aggregation_returns() {
         return new \external_value(PARAM_ALPHANUMEXT, 'Aggregation type');
     }
 

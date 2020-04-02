@@ -60,6 +60,9 @@
         </div>
         <div class="tw-criterion-value">
             <div data-tw-criterionCourseCompletion-courses="">
+                {{#items}}
+                    {{> totara_criteria/partial_item}}
+                {{/items}}
             </div>
 
             <div>
@@ -76,7 +79,8 @@
         </div>
     </div>
 
-    <div data-tw-criterionCourseCompletion-aggregation="">
+    <div data-tw-criterionCourseCompletion-aggregation="{{#aggregation}}{{method}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}"
+         data-tw-criterionCourseCompletion-aggregation-reqitems="{{#aggregation}}{{reqitems}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}">
         <div class="tw-criterion-label">
             <span>{{#str}}aggregation, totara_criteria{{/str}}</span>
         </div>

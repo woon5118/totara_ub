@@ -125,8 +125,6 @@ class linkedcourses extends criterion {
         return get_string('error:notenoughcourses', 'criteria_linkedcourses');
     }
 
-
-
     /**
      * Export the edit template name and data
      *
@@ -134,32 +132,6 @@ class linkedcourses extends criterion {
      */
     public function get_edit_template(): string {
         return 'criteria_linkedcourses/linkedcourses_edit';
-    }
-
-    /**
-     * Export the view template name and data
-     *
-     * @return string
-     */
-    public function get_view_template(): string {
-        return 'criteria_linkedcourses/linkedcourses';
-    }
-
-    // TODO:
-    // When exporting for the user profile page, we will
-    // retrieve the currently linked courses and export them
-    // as items in the same way as coursecompletion is doing it
-
-    /**
-     * Export detail for viewing this criterion
-     *
-     * @return array
-     */
-    public function export_view_detail(): array {
-        return [
-            'title' => get_string('linkedcourses', 'criteria_linkedcourses'),
-            'aggregation' => $this->export_view_aggregation(),
-        ];
     }
 
 }

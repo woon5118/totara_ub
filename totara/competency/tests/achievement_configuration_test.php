@@ -22,7 +22,8 @@
  */
 
 use criteria_coursecompletion\coursecompletion;
-use pathway_manual\models\roles\manager;
+use pathway_manual\models\roles\manager as manager_role;
+use pathway_manual\models\roles\self_role;
 use totara_competency\achievement_configuration;
 use totara_competency\achievement_criteria;
 use totara_competency\entities\competency;
@@ -174,7 +175,7 @@ class totara_competency_achievement_configuration_testcase extends advanced_test
         /** @var totara_competency_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
-        $manual = $generator->create_manual($data->comp, [manager::class], 1);
+        $manual = $generator->create_manual($data->comp, [manager_role::class], 1);
 
         $scale_value = $data->comp->scale->sorted_values_high_to_low->first();
         $cg = $generator->create_criteria_group($data->comp, [$data->cc[1], $data->cc[2]], $scale_value, null, null, 2);
@@ -286,9 +287,86 @@ class totara_competency_achievement_configuration_testcase extends advanced_test
         $config = new achievement_configuration($data->comp);
         $this->assertFalse($config->user_can_become_proficient());
 
-        $pw3 = $generator->create_manual($data->comp, [manager::class], 3);
+        $pw3 = $generator->create_manual($data->comp, [manager_role::class], 3);
         $data->comp->load_relation('active_pathways');
         $config = new achievement_configuration($data->comp);
         $this->assertTrue($config->user_can_become_proficient());
     }
+
+    public function test_export_pathway_groups(): void {
+        /** @var totara_competency_generator $competency_generator */
+        $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
+        /** @var totara_criteria_generator $criteria_generator */
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+
+        $course = $this->getDataGenerator()->create_course();
+
+        $scale = $competency_generator->create_scale('Test scale', 'Test scale', [
+            ['name' => 'Great', 'proficient' => true, 'default' => false, 'sortorder' => 1],
+            ['name' => 'Good', 'proficient' => false, 'default' => false, 'sortorder' => 2],
+            ['name' => 'Bad', 'proficient' => false, 'default' => true, 'sortorder' => 3],
+        ]);
+        $scale_values = $scale->sorted_values_high_to_low
+            ->key_by('sortorder')
+            ->all(true);
+
+        $fw = $competency_generator->create_framework($scale, 'Test FW');
+        $competency = $competency_generator->create_competency('Test competency 1', $fw);
+
+        $lc = $criteria_generator->create_linkedcourses(['competency' => $competency->id]);
+        $cc = $criteria_generator->create_coursecompletion(['courseids' => [$course->id]]);
+
+        $manual_manager_pw = $competency_generator->create_manual($competency->id, [manager_role::class], 1);
+        $criteria_group_pw_2 = $competency_generator->create_criteria_group($competency->id, [$lc], $scale_values[2], 2);
+        $criteria_group_pw_3 = $competency_generator->create_criteria_group($competency->id, [$cc], $scale_values[3], 3);
+        $manual_self_pw = $competency_generator->create_manual($competency->id, [self_role::class], 3);
+
+        $config = new achievement_configuration($competency);
+        $actual = $config->export_pathway_groups();
+
+        $expected = [
+            [
+                'id' => 'low-sortorder',
+                'name' => get_string('anyscalevalue', 'totara_competency'),
+                'hidden' => false,
+                'pathways' => [$manual_manager_pw->get_id()],
+            ],
+            [
+                'id' => 'singlevalue',
+                'group_templatename' => 'totara_competency/scalevalue_pathways_edit',
+                'hidden' => false,
+                'scale_values' => [
+                    1 => [],
+                    2 => [$criteria_group_pw_2->get_id()],
+                    3 => [$criteria_group_pw_2->get_id()],
+                ],
+            ],
+            [
+                'id' => 'high-sortorder',
+                'name' => get_string('anyscalevalue', 'totara_competency'),
+                'hidden' => false,
+                'pathways' => [$manual_self_pw->get_id()],
+            ],
+        ];
+
+        foreach ($expected as $key => $expected_group) {
+            foreach ($actual as $actual_group) {
+                if ($expected_group['id'] == $actual_group['id']) {
+                    $this->assertSame($expected_group['group_templatename'] ?? '', $actual_group['group_templatename'] ?? '');
+                    $this->assertSame($expected_group['hidden'], $actual_group['hidden']);
+                    if (isset($expected_group['pathways'])) {
+                        // TODO - check actual pathways
+                        $this->assertSame(count($expected_group['pathways']), count($actual_group['pathways']));
+                    } else {
+                        // TODO - check values and pathways
+                        $this->assertSame(count($expected_group['scale_values']), count($actual_group['scale_values']));
+                    }
+                    unset($expected[$key]);
+                }
+            }
+        }
+
+        $this->assertEmpty($expected);
+    }
+
 }

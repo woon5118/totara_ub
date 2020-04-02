@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
- * @author Brendan Cox <brendan.cox@totaralearning.com>
  * @package pathway_manual
  */
 
@@ -45,8 +44,9 @@ function (templates, notification, ajax, ModalList) {
          */
         this.pathway = {
             id: 0,
+            type: 'manual',
             sortorder: 0,
-            roles: []
+            roles: [],
         };
 
         // Key to use in achievementPath events
@@ -54,16 +54,15 @@ function (templates, notification, ajax, ModalList) {
 
         this.rolesPicker = null;
         this.fullRoles = []; // Contains the full role data indexed by the id to assist with deletion of pathway.roles
-        this.roleIds = []; // Contains the ids of the selected roles
+        this.roleIds = []; // Co`ntains the ids of the selected roles
 
         this.endpoints = {
             create: 'pathway_manual_create',
             update: 'pathway_manual_update',
-            detail: 'pathway_manual_get_detail',
             allroles: 'pathway_manual_get_roles',
         };
 
-        this.filename = 'learning_plan.js';
+        this.filename = 'manual.js';
     }
 
     PwManual.prototype = {
@@ -89,8 +88,8 @@ function (templates, notification, ajax, ModalList) {
                 }
 
                 if (e.target.closest('[data-pw-item-remove]')) {
-                    if (e.target.closest('[data-pw-item-value]')) {
-                        var id = e.target.closest('[data-pw-item-value]').getAttribute('data-pw-item-value');
+                    if (e.target.closest('[data-pw-item-id]')) {
+                        var id = e.target.closest('[data-pw-item-id]').getAttribute('data-pw-item-id');
 
                         that.removeRole(id);
                     }
@@ -108,102 +107,70 @@ function (templates, notification, ajax, ModalList) {
         },
 
         /**
-         * Initialise the data and display it
-         *
-         * @param {node}
+         * Initialise the data
          */
-        initData: function (wgt) {
+        initData: function () {
             var that = this,
                 pwWgt = this.widget.closest('[data-pw-key]'),
                 pwKey = 0,
-                pwId = 0,
-                idWgt = this.widget.closest('[data-pw-id]'),
-                apiArgs,
-                detailPromise;
+                pwId = 0;
 
             if (pwWgt) {
                 pwKey = pwWgt.getAttribute('data-pw-key') ? pwWgt.getAttribute('data-pw-key') : 0;
+                pwId = pwWgt.getAttribute('data-pw-id') ? pwWgt.getAttribute('data-pw-id') : 0;
             }
 
-            if (idWgt) {
-                pwId = idWgt.getAttribute('data-pw-id') ? idWgt.getAttribute('data-pw-id') : 0;
-            }
+            this.pwKey = pwKey;
 
-            if (pwId !== 0) {
-                apiArgs = {
-                    args: {id: pwId},
-                    methodname: this.endpoints.detail
-                };
+            if (pwId === 0) {
+                // New pw - we need the competency_id. Outer should have provided the key
+                var compIdWgt = document.querySelector('[data-comp-id]'),
+                    compId = 1;
 
-                detailPromise = ajax.getData(apiArgs);
+                if (compIdWgt) {
+                    compId = compIdWgt.getAttribute('data-comp-id') ? compIdWgt.getAttribute('data-comp-id') : 1;
+                }
+
+                this.pathway.competency_id = compId;
+                delete that.pathway.id;
+
+                this.widget.setAttribute('data-pw-save-endpoint', this.endpoints.create);
             } else {
-                // For new paths we only have a key not an id
-                detailPromise = that.createEmptyPw();
+                this.pathway.id = pwId;
+                this.widget.setAttribute('data-pw-save-endpoint', this.endpoints.update);
+
+                this.getRoles();
             }
 
-            detailPromise.then(function (responses) {
-                var pw = responses.results,
-                    target;
+            this.showHideNoRaters();
 
-                that.pwKey = pwKey;
-
-                // Set the save-endpoint data attribute
-                target = wgt;
-                if (pwId === 0) {
-                    // New pw - we need the competency_id
-                    var compIdWgt = document.querySelector('[data-comp-id]'),
-                        compId = 1;
-
-                    if (compIdWgt) {
-                        compId = compIdWgt.getAttribute('data-comp-id') ? compIdWgt.getAttribute('data-comp-id') : 1;
-                    }
-
-                    that.pathway.competency_id = compId;
-                    delete that.pathway.id;
-
-                    target.setAttribute('data-pw-save-endpoint', that.endpoints.create);
-                } else {
-                    that.pathway.id = pwId;
-                    target.setAttribute('data-pw-save-endpoint', that.endpoints.update);
-                }
-
-                // We index the roles with the ids to make it easier when adding / removing roles
-                var roles = pw.roles,
-                    rolesPromises = [];
-
-                target = wgt.querySelector('.pw_roles');
-
-                // Set the patway detail
-                that.pathway.roles = [];
-                that.roleIds = [];
-                for (var a = 0; a < pw.roles.length; a++) {
-                    that.pathway.roles.push(pw.roles[a].role);
-                    that.roleIds.push(pw.roles[a].id);
-                    that.fullRoles[pw.roles[a].id] = pw.roles[a];
-
-                    // Display the role
-                    rolesPromises.push(templates.renderAppend('totara_competency/partial_item', {value: roles[a].id, text: roles[a].name}, target));
-                }
-
-                that.showHideNoRaters();
-
-                // Init the picker
-                rolesPromises.push(that.initRolesPicker());
-
-                Promise.all(rolesPromises).then(function () {
-                    that.triggerEvent('update', {pathway: that.pathway});
-                }).catch(function (e) {
-                    notification.exception({
-                        fileName: that.filename,
-                        message: e[0] + ' modal: ' + e[1],
-                        name: 'Error initialising manual data'
-                    });
-                });
+            // Init the picker
+            this.initRolesPicker().then(function () {
+                that.triggerEvent('update', {pathway: that.pathway});
             }).catch(function (e) {
-                e.fileName = that.filename;
-                e.name = 'Error retrieving manual detail';
-                notification.exception(e);
+                notification.exception({
+                    fileName: that.filename,
+                    message: e[0] + ' modal: ' + e[1],
+                    name: 'Error initialising manual data'
+                });
             });
+        },
+
+        /**
+         * Retrieve the roles from the dom
+         */
+        getRoles: function () {
+            var roleNodes = this.widget.querySelectorAll('.pw_item'),
+                role;
+
+            for (var a = 0; a < roleNodes.length; a++) {
+                role = {};
+                role.id = parseInt(roleNodes[a].getAttribute('data-pw-item-id') ? roleNodes[a].getAttribute('data-pw-item-id') : 0);
+                role.value = roleNodes[a].getAttribute('data-pw-item-value') ? roleNodes[a].getAttribute('data-pw-item-value') : '';
+                this.pathway.roles.push(role.value);
+                this.roleIds.push(role.id);
+                this.fullRoles[role.id] = role;
+            }
         },
 
         /**
@@ -224,7 +191,7 @@ function (templates, notification, ajax, ModalList) {
                     list: {
                         map: {
                             cols: [{
-                                dataPath: 'name',
+                                dataPath: 'text',
                                 headerString: {
                                     key: 'selectraters',
                                     component: 'pathway_manual',
@@ -273,22 +240,23 @@ function (templates, notification, ajax, ModalList) {
             }
         },
 
+        /**
+         * @param []
+         */
         updateRoles: function (roles) {
             var that = this,
                 target = this.widget.querySelector('.pw_roles'),
-                promiseArr = [],
-                templateData = {};
+                promiseArr = [];
 
             for (var a = 0; a < roles.length; a++) {
                 var role = roles[a];
 
                 if (this.roleIds.indexOf(role.id) < 0) {
-                    this.pathway.roles.push(role.role);
+                    this.pathway.roles.push(role.value);
                     this.roleIds.push(role.id);
                     this.fullRoles[role.id] = role;
 
-                    templateData = {value: role.id, text: role.name};
-                    promiseArr.push(templates.renderAppend('totara_competency/partial_item', templateData, target));
+                    promiseArr.push(templates.renderAppend('totara_competency/partial_item', role, target));
                 }
             }
 
@@ -307,6 +275,9 @@ function (templates, notification, ajax, ModalList) {
             }
         },
 
+        /**
+         * @param {int} id
+         */
         removeRole: function (id) {
             id = parseInt(id);
 
@@ -316,7 +287,7 @@ function (templates, notification, ajax, ModalList) {
 
             if (idIndex >= 0) {
                 if (this.fullRoles[id]) {
-                    roleIndex = this.pathway.roles.indexOf(this.fullRoles[id].role);
+                    roleIndex = this.pathway.roles.indexOf(this.fullRoles[id].value);
                     delete this.fullRoles[id];
                 }
 
@@ -326,7 +297,7 @@ function (templates, notification, ajax, ModalList) {
 
                 this.roleIds.splice(idIndex, 1);
 
-                target = this.widget.querySelector('.pw_item[data-pw-item-value="' + id + '"');
+                target = this.widget.querySelector('.pw_item[data-pw-item-id="' + id + '"');
                 if (target) {
                     target.remove();
 
@@ -337,22 +308,6 @@ function (templates, notification, ajax, ModalList) {
 
             // Show noraters warning
             this.showHideNoRaters();
-        },
-
-        /**
-         * Create an empty pathway with the key
-         *
-         * @param {int} key
-         * @return {Promise}
-         */
-        createEmptyPw: function () {
-            return new Promise(function (resolve) {
-                resolve({
-                    results: {
-                        roles: [],
-                    }
-                });
-            });
         },
 
         /**
@@ -396,7 +351,7 @@ function (templates, notification, ajax, ModalList) {
             var wgt = new PwManual();
             wgt.setParent(parent);
             wgt.events();
-            wgt.initData(parent);
+            wgt.initData();
             resolve(wgt);
         });
     };

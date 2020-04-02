@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\entities\scale_value;
 use totara_competency\pathway;
 use totara_competency\pathway_factory;
+use totara_competency\plugin_types;
 use totara_criteria\criterion;
 use totara_criteria\criterion_factory;
 
@@ -413,6 +414,23 @@ class criteria_group extends pathway {
      *******************************************************************************************************/
 
     /**
+     * @return array
+     */
+    public static function export_criteria_types(): array {
+        $types = plugin_types::get_enabled_plugins('criteria', 'totara_criteria');
+        $types = array_map(function ($type) {
+            $criterion = criterion_factory::create($type);
+            return [
+                'type' => $criterion->get_plugin_type(),
+                'title' => $criterion->get_title(),
+                'singleuse' => $criterion->is_singleuse(),
+                'criterion_templatename' => $criterion->get_edit_template(),
+            ];
+        }, $types);
+
+        return array_values($types);
+    }
+    /**
      * Return the name of the template to use for editing this pathway
      *
      * @return string Template name
@@ -422,22 +440,12 @@ class criteria_group extends pathway {
     }
 
     /**
-     * Return the name of the template to use for viewing this pathway
-     *
-     * @return string Template name
-     */
-    public function get_view_template(): string {
-        return 'pathway_criteria_group/pathway_criteria_group';
-    }
-
-    /**
      * Export detail for editing the pathway
      *
      * @return array containing templatedata
      */
     public function export_edit_detail(): array {
         $result = $this->export_edit_overview();
-        $result['title'] = $this->get_title();
         $result['scalevalue'] = $this->get_scale_value()->id;
         $result['criteria'] = $this->export_criteria();
 
@@ -452,8 +460,16 @@ class criteria_group extends pathway {
     public function export_criteria(): array {
         $result = [];
 
+        $show_and = false;
         foreach ($this->criteria as $criterion) {
-            $result[] = $criterion->export_criterion_edit_template();
+            $criterion = $criterion->export_edit_detail();
+            if ($show_and) {
+                $criterion['showand'] = true;
+            } else {
+                $show_and = true;
+            }
+
+            $result[] = $criterion;
         }
 
         return $result;
@@ -474,27 +490,6 @@ class criteria_group extends pathway {
 
         $glue = ' ' . get_string('and', 'totara_competency') . ' ';
         return implode($glue, $criteria_types);
-    }
-
-    /**
-     * Export detail for viewing this pathway
-     *
-     * @return array
-     */
-    public function export_view_detail(): array {
-        $result = [
-            'id' => $this->get_id(),
-            'title' => $this->get_title(),
-            'criteria' => [],
-        ];
-
-        $keys = array_keys($this->criteria);
-        $lastkey = end($keys);
-        foreach ($this->criteria as $key => $criterion) {
-            $result['criteria'][] = array_merge($criterion->export_criterion_view_template(), ['showand' => ($key != $lastkey)]);
-        }
-
-        return $result;
     }
 
     /**

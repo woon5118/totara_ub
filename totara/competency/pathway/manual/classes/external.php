@@ -34,39 +34,6 @@ use totara_core\advanced_feature;
 
 class external extends \external_api {
 
-    /** get_detail */
-    public static function get_detail_parameters() {
-        return new \external_function_parameters(
-            [
-                'id' => new \external_value(PARAM_INT, 'Pathway id')
-            ]
-        );
-    }
-
-    public static function get_detail(int $id) {
-        advanced_feature::require('competency_assignment');
-
-        $pathway = manual::fetch($id);
-        return $pathway->export_edit_detail();
-    }
-
-    public static function get_detail_returns() {
-        return new \external_single_structure(
-            [
-                'roles' => new \external_multiple_structure(
-                    new \external_single_structure(
-                        [
-                            'id' => new \external_value(PARAM_INT, 'Role index'),
-                            'role' => new \external_value(PARAM_ALPHA, 'String identifier for role'),
-                            'name' => new \external_value(PARAM_TEXT, 'Human readable name for role'),
-                        ]
-                    )
-                ),
-            ]
-        );
-    }
-
-
     /**
      * get_roles
      * Sorting and pagination is ignored. Only added for compatibility with picker
@@ -81,7 +48,7 @@ class external extends \external_api {
                             'Role ids to filter by',
                             VALUE_OPTIONAL
                         ),
-                        'name' => new \external_value(PARAM_TEXT, 'Filter by role name ', VALUE_OPTIONAL, null),
+                        'value' => new \external_value(PARAM_TEXT, 'Filter by role name ', VALUE_OPTIONAL, null),
                         'pw_id' => new \external_value(PARAM_TEXT, 'Filter by pathway id ', VALUE_OPTIONAL, null),
                     ]
                 ),
@@ -137,8 +104,8 @@ class external extends \external_api {
         foreach ($roles as $id => $role) {
             $results['items'][] = [
                 'id' => $role::get_display_order(),
-                'role' => $role::get_name(),
-                'name' => $role::get_display_name(),
+                'value' => $role::get_name(),
+                'text' => $role::get_display_name(),
             ];
         }
 
@@ -152,8 +119,8 @@ class external extends \external_api {
                     new \external_single_structure(
                         [
                             'id' => new \external_value(PARAM_INT, 'Role id'),
-                            'role' => new \external_value(PARAM_ALPHA, 'String identifier for role'),
-                            'name' => new \external_value(PARAM_TEXT, 'Human readable name for role'),
+                            'value' => new \external_value(PARAM_ALPHA, 'String identifier for role'),
+                            'text' => new \external_value(PARAM_TEXT, 'Human readable name for role'),
                         ]
                     )
                 ),

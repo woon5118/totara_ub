@@ -118,6 +118,7 @@ class pathway_criteria_group_external_testcase extends \advanced_testcase {
 
         external::update($pw_id,
             1,
+            $scalevalue->id,
             [
                 [
                     'id' => $lc->id,
@@ -224,6 +225,7 @@ class pathway_criteria_group_external_testcase extends \advanced_testcase {
 
         external::update($pw_id,
             1,
+            $scalevalue->id,
             [
                 [
                     'id' => $cc->id,

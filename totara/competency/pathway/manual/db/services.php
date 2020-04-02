@@ -23,15 +23,6 @@
  */
 
 $functions = [
-    'pathway_manual_get_detail' => [
-        'classname' => \pathway_manual\external::class,
-        'methodname' => 'get_detail',
-        'description' => 'Get the detail',
-        'type' => 'read',
-        'loginrequired' => true,
-        'ajax' => true,
-    ],
-
     'pathway_manual_get_roles' => [
         'classname' => \pathway_manual\external::class,
         'methodname' => 'get_roles',
@@ -58,55 +49,4 @@ $functions = [
         'loginrequired' => true,
         'ajax' => true,
     ],
-
-    // 'pathway_manual_delete' => [
-    //     'classname' => \pathway_manual\external::class,
-    //     'methodname' => 'delete',
-    //     'description' => "Delete the manual pathway",
-    //     'type' => 'delete',
-    //     'loginrequired' => true,
-    //     'ajax' => true,
-    // ],
-
-    // 'pathway_manual_update_roles' => [
-    //     'classname' => \pathway_manual\external::class,
-    //     'methodname' => 'update_roles',
-    //     'description' => "Update the pathway's configured roles",
-    //     'type' => 'update',
-    //     'loginrequired' => true,
-    //     'ajax' => true,
-    // ],
-
-    // 'pathway_manual_get_pathway_roles' => [
-    //     'classname' => \pathway_manual\external::class,
-    //     'methodname' => 'get_pathway_roles',
-    //     'description' => 'Get the roles configured for a given pathway',
-    //     'type' => 'read',
-    //     'loginrequired' => true,
-    //     'ajax' => true,
-    // ],
-    // 'pathway_manual_set_user_value' => [
-    //     'classname' => \pathway_manual\external::class,
-    //     'methodname' => 'set_user_value',
-    //     'description' => 'Set a value for a user on a manual pathway',
-    //     'type' => 'update',
-    //     'loginrequired' => true,
-    //     'ajax' => true,
-    // ],
-    // 'pathway_manual_get_user_value' => [
-    //     'classname' => \pathway_manual\external::class,
-    //     'methodname' => 'get_user_value',
-    //     'description' => 'Get a value for a user on a manual pathway',
-    //     'type' => 'read',
-    //     'loginrequired' => true,
-    //     'ajax' => true,
-    // ],
-    // 'pathway_manual_save_draft' => [
-    //     'classname' => \pathway_manual\external::class,
-    //     'methodname' => 'save_draft',
-    //     'description' => 'Save configuration of manual pathway as a draft',
-    //     'type' => 'update',
-    //     'loginrequired' => true,
-    //     'ajax' => true
-    // ],
 ];

@@ -115,15 +115,6 @@ class coursecompletion extends criterion {
     }
 
     /**
-     * Return the name of the template to view this criterion
-     *
-     * @return string Summary template's name
-     */
-    public function get_view_template(): string {
-        return 'criteria_coursecompletion/coursecompletion';
-    }
-
-    /**
      * Export definition item data
      *
      * @return  array Array of item detail
@@ -137,17 +128,17 @@ class coursecompletion extends criterion {
             $item_detail = [
                 'type' => $this->get_items_type(),
                 'id' => $course_id,
+                'value' => $course_id,
             ];
 
             $course = $DB->get_record('course', ['id' => $course_id]);
             if ($course) {
-                $item_detail['name'] = format_string(get_course_display_name_for_list($course));
-
-                if (!$course->enablecompletion) {
-                    $item_detail['error'] = get_string('error:nocoursecompletion', 'criteria_coursecompletion');
-                }
+                $item_detail['text'] = format_string(get_course_display_name_for_list($course));
+                $item_detail['error'] = $course->enablecompletion
+                    ? ''
+                    : get_string('error:nocoursecompletion', 'criteria_coursecompletion');
             } else {
-                $item_detail['name'] = '';
+                $item_detail['text'] = '';
                 $item_detail['error'] = get_string('error:nocourse', 'criteria_coursecompletion');
             }
 

@@ -23,15 +23,6 @@
  */
 
 $functions = [
-    'pathway_criteria_group_get_criteria' => [
-        'classname' => \pathway_criteria_group\external::class,
-        'methodname' => 'get_criteria',
-        'description' => 'Get the criteria in this group',
-        'type' => 'get',
-        'loginrequired' => true,
-        'ajax' => true,
-    ],
-
     'pathway_criteria_group_update' => [
         'classname' => \pathway_criteria_group\external::class,
         'methodname' => 'update',
@@ -58,15 +49,4 @@ $functions = [
         'loginrequired' => true,
         'ajax' => true,
     ],
-
-
-    // 'pathway_criteria_group_get_summary' => [
-    //     'classname' => \pathway_criteria_group\external::class,
-    //     'methodname' => 'get_summary',
-    //     'description' => 'Get the criteria group summary for display',
-    //     'type' => 'get',
-    //     'loginrequired' => true,
-    //     'ajax' => true,
-    // ],
-
 ];

@@ -44,10 +44,16 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_competency/m
              * The variable names MUST correlate to the save endpoint parameters
              */
             this.criterion = {
+                id: 0,
                 type: 'othercompetency',
-                aggregation: {},
                 itemids: [],
-            };
+                aggregation: {
+                    method: 1,
+                    reqitems: 1
+                },
+                singleuse: false,
+                expandable: true
+                };
 
             // Saving items from the basket - therefore not stored in criterion
             this.criterionKey = ''; // Unique key to use in bubbled events
@@ -84,17 +90,17 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_competency/m
                         that.addCompetencies();
 
                         // Item remove link clicked
-                    } else if (e.target.closest('[data-tw-criterionOtherCompetency-item-remove]')) {
+                    } else if (e.target.closest('[data-tw-competency-item-remove]')) {
                         e.preventDefault();
 
-                        var competencyNode = e.target.closest('[data-tw-criterionOtherCompetency-item-value]'),
+                        var competencyNode = e.target.closest('[data-tw-competency-item-value]'),
                             competencyId;
 
                         if (!competencyNode) {
                             return;
                         }
 
-                        competencyId = competencyNode.getAttribute('data-tw-criterionOtherCompetency-item-value');
+                        competencyId = competencyNode.getAttribute('data-tw-competency-item-value');
                         that.removeCompetency(competencyId);
                     }
                 });
@@ -143,58 +149,42 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_competency/m
 
             /**
              * Retrieve the criterion detail
+             * @param {node}
              * @return {Promise}
              */
-            getDetail: function () {
+            getDetail: function (wgt) {
                 var that = this,
                     criterionNode = this.widget.closest('[data-tw-criterion-key]'),
-                    key = 0,
-                    id = 0,
-                    apiArgs,
-                    detailPromise = null;
+                    aggregationNode = criterionNode.querySelector('[data-tw-criterionOtherCompetency-aggregation]');
 
                 return new Promise(function (resolve) {
                     if (criterionNode) {
-                        key = criterionNode.hasAttribute('data-tw-criterion-key') ? criterionNode.getAttribute('data-tw-criterion-key') : 0;
-                        id = criterionNode.hasAttribute('data-tw-criterion-id') ? criterionNode.getAttribute('data-tw-criterion-id') : 0;
+                        that.criterionKey = criterionNode.hasAttribute('data-tw-criterion-key')
+                            ? criterionNode.getAttribute('data-tw-criterion-key')
+                            : '';
+                        that.criterion.id = criterionNode.hasAttribute('data-tw-criterion-id')
+                            ? criterionNode.getAttribute('data-tw-criterion-id')
+                            : 0;
                     }
 
-                    if (id == 0) {
-                        // New criterion - no detail yet
-                        detailPromise = new Promise(function (resolve) {
-                            resolve(that.createEmptyCriterion());
-                        });
-
-                    } else {
-                        apiArgs = {
-                            args: {id: id},
-                            methodname: that.endpoints.detail
-                        };
-
-                        detailPromise = ajax.getData(apiArgs);
+                    // Aggregation
+                    if (aggregationNode) {
+                        that.criterion.aggregation.method = aggregationNode.getAttribute('data-tw-criterionOtherCompetency-aggregation');
+                        that.criterion.aggregation.reqitems = aggregationNode.hasAttribute('data-tw-criterionOtherCompetency-aggregation-reqitems')
+                            ? aggregationNode.getAttribute('data-tw-criterionOtherCompetency-aggregation-reqitems')
+                            : 1;
                     }
 
-                    detailPromise.then(function (responses) {
-                        var instance = responses.results;
+                    that.setAggregationMethod(that.criterion.aggregation.method);
+                    that.setAggregationCount(that.criterion.aggregation.reqitems);
 
-                        // We want only the data required for saving in that.criterion
-                        // Not doing this earlier to prevent setting criterion attributes if
-                        // something went wrong (e.g. invalid id, etc.)
-                        that.criterion.id = id;
-                        that.criterionKey = key;
+                    // Competencies
+                    that.setCompetencies(wgt);
+                    that.showHideNotEnoughCompetency();
 
-                        // Aggregation
-                        that.setAggregationMethod(instance.aggregation.method);
-                        that.setAggregationCount(instance.aggregation.reqitems);
-
-                        Promise.all([that.setCompetencies(instance.items), that.initCompetencyAdder()]).then(function () {
-                            that.triggerEvent('update', {criterion: that.criterion});
-                            resolve();
-                        });
-                    }).catch(function (e) {
-                        e.fileName = that.filename;
-                        e.name = 'Error retrieving detail';
-                        notification.exception(e);
+                    Promise.all([that.initCompetencyAdder()]).then(function () {
+                        that.triggerEvent('update', {criterion: that.criterion});
+                        resolve();
                     });
                 });
             },
@@ -240,44 +230,22 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_competency/m
             /**
              * Set and display the competencies to be completed
              *
-             * @param {Object} competencies Array of competencies
-             * @return {Promise}
+             * @param {node}
              */
-            setCompetencies: function (competencies) {
-                var that = this,
-                    competenciesTarget = this.widget.querySelector('[data-tw-criterionOtherCompetency-competencies]'),
-                    competenciesPromiseArr = [],
-                    templateData = {};
+            setCompetencies: function (wgt) {
+                var competencyNodes = wgt.querySelectorAll('[data-tw-competency-item-value]'),
+                    comptencyId;
 
-                return new Promise(function (resolve) {
-                    // We want to index the items with the ids for easy adder results processing
-                    that.competencies = [];
-                    that.criterion.itemids = [];
+                this.criterion.itemids = [];
 
-                    if (competencies.length == 0 || !competenciesTarget) {
-                        that.showHideNotEnoughCompetency();
-                        resolve();
-                    } else {
-                        for (var a = 0; a < competencies.length; a++) {
-                            that.competencies[competencies[a].id] = competencies[a];
-                            that.criterion.itemids.push(competencies[a].id);
-                            templateData = {item_parent: 'criterionOtherCompetency', value: competencies[a].id, text: competencies[a].name};
-                            if (competencies[a].error) {
-                                templateData.error = competencies[a].error;
-                            }
-                            competenciesPromiseArr.push(templates.renderAppend('totara_criteria/partial_item', templateData, competenciesTarget));
-                        }
-
-                        Promise.all(competenciesPromiseArr).then(function () {
-                            that.showHideNotEnoughCompetency();
-                            resolve();
-                        }).catch(function (e) {
-                            e.fileName = that.filename;
-                            e.name = 'Error showing competencies';
-                            notification.exception(e);
-                        });
+                for (var a = 0; a < competencyNodes.length; a++) {
+                    comptencyId = parseInt(competencyNodes[a].getAttribute('data-tw-competency-item-value')
+                        ? competencyNodes[a].getAttribute('data-tw-competency-item-value')
+                        : 0);
+                    if (comptencyId) {
+                        this.criterion.itemids.push(comptencyId);
                     }
-                });
+                }
             },
 
             /**
@@ -286,7 +254,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_competency/m
              * @param {int} key
              * @return {Promise}
              */
-            createEmptyCriterion: function () {
+            odlCreateEmptyCriterion: function () {
                 // Ensure the basket is empty
                 return new Promise(function (resolve) {
                     resolve({
@@ -420,6 +388,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_competency/m
                     competenciesTarget = that.widget.querySelector('[data-tw-criterionOtherCompetency-competencies]'),
                     id,
                     fullname,
+                    idIndex,
                     competenciesPromiseArr = [],
                     templateData = {};
 
@@ -427,16 +396,12 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_competency/m
                     id = competencies[a].id;
                     fullname = competencies[a].fullname;
 
-                    if (!this.competencies[id]) {
-                        this.competencies[id] = {
-                            id: id,
-                            name: fullname};
+                    idIndex = this.criterion.itemids.indexOf(id);
+
+                    if (idIndex < 0) {
                         this.criterion.itemids.push(id);
 
-                        templateData = {item_parent: 'criterionOtherCompetency', value: id, text: fullname};
-                        if (competencies[a].error) {
-                            templateData.error = competencies[a].error;
-                        }
+                        templateData = {type: 'othercompetency', value: id, text: fullname};
                         competenciesPromiseArr.push(templates.renderAppend('totara_criteria/partial_item', templateData, competenciesTarget));
                     }
                 }
@@ -460,14 +425,11 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_competency/m
                 id = parseInt(id);
 
                 var that = this,
-                    competencyTarget = that.widget.querySelector('[data-tw-criterionOtherCompetency-item-value="' + id + '"]'),
+                    competencyTarget = that.widget.querySelector('[data-tw-competency-item-value="' + id + '"]'),
                     idIndex = this.criterion.itemids.indexOf(id);
 
-                if (this.competencies[id]) {
-                    delete this.competencies[id];
-                    if (idIndex >= 0) {
-                        this.criterion.itemids.splice(idIndex, 1);
-                    }
+                if (idIndex >= 0) {
+                    this.criterion.itemids.splice(idIndex, 1);
 
                     if (competencyTarget) {
                         competencyTarget.remove();
@@ -533,7 +495,7 @@ define(['core/templates', 'core/notification', 'core/ajax', 'totara_competency/m
                 resolve(wgt);
 
                 M.util.js_pending('criterionOtherCompetency');
-                wgt.getDetail().then(function () {
+                wgt.getDetail(parent).then(function () {
                     wgt.loader.hide();
                     M.util.js_complete('criterionOtherCompetency');
                 });
