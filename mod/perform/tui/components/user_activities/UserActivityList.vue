@@ -2,19 +2,24 @@
   <Loader :loading="$apollo.loading">
     <Table v-if="!$apollo.loading" :data="subjectInstances">
       <template v-slot:header-row>
-        <HeaderCell :size="showSubjectName ? '8' : '10'">
+        <HeaderCell :size="showSubjectName ? '6' : '8'">
           {{ $str('user_activities:title_header', 'mod_perform') }}
         </HeaderCell>
         <HeaderCell v-if="showSubjectName" size="2">
           {{ $str('user_activities:subject_header', 'mod_perform') }}
         </HeaderCell>
         <HeaderCell size="2">
-          {{ $str('perform:view:status', 'mod_perform') }}
+          {{
+            $str('user_activities_status_header_participation', 'mod_perform')
+          }}
+        </HeaderCell>
+        <HeaderCell size="2">
+          {{ $str('user_activities_status_header_activity', 'mod_perform') }}
         </HeaderCell>
       </template>
       <template v-slot:row="{ row: subjectInstance }">
         <Cell
-          :size="showSubjectName ? '8' : '10'"
+          :size="showSubjectName ? '6' : '8'"
           :column-header="$str('user_activities:title_header', 'mod_perform')"
         >
           <a :href="getViewActivityUrl(subjectInstance)">{{
@@ -30,9 +35,23 @@
         </Cell>
         <Cell
           size="2"
-          :column-header="$str('user_activities:status_header', 'mod_perform')"
+          :column-header="
+            $str('user_activities_status_header_participation', 'mod_perform')
+          "
         >
-          {{ getStatusText(subjectInstance) }}
+          {{
+            getStatusText(
+              subjectInstance.participant_instances[0].progress_status
+            )
+          }}
+        </Cell>
+        <Cell
+          size="2"
+          :column-header="
+            $str('user_activities_status_header_activity', 'mod_perform')
+          "
+        >
+          {{ getStatusText(subjectInstance.status) }}
         </Cell>
       </template>
     </Table>
@@ -112,16 +131,13 @@ export default {
     /**
      * Get the localized status text for a particular user activity.
      *
-     * @param status {{String}}
+     * @param status {String}
      * @returns {string}
      */
-    getStatusText({ status }) {
+    getStatusText(status) {
       switch (status) {
-        case 'NOT_YET_STARTED':
-          return this.$str(
-            'user_activities:status_not_yet_started',
-            'mod_perform'
-          );
+        case 'NOT_STARTED':
+          return this.$str('user_activities_status_not_started', 'mod_perform');
         case 'IN_PROGRESS':
           return this.$str('user_activities:status_in_progress', 'mod_perform');
         case 'COMPLETE':
@@ -159,9 +175,10 @@ export default {
     "mod_perform": [
       "perform:view:status",
       "user_activities:status_complete",
-      "user_activities:status_header",
+      "user_activities_status_header_activity",
+      "user_activities_status_header_participation",
       "user_activities:status_in_progress",
-      "user_activities:status_not_yet_started",
+      "user_activities_status_not_started",
       "user_activities:subject_header",
       "user_activities:title_header",
       "toast_success_save_response",

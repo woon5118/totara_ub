@@ -23,8 +23,10 @@
 
 namespace mod_perform\models\activity;
 
+use context_module;
 use core\orm\entity\model;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
+use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
 
@@ -33,7 +35,7 @@ use mod_perform\state\state_aware;
  *
  * @package mod_perform\models\activity
  *
- * @property-read int $status
+ * @property-read int $progress
  * @property-read int $participant_id
  */
 class participant_instance extends model {
@@ -41,8 +43,13 @@ class participant_instance extends model {
     use state_aware;
 
     protected $entity_attribute_whitelist = [
-        'status',
+        'progress',
         'participant_id',
+        'participant_sections'
+    ];
+
+    protected $model_accessor_whitelist = [
+        'progress_status'
     ];
 
     /**
@@ -55,11 +62,35 @@ class participant_instance extends model {
     }
 
     public function get_current_state_code(): int {
-        return $this->status;
+        return $this->progress;
     }
 
     protected function update_state_code(state $state): void {
-        $this->entity->status = $state::get_code();
+        $this->entity->progress = $state::get_code();
         $this->entity->update();
+    }
+
+    public function get_context(): context_module {
+        /** @var subject_instance_entity $subject_instance_entity */
+        $subject_instance_entity = $this->entity->subject_instance;
+        $subject_instance = new subject_instance($subject_instance_entity);
+
+        return $subject_instance->get_context();
+    }
+
+    /**
+     * Update progress status according to section progress.
+     */
+    public function update_progress_status() {
+        $this->get_state()->update_progress();
+    }
+
+    /**
+     * Get internal name of current progress state.
+     *
+     * @return string
+     */
+    public function get_progress_status(): string {
+        return $this->get_state()->get_name();
     }
 }

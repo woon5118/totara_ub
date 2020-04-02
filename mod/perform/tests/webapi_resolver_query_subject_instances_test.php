@@ -55,6 +55,11 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends mod_p
                 'subject_user' => [
                     'fullname' => self::$about_user_and_participating->subject_user->fullname
                 ],
+                'participant_instances' => [
+                    [
+                        'progress_status' => 'NOT_STARTED'
+                    ]
+                ],
             ]
         ];
 

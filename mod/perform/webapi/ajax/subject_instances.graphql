@@ -14,5 +14,8 @@ query mod_perform_subject_instances(
     subject_user {
       fullname
     }
+    participant_instances {
+      progress_status
+    }
   }
 }

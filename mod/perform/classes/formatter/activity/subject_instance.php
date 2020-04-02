@@ -44,6 +44,7 @@ class subject_instance extends entity_model_formatter {
             'activity' => null,
             'subject_user' => null,
             'status' => null,
+            'participant_instances' => null,
         ];
     }
 

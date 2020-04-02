@@ -35,7 +35,7 @@ use core\orm\entity\relations\has_many;
  * @property int $participant_source
  * @property int $participant_id
  * @property int $subject_instance_id
- * @property int $status
+ * @property int $progress
  * @property int $created_at
  * @property int $updated_at
  *

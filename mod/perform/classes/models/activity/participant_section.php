@@ -43,7 +43,7 @@ use mod_perform\state\state_helper;
  * @property-read int $id ID
  * @property-read int $section_id
  * @property-read int $participant_instance_id
- * @property-read int $status
+ * @property-read int $progress
  * @property-read int $created_at
  * @property-read int $updated_at
  * @property-read participant_instance_entity $participant_instance
@@ -59,7 +59,7 @@ class participant_section extends model {
         'id',
         'section_id',
         'participant_instance_id',
-        'status',
+        'progress',
         'created_at',
         'updated_at',
         'participant_instance',
@@ -120,8 +120,8 @@ class participant_section extends model {
     }
 
     /**
-     * Try to complete the section (save all answers, and set the status to complete).
-     * If any element validation rules do not pass no data is saved and the status is not updated.
+     * Try to complete the section (save all answers, and set the progress status to complete).
+     * If any element validation rules do not pass no data is saved and the progress status is not updated.
      *
      * Validation errors are accessible on each element response.
      *
@@ -142,26 +142,24 @@ class participant_section extends model {
             return false;
         }
 
-        // Validation has passed save all the responses, and ensure the status is set to complete.
+        // Validation has passed save all the responses, and ensure the progress status is set to complete.
         builder::get_db()->transaction(function () {
             foreach ($this->element_responses as $element_response) {
                 $element_response->save();
             }
 
-            if (!$this->get_state() instanceof complete) {
-                $this->switch_state(complete::class);
-            }
+            $this->get_state()->complete();
         });
 
         return true;
     }
 
     public function get_current_state_code(): int {
-        return $this->status;
+        return $this->progress;
     }
 
     protected function update_state_code(state $state): void {
-        $this->entity->status = $state::get_code();
+        $this->entity->progress = $state::get_code();
         $this->entity->update();
     }
 }

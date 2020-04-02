@@ -148,7 +148,7 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
                     $participant_instance->subject_instance_id = $subject_instance->id;
                     $participant_instance->participant_id = $participant;
                     $participant_instance->activity_relationship_id = $relationship->get_id();
-                    $participant_instance->status = not_started::get_code();
+                    $participant_instance->progress = not_started::get_code();
                     $participant_instance->save();
                     $participant_instance_dto = participant_instance_dto::create_from_data(
                         [

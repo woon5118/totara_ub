@@ -23,21 +23,46 @@
 
 namespace mod_perform\state\participant_instance;
 
-use mod_perform\state\participant_instance\condition\actor_is_participant;
-use mod_perform\state\state;
+use mod_perform\state\participant_instance\condition\all_sections_complete;
+use mod_perform\state\participant_instance\condition\at_least_one_section_started;
+use mod_perform\state\participant_instance\condition\not_all_sections_complete;
 use mod_perform\state\transition;
 
 defined('MOODLE_INTERNAL') || die();
 
-class not_started extends state {
+/**
+ * This class represents the "not_started" progress status of a participant instance.
+ *
+ * @package mod_perform
+ */
+class not_started extends participant_instance_progress {
+
+    public function get_name(): string {
+        return 'NOT_STARTED';
+    }
 
     public static function get_code(): int {
-        return 10;
+        return 0;
     }
 
     public function get_transitions(): array {
         return [
-            // TODO in TL-24541
+            transition::to(new complete($this->object))->with_conditions([
+                all_sections_complete::class
+            ]),
+            transition::to(new in_progress($this->object))->with_conditions([
+                not_all_sections_complete::class,
+                at_least_one_section_started::class,
+            ]),
         ];
+    }
+
+    public function update_progress(): void {
+        foreach ([complete::class, in_progress::class] as $to_state) {
+            if ($this->can_switch($to_state)) {
+                $this->object->switch_state($to_state);
+                break;
+            }
+        }
     }
 }

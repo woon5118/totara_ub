@@ -21,40 +21,19 @@
  * @package mod_perform
  */
 
-namespace mod_perform\state\participant_section;
+namespace mod_perform\state\participant_instance\condition;
 
-use mod_perform\state\transition;
+use mod_perform\state\condition;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This class represents the "not_started" progress status of a participant section.
- *
- * @package mod_perform
+ * Class not_all_sections_complete
  */
-class not_started extends participant_section_progress {
+class not_all_sections_complete extends condition {
 
-    public function get_name(): string {
-        return 'NOT_STARTED';
-    }
-
-    public static function get_code(): int {
-        return 0;
-    }
-
-    public function get_transitions(): array {
-        return [
-            // The participant has saved a draft.
-            transition::to(new incomplete($this->object)),
-
-            // The participant has completed a section.
-            transition::to(new complete($this->object)),
-        ];
-    }
-
-    public function complete(): void {
-        if ($this->can_switch(complete::class)) {
-            $this->object->switch_state(complete::class);
-        }
+    public function pass(): bool {
+        $all_complete = new all_sections_complete($this->object);
+        return !$all_complete->pass();
     }
 }

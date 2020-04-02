@@ -26,10 +26,9 @@ namespace mod_perform\event;
 defined('MOODLE_INTERNAL') || die();
 
 use core\event\base;
-use mod_perform\models\activity\activity;
-use mod_perform\models\activity\participant_section;
+use mod_perform\models\activity\participant_instance;
 
-class participant_section_status_updated extends base {
+class participant_instance_progress_updated extends base {
 
     /**
      * Initialise required event data properties.
@@ -37,21 +36,21 @@ class participant_section_status_updated extends base {
     protected function init() {
         $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_OTHER;
-        $this->data['objecttable'] = 'perform_participant_section';
+        $this->data['objecttable'] = 'perform_participant_instance';
     }
 
     /**
-     * Create instance of event.
+     * Create event by participant instance.
      *
-     * @param participant_section $participant_section
+     * @param participant_instance $participant_instance
      * @return self|base
      */
-    public static function create_from_participant_section(participant_section $participant_section): self {
+    public static function create_from_participant_instance(participant_instance $participant_instance): self {
         $data = [
-            'objectid' => $participant_section->get_id(),
-            'relateduserid' => $participant_section->participant_instance->participant_id,
+            'objectid' => $participant_instance->get_id(),
+            'relateduserid' => $participant_instance->participant_id,
             'other' => [],
-            'context' => $participant_section->get_context(),
+            'context' => $participant_instance->get_context(),
         ];
         return static::create($data);
     }

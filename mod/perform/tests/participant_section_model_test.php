@@ -74,7 +74,7 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
 
         // Set and verify initial state.
         $entity = $this->create_participant_section($subject_user, $other_participant);
-        $entity->status = $initial_state_class::get_code();
+        $entity->progress = $initial_state_class::get_code();
         $entity->update();
         $participant_section = participant_section::load_by_entity($entity);
         $this->assertInstanceOf($initial_state_class, $participant_section->get_state());
@@ -89,29 +89,12 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
 
         $participant_section->switch_state($target_state_class);
 
-        $db_status = participant_section_entity::repository()->find($participant_section->get_id())->status;
-        $this->assertEquals($target_state_class::get_code(), $db_status);
+        $db_progress = participant_section_entity::repository()->find($participant_section->get_id())->progress;
+        $this->assertEquals($target_state_class::get_code(), $db_progress);
         $this->assertInstanceOf($target_state_class, $participant_section->get_state());
 
         // Check that event has been triggered.
         $this->assert_section_updated_event($sink, $participant_section, $subject_user->id);
-    }
-
-    public function test_state_switch_actor_condition(): void {
-        $this->setAdminUser();
-
-        $subject_user = self::getDataGenerator()->create_user();
-        $other_participant = self::getDataGenerator()->create_user();
-
-        $participant_section = participant_section::load_by_entity(
-            $this->create_participant_section($subject_user, $other_participant)
-        );
-
-        $this->setUser($other_participant);
-
-        $this->expectException(moodle_exception::class);
-        $this->expectExceptionMessage('Cannot switch');
-        $participant_section->switch_state(complete::class);
     }
 
     public function test_duplicate_state_codes(): void {
@@ -136,7 +119,7 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
         $events = $sink->get_events();
         $this->assertCount(1, $events);
         $event = reset($events);
-        $this->assertInstanceOf('mod_perform\event\participant_section_status_updated', $event);
+        $this->assertInstanceOf('mod_perform\event\participant_section_progress_updated', $event);
         $this->assertEquals($participant_section->get_id(), $event->objectid);
         $this->assertEquals($user_id, $event->relateduserid);
 
@@ -160,7 +143,7 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
 
         self::assertEquals(
             not_started::get_code(),
-            $participant_section->status,
+            $participant_section->progress,
             'Participant section should start with the incomplete status'
         );
 
@@ -171,7 +154,7 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
 
         self::assertEquals(
             complete::get_code(),
-            $participant_section->status,
+            $participant_section->progress,
             'Participant section should have the complete status'
         );
 
@@ -189,7 +172,7 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
 
         self::assertEquals(
             not_started::get_code(),
-            $participant_section->status,
+            $participant_section->progress,
             'Participant section should start with the incomplete status'
         );
 
@@ -200,7 +183,7 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
 
         self::assertEquals(
             not_started::get_code(),
-            $participant_section->status,
+            $participant_section->progress,
             'Participant section should have the complete status'
         );
 

@@ -21,42 +21,51 @@
  * @package mod_perform
  */
 
-namespace mod_perform\state\participant_section;
+namespace mod_perform\state\participant_instance;
 
 use core\event\base;
-use mod_perform\event\participant_section_progress_updated;
-use mod_perform\models\activity\participant_section;
+use mod_perform\event\participant_instance_progress_updated;
+use mod_perform\models\activity\participant_instance;
+use mod_perform\state\participant_instance\condition\all_sections_complete;
+use mod_perform\state\state;
 use mod_perform\state\state_event;
+use mod_perform\state\transition;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This class represents the "complete" progress status of a participant section.
+ * This class represents the "in_progress" progress status of a participant instance.
  *
  * @package mod_perform
  */
-class complete extends participant_section_progress implements state_event {
+class in_progress extends state implements state_event {
 
     public function get_name(): string {
-        return 'COMPLETE';
+        return 'IN_PROGRESS';
     }
 
     public static function get_code(): int {
-        return 20;
+        return 10;
     }
 
     public function get_transitions(): array {
-        return [];
+        return [
+            // The participant has completed an instance.
+            transition::to(new complete($this->object))->with_conditions([
+                all_sections_complete::class
+            ]),
+        ];
     }
 
     public function get_event(): base {
-        /** @var participant_section $participant_section */
-        $participant_section = $this->get_object();
-        return participant_section_progress_updated::create_from_participant_section($participant_section);
+        /** @var participant_instance $participant_instance */
+        $participant_instance = $this->get_object();
+        return participant_instance_progress_updated::create_from_participant_instance($participant_instance);
     }
 
-    public function complete(): void {
-        // Already in complete state, don't do anything.
-        return;
+    public function update_progress(): void {
+        if ($this->can_switch(complete::class)) {
+            $this->object->switch_state(complete::class);
+        }
     }
 }

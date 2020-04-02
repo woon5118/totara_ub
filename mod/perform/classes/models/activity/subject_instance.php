@@ -26,6 +26,7 @@ namespace mod_perform\models\activity;
 
 use coding_exception;
 use context_module;
+use core\collection;
 use core\entities\user;
 use core\orm\entity\model;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
@@ -54,6 +55,7 @@ class subject_instance extends model {
     protected $model_accessor_whitelist = [
         'activity',
         'status',
+        'participant_instances',
     ];
 
     /** @var subject_instance_entity */
@@ -120,4 +122,10 @@ class subject_instance extends model {
         return participant_section::load_by_entity($first_participant_section);
     }
 
+    /**
+     * @return participant_instance[]|collection
+     */
+    public function get_participant_instances(): collection {
+        return $this->entity->participant_instances->map_to(participant_instance::class);
+    }
 }

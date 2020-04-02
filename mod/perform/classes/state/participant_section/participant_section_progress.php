@@ -21,23 +21,21 @@
  * @package mod_perform
  */
 
-namespace mod_perform\state\participant_section\condition;
+namespace mod_perform\state\participant_section;
 
-use core\entities\user;
-use mod_perform\state\condition;
+use mod_perform\state\state;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class actor_is_participant
+ * Abstract class representing a progress status of a participant section.
+ *
+ * @package mod_perform
  */
-class actor_is_participant extends condition {
+abstract class participant_section_progress extends state {
 
-    public function pass(): bool {
-        return (int)$this->object->participant_instance->participant_id === (int)user::logged_in()->id;
-    }
-
-    public function get_failure(): array {
-        return ['actor_is_participant' => get_string('condition_actor_is_participant_fail', 'mod_perform')];
-    }
+    /**
+     * Try to switch progress status to complete.
+     */
+    abstract public function complete(): void;
 }

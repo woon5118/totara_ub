@@ -28,7 +28,7 @@ use core\webapi\execution_context;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\entities\activity\section_element;
-use mod_perform\event\participant_section_status_updated;
+use mod_perform\event\participant_section_progress_updated;
 use mod_perform\entities\activity\element_response as element_response_entity;
 use mod_perform\state\participant_section\complete;
 use mod_perform\state\participant_section\not_started;
@@ -97,7 +97,7 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testscase ex
         // Initial save of responses.
         $initial_save_result = update_section_responses::resolve($args, $this->get_execution_context());
 
-        self::assertEquals(complete::get_code(), $initial_save_result->status);
+        self::assertEquals(complete::get_code(), $initial_save_result->progress);
         self::assertCount(2, $initial_save_result->get_element_responses());
 
         self::assertEquals(
@@ -128,16 +128,16 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testscase ex
         $sink->clear();
 
         self::assertInstanceOf(
-            participant_section_status_updated::class,
+            participant_section_progress_updated::class,
             reset($events),
-            'Expected status updated event to be fired'
+            'Expected progress updated event to be fired'
         );
 
         $participant_section->refresh();
         self::assertEquals(
             complete::get_code(),
-            $participant_section->status,
-            'Expected participant section to change to status "complete"'
+            $participant_section->progress,
+            'Expected participant section to change to progress status "complete"'
         );
 
         $encoded_response1_modified = json_encode(['answer_text' => 'Changed answer one']);
@@ -168,8 +168,8 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testscase ex
         $participant_section->refresh();
         self::assertEquals(
             complete::get_code(),
-            $participant_section->status,
-            'Expected participant section status to remain "complete"'
+            $participant_section->progress,
+            'Expected participant section progress status to remain "complete"'
         );
 
         self::assertEqualsCanonicalizing(
@@ -245,7 +245,7 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testscase ex
 
         self::assertEquals(
             not_started::get_code(),
-            $participant_section->refresh()->status,
+            $participant_section->refresh()->progress,
             'Section should not have been completed'
         );
 

@@ -21,42 +21,24 @@
  * @package mod_perform
  */
 
-namespace mod_perform\state\participant_section;
+namespace mod_perform\observers;
 
 use core\event\base;
 use mod_perform\event\participant_section_progress_updated;
-use mod_perform\models\activity\participant_section;
-use mod_perform\state\state_event;
+use mod_perform\entities\activity\participant_section;
+use mod_perform\models\activity\participant_instance;
 
-defined('MOODLE_INTERNAL') || die();
+class participant_section_progress {
 
-/**
- * This class represents the "complete" progress status of a participant section.
- *
- * @package mod_perform
- */
-class complete extends participant_section_progress implements state_event {
-
-    public function get_name(): string {
-        return 'COMPLETE';
-    }
-
-    public static function get_code(): int {
-        return 20;
-    }
-
-    public function get_transitions(): array {
-        return [];
-    }
-
-    public function get_event(): base {
+    /**
+     * When progress status of a participant section is updated
+     *
+     * @param base|participant_section_progress_updated $event
+     */
+    public static function progress_updated(base $event) {
         /** @var participant_section $participant_section */
-        $participant_section = $this->get_object();
-        return participant_section_progress_updated::create_from_participant_section($participant_section);
-    }
-
-    public function complete(): void {
-        // Already in complete state, don't do anything.
-        return;
+        $participant_section = participant_section::repository()->find_or_fail($event->objectid);
+        $participant_instance_model = participant_instance::load_by_entity($participant_section->participant_instance);
+        $participant_instance_model->update_progress_status();
     }
 }

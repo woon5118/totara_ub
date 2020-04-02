@@ -24,6 +24,7 @@
 namespace mod_perform\data_providers\activity;
 
 use core\orm\collection;
+use core\orm\entity\repository;
 use core\orm\query\builder;
 use mod_perform\entities\activity\filters\subject_instance_id;
 use mod_perform\entities\activity\participant_instance;
@@ -96,6 +97,12 @@ class subject_instance {
             ->as('si')
             ->with('subject_user')
             ->with('track.activity')
+            ->with([
+                // Only get the participant_instance for the given participant.
+                'participant_instances' => function (repository $repository) {
+                    $repository->where('participant_id', $this->participant_id);
+                }
+            ])
             ->where_exists($this->get_target_participant_exists())
             // Newest subject instances at the top of the list
             ->order_by('si.created_at', 'desc')

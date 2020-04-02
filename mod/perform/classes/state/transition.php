@@ -86,23 +86,6 @@ final class transition {
     }
 
     /**
-     * This function will return the reason strings for any failing conditions
-     * @return string[]
-     */
-    public function get_failures(): array {
-        $failures = [];
-        foreach ($this->conditions as $condition_class) {
-            /** @var condition $condition */
-            $condition = new $condition_class($this->to->get_object());
-            if (!$condition->pass()) {
-                $failures = array_merge($failures, $condition->get_failure());
-            }
-        }
-
-        return $failures;
-    }
-
-    /**
      * Get target state
      * @return state
      */

@@ -24,33 +24,44 @@
 namespace mod_perform\state\participant_section;
 
 use core\event\base;
-use mod_perform\event\participant_section_status_updated;
+use mod_perform\event\participant_section_progress_updated;
 use mod_perform\models\activity\participant_section;
-use mod_perform\state\participant_section\condition\actor_is_participant;
-use mod_perform\state\state;
 use mod_perform\state\state_event;
 use mod_perform\state\transition;
 
 defined('MOODLE_INTERNAL') || die();
 
-class incomplete extends state implements state_event {
+/**
+ * This class represents the "incomplete" progress status of a participant section.
+ *
+ * @package mod_perform
+ */
+class incomplete extends participant_section_progress implements state_event {
+
+    public function get_name(): string {
+        return 'INCOMPLETE';
+    }
 
     public static function get_code(): int {
-        return 20;
+        return 10;
     }
 
     public function get_transitions(): array {
         return [
             // The participant has completed a section.
-            transition::to(new complete($this->object))->with_conditions([
-                actor_is_participant::class
-            ]),
+            transition::to(new complete($this->object)),
         ];
     }
 
     public function get_event(): base {
         /** @var participant_section $participant_section */
         $participant_section = $this->get_object();
-        return participant_section_status_updated::create_from_participant_section($participant_section);
+        return participant_section_progress_updated::create_from_participant_section($participant_section);
+    }
+
+    public function complete(): void {
+        if ($this->can_switch(complete::class)) {
+            $this->object->switch_state(complete::class);
+        }
     }
 }

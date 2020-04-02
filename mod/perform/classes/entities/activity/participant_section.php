@@ -33,7 +33,7 @@ use core\orm\entity\relations\has_many_through;
  *
  * @property int $section_id ID of activity section
  * @property int $participant_instance_id ID of participant instance
- * @property int $status
+ * @property int $progress
  * @property int $created_at
  * @property int $updated_at
  *

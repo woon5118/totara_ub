@@ -25,6 +25,11 @@ namespace mod_perform\state;
 
 use moodle_exception;
 
+/**
+ * Exception that is thrown when an invalid state switch is attempted.
+ *
+ * @package mod_perform
+ */
 class invalid_state_switch_exception extends moodle_exception {
 
     public function __construct(string $from_state, string $target_state) {

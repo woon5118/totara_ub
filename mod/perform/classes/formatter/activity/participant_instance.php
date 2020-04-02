@@ -21,40 +21,21 @@
  * @package mod_perform
  */
 
-namespace mod_perform\state\participant_section;
+namespace mod_perform\formatter\activity;
 
-use mod_perform\state\transition;
-
-defined('MOODLE_INTERNAL') || die();
+use core\orm\formatter\entity_model_formatter;
 
 /**
- * This class represents the "not_started" progress status of a participant section.
+ * Class participant_instance
  *
- * @package mod_perform
+ * @package mod_perform\formatter\activity
  */
-class not_started extends participant_section_progress {
+class participant_instance extends entity_model_formatter {
 
-    public function get_name(): string {
-        return 'NOT_STARTED';
-    }
-
-    public static function get_code(): int {
-        return 0;
-    }
-
-    public function get_transitions(): array {
+    protected function get_map(): array {
         return [
-            // The participant has saved a draft.
-            transition::to(new incomplete($this->object)),
-
-            // The participant has completed a section.
-            transition::to(new complete($this->object)),
+            'id' => null,
+            'progress_status' => null,
         ];
-    }
-
-    public function complete(): void {
-        if ($this->can_switch(complete::class)) {
-            $this->object->switch_state(complete::class);
-        }
     }
 }

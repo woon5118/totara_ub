@@ -21,40 +21,28 @@
  * @package mod_perform
  */
 
-namespace mod_perform\state\participant_section;
+namespace mod_perform\state\participant_instance\condition;
 
-use mod_perform\state\transition;
+use mod_perform\entities\activity\participant_section;
+use mod_perform\state\condition;
+use mod_perform\state\participant_section\complete;
+use mod_perform\state\participant_section\incomplete;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This class represents the "not_started" progress status of a participant section.
- *
- * @package mod_perform
+ * Class all_sections_complete
  */
-class not_started extends participant_section_progress {
+class at_least_one_section_started extends condition {
 
-    public function get_name(): string {
-        return 'NOT_STARTED';
-    }
-
-    public static function get_code(): int {
-        return 0;
-    }
-
-    public function get_transitions(): array {
-        return [
-            // The participant has saved a draft.
-            transition::to(new incomplete($this->object)),
-
-            // The participant has completed a section.
-            transition::to(new complete($this->object)),
-        ];
-    }
-
-    public function complete(): void {
-        if ($this->can_switch(complete::class)) {
-            $this->object->switch_state(complete::class);
+    public function pass(): bool {
+        /** @var participant_section[] $sections */
+        $sections = $this->object->participant_sections->all();
+        foreach ($sections as $section) {
+            if (in_array((int)$section->progress, [incomplete::get_code(), complete::get_code()], true)) {
+                return true;
+            }
         }
+        return false;
     }
 }

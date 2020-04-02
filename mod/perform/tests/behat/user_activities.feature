@@ -17,8 +17,8 @@ Feature: Viewing and responding to perform activities
     Given I log in as "john"
     When I navigate to the outstanding perform activities list page
     Then I should see the tui datatable contains:
-      | Activity title                | Status      |
-      | John is participating subject | In progress |
+      | Activity title                | Your progress   | Overall activity progress |
+      | John is participating subject | Not yet started | In progress               |
 
     When I click on "John is participating subject" "link"
     Then I should see "John is participating subject" in the ".tui-performUserActivity h2" "css_element"
@@ -40,13 +40,18 @@ Feature: Viewing and responding to perform activities
     Then I should see "Activity responses saved" in the tui "success" notification toast
     And I should see "Question two" has no validation errors
 
+    When I navigate to the outstanding perform activities list page
+    Then I should see the tui datatable contains:
+      | Activity title                | Your progress | Overall activity progress |
+      | John is participating subject | Complete      | In progress               |
+
   Scenario: Can view and and respond to activities I'm a participant in but are not about me
     Given I log in as "admin"
     When I navigate to the outstanding perform activities list page
-    When I click on "Activities about others" "link"
+    And I click on "Activities about others" "link"
     Then I should see the tui datatable contains:
-      | Activity title   | User      | Status      |
-      | David is subject | David Two | In progress |
+      | Activity title   | User      | Your progress   | Overall activity progress |
+      | David is subject | David Two | Not yet started | In progress               |
 
     When I click on "David is subject" "link"
     Then I should see "David is subject" in the ".tui-performUserActivity h2" "css_element"
@@ -61,6 +66,12 @@ Feature: Viewing and responding to perform activities
     Then I should see "Activity responses saved" in the tui "success" notification toast
     And I should see "Question one" has no validation errors
     And I should see "Question two" has no validation errors
+
+    When I navigate to the outstanding perform activities list page
+    And I click on "Activities about others" "link"
+    Then I should see the tui datatable contains:
+      | Activity title   | User      | Your progress | Overall activity progress |
+      | David is subject | David Two | Complete      | In progress               |
 
   Scenario: I can't visit activities that don't exist
     Given I log in as "john"

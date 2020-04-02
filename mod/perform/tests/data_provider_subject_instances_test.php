@@ -23,6 +23,7 @@
 
 use mod_perform\data_providers\activity\subject_instance;
 use mod_perform\entities\activity\filters\subject_instances_about;
+use mod_perform\entities\activity\participant_instance;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 
 require_once(__DIR__ . '/subject_instance_testcase.php');
@@ -112,4 +113,31 @@ class mod_perform_data_provider_subject_instances_testcase extends mod_perform_s
         ); // 538001
     }
 
+    /**
+     * Check that the result only includes the one participant section for the relevant participant.
+     */
+    public function test_attaches_only_relevant_participant_instance(): void {
+        $returned_subject_instances = (new subject_instance(self::$user->id))
+            ->set_about_filter([subject_instances_about::VALUE_ABOUT_SELF])
+            ->fetch()
+            ->get();
+
+        $this->assertCount(1, $returned_subject_instances);
+
+        /** @var subject_instance_model $returned_subject_instance */
+        $returned_subject_instance = $returned_subject_instances->first();
+
+        // Verify that there are two participant_instances for this subject_instance.
+        $participant_instances = participant_instance::repository()
+            ->where('subject_instance_id', $returned_subject_instance->get_id())
+            ->get();
+        $this->assertCount(2, $participant_instances);
+
+        // Verify that only the participant_instance for the subject user is in the result.
+        $subject_participant_instances = $participant_instances->filter('participant_id', self::$user->id);
+        $returned_participant_instances = $returned_subject_instance->get_participant_instances();
+        $this->assertCount(1, $subject_participant_instances);
+        $this->assertCount(1, $returned_participant_instances);
+        $this->assertSame($subject_participant_instances->first()->id, $returned_participant_instances->first()->get_id());
+    }
 }

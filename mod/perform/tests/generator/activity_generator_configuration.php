@@ -36,6 +36,13 @@ class mod_perform_activity_generator_configuration {
     private $number_of_activities = 1;
 
     /**
+     * The number of sections per activity that should be created
+     *
+     * @var int
+     */
+    private $number_of_sections_per_activity = 1;
+
+    /**
      * The number of assignments per activity
      *
      * @var int
@@ -84,6 +91,24 @@ class mod_perform_activity_generator_configuration {
 
         return $this;
     }
+
+    /**
+     * @return int
+     */
+    public function get_number_of_sections_per_activity(): int {
+        return $this->number_of_sections_per_activity;
+    }
+
+    /**
+     * @param int $number
+     * @return $this
+     */
+    public function set_number_of_sections_per_activity(int $number): self {
+        $this->number_of_sections_per_activity = $number;
+
+        return $this;
+    }
+
 
     /**
      * @return int

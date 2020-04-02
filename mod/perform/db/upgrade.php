@@ -808,6 +808,26 @@ function xmldb_perform_upgrade($oldversion) {
         if (!$dbman->key_exists($table, $new_key)) {
             $dbman->add_key($table, $new_key);
         }
+        upgrade_mod_savepoint(true, 2020040701, 'perform');
+    }
+
+    if ($oldversion < 2020040800) {
+        // Rename field status on table perform_participant_section to progress.
+        $table = new xmldb_table('perform_participant_section');
+        $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'participant_instance_id');
+
+        // Launch rename field status.
+        $dbman->rename_field($table, $field, 'progress');
+
+        // Rename field status on table perform_participant_instance to progress.
+        $table = new xmldb_table('perform_participant_instance');
+        $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'subject_instance_id');
+
+        // Launch rename field status.
+        $dbman->rename_field($table, $field, 'progress');
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020040800, 'perform');
     }
 
     return true;

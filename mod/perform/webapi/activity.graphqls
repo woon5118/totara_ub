@@ -90,13 +90,22 @@ type mod_perform_validation_error {
 }
 
 """
-Details about perform activity that a user is involved with (either the subject or an answering pariticpent)
+Details about perform activity that a user is involved with (either the subject or an answering participant)
 """
 type mod_perform_subject_instance {
   id: core_id!
   activity: mod_perform_activity!
   status: mod_perform_subject_instance_status!
   subject_user: core_user!
+  participant_instances: [mod_perform_participant_instance!]!
+}
+
+"""
+Details about a participant_instance
+"""
+type mod_perform_participant_instance {
+  id: core_id!
+  progress_status: mod_perform_participant_instance_status!
 }
 
 """
@@ -108,12 +117,21 @@ enum mod_perform_activity_status {
 }
 
 """
-A list of possible states that a user activity/participant instance can be in
+A list of possible states that a subject instance can be in
 """
 enum mod_perform_subject_instance_status {
-  NOT_YET_STARTED
+  NOT_STARTED
   IN_PROGRESS
-  COMPLETED
+  COMPLETE
+}
+
+"""
+A list of possible states that a participant instance can be in
+"""
+enum mod_perform_participant_instance_status {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETE
 }
 
 input update_section_relationships_input {

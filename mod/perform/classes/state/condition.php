@@ -26,7 +26,7 @@ namespace mod_perform\state;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Abstract Condition.
+ * Abstract class representing a condition that can be applied to state transitions.
  */
 abstract class condition {
     /**
@@ -42,18 +42,9 @@ abstract class condition {
         $this->object = $object;
     }
 
-
     /**
      * Is condition passing
      * @return bool
      */
     abstract public function pass(): bool;
-
-    /**
-     * Return explanations why condition has not passed
-     * @return string[]
-     */
-    public function get_failure(): array {
-        return [];
-    }
 }

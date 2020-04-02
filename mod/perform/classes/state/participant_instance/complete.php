@@ -21,21 +21,24 @@
  * @package mod_perform
  */
 
-namespace mod_perform\state\participant_section;
+namespace mod_perform\state\participant_instance;
 
 use core\event\base;
-use mod_perform\event\participant_section_progress_updated;
-use mod_perform\models\activity\participant_section;
+use mod_perform\event\participant_instance_progress_updated;
+use mod_perform\models\activity\participant_instance;
+use mod_perform\state\participant_instance\condition\not_all_sections_complete;
+use mod_perform\state\state;
 use mod_perform\state\state_event;
+use mod_perform\state\transition;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This class represents the "complete" progress status of a participant section.
+ * This class represents the "complete" progress status of a participant instance.
  *
  * @package mod_perform
  */
-class complete extends participant_section_progress implements state_event {
+class complete extends state implements state_event {
 
     public function get_name(): string {
         return 'COMPLETE';
@@ -46,17 +49,23 @@ class complete extends participant_section_progress implements state_event {
     }
 
     public function get_transitions(): array {
-        return [];
+        return [
+            transition::to(new in_progress($this->object))->with_conditions([
+                not_all_sections_complete::class,
+            ]),
+        ];
+    }
+
+    public function update_progress(): void {
+        // May transition back to in_progress if another section was added.
+        if ($this->can_switch(in_progress::class)) {
+            $this->object->switch_state(in_progress::class);
+        }
     }
 
     public function get_event(): base {
-        /** @var participant_section $participant_section */
-        $participant_section = $this->get_object();
-        return participant_section_progress_updated::create_from_participant_section($participant_section);
-    }
-
-    public function complete(): void {
-        // Already in complete state, don't do anything.
-        return;
+        /** @var participant_instance $participant_instance */
+        $participant_instance = $this->get_object();
+        return participant_instance_progress_updated::create_from_participant_instance($participant_instance);
     }
 }

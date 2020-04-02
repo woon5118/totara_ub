@@ -24,12 +24,12 @@
 
 namespace mod_perform\state;
 
-use moodle_exception;
-
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This class is responsible for definition of all state transitions.
+ * Base class for all states.
+ *
+ * This is responsible for definition of all state transitions and other operations that depend on an object's state.
  */
 abstract class state {
     /**
@@ -38,13 +38,13 @@ abstract class state {
     protected $object = null;
 
     /**
-     * Get conditions and validations of transitions from current state
+     * Get possible transitions with conditions from current state.
      * @return transition[]
      */
     abstract public function get_transitions(): array;
 
     /**
-     * Code of status as it is stored in DB
+     * Code of status as it is stored in DB.
      * Status codes must be unique within one object type.
      *
      * @return int
@@ -52,16 +52,23 @@ abstract class state {
     abstract public static function get_code(): int;
 
     /**
+     * Get internal state name.
+     *
+     * @return string
+     */
+    abstract public function get_name(): string;
+
+    /**
      * state constructor.
      *
-     * @param object $object Object which this state belongs to
+     * @param object $object Object that this state belongs to.
      */
     public function __construct(object $object) {
         $this->object = $object;
     }
 
     /**
-     * Get the object which this state belongs to.
+     * Get the object that this state belongs to.
      *
      * @return object
      */
@@ -103,7 +110,7 @@ abstract class state {
 
     /**
      * This is called when the object has switched to the current state.
-     * Can be used if triggering an event is not necessary.
+     * Can be used if triggering an event seems unnecessary.
      *
      * @return void
      */

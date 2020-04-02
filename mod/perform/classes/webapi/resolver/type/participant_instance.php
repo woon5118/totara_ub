@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Nathan Lewis <nathan.lewis@totaralearning.com>
+ * @author Matthias Bonk <matthias.bonk@totaralearning.com>
  * @package mod_perform
  */
 
@@ -26,26 +26,26 @@ namespace mod_perform\webapi\resolver\type;
 use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use mod_perform\formatter\activity\participant_section as participant_section_formatter;
-use mod_perform\models\activity\participant_section as participant_section_model;
+use mod_perform\formatter\activity\participant_instance as participant_instance_formatter;
+use mod_perform\models\activity\participant_instance as participant_instance_model;
 
-class participant_section implements type_resolver {
+class participant_instance implements type_resolver {
 
     /**
      * @param string $field
-     * @param participant_section_model $participant_section
+     * @param participant_instance_model $participant_instance
      * @param array $args
      * @param execution_context $ec
      *
      * @return mixed
      */
-    public static function resolve(string $field, $participant_section, array $args, execution_context $ec) {
-        if (!$participant_section instanceof participant_section_model) {
-            throw new \coding_exception('Expected participant_section model');
+    public static function resolve(string $field, $participant_instance, array $args, execution_context $ec) {
+        if (!$participant_instance instanceof participant_instance_model) {
+            throw new \coding_exception('Expected participant_instance model');
         }
 
         $format = $args['format'] ?? format::FORMAT_HTML;
-        $formatter = new participant_section_formatter($participant_section, $ec->get_relevant_context());
+        $formatter = new participant_instance_formatter($participant_instance, $participant_instance->get_context());
         return $formatter->format($field, $format);
     }
 }

@@ -143,7 +143,7 @@ class mod_perform_generator extends component_generator_base {
         $participant_section =  new participant_section_entity();
         $participant_section->section_id = $section->id;
         $participant_section->participant_instance_id = $participant_instance->id;
-        $participant_section->status = not_started::get_code();
+        $participant_section->progress = not_started::get_code();
         $participant_section->save();
 
         if ($add_elements) {
@@ -346,8 +346,10 @@ class mod_perform_generator extends component_generator_base {
             ];
 
             $activity = $this->create_activity_in_container($data);
-            $section = $this->create_section($activity, ['title' => $activity->name . ' section']);
-            $this->create_section_relationship($section, ['class_name' => subject::class]);
+            for ($k = 0; $k < $configuration->get_number_of_sections_per_activity(); $k++) {
+                $section = $this->create_section($activity, ['title' => $activity->name . ' section ' . $k]);
+                $this->create_section_relationship($section, ['class_name' => subject::class]);
+            }
             $this->create_activity_tracks($activity);
             $activities[] = $activity;
         }
@@ -463,7 +465,7 @@ class mod_perform_generator extends component_generator_base {
             $subjects_participant_instance->activity_relationship_id = 0; // stubbed
             $subjects_participant_instance->participant_id = $subject->id; // Answering on activity about them self
             $subjects_participant_instance->subject_instance_id = $subject_instance->id;
-            $subjects_participant_instance->status = instance_not_started::get_code();
+            $subjects_participant_instance->progress = instance_not_started::get_code();
             $subjects_participant_instance->save();
         }
 
@@ -473,7 +475,7 @@ class mod_perform_generator extends component_generator_base {
             $other_participant_instance->activity_relationship_id = 0; // stubbed
             $other_participant_instance->participant_id = $other_participant->id;
             $other_participant_instance->subject_instance_id = $subject_instance->id;
-            $other_participant_instance->status = instance_not_started::get_code();
+            $other_participant_instance->progress = instance_not_started::get_code();
             $other_participant_instance->save();
         }
 
