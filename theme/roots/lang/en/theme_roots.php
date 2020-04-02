@@ -23,7 +23,7 @@
  * @author      Joby Harding <joby.harding@totaralearning.com>
  */
 
-$string['pluginname'] = 'Roots';
+$string['pluginname'] = 'Roots (deprecated)';
 $string['choosereadme'] = 'A Bootstrap 3 base theme for Totara.';
 $string['region-bottom'] = 'Bottom';
 $string['region-main'] = 'Main';
