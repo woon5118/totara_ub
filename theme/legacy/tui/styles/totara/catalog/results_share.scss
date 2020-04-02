@@ -88,7 +88,6 @@ $catalogResultsShare-screen_xsm_min: 500px !default;
     display: none;
     padding: var(--tui-gap-4);
     position: absolute;
-    right: 0;
     width: 300px;
     z-index: 2;
 
@@ -142,19 +141,23 @@ $catalogResultsShare-screen_xsm_min: 500px !default;
   .tw-catalogResultsShare {
     /*rtl:ignore*/
     margin-right: var(--tui-gap-1);
-
-    &__expanded {
-      /*rtl:ignore*/
-      margin-left: 50%;
-      /*rtl:ignore*/
-      right: initial;
-      transform: translateX(-50%);
-    }
   }
 }
 
 @media (min-width: $tui-screen-sm) {
   .tw-catalogResultsShare {
     margin: auto 0;
+  }
+}
+
+.tw-catalogResultsShare__expanded {
+  left: auto;
+  right: 0;
+}
+
+@media (min-width: $screen_sm_min) {
+  .tw-catalogResultsShare__expanded {
+      left: 0;
+      right: auto;
   }
 }
