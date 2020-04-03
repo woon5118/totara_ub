@@ -38,7 +38,7 @@
       position: relative;
 
       // Hover animation
-      transition-property: transform, box-shadow;
+      transition-property: box-shadow;
       transition-duration: 200ms;
       transition-timing-function: ease-in-out;
 
@@ -49,14 +49,9 @@
       &:active,
       &:focus {
         box-shadow: var(--tui-shadow-1);
-        transform: scale(1.01);
         text-decoration: none;
         color: var(--tui-color-neutral-7);
-      }
-
-
-      &__title {
-        font-weight: 600;
+        position: relative; // this lifts the shadow above the image
       }
     }
   }
@@ -73,6 +68,7 @@
   & .totara_core__myreports__list {
     &__item {
       width: 100%;
+      min-width: 140px;
 
       @media (min-width: $myReports-screen-xsm-min) {
         & {
@@ -107,29 +103,26 @@
 
           img.icon {
             display: block;
-            max-width: 100%;
-            max-height: 100%;
 
-            width: auto;
-            height: 100%;
+            width: 100%;
+            height: 120px;
 
             margin: 0 auto;
           }
         }
 
         &__title {
-          padding: $myReports-spacing-small;
-          font-size: $myReports-grid-title-text-size;
+          @include totara_style-heading_x_small();
+          height: 4.6rem;
+          margin: $myReports-spacing-small;
           overflow: hidden;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-          width: 100%;
+          font-weight: 600;
         }
 
         &__description {
-          margin: $myReports-spacing-small;
+          margin: 0 $myReports-spacing-small;
           font-size: $myReports-grid-text-size;
-          height: $myReports-grid-description-height;
+          height: 8.4rem;
           overflow: hidden;
         }
       }
@@ -144,14 +137,18 @@
 .totara_core__myreports__list--table {
   & .totara_core__myreports__list {
     &__item {
+      &:first-child {
+          border-top: 1px solid var(--tui-color-neutral-5);
+      }
+      border-bottom: 1px solid var(--tui-color-neutral-5);
+
       &__content {
         display: flex;
-        height: $myReports-table-row-height;
+        height: 50px;
 
-        &:first-of-type {
-          border-top: 1px solid $myReports-table-border-color;
+        @media screen and (min-width: $myReports-screen-xsm-min) {
+          height: 70px;
         }
-        border-bottom: 1px solid $myReports-table-border-color;
 
         &__image {
           max-height: 100%;
@@ -176,12 +173,15 @@
           flex-basis: 0;
           flex-grow: 1;
           flex-shrink: 1;
-          margin: auto;
-          padding: $myReports-spacing-small;
-          font-size: $myReports-table-title-text-size;
+          margin: $myReports-table-title-text-size;
           overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
+
+          font-size: $myReports-grid-text-size;
+
+          @media screen and (min-width: $myReports-screen-xsm-min) {
+              @include totara_style-heading_x_small();
+              font-weight: 600;                    
+          }
         }
 
         &__description {
@@ -189,7 +189,7 @@
           flex-basis: 0;
           flex-grow: 1;
           flex-shrink: 1;
-          margin: $myReports-spacing-small $myReports-spacing-med;
+          margin: $myReports-spacing-small auto;
           overflow: hidden;
           font-size: $myReports-table-text-size;
         }

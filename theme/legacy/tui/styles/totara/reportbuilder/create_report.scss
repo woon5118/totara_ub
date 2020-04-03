@@ -105,7 +105,7 @@
     display: block;
 
     // Hover animation
-    transition-property: transform, box-shadow;
+    transition-property: box-shadow;
     transition-duration: $reportbuilder-transition;
     transition-timing-function: ease-in-out;
 
@@ -120,7 +120,6 @@
     &:focus,
     .tw-grid__item_active & {
       box-shadow: var(--tui-shadow-1);
-      transform: scale(1.01);
     }
 
     &_title {
@@ -156,8 +155,8 @@
   .totara_reportbuilder__createreport_label {
     &--primary {
       position: absolute; // Sit over the top of the image
-      left: 0.7em;
-      top: 0.5em;
+      left: var(--tui-gap-2);
+      top: var(--tui-gap-2);
     }
 
     &--container {
@@ -169,14 +168,11 @@
 
     &_item {
       border: 1px solid var(--tui-color-border);
-      display: flex;
-      flex-direction: column;
-      max-height: $reportbuilder-create-grid-height;
-      min-height: $reportbuilder-create-grid-height / 2;
+      min-width: 140px;
 
       &_info {
         flex: 1 1 auto;
-        padding: 0 0.5em 0.7em;
+        padding: 0 var(--tui-gap-2) var(--tui-gap-2);
       }
 
       &_image {
@@ -199,14 +195,11 @@
       }
 
       &_title {
-        padding: var(--tui-gap-1);
-        font-size: var(--tui-font-size-15);
-
+        @include totara_style-heading_x_small();
+        
+        height: 5.55rem;
         overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-
-        flex: 0 0 auto;
+        padding: var(--tui-gap-2);
       }
     }
   }
@@ -219,8 +212,13 @@
   // Override width from grid css
   .tw-grid__item {
     flex-basis: 100%;
-    padding-top: 0;
-    padding-bottom: 0;
+    margin: 0 var(--tui-gap-2);
+    padding: 0;
+    border-bottom: 1px solid var(--tui-color-neutral-5);
+
+    &:first-child {
+      border-top: 1px solid var(--tui-color-neutral-5);
+    }
   }
 
   .totara_reportbuilder__createreport_label {
@@ -247,10 +245,12 @@
   & .totara_reportbuilder__createreport_list {
     &_item {
       box-sizing: content-box;
-      height: $reportbuilder-create-table-height;
+      height: 50px;
       clear: both;
 
-      border-bottom: 1px solid var(--tui-color-border);
+      @media screen and (min-width: $myReports-screen-xsm-min) {
+        height: 70px;
+      }
 
       &_image {
         max-height: 100%;
@@ -271,14 +271,23 @@
         }
       }
 
-      &_title {
-        padding: var(--tui-gap-2);
-        font-size: var(--tui-font-size-15);
+      &:hover,
+      &:focus,
+      .tw-grid__item_active & {
+          position: relative; // lift the image above the shadow
+      }
 
+      &_title {
+        @include totara_style-heading_x_small();
+
+        padding: 0 var(--tui-gap-2) var(--tui-gap-2);
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
 
+        @media screen and (min-width: $myReports-screen-xsm-min) {
+          padding: var(--tui-gap-2);
+        }
       }
     }
   }
