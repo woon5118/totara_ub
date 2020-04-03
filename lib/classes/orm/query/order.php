@@ -34,10 +34,13 @@ namespace core\orm\query;
  */
 final class order extends field {
 
+    const DIRECTION_ASC = 'ASC';
+    const DIRECTION_DESC = 'DESC';
+
     /**
      * @var string
      */
-    protected $direction = 'asc';
+    protected $direction = self::DIRECTION_ASC;
 
     /**
      * order constructor.
@@ -46,7 +49,7 @@ final class order extends field {
      * @param string $direction What order direction should be: desc or asc
      * @param builder|null $builder
      */
-    public function __construct($field, string $direction = 'asc', ?builder $builder = null) {
+    public function __construct($field, string $direction = self::DIRECTION_ASC, ?builder $builder = null) {
 
         if ($field instanceof raw_field) {
             if (is_null($builder)) {
@@ -73,7 +76,7 @@ final class order extends field {
      * @return $this
      */
     public function set_direction(string $direction) {
-        $this->direction = (strtolower($direction) === 'asc') ? 'ASC' : 'DESC';
+        $this->direction = (strtolower($direction) === 'asc') ? self::DIRECTION_ASC : self::DIRECTION_DESC;
 
         return $this;
     }

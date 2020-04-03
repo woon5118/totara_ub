@@ -422,7 +422,7 @@ interface interacts_with_query {
      * @param string $direction Order direction: ASC or DESC
      * @return $this
      */
-    public function order_by($column, string $direction = 'asc');
+    public function order_by($column, string $direction = order::DIRECTION_ASC);
 
     /**
      * Add order by raw field to the SQL query

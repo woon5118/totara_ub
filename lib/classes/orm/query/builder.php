@@ -759,7 +759,7 @@ final class builder extends builder_base implements interacts_with_query, intera
      * @param string $direction Order direction: ASC or DESC
      * @return $this
      */
-    public function order_by($column, string $direction = 'asc') {
+    public function order_by($column, string $direction = order::DIRECTION_ASC) {
 
         switch (true) {
             case is_null($column):
@@ -830,6 +830,13 @@ final class builder extends builder_base implements interacts_with_query, intera
      */
     public function has_order_by(): bool {
         return !empty($this->properties->orders);
+    }
+
+    /**
+     * @return array|order[]
+     */
+    public function get_orders(): array {
+        return $this->properties->orders;
     }
 
     /**
