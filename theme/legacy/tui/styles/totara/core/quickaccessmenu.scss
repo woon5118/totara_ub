@@ -190,6 +190,10 @@
       float: right;
       font-size: var(--tui-font-size-12);
     }
+
+    &-last {
+      margin-right: var(--tui-gap-2);
+    }
   }
 
   // When there are no groups within the menu
