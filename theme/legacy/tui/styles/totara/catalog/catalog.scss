@@ -33,7 +33,6 @@ $catalog-screen_xsm_min: 500px !default;
 .tw-catalog {
   clear: both;
   position: relative;
-  z-index: 1;
 
   &__aside {
     @include make-xs-column(12, 0);
