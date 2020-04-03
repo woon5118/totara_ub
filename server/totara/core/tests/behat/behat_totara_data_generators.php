@@ -319,6 +319,14 @@ class behat_totara_data_generators extends behat_base {
                 'datagenerator' => 'learning_plan_pathway_for_behat',
                 'required' => array('competency')
             ),
+            'learning plan with competency value' => array(
+                'datagenerator' => 'learning_plan_with_competency_value_for_behat',
+                'required' => array('competency', 'plan', 'scale_value')
+            ),
+            'linked courses' => array(
+                'datagenerator' => 'linked_course_for_behat',
+                'required' => array('competency', 'course')
+            ),
             'manual pathways' => array(
                 'datagenerator' => 'manual_pathway_for_behat',
                 'required' => array('competency', 'roles')
@@ -344,6 +352,10 @@ class behat_totara_data_generators extends behat_base {
             'onactivate' => array(
                 'datagenerator' => 'onactivate',
                 'required' => array('idnumber', 'competency')
+            ),
+            'othercompetency' => array(
+                'datagenerator' => 'othercompetency',
+                'required' => array('idnumber', 'competency', 'number_required', 'competencies')
             ),
         ),
         'totara_evidence' => array(

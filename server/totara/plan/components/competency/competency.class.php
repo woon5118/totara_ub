@@ -1182,6 +1182,14 @@ class dp_competency_component extends dp_base_component {
         }
     }
 
+    /**
+     * Set the value for a competency and user.
+     *
+     * @param int $competency_id Competency ID
+     * @param int $subject_id Subject User ID
+     * @param int $scale_value_id Scale Value ID
+     * @param object $details
+     */
     public function set_value($competency_id, $subject_id, $scale_value_id, $details) {
         global $DB;
 
@@ -1208,7 +1216,7 @@ class dp_competency_component extends dp_base_component {
         }
 
         $record->scale_value_id = $scale_value_id;
-        $record->date_assigned = time();
+        $record->date_assigned = $details->date_assigned ?? time();
 
         // Below are details that learning plans used to save a value directly.
         $record->positionid = $details->positionid ?? null;

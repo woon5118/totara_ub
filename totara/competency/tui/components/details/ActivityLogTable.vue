@@ -85,22 +85,7 @@
         size="3"
         :column-header="$str('proficiency_status', 'totara_competency')"
       >
-        <span
-          class="tui-competencyDetailActivityLog__proficient"
-          :class="{
-            'tui-competencyDetailActivityLog__proficient-srOnly': !row.proficient_status,
-          }"
-        >
-          <ProficientIcon v-if="row.proficient_status" size="200" />
-          <span>
-            {{
-              $str(
-                row.proficient_status ? 'proficient' : 'not_proficient',
-                'totara_competency'
-              )
-            }}
-          </span>
-        </span>
+        <ProficientStatus :proficient-status="row.proficient_status" />
       </Cell>
 
       <!-- Assignment column -->
@@ -118,7 +103,7 @@ import AddUserIcon from 'totara_core/components/icons/common/AddUser';
 import Cell from 'totara_core/components/datatable/Cell';
 import HeaderCell from 'totara_core/components/datatable/HeaderCell';
 import Popover from 'totara_core/components/popover/Popover';
-import ProficientIcon from 'totara_core/components/icons/common/CheckSuccess';
+import ProficientStatus from 'totara_competency/components/details/ProficientStatus';
 import RemoveUserIcon from 'totara_core/components/icons/common/RemoveUser';
 import Table from 'totara_core/components/datatable/Table';
 
@@ -128,7 +113,7 @@ export default {
     Cell,
     HeaderCell,
     Popover,
-    ProficientIcon,
+    ProficientStatus,
     RemoveUserIcon,
     Table,
   },
@@ -158,9 +143,7 @@ export default {
     "totara_competency": [
       "assignment",
       "proficiency_status",
-      "progress_name_by_user",
-      "not_proficient",
-      "proficient"
+      "progress_name_by_user"
     ]
   }
 </lang-strings>

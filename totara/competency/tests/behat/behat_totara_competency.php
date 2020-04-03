@@ -195,7 +195,7 @@ class behat_totara_competency extends behat_base {
         }
 
         /** @var user $user_entity */
-        $user_entity = user::repository()->where('name', $user)->get()->first();
+        $user_entity = user::repository()->where('username', $user)->get()->first();
 
         return $user_entity->id;
     }

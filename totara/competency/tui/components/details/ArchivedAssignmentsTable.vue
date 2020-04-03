@@ -30,7 +30,7 @@
         {{ $str('assignment_date_archived', 'totara_competency') }}
       </HeaderCell>
       <HeaderCell size="3">
-        {{ $str('proficient', 'totara_competency') }}
+        {{ $str('proficiency_status', 'totara_competency') }}
       </HeaderCell>
     </template>
     <template v-slot:row="{ row, expand }">
@@ -48,9 +48,12 @@
       </Cell>
 
       <!-- Proficiency status column -->
-      <Cell size="3" :column-header="$str('proficient', 'totara_competency')">
+      <Cell
+        size="3"
+        :column-header="$str('proficiency_status', 'totara_competency')"
+      >
         <div class="tui-competencyDetailArchivedAssignments__achievement">
-          {{ row.proficient }}
+          <ProficientStatus :proficient-status="row.proficient" />
           <InfoIconButton
             v-if="row.legacy"
             :aria-label="$str('more_information', 'totara_competency')"
@@ -77,6 +80,7 @@
 import Cell from 'totara_core/components/datatable/Cell';
 import HeaderCell from 'totara_core/components/datatable/HeaderCell';
 import InfoIconButton from 'totara_core/components/buttons/InfoIconButton';
+import ProficientStatus from 'totara_competency/components/details/ProficientStatus';
 import Table from 'totara_core/components/datatable/Table';
 
 export default {
@@ -84,6 +88,7 @@ export default {
     Cell,
     HeaderCell,
     InfoIconButton,
+    ProficientStatus,
     Table,
   },
   props: {
@@ -99,10 +104,10 @@ export default {
     "totara_competency": [
       "assignment",
       "assignment_date_archived",
-      "proficient",
-      "legacy_assignment_rating_discontinued",
       "legacy_assignment_rating_description",
-      "more_information"
+      "legacy_assignment_rating_discontinued",
+      "more_information",
+      "proficiency_status"
     ]
   }
 </lang-strings>

@@ -78,6 +78,11 @@ class totara_competency_generator extends component_generator_base {
      */
     protected $hierarchy_generator;
 
+    /**
+     * @var totara_plan_generator
+     */
+    protected $plan_generator;
+
     /**************************************************************************
      * Basic competency creation
      **************************************************************************/
@@ -413,41 +418,68 @@ class totara_competency_generator extends component_generator_base {
     }
 
     /**
-     * Create a learning plan with competencies assigned.
+     * Create a learning plan.
      *
      * @param stdClass|int $for_user User the learning plan is for
-     * @param array $competencies Array of [Competency ID => Scale Value ID]
-     * @param bool $completed Mark the plan as completed?
-     * @param string|null $plan_name Give the learning plan a specific name
+     * @param array $record Learning plan record data
      *
      * @return development_plan
      */
-    public function create_learning_plan_with_competencies($for_user, $competencies,
-                                                           bool $completed = false, string $plan_name = null): development_plan {
-        global $CFG;
-        require_once($CFG->dirroot . '/totara/plan/components/competency/competency.class.php');
-
+    protected function create_learning_plan($for_user, array $record = []): development_plan {
         if (!is_numeric($for_user)) {
             $for_user = $for_user->id;
         }
 
-        /** @var totara_plan_generator $plan_generator */
-        $plan_generator = $this->datagenerator->get_plugin_generator('totara_plan');
-        $plan = $plan_generator->create_learning_plan(['userid' => $for_user, 'name' => $plan_name]);
+        $completed = $record['completed'] ?? false;
+        unset($record['completed']);
+
+        $plan = $this->plan_generator()->create_learning_plan(array_merge($record, ['userid' => $for_user]));
 
         $plan = new development_plan($plan->id);
 
-        foreach ($competencies as $competency => $scale_value) {
-            $plan_generator->add_learning_plan_competency($plan->id, $competency);
-
-            if (!is_null($scale_value)) {
-                (new dp_competency_component($plan))
-                    ->set_value($competency, $for_user, $scale_value, (object)['manual' => true]);
-            }
-        }
-
         if ($completed) {
             $plan->set_status(DP_PLAN_STATUS_COMPLETE);
+        }
+
+        return $plan;
+    }
+
+    /**
+     * Add a competency with rating to a learning plan.
+     *
+     * @param development_plan $plan
+     * @param int $competency_id
+     * @param int $scale_value_id
+     * @param int $date_assigned
+     */
+    protected function add_learning_plan_competency(development_plan $plan, int $competency_id,
+                                                    int $scale_value_id = null, int $date_assigned = null): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/plan/components/competency/competency.class.php');
+
+        $this->plan_generator()->add_learning_plan_competency($plan->id, $competency_id);
+
+        if (isset($scale_value_id)) {
+            $plan_competency = new dp_competency_component($plan);
+            $details = (object) ['manual' => true, 'date_assigned' => $date_assigned];
+            $plan_competency->set_value($competency_id, $plan->userid, $scale_value_id, $details);
+        }
+    }
+
+    /**
+     * Create a learning plan with competencies assigned.
+     *
+     * @param stdClass|int $for_user User the learning plan is for
+     * @param array $competencies Array of [Competency ID => Scale Value ID]
+     * @param array $record Learning plan record data
+     *
+     * @return development_plan
+     */
+    public function create_learning_plan_with_competencies($for_user, array $competencies, array $record = []): development_plan {
+        $plan = $this->create_learning_plan($for_user, $record);
+
+        foreach ($competencies as $competency => $scale_value) {
+            $this->add_learning_plan_competency($plan, $competency, $scale_value);
         }
 
         return $plan;
@@ -505,6 +537,20 @@ class totara_competency_generator extends component_generator_base {
     /**
      * @param array $attributes
      */
+    public function create_learning_plan_with_competency_value_for_behat(array $attributes = []) {
+        $plan_id = self::get_record_id_from_field('dp_plan', 'name', $attributes['plan']);
+        $competency_id = self::get_record_id_from_field(competency::TABLE, 'idnumber', $attributes['competency']);
+        $scale_value_id = $attributes['scale_value'] ?
+            self::get_record_id_from_field(scale_value::TABLE, 'idnumber', $attributes['scale_value']) :
+            null;
+        $date_assigned = isset($attributes['date']) ? strtotime($attributes['date']) : null;
+
+        $this->add_learning_plan_competency(new development_plan($plan_id), $competency_id, $scale_value_id, $date_assigned);
+    }
+
+    /**
+     * @param array $attributes
+     */
     public function create_manual_pathway_for_behat(array $attributes = []) {
         $this->create_manual(
             self::get_record_id_from_field(competency::TABLE, 'idnumber', $attributes['competency']),
@@ -537,6 +583,22 @@ class totara_competency_generator extends component_generator_base {
             self::get_record_id_from_field(user::TABLE, 'username', $attributes['user']),
             $attributes['status'] ?? null
         );
+    }
+
+    /**
+     * @param array $attributes
+     */
+    public function create_linked_course_for_behat(array $attributes = []) {
+        global $DB, $USER;
+        $DB->insert_record('comp_criteria', [
+            'competencyid' => self::get_record_id_from_field(competency::TABLE, 'idnumber', $attributes['competency']),
+            'itemtype' => 'coursecompletion',
+            'iteminstance' => self::get_record_id_from_field(course::TABLE, 'shortname', $attributes['course']),
+            'timecreated' => time(),
+            'timemodified' => time(),
+            'usermodified' => $USER ? $USER->id : get_admin()->id,
+            'linktype' => (bool) ($attributes['mandatory'] ?? 0),
+        ]);
     }
 
 
@@ -601,6 +663,19 @@ class totara_competency_generator extends component_generator_base {
         }
 
         return $this->hierarchy_generator;
+    }
+
+    /**
+     * Get the generator used for learning plans.
+     *
+     * @return totara_plan_generator|component_generator_base
+     */
+    public function plan_generator(): totara_plan_generator {
+        if (is_null($this->plan_generator)) {
+            $this->plan_generator = $this->datagenerator->get_plugin_generator('totara_plan');
+        }
+
+        return $this->plan_generator;
     }
 
     /**

@@ -103,9 +103,9 @@ Feature: Test competencies can be user assigned
 
 
     Then I click on "Assign competencies" "button"
-    And I should see "You have selected 2 competencies to assign" in the tui confirmation modal
+    And I should see "You have selected 2 competencies to assign" in the tui modal
 
-    When I click on "OK" "button"
+    When I confirm the tui confirmation modal
     Then I should be on my competency profile
 
     When I change the competency profile to list view
