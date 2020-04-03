@@ -365,7 +365,7 @@ abstract class module {
      */
     protected function do_update(\stdClass $data, $mform = null): void {
         if (property_exists($data, 'groupmode')) {
-           $this->entity->groupmode = $data->groupmode;
+            $this->entity->groupmode = $data->groupmode;
         }
 
         if (isset($data->groupingid)) {
