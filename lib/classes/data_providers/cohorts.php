@@ -26,11 +26,11 @@ namespace core\data_providers;
 use context;
 use context_system;
 use coding_exception;
+use core\orm\pagination\cursor_paginator;
+use core\pagination\cursor;
 use moodle_exception;
 use core\entities\cohort;
 use core\entities\cohort_filters;
-use core\orm\cursor;
-use core\orm\cursor_paginator;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -204,7 +204,7 @@ class cohorts {
             ->order_by($this->order_by, $this->order_direction);
 
         $pages = $cursor ? $cursor : cursor::create()->set_limit($this->page_size);
-        $paginator = new cursor_paginator($repository, $pages);
+        $paginator = new cursor_paginator($repository, $pages, true);
 
         return $paginator->get();
     }

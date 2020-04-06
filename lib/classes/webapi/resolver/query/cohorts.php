@@ -28,7 +28,7 @@ use context_system;
 use context_tenant;
 use coding_exception;
 use cohort;
-use core\orm\cursor;
+use core\pagination\cursor;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use core\data_providers\cohorts as cohorts_provider;

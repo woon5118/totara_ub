@@ -1,0 +1,7 @@
+"""
+Represents a paginaeble result returning a next cursor containing the information needed to load the next page
+"""
+interface core_pageable_result {
+  total: Int
+  next_cursor: String
+}

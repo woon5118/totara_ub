@@ -25,7 +25,7 @@
 use core\collection;
 use core\data_providers\cohorts;
 use core\entities\cohort as cohort_entity;
-use core\orm\cursor;
+use core\pagination\cursor;
 
 // Needed for the cohort type enums.
 global $CFG;
