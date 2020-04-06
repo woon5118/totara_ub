@@ -298,13 +298,10 @@ function totara_search_for_value($arraytosearch, $property, $operator, $searchva
  *
  * @param integer $timestamp Describes the time in a timestamp.
  * @param integer $compare_to Describes what time the comparison should be made against.
- * @param boolean $return_date Return a date rather that a years relative time.
+ * @param boolean $return_date Return a date rather than a relative time.
  * @return string Natural language string describing the time difference.
  */
-function totara_core_get_relative_time_text ($timestamp, $compare_to = null, $return_date = false) {
-
-    $relative_time = '';
-
+function totara_core_get_relative_time_text($timestamp, $compare_to = null, $return_date = false) {
     if (!$timestamp) {
         return '';
     }
@@ -330,7 +327,10 @@ function totara_core_get_relative_time_text ($timestamp, $compare_to = null, $re
         $days = floor(($compare_to - $timestamp) / DAYSECS);
         $relative_time = get_string('relative_time_days', 'totara_core', $days);
     } else if ($timestamp >= strtotime('-2 years', $compare_to)) {
-        $months = floor(($compare_to - $timestamp) / (DAYSECS * 30.5));
+        $compare_to_dt = new DateTime('@' . $compare_to);
+        $timestamp_dt = new DateTime('@' . $timestamp);
+        $interval = $compare_to_dt->diff($timestamp_dt);
+        $months = $interval->format('%m');
 
         if ($months == 1) {
             $relative_time = get_string('relative_time_month', 'totara_core');

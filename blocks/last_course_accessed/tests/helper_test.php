@@ -144,6 +144,24 @@ class test_block_last_course_accessed extends advanced_testcase {
         $last_accessed = totara_core_get_relative_time_text($timestamp, $this->compare_to);
 
         $this->assertEquals('11 months ago', $last_accessed);
+
+        // ================= Testing an edge case =================
+        // February 22, 2020.
+        $timestamp = 1582404740;
+        // March 23, 2020.
+        $compare_to = 1584953540;
+
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $compare_to);
+
+        $this->assertEquals('A month ago', $last_accessed);
+
+        // February 24, 2020.
+        $timestamp = 1582577540;
+
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $compare_to);
+
+        $this->assertNotEquals('A month ago', $last_accessed);
+        $this->assertEquals('27 days ago', $last_accessed);
     }
 
     /**
