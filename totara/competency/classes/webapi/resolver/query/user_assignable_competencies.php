@@ -24,7 +24,7 @@
 namespace totara_competency\webapi\resolver\query;
 
 use context_system;
-use core\orm\cursor;
+use core\pagination\cursor;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use totara_competency\data_providers\user_assignable_competencies as provider;

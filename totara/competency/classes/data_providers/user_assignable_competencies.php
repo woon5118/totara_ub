@@ -24,8 +24,8 @@
 namespace totara_competency\data_providers;
 
 use core\orm\collection;
-use core\orm\cursor;
-use core\orm\cursor_paginator;
+use core\orm\pagination\cursor_paginator;
+use core\pagination\cursor;
 use totara_competency\entities\competency as competency_entity;
 use totara_competency\entities\competency_repository;
 use totara_competency\entities\filters\competency_user_assignment_status;
@@ -141,7 +141,7 @@ class user_assignable_competencies extends user_data_provider {
             ->set_filters($this->filters)
             ->order_by($this->order_by, $this->order_dir);
 
-        $paginator = new cursor_paginator($query, $cursor);
+        $paginator = new cursor_paginator($query, $cursor, true);
 
         $assignments = (new assignment_user($this->user->id))
             ->get_active_assignments_for_competencies($paginator->get_items()->pluck('id'));
