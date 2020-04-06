@@ -156,7 +156,7 @@ if ($plan->timecompleted) {
 $form->set_data($plan);
 $form->display();
 
-if ($action == 'view') {
+if ($action == 'view' && !empty($CFG->usecomments)) {
     // Comments
     require_once($CFG->dirroot.'/comment/lib.php');
     comment::init();

@@ -203,20 +203,22 @@ if ($objectivesenabled) {
 // Display linked evidence
 echo $evidence->display_linked_evidence($currenturl, $canupdate, $plancompleted);
 
-// Comments
-echo $OUTPUT->heading(get_string('comments', 'totara_plan'), 3, null, 'comments');
-require_once($CFG->dirroot.'/comment/lib.php');
-comment::init();
-$options = new stdClass;
-$options->area    = 'plan_course_item';
-$options->context = context_system::instance();
-$options->itemid  = $caid;
-$options->showcount = true;
-$options->component = 'totara_plan';
-$options->autostart = true;
-$options->notoggle = true;
-$comment = new comment($options);
-echo $comment->output(true);
+if (!empty($CFG->usecomments)) {
+    // Comments
+    echo $OUTPUT->heading(get_string('comments', 'totara_plan'), 3, null, 'comments');
+    require_once($CFG->dirroot.'/comment/lib.php');
+    comment::init();
+    $options = new stdClass();
+    $options->area    = 'plan_course_item';
+    $options->context = context_system::instance();
+    $options->itemid  = $caid;
+    $options->showcount = true;
+    $options->component = 'totara_plan';
+    $options->autostart = true;
+    $options->notoggle = true;
+    $comment = new comment($options);
+    echo $comment->output(true);
+}
 
 echo $OUTPUT->container_end();
 
