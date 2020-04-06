@@ -18,39 +18,37 @@
 //
 // @copyright 2019 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-// @author    Riana Rossouw <riana.rossouw@totaralearning.com>
+// @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @package   theme_roots
 
+.tw-editLinkedCourses {
+  position: relative;
 
-.tw-criterion-hidden {
-    display: none;
+  &__btn {
+    @include bs-btn-default();
+    margin: auto 0 auto auto;
+  }
+
+  &__list {
+    margin-bottom: var(--tui-gap-4);
+
+    &_removed {
+      color: var(--tui-color-neutral-3);
+      text-decoration: line-through;
+
+      input {
+        display: none;
+      }
+    }
+  }
+
+  &__title {
+    @include tui-font-heading-medium();
+    margin: auto 0;
+  }
+
+  &__top_bar {
+    display: flex;
+    margin-bottom: var(--tui-gap-4);
+  }
 }
-
-.tw-criterion-warning {
-    color: @brand-warning;
-}
-
-.tw-criterion-label {
-    display: inline-block;
-    min-width: 15em;
-    font-weight: bold;
-    margin-bottom: 0.5em;
-    vertical-align: top;
-}
-
-.tw-criterion-value {
-    min-width: 15em;
-    display: inline-block;
-    vertical-align: top;
-}
-
-.tw-criterion-smalltitle {
-    font-size: 1.1em;
-    font-weight: bold;
-    margin-bottom: 0.5em;
-}
-
-.tw-criterion-inline {
-    display: inline-block;
-}
-
