@@ -39,7 +39,7 @@ class block_totara_alerts_edit_form extends block_edit_form {
         }
 
         $mform->addElement('select', 'config_showempty', get_string('showempty', 'block_totara_alerts'), $options, $attributes);
-        $mform->addHelpButton('config_showempty', 'showempty', 'block_totara_tasks');
+        $mform->addHelpButton('config_showempty', 'showempty', 'block_totara_alerts');
         $mform->setDefault('config_showempty', 0);
     }
 }
