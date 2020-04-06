@@ -37,7 +37,7 @@ class view_user_activity extends perform_controller {
      * @inheritDoc
      */
     protected function setup_context(): context {
-        $category_id = util::get_default_categoryid();
+        $category_id = util::get_default_category_id();
         return \context_coursecat::instance($category_id);
     }
 
