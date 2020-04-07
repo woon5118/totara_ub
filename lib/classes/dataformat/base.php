@@ -94,7 +94,7 @@ abstract class base {
         header("Content-Type: $this->mimetype\n");
         $filename = $this->filename . $this->get_extension();
         // Totara: Send the content-disposition header with both filename and filename*.
-        require($CFG->libdir.'/filelib.php');
+        require_once($CFG->libdir.'/filelib.php');
         header(make_content_disposition('attachment', $filename));
     }
 
