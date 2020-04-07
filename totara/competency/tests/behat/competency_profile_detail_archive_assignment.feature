@@ -1,10 +1,8 @@
 @totara @totara_competency @javascript
-Feature: Archive user assignments on competency details page.
+Feature: Archive user assignments on competency details page and view archived assignments.
 
   Background:
-    Given I am on a totara site
-    When I log in as "admin"
-    And the following "users" exist:
+    Given the following "users" exist:
       | username | firstname | lastname | email               |
       | teacher  | Lesson    | Teacher  | teacher@example.com |
       | student  | Learn     | Student  | student@example.com |
@@ -41,21 +39,38 @@ Feature: Archive user assignments on competency details page.
       | sam1       | Comp 1    | comp1    | type1 | Lorem        | any                |
       | sam1       | Comp 2    | comp2    | type1 | Ipsum        | any                |
       | sam1       | Comp 3    | comp3    | type2 | Dixon        | any                |
-    And I log out
-    And I log in as "teacher"
+
+    And the following "courses" exist:
+      | fullname | shortname | enablecompletion |
+      | Course 1 | course1   | 1                |
+      | Course 2 | course2   | 1                |
+      | Course 3 | course3   | 1                |
+    And the following "course enrollments and completions" exist in "totara_competency" plugin:
+      | user    | course  |
+      | student | course1 |
+      | student | course2 |
+    And the following "assignments" exist in "totara_competency" plugin:
+      | competency | user_group_type | user_group | type   |
+      | comp2      | user            | student    | admin  |
+      | comp2      | user            | student    | legacy |
+    And the following "coursecompletion" exist in "totara_criteria" plugin:
+      | idnumber          | courses                 | number_required |
+      | coursecompletion1 | course1,course2,course3 | 2               |
+    And the following "criteria group pathways" exist in "totara_competency" plugin:
+      | competency  | scale_value  | criteria          | sortorder |
+      | comp2       | best         | coursecompletion1 | 1         |
+
+    # Expand the assignments - needed for them to be activated
+    And I run the scheduled task "totara_competency\task\expand_assignments_task"
+    And I run the scheduled task "totara_competency\task\competency_aggregation_queue"
 
     #Assign competency to student. Self and Other assigned.
     And the following "assignments" exist in "totara_competency" plugin:
       | competency | user_group_type | user_group   | type  |
       | comp1      | user            | student      | other |
-    And I run the scheduled task "totara_competency\task\expand_assignments_task"
-    And I log out
-    And I log in as "student"
-    And the following "assignments" exist in "totara_competency" plugin:
-      | competency | user_group_type | user_group   | type  |
       | comp1      | user            | student      | self  |
+      | comp2      | user            | student      | self  |
     And I run the scheduled task "totara_competency\task\expand_assignments_task"
-    And I log out
 
   Scenario: Archive self-assigned and other-assigned competency as manager
     Given I log in as "teacher"
@@ -92,3 +107,19 @@ Feature: Archive user assignments on competency details page.
     Then I should see "Confirm archiving of assignment"
     And I click on "OK" "button"
     Then I should not see "Self-assigned"
+
+  Scenario: View archived assignments
+    Given all assignments for the "comp2" competency are archived
+    When I log in as "student"
+    And I navigate to the competency profile details page for the "Comp 2" competency
+    When I click on "Archived assignments" "button"
+    Then I should see the tui datatable contains:
+      | Assignment        | Proficiency status |
+      | Directly assigned | Proficient         |
+      | Self-assigned     |                    |
+      | Legacy Assignment | Proficient         |
+    And I should see the current date in format "j F Y" in the ".tui-competencyDetailArchivedAssignments .tui-dataTableRows > div:nth-of-type(1) > div:nth-of-type(2)" "css_element"
+    And I should see the current date in format "j F Y" in the ".tui-competencyDetailArchivedAssignments .tui-dataTableRows > div:nth-of-type(2) > div:nth-of-type(2)" "css_element"
+    When I click on "More information" "button"
+    Then I should see "This rating was determined through methods which have been discontinued." in the tui popover
+    And I should see "These include learning plans, course completion, or proficiency in child competencies, in previous versions of the system." in the tui popover

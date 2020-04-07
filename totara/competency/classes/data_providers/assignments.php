@@ -119,6 +119,7 @@ class assignments extends user_data_provider {
             assignment::TYPE_OTHER => 1,
             assignment::TYPE_SELF => 2,
             assignment::TYPE_SYSTEM => 3,
+            assignment::TYPE_LEGACY => 4,
         ];
 
         $ug_type_map = [
@@ -126,7 +127,6 @@ class assignments extends user_data_provider {
             user_groups::ORGANISATION => 1,
             user_groups::COHORT => 2,
             user_groups::USER => 3,
-            assignment::TYPE_LEGACY => 4,
         ];
 
         // Let's compare status

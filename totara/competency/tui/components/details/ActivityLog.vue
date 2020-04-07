@@ -35,6 +35,7 @@
         <SelectFilter
           v-model="assignmentFilter"
           :label="$str('assignment', 'totara_competency')"
+          :name="'activity_log_select'"
           :options="assignments"
           :show-label="true"
           :stacked="false"
