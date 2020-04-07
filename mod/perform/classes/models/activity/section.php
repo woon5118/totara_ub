@@ -154,7 +154,7 @@ class section extends model {
      */
     public function update_relationships(array $relationship_ids): self {
         // Figure out which relationships to remove and which to add.
-        $current_relationship_ids = $this->get_activity_relationships()->pluck('relationship_id');
+        $current_relationship_ids = $this->get_activity_relationships()->pluck('core_relationship_id');
 
         builder::get_db()->transaction(function () use ($current_relationship_ids, $relationship_ids) {
             foreach ($relationship_ids as $relationship_id) {

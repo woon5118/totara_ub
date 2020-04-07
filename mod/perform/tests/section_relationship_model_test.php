@@ -172,7 +172,7 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
         $section_relationship = $perform_generator->create_section_relationship($section1, ['class_name' => manager::class]);
         $activity_relationship_entity = activity_relationship_entity::repository()
             ->where('activity_id', $activity1->get_id())
-            ->where('relationship_id', $manager_id)
+            ->where('core_relationship_id', $manager_id)
             ->one(true);
 
         // Update DB record directly with wrong section id.

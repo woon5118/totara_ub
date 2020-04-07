@@ -780,5 +780,35 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020031700, 'perform');
     }
 
+    if ($oldversion < 2020040701) {
+        // Rename field relationship_id on table perform_relationship to core_relationship_id.
+        $table = new xmldb_table('perform_relationship');
+        $field = new xmldb_field('relationship_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'activity_id');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->rename_field($table, $field, 'core_relationship_id');
+        }
+
+        // Replace index.
+        $old_index = new xmldb_index('activity_id_relationship_id', XMLDB_INDEX_UNIQUE, array('activity_id', 'relationship_id'));
+        if ($dbman->index_exists($table, $old_index)) {
+            $dbman->drop_index($table, $old_index);
+        }
+        $new_index = new xmldb_index('activity_id_core_relationship_id', XMLDB_INDEX_UNIQUE, array('activity_id', 'core_relationship_id'));
+        if (!$dbman->index_exists($table, $new_index)) {
+            $dbman->add_index($table, $new_index);
+        }
+
+        //Replace key
+        $old_key = new xmldb_key('relationship_id', XMLDB_KEY_FOREIGN, array('relationship_id'), 'totara_core_relationship', array('id'), 'restrict');
+        if ($dbman->key_exists($table, $old_key)) {
+            $dbman->drop_key($table, $old_key);
+        }
+        $new_key = new xmldb_key('core_relationship_id', XMLDB_KEY_FOREIGN, array('core_relationship_id'), 'totara_core_relationship', array('id'), 'restrict');
+        if (!$dbman->key_exists($table, $new_key)) {
+            $dbman->add_key($table, $new_key);
+        }
+    }
+
     return true;
 }

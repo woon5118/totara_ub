@@ -35,7 +35,7 @@ use totara_core\entities\relationship;
  * Properties:
  * @property-read int $id ID
  * @property int $activity_id ID of activity
- * @property int $relationship_id ID of relationship
+ * @property int $core_relationship_id ID of relationship
  * @property int $created_at
  *
  * Relationships:
@@ -66,7 +66,7 @@ class activity_relationship extends entity {
      * @return belongs_to
      */
     public function relationship(): belongs_to {
-        return $this->belongs_to(relationship::class, 'relationship_id');
+        return $this->belongs_to(relationship::class, 'core_relationship_id');
     }
 
 }

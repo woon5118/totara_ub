@@ -88,14 +88,14 @@ class section_relationship extends model {
         return $DB->transaction(function () use ($section_id, $relationship, $activity) {
             $relationship_entity = activity_relationship_entity::repository()
                 ->where('activity_id', $activity->get_id())
-                ->where('relationship_id', $relationship->id)
+                ->where('core_relationship_id', $relationship->id)
                 ->get()
                 ->first();
             // Create relationship record only if it doesn't exist already.
             if (!$relationship_entity) {
                 $relationship_entity = new activity_relationship_entity();
                 $relationship_entity->activity_id = $activity->get_id();
-                $relationship_entity->relationship_id = $relationship->id;
+                $relationship_entity->core_relationship_id = $relationship->id;
                 $relationship_entity->save();
             }
             $section_relationship_entity = section_relationship_entity::repository()
@@ -135,7 +135,7 @@ class section_relationship extends model {
         /** @var activity_relationship_entity $activity_relationship_entity */
         $activity_relationship_entity = activity_relationship_entity::repository()
             ->where('activity_id', $activity->get_id())
-            ->where('relationship_id', $relationship->id)
+            ->where('core_relationship_id', $relationship->id)
             ->get()
             ->first();
         if (!$activity_relationship_entity) {

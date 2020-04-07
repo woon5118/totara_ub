@@ -115,7 +115,7 @@ abstract class mod_perform_relationship_testcase extends advanced_testcase {
     protected function assert_section_relationships(section $section, array $expected_class_names): void {
         $actual_class_names = relationship_resolver::repository()
             ->select_raw('DISTINCT class_name')
-            ->join([activity_relationship::TABLE, 'activity_relationship'], 'relationship_id', 'relationship_id')
+            ->join([activity_relationship::TABLE, 'activity_relationship'], 'relationship_id', 'core_relationship_id')
             ->join([section_relationship::TABLE, 'section_relationships'], 'activity_relationship.id', 'activity_relationship_id')
             ->where('section_relationships.section_id', $section->id)
             ->get()
@@ -131,7 +131,7 @@ abstract class mod_perform_relationship_testcase extends advanced_testcase {
     protected function assert_activity_relationships(activity $activity, array $expected_class_names): void {
         $actual_class_names = relationship_resolver::repository()
             ->select_raw('DISTINCT class_name')
-            ->join([activity_relationship::TABLE, 'activity_relationship'], 'relationship_id', 'relationship_id')
+            ->join([activity_relationship::TABLE, 'activity_relationship'], 'relationship_id', 'core_relationship_id')
             ->where('activity_relationship.activity_id', $activity->id)
             ->get()
             ->pluck('class_name');

@@ -22,6 +22,7 @@
  */
 
 use core\collection;
+use \mod_perform\entities\activity\activity_relationship;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track_assignment;
@@ -64,6 +65,7 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
         $subject_instance_service = new subject_instance_creation();
         $subject_instance_service->generate_instances();
 
+        $this->assert_activity_relationship_id_is_saved();
         $this->assert_participant_instances_created($track_user_assignments);
     }
 
@@ -79,6 +81,7 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
         $participant_instance_service = new participant_instance_creation();
         $participant_instance_service->generate_instances($subject_instance_dto_collection);
 
+        $this->assert_activity_relationship_id_is_saved();
         $this->assert_participant_instances_created($track_user_assignments);
     }
 
@@ -89,11 +92,29 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
      * @return void
      */
     private function assert_participant_instances_created(collection $track_user_assignments): void {
-        $created_participants = participant_instance::repository()->count();
+        $created_participants = participant_instance::repository()->get()->count();
         $expected_participants_created = $track_user_assignments->count()
             * count($this->activity_relationships)
             * $this->users_per_relationship;
         $this->assertEquals($expected_participants_created, $created_participants);
+    }
+
+    /**
+     * Asserts the relationship ids saved in participant instances are the activity_relationship_id.
+     *
+     * @return void
+     */
+    private function assert_activity_relationship_id_is_saved(): void {
+        $activity_relationships = activity_relationship::repository()
+            ->select('id')
+            ->get()
+            ->pluck('id');
+        $participant_instance_relationships = participant_instance::repository()
+            ->select(['id', 'activity_relationship_id'])
+            ->get()
+            ->pluck('activity_relationship_id');
+
+        $this->assertEqualsCanonicalizing(array_unique($participant_instance_relationships), $activity_relationships);
     }
 
     /**

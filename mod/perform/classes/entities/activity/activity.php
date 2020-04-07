@@ -86,7 +86,7 @@ class activity extends entity {
             relationship::class,
             'id',
             'activity_id',
-            'relationship_id',
+            'core_relationship_id',
             'id'
         );
     }

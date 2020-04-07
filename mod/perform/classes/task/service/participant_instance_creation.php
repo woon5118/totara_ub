@@ -78,16 +78,16 @@ class participant_instance_creation {
     private function aggregate_participant_instances(collection $subject_instance_dtos): void {
         $activity_ids = array_unique($subject_instance_dtos->pluck('activity_id'), SORT_NUMERIC);
         $activity_relationships = $this->get_activity_relationships($activity_ids);
-        $relationship_ids = array_unique($activity_relationships->pluck('relationship_id'));
+        $core_relationship_ids = array_unique($activity_relationships->pluck('core_relationship_id'));
 
-        if (empty($relationship_ids)) {
+        if (empty($core_relationship_ids)) {
             return;
         }
-        $relationship_manager = new relationship_collection_manager($relationship_ids);
-        $relationship_ids_per_activity = $this->group_relationship_ids_by_activity($activity_relationships);
+        $relationship_manager = new relationship_collection_manager($core_relationship_ids);
+        $relationships_per_activity = $this->group_relationship_ids_by_activity($activity_relationships);
 
         foreach ($subject_instance_dtos as $subject_instance) {
-            $has_no_relationships_for_activity = !isset($relationship_ids_per_activity[$subject_instance->activity_id]);
+            $has_no_relationships_for_activity = !isset($relationships_per_activity[$subject_instance->activity_id]);
 
             if ($has_no_relationships_for_activity) {
                 continue;
@@ -96,10 +96,10 @@ class participant_instance_creation {
 
             $participant_ids_for_relationships = $relationship_manager->get_users_for_relationships(
                 $relationship_arguments,
-                $relationship_ids_per_activity[$subject_instance->activity_id]
+                array_column($relationships_per_activity[$subject_instance->activity_id], 'core_relationship_id')
             );
             $relationship_data = [
-                'activity_relationships' => $relationship_ids_per_activity[$subject_instance->activity_id],
+                'activity_relationships' => $relationships_per_activity[$subject_instance->activity_id],
                 'subject_instance' => $subject_instance,
                 'participant_ids' => $participant_ids_for_relationships,
             ];
@@ -129,7 +129,7 @@ class participant_instance_creation {
         $relationships_per_activity = [];
 
         foreach ($activity_relationships as $activity_relationship) {
-            $relationships_per_activity[$activity_relationship->activity_id][] = $activity_relationship->relationship_id;
+            $relationships_per_activity[$activity_relationship->activity_id][] = $activity_relationship;
         }
 
         return $relationships_per_activity;
@@ -164,16 +164,16 @@ class participant_instance_creation {
      * @return void
      */
     private function create_participant_instances_for_relationships(array $relationship_data): void {
-        $activity_relationship_ids = $relationship_data['activity_relationships'];
+        $activity_relationships = $relationship_data['activity_relationships'];
         $subject_instance = $relationship_data['subject_instance'];
         $participant_ids = $relationship_data['participant_ids'];
 
-        foreach ($activity_relationship_ids as $activity_relationship_id) {
-            $relationship_participants = $participant_ids[$activity_relationship_id];
+        foreach ($activity_relationships as $activity_relationship) {
+            $relationship_participants = $participant_ids[$activity_relationship->core_relationship_id];
 
             if (!empty($relationship_participants)) {
                 $this->create_participant_instances_for_user_list(
-                    $this->build_participant_instance_data($activity_relationship_id, $subject_instance),
+                    $this->build_participant_instance_data($activity_relationship->id, $subject_instance),
                     $relationship_participants
                 );
             }
