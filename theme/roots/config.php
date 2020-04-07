@@ -107,6 +107,12 @@ $THEME->layouts = array(
         'defaultregion' => 'side-pre',
         'options' => array('nonavbar' => true),
     ),
+    // A page with one column that allows top and bottom configurable blocks.
+    'columnpage' => array(
+        'file' => 'default.php',
+        'regions' => array('top', 'bottom'),
+        'defaultregion' => 'top',
+    ),
     // Server administration scripts.
     'admin' => array(
         'file' => 'default.php',

@@ -58,6 +58,7 @@ class catalog extends template {
         array $filterparams,
         string $request = null
     ) {
+        global $USER, $PAGE;
         $config = config::instance();
 
         $data = new \stdClass();
@@ -140,6 +141,22 @@ class catalog extends template {
             $data->defaulthomepage = true;
             $data->defaulthomepage_url = (new \moodle_url('/totara/catalog/index.php', ['setdefaulthome' => '1', 'sesskey' => sesskey()]))->out();
         }
+
+        // Page editing button.
+        $data->customisepage = false;
+        $data->customisepage_url = '';
+        $data->customisepage_string = '';
+        if ($PAGE->user_allowed_editing()) {
+            $data->customisepage = true;
+            if (!empty($USER->editing)) {
+                $data->customisepage_url = (new \moodle_url('/totara/catalog/index.php', ['edit' => '0', 'sesskey' => sesskey()]))->out();
+                $data->customisepage_string = get_string('customiseoff', 'totara_dashboard');
+            } else {
+                $data->customisepage_url = (new \moodle_url('/totara/catalog/index.php', ['edit' => '1', 'sesskey' => sesskey()]))->out();
+                $data->customisepage_string = get_string('customiseon', 'totara_dashboard');
+            }
+        }
+
         // Order by.
         $data->order_by_enabled = $catalog->alphabetical_sorting_enabled();
         if ($data->order_by_enabled) {

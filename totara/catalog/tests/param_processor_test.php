@@ -36,9 +36,10 @@ class totara_catalog_param_processor_testcase extends advanced_testcase {
     private $param_processor = null;
 
     protected function setUp() {
+        global $PAGE;
         parent::setup();
+        $PAGE->set_context(context_system::instance());
         $this->setAdminUser();
-        $this->resetAfterTest();
         $this->param_processor = new param_processor();
     }
 

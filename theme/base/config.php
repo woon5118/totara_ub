@@ -69,6 +69,11 @@ $THEME->layouts = array(
         'file' => 'general.php',
         'regions' => array(),
     ),
+    // A page with one column that allows top and bottom configurable blocks.
+    'columnpage' => array(
+        'file' => 'general.php',
+        'regions' => array(),
+    ),
     // Server administration scripts.
     'admin' => array(
         'file' => 'general.php',

@@ -45,6 +45,11 @@ require_once($CFG->dirroot . "/totara/catalog/tests/output_test_base.php");
  */
 class totara_catalog_output_catalog_testcase extends output_test_base {
 
+    protected function setUp() {
+        global $PAGE;
+        $PAGE->set_context(context_system::instance());
+    }
+
     /**
      * Test some parameter changes.
      *

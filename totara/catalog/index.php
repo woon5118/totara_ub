@@ -45,10 +45,27 @@ $heading = get_string('catalog_heading', 'totara_catalog');
 $PAGE->set_context($systemcontext);
 $PAGE->set_title($title);
 $PAGE->set_heading($heading);
-$PAGE->set_pagelayout('noblocks');
+$PAGE->set_pagelayout('columnpage');
+$PAGE->set_url($pageurl);
+
+// Page editing must be set up after page context is set.
+$edit = optional_param('edit', -1, PARAM_BOOL);
+if (!isset($USER->editing)) {
+    $USER->editing = 0;
+}
+if ($PAGE->user_allowed_editing()) {
+    if ($edit == 1 && confirm_sesskey()) {
+        $USER->editing = 1;
+        redirect($PAGE->url);
+    } else if ($edit == 0 && confirm_sesskey()) {
+        $USER->editing = 0;
+        redirect($PAGE->url);
+    }
+} else {
+    $USER->editing = 0;
+}
 
 // Start page output.
-$PAGE->set_url($pageurl);
 echo $OUTPUT->header();
 echo $OUTPUT->heading($heading, 2, 'tw-catalog__title');
 
