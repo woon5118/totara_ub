@@ -398,7 +398,7 @@ class achievement_configuration {
 
             return [
                 'id' => $scale_value->id,
-                'name' => $scale_value->name,
+                'name' => format_string($scale_value->name),
                 'proficient' => $scale_value->proficient,
                 'sortorder' => $scale_value->sortorder,
                 'pathways' => array_values($sv_pathways),

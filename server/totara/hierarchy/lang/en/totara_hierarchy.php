@@ -180,7 +180,7 @@ If the aggregation method is set to **Any** then only one of the child competenc
 
 If the aggregation method is set to **Off** then automatic achievement will be deactivated for this competency. (It may still be marked achieved manually.)';
 $string['competencyassignavailability'] = 'Non-admin assignment availability';
-$string['competencyassignavailability_help'] = 'RR Help';
+$string['competencyassignavailability_help'] = 'By default, this competency may only be assigned via the admin interface. However, if non-admin user types are selected here, it will be available for direct assignment to a user via their competency profile (by either a user with permission to assign to themselves, or another user who has permission to assign to them).';
 $string['competencyassignavailabilityself'] = 'Users who may self-assign';
 $string['competencyassignavailabilityother'] = 'Users who may assign to others';
 $string['competencyassignavailabilityselfsimple'] = 'Self';
@@ -195,7 +195,7 @@ $string['competencydeletedtype'] = 'The competency type "{$a}" has been complete
 $string['competencydepthcustomfields'] = 'Competency depth custom fields';
 $string['competencydepthlevelview'] = 'Competency depth level view';
 $string['competencydescription'] = 'Description';
-$string['competencydescription_help'] = 'A free-text field for providing more details about this competency. This data is displayed when viewing the hierarchy listing, and the individual competency page.';
+$string['competencydescription_help'] = 'A free-text field for providing more details about this competency. This data is displayed when viewing the hierarchy listing, on the individual competency page, on competencies when assigning them, and on users’ competency profiles.';
 $string['competencydetails'] = 'Competency Details';
 $string['competencydetails_competencyname'] = 'Competency Details - {$a}';
 $string['competencyeditframework'] = 'Edit competency framework';
@@ -349,7 +349,7 @@ $string['competencytemplates'] = 'Competency templates';
 $string['competencytemplateshortname_help'] = 'Template short name is a quick reference name for the competency template and can be used for display purposes.';
 $string['competencytitle'] = '{$a->framework} - {$a->fullname}';
 $string['competencytype'] = 'Type';
-$string['competencytype_help'] = 'Administrators can create and assign types of competencies. If a competency is assigned a type it inherits any custom fields that have been assigned to that type. This allows you to organise meta-data relating to your competencies and only show the fields that each sort of competency needs.';
+$string['competencytype_help'] = 'A type defines a set of custom fields intended to capture metadata that is relevant only to a subset of competencies on the site, i.e. those classified as that type. Administrators must first create the types in order for them to appear as options here. Once classified as a type, a competency can be reclassified, but any data captured in the fields of the original type will need to be mapped to the new ones to avoid being deleted.';
 $string['competencytypecustomfields'] = 'Competency type custom fields';
 $string['competencytypedescription'] = 'Competency Type Description';
 $string['competencytypedescription_help'] = 'A longer text description of the competency type.';
