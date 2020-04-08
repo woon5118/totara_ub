@@ -1131,13 +1131,17 @@ class database_manager {
                                 if ($field->getLength() != $dbfield->max_length) {
                                     $errors[$tablename][] = "column '$fieldname' length is $dbfield->max_length, expected {$field->getLength()} ($dbfield->meta_type)";
                                 }
-                                if ($field->getAllowedValues()) {
-                                    if (!$this->field_allowed_values_constraint_exists($table, $field)) {
-                                        $errors[$tablename][] = "column '$fieldname' does not have expected allowed values constraint";
-                                    }
-                                } else {
-                                    if ($this->field_allowed_values_constraint_exists($table, $field)) {
-                                        $errors[$tablename][] = "column '$fieldname' has unexpected allowed values constraint";
+
+                                // Check field constraints but not for old MySQL.
+                                if (!($this->mdb->get_dbfamily() === 'mysql' && version_compare($this->mdb->get_server_info()['version'], '8', '<'))) {
+                                    if ($field->getAllowedValues()) {
+                                        if (!$this->field_allowed_values_constraint_exists($table, $field)) {
+                                            $errors[$tablename][] = "column '$fieldname' does not have expected allowed values constraint";
+                                        }
+                                    } else {
+                                        if ($this->field_allowed_values_constraint_exists($table, $field)) {
+                                            $errors[$tablename][] = "column '$fieldname' has unexpected allowed values constraint";
+                                        }
                                     }
                                 }
 
@@ -1151,13 +1155,17 @@ class database_manager {
                                 if ($length > $dbfield->max_length) {
                                     $errors[$tablename][] = "column '$fieldname' length is $dbfield->max_length, expected at least {$field->getLength()} ($dbfield->meta_type)";
                                 }
-                                if ($field->getAllowedValues()) {
-                                    if (!$this->field_allowed_values_constraint_exists($table, $field)) {
-                                        $errors[$tablename][] = "column '$fieldname' does not have expected allowed values constraint";
-                                    }
-                                } else {
-                                    if ($this->field_allowed_values_constraint_exists($table, $field)) {
-                                        $errors[$tablename][] = "column '$fieldname' has unexpected allowed values constraint";
+
+                                // Check field constraints but not for old MySQL.
+                                if (!($this->mdb->get_dbfamily() === 'mysql' && version_compare($this->mdb->get_server_info()['version'], '8', '<'))) {
+                                    if ($field->getAllowedValues()) {
+                                        if (!$this->field_allowed_values_constraint_exists($table, $field)) {
+                                            $errors[$tablename][] = "column '$fieldname' does not have expected allowed values constraint";
+                                        }
+                                    } else {
+                                        if ($this->field_allowed_values_constraint_exists($table, $field)) {
+                                            $errors[$tablename][] = "column '$fieldname' has unexpected allowed values constraint";
+                                        }
                                     }
                                 }
 
