@@ -27,7 +27,6 @@
   min-width: 230px;
   padding: var(--tui-gap-2);
   border: var(--tui-border-width-thin) solid var(--tui-form-input-border-color);
-  border-radius: var(--tui-gap-1);
 
   &__tags {
     display: flex;

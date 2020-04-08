@@ -35,7 +35,6 @@
     background-color: var(--tui-dropdown-menu-bg-color);
     background-clip: padding-box;
     border: 1px solid var(--tui-dropdown-menu-border-color);
-    border-radius: 4px;
     box-shadow: var(--tui-shadow-2);
   }
 

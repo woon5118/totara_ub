@@ -83,8 +83,7 @@
           :styleclass="{ transparent: true }"
           @click.stop.prevent="expandList(toggle, isOpen)"
         >
-          <Collapse v-if="isOpen" />
-          <Expand v-else />
+          <Expand />
         </ButtonIcon>
       </div>
     </template>
@@ -100,7 +99,6 @@
 import Dropdown from 'totara_core/components/dropdown/Dropdown';
 import DropdownItem from 'totara_core/components/dropdown/DropdownItem';
 import InputText from 'totara_core/components/form/InputText';
-import Collapse from 'totara_core/components/icons/common/Hide';
 import Expand from 'totara_core/components/icons/common/Show';
 import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
 import Close from 'totara_core/components/icons/common/Close';
@@ -113,7 +111,6 @@ export default {
     Dropdown,
     DropdownItem,
     InputText,
-    Collapse,
     Expand,
     Close,
     Tag,
