@@ -358,4 +358,10 @@ $definitions = array(
     'themedesigner' => array(
         'mode' => cache_store::MODE_APPLICATION,
     ),
+
+    'image_sizes' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => true,
+    ),
 );

@@ -459,3 +459,41 @@ function generate_image_thumbnail_from_string($filedata, $width, $height) {
 function generate_image_thumbnail_from_image($original, $imageinfo, $width, $height) {
     return resize_image_from_image($original, $imageinfo, $width, $height, true);
 }
+
+/**
+ * Crop and Resize an image from the centre of an image object.
+ *
+ * @param resource $original The image to work on.
+ * @param array $imageinfo Contains [0] => originalwidth, [1] => originalheight.
+ * @param int|null $width The max width of the resized image
+ * @param int|null $height The max height of the resized image
+ * @return string|bool False if a problem occurs, else the resized image data.
+ */
+function crop_resize_image_from_image($original, array $imageinfo, int $width, int $height) {
+    [$original_width, $original_height] = $imageinfo;
+
+    // Calculate crop size.
+    $crop_x = 0;
+    $crop_y = 0;
+    $crop_width = $original_width;
+    $crop_height = $original_height;
+
+    if ($original_width / $original_height > $width / $height) {
+        $crop_width = (int) ceil($width * $original_height / $height);
+        $crop_x = (int) ceil(($original_width - $crop_width) / 2);
+    } else {
+        $crop_height = (int) ceil($height * $original_width / $width);
+        $crop_y = (int) ceil(($original_height - $crop_height) / 2);
+    }
+
+    // Crop proportional area.
+    $original = imagecrop($original, [
+        'x' => $crop_x,
+        'y' => $crop_y,
+        'width' => $crop_width,
+        'height' => $crop_height
+    ]);
+
+    // Generate the resized image.
+    return resize_image_from_image($original, [$crop_width, $crop_height], $width, $height);
+}

@@ -117,6 +117,11 @@ information provided here is intended especially for developers.
 * The internal structure of the cache 'core/coursecattree' has been changed; please refer to coursecat::get_tree()
 * Moved formatter classes from \totara_core\formatter to \core\webapi\formatter namespace as they are meant to be used only for GraphQL
 * New function make_content_disposition() correctly encodes the filename field of the Content-Disposition header
+* file_storage::create_imagefile_preview() has been deprecated, please use \core\image\preview_helper::get_preview_content() instead.
+* file_storage::create_file_preview() has been deprecated, please use \core\image\preview_helper::create_file_preview() instead.
+* file_storage::get_file_preview() has been deprecated, please use \core\image\preview_helper::get_file_preview() instead.
+* function file_pluginfile($relativepath, $forcedownload, $preview = null, $theme = null) has new parameter $theme to help on resizing image base on theme. If null is given, then default theme will be used.
+* Added new function crop_resize_image_from_image which can be used to resize the image from original image content.
 
 === 12.0 ===
 

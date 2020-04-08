@@ -34,6 +34,7 @@ require_once('lib/filelib.php');
 
 $relativepath = get_file_argument();
 $forcedownload = optional_param('forcedownload', 0, PARAM_BOOL);
-$preview = optional_param('preview', null, PARAM_ALPHANUM);
+$preview = optional_param('preview', null, PARAM_ALPHANUMEXT);
+$theme = optional_param('theme', null, PARAM_THEME);
 
-file_pluginfile($relativepath, $forcedownload, $preview);
+file_pluginfile($relativepath, $forcedownload, $preview, $theme);

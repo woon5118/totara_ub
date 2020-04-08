@@ -159,4 +159,39 @@ class core_gdlib_testcase extends basic_testcase {
         $this->assertEquals('image/png', $imageinfo['mime']);
     }
 
+    public function test_crop_resize_image_from_image() {
+        global $CFG;
+        require_once($CFG->libdir . '/gdlib.php');
+
+        $pngpath = $this->fixturepath . 'gd-logo.png';
+        $origimageinfo = getimagesize($pngpath);
+        $imagecontent = file_get_contents($pngpath);
+
+        // Same aspect ratio
+        $imageresource = imagecreatefromstring($imagecontent);
+        $newpng = crop_resize_image_from_image($imageresource, $origimageinfo, 56, 15);
+        $this->assertTrue(is_string($newpng));
+        $imageinfo = getimagesizefromstring($newpng);
+        $this->assertEquals(56, $imageinfo[0]);
+        $this->assertEquals(15, $imageinfo[1]);
+        $this->assertEquals('image/png', $imageinfo['mime']);
+
+        // Requested image is proportionally longer.
+        $imageresource = imagecreatefromstring($imagecontent);
+        $newpng = crop_resize_image_from_image($imageresource, $origimageinfo, 80, 10);
+        $this->assertTrue(is_string($newpng));
+        $imageinfo = getimagesizefromstring($newpng);
+        $this->assertEquals(80, $imageinfo[0]);
+        $this->assertEquals(10, $imageinfo[1]);
+        $this->assertEquals('image/png', $imageinfo['mime']);
+
+        // Requested image is proportionally higher.
+        $imageresource = imagecreatefromstring($imagecontent);
+        $newpng = crop_resize_image_from_image($imageresource, $origimageinfo, 50, 30);
+        $this->assertTrue(is_string($newpng));
+        $imageinfo = getimagesizefromstring($newpng);
+        $this->assertEquals(50, $imageinfo[0]);
+        $this->assertEquals(30, $imageinfo[1]);
+        $this->assertEquals('image/png', $imageinfo['mime']);
+    }
 }

@@ -444,21 +444,24 @@ class file_storage {
      * @param stored_file $file the file we want to preview
      * @param string $mode preview mode, eg. 'thumb'
      * @return stored_file|bool false if unable to create the preview, stored file otherwise
+     *
+     * @deprecated since Totara 13.0
      */
     public function get_file_preview(stored_file $file, $mode) {
+        debugging(
+            "Function '" . __FUNCTION__ . "' has been deprecated, please use ",
+            "\core\image\preview_helper::get_file_preview instead",
+            DEBUG_DEVELOPER
+        );
 
-        $context = context_system::instance();
-        $path = '/' . trim($mode, '/') . '/';
-        $preview = $this->get_file($context->id, 'core', 'preview', 0, $path, $file->get_contenthash());
+        $helper = \core\image\preview_helper::instance();
+        $stored_file = $helper->get_file_preview($file, $mode);
 
-        if (!$preview) {
-            $preview = $this->create_file_preview($file, $mode);
-            if (!$preview) {
-                return false;
-            }
+        if ($stored_file === null) {
+            return false;
         }
 
-        return $preview;
+        return $stored_file;
     }
 
     /**
@@ -615,40 +618,24 @@ class file_storage {
      * @param stored_file $file the file we want to preview
      * @param string $mode preview mode, eg. 'thumb'
      * @return stored_file|bool the newly created preview file or false
+     *
+     * @deprecated since Totara 13.0
      */
     protected function create_file_preview(stored_file $file, $mode) {
-
-        $mimetype = $file->get_mimetype();
-
-        if ($mimetype === 'image/gif' or $mimetype === 'image/jpeg' or $mimetype === 'image/png') {
-            // make a preview of the image
-            $data = $this->create_imagefile_preview($file, $mode);
-
-        } else {
-            // unable to create the preview of this mimetype yet
-            return false;
-        }
-
-        if (empty($data)) {
-            return false;
-        }
-
-        $context = context_system::instance();
-        $record = array(
-            'contextid' => $context->id,
-            'component' => 'core',
-            'filearea'  => 'preview',
-            'itemid'    => 0,
-            'filepath'  => '/' . trim($mode, '/') . '/',
-            'filename'  => $file->get_contenthash(),
+        debugging(
+            "Function '" . __FUNCTION__ . "' has been deprecated, please use " .
+            "\core\image\preview_helper::create_file_preview instead",
+            DEBUG_DEVELOPER
         );
 
-        $imageinfo = getimagesizefromstring($data);
-        if ($imageinfo) {
-            $record['mimetype'] = $imageinfo['mime'];
+        $helper = \core\image\preview_helper::instance();
+        $stored_file = $helper->create_file_preview($file, $mode);
+
+        if ($stored_file === null) {
+            return false;
         }
 
-        return $this->create_file_from_string($record, $data);
+        return $stored_file;
     }
 
     /**
@@ -657,25 +644,24 @@ class file_storage {
      * @param stored_file $file the image we want to preview
      * @param string $mode preview mode, eg. 'thumb'
      * @return string|bool false if a problem occurs, the thumbnail image data otherwise
+     *
+     * @deprecated since Totara 13.0
      */
     protected function create_imagefile_preview(stored_file $file, $mode) {
-        global $CFG;
-        require_once($CFG->libdir.'/gdlib.php');
+        debugging(
+            "Function '" . __FUNCTION__ . "' has been deprecated, please use " .
+            "'\core\image\preview_helper::get_preview_content' instead",
+            DEBUG_DEVELOPER
+        );
 
-        if ($mode === 'tinyicon') {
-            $data = $file->generate_image_thumbnail(24, 24);
+        $helper = \core\image\preview_helper::instance();
+        $content = $helper->get_preview_content($file, $mode);
 
-        } else if ($mode === 'thumb') {
-            $data = $file->generate_image_thumbnail(90, 90);
-
-        } else if ($mode === 'bigthumb') {
-            $data = $file->generate_image_thumbnail(250, 250);
-
-        } else {
-            throw new file_exception('storedfileproblem', 'Invalid preview mode requested');
+        if ($content === null) {
+            return false;
         }
 
-        return $data;
+        return $content;
     }
 
     /**

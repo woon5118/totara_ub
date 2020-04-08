@@ -1158,4 +1158,27 @@ class stored_file {
         // Generate the resized image.
         return resize_image_from_image($original, $imageinfo, $width, $height);
     }
+
+    /**
+     * Generate a crop-resized image for this stored_file.
+     *
+     * @param int|null $width The desired width, or null to only use the height.
+     * @param int|null $height The desired height, or null to only use the width.
+     * @return string|false False when a problem occurs, else the image data.
+     */
+    public function crop_image($width, $height) {
+        global $CFG;
+        require_once($CFG->libdir . '/gdlib.php');
+
+        // Fetch the image information for this image.
+        $imageinfo = @getimagesizefromstring($this->get_content());
+        if (empty($imageinfo)) {
+            return false;
+        }
+
+        // Create a new image from the file.
+        $original = @imagecreatefromstring($this->get_content());
+
+        return crop_resize_image_from_image($original, $imageinfo, $width, $height);
+    }
 }

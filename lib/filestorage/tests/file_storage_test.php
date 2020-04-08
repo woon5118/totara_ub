@@ -233,16 +233,17 @@ class core_files_file_storage_testcase extends advanced_testcase {
         $fs = get_file_storage();
         $file = $fs->create_file_from_pathname($filerecord, $filepath);
 
-        $previewtinyicon = $fs->get_file_preview($file, 'tinyicon');
+        $helper = \core\image\preview_helper::instance();
+        $previewtinyicon = $helper->get_file_preview($file, 'tinyicon');
         $this->assertInstanceOf('stored_file', $previewtinyicon);
         $this->assertEquals('6b9864ae1536a8eeef54e097319175a8be12f07c', $previewtinyicon->get_filename());
 
-        $previewtinyicon = $fs->get_file_preview($file, 'thumb');
+        $previewtinyicon = $helper->get_file_preview($file, 'thumb');
         $this->assertInstanceOf('stored_file', $previewtinyicon);
         $this->assertEquals('6b9864ae1536a8eeef54e097319175a8be12f07c', $previewtinyicon->get_filename());
 
         $this->expectException('file_exception');
-        $fs->get_file_preview($file, 'amodewhichdoesntexist');
+        $helper->get_file_preview($file, 'amodewhichdoesntexist');
     }
 
     public function test_get_file_preview_nonimage() {
@@ -262,8 +263,9 @@ class core_files_file_storage_testcase extends advanced_testcase {
         $textfile = $fs->get_file($syscontext->id, $filerecord['component'], $filerecord['filearea'],
             $filerecord['itemid'], $filerecord['filepath'], $filerecord['filename']);
 
-        $preview = $fs->get_file_preview($textfile, 'thumb');
-        $this->assertFalse($preview);
+        $helper = \core\image\preview_helper::instance();
+        $preview = $helper->get_file_preview($textfile, 'thumb');
+        $this->assertNull($preview);
     }
 
     /**

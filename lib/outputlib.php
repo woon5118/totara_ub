@@ -521,6 +521,22 @@ class theme_config {
     public $resolvefaviconcallback = null;
 
     /**
+     *  Whether to overriding the image sizes metadata defined by the plugins or not.
+     *
+     * @since Totara 13.0
+     * @var array
+     *
+     * @example
+     * $THEME->image_sizes = [
+     *      'tinyicon' => [
+     *          'width' => 50,
+     *          'height' => 50
+     *      ]
+     * ];
+     */
+    public $image_sizes = [];
+
+    /**
      * Load the config.php file for a particular theme, and return an instance
      * of this class. (That is, this is a factory method.)
      *
@@ -601,8 +617,9 @@ class theme_config {
             'hidefromselector', 'doctype', 'yuicssmodules', 'blockrtlmanipulations',
             'lessfile', 'extralesscallback', 'lessvariablescallback', 'blockrendermethod',
             'scss', 'extrascsscallback', 'prescsscallback', 'csstreepostprocessor', 'addblockposition');
-        // Totara: Add favicon resolver
+        // Totara: Add favicon resolver and image sizes
         $configurable[] = 'resolvefaviconcallback';
+        $configurable[] = 'image_sizes';
 
         foreach ($config as $key=>$value) {
             if (in_array($key, $configurable)) {
@@ -1311,7 +1328,7 @@ class theme_config {
                 }
             }
         }
-        
+
         $themes = [];
 
         // Find out wanted parent sheets.

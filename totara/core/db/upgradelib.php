@@ -1174,3 +1174,53 @@ function totara_core_upgrade_migrate_removed_user_fields() {
         $dbman->drop_field($table, $field);
     }
 }
+
+/**
+ * This is for purging all the cached preview image, it should be called when you are introduce a new image sizes
+ * or update the current image_sizes. The function will query all the preview files for every available themes +
+ * available image_sizes within the system and start purging it one by one.
+ *
+ * Unless $preview_mode is defined, then the function will actually purge cache for specific preview mode files
+ * within all available theme plugins.
+ *
+ * @param string|null $preview_mode
+ * @since Totara 13.0
+ */
+function totara_core_clear_preview_image_cache(?string $preview_mode = null): void {
+    global $DB;
+
+    $fs = get_file_storage();
+    $image_sizes = \core\image\preview_helper::get_all_sizes();
+
+    if ($preview_mode !== null && $preview_mode !== '') {
+        $image_sizes = array_filter(
+            $image_sizes,
+            function (string $key) use ($preview_mode): bool {
+                return $key === $preview_mode;
+            },
+            ARRAY_FILTER_USE_KEY
+        );
+    }
+
+    $themes = \core_component::get_plugin_list('theme');
+    foreach ($image_sizes as $mode => $unsed_image_size) {
+        // Cleaning up all the preview files one by one and separated by the theme.
+        foreach ($themes as $theme_name => $unused_theme) {
+            $path = '/' . trim($mode, '/') . '/' . $theme_name . '/';
+            $records = $DB->get_records('files', [
+                'component' => 'core',
+                'filearea' => 'preview',
+                'filepath' => $path
+            ]);
+
+            if (empty($records)) {
+                continue;
+            }
+
+            foreach ($records as $record) {
+                $file = $fs->get_file_instance($record);
+                $file->delete();
+            }
+        }
+    }
+}

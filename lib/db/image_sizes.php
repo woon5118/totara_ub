@@ -1,8 +1,8 @@
 <?php
-/*
- * This file is part of Totara LMS
+/**
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Aaron Barnes <aaron.barnes@totaralms.com>
- * @package totara_core
+ * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @package core
  */
-
 defined('MOODLE_INTERNAL') || die();
 
-/* NOTE: the following version number must be bumped during each major or minor Totara release. */
+$sizes = [
+    'tinyicon' => [
+        'width' => 24,
+        'height' => 24
+    ],
 
-$plugin->version  = 2020051300;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2017111309;       // Requires this Moodle version.
-$plugin->component = 'totara_core';   // To check on upgrade, that module sits in correct place
+    'thumb' => [
+        'width' => 90,
+        'height' => 90
+    ],
+
+    'bigthumb' => [
+        'width' => 250,
+        'height' => 250,
+    ],
+];

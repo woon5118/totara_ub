@@ -38,7 +38,8 @@ if (isguestuser()) {
 }
 
 $relativepath = get_file_argument();
-$preview = optional_param('preview', null, PARAM_ALPHANUM);
+$preview = optional_param('preview', null, PARAM_ALPHANUMEXT);
+$theme = optional_param('theme', null, PARAM_THEME);
 
 // relative path must start with '/'
 if (!$relativepath) {
@@ -87,4 +88,4 @@ if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->get_filename() == 
 // finally send the file
 // ========================================
 \core\session\manager::write_close(); // Unlock session during file serving.
-send_stored_file($file, 0, false, true, array('preview' => $preview)); // force download - security first!
+send_stored_file($file, 0, false, true, array('preview' => $preview, 'theme' => $theme)); // force download - security first!
