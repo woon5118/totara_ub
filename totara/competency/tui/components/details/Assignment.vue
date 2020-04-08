@@ -28,6 +28,7 @@
           <!-- Competency assignment select list -->
           <SelectFilter
             v-model="selectedAssignment"
+            class="tui-competencyDetailAssignment__bar-filter"
             :label="$str('assignment', 'totara_competency')"
             :name="'select_assignment'"
             :large="true"

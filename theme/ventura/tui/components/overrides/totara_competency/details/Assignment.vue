@@ -25,6 +25,12 @@
   &__bar {
     padding: var(--tui-gap-4);
     background: var(--tui-color-neutral-3);
+
+    &-filter.tui-selectFilter {
+      .tui-select {
+        max-width: initial;
+      }
+    }
   }
 
   &__actions {

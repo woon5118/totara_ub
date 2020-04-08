@@ -47,6 +47,7 @@
     }
 
     & > * + * {
+      margin-top: var(--tui-gap-4);
       margin-left: var(--tui-gap-2);
 
       .dir-rtl & {
@@ -61,7 +62,17 @@
   }
 
   &__description {
-    @include tui-font-heading-label();
+    @include tui-font-body();
+  }
+}
+
+@media (min-width: $tui-screen-xs) {
+  .tui-competencyDetail {
+    &__buttons {
+      > * {
+        margin-top: 0;
+      }
+    }
   }
 }
 </style>

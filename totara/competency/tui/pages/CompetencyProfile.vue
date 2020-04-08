@@ -35,7 +35,7 @@
         <h2 class="tui-competencyProfile__title">
           {{ $str('competency_profile', 'totara_competency') }}
         </h2>
-        <div v-if="!noAssignments">
+        <div v-if="!noAssignments" class="tui-competencyProfile__buttons">
           <ActionLink
             v-if="rateCompetenciesUrl"
             :href="rateCompetenciesUrl"

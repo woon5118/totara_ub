@@ -42,6 +42,12 @@
     margin: 0;
   }
 
+  &__buttons {
+    > * {
+      margin-top: var(--tui-gap-4);
+    }
+  }
+
   &__sectionTitle {
     @include tui-font-heading-small();
     margin: var(--tui-gap-4) 0 var(--tui-gap-2) 0;
@@ -49,6 +55,16 @@
 
   &__filtersBar {
     margin: var(--tui-gap-6) 0;
+  }
+}
+
+@media (min-width: $tui-screen-xs) {
+  .tui-competencyProfile {
+    &__buttons {
+      > * {
+        margin-top: 0;
+      }
+    }
   }
 }
 </style>
