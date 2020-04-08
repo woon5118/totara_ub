@@ -1319,6 +1319,60 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
                     result = !compare(value, Form.Operators.Filled);
                     break;
 
+                case Form.Operators.In:
+                    // Value in provided array.
+                    if (arguments.length !== 3) {
+                        l = arguments.length;
+                        MODULE.debug('Compare In expects 3 arguments, ' + l + ' given.', Form, MODULE.LOGLEVEL.error);
+                        return null;
+                    }
+                    if (valueIsArray) {
+                        // Value must be a string.
+                        result = null;
+                        break;
+                    }
+                    expected = arguments[2];
+                    if (!Array.isArray(expected)) {
+                        // Second parameter must be a list of values.
+                        result = null;
+                        break;
+                    }
+                    result = false;
+                    for (i in expected) {
+                        if (expected.hasOwnProperty(i) && (expected[i].toString() === value.toString())) {
+                            result = true;
+                            break;
+                        }
+                    }
+                    break;
+
+                case Form.Operators.NotIn:
+                    // Value not in provided array.
+                    if (arguments.length !== 3) {
+                        l = arguments.length;
+                        MODULE.debug('Compare NotIn expects 3 arguments, ' + l + ' given.', Form, MODULE.LOGLEVEL.error);
+                        return null;
+                    }
+                    if (valueIsArray) {
+                        // Value must be a string.
+                        result = null;
+                        break;
+                    }
+                    expected = arguments[2];
+                    if (!Array.isArray(expected)) {
+                        // Second parameter must be a list of values.
+                        result = null;
+                        break;
+                    }
+                    result = true;
+                    for (i in expected) {
+                        if (expected.hasOwnProperty(i) && (expected[i].toString() === value.toString())) {
+                            result = false;
+                            break;
+                        }
+                    }
+                    break;
+
                 default:
                     // If we hit this then you have a coding error OR someone has implemented a new operator and not
                     // set up a default comparison.
@@ -1447,7 +1501,9 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
         Filled: 'filled',               // Value has been provided, e.g. Value !== null &&  Value !== ''.
         NotEquals: 'notequals',         // Value !== Expected.
         NotEmpty: 'notempty',           // Value is not empty.
-        NotFilled: 'notfilled'          // Value === Null.
+        NotFilled: 'notfilled',         // Value === Null.
+        In: 'in',                       // Value in provided array.
+        NotIn: 'notin'                  // Value not in provided array.
     };
 
     /**
