@@ -304,7 +304,7 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
                     that.pathways = [];
                     that.nPaths = 0;
 
-                    templates.renderReplace(templatename, {'pathway_groups': pwGroups}, target).then(function() {
+                    templates.renderReplace(templatename, {'criteria_types': that.criteriaTypes, 'pathway_groups': pwGroups}, target).then(function() {
                         resolve();
                     }).catch(function(e) {
                         e.fileName = that.filename;
@@ -457,8 +457,6 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
             this.pathways[key] = pw;
             this.nPaths += 1;
 
-            // templatename = 'totara_competency/test';
-
             // Display the pathway in the correct div
             templates.renderAppend(templatename, pw, target).then(function () {
                 that.hideCriteriaTypeSelectors();
@@ -544,10 +542,11 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
 
             if (promiseArr.length > 0) {
                 Promise.all(promiseArr).then(function () {
+                    that.dirty = false;
+
                     // TODO: For now simply reloading all pathways. Try to find a way to update ids for keys
                     that.updatePage().then(function() {
                         that.showNotification('success', 'applysuccess', 'totara_competency', {});
-                        that.dirty = false;
                     }).catch(function (e) {
                         e.fileName = that.filename;
                         e.name = 'Error updating the page';
