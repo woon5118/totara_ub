@@ -282,8 +282,7 @@ class rb_source_scorm extends rb_base_source {
                 'sco',
                 'attempt',
                 get_string('attemptnum', 'rb_source_scorm'),
-                'select',
-                array('selectfunc' => 'scorm_attempt_list')
+                'number'
             ),
             new rb_filter_option(
                 'sco',
@@ -466,8 +465,13 @@ class rb_source_scorm extends rb_base_source {
     //
     //
 
+    /**
+     * @deprecated Since 13.0
+     */
     function rb_filter_scorm_attempt_list() {
         global $DB;
+
+        debugging('rb_filter_scorm_attempt_list has been deprecated use a number type filter instead', DEBUG_DEVELOPER);
 
         if (!$max = $DB->get_field_sql('SELECT MAX(attempt) FROM {scorm_scoes_track}')) {
             $max = 10;

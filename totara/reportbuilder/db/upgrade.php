@@ -667,5 +667,69 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020032100, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2020040700) {
+
+        // Only run migration if it hasn't happened already
+        if (!get_config('scorm', 'attemptreportfilterupgraded')) {
+            // Update saved searches using filter since the operators for 'select'
+            // and 'number' don't match up
+            // Old -> New
+            // 0 -> Remove value
+            // 1 -> 0
+            // 2 -> 1
+            $sql = "SELECT rbs.* FROM {report_builder_saved} rbs
+                JOIN {report_builder} rb
+                ON rb.id = rbs.reportid
+                WHERE rb.source = :source";
+
+            $params = ['source' => 'scorm'];
+
+            $savedsearches = $DB->get_records_sql($sql, $params);
+
+            foreach ($savedsearches as $saved) {
+                $search = unserialize($saved->search);
+
+                if (!is_array($search)) {
+                    continue;
+                }
+
+                $update = false;
+
+                foreach ($search as $key => $info) {
+                    list($type, $value) = explode('-', $key);
+
+                    if ($type == 'sco' && $value == 'attempt') {
+                        $update = true;
+
+                        switch ($info['operator']) {
+                        case 0: // Any value
+                            $search[$key]['value'] = '';
+                            break;
+                        case 1: // Is equal to
+                            $search[$key]['operator'] = 0;
+                            break;
+
+                        case 2: // Is not equal to
+                            $search[$key]['operator'] = 1;
+                            break;
+                        }
+                    }
+                }
+
+                if ($update) {
+                    $todb = new \stdClass();
+                    $todb->id = $saved->id;
+                    $todb->search = serialize($search);
+                    $DB->update_record('report_builder_saved', $todb);
+                }
+            }
+
+            set_config('attemptreportfilterupgraded', true, 'scorm');
+        }
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2020040700, 'totara', 'reportbuilder');
+    }
+
     return true;
 }
