@@ -21,7 +21,7 @@
 -->
 
 <template>
-  <Input v-bind="$props" type="password" @submit="$emit('submit', $event)" />
+  <Input v-bind="$props" type="password" v-on="$listeners" />
 </template>
 
 <script>
@@ -37,6 +37,7 @@ export default {
   /* eslint-disable vue/require-prop-types */
   props: [
     'ariaDescribedby',
+    'ariaInvalid',
     'ariaLabel',
     'ariaLabelledby',
     'autocomplete',

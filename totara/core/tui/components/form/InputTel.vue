@@ -21,12 +21,7 @@
 -->
 
 <template>
-  <Input
-    v-bind="$props"
-    type="tel"
-    @input="$emit('input', $event)"
-    @submit="$emit('submit', $event)"
-  />
+  <Input v-bind="$props" type="tel" v-on="$listeners" />
 </template>
 
 <script>
@@ -42,6 +37,7 @@ export default {
   /* eslint-disable vue/require-prop-types */
   props: [
     'ariaDescribedby',
+    'ariaInvalid',
     'ariaLabel',
     'ariaLabelledby',
     'autocomplete',

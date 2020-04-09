@@ -1,23 +1,21 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`presentation/form/HelpIcon.vue Checks snapshot 1`] = `
-<a
+<div
   class="tui-formHelpIcon"
-  href="#"
 >
-  <flexicon-stub
-    alt="fff"
-    icon="help"
-    title="help text"
-  />
+  <popover-stub
+    position="right"
+    triggers="click"
+  >
+     help text
+  </popover-stub>
    
   <div
     class="tui-formHelpIcon__desc"
     id="example"
   >
-    
     help text
-  
   </div>
-</a>
+</div>
 `;

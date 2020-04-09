@@ -26,8 +26,19 @@
   flex-shrink: 0;
   margin: 0 var(--tui-gap-1) 0 0;
 
+  legend& {
+    width: auto;
+    padding: 0;
+    color: inherit;
+    border: none;
+  }
+
   &--hidden {
     @include sr-only();
+  }
+
+  &__required {
+    color: var(--tui-color-prompt-alert);
   }
 }
 </style>

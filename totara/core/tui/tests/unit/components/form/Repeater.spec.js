@@ -32,6 +32,7 @@ describe('presentation/form/Repeater.vue', () => {
         $str: function() {
           return 'Add';
         },
+        uid: 'uid-9',
       },
       propsData: {
         ariaLabel: 'Repeater btn',

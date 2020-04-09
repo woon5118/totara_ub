@@ -117,6 +117,10 @@ input[type='week'].tui-formInput {
   border: var(--tui-form-input-border-size) solid;
   border-color: var(--tui-form-input-border-color);
 
+  .tui-context-invalid & {
+    border-color: var(--tui-form-input-border-color-invalid);
+  }
+
   &::placeholder {
     color: var(--tui-form-input-text-placeholder-color);
   }
@@ -127,6 +131,12 @@ input[type='week'].tui-formInput {
     border-color: var(--tui-form-input-border-color-focus);
     outline: none;
     box-shadow: var(--tui-shadow-1);
+
+    .tui-context-invalid & {
+      background: var(--tui-form-input-bg-color-invalid-focus);
+      border-color: var(--tui-form-input-border-color-invalid);
+      box-shadow: var(--tui-shadow-1-invalid);
+    }
   }
 
   &--preIcon {

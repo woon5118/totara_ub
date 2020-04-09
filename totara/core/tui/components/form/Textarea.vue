@@ -49,9 +49,10 @@
 <script>
 export default {
   props: {
-    ariaDescribedby: String,
-    ariaLabel: String,
-    ariaLabelledby: String,
+    ariaDescribedby: [String, Boolean],
+    ariaInvalid: [String, Boolean],
+    ariaLabel: [String, Boolean],
+    ariaLabelledby: [String, Boolean],
     autocomplete: String,
     autofocus: Boolean,
     cols: Number,

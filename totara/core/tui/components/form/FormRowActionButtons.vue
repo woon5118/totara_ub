@@ -22,7 +22,11 @@
 
 <template>
   <FormRow>
-    <SubmitCancelGroup @submit="submit" @cancel="cancel" />
+    <SubmitCancelGroup
+      :submitting="submitting"
+      @submit="submit"
+      @cancel="cancel"
+    />
   </FormRow>
 </template>
 
@@ -35,6 +39,10 @@ export default {
   components: {
     SubmitCancelGroup,
     FormRow,
+  },
+
+  props: {
+    submitting: Boolean,
   },
 
   methods: {

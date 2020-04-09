@@ -33,6 +33,8 @@
       :id="id"
       v-model="selectedValue"
       class="tui-select__input"
+      :aria-describedby="ariaDescribedby"
+      :aria-invalid="ariaInvalid"
       :aria-label="ariaLabel"
       :aria-labelledby="ariaLabelledby"
       :autocomplete="autocomplete"
@@ -68,8 +70,10 @@ export default {
 
   props: {
     id: String,
-    ariaLabel: [Boolean, String],
-    ariaLabelledby: String,
+    ariaDescribedby: [String, Boolean],
+    ariaInvalid: [String, Boolean],
+    ariaLabel: [String, Boolean],
+    ariaLabelledby: [String, Boolean],
     autocomplete: String,
     autofocus: Boolean,
     disabled: Boolean,

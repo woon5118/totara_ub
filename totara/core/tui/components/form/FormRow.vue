@@ -27,8 +27,10 @@
         v-if="label"
         :id="generatedLabelId"
         :for-id="generatedId"
+        :legend="labelLegend"
         :hidden="hidden"
         :label="label"
+        :required="required"
       />
       <HelpIcon
         v-if="helpmsg"
@@ -38,15 +40,17 @@
       />
     </div>
 
-    <div class="tui-formRow__action">
-      <slot
-        :id="generatedId"
-        :labelId="generatedLabelId"
-        :label="label"
-        :ariaDescribedby="ariaDescribedbyId"
-        :ariaLabel="ariaLabel"
-      />
-    </div>
+    <FieldContextProvider :id="generatedId" :label-id="generatedLabelId">
+      <div class="tui-formRow__action">
+        <slot
+          :id="generatedId"
+          :labelId="generatedLabelId"
+          :label="label"
+          :ariaDescribedby="ariaDescribedbyId"
+          :ariaLabel="ariaLabel"
+        />
+      </div>
+    </FieldContextProvider>
   </div>
 </template>
 
@@ -54,26 +58,22 @@
 // Components
 import HelpIcon from 'totara_core/components/form/HelpIcon';
 import Label from 'totara_core/components/form/Label';
+import FieldContextProvider from 'totara_core/components/reform/FieldContextProvider';
 
 export default {
   components: {
     HelpIcon,
     Label,
+    FieldContextProvider,
   },
 
   props: {
-    helpmsg: {
-      type: String,
-    },
-    hidden: {
-      type: Boolean,
-    },
-    id: {
-      type: String,
-    },
-    label: {
-      type: String,
-    },
+    labelLegend: Boolean,
+    helpmsg: String,
+    hidden: Boolean,
+    id: String,
+    label: String,
+    required: Boolean,
   },
 
   computed: {

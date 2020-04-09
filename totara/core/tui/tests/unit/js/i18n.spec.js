@@ -51,10 +51,10 @@ describe('getString', () => {
   it('wraps M.util.get_string', () => {
     expect(getString('a', 'b', 'c')).toBe('a,b,c');
     expect(M.util.get_string).toHaveBeenCalledWith('a', 'b', 'c');
-    expect(getString('d', 'e')).toBe('d,e');
-    expect(M.util.get_string).toHaveBeenCalledWith('d', 'e');
-    expect(getString('f')).toBe('f');
-    expect(M.util.get_string).toHaveBeenCalledWith('f');
+    expect(getString('d', 'e')).toBe('d,e,');
+    expect(M.util.get_string).toHaveBeenCalledWith('d', 'e', undefined);
+    expect(getString('f')).toBe('f,,');
+    expect(M.util.get_string).toHaveBeenCalledWith('f', undefined, undefined);
   });
 });
 

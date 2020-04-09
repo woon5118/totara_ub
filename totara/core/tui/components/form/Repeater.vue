@@ -22,24 +22,18 @@
 
 <template>
   <div
+    :id="uid"
     class="tui-repeater"
-    :class="[
-      `tui-repeater--${align}`,
-      `tui-repeater--${direction}`,
-      noSpacing && 'tui-repeater--noSpacing',
-    ]"
+    :class="[noSpacing && 'tui-repeater--noSpacing']"
+    aria-live="polite"
   >
     <template v-for="(row, index) in rows">
-      <div
-        :key="index"
-        class="tui-repeater__row"
-        :class="`tui-repeater__row--${direction}-${rowAlign}`"
-      >
+      <div :key="index" class="tui-repeater__row">
         <slot :row="row" :index="index" />
         <ButtonIcon
-          v-if="deleteIcon && !hideDeleteIcon(index)"
+          v-if="showDeleteIcon(index)"
           :aria-label="$str('delete', 'moodle')"
-          :styleclass="{ small: true, transparent: true }"
+          :styleclass="{ small: true, stealth: true }"
           :disabled="disabled"
           @click="$emit('remove', row, index)"
         >
@@ -51,9 +45,10 @@
       <ButtonIcon
         v-if="rows.length < maxRows"
         :aria-label="$str('add', 'moodle')"
+        :aria-controls="uid"
         :styleclass="{ small: true, circle: true }"
         :disabled="disabled"
-        @click.stop="$emit('add')"
+        @click="$emit('add')"
       >
         <AddIcon />
       </ButtonIcon>
@@ -72,11 +67,8 @@ export default {
     ButtonIcon,
     DeleteIcon,
   },
+
   props: {
-    noSpacing: {
-      type: Boolean,
-      default: false,
-    },
     rows: {
       type: Array,
       required: true,
@@ -87,7 +79,7 @@ export default {
     },
     maxRows: {
       type: Number,
-      default: 10,
+      default: Infinity,
     },
     disabled: {
       type: Boolean,
@@ -101,28 +93,20 @@ export default {
       type: Boolean,
       default: true,
     },
-    align: {
-      type: String,
-      default: 'start',
-      validator: val => ['start', 'center', 'end'].includes(val),
-    },
-    rowAlign: {
-      type: String,
-      default: 'center',
-      validator: val => ['start', 'center', 'end'].includes(val),
-    },
-    direction: {
-      type: String,
-      default: 'vertical',
-      validator: val => ['horizontal', 'vertical'].includes(val),
+    noSpacing: {
+      type: Boolean,
+      default: false,
     },
   },
+
   methods: {
-    hideDeleteIcon(index) {
-      return (
-        (this.allowDeletingFirstItems && this.rows.length <= this.minRows) ||
-        (!this.allowDeletingFirstItems && index < this.minRows)
-      );
+    showDeleteIcon(index) {
+      if (!this.deleteIcon) {
+        return false;
+      }
+      return this.allowDeletingFirstItems
+        ? this.rows.length > this.minRows
+        : index >= this.minRows;
     },
   },
 };

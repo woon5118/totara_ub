@@ -25,15 +25,32 @@
 import amd from './amd';
 
 /**
+ * Normalize component name for i18n API.
+ *
+ * @param {string} component
+ * @returns {string}
+ */
+const normalizeComponent = component => {
+  if (!component || component == 'core') {
+    return 'moodle';
+  } else if (component.startsWith('core_')) {
+    return component.slice(5);
+  } else if (component.startsWith('mod_')) {
+    return component.slice(4);
+  }
+  return component;
+};
+
+/**
  * Get and format a language string.
  *
  * @param {string} key Name of string, e.g. 'cancel'.
- * @param {string} component Name of Totara component, e.g. 'core'.
- * @param {*=} param Optional variable to populate placeholder with.
+ * @param {string} [component] Name of Totara component, e.g. 'core'.
+ * @param {*=} [param] Optional variable to populate placeholder with.
  * @return {string}
  */
-export function getString(...args) {
-  return M.util.get_string(...args);
+export function getString(key, component, param) {
+  return M.util.get_string(key, component, param);
 }
 
 /**
@@ -44,6 +61,7 @@ export function getString(...args) {
  * @return {boolean}
  */
 export function hasString(key, component) {
+  component = normalizeComponent(component);
   return !!(M.str[component] && M.str[component][key]);
 }
 
@@ -54,9 +72,7 @@ export function hasString(key, component) {
  * @return {array}
  */
 export function unloadedStrings(requests) {
-  return requests.filter(
-    req => !M.str[req.component] || !M.str[req.component][req.key]
-  );
+  return requests.filter(req => !hasString(req.key, req.component));
 }
 
 /**
@@ -104,4 +120,61 @@ export function langSide(side) {
     default:
       return side;
   }
+}
+
+/**
+ * Represents a language string that can be loaded.
+ */
+class LangString {
+  constructor(...bits) {
+    this.bits = bits;
+  }
+
+  loaded() {
+    return hasString(...this.bits);
+  }
+
+  toRequest() {
+    return { component: this.bits[1], key: this.bits[0] };
+  }
+
+  toString() {
+    return this.loaded()
+      ? getString(...this.bits)
+      : `[[${this.bits.slice(0, 2)}]]`;
+  }
+}
+
+/**
+ * Create a placeholder for a language string that can be loaded.
+ *
+ * @param {string} key Name of string, e.g. 'cancel'.
+ * @param {string} component Name of Totara component, e.g. 'core'.
+ * @param {*=} param Optional variable to populate placeholder with.
+ * @returns {LangString}
+ */
+export function langString(...args) {
+  return new LangString(...args);
+}
+
+/**
+ * Checks if the provided argument is a language string placeholder.
+ *
+ * @param {*} str
+ * @returns {boolean}
+ */
+export function isLangString(str) {
+  return str instanceof LangString;
+}
+
+/**
+ * Load lang string objects.
+ *
+ * @param {Array} strings
+ * @returns {Promise}
+ */
+export async function loadLangStrings(strings) {
+  return loadStrings(
+    strings.filter(x => isLangString(x) && !x.loaded()).map(x => x.toRequest())
+  );
 }

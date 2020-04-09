@@ -25,6 +25,7 @@
     :id="id"
     class="tui-formInput"
     :aria-describedby="ariaDescribedby"
+    :aria-invalid="ariaInvalid"
     :aria-label="ariaLabel"
     :aria-labelledby="ariaLabelledby"
     :autocomplete="autocomplete"
@@ -52,6 +53,7 @@
     :type="type"
     :value="value"
     @input="$emit('input', $event.target.value)"
+    @blur="$emit('blur')"
     @keydown.enter="$emit('submit', $event.target.value)"
   />
 </template>
@@ -59,9 +61,10 @@
 <script>
 export default {
   props: {
-    ariaDescribedby: String,
-    ariaLabel: String,
-    ariaLabelledby: String,
+    ariaDescribedby: [String, Boolean],
+    ariaInvalid: [String, Boolean],
+    ariaLabel: [String, Boolean],
+    ariaLabelledby: [String, Boolean],
     autocomplete: String,
     autofocus: Boolean,
     dir: {

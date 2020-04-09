@@ -22,75 +22,22 @@
 
 <style lang="scss">
 .tui-repeater {
-  display: flex;
+  display: block;
+  flex-grow: 1;
+  width: 100%;
+  min-width: 0;
 
   & > * {
     margin-bottom: var(--tui-gap-3);
-  }
-
-  &--horizontal {
-    flex-wrap: wrap;
-    & > * {
-      margin-right: var(--tui-gap-4);
-    }
   }
 
   &--noSpacing > * {
     margin: 0;
   }
 
-  &--vertical {
-    flex-direction: column;
-  }
-
-  &--start {
-    & > button:last-child {
-      align-self: flex-start;
-    }
-  }
-
-  &--center {
-    & > button:last-child {
-      align-self: center;
-    }
-  }
-
-  &--end {
-    & > button:last-child {
-      align-self: flex-end;
-    }
-  }
-
   &__row {
     display: flex;
-
-    &--vertical {
-      &-start {
-        justify-content: flex-start;
-      }
-
-      &-center {
-        justify-content: center;
-      }
-
-      &-end {
-        justify-content: flex-end;
-      }
-    }
-
-    &--horizontal {
-      &-start {
-        align-items: flex-start;
-      }
-
-      &-center {
-        align-items: center;
-      }
-
-      &-end {
-        align-items: flex-end;
-      }
-    }
+    align-items: flex-start;
   }
 }
 </style>

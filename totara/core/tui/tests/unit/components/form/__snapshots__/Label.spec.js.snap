@@ -6,6 +6,7 @@ exports[`presentation/form/Label.vue Checks snapshot 1`] = `
 >
   
   example
-
+  
+  <!---->
 </label>
 `;

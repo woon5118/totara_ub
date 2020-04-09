@@ -21,35 +21,52 @@
 -->
 
 <template>
-  <a href="#" class="tui-formHelpIcon">
-    <FlexIcon
-      v-if="!hidden"
-      icon="help"
-      :alt="$str('help', 'moodle')"
-      :title="helpmsg"
-    />
+  <div class="tui-formHelpIcon">
+    <Popover :position="position">
+      <template v-slot:trigger>
+        <a href="javascript:;" class="tui-formHelpIcon__icon">
+          <Info
+            v-if="!hidden"
+            :alt="$str('help', 'moodle')"
+            :title="iconLabel || helpmsg"
+          />
+        </a>
+      </template>
+      <slot v-if="$slots.default" />
+      <template v-else>{{ helpmsg }}</template>
+    </Popover>
+
     <div :id="descId" class="tui-formHelpIcon__desc">
-      {{ helpmsg }}
+      <slot v-if="$slots.default" />
+      <template v-else>{{ helpmsg }}</template>
     </div>
-  </a>
+  </div>
 </template>
 
 <script>
 // Components
-import FlexIcon from 'totara_core/components/icons/FlexIcon';
+import Info from 'totara_core/components/icons/common/Info';
+import Popover from 'totara_core/components/popover/Popover';
 
 export default {
   components: {
-    FlexIcon: FlexIcon,
+    Info,
+    Popover,
   },
 
   props: {
+    position: {
+      type: String,
+      default: 'right',
+    },
     descId: {
       required: true,
       type: String,
     },
     helpmsg: {
-      required: true,
+      type: String,
+    },
+    iconLabel: {
       type: String,
     },
     hidden: {

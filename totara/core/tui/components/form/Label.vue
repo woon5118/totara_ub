@@ -21,7 +21,8 @@
 -->
 
 <template>
-  <label
+  <component
+    :is="legend ? 'legend' : 'label'"
     :id="id"
     :for="forId"
     class="tui-formLabel"
@@ -30,7 +31,14 @@
     }"
   >
     {{ label }}
-  </label>
+    <span
+      v-if="required"
+      class="tui-formLabel__required"
+      :aria-label="$str('required', 'moodle')"
+      :title="$str('required', 'moodle')"
+      v-text="'*'"
+    />
+  </component>
 </template>
 
 <script>
@@ -38,11 +46,19 @@ export default {
   props: {
     id: String,
     forId: String,
+    legend: Boolean,
     hidden: Boolean,
     label: {
       required: true,
       type: String,
     },
+    required: Boolean,
   },
 };
 </script>
+
+<lang-strings>
+{
+  "moodle": ["required"]
+}
+</lang-strings>

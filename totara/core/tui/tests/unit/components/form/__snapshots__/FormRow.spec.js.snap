@@ -12,8 +12,13 @@ exports[`presentation/form/FormRow.vue Checks snapshot 1`] = `
     <!---->
   </div>
    
-  <div
-    class="tui-formRow__action"
-  />
+  <fieldcontextprovider-stub
+    id="example"
+    labelid="idlabel"
+  >
+    <div
+      class="tui-formRow__action"
+    />
+  </fieldcontextprovider-stub>
 </div>
 `;

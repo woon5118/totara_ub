@@ -27,7 +27,11 @@ import {
   result,
   memoize,
   memoizeLoad,
+  get,
+  set,
+  orderBy,
   url,
+  isPlainObject,
 } from 'totara_core/util';
 
 jest.mock('totara_core/config');
@@ -159,6 +163,43 @@ describe('memoizeLoad', () => {
   });
 });
 
+describe('get', () => {
+  it('returns the value at path', () => {
+    const obj = { a: [{ b: { c: 3 } }], d: 4, e: { f: { g: 5 } } };
+    expect(get(obj, [])).toBe(obj);
+    expect(get(obj, [''])).toBe(undefined);
+    expect(get(obj, ['q'])).toBe(undefined);
+    expect(get(obj, ['q', 'w'])).toBe(undefined);
+    expect(get(obj, ['a', '0', 'b', 'c'])).toBe(3);
+    expect(get(obj, ['d'])).toBe(4);
+    expect(get(obj, ['e', 'f'])).toBe(obj.e.f);
+    expect(get(obj, ['e', 'f', 'g'])).toBe(5);
+  });
+});
+
+describe('set', () => {
+  it('sets the value at path', () => {
+    const obj = {};
+    // set(obj, ['a'], 3);
+    // expect(obj.a).toBe(3);
+    set(obj, ['b', 'c'], 4);
+    expect(obj.b.c).toBe(4);
+    set(obj, ['d', '3'], 5);
+    expect(obj.d[3]).toBe(5);
+    expect(Array.isArray(obj.d)).toBe(true);
+    set(obj, ['e', '3', 'f'], 6);
+    expect(obj.e[3].f).toBe(6);
+  });
+});
+
+describe('orderBy', () => {
+  it('sorts an array using a key function', () => {
+    const arr = [2, 3, 2, 9, 2].map(x => ({ index: x }));
+    const ordered = orderBy(arr, x => x.index);
+    expect(ordered.map(x => x.index)).toEqual([2, 2, 2, 3, 9]);
+  });
+});
+
 describe('url', () => {
   it('prepends base url unless absolute', () => {
     expect(url('/hello')).toBe('http://foo/hello');
@@ -210,5 +251,24 @@ describe('url', () => {
     url('/oo');
     expect(global.URL).toHaveBeenLastCalledWith('http://foo/oo');
     delete global.URL;
+  });
+});
+
+describe('isPlainObject', () => {
+  it('detects whether object is a plain object ({}) or not', () => {
+    const Es5Class = function() {};
+    class Es6Class {}
+
+    expect(isPlainObject(true)).toBe(false);
+    expect(isPlainObject('a')).toBe(false);
+    expect(isPlainObject(9)).toBe(false);
+    expect(isPlainObject(function() {})).toBe(false);
+    expect(isPlainObject([])).toBe(false);
+    expect(isPlainObject(new Date())).toBe(false);
+    expect(isPlainObject(new Es5Class())).toBe(false);
+    expect(isPlainObject(new Es6Class())).toBe(false);
+
+    expect(isPlainObject({})).toBe(true);
+    expect(isPlainObject({ b: 3 })).toBe(true);
   });
 });

@@ -22,13 +22,16 @@
 
 <style lang="scss">
 .tui-formHelpIcon {
-  .flex-icon {
-    display: inline-block;
-    padding-top: var(--tui-gap-1);
-    line-height: 1.5;
+  @include tui-font-heading-label();
+  display: inline-block;
+
+  &__icon {
+    color: var(--tui-color-state);
   }
 
   &__desc {
+    // aria-describedby still works even if the target element is display: none
+    // https://developer.paciellogroup.com/blog/2015/05/short-note-on-aria-labelledby-and-aria-describedby/
     display: none;
   }
 }
