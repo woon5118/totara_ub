@@ -1268,11 +1268,11 @@ function enrol_totara_facetoface_enrol_on_approval($newstatus) {
         return true;
     }
 
-    $DB->delete_records('enrol_totara_f2f_pending', array('id' => $efdrec->id));
-
     if ($newstatus->statuscode < \mod_facetoface\signup\state\waitlisted::get_code()) {
         return true;
     }
+
+    $DB->delete_records('enrol_totara_f2f_pending', array('id' => $efdrec->id));
 
     // Enrol.
     if (!$enrol = $DB->get_record('enrol', array('id' => $efdrec->enrolid, 'enrol' => 'totara_facetoface'))) {
