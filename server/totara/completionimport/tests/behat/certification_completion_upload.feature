@@ -1,4 +1,4 @@
-@totara @totara_completion_upload @totara_evidence @javascript @_file_upload
+@totara @perform @totara_completion_upload @totara_evidence @javascript @_file_upload
 Feature: Verify certification completion data can be successfully uploaded.
 
   Background:

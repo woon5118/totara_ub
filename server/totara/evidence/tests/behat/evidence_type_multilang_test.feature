@@ -1,4 +1,4 @@
-@totara @totara_evidence
+@totara @perform @totara_evidence
 Feature: Verify evidence type multi-lang names, descriptions and custom field names resolve correctly
 
   Background:

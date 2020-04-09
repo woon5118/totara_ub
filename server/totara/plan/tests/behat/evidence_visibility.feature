@@ -1,4 +1,4 @@
-@totara @totara_plan @totara_rol @totara_evidence @javascript
+@totara @perform @totara_plan @totara_rol @totara_evidence @javascript
 Feature: Check Evidence visibility in Record of Learning feature visibility
 
   Background:

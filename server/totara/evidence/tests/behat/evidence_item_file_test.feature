@@ -1,4 +1,4 @@
-@totara @totara_evidence @editor @editor_atto @atto @atto_image @_file_upload @javascript
+@totara @perform @totara_evidence @editor @editor_atto @atto @atto_image @_file_upload @javascript
 Feature: Evidence item file picker and text area upload
 
   Scenario: Upload some files to file picker and text area

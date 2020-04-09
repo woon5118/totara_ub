@@ -1,4 +1,4 @@
-@totara @totara_evidence
+@totara @perform @totara_evidence
 Feature: Evidence bank page
   Shows a list of evidence items for a user
 

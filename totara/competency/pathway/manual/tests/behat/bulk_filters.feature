@@ -1,4 +1,4 @@
-@totara @totara_competency @pathway_manual @javascript @vuejs
+@totara @perform @totara_competency @pathway_manual @javascript @vuejs
 Feature: Test filtering by users, roles, assignments etc. functions as expected.
 
   Background:

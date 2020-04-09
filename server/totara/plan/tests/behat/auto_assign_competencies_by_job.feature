@@ -1,4 +1,4 @@
-@totara @totara_plan @javascript
+@totara @perform @totara_plan @javascript
 Feature: Verify competencies are automatically added to plan according to job assignment.
 
   Background:

@@ -1,4 +1,4 @@
-@totara @tool @tool_totara_sync @totara_hierarchy @javascript
+@totara @perform @tool @tool_totara_sync @totara_hierarchy @javascript
 Feature: Test the competency database source.
 
   Background:

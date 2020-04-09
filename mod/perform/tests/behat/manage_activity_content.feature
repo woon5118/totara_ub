@@ -1,4 +1,4 @@
-@totara @mod_perform @javascript
+@totara @perform @mod_perform @javascript @vuejs
 Feature: Adding, Updating, Removing activity elements.
 
   Background:

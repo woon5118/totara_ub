@@ -1,4 +1,4 @@
-@totara @mod_perform @javascript
+@totara @perform @mod_perform @javascript @vuejs
 Feature: Viewing and responding to perform activities
 
   Background:

@@ -1,4 +1,4 @@
-@totara @totara_hierarchy @totara_hierarchy_competency @totara_courseprogressbar @javascript
+@totara @perform @totara_hierarchy @totara_competency @totara_courseprogressbar @javascript
 Feature: Verify competencies completion status is updated when the associated course completions happen before the competency creation
 
   Background:

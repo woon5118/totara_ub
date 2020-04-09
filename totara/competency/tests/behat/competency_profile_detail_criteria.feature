@@ -1,4 +1,4 @@
-@totara @totara_competency @totara_criteria @pathway_criteria_group @javascript @vuejs
+@totara @perform @totara_competency @totara_criteria @pathway_criteria_group @javascript @vuejs
 Feature: Test viewing criteria fulfilment for a user on their competency details page.
 
   Background:

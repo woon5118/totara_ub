@@ -1,4 +1,4 @@
-@totara @totara_competency @javascript
+@totara @perform @totara_competency @javascript @vuejs
 Feature: Archive user assignments on competency details page and view archived assignments.
 
   Background:

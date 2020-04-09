@@ -1,4 +1,4 @@
-@totara @totara_competency @pathway_manual @javascript @vuejs
+@totara @perform @totara_competency @pathway_manual @javascript @vuejs
 Feature: Test rating a competency for a user as different roles via the competencies dashboard block.
   Ensures that the basic navigation workflow can be followed.
 

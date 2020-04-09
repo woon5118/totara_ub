@@ -1,4 +1,4 @@
-@totara @totara_hierarchy @totara_hierarchy_competency @javascript
+@totara @perform @totara_hierarchy @totara_competency @javascript
 Feature: The competencies can be disabled
   In order to check the correct behaviour related to the visibility settings for the competency feature
   As a admin

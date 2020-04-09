@@ -1,4 +1,4 @@
-@_file_upload @javascript @tool @totara @totara_customfield @totara_hierarchy @tool_totara_sync
+@_file_upload @javascript @tool @totara @perform @totara_customfield @totara_hierarchy @tool_totara_sync
 Feature: Upload competencies via HR Import using CSV file
   In order to test HR import of competencies
   I must log in as an admin and import from a CSV file

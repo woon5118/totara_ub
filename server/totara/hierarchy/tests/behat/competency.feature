@@ -1,4 +1,4 @@
-@totara @totara_hierarchy @totara_hierarchy_competency @javascript
+@totara @perform @totara_hierarchy @totara_competency @javascript
 Feature: Test competencies achieved is updated
   In order to test the competencies achieved is updated
   As a user

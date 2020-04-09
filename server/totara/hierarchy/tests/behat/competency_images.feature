@@ -1,4 +1,4 @@
-@totara @totara_hierarchy @totara_hierarchy_competency @_file_upload @totara_customfield
+@totara @perform @totara_hierarchy @totara_competency @_file_upload @totara_customfield
 Feature: Test use of images in competencies and competency custom fields
   I should be able to use and view images in competency descriptions
   and custom text area fields

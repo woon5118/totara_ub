@@ -1,4 +1,4 @@
-@totara @totara_evidence @javascript
+@totara @perform @totara_evidence @javascript
 Feature: Evidence type visibility
   Show list of evidence types
   With option to change their visibility

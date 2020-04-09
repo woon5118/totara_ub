@@ -1,4 +1,4 @@
-@totara @totara_plan
+@totara @perform @totara_plan
 Feature: See that competency proficiency can be updated in Record of Learning: Competency report
 
   Background:

@@ -1,4 +1,4 @@
-@totara @totara_competency @javascript @vuejs
+@totara @perform @totara_competency @javascript @vuejs
 Feature: Test competencies can be user assigned
 
   Background:

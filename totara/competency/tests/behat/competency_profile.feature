@@ -1,4 +1,4 @@
-@totara @totara_competency @javascript @vuejs
+@totara @perform @totara_competency @javascript @vuejs
 Feature: Competency profile landing page - an overview of their progress towards completing their competency assignments
 
   Background:

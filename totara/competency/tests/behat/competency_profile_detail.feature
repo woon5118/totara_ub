@@ -1,4 +1,4 @@
-@totara @totara_competency @javascript @vuejs
+@totara @perform @totara_competency @javascript @vuejs
 Feature: Competency profile detail page - an overview of their progress (or lack of) towards completing a particular competency
 
   Background:

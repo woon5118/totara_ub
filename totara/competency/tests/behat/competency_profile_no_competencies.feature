@@ -1,4 +1,4 @@
-@totara @totara_competency @javascript @vuejs
+@totara @perform @totara_competency @javascript @vuejs
 Feature: Message is shown if there are no competencies to be shown for a user's competency profile.
 
   Background:

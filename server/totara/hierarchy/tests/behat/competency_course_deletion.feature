@@ -1,4 +1,4 @@
-@totara @totara_hierarchy @totara_hierarchy_competency @core_course @javascript
+@totara @perform @totara_hierarchy @totara_competency @core_course @javascript @vuejs
 Feature: Test competencies are updated when linked courses are deleted
 
   Scenario: Delete course linked to a single competency

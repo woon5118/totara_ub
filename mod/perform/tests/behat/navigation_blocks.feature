@@ -1,4 +1,4 @@
-@totara @mod_perform @javascript
+@totara @perform @mod_perform @javascript @vuejs
 Feature: Make sure the correct navigation breadcrumbs and blocks are shown.
 
   Scenario: Admin management pages show correct navigation options

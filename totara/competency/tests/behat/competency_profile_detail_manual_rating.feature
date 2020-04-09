@@ -1,4 +1,4 @@
-@totara @totara_competency @pathway_manual @javascript @vuejs
+@totara @perform @totara_competency @pathway_manual @javascript @vuejs
 Feature: Test viewing assessment (manual rating) for a user on their competency details page.
 
   Background:

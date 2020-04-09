@@ -1,4 +1,4 @@
-@totara @totara_competency @pathway_learning_plan @javascript @vuejs
+@totara @perform @totara_competency @pathway_learning_plan @javascript @vuejs
 Feature: Test viewing learning plans for a user on their competency details page.
 
   Background:

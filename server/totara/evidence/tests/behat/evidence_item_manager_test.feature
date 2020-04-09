@@ -1,4 +1,4 @@
-@totara @totara_evidence
+@totara @perform @totara_evidence
 Feature: Evidence item creation and editing for another user as a manager
 
   Background:

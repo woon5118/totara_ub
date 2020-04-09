@@ -1,4 +1,4 @@
-@totara @totara_hierarchy @totara_hierarchy_competency @javascript
+@totara @perform @totara_hierarchy @totara_competency @javascript
 Feature: Verify completion of a course triggers assigning a competency.
 
   Background:

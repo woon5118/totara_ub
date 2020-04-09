@@ -1,4 +1,4 @@
-@totara @totara_plan @totara_hierarchy @totara_hierarchy_competency @javascript
+@totara @perform @totara_plan @totara_hierarchy @totara_competency @javascript
 Feature: Learner creates learning plan with competencies.
 
   Background:

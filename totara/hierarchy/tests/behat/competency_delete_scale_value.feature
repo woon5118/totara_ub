@@ -1,4 +1,4 @@
-@totara @totara_competency @javascript
+@totara @perform @totara_competency @javascript
 Feature: Delete scale values pathways when users haven't achieved the competency.
 
   Background:

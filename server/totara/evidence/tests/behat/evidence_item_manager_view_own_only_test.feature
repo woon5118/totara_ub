@@ -1,4 +1,4 @@
-@totara @totara_evidence @totara_plan @totara_rol @javascript
+@totara @perform @totara_evidence @totara_plan @totara_rol @javascript
 Feature: Verify that a manager can not see a staff members personal evidence records if
   they have the evidence:manageownevidenceonothers capability, but do not have viewothers or manageanyevidenceonothers
 

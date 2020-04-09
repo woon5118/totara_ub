@@ -1,4 +1,4 @@
-@totara @totara_competency @javascript
+@totara @perform @totara_competency @javascript @vuejs
 Feature: View activity logs
 
   Background:

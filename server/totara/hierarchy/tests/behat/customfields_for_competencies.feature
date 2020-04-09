@@ -1,4 +1,4 @@
-@totara @totara_hierarchy @javascript @totara_customfield
+@totara @perform @totara_hierarchy @totara_competency @javascript @totara_customfield
 Feature: Test I can manage custom fields for competency types
   In order to test custom fields for competency types
   I log in as an admin

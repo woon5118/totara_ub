@@ -1,4 +1,4 @@
-@totara @mod_perform @javascript
+@totara @perform @mod_perform @javascript @vuejs
 Feature: Assign user groups to perform activities
   As an activity administrator
   I need to be able to assign user groups to individual perform activities

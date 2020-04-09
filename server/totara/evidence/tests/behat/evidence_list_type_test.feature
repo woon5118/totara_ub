@@ -1,4 +1,4 @@
-@totara @totara_evidence @javascript
+@totara @perform @totara_evidence @javascript
 Feature: Evidence type index page
   Shows list of evidence types
   With options to add, edit and delete evidence type
