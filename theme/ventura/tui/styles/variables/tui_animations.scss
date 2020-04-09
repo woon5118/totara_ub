@@ -21,21 +21,9 @@
 // @author    Simon Chester <simon.chester@totaralearning.com>
 // @package   theme_ventura
 
-// use map-merge to override
-$totara_style_transitions: (
-  'form': (
-    function: linear,
-    duration: 0s,
-  ),
-  'modal': (
-    function: ease-out,
-    duration: 0.15s,
-  ),
-);
-
-@function transition($type, $property) {
-  $tv: map-get($totara_style_transitions, $type);
-  @return $property map-get($tv, 'function') map-get($tv, 'duration');
+@function tui-transition($type, $property) {
+  @return $property var(--tui-transition-#{$property}-duration)
+    var(--tui-transition-#{$property}-function);
 }
 
 :root {
@@ -49,4 +37,6 @@ $totara_style_transitions: (
   --tui-transition-sidepanel-content-duration: 0.25s;
   --tui-transition-progress-function: ease-out;
   --tui-transition-progress-duration: 0.3s;
+  --tui-transition-button-function: ease;
+  --tui-transition-button-duration: 0.2s;
 }
