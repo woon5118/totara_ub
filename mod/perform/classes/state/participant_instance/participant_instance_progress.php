@@ -38,4 +38,8 @@ abstract class participant_instance_progress extends state {
      * Something has happened that may affect the instance's progress status, so check if we should switch.
      */
     abstract public function update_progress(): void;
+
+    public static function get_display_name(): string {
+        return get_string('participant_instance_status_' . strtolower(static::get_name()), 'mod_perform');
+    }
 }

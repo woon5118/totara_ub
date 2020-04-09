@@ -21,6 +21,8 @@
  * @package mod_perform
  */
 
+use totara_core\relationship\resolvers\subject;
+
 /**
  * This class just holds the configuration needed to create full activities.
  *
@@ -41,6 +43,13 @@ class mod_perform_activity_generator_configuration {
      * @var int
      */
     private $number_of_sections_per_activity = 1;
+
+    /**
+     * List of section relationships that should be created
+     *
+     * @var string[]
+     */
+    private $relationships_per_section = [subject::class];
 
     /**
      * The number of assignments per activity
@@ -65,6 +74,16 @@ class mod_perform_activity_generator_configuration {
      * @var bool
      */
     private $generate_subject_instances = true;
+
+    /**
+     * @var bool
+     */
+    private $create_appraiser_for_each_subject_user = false;
+
+    /**
+     * @var bool
+     */
+    private $create_manager_for_each_subject_user = false;
 
     /**
      * shortcut function to get new object
@@ -109,6 +128,22 @@ class mod_perform_activity_generator_configuration {
         return $this;
     }
 
+    /**
+     * @return array
+     */
+    public function get_relationships_per_section(): array {
+        return $this->relationships_per_section;
+    }
+
+    /**
+     * @param array $relationship_classes
+     * @return $this
+     */
+    public function set_relationships_per_section(array $relationship_classes): self {
+        $this->relationships_per_section = $relationship_classes;
+
+        return $this;
+    }
 
     /**
      * @return int
@@ -183,6 +218,46 @@ class mod_perform_activity_generator_configuration {
      */
     public function should_generate_subject_instances(): bool {
         return $this->generate_subject_instances;
+    }
+
+    /**
+     * Enables the creation of appraisers.
+     *
+     * @return $this
+     */
+    public function enable_appraiser_for_each_subject_user() {
+        $this->create_appraiser_for_each_subject_user = true;
+
+        return $this;
+    }
+
+    /**
+     * Enables the creation of managers.
+     *
+     * @return $this
+     */
+    public function enable_manager_for_each_subject_user() {
+        $this->create_manager_for_each_subject_user = true;
+
+        return $this;
+    }
+
+    /**
+     * Should an appraiser be created for each subject user?
+     *
+     * @return bool
+     */
+    public function should_create_appraiser_for_each_subject_user(): bool {
+        return $this->create_appraiser_for_each_subject_user;
+    }
+
+    /**
+     * Should a manager be created for each subject user?
+     *
+     * @return bool
+     */
+    public function should_create_manager_for_each_subject_user(): bool {
+        return $this->create_manager_for_each_subject_user;
     }
 
 }

@@ -24,11 +24,15 @@
 namespace mod_perform\models\activity;
 
 use context_module;
+use core\collection;
 use core\entities\user;
 use core\orm\entity\model;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
+use mod_perform\entities\activity\participant_section as participant_section_entity;
+use mod_perform\state\participant_instance\participant_instance_progress;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
+use totara_core\relationship\relationship;
 
 /**
  * Class participant_instance
@@ -39,6 +43,9 @@ use mod_perform\state\state_aware;
  * @property-read int $participant_id
  * @property-read subject_instance $subject_instance
  * @property-read int $subject_instance_id
+ * @property-read collection|participant_section_entity[] $participant_sections
+ * @property-read string $progress_status internal name of current progress state
+ * @property-read string $relationship_name internal name of the participant instance's activity relationship
  */
 class participant_instance extends model {
 
@@ -60,6 +67,7 @@ class participant_instance extends model {
         'progress_status',
         'subject_instance',
         'participant',
+        'relationship_name'
     ];
 
     public static function get_entity_class(): string {
@@ -98,8 +106,10 @@ class participant_instance extends model {
     /**
      * Update progress status according to section progress.
      */
-    public function update_progress_status(): void {
-        $this->get_state()->update_progress();
+    public function update_progress_status() {
+        /** @var participant_instance_progress $state */
+        $state = $this->get_state();
+        $state->update_progress();
     }
 
     /**
@@ -109,5 +119,15 @@ class participant_instance extends model {
      */
     public function get_progress_status(): string {
         return $this->get_state()->get_name();
+    }
+
+    /**
+     * Get relationship name
+     *
+     * @return string
+     */
+    public function get_relationship_name(): string {
+        $relationship_entity = $this->entity->activity_relationship->relationship;
+        return (new relationship($relationship_entity))->get_name();
     }
 }

@@ -27,6 +27,10 @@ use mod_perform\state\state;
 
 abstract class activity_state extends state {
 
+    public static function get_display_name(): string {
+        return get_string('activity_status_' . strtolower(static::get_name()), 'mod_perform');
+    }
+
     /**
      * Can this activity be potentially activated, checking if the transition
      * to active is possible

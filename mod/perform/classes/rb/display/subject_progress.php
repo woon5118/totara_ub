@@ -1,6 +1,6 @@
 <?php
-/*
- * This file is part of Totara Perform
+/**
+ * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Oleg Demeshev <oleg.demeshev@totaralearning.com>
+ * @author Matthias Bonk <matthias.bonk@totaralearning.com>
  * @package mod_perform
  */
 
@@ -26,7 +26,7 @@ namespace mod_perform\rb\display;
 use mod_perform\state\state_helper;
 use totara_reportbuilder\rb\display\base;
 
-class participant_progress extends base {
+class subject_progress extends base {
 
     /**
      * Handles the display
@@ -39,7 +39,7 @@ class participant_progress extends base {
      * @return string
      */
     public static function display($code, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        return state_helper::from_code($code, 'participant_instance')::get_display_name();
+        return state_helper::from_code($code, 'subject_instance')::get_display_name();
     }
 
     /**

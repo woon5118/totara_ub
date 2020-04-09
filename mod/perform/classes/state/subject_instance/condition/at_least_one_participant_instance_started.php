@@ -21,30 +21,28 @@
  * @package mod_perform
  */
 
-namespace mod_perform\state\participant_section;
+namespace mod_perform\state\subject_instance\condition;
 
-use mod_perform\state\state;
+use mod_perform\entities\activity\participant_instance;
+use mod_perform\state\condition;
+use mod_perform\state\participant_instance\complete;
+use mod_perform\state\participant_instance\in_progress;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Abstract class representing a progress status of a participant section.
- *
- * @package mod_perform
+ * Class at_least_one_participant_instance_started
  */
-abstract class participant_section_progress extends state {
+class at_least_one_participant_instance_started extends condition {
 
-    /**
-     * Try to switch progress status to complete.
-     */
-    abstract public function complete(): void;
-
-    /**
-     * Handle the fact that participant has accessed the section.
-     */
-    abstract public function on_participant_access(): void;
-
-    public static function get_display_name(): string {
-        return get_string('participant_section_status_' . strtolower(static::get_name()), 'mod_perform');
+    public function pass(): bool {
+        /** @var participant_instance[] $participant_instances */
+        $participant_instances = $this->object->participant_instances->all();
+        foreach ($participant_instances as $participant_instance) {
+            if (in_array((int)$participant_instance->progress, [in_progress::get_code(), complete::get_code()], true)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

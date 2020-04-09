@@ -21,7 +21,10 @@
  * @package mod_perform
  */
 
+use core\webapi\execution_context;
 use mod_perform\entities\activity\filters\subject_instances_about;
+use mod_perform\entities\activity\participant_instance;
+use mod_perform\models\activity\subject_instance;
 use totara_webapi\graphql;
 
 require_once(__DIR__ . '/subject_instance_testcase.php');
@@ -29,9 +32,17 @@ require_once(__DIR__ . '/subject_instance_testcase.php');
 /**
  * @group perform
  */
-class mod_perform_webapi_resolver_query_subject_instances_testcase extends mod_perform_subject_instance_testcase {
+class mod_perform_webapi_resolver_query_subject_instances_testcase extends advanced_testcase {
 
     public function test_query_successful(): void {
+        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $activity = $perform_generator->create_full_activities()->first();
+        /** @var participant_instance $participant_instance */
+        $participant_instance = participant_instance::repository()->get()->first();
+        $subject_instance = subject_instance::load_by_id($participant_instance->subject_instance_id);
+
+        self::setUser($participant_instance->participant_id);
+
         $args = [
             'filters' => [
                 'about' => [subject_instances_about::VALUE_ABOUT_SELF]
@@ -39,7 +50,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends mod_p
         ];
 
         $result = graphql::execute_operation(
-            $this->get_execution_context('ajax', 'mod_perform_subject_instances'),
+            execution_context::create('ajax', 'mod_perform_subject_instances'),
             $args
         )->toArray(true);
 
@@ -47,17 +58,18 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends mod_p
 
         $expected = [
             [
-                'id' => self::$about_user_and_participating->id,
-                'status' => self::$about_user_and_participating->get_status(),
+                'id' => (int)$subject_instance->id,
+                'progress_status' => $subject_instance->get_progress_status(),
                 'activity' => [
-                    'name' => self::$about_user_and_participating->get_activity()->name
+                    'name' => $activity->name
                 ],
                 'subject_user' => [
-                    'fullname' => self::$about_user_and_participating->subject_user->fullname
+                    'fullname' => $subject_instance->subject_user->fullname
                 ],
                 'participant_instances' => [
                     [
-                        'progress_status' => 'NOT_STARTED'
+                        'progress_status' => 'NOT_STARTED',
+                        'relationship_name' => 'Subject',
                     ]
                 ],
             ]
@@ -74,7 +86,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends mod_p
         ];
 
         $errors = graphql::execute_operation(
-            $this->get_execution_context('ajax', 'mod_perform_subject_instances'),
+            execution_context::create('ajax', 'mod_perform_subject_instances'),
             $args
         )->errors;
 

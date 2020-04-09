@@ -50,6 +50,7 @@ use mod_perform\util;
 use totara_core\entities\relationship_resolver;
 use totara_core\relationship\relationship;
 use totara_core\relationship\resolvers\subject;
+use totara_job\job_assignment;
 use totara_job\relationship\resolvers\manager;
 
 /**
@@ -365,7 +366,9 @@ class mod_perform_generator extends component_generator_base {
             $activity = $this->create_activity_in_container($data);
             for ($k = 0; $k < $configuration->get_number_of_sections_per_activity(); $k++) {
                 $section = $this->create_section($activity, ['title' => $activity->name . ' section ' . $k]);
-                $this->create_section_relationship($section, ['class_name' => subject::class]);
+                foreach ($configuration->get_relationships_per_section() as $relationship_class) {
+                    $this->create_section_relationship($section, ['class_name' => $relationship_class]);
+                }
             }
             $this->create_activity_tracks($activity);
             $activities[] = $activity;
@@ -379,6 +382,24 @@ class mod_perform_generator extends component_generator_base {
                 for ($k = 0; $k < $configuration->get_number_of_users_per_user_group_type(); $k++) {
                     $user = $this->datagenerator->create_user();
                     cohort_add_member($cohort->id, $user->id);
+
+                    if ($configuration->should_create_appraiser_for_each_subject_user()) {
+                        $appraiser = $this->datagenerator->create_user();
+                        job_assignment::create([
+                            'userid' => $user->id,
+                            'idnumber' => 'app/' . $cohort->id . '/' . $user->id,
+                            'appraiserid' => $appraiser->id,
+                        ]);
+                    }
+                    if ($configuration->should_create_manager_for_each_subject_user()) {
+                        $manager = $this->datagenerator->create_user();
+                        job_assignment::create([
+                            'userid' => $user->id,
+                            'idnumber' => 'man/' . $cohort->id . '/' . $user->id,
+                            'managerjaid' => job_assignment::create_default($manager->id)->id,
+                        ]);
+                    }
+
                 }
             }
 
@@ -513,6 +534,18 @@ class mod_perform_generator extends component_generator_base {
                 }
 
                 $this->create_participant_section($activity, $participant_instance, false, $section1);
+            }
+
+            if ($subject_is_participating) {
+                $subject_relationship = $this->create_section_relationship($section1, ['class_name' => subject::class]);
+                $subjects_participant_instance->activity_relationship_id = $subject_relationship->activity_relationship_id;
+                $subjects_participant_instance->save();
+            }
+
+            if ($other_participant) {
+                $manager_relationship = $this->create_section_relationship($section1, ['class_name' => manager::class]);
+                $other_participant_instance->activity_relationship_id = $manager_relationship->activity_relationship_id;
+                $other_participant_instance->save();
             }
 
             if ($subject_is_participating) {

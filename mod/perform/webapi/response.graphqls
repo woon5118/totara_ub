@@ -68,6 +68,6 @@ A list of possible progress status states that a user participant section can be
 """
 enum mod_perform_participant_section_progress_status {
   COMPLETE
-  INCOMPLETE
+  IN_PROGRESS
   NOT_STARTED
 }

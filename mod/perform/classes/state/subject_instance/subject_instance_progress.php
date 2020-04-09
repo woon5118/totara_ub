@@ -21,30 +21,25 @@
  * @package mod_perform
  */
 
-namespace mod_perform\state\participant_section;
+namespace mod_perform\state\subject_instance;
 
 use mod_perform\state\state;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Abstract class representing a progress status of a participant section.
+ * Abstract class representing a progress status of a participant instance.
  *
  * @package mod_perform
  */
-abstract class participant_section_progress extends state {
+abstract class subject_instance_progress extends state {
 
     /**
-     * Try to switch progress status to complete.
+     * Something has happened that may affect the instance's progress status, so check if we should switch.
      */
-    abstract public function complete(): void;
-
-    /**
-     * Handle the fact that participant has accessed the section.
-     */
-    abstract public function on_participant_access(): void;
+    abstract public function update_progress(): void;
 
     public static function get_display_name(): string {
-        return get_string('participant_section_status_' . strtolower(static::get_name()), 'mod_perform');
+        return get_string('subject_instance_status_' . strtolower(static::get_name()), 'mod_perform');
     }
 }

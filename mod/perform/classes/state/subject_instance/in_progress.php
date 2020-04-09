@@ -21,25 +21,26 @@
  * @package mod_perform
  */
 
-namespace mod_perform\state\participant_section;
+namespace mod_perform\state\subject_instance;
 
 use core\event\base;
-use mod_perform\event\participant_section_progress_updated;
-use mod_perform\models\activity\participant_section;
+use mod_perform\event\subject_instance_progress_updated;
+use mod_perform\models\activity\subject_instance;
 use mod_perform\state\state_event;
+use mod_perform\state\subject_instance\condition\all_participant_instances_complete;
 use mod_perform\state\transition;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This class represents the "incomplete" progress status of a participant section.
+ * This class represents the "in_progress" progress status of a subject instance.
  *
  * @package mod_perform
  */
-class incomplete extends participant_section_progress implements state_event {
+class in_progress extends subject_instance_progress implements state_event {
 
-    public function get_name(): string {
-        return 'INCOMPLETE';
+    public static function get_name(): string {
+        return 'IN_PROGRESS';
     }
 
     public static function get_code(): int {
@@ -48,18 +49,20 @@ class incomplete extends participant_section_progress implements state_event {
 
     public function get_transitions(): array {
         return [
-            // The participant has completed a section.
-            transition::to(new complete($this->object)),
+            // All participants have completed their instances.
+            transition::to(new complete($this->object))->with_conditions([
+                all_participant_instances_complete::class
+            ]),
         ];
     }
 
     public function get_event(): base {
-        /** @var participant_section $participant_section */
-        $participant_section = $this->get_object();
-        return participant_section_progress_updated::create_from_participant_section($participant_section);
+        /** @var subject_instance $subject_instance */
+        $subject_instance = $this->get_object();
+        return subject_instance_progress_updated::create_from_subject_instance($subject_instance);
     }
 
-    public function complete(): void {
+    public function update_progress(): void {
         if ($this->can_switch(complete::class)) {
             $this->object->switch_state(complete::class);
         }

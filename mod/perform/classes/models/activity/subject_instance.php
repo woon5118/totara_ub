@@ -29,6 +29,9 @@ use core\collection;
 use core\entities\user;
 use core\orm\entity\model;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\state\state;
+use mod_perform\state\state_aware;
+use mod_perform\state\subject_instance\subject_instance_progress;
 
 /**
  * Class subject_instance
@@ -37,24 +40,29 @@ use mod_perform\entities\activity\subject_instance as subject_instance_entity;
  *
  * @property-read int $id
  * @property-read user $subject_user The user that this activity is about
- * @property-read activity activity The top level perform activity this is an instance of
- * @property-read string status The string representation of the status
+ * @property-read int $progress The progress status code
+ * @property-read activity $activity The top level perform activity this is an instance of
+ * @property-read collection|participant_instance[] $participant_instances models created from participant_instance entities
+ * @property-read string $progress_status internal name of current progress state
  *
  * @package mod_perform\models\activity
  */
 class subject_instance extends model {
 
+    use state_aware;
+
     protected $accessible_attributes = [
         'id',
         'subject_user',
+        'progress'
     ];
 
     protected $model_accessor_whitelist = [
         'activity',
-        'status',
         'participant_instances',
         'relationship_to_subject',
         'is_self',
+        'progress_status',
     ];
 
     /** @var subject_instance_entity */
@@ -94,12 +102,32 @@ class subject_instance extends model {
     }
 
     /**
-     * @return string The status of the user activity (subject instance),
-     * in the format of a constant, not human readable string
+     * Get internal name of current progress state.
+     *
+     * @return string
      */
-    public function get_status(): string {
-        // TODO get from the subject instance($this->>entity) once implemented
-        return 'IN_PROGRESS';
+    public function get_progress_status(): string {
+        return $this->get_state()->get_name();
+    }
+
+    /**
+     * Update progress status.
+     *
+     * Must be called when something happened that can affect the progress status.
+     */
+    public function update_progress_status() {
+        /** @var subject_instance_progress $state */
+        $state = $this->get_state();
+        $state->update_progress();
+    }
+
+    public function get_current_state_code(): int {
+        return $this->progress;
+    }
+
+    protected function update_state_code(state $state): void {
+        $this->entity->progress = $state::get_code();
+        $this->entity->update();
     }
 
     /**

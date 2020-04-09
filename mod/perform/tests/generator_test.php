@@ -23,13 +23,19 @@
  */
 
 use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\entities\activity\participant_instance as participant_instance_entity;
+use mod_perform\entities\activity\section_relationship;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\entities\activity\track_assignment as track_assignment_entity;
 use mod_perform\entities\activity\track_user_assignment as track_user_assignment_entity;
 use mod_perform\models\activity\track_status;
 use mod_perform\models\activity\track_assignment_type;
-
 use mod_perform\user_groups\grouping;
+use totara_core\relationship\resolvers\subject;
+use totara_job\entities\job_assignment as job_assignment_entity;
+use totara_job\job_assignment;
+use totara_job\relationship\resolvers\appraiser;
+use totara_job\relationship\resolvers\manager;
 
 /**
  * @coversDefaultClass mod_perform_generator.
@@ -137,6 +143,14 @@ class mod_perform_generator_testcase extends advanced_testcase {
         // Assert that there is the expected amount of subject instances in the database
         $subject_instances_in_db = subject_instance_entity::repository()->get();
         $this->assertCount(5, $subject_instances_in_db);
+
+        // Assert that there is the expected amount of participant instances in the database
+        $participant_instances_in_db = participant_instance_entity::repository()->get();
+        $this->assertCount(5, $participant_instances_in_db);
+
+        // Assert that there is the expected amount of section relationships in the database
+        $section_relationships_in_db = section_relationship::repository()->get();
+        $this->assertCount(1, $section_relationships_in_db);
     }
 
     public function test_create_full_activities_with_increased_number() {
@@ -145,9 +159,9 @@ class mod_perform_generator_testcase extends advanced_testcase {
         $configuration = mod_perform_activity_generator_configuration::new()
             ->set_number_of_activities(3)
             ->set_cohort_assignments_per_activity(4)
-            ->set_number_of_users_per_user_group_type(6);
+            ->set_number_of_users_per_user_group_type(6)
+            ->set_relationships_per_section([subject::class, manager::class, appraiser::class]);
 
-        // Try with default configuration
         $activities = $generator->create_full_activities($configuration);
         $this->assertEquals(3, count($activities));
 
@@ -169,6 +183,14 @@ class mod_perform_generator_testcase extends advanced_testcase {
         // Assert that there is the expected amount of subject instances in the database
         $subject_instances_in_db = subject_instance_entity::repository()->get();
         $this->assertCount(72, $subject_instances_in_db);
+
+        // Assert that there is the expected amount of participant instances in the database
+        $participant_instances_in_db = participant_instance_entity::repository()->get();
+        $this->assertCount(72, $participant_instances_in_db);
+
+        // Assert that there is the expected amount of section relationships in the database
+        $section_relationships_in_db = section_relationship::repository()->get();
+        $this->assertCount(9, $section_relationships_in_db);
     }
 
     public function test_create_full_activities_without_subject_instances() {
@@ -177,7 +199,6 @@ class mod_perform_generator_testcase extends advanced_testcase {
         $configuration = mod_perform_activity_generator_configuration::new()
             ->disable_subject_instances();
 
-        // Try with default configuration
         $activities = $generator->create_full_activities($configuration);
         $this->assertEquals(1, count($activities));
 
@@ -196,6 +217,10 @@ class mod_perform_generator_testcase extends advanced_testcase {
         $user_assignments_in_db = track_user_assignment_entity::repository()->get();
         $this->assertCount(5, $user_assignments_in_db);
 
+        // Assert that there is the expected amount of section relationships in the database
+        $section_relationships_in_db = section_relationship::repository()->get();
+        $this->assertCount(1, $section_relationships_in_db);
+
         // No subject instances should have been created
         $subject_instances_in_db = subject_instance_entity::repository()->get();
         $this->assertCount(0, $subject_instances_in_db);
@@ -207,7 +232,6 @@ class mod_perform_generator_testcase extends advanced_testcase {
         $configuration = mod_perform_activity_generator_configuration::new()
             ->disable_user_assignments();
 
-        // Try with default configuration
         $activities = $generator->create_full_activities($configuration);
         $this->assertEquals(1, count($activities));
 
@@ -222,6 +246,10 @@ class mod_perform_generator_testcase extends advanced_testcase {
         $assignments_in_db = track_assignment_entity::repository()->get();
         $this->assertCount(1, $assignments_in_db);
 
+        // Assert that there is the expected amount of section relationships in the database
+        $section_relationships_in_db = section_relationship::repository()->get();
+        $this->assertCount(1, $section_relationships_in_db);
+
         // No user assignments should have been created
         $user_assignments_in_db = track_user_assignment_entity::repository()->get();
         $this->assertCount(0, $user_assignments_in_db);
@@ -229,6 +257,37 @@ class mod_perform_generator_testcase extends advanced_testcase {
         // No user assignments - no subject instances
         $subject_instances_in_db = subject_instance_entity::repository()->get();
         $this->assertCount(0, $subject_instances_in_db);
+    }
+
+    public function test_create_full_activities_with_additional_roles() {
+        $generator = $this->generator();
+
+        $configuration = mod_perform_activity_generator_configuration::new()
+            ->set_number_of_activities(2)
+            ->set_number_of_users_per_user_group_type(2)
+            ->set_relationships_per_section([subject::class, manager::class, appraiser::class])
+            ->enable_manager_for_each_subject_user()
+            ->enable_appraiser_for_each_subject_user();
+
+        $activities = $generator->create_full_activities($configuration);
+
+        // Assert that there is the expected amount of subject instances in the database
+        $subject_user_ids = subject_instance_entity::repository()->get()->pluck('subject_user_id');
+        $this->assertCount(4, $subject_user_ids);
+
+        // Assert that there is the expected amount of participant instances in the database
+        $participant_instances_in_db = participant_instance_entity::repository()->get();
+        $this->assertCount(12, $participant_instances_in_db);
+
+        // Assert that a manager and appraiser was created for every subject user.
+        foreach ($subject_user_ids as $subject_user_id) {
+            $this->assertCount(1, job_assignment::get_all_manager_userids($subject_user_id));
+            $this->assertCount(1, job_assignment_entity::repository()
+                ->where('userid', $subject_user_id)
+                ->where('appraiserid', '>', 0)
+                ->get()
+            );
+        }
     }
 
     /**

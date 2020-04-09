@@ -31,6 +31,7 @@ use core\orm\query\builder;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\models\activity\section;
+use mod_perform\state\participant_section\participant_section_progress;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
 
@@ -199,10 +200,21 @@ class participant_section extends model {
                 $element_response->save();
             }
 
-            $this->get_state()->complete();
+            /** @var participant_section_progress $state */
+            $state = $this->get_state();
+            $state->complete();
         });
 
         return true;
+    }
+
+    /**
+     * Called when a participant has accessed this section.
+     */
+    public function on_participant_access() {
+        /** @var participant_section_progress $state */
+        $state = $this->get_state();
+        $state->on_participant_access();
     }
 
     public function get_current_state_code(): int {

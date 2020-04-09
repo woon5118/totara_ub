@@ -33,19 +33,26 @@ use mod_perform\state\participant_instance\condition\not_all_sections_complete;
 use mod_perform\state\participant_instance\in_progress;
 use mod_perform\state\participant_instance\not_started;
 use mod_perform\state\participant_section\complete as complete_section;
-use mod_perform\state\participant_section\incomplete as incomplete_section;
+use mod_perform\state\participant_section\in_progress as in_progress_section;
 use mod_perform\state\participant_section\not_started as not_started_section;
+use mod_perform\state\state_helper;
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
+require_once(__DIR__ . '/state_testcase.php');
+
 
 /**
  * @group perform
  */
-class mod_perform_participant_instance_progress_testcase extends advanced_testcase {
+class mod_perform_participant_instance_progress_testcase extends state_testcase {
+
+    protected static function get_object_type(): string {
+        return 'participant_instance';
+    }
 
     public function condition_all_sections_data_provider(): array {
         $n = not_started_section::get_code();
-        $i = incomplete_section::get_code();
+        $i = in_progress_section::get_code();
         $c = complete_section::get_code();
         return [
             [$n, $n, false],
@@ -82,7 +89,7 @@ class mod_perform_participant_instance_progress_testcase extends advanced_testca
 
     public function at_least_one_section_started_data_provider() {
         $n = not_started_section::get_code();
-        $i = incomplete_section::get_code();
+        $i = in_progress_section::get_code();
         $c = complete_section::get_code();
         return [
             [$n, $n, false],
@@ -155,8 +162,8 @@ class mod_perform_participant_instance_progress_testcase extends advanced_testca
 
         $this->setUser($subject_user1->to_the_origins());
 
-        // Progress section1 to incomplete - instance is expected to be in_progress as a result.
-        $participant_section1->switch_state(incomplete_section::class);
+        // Progress section1 to in_progress - instance is expected to be in_progress as a result.
+        $participant_section1->switch_state(in_progress_section::class);
         $this->assert_participant_instance_progress([
             $participant_instance1->id => in_progress::get_code(),
             $participant_instance2->id => not_started::get_code(),
@@ -169,8 +176,8 @@ class mod_perform_participant_instance_progress_testcase extends advanced_testca
             $participant_instance2->id => not_started::get_code(),
         ]);
 
-        // Progress section2 to incomplete - no change to instance (still in_progress).
-        $participant_section2->switch_state(incomplete_section::class);
+        // Progress section2 to in_progress - no change to instance (still in_progress).
+        $participant_section2->switch_state(in_progress_section::class);
         $this->assert_participant_instance_progress([
             $participant_instance1->id => in_progress::get_code(),
             $participant_instance2->id => not_started::get_code(),
@@ -197,6 +204,14 @@ class mod_perform_participant_instance_progress_testcase extends advanced_testca
             $participant_instance1->id => in_progress::get_code(),
             $participant_instance2->id => not_started::get_code(),
         ]);
+    }
+
+    public function test_get_all_translated() {
+        $this->assertEqualsCanonicalizing([
+            20 => 'Complete',
+            10 => 'In progress',
+            0 => 'Not started',
+        ], state_helper::get_all_display_names('participant_instance'));
     }
 
     /**

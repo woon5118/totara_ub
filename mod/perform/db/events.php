@@ -23,7 +23,9 @@
 
 use core\event\cohort_member_added;
 use core\event\cohort_member_removed;
+use mod_perform\event\participant_instance_progress_updated;
 use mod_perform\event\participant_section_progress_updated;
+use mod_perform\observers\participant_instance_progress;
 use mod_perform\observers\participant_section_progress;
 use mod_perform\observers\track_assignment_user_groups;
 use totara_cohort\event\members_updated;
@@ -46,5 +48,9 @@ $observers = [
     [
         'eventname' => participant_section_progress_updated::class,
         'callback' => participant_section_progress::class.'::progress_updated',
+    ],
+    [
+        'eventname' => participant_instance_progress_updated::class,
+        'callback' => participant_instance_progress::class.'::progress_updated',
     ],
 ];

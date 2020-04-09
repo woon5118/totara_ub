@@ -27,7 +27,6 @@ use core\event\base;
 use mod_perform\event\participant_instance_progress_updated;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\state\participant_instance\condition\all_sections_complete;
-use mod_perform\state\state;
 use mod_perform\state\state_event;
 use mod_perform\state\transition;
 
@@ -38,9 +37,9 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package mod_perform
  */
-class in_progress extends state implements state_event {
+class in_progress extends participant_instance_progress implements state_event {
 
-    public function get_name(): string {
+    public static function get_name(): string {
         return 'IN_PROGRESS';
     }
 

@@ -1,7 +1,7 @@
 query mod_perform_subject_instance($subject_instance_id: core_id!) {
   mod_perform_subject_instance(subject_instance_id: $subject_instance_id) {
     id
-    status
+    progress_status
     activity {
       name
     }

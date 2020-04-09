@@ -26,12 +26,12 @@ namespace mod_perform\state\participant_instance\condition;
 use mod_perform\entities\activity\participant_section;
 use mod_perform\state\condition;
 use mod_perform\state\participant_section\complete;
-use mod_perform\state\participant_section\incomplete;
+use mod_perform\state\participant_section\in_progress;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class all_sections_complete
+ * Class at_least_one_section_started
  */
 class at_least_one_section_started extends condition {
 
@@ -39,7 +39,7 @@ class at_least_one_section_started extends condition {
         /** @var participant_section[] $sections */
         $sections = $this->object->participant_sections->all();
         foreach ($sections as $section) {
-            if (in_array((int)$section->progress, [incomplete::get_code(), complete::get_code()], true)) {
+            if (in_array((int)$section->progress, [in_progress::get_code(), complete::get_code()], true)) {
                 return true;
             }
         }

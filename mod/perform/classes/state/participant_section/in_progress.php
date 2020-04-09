@@ -17,56 +17,54 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+ * @author Matthias Bonk <matthias.bonk@totaralearning.com>
  * @package mod_perform
  */
 
-namespace mod_perform\state\activity;
+namespace mod_perform\state\participant_section;
 
 use core\event\base;
-use mod_perform\event\activity_activated;
-use mod_perform\models\activity\activity;
+use mod_perform\event\participant_section_progress_updated;
+use mod_perform\models\response\participant_section;
 use mod_perform\state\state_event;
+use mod_perform\state\transition;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This class represents the "active" state of an activity.
+ * This class represents the "in progress" status of a participant section.
  *
  * @package mod_perform
  */
-class active extends activity_state implements state_event {
+class in_progress extends participant_section_progress implements state_event {
 
-    /**
-     * @inheritDoc
-     */
     public static function get_name(): string {
-        return 'ACTIVE';
+        return 'IN_PROGRESS';
     }
 
-    /**
-     * @inheritDoc
-     */
     public static function get_code(): int {
-        return 1;
+        return 10;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function get_transitions(): array {
-        return [];
+        return [
+            // The participant has completed a section.
+            transition::to(new complete($this->object)),
+        ];
     }
 
-    /**
-     * Trigger event if the activity gets activated
-     *
-     * @return base
-     */
     public function get_event(): base {
-        /** @var activity $activity */
-        $activity = $this->object;
-        return activity_activated::create_from_activity($activity);
+        /** @var participant_section $participant_section */
+        $participant_section = $this->get_object();
+        return participant_section_progress_updated::create_from_participant_section($participant_section);
     }
 
+    public function complete(): void {
+        $this->object->switch_state(complete::class);
+    }
+
+    public function on_participant_access(): void {
+        // Not relevant when already in progress. Do nothing.
+        return;
+    }
 }

@@ -29,6 +29,7 @@ use core\webapi\query_resolver;
 use mod_perform\data_providers\response\participant_section_with_responses;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
+use mod_perform\models\response\participant_section as participant_section_model;
 use totara_core\advanced_feature;
 
 class participant_section implements query_resolver {
@@ -52,6 +53,11 @@ class participant_section implements query_resolver {
         $ec->set_relevant_context(subject_instance_model::load_by_id($subject_instance_id)->get_context());
 
         $data_provider = new participant_section_with_responses($participant_id, $participant_section_entity->id);
+
+        // When this participant section is fetched, for now we can safely assume that the participant is accessing
+        // the section. In the future, this may have to move to a set_accessed mutation, e.g. if sections become
+        // expandable in the front end and are fetched before actually being accessed.
+        participant_section_model::load_by_entity($participant_section_entity)->on_participant_access();
 
         return $data_provider->fetch()->get();
     }

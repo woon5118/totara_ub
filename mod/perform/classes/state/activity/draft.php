@@ -37,7 +37,7 @@ class draft extends activity_state {
     /**
      * @inheritDoc
      */
-    public function get_name(): string {
+    public static function get_name(): string {
         return 'DRAFT';
     }
 

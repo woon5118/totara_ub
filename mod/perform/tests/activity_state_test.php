@@ -24,6 +24,7 @@
 use mod_perform\event\activity_activated;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;
+use mod_perform\state\state_helper;
 
 /**
  * @group perform
@@ -144,5 +145,13 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
         $this->assertFalse($active_activity->can_potentially_activate());
         $this->assertFalse($active_activity->can_activate());
     }
+
+    public function test_get_all_translated() {
+        $this->assertEqualsCanonicalizing([
+            1 => 'Active',
+            0 => 'Draft',
+        ], state_helper::get_all_display_names('activity'));
+    }
+
 
 }

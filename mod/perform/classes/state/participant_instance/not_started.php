@@ -37,7 +37,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class not_started extends participant_instance_progress {
 
-    public function get_name(): string {
+    public static function get_name(): string {
         return 'NOT_STARTED';
     }
 

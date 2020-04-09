@@ -25,7 +25,7 @@ namespace mod_perform\state\participant_section;
 
 use core\event\base;
 use mod_perform\event\participant_section_progress_updated;
-use mod_perform\models\activity\participant_section;
+use mod_perform\models\response\participant_section;
 use mod_perform\state\state_event;
 
 defined('MOODLE_INTERNAL') || die();
@@ -37,7 +37,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class complete extends participant_section_progress implements state_event {
 
-    public function get_name(): string {
+    public static function get_name(): string {
         return 'COMPLETE';
     }
 
@@ -56,7 +56,12 @@ class complete extends participant_section_progress implements state_event {
     }
 
     public function complete(): void {
-        // Already in complete state, don't do anything.
+        // Already in complete state. Do nothing.
+        return;
+    }
+
+    public function on_participant_access(): void {
+        // Not relevant when already complete. Do nothing.
         return;
     }
 }

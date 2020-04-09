@@ -21,30 +21,25 @@
  * @package mod_perform
  */
 
-namespace mod_perform\state\participant_section;
+namespace mod_perform\observers;
 
-use mod_perform\state\state;
+use core\event\base;
+use mod_perform\event\participant_instance_progress_updated;
+use mod_perform\entities\activity\participant_instance;
+use mod_perform\models\activity\subject_instance;
 
-defined('MOODLE_INTERNAL') || die();
-
-/**
- * Abstract class representing a progress status of a participant section.
- *
- * @package mod_perform
- */
-abstract class participant_section_progress extends state {
+class participant_instance_progress {
 
     /**
-     * Try to switch progress status to complete.
+     * When progress status of a participant instance is updated, make the subject instance check if it needs a
+     * progress status update as well.
+     *
+     * @param base|participant_instance_progress_updated $event
      */
-    abstract public function complete(): void;
-
-    /**
-     * Handle the fact that participant has accessed the section.
-     */
-    abstract public function on_participant_access(): void;
-
-    public static function get_display_name(): string {
-        return get_string('participant_section_status_' . strtolower(static::get_name()), 'mod_perform');
+    public static function progress_updated(base $event) {
+        /** @var participant_instance $participant_instance */
+        $participant_instance = participant_instance::repository()->find_or_fail($event->objectid);
+        $subject_instance_model = subject_instance::load_by_entity($participant_instance->subject_instance);
+        $subject_instance_model->update_progress_status();
     }
 }

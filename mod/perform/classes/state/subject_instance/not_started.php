@@ -21,51 +21,48 @@
  * @package mod_perform
  */
 
-namespace mod_perform\state\participant_instance;
+namespace mod_perform\state\subject_instance;
 
-use core\event\base;
-use mod_perform\event\participant_instance_progress_updated;
-use mod_perform\models\activity\participant_instance;
-use mod_perform\state\participant_instance\condition\not_all_sections_complete;
-use mod_perform\state\state;
-use mod_perform\state\state_event;
+use mod_perform\state\subject_instance\condition\all_participant_instances_complete;
+use mod_perform\state\subject_instance\condition\at_least_one_participant_instance_started;
+use mod_perform\state\subject_instance\condition\not_all_participant_instances_complete;
 use mod_perform\state\transition;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This class represents the "complete" progress status of a participant instance.
+ * This class represents the "not_started" progress status of a subject instance.
  *
  * @package mod_perform
  */
-class complete extends participant_instance_progress implements state_event {
+class not_started extends subject_instance_progress {
 
     public static function get_name(): string {
-        return 'COMPLETE';
+        return 'NOT_STARTED';
     }
 
     public static function get_code(): int {
-        return 20;
+        return 0;
     }
 
     public function get_transitions(): array {
         return [
+            transition::to(new complete($this->object))->with_conditions([
+                all_participant_instances_complete::class
+            ]),
             transition::to(new in_progress($this->object))->with_conditions([
-                not_all_sections_complete::class,
+                not_all_participant_instances_complete::class,
+                at_least_one_participant_instance_started::class,
             ]),
         ];
     }
 
     public function update_progress(): void {
-        // May transition back to in_progress if another section was added.
-        if ($this->can_switch(in_progress::class)) {
-            $this->object->switch_state(in_progress::class);
+        foreach ([complete::class, in_progress::class] as $to_state) {
+            if ($this->can_switch($to_state)) {
+                $this->object->switch_state($to_state);
+                break;
+            }
         }
-    }
-
-    public function get_event(): base {
-        /** @var participant_instance $participant_instance */
-        $participant_instance = $this->get_object();
-        return participant_instance_progress_updated::create_from_participant_instance($participant_instance);
     }
 }

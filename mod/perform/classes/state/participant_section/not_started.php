@@ -34,7 +34,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class not_started extends participant_section_progress {
 
-    public function get_name(): string {
+    public static function get_name(): string {
         return 'NOT_STARTED';
     }
 
@@ -45,7 +45,7 @@ class not_started extends participant_section_progress {
     public function get_transitions(): array {
         return [
             // The participant has saved a draft.
-            transition::to(new incomplete($this->object)),
+            transition::to(new in_progress($this->object)),
 
             // The participant has completed a section.
             transition::to(new complete($this->object)),
@@ -53,8 +53,10 @@ class not_started extends participant_section_progress {
     }
 
     public function complete(): void {
-        if ($this->can_switch(complete::class)) {
-            $this->object->switch_state(complete::class);
-        }
+        $this->object->switch_state(complete::class);
+    }
+
+    public function on_participant_access(): void {
+        $this->object->switch_state(in_progress::class);
     }
 }

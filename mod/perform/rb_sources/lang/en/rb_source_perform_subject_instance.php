@@ -30,6 +30,7 @@ $string['date_created'] = 'Date subject instance created';
 $string['instance_count'] = 'Instance count';
 $string['participant_count'] = 'Participant count';
 $string['perform_type'] = 'Performance type';
+$string['subject_instance_status'] = 'Status of subject instance';
 $string['subject_name'] = 'Subject\'s full name';
 
 $string['type_participant_instance'] = 'Participant instance';

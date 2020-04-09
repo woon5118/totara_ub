@@ -36,9 +36,9 @@ class state_helper {
      * Get all state classes for the given object type.
      *
      * @param string $object_type
-     * @return string[]
+     * @return state[]
      */
-    public static function get_all_states(string $object_type): array {
+    public static function get_all(string $object_type): array {
         return \core_component::get_namespace_classes(
             'state\\' . $object_type,
             'mod_perform\state\state',
@@ -47,16 +47,30 @@ class state_helper {
     }
 
     /**
+     * Get an array of all translated state names, indexed by state code.
+     *
+     * @param string $object_type
+     * @return array
+     */
+    public static function get_all_display_names(string $object_type): array {
+        $translated = [];
+        foreach (self::get_all($object_type) as $state_class) {
+            $translated[$state_class::get_code()] = $state_class::get_display_name();
+        }
+        return $translated;
+    }
+
+    /**
      * Get state class from DB code.
      *
      * @param int $code The code to create a state of.
      * @param string $object_type
-     * @return string
+     * @return string|state
      */
     public static function from_code(int $code, string $object_type): string {
-        $all_states = static::get_all_states($object_type);
+        $all_states = static::get_all($object_type);
         foreach ($all_states as $state_class) {
-            if (call_user_func([$state_class, 'get_code']) === $code) {
+            if ($state_class::get_code() === $code) {
                 return $state_class;
             }
         }

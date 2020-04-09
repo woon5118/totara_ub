@@ -870,5 +870,19 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020042001, 'perform');
     }
 
+    if ($oldversion < 2020042200) {
+        // Define field progress to be added to perform_subject_instance.
+        $table = new xmldb_table('perform_subject_instance');
+        $field = new xmldb_field('progress', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'subject_user_id');
+
+        // Conditionally launch add field progress.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020042200, 'perform');
+    }
+
     return true;
 }

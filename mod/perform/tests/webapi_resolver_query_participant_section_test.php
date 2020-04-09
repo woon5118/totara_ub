@@ -65,7 +65,7 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
 
             $this->assertEquals($participant_section->id, $result['id']);
             $this->assertSame($participant_section->section->title, $result['section']['title']);
-            $this->assertSame('NOT_STARTED', $result['progress_status']);
+            $this->assertSame('IN_PROGRESS', $result['progress_status']);
 
             $section_element_responses = $result['section_element_responses'];
 

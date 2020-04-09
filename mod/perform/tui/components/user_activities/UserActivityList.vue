@@ -24,11 +24,16 @@
   <Loader :loading="$apollo.loading">
     <Table v-if="!$apollo.loading" :data="subjectInstances">
       <template v-slot:header-row>
-        <HeaderCell :size="showSubjectName ? '6' : '8'">
+        <HeaderCell :size="isAboutOthers ? '4' : '8'">
           {{ $str('user_activities_title_header', 'mod_perform') }}
         </HeaderCell>
-        <HeaderCell v-if="showSubjectName" size="2">
+        <HeaderCell v-if="isAboutOthers" size="2">
           {{ $str('user_activities_subject_header', 'mod_perform') }}
+        </HeaderCell>
+        <HeaderCell v-if="isAboutOthers" size="2">
+          {{
+            $str('user_activities_status_header_relationship', 'mod_perform')
+          }}
         </HeaderCell>
         <HeaderCell size="2">
           {{
@@ -41,7 +46,7 @@
       </template>
       <template v-slot:row="{ row: subjectInstance }">
         <Cell
-          :size="showSubjectName ? '6' : '8'"
+          :size="isAboutOthers ? '4' : '8'"
           :column-header="$str('user_activities_title_header', 'mod_perform')"
         >
           <a :href="getViewActivityUrl(subjectInstance)">{{
@@ -49,11 +54,20 @@
           }}</a>
         </Cell>
         <Cell
-          v-if="showSubjectName"
+          v-if="isAboutOthers"
           size="2"
           :column-header="$str('user_activities_subject_header', 'mod_perform')"
         >
           {{ subjectInstance.subject_user.fullname }}
+        </Cell>
+        <Cell
+          v-if="isAboutOthers"
+          size="2"
+          :column-header="
+            $str('user_activities_status_header_relationship', 'mod_perform')
+          "
+        >
+          {{ getRelationshipText(subjectInstance.participant_instances) }}
         </Cell>
         <Cell
           size="2"
@@ -62,8 +76,8 @@
           "
         >
           {{
-            getStatusText(
-              subjectInstance.participant_instances[0].progress_status
+            calculateStatusTextFromInstances(
+              subjectInstance.participant_instances
             )
           }}
         </Cell>
@@ -73,7 +87,7 @@
             $str('user_activities_status_header_activity', 'mod_perform')
           "
         >
-          {{ getStatusText(subjectInstance.status) }}
+          {{ getStatusText(subjectInstance.progress_status) }}
         </Cell>
       </template>
     </Table>
@@ -118,7 +132,7 @@ export default {
     aboutFilter() {
       return [this.about.toUpperCase()];
     },
-    showSubjectName() {
+    isAboutOthers() {
       return this.about === ABOUT_OTHERS;
     },
   },
@@ -165,6 +179,38 @@ export default {
           return '';
       }
     },
+    // We have to take into account that there can be several participant instances per row (e.g. when the user is both
+    // appraiser and manager for the subject). So we get an overall status depending on the combination of individual
+    // statuses.
+    calculateStatusTextFromInstances(participantInstances) {
+      let allComplete = true;
+      let allNotStarted = true;
+      participantInstances.forEach(function(participant_instance) {
+        switch (participant_instance.progress_status) {
+          case 'NOT_STARTED':
+            allComplete = false;
+            break;
+          case 'IN_PROGRESS':
+            allComplete = false;
+            allNotStarted = false;
+            break;
+          case 'COMPLETE':
+            allNotStarted = false;
+        }
+      });
+      let calcStatus = allNotStarted
+        ? 'NOT_STARTED'
+        : allComplete
+        ? 'COMPLETE'
+        : 'IN_PROGRESS';
+      return this.getStatusText(calcStatus);
+    },
+    getRelationshipText(participantInstances) {
+      let relationships = participantInstances.map(
+        instance => instance.relationship_name
+      );
+      return relationships.join(', ');
+    },
   },
 };
 </script>
@@ -174,6 +220,7 @@ export default {
       "user_activities_status_complete",
       "user_activities_status_header_activity",
       "user_activities_status_header_participation",
+      "user_activities_status_header_relationship",
       "user_activities_status_in_progress",
       "user_activities_status_not_started",
       "user_activities_subject_header",

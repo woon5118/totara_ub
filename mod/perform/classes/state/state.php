@@ -58,7 +58,14 @@ abstract class state {
      *
      * @return string
      */
-    abstract public function get_name(): string;
+    abstract public static function get_name(): string;
+
+    /**
+     * Get translated state name.
+     *
+     * @return string
+     */
+    abstract public static function get_display_name(): string;
 
     /**
      * state constructor.

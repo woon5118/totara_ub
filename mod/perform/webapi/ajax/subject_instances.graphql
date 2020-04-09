@@ -7,7 +7,7 @@ query mod_perform_subject_instances(
     filters: $filters
   ) {
     id
-    status
+    progress_status
     activity {
       name
     }
@@ -16,6 +16,7 @@ query mod_perform_subject_instances(
     }
     participant_instances {
       progress_status
+      relationship_name
     }
   }
 }

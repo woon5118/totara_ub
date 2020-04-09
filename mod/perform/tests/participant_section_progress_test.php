@@ -36,24 +36,29 @@ use mod_perform\models\response\element_validation_error;
 use mod_perform\models\response\participant_section;
 use mod_perform\state\invalid_state_switch_exception;
 use mod_perform\state\participant_section\complete;
-use mod_perform\state\participant_section\incomplete;
+use mod_perform\state\participant_section\in_progress;
 use mod_perform\state\participant_section\not_started;
 use mod_perform\state\state_helper;
 
 require_once(__DIR__ . '/relationship_testcase.php');
+require_once(__DIR__ . '/state_testcase.php');
 
 /**
  * @group perform
  */
-class mod_perform_participant_section_model_testcase extends advanced_testcase {
+class mod_perform_participant_section_model_testcase extends state_testcase {
+
+    protected static function get_object_type(): string {
+        return 'participant_section';
+    }
 
     public function state_transitions_data_provider(): array {
         return [
-            'Not started to incomplete' => [not_started::class, incomplete::class, true],
+            'Not started to in progress' => [not_started::class, in_progress::class, true],
             'Not started to complete' => [not_started::class, complete::class, true],
-            'Incomplete to complete' => [incomplete::class, complete::class, true],
+            'In progress to complete' => [in_progress::class, complete::class, true],
             'Not started to not started' => [not_started::class, not_started::class, false],
-            'Complete to incomplete' => [complete::class, incomplete::class, false],
+            'Complete to in progress' => [complete::class, in_progress::class, false],
         ];
     }
 
@@ -99,13 +104,12 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
         $this->assert_section_updated_event($sink, $participant_section, $subject_user->id);
     }
 
-    public function test_duplicate_state_codes(): void {
-        $all_states = state_helper::get_all_states('participant_section');
-        $this->assertGreaterThanOrEqual(3, count($all_states));
-        $all_codes = array_unique(array_map(function (string $state_class) {
-            return call_user_func([$state_class, 'get_code']);
-        }, $all_states));
-        $this->assertCount(count($all_states), $all_codes);
+    public function test_get_all_translated() {
+        $this->assertEqualsCanonicalizing([
+            20 => 'Complete',
+            10 => 'In progress',
+            0 => 'Not started',
+        ], state_helper::get_all_display_names('participant_section'));
     }
 
     /**
@@ -127,7 +131,7 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
 
         $this->assertEquals($participant_section->get_context(), $event->get_context());
 
-        $only_activity = new activity(activity_entity::repository()->one());
+        $only_activity = activity::load_by_entity(activity_entity::repository()->one());
 
         $this->assertEquals($only_activity->get_context(), $event->get_context());
 
@@ -146,7 +150,7 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
         self::assertEquals(
             not_started::get_code(),
             $participant_section->progress,
-            'Participant section should start with the incomplete status'
+            'Participant section should start with the in_progress status'
         );
 
         $participant_section->set_element_responses($responses);
@@ -175,7 +179,7 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
         self::assertEquals(
             not_started::get_code(),
             $participant_section->progress,
-            'Participant section should start with the incomplete status'
+            'Participant section should start with the in_progress status'
         );
 
         $participant_section->set_element_responses(new collection($element_responses));

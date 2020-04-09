@@ -49,7 +49,7 @@ class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_pe
 
         $expected = [
             'id' => self::$about_user_and_participating->id,
-            'status' => self::$about_user_and_participating->get_status(),
+            'progress_status' => self::$about_user_and_participating->get_progress_status(),
             'activity' => [
                 'name' => self::$about_user_and_participating->get_activity()->name
             ],

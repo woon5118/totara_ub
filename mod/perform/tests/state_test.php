@@ -24,9 +24,12 @@
 use mod_perform\state\condition;
 use mod_perform\state\invalid_state_switch_exception;
 use mod_perform\state\state as base_state;
+use mod_perform\state\state_helper;
 use mod_perform\state\transition;
 
 /**
+ * Test some basic functionality of state and transition classes.
+ *
  * @group perform
  */
 class mod_perform_state_testcase extends advanced_testcase {
@@ -93,8 +96,12 @@ class test_state extends base_state {
         return 123;
     }
 
-    public function get_name(): string {
+    public static function get_name(): string {
         return 'TEST_STATE';
+    }
+
+    public static function get_display_name(): string {
+        return 'test state';
     }
 }
 
@@ -107,8 +114,12 @@ class test_state_2 extends base_state {
         return 200;
     }
 
-    public function get_name(): string {
+    public static function get_name(): string {
         return 'TEST_STATE_2';
+    }
+
+    public static function get_display_name(): string {
+        return 'test state 2';
     }
 }
 
@@ -121,7 +132,11 @@ class test_state_3 extends base_state {
         return 300;
     }
 
-    public function get_name(): string {
+    public static function get_name(): string {
         return 'TEST_STATE_3';
+    }
+
+    public static function get_display_name(): string {
+        return 'test state 3';
     }
 }

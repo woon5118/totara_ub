@@ -18,7 +18,7 @@ Feature: Viewing and responding to perform activities
     When I navigate to the outstanding perform activities list page
     Then I should see the tui datatable contains:
       | Activity title                | Your progress   | Overall activity progress |
-      | John is participating subject | Not yet started | In progress               |
+      | John is participating subject | Not yet started | Not yet started           |
 
     When I click on "John is participating subject" "link"
     Then I should see "John is participating subject" in the ".tui-performUserActivity h2" "css_element"
@@ -52,7 +52,7 @@ Feature: Viewing and responding to perform activities
     And I click on "Activities about others" "link"
     Then I should see the tui datatable contains:
       | Activity title   | User      | Your progress   | Overall activity progress |
-      | David is subject | David Two | Not yet started | In progress               |
+      | David is subject | David Two | Not yet started | Not yet started           |
 
     When I click on "David is subject" "link"
     Then I should see "David is subject" in the ".tui-performUserActivity h2" "css_element"
@@ -72,7 +72,7 @@ Feature: Viewing and responding to perform activities
     And the "Activities about others" tui tab should be active
     And I should see the tui datatable contains:
       | Activity title   | User      | Your progress | Overall activity progress |
-      | David is subject | David Two | Complete      | In progress               |
+      | David is subject | David Two | Complete      | Complete                  |
 
   Scenario: I can't visit activities that don't exist
     Given I log in as "john"
@@ -80,3 +80,18 @@ Feature: Viewing and responding to perform activities
     Then I should not see "Submit"
     Then I should not see "Cancel"
     Then I should see "The requested performance activity could not be found." in the tui "error" notification banner
+
+  Scenario: First access of a section changes both my progress and overall progress to 'In Progress'
+    Given I log in as "john"
+    When I navigate to the outstanding perform activities list page
+    Then I should see the tui datatable contains:
+      | Activity title                | Your progress   | Overall activity progress |
+      | John is participating subject | Not yet started | Not yet started           |
+
+    When I click on "John is participating subject" "link"
+    Then I should see "Part one"
+
+    When I navigate to the outstanding perform activities list page
+    Then I should see the tui datatable contains:
+      | Activity title                | Your progress   | Overall activity progress |
+      | John is participating subject | In progress     | In progress               |

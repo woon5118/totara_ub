@@ -24,6 +24,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 use mod_perform\rb\traits\participant_subject_instance_source;
+use mod_perform\state\state_helper;
 use totara_core\advanced_feature;
 use totara_job\rb\source\report_trait;
 
@@ -261,11 +262,6 @@ class rb_source_perform_participant_instance extends rb_base_source {
      * @return array
      */
     protected function define_filteroptions() {
-        $options = [
-            '20' => get_string('user_activities_status_complete', 'mod_perform'),
-            '10' => get_string('user_activities_status_in_progress', 'mod_perform'),
-            '0' => get_string('user_activities_status_not_started', 'mod_perform'),
-        ];
         $filteroptions = [
             // Participant name
             new rb_filter_option(
@@ -288,7 +284,7 @@ class rb_source_perform_participant_instance extends rb_base_source {
                 get_string('participant_status', 'rb_source_perform_participant_instance'),
                 'select',
                 [
-                    'selectchoices' => $options,
+                    'selectchoices' => state_helper::get_all_display_names('participant_instance'),
                     'simplemode' => true
                 ]
             ),
