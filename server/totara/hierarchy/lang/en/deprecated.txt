@@ -28,3 +28,4 @@ organisationdeletecheck,totara_hierarchy
 positiondeletecheck,totara_hierarchy
 confirmframeworkdeletion,totara_hierarchy
 deletecheckframework,totara_hierarchy
+assignedcompetencies,totara_hierarchy

@@ -89,7 +89,6 @@ $string['assigncoursecompletiontocompetencies'] = 'Assign course completion to c
 $string['assigncoursecompletiontocompetency'] = 'Assign course completion to competency';
 $string['assigncoursecompletiontogoal'] = 'Assign course completion to goal';
 $string['assigncoursecompletiontogoals'] = 'Assign course completion to goals';
-$string['assignedcompetencies'] = 'Assigned Competencies';
 $string['assignedcompetenciesandtemplates'] = 'Assigned Competencies and Competency Templates';
 $string['assignedcompetencytemplates'] = 'Assigned competency templates';
 $string['assignedgoals'] = 'Assigned Goals';
@@ -952,6 +951,8 @@ $string['invalidnumeric'] = 'Numerical value must be numerical (or not set)';
 $string['invalidscalenumericalvalue'] = 'Numerical value is outside the allowed range';
 $string['invalidtargetdate'] = 'The target date you have set is in the past';
 $string['itemstoadd'] = 'Items to add';
+$string['linkcompetencies'] = 'Link competencies';
+$string['linkedcompetencies'] = 'Linked Competencies';
 $string['linkcourses'] = 'Link courses';
 $string['linktoscalevalues'] = 'View/edit the scale values for this competency scale.';
 $string['linktoscalevaluesgoal'] = 'View/edit the scale values for this goal scale.';
@@ -1020,6 +1021,7 @@ $string['nogoal'] = 'No goals defined';
 $string['nogoalsassignedtoposition'] = 'No goals assigned to position';
 $string['nogoalscales'] = 'You must define at least one goal scale with values before you can define a goal framework.';
 $string['nogoalsinframework'] = 'No goals in this framework';
+$string['nolinkedcompetencies'] = 'No Linked Competencies';
 $string['nomanager'] = 'No managers defined';
 $string['nonsensicalproficientvalues'] = 'Warning: You have proficient values below non-proficient values in this scale. Remember that your scale should be ordered from most proficient at the top, to least proficient at the bottom.';
 $string['noorganisation'] = 'No organisations defined';
@@ -1335,6 +1337,7 @@ $string['xitemsdeleted'] = '{$a->num} {$a->items} and all children have been del
 $string['xitemsmoved'] = '{$a->num} {$a->items} and all children have been moved';
 
 // Deprecated in 13
+$string['assignedcompetencies'] = 'Assigned Competencies';
 $string['competencyscalevalueconfirmtitle'] = 'Confirm updates to scale values';
 $string['competencyscalevalueconfirmproficient'] = 'The proficiency status of users currently assigned to competencies using this scale may be affected.
 

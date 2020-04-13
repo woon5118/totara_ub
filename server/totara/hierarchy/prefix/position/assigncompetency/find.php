@@ -35,7 +35,7 @@ require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
 position::check_feature_enabled();
 
 // Page title
-$pagetitle = 'assigncompetencies';
+$pagetitle = 'linkcompetencies';
 
 ///
 /// Params

@@ -309,7 +309,7 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
         require_once($CFG->libdir . '/tablelib.php');
         require_once($CFG->dirroot . '/totara/plan/lib.php');
 
-        if ($displaytitle == 'assignedcompetencies') {
+        if ($displaytitle == 'linkedcompetencies') {
             $columns = array('type', 'name');
             $headers = array(
             get_string('type', 'totara_hierarchy'),
@@ -349,7 +349,7 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                 $content = array();
                 $content[] = empty($ritem->type) ? get_string('unclassified', 'totara_hierarchy') : $ritem->type;
 
-                if ($displaytitle == 'assignedcompetencies') {
+                if ($displaytitle == 'linkedcompetencies') {
                     $content[] = $this->output->action_link(new moodle_url('/totara/hierarchy/item/view.php', array('prefix' => $displayprefix, 'id' => $ritem->id)), format_string($ritem->fullname));
                 } elseif ($displaytitle == 'assignedcompetencytemplates') {
                     $content[] = $this->output->action_link(new moodle_url('/totara/hierarchy/prefix/competency/template/view.php', array('id' => $ritem->id)), format_string($ritem->fullname));

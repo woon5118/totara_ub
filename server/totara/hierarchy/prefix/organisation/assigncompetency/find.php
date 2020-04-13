@@ -31,7 +31,7 @@ require_once($CFG->dirroot.'/totara/hierarchy/prefix/organisation/lib.php');
 require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
 
 // Page title
-$pagetitle = 'assigncompetencies';
+$pagetitle = 'linkcompetencies';
 
 ///
 /// Params

@@ -31,7 +31,7 @@ define(['jquery', 'core/config'], function($, mdlconfig) {
          * @param prefix string the hierarchy type to work with
          */
         init: function (linktype) {
-            var selector = '.list-assignedcompetencies .menulinktype,'
+            var selector = '.list-linkedcompetencies .menulinktype,'
                     + ' #list-evidence .menulinktype, #list-coursecompetency .menulinktype';
             $(document).on('change', selector, function () {
                 hierarchy._update_linktype(linktype, $(this).data('id'), $(this).val());

@@ -119,8 +119,8 @@ M.totara_organisationitem = M.totara_organisationitem || {
             var id = M.totara_organisationitem.config.id;
             var fid = M.totara_organisationitem.config.frameworkid;
             totaraMultiSelectDialog(
-                'assignedcompetencies',
-                M.util.get_string('assigncompetencies', 'totara_hierarchy'),
+                'linkedcompetencies',
+                M.util.get_string('linkcompetencies', 'totara_hierarchy'),
                 url+'find.php?assignto='+id+'&frameworkid='+fid+'&add=',
                 url+'assign.php?assignto='+id+'&frameworkid='+fid+'&deleteexisting=1&add='
             );
@@ -131,7 +131,7 @@ M.totara_organisationitem = M.totara_organisationitem || {
         // element because it has a new, unique ID different from when rendered
         // on page load.
         var formid = 'switchframework';
-        $(totaraDialogs.assignedcompetencies.dialog).on('ajaxComplete', function(event) {
+        $(totaraDialogs.linkedcompetencies.dialog).on('ajaxComplete', function(event) {
 
             // to be double sure our newly appended DOM elements are ready to
             // have a listener bound by a component action generated ID, respond

@@ -75,7 +75,7 @@ class position extends hierarchy {
                              . '"sesskey":"' . sesskey() . '",'
                              . '"can_edit": true}');
 
-        $PAGE->requires->strings_for_js(array('assigncompetencies', 'assigncompetencytemplate', 'assigngoals'), 'totara_hierarchy');
+        $PAGE->requires->strings_for_js(array('linkcompetencies', 'assigncompetencytemplate', 'assigngoals'), 'totara_hierarchy');
 
         // Include position user js modules.
         $jsmodule = array(
@@ -101,12 +101,12 @@ class position extends hierarchy {
         $comptype = optional_param('comptype', 'competencies', PARAM_TEXT);
         $renderer = $PAGE->get_renderer('totara_hierarchy');
 
-        if (advanced_feature::is_enabled('competencies')) {
+        if (advanced_feature::is_enabled('competencies') && advanced_feature::is_disabled('competency_assignment')) {
             // Spacing.
             echo html_writer::empty_tag('br');
 
-            echo html_writer::start_tag('div', array('class' => "list-assignedcompetencies"));
-            echo $OUTPUT->heading(get_string('assignedcompetencies', 'totara_hierarchy'));
+            echo html_writer::start_tag('div', array('class' => "list-linkedcompetencies"));
+            echo $OUTPUT->heading(get_string('linkedcompetencies', 'totara_hierarchy'));
 
             echo $this->print_comp_framework_picker($item->id, $frameworkid);
 
@@ -114,7 +114,7 @@ class position extends hierarchy {
                 // Display assigned competencies
                 $items = $this->get_assigned_competencies($item, $frameworkid);
                 $addurl = new moodle_url('/totara/hierarchy/prefix/position/assigncompetency/find.php', array('assignto' => $item->id));
-                $displaytitle = 'assignedcompetencies';
+                $displaytitle = 'linkedcompetencies';
             } else if ($comptype == 'comptemplates') {
                 // Display assigned competencies
                 $items = $this->get_assigned_competency_templates($item, $frameworkid);
