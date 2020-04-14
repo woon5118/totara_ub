@@ -125,8 +125,12 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
                 }
 
                 if (e.target.closest('[data-cc-add-pathway]')) {
-                    var selectedOption = e.target.closest('[data-cc-add-pathway]').querySelector('option:checked');
-                    that.addPath(selectedOption);
+                    var addPathwayNode = e.target.closest('[data-cc-add-pathway]'),
+                        selectedOption = addPathwayNode.querySelector('option:checked');
+                    if (selectedOption.value != '0') {
+                        that.addPath(selectedOption);
+                        addPathwayNode.value = '0';
+                    }
                 } else if (e.target.closest('[data-cc-pw-agg-changed]')) {
                     that.setOverallAggregation(true);
                     that.dirty = true;
